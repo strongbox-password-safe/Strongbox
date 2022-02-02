@@ -324,7 +324,7 @@
     }];
 }
 
-- (void)onFilesGotData:(NSData*)data metadata:(SafeMetaData*)metadata {
+- (void)onFilesGotData:(NSData*)data metadata:(DatabasePreferences*)metadata {
     self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:self.exportFileName];
     
     NSError* error;

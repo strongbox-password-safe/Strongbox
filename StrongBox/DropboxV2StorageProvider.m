@@ -53,7 +53,7 @@
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
+        completion:(void (^)(DatabasePreferences *metadata, const NSError *error))completion {
     [SVProgressHUD show];
 
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
@@ -72,7 +72,7 @@
       });
 
       if (error == nil) {
-          SafeMetaData *metadata = [[SafeMetaData alloc] initWithNickName:nickName
+          DatabasePreferences *metadata = [DatabasePreferences templateDummyWithNickName:nickName
                                                           storageProvider:self.storageId
                                                                  fileName:desiredFilename
                                                            fileIdentifier:parentFolderPath];
@@ -85,7 +85,7 @@
     }];
 }
 
-- (void)pullDatabase:(SafeMetaData *)safeMetaData
+- (void)pullDatabase:(DatabasePreferences *)safeMetaData
     interactiveVC:(UIViewController *)viewController
            options:(StorageProviderReadOptions *)options
         completion:(StorageProviderReadCompletionBlock)completion {
@@ -184,7 +184,7 @@
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
     [self createOrUpdate:viewController path:path data:data completion:completion];
 }
@@ -433,11 +433,11 @@
     return ret;
 }
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
     DBFILESFileMetadata *file = (DBFILESFileMetadata *)providerData;
     NSString *parent = (file.pathLower).stringByDeletingLastPathComponent;
 
-    return [[SafeMetaData alloc] initWithNickName:nickName
+    return [DatabasePreferences templateDummyWithNickName:nickName
                                   storageProvider:self.storageId
                                          fileName:file.name
                                    fileIdentifier:parent];
@@ -448,7 +448,7 @@
     
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
+- (void)delete:(DatabasePreferences *)safeMetaData completion:(void (^)(const NSError *))completion {
     
 }
 

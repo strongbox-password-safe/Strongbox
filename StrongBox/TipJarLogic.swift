@@ -10,12 +10,12 @@ import UIKit
 
 extension Notification.Name {
     enum Tips {
-        static let loaded = Notification.Name( "TipsLoadedNotification" )
+        static let loaded = Notification.Name("TipsLoadedNotification")
     }
 }
 
-class TipJarLogic : NSObject {
-    enum Tip : String, CaseIterable {
+class TipJarLogic: NSObject {
+    enum Tip: String, CaseIterable {
         case monthly = "tip.monthly"
         case annual = "tip.yearly"
         case little = "tip.little"
@@ -24,113 +24,122 @@ class TipJarLogic : NSObject {
         case large = "tip.large"
         case huge = "tip.huge"
     }
-    
+
     @objc
     static let sharedInstance = TipJarLogic()
 
-    private var appStoreProducts : [ Tip : SKProduct ] = [ : ]
-    
-    private override init() {
+    private var appStoreProducts: [Tip: SKProduct] = [:]
+
+    override private init() {
         super.init()
-        
+
         DispatchQueue.global().async {
             self.loadTips()
         }
     }
-    
+
     @objc
-    var isLoaded : Bool = false {
+    var isLoaded: Bool = false {
         didSet {
             notifyLoaded()
         }
     }
-        
-    private var errorLoading : Bool = false
-    
-    func notifyLoaded () {
+
+    private var errorLoading: Bool = false
+
+    func notifyLoaded() {
         NotificationCenter.default.post(name: .Tips.loaded, object: nil)
     }
-    
-    private func getProductId( _ tip : Tip ) -> String {
-        if ( CustomizationManager.isAProBundle ) { 
+
+    private func getProductId(_ tip: Tip) -> String {
+        if CustomizationManager.isAProBundle { 
             return String(format: "pro.%@", tip.rawValue)
-        }
-        else {
+        } else {
             return tip.rawValue
         }
     }
-    
+
     private func loadTips() {
         let productIds = Tip.allCases.map { tip in
-            return getProductId(tip)
+            getProductId(tip)
         }
-        
+
         RMStore.default().requestProducts(Set(productIds)) { [weak self] products, invalidProducts in
             guard let self = self else { return }
-            
-            if ( invalidProducts != nil && !invalidProducts!.isEmpty ) {
+
+            if invalidProducts != nil && !invalidProducts!.isEmpty {
                 NSLog("Got Invalid Tips = [%@]", invalidProducts ?? "nil")
             }
-        
+
             guard let ps = products else {
                 NSLog("🔴 WARNWARN: Nil Tip Products Returned from App Store")
                 self.errorLoading = true
                 return
             }
-            
-            self.appStoreProducts = ps.reduce(into: [ Tip : SKProduct ](), { partialResult, product in
-                let p : SKProduct = product as! SKProduct
-                let tip = Tip(rawValue: p.productIdentifier)!
-                partialResult[tip] = p
-            })
-            
+
+            self.appStoreProducts = ps.reduce(into: [Tip: SKProduct]()) { partialResult, product in
+                let p: SKProduct = product as! SKProduct
+
+                var pid: String = p.productIdentifier
+                if pid.starts(with: "pro.") {
+                    let index = pid.index(pid.startIndex, offsetBy: 4)
+                    pid = String(pid[index...])
+                }
+
+                let tip = Tip(rawValue: pid)
+
+                if tip != nil {
+                    partialResult[tip!] = p
+                }
+            }
+
             self.isLoaded = true
         } failure: { [weak self] error in
             guard let self = self else { return }
-            
+
             let err = error as NSError?
-            if ( err != nil ) {
+            if err != nil {
                 NSLog("🔴 WARNWARN: Error getting Tips Products: [%@]", err!)
             }
+
             
-            
-            
+
             self.errorLoading = true
         }
     }
-        
-    func getTipPrice( _ tip : Tip ) -> String {
-        if ( errorLoading ) {
+
+    func getTipPrice(_ tip: Tip) -> String {
+        if errorLoading {
             return NSLocalizedString("generic_error", comment: "Error")
         }
-        
+
         guard let product = appStoreProducts[tip] else {
             return NSLocalizedString("generic_loading", comment: "Loading...")
         }
-        
+
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = product.priceLocale
-                
+
         let localCurrency = formatter.string(from: product.price) ?? NSLocalizedString("generic_error", comment: "Error")
 
         return localCurrency
     }
-    
-    func purchase ( _ tip : Tip, completion : @escaping (_ error : Error?) -> Void ) {
-        if( !SKPaymentQueue.canMakePayments() ) {
+
+    func purchase(_ tip: Tip, completion: @escaping (_ error: Error?) -> Void) {
+        if !SKPaymentQueue.canMakePayments() {
             let errorMessage = NSLocalizedString("upgrade_mgr_purchases_are_disabled", comment: "Purchases are disabled on your device.")
             let error = Utils.createNSError(errorMessage, errorCode: -1)
-            completion ( error )
+            completion(error)
             return
         }
-        
+
         RMStore.default().addPayment(getProductId(tip)) { transaction in
             NSLog("Product purchased: [%@]", transaction!)
             completion(nil)
         } failure: { transaction, error in
             NSLog("Something went wrong: [%@] error = [%@]", transaction ?? "nil", error?.localizedDescription ?? "nil")
-            completion( error )
+            completion(error)
         }
     }
 }

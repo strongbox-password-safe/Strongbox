@@ -7,20 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "ConflictResolutionWizardCommon.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-typedef NS_ENUM (NSUInteger, ConflictResolutionWizardResult) {
-    kConflictWizardCancel,
-    kConflictWizardResultAutoMerge,
-    kConflictWizardResultAlwaysAutoMerge,
-    kConflictWizardResultCompare,
-    kConflictWizardResultSyncLater,
-    kConflictWizardResultForcePushLocal,
-    kConflictWizardResultForcePullRemote,
-};
-
-typedef void (^ConflictResolutionWizardBlock)(ConflictResolutionWizardResult result);
 
 @interface ConflictResolutionWizard : UIViewController
 

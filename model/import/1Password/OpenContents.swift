@@ -6,8 +6,8 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-//import Cocoa
+// import Cocoa
 
 class OpenContents: Decodable {
-    var tags : [String]? = nil
+    var tags: [String]? = nil
 }

@@ -39,7 +39,9 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 
     [self loadStatistics];
     
-    self.metadataKvps = [self.viewModel.database.meta filteredKvpForUIWithFormat:self.viewModel.database.originalFormat];
+    
+    
+    self.metadataKvps = [[MutableOrderedDictionary alloc] init];
     
     self.customData = [[MutableOrderedDictionary alloc] init];
     NSArray* sortedKeys = [self.viewModel.database.meta.customData.allKeys sortedArrayUsingComparator:finderStringComparator];
@@ -135,6 +137,9 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
     if ( section == kSectionCustomDataIdx && self.customData.count == 0 ) {
         return CGFLOAT_MIN;
     }
+    else if ( section == kSectionPropertiesIdx ) {
+        return CGFLOAT_MIN;
+    }
     
     return UITableViewAutomaticDimension;
 }
@@ -143,7 +148,10 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
     if ( section == kSectionCustomDataIdx && self.customData.count == 0 ) {
         return CGFLOAT_MIN;
     }
-
+    else if ( section == kSectionPropertiesIdx ) {
+        return CGFLOAT_MIN;
+    }
+    
     return UITableViewAutomaticDimension;
 }
 

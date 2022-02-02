@@ -9,11 +9,8 @@
 import Foundation
 
 struct DarkMode {
-    static var isOn : Bool { // TODO: Test this
-        get {
-            let osxMode : String? = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
-            
-            return osxMode != nil && osxMode == "Dark"
-        }
+    static var isOn: Bool {
+        let osxMode: String? = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
+        return osxMode != nil && osxMode == "Dark"
     }
 }

@@ -13,7 +13,6 @@
 #import "Utils.h"
 #import "UIColor+Extensions.h"
 #import "Alerts.h"
-#import "DatabaseSearchAndSorter.h"
 #import "DatabaseDiffer.h"
 #import "SVProgressHUD.h"
 #import "AppPreferences.h"
@@ -26,9 +25,9 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonDone;
 
 @property NSArray<Node*>* willBeAddedOrOnlyInSecond;
-@property NSArray<Pair<Node*, Node*>*>* willBeChangedOrEdited;
+@property NSArray<MMcGPair<Node*, Node*>*>* willBeChangedOrEdited;
 @property NSArray<Node*>* willChangeHistoryOrHasDifferentHistory;
-@property NSArray<Pair<Node*, Node*>*>* willBeMovedOrDifferentLocation;
+@property NSArray<MMcGPair<Node*, Node*>*>* willBeMovedOrDifferentLocation;
 @property NSArray<Node*>* willBeDeletedOrOnlyInFirst;
 
 @property DiffSummary* diffSummary;
@@ -82,27 +81,21 @@
 - (DiffSummary*)diff {
     DiffSummary* summary = [DatabaseDiffer diff:self.firstDatabase.database second:self.secondDatabase.database];
     
-    DatabaseSearchAndSorter *sorter = [[DatabaseSearchAndSorter alloc] initWithModel:self.firstDatabase.database
-                                                                     browseSortField:self.firstDatabase.metadata.browseSortField
-                                                                          descending:self.firstDatabase.metadata.browseSortOrderDescending
-                                                                   foldersSeparately:YES
-                                                                         checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled];
-    
     
     
     NSArray<Node*>* created = [summary.onlyInSecond map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [self.secondDatabase.database getItemById:obj];
     }];
     
-    self.willBeAddedOrOnlyInSecond = [sorter sortItemsForBrowse:created];
-    
+    self.willBeAddedOrOnlyInSecond = [self.firstDatabase sortItemsForBrowse:created browseSortField:self.firstDatabase.metadata.browseSortField descending:self.firstDatabase.metadata.browseSortOrderDescending foldersSeparately:YES];
+        
     
     
     NSArray<Node*>* deleted = [summary.onlyInFirst map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [self.firstDatabase.database getItemById:obj];
     }];
-    
-    self.willBeDeletedOrOnlyInFirst = [sorter sortItemsForBrowse:deleted];
+
+    self.willBeDeletedOrOnlyInFirst = [self.firstDatabase sortItemsForBrowse:deleted browseSortField:self.firstDatabase.metadata.browseSortField descending:self.firstDatabase.metadata.browseSortOrderDescending foldersSeparately:YES];
     
     
     
@@ -110,17 +103,17 @@
         return [self.firstDatabase.database getItemById:obj];
     }];
     
-    self.willChangeHistoryOrHasDifferentHistory = [sorter sortItemsForBrowse:history];
+    self.willChangeHistoryOrHasDifferentHistory = [self.firstDatabase sortItemsForBrowse:history browseSortField:self.firstDatabase.metadata.browseSortField descending:self.firstDatabase.metadata.browseSortOrderDescending foldersSeparately:YES];
     
     
     
     self.willBeChangedOrEdited = [[summary.edited map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         Node* first = [self.firstDatabase.database getItemById:obj];
         Node* second = [self.secondDatabase.database getItemById:obj];
-        return [Pair pairOfA:first andB:second];
+        return [MMcGPair pairOfA:first andB:second];
     }] sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        Pair<Node*, Node*>* first = obj1;
-        Pair<Node*, Node*>* second = obj2;
+        MMcGPair<Node*, Node*>* first = obj1;
+        MMcGPair<Node*, Node*>* second = obj2;
         return finderStringCompare(first.a.title, second.a.title);
     }];
     
@@ -129,10 +122,10 @@
     self.willBeMovedOrDifferentLocation = [[summary.moved map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         Node* first = [self.firstDatabase.database getItemById:obj];
         Node* second = [self.secondDatabase.database getItemById:obj];
-        return [Pair pairOfA:first andB:second];
+        return [MMcGPair pairOfA:first andB:second];
     }] sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        Pair<Node*, Node*>* first = obj1;
-        Pair<Node*, Node*>* second = obj2;
+        MMcGPair<Node*, Node*>* first = obj1;
+        MMcGPair<Node*, Node*>* second = obj2;
         return finderStringCompare(first.a.title, second.a.title);
     }];
     
@@ -223,7 +216,7 @@
         return cell;
     }
     else if (indexPath.section == 1) {
-        Pair<Node*, Node*>* diffPair = self.willBeChangedOrEdited[indexPath.row];
+        MMcGPair<Node*, Node*>* diffPair = self.willBeChangedOrEdited[indexPath.row];
         UITableViewCell* cell = [self.browseCellHelperFirstDatabase getBrowseCellForNode:diffPair.a indexPath:indexPath showLargeTotpCell:NO showGroupLocation:NO groupLocationOverride:nil accessoryType:UITableViewCellAccessoryDisclosureIndicator noFlags:YES];
         
         return cell;
@@ -238,7 +231,7 @@
         return cell;
     }
     else if (indexPath.section == 3) {
-        Pair<Node*, Node*>* diffPair = self.willBeMovedOrDifferentLocation[indexPath.row];
+        MMcGPair<Node*, Node*>* diffPair = self.willBeMovedOrDifferentLocation[indexPath.row];
         UITableViewCell* cell = [self.browseCellHelperFirstDatabase getBrowseCellForNode:diffPair.a indexPath:indexPath showLargeTotpCell:NO showGroupLocation:NO groupLocationOverride:nil accessoryType:UITableViewCellAccessoryDisclosureIndicator noFlags:YES];
         return cell;
     }
@@ -390,7 +383,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 
-    Pair<Node*, Node*>* diffPair = nil;
+    MMcGPair<Node*, Node*>* diffPair = nil;
 
     if (indexPath.section == 0 && indexPath.row == 1) {
         [self performSegueWithIdentifier:@"segueToDiffDrillDown" sender:diffPair];

@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabasePropertiesVC : UITableViewController
 
-@property SafeMetaData* database;
+@property NSString* databaseUuid;
 
 @end
 

@@ -6,11 +6,11 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-//import Cocoa
+// import Cocoa
 
 class SectionField: Decodable {
-    var v : JSONAny? // Value
-    var t : String? // Title
-    var k : String? // Data type
-    var n : String? // Data type
+    var v: JSONAny? // Value
+    var t: String? // Title
+    var k: String? // Data type
+    var n: String? // Data type
 }

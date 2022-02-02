@@ -8,7 +8,6 @@
 
 #import "SafeStorageProviderFactory.h"
 
-
 #if TARGET_OS_IPHONE
 
 #import "LocalDeviceStorageProvider.h"

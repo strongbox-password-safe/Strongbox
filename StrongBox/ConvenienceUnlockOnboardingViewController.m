@@ -12,7 +12,7 @@
 #import "PinEntryController.h"
 #import "Alerts.h"
 #import "RoundedBlueButton.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @interface ConvenienceUnlockOnboardingViewController ()
 
@@ -64,8 +64,6 @@
     self.model.metadata.convenienceMasterPassword = self.model.database.ckfs.password;
     self.model.metadata.hasBeenPromptedForConvenience = YES;
     
-    [SafesList.sharedInstance update:self.model.metadata];
-    
     if ( self.onDone ) {
         self.onDone(NO, NO);
     }
@@ -82,8 +80,6 @@
     self.model.metadata.convenienceMasterPassword = nil;
     self.model.metadata.autoFillConvenienceAutoUnlockPassword = nil;
     self.model.metadata.hasBeenPromptedForConvenience = YES;
-
-    [SafesList.sharedInstance update:self.model.metadata];
     
     if ( self.onDone ) {
         self.onDone(NO, NO);
@@ -95,8 +91,6 @@
     self.model.metadata.conveniencePasswordHasBeenStored = YES;
     self.model.metadata.convenienceMasterPassword = self.model.database.ckfs.password;
     self.model.metadata.hasBeenPromptedForConvenience = YES;
-
-    [SafesList.sharedInstance update:self.model.metadata];
     
     if ( self.onDone ) {
         self.onDone(NO, NO);
@@ -108,24 +102,19 @@
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     pinEntryVc.isDatabasePIN = YES;
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-        [self dismissViewControllerAnimated:YES completion:^{
-            if(response == kOk) {
-                if(!(self.model.metadata.duressPin != nil && [pin isEqualToString:self.model.metadata.duressPin])) {
-                    [self enrolForPinCodeUnlock:pin];
-                }
-                else {
-                    [Alerts warn:self
-                           title:NSLocalizedString(@"open_sequence_warn_pin_conflict_title", @"PIN Conflict")
-                        message:NSLocalizedString(@"open_sequence_warn_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings")
-                    completion:^{
-                        [self onUseNone:nil];
-                    }];
-                }
+        if( response == kPinEntryResponseOk ) {
+            if(!(self.model.metadata.duressPin != nil && [pin isEqualToString:self.model.metadata.duressPin])) {
+                [self enrolForPinCodeUnlock:pin];
             }
             else {
-
+                [Alerts warn:self
+                       title:NSLocalizedString(@"open_sequence_warn_pin_conflict_title", @"PIN Conflict")
+                    message:NSLocalizedString(@"open_sequence_warn_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings")
+                completion:^{
+                    [self onUseNone:nil];
+                }];
             }
-        }];
+        }
     };
 
     [self presentViewController:pinEntryVc animated:YES completion:nil];

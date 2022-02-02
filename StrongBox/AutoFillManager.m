@@ -12,12 +12,12 @@
 #import "NSArray+Extensions.h"
 #import "SprCompilation.h"
 #import "NSString+Extensions.h"
+#import "CommonDatabasePreferences.h"
 
 #if TARGET_OS_IPHONE
 #import "SVProgressHUD.h"
-#import "SafesList.h"
 #else
-#import "DatabasesManager.h"
+
 #endif
 
 
@@ -372,13 +372,13 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABL
         
 - (NSUInteger)getDatabasesUsingQuickTypeCount {
 #if TARGET_OS_IPHONE
-    NSUInteger databasesUsingQuickType = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+    NSUInteger databasesUsingQuickType = [CommonDatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
         return obj.autoFillEnabled && obj.quickTypeEnabled;
     }].count;
     
 #else
-    NSUInteger databasesUsingQuickType = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
-        return obj.autoFillEnabled && obj.quickTypeEnabled;
+    NSUInteger databasesUsingQuickType = [CommonDatabasePreferences filteredDatabases:^BOOL(MacDatabasePreferences * _Nonnull database) {
+        return database.autoFillEnabled && database.quickTypeEnabled;
     }].count;
 #endif
         

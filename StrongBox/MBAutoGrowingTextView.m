@@ -64,8 +64,7 @@
 
 }
 
-- (void) layoutSubviews
-{
+- (void)layoutSubviews {
     
     
     

@@ -8,7 +8,6 @@
 
 #import "SelectAutoFillDatabaseViewController.h"
 #import "CustomBackgroundTableView.h"
-#import "DatabasesManager.h"
 #import "DatabaseCellView.h"
 #import "NSArray+Extensions.h"
 #import "Settings.h"
@@ -20,7 +19,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 @interface SelectAutoFillDatabaseViewController () <NSTableViewDelegate, NSTableViewDataSource>
 
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
-@property (nonatomic, strong) NSArray<DatabaseMetadata*>* databases;
+@property (nonatomic, strong) NSArray<MacDatabasePreferences*>* databases;
 @property (weak) IBOutlet NSButton *buttonSelect;
 
 @property BOOL viewWillAppearFirstTimeDone;
@@ -67,7 +66,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         if ( self.databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
             NSLog(@"Single Database Launching...");
         
-            DatabaseMetadata* database = self.databases.firstObject;
+            MacDatabasePreferences* database = self.databases.firstObject;
             
             [self dismissViewController:self];
             
@@ -82,7 +81,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     __block BOOL gotResponse = NO;
     __block NSMutableSet<NSString*> *unlocked = NSMutableSet.set;
         
-    for (DatabaseMetadata* database in self.databases) {
+    for (MacDatabasePreferences* database in self.databases) {
         NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, database.uuid];
 
         [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(), @"database-id" : database.uuid }
@@ -118,7 +117,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         if (!gotResponse) {
             NSLog(@"No wormhole response after %f seconds...", timeout);
             
-            for (DatabaseMetadata* database in self.databases) {
+            for (MacDatabasePreferences* database in self.databases) {
                 NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, database.uuid];
                 [self.wormhole stopListeningForMessageWithIdentifier:responseId];
             }
@@ -129,8 +128,8 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 }
 
 - (void)refresh {
-    self.databases = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
-        return obj.autoFillEnabled;
+    self.databases = [MacDatabasePreferences filteredDatabases:^BOOL(MacDatabasePreferences * _Nonnull database) {
+        return database.autoFillEnabled;
     }];
     
     [self.tableView reloadData];
@@ -152,7 +151,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     NSUInteger row = self.tableView.selectedRowIndexes.firstIndex;
     
     if (row != NSNotFound) {
-        DatabaseMetadata* database = self.databases[row];
+        MacDatabasePreferences* database = self.databases[row];
         
         [self dismissViewController:self];
         
@@ -165,7 +164,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 }
 
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
-    DatabaseMetadata* database = [self.databases objectAtIndex:row];
+    MacDatabasePreferences* database = [self.databases objectAtIndex:row];
 
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
     

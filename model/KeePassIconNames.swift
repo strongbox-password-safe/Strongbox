@@ -6,7 +6,7 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-enum KeePassIconNames : Int {
+enum KeePassIconNames: Int {
     case Key
     case World
     case Warning

@@ -45,8 +45,8 @@
 
 - (void)showHideClickableBorder {
     if(_isShowClickableBorder && _isClickable) {
-        self.layer.borderWidth = 1.5f;
-        self.layer.borderColor = [NSColor colorWithRed:0 green:0.5f blue:0.7f alpha:0.65f].CGColor;
+        self.layer.borderWidth = 2.0f;
+        self.layer.borderColor = NSColor.linkColor.CGColor; 
     }
     else {
         self.layer.borderColor = nil;
@@ -58,8 +58,7 @@
 
 
 
-- (void)mouseDown:(NSEvent *)theEvent
-{
+- (void)mouseDown:(NSEvent *)theEvent {
     
 }
 

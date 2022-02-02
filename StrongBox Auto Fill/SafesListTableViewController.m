@@ -7,8 +7,8 @@
 //
 
 #import "SafesListTableViewController.h"
-#import "SafeMetaData.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
+#import "DatabasePreferences.h"
 #import "SafeStorageProviderFactory.h"
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "CredentialProviderViewController.h"
@@ -30,7 +30,7 @@
 
 @interface SafesListTableViewController ()
 
-@property NSArray<SafeMetaData*> *safes;
+@property NSArray<DatabasePreferences*> *safes;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 
 @end
@@ -47,7 +47,7 @@
     
     
     if ( AppPreferences.sharedInstance.autoFillQuickLaunchUuid ) {
-        SafeMetaData* database = [self.safes firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        DatabasePreferences* database = [self.safes firstOrDefault:^BOOL(DatabasePreferences * _Nonnull obj) {
             return [obj.uuid isEqualToString:AppPreferences.sharedInstance.autoFillQuickLaunchUuid];
         }];
      
@@ -64,7 +64,7 @@
     
     
     if ( AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
-        NSArray<SafeMetaData*> *possibles = [self.safes filter:^BOOL(SafeMetaData * _Nonnull obj) {
+        NSArray<DatabasePreferences*> *possibles = [self.safes filter:^BOOL(DatabasePreferences * _Nonnull obj) {
             return [[self getInitialViewController] autoFillIsPossibleWithSafe:obj];
         }];
         
@@ -93,7 +93,7 @@
 }
 
 - (void)refreshSafes {
-    self.safes = SafesList.sharedInstance.snapshot;
+    self.safes = DatabasePreferences.allDatabases;
 
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self.tableView reloadData];
@@ -148,7 +148,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
-    SafeMetaData *safe = [self.safes objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.safes objectAtIndex:indexPath.row];
     
     BOOL autoFillPossible = [[self getInitialViewController] autoFillIsPossibleWithSafe:safe];
 
@@ -162,14 +162,14 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    SafeMetaData* safe = [self.safes objectAtIndex:indexPath.row];
+    DatabasePreferences* safe = [self.safes objectAtIndex:indexPath.row];
  
     [self openDatabase:safe];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-- (void)openDatabase:(SafeMetaData*)safe {
+- (void)openDatabase:(DatabasePreferences*)safe {
     IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
     [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {

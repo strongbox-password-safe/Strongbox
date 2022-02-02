@@ -6,7 +6,6 @@
 //  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
-//#import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -18,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) void (^onBeginEditing)(void);
 @property (nonatomic, copy) void (^onEndEditing)(void);
+@property (nonatomic, nullable, copy) void (^onTextDidChange)(void);
+@property (nonatomic, nullable, copy) void (^onImagePasted)(void);
 
 @end
 

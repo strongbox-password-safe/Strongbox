@@ -12,19 +12,16 @@
 #import "StorageProviderReadResult.h"
 #import "StorageProviderUpdateResult.h"
 #import "StorageProvider.h"
+#import "CrossPlatform.h"
 
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
-    #import "SafeMetaData.h"
     typedef UIViewController* VIEW_CONTROLLER_PTR;
     typedef UIImage* IMAGE_TYPE_PTR;
-    typedef SafeMetaData* METADATA_PTR;
 #else
     #import <Cocoa/Cocoa.h>
-    #import "DatabaseMetadata.h"
     typedef NSViewController* VIEW_CONTROLLER_PTR;
     typedef NSImage* IMAGE_TYPE_PTR;
-    typedef DatabaseMetadata* METADATA_PTR;
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -76,7 +73,7 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(NSDate*_Nullable modDat
 - (void)loadIcon:(NSObject *)providerData viewController:(VIEW_CONTROLLER_PTR )viewController
       completion:(void (^)(IMAGE_TYPE_PTR image))completionHandler;
 
-- (METADATA_PTR _Nullable)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
+- (METADATA_PTR _Nullable)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData;
 
 - (void)getModDate:(METADATA_PTR)safeMetaData
         completion:(StorageProviderGetModDateCompletionBlock)completion;

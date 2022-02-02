@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-import Foundation;
+import Foundation
 
 
 @objc public enum DetectedIconType: UInt {
@@ -40,7 +40,7 @@ import Foundation;
 }
 
 
-@objc public class DetectedIcon : NSObject {
+@objc public class DetectedIcon: NSObject {
     
     @objc public let url: URL
     

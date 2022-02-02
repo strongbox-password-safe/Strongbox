@@ -62,8 +62,6 @@
 
 
 
-
-
 - (BOOL)validateProposedFirstResponder:(NSResponder *)responder forEvent:(NSEvent *)event {
     return YES;
 }

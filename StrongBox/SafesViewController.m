@@ -8,7 +8,7 @@
 
 #import "SafesViewController.h"
 #import "BrowseSafeView.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "Alerts.h"
 #import "SelectStorageProviderController.h"
 #import "DatabaseCell.h"
@@ -90,6 +90,7 @@
 #import "CSVImporter.h"
 #import "CSV.h"
 #import "NSString+Extensions.h"
+#import "SafesList.h"
 
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate>
 
@@ -99,13 +100,13 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonCustomizeView;
 
-@property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
+@property (nonatomic, copy) NSArray<DatabasePreferences*> *collection;
 
 @property NSURL* enqueuedImportUrl;
 @property BOOL enqueuedImportCanOpenInPlace;
 
 @property (nonatomic, strong) NSDate *unlockedDatabaseWentIntoBackgroundAt;
-@property SafeMetaData* unlockedDatabase; 
+@property DatabasePreferences* unlockedDatabase; 
 @property BOOL appLockSuppressedForBiometricAuth;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
@@ -141,8 +142,6 @@
             
     [self setFreeTrialEndDateBasedOnIapPurchase]; 
 
-    [self performMigrations];
-            
     
     
     
@@ -194,62 +193,8 @@
     NSLog(@"SafesViewController::viewDidAppear");
 }
 
-- (void)performMigrations {
-#ifndef NO_SFTP_WEBDAV_SP
-    if ( !AppPreferences.sharedInstance.migratedConnections ) {
-        int wcount = 0;
-        int scount = 0;
-        
-        NSArray* databases = SafesList.sharedInstance.snapshot;
-        
-        for ( SafeMetaData *database in  databases ) {
-            if ( database.storageProvider == kWebDAV ) {
-                WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
-                if (  pd.sessionConfiguration ) {
-                    if ( pd.sessionConfiguration.name.length == 0 ) {
-                        pd.sessionConfiguration.name = [NSString stringWithFormat:@"%@ %@", pd.sessionConfiguration.host, @(++wcount)];
-                    }
-                    [WebDAVConnections.sharedInstance addOrUpdate:pd.sessionConfiguration];
-                    
-                    SafeMetaData* newDatabase = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
-                    
-                    database.fileName = newDatabase.fileName;
-                    database.fileIdentifier = newDatabase.fileIdentifier;
-                    
-                    [SafesList.sharedInstance update:database];
-                    
-                    NSLog(@"Migrated WebDAV Connection");
-                }
-            }
-            else if ( database.storageProvider == kSFTP ) {
-                SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
-                SFTPSessionConfiguration* connection = pd.sFtpConfiguration;
-                
-                if ( connection ) {
-                    if ( connection.name.length == 0 ) {
-                        connection.name = [NSString stringWithFormat:@"%@ %@", connection.host, @(++scount)];
-                    }
-
-                    [SFTPConnections.sharedInstance addOrUpdate:connection];
-                    
-                    SafeMetaData* newDatabase = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
-                    
-                    database.fileName = newDatabase.fileName;
-                    database.fileIdentifier = newDatabase.fileIdentifier;
-                    
-                    [SafesList.sharedInstance update:database];
-                    
-                    NSLog(@"Migrated SFTP Connection = [%@] - %@", pd.connectionIdentifier, connection.identifier);
-                }
-            }
-        }
-        AppPreferences.sharedInstance.migratedConnections = YES;
-    }
-#endif
-}
-
 - (void)setupTips {
-    if( AppPreferences.sharedInstance.hideTips || SafesList.sharedInstance.snapshot.firstObject == nil ) { 
+    if( AppPreferences.sharedInstance.hideTips || DatabasePreferences.allDatabases.firstObject == nil ) { 
         self.navigationItem.prompt = nil;
     }
     else {
@@ -271,7 +216,7 @@
 - (void)internalRefresh {
     NSLog(@"SafesViewController::internalRefresh");
     
-    self.collection = SafesList.sharedInstance.snapshot;
+    self.collection = DatabasePreferences.allDatabases;
 
     self.tableView.separatorStyle = AppPreferences.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
 
@@ -429,8 +374,8 @@
     
     
     
-    [SafesList.sharedInstance reloadIfChangedByOtherComponent];
-    self.collection = SafesList.sharedInstance.snapshot;
+    [DatabasePreferences reloadIfChangedByOtherComponent];
+    self.collection = DatabasePreferences.allDatabases;
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     [self refresh]; 
 
@@ -475,7 +420,7 @@
 
 - (BOOL)shouldLockUnlockedDatabase {
     if ( self.unlockedDatabaseWentIntoBackgroundAt && self.unlockedDatabase ) {
-        BOOL isEditing = [SafesList.sharedInstance isEditing:self.unlockedDatabase];
+        BOOL isEditing = [DatabasePreferences isEditing:self.unlockedDatabase];
         BOOL dontLockIfEditing = !self.unlockedDatabase.lockEvenIfEditing;
         
         if ( isEditing ) {
@@ -553,7 +498,7 @@
             
             
             
-            [SafesList.sharedInstance setEditing:self.unlockedDatabase editing:NO];
+            [DatabasePreferences setEditing:self.unlockedDatabase editing:NO];
 
             
             
@@ -669,7 +614,7 @@
     NSNotification* notification = param;
     NSString* databaseId = notification.object;
         
-    NSArray<SafeMetaData*>* newColl = SafesList.sharedInstance.snapshot;
+    NSArray<DatabasePreferences*>* newColl = DatabasePreferences.allDatabases;
     
     if (newColl.count != self.collection.count) { 
         [self refresh];
@@ -677,7 +622,7 @@
     else {
         self.collection = newColl; 
 
-        NSUInteger index = [self.collection indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSUInteger index = [self.collection indexOfObjectPassingTest:^BOOL(DatabasePreferences * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             return [obj.uuid isEqualToString:databaseId];
         }];
 
@@ -812,7 +757,7 @@
     if(![sourceIndexPath isEqual:destinationIndexPath]) {
         NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
         
-        [SafesList.sharedInstance move:sourceIndexPath.row to:destinationIndexPath.row];
+        [DatabasePreferences move:sourceIndexPath.row to:destinationIndexPath.row];
     }
 }
 
@@ -845,7 +790,7 @@
     WelcomeAddDatabaseViewController *vc = (WelcomeAddDatabaseViewController*)nav.topViewController;
     
     __weak id weakSelf = self;
-    vc.onDone = ^(BOOL addExisting, SafeMetaData * _Nullable databaseToOpen) {
+    vc.onDone = ^(BOOL addExisting, DatabasePreferences * _Nullable databaseToOpen) {
         [weakSelf dismissViewControllerAnimated:YES completion:^{
             [weakSelf onGetStartedWizardDone:addExisting databaseToOpen:databaseToOpen];
         }];
@@ -854,7 +799,7 @@
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (void)onGetStartedWizardDone:(BOOL)addExisting databaseToOpen:(SafeMetaData*)databaseToOpen {
+- (void)onGetStartedWizardDone:(BOOL)addExisting databaseToOpen:(DatabasePreferences*)databaseToOpen {
     if (addExisting) {
         [self onAddExistingSafe];
     }
@@ -867,7 +812,7 @@
     DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
 
     if ( indexPath.row < self.collection.count ) { 
-        SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
+        DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
 
         [cell populateCell:database];
     }
@@ -907,7 +852,7 @@
 }
 
 - (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline manualUnlock:(BOOL)manualUnlock ignoreForceOpenOffline:(BOOL)ignoreForceOpenOffline {
-    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
 
     if ( !ignoreForceOpenOffline ) {
         openOffline |= database.forceOpenOffline;
@@ -918,15 +863,15 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-- (void)openDatabase:(SafeMetaData*)database {
+- (void)openDatabase:(DatabasePreferences*)database {
     [self openDatabase:database biometricPreCleared:NO];
 }
 
-- (void)openDatabase:(SafeMetaData*)database biometricPreCleared:(BOOL)biometricPreCleared {
+- (void)openDatabase:(DatabasePreferences*)database biometricPreCleared:(BOOL)biometricPreCleared {
     [self openDatabase:database openOffline:database.forceOpenOffline noConvenienceUnlock:NO biometricPreCleared:biometricPreCleared];
 }
 
-- (void)openDatabase:(SafeMetaData*)safe
+- (void)openDatabase:(DatabasePreferences*)safe
          openOffline:(BOOL)openOffline
  noConvenienceUnlock:(BOOL)noConvenienceUnlock
  biometricPreCleared:(BOOL)biometricPreCleared {
@@ -1015,7 +960,7 @@
             [self getContextualMenuDatabaseStateActions:indexPath],
         ]];
 
-        SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+        DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
         if ( safe.storageProvider == kWebDAV || safe.storageProvider == kSFTP ) {
             UIMenu* m = [UIMenu menuWithTitle:@""
@@ -1037,7 +982,7 @@
 }
 
 - (UIAction*)getContextualViewBackupsAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
                                     systemImage:@"clock" 
@@ -1050,7 +995,7 @@
 }
 
 - (UIAction*)getContextualViewSyncLogAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
                                     systemImage:@"arrow.clockwise.icloud" 
@@ -1065,7 +1010,7 @@
 - (UIMenu*)getContextualMenuDatabaseNonMutatatingActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     BOOL conveniencePossible = safe.isConvenienceUnlockEnabled && safe.conveniencePasswordHasBeenStored && AppPreferences.sharedInstance.isProOrFreeTrial;
     if (conveniencePossible) [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
@@ -1114,7 +1059,7 @@
 - (UIMenu*)getContextualMenuDatabaseStateActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     BOOL makeVisible = safe.storageProvider == kLocalDevice;
     if (makeVisible) [ma addObject:[self getContextualMenuMakeVisibleAction:indexPath]];
@@ -1139,7 +1084,7 @@
 
 - (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
-    SafeMetaData *safe = self.collection[indexPath.row];
+    DatabasePreferences *safe = self.collection[indexPath.row];
 
     [ma addObject:[self getContextualMenuRenameAction:indexPath]];
 
@@ -1173,7 +1118,7 @@
 }
 
 - (UIAction*)getContextualMenuMakeVisibleAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
     NSString* localDeviceActionTitle = shared ?
@@ -1191,7 +1136,7 @@
 }
 
 - (UIAction*)getContextualMenuQuickLaunchAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
     
     NSString* title = NSLocalizedString(@"databases_toggle_quick_launch_context_menu", @"Quick Launch");
@@ -1209,7 +1154,7 @@
 }
 
 - (UIAction*)getContextualMenuAutoFillQuickLaunchAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:safe.uuid];
     
     NSString* title = NSLocalizedString(@"databases_toggle_autofill_quick_launch_context_menu", @"AutoFill Quick Launch");
@@ -1227,7 +1172,7 @@
 }
 
 - (UIAction*)getContextualMenuPropertiesAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     NSString* title = NSLocalizedString(@"browse_vc_action_properties", @"Properties");
     
@@ -1242,7 +1187,7 @@
 }
 
 - (UIAction*)getContextualMenuReadOnlyAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     NSString* title = NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read Only");
     
@@ -1297,7 +1242,7 @@
 - (UIAction*)getContextualMenuCreateLocalCopyAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
     UIImage* img = Platform.iOS13Available ? [UIImage systemImageNamed:@"doc.on.doc"] : [UIImage imageNamed:@"copy"];
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy")
                                  image:img
@@ -1318,7 +1263,7 @@
 - (UIAction*)getContextualMenuMergeAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
     UIImage* img = Platform.iOS14Available ? [UIImage systemImageNamed:@"arrow.triangle.merge"] : [UIImage imageNamed:@"paper_plane"];
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     return [ContextMenuHelper getItem:NSLocalizedString(@"generic_action_compare_and_merge_ellipsis", @"Compare & Merge...")
                                  image:img
@@ -1331,7 +1276,7 @@
 - (UIAction*)getContextualMenuEditConnectionAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
     UIImage* img = Platform.iOS14Available ? [UIImage systemImageNamed:@"externaldrive.connected.to.line.below"] : [UIImage imageNamed:@"link"];
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     NSString* foo = safe.storageProvider == kSFTP ? NSLocalizedString(@"generic_action_edit_sftp_connection_ellipsis", @"SFTP Connection...") : NSLocalizedString(@"generic_action_edit_webdav_connection_ellipsis", @"WebDAV Connection...");
     
@@ -1345,7 +1290,7 @@
 - (UIAction*)getContextualMenuEditFilePathAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
     UIImage* img = [UIImage systemImageNamed:@"location"];
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     NSString* foo = safe.storageProvider == kSFTP ? NSLocalizedString(@"reselect_sftp_file_ellipsis", @"Reselect SFTP File...") : NSLocalizedString(@"reselect_webdav_file_ellipsis", @"Reselect WebDAV File...");
     
@@ -1367,7 +1312,7 @@
 
 
 - (void)onShare:(NSIndexPath*)indexPath {
-    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
 
     if (!database) {
         return;
@@ -1428,7 +1373,7 @@
 
     
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     UITableViewRowAction *onOrOfflineAction = nil;
     if ( safe.forceOpenOffline ) {
@@ -1466,7 +1411,7 @@
 }
 
 - (void)showDatabaseMoreActions:(NSIndexPath*)indexPath {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"safes_vc_database_actions_sheet_title", @"Title of the 'More Actions' alert/action sheet")
                                                                              message:nil
@@ -1555,7 +1500,7 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)toggleAutoFillQuickLaunch:(SafeMetaData*)database {
+- (void)toggleAutoFillQuickLaunch:(DatabasePreferences*)database {
     if([AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:database.uuid]) {
         AppPreferences.sharedInstance.autoFillQuickLaunchUuid = nil;
         [self refresh];
@@ -1566,7 +1511,7 @@
     }
 }
 
-- (void)toggleQuickLaunch:(SafeMetaData*)database {
+- (void)toggleQuickLaunch:(DatabasePreferences*)database {
     if([AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
         AppPreferences.sharedInstance.quickLaunchUuid = nil;
         [self refresh];
@@ -1584,9 +1529,8 @@
     }
 }
 
-- (void)toggleReadOnly:(SafeMetaData*)database {
+- (void)toggleReadOnly:(DatabasePreferences*)database {
     database.readOnly = !database.readOnly;
-    [SafesList.sharedInstance update:database];
 }
 
 - (void)promptAboutToggleLocalStorage:(NSIndexPath*)indexPath shared:(BOOL)shared {
@@ -1605,7 +1549,7 @@
 }
 
 - (void)toggleLocalSharedStorage:(NSIndexPath*)indexPath {
-    SafeMetaData* metadata = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences* metadata = [self.collection objectAtIndex:indexPath.row];
 
     NSError* error;
     if (![SyncManager.sharedInstance toggleLocalDatabaseFilesVisibility:metadata error:&error]) {
@@ -1614,12 +1558,12 @@
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
-    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
     [self performSegueWithIdentifier:@"segueToRenameDatabase" sender:database];
 }
 
 - (void)removeSafe:(NSIndexPath * _Nonnull)indexPath {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     NSString *message;
     
@@ -1641,7 +1585,7 @@
            }];
 }
 
-- (void)removeAndCleanupSafe:(SafeMetaData *)safe {
+- (void)removeAndCleanupSafe:(DatabasePreferences *)safe {
     if (safe.storageProvider == kLocalDevice) {
         [[LocalDeviceStorageProvider sharedInstance] delete:safe
                 completion:^(NSError *error) {
@@ -1684,7 +1628,7 @@
     
     [BackupsManager.sharedInstance deleteAllBackups:safe];
     
-    [[SafesList sharedInstance] remove:safe.uuid];
+    [safe removeFromDatabasesList];
 }
 
 
@@ -1738,7 +1682,7 @@
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToRenameDatabase"]) {
-        SafeMetaData* database = (SafeMetaData*)sender;
+        DatabasePreferences* database = (DatabasePreferences*)sender;
         
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
@@ -1749,7 +1693,6 @@
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
                     database.nickName = creds.name;
-                    [SafesList.sharedInstance update:database];
                 }
             }];
         };
@@ -1794,7 +1737,7 @@
         
         if(url && url.lastPathComponent.length) {
             NSString* suggestion = url.lastPathComponent.stringByDeletingPathExtension;
-            scVc.initialName = [SafesList.sharedInstance getUniqueNameFromSuggestedName:suggestion];
+            scVc.initialName = [DatabasePreferences getUniqueNameFromSuggestedName:suggestion];
         }
         
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
@@ -1818,7 +1761,7 @@
         wcdvc.database = d[@"database"];
         wcdvc.password = d[@"password"];
         
-        wcdvc.onDone = ^(BOOL addExisting, SafeMetaData * _Nullable databaseToOpen) {
+        wcdvc.onDone = ^(BOOL addExisting, DatabasePreferences * _Nullable databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(databaseToOpen) {
                      [self openDatabase:databaseToOpen];
@@ -1840,12 +1783,12 @@
     else if ([segue.identifier isEqualToString:@"segueToBackups"]) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         BackupsTableViewController* vc = (BackupsTableViewController*)nav.topViewController;
-        vc.metadata = (SafeMetaData*)sender;
+        vc.metadata = (DatabasePreferences*)sender;
     }
     else if ([segue.identifier isEqualToString:@"segueToSyncLog"]) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         SyncLogViewController* vc = (SyncLogViewController*)nav.topViewController;
-        vc.database = (SafeMetaData*)sender;
+        vc.database = (DatabasePreferences*)sender;
     }
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
@@ -1857,7 +1800,7 @@
         }
     }
     else if ( [segue.identifier isEqualToString:@"segueToMergeWizard"] ) {
-        SafeMetaData* dest = (SafeMetaData*)sender;
+        DatabasePreferences* dest = (DatabasePreferences*)sender;
         UINavigationController* nav = segue.destinationViewController;
         MergeInitialViewController* vc = (MergeInitialViewController*)nav.topViewController;
         vc.firstMetadata = dest;
@@ -1870,10 +1813,10 @@
         };
     }
     else if ( [segue.identifier isEqualToString:@"segueToDatabaseProperties"] ) {
-        SafeMetaData* database = (SafeMetaData*)sender;
+        DatabasePreferences* database = (DatabasePreferences*)sender;
         UINavigationController* nav = segue.destinationViewController;
         DatabasePropertiesVC* vc = (DatabasePropertiesVC*)nav.topViewController;
-        vc.database = database;
+        vc.databaseUuid = database.uuid;
     }
 }
 
@@ -1973,7 +1916,7 @@
         [self addManuallyDownloadedUrlDatabase:name modDate:NSDate.date data:storageParams.data];
     }
     else { 
-        SafeMetaData* database = [storageParams.provider getSafeMetaData:name providerData:storageParams.file.providerData];
+        DatabasePreferences* database = [storageParams.provider getDatabasePreferences:name providerData:storageParams.file.providerData];
         database.likelyFormat = storageParams.likelyFormat;
         
         if(database == nil) {
@@ -1982,7 +1925,7 @@
                  message:NSLocalizedString(@"safes_vc_unknown_error_while_adding_database", @"Error Message- unknown error while adding")];
         }
         else {
-            [SafesList.sharedInstance add:database initialCache:storageParams.data initialCacheModDate:storageParams.initialDateModified];
+            [database add:storageParams.data initialCacheModDate:storageParams.initialDateModified];
         }
     }
 }
@@ -2002,7 +1945,7 @@
                           yubiKeyConfig:yubiKeyConfig
                           storageParams:storageParams
                                  format:format
-                             completion:^(BOOL userCancelled, SafeMetaData * _Nullable metadata, NSData * _Nonnull initialSnapshot, NSError * _Nullable error) {
+                             completion:^(BOOL userCancelled, DatabasePreferences * _Nullable metadata, NSData * _Nonnull initialSnapshot, NSError * _Nullable error) {
         if (userCancelled) {
             
         }
@@ -2043,7 +1986,7 @@
                                           name:name
                                       password:password
                                     forceLocal:forceLocal
-                                    completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
+                                    completion:^(BOOL userCancelled, DatabasePreferences * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
         if (userCancelled) {
             
         }
@@ -2083,9 +2026,9 @@
     }];
 }
 
-- (SafeMetaData*)addDatabaseWithiCloudRaceCheck:(SafeMetaData*)metadata initialCache:(NSData*)initialCache initialCacheModDate:(NSDate*)initialCacheModDate {
+- (DatabasePreferences*)addDatabaseWithiCloudRaceCheck:(DatabasePreferences*)metadata initialCache:(NSData*)initialCache initialCacheModDate:(NSDate*)initialCacheModDate {
     if (metadata.storageProvider == kiCloud) {
-        SafeMetaData* existing = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        DatabasePreferences* existing = [DatabasePreferences.allDatabases firstOrDefault:^BOOL(DatabasePreferences * _Nonnull obj) {
             return obj.storageProvider == kiCloud && [obj.fileName compare:metadata.fileName] == NSOrderedSame;
         }];
         
@@ -2095,7 +2038,7 @@
         }
     }
     
-    [[SafesList sharedInstance] add:metadata initialCache:initialCache initialCacheModDate:initialCacheModDate];
+    [metadata add:initialCache initialCacheModDate:initialCacheModDate];
     
     return metadata;
 }
@@ -2139,11 +2082,11 @@
                 data:data
         parentFolder:nil
       viewController:self
-          completion:^(SafeMetaData *metadata, NSError *error) {
+          completion:^(DatabasePreferences *metadata, NSError *error) {
          dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (error == nil) {
                 metadata.likelyFormat = format;
-                [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
+                [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
             }
             else {
                 [Alerts error:self title:NSLocalizedString(@"safes_vc_error_importing_database", @"Error Title Error Importing Datavase") error:error];
@@ -2310,35 +2253,25 @@
 - (void)requestPin {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
-    
-    __weak PinEntryController* weakVc = pinEntryVc;
-    
+        
     pinEntryVc.pinLength = AppPreferences.sharedInstance.appLockPin.length;
     pinEntryVc.isDatabasePIN = NO;
     
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-        if(response == kOk) {
+        if( response == kPinEntryResponseOk ) {
             if([pin isEqualToString:AppPreferences.sharedInstance.appLockPin]) {
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
-                [self dismissViewControllerAnimated:YES completion:^{
-                    [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
-                }];
+                [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
             }
             else {
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeError];
                 
-                [Alerts info:weakVc
+                [Alerts info:self
                        title:NSLocalizedString(@"safes_vc_error_pin_incorrect_title", @"")
-                     message:NSLocalizedString(@"safes_vc_error_pin_incorrect_message", @"")
-                  completion:^{
-                    [self dismissViewControllerAnimated:YES completion:nil];
-                }];
+                     message:NSLocalizedString(@"safes_vc_error_pin_incorrect_message", @"")];
             }
-        }
-        else {
-            [self dismissViewControllerAnimated:YES completion:nil];
         }
     };
     
@@ -2364,7 +2297,7 @@
         return;
     }
     
-    SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+    DatabasePreferences* safe = [DatabasePreferences.allDatabases firstOrDefault:^BOOL(DatabasePreferences * _Nonnull obj) {
         return [obj.uuid isEqualToString:AppPreferences.sharedInstance.quickLaunchUuid];
     }];
     
@@ -2618,11 +2551,11 @@
                              suggestedFilename:suggestedFilename
                                   parentFolder:nil
                                 viewController:self
-                                    completion:^(SafeMetaData *metadata, NSError *error) {
+                                    completion:^(DatabasePreferences *metadata, NSError *error) {
          dispatch_async(dispatch_get_main_queue(), ^(void) {
              if (error == nil) {
                  metadata.likelyFormat = format;
-                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
+                 [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
              }
              else {
                  [Alerts error:self
@@ -2643,11 +2576,11 @@
                                                  data:data
                                               modDate:modDate
                                     suggestedFilename:suggestedFilename
-                                           completion:^(SafeMetaData *metadata, NSError *error) {
+                                           completion:^(DatabasePreferences *metadata, NSError *error) {
        dispatch_async(dispatch_get_main_queue(), ^(void) {
            if (error == nil) {
                metadata.likelyFormat = format;
-               [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
+               [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
            }
            else {
                [Alerts error:self
@@ -2671,17 +2604,17 @@
 
     NSString* filename = [url lastPathComponent];
     
-    SafeMetaData* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getSafeMetaData:nickName fileName:filename providerData:bookMark];
+    DatabasePreferences* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getDatabasePreferences:nickName fileName:filename providerData:bookMark];
     
     DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];
     metadata.likelyFormat = format;
     
-    [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:dateModified];
+    [metadata addWithDuplicateCheck:data initialCacheModDate:dateModified];
 }
 
 
 
-- (void)createLocalCopyDatabase:(SafeMetaData*)database {
+- (void)createLocalCopyDatabase:(DatabasePreferences*)database {
     NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
     
     NSError* error;
@@ -2706,13 +2639,13 @@
                                                  data:data
                                               modDate:modDate
                                     suggestedFilename:nickName
-                                           completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
+                                           completion:^(DatabasePreferences * _Nonnull metadata, NSError * _Nonnull error) {
         if(error || !metadata) {
             [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
             return;
         }
         
-        [SafesList.sharedInstance addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
+        [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
 
         [Alerts info:self
                title:NSLocalizedString(@"generic_done", @"Done")
@@ -2723,7 +2656,7 @@
     }];
 }
 
-- (void)beginMergeWizard:(SafeMetaData*)destinationDatabase {
+- (void)beginMergeWizard:(DatabasePreferences*)destinationDatabase {
     if (self.collection.count < 2) {
         [Alerts info:self
                title:NSLocalizedString(@"merge_no_other_databases_available_title", @"No Other Databases Available")
@@ -2736,7 +2669,7 @@
 
 
 
-- (void)showDatabaseProperties:(SafeMetaData*)database {
+- (void)showDatabaseProperties:(DatabasePreferences*)database {
     [self performSegueWithIdentifier:@"segueToDatabaseProperties" sender:database];
 }
 
@@ -2758,7 +2691,7 @@
     return UIModalPresentationNone;
 }
 
-- (void)editConnection:(SafeMetaData*)database {
+- (void)editConnection:(DatabasePreferences*)database {
 #ifndef NO_SFTP_WEBDAV_SP
     if ( database.storageProvider == kWebDAV ) {
         WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
@@ -2805,29 +2738,27 @@
 #endif
 }
 
-- (void)changeWebDAVDatabaseConnection:(SafeMetaData*)database connection:(WebDAVSessionConfiguration*)connection {
+- (void)changeWebDAVDatabaseConnection:(DatabasePreferences*)database connection:(WebDAVSessionConfiguration*)connection {
 #ifndef NO_SFTP_WEBDAV_SP
     WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
     pd.connectionIdentifier = connection.identifier;
     
-    SafeMetaData* newDb = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+    DatabasePreferences* newDb = [WebDAVStorageProvider.sharedInstance getDatabasePreferences:database.nickName providerData:pd];
     database.fileIdentifier = newDb.fileIdentifier;
-    [SafesList.sharedInstance update:database];
 #endif
 }
 
-- (void)changeSFTPDatabaseConnection:(SafeMetaData*)database connection:(SFTPSessionConfiguration*)connection {
+- (void)changeSFTPDatabaseConnection:(DatabasePreferences*)database connection:(SFTPSessionConfiguration*)connection {
 #ifndef NO_SFTP_WEBDAV_SP
     SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
     pd.connectionIdentifier = connection.identifier;
     
-    SafeMetaData* newDb = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+    DatabasePreferences* newDb = [SFTPStorageProvider.sharedInstance getDatabasePreferences:database.nickName providerData:pd];
     database.fileIdentifier = newDb.fileIdentifier;
-    [SafesList.sharedInstance update:database];
 #endif
 }
 
-- (void)editFilePath:(SafeMetaData*)database {
+- (void)editFilePath:(DatabasePreferences*)database {
 #ifndef NO_SFTP_WEBDAV_SP
     if ( database.storageProvider == kWebDAV ) {
         StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
@@ -2892,25 +2823,21 @@
 #endif
 }
 
-- (void)changeSFTPFilePath:(SafeMetaData*)database providerData:(SFTPProviderData*)providerData {
+- (void)changeSFTPFilePath:(DatabasePreferences*)database providerData:(SFTPProviderData*)providerData {
 #ifndef NO_SFTP_WEBDAV_SP
-    SafeMetaData* newDb = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:providerData];
+    DatabasePreferences* newDb = [SFTPStorageProvider.sharedInstance getDatabasePreferences:database.nickName providerData:providerData];
     
     database.fileName = newDb.fileName;
     database.fileIdentifier = newDb.fileIdentifier;
-    
-    [SafesList.sharedInstance update:database];
 #endif
 }
 
-- (void)changeWebDAVFilePath:(SafeMetaData*)database providerData:(WebDAVProviderData*)providerData {
+- (void)changeWebDAVFilePath:(DatabasePreferences*)database providerData:(WebDAVProviderData*)providerData {
 #ifndef NO_SFTP_WEBDAV_SP
-    SafeMetaData* newDb = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:providerData];
+    DatabasePreferences* newDb = [WebDAVStorageProvider.sharedInstance getDatabasePreferences:database.nickName providerData:providerData];
     
     database.fileName = newDb.fileName;
     database.fileIdentifier = newDb.fileIdentifier;
-    
-    [SafesList.sharedInstance update:database];
 #endif
 }
 
@@ -2977,20 +2904,23 @@
 - (void)import1Password:(NSURL*)url {
     NSError* error;
     
-    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
-    if ( data == nil ) {
-        [self importFailedNotification:error];
-    }
-    else {
-        NSString* string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if ( string ) {
-            Node* root = [OnePasswordImporter convertToStrongboxNodesWithText:string error:&error];
-            [self addImportedDatabaseWithRoot:root error:error];
-        }
-        else {
-            [self importFailedNotification];
-        }
-    }
+    Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
+    [self addImportedDatabaseWithRoot:root error:error];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)importCsv:(NSURL*)url {
@@ -3047,8 +2977,8 @@
     [AddNewSafeHelper createNewExpressDatabase:self
                                           name:name
                                          model:database
-                                    completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
-        [SafesList.sharedInstance addWithDuplicateCheck:metadata initialCache:initialSnapshot initialCacheModDate:NSDate.date];
+                                    completion:^(BOOL userCancelled, DatabasePreferences * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
+        [metadata addWithDuplicateCheck:initialSnapshot initialCacheModDate:NSDate.date];
     }];
 }
 
@@ -3080,20 +3010,20 @@
 
     NSString* databaseId = components.host;
     
-    SafeMetaData* database = nil;
+    DatabasePreferences* database = nil;
     
     NSUUID* iden = [[NSUUID alloc] initWithUUIDString:databaseId];
-    SafeMetaData* nickNameMatch = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+    DatabasePreferences* nickNameMatch = [DatabasePreferences.allDatabases firstOrDefault:^BOOL(DatabasePreferences * _Nonnull obj) {
         return [obj.nickName caseInsensitiveCompare:databaseId] == NSOrderedSame;
     }];
     
     if ( databaseId.length == 0 ) {
-        database = SafesList.sharedInstance.snapshot.firstObject;
+        database = DatabasePreferences.allDatabases.firstObject;
         NSLog(@"No Database Specified. Will use first.");
     }
     else if ( iden != nil ) {
         NSLog(@"Database UUID Specified... [%@]", iden.UUIDString); 
-        database = [SafesList.sharedInstance getById:databaseId];
+        database = [DatabasePreferences fromUuid:databaseId];
     }
     else if ( nickNameMatch ) { 
         database = nickNameMatch;
@@ -3101,7 +3031,7 @@
     }
     else if ( databaseId.isAllDigits ) {
         NSLog(@"Database Index Specified: [%ld]", (long)databaseId.integerValue);
-        NSArray* databases = SafesList.sharedInstance.snapshot;
+        NSArray* databases = DatabasePreferences.allDatabases;
         if ( databaseId.integerValue < databases.count ) {
             database = databases[databaseId.integerValue];
         }
@@ -3118,7 +3048,7 @@
     }
 }
 
-- (void)handleUrlSchemeNavigationRequestWithDatabase:(SafeMetaData*)database path:(NSString*)path query:(NSString*)query {
+- (void)handleUrlSchemeNavigationRequestWithDatabase:(DatabasePreferences*)database path:(NSString*)path query:(NSString*)query {
     NSLog(@"URL Nav Scheme Requests Database = [%@] be Unlocked... - path = %@, query = %@", database.nickName, path, query);
 
     if ( self.unlockedDatabase) {

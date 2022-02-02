@@ -13,7 +13,6 @@
 #import "SVProgressHUD.h"
 #import "KeyFileParser.h"
 #import "Utils.h"
-#import "PinEntryController.h"
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
 #import "AddNewSafeHelper.h"
@@ -52,7 +51,7 @@
 
 #if TARGET_OS_IPHONE
 
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 #else
 
@@ -64,7 +63,9 @@
 
 
 @property (nonnull) UIViewController* viewController;
-@property (nonnull) SafeMetaData* database;
+@property (nonnull, readonly) DatabasePreferences* database;
+@property (nonnull) NSString* databaseUuid;
+
 @property BOOL isAutoFillOpen;
 @property BOOL offlineExplicitlyRequested;
 @property (nonnull) UnlockDatabaseCompletionBlock completion;
@@ -78,12 +79,12 @@
 
 @implementation UnlockDatabaseSequenceHelper
 
-+ (instancetype)helperWithViewController:(UIViewController *)viewController database:(SafeMetaData *)database {
++ (instancetype)helperWithViewController:(UIViewController *)viewController database:(DatabasePreferences *)database {
     return [self helperWithViewController:viewController database:database isAutoFillOpen:NO offlineExplicitlyRequested:NO];
 }
 
 + (instancetype)helperWithViewController:(UIViewController*)viewController
-                                database:(SafeMetaData*)database
+                                database:(DatabasePreferences*)database
                           isAutoFillOpen:(BOOL)isAutoFillOpen
               offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested {
     return [[UnlockDatabaseSequenceHelper alloc] initWithViewController:viewController
@@ -93,18 +94,22 @@
 }
 
 - (instancetype)initWithViewController:(UIViewController*)viewController
-                                  safe:(SafeMetaData*)safe
+                                  safe:(DatabasePreferences*)safe
                         isAutoFillOpen:(BOOL)isAutoFillOpen
             offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested {
     self = [super init];
     if (self) {
         self.viewController = viewController;
-        self.database = safe;
+        self.databaseUuid = safe.uuid;
         self.isAutoFillOpen = isAutoFillOpen;
         self.offlineExplicitlyRequested = offlineExplicitlyRequested;
     }
     
     return self;
+}
+
+- (DatabasePreferences *)database {
+    return [DatabasePreferences fromUuid:self.databaseUuid];
 }
 
 - (void)beginUnlockSequence:(UnlockDatabaseCompletionBlock)completion {
@@ -273,7 +278,6 @@
                 }
                 else if ( response == 1 ) {
                     self.database.couldNotConnectBehaviour = kCouldNotConnectBehaviourOpenOffline;
-                    [SafesList.sharedInstance update:self.database];
                     [self openOffline:factors];
                 }
                 else if ( response == 2) { 
@@ -441,8 +445,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
         NSString* identifier = [FilesAppUrlBookmarkProvider.sharedInstance getJsonFileIdentifier:bookMark];
 
         self.database.fileIdentifier = identifier;
-        [SafesList.sharedInstance update:self.database];
-        
+                
         [self syncAndUnlock:YES factors:self.relocationFactors]; 
     }
 }

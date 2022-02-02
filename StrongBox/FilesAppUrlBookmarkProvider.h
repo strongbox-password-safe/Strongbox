@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL privacyOptInRequired;
 
 - (NSString* _Nullable)getJsonFileIdentifier:(NSData*)bookmark;
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData;
+- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData;
 
 @end
 

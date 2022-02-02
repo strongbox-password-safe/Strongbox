@@ -174,8 +174,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL duplicateItemPreserveTimestamp;
 @property BOOL duplicateItemEditAfterwards;
 
-@property BOOL migratedConnections; 
-
 @property BOOL disableThirdPartyStorageOptions; 
 
 @property BOOL markdownNotes;

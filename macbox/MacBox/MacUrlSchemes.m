@@ -7,6 +7,7 @@
 //
 
 #import "MacUrlSchemes.h"
+#import "FileManager.h"
 
 NSString* const kStrongboxSFTPUrlScheme = @"sftp";
 NSString* const kStrongboxWebDAVUrlScheme = @"webdav";
@@ -48,6 +49,48 @@ NSURL* managedUrlFromFileUrl(NSURL* fileUrl) {
     
     return fileUrl;
 }
+
+NSString* getPathRelativeToUserHome(NSString* path) {
+    NSString* userHome = FileManager.sharedInstance.userHomePath;
+    
+    if ( userHome && path.length > userHome.length ) {
+        path = [path stringByReplacingOccurrencesOfString:userHome withString:@"~" options:kNilOptions range:NSMakeRange(0, userHome.length)];
+    }
+    
+    return path;
+}
+
+NSString* getFriendlyICloudPath(NSString* path) {
+    NSURL* iCloudRoot = FileManager.sharedInstance.iCloudRootURL;
+    NSURL* iCloudDriveRoot = FileManager.sharedInstance.iCloudDriveRootURL;
+
+    
+    
+    if ( iCloudRoot && path.length > iCloudRoot.path.length && [[path substringToIndex:iCloudRoot.path.length] isEqualToString:iCloudRoot.path]) {
+        return [NSString stringWithFormat:@"%@ (%@)", path.lastPathComponent, NSLocalizedString(@"databases_vc_database_location_suffix_database_is_in_official_icloud_strongbox_folder", @"Strongbox iCloud")];
+    }
+    
+    
+    
+    if ( iCloudDriveRoot && path.length > iCloudDriveRoot.path.length && [[path substringToIndex:iCloudDriveRoot.path.length] isEqualToString:iCloudDriveRoot.path]) {
+        NSArray *iCloudDriveDisplayComponents = [NSFileManager.defaultManager componentsToDisplayForPath:iCloudDriveRoot.path];
+        NSArray *pathDisplayComponents = [NSFileManager.defaultManager componentsToDisplayForPath:path];
+
+        if ( pathDisplayComponents.count > iCloudDriveDisplayComponents.count ) {
+            NSArray* relative = [pathDisplayComponents subarrayWithRange:NSMakeRange(iCloudDriveDisplayComponents.count, pathDisplayComponents.count - iCloudDriveDisplayComponents.count)];
+            
+            if ( relative.count > 1 ) {
+                NSString* niceICloudDriveName = relative.firstObject;
+                NSArray* pathWithiniCloudDrive = [relative subarrayWithRange:NSMakeRange(1, relative.count-1)];
+                NSString* strPathWithiniCloudDrive = [pathWithiniCloudDrive componentsJoinedByString:@"/"];
+                return [NSString stringWithFormat:@"%@ (%@)", strPathWithiniCloudDrive, niceICloudDriveName];
+            }
+        }
+    }
+
+    return getPathRelativeToUserHome(path);
+}
+
 
 
 

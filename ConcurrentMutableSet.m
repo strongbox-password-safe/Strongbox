@@ -44,7 +44,9 @@
 
 - (void)removeObject:(id)object {
     dispatch_barrier_async(self.dataQueue, ^{  
-        [self.data removeObject:object];
+        if ( object ) { 
+            [self.data removeObject:object];
+        }
     });
 }
 

@@ -45,7 +45,7 @@
                         completion:^(BOOL userCancelled, SerializationData * _Nullable serializationData, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         if(userCancelled || serializationData == nil || error) {
             if(error) {
-                NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", error);
+                NSLog(@"Error getting Decrypting KDBX3.1 binary: [%@]", error);
             }
 
             completion(userCancelled, nil, innerStreamError, error);

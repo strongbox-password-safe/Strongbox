@@ -8,17 +8,18 @@
 
 #import <Foundation/Foundation.h>
 #import "CompositeKeyDeterminer.h"
+#import "CommonDatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MacCompositeKeyDeterminer : NSObject
 
-+ (instancetype)determinerWithViewController:(VIEW_CONTROLLER_PTR)viewController
++ (instancetype)determinerWithViewController:(NSViewController*)viewController
                                     database:(METADATA_PTR)database
                               isAutoFillOpen:(BOOL)isAutoFillOpen;
 
 
-+ (instancetype)determinerWithViewController:(VIEW_CONTROLLER_PTR)viewController
++ (instancetype)determinerWithViewController:(NSViewController*)viewController
                                     database:(METADATA_PTR)database
                               isAutoFillOpen:(BOOL)isAutoFillOpen
                      isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen;
@@ -38,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL bioOrWatchUnlockIsPossible;
 
-+ (BOOL)bioOrWatchUnlockIsPossible:(DatabaseMetadata*)database;
++ (BOOL)bioOrWatchUnlockIsPossible:(MacDatabasePreferences*)database;
 
 
 

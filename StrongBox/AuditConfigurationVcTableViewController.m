@@ -14,7 +14,7 @@
 #import "ExcludedItemsViewController.h"
 #import "AppPreferences.h"
 #import "NSDate+Extensions.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 static const int kSectionIdxHibp = 2; 
 static const int kSectionIdxSimilarPasswords = 6; 
@@ -219,8 +219,11 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     [self promptForString:loc options:options currentIndex:idx completion:^(BOOL success, NSInteger selectedIdx) {
         NSNumber* sel = opts[selectedIdx];
-        self.model.metadata.auditConfig.hibpCheckForNewBreachesIntervalSeconds = sel.integerValue;
-        [SafesList.sharedInstance update:self.model.metadata];
+        
+        DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
+        config.hibpCheckForNewBreachesIntervalSeconds = sel.integerValue;
+        self.model.metadata.auditConfig = config;
+        
         [self bindUi];
     }];
 }
@@ -274,40 +277,37 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 }
 
-- (IBAction)onPreferenceChanged:(id)sender {    
-    self.model.metadata.auditConfig.auditInBackground = self.switchAuditInBackground.on;
-    self.model.metadata.auditConfig.checkForNoPasswords = self.switchNoPassword.on;
-    self.model.metadata.auditConfig.checkForDuplicatedPasswords = self.switchDuplicates.on;
-    self.model.metadata.auditConfig.caseInsensitiveMatchForDuplicates = self.switchCaseInsenstiveDupes.on;
-    
-    self.model.metadata.auditConfig.checkForCommonPasswords = self.switchCommon.on;
-    self.model.metadata.auditConfig.checkForSimilarPasswords = self.switchSimilar.on;
-    
-    self.model.metadata.auditConfig.checkForMinimumLength = self.switchMinLength.on;
-    self.model.metadata.auditConfig.minimumLength = self.sliderMinLength.value;
-    
-    self.model.metadata.auditConfig.levenshteinSimilarityThreshold = ((CGFloat)self.sliderSimilar.value / 100.0f);
+- (IBAction)onPreferenceChanged:(id)sender {
+    DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
         
-    self.model.metadata.auditConfig.checkHibp = self.switchHibp.on;
-    self.model.metadata.auditConfig.showAuditPopupNotifications = self.switchShowPopups.on;
-    
-    self.model.metadata.auditConfig.showCachedHibpHits = self.switchShowCached.on;
-
-    self.model.metadata.auditConfig.checkForLowEntropy = self.switchLowEntropy.on;
-    self.model.metadata.auditConfig.lowEntropyThreshold = self.sliderEntropyThreshold.value;
-    
+    config.auditInBackground = self.switchAuditInBackground.on;
+    config.checkForNoPasswords = self.switchNoPassword.on;
+    config.checkForDuplicatedPasswords = self.switchDuplicates.on;
+    config.caseInsensitiveMatchForDuplicates = self.switchCaseInsenstiveDupes.on;
+    config.checkForCommonPasswords = self.switchCommon.on;
+    config.checkForSimilarPasswords = self.switchSimilar.on;
+    config.checkForMinimumLength = self.switchMinLength.on;
+    config.minimumLength = self.sliderMinLength.value;
+    config.levenshteinSimilarityThreshold = ((CGFloat)self.sliderSimilar.value / 100.0f);
+    config.checkHibp = self.switchHibp.on;
+    config.showAuditPopupNotifications = self.switchShowPopups.on;
+    config.showCachedHibpHits = self.switchShowCached.on;
+    config.checkForLowEntropy = self.switchLowEntropy.on;
+    config.lowEntropyThreshold = self.sliderEntropyThreshold.value;
+        
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(restartBackgroundAudit) object:nil];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(saveSettingsAndRestartBackgroundAudit) object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(saveSettingsAndRestartBackgroundAudit:) object:nil];
     
-    [self performSelector:@selector(saveSettingsAndRestartBackgroundAudit) withObject:nil afterDelay:0.25f];
+    [self performSelector:@selector(saveSettingsAndRestartBackgroundAudit:) withObject:config afterDelay:0.25f];
     
     [self.model stopAndClearAuditor];
     
     [self bindUi];
 }
 
-- (void)saveSettingsAndRestartBackgroundAudit {
-    [SafesList.sharedInstance update:self.model.metadata];
+- (void)saveSettingsAndRestartBackgroundAudit:(id)object {
+    DatabaseAuditorConfiguration* config = (DatabaseAuditorConfiguration*)object;
+    self.model.metadata.auditConfig = config;
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(restartBackgroundAudit) object:nil];
     [self performSelector:@selector(restartBackgroundAudit) withObject:nil afterDelay:0.25f];
@@ -321,8 +321,9 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 - (IBAction)onHibpChanged:(id)sender {
     if (!self.switchHibp.on) {
-        self.model.metadata.auditConfig.lastHibpOnlineCheck = nil;
-        [SafesList.sharedInstance update:self.model.metadata];
+        DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
+        config.lastHibpOnlineCheck = nil;
+        self.model.metadata.auditConfig = config;
     }
     
     if (self.switchHibp.on && self.model.metadata.auditConfig.checkHibp == NO && !self.model.metadata.auditConfig.hibpCaveatAccepted) {
@@ -333,8 +334,10 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
         
         [Alerts twoOptionsWithCancel:self title:loc1 message:loc2 defaultButtonText:locNo secondButtonText:locYes action:^(int response) {
             if (response == 1) { 
-                self.model.metadata.auditConfig.hibpCaveatAccepted = YES;
-                [SafesList.sharedInstance update:self.model.metadata];
+                DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
+                
+                config.hibpCaveatAccepted = YES;
+                self.model.metadata.auditConfig = config;
                 
                 [self onPreferenceChanged:nil];
             }

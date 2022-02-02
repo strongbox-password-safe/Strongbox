@@ -173,30 +173,24 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     }
     
     [self setChangedDatabaseSettings];
-    
+
+    if (listChanged) {
+        [self notifyDatabasesListChanged];
+    }
+    else if (databaseIdChanged) {
+        [self notifyDatabaseChanged:databaseIdChanged];
+    }
+}
+
+- (void)notifyDatabasesListChanged {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (listChanged) {
-            [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
-        }
-        else if (databaseIdChanged) {
-            [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseUpdatedNotification object:databaseIdChanged];
-        }
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
     });
 }
 
-- (void)update:(SafeMetaData *_Nonnull)safe {
-    dispatch_barrier_async(self.dataQueue, ^{
-        NSUInteger index = [self.databasesList indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            return [obj.uuid isEqualToString:safe.uuid];
-        }];
-        
-        if(index != NSNotFound) {
-            [self.databasesList replaceObjectAtIndex:index withObject:safe];
-            [self serialize:NO databaseIdChanged:safe.uuid];
-        }
-        else {
-            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", safe);
-        }
+- (void)notifyDatabaseChanged:(NSString*)databaseIdChanged {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseUpdatedNotification object:databaseIdChanged];
     });
 }
 
@@ -215,7 +209,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
             }
         }
         else {
-            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", uuid);
+            NSLog(@"🔴 WARN: Attempt to update a safe not found in list... [%@]", uuid);
         }
     });
 }
@@ -236,9 +230,13 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     });
 }
 
-- (void)addWithDuplicateCheck:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
-    dispatch_barrier_async(self.dataQueue, ^{
-        BOOL duplicated = [self.databasesList anyMatch:^BOOL(SafeMetaData * _Nonnull obj) {
+- (NSString*)addWithDuplicateCheck:(SafeMetaData *)safe
+                      initialCache:(NSData *)initialCache
+               initialCacheModDate:(NSDate *)initialCacheModDate {
+    __block NSString* result;
+
+    dispatch_sync(self.dataQueue, ^{
+        SafeMetaData* dupe = [self.databasesList firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
             BOOL storage = obj.storageProvider == safe.storageProvider;
             
             NSString* name1 = obj.fileName;
@@ -252,13 +250,17 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
             return storage && names && ids;
         }];
         
-        if(!duplicated) {
+        if( dupe == nil ) {
             [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate];
+            result = nil;
         }
         else {
-            NSLog(@"Found duplicate... Not Adding");
+            NSLog(@"🔴 Found duplicate... Not Adding - [%@]", dupe.uuid);
+            result = dupe.uuid;
         }
     });
+    
+    return result;
 }
 
 - (void)_internalAdd:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
@@ -269,14 +271,16 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         safe.lastSyncRemoteModDate = initialCacheModDate; 
         
         if (error || !url) {
-            NSLog(@"ERROR: Error adding database - setWorkingCacheWithData: [%@]", error);
+            NSLog(@"🔴 ERROR: Error adding database - setWorkingCacheWithData: [%@]", error);
         }
         else {
+            NSLog(@"✅ Added Database [%@]", safe.uuid);
             [self.databasesList addObject:safe];
             [self serialize:YES];
         }
     }
     else {
+        NSLog(@"✅ Added Database [%@]", safe.uuid);
         [self.databasesList addObject:safe];
         [self serialize:YES];
     }

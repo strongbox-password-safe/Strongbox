@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,9 +15,9 @@ extern NSString* const kDatabaseCell;
 
 @interface DatabaseCell : UITableViewCell
 
-- (void)populateCell:(SafeMetaData*)database;
-- (void)populateCell:(SafeMetaData *)database disabled:(BOOL)disabled;
-- (void)populateCell:(SafeMetaData*)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill;
+- (void)populateCell:(DatabasePreferences*)database;
+- (void)populateCell:(DatabasePreferences *)database disabled:(BOOL)disabled;
+- (void)populateCell:(DatabasePreferences*)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill;
 
 @end
 

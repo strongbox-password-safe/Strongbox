@@ -360,9 +360,9 @@
 
     fields.expires = childEntry.times.expires ? childEntry.times.expiryTime : nil;
     
-    for (Binary* binary in childEntry.binaries) {
+    for ( Binary* binary in childEntry.binaries ) {
         NSInteger index = binary.index;
-        if ( index < 0 || index >= attachmentsPool.count || binary.filename.length == 0 ) {
+        if ( index < 0 || index >= attachmentsPool.count || binary.filename == nil ) {
             NSLog(@"WARNWARN: Node pointed to no existing attachment in attachments pool [%ld] not in %lu", (long)index, (unsigned long)attachmentsPool.count);
             continue;
         }

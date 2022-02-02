@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 #import "Model.h"
 #import "DatabaseUnlocker.h"
 
@@ -18,10 +18,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 
 + (instancetype)helperWithViewController:(UIViewController*)viewController
-                                database:(SafeMetaData*)database;
+                                database:(DatabasePreferences*)database;
 
 + (instancetype)helperWithViewController:(UIViewController*)viewController
-                                database:(SafeMetaData*)database
+                                database:(DatabasePreferences*)database
                           isAutoFillOpen:(BOOL)isAutoFillOpen
               offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested;
 

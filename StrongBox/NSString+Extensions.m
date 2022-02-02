@@ -154,7 +154,7 @@ static NSString* const kLowerCaseNull = @"null";
         NSRange range = [hostResult rangeAtIndex:i];
 
         if (range.location != NSNotFound) {
-            NSLog(@"hostResult Range %d: [%@]", i, [host substringWithRange:range]);
+
         }
     }
     
@@ -195,7 +195,7 @@ static NSString* const kLowerCaseNull = @"null";
         
     }
     
-    NSLog(@"Built: [%@]", components.URL);
+
     
     return components.URL;
 }

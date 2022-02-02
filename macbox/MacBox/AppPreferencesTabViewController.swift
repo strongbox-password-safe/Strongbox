@@ -11,12 +11,11 @@ import Cocoa
 class AppPreferencesTabViewController: NSTabViewController, NSWindowDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
 //        self.view.window?.delegate = self
     }
-    
-    override func cancelOperation(_ sender: Any?) {
-        NSLog("cancelOperation!")
 
+    override func cancelOperation(_: Any?) {
+        NSLog("cancelOperation!")
     }
 }

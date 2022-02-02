@@ -10,7 +10,6 @@
 #import "Utils.h"
 #import "SearchScope.h"
 #import "QuickViewConfig.h"
-#import "DatabaseSearchAndSorter.h"
 
 static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
 

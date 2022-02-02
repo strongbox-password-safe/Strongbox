@@ -10,7 +10,7 @@
 #import "AppPreferences.h"
 #import "AutoFillManager.h"
 #import "Alerts.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "NSArray+Extensions.h"
 #import "OfflineDetector.h"
 #import "BiometricsManager.h"

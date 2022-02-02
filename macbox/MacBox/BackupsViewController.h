@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
+#import "MacDatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

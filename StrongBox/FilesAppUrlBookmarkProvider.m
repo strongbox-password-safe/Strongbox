@@ -10,12 +10,12 @@
 #import "StrongboxUIDocument.h"
 #import "Utils.h"
 #import "BookmarksHelper.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "FileManager.h"
 #import "iCloudSafesCoordinator.h"
 #import "NSDate+Extensions.h"
 
-typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *error);
+typedef void (^CreateCompletionBlock)(DatabasePreferences *metadata, const NSError *error);
 
 @interface FilesAppUrlBookmarkProvider () <UIDocumentPickerDelegate>
 
@@ -130,7 +130,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
         
         if (bookmark) {
             NSString* desiredFilename = dest.lastPathComponent;
-            SafeMetaData* metadata = [self getSafeMetaData:self.createNickName fileName:desiredFilename providerData:bookmark];
+            DatabasePreferences* metadata = [self getDatabasePreferences:self.createNickName fileName:desiredFilename providerData:bookmark];
             self.createCompletion(metadata, nil);
         }
         else {
@@ -141,19 +141,19 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
     }
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
+- (void)delete:(DatabasePreferences *)safeMetaData completion:(void (^)(const NSError *))completion {
     
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
     return;
 }
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData {
+- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData {
     NSString* json = [self getJsonFileIdentifier:(NSData*)providerData];
     
-    return [[SafeMetaData alloc] initWithNickName:nickName
-                                  storageProvider:self.storageId
-                                         fileName:fileName
-                                   fileIdentifier:json];
+    return [DatabasePreferences templateDummyWithNickName:nickName
+                                          storageProvider:self.storageId
+                                                 fileName:fileName
+                                           fileIdentifier:json];
 }
 
 - (void)list:(NSObject *)parentFolder
@@ -168,7 +168,7 @@ viewController:(UIViewController *)viewController
     
 }
 
-- (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     
     
     NSError *error;
@@ -225,7 +225,7 @@ viewController:(UIViewController *)viewController
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     NSError *error;
     NSURL* url = [self filesAppUrlFromMetaData:safeMetaData ppError:&error];
     
@@ -260,7 +260,7 @@ viewController:(UIViewController *)viewController
     });
 }
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
     
     
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
@@ -293,7 +293,7 @@ viewController:(UIViewController *)viewController
     return json;
 }
 
-- (NSData*)bookMarkFromMetadata:(SafeMetaData*)metadata {
+- (NSData*)bookMarkFromMetadata:(DatabasePreferences*)metadata {
     NSData* data = [metadata.fileIdentifier dataUsingEncoding:NSUTF8StringEncoding];
     
     NSError *error;
@@ -308,7 +308,7 @@ viewController:(UIViewController *)viewController
     return b64 ? [[NSData alloc] initWithBase64EncodedString:b64 options:NSDataBase64DecodingIgnoreUnknownCharacters] : nil;
 }
 
-- (NSURL*)filesAppUrlFromMetaData:(SafeMetaData*)safeMetaData ppError:(NSError**)ppError {
+- (NSURL*)filesAppUrlFromMetaData:(DatabasePreferences*)safeMetaData ppError:(NSError**)ppError {
     NSData* bookmarkData = [self bookMarkFromMetadata:safeMetaData];
     if(!bookmarkData) {
         NSLog(@"Bookmark not found in metadata...");
@@ -322,9 +322,9 @@ viewController:(UIViewController *)viewController
         NSLog(@"Bookmark was stale! Updating Database with new one...");
         
         NSData* mainAppBookmark = updatedBookmark;
-
-        safeMetaData.fileIdentifier = [self getJsonFileIdentifier:mainAppBookmark];
-        [SafesList.sharedInstance update:safeMetaData];
+        NSString* fileIdentifier = [self getJsonFileIdentifier:mainAppBookmark];
+        
+        safeMetaData.fileIdentifier = fileIdentifier;
     }
     
     NSLog(@"Got URL from Bookmark: [%@]", url);

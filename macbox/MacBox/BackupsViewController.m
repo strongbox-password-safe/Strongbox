@@ -7,7 +7,6 @@
 //
 
 #import "BackupsViewController.h"
-#import "DatabasesManager.h"
 #import "BackupsManager.h"
 #import "NSDate+Extensions.h"
 #import "Utils.h"
@@ -57,7 +56,7 @@
 }
 
 - (void)bindUi {
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:self.databaseUuid];
 
     self.checkboxTakeBackups.enabled = Settings.sharedInstance.makeLocalRollingBackups;
     BOOL enabled = ( Settings.sharedInstance.makeLocalRollingBackups && database.makeBackups );
@@ -74,7 +73,7 @@
 }
 
 - (void)refreshTableView {
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:self.databaseUuid];
 
     self.items = [BackupsManager.sharedInstance getAvailableBackups:database all:NO];
 
@@ -84,10 +83,8 @@
 - (IBAction)onTakeBackups:(id)sender {
     BOOL makeBackups = self.checkboxTakeBackups.state == NSControlStateValueOn;
     
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.makeBackups = makeBackups;
-    }];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:self.databaseUuid];
+    database.makeBackups = makeBackups;
     
     [self bindUi];
 }
@@ -95,10 +92,9 @@
 - (IBAction)onStepper:(id)sender {
     NSInteger maxBackupKeepCount = self.stepperMaximumKeepCount.integerValue;
     
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.maxBackupKeepCount = maxBackupKeepCount;
-    }];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:self.databaseUuid];
+
+    database.maxBackupKeepCount = maxBackupKeepCount;
 
     [self bindUi];
 }
@@ -161,7 +157,7 @@
     if(self.tableView.selectedRow != -1) {
         BackupItem *item = self.items[self.tableView.selectedRow];
         
-        DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:self.databaseUuid];
 
         NSString* suggestedFileName = [NSString stringWithFormat:@"Backup-of-%@", database.fileUrl.lastPathComponent];
                                 

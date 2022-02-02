@@ -12,8 +12,8 @@ class DatabasesManagerWindow: NSWindow {
     override var canBecomeKey: Bool {
         return true
     }
-    
-    override func cancelOperation(_ sender: Any?) { // Pickup Esc
+
+    override func cancelOperation(_: Any?) { // Pickup Esc
         close()
     }
 }

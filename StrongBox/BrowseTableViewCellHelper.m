@@ -8,7 +8,6 @@
 
 #import "BrowseTableViewCellHelper.h"
 #import "NodeIconHelper.h"
-#import "DatabaseSearchAndSorter.h"
 #import "BrowseItemCell.h"
 #import "BrowseItemTotpCell.h"
 #import "NSDate+Extensions.h"

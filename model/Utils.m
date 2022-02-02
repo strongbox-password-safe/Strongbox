@@ -11,6 +11,8 @@
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
 
+#import <CoreImage/CoreImage.h>
+
 #if TARGET_OS_IPHONE
 #import <MobileCoreServices/MobileCoreServices.h>
 #endif
@@ -445,41 +447,115 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
 }
 
 + (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize {
-    CIImage *input = [self createQRForString:string];
-
-    NSUInteger kImageViewSize = pointSize * UIScreen.mainScreen.scale;
-    CGFloat scale = kImageViewSize / input.extent.size.width;
-
-    NSLog(@"Scaling by %f (image size = %lu)", scale, (unsigned long)kImageViewSize);
-
-    CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
-
-    CIImage *qrCode = [input imageByApplyingTransform:transform];
+    CIImage* qrCode = [self getQrCodeCIImage:string pointSize:pointSize];
 
     return [UIImage imageWithCIImage:qrCode
                                scale:[UIScreen mainScreen].scale
                          orientation:UIImageOrientationUp];
 }
 
+#else
+
++ (NSImage*)getQrCode:(NSString*)string pointSize:(NSUInteger)pointSize {
+    CIImage* qrCode = [self getQrCodeCIImage:string pointSize:pointSize];
+
+    NSCIImageRep *rep = [NSCIImageRep imageRepWithCIImage:qrCode];
+    NSImage *nsImage = [[NSImage alloc] initWithSize:rep.size];
+
+    [nsImage addRepresentation:rep];
+
+    return nsImage;
+}
+
+#endif
+
++ (CIImage *)getQrCodeCIImage:(NSString *)qrString pointSize:(NSUInteger)pointSize {
+    CIImage *input = [self createQRForString:qrString];
+
+    
+#if TARGET_OS_IPHONE
+    NSUInteger kImageViewSize = pointSize * UIScreen.mainScreen.scale;
+#else
+    NSUInteger kImageViewSize = pointSize * 2;
+#endif
+    
+    CGFloat scale = kImageViewSize / input.extent.size.width;
+
+    CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
+    CIImage *qrCode = [input imageByApplyingTransform:transform];
+    
+    return qrCode;
+}
+
 + (CIImage *)createQRForString:(NSString *)qrString {
     NSData *stringData = [qrString dataUsingEncoding:NSISOLatin1StringEncoding];
+
     CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
     
     
     
     [qrFilter setValue:stringData forKey:@"inputMessage"];
     [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
-
+    
     return qrFilter.outputImage;
 }
-
-#endif
 
 NSString* localizedYesOrNoFromBool(BOOL george) {
     return george ?
     NSLocalizedString(@"alerts_yes", @"Yes") :
     NSLocalizedString(@"alerts_no", @"No");
 }
+
+#if TARGET_OS_IPHONE
+#else
+BOOL checkForScreenRecordingPermissionsOnMac(void) {
+    
+    BOOL canRecordScreen = YES;
+    
+    if ( @available(macOS 10.15, *) ) {
+        canRecordScreen = NO;
+        NSRunningApplication *runningApplication = NSRunningApplication.currentApplication;
+        NSNumber *ourProcessIdentifier = [NSNumber numberWithInteger:runningApplication.processIdentifier];
+
+        CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+        NSUInteger numberOfWindows = CFArrayGetCount(windowList);
+        
+        for (int index = 0; index < numberOfWindows; index++) {
+            
+            NSDictionary *windowInfo = (NSDictionary *)CFArrayGetValueAtIndex(windowList, index);
+            NSString *windowName = windowInfo[(id)kCGWindowName];
+            NSNumber *processIdentifier = windowInfo[(id)kCGWindowOwnerPID];
+
+            
+            if (! [processIdentifier isEqual:ourProcessIdentifier]) {
+                
+                pid_t pid = processIdentifier.intValue;
+                NSRunningApplication *windowRunningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
+                
+                if (! windowRunningApplication) {
+                    
+                }
+                else {
+                    NSString *windowExecutableName = windowRunningApplication.executableURL.lastPathComponent;
+                    
+                    if (windowName) {
+                        if ([windowExecutableName isEqual:@"Dock"]) {
+                            
+                        }
+                        else {
+                            canRecordScreen = YES;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        CFRelease(windowList);
+    }
+    
+    return canRecordScreen;
+}
+#endif
 
 
 

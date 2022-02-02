@@ -10,7 +10,7 @@
 #import "StrongboxUIDocument.h"
 #import "Strongbox.h"
 #import "Utils.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "iCloudSafesCoordinator.h"
 #import "SVProgressHUD.h"
 #import "NSDate+Extensions.h"
@@ -59,7 +59,7 @@
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
+        completion:(void (^)(DatabasePreferences *metadata, const NSError *error))completion {
     [self create:nickName
        extension:extension
             data:data
@@ -79,7 +79,7 @@ suggestedFilename:nil
  suggestedFilename:(NSString*)suggestedFilename
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+        completion:(void (^)(DatabasePreferences *metadata, NSError *error))completion {
     NSURL * fileURL = nil;
     
     if(suggestedFilename) {
@@ -127,17 +127,17 @@ suggestedFilename:nil
                 }
             }];
             
-            SafeMetaData * metadata = [[SafeMetaData alloc] initWithNickName:nickName
-                                                             storageProvider:kiCloud
-                                                                    fileName:[fileURL lastPathComponent]
-                                                              fileIdentifier:[fileURL absoluteString]];
+            DatabasePreferences * metadata = [DatabasePreferences templateDummyWithNickName:nickName
+                                                                            storageProvider:kiCloud
+                                                                                   fileName:[fileURL lastPathComponent]
+                                                                             fileIdentifier:[fileURL absoluteString]];
             
             completion(metadata, nil);
         }];
     });
 }
 
-- (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     dispatch_async(dispatch_get_main_queue(), ^{ 
         NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
 
@@ -186,7 +186,7 @@ suggestedFilename:nil
     });
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
     
     dispatch_async(dispatch_get_main_queue(), ^{ 
@@ -226,7 +226,7 @@ suggestedFilename:nil
     });
 }
 
-- (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(NSError *error))completion {
+- (void)delete:(DatabasePreferences*)safeMetaData completion:(void (^)(NSError *error))completion {
     if(safeMetaData.storageProvider != kiCloud) {
         NSLog(@"Safe is not an Apple iCloud safe!");
         return;
@@ -241,7 +241,7 @@ suggestedFilename:nil
     [self deleteICloudUrl:url safeMetaData:safeMetaData secondAttempt:NO completion:completion];
 }
 
-- (void)deleteICloudUrl:(NSURL*)url safeMetaData:(SafeMetaData*)safeMetaData secondAttempt:(BOOL)secondAttempt completion:(void (^)(NSError *error))completion {
+- (void)deleteICloudUrl:(NSURL*)url safeMetaData:(DatabasePreferences*)safeMetaData secondAttempt:(BOOL)secondAttempt completion:(void (^)(NSError *error))completion {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSFileCoordinator* fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
@@ -301,8 +301,8 @@ suggestedFilename:nil
         NSLog(@"NOTIMPL: loadIcon");
 }
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
-        NSLog(@"NOTIMPL: getSafeMetaData");
+- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
+        NSLog(@"NOTIMPL: getDatabasePreferences");
     return nil;
 }
 

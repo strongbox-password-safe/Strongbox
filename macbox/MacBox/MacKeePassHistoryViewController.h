@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MacKeePassHistoryViewController : NSViewController
 
++ (instancetype)instantiateFromStoryboard;
+
 @property (copy)void (^onRestoreHistoryItem)(Node* node);
 @property (copy)void (^onDeleteHistoryItem)(Node* node);
 

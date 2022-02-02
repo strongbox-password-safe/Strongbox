@@ -34,13 +34,13 @@ static NSString* const kColumnLog = @"log";
 @property (weak) IBOutlet NSTableView *tableView;
 
 @property NSArray<TableRow*> *syncs;
-@property DatabaseMetadata* database;
+@property MacDatabasePreferences* database;
 
 @end
 
 @implementation SyncLogViewController
 
-+ (instancetype)showForDatabase:(DatabaseMetadata*)database {
++ (instancetype)showForDatabase:(MacDatabasePreferences*)database {
     NSStoryboard* storyboard = [NSStoryboard storyboardWithName:@"SyncLogViewController" bundle:nil];
     NSWindowController* wc = [storyboard instantiateInitialController];
     SyncLogViewController* ret = (SyncLogViewController*)wc.contentViewController;

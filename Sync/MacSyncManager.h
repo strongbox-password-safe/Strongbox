@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
-#import "DatabaseMetadata.h"
+#import "MacDatabasePreferences.h"
 #import "CompositeKeyFactors.h"
 #import "SyncAndMergeSequenceManager.h"
 #import "SyncManagement.h"
@@ -20,16 +20,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-- (void)sync:(DatabaseMetadata *)database interactiveVC:(NSViewController *_Nullable)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabaseMetadata *)database data:(NSData *)data error:(NSError**)error;
-- (SyncStatus*)getSyncStatus:(DatabaseMetadata *)database;
+- (void)sync:(MacDatabasePreferences *)database interactiveVC:(NSViewController *_Nullable)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(MacDatabasePreferences *)database data:(NSData *)data error:(NSError**)error;
+- (SyncStatus*)getSyncStatus:(MacDatabasePreferences *)database;
 
 - (void)backgroundSyncAll;
 - (void)backgroundSyncOutstandingUpdates;
-- (void)backgroundSyncDatabase:(DatabaseMetadata*)database;
-- (void)backgroundSyncDatabase:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion;
+- (void)backgroundSyncDatabase:(MacDatabasePreferences*)database;
+- (void)backgroundSyncDatabase:(MacDatabasePreferences*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion;
 
-- (void)pollForChanges:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock)completion;
+- (void)pollForChanges:(MacDatabasePreferences*)database completion:(SyncAndMergeCompletionBlock)completion;
 
 @property (readonly) BOOL syncInProgress;
 

@@ -6,9 +6,9 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-//import Cocoa
+// import Cocoa
 
-enum RecordType : String, Codable {
+enum RecordType: String, Codable {
     case Unknown
     case SavedSearch
     case RegularFolder
@@ -29,13 +29,13 @@ enum RecordType : String, Codable {
     case SsnUS
     case Router
     case License
-        
+
     func icon() -> KeePassIconNames {
         switch self {
         case .WebForm:
             return .World
         case .SecureNote:
-            return.Note
+            return .Note
         case .CreditCard:
             return .Money
         case .Password:
@@ -70,7 +70,7 @@ enum RecordType : String, Codable {
             return .Key
         }
     }
-    
+
     func category() -> ItemCategory {
         switch self {
         case .WebForm:

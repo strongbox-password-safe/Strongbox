@@ -15,4 +15,6 @@ typedef NS_ENUM (NSInteger, KeePassIconSet) {
     kKeePassIconSetKeePassXC,
 };
 
+NSString* getIconSetName(KeePassIconSet iconSet);
+
 #endif /* KeePassIconSet_h */

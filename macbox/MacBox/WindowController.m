@@ -13,6 +13,27 @@
 #import "LockScreenViewController.h"
 #import "MacAlerts.h"
 #import "DatabaseSettingsTabViewController.h"
+#import "Csv.h"
+#import "ClipboardManager.h"
+#import "MBProgressHUD.h"
+#import "NSArray+Extensions.h"
+#import "Utils.h"
+#import "OTPToken+Generation.h"
+#import "AppDelegate.h"
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
+#import "MacUrlSchemes.h"
+#import "SafeStorageProviderFactory.h"
+#import "MacKeePassHistoryViewController.h"
+#import "DatabaseFormatIncompatibilityHelper.h"
+#import "Constants.h"
+#import "FavIconDownloader.h"
+#import "SelectPredefinedIconController.h"
+#import <WebKit/WebKit.h>
+#import "CreateFormatAndSetCredentialsWizard.h"
+#import "macOSSpinnerUI.h"
+#import "BiometricIdHelper.h"
+#import "DatabaseOnboardingTabViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -20,10 +41,38 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
+@interface WindowController ()
+
+@property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
+
+@end
+
 @implementation WindowController
 
-- (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {
+static NSString* getFreeTrialSuffix() {
+    if(![Settings sharedInstance].fullVersion) {
+        if (![Settings sharedInstance].freeTrial) {
+            return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
+        }
+        else {
+            long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
+            
+            if(daysLeft < 1 || daysLeft > 88) {
+                return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
+            }
+            else {
+                NSString* loc = NSLocalizedString(@"mac_pro_days_left_window_title_suffix_fmt", @" - [%ld Pro Days Left]");
+                return [NSString stringWithFormat:loc, daysLeft];
+            }
+        }
+    }
+    
+    return @"";
+}
+
+- (NSArray *)getStatusSuffixii {
     Document* doc = (Document*)self.document;
+    
     NSMutableArray* statusii = NSMutableArray.array;
     if ( doc.viewModel.offlineMode ) {
         [statusii addObject:NSLocalizedString(@"database_offline_mode_window_suffix", @"Offline")];
@@ -31,32 +80,110 @@
     if ( doc.viewModel.isEffectivelyReadOnly ) {
         [statusii addObject:NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read-Only")];
     }
+    
+    return statusii;
+}
 
+- (NSString*)getStatusSuffix {
     NSString* statusSuffix = @"";
+
+    NSArray* statusii = [self getStatusSuffixii];
+    
     if ( statusii.firstObject ) {
         NSString* statusiiStrings = [statusii componentsJoinedByString:@", "];
         statusSuffix = [NSString stringWithFormat:@" (%@)", statusiiStrings];
     }
     
-    NSString* freeTrialSuffix = @"";
-    if(![Settings sharedInstance].fullVersion) {
-        if (![Settings sharedInstance].freeTrial) {
-            NSString* loc = NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
-            freeTrialSuffix = loc;
-        }
-        else {
-            long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
+    return statusSuffix;
+}
 
-            if(daysLeft < 1 || daysLeft > 88) {
-                NSString* loc = NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
-                freeTrialSuffix = loc;
+- (NSString*)getStatusSubtitle {
+    NSArray* statusii = [self getStatusSuffixii];
+    
+    if ( statusii.firstObject ) {
+        return [statusii componentsJoinedByString:@", "];
+    }
+    else {
+        return @"";
+    }
+}
+
+- (void)synchronizeWindowTitleWithDocumentName {
+    [super synchronizeWindowTitleWithDocumentName];
+    
+    [self updateNextGenWindowSubtitle];
+}
+
+- (void)updateNextGenWindowSubtitle {
+    if ( Settings.sharedInstance.nextGenUI ) {
+        if (@available(macOS 11.0, *)) {
+            if ( (YES) ) {
+                self.window.subtitle = [NSString stringWithFormat:@"%@%@", [self getStorageLocationSubtitle], [self getStatusSuffix]];
             }
             else {
-                NSString* loc = NSLocalizedString(@"mac_pro_days_left_window_title_suffix_fmt", @" - [%ld Pro Days Left]");
-                freeTrialSuffix = [NSString stringWithFormat:loc, daysLeft];
+                self.window.subtitle = [self getStatusSubtitle];
             }
         }
     }
+}
+
+- (NSString*)getStorageLocationSubtitle {
+    Document* doc = (Document*)self.document;
+    MacDatabasePreferences* metadata = doc.viewModel.databaseMetadata;
+    
+    NSString* path = @"";
+    
+    if ( metadata.storageProvider == kSFTP ) {
+        SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+        
+        path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
+    }
+    else if ( metadata.storageProvider == kWebDAV ) {
+        WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+        
+        path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
+    }
+    else if ( metadata.storageProvider == kMacFile ) {
+        if ( (YES) ) {
+            NSURL* url;
+            
+            if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+                url = fileUrlFromManagedUrl(metadata.fileUrl);
+            }
+            else {
+                url = metadata.fileUrl;
+            }
+            
+            if ( url ) {
+                if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
+                    path = getFriendlyICloudPath(url.path);
+                }
+                else {
+                    path = getPathRelativeToUserHome(url.path);
+                }
+            }
+        }
+    }
+    else {
+        path = @"🔴 RUH ROH! getStorageLocationSubtitle";
+    }
+    
+    return path;
+}
+
+- (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {
+    NSString* freeTrialSuffix = getFreeTrialSuffix();
+    Document* doc = (Document*)self.document;
+    MacDatabasePreferences* metadata = doc.viewModel.databaseMetadata;
+
+    if (@available(macOS 11.0, *)) {
+        if ( Settings.sharedInstance.nextGenUI ) {
+            
+            return [NSString stringWithFormat:@"%@%@", metadata.nickName, freeTrialSuffix];
+
+        }
+    }
+    
 
 
 
@@ -66,7 +193,8 @@
 
 
 
-
+    NSString* statusSuffix = [self getStatusSuffix];
+    
     return [NSString stringWithFormat:@"%@%@%@", displayName, statusSuffix, freeTrialSuffix];
 }
 
@@ -105,9 +233,9 @@
 }
 
 - (void)updateContentView { 
-    NSLog(@"WindowController::updateContentView");
-    
     Document* doc = self.document;
+
+    NSLog(@"WindowController::updateContentView - doc=[%@], doc.isLocked = [%hhd]", doc, doc.isLocked);
     
     CGRect oldFrame = self.contentViewController.view.frame;
     NSViewController* vc;
@@ -138,6 +266,21 @@
             [self.contentViewController performSelector:@selector(onDocumentLoaded)];
         }
     }
+    
+    if ( doc && !doc.isModelLocked ) {
+        [self maybeOnboardDatabase];
+
+        [self listenToEventsOfInterest];
+    }
+    else {
+        if ( Settings.sharedInstance.nextGenUI ) {
+            if (@available(macOS 10.13, *)) {
+                self.window.toolbar = [[NSToolbar alloc] init];
+            }
+        }
+        
+        [self unsubscribeFromNotifications];
+    }
 }
 
 - (ViewModel *)viewModel {
@@ -146,12 +289,630 @@
     return doc ? doc.viewModel : nil;
 }
 
-- (DatabaseMetadata*)databaseMetadata {
+- (MacDatabasePreferences*)databaseMetadata {
     return self.viewModel ? self.viewModel.databaseMetadata : nil;
 }
 
 
 
+
+- (Node*)getSingleSelectedItem {
+    if ( Settings.sharedInstance.nextGenUI ) {
+        if ( self.viewModel.nextGenSelectedItems.count == 1 ) {
+            NSUUID* uuid = self.viewModel.nextGenSelectedItems.firstObject;
+            return uuid ? [self.viewModel getItemById:uuid] : nil;
+        }
+    }
+    else {
+        ViewController* vc = (ViewController*)self.contentViewController;
+
+        if ( [vc getSelectedItems].count == 1 ) {
+            return [vc getCurrentSelectedItem];
+        }
+    }
+    
+    return nil;
+}
+
+- (Node*)getSideBarSelectedItem {
+    if ( Settings.sharedInstance.nextGenUI ) {
+        if ( self.viewModel.nextGenNavigationContext == OGNavigationContextRegularHierarchy ) {
+            
+            
+            NSUUID* uuid = self.viewModel.nextGenNavigationContextSideBarSelectedGroup;
+            return uuid ? [self.viewModel getItemById:uuid] : nil;
+        }
+    }
+    
+    return nil;
+}
+
+- (NSArray<Node*>*)getSelectedItems {
+    if ( Settings.sharedInstance.nextGenUI ) {
+        return [self.viewModel.nextGenSelectedItems map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+            return [self.viewModel getItemById:obj];
+        }];
+    }
+    else {
+        ViewController* vc = (ViewController*)self.contentViewController;
+        return [vc getSelectedItems];
+    }
+}
+
+- (NSArray<Node*>*)getMinimalSelectedEntriesOnly {
+    NSArray<Node*>* items = [self getSelectedItems];
+    
+    return [self getMinimalRecursiveEntriesOnly:items];
+}
+
+- (NSArray<Node*>*)getMinimalRecursiveEntriesOnly:(NSArray<Node*>*)items {
+    NSSet<Node*>* minimalItems = [self.viewModel getMinimalNodeSet:items];
+    NSArray<Node*>* entries = [minimalItems.allObjects flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        NSMutableArray* ret = NSMutableArray.array;
+        
+        if ( obj.isGroup ) {
+            [ret addObjectsFromArray:obj.allChildRecords];
+        }
+        else {
+            [ret addObject:obj];
+        }
+        
+        return ret;
+    }];
+    
+    return entries;
+}
+
+
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
+    SEL theAction = menuItem.action;
+
+    Node* item = nil;
+    NSArray<Node*>* items = nil;
+    
+    if(self.viewModel && !self.viewModel.locked) {
+        item = [self getSingleSelectedItem];
+        items = [self getSelectedItems];
+    }
+
+
+    
+    if ( theAction == @selector(onVCToggleOfflineMode:)) {
+        menuItem.state = self.databaseMetadata.offlineMode ? NSControlStateValueOn : NSControlStateValueOff;
+        return !self.databaseMetadata.isLocalDeviceDatabase;
+    }
+    else if ( theAction == @selector(onLock:) ) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onChangeMasterPassword:)) {
+        return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if(theAction == @selector(onPrintDatabase:)) { 
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector( onSideBarItemProperties: )) {
+        Node* item = [self getSideBarSelectedItem];
+        
+        if( item == nil || !item.isGroup) {
+            return NO;
+        }
+        
+        BOOL isKeePass2 = (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4); 
+        
+        return !self.viewModel.isEffectivelyReadOnly && isKeePass2;
+    }
+    else if (theAction == @selector( onRenameSideBarItem: )) {
+        Node* item = [self getSideBarSelectedItem];
+        
+        if( item == nil ) {
+            return NO;
+        }
+        
+        return !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if (theAction == @selector( onDeleteSideBarItem: )) {
+        Node* item = [self getSideBarSelectedItem];
+        
+        if( item == nil || item.uuid == self.viewModel.rootGroup.uuid ) {
+            return NO;
+        }
+        
+        return !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if (theAction == @selector(onSetSideBarItemIcon:)) {
+        Node* item = [self getSideBarSelectedItem];
+        
+        if( self.viewModel.format == kPasswordSafe || item == nil ) {
+            return NO;
+        }
+        
+        return !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if (theAction == @selector(onSetItemIcon:)) {
+        NSArray<Node*>* items = [self getSelectedItems];
+        
+        if(self.viewModel.format == kPasswordSafe || items.count == 0) {
+            return NO;
+        }
+        
+        return !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if (theAction == @selector(onSideBarFindFavIcons:)) {
+        BOOL isKeePass2 = (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4); 
+        
+        Node* item = [self getSideBarSelectedItem];
+        if( item == nil ) {
+            return NO;
+        }
+        
+        NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly:@[item]];
+        if( entries.count == 0 ) { 
+            return NO;
+        }
+        
+        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly && isKeePass2;
+    }
+    else if (theAction == @selector(onDownloadFavIcons:)) {
+        BOOL isKeePass2 = (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4); 
+        
+        NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly];
+        if( entries.count == 0 ) { 
+            return NO;
+        }
+        
+        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly && isKeePass2;
+    }
+    else if (theAction == @selector(onDelete:)) {
+        if (items.count == 0) {
+            return NO;
+        }
+
+        BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+            return ![self.viewModel canRecycle:obj];
+        }];
+        
+        if ( items.count  > 1) {
+            NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_items", @"Recycle Items") : NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
+            [menuItem setTitle:loc];
+        }
+        else {
+            NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
+            [menuItem setTitle:loc];
+        }
+
+        return items.count > 0 && !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if (theAction == @selector(onDuplicateItem:)) {
+        return item != nil && !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if (theAction == @selector(onViewItemHistory:)) {
+        return
+            item != nil &&
+            !item.isGroup &&
+            item.fields.keePassHistory.count > 0 &&
+            (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+    }
+    else if ( theAction == @selector(onVCToggleShowVerticalGridlines:)) {
+        menuItem.state = self.viewModel.showVerticalGrid ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowHorizontalGridlines:)) {
+        menuItem.state = self.viewModel.showHorizontalGrid ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowAlternatingGridRows:)) {
+        menuItem.state = self.viewModel.showAlternatingRows ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowTotpCodes:)) {
+        menuItem.state = self.viewModel.showTotp ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleReadOnly:)) {
+        menuItem.state = self.viewModel.isEffectivelyReadOnly ? NSControlStateValueOn : NSControlStateValueOff;
+        return !self.viewModel.offlineMode; 
+    }
+    else if ( theAction == @selector(onVCToggleLaunchAtStartup:)) {
+        menuItem.state = self.databaseMetadata.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleStartInSearchMode:)) {
+        menuItem.state = self.viewModel.startWithSearch ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowEditToasts:)) {
+        menuItem.state = self.viewModel.showChangeNotifications ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if (theAction == @selector(onGeneralDatabaseSettings:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onConvenienceUnlockProperties:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onCopySelectedItemsToClipboard:)) {
+        return items.count > 0;
+    }
+    else if (theAction == @selector(copy:)) {
+        return items.count > 0;
+    }
+    else if (theAction == @selector(paste:)) {
+        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+        NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
+        NSLog(@"Validate Paste - %d", blah != nil);
+        return blah != nil && !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if(theAction == @selector(onLaunchUrl:) ||
+            theAction == @selector(onCopyUrl:)) {
+        return item && !item.isGroup && item.fields.url.length;
+    }
+    else if (theAction == @selector(onCopyTitle:)) {
+        return item && !item.isGroup;
+    }
+    else if (theAction == @selector(onCopyUsername:)) {
+        return item && !item.isGroup;
+    }
+    else if (theAction == @selector(onCopyEmail:)) {
+        BOOL emailAvailable = self.viewModel.format == kPasswordSafe || item.fields.keePassEmail.length;
+        return item && !item.isGroup && emailAvailable;
+    }
+    else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
+        return item && !item.isGroup && item.fields.password.length;
+    }
+    else if (theAction == @selector(onCopyPassword:)) {
+        return item && !item.isGroup && item.fields.password.length;
+    }
+    else if (theAction == @selector(onCopyTotp:)) {
+        return item && !item.isGroup && item.fields.otpToken;
+    }
+    else if (theAction == @selector(onCopyNotes:)) {
+        return item && !item.isGroup && item.fields.notes.length;
+    }
+    else if (theAction == @selector(onCopyAllFields:)) {
+        return item && !item.isGroup;
+    }
+
+    return YES;
+}
+
+
+
+- (IBAction)onSetSideBarItemIcon:(id)sender {
+    Node* item = [self getSideBarSelectedItem];
+    if( item == nil ) {
+        return;
+    }
+    
+    [self onSetIconForItems:@[item]];
+}
+
+- (IBAction)onSideBarFindFavIcons:(id)sender {
+    Node* item = [self getSideBarSelectedItem];
+    if( item == nil ) {
+        return;
+    }
+
+    NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly:@[item]];
+    [self onDownloadFavIconsForEntries:entries];
+}
+
+- (IBAction)onDeleteSideBarItem:(id)sender {
+    Node* item = [self getSideBarSelectedItem];
+    if( item == nil ) {
+        return;
+    }
+    
+    [self onDeleteItems:@[item]];
+}
+
+- (IBAction)onRenameSideBarItem:(id)sender {
+    Node* item = [self getSideBarSelectedItem];
+    if( item == nil ) {
+        return;
+    }
+    
+    MacAlerts* ma = [[MacAlerts alloc] init];
+    NSString* text = [ma input:NSLocalizedString(@"browse_vc_rename_item", @"Rename Item") defaultValue:item.title allowEmpty:NO];
+    
+    if ( text && [Utils trim:text].length ) {
+        NSString* newTitle = [Utils trim:text];
+
+        if ( ![self.viewModel setItemTitle:item title:newTitle] ) {
+            NSLog(@"🔴 Could not rename item!");
+        }
+    }
+}
+
+- (IBAction)onSideBarItemProperties:(id)sender {
+    Node* item = [self getSideBarSelectedItem];
+    if( item == nil || !item.isGroup) {
+        return;
+    }
+    
+    GroupPropertiesViewController* vc = [GroupPropertiesViewController fromStoryboard];
+    vc.group = item;
+    
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+
+
+- (void)listenToEventsOfInterest {
+    NSLog(@"✅ WindowController::listenToEventsOfInterest");
+    
+    
+    
+    
+    
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
+
+    NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
+    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onScreenLocked) name:notificationName object:nil];
+    
+    NSString* notificationName2 = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"sessionDidMoveOffConsole"]; 
+    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onSessionDidMoveOffConsole) name:notificationName2 object:nil];
+}
+
+- (void)unsubscribeFromNotifications {
+    NSLog(@"✅ WindowController::unsubscribeFromNotifications");
+    
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+    [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
+}
+
+- (void)onAutoLock:(NSNotification*)notification {
+    if(self.viewModel && !self.viewModel.locked && !self.viewModel.document.isDocumentEdited) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onLock:nil];
+        });
+    }
+}
+
+- (void)onSessionDidMoveOffConsole {
+    if ( self.viewModel.lockOnScreenLock ) {
+        NSLog(@"onSessionDidMoveOffConsole: Locking Database");
+        [self onLock:nil];
+    }
+}
+
+- (void)onScreenLocked {
+    if ( self.viewModel.lockOnScreenLock ) {
+        NSLog(@"onScreenLocked: Locking Database");
+        [self onLock:nil];
+    }
+}
+
+- (void)onLock:(id)sender {
+    if(self.viewModel && !self.viewModel.locked) {
+        if([self.viewModel.document isDocumentEdited]) {
+
+
+
+                    NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
+                    
+                    [macOSSpinnerUI.sharedInstance show:loc viewController:self.contentViewController];
+                    
+                    [self.viewModel.document saveDocumentWithDelegate:self didSaveSelector:@selector(onSaveDoneLockCompletion:) contextInfo:nil];
+
+
+
+
+
+        }
+        else {
+            
+            
+            [self onSaveDoneLockCompletion:nil];
+        }
+    }
+}
+
+- (IBAction)onSaveDoneLockCompletion:(id)sender {
+    [macOSSpinnerUI.sharedInstance dismiss];
+
+    Document* doc = self.document;
+
+    if ( Settings.sharedInstance.nextGenUI ) {
+        [doc lock:nil];
+    }
+    else {
+        Node* item = [self getSingleSelectedItem];
+        NSString* sid = [self.viewModel.database getCrossSerializationFriendlyIdId:item.uuid];
+        ViewController* vc = (ViewController*)self.contentViewController;
+        
+        [vc closeAllDetailsWindows:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [doc lock:sid];
+                [vc onLockDone];
+            });
+        }];
+    }
+    
+    
+
+    if ( Settings.sharedInstance.clearClipboardEnabled) {
+        AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
+        [appDelegate clearClipboardWhereAppropriate];
+    }
+}
+
+
+
+- (IBAction)onSetItemIcon:(id)sender {
+    NSArray<Node*>* items = [self getSelectedItems];
+
+    [self onSetIconForItems:items];
+}
+
+- (void)onSetIconForItems:(NSArray<Node*>*)items {
+    if(self.viewModel.format == kPasswordSafe || items.count == 0) {
+        return;
+    }
+
+    __weak WindowController* weakSelf = self;
+    SelectPredefinedIconController* selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
+    selectPredefinedIconController.customIcons = self.viewModel.customIcons.allObjects;
+    selectPredefinedIconController.hideSelectFile = self.viewModel.format == kKeePass1;
+    
+    if ( Settings.sharedInstance.nextGenUI ) {
+        selectPredefinedIconController.iconSet = self.viewModel.iconSet;
+    }
+    
+    selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
+        if(showFindFavIcons) {
+            [weakSelf onDownloadFavIcons:nil];
+        }
+        else {
+            [weakSelf.viewModel batchSetIcons:items icon:icon];
+        }
+    };
+
+    [self.window beginSheet:selectPredefinedIconController.window  completionHandler:nil];
+}
+
+- (IBAction)onDownloadFavIcons:(id)sender {
+    NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly];
+    
+    [self onDownloadFavIconsForEntries:entries];
+}
+
+- (void)onDownloadFavIconsForEntries:(NSArray<Node*>*)entries {
+    if(self.viewModel.format == kPasswordSafe || entries.count == 0) {
+        return;
+    }
+    
+    FavIconDownloader *vc = [FavIconDownloader newVC];
+    
+    vc.nodes = entries;
+    vc.viewModel = self.viewModel;
+
+    __weak WindowController* weakSelf = self;
+    vc.onDone = ^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
+        if(go) {
+            [weakSelf.viewModel batchSetIcons:selectedFavIcons];
+        }
+    };
+    
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (IBAction)onPrintDatabase:(id)sender {
+    NSString* loc = NSLocalizedString(@"mac_database_print_emergency_sheet_fmt", @"%@ Emergency Sheet");
+    
+    NSString* databaseName = [NSString stringWithFormat:loc, self.databaseMetadata.nickName];
+    NSString* htmlString = [self.viewModel getHtmlPrintString:databaseName];
+
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    WebView *webView = [[WebView alloc] init];
+    [webView.mainFrame loadHTMLString:htmlString baseURL:nil];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:webView.mainFrame.frameView.documentView
+                                                                   printInfo:NSPrintInfo.sharedPrintInfo];
+                                  
+        [printOp runOperation];
+    });
+}
+
+- (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
+    [self.viewModel setCompositeKeyFactors:ckf];
+
+    MacDatabasePreferences* md = self.databaseMetadata;
+    md.conveniencePassword = ckf.password;
+
+    if ( self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile ) {
+        md.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
+    }
+    else {
+        md.keyFileBookmark = nil;
+    }
+    
+    md.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
+}
+
+- (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
+    if(self.viewModel && !self.viewModel.locked) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
+            
+            NSString* loc = new ?
+            NSLocalizedString(@"mac_please_set_master_credentials", @"Please Enter the Master Credentials for this Database") :
+            NSLocalizedString(@"mac_change_master_credentials", @"Change Master Credentials");
+            
+            self.changeMasterPassword.titleText = loc;
+            self.changeMasterPassword.initialDatabaseFormat = self.viewModel.format;
+            self.changeMasterPassword.initialYubiKeyConfiguration = self.databaseMetadata.yubiKeyConfiguration;
+            self.changeMasterPassword.initialKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
+            
+            [self.window beginSheet:self.changeMasterPassword.window
+                       completionHandler:^(NSModalResponse returnCode) {
+                if(returnCode == NSModalResponseOK) {
+                    NSError* error;
+                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelected:nil error:&error];
+                    
+                    if ( ckf ) {
+                        [self changeMasterCredentials:ckf];
+                    }
+                    else {
+                        NSString* loc = NSLocalizedString(@"mac_error_could_not_generate_composite_key", @"Could not generate Composite Key");
+                        [MacAlerts error:loc error:error window:self.window];
+                    }
+                }
+                
+                if(completion) {
+                    completion(returnCode == NSModalResponseOK);
+                }
+            }];
+        });
+    }
+}
+
+- (IBAction)onChangeMasterPassword:(id)sender {
+    [self promptForMasterPassword:NO
+                       completion:^(BOOL okCancel) {
+        if(okCancel) {
+            [self.viewModel.document saveDocumentWithDelegate:self
+                                              didSaveSelector:@selector(onMasterCredentialsChangedAndSaved:)
+                                                  contextInfo:nil];
+        }
+    }];
+}
+
+- (void)onMasterCredentialsChangedAndSaved:(id)param {
+    NSString* loc = NSLocalizedString(@"mac_master_credentials_changed_and_saved", @"Master Credentials Changed and Database Saved");
+    
+    [MacAlerts info:loc window:self.window];
+}
+
+
+
+- (IBAction)onVCToggleShowVerticalGridlines:(id)sender {
+    self.viewModel.showVerticalGrid = !self.viewModel.showVerticalGrid;
+}
+
+- (IBAction)onVCToggleShowHorizontalGridlines:(id)sender {
+    self.viewModel.showHorizontalGrid = !self.viewModel.showHorizontalGrid;
+}
+
+- (IBAction)onVCToggleShowAlternatingGridRows:(id)sender {
+    self.viewModel.showAlternatingRows = !self.viewModel.showAlternatingRows;
+}
+
+- (IBAction)onVCToggleShowTotpCodes:(id)sender {
+    self.viewModel.showTotp = !self.viewModel.showTotp;
+}
 
 - (IBAction)onVCToggleOfflineMode:(id)sender {
     self.viewModel.offlineMode = !self.viewModel.offlineMode;
@@ -185,41 +946,6 @@
     self.viewModel.showChangeNotifications = !self.viewModel.showChangeNotifications;
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
-    SEL theAction = menuItem.action;
-
-
-    
-    if ( theAction == @selector(onVCToggleOfflineMode:)) {
-        menuItem.state = self.databaseMetadata.offlineMode ? NSControlStateValueOn : NSControlStateValueOff;
-        return !self.databaseMetadata.isLocalDeviceDatabase;
-    }
-    else if ( theAction == @selector(onVCToggleReadOnly:)) {
-        menuItem.state = self.viewModel.isEffectivelyReadOnly ? NSControlStateValueOn : NSControlStateValueOff;
-        return !self.viewModel.offlineMode; 
-    }
-    else if ( theAction == @selector(onVCToggleLaunchAtStartup:)) {
-        menuItem.state = self.databaseMetadata.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-    else if ( theAction == @selector(onVCToggleStartInSearchMode:)) {
-        menuItem.state = self.viewModel.startWithSearch ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-    else if ( theAction == @selector(onVCToggleShowEditToasts:)) {
-        menuItem.state = self.viewModel.showChangeNotifications ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-    else if (theAction == @selector(onGeneralDatabaseSettings:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onConvenienceUnlockProperties:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-
-    return YES;
-}
-
 - (IBAction)onGeneralDatabaseSettings:(id)sender {
     DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
     [vc setModel:self.viewModel initialTab:0];
@@ -233,6 +959,704 @@
     [self.contentViewController presentViewControllerAsSheet:vc];
 }
 
+- (IBAction)onExportAsCsv:(id)sender {
+    NSData* data = [Csv getSafeAsCsv:self.viewModel.database];
+    if ( !data ) {
+        [MacAlerts error:nil window:self.window];
+        return;
+    }
+    
+    NSSavePanel* savePanel = NSSavePanel.savePanel;
+    savePanel.nameFieldStringValue = [NSString stringWithFormat:@"%@.csv", self.viewModel.databaseMetadata.exportFileName];
+    
+    if ( [savePanel runModal] == NSModalResponseOK ) {
+        NSURL* url = savePanel.URL;
+        NSError* error;
+        if (! [data writeToFile:url.path options:kNilOptions error:&error] ) {
+            [MacAlerts error:error window:self.window];
+        }
+    }
+}
 
+- (IBAction)onViewItemHistory:(id)sender {
+    Node *item = [self getSingleSelectedItem];
+    
+    if(item == nil ||
+       item.isGroup || item.fields.keePassHistory.count == 0 ||
+       (!(self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4))) {
+        return;
+    }
+
+    MacKeePassHistoryViewController* vc = [MacKeePassHistoryViewController instantiateFromStoryboard];
+    
+    __weak WindowController* weakSelf = self;
+    vc.onDeleteHistoryItem = ^(Node * _Nonnull node) {
+        [weakSelf.viewModel deleteHistoryItem:item historicalItem:node];
+    };
+    vc.onRestoreHistoryItem = ^(Node * _Nonnull node) {
+        [weakSelf.viewModel restoreHistoryItem:item historicalItem:node];
+    };
+    
+    vc.model = self.viewModel;
+    vc.history = item.fields.keePassHistory;
+    
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (IBAction)onDuplicateItem:(id)sender {
+    NSLog(@"onDuplicateItem");
+    
+    Node* item = nil;
+    
+    if( self.viewModel && !self.viewModel.locked ) {
+        item = [self getSingleSelectedItem];
+    }
+    
+    if ( item ) {
+        Node* destinationItem = item.parent ? item.parent : self.viewModel.rootGroup;
+        
+        
+        
+        Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")] preserveTimestamps:NO];
+        
+        [item touch:NO touchParents:YES];
+        if ( [self.viewModel addChildren:@[dupe] parent:destinationItem] ) {
+            NSString* loc = NSLocalizedString(@"mac_item_duplicated", @"Item Duplicated");
+            [self showPopupChangeToastNotification:loc];
+        }
+    }
+}
+
+- (IBAction)onDelete:(id)sender {
+    NSArray<Node *> *items = [self getSelectedItems];
+    if (items.count == 0) {
+        return;
+    }
+    
+    [self onDeleteItems:items];
+}
+
+- (void)onDeleteItems:(NSArray<Node*>*)items {
+    NSDictionary* grouped = [items groupBy:^id _Nonnull(Node * _Nonnull obj) {
+        BOOL delete = [self.viewModel canRecycle:obj];
+        return @(delete);
+    }];
+
+    const NSArray<Node*> *toBeDeleted = grouped[@(NO)];
+    const NSArray<Node*> *toBeRecycled = grouped[@(YES)];
+
+    if ( toBeDeleted == nil ) {
+        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled];
+    }
+    else {
+        if ( toBeRecycled == nil ) {
+            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted];
+        }
+        else { 
+            [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled];
+        }
+    }
+    
+    if ( Settings.sharedInstance.nextGenUI ) {
+        if ( items.count == 1 && items.firstObject.isGroup ) {
+            Node* node = items.firstObject;
+            Node* parent = node.parent;
+            
+            if ( parent ) {
+                [self.viewModel setNextGenNavigation:OGNavigationContextRegularHierarchy selectedGroup:parent.uuid];
+            }
+        }
+    }
+}
+
+- (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled {
+    [MacAlerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
+  informativeText:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
+           window:self.window
+       completion:^(BOOL yesNo) {
+        if (yesNo) {
+                   
+                   
+                   
+                   [self.viewModel deleteItems:toBeDeleted];
+                   
+                   BOOL fail = ![self.viewModel recycleItems:toBeRecycled];
+                   
+                   if(fail) {
+                       [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                    informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
+                             window:self.window
+                         completion:nil];
+                   }
+               }
+    }];
+}
+
+- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+    NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
+    
+    NSString* message;
+    
+    if (items.count > 1) {
+        message = NSLocalizedString(@"browse_vc_are_you_sure_delete", @"Are you sure you want to permanently delete these item(s)?");
+    }
+    else {
+        Node* item = items.firstObject;
+        message = [NSString stringWithFormat:NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"),
+                   [self.viewModel dereference:item.title node:item]];
+    }
+    
+    [MacAlerts yesNo:title
+     informativeText:message
+              window:self.window completion:^(BOOL yesNo) {
+        if (yesNo) {
+            [self.viewModel deleteItems:items];
+        }
+    }];
+}
+
+- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+    NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
+    NSString* message;
+    if (items.count > 1) {
+        message = NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?");
+    }
+    else {
+        Node* item = items.firstObject;
+        message = [NSString stringWithFormat:NSLocalizedString(@"mac_are_you_sure_recycle_bin_yes_no_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?"),
+                                [self.viewModel dereference:item.title node:item]];
+    }
+    
+    [MacAlerts yesNo:title
+     informativeText:message
+              window:self.window
+          completion:^(BOOL yesNo) {
+        if (yesNo) {
+            BOOL fail = ![self.viewModel recycleItems:items];
+
+            if(fail) {
+               [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+            informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
+                     window:self.window
+                 completion:nil];
+            }
+        }
+    }];
+}
+
+
+-(void)dereferenceAndCopyToPasteboard:(NSString*)text item:(Node*)item {
+    if(!item || !text.length) {
+        [[NSPasteboard generalPasteboard] clearContents];
+        return;
+    }
+    
+    NSString* deref = [self.viewModel dereference:text node:item];
+    
+    [self copyConcealedAndMaybeMinimize:deref];
+}
+
+- (void)copyConcealedAndMaybeMinimize:(NSString*)string {
+    [ClipboardManager.sharedInstance copyConcealedString:string];
+    
+    if ( Settings.sharedInstance.miniaturizeOnCopy ) {
+        [self.window miniaturize:nil];
+    }
+}
+
+
+
+- (id)copy:(id)sender {
+    NSLog(@"WindowController::copy");
+    
+    NSArray<Node*>* selected = [self getSelectedItems];
+    
+    if ( selected.count == 0) {
+        NSLog(@"Nothing selected!");
+        return nil;
+    }
+    
+    if (selected.count == 1 && !selected.firstObject.isGroup ) {
+        NSLog(@"Only one selected item and non group... copying password");
+        [self onCopyPassword:nil];
+    }
+    else {
+        NSLog(@"Multiple selected or group... copying items to clipboard");
+        [self onCopySelectedItemsToClipboard:nil];
+    }
+    
+    return nil;
+}
+
+- (id)paste:(id)sender { 
+    NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+    NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
+    if ( blah == nil ) {
+        return nil;
+    }
+
+    Node* selected = [self getSingleSelectedItem];
+    Node* destinationItem = self.viewModel.rootGroup;
+    if(selected) {
+        destinationItem = selected.isGroup ? selected : selected.parent;
+    }
+
+    NSUInteger itemCount = [self pasteItemsFromPasteboard:pasteboard destinationItem:destinationItem internal:NO clear:NO];
+    if ( itemCount == 0 ) {
+        [MacAlerts info:@"Could not paste! Unknown Error." window:self.window];
+    }
+    else {
+        NSString* loc = itemCount == 1 ? NSLocalizedString(@"mac_item_pasted_from_clipboard", @"Item Pasted from Clipboard") :
+            NSLocalizedString(@"mac_items_pasted_from_clipboard", @"Items Pasted from Clipboard");
+        
+        [self showPopupChangeToastNotification:loc];
+    }
+
+    return nil;
+}
+
+- (NSUInteger)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
+                       destinationItem:(Node*)destinationItem
+                              internal:(BOOL)internal
+                                 clear:(BOOL)clear {
+    if(![pasteboard propertyListForType:kDragAndDropExternalUti] &&
+       ![pasteboard dataForType:kDragAndDropInternalUti]) {
+        return NO;
+    }
+    
+    if ( internal ) {
+        NSArray<NSString*>* serializationIds = [pasteboard propertyListForType:kDragAndDropInternalUti];
+        NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+            return [self.viewModel getItemFromSerializationId:obj];
+        }];
+
+        BOOL result = [self.viewModel move:sourceItems destination:destinationItem];
+        
+        if(clear) {
+            [pasteboard clearContents];
+        }
+        
+        return result ? sourceItems.count : 0;
+    }
+    else if(destinationItem.isGroup) { 
+        NSData* json = [pasteboard dataForType:kDragAndDropExternalUti];
+        if(json && destinationItem.isGroup) {
+            NSUInteger ret = [self pasteFromExternal:json destinationItem:destinationItem];
+            if(clear) {
+                [pasteboard clearContents];
+            }
+            return ret;
+        }
+    }
+    
+    if(clear) {
+        [pasteboard clearContents];
+    }
+    
+    return 0;
+}
+
+- (NSUInteger)pasteFromExternal:(NSData*)json destinationItem:(Node*)destinationItem {
+    NSError* error;
+    NSDictionary* serialized = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
+
+    if(!serialized) {
+        [MacAlerts error:@"Could not deserialize!" error:error window:self.window];
+        return NO;
+    }
+    
+    NSNumber* sourceFormatNum = serialized[@"sourceFormat"];
+    DatabaseFormat sourceFormat = sourceFormatNum.integerValue;
+    NSArray<NSDictionary*>* serializedNodes = serialized[@"nodes"];
+    
+    BOOL keePassGroupTitleRules = self.viewModel.format != kPasswordSafe;
+    
+    
+    
+    NSMutableArray<Node*>* nodes = @[].mutableCopy;
+    NSError* err;
+    for (NSDictionary* obj in serializedNodes) {
+        Node* n = [Node deserialize:obj parent:destinationItem keePassGroupTitleRules:keePassGroupTitleRules error:&err];
+        
+        if(!n) {
+            [MacAlerts error:err window:self.window];
+            return 0;
+        }
+        
+        [nodes addObject:n];
+    }
+
+    BOOL destinationIsRootGroup = (destinationItem == nil || destinationItem == self.viewModel.rootGroup);
+    
+    [DatabaseFormatIncompatibilityHelper processFormatIncompatibilities:nodes
+                                                 destinationIsRootGroup:destinationIsRootGroup
+                                                           sourceFormat:sourceFormat
+                                                      destinationFormat:self.viewModel.format
+                                                    confirmChangesBlock:^(NSString * _Nullable confirmMessage, IncompatibilityConfirmChangesResultBlock  _Nonnull resultBlock) {
+        [MacAlerts yesNo:confirmMessage window:self.window completion:^(BOOL yesNo) {
+            resultBlock(yesNo);
+        }];
+    } completion:^(BOOL go, NSArray<Node *> * _Nullable compatibleFilteredNodes) {
+        if ( go ) {
+            [self continuePaste:compatibleFilteredNodes destinationItem:destinationItem];
+        }
+    }];
+        
+    return nodes.count;
+}
+
+- (void)continuePaste:(NSArray<Node*>*)nodes
+      destinationItem:(Node*)destinationItem {
+    BOOL success = [self.viewModel addChildren:nodes parent:destinationItem];
+    
+    if(!success) {
+        [MacAlerts info:@"Could Not Paste"
+     informativeText:@"Could not place these items here. Unknown error."
+              window:self.window
+          completion:nil];
+    }
+}
+
+- (IBAction)onCopySelectedItemsToClipboard:(id)sender {
+    NSArray* selected = [self getSelectedItems];
+    
+    if (selected.count) {
+        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+        [self placeItemsOnPasteboard:pasteboard items:selected];
+
+        NSString* loc = selected.count == 1 ? NSLocalizedString(@"mac_copied_item_to_clipboard", @"Item Copied to Clipboard") :
+            NSLocalizedString(@"mac_copied_items_to_clipboard", @"Items Copied to Clipboard");
+        
+        [self showPopupChangeToastNotification:loc];
+    }
+}
+
+- (BOOL)placeItemsOnPasteboard:(NSPasteboard*)pasteboard items:(NSArray<Node*>*)items {
+    [pasteboard declareTypes:@[kDragAndDropInternalUti,
+                               kDragAndDropExternalUti]
+                       owner:self];
+    
+    NSArray<Node*>* minimalNodeSet = [self.viewModel getMinimalNodeSet:items].allObjects;
+    
+    
+    
+    NSArray<NSString*>* internalSerializationIds = [self getInternalSerializationIds:minimalNodeSet];
+    [pasteboard setPropertyList:internalSerializationIds forType:kDragAndDropInternalUti];
+    
+    
+    
+    NSData* json = [self getJsonForNodes:minimalNodeSet];
+    [pasteboard setData:json forType:kDragAndDropExternalUti];
+    
+    return YES;
+}
+
+- (NSArray<NSString*>*)getInternalSerializationIds:(NSArray<Node*>*)nodes {
+    return [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return [self.viewModel.database getCrossSerializationFriendlyIdId:obj.uuid];
+    }];
+}
+
+- (NSData*)getJsonForNodes:(NSArray<Node*>*)nodes {
+    SerializationPackage *serializationPackage = [[SerializationPackage alloc] init];
+    
+    
+    
+    NSArray<NSDictionary*>* nodeDictionaries = [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return [obj serialize:serializationPackage];
+    }];
+            
+    
+    
+    NSDictionary *serialized = @{ @"sourceFormat" : @(self.viewModel.format),
+                                  @"nodes" : nodeDictionaries };
+    
+    
+    
+    NSError* error;
+    NSData* data = [NSJSONSerialization dataWithJSONObject:serialized options:kNilOptions error:&error];
+
+    if(!data) {
+        [MacAlerts error:@"Could not serialize these items!" error:error window:self.window];
+    }
+    
+    return data;
+}
+
+- (IBAction)onCopyTitle:(id)sender {
+    [self copyTitle:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyUsername:(id)sender {
+    [self copyUsername:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyEmail:(id)sender {
+    [self copyEmail:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyUrl:(id)sender {
+    [self copyUrl:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
+    Node* item = [self getSingleSelectedItem];
+    [self copyPassword:item];
+    [self onLaunchUrl:sender];
+}
+
+- (IBAction)onCopyNotes:(id)sender {
+    [self copyNotes:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyAllFields:(id)sender {
+    [self copyAllFields:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyPassword:(id)sender {
+    [self copyPassword:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyTotp:(id)sender {
+    [self copyTotp:[self getSingleSelectedItem]];
+}
+
+- (void)copyTitle:(Node*)item {
+    if(!item) return;
+    
+    [self dereferenceAndCopyToPasteboard:item.title item:item];
+    
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_title", @"Title")]];
+}
+
+- (void)copyUsername:(Node*)item {
+    if(!item) return;
+    
+    [self dereferenceAndCopyToPasteboard:item.fields.username item:item];
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_username", @"Username")]];
+}
+
+- (void)copyEmail:(Node*)item {
+    if ( !item ) {
+        return;
+    }
+    
+    if ( self.viewModel.format == kPasswordSafe ) {
+        [self dereferenceAndCopyToPasteboard:item.fields.email item:item];
+    }
+    else {
+        [self dereferenceAndCopyToPasteboard:item.fields.keePassEmail item:item];
+    }
+    
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_email", @"Email")]];
+}
+
+- (void)copyUrl:(Node*)item {
+    if(!item) return;
+    
+    [self dereferenceAndCopyToPasteboard:item.fields.url item:item];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_url", @"URL")]];
+}
+
+- (void)copyNotes:(Node*)item {
+    if(!item) return;
+    
+    [self dereferenceAndCopyToPasteboard:item.fields.notes item:item];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_notes", @"Notes")]];
+}
+
+- (void)copyPassword:(Node*)item {
+    if(!item || item.isGroup) {
+        return;
+    }
+
+    [self dereferenceAndCopyToPasteboard:item.fields.password item:item];
+    
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_password", @"Password")]];
+}
+
+- (void)copyTotp:(Node*)item {
+    if(!item || !item.fields.otpToken) {
+        return;
+    }
+
+    NSString *password = item.fields.otpToken.password;
+    [self copyConcealedAndMaybeMinimize:password];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"TOTP")]];
+}
+
+- (IBAction)onLaunchUrl:(id)sender {
+    Node* item = [self getSingleSelectedItem];
+    
+    [self.viewModel launchUrl:item];
+}
+
+- (void)copyAllFields:(Node*)item {
+    NSMutableArray<NSString*>* fields = NSMutableArray.array;
+    
+    [fields addObject:[self dereference:item.title node:item]];
+    [fields addObject:[self dereference:item.fields.username node:item]];
+    [fields addObject:[self dereference:item.fields.password node:item]];
+    [fields addObject:[self dereference:item.fields.url node:item]];
+    [fields addObject:[self dereference:item.fields.notes node:item]];
+    [fields addObject:[self dereference:item.fields.email node:item]];
+    
+    
+    
+    NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
+    for(NSString* key in sortedKeys) {
+        if ( ![NodeFields isTotpCustomFieldKey:key] ) {
+            StringValue* sv = item.fields.customFields[key];
+            NSString *val = [self dereference:sv.value node:item];
+            [fields addObject:val];
+        }
+    }
+
+    
+    
+    NSArray<NSString*> *all = [fields filter:^BOOL(NSString * _Nonnull obj) {
+        return obj.length != 0;
+    }];
+    
+    NSString* allString = [all componentsJoinedByString:@"\n"];
+    [ClipboardManager.sharedInstance copyConcealedString:allString];
+    
+    NSString* loc = NSLocalizedString(@"generic_copied", @"Copied");
+    [self showPopupChangeToastNotification:loc];
+}
+
+- (void)showPopupChangeToastNotification:(NSString*)message {
+    [self showToastNotification:message error:NO];
+}
+
+- (void)showToastNotification:(NSString*)message error:(BOOL)error {
+    if ( self.window.isMiniaturized ) {
+        NSLog(@"Not Showing Popup Change notification because window is miniaturized");
+        return;
+    }
+
+    [self showToastNotification:message error:error yOffset:150.f];
+}
+
+- (void)showToastNotification:(NSString*)message error:(BOOL)error yOffset:(CGFloat)yOffset {
+    if ( !self.viewModel.showChangeNotifications ) {
+        return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSColor *defaultColor = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
+        NSColor *errorColor = [NSColor colorWithDeviceRed:1 green:0.55 blue:0.05 alpha:0.90];
+
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.contentViewController.view animated:YES];
+        hud.labelText = message;
+        hud.color = error ? errorColor : defaultColor;
+        hud.mode = MBProgressHUDModeText;
+        hud.margin = 10.f;
+        hud.yOffset = yOffset;
+        hud.removeFromSuperViewOnHide = YES;
+        hud.dismissible = YES;
+        
+        NSTimeInterval delay = error ? 3.0f : 0.5f;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [hud hide:YES];
+        });
+    });
+}
+
+- (NSString*)dereference:(NSString*)text node:(Node*)node {
+    return [self maybeDereference:text node:node maybe:YES];
+}
+
+- (NSString*)maybeDereference:(NSString*)text node:(Node*)node maybe:(BOOL)maybe {
+    return maybe ? [self.viewModel dereference:text node:node] : text;
+}
+
+
+
+- (void)maybeOnboardDatabase {
+    MacDatabasePreferences* databaseMetadata = self.databaseMetadata;
+            
+    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL convenienceAvailable = watchAvailable || touchAvailable;
+    BOOL convenienceIsPossible = convenienceAvailable && featureAvailable;
+
+    BOOL shouldPromptForBiometricEnrol = convenienceIsPossible && !databaseMetadata.hasPromptedForTouchIdEnrol;
+    
+    BOOL autoFillAvailable = NO;
+    if ( @available(macOS 11.0, *) ) {
+        autoFillAvailable = YES;
+    }
+    
+    BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !databaseMetadata.hasPromptedForAutoFillEnrol;
+    
+    if(shouldPromptForBiometricEnrol || shouldPromptForAutoFillEnrol) {
+        [self onboardForBiometricsAndOrAutoFill:shouldPromptForBiometricEnrol
+                   shouldPromptForAutoFillEnrol:shouldPromptForAutoFillEnrol
+                            compositeKeyFactors:self.viewModel.database.ckfs];
+    }
+}
+
+- (void)onboardForBiometricsAndOrAutoFill:(BOOL)shouldPromptForBiometricEnrol
+             shouldPromptForAutoFillEnrol:(BOOL)shouldPromptForAutoFillEnrol
+                      compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
+    DatabaseOnboardingTabViewController *vc = [DatabaseOnboardingTabViewController fromStoryboard];
+        
+    vc.convenienceUnlock = shouldPromptForBiometricEnrol;
+    vc.autoFill = shouldPromptForAutoFillEnrol;
+    vc.ckfs = compositeKeyFactors;
+    vc.databaseUuid = self.databaseMetadata.uuid;
+    vc.model = self.viewModel.database;
+    
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+
+
+- (id)supplementalTargetForAction:(SEL)action sender:(id)sender {
+    NSString* str = NSStringFromSelector(action);
+
+    
+    
+    if ( [str isEqualToString:@"onShowHideQuickView:"] ) {
+        NSLog(@"supplementalTargetForAction: [%@]", str);
+    }
+
+    if ( !Settings.sharedInstance.nextGenUI ) {
+        return [super supplementalTargetForAction:action sender:sender];
+    }
+    
+    
+    
+    id target = [super supplementalTargetForAction:action sender:sender];
+
+    if (target != nil) {
+        return target;
+    }
+
+    NSViewController *childViewController = self.contentViewController;
+    target = [NSApp targetForAction:action to:childViewController from:sender];
+
+    if (![target respondsToSelector:action]) {
+        target = [target supplementalTargetForAction:action sender:sender];
+    }
+
+    if ([target respondsToSelector:action]) {
+        return target;
+    }
+    
+    return nil;
+}
 
 @end

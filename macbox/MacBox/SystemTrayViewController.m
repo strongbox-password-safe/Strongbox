@@ -14,13 +14,14 @@
 #import "Settings.h"
 #import "ClipboardManager.h"
 #import "MBProgressHUD.h"
-#import "DatabasesManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
+
+#import "MacDatabasePreferences.h"
 
 @interface SystemTrayViewController ()
 
@@ -104,17 +105,17 @@
         [view removeFromSuperview];
     }
     
-    NSArray<DatabaseMetadata*> *databases = DatabasesManager.sharedInstance.snapshot;
+    NSArray<MacDatabasePreferences*> *databases = MacDatabasePreferences.allDatabases;
 
     
     
-    for (DatabaseMetadata* db in databases ) {
+    for (MacDatabasePreferences* db in databases ) {
         NSButton* databaseButton = [self createDatabaseButton:db];
         [self.databasesStack addView:databaseButton inGravity:NSStackViewGravityBottom];
     }
 }
 
-- (NSButton*)createDatabaseButton:(DatabaseMetadata*)db {
+- (NSButton*)createDatabaseButton:(MacDatabasePreferences*)db {
     NSButton* databaseButton = [NSButton buttonWithTitle:db.nickName target:self action:@selector(onDatabaseClicked:)];
     databaseButton.identifier = db.uuid;
     

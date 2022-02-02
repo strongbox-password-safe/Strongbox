@@ -20,9 +20,11 @@
 - (NSTextView *)fieldEditorForView:(NSView *)controlView {
     if (self.theFieldEditor == nil) {
         self.theFieldEditor = [[MMcGACTextViewEditor alloc] init];
+        self.theFieldEditor.onImagePasted = self.onImagePasted;
         [self.theFieldEditor setFieldEditor:YES];
     }
-    
+
     return self.theFieldEditor;
 }
+
 @end

@@ -12,7 +12,6 @@
 #import "DatabaseModel.h"
 #import "MacHardwareKeyManager.h"
 #import "BookmarksHelper.h"
-#import "DatabasesManager.h"
 #import "MacAlerts.h"
 
 @interface ManualCredentialsEntry () <NSTextFieldDelegate>
@@ -44,7 +43,7 @@
 
 @property BOOL hasSetInitialFocus;
 
-@property (readonly) DatabaseMetadata* database;
+@property (readonly) MacDatabasePreferences* database;
 @property (nullable) NSString* contextAwareKeyFileBookmark;
 
 @property (weak) IBOutlet NSStackView *stackHardwareKey;
@@ -53,8 +52,8 @@
 
 @implementation ManualCredentialsEntry
 
-- (DatabaseMetadata*)database {
-    return [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+- (MacDatabasePreferences*)database {
+    return [MacDatabasePreferences fromUuid:self.databaseUuid];
 }
 
 - (void)viewDidLoad {
@@ -114,9 +113,7 @@
 }
 
 - (void)bindAdvanced {
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
-
-    BOOL advanced = database.showAdvancedUnlockOptions;
+    BOOL advanced = self.database.showAdvancedUnlockOptions;
     self.acceptEmptyPassword.hidden = !advanced;
     self.labelKeyFile.hidden = !advanced;
     self.popupKeyFile.hidden = !advanced;
@@ -172,9 +169,7 @@
 }
 
 - (IBAction)onToggleAdvanced:(id)sender {
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.showAdvancedUnlockOptions = !metadata.showAdvancedUnlockOptions;
-    }];
+    self.database.showAdvancedUnlockOptions = !self.database.showAdvancedUnlockOptions;
     
     [self bindAdvanced];
 }
@@ -207,11 +202,10 @@
 
     
 
-    DatabaseMetadata *database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
     NSURL* configuredUrl;
     NSString* configuredBookmarkForKeyFile = [self contextAwareKeyFileBookmark];
     
-    if(database && configuredBookmarkForKeyFile) {
+    if(self.database && configuredBookmarkForKeyFile) {
         NSString* updatedBookmark = nil;
         NSError* error;
         configuredUrl = [BookmarksHelper getUrlFromBookmark:configuredBookmarkForKeyFile
@@ -316,9 +310,7 @@
 }
 
 - (DatabaseFormat)getHeuristicFormat {
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
-
-    BOOL probablyPasswordSafe = [database.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
+    BOOL probablyPasswordSafe = [self.database.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
     DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; 
     return heuristicFormat;
 }
@@ -550,14 +542,12 @@
 }
 
 - (void)setContextAwareKeyFileBookmark:(NSString *)contextAwareKeyFileBookmark {
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        if ( self.isAutoFillOpen ) {
-            metadata.autoFillKeyFileBookmark = contextAwareKeyFileBookmark;
-        }
-        else {
-            metadata.keyFileBookmark = contextAwareKeyFileBookmark;
-        }
-    }];
+    if ( self.isAutoFillOpen ) {
+        self.database.autoFillKeyFileBookmark = contextAwareKeyFileBookmark;
+    }
+    else {
+        self.database.keyFileBookmark = contextAwareKeyFileBookmark;
+    }
 }
 
 @end

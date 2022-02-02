@@ -10,7 +10,6 @@
 #import "Settings.h"
 #import "BiometricIdHelper.h"
 #import "ManualCredentialsEntry.h"
-#import "DatabasesManager.h"
 #import "MacHardwareKeyManager.h"
 #import "Utils.h"
 #import "WorkingCopyManager.h"
@@ -22,7 +21,7 @@
 
 @interface MacCompositeKeyDeterminer ()
 
-@property (nonnull) VIEW_CONTROLLER_PTR viewController;
+@property (nonnull) NSViewController* viewController;
 @property (nonnull) METADATA_PTR database;
 @property BOOL isAutoFillOpen;
 @property BOOL isAutoFillQuickTypeOpen;
@@ -32,13 +31,13 @@
 
 @implementation MacCompositeKeyDeterminer
 
-+ (instancetype)determinerWithViewController:(VIEW_CONTROLLER_PTR)viewController
++ (instancetype)determinerWithViewController:(NSViewController*)viewController
                                     database:(METADATA_PTR)database
                               isAutoFillOpen:(BOOL)isAutoFillOpen {
     return [MacCompositeKeyDeterminer determinerWithViewController:viewController database:database isAutoFillOpen:isAutoFillOpen isAutoFillQuickTypeOpen:NO];
 }
 
-+ (instancetype)determinerWithViewController:(VIEW_CONTROLLER_PTR)viewController
++ (instancetype)determinerWithViewController:(NSViewController*)viewController
                                     database:(METADATA_PTR)database
                               isAutoFillOpen:(BOOL)isAutoFillOpen
                      isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen {
@@ -49,7 +48,7 @@
 
 }
 
-- (instancetype)initWithViewController:(VIEW_CONTROLLER_PTR)viewController
+- (instancetype)initWithViewController:(NSViewController*)viewController
                               database:(METADATA_PTR)database
                         isAutoFillOpen:(BOOL)isAutoFillOpen
                isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen {
@@ -161,7 +160,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             
             if ( requiredDummyAutoFillSheet ) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [self.viewController dismissViewController:requiredDummyAutoFillSheet];
                 });
             }
@@ -243,11 +242,9 @@
     if ( ret == nil && fromConvenience ) {
         NSLog(@"Could not get CKFs with Convenience Unlock. Clearing Secure Convenience Items");
 
-        [DatabasesManager.sharedInstance atomicUpdate:self.database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.conveniencePassword = nil;
-            metadata.autoFillConvenienceAutoUnlockPassword = nil;
-            metadata.conveniencePasswordHasBeenStored = NO;
-        }];
+        self.database.conveniencePassword = nil;
+        self.database.autoFillConvenienceAutoUnlockPassword = nil;
+        self.database.conveniencePasswordHasBeenStored = NO;
     }
     
     
@@ -259,18 +256,16 @@
         BOOL yubikeyChanged = (!(self.database.yubiKeyConfiguration == nil && yubiKeyConfiguration == nil)) && (![self.database.yubiKeyConfiguration isEqual:yubiKeyConfiguration]);
         
         if( keyFileChanged || yubikeyChanged ) {
-            [DatabasesManager.sharedInstance atomicUpdate:self.database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                NSString* temp = rememberKeyFile ? keyFileBookmark : nil;
-                
-                if ( self.isAutoFillOpen ) {
-                    metadata.autoFillKeyFileBookmark = temp;
-                }
-                else {
-                    metadata.keyFileBookmark = temp;
-                }
-                
-                metadata.yubiKeyConfiguration = yubiKeyConfiguration;
-            }];
+            NSString* temp = rememberKeyFile ? keyFileBookmark : nil;
+            
+            if ( self.isAutoFillOpen ) {
+                self.database.autoFillKeyFileBookmark = temp;
+            }
+            else {
+                self.database.keyFileBookmark = temp;
+            }
+            
+            self.database.yubiKeyConfiguration = yubiKeyConfiguration;
         }
     }
     
@@ -350,7 +345,7 @@
     return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.database];
 }
 
-+ (BOOL)bioOrWatchUnlockIsPossible:(DatabaseMetadata*)database {
++ (BOOL)bioOrWatchUnlockIsPossible:(MacDatabasePreferences*)database {
     if ( !database ) {
         return NO;
     }

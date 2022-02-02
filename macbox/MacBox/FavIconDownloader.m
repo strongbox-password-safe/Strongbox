@@ -103,9 +103,9 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
   
     
     
-    if(self.validUniqueUrls.count == 1) {
+
         [self onStartStop:nil];
-    }
+
 }
 
 - (void)loadAndValidateNodesAndUrls {
@@ -124,7 +124,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     NSMutableSet<NSURL*> *added = [NSMutableSet setWithCapacity:self.nodes.count];
     NSMutableArray<NSURL*> *addedArray = [NSMutableArray arrayWithCapacity:self.nodes.count];
     
-    for (Node* node in self.validNodes) {
+    for ( Node* node in self.validNodes ) {
         NSURL* url = node.fields.url.urlExtendedParse;
         
         if(![added containsObject:url]) {

@@ -11,13 +11,13 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "AutoFillManager.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "SyncManager.h"
 
 @implementation DuressActionHelper
 
 + (void)performDuressAction:(UIViewController*)viewController
-                   database:(SafeMetaData*)database
+                   database:(DatabasePreferences*)database
              isAutoFillOpen:(BOOL)isAutoFillOpen
                  completion:(UnlockDatabaseCompletionBlock)completion {
     if (database.duressAction == kOpenDummy) {
@@ -39,7 +39,7 @@
     }
 }
 
-+ (void)openDummy:(SafeMetaData * _Nonnull)database isAutoFillOpen:(BOOL)isAutoFillOpen completion:(UnlockDatabaseCompletionBlock _Nonnull)completion {
++ (void)openDummy:(DatabasePreferences * _Nonnull)database isAutoFillOpen:(BOOL)isAutoFillOpen completion:(UnlockDatabaseCompletionBlock _Nonnull)completion {
     Model *viewModel = [[Model alloc] initAsDuressDummy:isAutoFillOpen templateMetaData:database];
     completion(kUnlockDatabaseResultSuccess, viewModel, nil, nil);
 }
@@ -50,10 +50,11 @@
     completion(kUnlockDatabaseResultError, nil, nil, error);
 }
 
-+ (void)removeOrDeleteSafe:(SafeMetaData*)database {
++ (void)removeOrDeleteSafe:(DatabasePreferences*)database {
     [SyncManager.sharedInstance removeDatabaseAndLocalCopies:database];
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    [[SafesList sharedInstance] remove:database.uuid];
+    
+    [database removeFromDatabasesList];
 }
 
 @end

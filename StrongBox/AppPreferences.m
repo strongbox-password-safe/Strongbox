@@ -137,7 +137,6 @@ static NSString* const kDuplicateItemReferencePassword = @"duplicateItemReferenc
 static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenceUsername";
 
 static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
-static NSString* const kMigratedConnections = @"migratedConnections";
 static NSString* const kDisableThirdPartyStorageOptions = @"disableThirdPartyStorageOptions";
 static NSString* const kSuppressAppBackgroundTriggers = @"suppressAppBackgroundTriggers";
 static NSString* const kMarkdownNotes = @"markdownNotes";
@@ -214,14 +213,6 @@ static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
 
 - (void)setDisableThirdPartyStorageOptions:(BOOL)disableThirdPartyStorageOptions {
     [self setBool:kDisableThirdPartyStorageOptions value:disableThirdPartyStorageOptions];
-}
-
-- (BOOL)migratedConnections {
-    return [self getBool:kMigratedConnections];
-}
-
-- (void)setMigratedConnections:(BOOL)migratedConnections {
-    [self setBool:kMigratedConnections value:migratedConnections];
 }
 
 - (BOOL)duplicateItemEditAfterwards {
@@ -416,6 +407,14 @@ static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
 - (void)setAutoFillLastKnownGoodBiometricsDatabaseState:(NSData *)autoFillLastKnownGoodBiometricsDatabaseState {
     [self.sharedAppGroupDefaults setObject:autoFillLastKnownGoodBiometricsDatabaseState forKey:kAutoFillLastKnownGoodDatabaseState];
     [self.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)checkPinYin {
+    return self.pinYinSearchEnabled;
+}
+
+- (void)setCheckPinYin:(BOOL)checkPinYin {
+    self.pinYinSearchEnabled = checkPinYin;
 }
 
 - (BOOL)pinYinSearchEnabled {

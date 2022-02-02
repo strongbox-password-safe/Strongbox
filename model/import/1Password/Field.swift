@@ -6,11 +6,11 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-//import Cocoa
+// import Cocoa
 
 class Field: Decodable {
-    var value : JSONAny?
+    var value: JSONAny?
 //    var type : String?
-    var name : String?
-    var designation : String?
+    var name: String?
+    var designation: String?
 }

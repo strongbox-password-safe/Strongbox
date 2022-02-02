@@ -53,7 +53,7 @@
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
+        completion:(void (^)(DatabasePreferences *metadata, const NSError *error))completion {
     [SVProgressHUD show];
 
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
@@ -69,7 +69,7 @@
         });
 
         if (error == nil) {
-            SafeMetaData *metadata = [self getSafeMetaData:nickName
+            DatabasePreferences *metadata = [self getDatabasePreferences:nickName
                                               providerData:file];
 
             completion(metadata, error);
@@ -80,7 +80,7 @@
     }];
 }
 
-- (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     [[GoogleDriveManager sharedInstance] read:viewController
                          parentFileIdentifier:safeMetaData.fileIdentifier
                                      fileName:safeMetaData.fileName
@@ -95,7 +95,7 @@
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     if (viewController) {
         [SVProgressHUD show];
     }
@@ -226,17 +226,17 @@
     }
 }
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
     GTLRDrive_File *file = (GTLRDrive_File *)providerData;
     NSString *parent = (file.parents)[0];
 
-    return [[SafeMetaData alloc] initWithNickName:nickName
+    return [DatabasePreferences templateDummyWithNickName:nickName
                                   storageProvider:self.storageId
                                          fileName:file.name
                                    fileIdentifier:parent];
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
+- (void)delete:(DatabasePreferences *)safeMetaData completion:(void (^)(const NSError *))completion {
     
 }
 

@@ -10,7 +10,7 @@
 
 #import "IOSCompositeKeyDeterminer.h"
 #import "BiometricsManager.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "AppPreferences.h"
 #import "Alerts.h"
 #import "PinEntryController.h"
@@ -33,7 +33,7 @@ static const int kMaxFailedPinAttempts = 3;
 @interface IOSCompositeKeyDeterminer ()
 
 @property (nonnull) UIViewController* viewController;
-@property (nonnull) SafeMetaData* database;
+@property (nonnull) DatabasePreferences* database;
 @property BOOL isAutoFillOpen;
 @property BOOL isAutoFillQuickTypeOpen;
 @property BOOL biometricPreCleared; 
@@ -46,7 +46,7 @@ static const int kMaxFailedPinAttempts = 3;
 @implementation IOSCompositeKeyDeterminer
 
 + (instancetype)determinerWithViewController:(UIViewController *)viewController
-                                    database:(SafeMetaData *)database
+                                    database:(DatabasePreferences *)database
                               isAutoFillOpen:(BOOL)isAutoFillOpen
                      isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
                          biometricPreCleared:(BOOL)biometricPreCleared
@@ -60,7 +60,7 @@ static const int kMaxFailedPinAttempts = 3;
 }
 
 - (instancetype)initWithViewController:(UIViewController *)viewController
-                              database:(SafeMetaData *)database
+                              database:(DatabasePreferences *)database
                         isAutoFillOpen:(BOOL)isAutoFillOpen
                isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
                    biometricPreCleared:(BOOL)biometricPreCleared
@@ -182,19 +182,11 @@ static const int kMaxFailedPinAttempts = 3;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( self.database.showConvenienceExpiryMessage ) {
-            [Alerts twoOptionsWithCancel:self.viewController
-                                   title:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Master Password Required")
-                                 message:NSLocalizedString(@"composite_key_determiner_convenience_expired_message", @"It's time now to re-enter your Master Password manually. You can change this master password expiry interval in Database Settings.")
-                       defaultButtonText:NSLocalizedString(@"alerts_ok", @"OK")
-                        secondButtonText:NSLocalizedString(@"generic_dont_tell_again", @"Don't Tell Me Again")
-                                  action:^(int response) {
-                if ( response == 0 ) { 
-                    [self promptForManualCredentials];
-                }
-                else if ( response == 1) { 
-                    self.database.showConvenienceExpiryMessage = NO;
-                    [SafesList.sharedInstance update:self.database];
-                    
+            [Alerts okCancel:self.viewController
+                       title:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Master Password Required")
+                     message:NSLocalizedString(@"composite_key_determiner_convenience_expired_message", @"It's time now to re-enter your Master Password manually. You can change this master password expiry interval in Database Settings.")
+                      action:^(BOOL response) {
+                if ( response ) { 
                     [self promptForManualCredentials];
                 }
                 else {
@@ -222,20 +214,18 @@ static const int kMaxFailedPinAttempts = 3;
 }
 
 - (void)clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState {
-    NSArray<SafeMetaData*>* databases = SafesList.sharedInstance.snapshot;
+    NSArray<DatabasePreferences*>* databases = DatabasePreferences.allDatabases;
     
     
     
     
 
-    for (SafeMetaData* database in databases) {
+    for (DatabasePreferences* database in databases) {
         if(database.isTouchIdEnabled) {
             NSLog(@"Clearing Biometrics for Database: [%@]", database.nickName);
             
             database.conveniencePasswordHasBeenStored = NO;
             database.convenienceMasterPassword = nil;
-
-            [SafesList.sharedInstance update:database];
         }
     }
 
@@ -258,9 +248,7 @@ static const int kMaxFailedPinAttempts = 3;
     }
     
     vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-        [self.viewController dismissViewControllerAnimated:YES completion:^{
-            [self onPinEntered:password response:response pin:pin];
-        }];
+        [self onPinEntered:password response:response pin:pin];
     };
     
     vc.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -268,11 +256,10 @@ static const int kMaxFailedPinAttempts = 3;
 }
 
 - (void)onPinEntered:(NSString*)password response:(PinEntryResponse)response pin:(NSString*)pin {
-    if(response == kOk) {
-        if([pin isEqualToString:self.database.conveniencePin]) {
+    if(response == kPinEntryResponseOk) {
+        if( [pin isEqualToString:self.database.conveniencePin] ) {
             if (self.database.failedPinAttempts != 0) { 
                 self.database.failedPinAttempts = 0;
-                [SafesList.sharedInstance update:self.database];
             }
             
             [self onConvenienceMethodsSucceeded:password
@@ -290,7 +277,6 @@ static const int kMaxFailedPinAttempts = 3;
         }
         else {
             self.database.failedPinAttempts++;
-            [SafesList.sharedInstance update:self.database];
             
             UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
             [gen notificationOccurred:UINotificationFeedbackTypeError];
@@ -304,8 +290,6 @@ static const int kMaxFailedPinAttempts = 3;
 
                 self.database.isTouchIdEnabled = NO;
                 self.database.conveniencePin = nil;
-
-                [SafesList.sharedInstance update:self.database];
                 
                 [Alerts warn:self.viewController
                        title:NSLocalizedString(@"open_sequence_prompt_too_many_incorrect_pins_title",@"Too Many Incorrect PINs")
@@ -318,7 +302,7 @@ static const int kMaxFailedPinAttempts = 3;
             }
         }
     }
-    else if (response == kFallback) {
+    else if (response == kPinEntryResponseFallback) {
         [self promptForManualCredentials];
     }
     else {
@@ -556,8 +540,6 @@ static const int kMaxFailedPinAttempts = 3;
                 self.database.convenienceMasterPassword = nil;
                 self.database.autoFillConvenienceAutoUnlockPassword = nil;
                 self.database.hasBeenPromptedForConvenience = NO; 
-                
-                [SafesList.sharedInstance update:self.database];
             }
 
             if(keyFileBookmark && self.isAutoFillOpen) {
@@ -591,7 +573,6 @@ static const int kMaxFailedPinAttempts = 3;
         self.database.readOnly = readOnly;
         self.database.keyFileBookmark = keyFileBookmark;
         self.database.contextAwareYubiKeyConfig = yubiKeyConfiguration;
-        [SafesList.sharedInstance update:self.database];
     }
     
     [self completeRequestWithCredentials:password

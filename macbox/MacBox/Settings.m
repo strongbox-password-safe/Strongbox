@@ -7,8 +7,7 @@
 //
 
 #import "Settings.h"
-
-static NSString* const kVisibleColumns = @"visibleColumns";
+#import "NotificationConstants.h"
 
 NSString* const kTitleColumn = @"TitleColumn";
 NSString* const kUsernameColumn = @"UsernameColumn";
@@ -23,45 +22,23 @@ NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
 
 
 
-NSString *const kPreferenceGlobalShowShortcut = @"GlobalShowStrongboxHotKey-New";
-NSString *const kPreferencesChangedNotification = @"preferencesChangedNotification";
-
-
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
-static NSString* const kShowQuickView = @"revealDetailsImmediately";
 static NSString* const kFullVersion = @"fullVersion";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* const kAutoLockTimeout = @"autoLockTimeout";
 static NSString* const kWarnedAboutTouchId = @"warnedAboutTouchId";
 static NSString* const kAlwaysShowPassword = @"alwaysShowPassword";
-static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kAutoSave = @"autoSave";
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
-static NSString* const kDoNotShowTotp = @"doNotShowTotp";
-static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
-static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
 static NSString* const kFloatOnTop = @"floatOnTop";
-static NSString* const kNoAlternatingRows = @"noAlternatingRows";
-static NSString* const kShowHorizontalGrid = @"showHorizontalGrid";
-static NSString* const kShowVerticalGrid = @"showVerticalGrid";
-static NSString* const kDoNotShowAutoCompleteSuggestions = @"doNotShowAutoCompleteSuggestions";
-static NSString* const kDoNotShowChangeNotifications = @"doNotShowChangeNotifications";
-static NSString* const kOutlineViewTitleIsReadonly = @"outlineViewTitleIsReadonly";
-static NSString* const kOutlineViewEditableFieldsAreReadonly = @"outlineViewEditableFieldsAreReadonly";
-static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
-static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
 static NSString* const kTrayPasswordGenerationConfig = @"trayPasswordGenerationConfig";
-
 static NSString* const kAutoPromptForTouchIdOnActivate = @"autoPromptForTouchIdOnActivate";
 static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
-static NSString* const kExpressDownloadFavIconOnNewOrUrlChanged = @"expressDownloadFavIconOnNewOrUrlChanged";
-static NSString* const kShowAttachmentsOnQuickViewPanel = @"showAttachmentsOnQuickViewPanel";
-static NSString* const kShowAttachmentImagePreviewsOnQuickViewPanel = @"showAttachmentImagePreviewsOnQuickViewPanel";
 static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmediatelyInOutline";
 static NSString* const kHideKeyFileNameOnLockScreen = @"hideKeyFileNameOnLockScreen";
 static NSString* const kDoNotRememberKeyFile = @"doNotRememberKeyFile";
@@ -69,23 +46,20 @@ static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEn
 static NSString* const kColorizePasswords = @"colorizePasswords";
 static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
-
-static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
-static NSString* const kStartWithSearch = @"startWithSearch";
 static NSString* const kShowDatabasesManagerOnCloseAllWindows = @"showDatabasesManagerOnCloseAllWindows";
 static NSString* const kShowAutoFillTotpCopiedMessage = @"showAutoFillTotpCopiedMessage";
 static NSString* const kAutoLaunchSingleDatabase = @"autoLaunchSingleDatabase";
-static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock";
-
 static NSString* const kHideDockIconOnAllMinimized = @"hideDockIconOnAllMinimized";
-static NSString* const kMigratedConnections = @"migratedConnections";
 static NSString* const kCloseManagerOnLaunch = @"closeManagerOnLaunch";
 static NSString* const kMakeLocalRollingBackups = @"makeLocalRollingBackups";
 static NSString* const kMiniaturizeOnCopy = @"miniaturizeOnCopy";
 static NSString* const kQuickRevealWithOptionKey = @"quickRevealWithOptionKey";
 static NSString* const kMarkdownNotes = @"markdownNotes";
 static NSString* const kShowPasswordGenInTray = @"showPasswordGenInTray";
-
+static NSString* const kNextGenUI = @"nextGenUI-Beta";
+static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
+static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupplementaryTotpCustomFields";
+        
 
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
@@ -142,6 +116,30 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+- (BOOL)addOtpAuthUrl {
+    return [self getBool:kAddOtpAuthUrl fallback:YES];
+}
+
+- (void)setAddOtpAuthUrl:(BOOL)addOtpAuthUrl {
+    [self setBool:kAddOtpAuthUrl value:addOtpAuthUrl];
+}
+
+- (BOOL)addLegacySupplementaryTotpCustomFields {
+    return [self getBool:kAddLegacySupplementaryTotpCustomFields fallback:NO];
+}
+
+- (void)setAddLegacySupplementaryTotpCustomFields:(BOOL)addLegacySupplementaryTotpCustomFields {
+    [self setBool:kAddLegacySupplementaryTotpCustomFields value:addLegacySupplementaryTotpCustomFields];
+}
+
+- (BOOL)checkPinYin {
+    return NO;
+}
+
+- (void)setCheckPinYin:(BOOL)checkPinYin {
+    
+}
+
 - (BOOL)runningAsATrayApp {
     return Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.hideDockIconOnAllMinimized;
 }
@@ -179,11 +177,11 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)nextGenUI {
-    return NO;
+    return [self getBool:kNextGenUI fallback:NO];
 }
 
 - (void)setNextGenUI:(BOOL)nextGenUI {
-    
+    [self setBool:kNextGenUI value:nextGenUI];
 }
 
 - (BOOL)makeLocalRollingBackups {
@@ -202,28 +200,12 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kCloseManagerOnLaunch value:closeManagerOnLaunch];
 }
 
-- (BOOL)migratedConnections {
-    return [self getBool:kMigratedConnections];
-}
-
-- (void)setMigratedConnections:(BOOL)migratedConnections {
-    [self setBool:kMigratedConnections value:migratedConnections];
-}
-
 - (BOOL)hideDockIconOnAllMinimized {
     return [self getBool:kHideDockIconOnAllMinimized];
 }
 
 - (void)setHideDockIconOnAllMinimized:(BOOL)hideDockIconOnAllMinimized {
     return [self setBool:kHideDockIconOnAllMinimized value:hideDockIconOnAllMinimized];
-}
-
-- (BOOL)lockOnScreenLock {
-    return [self getBool:kLockDatabasesOnScreenLock fallback:YES];
-}
-
-- (void)setLockOnScreenLock:(BOOL)lockDatabasesOnScreenLock {
-    [self setBool:kLockDatabasesOnScreenLock value:lockDatabasesOnScreenLock];
 }
 
 - (BOOL)autoFillAutoLaunchSingleDatabase {
@@ -248,22 +230,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setShowDatabasesManagerOnCloseAllWindows:(BOOL)showDatabasesManagerOnCloseAllWindows {
     [self setBool:kShowDatabasesManagerOnCloseAllWindows value:showDatabasesManagerOnCloseAllWindows];
-}
-
-- (BOOL)startWithSearch {
-    return [self getBool:kStartWithSearch fallback:YES];
-}
-
-- (void)setStartWithSearch:(BOOL)startWithSearch {
-    [self setBool:kStartWithSearch value:startWithSearch];
-}
-
-- (BOOL)showAdvancedUnlockOptions {
-    return [self getBool:kShowAdvancedUnlockOptions];
-}
-
-- (void)setShowAdvancedUnlockOptions:(BOOL)showAdvancedUnlockOptions {
-    [self setBool:kShowAdvancedUnlockOptions value:showAdvancedUnlockOptions];
 }
 
 - (BOOL)clipboardHandoff {
@@ -312,14 +278,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setDoNotRememberKeyFile:(BOOL)doNotRememberKeyFile {
     [self setBool:kDoNotRememberKeyFile value:doNotRememberKeyFile];
-}
-
-- (BOOL)expressDownloadFavIconOnNewOrUrlChanged {
-    return [self getBool:kExpressDownloadFavIconOnNewOrUrlChanged fallback:YES];
-}
-
-- (void)setExpressDownloadFavIconOnNewOrUrlChanged:(BOOL)expressDownloadFavIconOnNewOrUrlChanged {
-    [self setBool:kExpressDownloadFavIconOnNewOrUrlChanged value:expressDownloadFavIconOnNewOrUrlChanged];
 }
 
 - (FavIconDownloadOptions *)favIconDownloadOptions {
@@ -388,18 +346,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self.userDefaults synchronize];
 }
 
-+ (NSArray<NSString*> *)kDefaultVisibleColumns 
-{
-    static NSArray *_arr;
-    static dispatch_once_t onceToken;
-    
-    dispatch_once(&onceToken, ^{
-        _arr = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
-    });
-    
-    return _arr;
-}
-
 + (NSArray<NSString*> *)kAllColumns
 {
     static NSArray *_arr;
@@ -410,14 +356,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     });
     
     return _arr;
-}
-
-- (BOOL)showQuickView {
-    return [self getBool:kShowQuickView fallback:YES];
-}
-
-- (void)setShowQuickView:(BOOL)value {
-    [self setBool:kShowQuickView value:value];
 }
 
 - (BOOL)warnedAboutTouchId {
@@ -543,14 +481,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kAutoSave value:autoSave];
 }
 
-- (BOOL)uiDoNotSortKeePassNodesInBrowseView {
-    return [self getBool:kUiDoNotSortKeePassNodesInBrowseView];
-}
-
-- (void)setUiDoNotSortKeePassNodesInBrowseView:(BOOL)uiDoNotSortKeePassNodesInBrowseView {
-    [self setBool:kUiDoNotSortKeePassNodesInBrowseView value:uiDoNotSortKeePassNodesInBrowseView];
-}
-
 - (BOOL)clearClipboardEnabled {
     return [self getBool:kClearClipboardEnabled fallback:YES]; 
 }
@@ -575,30 +505,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self.userDefaults synchronize];
 }
 
-- (BOOL)doNotShowTotp {
-    return [self getBool:kDoNotShowTotp];
-}
-
-- (void)setDoNotShowTotp:(BOOL)doNotShowTotp {
-    [self setBool:kDoNotShowTotp value:doNotShowTotp];
-}
-
-- (BOOL)showRecycleBinInSearchResults {
-    return [self getBool:kShowRecycleBinInSearchResults];
-}
-
-- (void)setShowRecycleBinInSearchResults:(BOOL)showRecycleBinInSearchResults {
-    [self setBool:kShowRecycleBinInSearchResults value:showRecycleBinInSearchResults];
-}
-
-- (BOOL)doNotShowRecycleBinInBrowse {
-    return [self getBool:kDoNotShowRecycleBinInBrowse];
-}
-
-- (void)setDoNotShowRecycleBinInBrowse:(BOOL)doNotShowRecycleBinInBrowse {
-    [self setBool:kDoNotShowRecycleBinInBrowse value:doNotShowRecycleBinInBrowse];
-}
-
 - (BOOL)floatOnTop {
     return [self getBool:kFloatOnTop];
 }
@@ -607,128 +513,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kFloatOnTop value:floatOnTop];
 }
 
-- (BOOL)noAlternatingRows {
-    return [self getBool:kNoAlternatingRows];
-}
-
-- (void)setNoAlternatingRows:(BOOL)noAlternatingRows {
-    [self setBool:kNoAlternatingRows value:noAlternatingRows];
-}
-
-- (BOOL)showHorizontalGrid {
-    return [self getBool:kShowHorizontalGrid];
-}
-
-- (void)setShowHorizontalGrid:(BOOL)showHorizontalGrid {
-    [self setBool:kShowHorizontalGrid value:showHorizontalGrid];
-}
-
-- (BOOL)showVerticalGrid {
-    return [self getBool:kShowVerticalGrid];
-}
-
-- (void)setShowVerticalGrid:(BOOL)showVerticalGrid {
-    [self setBool:kShowVerticalGrid value:showVerticalGrid];
-}
-
-- (BOOL)doNotShowAutoCompleteSuggestions {
-    return [self getBool:kDoNotShowAutoCompleteSuggestions];
-}
-
-- (void)setDoNotShowAutoCompleteSuggestions:(BOOL)doNotShowAutoCompleteSuggestions {
-    [self setBool:kDoNotShowAutoCompleteSuggestions value:doNotShowAutoCompleteSuggestions];
-}
-
-- (BOOL)doNotShowChangeNotifications {
-    return [self getBool:kDoNotShowChangeNotifications];
-}
-
-- (void)setDoNotShowChangeNotifications:(BOOL)doNotShowChangeNotifications {
-    [self setBool:kDoNotShowChangeNotifications value:doNotShowChangeNotifications];
-}
-
 - (NSString *)easyReadFontName {
     return @"Menlo";
-}
-
-- (NSArray<NSString *> *)visibleColumns {
-    NSArray<NSString*>* ret = [self.userDefaults objectForKey:kVisibleColumns];
-    
-    return ret ? ret : [Settings kDefaultVisibleColumns];
-}
-
-- (void)setVisibleColumns:(NSArray<NSString *> *)visibleColumns {
-    if(!visibleColumns || !visibleColumns.count) {
-        visibleColumns = [Settings kDefaultVisibleColumns];
-    }
-    
-    [self.userDefaults setObject:visibleColumns forKey:kVisibleColumns];
-    [self.userDefaults synchronize];
-}
-
-- (BOOL)outlineViewTitleIsReadonly {
-    return [self getBool:kOutlineViewTitleIsReadonly];
-}
-
-- (void)setOutlineViewTitleIsReadonly:(BOOL)outlineViewTitleIsReadonly {
-    [self setBool:kOutlineViewTitleIsReadonly value:outlineViewTitleIsReadonly];
-}
-
-- (BOOL)outlineViewEditableFieldsAreReadonly {
-    return [self getBool:kOutlineViewEditableFieldsAreReadonly];
-}
-
-- (void)setOutlineViewEditableFieldsAreReadonly:(BOOL)outlineViewEditableFieldsAreReadonly {
-    [self setBool:kOutlineViewEditableFieldsAreReadonly value:outlineViewEditableFieldsAreReadonly];
-}
-
-- (BOOL)dereferenceInQuickView {
-    return YES;
-}
-
-- (BOOL)dereferenceInOutlineView {
-    return YES;
-}
-
-- (BOOL)dereferenceDuringSearch {
-    return YES;
-}
-
-- (BOOL)concealEmptyProtectedFields {
-    return [self getBool:kConcealEmptyProtectedFields fallback:YES];
-}
-
-- (void)setConcealEmptyProtectedFields:(BOOL)concealEmptyProtectedFields {
-
-    [self setBool:kConcealEmptyProtectedFields value:concealEmptyProtectedFields];
-}
-
-- (BOOL)showCustomFieldsOnQuickViewPanel {
-    return YES;
-
-}
-
-- (void)setShowCustomFieldsOnQuickViewPanel:(BOOL)showCustomFieldsOnQuickViewPanel {
-    return [self setBool:kShowCustomFieldsOnQuickView value:showCustomFieldsOnQuickViewPanel];
-}
-
-- (BOOL)showAttachmentsOnQuickViewPanel {
-    return YES;
-
-
-}
-
-- (void)setShowAttachmentsOnQuickViewPanel:(BOOL)showAttachmentsOnQuickViewPanel {
-    [self setBool:kShowAttachmentsOnQuickViewPanel value:showAttachmentsOnQuickViewPanel];
-}
-
-- (BOOL)showAttachmentImagePreviewsOnQuickViewPanel {
-    return YES;
-
-}
-
-- (void)setShowAttachmentImagePreviewsOnQuickViewPanel:(BOOL)showAttachmentImagePreviewsOnQuickViewPanel {
-    [self setBool:kShowAttachmentImagePreviewsOnQuickViewPanel value:showAttachmentImagePreviewsOnQuickViewPanel];
 }
 
 

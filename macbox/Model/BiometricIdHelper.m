@@ -77,11 +77,11 @@
     }
 }
 
-- (void)authorize:(DatabaseMetadata *)database completion:(void (^)(BOOL, NSError *))completion {
+- (void)authorize:(MacDatabasePreferences *)database completion:(void (^)(BOOL, NSError *))completion {
     [self authorize:nil database:database completion:completion];
 }
 
-- (void)authorize:(NSString *)fallbackTitle database:(DatabaseMetadata *)database completion:(void (^)(BOOL, NSError *))completion {
+- (void)authorize:(NSString *)fallbackTitle database:(MacDatabasePreferences *)database completion:(void (^)(BOOL, NSError *))completion {
     if(self.dummyMode) {
         completion(YES, nil);
         return;

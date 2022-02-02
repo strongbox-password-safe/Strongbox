@@ -8,7 +8,6 @@
 
 #import "MacFileBasedBookmarkStorageProvider.h"
 #import "BookmarksHelper.h"
-#import "DatabasesManager.h"
 #import "Utils.h"
 #import "MacUrlSchemes.h"
 
@@ -45,10 +44,6 @@
 
 - (void)delete:(nonnull METADATA_PTR)safeMetaData completion:(nonnull void (^)(const NSError * _Nullable))completion {
     
-}
-
-- (METADATA_PTR _Nullable)getSafeMetaData:(nonnull NSString *)nickName providerData:(nonnull NSObject *)providerData {
-    return nil;
 }
 
 - (void)list:(NSObject * _Nullable)parentFolder viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController completion:(nonnull void (^)(BOOL, NSArray<StorageBrowserItem *> * _Nonnull, const NSError * _Nonnull))completion {
@@ -183,6 +178,10 @@
     
 }
 
+- (METADATA_PTR _Nullable)getDatabasePreferences:(nonnull NSString *)nickName providerData:(nonnull NSObject *)providerData {
+    return nil;
+}
+
 - (NSURL*)directFileUrlForDatabase:(METADATA_PTR)database ppError:(NSError**)ppError {
     if ( database.storageInfo != nil ) {
         NSError *error = nil;
@@ -201,9 +200,6 @@
             if ( updatedBookmark ) {
                 NSLog(@"INFO: Bookmark has changed for Database updating...");
                 database.storageInfo = updatedBookmark;
-                [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                    metadata.storageInfo = updatedBookmark;
-                }];
             }
             
             NSURL* defaultRet = fileUrlFromManagedUrl(database.fileUrl);
@@ -211,9 +207,6 @@
                 NSLog(@"INFO: URL has changed for Database updating...");
 
                 database.fileUrl = managedUrlFromFileUrl(url);
-                [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                    metadata.fileUrl = database.fileUrl;
-                }];
             }
             
             return url; 

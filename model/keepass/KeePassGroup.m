@@ -33,6 +33,7 @@
         self.enableSearching = nil;
         self.lastTopVisibleEntry = nil;
         self.tags = [NSMutableSet set];
+        self.isExpanded = YES;
     }
     
     return self;
@@ -138,7 +139,7 @@
         return YES;
     }
     else if ( [withXmlElementName isEqualToString:kIsExpandedElementName] ) {
-        self.isExpanded = [SimpleXmlValueExtractor getBool:completedObject];
+        self.isExpanded = [SimpleXmlValueExtractor getBool:completedObject defaultValue:YES];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kPreviousParentGroupElementName]) {
@@ -177,8 +178,8 @@
             if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
         }
         
-        if ( self.isExpanded ) {
-            if ( ![serializer writeElement:kIsExpandedElementName boolean:self.isExpanded]) return NO;
+        if ( !self.isExpanded ) { 
+            if ( ![serializer writeElement:kIsExpandedElementName boolean:NO]) return NO;
         }
         
         if (self.groupsAndEntries) {

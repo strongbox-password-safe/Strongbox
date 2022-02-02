@@ -8,8 +8,7 @@
 
 #import "SFTPConnectionsManager.h"
 #import "SFTPConnections.h"
-#import "DatabaseMetadata.h"
-#import "DatabasesManager.h"
+#import "MacDatabasePreferences.h"
 #import "NSArray+Extensions.h"
 #import "SFTPStorageProvider.h"
 #import "MacAlerts.h"
@@ -131,12 +130,12 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
     [self bindUi];
 }
 
-- (NSArray<DatabaseMetadata*>*)getDatabasesUsingConnection:(SFTPSessionConfiguration*)connection {
-    NSArray<DatabaseMetadata*>* possibles = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
-        return obj.storageProvider == kSFTP;
+- (NSArray<MacDatabasePreferences*>*)getDatabasesUsingConnection:(SFTPSessionConfiguration*)connection {
+    NSArray<MacDatabasePreferences*>* possibles = [MacDatabasePreferences filteredDatabases:^BOOL(MacDatabasePreferences * _Nonnull database) {
+        return database.storageProvider == kSFTP;
     }];
     
-    NSArray<DatabaseMetadata*>* using = [possibles filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
+    NSArray<MacDatabasePreferences*>* using = [possibles filter:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         SFTPSessionConfiguration* config = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:obj];
         return ( config && [config.identifier isEqualToString:connection.identifier] );
     }];
@@ -145,7 +144,7 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
 }
 
 - (NSString*)getUsedByString:(SFTPSessionConfiguration*)connection {
-    NSArray<DatabaseMetadata*>* using = [self getDatabasesUsingConnection:connection];
+    NSArray<MacDatabasePreferences*>* using = [self getDatabasesUsingConnection:connection];
     
     if ( using.count == 0 ) {
         return NSLocalizedString(@"not_used_by_any_databases", @"Not used by any databases.");

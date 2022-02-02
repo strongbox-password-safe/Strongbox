@@ -22,6 +22,7 @@
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
 #import "AppPreferences.h"
+#import "StatisticsPropertiesViewController.h"
 
 @interface DatabaseOperations ()
 
@@ -29,6 +30,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBulkUpdateFavIcons;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellStats;
 
 @end
 
@@ -44,6 +46,30 @@
     self.cellPrint.imageView.image = [UIImage imageNamed:@"print"];
     self.cellViewAttachments.imageView.image = [UIImage imageNamed:@"attach"];
     self.cellBulkUpdateFavIcons.imageView.image = [UIImage imageNamed:@"picture"];
+    self.cellStats.imageView.image = [UIImage imageNamed:@"statistics"];
+
+    if (@available(iOS 13.0, *)) {
+        self.cellExport.imageView.image = [UIImage systemImageNamed:@"square.and.arrow.up"];
+        [self.cellExport.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+
+        self.cellPrint.imageView.image = [UIImage systemImageNamed:@"printer"];
+        [self.cellPrint.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+
+        self.cellViewAttachments.imageView.image = [UIImage systemImageNamed:@"paperclip"];
+        [self.cellViewAttachments.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+
+        self.cellBulkUpdateFavIcons.imageView.image = [UIImage systemImageNamed:@"photo"];
+        [self.cellBulkUpdateFavIcons.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+        
+        self.cellStats.imageView.image = [UIImage systemImageNamed:@"number.circle"];
+        [self.cellStats.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+
+        
+        
+        if (@available(iOS 14.0, *)) {
+
+        }
+    }
     
     [self setupTableView];
 }
@@ -76,6 +102,10 @@
     }
     else if ([segue.identifier isEqualToString:@"segueToAttachmentsPool"]) {
         AttachmentsPoolViewController* vc = (AttachmentsPoolViewController*)segue.destinationViewController;
+        vc.viewModel = self.viewModel;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToStatistics"]) {
+        StatisticsPropertiesViewController* vc = (StatisticsPropertiesViewController*)segue.destinationViewController;
         vc.viewModel = self.viewModel;
     }
 }

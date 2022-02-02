@@ -8,30 +8,37 @@
 
 #import <Foundation/Foundation.h>
 #import "OnboardingDatabaseChangeRequests.h"
+#import "SearchScope.h"
+#import "BrowseSortField.h"
 
 #if TARGET_OS_IPHONE
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
 
 typedef UIViewController* VIEW_CONTROLLER_PTR;
-typedef SafeMetaData* METADATA_PTR;
 
 #else
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
 
 typedef NSViewController* VIEW_CONTROLLER_PTR;
-typedef DatabaseMetadata* METADATA_PTR;
 
 #endif
 
 #import "DatabaseModel.h"
 #import "DatabaseAuditor.h"
 #import "AsyncUpdateResult.h"
+#import "CommonDatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+extern NSString* const kSpecialSearchTermAllEntries;
+extern NSString* const kSpecialSearchTermAuditEntries;
+extern NSString* const kSpecialSearchTermTotpEntries;
+extern NSString* const kSpecialSearchTermExpiredEntries;
+extern NSString* const kSpecialSearchTermNearlyExpiredEntries;
+
+typedef void (^AsyncUpdateCompletion)(AsyncUpdateResult *result);
 
 extern NSString* const kAuditNodesChangedNotificationKey;
 extern NSString* const kAuditProgressNotificationKey;
@@ -48,6 +55,7 @@ extern NSString* const kAsyncUpdateStarting;
 
 @interface Model : NSObject
 
+@property (nonatomic, readonly) NSString *databaseUuid;
 @property (nonatomic, readonly, nonnull) METADATA_PTR metadata;
 @property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
 @property (nonatomic, readonly) BOOL isReadOnly;
@@ -60,7 +68,7 @@ extern NSString* const kAsyncUpdateStarting;
 
 
 
-- (instancetype _Nullable )init NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype _Nullable )initWithDatabase:(DatabaseModel *_Nonnull)passwordDatabase
                                    metaData:(METADATA_PTR _Nonnull)metaData
@@ -88,6 +96,8 @@ extern NSString* const kAsyncUpdateStarting;
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
 - (void)stopAndClearAuditor;
+
+- (Node*_Nullable)getItemById:(NSUUID*)uuid;
 
 @property (readonly) AuditState auditState;
 @property (readonly, nullable) NSNumber* auditIssueCount;
@@ -120,8 +130,8 @@ extern NSString* const kAsyncUpdateStarting;
 - (BOOL)isPinned:(NSUUID*)itemId;
 - (void)togglePin:(NSUUID*)itemId;
 
-- (void)launchUrl:(Node*)item;
-- (void)launchUrlString:(NSString*)urlString;
+- (BOOL)launchUrl:(Node*)item;
+- (BOOL)launchUrlString:(NSString*)urlString;
 
 @property (readonly) NSSet<NSString*>* pinnedSet;
 @property (readonly) NSArray<Node*>* pinnedNodes;
@@ -141,6 +151,7 @@ extern NSString* const kAsyncUpdateStarting;
 @property (readonly) BOOL isRunningAsyncUpdate;
 
 - (BOOL)asyncUpdateAndSync;
+- (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion _Nullable)completion;
 - (void)clearAsyncUpdateState;
 
 
@@ -148,6 +159,58 @@ extern NSString* const kAsyncUpdateStarting;
 @property BOOL isDuressDummyDatabase; 
 
 @property (nullable) OnboardingDatabaseChangeRequests* onboardingDatabaseChangeRequests;
+
+
+
+@property (nonatomic, readonly) DatabaseFormat originalFormat;
+- (BOOL)isDereferenceableText:(NSString*)text;
+- (NSString*)dereference:(NSString*)text node:(Node*)node;
+
+
+
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(SearchScope)scope
+              dereference:(BOOL)dereference
+    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups
+          browseSortField:(BrowseSortField)browseSortField
+               descending:(BOOL)descending
+        foldersSeparately:(BOOL)foldersSeparately;
+
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(SearchScope)scope
+              dereference:(BOOL)dereference
+    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups
+                 trueRoot:(BOOL)trueRoot
+          browseSortField:(BrowseSortField)browseSortField
+               descending:(BOOL)descending
+        foldersSeparately:(BOOL)foldersSeparately;
+
+- (NSArray<Node*>*)filterAndSortForBrowse:(NSMutableArray<Node*>*)nodes
+                    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+                        includeRecycleBin:(BOOL)includeRecycleBin
+                           includeExpired:(BOOL)includeExpired
+                            includeGroups:(BOOL)includeGroups
+                          browseSortField:(BrowseSortField)browseSortField
+                               descending:(BOOL)descending
+                        foldersSeparately:(BOOL)foldersSeparately;
+
+- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items
+                      browseSortField:(BrowseSortField)browseSortField
+                           descending:(BOOL)descending
+                    foldersSeparately:(BOOL)foldersSeparately;
+
+- (NSComparisonResult)compareNodesForSort:(Node*)node1
+                                    node2:(Node*)node2
+                                    field:(BrowseSortField)field
+                               descending:(BOOL)descending
+                        foldersSeparately:(BOOL)foldersSeparately
+                         tieBreakUseTitle:(BOOL)tieBreakUseTitle;
 
 @end
 

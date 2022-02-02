@@ -12,7 +12,8 @@
 #import "ItemMetadataEntry.h"
 #import "DatabaseAttachment.h"
 #import "MutableOrderedDictionary.h"
-#import "NodeIcon.h"
+#import "Node.h"
+#import "DatabaseFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,22 +21,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)demoItem;
 
++ (instancetype)fromNode:(Node *)item format:(DatabaseFormat)format keePassEmailField:(BOOL)keePassEmailField;
+
+- (BOOL)applyToNode:(Node*)ret
+     databaseFormat:(DatabaseFormat)databaseFormat
+  keePassEmailField:(BOOL)keePassEmailField
+legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
+      addOtpAuthUrl:(BOOL)addOtpAuthUrl;
+
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithTitle:(NSString*)title
-                     username:(NSString*)username
-                     password:(NSString*)password
-                          url:(NSString*)url
-                        notes:(NSString*)notes
-                        email:(NSString*)email
-         keePassEmailFieldKey:(NSString*_Nullable)keePassEmailFieldKey
-                      expires:(NSDate*_Nullable)expires
-                         tags:(NSSet<NSString*>*_Nullable)tags
-                         totp:(OTPToken*_Nullable)totp
-                         icon:(NodeIcon*_Nullable)icon
-                 customFields:(NSArray<CustomFieldViewModel*>*)customFields
-                  attachments:(NSDictionary<NSString*, DatabaseAttachment*>*)attachments
-                     metadata:(NSArray<ItemMetadataEntry*>*)metadata
-                   hasHistory:(BOOL)hasHistory NS_DESIGNATED_INITIALIZER;
+
 
 - (instancetype)clone;
 - (BOOL)isValid;
@@ -64,9 +59,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)addTag:(NSString*)tag;
 - (void)removeTag:(NSString*)tag;
+- (void)resetTags:(NSSet<NSString*>*)tags;
 @property (readonly) NSArray<NSString*> *tags;
 
 @property BOOL hasHistory;
+
+@property (nullable) NSUUID* parentGroupUuid;
 
 @end
 

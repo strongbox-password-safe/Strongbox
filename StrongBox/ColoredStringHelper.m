@@ -127,9 +127,12 @@ static COLOR_PTR defaultNonColorizedColor;
                                        palette:(Palette*)palette
                                           font:(FONT_PTR)font {
     NSMutableDictionary* ret = [NSMutableDictionary dictionaryWithDictionary:@{
-        NSForegroundColorAttributeName : colorize ? [ColoredStringHelper getColorForCharacterType:type palette:palette] : defaultNonColorizedColor,
-        NSKernAttributeName : @(1.4) 
+        NSForegroundColorAttributeName : colorize ? [ColoredStringHelper getColorForCharacterType:type palette:palette] : defaultNonColorizedColor
     }];
+    
+    if (colorize) {
+        ret[NSKernAttributeName] = @(1.4); 
+    }
     
     if ( font ) {
         ret[NSFontAttributeName] = font;

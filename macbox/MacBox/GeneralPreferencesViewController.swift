@@ -9,25 +9,25 @@
 import Cocoa
 
 class GeneralPreferencesViewController: NSViewController {
-    @IBOutlet weak var autoLockDatabase: NSButton!
-    @IBOutlet weak var miniaturizeOnCopy: NSButton!
-    @IBOutlet weak var autoClearClipboard: NSButton!
-    @IBOutlet weak var shortcutView: MASShortcutView!
-    @IBOutlet weak var autoClearClipboardTimeout: NSTextField!
-    @IBOutlet weak var autoLockTimeoutTextField: NSTextField!
-    @IBOutlet weak var stepperAutoClearClipboard: NSStepper!
-    @IBOutlet weak var autoLockStepper: NSStepper!
-    @IBOutlet weak var hideDockIcon: NSButton!
-    @IBOutlet weak var showInSystemTray: NSButton!
+    @IBOutlet var autoLockDatabase: NSButton!
+    @IBOutlet var miniaturizeOnCopy: NSButton!
+    @IBOutlet var autoClearClipboard: NSButton!
+    @IBOutlet var shortcutView: MASShortcutView!
+    @IBOutlet var autoClearClipboardTimeout: NSTextField!
+    @IBOutlet var autoLockTimeoutTextField: NSTextField!
+    @IBOutlet var stepperAutoClearClipboard: NSStepper!
+    @IBOutlet var autoLockStepper: NSStepper!
+    @IBOutlet var hideDockIcon: NSButton!
+    @IBOutlet var showInSystemTray: NSButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         shortcutView.associatedUserDefaultsKey = kPreferenceGlobalShowShortcut
 
         bindUI()
     }
-    
+
     private func bindUI() {
         bindAutoLock()
         bindClipboard()
@@ -37,87 +37,87 @@ class GeneralPreferencesViewController: NSViewController {
         hideDockIcon.state = Settings.sharedInstance().hideDockIconOnAllMinimized ? .on : .off
         miniaturizeOnCopy.state = Settings.sharedInstance().miniaturizeOnCopy ? .on : .off
     }
-    
+
     func bindAutoLock() {
         let alt = Settings.sharedInstance().autoLockTimeoutSeconds
-        
+
         autoLockDatabase.state = alt != 0 ? .on : .off
-        autoLockTimeoutTextField.isEnabled = alt != 0;
-        autoLockStepper.isEnabled = alt != 0;
-        autoLockStepper.integerValue = alt;
-        autoLockTimeoutTextField.stringValue = alt != 0 ? autoLockStepper.stringValue : "120";
+        autoLockTimeoutTextField.isEnabled = alt != 0
+        autoLockStepper.isEnabled = alt != 0
+        autoLockStepper.integerValue = alt
+        autoLockTimeoutTextField.stringValue = alt != 0 ? autoLockStepper.stringValue : "120"
     }
-    
+
     func bindClipboard() {
         autoClearClipboard.state = Settings.sharedInstance().clearClipboardEnabled ? .on : .off
         autoClearClipboardTimeout.isEnabled = Settings.sharedInstance().clearClipboardEnabled
         stepperAutoClearClipboard.isEnabled = Settings.sharedInstance().clearClipboardEnabled
         stepperAutoClearClipboard.integerValue = Settings.sharedInstance().clearClipboardAfterSeconds
-        autoClearClipboardTimeout.stringValue =  stepperAutoClearClipboard.stringValue
+        autoClearClipboardTimeout.stringValue = stepperAutoClearClipboard.stringValue
     }
-    
-    @IBAction func onClearClipboardTextFieldEdited(_ sender: Any) {
-        stepperAutoClearClipboard.integerValue = autoClearClipboardTimeout.integerValue;
-        
-        Settings.sharedInstance().clearClipboardAfterSeconds = stepperAutoClearClipboard.integerValue;
-        
+
+    @IBAction func onClearClipboardTextFieldEdited(_: Any) {
+        stepperAutoClearClipboard.integerValue = autoClearClipboardTimeout.integerValue
+
+        Settings.sharedInstance().clearClipboardAfterSeconds = stepperAutoClearClipboard.integerValue
+
         bindUI()
-        
+
         notifyChanged()
     }
-    
-    @IBAction func onClearClipboardStepper(_ sender: Any) {
-        Settings.sharedInstance().clearClipboardAfterSeconds = stepperAutoClearClipboard.integerValue;
-        
+
+    @IBAction func onClearClipboardStepper(_: Any) {
+        Settings.sharedInstance().clearClipboardAfterSeconds = stepperAutoClearClipboard.integerValue
+
         bindUI()
-        
+
         notifyChanged()
     }
-    
-    @IBAction func onClearClipboardCheckbox(_ sender: Any) {
+
+    @IBAction func onClearClipboardCheckbox(_: Any) {
         Settings.sharedInstance().clearClipboardEnabled = autoClearClipboard.state == .on
 
         bindUI()
-        
+
         notifyChanged()
     }
-    
-    @IBAction func onAutoLockTextFieldEdited(_ sender: Any) {
-        autoLockStepper.integerValue = autoLockTimeoutTextField.integerValue;
-        
-        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockStepper.integerValue;
-        
-        bindUI()
-        
-        notifyChanged()
-    }
-    
-    @IBAction func onAutoLockStepperChanged(_ sender: Any) {
-        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockStepper.integerValue;
-        
-        bindUI()
-        
-        notifyChanged()
-    }
-    
-    @IBAction func onAutoLockTimeoutChanged(_ sender: Any) {
-        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockDatabase.state == .on ? 120 : 0;
+
+    @IBAction func onAutoLockTextFieldEdited(_: Any) {
+        autoLockStepper.integerValue = autoLockTimeoutTextField.integerValue
+
+        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockStepper.integerValue
 
         bindUI()
-        
+
         notifyChanged()
     }
-    
-    @IBAction func onChanged(_ sender: Any) {
+
+    @IBAction func onAutoLockStepperChanged(_: Any) {
+        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockStepper.integerValue
+
+        bindUI()
+
+        notifyChanged()
+    }
+
+    @IBAction func onAutoLockTimeoutChanged(_: Any) {
+        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockDatabase.state == .on ? 120 : 0
+
+        bindUI()
+
+        notifyChanged()
+    }
+
+    @IBAction func onChanged(_: Any) {
         Settings.sharedInstance().showSystemTrayIcon = showInSystemTray.state == .on
         Settings.sharedInstance().hideDockIconOnAllMinimized = hideDockIcon.state == .on
         Settings.sharedInstance().miniaturizeOnCopy = miniaturizeOnCopy.state == .on
-        
+
         bindUI()
-        
+
         notifyChanged()
     }
-    
+
     func notifyChanged() {
         NotificationCenter.default.post(name: .preferencesChanged, object: nil)
     }

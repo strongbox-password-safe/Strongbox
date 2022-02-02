@@ -26,7 +26,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 + (void)createNewExpressDatabase:(UIViewController*)vc
                             name:(NSString *)name
                         password:(NSString *)password
-                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion  {
+                      completion:(void (^)(BOOL userCancelled, DatabasePreferences* metadata, NSData* initialSnapshot, NSError* error))completion  {
     [AddNewSafeHelper createNewExpressDatabase:vc name:name password:password forceLocal:NO completion:completion];
 }
 
@@ -34,7 +34,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                             name:(NSString *)name
                         password:(NSString *)password
                       forceLocal:(BOOL)forceLocal
-                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
+                      completion:(void (^)(BOOL userCancelled, DatabasePreferences* metadata, NSData* initialSnapshot, NSError* error))completion {
     NSError* error;
     DatabaseModel *database = getNewDatabase(password, nil, nil, nil, kDefaultFormat, &error);
     
@@ -49,7 +49,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 + (void)createNewExpressDatabase:(UIViewController *)vc
                             name:(NSString *)name
                            model:(DatabaseModel *)model
-                      completion:(void (^)(BOOL, SafeMetaData * _Nonnull, NSData * _Nonnull, NSError * _Nonnull))completion {
+                      completion:(void (^)(BOOL, DatabasePreferences * _Nonnull, NSData * _Nonnull, NSError * _Nonnull))completion {
     [AddNewSafeHelper createNewExpressDatabase:vc name:name model:model forceLocal:NO completion:completion];
 }
 
@@ -57,7 +57,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                             name:(NSString *)name
                            model:(DatabaseModel *)model
                       forceLocal:(BOOL)forceLocal
-                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
+                      completion:(void (^)(BOOL userCancelled, DatabasePreferences* metadata, NSData* initialSnapshot, NSError* error))completion {
     BOOL iCloud = !forceLocal && AppPreferences.sharedInstance.iCloudOn && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
     
     [AddNewSafeHelper createDatabase:vc
@@ -78,7 +78,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
             yubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig
             storageParams:(nonnull SelectedStorageParameters *)storageParams
                    format:(DatabaseFormat)format
-               completion:(nonnull void (^)(BOOL userCancelled, SafeMetaData * _Nullable, NSData* initialSnapshot, NSError * _Nullable))completion {
+               completion:(nonnull void (^)(BOOL userCancelled, DatabasePreferences * _Nullable, NSData* initialSnapshot, NSError * _Nullable))completion {
     NSError* error;
     DatabaseModel *database = getNewDatabase(password, keyFileBookmark, onceOffKeyFileData, yubiKeyConfig, format, &error);
     
@@ -104,7 +104,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
               provider:(id<SafeStorageProvider>)provider
           parentFolder:(NSObject*)parentFolder
          yubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig
-           completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
+           completion:(void (^)(BOOL userCancelled, DatabasePreferences* metadata, NSData* initialSnapshot, NSError* error))completion {
     dispatch_async(dispatch_get_main_queue(), ^(void) { 
         [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     });
@@ -132,7 +132,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                             data:data
                     parentFolder:parentFolder
                   viewController:vc
-                      completion:^(SafeMetaData *metadata, NSError *error) {
+                      completion:^(DatabasePreferences *metadata, NSError *error) {
                     metadata.keyFileBookmark = keyFileBookmark;
                     metadata.likelyFormat = format;
                     metadata.contextAwareYubiKeyConfig = yubiKeyConfig;

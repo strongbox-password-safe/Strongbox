@@ -7,7 +7,6 @@
 //
 
 #import "DatabasesManagerVC.h"
-#import "DatabasesManager.h"
 #import "MacAlerts.h"
 #import "DocumentController.h"
 #import "Settings.h"
@@ -32,6 +31,7 @@
 #import "WebDAVConnectionsManager.h"
 #import "NSDate+Extensions.h"
 #import "macOSSpinnerUI.h"
+#import "DatabasesManager.h"
 
 
 
@@ -88,8 +88,6 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)doInitialSetup {
-
-
     
     
     
@@ -119,13 +117,9 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     NSTableColumn *col = [self.tableView.tableColumns objectAtIndex:0];
     [col setResizingMask:NSTableColumnAutoresizingMask];
     self.tableView.headerView = nil;
-    
-    
 
     [self loadDatabases];
     [self.tableView reloadData];
-
-
 
     
 
@@ -136,7 +130,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
-    
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
+
     NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
     
     NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
@@ -146,7 +141,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)loadDatabases {
-    self.databaseIds = [DatabasesManager.sharedInstance.snapshot map:^id _Nonnull(DatabaseMetadata * _Nonnull obj, NSUInteger idx) {
+    self.databaseIds = [MacDatabasePreferences.allDatabases map:^id _Nonnull(MacDatabasePreferences * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;
     }];
 }
@@ -160,9 +155,9 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         return;
     }
     
-    NSMutableSet<DatabaseMetadata*>* selected = NSMutableSet.set;
+    NSMutableSet<MacDatabasePreferences*>* selected = NSMutableSet.set;
 
-    [self performActionOnSelected:^(DatabaseMetadata *database) {
+    [self performActionOnSelected:^(MacDatabasePreferences *database) {
         [selected addObject:database];
     }];
     
@@ -170,7 +165,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
     DocumentController* dc = DocumentController.sharedDocumentController;
 
-    BOOL atLeastOneUnlocked = [selected.allObjects anyMatch:^BOOL(DatabaseMetadata * _Nonnull obj) {
+    BOOL atLeastOneUnlocked = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         return [dc databaseIsUnlockedInDocumentWindow:obj];
     }];
 
@@ -193,7 +188,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
            window:self.view.window
        completion:^(BOOL yesNo) {
         if (yesNo) {
-            for (DatabaseMetadata* database in selected) {
+            for (MacDatabasePreferences* database in selected) {
                 BOOL isOpen = [dc databaseIsDocumentWindow:database];
                 if (isOpen) {
                     [dc closeDocumentWindowForDatabase:database];
@@ -201,7 +196,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 [self removeDatabase:database];
             }
             
-            BOOL quickTypeDb = [selected.allObjects anyMatch:^BOOL(DatabaseMetadata * _Nonnull obj) {
+            BOOL quickTypeDb = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
                 return obj.autoFillEnabled && obj.quickTypeEnabled;
             }];
             
@@ -212,8 +207,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }];
 }
 
-- (void)removeDatabase:(DatabaseMetadata*)safe {
-    [DatabasesManager.sharedInstance remove:safe.uuid];
+- (void)removeDatabase:(MacDatabasePreferences*)safe {
+    [safe remove];
     [safe clearSecureItems];
     [BackupsManager.sharedInstance deleteAllBackups:safe];
 }
@@ -261,7 +256,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
 
     NSString* databaseId = [self.databaseIds objectAtIndex:row];
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
     [result setWithDatabase:database];
 
@@ -305,16 +300,16 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     
     NSString* databaseId = self.databaseIds[row];
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
     [self openDatabase:database];
 }
 
-- (void)openDatabase:(DatabaseMetadata*)database {
+- (void)openDatabase:(MacDatabasePreferences*)database {
     [self openDatabase:database offline:database.alwaysOpenOffline];
 }
 
-- (void)openDatabase:(DatabaseMetadata*)database offline:(BOOL)offline {
+- (void)openDatabase:(MacDatabasePreferences*)database offline:(BOOL)offline {
     DocumentController* dc = DocumentController.sharedDocumentController;
 
     
@@ -328,10 +323,6 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         }
         else {
             database.offlineMode = offline;
-            [DatabasesManager.sharedInstance atomicUpdate:database.uuid
-                                                    touch:^(DatabaseMetadata * _Nonnull metadata) {
-                metadata.offlineMode = offline;
-            }];
         }
     }
     
@@ -415,16 +406,15 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 
                 NSString* suggestedName = [selectedItem.name stringByDeletingPathExtension];
                 
-                DatabaseMetadata *newDatabase = [provider getSafeMetaData:suggestedName
-                                                             providerData:selectedItem.providerData];
-                
+                MacDatabasePreferences *newDatabase = [provider getDatabasePreferences:suggestedName providerData:selectedItem.providerData];
+                    
                 if (!newDatabase) {
                     [MacAlerts error:nil window:self.view.window];
                 }
                 else {
                     NSLog(@"[%@]", newDatabase.fileUrl.absoluteString);
                     
-                    [DatabasesManager.sharedInstance add:newDatabase];
+                    [newDatabase add];
                     [self openDatabase:newDatabase];
                 }
             }
@@ -447,7 +437,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     else if ( (aChar == NSEnterCharacter) || (aChar == NSCarriageReturnCharacter) ) {
         NSLog(@"DatabasesManagerVC::keyDown - OPEN");
-        [self performActionOnSelected:^(DatabaseMetadata* database) {
+        [self performActionOnSelected:^(MacDatabasePreferences* database) {
             [self openDatabase:database];
         }];
     }
@@ -457,10 +447,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 }
 
-- (void)performActionOnSelected:(void(^)(DatabaseMetadata* database))action {
+- (void)performActionOnSelected:(void(^)(MacDatabasePreferences* database))action {
     [self.tableView.selectedRowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
         NSString* databaseId = self.databaseIds[idx];
-        DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
         if (action) {
             action(database);
@@ -498,11 +488,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         NSInteger oldIndex = num.integerValue;
         
         if (oldIndex < row) {
-            [DatabasesManager.sharedInstance move:oldIndex + oldIndexOffset to:row-1];
+            [MacDatabasePreferences move:oldIndex + oldIndexOffset to:row-1];
             oldIndexOffset -= 1;
         }
         else {
-            [DatabasesManager.sharedInstance move:oldIndex to:row + newIndexOffset];
+            [MacDatabasePreferences move:oldIndex to:row + newIndexOffset];
             newIndexOffset += 1;
         }
     }
@@ -514,10 +504,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     SEL theAction = [anItem action];
 
 
-    DatabaseMetadata* database;
+    MacDatabasePreferences* database;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
-        database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+        database = [MacDatabasePreferences fromUuid:databaseId];
     }
     
     if (theAction == @selector(onViewSyncLog:)) {
@@ -604,7 +594,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (IBAction)onViewSyncLog:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
-        DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
         SyncLogViewController* vc = [SyncLogViewController showForDatabase:database];
         [self presentViewControllerAsSheet:vc];
@@ -614,7 +604,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (IBAction)onSync:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
-        DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
         Document* doc = [DocumentController.sharedDocumentController documentForURL:database.fileUrl];
         if ( doc && !doc.isModelLocked ) {
@@ -641,7 +631,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (IBAction)onViewBackups:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
-        DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
         [self performSegueWithIdentifier:@"segueToBackups" sender:database.uuid];
     }
@@ -664,10 +654,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 
     NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
     NSSavePanel* panel = [NSSavePanel savePanel];
-    panel.nameFieldStringValue = [self exportFileName:database];
+    panel.nameFieldStringValue = database.exportFileName;
     
     if ( [panel runModal] != NSModalResponseOK ) {
         return;
@@ -692,19 +682,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 }
 
-- (NSString*)exportFileName:(DatabaseMetadata*)metadata {
-    NSString* extension = metadata.fileUrl.path.pathExtension;
-    NSString* withoutExtension = [metadata.fileUrl.path.lastPathComponent stringByDeletingPathExtension];
-    NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
-    
-    NSString* ret = [newFileName stringByAppendingPathExtension:extension];
-    
-    NSLog(@"Export Filename: [%@]", ret);
-    
-    return  ret;
-}
-
-- (void)syncBeforeExport:(DatabaseMetadata *)database dest:(NSURL*)dest showSpinner:(BOOL)showSpinner {
+- (void)syncBeforeExport:(MacDatabasePreferences *)database dest:(NSURL*)dest showSpinner:(BOOL)showSpinner {
     if ( showSpinner ) {
         [self showProgressModal:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
     }
@@ -725,7 +703,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }];
 }
 
-- (void)export:(DatabaseMetadata *)database
+- (void)export:(MacDatabasePreferences *)database
           dest:(NSURL*)dest {
     NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
     NSLog(@"Export [%@] => [%@]", src, dest);
@@ -763,7 +741,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 
     NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
     [self openDatabase:database offline:YES];
 }
@@ -771,30 +749,27 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (IBAction)onToggleLaunchAtStartup:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
-        [DatabasesManager.sharedInstance atomicUpdate:databaseId touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.launchAtStartup = !metadata.launchAtStartup;
-        }];
+        database.launchAtStartup = !database.launchAtStartup;
     }
 }
 
 - (IBAction)onToggleAlwaysOpenOffline:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
-        [DatabasesManager.sharedInstance atomicUpdate:databaseId touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.alwaysOpenOffline = !metadata.alwaysOpenOffline;
-        }];
+        database.alwaysOpenOffline = !database.alwaysOpenOffline;
     }
 }
 
 - (IBAction)onToggleReadOnly:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
-        [DatabasesManager.sharedInstance atomicUpdate:databaseId touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.readOnly = !metadata.readOnly;
-        }];
+        database.readOnly = !database.readOnly;
     }
 }
 

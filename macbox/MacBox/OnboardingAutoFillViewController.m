@@ -7,7 +7,6 @@
 //
 
 #import "OnboardingAutoFillViewController.h"
-#import "DatabasesManager.h"
 #import "AutoFillManager.h"
 #import "MacAlerts.h"
 
@@ -25,8 +24,8 @@
 
 @implementation OnboardingAutoFillViewController
 
-- (DatabaseMetadata*)database {
-    return [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+- (MacDatabasePreferences*)database {
+    return [MacDatabasePreferences fromUuid:self.databaseUuid];
 }
 
 - (void)viewDidLoad {
@@ -101,20 +100,16 @@
                                          unConcealedCustomFieldsAsCreds:self.database.autoFillUnConcealedFieldsAsCreds];
     }
 
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoFillEnabled = autoFillEnabled;
-        metadata.quickTypeEnabled = quickTypeEnabled;
-        metadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
-    }];
+    
+    self.database.autoFillEnabled = autoFillEnabled;
+    self.database.quickTypeEnabled = quickTypeEnabled;
+    self.database.quickWormholeFillEnabled = quickWormholeFillEnabled;
     
     [self bindUI];
 }
 
 - (IBAction)onDone:(id)sender {
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.hasPromptedForAutoFillEnrol = YES;
-    }];
+    self.database.hasPromptedForAutoFillEnrol = YES;
 
     [self.view.window close];
 }

@@ -19,6 +19,9 @@
 #import "ConcurrentMutableStack.h"
 #import "FileManager.h"
 #import "CrossPlatform.h"
+#import "AsyncUpdateJob.h"
+#import "NSMutableArray+Extensions.h"
+#import "WorkingCopyManager.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
@@ -34,6 +37,12 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 NSString* const kAsyncUpdateDone = @"kAsyncUpdateDone";
 NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
+NSString* const kSpecialSearchTermAllEntries = @"strongbox:allEntries";
+NSString* const kSpecialSearchTermAuditEntries = @"strongbox:auditEntries";
+NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
+NSString* const kSpecialSearchTermExpiredEntries = @"strongbox:expiredEntries";
+NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpiredEntries";
+
 @interface Model ()
 
 @property NSSet<NSString*> *cachedPinned;
@@ -45,12 +54,11 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 @property BOOL offlineMode;
 
 @property dispatch_queue_t asyncUpdateEncryptionQueue;
-@property ConcurrentMutableStack* asyncUpdatesStack;
+@property ConcurrentMutableStack<AsyncUpdateJob*>* asyncUpdatesStack;
 
 @property (readonly) id<ApplicationPreferences> applicationPreferences;
 @property (readonly) id<SyncManagement> syncManagement;
 @property (readonly) id<SpinnerUI> spinnerUi;
-@property (readonly) id<DatabasePreferencesManager> databasesPreferencesManager;
 
 @end
 
@@ -68,10 +76,6 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     return CrossPlatformDependencies.defaults.spinnerUi;
 }
 
-- (id<DatabasePreferencesManager>)databasesPreferencesManager {
-    return CrossPlatformDependencies.defaults.databasesPreferencesManager;
-}
-
 
 
 - (NSData*)getDuressDummyData {
@@ -84,7 +88,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 - (void)dealloc {
     NSLog(@"=====================================================================");
-    NSLog(@"Model DEALLOC...");
+    NSLog(@"😎 Model DEALLOC...");
     NSLog(@"=====================================================================");
 }
 
@@ -100,10 +104,10 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 - (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
                  templateMetaData:(METADATA_PTR)templateMetaData {
-    SafeMetaData* meta = [[SafeMetaData alloc] initWithNickName:templateMetaData.nickName
-                                                storageProvider:templateMetaData.storageProvider
-                                                       fileName:templateMetaData.fileName
-                                                 fileIdentifier:templateMetaData.fileIdentifier];
+    METADATA_PTR meta = [DatabasePreferences templateDummyWithNickName:templateMetaData.nickName
+                                                       storageProvider:templateMetaData.storageProvider
+                                                              fileName:templateMetaData.fileName
+                                                        fileIdentifier:templateMetaData.fileIdentifier];
     self.isDuressDummyDatabase = YES;
     
     NSData* data = [self getDuressDummyData];
@@ -166,11 +170,11 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
             return nil;
         }
         
+        _metadata = metaData;
         self.theDatabase = passwordDatabase;
         self.asyncUpdateEncryptionQueue = dispatch_queue_create("Model-AsyncUpdateEncryptionQueue", DISPATCH_QUEUE_SERIAL);
         self.asyncUpdatesStack = ConcurrentMutableStack.mutableStack;
         
-        _metadata = metaData;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
                 
         if ( self.applicationPreferences.databasesAreAlwaysReadOnly ) {
@@ -195,8 +199,16 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 
 
+- (NSString *)databaseUuid {
+    return self.metadata.uuid;
+}
+
 - (DatabaseModel *)database {
     return self.theDatabase;
+}
+
+- (Node *)getItemById:(NSUUID *)uuid {
+    return [self.database getItemById:uuid];
 }
 
 - (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
@@ -217,8 +229,11 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
     NSLog(@"reloadDatabaseFromLocalWorkingCopy....");
 
-    
-    DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata viewController:viewController forceReadOnly:self.forcedReadOnly isAutoFillOpen:self.isAutoFillOpen offlineMode:self.offlineMode];
+    DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata
+                                                        viewController:viewController
+                                                         forceReadOnly:self.forcedReadOnly
+                                                        isAutoFillOpen:self.isAutoFillOpen
+                                                           offlineMode:self.offlineMode];
     [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         if ( result == kUnlockDatabaseResultSuccess) {
             NSLog(@"reloadDatabaseFromLocalWorkingCopy... Success ");
@@ -257,15 +272,22 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 }
 
 - (BOOL)asyncUpdateAndSync {
+    return [self asyncUpdateAndSync:nil];
+}
+
+- (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion)completion {
     NSLog(@"asyncUpdateAndSync ENTER");
 
     if(self.isReadOnly) {
-        NSLog(@"WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
+        NSLog(@"🔴 WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
         return NO;
     }
     
-    DatabaseModel* cloneForUpdate = [self.database clone];
-    [self.asyncUpdatesStack push:cloneForUpdate];
+    AsyncUpdateJob* job = [[AsyncUpdateJob alloc] init];
+    job.snapshot = [self.database clone];
+    job.completion = completion;
+    
+    [self.asyncUpdatesStack push:job];
     
     dispatch_async(self.asyncUpdateEncryptionQueue, ^{
         [self dequeueOutstandingAsyncUpdateAndProcess];
@@ -277,10 +299,10 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 }
 
 - (void)dequeueOutstandingAsyncUpdateAndProcess {
-    DatabaseModel* cloneForUpdate = [self.asyncUpdatesStack popAndClear]; 
+    AsyncUpdateJob* job = [self.asyncUpdatesStack popAndClear]; 
     
-    if ( cloneForUpdate ) {
-        [self queueAsyncUpdateWithDatabaseClone:NSUUID.UUID cloneForUpdate:cloneForUpdate];
+    if ( job ) {
+        [self queueAsyncUpdateWithDatabaseClone:NSUUID.UUID job:job];
     }
     else {
         NSLog(@"NOP - No outstanding async updates found. All Done.");
@@ -291,18 +313,34 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     NSString* ret;
     
     do {
+#if TARGET_OS_IPHONE
         ret = [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+#else
+        
+        
+        NSURL* localWorkingCacheUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCacheUrlForDatabase:self.databaseUuid];
+        NSError* error;
+        NSURL* url = [NSFileManager.defaultManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:localWorkingCacheUrl create:YES error:&error];
+
+        if ( !url ) {
+            NSLog(@"getUniqueStreamingFilename: ERROR = [%@]", error);
+            return [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+        }
+
+        ret = [url URLByAppendingPathComponent:NSUUID.UUID.UUIDString].path;
+        NSLog(@"MacOS - getUniqueStreamingFilename [FINAL] = [%@]", ret);
+#endif
     } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
     
     return ret;
 }
 
-- (void)queueAsyncUpdateWithDatabaseClone:(NSUUID*)updateId cloneForUpdate:(DatabaseModel*)cloneForUpdate {
+- (void)queueAsyncUpdateWithDatabaseClone:(NSUUID*)updateId job:(AsyncUpdateJob*)job {
     NSLog(@"queueAsyncUpdateWithDatabaseClone ENTER - [%@]", NSThread.currentThread.name);
     
     _isRunningAsyncUpdate = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:nil];
+        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateStarting object:nil];
     });
     
     dispatch_group_t mutex = dispatch_group_create();
@@ -312,13 +350,13 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     NSOutputStream* outputStream = [NSOutputStream outputStreamToFileAtPath:streamingFile append:NO];
     [outputStream open];
     
-    [Serializator getAsData:cloneForUpdate
-                     format:cloneForUpdate.originalFormat
+    [Serializator getAsData:job.snapshot
+                     format:job.snapshot.originalFormat
                outputStream:outputStream
                  completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
         [outputStream close];
         
-        [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled streamingFile:streamingFile updateMutex:mutex error:error]; 
+        [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled streamingFile:streamingFile updateMutex:mutex job:job error:error]; 
     }];
 
     dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
@@ -326,10 +364,15 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
 }
 
-- (void)onAsyncUpdateSerializeDone:(NSUUID*)updateId userCancelled:(BOOL)userCancelled streamingFile:(NSString*)streamingFile updateMutex:(dispatch_group_t)updateMutex error:(NSError * _Nullable)error {
+- (void)onAsyncUpdateSerializeDone:(NSUUID*)updateId
+                     userCancelled:(BOOL)userCancelled
+                     streamingFile:(NSString*)streamingFile
+                       updateMutex:(dispatch_group_t)updateMutex
+                               job:(AsyncUpdateJob*)job
+                             error:(NSError * _Nullable)error {
     if (userCancelled || error) {
         
-        [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+        [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
         return;
     }
     
@@ -338,7 +381,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
         
         [self setDuressDummyData:data];
-        [self onAsyncUpdateDone:updateId success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
+        [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
         return;
     }
 
@@ -347,7 +390,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
 
     if (!success) { 
-        [self onAsyncUpdateDone:updateId success:NO userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:localUpdateError];
+        [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:localUpdateError];
         return;
     }
 
@@ -360,7 +403,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     
     
     if ( self.offlineMode ) { 
-        [self onAsyncUpdateDone:updateId success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
+        [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
         return;
     }
 
@@ -381,22 +424,23 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                                                  unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds];
             }
 
-            [self onAsyncUpdateDone:updateId success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
+            [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
         }
         else if (result == kSyncAndMergeError) {
-            [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+            [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
         }
         else if ( result == kSyncAndMergeResultUserInteractionRequired ) {
-            [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:YES localUpdated:NO updateMutex:updateMutex error:error];
+            [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:YES localUpdated:NO updateMutex:updateMutex error:error];
         }
         else {
             error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from async update sync: [%@]", @(result)] errorCode:-1];
-            [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+            [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
         }
     }];
 }
 
 - (void)onAsyncUpdateDone:(NSUUID*)updateId
+                      job:(AsyncUpdateJob*)job
                   success:(BOOL)success
             userCancelled:(BOOL)userCancelled
   userInteractionRequired:(BOOL)userInteractionRequired
@@ -405,17 +449,24 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                     error:(NSError*)error {
     NSLog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localUpdated=%hhd, error=%@", updateId, success, userInteractionRequired, localUpdated, error);
 
-    self.lastAsyncUpdateResult = [[AsyncUpdateResult alloc] init];
-    self.lastAsyncUpdateResult.success = success;
-    self.lastAsyncUpdateResult.error = error;
-    self.lastAsyncUpdateResult.userCancelled = userCancelled;
-    self.lastAsyncUpdateResult.localWasChanged = localUpdated;
-    self.lastAsyncUpdateResult.userInteractionRequired = userInteractionRequired;
-    
+    AsyncUpdateResult* result;
+
+    result = [[AsyncUpdateResult alloc] init];
+    result.success = success;
+    result.error = error;
+    result.userCancelled = userCancelled;
+    result.localWasChanged = localUpdated;
+    result.userInteractionRequired = userInteractionRequired;
+
+    self.lastAsyncUpdateResult = result;
     _isRunningAsyncUpdate = NO;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:nil];
+        
+        if ( job.completion ) {
+            job.completion(result);
+        }
     });
     
     dispatch_group_leave(updateMutex);
@@ -493,10 +544,10 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     }
     else {
         [self.syncManagement sync:self.metadata
-                           interactiveVC:viewController
-                                     key:self.database.ckfs
-                                    join:NO
-                              completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
+                    interactiveVC:viewController
+                              key:self.database.ckfs
+                             join:NO
+                       completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
             if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
                 if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
                     [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database
@@ -566,8 +617,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         return [weakSelf isExcludedFromAuditHelper:set uuid:item.uuid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
-        
-        [self.databasesPreferencesManager update:weakSelf.metadata];
+        weakSelf.metadata.auditConfig = config;
     }];
 #endif
 }
@@ -702,7 +752,6 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     }
     
     self.metadata.auditExcludedItems = mutable.allObjects;
-    [self.databasesPreferencesManager update:self.metadata];
 }
 
 - (NSArray<Node*>*)getExcludedAuditItems {
@@ -731,13 +780,11 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 - (void)disableAndClearAutoFill {
     self.metadata.autoFillEnabled = NO;
-    [self.databasesPreferencesManager update:self.metadata];
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 }
 
 - (void)enableAutoFill {
-    _metadata.autoFillEnabled = YES;
-    [self.databasesPreferencesManager update:self.metadata];
+    self.metadata.autoFillEnabled = YES;
 }
 
 
@@ -792,26 +839,29 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     return ret;
 }
 
-- (void)launchUrl:(Node *)item {
+- (BOOL)launchUrl:(Node *)item {
     NSURL* launchableUrl = [self.database launchableUrlForItem:item];
         
     if ( !launchableUrl ) {
         NSLog(@"Could not get launchable URL for item.");
-        return;
+        return NO;
     }
     
     [self launchLaunchableUrl:launchableUrl];
+    
+    return YES;
 }
 
-- (void)launchUrlString:(NSString*)urlString {
+- (BOOL)launchUrlString:(NSString*)urlString {
     NSURL* launchableUrl = [self.database launchableUrlForUrlString:urlString];
         
     if ( !launchableUrl ) {
         NSLog(@"Could not get launchable URL for string.");
-        return;
+        return NO;
     }
     
     [self launchLaunchableUrl:launchableUrl];
+    return YES;
 }
 
 - (void)launchLaunchableUrl:(NSURL*)launchableUrl {
@@ -897,8 +947,6 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     self.cachedPinned = [NSSet setWithArray:trimmed];
 
     self.metadata.favourites = trimmed;
-    
-    [self.databasesPreferencesManager update:self.metadata];
 }
 
 
@@ -934,6 +982,349 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 -(NSArray<Node *> *)allGroups {
     return self.database.effectiveRootGroup.allChildGroups;
+}
+
+
+
+- (DatabaseFormat)originalFormat {
+    return self.database.originalFormat;
+}
+
+- (BOOL)isDereferenceableText:(NSString *)text {
+    return [self.database isDereferenceableText:text];
+}
+
+- (NSString *)dereference:(NSString *)text node:(Node *)node {
+    return [self.database dereference:text node:node];
+}
+
+
+
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(SearchScope)scope
+              dereference:(BOOL)dereference
+    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups
+          browseSortField:(BrowseSortField)browseSortField
+               descending:(BOOL)descending
+        foldersSeparately:(BOOL)foldersSeparately {
+    return [self search:searchText
+                  scope:scope
+            dereference:dereference
+  includeKeePass1Backup:includeKeePass1Backup
+      includeRecycleBin:includeRecycleBin
+         includeExpired:includeExpired
+          includeGroups:includeGroups
+               trueRoot:NO
+        browseSortField:browseSortField
+             descending:descending
+      foldersSeparately:foldersSeparately];
+}
+
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(SearchScope)scope
+              dereference:(BOOL)dereference
+    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups
+                 trueRoot:(BOOL)trueRoot
+          browseSortField:(BrowseSortField)browseSortField
+               descending:(BOOL)descending
+        foldersSeparately:(BOOL)foldersSeparately {
+    NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRoot : self.database.allSearchable;
+    
+    return [self searchNodes:nodes
+                  searchText:searchText
+                       scope:scope
+                 dereference:dereference
+       includeKeePass1Backup:includeKeePass1Backup
+           includeRecycleBin:includeRecycleBin
+              includeExpired:includeExpired
+               includeGroups:includeGroups
+             browseSortField:browseSortField
+                  descending:descending
+           foldersSeparately:foldersSeparately];
+}
+
+- (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
+                    searchText:(NSString *)searchText
+                         scope:(SearchScope)scope
+                   dereference:(BOOL)dereference
+         includeKeePass1Backup:(BOOL)includeKeePass1Backup
+             includeRecycleBin:(BOOL)includeRecycleBin
+                includeExpired:(BOOL)includeExpired
+                 includeGroups:(BOOL)includeGroups
+               browseSortField:(BrowseSortField)browseSortField
+                    descending:(BOOL)descending
+             foldersSeparately:(BOOL)foldersSeparately {
+    NSMutableArray* results = [nodes mutableCopy]; 
+    
+    NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
+    
+    for (NSString* word in terms) {
+        [self filterForWord:results
+                 searchText:word
+                      scope:scope
+                dereference:dereference];
+    }
+    
+    return [self filterAndSortForBrowse:results
+                  includeKeePass1Backup:includeKeePass1Backup
+                      includeRecycleBin:includeRecycleBin
+                         includeExpired:includeExpired
+                          includeGroups:includeGroups
+                        browseSortField:browseSortField
+                             descending:descending
+                      foldersSeparately:foldersSeparately];
+}
+
+- (NSArray<Node *> *)filterAndSortForBrowse:(NSMutableArray<Node *> *)nodes
+                      includeKeePass1Backup:(BOOL)includeKeePass1Backup
+                          includeRecycleBin:(BOOL)includeRecycleBin
+                             includeExpired:(BOOL)includeExpired
+                              includeGroups:(BOOL)includeGroups
+                            browseSortField:(BrowseSortField)browseSortField
+                                 descending:(BOOL)descending
+                          foldersSeparately:(BOOL)foldersSeparately {
+    [self filterExcluded:nodes
+   includeKeePass1Backup:includeKeePass1Backup
+       includeRecycleBin:includeRecycleBin
+          includeExpired:includeExpired
+           includeGroups:includeGroups];
+    
+    return [self sortItemsForBrowse:nodes browseSortField:browseSortField descending:descending foldersSeparately:foldersSeparately];
+}
+
+- (void)filterForWord:(NSMutableArray<Node*>*)searchNodes
+           searchText:(NSString *)searchText
+                scope:(NSInteger)scope
+          dereference:(BOOL)dereference {
+    if ([searchText isEqualToString:kSpecialSearchTermAllEntries]) { 
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return !obj.isGroup;
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermAuditEntries] ) { 
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return [self isFlaggedByAudit:obj.uuid];
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermTotpEntries]) { 
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.otpToken != nil;
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermExpiredEntries]) { 
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.expired;
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermNearlyExpiredEntries]) { 
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.nearlyExpired;
+        }];
+    }
+    else if (scope == kSearchScopeTitle) {
+        [self searchTitle:searchNodes searchText:searchText dereference:dereference checkPinYin:self.applicationPreferences.checkPinYin];
+    }
+    else if (scope == kSearchScopeUsername) {
+        [self searchUsername:searchNodes searchText:searchText dereference:dereference checkPinYin:self.applicationPreferences.checkPinYin];
+    }
+    else if (scope == kSearchScopePassword) {
+        [self searchPassword:searchNodes searchText:searchText dereference:dereference checkPinYin:self.applicationPreferences.checkPinYin];
+    }
+    else if (scope == kSearchScopeUrl) {
+        [self searchUrl:searchNodes searchText:searchText dereference:dereference checkPinYin:self.applicationPreferences.checkPinYin];
+    }
+    else if (scope == kSearchScopeTags) {
+        [self searchTags:searchNodes searchText:searchText checkPinYin:self.applicationPreferences.checkPinYin];
+    }
+    else {
+        [self searchAllFields:searchNodes searchText:searchText dereference:dereference checkPinYin:self.applicationPreferences.checkPinYin];
+    }
+}
+
+- (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self.database isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    }];
+}
+
+- (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self.database isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    }];
+}
+
+- (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self.database isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    }];
+}
+
+- (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    }];
+}
+
+- (void)searchTags:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText checkPinYin:(BOOL)checkPinYin {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self.database isTagsMatches:searchText node:node checkPinYin:checkPinYin];
+    }];
+}
+
+- (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    }];
+}
+
+- (void)filterExcluded:(NSMutableArray<Node*>*)matches
+ includeKeePass1Backup:(BOOL)includeKeePass1Backup
+     includeRecycleBin:(BOOL)includeRecycleBin
+        includeExpired:(BOOL)includeExpired
+         includeGroups:(BOOL)includeGroups {
+    if(!includeKeePass1Backup) {
+        if (self.database.originalFormat == kKeePass1) {
+            Node* backupGroup = self.database.keePass1BackupNode;
+            if(backupGroup) {
+                [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+                    return (obj != backupGroup && ![backupGroup contains:obj]);
+                }];
+            }
+        }
+    }
+
+    Node* recycleBin = self.database.recycleBinNode;
+    if(!includeRecycleBin && recycleBin) {
+        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj != recycleBin && ![recycleBin contains:obj];
+        }];
+    }
+
+    if(!includeExpired) {
+        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return !obj.expired;
+        }];
+    }
+    
+    if(!includeGroups) {
+        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return !obj.isGroup;
+        }];
+    }
+}
+
+- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items
+                      browseSortField:(BrowseSortField)browseSortField
+                           descending:(BOOL)descending
+                    foldersSeparately:(BOOL)foldersSeparately {
+    BrowseSortField field = browseSortField;
+    
+    if (field == kBrowseSortFieldEmail && self.database.originalFormat != kPasswordSafe) { 
+        field = kBrowseSortFieldTitle;
+    }
+    else if(field == kBrowseSortFieldNone && self.database.originalFormat == kPasswordSafe) {
+        field = kBrowseSortFieldTitle;
+    }
+    
+    if(field != kBrowseSortFieldNone) {
+        return [items sortedArrayWithOptions:NSSortStable
+                             usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+                                 Node* n1 = (Node*)obj1;
+                                 Node* n2 = (Node*)obj2;
+                                 
+                                 return [self compareNodesForSort:n1
+                                                            node2:n2
+                                                            field:field
+                                                       descending:descending
+                                                foldersSeparately:foldersSeparately
+                                                 tieBreakUseTitle:YES];
+                             }];
+    }
+    else { 
+        if ( foldersSeparately ) { 
+            
+            return [items sortedArrayWithOptions:NSSortStable
+                                 usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+                Node* node1 = (Node*)obj1;
+                Node* node2 = (Node*)obj2;
+                
+                if ( node1.isGroup == node2.isGroup ) {
+                    return NSOrderedSame;
+                }
+                
+                return node1.isGroup ? NSOrderedAscending : NSOrderedDescending;
+            }];
+        }
+        else {
+            return items;
+        }
+    }
+}
+
+- (NSComparisonResult)compareNodesForSort:(Node*)node1
+                                    node2:(Node*)node2
+                                    field:(BrowseSortField)field
+                               descending:(BOOL)descending
+                        foldersSeparately:(BOOL)foldersSeparately
+                         tieBreakUseTitle:(BOOL)tieBreakUseTitle {
+    if(foldersSeparately) {
+        if(node1.isGroup && !node2.isGroup) {
+            return NSOrderedAscending;
+        }
+        else if(!node1.isGroup && node2.isGroup) {
+            return NSOrderedDescending;
+        }
+    }
+    
+    
+    
+    if(node2.isGroup && node1.isGroup && field != kBrowseSortFieldTitle) {
+        return finderStringCompare(node1.title, node2.title);
+    }
+    
+    Node* n1 = descending ? node2 : node1;
+    Node* n2 = descending ? node1 : node2;
+    
+    NSComparisonResult result = NSOrderedSame;
+    
+    if(field == kBrowseSortFieldTitle) {
+        result = finderStringCompare(n1.title, n2.title);
+    }
+    else if(field == kBrowseSortFieldUsername) {
+        result = finderStringCompare(n1.fields.username, n2.fields.username);
+    }
+    else if(field == kBrowseSortFieldPassword) {
+        result = finderStringCompare(n1.fields.password, n2.fields.password);
+    }
+    else if(field == kBrowseSortFieldUrl) {
+        result = finderStringCompare(n1.fields.url, n2.fields.url);
+    }
+    else if(field == kBrowseSortFieldEmail) {
+        result = finderStringCompare(n1.fields.email, n2.fields.email);
+    }
+    else if(field == kBrowseSortFieldNotes) {
+        result = finderStringCompare(n1.fields.notes, n2.fields.notes);
+    }
+    else if(field == kBrowseSortFieldCreated) {
+        result = [n1.fields.created compare:n2.fields.created];
+    }
+    else if(field == kBrowseSortFieldModified) {
+        result = [n1.fields.modified compare:n2.fields.modified];
+    }
+    
+    
+    
+    if( result == NSOrderedSame && field != kBrowseSortFieldTitle && tieBreakUseTitle ) {
+        result = finderStringCompare(n1.title, n2.title);
+    }
+    
+    return result;
 }
 
 @end

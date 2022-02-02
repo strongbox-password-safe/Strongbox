@@ -125,7 +125,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     }
     
     SFTPProviderData* providerData = makeProviderData(path, configuration);
-    METADATA_PTR metadata = [self getSafeMetaData:nickName providerData:providerData];
+    METADATA_PTR metadata = [self getDatabasePreferences:nickName providerData:providerData];
 
     [sftp disconnect];
 
@@ -273,7 +273,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     return foo;
 }
 
-- (METADATA_PTR )getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+- (METADATA_PTR )getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
     SFTPProviderData* foo = (SFTPProviderData*)providerData;
     
     NSError* error;
@@ -287,22 +287,21 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
 #if TARGET_OS_IPHONE
-    return [[SafeMetaData alloc] initWithNickName:nickName
+    return [DatabasePreferences templateDummyWithNickName:nickName
                                   storageProvider:self.storageId
                                          fileName:[foo.filePath lastPathComponent]
                                    fileIdentifier:json];
 #else
     NSURLComponents* components = [[NSURLComponents alloc] init];
     components.scheme = kStrongboxSFTPUrlScheme;
-    components.host = foo.sFtpConfiguration.host;
     components.path = foo.filePath;
     
     
     
-    DatabaseMetadata *ret = [[DatabaseMetadata alloc] initWithNickName:nickName
-                                                       storageProvider:self.storageId
-                                                               fileUrl:components.URL
-                                                           storageInfo:json];
+    MacDatabasePreferences *ret = [MacDatabasePreferences templateDummyWithNickName:nickName
+                                                                    storageProvider:self.storageId
+                                                                            fileUrl:components.URL
+                                                                        storageInfo:json];
     
     
     
@@ -440,7 +439,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 - (NMSFTP*)connectAndAuthenticateWithSessionConfiguration:(SFTPSessionConfiguration*)sessionConfiguration
                                            viewController:viewController
                                                     error:(NSError**)error {
-    NSLog(@"Connecting to %@", sessionConfiguration.host);
+    
     
     if ( ( sessionConfiguration.authenticationMode == kPrivateKey && sessionConfiguration.privateKey == nil ) || ( sessionConfiguration.authenticationMode == kUsernamePassword && sessionConfiguration.password == nil ) ) {
         if ( error ) {
@@ -490,7 +489,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                        viewController:viewController];
         }
         
-        NSLog(@"Supported Authentication Methods by Server: [%@]", session.supportedAuthenticationMethods);
+        
         
         if(sessionConfiguration.authenticationMode == kPrivateKey) {
             [session authenticateByInMemoryPublicKey:sessionConfiguration.publicKey

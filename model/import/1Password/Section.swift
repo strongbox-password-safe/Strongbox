@@ -6,8 +6,8 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-//import Cocoa
+// import Cocoa
 
 class Section: Decodable {
-    var fields : [SectionField]? = nil
+    var fields: [SectionField]? = nil
 }

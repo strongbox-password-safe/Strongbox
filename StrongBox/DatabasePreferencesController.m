@@ -23,7 +23,7 @@
 #import "BiometricsManager.h"
 #import "ScheduledExportConfigurationViewController.h"
 #import "EncryptionPreferencesViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "AutomaticLockingPreferences.h"
 #import "CASGTableViewController.h"
 
@@ -33,8 +33,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewDatabaseOperations;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewPreferences;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewPreferences;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellStats;
-@property (weak, nonatomic) IBOutlet UIImageView *imageViewStats;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAudit;
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAutoFill;
@@ -73,7 +71,6 @@
     self.imageViewAudit.image = [UIImage imageNamed:@"security_checked"];
     self.imageViewAutoFill.image = [UIImage imageNamed:@"password"];
     self.imageViewScheduledExport.image = [UIImage imageNamed:@"delivery"];
-    self.imageViewStats.image = [UIImage imageNamed:@"statistics"];
     self.imageViewEncryptionSettings.image = [UIImage imageNamed:@"unlock"];
 
     self.imageViewChangeCreds.image = [UIImage imageNamed:@"key"];
@@ -84,7 +81,6 @@
         self.imageViewDatabaseOperations.image = [UIImage systemImageNamed:@"wrench"];
         self.imageViewAudit.image = [UIImage systemImageNamed:@"checkmark.shield"];
         self.imageViewAudit.preferredSymbolConfiguration = [UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightLight];
-        self.imageViewStats.image = [UIImage systemImageNamed:@"number.circle"];
         self.imageViewEncryptionSettings.image = [UIImage systemImageNamed:@"function"];
         self.imageViewAutoLock.image = [UIImage systemImageNamed:@"lock.rotation.open"];
 
@@ -99,8 +95,6 @@
     
     self.labelConvenienceUnlock.text = fmt;
     self.imageConvenienceUnlock.image = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
-
-    [self cell:self.cellStats setHidden:YES];
     
     
     
@@ -138,10 +132,6 @@
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)segue.destinationViewController;
         vc.format = self.viewModel.database.originalFormat;
         vc.databaseMetaData = self.viewModel.metadata;
-    }
-    else if ([segue.identifier isEqualToString:@"segueToStatistics"]) {
-        StatisticsPropertiesViewController* vc = (StatisticsPropertiesViewController*)segue.destinationViewController;
-        vc.viewModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToAudit"]) {
         AuditConfigurationVcTableViewController* vc = (AuditConfigurationVcTableViewController*)segue.destinationViewController;

@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-import Foundation;
+import Foundation
 
 
 final class CheckURLExistsOperation: URLRequestOperation {
@@ -23,7 +23,7 @@ final class CheckURLExistsOperation: URLRequestOperation {
         urlRequest.httpMethod = "GET"
     }
 
-    override func processResult(_ data: Data?, response: HTTPURLResponse, completion: @escaping (URLResult) -> Void) {
+    override func processResult(_: Data?, response: HTTPURLResponse, completion: @escaping (URLResult) -> Void) {
         completion(.success(url: response.url!))
     }
 }

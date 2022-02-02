@@ -11,6 +11,7 @@
 #import "AutoFillNewRecordSettings.h"
 #import "FavIconDownloadOptions.h"
 #import "ApplicationPreferences.h"
+#import "NotificationConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,9 +25,6 @@ extern NSString* const kExpiresColumn;
 extern NSString* const kNotesColumn;
 extern NSString* const kAttachmentsColumn;
 extern NSString* const kCustomFieldsColumn;
-
-extern NSString *const kPreferenceGlobalShowShortcut;
-extern NSString *const kPreferencesChangedNotification;
 
 @interface Settings : NSObject<ApplicationPreferences>
 
@@ -48,9 +46,7 @@ extern NSString *const kPreferencesChangedNotification;
 @property (nonatomic) BOOL warnedAboutTouchId;
 
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
-@property (readonly) BOOL dereferenceInQuickView;
-@property (readonly) BOOL dereferenceInOutlineView;
-@property (readonly) BOOL dereferenceDuringSearch;
+
 @property BOOL floatOnTop;
 @property (readonly) NSString* easyReadFontName;
 @property PasswordGenerationConfig *trayPasswordGenerationConfig;
@@ -78,39 +74,6 @@ extern NSString *const kPreferencesChangedNotification;
 
 @property (nonatomic) NSInteger autoLockTimeoutSeconds; 
 
-/* =================================================================================================== */
-
-
-@property BOOL showCustomFieldsOnQuickViewPanel;
-@property BOOL showAttachmentsOnQuickViewPanel;
-@property BOOL showAttachmentImagePreviewsOnQuickViewPanel;
-
-/* =================================================================================================== */
-/* Migrated to Per Database Settings - Begin 14 Jun 2021 - Give 3 months migration time -> 14-Sep-2021 */
-
-@property (nonatomic) BOOL showQuickView;
-@property BOOL doNotShowTotp;
-@property BOOL noAlternatingRows;
-@property BOOL showHorizontalGrid;
-@property BOOL showVerticalGrid;
-@property BOOL doNotShowAutoCompleteSuggestions;
-@property BOOL doNotShowChangeNotifications;
-@property BOOL outlineViewTitleIsReadonly;
-@property BOOL outlineViewEditableFieldsAreReadonly;
-@property BOOL concealEmptyProtectedFields;
-@property BOOL startWithSearch;
-@property BOOL showAdvancedUnlockOptions;
-@property BOOL lockOnScreenLock;
-@property BOOL expressDownloadFavIconOnNewOrUrlChanged;
-@property BOOL doNotShowRecycleBinInBrowse;
-@property BOOL showRecycleBinInSearchResults;
-@property BOOL uiDoNotSortKeePassNodesInBrowseView;
-@property NSArray<NSString*>* visibleColumns;
-
-/* =================================================================================================== */
-
-@property BOOL migratedConnections;
-
 @property BOOL closeManagerOnLaunch;
 @property BOOL makeLocalRollingBackups;
 
@@ -132,6 +95,11 @@ extern NSString *const kPreferencesChangedNotification;
 
 
 @property (readonly) BOOL runningAsATrayApp;
+
+@property BOOL checkPinYin;
+
+@property BOOL addLegacySupplementaryTotpCustomFields;
+@property BOOL addOtpAuthUrl;
 
 @end
 

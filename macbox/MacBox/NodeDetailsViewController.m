@@ -38,6 +38,7 @@
 #import "EditCustomFieldController.h"
 #import "EditTagsViewController.h"
 #import "PasswordStrengthTester.h"
+#import "PasswordStrengthUIHelper.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -618,28 +619,7 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)bindPasswordStrength {
     NSString* pw = self.revealedPasswordField.stringValue;
-    PasswordStrength* strength = [PasswordStrengthTester getStrength:pw config:PasswordStrengthConfig.defaults];
-    
-    self.labelStrength.stringValue = strength.summaryString;
-    
-    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-        
-    self.progressStrength.doubleValue = relativeStrength * 100.0f;
-    
-    CIFilter *colorPoly = [CIFilter filterWithName:@"CIColorPolynomial"];
-    [colorPoly setDefaults];
-    
-    double red = 1.0 - relativeStrength;
-    double green = relativeStrength;
-
-    CIVector *redVector = [CIVector vectorWithX:red Y:0 Z:0 W:0];
-    CIVector *greenVector = [CIVector vectorWithX:green Y:0 Z:0 W:0];
-    CIVector *blueVector = [CIVector vectorWithX:0 Y:0 Z:0 W:0];
-    
-    [colorPoly setValue:redVector forKey:@"inputRedCoefficients"];
-    [colorPoly setValue:greenVector forKey:@"inputGreenCoefficients"];
-    [colorPoly setValue:blueVector forKey:@"inputBlueCoefficients"];
-    [self.progressStrength setContentFilters:@[colorPoly]];
+    [PasswordStrengthUIHelper bindPasswordStrength:pw labelStrength:self.labelStrength progress:self.progressStrength];
 }
 
 - (void)bindRevealedPassword {
@@ -1469,41 +1449,8 @@ static NSString* trimField(NSTextField* textField) {
 
 #pragma mark - QR Code Generator
 
-- (CIImage *)createQRForString:(NSString *)qrString {
-    NSData *stringData = [qrString dataUsingEncoding:NSISOLatin1StringEncoding];
-
-    CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
-    
-    
-    
-    [qrFilter setValue:stringData forKey:@"inputMessage"];
-    [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
-    
-    return qrFilter.outputImage;
-}
-
 - (NSImage*)generateTheQRCodeImageFromDataBaseInfo:(NSString*)string {
-    CIImage *input = [self createQRForString:string];
-
-    
-
-    static NSUInteger kImageViewSize = 256;
-    CGFloat scale = kImageViewSize / input.extent.size.width;
-
-    
-
-    
-    
-    CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
-
-    CIImage *qrCode = [input imageByApplyingTransform:transform];
-
-    NSCIImageRep *rep = [NSCIImageRep imageRepWithCIImage:qrCode];
-    NSImage *nsImage = [[NSImage alloc] initWithSize:rep.size];
-    
-    [nsImage addRepresentation:rep];
-
-    return nsImage;
+    return [Utils getQrCode:string pointSize:128];
 }
 
 - (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
@@ -1533,6 +1480,7 @@ static NSString* trimField(NSTextField* textField) {
         
         vc.field = sender;
         vc.existingKeySet = existingKeySet;
+        vc.customFieldKeySet = self.model.customFieldKeySet;
         
         vc.onSetField = ^(NSString * _Nonnull key, NSString * _Nonnull value, BOOL protected) {
             CustomField* field = [[CustomField alloc] init];

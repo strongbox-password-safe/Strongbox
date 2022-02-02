@@ -10,7 +10,7 @@
 #import "PinEntryController.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @interface PinsConfigurationController ()
 
@@ -179,7 +179,6 @@
            self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
        }
                        
-       [[SafesList sharedInstance] update:self.viewModel.metadata];
        [self bindUiToModel];
     }
     else {
@@ -194,7 +193,6 @@
 - (IBAction)onDuressPinOnOff:(id)sender {
     if(self.viewModel.metadata.duressPin != nil) {
         self.viewModel.metadata.duressPin = nil;
-        [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindUiToModel];
     }
     else {
@@ -214,37 +212,35 @@
     
     pinEntryVc.info = duressPin ? NSLocalizedString(@"pins_config_vc_enter_duress_pin", @"Enter Duress PIN") : @"";
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-        [self dismissViewControllerAnimated:YES completion:^{
-            if(response == kOk) {
-                NSString* otherPin = duressPin ? self.viewModel.metadata.conveniencePin : self.viewModel.metadata.duressPin;
-                
-                if(otherPin == nil || (![pin isEqualToString:otherPin] && pin.length == otherPin.length)) {
-                    if(duressPin) {
-                        self.viewModel.metadata.duressPin = pin;
-                    }
-                    else {
-                        if (self.viewModel.database.ckfs.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) {
-                            [Alerts warn:self
-                                   title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
-                                 message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
-                            
-                            return;
-                        }
-
-                        self.viewModel.metadata.conveniencePin = pin;
-                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;                        
-                        self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
-                    }
-                    
-                    [[SafesList sharedInstance] update:self.viewModel.metadata];
-                    [self bindUiToModel];
+        if( response == kPinEntryResponseOk ) {
+            NSString* otherPin = duressPin ? self.viewModel.metadata.conveniencePin : self.viewModel.metadata.duressPin;
+            
+            if(otherPin == nil || (![pin isEqualToString:otherPin] && pin.length == otherPin.length)) {
+                if(duressPin) {
+                    self.viewModel.metadata.duressPin = pin;
                 }
                 else {
-                    [Alerts warn:self
-                           title:NSLocalizedString(@"pins_config_vc_error_pin_conflict_title", @"PIN Conflict")
-                         message:NSLocalizedString(@"pins_config_vc_error_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please select another.")];
+                    if (self.viewModel.database.ckfs.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) {
+                        [Alerts warn:self
+                               title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
+                             message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
+                        
+                        return;
+                    }
+
+                    self.viewModel.metadata.conveniencePin = pin;
+                    self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
+                    self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
                 }
-            }}];
+                
+                [self bindUiToModel];
+            }
+            else {
+                [Alerts warn:self
+                       title:NSLocalizedString(@"pins_config_vc_error_pin_conflict_title", @"PIN Conflict")
+                     message:NSLocalizedString(@"pins_config_vc_error_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please select another.")];
+            }
+        }
     };
     
     [self presentViewController:pinEntryVc animated:YES completion:nil];
@@ -270,7 +266,6 @@
             self.viewModel.metadata.duressAction = indexPath.row == 2 ? kRemoveDatabase : kOpenDummyAndRemoveDatabase;
         }
 
-        [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindUiToModel];
     }
 }

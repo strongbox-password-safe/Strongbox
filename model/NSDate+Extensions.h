@@ -21,12 +21,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isLaterThan:(NSDate*)other;
 - (BOOL)isEarlierThan:(NSDate*)other;
 
+@property (readonly) BOOL isInPast;
+@property (readonly) BOOL isInFuture;
+
 @property (readonly) NSString* fileNameCompatibleDateTime;
 @property (readonly) NSString* fileNameCompatibleDateTimePrecise;
 
 @property (readonly) NSString* friendlyDateString;
 @property (readonly) NSString* friendlyDateTimeString;
 @property (readonly) NSString* friendlyDateStringVeryShort;
+@property (readonly) NSString* friendlyDateStringVeryShortDateOnly;
 @property (readonly) NSString* friendlyDateTimeStringPrecise;
 @property (readonly) NSString* iso8601DateString;
 @property (readonly) NSString* friendlyTimeStringPrecise;

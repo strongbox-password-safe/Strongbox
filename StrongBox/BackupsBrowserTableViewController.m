@@ -13,7 +13,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "NSDate+Extensions.h"
 #import "Serializator.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @interface BackupsBrowserTableViewController ()
 
@@ -81,7 +81,7 @@
         NSString* secondLast = components[components.count - 2];
         
         
-        SafeMetaData* metadata = [SafesList.sharedInstance getById:secondLast];
+        DatabasePreferences* metadata = [DatabasePreferences fromUuid:secondLast];
         if ( metadata ) {
             return metadata.nickName;
         }
@@ -183,13 +183,13 @@
                                                  data:data
                                               modDate:modDate
                                     suggestedFilename:nickName
-                                           completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
+                                           completion:^(DatabasePreferences * _Nonnull metadata, NSError * _Nonnull error) {
         if(error || !metadata) {
             [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
             return;
         }
         
-        [SafesList.sharedInstance addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
+        [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
 
         [Alerts info:self
                title:NSLocalizedString(@"generic_done", @"Done")

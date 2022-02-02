@@ -7,7 +7,6 @@
 //
 
 #import "SearchResultsBrowseTableDatasource.h"
-#import "DatabaseSearchAndSorter.h"
 #import "BrowseTableViewCellHelper.h"
 #import "BrowseSortField.h"
 #import "DatabaseModel.h"
@@ -69,24 +68,18 @@
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
-    
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node.uuid];
-    }];
 
-    self.searchResults = [searcher search:searchController.searchBar.text
-                                    scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
-                              dereference:self.viewModel.metadata.searchDereferencedFields
-                    includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
-                        includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults
-                           includeExpired:self.viewModel.metadata.showExpiredInSearch
-                            includeGroups:YES
-                                 trueRoot:YES];
+    self.searchResults = [self.viewModel search:searchController.searchBar.text
+                                          scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
+                                    dereference:self.viewModel.metadata.searchDereferencedFields
+                          includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
+                              includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults
+                                 includeExpired:self.viewModel.metadata.showExpiredInSearch
+                                  includeGroups:YES
+                                       trueRoot:YES
+                                browseSortField:sortField
+                                     descending:descending
+                              foldersSeparately:foldersSeparately];
 }
 
 - (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath {

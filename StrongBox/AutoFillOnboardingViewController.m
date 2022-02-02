@@ -8,7 +8,7 @@
 
 #import "AutoFillOnboardingViewController.h"
 #import "AutoFillManager.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @implementation AutoFillOnboardingViewController
 
@@ -23,7 +23,6 @@
 - (IBAction)onUseAutoFill:(id)sender {
     self.model.metadata.autoFillEnabled = YES;
     self.model.metadata.autoFillOnboardingDone = YES;
-    [SafesList.sharedInstance update:self.model.metadata];
 
     if( self.model.metadata.quickTypeEnabled ) {
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
@@ -44,7 +43,6 @@
 - (IBAction)onNoThankYou:(id)sender {
     self.model.metadata.autoFillEnabled = NO;
     self.model.metadata.autoFillOnboardingDone = YES;
-    [SafesList.sharedInstance update:self.model.metadata];
         
     if ( self.onDone ) {
         self.onDone(NO, NO);

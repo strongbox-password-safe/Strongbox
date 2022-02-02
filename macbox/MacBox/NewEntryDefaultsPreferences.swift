@@ -9,31 +9,31 @@
 import Cocoa
 
 class NewEntryDefaultsPreferences: NSViewController {
-    @IBOutlet weak var titleSegment: NSSegmentedControl!
-    @IBOutlet weak var usernameSegment: NSSegmentedControl!
-    @IBOutlet weak var passwordSegment: NSSegmentedControl!
-    @IBOutlet weak var emailSegment: NSSegmentedControl!
-    @IBOutlet weak var urlSegment: NSSegmentedControl!
-    @IBOutlet weak var notesSegment: NSSegmentedControl!
-    
-    @IBOutlet weak var titleLabel: NSTextField!
-    @IBOutlet weak var usernameLabel: NSTextField!
-    @IBOutlet weak var passwordLabel: NSTextField!
-    @IBOutlet weak var emailLabel: NSTextField!
-    @IBOutlet weak var urlLabel: NSTextField!
-    @IBOutlet weak var notesLabel: NSTextField!
-    
+    @IBOutlet var titleSegment: NSSegmentedControl!
+    @IBOutlet var usernameSegment: NSSegmentedControl!
+    @IBOutlet var passwordSegment: NSSegmentedControl!
+    @IBOutlet var emailSegment: NSSegmentedControl!
+    @IBOutlet var urlSegment: NSSegmentedControl!
+    @IBOutlet var notesSegment: NSSegmentedControl!
+
+    @IBOutlet var titleLabel: NSTextField!
+    @IBOutlet var usernameLabel: NSTextField!
+    @IBOutlet var passwordLabel: NSTextField!
+    @IBOutlet var emailLabel: NSTextField!
+    @IBOutlet var urlLabel: NSTextField!
+    @IBOutlet var notesLabel: NSTextField!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         bindUI()
     }
-    
+
     func bindUI() {
         let settings = Settings.sharedInstance().autoFillNewRecordSettings
 
         var index = autoFillModeToSegmentIndex(mode: settings.titleAutoFillMode)
-        titleSegment.selectedSegment = index;
+        titleSegment.selectedSegment = index
         titleLabel.stringValue = settings.titleAutoFillMode == .custom ? settings.titleCustomAutoFill : ""
 
         
@@ -41,161 +41,161 @@ class NewEntryDefaultsPreferences: NSViewController {
         
 
         index = autoFillModeToSegmentIndex(mode: settings.usernameAutoFillMode)
-        usernameSegment.selectedSegment = index;
+        usernameSegment.selectedSegment = index
         usernameLabel.stringValue = settings.usernameAutoFillMode == .custom ? settings.usernameCustomAutoFill : ""
 
         
 
         index = autoFillModeToSegmentIndex(mode: settings.passwordAutoFillMode)
-        passwordSegment.selectedSegment = index;
+        passwordSegment.selectedSegment = index
         passwordLabel.stringValue = settings.passwordAutoFillMode == .custom ? settings.passwordCustomAutoFill : ""
 
         
 
         index = autoFillModeToSegmentIndex(mode: settings.emailAutoFillMode)
-        emailSegment.selectedSegment = index;
+        emailSegment.selectedSegment = index
         emailLabel.stringValue = settings.emailAutoFillMode == .custom ? settings.emailCustomAutoFill : ""
 
         
 
         index = autoFillModeToSegmentIndex(mode: settings.urlAutoFillMode)
-        urlSegment.selectedSegment = index;
+        urlSegment.selectedSegment = index
         urlLabel.stringValue = settings.urlAutoFillMode == .custom ? settings.urlCustomAutoFill : ""
 
         
 
         index = autoFillModeToSegmentIndex(mode: settings.notesAutoFillMode)
-        notesSegment.selectedSegment = index;
+        notesSegment.selectedSegment = index
         notesLabel.stringValue = settings.notesAutoFillMode == .custom ? settings.notesCustomAutoFill : ""
     }
-    
-    @IBAction func onTitleChanged(_ sender: Any) {
+
+    @IBAction func onTitleChanged(_: Any) {
         let settings = Settings.sharedInstance().autoFillNewRecordSettings
 
-        let selected = titleSegment.selectedSegment;
+        let selected = titleSegment.selectedSegment
         settings.titleAutoFillMode = selected == 0 ? .default : (selected == 1 ? .smartUrlFill : .custom)
-        if(settings.titleAutoFillMode == .custom) {
+        if settings.titleAutoFillMode == .custom {
             let loc = NSLocalizedString("mac_enter_custom_title_default", comment: "Please enter your custom Title auto fill")
             let response = MacAlerts().input(loc, defaultValue: settings.titleCustomAutoFill, allowEmpty: false)
-            
-            if ( response != nil ) {
+
+            if response != nil {
                 settings.titleCustomAutoFill = response!
             }
         }
-        
+
         Settings.sharedInstance().autoFillNewRecordSettings = settings
-        
+
         bindUI()
     }
-    
-    @IBAction func onUsernameChanged(_ sender: Any) {
+
+    @IBAction func onUsernameChanged(_: Any) {
         let settings = Settings.sharedInstance().autoFillNewRecordSettings
 
-        let selected = usernameSegment.selectedSegment;
+        let selected = usernameSegment.selectedSegment
         settings.usernameAutoFillMode = selected == 0 ? .none : (selected == 1 ? .mostUsed : .custom)
-        if(settings.usernameAutoFillMode == .custom) {
+        if settings.usernameAutoFillMode == .custom {
             let loc = NSLocalizedString("mac_enter_custom_username_default", comment: "Please enter your custom Title auto fill")
             let response = MacAlerts().input(loc, defaultValue: settings.usernameCustomAutoFill, allowEmpty: false)
-            
-            if ( response != nil ) {
+
+            if response != nil {
                 settings.usernameCustomAutoFill = response!
             }
         }
-        
-        Settings.sharedInstance().autoFillNewRecordSettings = settings;
-        
+
+        Settings.sharedInstance().autoFillNewRecordSettings = settings
+
         bindUI()
     }
-    
-    @IBAction func onPasswordChanged(_ sender: Any) {
+
+    @IBAction func onPasswordChanged(_: Any) {
         let settings = Settings.sharedInstance().autoFillNewRecordSettings
 
-        let selected = passwordSegment.selectedSegment;
+        let selected = passwordSegment.selectedSegment
         settings.passwordAutoFillMode = selected == 0 ? .none : (selected == 1 ? .generated : .custom)
-        if(settings.passwordAutoFillMode == .custom) {
+        if settings.passwordAutoFillMode == .custom {
             let loc = NSLocalizedString("mac_enter_custom_password_default", comment: "Please enter your custom Title auto fill")
             let response = MacAlerts().input(loc, defaultValue: settings.passwordCustomAutoFill, allowEmpty: false)
-            
-            if ( response != nil ) {
+
+            if response != nil {
                 settings.passwordCustomAutoFill = response!
             }
         }
-        
-        Settings.sharedInstance().autoFillNewRecordSettings = settings;
-        
+
+        Settings.sharedInstance().autoFillNewRecordSettings = settings
+
         bindUI()
     }
-    
-    @IBAction func onEmailChanged(_ sender: Any) {
+
+    @IBAction func onEmailChanged(_: Any) {
         let settings = Settings.sharedInstance().autoFillNewRecordSettings
 
-        let selected = emailSegment.selectedSegment;
+        let selected = emailSegment.selectedSegment
         settings.emailAutoFillMode = selected == 0 ? .none : (selected == 1 ? .mostUsed : .custom)
-        if(settings.emailAutoFillMode == .custom) {
+        if settings.emailAutoFillMode == .custom {
             let loc = NSLocalizedString("mac_enter_custom_email_default", comment: "Please enter your custom Title auto fill")
             let response = MacAlerts().input(loc, defaultValue: settings.emailCustomAutoFill, allowEmpty: false)
-            
-            if ( response != nil ) {
+
+            if response != nil {
                 settings.emailCustomAutoFill = response!
             }
         }
-        
-        Settings.sharedInstance().autoFillNewRecordSettings = settings;
-        
+
+        Settings.sharedInstance().autoFillNewRecordSettings = settings
+
         bindUI()
     }
-    
-    @IBAction func onUrlChanged(_ sender: Any) {
+
+    @IBAction func onUrlChanged(_: Any) {
         let settings = Settings.sharedInstance().autoFillNewRecordSettings
 
-        let selected = urlSegment.selectedSegment;
+        let selected = urlSegment.selectedSegment
         settings.urlAutoFillMode = selected == 0 ? .none : (selected == 1 ? .smartUrlFill : .custom)
-        if(settings.urlAutoFillMode == .custom) {
+        if settings.urlAutoFillMode == .custom {
             let loc = NSLocalizedString("mac_enter_custom_url_default", comment: "Please enter your custom Title auto fill")
             let response = MacAlerts().input(loc, defaultValue: settings.urlCustomAutoFill, allowEmpty: false)
-            
-            if ( response != nil ) {
+
+            if response != nil {
                 settings.urlCustomAutoFill = response!
             }
         }
-        
-        Settings.sharedInstance().autoFillNewRecordSettings = settings;
-        
+
+        Settings.sharedInstance().autoFillNewRecordSettings = settings
+
         bindUI()
     }
-    
-    @IBAction func onNotesChanged(_ sender: Any) {
+
+    @IBAction func onNotesChanged(_: Any) {
         let settings = Settings.sharedInstance().autoFillNewRecordSettings
 
-        let selected = notesSegment.selectedSegment;
+        let selected = notesSegment.selectedSegment
         settings.notesAutoFillMode = selected == 0 ? .none : (selected == 1 ? .clipboard : .custom)
-        if(settings.notesAutoFillMode == .custom) {
+        if settings.notesAutoFillMode == .custom {
             let loc = NSLocalizedString("mac_enter_custom_notes_default", comment: "Please enter your custom Title auto fill")
             let response = MacAlerts().input(loc, defaultValue: settings.notesCustomAutoFill, allowEmpty: false)
-            
-            if ( response != nil ) {
+
+            if response != nil {
                 settings.notesCustomAutoFill = response!
             }
         }
-        
-        Settings.sharedInstance().autoFillNewRecordSettings = settings;
-        
+
+        Settings.sharedInstance().autoFillNewRecordSettings = settings
+
         bindUI()
     }
-    
-    func autoFillModeToSegmentIndex(mode : AutoFillMode) -> Int {
+
+    func autoFillModeToSegmentIndex(mode: AutoFillMode) -> Int {
         
-        
-        switch (mode) {
+
+        switch mode {
         case .none, .default:
-            return 0;
+            return 0
         case .mostUsed, .smartUrlFill, .clipboard, .generated:
-            return 1;
+            return 1
         case .custom:
-            return 2;
+            return 2
         default:
             NSLog("Ruh Roh... ")
-            return -1;
+            return -1
         }
     }
 }

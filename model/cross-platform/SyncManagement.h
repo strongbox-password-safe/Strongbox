@@ -9,7 +9,7 @@
 #ifndef SyncManagement_h
 #define SyncManagement_h
 
-#import "DatabasePreferencesManager.h"
+#import "CommonDatabasePreferences.h"
 #import "SyncAndMergeSequenceManager.h"
 
 NS_ASSUME_NONNULL_BEGIN

@@ -7,9 +7,9 @@
 //
 
 #import "GeneralDatabaseSettings.h"
-#import "DatabasesManager.h"
 #import "Settings.h"
 #import "AppDelegate.h"
+#import "KeePassIconSet.h"
 
 @interface GeneralDatabaseSettings ()
 
@@ -20,6 +20,8 @@
 @property (weak) IBOutlet NSButton *checkboxLockOnLockScreen;
 @property (weak) IBOutlet NSButton *checkboxAutoDownloadFavIcon;
 @property (weak) IBOutlet NSButton *closeButton;
+@property (weak) IBOutlet NSPopUpButton *popupIconSet;
+@property (weak) IBOutlet NSView *iconSetView;
 
 @end
 
@@ -28,10 +30,28 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self.popupIconSet.menu removeAllItems];
+    
+    [self.popupIconSet.menu addItemWithTitle:getIconSetName(kKeePassIconSetClassic) action:nil keyEquivalent:@""];
+    [self.popupIconSet.menu addItemWithTitle:getIconSetName(kKeePassIconSetSfSymbols) action:nil keyEquivalent:@""];
+    [self.popupIconSet.menu addItemWithTitle:getIconSetName(kKeePassIconSetKeePassXC) action:nil keyEquivalent:@""];
+
+    self.iconSetView.hidden = !Settings.sharedInstance.nextGenUI;
+
     [self bindUI];
     
     [self.textboxMonitorInterval resignFirstResponder];
     [self.closeButton becomeFirstResponder];
+}
+
+- (IBAction)onSetIconSet:(id)sender {
+    NSInteger idx = self.popupIconSet.indexOfSelectedItem;
+    
+    self.model.iconSet = idx;
+    
+    [self bindUI];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
 - (void)bindUI {
@@ -50,6 +70,8 @@
     if ( !Settings.sharedInstance.fullVersion ) {
         self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
     }
+    
+    [self.popupIconSet selectItemAtIndex:self.model.iconSet];
 }
 
 - (IBAction)onSettingChanged:(id)sender {

@@ -29,7 +29,7 @@
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
 #import "ExportOptionsTableViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "EncryptionSettingsViewModel.h"
 #import "BackupsManager.h"
 
@@ -501,8 +501,6 @@
             model.metadata.scheduledExport = YES;
             model.metadata.nextScheduledExport = [NSDate.date dateByAddingTimeInterval:14 * 24 * 60 * 60];
             model.metadata.lastScheduledExportModDate = nil;
-            
-            [SafesList.sharedInstance update:model.metadata];
         }
         else if ( buttonIdCancelIsZero == 2 ) {
             model.metadata.scheduledExportOnboardingDone = YES;
@@ -510,14 +508,10 @@
             model.metadata.scheduledExport = YES;
             model.metadata.nextScheduledExport = [NSDate.date dateByAddingTimeInterval:28 * 24 * 60 * 60];
             model.metadata.lastScheduledExportModDate = nil;
-
-            [SafesList.sharedInstance update:model.metadata];
         }
         else if ( buttonIdCancelIsZero == 3 ) {
             model.metadata.scheduledExportOnboardingDone = YES;
             model.metadata.scheduledExport = NO;
-
-            [SafesList.sharedInstance update:model.metadata];
         }
         
         onDone(NO, NO);
@@ -566,7 +560,6 @@
                 model.metadata.nextScheduledExport = [NSDate.date dateByAddingTimeInterval:days * 24 * 60 * 60];
                 
                 model.metadata.lastScheduledExportModDate = modDate;
-                [SafesList.sharedInstance update:model.metadata];
                 
                 onDone(NO, NO);
             };
@@ -576,7 +569,6 @@
         else if ( buttonIdCancelIsZero == 2) { 
             NSUInteger days = model.metadata.scheduleExportIntervalDays;
             model.metadata.nextScheduledExport = [model.metadata.nextScheduledExport dateByAddingTimeInterval:days * 24 * 60 * 60];
-            [SafesList.sharedInstance update:model.metadata];
             
             onDone(NO, NO);
         }
@@ -625,7 +617,6 @@
         }
         else if ( buttonIdCancelIsZero == 2 ) { 
             model.metadata.hasAcknowledgedAppLockBiometricQuickLaunchCoalesceIssue = YES;
-            [SafesList.sharedInstance update:model.metadata];
             onDone(NO, NO);
         }
     };
@@ -649,7 +640,6 @@
     
     module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
         model.metadata.onboardingDoneHasBeenShown = YES;
-        [SafesList.sharedInstance update:model.metadata];
         onDone(NO, YES); 
     };
 
@@ -702,8 +692,6 @@
         model.metadata.lastAskedAboutArgon2MemReduction = NSDate.date;
         
         if ( buttonIdCancelIsZero == 0 ) {
-            [SafesList.sharedInstance update:model.metadata];
-        
             onDone(NO, YES); 
             return;
         }
@@ -720,7 +708,6 @@
             model.metadata.argon2MemReductionDontAskAgain = YES;
         }
 
-        [SafesList.sharedInstance update:model.metadata];
         onDone(NO, NO);
     };
 
@@ -753,7 +740,7 @@
                                                                             modified:nil
                                                                             fileSize:&fileSize];
         
-        const unsigned long long kMinFileSize = 3 * 1024 * 1024; 
+        const unsigned long long kMinFileSize = 1.5f * 1024 * 1024; 
         if ( !workingCopy || fileSize < kMinFileSize ) {
             return NO;
         }
@@ -781,8 +768,6 @@
         model.metadata.lastAskedAboutKdbx4Upgrade = NSDate.date;
         
         if ( buttonIdCancelIsZero == 0 ) {
-            [SafesList.sharedInstance update:model.metadata];
-        
             onDone(NO, YES); 
             return;
         }
@@ -797,7 +782,6 @@
             model.metadata.kdbx4UpgradeDontAskAgain = YES;
         }
 
-        [SafesList.sharedInstance update:model.metadata];
         onDone(NO, NO);
     };
 
@@ -860,16 +844,16 @@
 
 
 
-- (NSArray<SafeMetaData*>*)getLocalDeviceSafes {
-    return [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+- (NSArray<DatabasePreferences*>*)getLocalDeviceSafes {
+    return [DatabasePreferences forAllDatabasesOfProvider:kLocalDevice];
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {
-    return SafesList.sharedInstance.snapshot.count - ([self getICloudSafes].count + [self getLocalDeviceSafes].count) > 0;
+    return DatabasePreferences.allDatabases.count - ([self getICloudSafes].count + [self getLocalDeviceSafes].count) > 0;
 }
 
-- (NSArray<SafeMetaData*>*)getICloudSafes {
-    return [SafesList.sharedInstance getSafesOfProvider:kiCloud];
+- (NSArray<DatabasePreferences*>*)getICloudSafes {
+    return [DatabasePreferences forAllDatabasesOfProvider:kiCloud];
 }
 
 

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SyncParameters.h"
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 #import "SyncStatus.h"
 #import "SyncManagement.h"
 
@@ -18,26 +18,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype _Nullable)sharedInstance;
 
-- (SyncStatus*)getSyncStatus:(SafeMetaData*)database;
+- (SyncStatus*)getSyncStatus:(DatabasePreferences*)database;
 
 - (void)backgroundSyncAll;
 - (void)backgroundSyncOutstandingUpdates;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;
 
-- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *_Nullable)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
+- (void)sync:(DatabasePreferences *)database interactiveVC:(UIViewController *_Nullable)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error;
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database file:(NSString *)file error:(NSError**)error;
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabasePreferences *)database data:(NSData *)data error:(NSError**)error;
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabasePreferences *)database file:(NSString *)file error:(NSError**)error;
 
 
 
-- (NSString*)getPrimaryStorageDisplayName:(SafeMetaData*)database;
-- (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database;
+- (NSString*)getPrimaryStorageDisplayName:(DatabasePreferences*)database;
+- (void)removeDatabaseAndLocalCopies:(DatabasePreferences*)database;
 
 - (void)startMonitoringDocumentsDirectory;
 
 #ifndef IS_APP_EXTENSION
-- (BOOL)toggleLocalDatabaseFilesVisibility:(SafeMetaData*)metadata error:(NSError**)error;
+- (BOOL)toggleLocalDatabaseFilesVisibility:(DatabasePreferences*)metadata error:(NSError**)error;
 #endif
 
 @end

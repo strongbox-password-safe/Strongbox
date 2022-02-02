@@ -7,7 +7,7 @@
 //
 
 #import "FileManager.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "DatabaseModel.h"
 #import "AppPreferences.h"
 

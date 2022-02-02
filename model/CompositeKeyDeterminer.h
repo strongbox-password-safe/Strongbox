@@ -11,18 +11,10 @@
 #if TARGET_OS_IPHONE
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
-
-typedef UIViewController* VIEW_CONTROLLER_PTR;
-typedef SafeMetaData* METADATA_PTR;
 
 #else
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
-
-typedef NSViewController* VIEW_CONTROLLER_PTR;
-typedef DatabaseMetadata* METADATA_PTR;
 
 #endif
 

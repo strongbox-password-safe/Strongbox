@@ -11,18 +11,17 @@ import SwiftUI
 @available(OSX 10.15.0, *)
 
 class
-SwiftUIController: NSHostingController<SwiftUIView>
-{
+SwiftUIController: NSHostingController<SwiftUIView> {
     @objc
-    required
     dynamic
-    init?(coder: NSCoder)
-    {
-        weak var parent: NSViewController? = nil 
+    required
+    init?(coder _: NSCoder) {
+        weak var parent: NSViewController? 
         super.init(rootView:
             SwiftUIView(parent: Binding(
                 get: { parent },
-                set: { parent = $0 })
+                set: { parent = $0 }
+            )
             )
         )
 
@@ -32,23 +31,23 @@ SwiftUIController: NSHostingController<SwiftUIView>
 
 @available(OSX 10.15.0, *)
 struct SwiftUIView: View {
-
+    
     @Binding var parent: NSViewController?
 
-    
-  var body: some View {
-    VStack(spacing: 8) {
-      Text("SwiftUI View 🎉")
-        .font(.title)
-        .bold()
 
-      Button(action: {
-        self.parent?.dismiss(nil)
+    var body: some View {
+        VStack(spacing: 8) {
+            Text("SwiftUI View 🎉")
+                .font(.title)
+                .bold()
 
-      }, label: {
-        Text("Close")
-      })
-    }.toggleStyle(SwitchToggleStyle())
-    .frame(minWidth: 300, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
-  }
+            Button(action: {
+                self.parent?.dismiss(nil)
+
+            }, label: {
+                Text("Close")
+            })
+        }.toggleStyle(SwitchToggleStyle())
+            .frame(minWidth: 300, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
+    }
 }

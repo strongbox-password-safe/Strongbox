@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 #import "OnboardingModule.h"
 
 NS_ASSUME_NONNULL_BEGIN

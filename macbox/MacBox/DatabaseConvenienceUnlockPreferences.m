@@ -11,11 +11,11 @@
 #import "Utils.h"
 #import "SecretStore.h"
 #import "MacAlerts.h"
-#import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "BiometricIdHelper.h"
 #import "Settings.h"
 #import "NSDate+Extensions.h"
+#import "DatabaseMetadata.h"
 
 @interface DatabaseConvenienceUnlockPreferences ()
 
@@ -44,16 +44,13 @@
 - (IBAction)onSettingChanged:(id)sender {
     BOOL foo = self.checkboxAutomaticallyPrompt.state == NSControlStateValueOn;
     
-    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoPromptForConvenienceUnlockOnActivate = foo;
-    }];
+    self.model.databaseMetadata.autoPromptForConvenienceUnlockOnActivate = foo;
     
     [self bindUi];
 }
 
 - (IBAction)onConvenienceUnlockMethodsChanged:(id)sender {
-    DatabaseMetadata* meta = self.model.databaseMetadata;
+    MacDatabasePreferences* meta = self.model.databaseMetadata;
     
     BOOL touch = self.checkboxUseTouchId.state == NSControlStateValueOn;
     BOOL watch = self.checkBoxEnableWatch.state == NSControlStateValueOn;
@@ -62,24 +59,21 @@
     
     NSString* password = self.model.compositeKeyFactors.password;
     
-    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.isTouchIdEnabled = touch;
-        metadata.isWatchUnlockEnabled = watch;
-        
-        if ( on && wasOff )  {
-            metadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
-        }
-        
-        if ( on ) {
-            meta.conveniencePasswordHasBeenStored = YES;
-            metadata.conveniencePassword = password;
-        }
-        else {
-            meta.conveniencePasswordHasBeenStored = NO;
-            metadata.conveniencePassword = nil;
-        }
-    }];
+    self.model.databaseMetadata.isTouchIdEnabled = touch;
+    self.model.databaseMetadata.isWatchUnlockEnabled = watch;
+    
+    if ( on && wasOff )  {
+        self.model.databaseMetadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
+    }
+    
+    if ( on ) {
+        self.model.databaseMetadata.conveniencePasswordHasBeenStored = YES;
+        self.model.databaseMetadata.conveniencePassword = password;
+    }
+    else {
+        self.model.databaseMetadata.conveniencePasswordHasBeenStored = NO;
+        self.model.databaseMetadata.conveniencePassword = nil;
+    }
     
     [self bindUi];
 }
@@ -97,7 +91,7 @@
     BOOL methodAvailable = watchAvailable || touchAvailable;
     BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
 
-    DatabaseMetadata* meta = self.model.databaseMetadata;
+    MacDatabasePreferences* meta = self.model.databaseMetadata;
     
     self.checkboxUseTouchId.enabled = touchAvailable && featureAvailable;
     self.checkboxUseTouchId.state = meta.isTouchIdEnabled ? NSControlStateValueOn : NSControlStateValueOff;
@@ -123,7 +117,7 @@
 }
 
 - (NSString*)getSecureStorageSummary {
-    DatabaseMetadata* meta = self.model.databaseMetadata;
+    MacDatabasePreferences* meta = self.model.databaseMetadata;
     
     BOOL featureAvailable = Settings.sharedInstance.isProOrFreeTrial;
     if( !featureAvailable ) {
@@ -215,13 +209,10 @@
 - (void)throttledSliderChanged {
     NSInteger foo = [self getHoursFromSliderValue:self.sliderExpiry.integerValue];
     NSString* password = self.model.compositeKeyFactors.password;
-    
-    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.touchIdPasswordExpiryPeriodHours = foo;
-        metadata.conveniencePasswordHasBeenStored = YES;
-        metadata.conveniencePassword = password;
-    }];
+
+    self.model.databaseMetadata.touchIdPasswordExpiryPeriodHours = foo;
+    self.model.databaseMetadata.conveniencePasswordHasBeenStored = YES;
+    self.model.databaseMetadata.conveniencePassword = password;
     
     [self bindUi];
 }

@@ -23,4 +23,7 @@ NSString* schemeFromStorageProvider(StorageProvider storageProvider);
 NSURL* fileUrlFromManagedUrl(NSURL* managedUrl);
 NSURL* managedUrlFromFileUrl(NSURL* fileUrl);
 
+NSString* getPathRelativeToUserHome(NSString* path);
+NSString* getFriendlyICloudPath(NSString* path);
+    
 NS_ASSUME_NONNULL_END

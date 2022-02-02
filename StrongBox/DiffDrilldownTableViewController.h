@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Pair.h"
+#import "MMcGPair.h"
 #import "Node.h"
 #import "Model.h"
 
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL isMergeDiff;
 
-@property Pair<Node*, Node*>* diffPair;
+@property MMcGPair<Node*, Node*>* diffPair;
 
 @end
 

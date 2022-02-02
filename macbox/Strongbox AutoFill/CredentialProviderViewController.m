@@ -9,7 +9,6 @@
 #import "CredentialProviderViewController.h"
 #import "Utils.h"
 #import "QuickTypeRecordIdentifier.h"
-#import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
 #import "MacAlerts.h"
@@ -42,7 +41,7 @@
 @property MMWormhole* wormhole;
 
 @property NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers;
-@property DatabaseMetadata* database;
+@property MacDatabasePreferences* database;
 @property (nullable) QuickTypeRecordIdentifier* quickTypeIdentifier;
 
 @property BOOL withUserInteraction;
@@ -54,7 +53,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
 @implementation CredentialProviderViewController
 
-- (void)exitWithUserCancelled:(DatabaseMetadata*)unlockedDatabase {
+- (void)exitWithUserCancelled:(MacDatabasePreferences*)unlockedDatabase {
     NSLog(@"EXIT: User Cancelled");
     
     if ( unlockedDatabase ) {
@@ -76,7 +75,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     [self.extensionContext cancelRequestWithError:error];
 }
 
-- (void)exitWithCredential:(DatabaseMetadata*)unlockedDatabase username:(NSString*)username password:(NSString*)password totp:(NSString*)totp {
+- (void)exitWithCredential:(MacDatabasePreferences*)unlockedDatabase username:(NSString*)username password:(NSString*)password totp:(NSString*)totp {
     BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
     
     [self markLastUnlockedAtTime:unlockedDatabase];
@@ -151,12 +150,10 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
     NSLog(@"Checking wormhole to see if Main App can provide credentials immediately...");
 
-    if(identifier) {
-        DatabaseMetadata* database = [DatabasesManager.sharedInstance.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
-            return [obj.uuid isEqualToString:identifier.databaseId];
-        }];
+    if ( identifier ) {
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:identifier.databaseId];
 
-        if ( database.autoFillEnabled && database.quickWormholeFillEnabled ) {
+        if ( database && database.autoFillEnabled && database.quickWormholeFillEnabled ) {
             [self doQuickWormholeFill:identifier];
             return;
         }
@@ -190,7 +187,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
         [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeQuickTypeResponseId];
         [self.wormhole clearAllMessageContents];
 
-        DatabaseMetadata* metadata = [DatabasesManager.sharedInstance getDatabaseById:identifier.databaseId];
+        MacDatabasePreferences* metadata = [MacDatabasePreferences fromUuid:identifier.databaseId];
         [self decodeWormholeMessage:messageObject metadata:metadata];
     }];
     
@@ -211,7 +208,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     });
 }
 
-- (void)decodeWormholeMessage:(id)messageObject metadata:(DatabaseMetadata*)metadata {
+- (void)decodeWormholeMessage:(id)messageObject metadata:(MacDatabasePreferences*)metadata {
     NSDictionary* message = (NSDictionary*)messageObject;
     NSString* userSession = message[@"user-session-id"];
 
@@ -253,9 +250,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
     
     if(identifier) {
-        DatabaseMetadata* safe = [DatabasesManager.sharedInstance.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
-            return [obj.uuid isEqualToString:identifier.databaseId];
-        }];
+        MacDatabasePreferences* safe = [MacDatabasePreferences fromUuid:identifier.databaseId];
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if(safe) {
@@ -306,7 +301,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     
     self.selectDbVc.wormhole = self.wormhole;
     
-    self.selectDbVc.onDone = ^(BOOL userCancelled, DatabaseMetadata * _Nonnull database) {
+    self.selectDbVc.onDone = ^(BOOL userCancelled, MacDatabasePreferences * _Nonnull database) {
         if (userCancelled) {
             [weakSelf exitWithUserCancelled:nil];
         }
@@ -328,14 +323,14 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
 - (void)presentRequiredUI {
     if ( !self.quickTypeMode ) {
-        NSArray<DatabaseMetadata*> *databases = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
-            return obj.autoFillEnabled;
+        NSArray<MacDatabasePreferences*> *databases = [MacDatabasePreferences filteredDatabases:^BOOL(MacDatabasePreferences * _Nonnull database) {
+            return database.autoFillEnabled;
         }];
 
         if ( databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
             NSLog(@"Single Database Launching...");
 
-            DatabaseMetadata* database = databases.firstObject;
+            MacDatabasePreferences* database = databases.firstObject;
             __weak CredentialProviderViewController* weakSelf = self;
 
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -369,7 +364,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
 
 
-- (void)unlockDatabase:(DatabaseMetadata*)database
+- (void)unlockDatabase:(MacDatabasePreferences*)database
    quickTypeIdentifier:(QuickTypeRecordIdentifier*_Nullable)quickTypeIdentifier
     serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"AUTOFILL: unlockDatabase ENTER");
@@ -547,7 +542,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
                                                         viewController:self
                                                          forceReadOnly:NO
                                                         isAutoFillOpen:YES
-                                                           offlineMode:NO];
+                                                           offlineMode:self.database.offlineMode];
     
     [unlocker unlockLocalWithKey:ckf
               keyFromConvenience:isConvenienceUnlock
@@ -555,7 +550,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
         NSLog(@"unlockLocalWithKey => [%lu](%@) - error = [%@]", result, result == kUnlockDatabaseResultSuccess ? @"Success" : @"Not Successful", error);
         
         if ( result == kUnlockDatabaseResultSuccess ) {
-            [self onSucccesfullyUnlocked:model.database];
+            [self onSucccesfullyUnlocked:model];
         }
         else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
             [self manualUnlockDatabase];
@@ -573,7 +568,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     }];
 }
 
-- (void)onSucccesfullyUnlocked:(DatabaseModel*)model {
+- (void)onSucccesfullyUnlocked:(Model*)model {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.database.autoFillConvenienceAutoUnlockTimeout == -1 && self.withUserInteraction ) {
             [self onboardForAutoFillConvenienceAutoUnlock:^{
@@ -586,9 +581,9 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     });
 }
 
-- (void)continueUnlockedDatabase:(DatabaseModel*)model {
+- (void)continueUnlockedDatabase:(Model*)model {
     if ( self.database.autoFillConvenienceAutoUnlockTimeout > 0 ) {
-        self.database.autoFillConvenienceAutoUnlockPassword = model.ckfs.password;
+        self.database.autoFillConvenienceAutoUnlockPassword = model.database.ckfs.password;
         [self markLastUnlockedAtTime:self.database];
     }
 
@@ -610,21 +605,12 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
                  completion:^(NSUInteger option) {
         if (option == 1) {
             self.database.autoFillConvenienceAutoUnlockTimeout = 180;
-            [DatabasesManager.sharedInstance atomicUpdate:self.database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                metadata.autoFillConvenienceAutoUnlockTimeout = 180;
-            }];
         }
         else if (option == 2) {
             self.database.autoFillConvenienceAutoUnlockTimeout = 600;
-            [DatabasesManager.sharedInstance atomicUpdate:self.database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                metadata.autoFillConvenienceAutoUnlockTimeout = 600;
-            }];
         }
         else if (option == 3) {
             self.database.autoFillConvenienceAutoUnlockTimeout = 0;
-            [DatabasesManager.sharedInstance atomicUpdate:self.database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                metadata.autoFillConvenienceAutoUnlockTimeout = 0;
-            }];
         }
         
         completion();
@@ -633,7 +619,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
 
 
-- (void)autoFillWithQuickType:(DatabaseModel*)model {
+- (void)autoFillWithQuickType:(Model*)model {
     NSUUID* uuid = [[NSUUID alloc] initWithUUIDString:self.quickTypeIdentifier.nodeId];
     Node* node = [model getItemById:uuid];
     
@@ -668,7 +654,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     }
 }
 
-- (void)presentCredentialSelector:(DatabaseModel*)model {
+- (void)presentCredentialSelector:(Model*)model {
     NSLog(@"presentCredentialSelector: [%@]", model);
     
     SelectCredential* vc = [[SelectCredential alloc] initWithNibName:@"SelectCredential" bundle:nil];
@@ -686,15 +672,11 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     [self presentViewControllerAsSheet:vc];
 }
 
-- (void)markLastUnlockedAtTime:(DatabaseMetadata*)database {
+- (void)markLastUnlockedAtTime:(MacDatabasePreferences*)database {
     database.autoFillLastUnlockedAt = NSDate.date;
-    [DatabasesManager.sharedInstance atomicUpdate:database.uuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoFillLastUnlockedAt = database.autoFillLastUnlockedAt;
-    }];
 }
 
-- (BOOL)isAutoFillConvenienceAutoLockPossible:(DatabaseMetadata*)database {
+- (BOOL)isAutoFillConvenienceAutoLockPossible:(MacDatabasePreferences*)database {
     BOOL isWithinAutoFillConvenienceAutoUnlockTime = NO;
     
 

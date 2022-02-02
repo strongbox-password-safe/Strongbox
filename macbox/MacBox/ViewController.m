@@ -8,27 +8,21 @@
 
 #import "ViewController.h"
 #import "MacAlerts.h"
-#import "CreateFormatAndSetCredentialsWizard.h"
+
 #import "Settings.h"
 #import "AppDelegate.h"
 #import "Utils.h"
-#import "CHCSVParser.h"
-#import "DatabasesManager.h"
-#import "BiometricIdHelper.h"
-#import "Csv.h"
-#import "AttachmentItem.h"
+
 #import "CustomField.h"
 #import "Entry.h"
 #import "KeyFileParser.h"
 
-#import "SelectPredefinedIconController.h"
-#import "MacKeePassHistoryViewController.h"
 #import "NodeIconHelper.h"
 #import "OTPToken+Generation.h"
 
 #import "CustomFieldTableCellView.h"
 #import "SearchScope.h"
-#import <WebKit/WebKit.h>
+
 #import "FavIconDownloader.h"
 #import "FavIconManager.h"
 #import "NodeDetailsViewController.h"
@@ -46,18 +40,18 @@
 #import "DatabaseOnboardingTabViewController.h"
 #import "DatabasesManagerVC.h"
 #import "AutoFillManager.h"
-#import "MMWormhole.h"
-#import "AutoFillWormhole.h"
-#import "QuickTypeRecordIdentifier.h"
+
 #import "SecretStore.h"
 #import "OutlineView.h"
 #import "Document.h"
 #import "SyncAndMergeSequenceManager.h"
 #import "PasswordStrengthTester.h"
 #import "StrongboxErrorCodes.h"
-#import "DatabaseFormatIncompatibilityHelper.h"
 #import "macOSSpinnerUI.h"
 #import "MBProgressHUD.h"
+#import "WindowController.h"
+#import "PasswordStrengthUIHelper.h"
+#import "Constants.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -86,13 +80,11 @@ static NSString* const kNewEntryKey = @"newEntry";
                                 NSTableViewDelegate,
                                 NSTableViewDataSource>
 
-@property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
-@property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
 @property (nonatomic) BOOL showPassword;
 
 @property NSMutableDictionary<NSUUID*, NSArray<Node*>*> *itemsCache;
 
-@property NSTimer* timerRefreshOtp;
+
 @property NSFont* italicFont;
 @property NSFont* regularFont;
 
@@ -143,15 +135,12 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property NSArray<NSString*>* sortedAttachmentsFilenames;
 @property NSDictionary<NSString*, DatabaseAttachment*>* attachments;
 
-@property BOOL isPromptingAboutUnderlyingFileChange;
 @property NSArray* customFields;
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
 
-@property MMWormhole* wormhole;
-
 @property (weak) Document* _Nullable document;
 @property (readonly) ViewModel*_Nullable viewModel;
-@property (readonly) DatabaseMetadata*_Nullable databaseMetadata;
+@property (readonly) MacDatabasePreferences*_Nullable databaseMetadata;
 
 @property BOOL hasUILoaded;
 @property BOOL hasDocumentLoaded;
@@ -175,7 +164,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     return self.document.viewModel;
 }
 
-- (DatabaseMetadata*)databaseMetadata {
+- (MacDatabasePreferences*)databaseMetadata {
     return self.viewModel.databaseMetadata;
 }
 
@@ -210,11 +199,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     
     [self fullModelReload];
         
-    [self maybeOnboardDatabase];
-    
     [self listenToEventsOfInterest];
-    
-    [self listenToAutoFillWormhole];
     
     
     
@@ -238,40 +223,12 @@ static NSString* const kNewEntryKey = @"newEntry";
     [super viewDidAppear];
         
     [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
-
-    [self startRefreshOtpTimer];
 }
 
 - (void)listenToEventsOfInterest {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(windowWillClose:) name:NSWindowWillCloseNotification object:nil]; 
-
-
-
-
-
-
-
-    NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
-    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onScreenLocked) name:notificationName object:nil];
-    
-    NSString* notificationName2 = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"sessionDidMoveOffConsole"]; 
-    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onSessionDidMoveOffConsole) name:notificationName2 object:nil];
-}
-
-- (void)onSessionDidMoveOffConsole {
-    if ( self.viewModel.lockOnScreenLock ) {
-        NSLog(@"onSessionDidMoveOffConsole: Locking Database");
-        [self onLock:nil];
-    }
-}
-
-- (void)onScreenLocked {
-    if ( self.viewModel.lockOnScreenLock ) {
-        NSLog(@"onScreenLocked: Locking Database");
-        [self onLock:nil];
-    }
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshOtpCode:) name:kTotpUpdateNotification object:nil];
 }
 
 - (void)fullModelReload {
@@ -295,19 +252,9 @@ static NSString* const kNewEntryKey = @"newEntry";
 - (void)cleanupOnClose {
     NSLog(@"ViewController::cleanupOnClose");
     
-    [self stopRefreshOtpTimer];
     [self closeAllDetailsWindows:nil];
-    [self cleanupWormhole];
     
     [NSNotificationCenter.defaultCenter removeObserver:self];
-    [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
-    
-    
-
-    if ( Settings.sharedInstance.clearClipboardEnabled) {
-        AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-        [appDelegate clearClipboardWhereAppropriate];
-    }
 }
 
 - (void)closeAllDetailsWindows:(void (^)(void))completion {
@@ -345,7 +292,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     });
 }
 
-- (IBAction)onViewItemDetails:(id)sender {
+- (IBAction)onEditEntry:(id)sender {
     [self showItemDetails];
 }
 
@@ -411,47 +358,6 @@ static NSString* const kNewEntryKey = @"newEntry";
 
         
         self.detailsViewControllers[item.uuid] = vc;
-    }
-    else if([segue.identifier isEqualToString:@"segueToItemHistory"]) {
-        NSDictionary<NSString*, id> *params = sender;
-        Node* item = params[kItemKey];
-
-        MacKeePassHistoryViewController* vc = (MacKeePassHistoryViewController*)segue.destinationController;
-        
-        vc.onDeleteHistoryItem = ^(Node * _Nonnull node) {
-            [weakSelf.viewModel deleteHistoryItem:item historicalItem:node];
-        };
-        vc.onRestoreHistoryItem = ^(Node * _Nonnull node) {
-            [weakSelf.viewModel restoreHistoryItem:item historicalItem:node];
-        };
-        
-        vc.model = self.viewModel;
-        vc.history = item.fields.keePassHistory;
-    }
-    else if ([segue.identifier isEqualToString:@"segueToDatabaseOnboarding"]) {
-        DatabaseOnboardingTabViewController *vc = (DatabaseOnboardingTabViewController*)segue.destinationController;
-        
-        NSDictionary<NSString*, id>* foo = sender;
-        
-        vc.convenienceUnlock = ((NSNumber*)foo[@"convenienceUnlock"]).boolValue;
-        vc.autoFill = ((NSNumber*)foo[@"autoFill"]).boolValue;
-        vc.ckfs = foo[@"compositeKeyFactors"];
-        vc.databaseUuid = self.databaseMetadata.uuid;
-        vc.model = foo[@"model"];
-    }
-    else if ( [segue.identifier isEqualToString:@"segueToFavIconDownloader"] ) {
-        Node* item = sender;
-        NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.viewModel.activeRecords;
-        
-        FavIconDownloader *vc = segue.destinationController;
-        vc.nodes = items;
-        vc.viewModel = self.viewModel;
-
-        vc.onDone = ^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
-            if(go) {
-                [weakSelf.viewModel batchSetIcons:selectedFavIcons];
-            }
-        };
     }
 }
 
@@ -677,6 +583,38 @@ static NSString* const kNewEntryKey = @"newEntry";
     [self bindDetailsPane];
 }
 
+- (void)onItemsAddedNotification:(NSNotification*)param {
+    if(param.object != self.viewModel) {
+        return;
+    }
+
+    NSArray<Node*>* items = param.userInfo[kNotificationUserInfoKeyNode];
+    NSNumber* boolean = param.userInfo[kNotificationUserInfoKeyBoolParam];
+
+    Node* node = items.firstObject;
+    BOOL openEntryDetailsWindowWhenDone = boolean.boolValue;
+    
+    self.itemsCache = nil; 
+    self.searchField.stringValue = @""; 
+    [self.outlineView reloadData];
+    NSInteger row = [self findRowForItemExpandIfNecessary:node];
+    
+    if(row < 0) {
+        NSLog(@"Could not find newly added item?");
+    }
+    else {
+        [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
+    }
+
+    if ( openEntryDetailsWindowWhenDone ) {
+        [self openItemDetails:node newEntry:YES];
+        
+        if ( self.viewModel.downloadFavIconOnChange ) {
+            [self expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:node];
+        }
+    }
+}
+
 - (void)onDatabasePreferencesChanged:(NSNotification*)param {
     if(param.object != self.viewModel) {
         return;
@@ -737,10 +675,30 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 - (void)expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:(Node*)node {
     NSURL* url = node.fields.url.urlExtendedParse;
-        
     BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    if( url && featureAvailable ) {
+        if ( !self.viewModel.promptedForAutoFetchFavIcon ) {
+            NSViewController* appropriate = self.detailsViewControllers[node.uuid];
+            
+            [MacAlerts yesNo:NSLocalizedString(@"item_details_prompt_auto_fetch_favicon_title", @"Auto Fetch FavIcon?")
+             informativeText:NSLocalizedString(@"item_details_prompt_auto_fetch_favicon_message", @"Strongbox can automatically fetch FavIcons when an new entry is created or updated.\n\nWould you like to Strongbox to do this?")
+                      window:appropriate ? appropriate.view.window : self.view.window
+                  completion:^(BOOL yesNo) {
+                self.viewModel.promptedForAutoFetchFavIcon = YES;
+                self.viewModel.downloadFavIconOnChange = yesNo;
+                
+                [self downloadFavIconForNewOrUpdatedNode:node];
+            }];
+        }
+        else {
+            [self downloadFavIconForNewOrUpdatedNode:node];
+        }
+    }
+}
 
-    if( url && featureAvailable && self.viewModel.downloadFavIconOnChange ) {
+- (void)downloadFavIconForNewOrUpdatedNode:(Node*)node {
+    if( self.viewModel.downloadFavIconOnChange && node.fields.url.length ) {
+        NSURL* url = node.fields.url.urlExtendedParse;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
             [FavIconManager.sharedInstance downloadPreferred:url
                                                      options:FavIconDownloadOptions.express
@@ -845,10 +803,9 @@ static NSString* const kNewEntryKey = @"newEntry";
 }
 
 - (void)stopObservingModelChanges {
-    NSLog(@"stopObservingModelChanges");
+
 
     if(self.viewModel) {
-        self.viewModel.onNewItemAdded = nil;
         self.viewModel.onDeleteHistoryItem = nil;
         self.viewModel.onRestoreHistoryItem = nil;
     }
@@ -871,22 +828,21 @@ static NSString* const kNewEntryKey = @"newEntry";
 
     
     
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationLongRunningOperationStart object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationLongRunningOperationDone object:nil];
+
+
+    
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationFullReload object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationDatabaseChangedByOther object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationSyncDone object:nil];
+
+
+
 }
 
 - (void)startObservingModelChanges {
-    NSLog(@"startObservingModelChanges");
+
     
     __weak ViewController* weakSelf = self;
     
     if ( self.viewModel ) { 
-        self.viewModel.onNewItemAdded = ^(Node * _Nonnull node, BOOL openEntryDetailsWindowWhenDone) {
-            [weakSelf onNewItemAdded:node openEntryDetailsWindowWhenDone:openEntryDetailsWindowWhenDone];
-        };
         self.viewModel.onDeleteHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
             [weakSelf onDeleteHistoryItem:item historicalItem:historicalItem];
         };
@@ -909,17 +865,19 @@ static NSString* const kNewEntryKey = @"newEntry";
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsDeletedNotification:) name:kModelUpdateNotificationItemsDeleted object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsUnDeletedNotification:) name:kModelUpdateNotificationItemsUnDeleted object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsMovedNotification:) name:kModelUpdateNotificationItemsMoved object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsAddedNotification:) name:kModelUpdateNotificationItemsAdded object:nil];
 
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onDatabasePreferencesChanged:) name:kModelUpdateNotificationDatabasePreferenceChanged object:nil];
 
     
     
-    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onModelLongRunningOpStart:) name:kModelUpdateNotificationLongRunningOperationStart object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onModelLongRunningOpDone:) name:kModelUpdateNotificationLongRunningOperationDone object:nil];
+
+
     
-    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onFullModelReloadNotification:) name:kModelUpdateNotificationFullReload object:nil];    
-    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onFileChangedByOtherApplication:) name:kModelUpdateNotificationDatabaseChangedByOther object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onSyncDone:) name:kModelUpdateNotificationSyncDone object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onFullModelReloadNotification:) name:kModelUpdateNotificationFullReload object:nil];
+    
+
+
 }
 
 - (void)bindDetailsPane {
@@ -931,18 +889,16 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
     else if (it.isGroup) {
         [self.tabViewRightPane selectTabViewItemAtIndex:1];
-        self.imageViewGroupDetails.image = [self getIconForNode:it large:YES];
-        self.imageViewGroupDetails.clickable = self.viewModel.format != kPasswordSafe;
-        self.imageViewGroupDetails.showClickableBorder = YES;
         
-        __weak ViewController* weakSelf = self;
-        self.imageViewGroupDetails.onClick = ^{ [weakSelf onEditNodeIcon:it]; };
-
-        self.textFieldSummaryTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];;
+        self.imageViewGroupDetails.image = [self getIconForNode:it large:YES];
+        self.imageViewGroupDetails.clickable = NO;
+        self.imageViewGroupDetails.showClickableBorder = NO;
+        
+        self.textFieldSummaryTitle.stringValue = [self dereference:it.title node:it];;
         
         if ( it.fields.notes.length ) {
             self.groupNotesScrollView.hidden = NO;
-            self.textViewGroupNotes.string = [self maybeDereference:it.fields.notes node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+            self.textViewGroupNotes.string = [self dereference:it.fields.notes node:it];
             
             
             
@@ -970,9 +926,9 @@ static NSString* const kNewEntryKey = @"newEntry";
         self.imageViewIcon.hidden = self.viewModel.format == kPasswordSafe;
 
         
-        self.labelTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        self.labelTitle.stringValue = [self dereference:it.title node:it];
         
-        NSString* pw = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        NSString* pw = [self dereference:it.fields.password node:it];
         
         BOOL colorize = Settings.sharedInstance.colorizePasswords;
         
@@ -988,10 +944,10 @@ static NSString* const kNewEntryKey = @"newEntry";
         
         [self bindPasswordStrength:pw];
         
-        self.labelUrl.stringValue = [self maybeDereference:it.fields.url node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
-        self.labelUsername.stringValue = [self maybeDereference:it.fields.username node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        self.labelUrl.stringValue = [self dereference:it.fields.url node:it];
+        self.labelUsername.stringValue = [self dereference:it.fields.username node:it];
         self.labelEmail.stringValue = it.fields.email;
-        self.textViewNotes.string = [self maybeDereference:it.fields.notes node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        self.textViewNotes.string = [self dereference:it.fields.notes node:it];
 
         
         
@@ -1035,7 +991,7 @@ static NSString* const kNewEntryKey = @"newEntry";
             return field;
         }];
         
-        self.customFieldsRow.hidden = self.viewModel.format == kPasswordSafe || self.customFields.count == 0 || !Settings.sharedInstance.showCustomFieldsOnQuickViewPanel;
+        self.customFieldsRow.hidden = self.viewModel.format == kPasswordSafe || self.customFields.count == 0;
         [self.customFieldsTable reloadData];
         
         
@@ -1043,31 +999,13 @@ static NSString* const kNewEntryKey = @"newEntry";
         self.sortedAttachmentsFilenames = [it.fields.attachments.allKeys sortedArrayUsingComparator:finderStringComparator];
         self.attachments = it.fields.attachments.copy;
         
-        self.attachmentsRow.hidden = self.viewModel.format == kPasswordSafe || self.sortedAttachmentsFilenames.count == 0 || !Settings.sharedInstance.showAttachmentsOnQuickViewPanel;
+        self.attachmentsRow.hidden = self.viewModel.format == kPasswordSafe || self.sortedAttachmentsFilenames.count == 0;
         [self.attachmentsTable reloadData];
     }
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
-    return [self maybeDereference:text node:node maybe:YES];
-}
-
-- (NSString*)maybeDereference:(NSString*)text node:(Node*)node maybe:(BOOL)maybe {
-    return maybe ? [self.viewModel dereference:text node:node] : text;
-}
-
-- (void)startRefreshOtpTimer {
-    if(self.timerRefreshOtp == nil) {
-        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshOtpCode:) userInfo:nil repeats:YES];
-        [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
-    }
-}
-
-- (void)stopRefreshOtpTimer {
-    if(self.timerRefreshOtp) {
-        [self.timerRefreshOtp invalidate];
-        self.timerRefreshOtp = nil;
-    }
+    return [self.viewModel dereference:text node:node];
 }
 
 
@@ -1143,7 +1081,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     else if([tableColumn.identifier isEqualToString:kPasswordColumn]) {
         CustomFieldTableCellView* cell = [self.outlineView makeViewWithIdentifier:kPasswordCellIdentifier owner:nil];
         
-        NSString* password = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
+        NSString* password = [self dereference:it.fields.password node:it];
         
         cell.value = it.isGroup ? @"" : password;
         cell.protected = !it.isGroup && !(password.length == 0 && !self.viewModel.concealEmptyProtectedFields);
@@ -1244,11 +1182,11 @@ static NSString* const kNewEntryKey = @"newEntry";
 - (NSTableCellView*)getEditableCell:(NSString*)text node:(Node*)node selector:(SEL)selector {
     NSTableCellView* cell = (NSTableCellView*)[self.outlineView makeViewWithIdentifier:@"GenericCell" owner:self];
     
-    cell.textField.stringValue = [self maybeDereference:text node:node maybe:Settings.sharedInstance.dereferenceInOutlineView];
+    cell.textField.stringValue = [self dereference:text node:node];
     
     
     
-    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.viewModel isDereferenceableText:text];
+    BOOL possiblyDereferencedText = [self.viewModel isDereferenceableText:text];
     
     cell.textField.editable = !possiblyDereferencedText &&
         !self.viewModel.outlineViewEditableFieldsAreReadonly &&
@@ -1276,9 +1214,9 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
 
     cell.imageView.objectValue = [self getIconForNode:it large:NO];
-    cell.textField.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
+    cell.textField.stringValue = [self dereference:it.title node:it];
 
-    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.viewModel isDereferenceableText:it.title];
+    BOOL possiblyDereferencedText = [self.viewModel isDereferenceableText:it.title];
     cell.textField.editable = !possiblyDereferencedText
         && !self.viewModel.isEffectivelyReadOnly
         && (it.isGroup || (!self.viewModel.outlineViewTitleIsReadonly));
@@ -1457,7 +1395,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 }
 
 - (void)outlineViewOnDeleteKey {
-    [self onDelete:nil];
+    [NSApplication.sharedApplication sendAction:@selector(onDelete:) to:nil from:nil];
 }
 
 
@@ -1553,19 +1491,19 @@ static NSString* const kNewEntryKey = @"newEntry";
     
     for (NSString* term in terms) {
         if (scope == kSearchScopeTitle) {
-            immediateMatch = [self.viewModel isTitleMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isTitleMatches:term node:item dereference:YES];
         }
         else if (scope == kSearchScopeUsername) {
-            immediateMatch = [self.viewModel isUsernameMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isUsernameMatches:term node:item dereference:YES];
         }
         else if (scope == kSearchScopePassword) {
-            immediateMatch = [self.viewModel isPasswordMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isPasswordMatches:term node:item dereference:YES];
         }
         else if (scope == kSearchScopeUrl) {
-            immediateMatch = [self.viewModel isUrlMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isUrlMatches:term node:item dereference:YES];
         }
         else {
-            immediateMatch = [self.viewModel isAllFieldsMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isAllFieldsMatches:term node:item dereference:YES];
         }
         
         if(!immediateMatch) { 
@@ -1578,280 +1516,12 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 
 
-- (NSString*)selectedItemSerializationId {
-    Node* item = [self getCurrentSelectedItem];
-    return [self.viewModel.database getCrossSerializationFriendlyIdId:item.uuid];
-}
-
-- (void)showProgressModal:(NSString*)operationDescription {
-    if ( self.view.window.isMiniaturized ) {
-        NSLog(@"Not showing Progress Modal because miniaturized...");
-        return;
-    }
-    
-    [macOSSpinnerUI.sharedInstance show:operationDescription viewController:self];
-}
-
-- (void)hideProgressModal {
-    [macOSSpinnerUI.sharedInstance dismiss];
-}
-
-
-
-- (void)onDatabaseChangedByExternalOther {
-    if(self.isPromptingAboutUnderlyingFileChange) {
-        NSLog(@"Already in Use...");
-        return;
-    }
-    
-    self.isPromptingAboutUnderlyingFileChange = YES;
-    if(self.viewModel && !self.viewModel.locked) {
-        NSLog(@"ViewController::onDatabaseChangedByExternalOther - Reloading...");
-        
-        if(!self.viewModel.document.isDocumentEdited) {
-            if( !self.databaseMetadata.autoReloadAfterExternalChanges ) {
-                NSString* loc = NSLocalizedString(@"mac_db_changed_externally_reload_yes_or_no", @"The database has been changed by another application, would you like to reload this latest version and automatically unlock?");
-
-                [MacAlerts yesNo:loc
-                       window:self.view.window
-                   completion:^(BOOL yesNo) {
-                    if(yesNo) {
-                        NSString* loc = NSLocalizedString(@"mac_db_reloading_after_external_changes_popup_notification", @"Reloading after external changes...");
-
-                        [self showPopupChangeToastNotification:loc];
-                        
-                        self.document.selectedItem = [self selectedItemSerializationId];
-                        
-                        [self reload:self.viewModel.compositeKeyFactors isBiometricOpen:NO];
-                    }
-                    
-                    self.isPromptingAboutUnderlyingFileChange = NO;
-                }];
-                return;
-            }
-            else {
-                NSString* loc = NSLocalizedString(@"mac_db_reloading_after_external_changes_popup_notification", @"Reloading after external changes...");
-
-                [self showPopupChangeToastNotification:loc];
-
-                self.document.selectedItem = [self selectedItemSerializationId];
-                
-                BOOL background = self.view.window.isMiniaturized;
-                [self reload:self.viewModel.compositeKeyFactors isBiometricOpen:NO backgroundSync:background];
-            
-                self.isPromptingAboutUnderlyingFileChange = NO;
-
-                return;
-            }
-        }
-        else {
-            NSLog(@"Local Changes Present... ignore this, we can't auto reload...");
-        }
-    }
-    else {
-        NSLog(@"Ignoring File Change by Other Application because Database is locked/not set.");
-    }
-    self.isPromptingAboutUnderlyingFileChange = NO;
-}
-
-- (void)reload:(CompositeKeyFactors*)compositeKeyFactors isBiometricOpen:(BOOL)isBiometricOpen {
-    [self reload:compositeKeyFactors isBiometricOpen:isBiometricOpen backgroundSync:NO];
-}
-
-- (void)reload:(CompositeKeyFactors*)compositeKeyFactors isBiometricOpen:(BOOL)isBiometricOpen backgroundSync:(BOOL)backgroundSync {
-    NSLog(@"ViewController::reload ENTER");
-    
-    if( self.viewModel ) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.document revertWithUnlock:compositeKeyFactors
-                             viewController:self
-                            fromConvenience:isBiometricOpen
-                                 completion:^(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError * _Nonnull error) {
-                
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if (!success) {
-                        NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
-                        [MacAlerts error:loc error:error window:self.view.window];
-                    }
-                });
-            }];
-        });
-    }
-    else { 
-        [MacAlerts info:@"Model is not set. Could not unlock. Please close and reopen your database"
-              window:self.view.window];
-    }
-}
-
-- (void)maybeOnboardDatabase {
-    DatabaseMetadata* databaseMetadata = self.databaseMetadata;
-            
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
-    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
-    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
-    BOOL convenienceAvailable = watchAvailable || touchAvailable;
-    BOOL convenienceIsPossible = convenienceAvailable && featureAvailable;
-
-    BOOL shouldPromptForBiometricEnrol = convenienceIsPossible && !databaseMetadata.hasPromptedForTouchIdEnrol;
-    
-    BOOL autoFillAvailable = NO;
-    if ( @available(macOS 11.0, *) ) {
-        autoFillAvailable = YES;
-    }
-    
-    BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !databaseMetadata.hasPromptedForAutoFillEnrol;
-    
-    if(shouldPromptForBiometricEnrol || shouldPromptForAutoFillEnrol) {
-        [self onboardForBiometricsAndOrAutoFill:shouldPromptForBiometricEnrol
-                   shouldPromptForAutoFillEnrol:shouldPromptForAutoFillEnrol
-                            compositeKeyFactors:self.viewModel.database.ckfs];
-    }
-}
-
-- (void)onboardForBiometricsAndOrAutoFill:(BOOL)shouldPromptForBiometricEnrol
-             shouldPromptForAutoFillEnrol:(BOOL)shouldPromptForAutoFillEnrol
-                      compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
-    NSDictionary* foo = @ {
-        @"convenienceUnlock" : @(shouldPromptForBiometricEnrol),
-        @"autoFill" : @(shouldPromptForAutoFillEnrol),
-        @"compositeKeyFactors" : compositeKeyFactors,
-        @"model" : self.viewModel.database,
-    };
-    
-    [self performSegueWithIdentifier:@"segueToDatabaseOnboarding" sender:foo];
-}
-
-
-
-- (void)onAutoLock:(NSNotification*)notification {
-    if(self.viewModel && !self.viewModel.locked && !self.viewModel.document.isDocumentEdited) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self onLock:nil];
-        });
-    }
-}
-
-- (IBAction)onLock:(id)sender {
-    if(self.viewModel && !self.viewModel.locked) {
-        if([self.viewModel.document isDocumentEdited]) {
-            NSString* loc = NSLocalizedString(@"mac_cant_lock_db_while_changes_pending", @"You cannot lock a database while changes are pending. Save changes and lock now?");
-            
-            [MacAlerts yesNo:loc window:self.view.window completion:^(BOOL yesNo) {
-                if(yesNo) {
-                    NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
-                    [self showProgressModal:loc];
-                    [self.viewModel.document saveDocumentWithDelegate:self didSaveSelector:@selector(lockSafeContinuation:) contextInfo:nil];
-                }
-                else {
-                    return;
-                }
-            }];
-        }
-        else {
-            
-            
-            
-            
-
-            [self lockSafeContinuation:nil];
-        }
-    }
-}
-
-- (IBAction)lockSafeContinuation:(id)sender {
-    NSString* sid = [self selectedItemSerializationId];
-    [self closeAllDetailsWindows:^{
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.document lock:sid];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self onLockDone];
-            });
-        });
-    }];
-}
-
 - (void)onLockDone {
     NSLog(@"ViewController::onLockDone");
-    
-    [self hideProgressModal];
-    
+        
     [self stopObservingModelChanges];
     
     [self cleanupOnClose];
-}
-
-- (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
-    [self.viewModel setCompositeKeyFactors:ckf];
-
-    DatabaseMetadata* md = self.databaseMetadata;
-    md.conveniencePassword = ckf.password;
-    
-    [DatabasesManager.sharedInstance atomicUpdate:md.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        if ( self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile ) {
-            metadata.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
-        }
-        else {
-            metadata.keyFileBookmark = nil;
-        }
-        
-        metadata.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
-    }];
-}
-
-- (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
-    if(self.viewModel && !self.viewModel.locked) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-            
-            NSString* loc = new ?
-            NSLocalizedString(@"mac_please_set_master_credentials", @"Please Enter the Master Credentials for this Database") :
-            NSLocalizedString(@"mac_change_master_credentials", @"Change Master Credentials");
-            
-            self.changeMasterPassword.titleText = loc;
-            self.changeMasterPassword.initialDatabaseFormat = self.viewModel.format;
-            self.changeMasterPassword.initialYubiKeyConfiguration = self.databaseMetadata.yubiKeyConfiguration;
-            self.changeMasterPassword.initialKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
-            
-            [self.view.window beginSheet:self.changeMasterPassword.window
-                       completionHandler:^(NSModalResponse returnCode) {
-                if(returnCode == NSModalResponseOK) {
-                    NSError* error;
-                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelected:nil error:&error];
-                    
-                    if ( ckf ) {
-                        [self changeMasterCredentials:ckf];
-                    }
-                    else {
-                        NSString* loc = NSLocalizedString(@"mac_error_could_not_generate_composite_key", @"Could not generate Composite Key");
-                        [MacAlerts error:loc error:error window:self.view.window];
-                    }
-                }
-                
-                if(completion) {
-                    completion(returnCode == NSModalResponseOK);
-                }
-            }];
-        });
-    }
-}
-
-- (IBAction)onChangeMasterPassword:(id)sender {
-    [self promptForMasterPassword:NO
-                       completion:^(BOOL okCancel) {
-        if(okCancel) {
-            [self.viewModel.document saveDocumentWithDelegate:self
-                                              didSaveSelector:@selector(onMasterCredentialsChangedAndSaved:)
-                                                  contextInfo:nil];
-        }
-    }];
-}
-
-- (void)onMasterCredentialsChangedAndSaved:(id)param {
-    NSString* loc = NSLocalizedString(@"mac_master_credentials_changed_and_saved", @"Master Credentials Changed and Database Saved");
-    
-    [MacAlerts info:loc window:self.view.window];
 }
 
 
@@ -1906,7 +1576,19 @@ static NSString* const kNewEntryKey = @"newEntry";
 - (void)showOrHideQuickViewPassword {
     self.labelHiddenPassword.hidden = self.showPassword;
     self.labelPassword.hidden = !self.showPassword;
-    self.imageViewTogglePassword.image = [NSImage imageNamed:self.showPassword ? @"hide" : @"show"];
+    
+    NSImage* img = nil;
+    
+    if (@available(macOS 11.0, *)) {
+        img = [NSImage imageWithSystemSymbolName:!self.showPassword ? @"eye" : @"eye.slash" accessibilityDescription:@""];
+        
+        [self.imageViewTogglePassword setSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
+    } else {
+        img = !self.showPassword ?
+         [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
+    }
+    
+    self.imageViewTogglePassword.image = img;
 }
 
 
@@ -1916,48 +1598,10 @@ static NSString* const kNewEntryKey = @"newEntry";
         [[NSPasteboard generalPasteboard] clearContents];
         return;
     }
-    
+
     NSString* deref = [self.viewModel dereference:text node:item];
-    
+
     [self copyConcealedAndMaybeMinimize:deref];
-}
-
-- (IBAction)onCopyTitle:(id)sender {
-    [self copyTitle:[self getCurrentSelectedItem]];
-}
-
-- (IBAction)onCopyUsername:(id)sender {
-    [self copyUsername:[self getCurrentSelectedItem]];
-}
-
-- (IBAction)onCopyEmail:(id)sender {
-    [self copyEmail:[self getCurrentSelectedItem]];
-}
-
-- (IBAction)onCopyUrl:(id)sender {
-    [self copyUrl:[self getCurrentSelectedItem]];
-}
-
-- (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
-    Node* item = [self getCurrentSelectedItem];
-    [self copyPassword:item];
-    [self onLaunchUrl:sender];
-}
-
-- (IBAction)onCopyNotes:(id)sender {
-    [self copyNotes:[self getCurrentSelectedItem]];
-}
-
-- (IBAction)onCopyAllFields:(id)sender {
-    [self copyAllFields:[self getCurrentSelectedItem]];
-}
-
-- (IBAction)onCopyPassword:(id)sender {
-    [self copyPassword:[self getCurrentSelectedItem]];
-}
-
-- (IBAction)onCopyTotp:(id)sender {
-    [self copyTotp:[self getCurrentSelectedItem]];
 }
 
 - (void)onDoubleClickCustomField:(id)sender {
@@ -1982,7 +1626,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 - (void)copyCustomField:(CustomField*)field {
     Node* it = [self getCurrentSelectedItem];
-    NSString* derefed = [self maybeDereference:field.value node:it maybe:YES];
+    NSString* derefed = [self dereference:field.value node:it];
 
     [self copyConcealedAndMaybeMinimize:derefed];
     
@@ -2145,59 +1789,8 @@ static NSString* const kNewEntryKey = @"newEntry";
 - (BOOL)outlineView:(NSOutlineView *)outlineView
          writeItems:(NSArray *)items
        toPasteboard:(NSPasteboard *)pasteboard {
-    return [self placeItemsOnPasteboard:pasteboard items:items];
-}
-
-- (BOOL)placeItemsOnPasteboard:(NSPasteboard*)pasteboard items:(NSArray<Node*>*)items {
-    [pasteboard declareTypes:@[kDragAndDropInternalUti,
-                               kDragAndDropExternalUti]
-                       owner:self];
-    
-    NSArray<Node*>* minimalNodeSet = [self.viewModel getMinimalNodeSet:items].allObjects;
-    
-    
-    
-    NSArray<NSString*>* internalSerializationIds = [self getInternalSerializationIds:minimalNodeSet];
-    [pasteboard setPropertyList:internalSerializationIds forType:kDragAndDropInternalUti];
-    
-    
-    
-    NSData* json = [self getJsonForNodes:minimalNodeSet];
-    [pasteboard setData:json forType:kDragAndDropExternalUti];
-    
-    return YES;
-}
-
-- (NSArray<NSString*>*)getInternalSerializationIds:(NSArray<Node*>*)nodes {
-    return [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [self.viewModel.database getCrossSerializationFriendlyIdId:obj.uuid];
-    }];
-}
-
-- (NSData*)getJsonForNodes:(NSArray<Node*>*)nodes {
-    SerializationPackage *serializationPackage = [[SerializationPackage alloc] init];
-    
-    
-    
-    NSArray<NSDictionary*>* nodeDictionaries = [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [obj serialize:serializationPackage];
-    }];
-            
-    
-    
-    NSDictionary *serialized = @{ @"sourceFormat" : @(self.viewModel.format),
-                                  @"nodes" : nodeDictionaries };
-    
-    
-    
-    NSError* error;
-    NSData* data = [NSJSONSerialization dataWithJSONObject:serialized options:kNilOptions error:&error];
-
-    if(!data) {
-        [MacAlerts error:@"Could not serialize these items!" error:error window:self.view.window];
-    }
-    
-    return data;
+    WindowController* wc = self.view.window.windowController;
+    return [wc placeItemsOnPasteboard:pasteboard items:items];
 }
 
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id<NSDraggingInfo>)info
@@ -2213,13 +1806,6 @@ static NSString* const kNewEntryKey = @"newEntry";
 
         BOOL valid = [self.viewModel validateMove:sourceItems destination:destinationItem];
 
-
-
-
-
-
-
-        
         return valid ? NSDragOperationMove : NSDragOperationNone;
     }
     else {
@@ -2228,115 +1814,17 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
 }
 
--(BOOL)outlineView:(NSOutlineView *)outlineView acceptDrop:(id<NSDraggingInfo>)info
+-(BOOL)outlineView:(NSOutlineView *)outlineView
+        acceptDrop:(id<NSDraggingInfo>)info
               item:(id)item
         childIndex:(NSInteger)index {
-    
+    BOOL internal = ( info.draggingSource == self.outlineView ); 
+
     Node* destinationItem = (item == nil) ? self.viewModel.rootGroup : item;
 
-    return [self pasteItemsFromPasteboard:info.draggingPasteboard destinationItem:destinationItem source:info.draggingSource clear:YES] != 0;
-}
-
-- (NSUInteger)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
-                 destinationItem:(Node*)destinationItem
-                          source:(id)source
-                           clear:(BOOL)clear {
-    if(![pasteboard propertyListForType:kDragAndDropExternalUti] &&
-       ![pasteboard dataForType:kDragAndDropInternalUti]) {
-        return NO;
-    }
+    WindowController* wc = self.view.window.windowController;
     
-    if (source == self.outlineView) {
-        NSArray<NSString*>* serializationIds = [pasteboard propertyListForType:kDragAndDropInternalUti];
-        NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-            return [self.viewModel getItemFromSerializationId:obj];
-        }];
-
-        BOOL result = [self.viewModel move:sourceItems destination:destinationItem];
-        
-        if(clear) {
-            [pasteboard clearContents];
-        }
-        
-        return result ? sourceItems.count : 0;
-    }
-    else if(destinationItem.isGroup) { 
-        NSData* json = [pasteboard dataForType:kDragAndDropExternalUti];
-        if(json && destinationItem.isGroup) {
-            NSUInteger ret = [self pasteFromExternal:json destinationItem:destinationItem];
-            if(clear) {
-                [pasteboard clearContents];
-            }
-            return ret;
-        }
-    }
-    
-    if(clear) {
-        [pasteboard clearContents];
-    }
-    
-    return 0;
-}
-
-- (NSUInteger)pasteFromExternal:(NSData*)json destinationItem:(Node*)destinationItem {
-    NSError* error;
-    NSDictionary* serialized = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
-
-    if(!serialized) {
-        [MacAlerts error:@"Could not deserialize!" error:error window:self.view.window];
-        return NO;
-    }
-    
-    NSNumber* sourceFormatNum = serialized[@"sourceFormat"];
-    DatabaseFormat sourceFormat = sourceFormatNum.integerValue;
-    NSArray<NSDictionary*>* serializedNodes = serialized[@"nodes"];
-    
-    BOOL keePassGroupTitleRules = self.viewModel.format != kPasswordSafe;
-    
-    
-    
-    NSMutableArray<Node*>* nodes = @[].mutableCopy;
-    NSError* err;
-    for (NSDictionary* obj in serializedNodes) {
-        Node* n = [Node deserialize:obj parent:destinationItem keePassGroupTitleRules:keePassGroupTitleRules error:&err];
-        
-        if(!n) {
-            [MacAlerts error:err window:self.view.window];
-            return 0;
-        }
-        
-        [nodes addObject:n];
-    }
-
-    BOOL destinationIsRootGroup = (destinationItem == nil || destinationItem == self.viewModel.rootGroup);
-    
-    [DatabaseFormatIncompatibilityHelper processFormatIncompatibilities:nodes
-                                                 destinationIsRootGroup:destinationIsRootGroup
-                                                           sourceFormat:sourceFormat
-                                                      destinationFormat:self.viewModel.format
-                                                    confirmChangesBlock:^(NSString * _Nullable confirmMessage, IncompatibilityConfirmChangesResultBlock  _Nonnull resultBlock) {
-        [MacAlerts yesNo:confirmMessage window:self.view.window completion:^(BOOL yesNo) {
-            resultBlock(yesNo);
-        }];
-    } completion:^(BOOL go, NSArray<Node *> * _Nullable compatibleFilteredNodes) {
-        if ( go ) {
-            [self continuePaste:compatibleFilteredNodes destinationItem:destinationItem];
-        }
-    }];
-        
-    return nodes.count;
-}
-
-- (void)continuePaste:(NSArray<Node*>*)nodes
-      destinationItem:(Node*)destinationItem {
-    BOOL success = [self.viewModel addChildren:nodes parent:destinationItem];
-    
-    if(!success) {
-        [MacAlerts info:@"Could Not Paste"
-     informativeText:@"Could not place these items here. Unknown error."
-              window:self.view.window
-          completion:nil];
-    }
+    return [wc pasteItemsFromPasteboard:info.draggingPasteboard destinationItem:destinationItem internal:internal clear:YES] != 0;
 }
 
 
@@ -2362,161 +1850,6 @@ static NSString* const kNewEntryKey = @"newEntry";
     if(title.length) {
         [self.viewModel addNewGroup:parent title:title];
     }
-}
-
-- (void)onNewItemAdded:(Node*)node openEntryDetailsWindowWhenDone:(BOOL)openEntryDetailsWindowWhenDone {
-    self.itemsCache = nil; 
-    self.searchField.stringValue = @""; 
-    [self.outlineView reloadData];
-    NSInteger row = [self findRowForItemExpandIfNecessary:node];
-    
-    if(row < 0) {
-        NSLog(@"Could not find newly added item?");
-    }
-    else {
-        [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
-    }
-
-    if(openEntryDetailsWindowWhenDone) {
-        [self openItemDetails:node newEntry:YES];
-        [self expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:node];
-    }    
-}
-
-- (IBAction)onDelete:(id)sender {
-    NSArray<Node *> *items = [self getSelectedItems];
-    if (items.count == 0) {
-        return;
-    }
-    
-    NSDictionary* grouped = [items groupBy:^id _Nonnull(Node * _Nonnull obj) {
-        BOOL delete = [self.viewModel canRecycle:obj];
-        return @(delete);
-    }];
-
-    const NSArray<Node*> *toBeDeleted = grouped[@(NO)];
-    const NSArray<Node*> *toBeRecycled = grouped[@(YES)];
-
-    if ( toBeDeleted == nil ) {
-        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled];
-    }
-    else {
-        if ( toBeRecycled == nil ) {
-            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted];
-        }
-        else { 
-            [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled];
-        }
-    }
-}
-
-- (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled {
-    [MacAlerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
-  informativeText:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
-           window:self.view.window
-       completion:^(BOOL yesNo) {
-        if (yesNo) {
-                   
-                   
-                   
-                   [self.viewModel deleteItems:toBeDeleted];
-                   
-                   BOOL fail = ![self.viewModel recycleItems:toBeRecycled];
-                   
-                   if(fail) {
-                       [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
-                    informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
-                             window:self.view.window
-                         completion:nil];
-                   }
-               }
-    }];
-}
-
-- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
-    NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
-    
-    NSString* message;
-    
-    if (items.count > 1) {
-        message = NSLocalizedString(@"browse_vc_are_you_sure_delete", @"Are you sure you want to permanently delete these item(s)?");
-    }
-    else {
-        Node* item = items.firstObject;
-        message = [NSString stringWithFormat:NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"),
-                   [self.viewModel dereference:item.title node:item]];
-    }
-    
-    [MacAlerts yesNo:title
-     informativeText:message
-              window:self.view.window completion:^(BOOL yesNo) {
-        if (yesNo) {
-            [self.viewModel deleteItems:items];
-        }
-    }];
-}
-
-- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
-    NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
-    NSString* message;
-    if (items.count > 1) {
-        message = NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?");
-    }
-    else {
-        Node* item = items.firstObject;
-        message = [NSString stringWithFormat:NSLocalizedString(@"mac_are_you_sure_recycle_bin_yes_no_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?"),
-                                [self.viewModel dereference:item.title node:item]];
-    }
-    
-    [MacAlerts yesNo:title
-     informativeText:message
-              window:self.view.window
-          completion:^(BOOL yesNo) {
-        if (yesNo) {
-            BOOL fail = ![self.viewModel recycleItems:items];
-
-            if(fail) {
-               [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
-            informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
-                     window:self.view.window
-                 completion:nil];
-            }
-        }
-    }];
-}
-
-- (IBAction)onLaunchUrl:(id)sender {
-    Node* item = [self getCurrentSelectedItem];
-    
-    [self.viewModel launchUrl:item];
-}
-
-- (IBAction)onExportAsCsv:(id)sender { 
-    NSData* data = [Csv getSafeAsCsv:self.viewModel.database];
-    if ( !data ) {
-        [MacAlerts error:nil window:self.view.window];
-        return;
-    }
-    
-    NSSavePanel* savePanel = NSSavePanel.savePanel;
-    savePanel.nameFieldStringValue = [NSString stringWithFormat:@"%@.csv", [self exportFileName]];
-    
-    if ( [savePanel runModal] == NSModalResponseOK ) {
-        NSURL* url = savePanel.URL;
-        NSError* error;
-        if (! [data writeToFile:url.path options:kNilOptions error:&error] ) {
-            [MacAlerts error:error window:self.view.window];
-        }
-    }
-}
-
-- (NSString*)exportFileName {
-    NSString* withoutExtension = [self.databaseMetadata.fileUrl.path.lastPathComponent stringByDeletingPathExtension];
-    NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
-    
-    NSLog(@"Export Filename: [%@]", newFileName);
-    
-    return  newFileName;
 }
 
 - (NSString *)formatDate:(NSDate *)date {
@@ -2629,7 +1962,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         }
         
         NSImage* cachedIcon = self.attachmentsIconCache[dbAttachment.digestHash];
-        if(cachedIcon && Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel) {
+        if( cachedIcon ) {
             cell.imageView.image = cachedIcon;
         }
         else {
@@ -2654,7 +1987,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             CustomFieldTableCellView* cell = [self.customFieldsTable makeViewWithIdentifier:cellId owner:nil];
             
             Node* it = [self getCurrentSelectedItem];
-            NSString* derefed = [self maybeDereference:field.value node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+            NSString* derefed = [self dereference:field.value node:it];
             
             cell.value = derefed;
             cell.protected = field.protected && !(derefed.length == 0 && !self.viewModel.concealEmptyProtectedFields);
@@ -2768,50 +2101,6 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             [savePanel orderOut:self];
         }
     }];
-}
-
-- (IBAction)onSetItemIcon:(id)sender {
-    Node *item = [self getCurrentSelectedItem];
-    
-    if(!item) {
-        return;
-    }
-    
-    [self onEditNodeIcon:item];
-}
-
-- (void)onEditNodeIcon:(Node*)item {
-    if(self.viewModel.format == kPasswordSafe) {
-        return;
-    }
-    
-    __weak ViewController* weakSelf = self;
-    self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
-    self.selectPredefinedIconController.customIcons = self.viewModel.customIcons.allObjects;
-    self.selectPredefinedIconController.hideSelectFile = self.viewModel.format == kKeePass1;
-    self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) { 
-        if(showFindFavIcons) {
-            [weakSelf showFindFavIconsForItem:item];
-        }
-        else {
-            [weakSelf.viewModel setItemIcon:item icon:icon];
-        }
-    };
-
-    
-    [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
-}
-
-- (IBAction)onViewItemHistory:(id)sender {
-    Node *item = [self getCurrentSelectedItem];
-    
-    if(item == nil ||
-       item.isGroup || item.fields.keePassHistory.count == 0 ||
-       (!(self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4))) {
-        return;
-    }
-
-    [self performSegueWithIdentifier:@"segueToItemHistory" sender:@{ kItemKey : item }];
 }
 
 - (IBAction)refreshOtpCode:(id)sender {
@@ -2965,331 +2254,13 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     [self.outlineView expandItem:nil expandChildren:YES];
 }
 
-- (IBAction)onPrintDatabase:(id)sender {
-    NSString* loc = NSLocalizedString(@"mac_database_print_emergency_sheet_fmt", @"%@ Emergency Sheet");
-    
-    NSString* databaseName = [NSString stringWithFormat:loc, self.databaseMetadata.nickName];
-    NSString* htmlString = [self.viewModel getHtmlPrintString:databaseName];
 
-    
-    
-    
-    
-    
-    
-
-    
-    
-    
-    
-    WebView *webView = [[WebView alloc] init];
-    [webView.mainFrame loadHTMLString:htmlString baseURL:nil];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:webView.mainFrame.frameView.documentView
-                                                                   printInfo:NSPrintInfo.sharedPrintInfo];
-                                  
-        [printOp runOperation];
-    });
-}
-
-- (IBAction)onDownloadFavIcons:(id)sender {
-    Node* item = [self getCurrentSelectedItem];
-
-    [self showFindFavIconsForItem:item];
-}
-
-- (void)showFindFavIconsForItem:(Node*)item {
-    [self performSegueWithIdentifier:@"segueToFavIconDownloader" sender:item];
-}
-
-
-
-- (IBAction)onDuplicateItem:(id)sender {
-    NSLog(@"onDuplicateItem");
-    
-    Node* item = nil;
-    
-    if( self.viewModel && !self.viewModel.locked ) {
-        item = [self getCurrentSelectedItem];
-    }
-    
-    if ( item ) {
-        Node* destinationItem = item.parent ? item.parent : self.viewModel.rootGroup;
-        
-        
-        
-        Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")] preserveTimestamps:NO];
-        
-        [item touch:NO touchParents:YES];
-        if ( [self.viewModel addChildren:@[dupe] parent:destinationItem] ) {
-            NSString* loc = NSLocalizedString(@"mac_item_duplicated", @"Item Duplicated");
-            [self showPopupChangeToastNotification:loc];
-        }
-    }
-}
-
-
-
-- (void)cleanupWormhole {
-    if ( self.wormhole ) {
-
-        [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeQuickTypeRequestId];
-
-        NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, self.databaseMetadata.uuid];
-        [self.wormhole stopListeningForMessageWithIdentifier:requestId];
-        
-        NSString* convRequestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, self.databaseMetadata.uuid];
-        [self.wormhole stopListeningForMessageWithIdentifier:convRequestId];
-
-        [self.wormhole clearAllMessageContents];
-        self.wormhole = nil;
-    }
-}
-
-- (void)listenToAutoFillWormhole {
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
-                                                         optionalDirectory:kAutoFillWormholeName];
-
-    
-    
-    __weak ViewController* weakSelf = self;
-    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeQuickTypeRequestId
-                                         listener:^(id messageObject) {
-        NSDictionary *dict = (NSDictionary*)messageObject;
-        NSString* userSession = dict[@"user-session-id"];
-        
-        if ([userSession isEqualToString:NSUserName()]) { 
-            NSString* json = dict ? dict[@"id"] : nil;
-            [weakSelf onQuickTypeAutoFillWormholeRequest:json];
-        }
-    }];
-    
-    
-    
-    NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, self.databaseMetadata.uuid];
-
-    [self.wormhole listenForMessageWithIdentifier:requestId
-                                         listener:^(id messageObject) {
-        NSDictionary *dict = (NSDictionary*)messageObject;
-        NSString* userSession = dict[@"user-session-id"];
-        
-        if ( [userSession isEqualToString:NSUserName()] ) { 
-            NSString* databaseId = dict[@"database-id"];
-            [weakSelf onAutoFillDatabaseUnlockedStatusWormholeRequest:databaseId];
-        }
-    }];
-    
-    
-
-    NSString* convRequestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, self.databaseMetadata.uuid];
-
-    [self.wormhole listenForMessageWithIdentifier:convRequestId
-                                         listener:^(id messageObject) {
-        NSDictionary *dict = (NSDictionary*)messageObject;
-        NSString* userSession = dict[@"user-session-id"];
-        
-        if ( [userSession isEqualToString:NSUserName()] ) { 
-            NSString* databaseId = dict[@"database-id"];
-            [weakSelf onAutoFillWormholeMasterCredentialsRequest:databaseId];
-        }
-    }];
-}
-
-- (void)onAutoFillWormholeMasterCredentialsRequest:(NSString*)databaseId {
-    NSLog(@"onAutoFillWormholeMasterCredentialsRequest: [%@]", databaseId );
-    
-    if ( self.viewModel && !self.viewModel.locked && databaseId) {
-        if (!self.databaseMetadata.quickWormholeFillEnabled ) {
-            return;
-        }
-
-        if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
-            NSLog(@"Responding to Conv Unlock Req for Database - [%@]-%@", self, databaseId);
-
-            NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockResponseId, databaseId];
-            NSString* secretStoreId = NSUUID.UUID.UUIDString;
-            NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
-            [SecretStore.sharedInstance setSecureObject:self.viewModel.compositeKeyFactors.password
-                                          forIdentifier:secretStoreId
-                                              expiresAt:expiry];
-
-            [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(),
-                                                 @"secret-store-id" : secretStoreId }
-                                  identifier:responseId];
-        }
-    }
-}
-
-- (void)onAutoFillDatabaseUnlockedStatusWormholeRequest:(NSString*)databaseId {
-    if ( self.viewModel && !self.viewModel.locked && databaseId) {
-        if (!self.databaseMetadata.quickWormholeFillEnabled ) {
-            return;
-        }
-        
-        if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
-
-
-            NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, databaseId];
-
-            [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(), @"unlocked" : databaseId }
-                                  identifier:responseId];
-        }
-    }
-}
-
-- (void)onQuickTypeAutoFillWormholeRequest:(NSString*)json {
-    if ( self.viewModel && !self.viewModel.locked && json) {
-        QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
-        
-        if( identifier && self.databaseMetadata && [self.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
-            if (!self.databaseMetadata.quickWormholeFillEnabled || !self.databaseMetadata.quickTypeEnabled ) {
-                return;
-            }
-            
-            
-            
-            DatabaseModel* model = self.viewModel.database;
-            Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
-                return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
-            }];
-
-            NSString* secretStoreId = NSUUID.UUID.UUIDString;
-
-            if(node) {
-                NSString* password = @"";
-
-                if ( identifier.fieldKey ) {
-                    StringValue* sv = node.fields.customFields[identifier.fieldKey];
-                    if ( sv ) {
-                        password = sv.value;
-                    }
-                }
-                else {
-                    password = [model dereference:node.fields.password node:node];
-                }
-                
-                NSString* user = [model dereference:node.fields.username node:node];
-                NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
-                
-                password = password ? password : @"";
-                
-
-                
-                NSDictionary* securePayload = @{
-                    @"user" : user,
-                    @"password" : password,
-                    @"totp" : totp,
-                };
-                
-                NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
-                [SecretStore.sharedInstance setSecureObject:securePayload forIdentifier:secretStoreId expiresAt:expiry];
-            }
-            else {
-
-            }
-            
-            [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(),
-                                                @"success" : @(node != nil),
-                                                @"secret-store-id" : secretStoreId }
-                                  identifier:kAutoFillWormholeQuickTypeResponseId];
-        }
-    }
-}
-
-
-
-- (void)onModelLongRunningOpStart:(NSNotification*)notification {
-    if( notification.object != self.viewModel.document ) {
-        return;
-    }
-    
-
-
-    NSString* status = (NSString*)notification.userInfo[kNotificationUserInfoLongRunningOperationStatus];
-
-
-
-    [self showProgressModal:status];
-}
-
-- (void)onModelLongRunningOpDone:(NSNotification*)notification {
-    if( notification.object != self.viewModel.document ) {
-        return;
-    }
-
-    NSLog(@"onModelLongRunningOpDone notification.object = [%@]", notification.object);
-
-    [self hideProgressModal];
-}
-
-- (void)onFullModelReloadNotification:(NSNotification*)notification {
-    if( notification.object != self.viewModel.document ) {
-        return;
-    }
-
-
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self fullModelReload];
-    });
-}
-
-- (void)onSyncDone:(NSNotification*)notification {
-    if( notification.object != self.viewModel.document ) {
-        return;
-    }
-
-    NSLog(@"onSyncDone notification.object = [%@]", notification.object);
-
-    NSNumber* r = notification.userInfo[@"result"];
-    NSNumber* l = notification.userInfo[@"localWasChanged"];
-    
-    SyncAndMergeResult result = r.integerValue;
-    BOOL localWasChanged = l.boolValue;
-    NSError* error = notification.userInfo[@"error"];
-       
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ( result == kSyncAndMergeResultUserInteractionRequired ) {
-            NSLog(@"Background sync failed, will now try an interactive sync...");
-            [self.document performFullInteractiveSync:self key:self.viewModel.compositeKeyFactors];
-        }
-        else if ( error ) {
-            NSString* message = [NSString stringWithFormat:@"%@: %@",
-                                 NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error"),
-                                 error.localizedDescription];
-            [self showToastNotification:message error:YES];
-        }
-        else {
-            [self showToastNotification:NSLocalizedString(@"notification_sync_successful", @"Sync Successful") error:NO];
-            
-            if ( localWasChanged ) {
-                NSLog(@"Sync successful and local was changed, reloading...");
-                [self.document reloadFromLocalWorkingCopy:self.viewModel.compositeKeyFactors
-                                           viewController:self
-                                             selectedItem:[self selectedItemSerializationId]];
-            }
-        }
-    });
-}
-
-- (void)onFileChangedByOtherApplication:(NSNotification*)notification {
-    NSLog(@"XXXX - [%@] - onFileChangedByOtherApplication: [%@]", self, notification.object);
-    
-    if( notification.object != self.viewModel.document ) {
-        return;
-    }
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self onDatabaseChangedByExternalOther];
-    });
-}
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
     SEL theAction = [anItem action];
 
 
-    NSMenuItem* menuItem = (NSMenuItem*)anItem;
+
     
     Node* item = nil;
     
@@ -3297,109 +2268,15 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         item = [self getCurrentSelectedItem];
     }
     
-    if (theAction == @selector(onViewItemDetails:)) {
+    if (theAction == @selector(onEditEntry:)) {
         return item != nil && !item.isGroup;
-    }
-    else if (theAction == @selector(onDuplicateItem:)) {
-        return item != nil && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(copy:)) {
-        return item != nil;
-    }
-    else if (theAction == @selector(onCopySelectedItemsToClipboard:)) {
-        return item != nil;
-    }
-    else if ( theAction == @selector(onVCToggleShowVerticalGridlines:)) {
-        menuItem.state = self.viewModel.showVerticalGrid ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-    else if ( theAction == @selector(onVCToggleShowHorizontalGridlines:)) {
-        menuItem.state = self.viewModel.showHorizontalGrid ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-    else if ( theAction == @selector(onVCToggleShowAlternatingGridRows:)) {
-        menuItem.state = self.viewModel.showAlternatingRows ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-    else if ( theAction == @selector(onVCToggleShowTotpCodes:)) {
-        menuItem.state = self.viewModel.showTotp ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-
-    else if (theAction == @selector(paste:)) {
-        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-        NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
-        NSLog(@"Validate Paste - %d", blah != nil);
-        return blah != nil && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onDelete:)) {
-        if(self.outlineView.selectedRowIndexes.count > 1) {
-            NSMenuItem* mi = (NSMenuItem*)anItem;
-            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
-            [mi setTitle:loc];
-        }
-        else {
-            NSMenuItem* mi = (NSMenuItem*)anItem;
-            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
-            [mi setTitle:loc];
-        }
-        
-
-        
-        return item != nil && self.view.window.firstResponder == self.outlineView && !self.viewModel.isEffectivelyReadOnly; 
     }
     else if(theAction == @selector(onCreateGroup:) ||
             theAction == @selector(onCreateRecord:)) {
         return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
     }
-    else if (theAction == @selector(onChangeMasterPassword:)) {
-        return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onExportAsCsv:) ||
-             theAction == @selector(onLock:)) { 
-        return self.viewModel && !self.viewModel.locked;
-    }
     else if (theAction == @selector(onShowSafeSummary:)) {
         return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onFind:)) {
-        return self.viewModel && !self.viewModel.locked;
-            
-    }
-    else if(theAction == @selector(onLaunchUrl:) ||
-            theAction == @selector(onCopyUrl:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyTitle:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyUsername:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyEmail:)) {
-        BOOL emailAvailable = self.viewModel.format == kPasswordSafe || item.fields.keePassEmail.length;
-        return item && !item.isGroup && emailAvailable;
-    }
-    else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
-        return item && !item.isGroup && item.fields.password.length;
-    }
-    else if (theAction == @selector(onCopyPassword:)) {
-        return item && !item.isGroup && item.fields.password.length;
-    }
-    else if (theAction == @selector(onCopyTotp:)) {
-        return item && !item.isGroup && item.fields.otpToken;
-    }
-    else if (theAction == @selector(onCopyNotes:)) {
-        return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
-    }
-    else if (theAction == @selector(onCopyAllFields:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(saveDocument:)) {
-        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onSetItemIcon:)) {
-        return item != nil && self.viewModel.format != kPasswordSafe && !self.viewModel.isEffectivelyReadOnly;
     }
     else if(theAction == @selector(onSetTotp:)) {
         return item && !item.isGroup && !self.viewModel.isEffectivelyReadOnly;
@@ -3407,23 +2284,10 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     else if(theAction == @selector(onClearTotp:)) {
         return item && !item.isGroup && item.fields.otpToken && !self.viewModel.isEffectivelyReadOnly;
     }
-    else if (theAction == @selector(onViewItemHistory:)) {
-        return
-            item != nil &&
-            !item.isGroup &&
-            item.fields.keePassHistory.count > 0 &&
-            (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
-    }
     else if(theAction == @selector(onOutlineHeaderColumnsChanged:)) {
         NSMenuItem* menuItem = (NSMenuItem*)anItem;
         menuItem.state = [self isColumnVisible:menuItem.identifier];
         return [self isColumnAvailableForModel:menuItem.identifier];
-    }
-    else if(theAction == @selector(onPrintDatabase:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onDownloadFavIcons:)) {
-        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly && (item == nil || ((self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
     }
     else if (theAction == @selector(onPreviewQuickViewAttachment:)) {
         return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
@@ -3431,112 +2295,18 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     else if (theAction == @selector(onSaveQuickViewAttachmentAs:)) {
         return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
     }
+    else if (theAction == @selector(onFind:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }    
+    else if (theAction == @selector(saveDocument:)) {
+        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
+    }
     
     return YES;
 }
 
-- (id)copy:(id)sender {
-    NSLog(@"ViewController::copy");
-    
-    NSArray<Node*>* selected = [self getSelectedItems];
-    
-    if ( selected.count == 0) {
-        NSLog(@"Nothing selected!");
-        return nil;
-    }
-    
-    if (selected.count == 1 && !selected.firstObject.isGroup ) {
-        NSLog(@"Only one selected item and non group... copying password");
-        [self onCopyPassword:nil];
-    }
-    else {
-        NSLog(@"Multiple selected or group... copying items to clipboard");
-        [self onCopySelectedItemsToClipboard:nil];
-    }
-    
-    return nil;
-}
-
-- (id)paste:(id)sender {
-    NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-    NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
-    if ( blah == nil ) {
-        return nil;
-    }
-
-    Node* selected = [self getCurrentSelectedItem];
-    Node* destinationItem = self.viewModel.rootGroup;
-    if(selected) {
-        destinationItem = selected.isGroup ? selected : selected.parent;
-    }
-
-    NSUInteger itemCount = [self pasteItemsFromPasteboard:pasteboard destinationItem:destinationItem source:nil clear:NO];
-    if ( itemCount == 0 ) {
-        [MacAlerts info:@"Could not paste! Unknown Error." window:self.view.window];
-    }
-    else {
-        NSString* loc = itemCount == 1 ? NSLocalizedString(@"mac_item_pasted_from_clipboard", @"Item Pasted from Clipboard") :
-            NSLocalizedString(@"mac_items_pasted_from_clipboard", @"Items Pasted from Clipboard");
-        
-        [self showPopupChangeToastNotification:loc];
-    }
-
-    return nil;
-}
-
-- (IBAction)onCopySelectedItemsToClipboard:(id)sender {
-    NSArray* selected = [self getSelectedItems];
-    
-    if (selected.count) {
-        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-        [self placeItemsOnPasteboard:pasteboard items:selected];
-
-        NSString* loc = selected.count == 1 ? NSLocalizedString(@"mac_copied_item_to_clipboard", @"Item Copied to Clipboard") :
-            NSLocalizedString(@"mac_copied_items_to_clipboard", @"Items Copied to Clipboard");
-        
-        [self showPopupChangeToastNotification:loc];
-    }
-}
-
 - (void)bindPasswordStrength:(NSString*)pw {
-    PasswordStrength* strength = [PasswordStrengthTester getStrength:pw config:PasswordStrengthConfig.defaults];
-
-    self.labelStrength.stringValue = strength.summaryString;
-
-    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-
-    self.progressStrength.doubleValue = relativeStrength * 100.0f;
-
-    CIFilter *colorPoly = [CIFilter filterWithName:@"CIColorPolynomial"];
-    [colorPoly setDefaults];
-
-    double red = 1.0 - relativeStrength;
-    double green = relativeStrength;
-
-    CIVector *redVector = [CIVector vectorWithX:red Y:0 Z:0 W:0];
-    CIVector *greenVector = [CIVector vectorWithX:green Y:0 Z:0 W:0];
-    CIVector *blueVector = [CIVector vectorWithX:0 Y:0 Z:0 W:0];
-
-    [colorPoly setValue:redVector forKey:@"inputRedCoefficients"];
-    [colorPoly setValue:greenVector forKey:@"inputGreenCoefficients"];
-    [colorPoly setValue:blueVector forKey:@"inputBlueCoefficients"];
-    [self.progressStrength setContentFilters:@[colorPoly]];
-}
-
-- (IBAction)onVCToggleShowVerticalGridlines:(id)sender {
-    self.viewModel.showVerticalGrid = !self.viewModel.showVerticalGrid;
-}
-
-- (IBAction)onVCToggleShowHorizontalGridlines:(id)sender {
-    self.viewModel.showHorizontalGrid = !self.viewModel.showHorizontalGrid;
-}
-
-- (IBAction)onVCToggleShowAlternatingGridRows:(id)sender {
-    self.viewModel.showAlternatingRows = !self.viewModel.showAlternatingRows;
-}
-
-- (IBAction)onVCToggleShowTotpCodes:(id)sender {
-    self.viewModel.showTotp = !self.viewModel.showTotp;
+    [PasswordStrengthUIHelper bindPasswordStrength:pw labelStrength:self.labelStrength progress:self.progressStrength];
 }
 
 
@@ -3545,12 +2315,12 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     BOOL cmd = ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand);
     unichar key = [[event charactersIgnoringModifiers] characterAtIndex:0];
 
-    NSLog(@"keyDown: %hu - %d", key, event.keyCode);
+
 
     if ( cmd && key > 48 && key < 58 ) {
         NSUInteger number = key - 48;
 
-        NSLog(@"%hu - %d => %ld", key, event.keyCode, number);
+
 
         [self onCmdPlusNumberPressed:number];
         return;
@@ -3604,7 +2374,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
                 if (aChar == 'c') {
                     Node* item = [self getCurrentSelectedItem];
                     if ( item && !item.isGroup ) {
-                        [self onCopyPassword:nil];
+                        [self copyPassword:item];
                         return YES;
                     }
                 }
@@ -3646,40 +2416,16 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     }
 }
 
-
-
-- (void)copyAllFields:(Node*)item {
-    NSMutableArray<NSString*>* fields = NSMutableArray.array;
-    
-    [fields addObject:[self dereference:item.title node:item]];
-    [fields addObject:[self dereference:item.fields.username node:item]];
-    [fields addObject:[self dereference:item.fields.password node:item]];
-    [fields addObject:[self dereference:item.fields.url node:item]];
-    [fields addObject:[self dereference:item.fields.notes node:item]];
-    [fields addObject:[self dereference:item.fields.email node:item]];
-    
-    
-    
-    NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
-    for(NSString* key in sortedKeys) {
-        if ( ![NodeFields isTotpCustomFieldKey:key] ) {
-            StringValue* sv = item.fields.customFields[key];
-            NSString *val = [self dereference:sv.value node:item];
-            [fields addObject:val];
-        }
+- (void)onFullModelReloadNotification:(NSNotification*)notification {
+    if( notification.object != self.viewModel.document ) {
+        return;
     }
 
-    
-    
-    NSArray<NSString*> *all = [fields filter:^BOOL(NSString * _Nonnull obj) {
-        return obj.length != 0;
-    }];
-    
-    NSString* allString = [all componentsJoinedByString:@"\n"];
-    [ClipboardManager.sharedInstance copyConcealedString:allString];
-    
-    NSString* loc = NSLocalizedString(@"generic_copied", @"Copied");
-    [self showPopupChangeToastNotification:loc];
+    NSLog(@"onFullModelReloadNotification notification.object = [%@]", notification.object);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self fullModelReload];
+    });
 }
 
 @end

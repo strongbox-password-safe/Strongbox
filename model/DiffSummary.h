@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "Pair.h"
+#import "MMcGPair.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -7,8 +7,8 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
-#import "DatabaseModel.h"
+#import "MacDatabasePreferences.h"
+#import "Model.h"
 #import <AuthenticationServices/AuthenticationServices.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SelectCredential : NSViewController
 
 @property NSArray<ASCredentialServiceIdentifier *>* serviceIdentifiers;
-@property DatabaseModel* model;
+@property Model* model;
 @property (nonatomic, copy) void (^onDone)(BOOL userCancelled,  NSString*_Nullable username, NSString*_Nullable password, NSString*_Nullable totp);
 
 @end

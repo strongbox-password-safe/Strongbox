@@ -11,7 +11,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "Utils.h"
 #import "IOsUtils.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "NSArray+Extensions.h"
 #import "FileManager.h"
 #import "AppPreferences.h"
@@ -490,7 +490,7 @@
 }
 
 - (NSString*)getAssociatedDatabaseSubtitle:(NSIndexPath*)indexPath {
-    NSArray<SafeMetaData*>* assoc = [self getAssociatedDatabase:indexPath.section == 1 ? self.keyFiles[indexPath.row] : self.otherFiles[indexPath.row]];
+    NSArray<DatabasePreferences*>* assoc = [self getAssociatedDatabase:indexPath.section == 1 ? self.keyFiles[indexPath.row] : self.otherFiles[indexPath.row]];
     
     if(assoc.count) {
         return [NSString stringWithFormat:
@@ -502,8 +502,8 @@
     }
 }
 
-- (NSArray<SafeMetaData*>*)getAssociatedDatabase:(NSURL*)url {
-    return [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+- (NSArray<DatabasePreferences*>*)getAssociatedDatabase:(NSURL*)url {
+    return [DatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
         if (obj.keyFileBookmark) {
             NSURL* dbUrl = [BookmarksHelper getExpressReadOnlyUrlFromBookmark:obj.keyFileBookmark];
             return [dbUrl isEqual:url];

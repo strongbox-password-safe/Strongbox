@@ -179,32 +179,31 @@ class JSONAny: Codable {
 
     public required init(from decoder: Decoder) throws {
         if var arrayContainer = try? decoder.unkeyedContainer() {
-            self.value = try JSONAny.decodeArray(from: &arrayContainer)
+            value = try JSONAny.decodeArray(from: &arrayContainer)
         } else if var container = try? decoder.container(keyedBy: MyCodingKey.self) {
-            self.value = try JSONAny.decodeDictionary(from: &container)
+            value = try JSONAny.decodeDictionary(from: &container)
         } else {
             let container = try decoder.singleValueContainer()
-            self.value = try JSONAny.decode(from: container)
+            value = try JSONAny.decode(from: container)
         }
     }
 
     public func encode(to encoder: Encoder) throws {
-        if let arr = self.value as? [Any] {
+        if let arr = value as? [Any] {
             var container = encoder.unkeyedContainer()
             try JSONAny.encode(to: &container, array: arr)
-        } else if let dict = self.value as? [String: Any] {
+        } else if let dict = value as? [String: Any] {
             var container = encoder.container(keyedBy: MyCodingKey.self)
             try JSONAny.encode(to: &container, dictionary: dict)
         } else {
             var container = encoder.singleValueContainer()
-            try JSONAny.encode(to: &container, value: self.value)
+            try JSONAny.encode(to: &container, value: value)
         }
     }
 }
 
 class JSONNull: Codable {
-    public init() {
-    }
+    public init() {}
 
     public required init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -219,10 +218,10 @@ class JSONNull: Codable {
     }
 }
 
-class MyCodingKey : CodingKey {
+class MyCodingKey: CodingKey {
     let key: String
 
-    required init?(intValue: Int) {
+    required init?(intValue _: Int) {
         return nil
     }
 

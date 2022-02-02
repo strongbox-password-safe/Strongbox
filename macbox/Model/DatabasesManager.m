@@ -119,26 +119,26 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     });
 }
 
-- (void)update:(DatabaseMetadata *_Nonnull)safe {
-    dispatch_barrier_async(self.dataQueue, ^{
-        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
 
-        NSUInteger index = [databases indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            return [obj.uuid isEqualToString:safe.uuid];
-        }];
-        
-        if(index != NSNotFound) {
-            [databases replaceObjectAtIndex:index withObject:safe];
-            [self serialize:databases];
-        }
-        else {
-            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", safe);
-        }
-    });
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)atomicUpdate:(NSString *)uuid touch:(void (^)(DatabaseMetadata * _Nonnull))touch {
-    dispatch_barrier_async(self.dataQueue, ^{
+    dispatch_barrier_async(self.dataQueue, ^{  
         NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
 
         NSUInteger index = [databases indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {

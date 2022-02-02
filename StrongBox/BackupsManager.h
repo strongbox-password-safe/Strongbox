@@ -8,20 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "BackupItem.h"
-
-#if TARGET_OS_IPHONE
-//    #import <UIKit/UIKit.h>
-    #import "SafeMetaData.h"
-//    typedef UIViewController* VIEW_CONTROLLER_PTR;
-//    typedef UIImage* IMAGE_TYPE_PTR;
-    typedef SafeMetaData* METADATA_PTR;
-#else
-
-    #import "DatabaseMetadata.h"
-
-
-    typedef DatabaseMetadata* METADATA_PTR;
-#endif
+#import "CommonDatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

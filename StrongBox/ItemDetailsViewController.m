@@ -55,7 +55,7 @@
 
 #endif
 
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
@@ -459,7 +459,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
                     self.model = self.preEditModelClone;
                     
                     if(self.createNewItem) {
-                        [SafesList.sharedInstance setEditing:self.databaseModel.metadata editing:NO];
+                        [DatabasePreferences setEditing:self.databaseModel.metadata editing:NO];
 
                         if(self.splitViewController) {
                             if(self.splitViewController.isCollapsed) { 
@@ -481,7 +481,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         }
         else {
             if(self.createNewItem) {
-                [SafesList.sharedInstance setEditing:self.databaseModel.metadata editing:NO];
+                [DatabasePreferences setEditing:self.databaseModel.metadata editing:NO];
 
                 if(self.splitViewController) {
                     if(self.splitViewController.isCollapsed) { 
@@ -568,7 +568,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     
-    [SafesList.sharedInstance setEditing:self.databaseModel.metadata editing:editing];
+    [DatabasePreferences setEditing:self.databaseModel.metadata editing:editing];
     
     if (@available(iOS 11.0, *)) { 
         [self.tableView performBatchUpdates:^{
@@ -1284,38 +1284,6 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
 
 
-- (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item format:(DatabaseFormat)format {
-    NSMutableArray<ItemMetadataEntry*>* metadata = [NSMutableArray array];
-
-    [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
-
-    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
-                                                  value:item.fields.created ? item.fields.created.friendlyDateTimeStringPrecise : @""
-                                               copyable:NO]];
-    
-
-
-
-
-    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
-                                                  value:item.fields.modified ? item.fields.modified.friendlyDateTimeStringPrecise : @""
-                                               copyable:NO]];
-        
-
-
-
-
-
-
-
-
-
-
-
-    
-    return metadata;
-}
-
 - (Node*)createNewEntryNode {
     AutoFillNewRecordSettings* settings = AppPreferences.sharedInstance.autoFillNewRecordSettings;
 
@@ -1380,61 +1348,14 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         [self addHistoricalNode:ret originalNodeForHistory:originalNodeForHistory];
     }
 
-    if (! [ret setTitle:self.model.title keePassGroupTitleRules:NO] ) {
+    if ( ![self.model applyToNode:ret
+                   databaseFormat:self.databaseFormat
+                keePassEmailField:AppPreferences.sharedInstance.keePassEmailField
+          legacySupplementaryTotp:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
+                    addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl] ) {
         completion(nil);
         return;
     }
-    
-    [ret touch:YES touchParents:NO];
-
-    ret.fields.username = self.model.username;
-    ret.fields.password = self.model.password;
-    ret.fields.url = self.model.url;
-    ret.fields.notes = self.model.notes;
-    ret.fields.expires = self.model.expires;
-
-    
-
-    [ret.fields removeAllCustomFields];
-    for (CustomFieldViewModel *field in self.model.customFields) {
-        StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
-        [ret.fields setCustomField:field.key value:value];
-    }
-
-    
-    
-    if ( self.databaseFormat == kPasswordSafe ) {
-        ret.fields.email = self.model.email;
-    }
-    else if ( self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4 ) {
-        if ( AppPreferences.sharedInstance.keePassEmailField ) {
-            ret.fields.keePassEmail = self.model.email;
-        }
-    }
-    
-    
-
-    if([OTPToken areDifferent:ret.fields.otpToken b:self.model.totp]) {
-        [ret.fields clearTotp]; 
-
-        if(self.model.totp != nil) {
-            [ret.fields setTotp:self.model.totp
-               appendUrlToNotes:self.databaseModel.database.originalFormat == kPasswordSafe || self.databaseModel.database.originalFormat == kKeePass1
-                addLegacyFields:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
-                  addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl];
-        }
-    }
-
-    
-
-    [ret.fields.attachments removeAllObjects];
-    [ret.fields.attachments addEntriesFromDictionary:self.model.attachments.dictionary];
-
-    
-    
-    [ret.fields.tags removeAllObjects];
-    [ret.fields.tags addObjectsFromArray:self.model.tags];
-    
     
     
     
@@ -1466,7 +1387,6 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
                            action:^(BOOL response) {
                         self.databaseModel.metadata.promptedForAutoFetchFavIcon = YES;
                         self.databaseModel.metadata.tryDownloadFavIconForNewRecord = response;
-                        [SafesList.sharedInstance update:self.databaseModel.metadata];
 
                         if (self.databaseModel.metadata.tryDownloadFavIconForNewRecord ) {
                             [self fetchFavIcon:item completion:completion];
@@ -1578,9 +1498,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         NSMutableArray* mutable = [weakSelf.databaseModel.metadata.detailsViewCollapsedSections mutableCopy];
         mutable[section] = @(toggled);
         weakSelf.databaseModel.metadata.detailsViewCollapsedSections = mutable;
-        
-        [SafesList.sharedInstance update:weakSelf.databaseModel.metadata];
-        
+                
         [weakHeader setCollapsed:toggled];
         [weakSelf.tableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
     };
@@ -1669,7 +1587,6 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
 
     __weak ItemDetailsViewController* weakSelf = self;
-    
     
     UIImage* refresh = [UIImage imageNamed:@"syncronize"];
     
@@ -2228,8 +2145,6 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (EntryViewModel*)refreshViewModel {
     DatabaseFormat format = self.databaseModel.database.originalFormat;
-    
-    
 
     Node* item;
     
@@ -2246,52 +2161,8 @@ suggestionProvider:^NSString*(NSString *text) {
             }
         }
     }
-    
-    NSArray<ItemMetadataEntry*>* metadata = [self getMetadataFromItem:item format:format];
-    
-    
-    
-    BOOL keePassHistoryAvailable = item.fields.keePassHistory.count > 0 && (format == kKeePass || format == kKeePass4);
-    BOOL historyAvailable = format == kPasswordSafe || keePassHistoryAvailable;
-   
-    
-    
-    NSArray<CustomFieldViewModel*>* customFieldModels = [item.fields.customFields map:^id(NSString *key, StringValue* value) {
-        return [CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected];
-    }];
-    
-    
-    
-    NSString* email = @"";
-    NSString* keePassEmailFieldKey = nil;
-    
-    if ( self.databaseFormat == kPasswordSafe ) {
-        email = item.fields.email;
-    }
-    else if ( self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4 ) {
-        if ( AppPreferences.sharedInstance.keePassEmailField ) {
-            email = item.fields.keePassEmail;
-            keePassEmailFieldKey = item.fields.keePassEmailFieldKey;
-        }
-    }
-        
-    EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
-                                                       username:item.fields.username
-                                                       password:item.fields.password
-                                                            url:item.fields.url
-                                                          notes:item.fields.notes
-                                                          email:email
-                                           keePassEmailFieldKey:keePassEmailFieldKey
-                                                        expires:item.fields.expires
-                                                           tags:item.fields.tags
-                                                           totp:item.fields.otpToken
-                                                           icon:item.icon
-                                                   customFields:customFieldModels
-                                                    attachments:item.fields.attachments
-                                                       metadata:metadata
-                                                     hasHistory:historyAvailable];
-    
-    return ret;
+
+    return [EntryViewModel fromNode:item format:format keePassEmailField:AppPreferences.sharedInstance.keePassEmailField];
 }
 
 - (void)performFullReload {

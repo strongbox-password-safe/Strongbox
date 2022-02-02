@@ -7,14 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 #import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MergeInitialViewController : UIViewController
 
-@property SafeMetaData* firstMetadata;
+@property DatabasePreferences* firstMetadata;
 @property (nonatomic, copy) void (^onDone)(BOOL mergeRequested, Model*_Nullable first, Model*_Nullable second);
 
 @end

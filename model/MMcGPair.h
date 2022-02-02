@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Pair <TypeA, TypeB> : NSObject
+@interface MMcGPair <TypeA, TypeB> : NSObject
 
 + (instancetype)pairOfA:(TypeA)a andB:(TypeB)b;
 - (instancetype)init NS_UNAVAILABLE;

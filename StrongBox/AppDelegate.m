@@ -24,7 +24,7 @@
 #import "iCloudSafesCoordinator.h"
 #import "SecretStore.h"
 #import "Alerts.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "VirtualYubiKeys.h"
 #import "AppLockViewController.h"
 #import "CustomizationManager.h"
@@ -80,7 +80,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
     self.appIsLocked = AppPreferences.sharedInstance.appLockMode != kNoLock;
     
-    [CustomizationManager applyCustomizations];
+    [CustomizationManager applyCustomizations]; 
     
     [self markDirectoriesForBackupInclusion];
     

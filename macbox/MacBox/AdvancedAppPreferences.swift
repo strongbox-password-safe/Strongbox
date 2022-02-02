@@ -9,34 +9,42 @@
 import Cocoa
 
 class AdvancedAppPreferences: NSViewController {
-    @IBOutlet weak var quickReveal: NSButton!
-    @IBOutlet weak var autoSave: NSButton!
-    @IBOutlet weak var rememberKeyFile: NSButton!
-    @IBOutlet weak var hideKeyFile: NSButton!
-    @IBOutlet weak var useColorBindPalette: NSButton!
-    @IBOutlet weak var revealImmediately: NSButton!
-    @IBOutlet weak var makeBackups: NSButton!
-    @IBOutlet weak var colorizePasswords: NSButton!
-    @IBOutlet weak var markdown: NSButton! 
-    @IBOutlet weak var showManagerOnAllClosed: NSButton!
-    @IBOutlet weak var hideManagerAfterLaunching: NSButton!
-    @IBOutlet weak var allowClipboardHandoff: NSButton!
+    @IBOutlet var quickReveal: NSButton!
+    @IBOutlet var autoSave: NSButton!
+    @IBOutlet var rememberKeyFile: NSButton!
+    @IBOutlet var hideKeyFile: NSButton!
+    @IBOutlet var useColorBindPalette: NSButton!
+    @IBOutlet var revealImmediately: NSButton!
+    @IBOutlet var makeBackups: NSButton!
+    @IBOutlet var colorizePasswords: NSButton!
+    @IBOutlet var markdown: NSButton!
+    @IBOutlet var showManagerOnAllClosed: NSButton!
+    @IBOutlet var hideManagerAfterLaunching: NSButton!
+    @IBOutlet var allowClipboardHandoff: NSButton!
+    @IBOutlet var useNextGenUI: NSButton!
+    @IBOutlet var addTotpOtpAuth: NSButton!
+    @IBOutlet var addLegacyTotpFields: NSButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
+        if #available(macOS 11.0, *) {
+        } else {
+            useNextGenUI.isHidden = true
+        }
+
         bindUI()
-        
+
         NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self = self else { return }
-                
+
             self.bindUI()
         }
     }
-    
+
     func bindUI() {
         let settings = Settings.sharedInstance()
-        
+
         quickReveal.state = settings.quickRevealWithOptionKey ? .on : .off
         autoSave.state = settings.autoSave ? .on : .off
         rememberKeyFile.state = (!settings.doNotRememberKeyFile) ? .on : .off
@@ -49,17 +57,21 @@ class AdvancedAppPreferences: NSViewController {
         colorizePasswords.state = settings.colorizePasswords ? .on : .off
         markdown.state = settings.markdownNotes ? .on : .off
         allowClipboardHandoff.state = Settings.sharedInstance().clipboardHandoff ? .on : .off
+        addLegacyTotpFields.state = settings.addLegacySupplementaryTotpCustomFields ? .on : .off
+        addTotpOtpAuth.state = settings.addOtpAuthUrl ? .on : .off
 
         useColorBindPalette.isEnabled = settings.colorizePasswords
         hideKeyFile.isEnabled = !settings.doNotRememberKeyFile
+
         
-        
-        
+
         showManagerOnAllClosed.isEnabled = !settings.runningAsATrayApp
+
+        useNextGenUI.state = Settings.sharedInstance().nextGenUI ? .on : .off
     }
-    
-    @IBAction func onChanged(_ sender: Any) {
-        Settings.sharedInstance().quickRevealWithOptionKey = quickReveal.state ==  .on
+
+    @IBAction func onChanged(_: Any) {
+        Settings.sharedInstance().quickRevealWithOptionKey = quickReveal.state == .on
         Settings.sharedInstance().autoSave = autoSave.state == .on
         Settings.sharedInstance().doNotRememberKeyFile = rememberKeyFile.state != .on
         Settings.sharedInstance().hideKeyFileNameOnLockScreen = hideKeyFile.state == .on
@@ -71,12 +83,16 @@ class AdvancedAppPreferences: NSViewController {
         Settings.sharedInstance().colorizePasswords = colorizePasswords.state == .on
         Settings.sharedInstance().markdownNotes = markdown.state == .on
         Settings.sharedInstance().clipboardHandoff = allowClipboardHandoff.state == .on
+        Settings.sharedInstance().addLegacySupplementaryTotpCustomFields = addLegacyTotpFields.state == .on
+        Settings.sharedInstance().addOtpAuthUrl = addTotpOtpAuth.state == .on
+
+        Settings.sharedInstance().nextGenUI = useNextGenUI.state == .on
 
         bindUI()
-        
+
         notifyChanged()
     }
-    
+
     func notifyChanged() {
         NotificationCenter.default.post(name: .preferencesChanged, object: nil)
     }

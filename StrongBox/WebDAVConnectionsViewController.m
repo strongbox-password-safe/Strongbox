@@ -12,7 +12,7 @@
 #import "WebDAVConnections.h"
 #import "WebDAVConfigurationViewController.h"
 #import "Alerts.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "NSArray+Extensions.h"
 
 #ifndef NO_SFTP_WEBDAV_SP
@@ -230,12 +230,12 @@
     [self refresh];
 }
 
-- (NSArray<SafeMetaData*>*)getDatabasesUsingConnection:(WebDAVSessionConfiguration*)connection {
-    NSArray<SafeMetaData*>* possibles = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+- (NSArray<DatabasePreferences*>*)getDatabasesUsingConnection:(WebDAVSessionConfiguration*)connection {
+    NSArray<DatabasePreferences*>* possibles = [DatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
         return obj.storageProvider == kWebDAV;
     }];
     
-    NSArray<SafeMetaData*>* using = [possibles filter:^BOOL(SafeMetaData * _Nonnull obj) {
+    NSArray<DatabasePreferences*>* using = [possibles filter:^BOOL(DatabasePreferences * _Nonnull obj) {
 #ifndef NO_SFTP_WEBDAV_SP
         WebDAVSessionConfiguration* config = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:obj];
         return ( config && [config.identifier isEqualToString:connection.identifier] );
@@ -248,7 +248,7 @@
 }
 
 - (NSString*)getUsedByString:(WebDAVSessionConfiguration*)connection {
-    NSArray<SafeMetaData*>* using = [self getDatabasesUsingConnection:connection];
+    NSArray<DatabasePreferences*>* using = [self getDatabasesUsingConnection:connection];
     
     if ( using.count == 0 ) {
         return NSLocalizedString(@"not_used_by_any_databases", @"Not used by any databases.");

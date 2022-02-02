@@ -202,7 +202,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (Node *)effectiveRootGroup {
-    if(self.format == kKeePass || self.format == kKeePass4) {
+    if ( self.format == kKeePass || self.format == kKeePass4 ) {
         
         
         
@@ -277,7 +277,6 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (void)rebuildFastNodeIdMap {
     [self.fastNodeIdMap removeAllObjects];
 
-    
     if (self.rootNode && self.rootNode.children) {
         self.fastNodeIdMap[self.rootNode.uuid] = self.rootNode;
         
@@ -297,8 +296,16 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (BOOL)insertNodeAndTrackNode:(Node*)node parent:(Node*)parent position:(NSInteger)position {
     if (node && parent) {
         BOOL ret = [parent insertChild:node keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules atPosition:position];
-        
-        self.fastNodeIdMap[node.uuid] = node;
+
+        if ( ret ) {
+            self.fastNodeIdMap[node.uuid] = node;
+
+            
+
+            for ( Node* child in node.allChildren ) {
+                self.fastNodeIdMap[child.uuid] = child;
+            }
+        }
         
         return ret;
     }
@@ -308,9 +315,19 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (void)removeNodeFromParentAndTrack:(Node*)node {
-    if (node && node.parent) {
+    if ( node && node.parent ) {
         [node.parent removeChild:node];
+        
         [self.fastNodeIdMap removeObjectForKey:node.uuid];
+
+        
+        
+        if ( node.allChildren != 0 ) {
+            [self rebuildFastNodeIdMap]; 
+        }
+    }
+    else {
+        NSLog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", node, node.parent);
     }
 }
 
@@ -611,12 +628,16 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm {
+    return [self getSearchParentGroupPathDisplayString:vm prependSlash:NO];
+}
+
+- (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm prependSlash:(BOOL)prependSlash {
     if(!vm || vm.parent == nil || vm.parent == self.effectiveRootGroup) {
         return @"/";
     }
     
     NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
-    
+        
     Node* current = vm;
     while (current.parent != nil && current.parent != self.effectiveRootGroup) {
         [hierarchy insertObject:current.parent.title atIndex:0];
@@ -625,6 +646,10 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     NSString *path = [hierarchy componentsJoinedByString:@"/"];
     
+    if ( prependSlash ) {
+        return [NSString stringWithFormat:@"/%@", path];
+    }
+
     return path;
 }
 
@@ -791,6 +816,20 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return bag;
 }
 
+- (NSSet<NSString*> *)customFieldKeySet {
+    NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
+    
+    for (Node *record in self.allSearchableEntries) {
+        for (NSString* key in record.fields.customFields.allKeys) {
+            if ([Utils trim:key].length > 0) {
+                [bag addObject:key];
+            }
+        }
+    }
+    
+    return bag;
+}
+
 - (NSString *)mostPopularEmail {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
@@ -805,6 +844,28 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [self mostFrequentInCountedSet:bag];
 }
 
+- (NSArray<NSString*>*)mostPopularEmails {
+    NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
+    
+    for (Node *record in self.allSearchableEntries) {
+        if(record.fields.email.length) {
+            [bag addObject:record.fields.email];
+        }
+    }
+
+    return [self orderedByMostFrequentDescending:bag];
+}
+
+- (NSArray<NSString*>*)mostPopularTags {
+    NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
+    
+    for (Node *record in self.allSearchableEntries) {
+        [bag addObjectsFromArray:record.fields.tags.allObjects];
+    }
+
+    return [self orderedByMostFrequentDescending:bag];
+}
+
 - (NSString *)mostPopularUsername {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
@@ -815,6 +876,18 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }
     
     return [self mostFrequentInCountedSet:bag];
+}
+
+- (NSArray<NSString*>*)mostPopularUsernames {
+    NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
+    
+    for (Node *record in self.allSearchableEntries) {
+        if(record.fields.username.length) {
+            [bag addObject:record.fields.username];
+        }
+    }
+
+    return [self orderedByMostFrequentDescending:bag];
 }
 
 - (NSString *)mostPopularPassword {
@@ -835,6 +908,14 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return self.effectiveRootGroup.allChildGroups.count;
 }
 
+- (NSArray*)orderedByMostFrequentDescending:(NSCountedSet<NSString*>*)bag {
+    return [bag.allObjects sortedArrayUsingComparator:^(id obj1, id obj2) {
+        NSUInteger n = [bag countForObject:obj1];
+        NSUInteger m = [bag countForObject:obj2];
+        return (n <= m) ? (n < m)? NSOrderedDescending : NSOrderedSame : NSOrderedAscending;
+    }];
+}
+
 - (NSString*)mostFrequentInCountedSet:(NSCountedSet<NSString*>*)bag {
     NSString *mostOccurring = nil;
     NSUInteger highest = 0;
@@ -848,7 +929,6 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     return mostOccurring;
 }
-
 
 
 

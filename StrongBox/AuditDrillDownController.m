@@ -15,7 +15,7 @@
 #import "SVProgressHUD.h"
 #import "AuditConfigurationVcTableViewController.h"
 #import "AppPreferences.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 const NSUInteger kSectionSettingsIdx = 0;
 const NSUInteger kSectionBasicIdx = 1;
@@ -417,9 +417,10 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     
     [Alerts twoOptionsWithCancel:self title:loc1 message:loc2 defaultButtonText:locNo secondButtonText:locYes action:^(int response) {
         if (response == 1) { 
-            self.model.metadata.auditConfig.hibpCaveatAccepted = YES;
-            [SafesList.sharedInstance update:self.model.metadata];
-                          
+            DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
+            config.hibpCaveatAccepted = YES;
+            self.model.metadata.auditConfig = config;
+            
             [self checkHibp];
         }
     }];

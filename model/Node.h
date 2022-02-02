@@ -157,6 +157,8 @@ extern NSComparator finderStyleNodeComparator;
 
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 
+@property (readonly) NSUInteger estimatedSize;
+
 @end
 
 NS_ASSUME_NONNULL_END

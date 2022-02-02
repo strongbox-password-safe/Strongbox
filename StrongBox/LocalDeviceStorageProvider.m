@@ -9,7 +9,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "IOsUtils.h"
 #import "Utils.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "DatabaseModel.h"
 #import "FileManager.h"
 #import "LocalDatabaseIdentifier.h"
@@ -49,7 +49,7 @@
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+        completion:(void (^)(DatabasePreferences *metadata, NSError *error))completion {
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
     [self create:nickName extension:extension data:data modDate:NSDate.date suggestedFilename:desiredFilename completion:completion];
 }
@@ -59,7 +59,7 @@
           data:(NSData *)data
        modDate:(NSDate *)modDate
 suggestedFilename:(NSString *)suggestedFilename
-    completion:(void (^)(SafeMetaData * _Nonnull, NSError *))completion {
+    completion:(void (^)(DatabasePreferences * _Nonnull, NSError *))completion {
     
     
     
@@ -79,7 +79,7 @@ suggestedFilename:(NSString *)suggestedFilename
     identifier.filename = suggestedFilename;
     identifier.sharedStorage = YES;
     
-    SafeMetaData *metadata = [self getSafeMetaData:nickName providerData:identifier];
+    DatabasePreferences *metadata = [self getDatabasePreferences:nickName providerData:identifier];
     
     
     
@@ -153,7 +153,7 @@ suggestedFilename:(NSString *)suggestedFilename
     return ret;
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     NSURL* url = [self getFileUrl:safeMetaData];
 
     NSError* error;
@@ -172,7 +172,7 @@ suggestedFilename:(NSString *)suggestedFilename
     }
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
+- (void)delete:(DatabasePreferences *)safeMetaData completion:(void (^)(NSError *error))completion {
     NSURL *url = [self getFileUrl:safeMetaData];
 
     NSError *error;
@@ -199,16 +199,16 @@ suggestedFilename:(NSString *)suggestedFilename
     
 }
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
     LocalDatabaseIdentifier* identifier = (LocalDatabaseIdentifier*)providerData;
     
-    return [[SafeMetaData alloc] initWithNickName:nickName
-                                  storageProvider:self.storageId
-                                         fileName:identifier.filename
-                                   fileIdentifier:[identifier toJson]];
+    return [DatabasePreferences templateDummyWithNickName:nickName
+                                          storageProvider:self.storageId
+                                                 fileName:identifier.filename
+                                           fileIdentifier:[identifier toJson]];
 }
 
-- (void)pullDatabase:(SafeMetaData *)safeMetaData
+- (void)pullDatabase:(DatabasePreferences *)safeMetaData
     interactiveVC:(UIViewController *)viewController
            options:(StorageProviderReadOptions *)options
         completion:(StorageProviderReadCompletionBlock)completion {
@@ -240,7 +240,7 @@ suggestedFilename:(NSString *)suggestedFilename
 
 
 
-- (LocalDatabaseIdentifier*)getIdentifierFromMetadata:(SafeMetaData*)metaData {
+- (LocalDatabaseIdentifier*)getIdentifierFromMetadata:(DatabasePreferences*)metaData {
     NSString* json = metaData.fileIdentifier;
     return [LocalDatabaseIdentifier fromJson:json];
 }
@@ -249,7 +249,7 @@ suggestedFilename:(NSString *)suggestedFilename
     return shared ? FileManager.sharedInstance.sharedAppGroupDirectory : FileManager.sharedInstance.documentsDirectory;
 }
 
-- (NSURL*)getFileUrl:(SafeMetaData*)safeMetaData {
+- (NSURL*)getFileUrl:(DatabasePreferences*)safeMetaData {
     LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:safeMetaData];
     return [self getFileUrl:identifier.sharedStorage filename:identifier.filename];
 }
@@ -269,7 +269,7 @@ suggestedFilename:(NSString *)suggestedFilename
     return [[NSFileManager defaultManager] fileExistsAtPath:fullPath.path];
 }
 
-- (BOOL)isUsingSharedStorage:(SafeMetaData*)metadata {
+- (BOOL)isUsingSharedStorage:(DatabasePreferences*)metadata {
     LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:metadata];
     return identifier.sharedStorage;
 }

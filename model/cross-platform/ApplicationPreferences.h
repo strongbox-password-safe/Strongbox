@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 @property (readonly) BOOL isProOrFreeTrial;
 @property PasswordStrengthConfig* passwordStrengthConfig;
+@property BOOL checkPinYin;
 
 @end
 

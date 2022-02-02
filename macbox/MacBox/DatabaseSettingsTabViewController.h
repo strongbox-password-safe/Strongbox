@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "DatabaseModel.h"
-#import "DatabaseMetadata.h"
+#import "MacDatabasePreferences.h"
 #import "ViewModel.h"
 
 NS_ASSUME_NONNULL_BEGIN

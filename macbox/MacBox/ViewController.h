@@ -20,6 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ViewController : NSViewController
 
 - (void)onDocumentLoaded; 
+- (Node*)getCurrentSelectedItem;
+- (NSArray<Node*>*)getSelectedItems;
+
+- (void)closeAllDetailsWindows:(void (^ _Nullable)(void))completion;
+- (void)onLockDone;
 
 @end
 

@@ -17,6 +17,12 @@
 
 @implementation DatabaseOnboardingTabViewController
 
++ (instancetype)fromStoryboard {
+    NSStoryboard* sb = [NSStoryboard storyboardWithName:@"DatabaseOnboarding" bundle:nil];
+    DatabaseOnboardingTabViewController* vc = [sb instantiateInitialController];
+    return vc;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
   

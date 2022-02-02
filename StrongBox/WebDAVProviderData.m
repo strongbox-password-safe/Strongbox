@@ -16,18 +16,11 @@
 
 - (NSDictionary *)serializationDictionary {
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    
-    if ( self.sessionConfiguration ) {
-        [dict addEntriesFromDictionary:[self.sessionConfiguration serializationDictionary]];
-    }
-    
+        
     [dict setObject:self.href forKey:@"href"];
     
     if ( self.connectionIdentifier ) {
         dict[@"connectionIdentifier"] = self.connectionIdentifier;
-    }
-    else {
-        dict[@"connectionIdentifier"] = self.sessionConfiguration.identifier;
     }
 
     return dict;
@@ -38,17 +31,8 @@
     
     pd.href = [dictionary objectForKey:@"href"];
     
-    WebDAVSessionConfiguration* config = [WebDAVSessionConfiguration fromSerializationDictionary:dictionary];
-    
-    if ( config ) {
-        pd.sessionConfiguration = config;
-    }
-    
     if ( dictionary[@"connectionIdentifier"] ) {
         pd.connectionIdentifier = dictionary[@"connectionIdentifier"];
-    }
-    else if ( config ) { 
-        pd.connectionIdentifier = config.identifier;
     }
     
     return pd;

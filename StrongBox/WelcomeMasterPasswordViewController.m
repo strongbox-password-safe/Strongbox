@@ -11,7 +11,7 @@
 #import "WelcomeCreateDoneViewController.h"
 #import "AddNewSafeHelper.h"
 #import "Alerts.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "FontManager.h"
 #import "PasswordStrengthTester.h"
 #import "AppPreferences.h"
@@ -22,7 +22,7 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonCreate;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPw;
-@property SafeMetaData* database;
+@property DatabasePreferences* database;
 @property NSString* password;
 
 @property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
@@ -111,7 +111,7 @@
                                           name:self.name
                                       password:self.password
                                     forceLocal:forceLocal
-                                    completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
+                                    completion:^(BOOL userCancelled, DatabasePreferences * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
         if (userCancelled) {
             self.onDone(NO, nil);
         }
@@ -131,7 +131,7 @@
         }
         else {
             self.database = metadata;
-            [SafesList.sharedInstance addWithDuplicateCheck:self.database initialCache:initialSnapshot initialCacheModDate:NSDate.date];
+            [self.database addWithDuplicateCheck:initialSnapshot initialCacheModDate:NSDate.date];
             [self performSegueWithIdentifier:@"segueToDone" sender:nil];
         }
     }];

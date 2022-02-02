@@ -6,10 +6,10 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-import Foundation
 import Down
+import Foundation
 
-@objc class SwiftHelper : NSObject {
+@objc class SwiftHelper: NSObject {
 //    @objc public class func getHtmlStringForMarkdown( _ maybeMarkdown : String ) -> String? {
 //        let down = Down(markdownString: maybeMarkdown )
 //

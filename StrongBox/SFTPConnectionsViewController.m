@@ -18,7 +18,7 @@
 #endif
 
 #import "NSArray+Extensions.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @interface SFTPConnectionsViewController ()
 
@@ -231,12 +231,12 @@
     [self refresh];
 }
 
-- (NSArray<SafeMetaData*>*)getDatabasesUsingConnection:(SFTPSessionConfiguration*)connection {
-    NSArray<SafeMetaData*>* possibles = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+- (NSArray<DatabasePreferences*>*)getDatabasesUsingConnection:(SFTPSessionConfiguration*)connection {
+    NSArray<DatabasePreferences*>* possibles = [DatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
         return obj.storageProvider == kSFTP;
     }];
     
-    NSArray<SafeMetaData*>* using = [possibles filter:^BOOL(SafeMetaData * _Nonnull obj) {
+    NSArray<DatabasePreferences*>* using = [possibles filter:^BOOL(DatabasePreferences * _Nonnull obj) {
 #ifndef NO_SFTP_WEBDAV_SP
         SFTPSessionConfiguration* config = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:obj];
         return ( config && [config.identifier isEqualToString:connection.identifier] );
@@ -249,7 +249,7 @@
 }
 
 - (NSString*)getUsedByString:(SFTPSessionConfiguration*)connection {
-    NSArray<SafeMetaData*>* using = [self getDatabasesUsingConnection:connection];
+    NSArray<DatabasePreferences*>* using = [self getDatabasesUsingConnection:connection];
     
     if ( using.count == 0 ) {
         return NSLocalizedString(@"not_used_by_any_databases", @"Not used by any databases.");

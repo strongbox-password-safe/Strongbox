@@ -6,9 +6,9 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-//import Cocoa
+// import Cocoa
 
-enum ItemCategory : String {
+enum ItemCategory: String {
     case Unknown
     case Logins
     case SecureNotes = "Secure Notes"
@@ -27,13 +27,13 @@ enum ItemCategory : String {
     case SocialSecurityNumbers = "Social Security Numbers"
     case WirelessRouters = "Wireless Routers"
     case SoftwareLicenses = "Software Licenses"
-    
+
     func icon() -> KeePassIconNames {
         switch self {
         case .Logins:
             return .Identity
         case .SecureNotes:
-            return.Note
+            return .Note
         case .CreditCards:
             return .Money
         case .Identities:

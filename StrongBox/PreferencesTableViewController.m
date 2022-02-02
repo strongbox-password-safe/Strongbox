@@ -11,7 +11,7 @@
 #import "Utils.h"
 #import "AppPreferences.h"
 #import <MessageUI/MessageUI.h>
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "PinEntryController.h"
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
@@ -318,47 +318,43 @@
     vc1.isDatabasePIN = NO;
     
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-        [self dismissViewControllerAnimated:YES completion:^{
-            if(response == kOk) {
-                PinEntryController* vc2 = (PinEntryController*)[storyboard instantiateInitialViewController];
-                vc2.info = NSLocalizedString(@"prefs_vc_confirm_pin", @"Confirm PIN");
-                vc2.isDatabasePIN = NO;
-                vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
-                    [self dismissViewControllerAnimated:YES completion:^{
-                        if(response2 == kOk) {
-                            if ([pin isEqualToString:confirmPin]) {
-                                AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
-                                AppPreferences.sharedInstance.appLockPin = pin;
-                                [self bindAppLock];
-                            }
-                            else {
-                                [Alerts warn:self
-                                       title:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_title", @"PINs do not match")
-                                     message:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_message", @"Your PINs do not match.")
-                                  completion:nil];
-                                
-                                [self bindAppLock];
-                            }
-                        }
-                        else {
-                            [self bindAppLock];
-                        }
-                    }];
-                };
-                
-                [self presentViewController:vc2 animated:YES completion:nil];
-            }
-            else {
-                [self bindAppLock];
-            }
-        }];
+        if(response == kPinEntryResponseOk ) {
+            PinEntryController* vc2 = (PinEntryController*)[storyboard instantiateInitialViewController];
+            vc2.info = NSLocalizedString(@"prefs_vc_confirm_pin", @"Confirm PIN");
+            vc2.isDatabasePIN = NO;
+            vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
+                if(response2 == kPinEntryResponseOk ) {
+                    if ([pin isEqualToString:confirmPin]) {
+                        AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
+                        AppPreferences.sharedInstance.appLockPin = pin;
+                        [self bindAppLock];
+                    }
+                    else {
+                        [Alerts warn:self
+                               title:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_title", @"PINs do not match")
+                             message:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_message", @"Your PINs do not match.")
+                          completion:nil];
+                        
+                        [self bindAppLock];
+                    }
+                }
+                else {
+                    [self bindAppLock];
+                }
+            };
+            
+            [self presentViewController:vc2 animated:YES completion:nil];
+        }
+        else {
+            [self bindAppLock];
+        }
     };
 
     [self presentViewController:vc1 animated:YES completion:nil];
 }
 
 - (BOOL)hasLocalOrICloudSafes {
-    return ([SafesList.sharedInstance getSafesOfProvider:kLocalDevice].count + [SafesList.sharedInstance getSafesOfProvider:kiCloud].count) > 0;
+    return (DatabasePreferences.localDeviceDatabases.count + DatabasePreferences.iCloudDatabases.count) > 0;
 }
 
 - (IBAction)onUseICloud:(id)sender {

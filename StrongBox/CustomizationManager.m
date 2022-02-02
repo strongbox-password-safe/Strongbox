@@ -31,6 +31,10 @@
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = YES;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
+        
+        AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
+        AppPreferences.sharedInstance.backupFiles = NO;
+        AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
     }
     else if ( self.isGrapheneEdition ) {
         NSLog(@"Graphene Edition... customizing...");

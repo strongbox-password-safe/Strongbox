@@ -85,19 +85,20 @@ disableEscapeKey:(BOOL)disableEscapeKey
         
         [alert setAlertStyle:NSAlertStyleInformational];
         
-        NSString* loc = NSLocalizedString(@"alerts_no", @"No");
-        [alert addButtonWithTitle:loc];
-        NSString* loc2 = NSLocalizedString(@"alerts_yes", @"Yes");
-        [alert addButtonWithTitle:loc2];
+        NSString* yes = NSLocalizedString(@"alerts_yes", @"Yes");
+        [alert addButtonWithTitle:yes];
+        
+        NSString* no = NSLocalizedString(@"alerts_no", @"No");
+        [alert addButtonWithTitle:no];
         
         if (!disableEscapeKey) {
-            [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
+            [[[alert buttons] objectAtIndex:1] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
         }
         
-        [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; 
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
         
         [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-            completion(returnCode == NSAlertSecondButtonReturn);
+            completion(returnCode == NSAlertFirstButtonReturn);
         }];
     });
 }

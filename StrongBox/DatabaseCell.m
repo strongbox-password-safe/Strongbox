@@ -7,7 +7,7 @@
 //
 
 #import "DatabaseCell.h"
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 #import "DatabaseCellSubtitleField.h"
 #import "AppPreferences.h"
 #import "SafeStorageProviderFactory.h"
@@ -143,15 +143,15 @@ rotateLastImage:(BOOL)rotateLastImage
 
 
 
-- (void)populateCell:(SafeMetaData*)database {
+- (void)populateCell:(DatabasePreferences*)database {
     [self populateCell:database disabled:NO];
 }
 
-- (void)populateCell:(SafeMetaData *)database disabled:(BOOL)disabled {
+- (void)populateCell:(DatabasePreferences *)database disabled:(BOOL)disabled {
     [self populateCell:database disabled:disabled autoFill:NO];
 }
 
-- (void)populateCell:(SafeMetaData *)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill {
+- (void)populateCell:(DatabasePreferences *)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill {
     SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [SyncManager.sharedInstance getSyncStatus:database].state;
     
     NSArray* tints;
@@ -187,7 +187,7 @@ rotateLastImage:(BOOL)rotateLastImage
 
 
 
-- (NSArray<UIImage*>*)getStatusImages:(SafeMetaData*)database syncState:(SyncOperationState)syncState tints:(NSArray**)tints {
+- (NSArray<UIImage*>*)getStatusImages:(DatabasePreferences*)database syncState:(SyncOperationState)syncState tints:(NSArray**)tints {
     NSMutableArray<UIImage*> *ret = NSMutableArray.array;
     NSMutableArray *tnts = NSMutableArray.array;
 
@@ -255,7 +255,7 @@ rotateLastImage:(BOOL)rotateLastImage
     return ret;
 }
 
-- (NSString*)getDatabaseCellSubtitleField:(SafeMetaData*)database field:(DatabaseCellSubtitleField)field {
+- (NSString*)getDatabaseCellSubtitleField:(DatabasePreferences*)database field:(DatabaseCellSubtitleField)field {
     switch (field) {
         case kDatabaseCellSubtitleFieldNone:
             return nil;
@@ -287,7 +287,7 @@ rotateLastImage:(BOOL)rotateLastImage
     }
 }
 
-- (NSString*)getCreateDate:(SafeMetaData*)safe {
+- (NSString*)getCreateDate:(DatabasePreferences*)safe {
     NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
     NSError* error;
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
@@ -301,7 +301,7 @@ rotateLastImage:(BOOL)rotateLastImage
     return created ? created.friendlyDateStringVeryShort : @"";
 }
 
-- (NSString*)getCreateDatePrecise:(SafeMetaData*)safe {
+- (NSString*)getCreateDatePrecise:(DatabasePreferences*)safe {
     NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
     NSError* error;
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
@@ -315,25 +315,25 @@ rotateLastImage:(BOOL)rotateLastImage
     return created ? created.friendlyDateTimeStringPrecise : @"";
 }
 
-- (NSString*)getModifiedDate:(SafeMetaData*)safe {
+- (NSString*)getModifiedDate:(DatabasePreferences*)safe {
     NSDate* mod;
     [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe.uuid modified:&mod];
     return mod ? mod.friendlyDateStringVeryShort : @"";
 }
 
-- (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
+- (NSString*)getModifiedDatePrecise:(DatabasePreferences*)safe {
     NSDate* mod;
     [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe.uuid modified:&mod];
     return mod ? mod.friendlyDateTimeStringPrecise : @"";
 }
 
-- (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
+- (NSString*)getLocalWorkingCopyFileSize:(DatabasePreferences*)safe {
     unsigned long long fileSize;
     NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid modified:nil fileSize:&fileSize];
     return url ? friendlyFileSizeString(fileSize) : @"";
 }
 
-- (NSString*)getStorageString:(SafeMetaData*)database {
+- (NSString*)getStorageString:(DatabasePreferences*)database {
     return [SafeStorageProviderFactory getStorageDisplayName:database];
 }
 

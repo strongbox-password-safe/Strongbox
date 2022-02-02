@@ -26,7 +26,7 @@
 @interface DatabaseUnlocker ()
 
 @property (nonnull) VIEW_CONTROLLER_PTR viewController;
-@property (nonnull) METADATA_PTR database;
+@property (nonnull, readonly) METADATA_PTR database;
 @property (nonnull) UnlockDatabaseCompletionBlock completion;
 @property BOOL keyFromConvenience;
 @property BOOL forcedReadOnly;
@@ -36,8 +36,9 @@
 @property (readonly) id<ApplicationPreferences> applicationPreferences;
 @property (readonly) id<SyncManagement> syncManagement;
 @property (readonly) id<SpinnerUI> spinnerUi;
-@property (readonly) id<DatabasePreferencesManager> databasesPreferencesManager;
 @property (readonly) id<AlertingUI> alertingUi;
+
+@property (nonatomic, readonly) NSString *databaseUuid;
 
 @end
 
@@ -53,10 +54,6 @@
 
 - (id<SpinnerUI>)spinnerUi {
     return CrossPlatformDependencies.defaults.spinnerUi;
-}
-
-- (id<DatabasePreferencesManager>)databasesPreferencesManager {
-    return CrossPlatformDependencies.defaults.databasesPreferencesManager;
 }
 
 - (id<AlertingUI>)alertingUi {
@@ -83,7 +80,7 @@
     self = [super init];
     
     if (self) {
-        self.database = database;
+        _databaseUuid = database.uuid;
         self.viewController = viewController;
         self.forcedReadOnly = forcedReadOnly;
         self.isAutoFillOpen = isAutoFillOpen;
@@ -92,6 +89,10 @@
     }
     
     return self;
+}
+
+- (METADATA_PTR)database {
+    return [CommonDatabasePreferences fromUuid:self.databaseUuid];
 }
 
 + (Model*)expressTryUnlockWithKey:(METADATA_PTR)database key:(CompositeKeyFactors *)key {
@@ -258,10 +259,9 @@
   
         if ( expired || secretUnavailable ) {
             NSLog(@"Convenience Unlock enabled, successful open, and password expired (%hhd) or unavailble (%hhd). refreshing stored secret.", expired, secretUnavailable);
+            
             self.database.conveniencePasswordHasBeenStored = YES;
             self.database.convenienceMasterPassword = openedSafe.ckfs.password;
-
-            [self.databasesPreferencesManager update:self.database];
         }
     }
 }
@@ -272,8 +272,6 @@
     self.database.conveniencePasswordHasBeenStored = NO;
     self.database.convenienceMasterPassword = nil;
     self.database.autoFillConvenienceAutoUnlockPassword = nil;
-
-    [self.databasesPreferencesManager update:self.database];
     
     [self.alertingUi info:self.viewController
                     title:NSLocalizedString(@"open_sequence_problem_opening_title", @"Could not open database")
@@ -337,8 +335,7 @@
             NSLog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
             
             self.database.emptyOrNilPwPreferNilCheckFirst = !self.database.emptyOrNilPwPreferNilCheckFirst;
-            [self.databasesPreferencesManager update:self.database];
-            
+                        
             if ( secondCheck.yubiKeyCR != nil ) {
                 
                 
@@ -410,8 +407,6 @@
         
         self.database.likelyFormat = openedSafe.originalFormat;
         self.database.unlockCount++;
-        
-        [self.databasesPreferencesManager update:self.database];
     }
 }
 

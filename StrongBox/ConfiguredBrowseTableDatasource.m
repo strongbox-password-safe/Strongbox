@@ -8,7 +8,6 @@
 
 #import "ConfiguredBrowseTableDatasource.h"
 #import "NSArray+Extensions.h"
-#import "DatabaseSearchAndSorter.h"
 #import "BrowseTableViewCellHelper.h"
 #import "AppPreferences.h"
 
@@ -99,20 +98,15 @@ const NSUInteger kSectionIdxLast = 3;
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node.uuid];
-    }];
-
-    return [searcher filterAndSortForBrowse:self.viewModel.pinnedNodes.mutableCopy
-                      includeKeePass1Backup:YES
-                          includeRecycleBin:YES
-                             includeExpired:YES
-                              includeGroups:YES];
+    
+    return [self.viewModel filterAndSortForBrowse:self.viewModel.pinnedNodes.mutableCopy
+                            includeKeePass1Backup:YES
+                                includeRecycleBin:YES
+                                   includeExpired:YES
+                                    includeGroups:YES
+                                  browseSortField:sortField
+                                       descending:descending
+                                foldersSeparately:foldersSeparately];
 }
 
 - (NSArray<Node*>*)loadNearlyExpiredItems {
@@ -127,20 +121,15 @@ const NSUInteger kSectionIdxLast = 3;
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node.uuid];
-    }];
-
-    return [searcher filterAndSortForBrowse:ne.mutableCopy
-                      includeKeePass1Backup:NO
-                          includeRecycleBin:NO
-                             includeExpired:NO
-                              includeGroups:YES];
+    
+    return [self.viewModel filterAndSortForBrowse:ne.mutableCopy
+                            includeKeePass1Backup:NO
+                                includeRecycleBin:NO
+                                   includeExpired:NO
+                                    includeGroups:YES
+                                  browseSortField:sortField
+                                       descending:descending
+                                foldersSeparately:foldersSeparately];
 }
 
 - (NSArray<Node*>*)loadExpiredItems {
@@ -155,20 +144,15 @@ const NSUInteger kSectionIdxLast = 3;
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node.uuid];
-    }];
-
-    return [searcher filterAndSortForBrowse:exp.mutableCopy
-                      includeKeePass1Backup:NO
-                          includeRecycleBin:NO
-                             includeExpired:YES
-                              includeGroups:YES];
+    
+    return [self.viewModel filterAndSortForBrowse:exp.mutableCopy
+                            includeKeePass1Backup:NO
+                                includeRecycleBin:NO
+                                   includeExpired:YES
+                                    includeGroups:YES
+                                  browseSortField:sortField
+                                       descending:descending
+                                foldersSeparately:foldersSeparately];
 }
 
 - (NSArray<Node*>*)loadStandardItems:(NSUUID*)currentGroup  {
@@ -196,20 +180,15 @@ const NSUInteger kSectionIdxLast = 3;
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node.uuid];
-    }];
-
-    return [searcher filterAndSortForBrowse:ret.mutableCopy
-                      includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
-                          includeRecycleBin:!self.viewModel.metadata.doNotShowRecycleBinInBrowse
-                             includeExpired:self.viewModel.metadata.showExpiredInBrowse
-                              includeGroups:YES];
+    
+    return [self.viewModel filterAndSortForBrowse:ret.mutableCopy
+                            includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
+                                includeRecycleBin:!self.viewModel.metadata.doNotShowRecycleBinInBrowse
+                                   includeExpired:self.viewModel.metadata.showExpiredInBrowse
+                                    includeGroups:YES
+                                  browseSortField:sortField
+                                       descending:descending
+                                foldersSeparately:foldersSeparately];
 }
 
 - (void)refreshItems:(NSUUID *)currentGroup {

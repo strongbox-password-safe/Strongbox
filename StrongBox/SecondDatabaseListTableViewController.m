@@ -7,12 +7,12 @@
 //
 
 #import "SecondDatabaseListTableViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "DatabaseCell.h"
 
 @interface SecondDatabaseListTableViewController ()
 
-@property NSArray<SafeMetaData*> *list;
+@property NSArray<DatabasePreferences*> *list;
 
 @end
 
@@ -21,7 +21,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.list = SafesList.sharedInstance.snapshot;
+    self.list = DatabasePreferences.allDatabases;
 
     [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
     self.tableView.tableFooterView = UIView.new;
@@ -38,7 +38,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
     
-    SafeMetaData* database = self.list[indexPath.row];
+    DatabasePreferences* database = self.list[indexPath.row];
     
     BOOL isFirstDatabase = [database.uuid isEqualToString:self.firstDatabase.metadata.uuid];
     BOOL isReadOnly = database.readOnly;
@@ -51,7 +51,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    SafeMetaData* database = self.list[indexPath.row];
+    DatabasePreferences* database = self.list[indexPath.row];
     
     self.onSelectedDatabase(database, self);
 }

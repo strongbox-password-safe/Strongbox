@@ -13,7 +13,6 @@
 #import "ItemDetailsViewController.h"
 #import "BrowseItemCell.h"
 #import "Utils.h"
-#import "DatabaseSearchAndSorter.h"
 #import "BrowseTableViewCellHelper.h"
 #import "AppPreferences.h"
 

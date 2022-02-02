@@ -12,7 +12,6 @@
 
 #import "AppPreferences.h"
 #import "SyncManager.h"
-#import "SafesList.h"
 #import "iOSSpinnerUI.h"
 #import "IOSAlertingUI.h"
 
@@ -20,7 +19,6 @@
 
 #import "Settings.h"
 #import "MacSyncManager.h"
-#import "DatabasesManager.h"
 #import "macOSSpinnerUI.h"
 #import "MacOSAlertingUI.h"
 
@@ -37,14 +35,12 @@
         sharedInstance = [[CrossPlatformDependencies alloc] initWithApplicationPreferences:AppPreferences.sharedInstance
                                                                             syncManagement:SyncManager.sharedInstance
                                                                                  spinnerUi:iOSSpinnerUI.sharedInstance
-                                                               databasesPreferencesManager:SafesList.sharedInstance
                                                                                 alertingUi:IOSAlertingUI.sharedInstance];
 
 #else
     sharedInstance = [[CrossPlatformDependencies alloc] initWithApplicationPreferences:Settings.sharedInstance
                                                                         syncManagement:MacSyncManager.sharedInstance
                                                                              spinnerUi:macOSSpinnerUI.sharedInstance
-                                                           databasesPreferencesManager:DatabasesManager.sharedInstance
                                                                             alertingUi:MacOSAlertingUI.sharedInstance];
 #endif
     });
@@ -55,7 +51,6 @@
 - (instancetype)initWithApplicationPreferences:(id<ApplicationPreferences>)applicationPreferences
                                 syncManagement:(id<SyncManagement>)syncManagement
                                      spinnerUi:(id<SpinnerUI>)spinnerUi
-                   databasesPreferencesManager:(id<DatabasePreferencesManager>)databasesPreferencesManager
                                     alertingUi:(id<AlertingUI>)alertingUi {
     self = [super init];
     
@@ -63,7 +58,6 @@
         _applicationPreferences = applicationPreferences;
         _syncManagement = syncManagement;
         _spinnerUi = spinnerUi;
-        _databasesPreferencesManager = databasesPreferencesManager;
         _alertingUi = alertingUi;
     }
     

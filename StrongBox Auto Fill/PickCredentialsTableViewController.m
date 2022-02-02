@@ -13,7 +13,6 @@
 #import "Utils.h"
 #import "regdom.h"
 #import "ItemDetailsViewController.h"
-#import "DatabaseSearchAndSorter.h"
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
 #import "BrowseTableViewCellHelper.h"
@@ -228,6 +227,14 @@ static NSString* const kGroupAllItems = @"all-items";
 }
 
 - (void)smartInitializeSearchFromDomain:(NSString*)domain {
+    if(!domain.length) {
+        return;
+    }
+    
+    if ( [domain hasPrefix:@"www."] && domain.length > 4) {
+        domain = [domain substringFromIndex:4];
+    }
+    
     
     
     NSArray* items = [self getMatchingItems:domain scope:kSearchScopeUrl];
@@ -291,12 +298,16 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if(!domain.length) {
         return domain;
     }
+
+    if ( [domain hasPrefix:@"www."] ) {
+        domain = [domain substringFromIndex:4];
+    }
     
     NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
     
     NSLog(@"%@", parts);
     
-    NSString *searchTerm =  parts.count ? parts[0] : domain;
+    NSString *searchTerm = parts.count ? parts[0] : domain;
     return searchTerm;
 }
 
@@ -305,20 +316,14 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     BOOL descending = self.model.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
     
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.model isFlaggedByAudit:node.uuid];
-    }];
-
-    return [searcher filterAndSortForBrowse:self.model.allRecords.mutableCopy
-                      includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
-                          includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
-                             includeExpired:self.model.metadata.showExpiredInSearch
-                              includeGroups:NO];
+    return [self.model filterAndSortForBrowse:self.model.allRecords.mutableCopy
+                        includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
+                            includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
+                               includeExpired:self.model.metadata.showExpiredInSearch
+                                includeGroups:NO
+                              browseSortField:sortField
+                                   descending:descending
+                            foldersSeparately:foldersSeparately];
 }
 
 - (NSArray<Node*>*)loadPinnedItems {
@@ -330,20 +335,14 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     BOOL descending = self.model.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
     
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.model isFlaggedByAudit:node.uuid];
-    }];
-
-    return [searcher filterAndSortForBrowse:self.model.pinnedNodes.mutableCopy
-                      includeKeePass1Backup:NO
-                          includeRecycleBin:NO
-                             includeExpired:YES
-                              includeGroups:NO];
+    return [self.model filterAndSortForBrowse:self.model.pinnedNodes.mutableCopy
+                        includeKeePass1Backup:NO
+                            includeRecycleBin:NO
+                               includeExpired:YES
+                                includeGroups:NO
+                              browseSortField:sortField
+                                   descending:descending
+                            foldersSeparately:foldersSeparately];
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
@@ -392,22 +391,17 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     BrowseSortField sortField = self.model.metadata.browseSortField;
     BOOL descending = self.model.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model.database
-                                                                       browseSortField:sortField
-                                                                            descending:descending
-                                                                     foldersSeparately:foldersSeparately
-                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
-                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.model isFlaggedByAudit:node.uuid];
-    }];
-
-    return [searcher search:searchText
-                      scope:scope
-                dereference:self.model.metadata.searchDereferencedFields
-      includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
-          includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
-             includeExpired:self.model.metadata.showExpiredInSearch
-              includeGroups:NO];
+    
+    return [self.model search:searchText
+                        scope:scope
+                  dereference:self.model.metadata.searchDereferencedFields
+        includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
+            includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
+               includeExpired:self.model.metadata.showExpiredInSearch
+                includeGroups:NO
+              browseSortField:sortField
+                   descending:descending
+            foldersSeparately:foldersSeparately];
 }
 
 

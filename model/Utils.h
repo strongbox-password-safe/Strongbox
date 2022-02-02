@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)hostname;
 + (NSString *)getUsername;
 
-NSString*_Nullable keePassStringIdFromUuid(NSUUID* uuid);
+NSString* keePassStringIdFromUuid(NSUUID* uuid);
 NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
 
 BOOL isValidUrl(NSString* urlString);
@@ -89,7 +89,13 @@ UIImage* scaleImage(UIImage* image, CGSize newSize);
 + (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize;
 
 #else
+
++ (NSImage*)getQrCode:(NSString*)string pointSize:(NSUInteger)pointSize;
+
 NSImage* scaleImage(NSImage* image, CGSize newSize);
+
+BOOL checkForScreenRecordingPermissionsOnMac(void);
+
 #endif
 
 #if TARGET_OS_IPHONE

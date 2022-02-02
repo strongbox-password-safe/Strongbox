@@ -10,9 +10,9 @@
 #define PinEntryResponse_h
 
 typedef NS_ENUM (NSUInteger, PinEntryResponse) {
-    kCancel,
-    kOk,
-    kFallback,
+    kPinEntryResponseCancel,
+    kPinEntryResponseOk,
+    kPinEntryResponseFallback,
 };
 
 #endif /* PinEntryResponse_h */

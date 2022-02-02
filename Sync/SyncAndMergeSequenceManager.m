@@ -25,7 +25,7 @@
 #import "DatabaseUnlocker.h"
 #import "BackupsManager.h"
 #import "CompositeKeyDeterminer.h"
-#import "CrossPlatform.h"
+#import "CommonDatabasePreferences.h"
 
 #if TARGET_OS_IPHONE
 
@@ -36,6 +36,7 @@
 #else
 
 #import "MacCompositeKeyDeterminer.h"
+#import "MacConflictResolutionWizard.h"
 
 #endif
 
@@ -51,7 +52,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 @property (readonly) id<ApplicationPreferences> applicationPreferences;
 @property (readonly) id<SyncManagement> syncManagement;
 @property (readonly) id<SpinnerUI> spinnerUi;
-@property (readonly) id<DatabasePreferencesManager> databasesPreferencesManager;
 @property (readonly) id<AlertingUI> alertingUi;
 
 @end
@@ -68,10 +68,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
 - (id<SpinnerUI>)spinnerUi {
     return CrossPlatformDependencies.defaults.spinnerUi;
-}
-
-- (id<DatabasePreferencesManager>)databasesPreferencesManager {
-    return CrossPlatformDependencies.defaults.databasesPreferencesManager;
 }
 
 - (id<AlertingUI>)alertingUi {
@@ -198,12 +194,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }
 }
 
-- (METADATA_PTR)databaseMetadataFromDatabaseId:(NSString*)databaseUuid {
-    return [self.databasesPreferencesManager getDatabaseById:databaseUuid];
-}
-
-- (void)updateDatabaseMetadata:(NSString *_Nonnull)uuid touch:(void (^_Nonnull)(METADATA_PTR metadata))touch {
-    [self.databasesPreferencesManager atomicUpdate:uuid touch:touch];
+- (METADATA_PTR)databaseMetadataFromDatabaseId:(NSString*)databaseUuid { 
+    return [CommonDatabasePreferences fromUuid:databaseUuid];
 }
 
 - (void)syncOrPoll:(NSString*)databaseUuid syncId:(NSUUID*)syncId parameters:(SyncParameters*)parameters completion:(SyncAndMergeCompletionBlock)completion {
@@ -254,10 +246,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         completion(kSyncAndMergeError, NO, nil);
         return;
     }
-    [self updateDatabaseMetadata:databaseUuid touch:^(METADATA_PTR metadata) {
-        metadata.lastSyncAttempt = NSDate.date;
-    }];
-
+    
+    database.lastSyncAttempt = NSDate.date;
+    
     BOOL syncPullEvenIfModifiedDateSame = parameters.syncPullEvenIfModifiedDateSame;
     NSDate* localModDate;
     [self getExistingLocalCopy:databaseUuid modified:&localModDate];
@@ -391,6 +382,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
               remoteModified:(NSDate*)remoteModified
                   parameters:(SyncParameters*)parameters
                   completion:(SyncAndMergeCompletionBlock)completion {
+    NSLog(@"⚠️ Sync - Conflict Resolution Begin...");
+    
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
 
     [self logMessage:databaseUuid
@@ -400,11 +393,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     ConflictResolutionStrategy strategy = database.conflictResolutionStrategy;
     
     
+#if TARGET_OS_IPHONE
     
-#if TARGET_OS_IPHONE 
     
-    
-
     if ( database.storageProvider == kLocalDevice && database.conflictResolutionStrategy == kConflictResolutionStrategyAsk ) {
         strategy = (database.likelyFormat == kKeePass || database.likelyFormat == kKeePass4) ? kConflictResolutionStrategyAutoMerge : kConflictResolutionStrategyForcePushLocal;
     }
@@ -432,20 +423,20 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     else if (strategy == kConflictResolutionStrategyForcePullRemote) { 
         [self conflictResolutionForcePullRemote:databaseUuid syncId:syncId remoteData:remoteData remoteModified:remoteModified interactiveVC:parameters.interactiveVC completion:completion];
     }
-#if TARGET_OS_IPHONE
     else if (strategy == kConflictResolutionStrategyAsk) {
-        
-        [self conflictResolutionAsk:databaseUuid syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified parameters:parameters completion:completion];
+        [self conflictResolutionAsk:databaseUuid
+                             syncId:syncId
+                          localData:localData
+                       localModDate:localModDate
+                         remoteData:remoteData
+                     remoteModified:remoteModified
+                         parameters:parameters
+                         completion:completion];
     }
-#endif
     else {
         NSLog(@"WARNWARN: doConflictResolution - Unknown Conflict Resolution Strategy");
     }
 }
-
-#if TARGET_OS_IPHONE
-
-
 
 - (void)conflictResolutionAsk:(NSString*)databaseUuid
                        syncId:(NSUUID*)syncId
@@ -458,32 +449,63 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Source DB has also changed. Requesting User Advice..."];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"ConflictResolutionWizard" bundle:nil];
-        UINavigationController* nav = [storyboard instantiateInitialViewController];
-        ConflictResolutionWizard* wiz = (ConflictResolutionWizard*)nav.topViewController;
-        
-        wiz.localModDate = localModDate;
-        wiz.remoteModified = remoteModified;
-        
-        METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
-        wiz.remoteStorage = [SafeStorageProviderFactory getStorageDisplayName:database];
-        
-        wiz.completion = ^(ConflictResolutionWizardResult result) {
-            [parameters.interactiveVC dismissViewControllerAnimated:YES completion:^{
-                [self doConflictResolutionWizardChoice:databaseUuid
-                                                syncId:syncId
-                                          wizardResult:result
-                                             localData:localData
-                                          localModDate:localModDate
-                                            remoteData:remoteData
-                                        remoteModified:remoteModified
-                                            parameters:parameters
-                                            completion:completion];
-            }];
-        };
-        
-        [parameters.interactiveVC presentViewController:nav animated:YES completion:nil];
+        [self showConflictResolutionWizard:databaseUuid
+                                    syncId:syncId
+                                 localData:localData
+                              localModDate:localModDate
+                                remoteData:remoteData
+                            remoteModified:remoteModified
+                                parameters:parameters
+                                completion:completion];
     });
+}
+
+- (void)showConflictResolutionWizard:(NSString*)databaseUuid
+                              syncId:(NSUUID*)syncId
+                           localData:(NSData*)localData
+                        localModDate:(NSDate*)localModDate
+                          remoteData:(NSData*)remoteData
+                      remoteModified:(NSDate*)remoteModified
+                          parameters:(SyncParameters*)parameters
+                          completion:(SyncAndMergeCompletionBlock)completion {
+#if TARGET_OS_IPHONE
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"ConflictResolutionWizard" bundle:nil];
+    UINavigationController* nav = [storyboard instantiateInitialViewController];
+    ConflictResolutionWizard* wiz = (ConflictResolutionWizard*)nav.topViewController;
+#else
+    MacConflictResolutionWizard* wiz = [MacConflictResolutionWizard fromStoryboard];
+#endif
+    wiz.localModDate = localModDate;
+    wiz.remoteModified = remoteModified;
+    
+    METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
+    wiz.remoteStorage = [SafeStorageProviderFactory getStorageDisplayName:database];
+    
+    wiz.completion = ^(ConflictResolutionWizardResult result) {
+#if TARGET_OS_IPHONE
+        [parameters.interactiveVC dismissViewControllerAnimated:YES completion:^{
+#else
+    
+#endif
+            [self doConflictResolutionWizardChoice:databaseUuid
+                                            syncId:syncId
+                                      wizardResult:result
+                                         localData:localData
+                                      localModDate:localModDate
+                                        remoteData:remoteData
+                                    remoteModified:remoteModified
+                                        parameters:parameters
+                                        completion:completion];
+#if TARGET_OS_IPHONE
+        }];
+#endif
+    };
+    
+#if TARGET_OS_IPHONE
+    [parameters.interactiveVC presentViewController:nav animated:YES completion:nil];
+#else
+    [parameters.interactiveVC presentViewControllerAsSheet:wiz];
+#endif
 }
 
 - (void)doConflictResolutionWizardChoice:(NSString*)databaseUuid
@@ -506,10 +528,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                    message:NSLocalizedString(@"sync_are_you_sure_always_auto_merge", @"Are you sure you want to always Auto-Merge when you have a Sync Conflict like this?")
                     action:^(BOOL response) {
             if (response) {
-                [self updateDatabaseMetadata:databaseUuid touch:^(METADATA_PTR metadata) {
-                    metadata.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
-                }];
-
+                METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
+                database.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
+                
                 [self conflictResolutionMerge:databaseUuid syncId:syncId parameters:parameters localData:localData remoteData:remoteData compareFirst:NO completion:completion];
             }
             else {
@@ -557,8 +578,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     completion(kSyncAndMergeUserPostponedSync, NO, nil);
 }
 
-#endif
-
 - (void)conflictResolutionForcePushLocal:(NSString*)databaseUuid
                                   syncId:(NSUUID*)syncId
                                localData:(NSData*)localData
@@ -574,9 +593,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                            remoteModified:(NSDate*)remoteModified
                             interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
                                completion:(SyncAndMergeCompletionBlock)completion {
-    [self updateDatabaseMetadata:databaseUuid touch:^(METADATA_PTR metadata) {
-        metadata.outstandingUpdateId = nil;
-    }];
+    METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
+    database.outstandingUpdateId = nil;
     
     [self logMessage:databaseUuid syncId:syncId message:@"Sync Conflict Resolution: Use Theirs/Source DB - Pulling from Source DB and overwriting Working Copy."];
     [self setLocalAndComplete:remoteData dateModified:remoteModified database:databaseUuid syncId:syncId localWasChanged:YES takeABackup:YES completion:completion];
@@ -600,6 +618,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                      remoteData:(NSData*)remoteData
                    compareFirst:(BOOL)compareFirst
                      completion:(SyncAndMergeCompletionBlock)completion {
+    NSLog(@"⚠️ Sync - conflictResolutionMerge...");
+
     [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Source DB has also changed. Conflict. Auto Merging..."];
 
     if ( !parameters.key ) {
@@ -746,8 +766,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                                    compareFirst:(BOOL)compareFirst
                                                            mine:(DatabaseModel*)mine
                                                      completion:(SyncAndMergeCompletionBlock)completion {
-    NSLog(@"mergeLocalAndRemoteUrlsUnlockSecondDatabaseContinuation ENTER");
-    
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:database
                                                         viewController:parameters.interactiveVC
@@ -847,9 +865,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 
 
 #if TARGET_OS_IPHONE 
-                [self updateDatabaseMetadata:databaseUuid touch:^(METADATA_PTR metadata) {
-                    metadata.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
-                }];
+                METADATA_PTR metadata = [self databaseMetadataFromDatabaseId:databaseUuid];
+                metadata.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
 #endif
                 
                 if ( parameters.interactiveVC ) {
@@ -1020,9 +1037,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
         }
         else {
-            [self updateDatabaseMetadata:databaseUuid touch:^(METADATA_PTR metadata) {
-                metadata.outstandingUpdateId = nil;
-            }];
+            database.outstandingUpdateId = nil;
             
             [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Outstanding Update successfully pushed to Source DB. [New Source DB Mod Date=%@]. Making Working Copy Match Source...", newRemoteModDate.friendlyDateTimeStringBothPrecise]];
 
@@ -1067,11 +1082,10 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:nil];
 
         
-        
-        [self updateDatabaseMetadata:databaseUuid touch:^(METADATA_PTR metadata) {
-            metadata.lastSyncRemoteModDate = dateModified;
-        }];
-        
+
+        METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
+        database.lastSyncRemoteModDate = dateModified;
+                
         completion(kSyncAndMergeSuccess, localWasChanged, nil);
     }
 }

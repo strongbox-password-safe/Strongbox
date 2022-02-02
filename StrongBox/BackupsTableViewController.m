@@ -8,7 +8,7 @@
 
 #import "BackupsTableViewController.h"
 #import "BackupsManager.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "BackupsBrowserTableViewController.h"
@@ -35,9 +35,7 @@
 
 - (IBAction)onSettingChanged:(id)sender {
     self.metadata.makeBackups = self.switchMakeBackups.on;
-        
-    [SafesList.sharedInstance update:self.metadata];
-    
+            
     [self bindUi];
 }
 
@@ -66,7 +64,6 @@
                     completion:^(BOOL success, NSInteger selectedValue) {
             if(success) {
                 self.metadata.maxBackupKeepCount = selectedValue;
-                [SafesList.sharedInstance update:self.metadata];
                 [self bindUi];
             }
         }];

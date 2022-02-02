@@ -120,6 +120,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL expired;
 @property (readonly) BOOL nearlyExpired;
 
++ (BOOL)nearlyExpired:(NSDate*)expires;
+
 
 
 @property (readonly) NSArray<NSString*> *alternativeUrls;

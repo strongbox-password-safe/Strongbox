@@ -8,9 +8,8 @@
 
 #import "AppLockViewController.h"
 #import "PinEntryController.h"
-//#import "Settings.h"
 #import "Alerts.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "AutoFillManager.h"
 #import "FileManager.h"
 #import <LocalAuthentication/LocalAuthentication.h>
@@ -151,24 +150,19 @@
     }
     
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-        if(response == kOk) {
+        if( response == kPinEntryResponseOk ) {
             if([pin isEqualToString:AppPreferences.sharedInstance.appLockPin]) {
                 AppPreferences.sharedInstance.failedUnlockAttempts = 0;
-                [self onDone:afterSuccessfulBiometricAuthentication];
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
+                [self onDone:afterSuccessfulBiometricAuthentication];
             }
             else {
                 [self incrementFailedUnlockCount];
 
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeError];
-
-                [self dismissViewControllerAnimated:YES completion:nil];
             }
-        }
-        else {
-            [self dismissViewControllerAnimated:YES completion:nil];
         }
     };
 
@@ -194,7 +188,7 @@
     
     [FileManager.sharedInstance deleteAllLocalAndAppGroupFiles]; 
 
-    [SafesList.sharedInstance deleteAll]; 
+    [DatabasePreferences deleteAll]; 
 }
 
 - (void)onDone:(BOOL)userJustCompletedBiometricAuthentication {

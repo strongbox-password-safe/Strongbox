@@ -15,11 +15,10 @@
 // limitations under the License.
 //
 
-import Foundation;
+import Foundation
 
 
 enum URLResult {
-
     
     
     
@@ -38,7 +37,6 @@ enum URLResult {
     
     
     case failed(error: Error)
-
 }
 
 
@@ -69,8 +67,8 @@ class URLRequestOperation: Operation {
 
     @objc init(url: URL, session: URLSession) {
         self.session = session
-        self.urlRequest = URLRequest(url: url, timeoutInterval: 8.0) 
-        self.semaphore = nil
+        urlRequest = URLRequest(url: url, timeoutInterval: 8.0) 
+        semaphore = nil
     }
 
     override func main() {
@@ -88,35 +86,34 @@ class URLRequestOperation: Operation {
         }
     }
 
-    @objc func prepareRequest() {
-    }
+    @objc func prepareRequest() {}
 
-    func processResult(_ data: Data?, response: HTTPURLResponse, completion: @escaping (URLResult) -> Void) {
+    func processResult(_: Data?, response _: HTTPURLResponse, completion _: @escaping (URLResult) -> Void) {
         fatalError("must override processResult()")
     }
 
     fileprivate func dataTaskCompletion(_ data: Data?, response: URLResponse?, error: Error?) {
         guard error == nil else {
             result = .failed(error: error!)
-            self.notifyFinished()
+            notifyFinished()
             return
         }
 
         guard let response = response as? HTTPURLResponse else {
             result = .failed(error: URLRequestError.missingResponse)
-            self.notifyFinished()
+            notifyFinished()
             return
         }
 
         if response.statusCode == 404 {
             result = .failed(error: URLRequestError.fileNotFound)
-            self.notifyFinished()
+            notifyFinished()
             return
         }
 
         if response.statusCode < 200 || response.statusCode > 299 {
             result = .failed(error: URLRequestError.httpError(response: response))
-            self.notifyFinished()
+            notifyFinished()
             return
         }
 
@@ -129,7 +126,7 @@ class URLRequestOperation: Operation {
     }
 
     fileprivate func notifyFinished() {
-        if let semaphore = self.semaphore {
+        if let semaphore = semaphore {
             semaphore.signal()
         }
     }
@@ -140,7 +137,8 @@ typealias URLRequestWithCallback = (request: URLRequestOperation, completion: (U
 func executeURLOperations(_ operations: [URLRequestOperation],
                           concurrency: Int = 2,
                           on queue: OperationQueue? = nil,
-                          completion: @escaping ([URLResult]) -> Void) {
+                          completion: @escaping ([URLResult]) -> Void)
+{
     guard operations.count > 0 else {
         completion([])
         return
@@ -165,7 +163,8 @@ func executeURLOperations(_ operations: [URLRequestOperation],
 func executeURLOperations(_ operations: [URLRequestWithCallback],
                           concurrency: Int = 2,
                           on queue: OperationQueue? = nil,
-                          completion: @escaping () -> Void) {
+                          completion: @escaping () -> Void)
+{
     guard operations.count > 0 else { return }
 
     let queue = queue ?? OperationQueue()
@@ -191,6 +190,7 @@ func executeURLOperations(_ operations: [URLRequestWithCallback],
 }
 
 func urlRequestOperation(_ operation: URLRequestOperation,
-                         completion: @escaping (URLResult) -> Void) -> URLRequestWithCallback {
+                         completion: @escaping (URLResult) -> Void) -> URLRequestWithCallback
+{
     return (request: operation, completion: completion)
 }

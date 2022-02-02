@@ -10,7 +10,7 @@
 #import "GenericOnboardingViewController.h"
 #import "iCloudSafesCoordinator.h"
 #import "AppPreferences.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "SVProgressHUD.h"
 
 typedef NS_ENUM (NSUInteger, iCloudOnboardingMode) {
@@ -192,21 +192,21 @@ typedef NS_ENUM (NSUInteger, iCloudOnboardingMode) {
     return vc;
 }
 
-- (NSArray<SafeMetaData*>*)getICloudSafes {
-    return [SafesList.sharedInstance getSafesOfProvider:kiCloud];
+- (NSArray<DatabasePreferences*>*)getICloudSafes {
+    return [DatabasePreferences forAllDatabasesOfProvider:kiCloud];
 }
 
 - (void)removeAllICloudSafes {
-    NSArray<SafeMetaData*> *icloudSafesToRemove = [self getICloudSafes];
+    NSArray<DatabasePreferences*> *icloudSafesToRemove = [self getICloudSafes];
     
-    for (SafeMetaData *item in icloudSafesToRemove) {
+    for (DatabasePreferences *item in icloudSafesToRemove) {
         NSLog(@"Removing...");
-        [SafesList.sharedInstance remove:item.uuid];
+        [item removeFromDatabasesList];
     }
 }
 
-- (NSArray<SafeMetaData*>*)getLocalDeviceSafes {
-    return [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+- (NSArray<DatabasePreferences*>*)getLocalDeviceSafes {
+    return [DatabasePreferences forAllDatabasesOfProvider:kLocalDevice];
 }
 
 - (void)showiCloudMigrationUi:(BOOL)show {

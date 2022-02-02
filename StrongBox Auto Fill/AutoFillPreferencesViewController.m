@@ -12,7 +12,7 @@
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
 #import "Utils.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @interface AutoFillPreferencesViewController ()
 
@@ -229,8 +229,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 }
 
 - (IBAction)onCopyTotp:(id)sender {
-    self.viewModel.metadata.autoFillCopyTotp = self.switchCopyTOTP.on;
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
+    BOOL on = self.switchCopyTOTP.on;
+    
+    self.viewModel.metadata.autoFillCopyTotp = on;
 
     [self bind];
 }
@@ -238,15 +239,13 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 - (IBAction)onSwitchQuickTypeAutoFill:(id)sender {
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-
+    
     self.viewModel.metadata.quickTypeEnabled = self.switchQuickTypeAutoFill.on;
     self.viewModel.metadata.autoFillScanAltUrls = self.switchScanAlternativeURLs.on;
     self.viewModel.metadata.autoFillScanNotes = self.switchScanNotes.on;
     self.viewModel.metadata.autoFillScanCustomFields = self.switchScanCustomFields.on;
     self.viewModel.metadata.autoFillConcealedFieldsAsCreds = self.switchSuggestConcealed.on;
     self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds = self.suggestUnconcealed.on;
-    
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
 
     if ( self.switchQuickTypeAutoFill.on ) {
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
@@ -318,8 +317,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                completion:^(BOOL success, NSInteger selectedIndex) {
         if (success) {
             NSNumber *numFormat = options[selectedIndex];
+            
             self.viewModel.metadata.autoFillConvenienceAutoUnlockTimeout = numFormat.integerValue;
-            [SafesList.sharedInstance update:self.viewModel.metadata];
             
             if (self.viewModel.metadata.autoFillConvenienceAutoUnlockTimeout == 0) {
                 self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
@@ -348,7 +347,6 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         if (success) {
             NSNumber *numFormat = options[selectedIndex];
             self.viewModel.metadata.quickTypeDisplayFormat = numFormat.integerValue;
-            [SafesList.sharedInstance update:self.viewModel.metadata];
             
             
 

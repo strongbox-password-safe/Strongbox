@@ -114,6 +114,15 @@
     return [df stringFromDate:self];
 }
 
+- (NSString *)friendlyDateStringVeryShortDateOnly {
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.timeStyle = NSDateFormatterNoStyle;
+    df.dateStyle = NSDateFormatterShortStyle;
+    df.locale = NSLocale.currentLocale;
+    
+    return [df stringFromDate:self];
+}
+
 - (NSString *)friendlyDateTimeStringPrecise {
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     
@@ -189,6 +198,14 @@
     [dateFormatter setTimeZone:sourceTimeZone];
     
     return [dateFormatter dateFromString:string];
+}
+
+- (BOOL)isInPast {
+    return [self isEarlierThan:NSDate.date];
+}
+
+- (BOOL)isInFuture {
+    return [self isLaterThan:NSDate.date];
 }
 
 @end

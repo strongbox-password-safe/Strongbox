@@ -77,7 +77,7 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
 }
 
 - (instancetype)initAsRoot:(NSUUID*)uuid childRecordsAllowed:(BOOL)childRecordsAllowed {
-    return [self initWithParent:nil title:@"<ROOT>" isGroup:YES uuid:uuid fields:nil childRecordsAllowed:childRecordsAllowed];
+    return [self initWithParent:nil title:NSLocalizedString(@"generic_database", @"Database") isGroup:YES uuid:uuid fields:nil childRecordsAllowed:childRecordsAllowed];
 }
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
@@ -471,13 +471,15 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (BOOL)validateAddChild:(Node *)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
-    if(!node) {
+    if ( !node ) {
+        NSLog(@"🔴 Cannot Add: Node is nil.");
         return NO;
     }
-    
+        
     
     
     if ( !self.isGroup ) {
+        
         return NO;
     }
     
@@ -492,7 +494,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if ( !keePassGroupTitleRules) {
         for (Node* child in self.children) {
             if (child.isGroup && [child.title compare:node.title] == NSOrderedSame) {
-                NSLog(@"Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
+                NSLog(@"🔴 Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
                 return NO;
             }
         }
@@ -510,6 +512,11 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
         return NO;
     }
 
+    if ( node.parent != self ) {
+        NSLog(@"⚠️ Node parent field is not correctly set to this node. Patching parent, please fix whatever broken code led here...");
+        [node internalPatchParent:self];
+    }
+    
     if (atPosition == -1) { 
         atPosition = _mutableChildren.count;
     }
@@ -549,6 +556,10 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
 - (void)clearParent {
     _parent = nil;
+}
+
+- (void)internalPatchParent:(Node*)parent {
+    _parent = parent;
 }
 
 - (void)sortChildren:(BOOL)ascending {
@@ -840,6 +851,62 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     return NO;
 }
+
+
+
+- (NSUInteger)estimatedSize {
+    return [self getEstimatedSize:NO];
+}
+
+- (NSUInteger)getEstimatedSize:(BOOL)historyItem {
+    
+    NSUInteger fixedStructuralSizeGuess = 256;
+    
+    NSUInteger basicFields = self.title.length +
+    self.fields.username.length +
+    self.fields.password.length +
+    self.fields.url.length +
+    self.fields.notes.length;
+    
+    NSUInteger customFields = 0;
+    for (NSString* key in self.fields.customFields.allKeys) {
+        customFields += key.length + self.fields.customFields[key].value.length;
+    }
+            
+    NSUInteger iconSize = 0;
+    NSUInteger binariesSize = 0;
+    NSUInteger historySize = 0;
+
+    if ( !historyItem ) {
+        
+        
+        iconSize = self.icon ? self.icon.estimatedStorageBytes : 0UL;
+            
+        
+        
+        for (NSString* filename in self.fields.attachments.allKeys) {
+            DatabaseAttachment* dbA = self.fields.attachments[filename];
+            binariesSize += dbA == nil ? 0 : dbA.estimatedStorageBytes;
+        }
+        
+        
+        
+        
+        for (Node* historyNode in self.fields.keePassHistory) {
+            historySize += [historyNode getEstimatedSize:YES];
+        }
+    }
+
+    NSUInteger textSize = basicFields + customFields; 
+
+    NSUInteger ret = fixedStructuralSizeGuess + textSize + historySize + iconSize + binariesSize;
+
+    
+
+    return ret;
+}
+
+
 
 - (NSString *)description {
     if(self.isGroup) {

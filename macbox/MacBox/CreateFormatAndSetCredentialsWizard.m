@@ -16,6 +16,7 @@
 #import "PasswordStrengthTester.h"
 #import <CoreImage/CoreImage.h>
 #import "MacCompositeKeyDeterminer.h"
+#import "PasswordStrengthUIHelper.h"
 
 @interface CreateFormatAndSetCredentialsWizard () <NSTabViewDelegate>
 
@@ -546,28 +547,10 @@
     self.stackStrength.hidden = NO;
     
     NSString* pw = self.textFieldNew.stringValue;
-    PasswordStrength* strength = [PasswordStrengthTester getStrength:pw config:PasswordStrengthConfig.defaults];
     
-    self.labelStrength.stringValue = strength.summaryString;
-    
-    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-        
-    self.progressStrength.doubleValue = relativeStrength * 100.0f;
-    
-    CIFilter *colorPoly = [CIFilter filterWithName:@"CIColorPolynomial"];
-    [colorPoly setDefaults];
-    
-    double red = 1.0 - relativeStrength;
-    double green = relativeStrength;
-
-    CIVector *redVector = [CIVector vectorWithX:red Y:0 Z:0 W:0];
-    CIVector *greenVector = [CIVector vectorWithX:green Y:0 Z:0 W:0];
-    CIVector *blueVector = [CIVector vectorWithX:0 Y:0 Z:0 W:0];
-    
-    [colorPoly setValue:redVector forKey:@"inputRedCoefficients"];
-    [colorPoly setValue:greenVector forKey:@"inputGreenCoefficients"];
-    [colorPoly setValue:blueVector forKey:@"inputBlueCoefficients"];
-    [self.progressStrength setContentFilters:@[colorPoly]];
+    [PasswordStrengthUIHelper bindPasswordStrength:pw
+                                     labelStrength:self.labelStrength
+                                          progress:self.progressStrength];
 }
 
 @end

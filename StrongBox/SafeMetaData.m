@@ -10,6 +10,7 @@
 #import "SecretStore.h"
 #import "FileManager.h"
 #import "ItemDetailsViewController.h"
+#import "NSDate+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 #import "SafeStorageProviderFactory.h"
@@ -26,6 +27,8 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 @property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
 @property BOOL isEnrolledForConvenience; 
 @property BOOL isAutoFillMemOnlyConveniencePasswordHasBeenStored; 
+@property (nullable) NSDate* convenienceExpiresAt;
+@property (readonly) BOOL isNowAfterConvenienceExpiresAt;
 
 @end
 
@@ -298,7 +301,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     
     
     if ( jsonDictionary[@"showConvenienceExpiryMessage"] != nil ) {
-        ret.showConvenienceExpiryMessage = ((NSNumber*)jsonDictionary[@"showConvenienceExpiryMessage"]).boolValue;
+        ret.showConvenienceExpiryMessage = YES; 
     }
     else { 
         ret.showConvenienceExpiryMessage = YES;
@@ -642,6 +645,19 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( expired ) { 
         self.conveniencePasswordHasExpired = YES;
     }
+    else {
+        if ( self.isNowAfterConvenienceExpiresAt ) {
+            self.conveniencePasswordHasExpired = YES;
+        }
+    }
+}
+
+- (BOOL)isNowAfterConvenienceExpiresAt {
+    if ( self.convenienceExpiresAt == nil ) {
+        return NO;
+    }
+    
+    return self.convenienceExpiresAt.isInPast;
 }
 
 - (NSString *)convenienceMasterPassword {
@@ -652,7 +668,13 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( expired ) { 
         self.conveniencePasswordHasExpired = YES;
     }
-    
+    else {
+        if ( self.isNowAfterConvenienceExpiresAt ) {
+            self.conveniencePasswordHasExpired = YES;
+            object = nil;
+        }
+    }
+
     return object; 
 }
 
@@ -665,15 +687,17 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     }
 
     if(expiringAfterHours == -1) {
+        self.convenienceExpiresAt = nil;
         [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:key];
     }
     else if(expiringAfterHours == 0) {
+        self.convenienceExpiresAt = nil;
         [SecretStore.sharedInstance setSecureEphemeralObject:convenienceMasterPassword forIdentifer:key];
     }
     else {
-        NSCalendar *cal = [NSCalendar currentCalendar];
-        NSDate *date = [cal dateByAddingUnit:NSCalendarUnitHour value:expiringAfterHours toDate:[NSDate date] options:0];
-        [SecretStore.sharedInstance setSecureObject:convenienceMasterPassword forIdentifier:key expiresAt:date];
+        NSDate *date = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitHour value:expiringAfterHours toDate:[NSDate date] options:0];
+        self.convenienceExpiresAt = date;
+        [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:key];
     }
 }
 
@@ -828,6 +852,20 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 #endif
 
     [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:conveniencePasswordHasExpired forKey:key];
+}
+
+- (NSDate *)convenienceExpiresAt {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-expires-at", self.uuid];
+    
+    NSDate* ret = [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:key];
+    
+    return ret;
+}
+
+- (void)setConvenienceExpiresAt:(NSDate *)convenienceExpiresAt {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-expires-at", self.uuid];
+
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setObject:convenienceExpiresAt forKey:key];
 }
 
 @end

@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "NodeIcon.h"
+#import "KeePassIconSet.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL hideSelectFile;
 @property BOOL hideFavIconButton;
+@property KeePassIconSet iconSet;
 
 @property NSArray<NodeIcon*>* customIcons;
 

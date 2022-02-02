@@ -118,6 +118,7 @@ NS_ASSUME_NONNULL_BEGIN
                           joinedBy:(NSString*)joinedBy;
 
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
+- (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm prependSlash:(BOOL)prependSlash;
 
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
 - (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
@@ -149,9 +150,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull urlSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull passwordSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull customFieldKeySet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull tagSet;
+
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
+@property (nonatomic, readonly) NSArray<NSString*>* mostPopularUsernames;
+
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularEmail;
+@property (nonatomic, readonly) NSArray<NSString*>* mostPopularEmails;
+@property (nonatomic, readonly) NSArray<NSString*>* mostPopularTags;
+
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;

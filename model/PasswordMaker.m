@@ -297,6 +297,15 @@ const static NSArray<NSString*> *kEmailDomains;
     return pw ? pw : [self generateWithDefaultConfig];
 }
 
+- (NSString*)generateAlternateForConfig:(PasswordGenerationConfig *)config {
+    if(config.algorithm == kPasswordGenerationAlgorithmDiceware) {
+        return [self generateBasicForConfig:config];
+    }
+    else {
+        return [self generateDicewareForConfig:config];
+    }
+}
+
 - (NSString*)generateWithDefaultConfig {
     PasswordGenerationConfig* defaults = [PasswordGenerationConfig defaults];
     return [self generateForConfig:defaults];

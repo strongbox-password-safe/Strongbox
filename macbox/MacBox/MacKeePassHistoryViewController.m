@@ -23,6 +23,12 @@
 
 @implementation MacKeePassHistoryViewController
 
++ (instancetype)instantiateFromStoryboard {
+    NSStoryboard* sb = [NSStoryboard storyboardWithName:@"MacKeePassHistory" bundle:nil];
+    
+    return [sb instantiateInitialController];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     

@@ -1,5 +1,5 @@
 //
-//  SafesList.h
+//  DatabasePreferences.h
 //  Strongbox
 //
 //  Created by Mark on 30/03/2018.
@@ -8,14 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "SafeMetaData.h"
-#import "DatabasePreferencesManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* _Nonnull const kDatabasesListChangedNotification;
 extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
-@interface SafesList : NSObject<DatabasePreferencesManager>
+@interface SafesList : NSObject
 
 + (instancetype _Nullable)sharedInstance;
 @property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *snapshot;
@@ -32,10 +31,14 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 - (BOOL)isValid:(NSString *)nickName;
 
 - (void)atomicUpdate:(NSString *_Nonnull)uuid touch:(void (^_Nonnull)(SafeMetaData* metadata))touch;
-- (void)update:(SafeMetaData *_Nonnull)safe;
+
 - (void)remove:(NSString*_Nonnull)uuid;
 
-- (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe initialCache:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
+- (NSString*_Nullable)addWithDuplicateCheck:(SafeMetaData *)safe
+                      initialCache:(NSData *)initialCache
+               initialCacheModDate:(NSDate *)initialCacheModDate;
+
+
 
 
 
@@ -66,6 +69,9 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 
 - (void)reloadIfChangedByOtherComponent;
+
+- (void)notifyDatabasesListChanged;
+- (void)notifyDatabaseChanged:(NSString*)databaseIdChanged;
 
 #ifndef IS_APP_EXTENSION
 

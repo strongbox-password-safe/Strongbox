@@ -7,13 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface WelcomeCreateDatabaseViewController : UIViewController
 
-@property (nonatomic, copy) void (^onDone)(BOOL addExisting, SafeMetaData* _Nullable databaseToOpen);
+@property (nonatomic, copy) void (^onDone)(BOOL addExisting, DatabasePreferences* _Nullable databaseToOpen);
 
 @end
 

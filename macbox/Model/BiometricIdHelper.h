@@ -7,15 +7,15 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
+#import "MacDatabasePreferences.h"
 
 @interface BiometricIdHelper : NSObject
 
 + (instancetype)sharedInstance;
 
 
-- (void)authorize:(DatabaseMetadata*)database completion:(void (^)(BOOL success, NSError *error))completion;
-- (void)authorize:(NSString *)fallbackTitle database:(DatabaseMetadata*)database completion:(void (^)(BOOL, NSError *))completion;
+- (void)authorize:(MacDatabasePreferences*)database completion:(void (^)(BOOL success, NSError *error))completion;
+- (void)authorize:(NSString *)fallbackTitle database:(MacDatabasePreferences*)database completion:(void (^)(BOOL, NSError *))completion;
 
 @property (readonly) BOOL isTouchIdUnlockAvailable;
 @property (readonly) BOOL isWatchUnlockAvailable;

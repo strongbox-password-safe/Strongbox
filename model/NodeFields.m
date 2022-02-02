@@ -124,6 +124,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         self.tags = [NSMutableSet set];
         self.customData = @{}.mutableCopy;
         self.qualityCheck = YES;
+        self.isExpanded = YES; 
     }
     
     return self;
@@ -1081,18 +1082,26 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
 
 - (BOOL)expired {
-    return self.expires != nil && [NSDate.date compare:self.expires] == NSOrderedDescending;
+    return self.expires != nil && self.expires.isInPast;
 }
 
 - (BOOL)nearlyExpired {
     if(self.expires == nil || self.expired) {
         return NO;
     }
+ 
+    return [NodeFields nearlyExpired:self.expires];
+}
+
++ (BOOL)nearlyExpired:(NSDate*)expires {
+    if ( expires.isInPast ) {
+        return NO;
+    }
     
     NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
     NSDateComponents *components = [gregorian components:NSCalendarUnitDay
                                                 fromDate:[NSDate date]
-                                                  toDate:self.expires
+                                                  toDate:expires
                                                  options:0];
     
     NSInteger days = [components day];

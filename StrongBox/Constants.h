@@ -25,6 +25,10 @@ extern NSString* const kDefaultKeePassEmailFieldKey;
 @property (readonly, class) NSString* scotusEditionBundleId;
 @property (readonly, class) NSString* grapheneEditionBundleId;
 
+extern NSString* const kStrongboxPasteboardName;
+extern NSString* const kDragAndDropInternalUti;
+extern NSString* const kDragAndDropExternalUti;
+
 @end
 
 NS_ASSUME_NONNULL_END

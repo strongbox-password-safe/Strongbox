@@ -33,7 +33,7 @@
     self.buttonSelectFile.hidden = self.hideSelectFile;
     self.buttonFindFavIcons.hidden = self.hideFavIconButton;
     
-    self.predefinedIcons = [NodeIconHelper getIconSet:kKeePassIconSetClassic];
+    self.predefinedIcons = [NodeIconHelper getIconSet:self.iconSet];
 }
 
 - (BOOL)hasCustomIcons {

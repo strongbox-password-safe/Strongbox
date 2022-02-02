@@ -7,7 +7,6 @@
 //
 
 #import "OnboardingConvenienceViewController.h"
-#import "DatabasesManager.h"
 #import "BiometricIdHelper.h"
 #import "Settings.h"
 
@@ -40,8 +39,8 @@
     [self bindUI];
 }
 
-- (DatabaseMetadata*)database {
-    return [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+- (MacDatabasePreferences*)database {
+    return [MacDatabasePreferences fromUuid:self.databaseUuid];
 }
 
 - (void)bindUI {
@@ -57,36 +56,29 @@
 - (IBAction)onPreferencesChanged:(id)sender {
     BOOL enable = self.enableTouchId.state == NSControlStateValueOn;
     
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.isTouchIdEnabled = enable;
-        metadata.isWatchUnlockEnabled = enable;
+    self.database.isTouchIdEnabled = enable;
+    self.database.isWatchUnlockEnabled = enable;
 
-        if ( enable ) {
-            metadata.conveniencePasswordHasBeenStored = YES;
-            metadata.conveniencePassword = self.ckfs.password;
-        }
-        else {
-            metadata.conveniencePasswordHasBeenStored = NO;
-            metadata.conveniencePassword = nil;
-        }
-    }];
+    if ( enable ) {
+        self.database.conveniencePasswordHasBeenStored = YES;
+        self.database.conveniencePassword = self.ckfs.password;
+    }
+    else {
+        self.database.conveniencePasswordHasBeenStored = NO;
+        self.database.conveniencePassword = nil;
+    }
     
     [self bindUI];
 }
 
 - (IBAction)onDone:(id)sender {
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.hasPromptedForTouchIdEnrol = YES;
-    }];
+    self.database.hasPromptedForTouchIdEnrol = YES;
 
     [self.view.window close];
 }
 
 - (IBAction)onNext:(id)sender {
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.hasPromptedForTouchIdEnrol = YES;
-    }];
+    self.database.hasPromptedForTouchIdEnrol = YES;
 
     self.onNext();
 }

@@ -9,7 +9,6 @@
 #import "MacSyncManager.h"
 #import "WorkingCopyManager.h"
 #import "Utils.h"
-#import "DatabasesManager.h"
 #import "Settings.h"
 #import "MacUrlSchemes.h"
 #import "BackupsManager.h"
@@ -29,7 +28,7 @@
 - (void)backgroundSyncOutstandingUpdates {
     NSLog(@"backgroundSyncOutstandingUpdates START");
     
-    for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
+    for (MacDatabasePreferences* database in MacDatabasePreferences.allDatabases) {
         if ( database.outstandingUpdateId && !database.offlineMode ) {
             [self backgroundSyncDatabase:database];
         }
@@ -39,16 +38,16 @@
 - (void)backgroundSyncAll {
     NSLog(@"backgroundSyncOutstandingUpdates START");
     
-    for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
+    for (MacDatabasePreferences* database in MacDatabasePreferences.allDatabases) {
         [self backgroundSyncDatabase:database];
     }
 }
 
-- (void)backgroundSyncDatabase:(DatabaseMetadata*)database {
+- (void)backgroundSyncDatabase:(MacDatabasePreferences*)database {
     [self backgroundSyncDatabase:database completion:nil];
 }
 
-- (void)backgroundSyncDatabase:(DatabaseMetadata*)database
+- (void)backgroundSyncDatabase:(MacDatabasePreferences*)database
                     completion:(SyncAndMergeCompletionBlock _Nullable)completion {
     NSLog(@"backgroundSyncDatabase enter [%@]", database);
         
@@ -79,7 +78,7 @@
     }];
 }
 
-- (void)sync:(DatabaseMetadata *)database interactiveVC:(NSViewController *)interactiveVC key:(CompositeKeyFactors *)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
+- (void)sync:(MacDatabasePreferences *)database interactiveVC:(NSViewController *)interactiveVC key:(CompositeKeyFactors *)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
     NSLog(@"Sync ENTER - [%@]", database.nickName);
     
 
@@ -103,7 +102,7 @@
     [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"INTERACTIVE SYNC DONE: [%@] [%@] - Local Changed: [%@] - [%@]", database.nickName, syncResultToString(result), localizedYesOrNoFromBool(localWasChanged), error);
+        NSLog(@"SYNC DONE: [%@] [%@] - Local Changed: [%@] - [%@]", database.nickName, syncResultToString(result), localizedYesOrNoFromBool(localWasChanged), error);
         completion(result, localWasChanged, error);
     }];
 }
@@ -112,7 +111,7 @@
     return [self updateLocalCopyMarkAsRequiringSync:database data:nil file:file error:error];
 }
 
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabaseMetadata *)database data:(NSData *)data error:(NSError**)error {
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(MacDatabasePreferences *)database data:(NSData *)data error:(NSError**)error {
     return [self updateLocalCopyMarkAsRequiringSync:database data:data file:nil error:error];
 }
 
@@ -141,11 +140,7 @@
         }
     }
     
-    [DatabasesManager.sharedInstance atomicUpdate:database.uuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        NSUUID* updateId = NSUUID.UUID;
-        metadata.outstandingUpdateId = updateId;
-    }];
+    database.outstandingUpdateId = NSUUID.UUID;
     
     NSURL* url;
     if ( file ) {
@@ -164,11 +159,11 @@
     return url != nil;
 }
 
-- (SyncStatus*)getSyncStatus:(DatabaseMetadata *)database {
+- (SyncStatus*)getSyncStatus:(MacDatabasePreferences *)database {
     return [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:database.uuid];
 }
 
-- (void)pollForChanges:(DatabaseMetadata *)database completion:(SyncAndMergeCompletionBlock)completion {
+- (void)pollForChanges:(MacDatabasePreferences *)database completion:(SyncAndMergeCompletionBlock)completion {
 
     
     SyncParameters* params = [[SyncParameters alloc] init];
@@ -185,7 +180,7 @@
 }
 
 - (BOOL)syncInProgress {
-    for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
+    for (MacDatabasePreferences* database in MacDatabasePreferences.allDatabases) {
         SyncStatus *status = [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:database.uuid];
         
         if ( status.state == kSyncOperationStateInProgress ) {

@@ -7,7 +7,7 @@
 //
 
 #import "WelcomeCreateDatabaseViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "Utils.h"
 #import "MasterPasswordExplanationViewController.h"
 
@@ -63,7 +63,7 @@
 
     self.nextButton.layer.cornerRadius = 5.0f;
 
-    self.textFieldName.text = [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
+    self.textFieldName.text = DatabasePreferences.suggestedDatabaseNameUsingDeviceName;
     
     [self.textFieldName addTarget:self
                            action:@selector(validateUi)
@@ -98,15 +98,15 @@
 }
 
 - (BOOL)nameIsValid {
-    NSString* sanitized = [SafesList trimDatabaseNickName:self.textFieldName.text];
-    return [SafesList.sharedInstance isValid:sanitized] && [SafesList.sharedInstance isUnique:sanitized];
+    NSString* sanitized = [DatabasePreferences trimDatabaseNickName:self.textFieldName.text];
+    return [DatabasePreferences isValid:sanitized] && [DatabasePreferences isUnique:sanitized];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToMasterPassword"]) {
         MasterPasswordExplanationViewController* vc = (MasterPasswordExplanationViewController*)segue.destinationViewController;
         
-        vc.name = [SafesList trimDatabaseNickName:self.textFieldName.text];
+        vc.name = [DatabasePreferences trimDatabaseNickName:self.textFieldName.text];
         vc.onDone = self.onDone;
     }
 }

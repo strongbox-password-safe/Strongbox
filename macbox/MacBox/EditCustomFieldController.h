@@ -13,9 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface EditCustomFieldController : NSViewController
 
++ (instancetype)fromStoryboard;
+
 @property CustomField* field;
 @property (nonatomic, copy) void (^onSetField)(NSString* key, NSString* value, BOOL protected);
 @property NSSet<NSString*> *existingKeySet;
+@property NSSet<NSString*> *customFieldKeySet;
 
 @end
 

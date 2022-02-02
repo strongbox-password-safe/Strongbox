@@ -8,7 +8,7 @@
 
 #import "AutomaticLockingPreferences.h"
 #import "Utils.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 
@@ -66,7 +66,6 @@
                 completion:^(BOOL success, NSInteger selectedValue) {
                     if (success) {
                         self.viewModel.metadata.autoLockTimeoutSeconds = @(selectedValue);
-                        [SafesList.sharedInstance update:self.viewModel.metadata];
                     }
                     [self bindUi];
                 }];
@@ -112,19 +111,16 @@
 
 - (IBAction)onSwitchDatabaseAutoLockEnabled:(id)sender {
     self.viewModel.metadata.autoLockTimeoutSeconds = self.switchDatabaseAutoLockEnabled.on ? @(60) : @(-1);
-    [SafesList.sharedInstance update:self.viewModel.metadata];
     [self bindUi];
 }
 
 - (IBAction)onSwitchLockOnDeviceLock:(id)sender {
     self.viewModel.metadata.autoLockOnDeviceLock = self.switchLockOnDeviceLock.on;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
     [self bindUi];
 }
 
 - (IBAction)onSwitchLockEvenIfEditing:(id)sender {
     self.viewModel.metadata.lockEvenIfEditing = self.switchLockDuringEditing.on;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
     [self bindUi];
 }
 

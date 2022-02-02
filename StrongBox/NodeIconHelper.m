@@ -11,6 +11,11 @@
 #import "Utils.h"
 #import "ConcurrentMutableDictionary.h"
 
+#if TARGET_OS_IPHONE
+#else
+#import "Settings.h"
+#endif
+
 static IMAGE_TYPE_PTR kPwSafeFolderImage;
 static IMAGE_TYPE_PTR kPwSafeRecordImage;
 
@@ -318,8 +323,14 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet() {
 #if TARGET_OS_IPHONE
         return isGroup ? kPwSafeFolderImage : kPwSafeRecordImage;
 #else
-        if(!large) {
-            return isGroup ? kSmallYellowFolderImage : kSmallLockImage;
+        if ( !large ) {
+            if ( Settings.sharedInstance.nextGenUI ) {
+                NSArray<IMAGE_TYPE_PTR>* iconSet = [NodeIconHelper getIconSet:kKeePassIconSetSfSymbols];
+                return isGroup ? iconSet[48] : iconSet[0];
+            }
+            else {
+                return isGroup ? kSmallYellowFolderImage : kSmallLockImage;
+            }
         }
         else {
             return isGroup ? kFolderImage : kSmallLockImage;

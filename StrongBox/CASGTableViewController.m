@@ -10,7 +10,7 @@
 #import "SelectDatabaseFormatTableViewController.h"
 #import "KeyFilesTableViewController.h"
 #import "IOsUtils.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "Utils.h"
 #import "Alerts.h"
 #import "YubiKeyConfigurationController.h"
@@ -84,7 +84,7 @@
     
     self.switchReadOnly.on = self.initialReadOnly;
     
-    self.textFieldName.text = self.selectedName.length ? self.selectedName : [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
+    self.textFieldName.text = self.selectedName.length ? self.selectedName : DatabasePreferences.suggestedDatabaseNameUsingDeviceName;
   
     self.textFieldPassword.font = FontManager.sharedInstance.easyReadFont;
     self.textFieldConfirmPassword.font = FontManager.sharedInstance.easyReadFont;
@@ -194,7 +194,7 @@
 }
 
 - (IBAction)onDone:(id)sender {
-    self.selectedName = [SafesList trimDatabaseNickName:self.textFieldName.text];
+    self.selectedName = [DatabasePreferences trimDatabaseNickName:self.textFieldName.text];
     self.selectedPassword = self.textFieldPassword.text;
     
     if(self.selectedPassword.length != 0 || self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
@@ -642,8 +642,8 @@
 }
 
 - (BOOL)nameIsValid {
-    NSString* sanitized = [SafesList trimDatabaseNickName:self.textFieldName.text];
-    return [SafesList.sharedInstance isValid:sanitized] && [SafesList.sharedInstance isUnique:sanitized];
+    NSString* sanitized = [DatabasePreferences trimDatabaseNickName:self.textFieldName.text];
+    return [DatabasePreferences isValid:sanitized] && [DatabasePreferences isUnique:sanitized];
 }
 
 - (BOOL)passwordIsValid {

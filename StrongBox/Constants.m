@@ -44,4 +44,8 @@ NSString* const kDefaultKeePassEmailFieldKey = @"Email";
     return kGrapheneEditionBundleId;
 }
 
+NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";
+NSString* const kDragAndDropInternalUti = @"com.markmcguill.strongbox.drag.and.drop.internal.uti";
+NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.drop.external.uti";
+
 @end

@@ -16,7 +16,6 @@
 #import "DatabasesManagerVC.h"
 #import "BiometricIdHelper.h"
 #import "ViewController.h"
-#import "DatabasesManager.h"
 #import "SafeStorageProviderFactory.h"
 #import "AboutViewController.h"
 #import "FileManager.h"
@@ -40,6 +39,7 @@
 #import "CreateFormatAndSetCredentialsWizard.h"
 #import "MacSyncManager.h"
 #import "macOSSpinnerUI.h"
+#import "Constants.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -63,10 +63,6 @@ static NSString * const kBundledFreemiumBundleId = @"com.markmcguill.strongbox";
 
 
 
-NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";
-NSString* const kDragAndDropInternalUti = @"com.markmcguill.strongbox.drag.and.drop.internal.uti";
-NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.drop.external.uti";
-
 const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 const NSInteger kTopLevelMenuItemTagFile = 1111;
 const NSInteger kTopLevelMenuItemTagView = 1113;
@@ -86,6 +82,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 @property NSInteger currentClipboardVersion;
 @property NSPopover* systemTrayPopover;
 @property NSDate* systemTrayPopoverClosedAt;
+@property NSTimer* timerRefreshOtp;
 
 @end
 
@@ -105,29 +102,31 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    [self performMigrations];
-    
 #ifdef DEBUG
     
     
     [NSUserDefaults.standardUserDefaults setValue:@(NO) forKey:@"NSConstraintBasedLayoutLogUnsatisfiable"];
     [NSUserDefaults.standardUserDefaults setValue:@(NO) forKey:@"__NSConstraintBasedLayoutLogUnsatisfiable"];
-
+#else
     [self cleanupWorkingDirectories];
 #endif
 
     [self applyCustomizations];
 
 
-    
-    
-    
-    
-        
+
+
+
+
+
     [self showHideSystemStatusBarIcon];
     
     [self installGlobalHotKeys];
             
+    [self clearAsyncUpdateIds]; 
+    
+    [self startRefreshOtpTimer];
+    
     
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -183,11 +182,16 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 
+- (BOOL)isWindowOfInterest:(NSNotification*)notification {
+    return ( [notification.object isMemberOfClass:MainWindow.class] ||
+            [notification.object isMemberOfClass:DatabasesManagerWindow.class] ||
+            [notification.object isMemberOfClass:NextGenWindow.class]);
+}
+
 - (void)onWindowWillClose:(NSNotification*)notification {
 
     
-    if ( ![notification.object isMemberOfClass:MainWindow.class] &&
-        ![notification.object isMemberOfClass:DatabasesManagerWindow.class] ) { 
+    if ( ![self isWindowOfInterest:notification] ) { 
 
         return;
     }
@@ -198,8 +202,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)onWindowDidMiniaturize:(NSNotification*)notification {
     NSLog(@"onWindowDidMiniaturizeOrClose");
 
-    if ( ![notification.object isMemberOfClass:MainWindow.class] &&
-        ![notification.object isMemberOfClass:DatabasesManagerWindow.class] ) { 
+    if ( ![self isWindowOfInterest:notification] ) { 
 
         return;
     }
@@ -279,65 +282,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     else {
         [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
 
-    }
-}
-
-
-
-- (void)performMigrations {
-    [self performConnectionMigrations]; 
-}
-
-- (void)performConnectionMigrations {
-    if ( !Settings.sharedInstance.migratedConnections ) {
-        int wcount = 0;
-        int scount = 0;
-        
-        NSArray* databases = DatabasesManager.sharedInstance.snapshot;
-        
-        for ( DatabaseMetadata *database in  databases ) {
-            if ( database.storageProvider == kWebDAV ) {
-                WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
-                if (  pd.sessionConfiguration ) {
-                    if ( pd.sessionConfiguration.name.length == 0 ) {
-                        pd.sessionConfiguration.name = [NSString stringWithFormat:@"%@ %@", pd.sessionConfiguration.host, @(++wcount)];
-                    }
-                    [WebDAVConnections.sharedInstance addOrUpdate:pd.sessionConfiguration];
-                    
-                    DatabaseMetadata* newDatabase = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
-                                        
-                    [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                        metadata.fileUrl = newDatabase.fileUrl;
-                        metadata.storageInfo = newDatabase.storageInfo;
-                    }];
-                    
-                    NSLog(@"Migrated WebDAV Connection");
-                }
-            }
-            else if ( database.storageProvider == kSFTP ) {                
-                SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
-                SFTPSessionConfiguration* connection = pd.sFtpConfiguration;
-                
-                if ( connection ) {
-                    if ( connection.name.length == 0 ) {
-                        connection.name = [NSString stringWithFormat:@"%@ %@", connection.host, @(++scount)];
-                    }
-
-                    [SFTPConnections.sharedInstance addOrUpdate:connection];
-                    
-                    DatabaseMetadata* newDatabase = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
-                    
-                    [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                        metadata.fileUrl = newDatabase.fileUrl;
-                        metadata.storageInfo = newDatabase.storageInfo;
-                    }];
-
-                    NSLog(@"Migrated SFTP Connection = [%@] - %@", pd.connectionIdentifier, connection.identifier);
-                }
-            }
-        }
-        
-        Settings.sharedInstance.migratedConnections = YES;
     }
 }
 
@@ -478,7 +422,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     DocumentController* dc = NSDocumentController.sharedDocumentController;
     
     if ( databaseUuid ) {
-        DatabaseMetadata* metadata = [DatabasesManager.sharedInstance getDatabaseById:databaseUuid];
+        MacDatabasePreferences* metadata = [MacDatabasePreferences fromUuid:databaseUuid];
         if ( metadata ) {
             [dc openDatabase:metadata completion:nil];
         }
@@ -962,45 +906,24 @@ static NSInteger clipboardChangeCount;
     NSInteger result = [panel runModal];
     if(result == NSModalResponseOK) {
         NSURL* url = panel.URLs.firstObject;
+        
         if ( url ) {
-            NSError* error = nil;
-            NSFileWrapper* wrapper = [[NSFileWrapper alloc] initWithURL:url options:kNilOptions error:&error];
+            NSError* error;
+            Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
             
-            NSData* data = nil;
-            if ( wrapper.isDirectory ) {
-                
-                NSString* firstFile = [wrapper.fileWrappers.allKeys firstOrDefault:^BOOL(NSString * _Nonnull obj) {
-                    return [obj.pathExtension isEqualToString:@"1pif"];
-                }];
-                
-                if ( firstFile ) {
-                    NSFileWrapper* firstWrapper = wrapper.fileWrappers[firstFile];
-                    if ( firstWrapper.isRegularFile ) {
-                        data = firstWrapper.regularFileContents;
-                    }
-                }
+            
+            if ( error ) {
+                [MacAlerts error:error window:NSApplication.sharedApplication.mainWindow];
             }
             else {
-                data = wrapper.regularFileContents;
+                [self addImportedDatabase:root];
             }
-            
-            if ( data ) {
-                NSString* string = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-                Node* root = [OnePasswordImporter convertToStrongboxNodesWithText:string error:&error];
-                if ( error ) {
-                    [MacAlerts error:error
-                              window:NSApplication.sharedApplication.mainWindow];
-                }
-                else {
-                    [self addImportedDatabase:root];
-                }
-            }
-            else {
-                [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
-                informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
-                         window:NSApplication.sharedApplication.mainWindow
-                     completion:nil];
-            }
+        }
+        else {
+            [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
+            informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
+                     window:NSApplication.sharedApplication.mainWindow
+                 completion:nil];
         }
     }
 }
@@ -1045,7 +968,6 @@ static NSInteger clipboardChangeCount;
                                                                metadata:[UnifiedDatabaseMetadata withDefaultsForFormat:format]
                                                                    root:root];
         
-        
         DocumentController* dc = DocumentController.sharedDocumentController;
         [dc serializeAndAddDatabase:database format:format];
     }
@@ -1054,8 +976,20 @@ static NSInteger clipboardChangeCount;
     }
 }
 
+- (BOOL)shouldWaitForUpdatesToFinish {
+    BOOL asyncUpdatesInProgress = [MacDatabasePreferences.allDatabases anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+        return obj.asyncUpdateId != nil;
+    }];
+
+    return asyncUpdatesInProgress || MacSyncManager.sharedInstance.syncInProgress;
+}
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-    if ( MacSyncManager.sharedInstance.syncInProgress ) {
+    [self stopRefreshOtpTimer];
+    
+    if ( [self shouldWaitForUpdatesToFinish] ) {
+        [DBManagerPanel.sharedInstance show];
+        
         [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"macos_quitting_finishing_sync", @"Quitting - Finishing Sync...") viewController:nil];
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -1070,16 +1004,16 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)waitForAllSyncToFinishThenTerminate {
-    if ( MacSyncManager.sharedInstance.syncInProgress ) {
+    if ( [self shouldWaitForUpdatesToFinish] ) {
 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1. * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self waitForAllSyncToFinishThenTerminate];
         });
     }
     else {
         [macOSSpinnerUI.sharedInstance dismiss];
 
-
+        NSLog(@"waitForAllSyncToFinishThenTerminate - All Syncs Done - Quitting app.");
         [NSApplication.sharedApplication replyToApplicationShouldTerminate:NSTerminateNow];
     }
 }
@@ -1103,6 +1037,40 @@ static NSInteger clipboardChangeCount;
 
 - (IBAction)onAppPreferences:(id)sender {
     [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabGeneral];
+}
+
+
+
+- (void)clearAsyncUpdateIds {
+    for (MacDatabasePreferences* preferences in MacDatabasePreferences.allDatabases) {
+        if ( preferences.asyncUpdateId != nil ) {
+            preferences.asyncUpdateId = nil;
+        }
+    }
+}
+
+
+
+- (void)startRefreshOtpTimer {
+    NSLog(@"startRefreshOtpTimer");
+    
+    if(self.timerRefreshOtp == nil) {
+        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(publishTotpUpdateNotification) userInfo:nil repeats:YES];
+        [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+    }
+}
+
+- (void)stopRefreshOtpTimer {
+    NSLog(@"stopRefreshOtpTimer");
+    
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+}
+
+- (void)publishTotpUpdateNotification {
+    [NSNotificationCenter.defaultCenter postNotificationName:kTotpUpdateNotification object:nil];
 }
 
 @end

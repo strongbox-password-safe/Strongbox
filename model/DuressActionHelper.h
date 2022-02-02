@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DuressActionHelper : NSObject
 
-+ (void)performDuressAction:(UIViewController*)viewController database:(SafeMetaData*)database isAutoFillOpen:(BOOL)isAutoFillOpen completion:(UnlockDatabaseCompletionBlock)completion;
++ (void)performDuressAction:(UIViewController*)viewController database:(DatabasePreferences*)database isAutoFillOpen:(BOOL)isAutoFillOpen completion:(UnlockDatabaseCompletionBlock)completion;
 
 @end
 

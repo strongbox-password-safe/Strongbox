@@ -23,7 +23,6 @@
 #import "BrowsePreferencesTableViewController.h"
 #import "SortOrderTableViewController.h"
 #import "BrowseItemTotpCell.h"
-#import "DatabaseSearchAndSorter.h"
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
 #import "DatabasePreferencesController.h"
@@ -46,7 +45,7 @@
 #import "SyncManager.h"
 #import "AsyncUpdateResultViewController.h"
 #import "Platform.h"
-#import "Pair.h"
+#import "MMcGPair.h"
 #import "ConvenienceUnlockPreferences.h"
 #import "KeyFileParser.h"
 #import "SecondDatabaseListTableViewController.h"
@@ -58,7 +57,7 @@
 #import "SVProgressHUD.h"
 #import "DuplicateOptionsViewController.h"
 #import "ContextMenuHelper.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "EncryptionSettingsViewModel.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
@@ -89,7 +88,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property (nonatomic) NSIndexPath *tappedIndexPath;
 @property (strong, nonatomic) NSTimer *tapTimer;
 @property (strong) SetNodeIconUiHelper* sni; 
-@property NSMutableArray<Pair<NSIndexPath*, NSIndexPath*>*> * reorderItemOperations;
+@property NSMutableArray<MMcGPair<NSIndexPath*, NSIndexPath*>*> * reorderItemOperations;
 @property BOOL sortOrderForAutomaticSortDuringEditing;
 @property BOOL hasAlreadyAppeared;
 
@@ -618,8 +617,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)setViewType:(BrowseViewType)viewType {
     self.viewModel.metadata.browseViewType = viewType;
     
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-    
     [self refresh];
     
     if (@available(iOS 14.0, *)) {
@@ -629,8 +626,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (void)toggleStartWithSearch {
     self.viewModel.metadata.immediateSearchOnBrowse = !self.viewModel.metadata.immediateSearchOnBrowse;
-    
-    [SafesList.sharedInstance update:self.viewModel.metadata];
     
     if (@available(iOS 14.0, *)) {
         [self refreshiOS14MoreMenu];
@@ -716,9 +711,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         
         NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", issueCount.unsignedLongValue, lastKnownAuditIssueCount);
         
-        self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount = issueCount;
-        [SafesList.sharedInstance update:self.viewModel.metadata];
-
+        DatabaseAuditorConfiguration* config = self.viewModel.metadata.auditConfig;
+        config.lastKnownAuditIssueCount = issueCount;
+        self.viewModel.metadata.auditConfig = config;
+        
         if ( self.viewModel.metadata.auditConfig.showAuditPopupNotifications) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self showAuditPopup:issueCount.unsignedLongValue lastKnownAuditIssueCount:lastKnownAuditIssueCount];
@@ -801,7 +797,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             self.reorderItemOperations = [NSMutableArray array];
         }
         
-        [self.reorderItemOperations addObject:[Pair pairOfA:sourceIndexPath andB:destinationIndexPath]];
+        [self.reorderItemOperations addObject:[MMcGPair pairOfA:sourceIndexPath andB:destinationIndexPath]];
         
         [self updateToolbarButtonsState]; 
     }
@@ -810,7 +806,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)reorderPendingItems {
     NSLog(@"Reordering...");
     
-    for (Pair<NSIndexPath*, NSIndexPath*> *moveOp in self.reorderItemOperations) {
+    for (MMcGPair<NSIndexPath*, NSIndexPath*> *moveOp in self.reorderItemOperations) {
         NSUInteger srcIndex;
         NSUInteger destIndex;
 
@@ -1640,7 +1636,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     
-    if ( [SafesList.sharedInstance isEditing:self.viewModel.metadata] ) {
+    if ( [DatabasePreferences isEditing:self.viewModel.metadata] ) {
         [Alerts yesNo:self
                 title:NSLocalizedString(@"item_details_vc_discard_changes", @"Discard Changes?")
               message:NSLocalizedString(@"item_details_vc_are_you_sure_discard_changes", @"Are you sure you want to discard all your changes?")
@@ -1950,7 +1946,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.customTitle = NSLocalizedString(@"export_items_select_destination_database_title", @"Destination Database");
         
         NSArray<Node*>* itemsToExport = sender;
-        vc.onSelectedDatabase = ^(SafeMetaData * _Nonnull secondDatabase, UIViewController *__weak  _Nonnull vcToDismiss) {
+        vc.onSelectedDatabase = ^(DatabasePreferences * _Nonnull secondDatabase, UIViewController *__weak  _Nonnull vcToDismiss) {
             [vcToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:^{
                 [weakSelf onExportItemsToDatabase:secondDatabase itemsToExport:itemsToExport];
             }];
@@ -3255,8 +3251,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
     self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
     
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-
     dispatch_async(dispatch_get_main_queue(), ^{
         [ISMessages showCardAlertWithTitle:self.viewModel.database.originalFormat == kPasswordSafe ?
          NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
@@ -3335,7 +3329,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
 }
 
-- (void)onUpdateDoneCommonCompletion:(BOOL)success localWasChanged:(BOOL)localWasChanged userCancelled:(BOOL)userCancelled userInteractionRequired:(BOOL)userInteractionRequired error:(NSError*)error {
+- (void)onUpdateDoneCommonCompletion:(BOOL)success
+                     localWasChanged:(BOOL)localWasChanged
+                       userCancelled:(BOOL)userCancelled
+             userInteractionRequired:(BOOL)userInteractionRequired
+                               error:(NSError*)error {
     if ( success ) {
         if ( localWasChanged ) {
             NSLog(@"BrowseSafeView::onAsyncUpdateDone - Database was changed by external actor reloading...");
@@ -3394,9 +3392,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 - (BOOL)isItemsCanBeExported {
-    return [SafesList.sharedInstance.snapshot anyMatch:^BOOL(SafeMetaData * _Nonnull obj) {
+    return [DatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
         return ![obj.uuid isEqualToString:self.viewModel.metadata.uuid] && !obj.readOnly;
-    }];
+    }].count > 0;
 }
 
 - (void)onExportItemSingleItem:(Node*)node {
@@ -3423,7 +3421,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
 }
 
-- (void)onExportItemsToDatabase:(SafeMetaData*)destinationDatabase
+- (void)onExportItemsToDatabase:(DatabasePreferences*)destinationDatabase
                   itemsToExport:(NSArray<Node*>*)itemsToExport {
     
 

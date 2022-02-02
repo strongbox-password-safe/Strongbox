@@ -6,12 +6,12 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "Pair.h"
+#import "MMcGPair.h"
 
-@implementation Pair
+@implementation MMcGPair
 
 + (instancetype)pairOfA:(id)a andB:(id)b {
-    return [[Pair alloc] initPairOfA:a andB:b];
+    return [[MMcGPair alloc] initPairOfA:a andB:b];
 }
 
 - (instancetype)initPairOfA:(id)a andB:(id)b {

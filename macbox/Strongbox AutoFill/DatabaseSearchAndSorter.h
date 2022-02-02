@@ -24,53 +24,53 @@ typedef BOOL (^FlaggedByAuditPredicate)(Node* node);
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithModel:(DatabaseModel*)databaseModel
-              browseSortField:(BrowseSortField)browseSortField
-                   descending:(BOOL)descending
-            foldersSeparately:(BOOL)foldersSeparately
-                  checkPinYin:(BOOL)checkPinYin;
-
-- (instancetype)initWithModel:(DatabaseModel*)databaseModel
-              browseSortField:(BrowseSortField)browseSortField
-                   descending:(BOOL)descending
-            foldersSeparately:(BOOL)foldersSeparately
-                  checkPinYin:(BOOL)checkPinYin
-             isFlaggedByAudit:(FlaggedByAuditPredicate _Nullable)isFlaggedByAudit;
 
 
-- (NSArray<Node*>*)search:(NSString *)searchText
-                    scope:(SearchScope)scope
-              dereference:(BOOL)dereference
-    includeKeePass1Backup:(BOOL)includeKeePass1Backup
-        includeRecycleBin:(BOOL)includeRecycleBin
-           includeExpired:(BOOL)includeExpired
-            includeGroups:(BOOL)includeGroups;
 
-- (NSArray<Node*>*)search:(NSString *)searchText
-                    scope:(SearchScope)scope
-              dereference:(BOOL)dereference
-    includeKeePass1Backup:(BOOL)includeKeePass1Backup
-        includeRecycleBin:(BOOL)includeRecycleBin
-           includeExpired:(BOOL)includeExpired
-            includeGroups:(BOOL)includeGroups
-                 trueRoot:(BOOL)trueRoot;
 
-- (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
-                    searchText:(NSString *)searchText
-                         scope:(SearchScope)scope
-                   dereference:(BOOL)dereference
-         includeKeePass1Backup:(BOOL)includeKeePass1Backup
-             includeRecycleBin:(BOOL)includeRecycleBin
-                includeExpired:(BOOL)includeExpired
-                 includeGroups:(BOOL)includeGroups;
 
-- (NSArray<Node*>*)filterAndSortForBrowse:(NSMutableArray<Node*>*)nodes
-                    includeKeePass1Backup:(BOOL)includeKeePass1Backup
-                        includeRecycleBin:(BOOL)includeRecycleBin
-                           includeExpired:(BOOL)includeExpired
-                            includeGroups:(BOOL)includeGroups;
 
-- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end
 

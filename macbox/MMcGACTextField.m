@@ -21,30 +21,24 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    
-    MMcGACTextFieldCell *cell =  [[MMcGACTextFieldCell alloc] initTextCell:self.stringValue];
-    cell.placeholderString = self.placeholderString;
 
+    
+    
+    NSMutableData *data = [[NSMutableData alloc] init];
+    NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initForWritingWithMutableData:data];
+    [self.cell encodeWithCoder:archiver];
+    [archiver finishEncoding];
+    
+    NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingWithData:data];
+    MMcGACTextFieldCell *cell =  [[MMcGACTextFieldCell alloc] initWithCoder:unarchiver];
+    [unarchiver finishDecoding];
+    
+    
+    
     self.cell = cell;
-    self.bordered = YES;
-    self.backgroundColor = NSColor.whiteColor;
-    self.bezeled = YES;
-    self.bezelStyle = NSTextFieldSquareBezel;
-    self.enabled = YES;
-    self.editable = YES;
-    self.selectable = YES;
+    self.needsDisplay = YES;
     
     self.delegate = self;
-}
-
-- (NSArray<NSString*>*)filterCompletions:(NSString*)prefix {
-    if(!self.completions) {
-        return @[];
-    }
-    
-    return [[self.completions filter:^BOOL(NSString * _Nonnull obj) {
-        return [obj localizedCaseInsensitiveContainsString:prefix];
-    }] sortedArrayUsingComparator:finderStringComparator];
 }
 
 - (void)controlTextDidBeginEditing:(NSNotification *)obj {
@@ -56,7 +50,11 @@
 }
 
 - (void)controlTextDidChange:(NSNotification *)obj {
-    if (self.completionEnabled && !self.isAutoCompleting && self.stringValue.length) {
+    if ( self.onTextDidChange ) {
+        self.onTextDidChange();
+    }
+    
+    if ( self.completionEnabled && !self.isAutoCompleting && self.stringValue.length ) {
         self.isAutoCompleting = YES;
         NSControl* control = [[obj userInfo] objectForKey:@"NSFieldEditor"];
 
@@ -79,6 +77,26 @@
     NSArray* matches = [self filterCompletions:str];
     *index = -1;
     return matches;
+}
+
+- (NSArray<NSString*>*)filterCompletions:(NSString*)prefix {
+    if(!self.completions) {
+        return @[];
+    }
+    
+    return [[self.completions filter:^BOOL(NSString * _Nonnull obj) {
+        return [obj localizedCaseInsensitiveContainsString:prefix];
+    }] sortedArrayUsingComparator:finderStringComparator];
+}
+
+- (void (^)(void))onImagePasted {
+    MMcGACTextFieldCell *cell = (MMcGACTextFieldCell *)self.cell;
+    return cell.onImagePasted;
+}
+
+- (void)setOnImagePasted:(void (^)(void))onImagePasted {
+    MMcGACTextFieldCell *cell = (MMcGACTextFieldCell *)self.cell;
+    cell.onImagePasted = onImagePasted;
 }
 
 @end

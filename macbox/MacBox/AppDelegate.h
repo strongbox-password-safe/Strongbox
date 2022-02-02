@@ -12,10 +12,6 @@
 
 #define kAutoLockTime @"autoLockTime"
 
-extern NSString* const kStrongboxPasteboardName;
-extern NSString* const kDragAndDropInternalUti;
-extern NSString* const kDragAndDropExternalUti;
-
 extern const NSInteger kTopLevelMenuItemTagStrongbox;
 extern const NSInteger kTopLevelMenuItemTagFile;
 extern const NSInteger kTopLevelMenuItemTagView;

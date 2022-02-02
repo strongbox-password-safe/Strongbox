@@ -10,7 +10,6 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "BrowseTableViewCellHelper.h"
-#import "DatabaseSearchAndSorter.h"
 #import "AppPreferences.h"
 
 @interface SelectDestinationGroupController ()
@@ -59,14 +58,8 @@
 }
 
 - (void)refresh {
-    DatabaseSearchAndSorter *sorter = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
-                                                                     browseSortField:self.viewModel.metadata.browseSortField
-                                                                          descending:self.viewModel.metadata.browseSortOrderDescending
-                                                                   foldersSeparately:YES
-                                                                         checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled];
-    
-    self.items = [sorter sortItemsForBrowse:self.currentGroup.childGroups];
-    
+    self.items = [self.viewModel sortItemsForBrowse:self.currentGroup.childGroups browseSortField:self.viewModel.metadata.browseSortField descending:self.viewModel.metadata.browseSortOrderDescending foldersSeparately:YES];
+        
     self.buttonSelectThisDestination.enabled = [self isValidDestination:self.currentGroup validIfContainsAValidDestination:NO];
     
     [self.tableView reloadData];

@@ -7,7 +7,7 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
+#import "MacDatabasePreferences.h"
 #import "DatabaseModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -15,11 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DocumentController : NSDocumentController
 
 - (void)originalOpenDocument:(id _Nullable)sender;
-- (void)openDatabase:(DatabaseMetadata*)database completion:(void (^_Nullable)(NSError* error))completion;
+- (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^_Nullable)(NSError* error))completion;
 
-- (BOOL)databaseIsDocumentWindow:(DatabaseMetadata*)database;
-- (BOOL)databaseIsUnlockedInDocumentWindow:(DatabaseMetadata*)database;
-- (void)closeDocumentWindowForDatabase:(DatabaseMetadata *)database;
+- (BOOL)databaseIsDocumentWindow:(MacDatabasePreferences*)database;
+- (BOOL)databaseIsUnlockedInDocumentWindow:(MacDatabasePreferences*)database;
+- (void)closeDocumentWindowForDatabase:(MacDatabasePreferences *)database;
 
 - (void)onAppStartup;
 - (void)performEmptyLaunchTasksIfNecessary;

@@ -14,6 +14,9 @@
 #import "ConflictResolutionStrategy.h"
 #import "DatabaseAuditorConfiguration.h"
 #import "DatabaseFormat.h"
+#import "KeePassIconSet.h"
+#import "NextNavigationConstants.h"
+#import "SearchScope.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,7 +40,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nonatomic, strong, nullable) NSString* keyFileBookmark;
 @property (nonatomic, strong, nullable) NSString* autoFillKeyFileBookmark;
 
-@property (nonatomic, strong) YubiKeyConfiguration* yubiKeyConfiguration;
+@property (nonatomic, strong, nullable) YubiKeyConfiguration* yubiKeyConfiguration;
 
 
 
@@ -63,7 +66,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property NSInteger autoFillConvenienceAutoUnlockTimeout; 
 @property (nullable) NSDate* autoFillLastUnlockedAt;
 
-@property (readonly) ConflictResolutionStrategy conflictResolutionStrategy;
+@property ConflictResolutionStrategy conflictResolutionStrategy;
 
 @property BOOL monitorForExternalChanges;
 @property NSInteger monitorForExternalChangesInterval;
@@ -72,7 +75,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
-@property BOOL makeBackups;  
+@property BOOL makeBackups;
 
 @property (readonly) BOOL isLocalDeviceDatabase;
 
@@ -96,10 +99,10 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL startWithSearch;
 @property BOOL showAdvancedUnlockOptions;
 @property BOOL lockOnScreenLock;
-@property BOOL expressDownloadFavIconOnNewOrUrlChanged; 
+@property BOOL expressDownloadFavIconOnNewOrUrlChanged;
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;
-@property BOOL uiDoNotSortKeePassNodesInBrowseView; 
+@property BOOL uiDoNotSortKeePassNodesInBrowseView;
 @property NSArray<NSString*>* visibleColumns;
 
 /* =================================================================================================== */
@@ -159,7 +162,22 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL autoFillConcealedFieldsAsCreds;
 @property BOOL autoFillUnConcealedFieldsAsCreds;
 
+@property (nullable) NSUUID* asyncUpdateId; 
 
+@property BOOL promptedForAutoFetchFavIcon;
+
+
+
+@property KeePassIconSet iconSet;
+
+
+
+@property OGNavigationContext sideBarNavigationContext;
+@property (nullable) NSUUID* sideBarSelectedGroup;
+@property (nullable) NSString* sideBarSelectedTag;
+@property OGNavigationSpecial sideBarSelectedSpecial;
+@property NSArray<NSUUID*> *browseSelectedItems;
+@property NSString* searchText;
 
 @end
 

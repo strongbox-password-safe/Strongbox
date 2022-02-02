@@ -20,7 +20,7 @@
  suggestedFilename:(NSString*)suggestedFilename
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
+        completion:(void (^)(DatabasePreferences *metadata, NSError *error))completion;
 
 @property (nonatomic, readonly) StorageProvider storageId;
 @property (nonatomic, readonly) BOOL providesIcons;
@@ -31,6 +31,6 @@
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 @property (nonatomic, readonly) BOOL privacyOptInRequired;
 
-- (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(NSError *error))completion;
+- (void)delete:(DatabasePreferences*)safeMetaData completion:(void (^)(NSError *error))completion;
 
 @end

@@ -17,7 +17,6 @@
 #import "MacSyncManager.h"
 #import <QuartzCore/QuartzCore.h>
 #import "SafeStorageProviderFactory.h"
-#import "DatabasesManager.h"
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 
@@ -52,7 +51,7 @@
     [super awakeFromNib];
         
     self.textFieldName.delegate = self;
-
+    
     self.gestureRecognizerClick = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onNicknameClick)];
     [self.textFieldName addGestureRecognizer:self.gestureRecognizerClick];
     
@@ -69,11 +68,11 @@
     self.originalNickName = nil;
 }
 
-- (void)setWithDatabase:(DatabaseMetadata*)metadata {
+- (void)setWithDatabase:(MacDatabasePreferences*)metadata {
     [self setWithDatabase:metadata autoFill:NO wormholeUnlocked:NO];
 }
 
-- (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill wormholeUnlocked:(BOOL)wormholeUnlocked {
+- (void)setWithDatabase:(MacDatabasePreferences*)metadata autoFill:(BOOL)autoFill wormholeUnlocked:(BOOL)wormholeUnlocked {
     self.uuid = metadata.uuid;
     self.originalNickName = metadata.nickName;
     
@@ -120,12 +119,31 @@
                 [self.syncProgressIndicator startAnimation:nil];
             }
         }
-    } @catch (NSException *exception) {
+        else if ( metadata.asyncUpdateId != nil ) {
+            self.imageViewSyncing.hidden = NO;
+            
+            self.imageViewSyncing.image = [NSImage imageNamed:@"syncronize"];
+            
+            if (@available(macOS 11.0, *)) {
+                self.imageViewSyncing.image = [NSImage imageWithSystemSymbolName:@"function" accessibilityDescription:nil];
+                self.imageViewSyncing.controlSize = NSControlSizeLarge;
+            }
+
+            if (@available(macOS 10.14, *)) {
+                NSColor *tint = NSColor.systemYellowColor;
+                self.imageViewSyncing.contentTintColor = tint;
+            }
+
+            self.syncProgressIndicator.hidden = NO;
+            [self.syncProgressIndicator startAnimation:nil];
+        }
+    }
+    @catch (NSException *exception) {
         NSLog(@"Exception getting display attributes for database: %@", exception);
     }
 }
 
-- (void)determineFields:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill {
+- (void)determineFields:(MacDatabasePreferences*)metadata autoFill:(BOOL)autoFill {
     NSString* path = @"";
     NSString* fileSize = @"";
     NSString* fileMod = @"";
@@ -176,10 +194,10 @@
         
         if ( url ) {
             if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
-                path = [self getFriendlyICloudPath:url.path];
+                path = getFriendlyICloudPath(url.path);
             }
             else {
-                path = [self getPathRelativeToUserHome:url.path];
+                path = getPathRelativeToUserHome(url.path);
             }
             
             NSError* error;
@@ -202,47 +220,6 @@
     self.textFieldStorage.stringValue = [SafeStorageProviderFactory getStorageDisplayName:metadata];
 }
 
-- (NSString*)getPathRelativeToUserHome:(NSString*)path {
-    NSString* userHome = FileManager.sharedInstance.userHomePath;
-    
-    if ( userHome && path.length > userHome.length ) {
-        path = [path stringByReplacingOccurrencesOfString:userHome withString:@"~" options:kNilOptions range:NSMakeRange(0, userHome.length)];
-    }
-    
-    return path;
-}
-
-- (NSString*)getFriendlyICloudPath:(NSString*)path {
-    NSURL* iCloudRoot = FileManager.sharedInstance.iCloudRootURL;
-    NSURL* iCloudDriveRoot = FileManager.sharedInstance.iCloudDriveRootURL;
-
-    
-    
-    if ( iCloudRoot && path.length > iCloudRoot.path.length && [[path substringToIndex:iCloudRoot.path.length] isEqualToString:iCloudRoot.path]) {
-        return [NSString stringWithFormat:@"%@ (%@)", path.lastPathComponent, NSLocalizedString(@"databases_vc_database_location_suffix_database_is_in_official_icloud_strongbox_folder", @"Strongbox iCloud")];
-    }
-    
-    
-    
-    if ( iCloudDriveRoot && path.length > iCloudDriveRoot.path.length && [[path substringToIndex:iCloudDriveRoot.path.length] isEqualToString:iCloudDriveRoot.path]) {
-        NSArray *iCloudDriveDisplayComponents = [NSFileManager.defaultManager componentsToDisplayForPath:iCloudDriveRoot.path];
-        NSArray *pathDisplayComponents = [NSFileManager.defaultManager componentsToDisplayForPath:path];
-
-        if ( pathDisplayComponents.count > iCloudDriveDisplayComponents.count ) {
-            NSArray* relative = [pathDisplayComponents subarrayWithRange:NSMakeRange(iCloudDriveDisplayComponents.count, pathDisplayComponents.count - iCloudDriveDisplayComponents.count)];
-            
-            if ( relative.count > 1 ) {
-                NSString* niceICloudDriveName = relative.firstObject;
-                NSArray* pathWithiniCloudDrive = [relative subarrayWithRange:NSMakeRange(1, relative.count-1)];
-                NSString* strPathWithiniCloudDrive = [pathWithiniCloudDrive componentsJoinedByString:@"/"];
-                return [NSString stringWithFormat:@"%@ (%@)", strPathWithiniCloudDrive, niceICloudDriveName];
-            }
-        }
-    }
-
-    return [self getPathRelativeToUserHome:path];
-}
-
 - (void)onNicknameClick {
 
     
@@ -259,9 +236,9 @@
     
     if ( obj.object == self.textFieldName ) {
         NSString* raw = self.textFieldName.stringValue;
-        NSString* trimmed = [DatabasesManager trimDatabaseNickName:raw];
+        NSString* trimmed = [MacDatabasePreferences trimDatabaseNickName:raw];
         
-        if ( [self.originalNickName isEqualToString:trimmed] || ( [DatabasesManager.sharedInstance isValid:trimmed] && [DatabasesManager.sharedInstance isUnique:trimmed] )) {
+        if ( [self.originalNickName isEqualToString:trimmed] || ( [MacDatabasePreferences isValid:trimmed] && [MacDatabasePreferences isUnique:trimmed] )) {
             self.textFieldName.textColor = NSColor.labelColor;
         }
         else {
@@ -294,20 +271,18 @@
 
 - (void)setNewNicknameIfValidOtherwiseRestore {
     NSString* raw = self.textFieldName.stringValue;
-    NSString* trimmed = [DatabasesManager trimDatabaseNickName:raw];
+    NSString* trimmed = [MacDatabasePreferences trimDatabaseNickName:raw];
 
     if ( ![self.originalNickName isEqualToString:trimmed] &&
-        [DatabasesManager.sharedInstance isValid:trimmed] &&
-        [DatabasesManager.sharedInstance isUnique:trimmed] ) {
-        [DatabasesManager.sharedInstance atomicUpdate:self.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.nickName = trimmed;
-        }];
+        [MacDatabasePreferences isValid:trimmed] &&
+        [MacDatabasePreferences isUnique:trimmed] ) {
+        
+        [MacDatabasePreferences fromUuid:self.uuid].nickName = trimmed;
     }
     else {
         [self restoreOriginalNickname];
     }
 }
-
 
 - (void)beginEditingNickname {
     if ( self.onBeginEditingNickname ) {

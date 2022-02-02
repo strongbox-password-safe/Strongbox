@@ -14,6 +14,7 @@
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
+#import "DatabasePreferences.h"
 #import "SafesList.h"
 
 @interface ConvenienceUnlockPreferences () <UIAdaptivePresentationControllerDelegate>
@@ -135,8 +136,6 @@
                 self.viewModel.metadata.convenienceExpiryPeriod = selectedValue;
                 self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
                 self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
-                
-                [SafesList.sharedInstance update:self.viewModel.metadata];
             }
         }];
     }
@@ -154,7 +153,6 @@
             self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
         }
 
-        [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindUi];
     }
     else {
@@ -169,8 +167,6 @@
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
         self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
-        
-        [[SafesList sharedInstance] update:self.viewModel.metadata];
     }
 }
 

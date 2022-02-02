@@ -7,14 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "DatabaseMetadata.h"
+#import "MacDatabasePreferences.h"
 #import "MMWormhole.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SelectAutoFillDatabaseViewController : NSViewController
 
-@property (nonatomic, copy) void (^onDone)(BOOL userCancelled, DatabaseMetadata*_Nullable database);
+@property (nonatomic, copy) void (^onDone)(BOOL userCancelled, MacDatabasePreferences*_Nullable database);
 @property MMWormhole* wormhole;
 
 @end

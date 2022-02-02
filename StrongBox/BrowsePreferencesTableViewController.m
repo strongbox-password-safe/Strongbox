@@ -9,7 +9,7 @@
 #import "BrowsePreferencesTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "Model.h"
 #import "AppPreferences.h"
 
@@ -130,8 +130,6 @@
     self.databaseMetaData.colorizePasswords = self.switchColorizePasswords.on;
     self.databaseMetaData.colorizeProtectedCustomFields = self.switchColorizeProtectedCustomFields.on;
     
-    [SafesList.sharedInstance update:self.databaseMetaData];
-    
     [self bindPreferences];
 
     [self notifyDatabaseViewPreferencesChanged];
@@ -177,7 +175,7 @@
     self.switchShowFavourites.on = self.databaseMetaData.showQuickViewFavourites;
     self.switchShowSpecialExpired.on = self.databaseMetaData.showQuickViewExpired;
     
-    self.labelIconSet.text = [BrowsePreferencesTableViewController getIconSetName:self.databaseMetaData.keePassIconSet];
+    self.labelIconSet.text = getIconSetName(self.databaseMetaData.keePassIconSet);
     
     self.switchAutoFavIcon.on = self.databaseMetaData.tryDownloadFavIconForNewRecord;
     self.switchShowPasswordOnDetails.on = self.databaseMetaData.showPasswordByDefaultOnEditScreen;
@@ -254,7 +252,7 @@
     ];
     
     NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [BrowsePreferencesTableViewController getIconSetName:(KeePassIconSet)obj.integerValue];
+        return  getIconSetName((KeePassIconSet)obj.integerValue);
     }];
     
     KeePassIconSet current = self.databaseMetaData.keePassIconSet;
@@ -269,26 +267,11 @@
                completion:^(BOOL success, NSInteger selectedIdx) {
         if (success) {
            self.databaseMetaData.keePassIconSet = (KeePassIconSet)options[selectedIdx].integerValue;
-           [SafesList.sharedInstance update:self.databaseMetaData];
         }
 
         [self bindPreferences];
         [self notifyDatabaseViewPreferencesChanged];
     }];
-}
-
-+ (NSString*)getIconSetName:(KeePassIconSet)iconSet {
-    switch (iconSet) {
-        case kKeePassIconSetKeePassXC:
-            return NSLocalizedString(@"keepass_icon_set_keepassxc", @"KeePassXC");
-            break;
-        case kKeePassIconSetSfSymbols:
-            return NSLocalizedString(@"keepass_icon_set_sf_symbols", @"SF Symbols (iOS 13+)");
-            break;
-        default:
-            return NSLocalizedString(@"keepass_icon_set_classic", @"Classic");
-            break;
-    }
 }
 
 - (void)onChangeTapAction:(UITableViewCell*)cell {
@@ -357,8 +340,6 @@
                        else {
                            self.databaseMetaData.longPressTapAction = (BrowseTapAction)options[selectedIdx].integerValue;
                        }
-                       
-                       [SafesList.sharedInstance update:self.databaseMetaData];
                    }
                    
                    [self bindPreferences];
@@ -387,7 +368,6 @@
                completion:^(BOOL success, NSInteger selectedIdx) {
                    if (success) {
                        self.databaseMetaData.browseViewType = (BrowseViewType)options[selectedIdx].integerValue;
-                       [SafesList.sharedInstance update:self.databaseMetaData];
                    }
                    
                    [self bindPreferences];

@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MMcGACTextFieldCell : NSTextFieldCell
 
+@property (nonatomic, nullable, copy) void (^onImagePasted)(void);
+
 @end
 
 NS_ASSUME_NONNULL_END

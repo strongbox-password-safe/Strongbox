@@ -35,12 +35,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
         self.autoFillConvenienceAutoUnlockTimeout = -1; 
         self.monitorForExternalChanges = YES;
-        self.monitorForExternalChangesInterval = self.storageProvider == kMacFile ? 10 : 30; 
         self.autoReloadAfterExternalChanges = YES;
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
-        
-
 
         self.showQuickView = YES;
         self.outlineViewTitleIsReadonly = YES;
@@ -48,13 +45,14 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.concealEmptyProtectedFields = YES;
         self.startWithSearch = YES;
         self.lockOnScreenLock = YES;
-        self.expressDownloadFavIconOnNewOrUrlChanged = YES; 
         self.visibleColumns = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
         
         self.autoFillScanAltUrls = YES;
         self.autoFillScanCustomFields = YES;
         self.autoFillScanNotes = YES;
         self.autoFillConcealedFieldsAsCreds = YES;
+        self.iconSet = kKeePassIconSetSfSymbols;
+        self.browseSelectedItems = @[];
     }
     
     return self;
@@ -68,6 +66,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         _nickName = nickName ? nickName : @"<Unknown>";
         _uuid = [[NSUUID UUID] UUIDString];
         self.storageProvider = storageProvider;
+        self.monitorForExternalChangesInterval = storageProvider == kMacFile ? 5 : 30; 
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
         self.autoPromptForConvenienceUnlockOnActivate = YES;
@@ -83,6 +82,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     self.keyFileBookmark = nil;
     self.autoFillKeyFileBookmark = nil;
     self.autoFillConvenienceAutoUnlockPassword = nil;
+    self.sideBarSelectedTag = nil;
 }
 
 - (NSString*)getConveniencePasswordIdentifier {
@@ -280,6 +280,17 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     
     [encoder encodeBool:self.autoFillConcealedFieldsAsCreds forKey:@"autoFillConcealedFieldsAsCreds"];
     [encoder encodeBool:self.autoFillUnConcealedFieldsAsCreds forKey:@"autoFillUnConcealedFieldsAsCreds"];
+    [encoder encodeObject:self.asyncUpdateId forKey:@"asyncUpdateId"];
+
+    [encoder encodeBool:self.promptedForAutoFetchFavIcon forKey:@"promptedForAutoFetchFavIcon"];
+    [encoder encodeInteger:self.iconSet forKey:@"iconSet"];
+    
+    
+    
+    [encoder encodeInteger:self.sideBarNavigationContext forKey:@"sideBarNavigationContext"];
+    [encoder encodeObject:self.sideBarSelectedGroup forKey:@"sideBarSelectedGroup"];
+    [encoder encodeInteger:self.sideBarSelectedSpecial forKey:@"sideBarSelectedSpecial"];
+    [encoder encodeObject:self.browseSelectedItems forKey:@"browseSelectedItems"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -389,10 +400,13 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.autoReloadAfterExternalChanges = [decoder decodeBoolForKey:@"autoReloadAfterExternalChanges"];
         }
         
-        
-
-
-
+        if([decoder containsValueForKey:@"conflictResolutionStrategy"]) {
+            self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
+            
+        }
+        else {
+            self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
+        }
         
         if ( [decoder containsValueForKey:@"maxBackupKeepCount"] ) {
             self.maxBackupKeepCount = [decoder decodeIntegerForKey:@"maxBackupKeepCount"];
@@ -417,127 +431,73 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         if ( [decoder containsValueForKey:@"showQuickView"] ) {
             self.showQuickView = [decoder decodeBoolForKey:@"showQuickView"];
         }
-        else {
-            self.showQuickView = Settings.sharedInstance.showQuickView;
-        }
         
         if ( [decoder containsValueForKey:@"doNotShowTotp"] ) {
             self.doNotShowTotp = [decoder decodeBoolForKey:@"doNotShowTotp"];
-        }
-        else {
-            self.doNotShowTotp = Settings.sharedInstance.doNotShowTotp;
         }
 
         if ( [decoder containsValueForKey:@"noAlternatingRows"] ) {
             self.noAlternatingRows = [decoder decodeBoolForKey:@"noAlternatingRows"];
         }
-        else {
-            self.noAlternatingRows = Settings.sharedInstance.noAlternatingRows;
-        }
 
         if ( [decoder containsValueForKey:@"showHorizontalGrid"] ) {
             self.showHorizontalGrid = [decoder decodeBoolForKey:@"showHorizontalGrid"];
-        }
-        else {
-            self.showHorizontalGrid = Settings.sharedInstance.showHorizontalGrid;
         }
 
         if ( [decoder containsValueForKey:@"showVerticalGrid"] ) {
             self.showVerticalGrid = [decoder decodeBoolForKey:@"showVerticalGrid"];
         }
-        else {
-            self.showVerticalGrid = Settings.sharedInstance.showVerticalGrid;
-        }
 
         if ( [decoder containsValueForKey:@"doNotShowAutoCompleteSuggestions"] ) {
             self.doNotShowAutoCompleteSuggestions = [decoder decodeBoolForKey:@"doNotShowAutoCompleteSuggestions"];
-        }
-        else {
-            self.doNotShowAutoCompleteSuggestions = Settings.sharedInstance.doNotShowAutoCompleteSuggestions;
         }
 
         if ( [decoder containsValueForKey:@"doNotShowChangeNotifications"] ) {
             self.doNotShowChangeNotifications = [decoder decodeBoolForKey:@"doNotShowChangeNotifications"];
         }
-        else {
-            self.doNotShowChangeNotifications = Settings.sharedInstance.doNotShowChangeNotifications;
-        }
 
         if ( [decoder containsValueForKey:@"outlineViewTitleIsReadonly"] ) {
             self.outlineViewTitleIsReadonly = [decoder decodeBoolForKey:@"outlineViewTitleIsReadonly"];
-        }
-        else {
-            self.outlineViewTitleIsReadonly = Settings.sharedInstance.outlineViewTitleIsReadonly;
         }
 
         if ( [decoder containsValueForKey:@"outlineViewEditableFieldsAreReadonly"] ) {
             self.outlineViewEditableFieldsAreReadonly = [decoder decodeBoolForKey:@"outlineViewEditableFieldsAreReadonly"];
         }
-        else {
-            self.outlineViewEditableFieldsAreReadonly = Settings.sharedInstance.outlineViewEditableFieldsAreReadonly;
-        }
 
         if ( [decoder containsValueForKey:@"concealEmptyProtectedFields"] ) {
             self.concealEmptyProtectedFields = [decoder decodeBoolForKey:@"concealEmptyProtectedFields"];
-        }
-        else {
-            self.concealEmptyProtectedFields = Settings.sharedInstance.concealEmptyProtectedFields;
         }
 
         if ( [decoder containsValueForKey:@"startWithSearch"] ) {
             self.startWithSearch = [decoder decodeBoolForKey:@"startWithSearch"];
         }
-        else {
-            self.startWithSearch = Settings.sharedInstance.startWithSearch;
-        }
 
         if ( [decoder containsValueForKey:@"showAdvancedUnlockOptions"] ) {
             self.showAdvancedUnlockOptions = [decoder decodeBoolForKey:@"showAdvancedUnlockOptions"];
-        }
-        else {
-            self.showAdvancedUnlockOptions = Settings.sharedInstance.showAdvancedUnlockOptions;
         }
 
         if ( [decoder containsValueForKey:@"lockOnScreenLock"] ) {
             self.lockOnScreenLock = [decoder decodeBoolForKey:@"lockOnScreenLock"];
         }
-        else {
-            self.lockOnScreenLock = Settings.sharedInstance.lockOnScreenLock;
-        }
 
         if ( [decoder containsValueForKey:@"expressDownloadFavIconOnNewOrUrlChanged"] ) {
             self.expressDownloadFavIconOnNewOrUrlChanged = [decoder decodeBoolForKey:@"expressDownloadFavIconOnNewOrUrlChanged"];
-        }
-        else {
-            self.expressDownloadFavIconOnNewOrUrlChanged = Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged;
         }
 
         if ( [decoder containsValueForKey:@"doNotShowRecycleBinInBrowse"] ) {
             self.doNotShowRecycleBinInBrowse = [decoder decodeBoolForKey:@"doNotShowRecycleBinInBrowse"];
         }
-        else {
-            self.doNotShowRecycleBinInBrowse = Settings.sharedInstance.doNotShowRecycleBinInBrowse;
-        }
 
         if ( [decoder containsValueForKey:@"showRecycleBinInSearchResults"] ) {
             self.showRecycleBinInSearchResults = [decoder decodeBoolForKey:@"showRecycleBinInSearchResults"];
-        }
-        else {
-            self.showRecycleBinInSearchResults = Settings.sharedInstance.showRecycleBinInSearchResults;
         }
 
         if ( [decoder containsValueForKey:@"uiDoNotSortKeePassNodesInBrowseView"] ) {
             self.uiDoNotSortKeePassNodesInBrowseView = [decoder decodeBoolForKey:@"uiDoNotSortKeePassNodesInBrowseView"];
         }
-        else {
-            self.uiDoNotSortKeePassNodesInBrowseView = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView;
-        }
 
         if ( [decoder containsValueForKey:@"visibleColumns"] ) {
             self.visibleColumns = [decoder decodeObjectForKey:@"visibleColumns"];
-        }
-        else {
-            self.visibleColumns = Settings.sharedInstance.visibleColumns;
         }
         
         /* =================================================================================================== */
@@ -600,17 +560,59 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         if ( [decoder containsValueForKey:@"autoFillUnConcealedFieldsAsCreds"] ) {
             self.autoFillUnConcealedFieldsAsCreds = [decoder decodeBoolForKey:@"autoFillUnConcealedFieldsAsCreds"];
         }
+        
+        if ( [decoder containsValueForKey:@"asyncUpdateId"] ) {
+            self.asyncUpdateId = [decoder decodeObjectForKey:@"asyncUpdateId"];
+        }
+        
+        if ( [decoder containsValueForKey:@"promptedForAutoFetchFavIcon"] ) {
+            self.promptedForAutoFetchFavIcon = [decoder decodeBoolForKey:@"promptedForAutoFetchFavIcon"];
+        }
+        else {
+            self.promptedForAutoFetchFavIcon = [decoder decodeBoolForKey:@"expressDownloadFavIconOnNewOrUrlChanged"]; 
+        }
+        
+        
+        
+        if ( [decoder containsValueForKey:@"iconSet"] ) {
+            self.iconSet = [decoder decodeIntegerForKey:@"iconSet"];
+        }
+        else {
+            self.iconSet = kKeePassIconSetSfSymbols;
+        }
+        
+        
+
+        if ( [decoder containsValueForKey:@"sideBarNavigationContext"] ) {
+            self.sideBarNavigationContext = [decoder decodeIntegerForKey:@"sideBarNavigationContext"];
+        }
+        else {
+            self.sideBarNavigationContext = OGNavigationContextNone; 
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarSelectedGroup"] ) {
+            self.sideBarSelectedGroup = [decoder decodeObjectForKey:@"sideBarSelectedGroup"];
+        }
+        else {
+            self.sideBarSelectedGroup = nil;
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarSelectedSpecial"] ) {
+            self.sideBarSelectedSpecial = [decoder decodeIntegerForKey:@"sideBarSelectedSpecial"];
+        }
+        
+        if ( [decoder containsValueForKey:@"browseSelectedItems"] ) {
+            self.browseSelectedItems = [decoder decodeObjectForKey:@"browseSelectedItems"];
+        }
+        else {
+            self.browseSelectedItems = @[];
+        }
     }
     
     return self;
 }
 
 
-
-
-- (ConflictResolutionStrategy)conflictResolutionStrategy {
-    return kConflictResolutionStrategyAutoMerge;
-}
 
 - (NSURL *)backupsDirectory {
     NSURL* url = [FileManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
@@ -676,7 +678,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 }
 
 - (DatabaseAuditorConfiguration *)auditConfig {
-    return DatabaseAuditorConfiguration.defaults;
+    DatabaseAuditorConfiguration* foo = DatabaseAuditorConfiguration.defaults;
+    foo.auditInBackground = NO;
+    
+    return foo;
 }
 
 - (void)setAuditConfig:(DatabaseAuditorConfiguration *)auditConfig {
@@ -740,6 +745,30 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 #endif
 
     [Settings.sharedInstance.sharedAppGroupDefaults setBool:conveniencePasswordHasExpired forKey:key];
+}
+
+
+
+- (NSString *)sideBarSelectedTag {
+    NSString* key = [NSString stringWithFormat:@"sidebar-selected-tag-%@", self.uuid];
+    return [SecretStore.sharedInstance getSecureString:key];
+}
+
+- (void)setSideBarSelectedTag:(NSString *)sideBarSelectedTag {
+    NSString* key = [NSString stringWithFormat:@"sidebar-selected-tag-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureString:sideBarSelectedTag forIdentifier:key];
+}
+
+- (NSString *)searchText {
+    NSString* key = [NSString stringWithFormat:@"search-text-%@", self.uuid];
+    NSString* ret = [SecretStore.sharedInstance getSecureString:key];
+    return ret ? ret : @"";
+}
+
+- (void)setSearchText:(NSString *)searchText {
+    NSString* foo = searchText ? searchText : @"";
+    NSString* key = [NSString stringWithFormat:@"search-text-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureString:foo forIdentifier:key];
 }
 
 @end

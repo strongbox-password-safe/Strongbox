@@ -29,7 +29,6 @@ import Foundation
 
 
 public enum IconDownloadResult {
-
     
     
     
@@ -39,16 +38,16 @@ public enum IconDownloadResult {
     
     
     case failure(error: Error)
-
 }
 
 
 
 
 class AuthSessionDelegate: NSObject, URLSessionDelegate {
-    func urlSession(_ session: URLSession,
+    func urlSession(_: URLSession,
                     didReceive challenge: URLAuthenticationChallenge,
-                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+                    completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void)
+    {
 
 
 
@@ -57,21 +56,19 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
 
 
 
-        
-        
+
         guard let serverTrust = challenge.protectionSpace.serverTrust else {
             print(challenge)
             completionHandler(.rejectProtectionSpace, nil)
             return
         }
-        
+
         completionHandler(.useCredential, URLCredential(trust: serverTrust))
     }
 }
-    
 
-@objc public final class FavIcon : NSObject {
 
+@objc public final class FavIcon: NSObject {
     
 
     
@@ -99,16 +96,17 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                                   duckDuckGo: Bool = true,
                                   google: Bool = true,
                                   allowInvalidSSLCerts: Bool = false,
-                                  completion: @escaping ([DetectedIcon], [String:String]) -> Void) throws {
+                                  completion: @escaping ([DetectedIcon], [String: String]) -> Void) throws
+    {
         let syncQueue = DispatchQueue(label: "org.bitserf.FavIcon", attributes: [])
         var icons: [DetectedIcon] = []
         var additionalDownloads: [URLRequestWithCallback] = []
         let urlSession = allowInvalidSSLCerts ? insecureUrlSessionProvider() : urlSessionProvider()
-        var meta: [String:String] = [:]
-      
+        var meta: [String: String] = [:]
+
         var operations: [URLRequestWithCallback] = []
-        
-        if(scanHtml) {
+
+        if scanHtml {
             let downloadHTMLOperation = DownloadTextOperation(url: url, session: urlSession)
             let downloadHTML = urlRequestOperation(downloadHTMLOperation) { result in
                 if case let .textDownloaded(actualURL, text, contentType) = result {
@@ -124,9 +122,9 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
 
                         for manifestURL in extractWebAppManifestURLs(document, baseURL: url) {
                             let downloadOperation = DownloadTextOperation(url: manifestURL,
-                                                                                  session: urlSession)
+                                                                          session: urlSession)
                             let download = urlRequestOperation(downloadOperation) { result in
-                                if case .textDownloaded(_, let manifestJSON, _) = result {
+                                if case let .textDownloaded(_, manifestJSON, _) = result {
                                     let jsonIcons = extractManifestJSONIcons(
                                         manifestJSON,
                                         baseURL: actualURL
@@ -161,30 +159,30 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                 }
             }
 
-            operations.append(downloadHTML);
+            operations.append(downloadHTML)
         }
 
-        if(favIcon) {
-            let commonFiles : [String] = [  "favicon.ico",
-                                            "apple-touch-icon.png",
-                                            "apple-icon-57x57.png",
-                                            "apple-icon-60x60.png",
-                                            "apple-icon-72x72.png",
-                                            "apple-icon-76x76.png",
-                                            "apple-icon-114x114.png",
-                                            "apple-icon-120x120.png",
-                                            "apple-icon-144x144.png",
-                                            "apple-icon-152x152.png",
-                                            "apple-icon-180x180.png",
-                                            "android-icon-192x192.png",
-                                            "favicon-32x32.png",
-                                            "favicon-96x96.png",
-                                            "favicon-16x16.png",
-                                            "ms-icon-144x144.png"];
-                                            
+        if favIcon {
+            let commonFiles: [String] = ["favicon.ico",
+                                         "apple-touch-icon.png",
+                                         "apple-icon-57x57.png",
+                                         "apple-icon-60x60.png",
+                                         "apple-icon-72x72.png",
+                                         "apple-icon-76x76.png",
+                                         "apple-icon-114x114.png",
+                                         "apple-icon-120x120.png",
+                                         "apple-icon-144x144.png",
+                                         "apple-icon-152x152.png",
+                                         "apple-icon-180x180.png",
+                                         "android-icon-192x192.png",
+                                         "favicon-32x32.png",
+                                         "favicon-96x96.png",
+                                         "favicon-16x16.png",
+                                         "ms-icon-144x144.png"]
+
             for commonFile in commonFiles {
                 
-                
+
                 let favIconURL = URL(string: commonFile, relativeTo: url as URL)!.absoluteURL
                 let checkFavIconOperation = CheckURLExistsOperation(url: favIconURL, session: urlSession)
                 let checkFavIcon = urlRequestOperation(checkFavIconOperation) { result in
@@ -195,24 +193,24 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                         }
                     }
                 }
-                operations.append(checkFavIcon);
+                operations.append(checkFavIcon)
             }
         }
 
-        var components = URLComponents(url: url, resolvingAgainstBaseURL: false);
-        components?.path = ""; 
-        components?.query = nil; 
-        components?.user = nil; 
-        components?.password = nil; 
-        components?.fragment = nil; 
-        
-        let domain = components?.host ?? url.absoluteString;
+        var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        components?.path = "" 
+        components?.query = nil 
+        components?.user = nil 
+        components?.password = nil 
+        components?.fragment = nil 
+
+        let domain = components?.host ?? url.absoluteString
         let blah = String(format: "https:
-        
-        if(duckDuckGo) {
-            let ddgUrl = URL(string: blah);
-            
-            if (ddgUrl != nil) {
+
+        if duckDuckGo {
+            let ddgUrl = URL(string: blah)
+
+            if ddgUrl != nil {
                 let duckDuckGoURL = ddgUrl!.absoluteURL
                 let checkDuckDuckGoURLOperation = CheckURLExistsOperation(url: duckDuckGoURL, session: urlSession)
                 let checkDuckDuckGoURL = urlRequestOperation(checkDuckDuckGoURLOperation) { result in
@@ -222,36 +220,36 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                         }
                     }
                 }
-                
-                operations.append(checkDuckDuckGoURL);
+
+                operations.append(checkDuckDuckGoURL)
             }
         }
-        
+
         
 
-        if(google) {
+        if google {
             let blah2 = String(format: "https:
             let googleURL = URL(string: blah2)?.absoluteURL
-            if (googleURL != nil) {
+            if googleURL != nil {
                 let checkGoogleUrlOperation = CheckURLExistsOperation(url: googleURL!, session: urlSession)
                 let checkGoogleUrl = urlRequestOperation(checkGoogleUrlOperation) { result in
                     if case let .success(actualURL) = result {
                         syncQueue.sync {
-                            icons.append(DetectedIcon(url: actualURL, type: .classic)) 
+                            icons.append(DetectedIcon(url: actualURL, type: .classic))
                         }
                     }
                 }
-                
-                operations.append(checkGoogleUrl);
+
+                operations.append(checkGoogleUrl)
             }
         }
 
-        if(operations.count == 0) {
+        if operations.count == 0 {
             DispatchQueue.main.async {
                 completion(icons, meta)
             }
         }
-        
+
         executeURLOperations(operations, on: queue) {
             if additionalDownloads.count > 0 {
                 executeURLOperations(additionalDownloads, on: queue) {
@@ -266,6 +264,7 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
             }
         }
     }
+
     
 
     
@@ -282,12 +281,12 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
         executeURLOperations(operations) { results in
             let downloadResults: [ImageType] = results.compactMap { result in
                 switch result {
-                case .imageDownloaded(_, let image):
-                  return image;
-                case .failed(_):
-                  return nil;
+                case let .imageDownloaded(_, image):
+                    return image
+                case .failed:
+                    return nil
                 default:
-                  return nil;
+                    return nil
                 }
             }
 
@@ -300,21 +299,22 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
     enum MyError: Error {
         case runtimeError(String)
     }
-    
+
     @objc public static func downloadAll(_ url: URL,
                                          favIcon: Bool,
-                                          scanHtml: Bool,
-                                          duckDuckGo: Bool,
-                                          google: Bool,
-                                          allowInvalidSSLCerts: Bool,
-                                          completion: @escaping ([ImageType]?) -> Void)  throws {
+                                         scanHtml: Bool,
+                                         duckDuckGo: Bool,
+                                         google: Bool,
+                                         allowInvalidSSLCerts: Bool,
+                                         completion: @escaping ([ImageType]?) -> Void) throws
+    {
         do {
-            try scan(url, favIcon: favIcon, scanHtml: scanHtml, duckDuckGo: duckDuckGo, google: google, allowInvalidSSLCerts: allowInvalidSSLCerts ) { icons, meta in
-                let iconMap = icons.reduce(into: [URL:DetectedIcon](), { current,icon in
+            try scan(url, favIcon: favIcon, scanHtml: scanHtml, duckDuckGo: duckDuckGo, google: google, allowInvalidSSLCerts: allowInvalidSSLCerts) { icons, _ in
+                let iconMap = icons.reduce(into: [URL: DetectedIcon]()) { current, icon in
                     current[icon.url] = icon
-                })
-                
-                let uniqueIcons = Array(iconMap.values);
+                }
+
+                let uniqueIcons = Array(iconMap.values)
                 dl(uniqueIcons) { downloaded in
                     let blah = Array(downloaded.values)
                     DispatchQueue.main.async {
@@ -322,8 +322,7 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                     }
                 }
             }
-        }
-        catch {
+        } catch {
             DispatchQueue.main.async {
                 completion([])
             }
@@ -334,19 +333,19 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
         let urlSession = urlSessionProvider()
         let operations: [DownloadImageOperation] =
             icons.map { DownloadImageOperation(url: $0.url, session: urlSession) }
-        
-        var myDictionary =  [URL: ImageType]()
-        
+
+        var myDictionary = [URL: ImageType]()
+
         executeURLOperations(operations, on: queue) { results in
             for result in results {
                 switch result {
                 case let .imageDownloaded(url, image):
                     myDictionary[url] = image
                 default:
-                    continue;
+                    continue
                 }
             }
-            
+
             DispatchQueue.main.async {
                 completion(myDictionary)
             }
@@ -360,9 +359,9 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
     @objc static func createDefaultURLSession() -> URLSession {
         return URLSession.shared
     }
-    
+
     @objc static func createInsecureURLSession() -> URLSession {
-        return URLSession (configuration: URLSessionConfiguration.default, delegate: AuthSessionDelegate (), delegateQueue: nil);
+        return URLSession(configuration: URLSessionConfiguration.default, delegate: AuthSessionDelegate(), delegateQueue: nil)
     }
 }
 
@@ -387,5 +386,3 @@ extension DetectedIcon {
         return nil
     }
 }
-
-

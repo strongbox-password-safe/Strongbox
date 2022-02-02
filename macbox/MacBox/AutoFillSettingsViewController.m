@@ -7,7 +7,6 @@
 //
 
 #import "AutoFillSettingsViewController.h"
-#import "DatabasesManager.h"
 #import "AutoFillManager.h"
 #import "Settings.h"
 #import "MacAlerts.h"
@@ -159,7 +158,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     
     
     
-    DatabaseMetadata* meta = self.model.databaseMetadata;
+    MacDatabasePreferences* meta = self.model.databaseMetadata;
     self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && isOnForStrongbox;
     self.enableAutoFill.state = meta.autoFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
 
@@ -225,11 +224,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     NSInteger val = num.integerValue;
     
     if ( val != self.model.databaseMetadata.autoFillConvenienceAutoUnlockTimeout ) {
-        [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
-                                                touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.autoFillConvenienceAutoUnlockTimeout = val;
-            metadata.autoFillConvenienceAutoUnlockPassword = nil;
-        }];
+        self.model.databaseMetadata.autoFillConvenienceAutoUnlockTimeout = val;
+        self.model.databaseMetadata.autoFillConvenienceAutoUnlockPassword = nil;
     }
     
     [self bindUI];
@@ -239,19 +235,16 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     NSInteger newIndex = self.popupDisplayFormat.indexOfSelectedItem;
     
     if ( newIndex != self.model.databaseMetadata.quickTypeDisplayFormat ) {
-        [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
-                                                touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.quickTypeDisplayFormat = newIndex;
-        }];
-
+        self.model.databaseMetadata.quickTypeDisplayFormat = newIndex;
+    
         NSLog(@"AutoFill QuickType Format was changed - Populating Database....");
         
         
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 
-        DatabaseMetadata* meta = self.model.databaseMetadata;
+        MacDatabasePreferences* meta = self.model.databaseMetadata;
 
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel.database
                                                            databaseUuid:meta.uuid
                                                           displayFormat:meta.quickTypeDisplayFormat
                                                         alternativeUrls:meta.autoFillScanAltUrls
@@ -279,19 +272,16 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     BOOL concealedCustomFieldsAsCreds = self.addConcealedFields.state == NSControlStateValueOn;
     BOOL unConcealedCustomFieldsAsCreds = self.addUnconcealedFields.state == NSControlStateValueOn;
     
-    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoFillEnabled = autoFillEnabled;
-        metadata.quickTypeEnabled = quickTypeEnabled;
-        metadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
-        metadata.autoFillScanAltUrls = autoFillScanAltUrls;
-        metadata.autoFillScanCustomFields = autoFillScanCustomFields;
-        metadata.autoFillScanNotes = autoFillScanNotes;
-        metadata.autoFillConcealedFieldsAsCreds = concealedCustomFieldsAsCreds;
-        metadata.autoFillUnConcealedFieldsAsCreds = unConcealedCustomFieldsAsCreds;
-    }];
-    
-    DatabaseMetadata* meta = self.model.databaseMetadata;
+    self.model.databaseMetadata.autoFillEnabled = autoFillEnabled;
+    self.model.databaseMetadata.quickTypeEnabled = quickTypeEnabled;
+    self.model.databaseMetadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
+    self.model.databaseMetadata.autoFillScanAltUrls = autoFillScanAltUrls;
+    self.model.databaseMetadata.autoFillScanCustomFields = autoFillScanCustomFields;
+    self.model.databaseMetadata.autoFillScanNotes = autoFillScanNotes;
+    self.model.databaseMetadata.autoFillConcealedFieldsAsCreds = concealedCustomFieldsAsCreds;
+    self.model.databaseMetadata.autoFillUnConcealedFieldsAsCreds = unConcealedCustomFieldsAsCreds;
+
+    MacDatabasePreferences* meta = self.model.databaseMetadata;
     
     
 
@@ -312,7 +302,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 
         NSLog(@"AutoFill QuickType was turned off - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel.database
                                                            databaseUuid:meta.uuid
                                                           displayFormat:meta.quickTypeDisplayFormat
                                                         alternativeUrls:autoFillScanAltUrls

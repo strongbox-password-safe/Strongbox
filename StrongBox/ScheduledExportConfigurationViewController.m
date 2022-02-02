@@ -7,7 +7,7 @@
 //
 
 #import "ScheduledExportConfigurationViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
@@ -51,8 +51,6 @@
     self.model.metadata.scheduledExport = self.switchEnabled.on;
     self.model.metadata.nextScheduledExport = [NSDate.date dateByAddingTimeInterval:self.model.metadata.scheduleExportIntervalDays * 24 * 60 * 60];
 
-    [SafesList.sharedInstance update:self.model.metadata];
-    
     [self bindUI];
 }
 
@@ -75,8 +73,6 @@
                     if (success) {
                         self.model.metadata.scheduleExportIntervalDays = selectedValue;
                         self.model.metadata.nextScheduledExport = [NSDate.date dateByAddingTimeInterval:self.model.metadata.scheduleExportIntervalDays * 24 * 60 * 60];
-
-                        [SafesList.sharedInstance update:self.model.metadata];
                     }
                     [self bindUI];
                 }];

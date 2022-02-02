@@ -192,7 +192,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         }
         else {
             WebDAVProviderData* providerData = makeProviderData(path, configuration);
-            METADATA_PTR metadata = [self getSafeMetaData:nickName providerData:providerData];
+            METADATA_PTR metadata = [self getDatabasePreferences:nickName providerData:providerData];
             completion(metadata, nil);
         }
     };
@@ -577,7 +577,7 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     return foo;
 }
 
-- (METADATA_PTR)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+- (METADATA_PTR)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
     WebDAVProviderData* foo = (WebDAVProviderData*)providerData;
     
     NSError* error;
@@ -591,10 +591,10 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
 #if TARGET_OS_IPHONE
-    return [[SafeMetaData alloc] initWithNickName:nickName
-                                  storageProvider:self.storageId
-                                         fileName:[[foo.href lastPathComponent] stringByRemovingPercentEncoding]
-                                   fileIdentifier:json];
+    return [DatabasePreferences templateDummyWithNickName:nickName
+                                          storageProvider:self.storageId
+                                                 fileName:[[foo.href lastPathComponent] stringByRemovingPercentEncoding]
+                                           fileIdentifier:json];
 #else
     NSURLComponents* components = [NSURLComponents componentsWithString:foo.href];
     
@@ -606,10 +606,10 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     
     
     
-    DatabaseMetadata *ret = [[DatabaseMetadata alloc] initWithNickName:nickName
-                                                       storageProvider:self.storageId
-                                                               fileUrl:newComponents.URL
-                                                           storageInfo:json];
+    MacDatabasePreferences *ret = [MacDatabasePreferences templateDummyWithNickName:nickName
+                                                                    storageProvider:self.storageId
+                                                                            fileUrl:newComponents.URL
+                                                                        storageInfo:json];
     
     
     

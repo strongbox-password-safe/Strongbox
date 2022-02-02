@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView identifier="TotpTableCellView" id="c22-O7-iKe" customClass="TotpTableCellView" customModule="Strongbox" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="412" height="87"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="999" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bCh-EQ-71x" userLabel="TOTP Code">
+                    <rect key="frame" x="-2" y="26" width="159" height="38"/>
+                    <textFieldCell key="cell" lineBreakMode="clipping" title="00000000" id="qaW-PJ-w7b">
+                        <font key="font" size="32" name="Menlo-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <progressIndicator wantsLayer="YES" verticalHuggingPriority="999" maxValue="100" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="P8u-ZS-vrP">
+                    <rect key="frame" x="0.0" y="7" width="155" height="20"/>
+                </progressIndicator>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="7vo-hi-a1d">
+                    <rect key="frame" x="-2" y="64" width="62" height="15"/>
+                    <constraints>
+                        <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="20" id="sel-gP-DcA"/>
+                    </constraints>
+                    <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="&lt;Not Set&gt;" id="xyV-Ec-9aE">
+                        <font key="font" textStyle="callout" name=".SFNS-Regular"/>
+                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VlX-TP-gto">
+                    <rect key="frame" x="370" y="34" width="42" height="19"/>
+                    <popUpButtonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="zMR-do-i0T" id="nu8-e4-Eoj">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                        <font key="font" textStyle="body" name=".SFNS-Regular"/>
+                        <menu key="menu" autoenablesItems="NO" id="uNR-re-F6u">
+                            <items>
+                                <menuItem state="on" hidden="YES" id="zMR-do-i0T">
+                                    <imageReference key="image" image="ellipsis.circle" catalog="system" symbolScale="large"/>
+                                </menuItem>
+                                <menuItem title="Item 2" id="X7r-mJ-WXx"/>
+                                <menuItem title="Item 3" id="F6X-u1-FPs"/>
+                            </items>
+                        </menu>
+                    </popUpButtonCell>
+                    <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                </popUpButton>
+            </subviews>
+            <constraints>
+                <constraint firstItem="bCh-EQ-71x" firstAttribute="top" secondItem="7vo-hi-a1d" secondAttribute="bottom" id="HOj-KY-7Cd"/>
+                <constraint firstItem="bCh-EQ-71x" firstAttribute="width" secondItem="P8u-ZS-vrP" secondAttribute="width" id="TtX-fh-not"/>
+                <constraint firstAttribute="bottom" secondItem="P8u-ZS-vrP" secondAttribute="bottom" constant="8" id="Yad-pJ-pNt"/>
+                <constraint firstItem="P8u-ZS-vrP" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="azi-pZ-VPH"/>
+                <constraint firstItem="VlX-TP-gto" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bCh-EQ-71x" secondAttribute="trailing" constant="8" symbolic="YES" id="c7x-bD-vuF"/>
+                <constraint firstItem="bCh-EQ-71x" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="d1v-lX-F9f"/>
+                <constraint firstItem="7vo-hi-a1d" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="8" id="igr-Fh-rXJ"/>
+                <constraint firstItem="7vo-hi-a1d" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="uYD-cg-b0e"/>
+                <constraint firstAttribute="trailing" secondItem="VlX-TP-gto" secondAttribute="trailing" id="z7Q-x7-Zd6"/>
+                <constraint firstItem="VlX-TP-gto" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="zNG-Re-Q9E"/>
+                <constraint firstItem="P8u-ZS-vrP" firstAttribute="top" secondItem="bCh-EQ-71x" secondAttribute="bottom" id="zvY-CS-93v"/>
+            </constraints>
+            <connections>
+                <outlet property="labelFieldName" destination="7vo-hi-a1d" id="1uc-rs-Mq3"/>
+                <outlet property="labelTotp" destination="bCh-EQ-71x" id="hFK-SG-01X"/>
+                <outlet property="popupButton" destination="VlX-TP-gto" id="gNE-5w-uAQ"/>
+                <outlet property="progressTotp" destination="P8u-ZS-vrP" id="CIa-Dl-R5C"/>
+            </connections>
+            <point key="canvasLocation" x="247" y="99.5"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="ellipsis.circle" catalog="system" width="20" height="20"/>
+    </resources>
+</document>

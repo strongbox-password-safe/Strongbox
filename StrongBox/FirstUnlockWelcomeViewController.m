@@ -7,7 +7,7 @@
 //
 
 #import "FirstUnlockWelcomeViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @interface FirstUnlockWelcomeViewController ()
 
@@ -25,7 +25,6 @@
 
 - (IBAction)onLetsGo:(id)sender {
     self.model.metadata.hasShownInitialOnboardingScreen = YES;
-    [SafesList.sharedInstance update:self.model.metadata];
     
     if ( self.onDone ) {
         self.onDone(NO, NO);
@@ -34,8 +33,7 @@
 
 - (IBAction)onNotRightNow:(id)sender {
     self.model.metadata.hasShownInitialOnboardingScreen = YES;
-    [SafesList.sharedInstance update:self.model.metadata];
-
+    
     if ( self.onDone ) {
         self.onDone(NO, YES);
     }

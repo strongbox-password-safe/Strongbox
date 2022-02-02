@@ -8,7 +8,7 @@
 
 #import "QuickLaunchOnboardingViewController.h"
 #import "AppPreferences.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @implementation QuickLaunchOnboardingViewController
 
@@ -25,7 +25,6 @@
     AppPreferences.sharedInstance.autoFillQuickLaunchUuid = self.model.metadata.uuid;
 
     self.model.metadata.hasBeenPromptedForQuickLaunch = YES;
-    [SafesList.sharedInstance update:self.model.metadata];
 
     if ( self.onDone ) {
         self.onDone(NO, NO);
@@ -34,7 +33,6 @@
 
 - (IBAction)onNoThankYou:(id)sender {
     self.model.metadata.hasBeenPromptedForQuickLaunch = YES;
-    [SafesList.sharedInstance update:self.model.metadata];
 
     if ( self.onDone ) {
         self.onDone(NO, NO);

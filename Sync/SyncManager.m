@@ -7,7 +7,7 @@
 //
 
 #import "SyncManager.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "SafeStorageProviderFactory.h"
 #import "AppPreferences.h"
 #import "OfflineDetector.h"
@@ -46,7 +46,7 @@
 }
 
 - (void)backgroundSyncOutstandingUpdates {
-    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
+    for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
         if (database.outstandingUpdateId) {
             [self backgroundSyncDatabase:database];
         }
@@ -54,24 +54,24 @@
 }
 
 - (void)backgroundSyncAll {
-    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
+    for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
         [self backgroundSyncDatabase:database];
     }
 }
 
 - (void)backgroundSyncLocalDeviceDatabasesOnly {
-    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
+    for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
         if (database.storageProvider == kLocalDevice) {
             [self backgroundSyncDatabase:database];
         }
     }
 }
 
-- (void)backgroundSyncDatabase:(SafeMetaData*)database {
+- (void)backgroundSyncDatabase:(DatabasePreferences*)database {
     [self backgroundSyncDatabase:database join:YES];
 }
 
-- (void)backgroundSyncDatabase:(SafeMetaData*)database join:(BOOL)join {
+- (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join {
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
@@ -87,7 +87,7 @@
     }];
 }
 
-- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
+- (void)sync:(DatabasePreferences *)database interactiveVC:(UIViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.interactiveVC = interactiveVC;
@@ -104,15 +104,15 @@
     }];
 }
 
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database file:(NSString *)file error:(NSError **)error {
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabasePreferences *)database file:(NSString *)file error:(NSError **)error {
     return [self updateLocalCopyMarkAsRequiringSync:database data:nil file:file error:error];
 }
 
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error {
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabasePreferences *)database data:(NSData *)data error:(NSError**)error {
     return [self updateLocalCopyMarkAsRequiringSync:database data:data file:nil error:error];
 }
 
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data file:(NSString *)file error:(NSError**)error {
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabasePreferences *)database data:(NSData *)data file:(NSString *)file error:(NSError**)error {
     
     
     NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
@@ -131,7 +131,6 @@
     
     NSUUID* updateId = NSUUID.UUID;
     database.outstandingUpdateId = updateId;
-    [SafesList.sharedInstance update:database];
         
     NSURL* url;
     if ( file ) {
@@ -150,17 +149,17 @@
     return url != nil;
 }
 
-- (SyncStatus*)getSyncStatus:(SafeMetaData *)database {
+- (SyncStatus*)getSyncStatus:(DatabasePreferences *)database {
     return [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:database.uuid];
 }
 
 
 
-- (NSString *)getPrimaryStorageDisplayName:(SafeMetaData *)database {
+- (NSString *)getPrimaryStorageDisplayName:(DatabasePreferences *)database {
     return [SafeStorageProviderFactory getStorageDisplayName:database];
 }
 
-- (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database {
+- (void)removeDatabaseAndLocalCopies:(DatabasePreferences*)database {
     if (database.storageProvider == kLocalDevice) {
         [[LocalDeviceStorageProvider sharedInstance] delete:database completion:nil];
     }
@@ -209,9 +208,9 @@
 }
 
 - (NSArray<StorageBrowserItem *>*)scanForNewDatabases {
-    NSArray<SafeMetaData*> * localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+    NSArray<DatabasePreferences*> * localSafes = [DatabasePreferences forAllDatabasesOfProvider:kLocalDevice];
     NSMutableSet *existing = [NSMutableSet set];
-    for (SafeMetaData* safe in localSafes) {
+    for (DatabasePreferences* safe in localSafes) {
         LocalDatabaseIdentifier* identifier = [self getLegacyLocalDatabaseStorageIdentifier:safe];
         if(identifier && !identifier.sharedStorage) {
             [existing addObject:identifier.filename];
@@ -281,9 +280,9 @@
     NSArray<StorageBrowserItem*> *items = [self scanForNewDatabases];
     
     for(StorageBrowserItem* item in items) {
-        NSString* name = [SafesList trimDatabaseNickName:[item.name stringByDeletingPathExtension]];
-        SafeMetaData *safe = [LocalDeviceStorageProvider.sharedInstance getSafeMetaData:name
-                                                                           providerData:item.providerData];
+        NSString* name = [DatabasePreferences trimDatabaseNickName:[item.name stringByDeletingPathExtension]];
+        DatabasePreferences *safe = [LocalDeviceStorageProvider.sharedInstance getDatabasePreferences:name
+                                                                                         providerData:item.providerData];
         
         NSURL *url = [FileManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
         NSData* snapshot = [NSData dataWithContentsOfURL:url];
@@ -291,14 +290,14 @@
         NSError* error;
         NSDictionary *att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
         
-        [[SafesList sharedInstance] addWithDuplicateCheck:safe initialCache:snapshot initialCacheModDate:att.fileModificationDate];
+        [safe addWithDuplicateCheck:snapshot initialCacheModDate:att.fileModificationDate];
     }
     
     
     
-    NSArray<SafeMetaData*> *localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
+    NSArray<DatabasePreferences*> *localSafes = [DatabasePreferences forAllDatabasesOfProvider:kLocalDevice];
     
-    for (SafeMetaData* localSafe in localSafes) {
+    for (DatabasePreferences* localSafe in localSafes) {
         NSURL* url = [self getLegacyLocalDatabaseFileUrl:localSafe];
         if(![NSFileManager.defaultManager fileExistsAtPath:url.path]) {
             NSLog(@"WARNWARN: Database [%@] underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
@@ -314,8 +313,8 @@
     [SyncManager.sharedInstance backgroundSyncLocalDeviceDatabasesOnly];
 }
 
-- (BOOL)toggleLocalDatabaseFilesVisibility:(SafeMetaData*)metadata error:(NSError**)error {
-    LocalDatabaseIdentifier* identifier = [self getLegacyLocalDatabaseStorageIdentifier:metadata];
+- (BOOL)toggleLocalDatabaseFilesVisibility:(DatabasePreferences*)databaseMetadata error:(NSError**)error {
+    LocalDatabaseIdentifier* identifier = [self getLegacyLocalDatabaseStorageIdentifier:databaseMetadata];
 
     NSURL* src = [self getLegacyLocalDatabaseFileUrl:identifier.sharedStorage filename:identifier.filename];
     NSURL* dest = [self getLegacyLocalDatabaseFileUrl:!identifier.sharedStorage filename:identifier.filename];
@@ -347,17 +346,15 @@
     
     identifier.sharedStorage = !identifier.sharedStorage;
     
-    metadata.fileIdentifier = [identifier toJson];
-    metadata.fileName = identifier.filename;
+    databaseMetadata.fileIdentifier = [identifier toJson];
+    databaseMetadata.fileName = identifier.filename;
 
-    [SafesList.sharedInstance update:metadata];
-    
     [self startMonitoringDocumentsDirectory];
     
     return YES;
 }
 
-- (LocalDatabaseIdentifier*)getLegacyLocalDatabaseStorageIdentifier:(SafeMetaData*)metaData {
+- (LocalDatabaseIdentifier*)getLegacyLocalDatabaseStorageIdentifier:(DatabasePreferences*)metaData {
     NSString* json = metaData.fileIdentifier;
     return [LocalDatabaseIdentifier fromJson:json];
 }
@@ -366,7 +363,7 @@
     return shared ? FileManager.sharedInstance.sharedAppGroupDirectory : FileManager.sharedInstance.documentsDirectory;
 }
 
-- (NSURL*)getLegacyLocalDatabaseFileUrl:(SafeMetaData*)safeMetaData {
+- (NSURL*)getLegacyLocalDatabaseFileUrl:(DatabasePreferences*)safeMetaData {
     LocalDatabaseIdentifier* identifier = [self getLegacyLocalDatabaseStorageIdentifier:safeMetaData];
     return identifier ? [self getLegacyLocalDatabaseFileUrl:identifier.sharedStorage filename:identifier.filename] : nil;
 }

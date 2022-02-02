@@ -9,14 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "StaticDataTableViewController.h"
 #import "AbstractDatabaseFormatAdaptor.h"
-#import "SafeMetaData.h"
+#import "DatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BrowsePreferencesTableViewController : StaticDataTableViewController
 
 @property DatabaseFormat format;
-@property SafeMetaData* databaseMetaData;
+@property DatabasePreferences* databaseMetaData;
 @property (nonatomic, copy) void (^onDone)(void);
 
 @end

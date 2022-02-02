@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 
-import Foundation;
+import Foundation
 
 extension String {
     
@@ -27,7 +27,7 @@ extension String {
 
         if headerComponents.count > 1 {
             let parameters =
-                headerComponents[1..<headerComponents.count]
+                headerComponents[1 ..< headerComponents.count]
                     .filter { $0.contains("=") }
                     .map { $0.components(separatedBy: "=") }
                     .toDictionary { ($0[0], $0[1]) }

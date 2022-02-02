@@ -8,9 +8,10 @@
 
 #import "WelcomeAddDatabaseViewController.h"
 #import "WelcomeCreateDatabaseViewController.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "AppPreferences.h"
 #import "AutoFillManager.h"
+#import "SafesList.h"
 
 @interface WelcomeAddDatabaseViewController ()
 
@@ -70,7 +71,7 @@
 }
 
 - (void)onDatabasesChanged {
-    NSInteger count = SafesList.sharedInstance.snapshot.count;
+    NSInteger count = DatabasePreferences.allDatabases.count;
     [self.buttonAdd setTitle:count ? (count == 1 ?
                                       NSLocalizedString(@"welcome_vc_view_database", @"View Your Database") :
                                       NSLocalizedString(@"welcome_vc_view_databases", @"View Your Databases")) :

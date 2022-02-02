@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView identifier="TitleCellView" focusRingType="exterior" id="7mF-mB-o7T" customClass="TitleCellView" customModule="Strongbox" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="430" height="71"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <textField horizontalHuggingPriority="252" verticalHuggingPriority="999" horizontalCompressionResistancePriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="Qwk-tl-sWp">
+                    <rect key="frame" x="50" y="20" width="382" height="31"/>
+                    <textFieldCell key="cell" selectable="YES" title="Title" id="VJ4-Rg-JL4">
+                        <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xCl-YF-1uz">
+                    <rect key="frame" x="0.0" y="14.5" width="32.5" height="44"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="32" id="L6e-yu-JeZ"/>
+                        <constraint firstAttribute="width" constant="32" id="zix-TC-i5r"/>
+                    </constraints>
+                    <imageCell key="cell" controlSize="large" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="Seh-cu-pzY">
+                        <imageReference key="image" image="wand.and.rays" catalog="system" symbolScale="large"/>
+                    </imageCell>
+                    <color key="contentTintColor" name="linkColor" catalog="System" colorSpace="catalog"/>
+                </imageView>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Qwk-tl-sWp" secondAttribute="trailing" id="8EV-tc-9Uu"/>
+                <constraint firstAttribute="bottom" secondItem="Qwk-tl-sWp" secondAttribute="bottom" constant="20" id="BCl-4y-gLE"/>
+                <constraint firstItem="Qwk-tl-sWp" firstAttribute="centerY" secondItem="xCl-YF-1uz" secondAttribute="centerY" id="IZm-4f-zh7"/>
+                <constraint firstItem="Qwk-tl-sWp" firstAttribute="top" secondItem="7mF-mB-o7T" secondAttribute="top" constant="20" id="Z4F-uE-HQc"/>
+                <constraint firstItem="Qwk-tl-sWp" firstAttribute="leading" secondItem="xCl-YF-1uz" secondAttribute="trailing" constant="20" id="ebD-DF-l0h"/>
+                <constraint firstItem="xCl-YF-1uz" firstAttribute="leading" secondItem="7mF-mB-o7T" secondAttribute="leading" id="fud-yu-ANd"/>
+            </constraints>
+            <connections>
+                <outlet property="image" destination="xCl-YF-1uz" id="kxQ-Dh-XBR"/>
+                <outlet property="titleLabel" destination="Qwk-tl-sWp" id="nY4-Rw-zPA"/>
+            </connections>
+            <point key="canvasLocation" x="1" y="338.5"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="wand.and.rays" catalog="system" width="21" height="21"/>
+    </resources>
+</document>

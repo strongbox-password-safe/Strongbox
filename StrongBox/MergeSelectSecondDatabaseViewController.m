@@ -48,7 +48,7 @@
         vc.firstDatabase = self.firstDatabase;
         
         __weak MergeSelectSecondDatabaseViewController* weakSelf = self;
-        vc.onSelectedDatabase = ^(SafeMetaData * _Nonnull secondDatabase, UIViewController *__weak  _Nonnull vcToDismiss) {
+        vc.onSelectedDatabase = ^(DatabasePreferences * _Nonnull secondDatabase, UIViewController *__weak  _Nonnull vcToDismiss) {
             [vcToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:^{
                 [weakSelf onSecondDatabaseSelected:secondDatabase];
             }];
@@ -62,7 +62,7 @@
     }
 }
 
-- (void)onSecondDatabaseSelected:(SafeMetaData * _Nonnull)secondDatabase {
+- (void)onSecondDatabaseSelected:(DatabasePreferences * _Nonnull)secondDatabase {
     if ( [NSDate isMoreThanXMinutesAgo:secondDatabase.lastSyncAttempt minutes:3] ||
          [NSDate isMoreThanXMinutesAgo:self.firstDatabase.metadata.lastSyncAttempt minutes:3] ) {
         [Alerts info:self
@@ -77,7 +77,7 @@
     }
 }
 
-- (void)unlockSecondDatabase:(SafeMetaData*)database {
+- (void)unlockSecondDatabase:(DatabasePreferences*)database {
     CompositeKeyFactors* firstKey = self.firstDatabase.database.ckfs;
 
     Model* expressAttempt = [DatabaseUnlocker expressTryUnlockWithKey:database key:firstKey];

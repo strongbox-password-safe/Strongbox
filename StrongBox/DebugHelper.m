@@ -17,7 +17,7 @@
 
 #if TARGET_OS_IPHONE
 
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "AppPreferences.h"
 #import "git-version.h"
 #import "SyncManager.h"
@@ -30,9 +30,9 @@
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #import "Settings.h"
-#import "DatabasesManager.h"
 #import "MacSyncManager.h"
 #import "FileManager.h"
+#import "MacDatabasePreferences.h"
 
 #endif
 
@@ -170,10 +170,10 @@ static NSString *ModelIdentifier()
     [debugLines addObject:@"--------------------"];
 
 #if TARGET_OS_IPHONE
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
+    for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
         SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
 #else
-    for(DatabaseMetadata *safe in [DatabasesManager sharedInstance].snapshot) {
+    for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
         SyncStatus *syncStatus = [MacSyncManager.sharedInstance getSyncStatus:safe];
 #endif
         NSMutableArray<NSArray*>* mutableSyncs = NSMutableArray.array;
@@ -244,9 +244,11 @@ static NSString *ModelIdentifier()
 
         
 #if TARGET_OS_IPHONE
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
+    for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
         NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+        [debugLines addObject:@"================================================================="];
         [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
+        [debugLines addObject:@"================================================================="];
 
         NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
         jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
@@ -254,62 +256,26 @@ static NSString *ModelIdentifier()
         [debugLines addObject:thisSafe];
     }
 #else
-    for(DatabaseMetadata *safe in [DatabasesManager sharedInstance].snapshot) {
+    for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
         NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+        [debugLines addObject:@"================================================================="];
         [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
+        [debugLines addObject:@"================================================================="];
 
-        @autoreleasepool {
-            unsigned int count;
-            Ivar *ivars = class_copyIvarList([DatabaseMetadata class], &count);
-            for (unsigned int i = 0; i < count; i++) {
-                Ivar ivar = ivars[i];
-
-                const char *name = ivar_getName(ivar);
-                const char *type = ivar_getTypeEncoding(ivar);
-                ptrdiff_t offset = ivar_getOffset(ivar);
-
-                NSString* str;
-                if (strncmp(type, "i", 1) == 0) {
-                    int intValue = *(int*)((uintptr_t)safe + offset);
-                    str = [NSString stringWithFormat:@"%s = %i", name, intValue];
-                }
-                else if (strncmp(type, "f", 1) == 0) {
-                    float floatValue = *(float*)((uintptr_t)safe + offset);
-                    str = [NSString stringWithFormat:@"%s = %f", name, floatValue];
-                }
-                else if (strncmp(type, "c", 1) == 0) {
-                    char value = *(char*)((uintptr_t)safe + offset);
-                    str = [NSString stringWithFormat:@"%s = %d", name, value];
-                }
-                else if (strncmp(type, "q", 1) == 0) {
-                    long long value = *(long long*)((uintptr_t)safe + offset);
-                    str = [NSString stringWithFormat:@"%s = %lld", name, value];
-                }
-                else if (strncmp(type, "Q", 1) == 0) {
-                    unsigned long long value = *(unsigned long long*)((uintptr_t)safe + offset);
-                    str = [NSString stringWithFormat:@"%s = %lld", name, value];
-                }
-                else if (strncmp(type, "@", 1) == 0) {
-                    id value = object_getIvar(safe, ivar);
-                    str = [NSString stringWithFormat:@"%s = %@", name, value];
-                }
-                
-                
-                if ( str ) {
-                    [debugLines addObject:str];
-                }
-                else {
-                    NSLog(@"WARNWARN Unknown iVar Type: %s", type);
-                }
-            }
-            free(ivars);
-       }
+        NSMutableDictionary<NSString*, NSString*>* mut = safe.debugInfoLines.mutableCopy;
+        
+        [mut removeObjectForKey:@"_storageInfo"]; 
+        
+        for ( NSString* key in mut.allKeys ) {
+            NSString* val = mut[key];
+            [debugLines addObject:[NSString stringWithFormat:@"%@ = %@", key, val]];
+        }
+        
+        [debugLines addObject:@"================================================================="];
     }
 #endif
 
     [debugLines addObject:@"--------------------"];
-
-    
     
     return debugLines;
 }

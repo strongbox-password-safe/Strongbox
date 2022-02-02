@@ -19,7 +19,6 @@
 #import "MacHardwareKeyManager.h"
 #import "DatabasesManagerVC.h"
 #import "BookmarksHelper.h"
-#import "DatabasesManager.h"
 #import "StrongboxErrorCodes.h"
 #import "KeyFileParser.h"
 #import "MBProgressHUD.h"
@@ -38,7 +37,7 @@
 @property BOOL hasLoaded;
 @property (weak) Document*_Nullable document;
 @property (readonly) ViewModel*_Nullable viewModel;
-@property (readonly) DatabaseMetadata*_Nullable databaseMetadata;
+@property (readonly) MacDatabasePreferences*_Nullable databaseMetadata;
 
 @property (weak) IBOutlet NSTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
@@ -78,7 +77,7 @@
     return self.document.viewModel;
 }
 
-- (DatabaseMetadata*)databaseMetadata {
+- (MacDatabasePreferences*)databaseMetadata {
     return self.viewModel.databaseMetadata;
 }
 
@@ -175,12 +174,6 @@
     [self startObservingModelChanges];
     
     [self.view.window.windowController synchronizeWindowTitleWithDocumentName]; 
-
-    if ( Settings.sharedInstance.nextGenUI ) {
-        if (@available(macOS 11.0, *)) {
-            self.view.window.subtitle = @"Lock Screen Subtitle - do or say something?"; 
-        }
-    }
     
     self.selectedKeyFileBookmark = self.viewModel ? self.databaseMetadata.keyFileBookmark : nil;
     self.selectedYubiKeyConfiguration = self.viewModel ? self.databaseMetadata.yubiKeyConfiguration : nil;
@@ -191,9 +184,7 @@
         [self.view.window setFrame:NSMakeRect(0,0, 600, 750) display:YES];
         [self.view.window center];
         
-        [DatabasesManager.sharedInstance atomicUpdate:self.databaseMetadata.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.hasSetInitialWindowPosition = YES;
-        }];
+        self.databaseMetadata.hasSetInitialWindowPosition = YES;
     }
     
     [self bindUI];
@@ -213,7 +204,7 @@
 }
 
 - (void)stopObservingModelChanges {
-    NSLog(@"LockScreenViewController::stopObservingModelChanges");
+
     
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
@@ -269,7 +260,9 @@
     NSImage* img = nil;
     
     if (@available(macOS 11.0, *)) {
-        img = [NSImage imageWithSystemSymbolName:!self.textFieldMasterPassword.showsText ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""];
+        img = [NSImage imageWithSystemSymbolName:!self.textFieldMasterPassword.showsText ? @"eye" : @"eye.slash" accessibilityDescription:@""];
+        
+        [self.buttonToggleRevealMasterPasswordTip setSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
     } else {
         img = !self.textFieldMasterPassword.showsText ?
          [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
@@ -316,7 +309,7 @@
 }
 
 - (void)bindBiometricButtonOnLockScreen {
-    DatabaseMetadata* database = self.databaseMetadata;
+    MacDatabasePreferences* database = self.databaseMetadata;
         
     BOOL passwordAvailable = database.conveniencePasswordHasBeenStored;
     BOOL convenienceEnabled = database.isConvenienceUnlockEnabled;
@@ -618,7 +611,7 @@
     
     
 
-    DatabaseMetadata *database = self.databaseMetadata;
+    MacDatabasePreferences *database = self.databaseMetadata;
     NSURL* configuredUrl;
     if ( database && database.keyFileBookmark ) {
         NSString* updatedBookmark = nil;
@@ -633,10 +626,7 @@
         else {
            
             if(updatedBookmark) {
-                [DatabasesManager.sharedInstance atomicUpdate:database.uuid
-                                                        touch:^(DatabaseMetadata * _Nonnull metadata) {
-                    metadata.keyFileBookmark = updatedBookmark;
-                }];
+                database.keyFileBookmark = updatedBookmark;
             }
         }
     }
@@ -847,7 +837,7 @@
     [self enableMasterCredentialsEntry:NO];
             
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.document revertWithUnlock:compositeKeyFactors
+        [self.document unlock:compositeKeyFactors
                          viewController:self
                     alertOnJustPwdWrong:NO
                         fromConvenience:fromConvenience
@@ -880,16 +870,13 @@
         [self bindUI];
         
         [self setInitialFocus];
-
-        
-        
         
         if ( incorrectCredentials && !fromConvenience && ( ckfs.keyFileDigest == nil && ckfs.yubiKeyCR == nil ) ) {
             [self showIncorrectPasswordToast];
         }
-
-
-
+        else if (error) {
+            [MacAlerts error:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") error:error window:self.view.window];
+        }
     }
 }
 

@@ -11,7 +11,7 @@ import SwiftUI
 
 @available(OSX 10.15, *)
 class SwiftUIViewFactory: NSObject {
-  @objc static func makeSwiftUIView(dismissHandler: @escaping (() -> Void)) -> NSViewController? {
-    return SwiftUIController(coder: NSCoder())
-  }
+    @objc static func makeSwiftUIView(dismissHandler _: @escaping (() -> Void)) -> NSViewController? {
+        return SwiftUIController(coder: NSCoder())
+    }
 }

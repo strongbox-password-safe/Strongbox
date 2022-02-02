@@ -8,18 +8,23 @@
 //
 
 #import "ViewModel.h"
-#import "DatabaseModel.h"
+#import "Model.h"
 #import "PasswordMaker.h"
 #import "Settings.h"
 #import "OTPToken+Serialization.h"
 #import "FavIconManager.h"
-#import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "NSString+Extensions.h"
 #import "AutoFillManager.h"
 #import "Serializator.h"
 #import "Utils.h"
 #import "Document.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -37,129 +42,164 @@ NSString* const kModelUpdateNotificationItemsUnDeleted = @"kModelUpdateNotificat
 NSString* const kModelUpdateNotificationItemsMoved = @"kModelUpdateNotificationItemsMoved";
 NSString* const kModelUpdateNotificationTagsChanged = @"kModelUpdateNotificationTagsChanged";
 NSString* const kModelUpdateNotificationSelectedItemChanged = @"kModelUpdateNotificationSelectedItemChanged";
+NSString* const kModelUpdateNotificationItemsAdded = @"kModelUpdateNotificationItemsAdded";
+NSString* const kModelUpdateNotificationItemEdited = @"kModelUpdateNotificationItemEdited";
 
 NSString* const kModelUpdateNotificationDatabasePreferenceChanged = @"kModelUpdateNotificationDatabasePreferenceChanged";
+NSString* const kModelUpdateNotificationDatabaseUpdateStatusChanged = @"kModelUpdateNotificationDatabaseUpdateStatusChanged";
+
+NSString* const kModelUpdateNotificationNextGenNavigationChanged = @"kModelUpdateNotificationNextGenNavigationChanged";
+NSString* const kModelUpdateNotificationNextGenSelectedItemsChanged = @"kModelUpdateNotificationNextGenSelectedItemsChanged";
+NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUpdateNotificationNextGenSearchContextChanged";
 
 NSString* const kNotificationUserInfoKeyIsBatchIconUpdate = @"kNotificationUserInfoKeyIsBatchIconUpdate";
 NSString* const kNotificationUserInfoKeyNode = @"node";
+NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 @interface ViewModel ()
 
-@property (nullable) DatabaseModel* passwordDatabase;
-@property (nullable) NSUUID* internalSelectedItem;
+@property (nullable) Model* innerModel;
+@property (nullable) NSUUID* internalSelectedItem; 
+@property SearchScope innerNextGenSearchScope;
 
 @end
 
 @implementation ViewModel
 
-- (instancetype)initLocked:(NSDocument *)document
-                  metadata:(DatabaseMetadata *)metadata {
-    return [self initUnlockedWithDatabase:document
-                                 metadata:metadata
-                                database:nil];
+- (void)dealloc {
+    NSLog(@"=====================================================================");
+    NSLog(@"😎 ViewModel DEALLOC...");
+    NSLog(@"=====================================================================");
 }
 
-- (instancetype)initUnlockedWithDatabase:(NSDocument *)document
-                                metadata:(DatabaseMetadata *)metadata
-                                database:(DatabaseModel *)database {
+- (instancetype)initLocked:(NSDocument*)document
+              databaseUuid:(NSString*)databaseUuid {
     if (self = [super init]) {
         _document = document;
-        self.passwordDatabase = database;
+        _databaseUuid = databaseUuid;
+        _innerNextGenSearchScope = kSearchScopeAll;
+        
+        self.innerModel = nil;
     }
     
     return self;
 }
 
+- (instancetype)initUnlocked:(NSDocument *)document
+                databaseUuid:(NSString*)databaseUuid
+                       model:(Model *)model {
+    if ( self = [self initLocked:document databaseUuid:databaseUuid] ) {
+        self.innerModel = model;
+    }
+
+    return self;
+}
+
 - (BOOL)locked {
-    return self.passwordDatabase == nil;
+    return self.innerModel == nil;
 }
 
 
 
 
-- (NSString *)databaseUuid {
-    return self.databaseMetadata.uuid;
-}
-
-- (DatabaseMetadata *)databaseMetadata {
-    Document* doc = (Document*)self.document;
-    return doc.databaseMetadata;
-}
-
-- (void)updateDatabaseMetadata:(void (^)(DatabaseMetadata * _Nonnull metadata))touch {
-    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
-                                            touch:touch];
+- (MacDatabasePreferences *)databaseMetadata {
+    return [MacDatabasePreferences fromUuid:self.databaseUuid];
 }
 
 
 
 - (BOOL)isEffectivelyReadOnly {
-    return self.readOnly || self.offlineMode;
+    return self.readOnly || self.offlineMode || (self.innerModel && self.innerModel.isReadOnly);
+}
+
+- (Model *)commonModel {
+    
+    return self.innerModel;
 }
 
 - (DatabaseModel *)database {
-    return self.passwordDatabase;
+    
+    return self.innerModel.database;
+}
+
+- (Node *)getItemById:(NSUUID *)uuid {
+    return [self.innerModel getItemById:uuid];
 }
 
 - (DatabaseFormat)format {
-    return self.passwordDatabase.originalFormat;
+    return self.database.originalFormat;
 }
 
 - (UnifiedDatabaseMetadata*)metadata {
-    return self.passwordDatabase.meta;
+    return self.database.meta;
 }
 
 - (NSSet<NodeIcon*>*)customIcons {
-    return self.passwordDatabase.iconPool.allValues.set;
+    return self.database.iconPool.allValues.set;
 }
 
 - (NSArray<Node*>*)activeRecords {
-    return self.passwordDatabase.allActiveEntries;
+    return self.database.allActiveEntries;
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)node {
-    return [self.passwordDatabase getPathDisplayString:node includeRootGroup:YES rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
+    return [self getGroupPathDisplayString:node rootGroupNameInsteadOfSlash:NO];
+}
+
+- (NSString *)getGroupPathDisplayString:(Node *)node rootGroupNameInsteadOfSlash:(BOOL)rootGroupNameInsteadOfSlash {
+    return [self.database getPathDisplayString:node includeRootGroup:YES rootGroupNameInsteadOfSlash:rootGroupNameInsteadOfSlash includeFolderEmoji:NO joinedBy:@"/"];
+}
+
+- (NSString *)getParentGroupPathDisplayString:(Node *)node {
+    return [self.database getSearchParentGroupPathDisplayString:node prependSlash:NO];
 }
 
 - (NSArray<Node*>*)activeGroups {
-    return self.passwordDatabase.allActiveGroups;
+    return self.database.allActiveGroups;
 }
 
 -(Node*)rootGroup {
-    return self.passwordDatabase.effectiveRootGroup;
+    return self.database.effectiveRootGroup;
 }
 
 - (BOOL)masterCredentialsSet {
     if(!self.locked) {
-        return !(self.passwordDatabase.ckfs.password == nil &&
-                 self.passwordDatabase.ckfs.keyFileDigest == nil &&
-                 self.passwordDatabase.ckfs.yubiKeyCR == nil);
+        return !(self.database.ckfs.password == nil &&
+                 self.database.ckfs.keyFileDigest == nil &&
+                 self.database.ckfs.yubiKeyCR == nil);
     }
     
     return NO;
 }
 
-- (void)getPasswordDatabaseAsData:(void (^)(BOOL userCancelled, NSData *data, NSError *error))completion {
+- (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion)completion {
     if (self.locked) {
-        NSLog(@"Attempt to get safe data while locked?");
-        completion(NO, nil, nil);
+        NSLog(@"🔴 Attempt to get update while locked?");
+        return NO;
     }
-    
-    NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory]; 
-    [outputStream open];
-    
-    [Serializator getAsData:self.passwordDatabase format:self.passwordDatabase.originalFormat outputStream:outputStream completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        [outputStream close];
-                
-        if ( !userCancelled && !error ) {
-            NSData* data = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-            completion(userCancelled, data, error);
-        }
-        else {
-            completion(userCancelled, nil, error);
-        }
-    }];
+
+    return [self.innerModel asyncUpdateAndSync:completion];
 }
+
+- (void)update:(NSViewController *)viewController handler:(void (^)(BOOL, BOOL, NSError * _Nullable))handler {
+    if (self.locked) {
+        NSLog(@"🔴 Attempt to get update while locked?");
+        return;
+    }
+
+    [self.innerModel update:viewController handler:handler];
+}
+
+- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL))completion {
+    if (self.locked) {
+        NSLog(@"🔴 Attempt to get update while locked?");
+        return;
+    }
+
+    [self.innerModel reloadDatabaseFromLocalWorkingCopy:viewController completion:completion];
+}
+
+
 
 - (NSURL*)fileUrl {
     return [self.document fileURL];
@@ -168,17 +208,17 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 
 - (BOOL)isDereferenceableText:(NSString *)text {
-    return [self.passwordDatabase isDereferenceableText:text];
+    return [self.database isDereferenceableText:text];
 }
 
 - (NSString *)dereference:(NSString *)text node:(Node *)node {
-    return [self.passwordDatabase dereference:text node:node];
+    return [self.database dereference:text node:node];
 }
 
 
 
 -(CompositeKeyFactors *)compositeKeyFactors {
-    return self.locked ? nil : self.passwordDatabase.ckfs;
+    return self.locked ? nil : self.database.ckfs;
 }
 
 - (void)setCompositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
@@ -186,24 +226,24 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    CompositeKeyFactors* original = [self.passwordDatabase.ckfs clone];
+    CompositeKeyFactors* original = [self.database.ckfs clone];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setCompositeKeyFactors:original];
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_change_master_credentials", @"Change Master Credentials");
     [self.document.undoManager setActionName:loc];
     
-    self.passwordDatabase.ckfs = compositeKeyFactors;
+    self.database.ckfs = compositeKeyFactors;
 }
 
 
 
 - (BOOL)recycleBinEnabled {
-    return self.passwordDatabase.recycleBinEnabled;
+    return self.database.recycleBinEnabled;
 }
 
 - (Node *)recycleBinNode {
-    return self.passwordDatabase.recycleBinNode;
+    return self.database.recycleBinNode;
 }
 
 - (void)createNewRecycleBinNode {
@@ -211,7 +251,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (Node *)keePass1BackupNode {
-    return self.passwordDatabase.keePass1BackupNode;
+    return self.database.keePass1BackupNode;
 }
 
 
@@ -402,13 +442,18 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSDate* oldModified = item.fields.modified;
 
     if(self.document.undoManager.isUndoing) {
-        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+        if(item.fields.keePassHistory.count > 0) {
+            [item.fields.keePassHistory removeLastObject];
+        }
     }
     else {
         Node* cloneForHistory = [item cloneForHistory];
+        
+        NSLog(@"setItemPassword: %ld / %ld", cloneForHistory.fields.keePassHistory.count, item.fields.keePassHistory.count);
+        
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
-
+    
     item.fields.password = password;
     [self touchAndModify:item modDate:modified];
     item.fields.passwordModified = item.fields.modified;
@@ -481,9 +526,130 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     });
 }
 
+- (void)setGroupExpandedState:(Node *)item expanded:(BOOL)expanded {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    
+    
+    item.fields.isExpanded = expanded;
+    [self touchAndModify:item modDate:NSDate.date];
+    [self.document updateChangeCount:NSChangeDone]; 
+}
 
 
 
+- (BOOL)applyModelEditsAndMoves:(EntryViewModel *)editModel toNode:(NSUUID*)nodeId {
+    Node* node = [self getItemById:nodeId];
+    if ( node == nil ) {
+        NSLog(@"🔴 Could not find destination node!");
+        return NO;
+    }
+
+    Node* cloneForApplication = [node clone];
+    
+    if ( ![editModel applyToNode:cloneForApplication
+                  databaseFormat:self.format
+               keePassEmailField:YES
+         legacySupplementaryTotp:NO
+                   addOtpAuthUrl:YES] ) {
+        return NO;
+    }
+
+    [self.document.undoManager beginUndoGrouping];
+            
+    if ( ![self editNodeFieldsUsingSourceNode:cloneForApplication destination:nodeId] ) {
+        [self.document.undoManager endUndoGrouping];
+        NSLog(@"🔴 Could not edit node fields using source node!");
+        return NO;
+    }
+    
+    
+    
+    node = [self getItemById:nodeId];
+        
+    if (!( ( editModel.parentGroupUuid == nil && node.parent.uuid == nil ) || (editModel.parentGroupUuid && [editModel.parentGroupUuid isEqual:node.parent.uuid]) )) {
+        Node* parent = [self getItemById:editModel.parentGroupUuid];
+        if ( parent == nil || !parent.isGroup ) {
+            [self.document.undoManager endUndoGrouping];
+            NSLog(@"🔴 Could not find destination node!");
+            return NO;
+        }
+
+        if (! [self move:@[node] destination:parent] ) {
+            [self.document.undoManager endUndoGrouping];
+            NSLog(@"🔴 Could not move node!");
+            return NO;
+        }
+    }
+    
+    NSString* loc = NSLocalizedString(@"browse_prefs_tap_action_edit", @"Edit Item");
+
+    [self.document.undoManager setActionName:loc];
+    [self.document.undoManager endUndoGrouping];
+    
+    return YES;
+}
+
+- (BOOL)editNodeFieldsUsingSourceNode:(Node*)sourceNode destination:(NSUUID*)destination {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    Node* destinationNode = [self getItemById:destination];
+    if ( destinationNode == nil ) {
+        NSLog(@"🔴 Could not find destination node!");
+        return NO;
+    }
+    
+    Node* old = [destinationNode clone];
+    Node* cloneForHistory = [destinationNode cloneForHistory];
+    
+    if ( [destinationNode mergePropertiesInFromNode:sourceNode
+                           mergeLocationChangedDate:NO
+                                     includeHistory:NO
+                             keePassGroupTitleRules:NO] ) {
+        if(self.document.undoManager.isUndoing) {
+            if(destinationNode.fields.keePassHistory.count > 0) [destinationNode.fields.keePassHistory removeLastObject];
+        }
+        else {
+            [destinationNode.fields.keePassHistory addObject:cloneForHistory];
+        }
+        
+        [[self.document.undoManager prepareWithInvocationTarget:self] editNodeFieldsUsingSourceNode:old destination:destination];
+        
+        NSString* loc = NSLocalizedString(@"browse_prefs_tap_action_edit", @"Edit Item");
+        [self.document.undoManager setActionName:loc];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemEdited object:self userInfo:@{ kNotificationUserInfoKeyNode : destinationNode }];
+        });
+
+        return YES;
+    }
+    
+    return NO;
+}
+
+
+
+- (void)batchSetIcons:(NSArray<Node*>*)items icon:(NodeIcon*)icon {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    [self.document.undoManager beginUndoGrouping];
+            
+    for (Node* item in items) {
+        [self setItemIcon:item icon:icon batchUpdate:YES];
+    }
+
+    NSString* loc = NSLocalizedString(@"mac_undo_action_set_icons", @"Set Icon(s)");
+
+    [self.document.undoManager setActionName:loc];
+    [self.document.undoManager endUndoGrouping];
+}
 
 - (void)batchSetIcons:(NSDictionary<NSUUID *,NSImage *>*)iconMap {
     if(self.locked) {
@@ -820,8 +986,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [item setTotpWithString:otp
            appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
                  forceSteam:steam
-            addLegacyFields:NO
-              addOtpAuthUrl:YES]; 
+            addLegacyFields:Settings.sharedInstance.addLegacySupplementaryTotpCustomFields
+              addOtpAuthUrl:Settings.sharedInstance.addOtpAuthUrl];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
     
@@ -953,7 +1119,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (NSSet<Node *> *)getMinimalNodeSet:(const NSArray<Node *> *)nodes {
-    return [self.passwordDatabase getMinimalNodeSet:nodes];
+    return [self.database getMinimalNodeSet:nodes];
 }
 
 
@@ -965,17 +1131,27 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)addNewGroup:(Node *)parentGroup title:(NSString *)title {
+    return [self addNewGroup:parentGroup title:title group:nil];
+}
+
+- (BOOL)addNewGroup:(Node *)parentGroup title:(NSString *)title group:(Node **)group {
     if ( !parentGroup ) {
         return NO;
     }
     
     Node* newGroup = [self getNewGroupWithSafeName:parentGroup title:title];
-    return [self addItem:newGroup parent:parentGroup openEntryDetailsWindowWhenDone:NO];
+    BOOL ret = [self addItem:newGroup parent:parentGroup openEntryDetailsWindowWhenDone:NO];
+    
+    if ( ret && group ) {
+        *group = newGroup;
+    }
+    
+    return ret;
 }
 
 - (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent {
     for (Node* child in children) {
-        if ( ![self.passwordDatabase validateAddChild:child destination:parent] ) {
+        if ( ![self.database validateAddChild:child destination:parent] ) {
             return NO;
         }
     }
@@ -983,7 +1159,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager beginUndoGrouping];
     
     for (Node* child in children) {
-        [self addItem:child parent:parent openEntryDetailsWindowWhenDone:NO];
+        [self addItem:child parent:parent];
     }
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_add_items", @"Add Items");
@@ -993,31 +1169,48 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return YES;
 }
 
-- (BOOL)addItem:(Node*)item parent:(Node*)parent openEntryDetailsWindowWhenDone:(BOOL)openEntryDetailsWindowWhenDone {
-    if (![self.passwordDatabase addChild:item destination:parent]) {
-        return NO;
-    }
-    
-    [[self.document.undoManager prepareWithInvocationTarget:self] unAddItem:item];
-    
-    NSString* loc = NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
-    [self.document.undoManager setActionName:loc];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.onNewItemAdded(item, openEntryDetailsWindowWhenDone);
-    });
-    
-    return YES;
+- (BOOL)addItem:(Node *)item parent:(Node *)parent {
+    return [self addItem:item parent:parent openEntryDetailsWindowWhenDone:NO];
 }
 
-- (void)unAddItem:(Node*)item {
+- (BOOL)addItem:(Node*)item parent:(Node*)parent openEntryDetailsWindowWhenDone:(BOOL)openEntryDetailsWindowWhenDone {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
 
-    [self.passwordDatabase removeChildFromParent:item];
+    if ( parent == nil ) {
+        NSLog(@"🔴 Failed to add child to NIL parent");
+        return NO;
+    }
+    
+    if (![self.database addChild:item destination:parent]) {
+        NSLog(@"🔴 Failed to add child");
+        return NO;
+    }
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] unAddItem:item parent:parent];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
+    [self.document.undoManager setActionName:loc];
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsAdded
+                                                      object:self
+                                                    userInfo:@{ kNotificationUserInfoKeyNode : @[item] ,
+                                                                kNotificationUserInfoKeyBoolParam : @(openEntryDetailsWindowWhenDone)
+                                                             }];
 
-    [[self.document.undoManager prepareWithInvocationTarget:self] addItem:item parent:item.parent openEntryDetailsWindowWhenDone:NO];
+    return YES;
+}
+
+- (void)unAddItem:(Node*)item parent:(Node*)parent { 
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    Node* original = [item clone];
+    [self.database removeChildFromParent:item];
+
+    [[self.document.undoManager prepareWithInvocationTarget:self] addItem:original parent:parent];
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
     [self.document.undoManager setActionName:loc];
@@ -1028,7 +1221,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)canRecycle:(Node *)item {
-    return [self.passwordDatabase canRecycle:item.uuid];
+    return [self.database canRecycle:item.uuid];
 }
 
 - (void)deleteItems:(const NSArray<Node *> *)items {
@@ -1037,7 +1230,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     NSArray<NodeHierarchyReconstructionData*>* undoData;
-    [self.passwordDatabase deleteItems:items undoData:&undoData];
+    [self.database deleteItems:items undoData:&undoData];
 
     [[self.document.undoManager prepareWithInvocationTarget:self] unDeleteItems:undoData];
     
@@ -1056,7 +1249,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    [self.passwordDatabase unDelete:undoData];
+    [self.database unDelete:undoData];
     
     NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
         return obj.clonedNode;
@@ -1082,7 +1275,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     NSArray<NodeHierarchyReconstructionData*> *undoData;
-    BOOL ret = [self.passwordDatabase recycleItems:items undoData:&undoData];
+    BOOL ret = [self.database recycleItems:items undoData:&undoData];
 
     [[self.document.undoManager prepareWithInvocationTarget:self] unRecycleItems:undoData];
     
@@ -1104,7 +1297,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    [self.passwordDatabase undoRecycle:undoData];
+    [self.database undoRecycle:undoData];
     
     NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
         return obj.clonedNode;
@@ -1126,7 +1319,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 
 - (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination {
-    return [self.passwordDatabase validateMoveItems:items destination:destination];
+    return [self.database validateMoveItems:items destination:destination];
 }
 
 - (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination {
@@ -1135,7 +1328,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
 
     NSArray<NodeHierarchyReconstructionData*> *undoData;
-    BOOL ret = [self.passwordDatabase moveItems:items destination:destination undoData:&undoData];
+    BOOL ret = [self.database moveItems:items destination:destination undoData:&undoData];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] unMove:undoData destination:destination];
     
@@ -1158,7 +1351,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    [self.passwordDatabase undoMove:undoData];
+    [self.database undoMove:undoData];
     
     NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
         return obj.clonedNode;
@@ -1178,25 +1371,12 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 
 
-- (void)launchUrl:(Node*)item { 
-    NSURL* launchableUrl = [self.database launchableUrlForItem:item];
-        
-    if ( !launchableUrl ) {
-        NSLog(@"Could not get launchable URL for item.");
-        return;
-    }
-    
-    if (@available(macOS 10.15, *)) {
-        [[NSWorkspace sharedWorkspace] openURL:launchableUrl
-                                 configuration:NSWorkspaceOpenConfiguration.configuration
-                             completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
-            if ( error ) {
-                NSLog(@"Launch URL done. Error = [%@]", error);
-            }
-        }];
-    } else {
-        [[NSWorkspace sharedWorkspace] openURL:launchableUrl];
-    }
+- (BOOL)launchUrl:(Node *)item {
+    return [self.innerModel launchUrl:item];
+}
+
+- (BOOL)launchUrlString:(NSString *)urlString {
+    return [self.innerModel launchUrlString:urlString];
 }
 
 
@@ -1309,83 +1489,103 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (NSString*)getAutoFillMostPopularUsername {
-    return self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
+    return self.database.mostPopularUsername == nil ? @"" : self.database.mostPopularUsername;
 }
 
 - (NSString*)getAutoFillMostPopularEmail {
-    return self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;
+    return self.database.mostPopularEmail == nil ? @"" : self.database.mostPopularEmail;
 }
 
 - (Node*)getItemFromSerializationId:(NSString*)serializationId {
-    return [self.passwordDatabase getItemByCrossSerializationFriendlyId:serializationId];
+    return [self.database getItemByCrossSerializationFriendlyId:serializationId];
 }
 
 - (NSString*)generatePassword {
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:Settings.sharedInstance.passwordGenerationConfig];
 }
 
+- (NSSet<NSString*> *)customFieldKeySet {
+    return self.database.customFieldKeySet;
+}
+
 - (NSSet<NSString*> *)emailSet {
-    return self.passwordDatabase.emailSet;
+    return self.database.emailSet;
 }
 
 - (NSSet<NSString *> *)tagSet {
-    return self.passwordDatabase.tagSet;
+    return self.database.tagSet;
 }
 
 - (NSSet<NSString*> *)urlSet {
-    return self.passwordDatabase.urlSet;
+    return self.database.urlSet;
 }
 
 - (NSSet<NSString*> *)usernameSet {
-    return self.passwordDatabase.usernameSet;
+    return self.database.usernameSet;
 }
 
 - (NSSet<NSString*> *)passwordSet {
-    return self.passwordDatabase.passwordSet;
+    return self.database.passwordSet;
 }
 
 - (NSString *)mostPopularUsername {
-    return self.passwordDatabase.mostPopularUsername;
+    return self.database.mostPopularUsername;
+}
+
+- (NSArray<NSString *> *)mostPopularUsernames {
+    return self.database.mostPopularUsernames;
+}
+
+- (NSString *)mostPopularEmail {
+    return self.database.mostPopularEmail;
+}
+
+- (NSArray<NSString *> *)mostPopularEmails {
+    return self.database.mostPopularEmails;
+}
+
+- (NSArray<NSString *> *)mostPopularTags {
+    return self.database.mostPopularTags;
 }
 
 - (NSString *)mostPopularPassword {
-    return self.passwordDatabase.mostPopularPassword;
+    return self.database.mostPopularPassword;
 }
 
 - (NSInteger)numberOfRecords {
-    return self.passwordDatabase.numberOfRecords;
+    return self.database.numberOfRecords;
 }
 
 - (NSInteger)numberOfGroups {
-    return self.passwordDatabase.numberOfGroups;
+    return self.database.numberOfGroups;
 }
 
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isTitleMatches:searchText node:node dereference:dereference checkPinYin:NO];
+    return [self.database isTitleMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isUsernameMatches:searchText node:node dereference:dereference checkPinYin:NO];
+    return [self.database isUsernameMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isPasswordMatches:searchText node:node dereference:dereference checkPinYin:NO];
+    return [self.database isPasswordMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isUrlMatches:searchText node:node dereference:dereference checkPinYin:NO];
+    return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:NO];
+    return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
-    return [self.passwordDatabase getSearchTerms:searchText];
+    return [self.database getSearchTerms:searchText];
 }
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName {
-    return [self.passwordDatabase getHtmlPrintString:databaseName];
+    return [self.database getHtmlPrintString:databaseName];
 }
 
 
@@ -1395,9 +1595,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowTotp:(BOOL)showTotp {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.doNotShowTotp = !showTotp;
-    }];
+    self.databaseMetadata.doNotShowTotp = !showTotp;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1407,9 +1605,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowAutoCompleteSuggestions:(BOOL)showAutoCompleteSuggestions {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.doNotShowAutoCompleteSuggestions = !showAutoCompleteSuggestions;
-    }];
+    self.databaseMetadata.doNotShowAutoCompleteSuggestions = !showAutoCompleteSuggestions;
 }
 
 - (BOOL)showChangeNotifications {
@@ -1417,9 +1613,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowChangeNotifications:(BOOL)showChangeNotifications {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.doNotShowChangeNotifications = !showChangeNotifications;
-    }];
+    self.databaseMetadata.doNotShowChangeNotifications = !showChangeNotifications;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1429,9 +1623,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setConcealEmptyProtectedFields:(BOOL)concealEmptyProtectedFields {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.concealEmptyProtectedFields = concealEmptyProtectedFields;
-    }];
+    self.databaseMetadata.concealEmptyProtectedFields = concealEmptyProtectedFields;
 }
 
 - (BOOL)lockOnScreenLock {
@@ -1439,9 +1631,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setLockOnScreenLock:(BOOL)lockOnScreenLock {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-            metadata.lockOnScreenLock = lockOnScreenLock;
-    }];
+    self.databaseMetadata.lockOnScreenLock = lockOnScreenLock;
 }
 
 - (BOOL)autoPromptForConvenienceUnlockOnActivate {
@@ -1449,9 +1639,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setAutoPromptForConvenienceUnlockOnActivate:(BOOL)autoPromptForConvenienceUnlockOnActivate {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoPromptForConvenienceUnlockOnActivate = autoPromptForConvenienceUnlockOnActivate;
-    }];
+    self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate = autoPromptForConvenienceUnlockOnActivate;
 }
 
 - (BOOL)showAdvancedUnlockOptions {
@@ -1459,9 +1647,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowAdvancedUnlockOptions:(BOOL)showAdvancedUnlockOptions {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.showAdvancedUnlockOptions = showAdvancedUnlockOptions;
-    }];
+    self.databaseMetadata.showAdvancedUnlockOptions = showAdvancedUnlockOptions;
 }
 
 - (BOOL)showQuickView {
@@ -1469,9 +1655,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowQuickView:(BOOL)showQuickView {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.showQuickView = showQuickView;
-    }];
+    self.databaseMetadata.showQuickView = showQuickView;
 }
 
 - (BOOL)showAlternatingRows {
@@ -1479,9 +1663,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowAlternatingRows:(BOOL)showAlternatingRows {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.noAlternatingRows = !showAlternatingRows;
-    }];
+    self.databaseMetadata.noAlternatingRows = !showAlternatingRows;
 
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1491,9 +1673,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowVerticalGrid:(BOOL)showVerticalGrid {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.showVerticalGrid = showVerticalGrid;
-    }];
+    self.databaseMetadata.showVerticalGrid = showVerticalGrid;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1503,9 +1683,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowHorizontalGrid:(BOOL)showHorizontalGrid {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.showHorizontalGrid = showHorizontalGrid;
-    }];
+    self.databaseMetadata.showHorizontalGrid = showHorizontalGrid;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1515,9 +1693,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setVisibleColumns:(NSArray *)visibleColumns {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.visibleColumns = visibleColumns;
-    }];
+    self.databaseMetadata.visibleColumns = visibleColumns;
 }
 
 - (BOOL)downloadFavIconOnChange {
@@ -1525,9 +1701,15 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setDownloadFavIconOnChange:(BOOL)downloadFavIconOnChange {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.expressDownloadFavIconOnNewOrUrlChanged = downloadFavIconOnChange;
-    }];
+    self.databaseMetadata.expressDownloadFavIconOnNewOrUrlChanged = downloadFavIconOnChange;
+}
+
+- (BOOL)promptedForAutoFetchFavIcon {
+    return self.databaseMetadata.promptedForAutoFetchFavIcon;
+}
+
+- (void)setPromptedForAutoFetchFavIcon:(BOOL)promptedForAutoFetchFavIcon {
+    self.databaseMetadata.promptedForAutoFetchFavIcon = promptedForAutoFetchFavIcon;
 }
 
 - (BOOL)startWithSearch {
@@ -1535,9 +1717,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setStartWithSearch:(BOOL)startWithSearch {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.startWithSearch = startWithSearch;
-    }];
+    self.databaseMetadata.startWithSearch = startWithSearch;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1547,9 +1727,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setOutlineViewTitleIsReadonly:(BOOL)outlineViewTitleIsReadonly {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.outlineViewTitleIsReadonly = outlineViewTitleIsReadonly;
-    }];
+    self.databaseMetadata.outlineViewTitleIsReadonly = outlineViewTitleIsReadonly;
 }
 
 - (BOOL)outlineViewEditableFieldsAreReadonly {
@@ -1557,9 +1735,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setOutlineViewEditableFieldsAreReadonly:(BOOL)outlineViewEditableFieldsAreReadonly {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.outlineViewEditableFieldsAreReadonly = outlineViewEditableFieldsAreReadonly;
-    }];
+    self.databaseMetadata.outlineViewEditableFieldsAreReadonly = outlineViewEditableFieldsAreReadonly;
 }
 
 - (BOOL)showRecycleBinInSearchResults {
@@ -1567,9 +1743,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowRecycleBinInSearchResults:(BOOL)showRecycleBinInSearchResults {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.showRecycleBinInSearchResults = showRecycleBinInSearchResults;
-    }];
+    self.databaseMetadata.showRecycleBinInSearchResults = showRecycleBinInSearchResults;
 }
 
 - (BOOL)sortKeePassNodes {
@@ -1577,9 +1751,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setSortKeePassNodes:(BOOL)sortKeePassNodes {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.uiDoNotSortKeePassNodesInBrowseView = !sortKeePassNodes;
-    }];
+    self.databaseMetadata.uiDoNotSortKeePassNodesInBrowseView = !sortKeePassNodes;
 }
 
 - (BOOL)showRecycleBinInBrowse {
@@ -1587,9 +1759,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setShowRecycleBinInBrowse:(BOOL)showRecycleBinInBrowse {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.doNotShowRecycleBinInBrowse = !showRecycleBinInBrowse;
-    }];
+    self.databaseMetadata.doNotShowRecycleBinInBrowse = !showRecycleBinInBrowse;
 }
 
 - (BOOL)monitorForExternalChanges {
@@ -1598,9 +1768,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setMonitorForExternalChanges:(BOOL)monitorForExternalChanges {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.monitorForExternalChanges = monitorForExternalChanges;
-    }];
+    self.databaseMetadata.monitorForExternalChanges = monitorForExternalChanges;
 }
 
 - (NSInteger)monitorForExternalChangesInterval {
@@ -1608,9 +1776,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setMonitorForExternalChangesInterval:(NSInteger)monitorForExternalChangesInterval {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.monitorForExternalChangesInterval = monitorForExternalChangesInterval;
-    }];
+    self.databaseMetadata.monitorForExternalChangesInterval = monitorForExternalChangesInterval;
 }
 
 - (BOOL)autoReloadAfterExternalChanges {
@@ -1618,20 +1784,15 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setAutoReloadAfterExternalChanges:(BOOL)autoReloadAfterExternalChanges {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoReloadAfterExternalChanges = autoReloadAfterExternalChanges;
-    }];
+    self.databaseMetadata.autoReloadAfterExternalChanges = autoReloadAfterExternalChanges;
 }
 
 - (BOOL)launchAtStartup {
     return self.databaseMetadata.launchAtStartup;
-
 }
 
 - (void)setLaunchAtStartup:(BOOL)launchAtStartup {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.launchAtStartup = launchAtStartup;
-    }];
+    self.databaseMetadata.launchAtStartup = launchAtStartup;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1642,9 +1803,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setAlwaysOpenOffline:(BOOL)alwaysOpenOffline {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.alwaysOpenOffline = alwaysOpenOffline;
-    }];
+    self.databaseMetadata.alwaysOpenOffline = alwaysOpenOffline;
 }
 
 - (BOOL)readOnly {
@@ -1652,9 +1811,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setReadOnly:(BOOL)readOnly {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.readOnly = readOnly;
-    }];
+    self.databaseMetadata.readOnly = readOnly;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -1664,16 +1821,217 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)setOfflineMode:(BOOL)offlineMode {
-    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.offlineMode = offlineMode;
-    }];
+    self.databaseMetadata.offlineMode = offlineMode;
 
     [self publishDatabasePreferencesChangedNotification];
 }
 
+- (NSUUID *)asyncUpdateId {
+    return self.databaseMetadata.asyncUpdateId;
+}
+
+- (void)setAsyncUpdateId:(NSUUID *)asyncUpdateId {
+    self.databaseMetadata.asyncUpdateId = asyncUpdateId;
+
+    [self publishDatabaseUpdateStatusChangedNotification];
+}
+
+
+
+- (KeePassIconSet)iconSet {
+    return self.databaseMetadata.iconSet;
+}
+
+- (void)setIconSet:(KeePassIconSet)iconSet {
+    self.databaseMetadata.iconSet = iconSet;
+
+    [self publishDatabasePreferencesChangedNotification];
+}
+
+
+
 - (void)publishDatabasePreferencesChangedNotification {
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationDatabasePreferenceChanged object:self userInfo:@{ }];
+    });
+}
+
+- (void)publishDatabaseUpdateStatusChangedNotification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationDatabaseUpdateStatusChanged object:self userInfo:@{ }];
+    });
+}
+
+
+
+- (NSArray<Node *> *)search:(NSString *)searchText
+                      scope:(SearchScope)scope
+                dereference:(BOOL)dereference
+      includeKeePass1Backup:(BOOL)includeKeePass1Backup
+          includeRecycleBin:(BOOL)includeRecycleBin
+             includeExpired:(BOOL)includeExpired
+              includeGroups:(BOOL)includeGroups
+            browseSortField:(BrowseSortField)browseSortField
+                 descending:(BOOL)descending
+          foldersSeparately:(BOOL)foldersSeparately {
+    return [self.innerModel search:searchText
+                             scope:scope
+                       dereference:dereference
+             includeKeePass1Backup:includeKeePass1Backup
+                 includeRecycleBin:includeRecycleBin
+                    includeExpired:includeExpired
+                     includeGroups:includeGroups
+                   browseSortField:browseSortField
+                        descending:descending
+                 foldersSeparately:foldersSeparately];
+}
+
+- (NSArray<Node *> *)filterAndSortForBrowse:(NSMutableArray<Node *> *)nodes
+                      includeKeePass1Backup:(BOOL)includeKeePass1Backup
+                          includeRecycleBin:(BOOL)includeRecycleBin
+                             includeExpired:(BOOL)includeExpired
+                              includeGroups:(BOOL)includeGroups
+                            browseSortField:(BrowseSortField)browseSortField
+                                 descending:(BOOL)descending
+                          foldersSeparately:(BOOL)foldersSeparately {
+    return [self.innerModel filterAndSortForBrowse:nodes
+                             includeKeePass1Backup:includeKeePass1Backup
+                                 includeRecycleBin:includeRecycleBin
+                                    includeExpired:includeExpired
+                                     includeGroups:includeGroups
+                                   browseSortField:browseSortField
+                                        descending:descending
+                                 foldersSeparately:foldersSeparately];
+}
+
+- (NSComparisonResult)compareNodesForSort:(Node *)node1
+                                    node2:(Node *)node2
+                                    field:(BrowseSortField)field
+                               descending:(BOOL)descending
+                        foldersSeparately:(BOOL)foldersSeparately
+                         tieBreakUseTitle:(BOOL)tieBreakUseTitle {
+    return [self.innerModel compareNodesForSort:node1 node2:node2 field:field descending:descending foldersSeparately:foldersSeparately tieBreakUseTitle:tieBreakUseTitle];
+}
+
+
+
+
+- (OGNavigationContext)nextGenNavigationContext {
+    return self.databaseMetadata.sideBarNavigationContext;
+}
+
+- (NSUUID *)nextGenNavigationContextSideBarSelectedGroup {
+    return self.databaseMetadata.sideBarSelectedGroup;
+}
+
+- (NSString *)nextGenNavigationContextSelectedTag {
+    return self.databaseMetadata.sideBarSelectedTag;
+}
+
+- (OGNavigationSpecial)nextGenNavigationContextSpecial {
+    return self.databaseMetadata.sideBarSelectedSpecial;
+}
+
+- (NSArray<NSUUID *> *)nextGenSelectedItems {
+    return self.databaseMetadata.browseSelectedItems;
+}
+
+- (void)setNextGenNavigationNone {
+    if ( self.nextGenNavigationContext != OGNavigationContextNone ) {
+        self.databaseMetadata.sideBarNavigationContext = OGNavigationContextNone;
+        [self publishNextGenNavigationContextChanged];
+    }
+}
+
+- (void)setNextGenNavigation:(OGNavigationContext)context selectedGroup:(NSUUID *)selectedGroup {
+    if ( self.nextGenNavigationContext != context || ![self.nextGenNavigationContextSideBarSelectedGroup isEqualTo:selectedGroup] ) {
+        self.databaseMetadata.sideBarNavigationContext = context;
+        self.databaseMetadata.sideBarSelectedGroup = selectedGroup;
+        [self publishNextGenNavigationContextChanged];
+    }
+    else {
+
+    }
+}
+
+- (void)setNextGenNavigation:(OGNavigationContext)context tag:(NSString *)tag {
+    if ( self.nextGenNavigationContext != context || ![self.nextGenNavigationContextSelectedTag isEqualToString:tag] ) {
+        self.databaseMetadata.sideBarNavigationContext = context;
+        self.databaseMetadata.sideBarSelectedTag = tag;
+        [self publishNextGenNavigationContextChanged];
+    }
+    else {
+
+    }
+}
+
+- (void)setNextGenNavigation:(OGNavigationContext)context special:(OGNavigationSpecial)special {
+    if ( self.nextGenNavigationContext != context || self.nextGenNavigationContextSpecial != special ) {
+        self.databaseMetadata.sideBarNavigationContext = context;
+        self.databaseMetadata.sideBarSelectedSpecial = special;
+        [self publishNextGenNavigationContextChanged];
+    }
+    else {
+
+    }
+}
+
+- (void)setNextGenSelectedItems:(NSArray<NSUUID *> *)nextGenMasterSelectedItems {
+
+    
+    NSSet<NSUUID*>* newSelected = nextGenMasterSelectedItems ? [NSSet setWithArray:nextGenMasterSelectedItems] : NSSet.set;
+    NSSet<NSUUID*>* oldSelected = [NSSet setWithArray:self.nextGenSelectedItems];
+    
+    if ( ![newSelected isEqualToSet:oldSelected]) {
+        self.databaseMetadata.browseSelectedItems = newSelected.allObjects;
+        [self publishNextGenSelectedItemsChanged];
+    }
+    else {
+
+    }
+}
+
+- (void)publishNextGenSelectedItemsChanged {
+    NSLog(@"✅ publishNextGenSelectedItemsChanged");
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNextGenSelectedItemsChanged object:self userInfo:nil];
+    });
+}
+
+- (void)publishNextGenNavigationContextChanged {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNextGenNavigationChanged object:self userInfo:nil];
+    });
+}
+
+
+
+- (NSString *)nextGenSearchText {
+    return self.databaseMetadata.searchText;
+}
+
+- (void)setNextGenSearchText:(NSString *)nextGenSearchText {
+    if ( ![self.nextGenSearchText isEqual:nextGenSearchText] ) {
+        self.databaseMetadata.searchText = nextGenSearchText;
+        [self publishNextGenSearchContextChanged];
+    }
+}
+
+- (SearchScope)nextGenSearchScope {
+    return self.innerNextGenSearchScope;
+}
+
+- (void)setNextGenSearchScope:(SearchScope)nextGenSearchScope {
+    if ( self.nextGenSearchScope != nextGenSearchScope ) {
+        self.innerNextGenSearchScope = nextGenSearchScope;
+        [self publishNextGenSearchContextChanged];
+    }
+}
+
+- (void)publishNextGenSearchContextChanged {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNextGenSearchContextChanged object:self userInfo:nil];
     });
 }
 

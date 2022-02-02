@@ -8,7 +8,7 @@
 
 #import "DatabasePropertiesVC.h"
 #import "PropertySwitchTableViewCell.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 #import "AppPreferences.h"
 #import "BackupsTableViewController.h"
 #import "SyncLogViewController.h"
@@ -31,6 +31,8 @@ static NSUInteger const kRowCount = 8;
 
 @interface DatabasePropertiesVC ()
 
+@property (readonly) DatabasePreferences* database;
+
 @end
 
 @implementation DatabasePropertiesVC
@@ -45,18 +47,24 @@ static NSUInteger const kRowCount = 8;
     return kRowCount;
 }
 
+- (DatabasePreferences*)database {
+    return [DatabasePreferences fromUuid:self.databaseUuid];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    SafeMetaData* metadata = self.database;
+    NSString* databaseUuid = self.database.uuid;
+    __weak DatabasePropertiesVC* weakSelf = self;
     
     if ( indexPath.row == kReadOnlyRow ) {
         PropertySwitchTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kPropertySwitchTableViewCellId forIndexPath:indexPath];
 
         cell.titleLabel.text = NSLocalizedString( @"databases_toggle_read_only_context_menu", @"Read Only");
         cell.subtitleLabel.text = NSLocalizedString ( @"database_properties_subtitle_read_only", @"Do not allow changes/edits to be made to this database when it is open.");
-        cell.switchBool.on = metadata.readOnly;
+        cell.switchBool.on = self.database.readOnly;
+        
+        
         cell.onToggledSwitch = ^(BOOL currentState) {
-            metadata.readOnly = currentState;
-            [SafesList.sharedInstance update:metadata];
+            weakSelf.database.readOnly = currentState;
         };
         
         return cell;
@@ -66,17 +74,17 @@ static NSUInteger const kRowCount = 8;
 
         cell.titleLabel.text = NSLocalizedString(@"databases_toggle_quick_launch_context_menu", @"Quick Launch");
         cell.subtitleLabel.text = NSLocalizedString ( @"database_properties_subtitle_quick_launch", @"Automatically Prompt to open this database on App Launch.");
-        BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:metadata.uuid];
+        BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:databaseUuid];
         cell.switchBool.on = isAlreadyQuickLaunch;
         
         cell.onToggledSwitch = ^(BOOL currentState) {
             if (currentState) {
-                AppPreferences.sharedInstance.quickLaunchUuid = metadata.uuid;
-                [SafesList.sharedInstance update:metadata]; 
+                AppPreferences.sharedInstance.quickLaunchUuid = databaseUuid;
+                [DatabasePreferences notifyDatabaseChanged:databaseUuid];
             }
             else {
                 AppPreferences.sharedInstance.quickLaunchUuid = nil;
-                [SafesList.sharedInstance update:metadata]; 
+                [DatabasePreferences notifyDatabaseChanged:databaseUuid];
             }
         };
         
@@ -87,11 +95,10 @@ static NSUInteger const kRowCount = 8;
 
         cell.titleLabel.text = NSLocalizedString ( @"database_properties_title_always_auto_merge", @"Always Auto-Merge");
         cell.subtitleLabel.text = NSLocalizedString ( @"database_properties_subtitle_conflict_resolution", @"When a sync conflict occurs automatically merge without asking.");
-        cell.switchBool.on = metadata.conflictResolutionStrategy == kConflictResolutionStrategyAutoMerge;
+        cell.switchBool.on = self.database.conflictResolutionStrategy == kConflictResolutionStrategyAutoMerge;
 
         cell.onToggledSwitch = ^(BOOL currentState) {
-            metadata.conflictResolutionStrategy = currentState ? kConflictResolutionStrategyAutoMerge : kConflictResolutionStrategyAsk;
-            [SafesList.sharedInstance update:metadata];
+            weakSelf.database.conflictResolutionStrategy = currentState ? kConflictResolutionStrategyAutoMerge : kConflictResolutionStrategyAsk;
         };
         
         return cell;
@@ -100,7 +107,7 @@ static NSUInteger const kRowCount = 8;
         UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:@"DatabaseMetadataGenericCell" forIndexPath:indexPath];
 
         cell.textLabel.text = NSLocalizedString( @"database_properties_title_offline_detected_behaviour", @"Offline Detected Behaviour");
-        cell.detailTextLabel.text = stringForOfflineBehaviour(metadata.offlineDetectedBehaviour);
+        cell.detailTextLabel.text = stringForOfflineBehaviour(self.database.offlineDetectedBehaviour);
                 
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
@@ -112,7 +119,7 @@ static NSUInteger const kRowCount = 8;
 
         cell.textLabel.text = NSLocalizedString( @"database_properties_title_could_not_connect_behaviour", @"Could Not Connect Behaviour");
         
-        cell.detailTextLabel.text = stringForCouldNotConnectBehaviour(metadata.couldNotConnectBehaviour);
+        cell.detailTextLabel.text = stringForCouldNotConnectBehaviour(self.database.couldNotConnectBehaviour);
                 
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
@@ -125,11 +132,10 @@ static NSUInteger const kRowCount = 8;
         cell.titleLabel.text = NSLocalizedString ( @"database_properties_title_always_offline", @"Always Open Offline");
         cell.subtitleLabel.text = NSLocalizedString ( @"database_properties_subtitle_always_offline", @"You can choose to immediately open offline whenever you use this database. No sync will be performed on unlock. A background sync can be performed by pulling down on your Databases list.");
         
-        cell.switchBool.on = metadata.forceOpenOffline;
+        cell.switchBool.on = self.database.forceOpenOffline;
 
         cell.onToggledSwitch = ^(BOOL currentState) {
-            metadata.forceOpenOffline = currentState;
-            [SafesList.sharedInstance update:metadata];
+            weakSelf.database.forceOpenOffline = currentState;
         };
         
         return cell;
@@ -161,6 +167,8 @@ static NSUInteger const kRowCount = 8;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    __weak DatabasePropertiesVC* weakSelf = self;
+    
     if ( indexPath.row == kBackupsRow ) {
         [self performSegueWithIdentifier:@"segueToBackups" sender:self.database];
     }
@@ -181,8 +189,7 @@ static NSUInteger const kRowCount = 8;
          currentlySelectIndex:self.database.offlineDetectedBehaviour
                    completion:^(BOOL success, NSInteger selectedIndex) {
             if ( success ) {
-                self.database.offlineDetectedBehaviour = selectedIndex;
-                [SafesList.sharedInstance update:self.database];
+                weakSelf.database.offlineDetectedBehaviour = selectedIndex;
                 [self.tableView reloadData];
             }
         }];
@@ -200,8 +207,7 @@ static NSUInteger const kRowCount = 8;
          currentlySelectIndex:self.database.couldNotConnectBehaviour
                    completion:^(BOOL success, NSInteger selectedIndex) {
             if ( success ) {
-                self.database.couldNotConnectBehaviour = selectedIndex;
-                [SafesList.sharedInstance update:self.database];
+                weakSelf.database.couldNotConnectBehaviour = selectedIndex;
                 [self.tableView reloadData];
             }
         }];
@@ -235,12 +241,12 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
     if ([segue.identifier isEqualToString:@"segueToBackups"]) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         BackupsTableViewController* vc = (BackupsTableViewController*)nav.topViewController;
-        vc.metadata = (SafeMetaData*)sender;
+        vc.metadata = (DatabasePreferences*)sender;
     }
     else if ([segue.identifier isEqualToString:@"segueToSyncLog"]) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         SyncLogViewController* vc = (SyncLogViewController*)nav.topViewController;
-        vc.database = (SafeMetaData*)sender;
+        vc.database = (DatabasePreferences*)sender;
     }
 }
 

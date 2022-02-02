@@ -6,34 +6,34 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-import Foundation
 import Down
+import Foundation
 
 extension DownFont {
-    func withTraits(traits:DownFontDescriptor.SymbolicTraits) -> DownFont? {
+    func withTraits(traits: DownFontDescriptor.SymbolicTraits) -> DownFont? {
         let descriptor = fontDescriptor.withSymbolicTraits(traits)
-        
+
         #if os(iOS)
-        return DownFont(descriptor: descriptor!, size: 0) 
+            return DownFont(descriptor: descriptor!, size: 0) 
         #else
-        return DownFont(descriptor: descriptor, size: 0)
+            return DownFont(descriptor: descriptor, size: 0)
         #endif
     }
 
     func bold() -> DownFont? {
-#if os(iOS)
-        return withTraits(traits: .traitBold)
-#else
-        return withTraits(traits: .bold)
-#endif
+        #if os(iOS)
+            return withTraits(traits: .traitBold)
+        #else
+            return withTraits(traits: .bold)
+        #endif
     }
 
     func italic() -> DownFont? {
-#if os(iOS)
-        return withTraits(traits: .traitItalic)
-#else
-        return withTraits(traits: .italic)
-#endif
+        #if os(iOS)
+            return withTraits(traits: .traitItalic)
+        #else
+            return withTraits(traits: .italic)
+        #endif
     }
 }
 
@@ -45,7 +45,6 @@ extension DownFont {
 
 
 public struct StrongboxFontCollection: FontCollection {
-
     
 
     public var heading1: DownFont
@@ -68,21 +67,21 @@ public struct StrongboxFontCollection: FontCollection {
         heading5: DownFont = .preferredFont(forTextStyle: .headline), 
         heading6: DownFont = .preferredFont(forTextStyle: .subheadline), 
         body: DownFont = .preferredFont(forTextStyle: .body),
-        code: DownFont = DownFont(name: "menlo", size: 17) ?? .systemFont(ofSize: 17),
-        listItemPrefix: DownFont = DownFont.monospacedDigitSystemFont(ofSize: 17, weight: .regular)
+        code _: DownFont = DownFont(name: "menlo", size: 17) ?? .systemFont(ofSize: 17),
+        listItemPrefix _: DownFont = DownFont.monospacedDigitSystemFont(ofSize: 17, weight: .regular)
     ) {
-        let fallback : DownFont = DownFont.systemFont(ofSize: 17)
-        
+        let fallback = DownFont.systemFont(ofSize: 17)
+
         self.heading1 = heading1.bold() ?? fallback
         self.heading2 = heading2.bold() ?? fallback
         self.heading3 = heading3.bold() ?? fallback
         self.heading4 = heading4.bold() ?? fallback
         self.heading5 = heading5.bold() ?? fallback
         self.heading6 = heading6.bold() ?? fallback
-        
+
         self.body = body
         let bodyPointSize = body.pointSize
-        self.code = DownFont(name: "menlo", size: bodyPointSize) ?? .systemFont(ofSize: bodyPointSize)
-        self.listItemPrefix = DownFont.monospacedDigitSystemFont(ofSize: bodyPointSize, weight: .regular)
+        code = DownFont(name: "menlo", size: bodyPointSize) ?? .systemFont(ofSize: bodyPointSize)
+        listItemPrefix = DownFont.monospacedDigitSystemFont(ofSize: bodyPointSize, weight: .regular)
     }
 }

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="bU7-R8-ocO">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Group Properties-->
+        <scene sceneID="PEd-7d-5j0">
+            <objects>
+                <viewController title="Group Properties" id="bU7-R8-ocO" customClass="GroupPropertiesViewController" customModule="Strongbox" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="tOy-S4-hL0">
+                        <rect key="frame" x="0.0" y="0.0" width="450" height="413"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" translatesAutoresizingMaskIntoConstraints="NO" id="MJU-Te-mGn">
+                                <rect key="frame" x="20" y="68" width="410" height="304"/>
+                                <clipView key="contentView" drawsBackground="NO" id="NTI-pz-SN4">
+                                    <rect key="frame" x="1" y="1" width="408" height="302"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView editable="NO" drawsBackground="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="nzR-cM-0QS" customClass="SBDownTextView" customModule="Strongbox" customModuleProvider="target">
+                                            <rect key="frame" x="0.0" y="0.0" width="408" height="302"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="408" height="302"/>
+                                            <size key="maxSize" width="466" height="10000000"/>
+                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                        </textView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="80d-Sk-3Bb">
+                                    <rect key="frame" x="1" y="175" width="393" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="jDb-Ou-k0k">
+                                    <rect key="frame" x="394" y="1" width="15" height="174"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fNV-2B-Tvt">
+                                <rect key="frame" x="344" y="14" width="92" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="XTZ-Bn-QNr"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" title="OK" bezelStyle="rounded" alignment="center" controlSize="large" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="yxg-KL-Hhz">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="onOK:" target="bU7-R8-ocO" id="e41-hj-8d4"/>
+                                </connections>
+                            </button>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XGa-vg-YpG">
+                                <rect key="frame" x="18" y="380" width="33" height="13"/>
+                                <textFieldCell key="cell" controlSize="large" lineBreakMode="clipping" title="Notes" id="Ieu-gB-2RW">
+                                    <font key="font" textStyle="caption1" name=".SFNS-Regular"/>
+                                    <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="fNV-2B-Tvt" firstAttribute="top" secondItem="MJU-Te-mGn" secondAttribute="bottom" constant="20" symbolic="YES" id="864-Q8-pCW"/>
+                            <constraint firstItem="MJU-Te-mGn" firstAttribute="trailing" secondItem="fNV-2B-Tvt" secondAttribute="trailing" id="BIe-gs-edu"/>
+                            <constraint firstAttribute="bottom" secondItem="fNV-2B-Tvt" secondAttribute="bottom" constant="20" id="G8k-Tn-gIE"/>
+                            <constraint firstItem="XGa-vg-YpG" firstAttribute="top" secondItem="tOy-S4-hL0" secondAttribute="top" constant="20" id="MtB-KW-UQL"/>
+                            <constraint firstItem="XGa-vg-YpG" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="N91-qb-fHs"/>
+                            <constraint firstItem="MJU-Te-mGn" firstAttribute="top" secondItem="XGa-vg-YpG" secondAttribute="bottom" constant="8" symbolic="YES" id="Vmq-5Q-Bku"/>
+                            <constraint firstAttribute="trailing" secondItem="MJU-Te-mGn" secondAttribute="trailing" constant="20" symbolic="YES" id="hbP-rv-CLd"/>
+                            <constraint firstItem="MJU-Te-mGn" firstAttribute="leading" secondItem="tOy-S4-hL0" secondAttribute="leading" constant="20" symbolic="YES" id="sFK-zj-ehG"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="textViewNotes" destination="nzR-cM-0QS" id="xg6-AA-ZkP"/>
+                    </connections>
+                </viewController>
+                <customObject id="9uD-mB-xHs" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="128" y="187.5"/>
+        </scene>
+    </scenes>
+</document>

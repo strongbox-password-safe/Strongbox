@@ -13,7 +13,7 @@
     #import <UIKit/UIKit.h>
     typedef UIViewController* VIEW_CONTROLLER_PTR;
 //    typedef UIImage* IMAGE_TYPE_PTR;
-//    typedef SafeMetaData* METADATA_PTR;
+//    typedef DatabasePreferences* METADATA_PTR;
 #else
     #import <Cocoa/Cocoa.h>
     typedef NSViewController* VIEW_CONTROLLER_PTR;

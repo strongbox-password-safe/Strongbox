@@ -19,15 +19,15 @@ import Foundation
 
 
 
-struct IconSize : Hashable, Equatable {
+struct IconSize: Hashable, Equatable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(width.hashValue ^ height.hashValue)
     }
-    
-    static func ==(lhs: IconSize, rhs: IconSize) -> Bool {
+
+    static func == (lhs: IconSize, rhs: IconSize) -> Bool {
         return lhs.width == rhs.width && lhs.height == rhs.height
     }
-    
+
     
     let width: Int
     
@@ -39,7 +39,7 @@ private let kRelIconTypeMap: [IconSize: DetectedIconType] = [
     IconSize(width: 32, height: 32): .appleOSXSafariTab,
     IconSize(width: 96, height: 96): .googleTV,
     IconSize(width: 192, height: 192): .googleAndroidChrome,
-    IconSize(width: 196, height: 196): .googleAndroidChrome
+    IconSize(width: 196, height: 196): .googleAndroidChrome,
 ]
 
 private let kMicrosoftSizeMap: [String: IconSize] = [
@@ -52,7 +52,7 @@ private let kMicrosoftSizeMap: [String: IconSize] = [
 
 private let siteImage: [String: IconSize] = [
     "og:image": IconSize(width: 1024, height: 512),
-    "twitter:image": IconSize(width: 1024, height: 512)
+    "twitter:image": IconSize(width: 1024, height: 512),
 ]
 
 
@@ -62,44 +62,41 @@ private let siteImage: [String: IconSize] = [
 
 
 
-func examineHTMLMeta(_ document: HTMLDocument, baseURL: URL) -> [String:String] {
-    var resp: [String:String] = [:]
+func examineHTMLMeta(_ document: HTMLDocument, baseURL: URL) -> [String: String] {
+    var resp: [String: String] = [:]
     for meta in document.query("/html/head/meta") {
         if let property = meta.attributes["property"]?.lowercased(),
-           let content = meta.attributes["content"]{
+           let content = meta.attributes["content"]
+        {
             switch property {
             case "og:url":
-                resp["og:url"] = content;
-                break
+                resp["og:url"] = content
             case "og:description":
-                resp["description"] = content;
-                break
+                resp["description"] = content
             case "og:image":
-                resp["image"] = content;
-                break
+                resp["image"] = content
             case "og:title":
-                resp["title"] = content;
-                break
+                resp["title"] = content
             case "og:site_name":
-                resp["site_name"] = content;
-                break
+                resp["site_name"] = content
             default:
                 break
             }
         }
         if let name = meta.attributes["name"]?.lowercased(),
            let content = meta.attributes["content"],
-           name == "description" {
-            resp["description"] = resp["description"] ?? content;
+           name == "description"
+        {
+            resp["description"] = resp["description"] ?? content
         }
     }
-    
+
     for title in document.query("/html/head/title") {
         if let titleString = title.contents {
-            resp["title"] = resp["title"] ?? titleString;
+            resp["title"] = resp["title"] ?? titleString
         }
     }
-    
+
     for link in document.query("/html/head/link") {
         if let rel = link.attributes["rel"],
            let href = link.attributes["href"],
@@ -107,43 +104,38 @@ func examineHTMLMeta(_ document: HTMLDocument, baseURL: URL) -> [String:String] 
         {
             switch rel.lowercased() {
             case "canonical":
-                resp["canonical"] = url.absoluteString;
-                break
+                resp["canonical"] = url.absoluteString
             case "amphtml":
-                resp["amphtml"] = url.absoluteString;
-                break
+                resp["amphtml"] = url.absoluteString
             case "search":
-                resp["search"] = url.absoluteString;
-                break
+                resp["search"] = url.absoluteString
             case "fluid-icon":
-                resp["fluid-icon"] = url.absoluteString;
-                break
+                resp["fluid-icon"] = url.absoluteString
             case "alternate":
                 let application = link.attributes["application"]
                 if application == "application/atom+xml" {
-                    resp["atom"] = url.absoluteString;
+                    resp["atom"] = url.absoluteString
                 }
-                break
             default:
                 break
             }
         }
     }
-    
-    return resp;
+
+    return resp
 }
 
 func extractHTMLHeadIcons(_ document: HTMLDocument, baseURL: URL) -> [DetectedIcon] {
     var icons: [DetectedIcon] = []
-    
+
     for link in document.query("/html/head/link") {
         if let rel = link.attributes["rel"],
            let href = link.attributes["href"],
-           let url = URL(string: href, relativeTo: baseURL) {
+           let url = URL(string: href, relativeTo: baseURL)
+        {
             switch rel.lowercased() {
             case "shortcut icon":
-                icons.append(DetectedIcon(url: url.absoluteURL, type:.shortcut))
-                break
+                icons.append(DetectedIcon(url: url.absoluteURL, type: .shortcut))
             case "icon":
                 if let type = link.attributes["type"], type.lowercased() == "image/png" {
                     let sizes = parseHTMLIconSizes(link.attributes["sizes"])
@@ -182,12 +174,13 @@ func extractHTMLHeadIcons(_ document: HTMLDocument, baseURL: URL) -> [DetectedIc
             }
         }
     }
-    
+
     for meta in document.query("/html/head/meta") {
         if let name = meta.attributes["name"]?.lowercased(),
            let content = meta.attributes["content"],
            let url = URL(string: content, relativeTo: baseURL),
-           let size = kMicrosoftSizeMap[name] {
+           let size = kMicrosoftSizeMap[name]
+        {
             icons.append(DetectedIcon(url: url,
                                       type: .microsoftPinnedSite,
                                       width: size.width,
@@ -196,14 +189,15 @@ func extractHTMLHeadIcons(_ document: HTMLDocument, baseURL: URL) -> [DetectedIc
             let property = meta.attributes["property"]?.lowercased(),
             let content = meta.attributes["content"],
             let url = URL(string: content, relativeTo: baseURL),
-            let size = siteImage[property] {
+            let size = siteImage[property]
+        {
             icons.append(DetectedIcon(url: url,
                                       type: .FBImage,
                                       width: size.width,
                                       height: size.height))
         }
     }
-    
+
     return icons
 }
 
@@ -214,17 +208,20 @@ func extractHTMLHeadIcons(_ document: HTMLDocument, baseURL: URL) -> [DetectedIc
 
 
 
+
 func extractManifestJSONIcons(_ jsonString: String, baseURL: URL) -> [DetectedIcon] {
     var icons: [DetectedIcon] = []
-    
+
     if let data = jsonString.data(using: String.Encoding.utf8),
        let object = try? JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions()),
        let manifest = object as? NSDictionary,
-       let manifestIcons = manifest["icons"] as? [NSDictionary] {
+       let manifestIcons = manifest["icons"] as? [NSDictionary]
+    {
         for icon in manifestIcons {
             if let type = icon["type"] as? String, type.lowercased() == "image/png",
                let src = icon["src"] as? String,
-               let url = URL(string: src, relativeTo: baseURL)?.absoluteURL {
+               let url = URL(string: src, relativeTo: baseURL)?.absoluteURL
+            {
                 let sizes = parseHTMLIconSizes(icon["sizes"] as? String)
                 if sizes.count > 0 {
                     for size in sizes {
@@ -239,7 +236,7 @@ func extractManifestJSONIcons(_ jsonString: String, baseURL: URL) -> [DetectedIc
             }
         }
     }
-    
+
     return icons
 }
 
@@ -250,32 +247,28 @@ func extractManifestJSONIcons(_ jsonString: String, baseURL: URL) -> [DetectedIc
 
 func extractBrowserConfigXMLIcons(_ document: LBXMLDocument, baseURL: URL) -> [DetectedIcon] {
     var icons: [DetectedIcon] = []
-    
+
     for tile in document.query("/browserconfig/msapplication/tile/*") {
         if let src = tile.attributes["src"],
-           let url = URL(string: src, relativeTo: baseURL)?.absoluteURL {
+           let url = URL(string: src, relativeTo: baseURL)?.absoluteURL
+        {
             switch tile.name.lowercased() {
             case "tileimage":
                 icons.append(DetectedIcon(url: url, type: .microsoftPinnedSite, width: 144, height: 144))
-                break
             case "square70x70logo":
                 icons.append(DetectedIcon(url: url, type: .microsoftPinnedSite, width: 70, height: 70))
-                break
             case "square150x150logo":
                 icons.append(DetectedIcon(url: url, type: .microsoftPinnedSite, width: 150, height: 150))
-                break
             case "wide310x150logo":
                 icons.append(DetectedIcon(url: url, type: .microsoftPinnedSite, width: 310, height: 150))
-                break
             case "square310x310logo":
                 icons.append(DetectedIcon(url: url, type: .microsoftPinnedSite, width: 310, height: 310))
-                break
             default:
                 break
             }
         }
     }
-    
+
     return icons
 }
 
@@ -288,7 +281,8 @@ func extractWebAppManifestURLs(_ document: HTMLDocument, baseURL: URL) -> [URL] 
     var urls: [URL] = []
     for link in document.query("/html/head/link") {
         if let rel = link.attributes["rel"]?.lowercased(), rel == "manifest",
-           let href = link.attributes["href"], let manifestURL = URL(string: href, relativeTo: baseURL) {
+           let href = link.attributes["href"], let manifestURL = URL(string: href, relativeTo: baseURL)
+        {
             urls.append(manifestURL)
         }
     }
@@ -304,7 +298,8 @@ func extractWebAppManifestURLs(_ document: HTMLDocument, baseURL: URL) -> [URL] 
 func extractBrowserConfigURL(_ document: HTMLDocument, baseURL: URL) -> (url: URL?, disabled: Bool) {
     for meta in document.query("/html/head/meta") {
         if let name = meta.attributes["name"]?.lowercased(), name == "msapplication-config",
-           let content = meta.attributes["content"] {
+           let content = meta.attributes["content"]
+        {
             if content.lowercased() == "none" {
                 
                 return (url: nil, disabled: true)
@@ -333,4 +328,3 @@ func parseHTMLIconSizes(_ string: String?) -> [IconSize] {
     }
     return sizes
 }
-

@@ -12,6 +12,20 @@
 
 @implementation NodeIcon
 
+#if !TARGET_OS_IPHONE
++ (instancetype)withCustomImage:(IMAGE_TYPE_PTR)image {
+    CGImageRef cgRef = [image CGImageForProposedRect:NULL context:nil hints:nil];
+
+    if (cgRef) { 
+        NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
+        NSData *selectedImageData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
+        return [NodeIcon withCustom:selectedImageData];
+    }
+    
+    return nil;
+}
+#endif
+
 + (instancetype)withCustom:(NSData *)custom {
     return [NodeIcon withCustom:custom name:nil modified:nil];
 }

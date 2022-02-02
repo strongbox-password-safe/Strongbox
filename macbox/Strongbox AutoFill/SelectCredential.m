@@ -116,17 +116,14 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 }
 
 - (void)loadItems {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model
-                                                                       browseSortField:kBrowseSortFieldTitle
-                                                                            descending:NO
-                                                                     foldersSeparately:YES
-                                                                           checkPinYin:NO];
-    
-    self.items = [searcher filterAndSortForBrowse:self.model.effectiveRootGroup.allChildRecords.mutableCopy
-                                  includeKeePass1Backup:NO
-                                      includeRecycleBin:NO
-                                         includeExpired:NO
-                                          includeGroups:NO];
+    self.items = [self.model filterAndSortForBrowse:self.model.database.effectiveRootGroup.allChildRecords.mutableCopy
+                              includeKeePass1Backup:NO
+                                  includeRecycleBin:NO
+                                     includeExpired:NO
+                                      includeGroups:NO
+                                    browseSortField:kBrowseSortFieldTitle
+                                         descending:NO
+                                  foldersSeparately:YES];
 
     [self.tableView reloadData];
 }
@@ -251,19 +248,16 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model
-                                                                       browseSortField:kBrowseSortFieldTitle
-                                                                            descending:NO
-                                                                     foldersSeparately:YES
-                                                                           checkPinYin:NO];
-    
-    return [searcher search:searchText
-                      scope:scope
-                dereference:YES
-      includeKeePass1Backup:NO
-          includeRecycleBin:NO
-             includeExpired:NO
-              includeGroups:NO];
+    return [self.model search:searchText
+                        scope:scope
+                  dereference:YES
+        includeKeePass1Backup:NO
+            includeRecycleBin:NO
+               includeExpired:NO
+                includeGroups:NO
+              browseSortField:kBrowseSortFieldTitle
+                   descending:NO
+            foldersSeparately:YES];
 }
 
 

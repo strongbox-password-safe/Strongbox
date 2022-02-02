@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SFTPSessionConfiguration.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,8 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSString* filePath;
 @property NSString* connectionIdentifier;
-
-@property SFTPSessionConfiguration *sFtpConfiguration; 
 
 + (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
 - (NSDictionary*)serializationDictionary;

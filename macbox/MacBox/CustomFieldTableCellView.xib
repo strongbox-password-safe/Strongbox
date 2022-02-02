@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14490.70"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -10,16 +10,16 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <tableCellView identifier="CustomFieldValueCellIdentifier" id="ePh-9N-6mr" customClass="CustomFieldTableCellView">
-            <rect key="frame" x="0.0" y="0.0" width="167" height="20"/>
+            <rect key="frame" x="0.0" y="0.0" width="167" height="36"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nY4-uB-E0m">
-                    <rect key="frame" x="0.0" y="0.0" width="167" height="20"/>
+                    <rect key="frame" x="0.0" y="8" width="167" height="20"/>
                     <subviews>
                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="cks-zF-QVH">
                             <rect key="frame" x="-2" y="0.0" width="144" height="20"/>
-                            <textFieldCell key="cell" selectable="YES" enabled="NO" title="Multiline Label" id="YDh-Ip-fHW">
-                                <font key="font" metaFont="system"/>
+                            <textFieldCell key="cell" selectable="YES" enabled="NO" title="Multiline Label2" id="YDh-Ip-fHW">
+                                <font key="font" textStyle="body" name=".SFNS-Regular"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </textFieldCell>
@@ -58,9 +58,10 @@
             </subviews>
             <constraints>
                 <constraint firstItem="nY4-uB-E0m" firstAttribute="leading" secondItem="ePh-9N-6mr" secondAttribute="leading" id="I7w-wM-Ru1"/>
-                <constraint firstAttribute="bottom" secondItem="nY4-uB-E0m" secondAttribute="bottom" id="MjD-hn-Vdh"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="nY4-uB-E0m" secondAttribute="bottom" id="MjD-hn-Vdh"/>
                 <constraint firstAttribute="trailing" secondItem="nY4-uB-E0m" secondAttribute="trailing" id="Uu5-P7-zoL"/>
-                <constraint firstItem="nY4-uB-E0m" firstAttribute="top" secondItem="ePh-9N-6mr" secondAttribute="top" id="pzc-ty-cln"/>
+                <constraint firstItem="nY4-uB-E0m" firstAttribute="centerY" secondItem="ePh-9N-6mr" secondAttribute="centerY" id="eU8-zW-SYo"/>
+                <constraint firstItem="nY4-uB-E0m" firstAttribute="top" relation="greaterThanOrEqual" secondItem="ePh-9N-6mr" secondAttribute="top" id="pzc-ty-cln"/>
             </constraints>
             <connections>
                 <outlet property="buttonShowHide" destination="y2O-sN-zGf" id="hzH-Ub-3dZ"/>

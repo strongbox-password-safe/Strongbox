@@ -222,15 +222,24 @@
 }
 
 - (IBAction)onOK:(id)sender {
-    self.onDone(kOk, self.enteredText);
+    __weak PinEntryController* weakSelf = self;
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+        weakSelf.onDone(kPinEntryResponseOk, weakSelf.enteredText);
+    }];
 }
 
 - (IBAction)onCancel:(id)sender {
-    self.onDone(kCancel, nil);
+    __weak PinEntryController* weakSelf = self;
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+        weakSelf.onDone(kPinEntryResponseCancel, nil);
+    }];
 }
 
 - (IBAction)onUseMasterCredentials:(id)sender {
-    self.onDone(kFallback, nil);
+    __weak PinEntryController* weakSelf = self;
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+        weakSelf.onDone(kPinEntryResponseFallback, nil);
+    }];
 }
 
 - (IBAction)onKeyPadButton:(id)sender {
@@ -257,7 +266,7 @@
         
         
         
-        self.onDone(kOk, self.enteredText);
+        [self onOK:nil];
     }
 }
 
@@ -295,7 +304,7 @@
 - (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
 
     
-    [self onCancel:nil];
+    self.onDone(kPinEntryResponseCancel, nil); 
 }
 
 @end

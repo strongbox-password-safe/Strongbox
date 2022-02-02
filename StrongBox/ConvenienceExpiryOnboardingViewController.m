@@ -8,7 +8,7 @@
 
 #import "ConvenienceExpiryOnboardingViewController.h"
 #import "RoundedBlueButton.h"
-#import "SafesList.h"
+#import "DatabasePreferences.h"
 
 @interface ConvenienceExpiryOnboardingViewController ()
 
@@ -52,9 +52,6 @@
 - (void)setExpiryAndExitModule:(NSInteger)expiryHours {
     self.model.metadata.convenienceExpiryOnboardingDone = YES;
     self.model.metadata.convenienceExpiryPeriod = expiryHours;
-    
-    [SafesList.sharedInstance update:self.model.metadata];
-
     self.model.metadata.convenienceMasterPassword = self.model.database.ckfs.password;
 
     if ( self.onDone ) {
