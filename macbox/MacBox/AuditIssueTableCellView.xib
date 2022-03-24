@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customView identifier="AuditIssueTableCellView" id="4Bm-Bz-cth" customClass="AuditIssueTableCellView" customModule="Strongbox" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="58"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+            <subviews>
+                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0HQ-su-cHv">
+                    <rect key="frame" x="0.0" y="4" width="320" height="50"/>
+                    <subviews>
+                        <imageView horizontalHuggingPriority="253" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="bLt-fu-IPW">
+                            <rect key="frame" x="0.0" y="14" width="16" height="22"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="16" id="uag-ks-s4p"/>
+                                <constraint firstAttribute="height" constant="16" id="wVK-k9-m06"/>
+                            </constraints>
+                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="checkmark.shield" catalog="system" id="w3W-x7-4fb"/>
+                            <color key="contentTintColor" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                        </imageView>
+                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hU7-Rr-3fa" customClass="ClickableTextField">
+                            <rect key="frame" x="18" y="19" width="304" height="13"/>
+                            <constraints>
+                                <constraint firstAttribute="width" relation="lessThanOrEqual" constant="300" id="uYu-kr-FAF"/>
+                            </constraints>
+                            <textFieldCell key="cell" title="Label" id="5MM-GY-8rM">
+                                <font key="font" textStyle="caption1" name=".SFNS-Regular"/>
+                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </textFieldCell>
+                        </textField>
+                    </subviews>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
+            </subviews>
+            <constraints>
+                <constraint firstItem="0HQ-su-cHv" firstAttribute="top" secondItem="4Bm-Bz-cth" secondAttribute="top" constant="4" id="72c-N0-0Qm"/>
+                <constraint firstAttribute="bottom" secondItem="0HQ-su-cHv" secondAttribute="bottom" constant="4" id="9o6-gB-YoH"/>
+                <constraint firstItem="0HQ-su-cHv" firstAttribute="leading" secondItem="4Bm-Bz-cth" secondAttribute="leading" id="Fbz-BX-TJg"/>
+                <constraint firstAttribute="trailing" secondItem="0HQ-su-cHv" secondAttribute="trailing" id="wsR-rP-EBm"/>
+            </constraints>
+            <connections>
+                <outlet property="icon" destination="bLt-fu-IPW" id="uTx-wy-vLB"/>
+                <outlet property="labelIssue" destination="hU7-Rr-3fa" id="8Dk-kS-iXV"/>
+            </connections>
+            <point key="canvasLocation" x="139" y="32.5"/>
+        </customView>
+    </objects>
+    <resources>
+        <image name="checkmark.shield" catalog="system" width="16" height="15"/>
+    </resources>
+</document>
