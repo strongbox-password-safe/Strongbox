@@ -85,12 +85,7 @@
     self.labelWarning.text = self.warning;
     self.labelWarning.hidden = self.warning.length == 0;
     if(self.warning.length) {
-        if (@available(iOS 11.0, *)) {
-            [self.stackView setCustomSpacing:4 afterView:self.logo];
-        }
-        else {
-            [self.stackView setSpacing:4]; 
-        }
+        [self.stackView setCustomSpacing:4 afterView:self.logo];
     }
     
     self.enteredText = @"";
@@ -111,11 +106,10 @@
         self.logo.hidden = YES;
         self.bottomButtonsStack.hidden = YES;
         
-        if (@available(iOS 11.0, *)) {
-            [self.stackView setCustomSpacing:0 afterView:self.logo];
-            [self.stackView setCustomSpacing:0 afterView:self.labelWarning];
-            [self.stackView setCustomSpacing:0 afterView:self.labelEnteredText];
-        }
+        [self.stackView setCustomSpacing:0 afterView:self.logo];
+        [self.stackView setCustomSpacing:0 afterView:self.labelWarning];
+        [self.stackView setCustomSpacing:0 afterView:self.labelEnteredText];
+        
         
         self.keyPadRowsStack.spacing = 0.0f;
         
@@ -125,12 +119,10 @@
         self.logo.hidden = NO;
         self.bottomButtonsStack.hidden = NO;
         
-        if (@available(iOS 11.0, *)) {
-            [self.stackView setCustomSpacing:12 afterView:self.logo];
-            [self.stackView setCustomSpacing:12 afterView:self.labelWarning];
-            [self.stackView setCustomSpacing:12 afterView:self.labelEnteredText];
-        }
-
+        [self.stackView setCustomSpacing:12 afterView:self.logo];
+        [self.stackView setCustomSpacing:12 afterView:self.labelWarning];
+        [self.stackView setCustomSpacing:12 afterView:self.labelEnteredText];
+    
         self.keyPadRowsStack.spacing = 10.0f;
         
         self.labelEnteredText.font = FontManager.sharedInstance.title1Font;

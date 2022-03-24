@@ -37,7 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString* friendlyDateTimeStringBothPrecise;
 
 + (instancetype)fromYYYY_MM_DDString:(NSString*)string;
-+ (instancetype)fromYYYY_MM_DD_London_Time_String:(NSString *)string;
++ (instancetype)fromYYYY_MM_DD_London_Noon_Time_String:(NSString *)string;
++ (instancetype _Nullable )microsoftGraphDateFromString:(NSString *)dateString;
 
 @end
 

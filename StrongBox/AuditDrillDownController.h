@@ -15,7 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property Model* model;
 @property NSUUID* itemId;
+
 @property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues, __weak UIViewController* viewControllerToDismiss);
+
+@property (nonatomic, copy) void (^updateDatabase)(void);
+
 @property BOOL hideShowAllAuditIssues;
 
 @end

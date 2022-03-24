@@ -14,12 +14,28 @@ typedef enum : NSUInteger {
     OGNavigationContextFavourites,
     OGNavigationContextRegularHierarchy,
     OGNavigationContextTags,
-    OGNavigationContextTotps,
+    OGNavigationContextAuditIssues,
     OGNavigationContextSpecial,
 } OGNavigationContext;
 
 typedef enum : NSUInteger {
     OGNavigationSpecialAllItems,
+    OGNavigationSpecialTotpItems,
+    OGNavigationSpecialAttachmentItems,
+    OGNavigationSpecialExpired,
+    OGNavigationSpecialNearlyExpired,
 } OGNavigationSpecial;
+
+typedef enum : NSUInteger {
+    OGNavigationAuditCategoryNoPasswords,
+    OGNavigationAuditCategoryDuplicated,
+    OGNavigationAuditCategoryCommon,
+    OGNavigationAuditCategorySimilar,
+    OGNavigationAuditCategoryTooShort,
+    OGNavigationAuditCategoryPwned,
+    OGNavigationAuditCategoryLowEntropy,
+    OGNavigationAuditCategoryTwoFactorAvailable,
+    OGNavigationAuditCategoryAllEntries,
+} OGNavigationAuditCategory;
 
 #endif /* NextNavigationConstants_h */

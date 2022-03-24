@@ -154,9 +154,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
     NSString *suggestedFilename = @"image.png";
 
     if(isImage) {
-        if (@available(iOS 11.0, *)) {
-            url =  [info objectForKey:UIImagePickerControllerImageURL];
-        }
+        url =  [info objectForKey:UIImagePickerControllerImageURL];
         
         if(!url) {
             UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];

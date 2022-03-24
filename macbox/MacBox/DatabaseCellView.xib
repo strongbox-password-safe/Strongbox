@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19455" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19455"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,35 +14,29 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="vertical" alignment="centerX" spacing="0.0" horizontalStackHuggingPriority="750" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DjV-nr-2AM" userLabel="Icon &amp; Provider">
-                    <rect key="frame" x="8" y="111" width="30" height="44"/>
+                    <rect key="frame" x="8" y="117" width="32" height="32"/>
                     <subviews>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gfj-gm-s17">
-                            <rect key="frame" x="0.0" y="14" width="30" height="30"/>
-                            <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="lock" id="YAl-1y-JLp"/>
-                        </imageView>
-                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8OX-P6-YzU">
-                            <rect key="frame" x="-2" y="0.0" width="34" height="14"/>
+                            <rect key="frame" x="0.0" y="-5.5" width="32.5" height="43"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="30" id="iCX-Rb-MMq"/>
+                                <constraint firstAttribute="width" constant="32" id="01D-OR-KWj"/>
+                                <constraint firstAttribute="height" constant="32" id="id2-pJ-438"/>
                             </constraints>
-                            <textFieldCell key="cell" lineBreakMode="clipping" alignment="center" title="DAV" id="007-1i-S46">
-                                <font key="font" textStyle="subheadline" name=".SFNS-Regular"/>
-                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                            </textFieldCell>
-                        </textField>
+                            <imageCell key="cell" controlSize="large" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="YAl-1y-JLp">
+                                <imageReference key="image" image="desktopcomputer" catalog="system" symbolScale="large"/>
+                            </imageCell>
+                            <color key="contentTintColor" name="linkColor" catalog="System" colorSpace="catalog"/>
+                        </imageView>
                     </subviews>
                     <visibilityPriorities>
-                        <integer value="1000"/>
                         <integer value="1000"/>
                     </visibilityPriorities>
                     <customSpacing>
                         <real value="3.4028234663852886e+38"/>
-                        <real value="3.4028234663852886e+38"/>
                     </customSpacing>
                 </stackView>
                 <customView horizontalHuggingPriority="750" horizontalCompressionResistancePriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="GDW-Gu-fmg">
-                    <rect key="frame" x="50" y="115" width="576" height="36"/>
+                    <rect key="frame" x="52" y="115" width="574" height="36"/>
                     <subviews>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Ydl-fJ-xJH">
                             <rect key="frame" x="-2" y="20" width="214" height="16"/>
@@ -123,7 +118,7 @@
                             </customSpacing>
                         </stackView>
                         <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="re4-jk-skV" userLabel="Size">
-                            <rect key="frame" x="344" y="21" width="234" height="14"/>
+                            <rect key="frame" x="344" y="21" width="232" height="14"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="bF8-vc-3e7"/>
                             </constraints>
@@ -142,7 +137,7 @@
                             </textFieldCell>
                         </textField>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="XAm-4f-9rn" userLabel="Mod">
-                            <rect key="frame" x="334" y="0.0" width="244" height="14"/>
+                            <rect key="frame" x="334" y="0.0" width="242" height="14"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Today at 18:45" id="hhe-oD-rPl">
                                 <font key="font" textStyle="subheadline" name=".SFNS-Regular"/>
                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -178,13 +173,13 @@
             </constraints>
             <connections>
                 <outlet property="imageViewOutstandingUpdate" destination="3iq-HL-saj" id="DvY-tg-2nv"/>
+                <outlet property="imageViewProvider" destination="gfj-gm-s17" id="CLL-3T-aa2"/>
                 <outlet property="imageViewQuickLaunch" destination="8eo-Lq-QCv" id="Fql-ek-gag"/>
                 <outlet property="imageViewReadOnly" destination="Qaa-R4-HcO" id="u8B-BN-pg6"/>
                 <outlet property="imageViewSyncing" destination="fib-kd-ruM" id="Bf2-pI-F6J"/>
                 <outlet property="imageViewUnlocked" destination="4f5-Uy-tr6" id="197-W2-NbE"/>
                 <outlet property="syncProgressIndicator" destination="Wza-bV-vlN" id="ZTA-bQ-zev"/>
                 <outlet property="textFieldName" destination="Ydl-fJ-xJH" id="28L-Jv-bo6"/>
-                <outlet property="textFieldStorage" destination="8OX-P6-YzU" id="Prj-jC-FgK"/>
                 <outlet property="textFieldSubtitleBottomRight" destination="XAm-4f-9rn" id="htB-A8-UDP"/>
                 <outlet property="textFieldSubtitleLeft" destination="FPz-lw-3sJ" id="fLJ-bQ-d5h"/>
                 <outlet property="textFieldSubtitleTopRight" destination="re4-jk-skV" id="4AM-Kr-Qmm"/>
@@ -193,8 +188,8 @@
         </customView>
     </objects>
     <resources>
+        <image name="desktopcomputer" catalog="system" width="24" height="20"/>
         <image name="glasses" width="107" height="107"/>
-        <image name="lock" width="30" height="30"/>
         <image name="rocket" width="30" height="30"/>
         <image name="syncronize" width="30" height="30"/>
         <image name="unlock" width="30" height="30"/>

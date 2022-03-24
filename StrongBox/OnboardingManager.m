@@ -740,7 +740,7 @@
                                                                             modified:nil
                                                                             fileSize:&fileSize];
         
-        const unsigned long long kMinFileSize = 1.5f * 1024 * 1024; 
+        const unsigned long long kMinFileSize = 0.8f * 1024 * 1024;
         if ( !workingCopy || fileSize < kMinFileSize ) {
             return NO;
         }

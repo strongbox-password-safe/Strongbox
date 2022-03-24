@@ -33,6 +33,8 @@
 #import "macOSSpinnerUI.h"
 #import "DatabasesManager.h"
 
+#import "Strongbox-Swift.h"
+
 
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
@@ -314,7 +316,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
     
 
-    NSLog(@"%hhd-%hhd", offline, database.offlineMode);
+
+    
     if ( offline != database.offlineMode ) {
         if ( [dc databaseIsDocumentWindow:database] ) {
             [MacAlerts info:NSLocalizedString(@"database_already_open_please_close", @"This database is already open. Please close it first if you would like to open it in a different mode.")
@@ -363,6 +366,12 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 - (void)onNewDatabase:(id)sender {
     [NSDocumentController.sharedDocumentController newDocument:nil];
+}
+
+- (IBAction)onAddOneDriveDatabase:(id)sender {
+    TwoDriveStorageProvider* storageProvider = TwoDriveStorageProvider.sharedInstance;
+    
+    [self showStorageBrowserForProvider:storageProvider];
 }
 
 - (void)onAddSFTPDatabase:(id)sender {
@@ -569,6 +578,9 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         }
 
         return Settings.sharedInstance.isProOrFreeTrial;
+    }
+    else if ( theAction == @selector(onAddOneDriveDatabase:)) {
+        return YES;
     }
     else if ( theAction == @selector(onOpenFromFiles:)) {
         return YES;

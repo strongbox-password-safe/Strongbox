@@ -159,7 +159,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property BOOL useIsolatedDropbox;
-@property BOOL keePassEmailField;
 
 
 

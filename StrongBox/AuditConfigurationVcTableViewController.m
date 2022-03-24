@@ -48,7 +48,6 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCheckHibp;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellOnlineHibpInterval;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellHipbShowCached;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelOnlineCheckInterval;
 @property (weak, nonatomic) IBOutlet UILabel *labelLastOnineCheck;
@@ -57,8 +56,6 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UIStackView *stackViewLastOnlineCheck;
 @property (weak, nonatomic) IBOutlet UILabel *labelCheckHaveIBeenPwned;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAllAuditIssues;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowCached;
-@property (weak, nonatomic) IBOutlet UILabel *labelCheckOfflinePwnedCache;
 @property (weak, nonatomic) IBOutlet UILabel *labelCaseInsensitiveDupes;
 @property (weak, nonatomic) IBOutlet UILabel *labelLengthOfMinimumLength;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewExcluded;
@@ -67,6 +64,12 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UISlider *sliderEntropyThreshold;
 @property (weak, nonatomic) IBOutlet UILabel *labelEntropyThreshold;
 @property (weak, nonatomic) IBOutlet UILabel *labelLowEntropy;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchTwoFactorAuth;
+
+
+
+
 
 @end
 
@@ -79,7 +82,8 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     [self cell:self.cellCheckHibp setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
     [self cell:self.cellOnlineHibpInterval setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
-    [self cell:self.cellHipbShowCached setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
+
+    
     
     [self reloadDataAnimated:NO];
     
@@ -112,6 +116,10 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     
     
+    self.switchTwoFactorAuth.on = self.model.metadata.auditConfig.checkForTwoFactorAvailable;
+    
+    
+    
     self.switchDuplicates.on = self.model.metadata.auditConfig.checkForDuplicatedPasswords;
     self.switchCaseInsenstiveDupes.on = self.model.metadata.auditConfig.caseInsensitiveMatchForDuplicates;
     self.switchCaseInsenstiveDupes.enabled = self.switchDuplicates.on;
@@ -136,18 +144,18 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     
     self.switchHibp.on = self.model.metadata.auditConfig.checkHibp;
-    self.switchShowCached.on = self.model.metadata.auditConfig.showCachedHibpHits;
+
     [self bindLastOnlineCheckUi];
     self.cellOnlineHibpInterval.userInteractionEnabled = self.switchHibp.on;
 
     
     
     self.switchHibp.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
-    self.switchShowCached.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
+
     self.labelCheckHaveIBeenPwned.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
     self.labelLastOnlineCheckHeader.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
     self.labelOnlineCheckInterval.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
-    self.labelCheckOfflinePwnedCache.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
+
     self.labelCheckHaveIBeenPwned.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
 
     
@@ -229,7 +237,13 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (void)bindAuditStatus:(NSNotification*)notification {
-    [self bindAuditStatusWithProgress:notification.object];
+    if (notification.name == kAuditProgressNotificationKey ) {
+        [self bindAuditStatusWithProgress:notification.object];
+    }
+    else {
+
+        [self bindAuditStatusWithProgress:nil];
+    }
 }
 
 - (void)bindAuditStatusWithProgress:(NSNumber*)progress {
@@ -291,10 +305,11 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     config.levenshteinSimilarityThreshold = ((CGFloat)self.sliderSimilar.value / 100.0f);
     config.checkHibp = self.switchHibp.on;
     config.showAuditPopupNotifications = self.switchShowPopups.on;
-    config.showCachedHibpHits = self.switchShowCached.on;
+
     config.checkForLowEntropy = self.switchLowEntropy.on;
     config.lowEntropyThreshold = self.sliderEntropyThreshold.value;
-        
+    config.checkForTwoFactorAvailable = self.switchTwoFactorAuth.on;
+    
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(restartBackgroundAudit) object:nil];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(saveSettingsAndRestartBackgroundAudit:) object:nil];
     
@@ -400,6 +415,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     if ([segue.identifier isEqualToString:@"segueToExcludedItems"]) {
         ExcludedItemsViewController* vc = segue.destinationViewController;
         vc.model = self.model;
+        vc.updateDatabase = self.updateDatabase;
     }
 }
 

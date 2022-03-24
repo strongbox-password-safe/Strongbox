@@ -37,11 +37,11 @@
 @property (weak) IBOutlet NSProgressIndicator *syncProgressIndicator;
 @property (weak) IBOutlet NSImageView *imageViewUnlocked;
 
-@property (weak) IBOutlet NSTextField *textFieldStorage;
-
 @property NSClickGestureRecognizer *gestureRecognizerClick;
 @property NSString* uuid;
 @property NSString* originalNickName;
+
+@property (weak) IBOutlet NSImageView *imageViewProvider;
 
 @end
 
@@ -82,7 +82,6 @@
     self.textFieldSubtitleLeft.stringValue = @"";
     self.textFieldSubtitleTopRight.stringValue = @"";
     self.textFieldSubtitleBottomRight.stringValue = @"";
-    self.textFieldStorage.stringValue = @"";
     
     self.imageViewQuickLaunch.hidden = YES;
     self.imageViewOutstandingUpdate.hidden = YES;
@@ -150,6 +149,8 @@
     
     NSString* title = metadata.nickName ? metadata.nickName : @"";
     
+    self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:metadata.storageProvider];
+    
     if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] && ![metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
         if ( metadata.storageProvider == kSFTP ) {
             SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
@@ -162,7 +163,7 @@
             path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
         }
         else {
-            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, metadata.fileUrl.host];
+            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
         }
         
         NSDate* modDate;
@@ -195,9 +196,10 @@
         if ( url ) {
             if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
                 path = getFriendlyICloudPath(url.path);
+                self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:kiCloud];
             }
             else {
-                path = getPathRelativeToUserHome(url.path);
+                path = [NSString stringWithFormat:@"%@ (%@)", getPathRelativeToUserHome(url.path), [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
             }
             
             NSError* error;
@@ -217,7 +219,6 @@
     self.textFieldSubtitleLeft.stringValue = path;
     self.textFieldSubtitleTopRight.stringValue = fileSize;
     self.textFieldSubtitleBottomRight.stringValue = fileMod;
-    self.textFieldStorage.stringValue = [SafeStorageProviderFactory getStorageDisplayName:metadata];
 }
 
 - (void)onNicknameClick {

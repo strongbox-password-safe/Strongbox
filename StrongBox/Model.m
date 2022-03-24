@@ -22,6 +22,7 @@
 #import "AsyncUpdateJob.h"
 #import "NSMutableArray+Extensions.h"
 #import "WorkingCopyManager.h"
+#import "Constants.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
@@ -45,7 +46,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 @interface Model ()
 
-@property NSSet<NSString*> *cachedPinned;
+@property NSSet<NSString*> *cachedLegacyFavourites;
 @property DatabaseAuditor* auditor;
 @property BOOL isAutoFillOpen;
 @property BOOL forcedReadOnly;
@@ -59,6 +60,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 @property (readonly) id<ApplicationPreferences> applicationPreferences;
 @property (readonly) id<SyncManagement> syncManagement;
 @property (readonly) id<SpinnerUI> spinnerUi;
+@property (readonly) BOOL formatSupportsTags;
+@property (readonly) NSArray<Node*>* legacyFavourites;
 
 @end
 
@@ -175,7 +178,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         self.asyncUpdateEncryptionQueue = dispatch_queue_create("Model-AsyncUpdateEncryptionQueue", DISPATCH_QUEUE_SERIAL);
         self.asyncUpdatesStack = ConcurrentMutableStack.mutableStack;
         
-        _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
+        _cachedLegacyFavourites = [NSSet setWithArray:self.metadata.favourites];
                 
         if ( self.applicationPreferences.databasesAreAlwaysReadOnly ) {
             self.forcedReadOnly = YES;
@@ -209,6 +212,12 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (Node *)getItemById:(NSUUID *)uuid {
     return [self.database getItemById:uuid];
+}
+
+- (NSArray<Node *>*)getItemsById:(NSArray<NSUUID *>*)ids {
+    return [ids map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [self.database getItemById:obj];
+    }];
 }
 
 - (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
@@ -421,7 +430,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                                                                    customFields:self.metadata.autoFillScanCustomFields
                                                                           notes:self.metadata.autoFillScanNotes
                                                    concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
-                                                 unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds];
+                                                 unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds      nickName:self.metadata.nickName];
             }
 
             [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
@@ -557,7 +566,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                                                                        customFields:self.metadata.autoFillScanCustomFields
                                                                               notes:self.metadata.autoFillScanNotes
                                                        concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
-                                                     unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds];
+                                                     unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds nickName:self.metadata.nickName];
                 }
 
                 completion(NO, localWasChanged, nil);
@@ -603,6 +612,13 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 - (void)stopAndClearAuditor {
     [self stopAudit];
     [self createNewAuditor];
+
+    __weak Model* weakSelf = self; 
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ( weakSelf ) {
+            [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@{ @"userStopped" : @(NO), @"model" : weakSelf }];
+        }
+    });
 }
 
 - (void)createNewAuditor {
@@ -622,34 +638,20 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 #endif
 }
 
-- (BOOL)isExcludedFromAudit:(NSUUID *)item {
-    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
-    
-    return [self isExcludedFromAuditHelper:set uuid:item];
-}
-
-- (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set uuid:(NSUUID*)uuid {
-    Node* node = [self.database getItemById:uuid];
-    if ( !node.fields.qualityCheck ) { 
-        return YES;
-    }
-    
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
-
-    return [set containsObject:sid];
-}
-
 - (void)restartAudit {
     [self stopAndClearAuditor];
-
+    
 #ifndef IS_APP_EXTENSION
+    __weak Model* weakSelf = self;
+    
     [self.auditor start:self.database
                  config:self.metadata.auditConfig
             nodesChanged:^{
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kAuditNodesChangedNotificationKey object:nil];
+            if ( weakSelf ) {
+                [NSNotificationCenter.defaultCenter postNotificationName:kAuditNodesChangedNotificationKey object:@{ @"model" : weakSelf }];
+            }
         });
     }
     progress:^(double progress) {
@@ -659,7 +661,9 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     } completion:^(BOOL userStopped) {
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@(userStopped)];
+            if ( weakSelf ) {
+                [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@{ @"userStopped" : @(userStopped), @"model" : weakSelf }];
+            }
         });
     }];
 #endif
@@ -685,6 +689,22 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     return @"";
 }
 
+- (NSArray<NSString *> *)getQuickAuditAllIssuesVeryBriefSummaryForNode:(NSUUID *)item {
+    if (self.auditor) {
+        return [self.auditor getQuickAuditAllIssuesVeryBriefSummaryForNode:item];
+    }
+    
+    return @[];
+}
+
+- (NSArray<NSString *> *)getQuickAuditAllIssuesSummaryForNode:(NSUUID *)item {
+    if (self.auditor) {
+        return [self.auditor getQuickAuditAllIssuesSummaryForNode:item];
+    }
+    
+    return @[];
+}
+
 - (NSString *)getQuickAuditSummaryForNode:(NSUUID *)item {
     if (self.auditor) {
         return [self.auditor getQuickAuditSummaryForNode:item];
@@ -708,6 +728,14 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     }
     
     return NO;
+}
+
+- (DatabaseAuditReport *)auditReport {
+    if (self.auditor) {
+        return [self.auditor getAuditReport];
+    }
+    
+    return nil;
 }
 
 - (NSSet<Node *> *)getSimilarPasswordNodeSet:(NSUUID *)node {
@@ -738,25 +766,59 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     return NSSet.set;
 }
 
-- (void)setItemAuditExclusion:(NSUUID *)item exclude:(BOOL)exclude {
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:item];
+
+
+- (BOOL)isExcludedFromAudit:(NSUUID *)item {
+    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
+    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
+    
+    return [self isExcludedFromAuditHelper:set uuid:item];
+}
+
+- (NSArray<Node*>*)getExcludedAuditItems {
+    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
+    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
+  
+    return [self.database.allActiveEntries filter:^BOOL(Node * _Nonnull obj) {
+        if ( !obj.fields.qualityCheck ) {
+            return YES;
+        }
+
+        NSString* sid = [self.database getCrossSerializationFriendlyIdId:obj.uuid];
+
+        return [set containsObject:sid];
+    }];
+}
+
+- (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set uuid:(NSUUID*)uuid {
+    Node* node = [self.database getItemById:uuid];
+    if ( !node.fields.qualityCheck ) { 
+        return YES;
+    }
+    
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
+
+    return [set containsObject:sid];
+}
+
+- (void)excludeFromAudit:(Node *)node exclude:(BOOL)exclude {
+    node.fields.qualityCheck = !exclude;
+        
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
         
     NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
     
     if (exclude) {
-        [mutable addObject:sid];
+        if ( self.originalFormat != kKeePass4 ) { 
+            [mutable addObject:sid];
+        }
     }
     else {
         [mutable removeObject:sid];
     }
     
     self.metadata.auditExcludedItems = mutable.allObjects;
-}
-
-- (NSArray<Node*>*)getExcludedAuditItems {
-    NSSet<NSString*> *excludedSet = [NSSet setWithArray:self.metadata.auditExcludedItems];
-    return [self getNodesFromSerializationIds:excludedSet];
 }
 
 - (void)oneTimeHibpCheck:(NSString *)password completion:(void (^)(BOOL, NSError * _Nonnull))completion {
@@ -795,19 +857,26 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup keePassGroupTitleRules:keePassGroupTitleRules uuid:nil];
     
-    if ( [self.database addChild:newGroup destination:parentGroup] ) {
-        return newGroup;
-    }
-
-    return nil;
+    return [self addItem:parentGroup item:newGroup];
 }
 
 - (Node *)addItem:(Node *)parent item:(Node *)item {
-    if ( [self.database addChild:item destination:parent] ) {
+    if ( [self addChildren:@[item] destination:parent] ) {
         return item;
     }
+    
     return nil;
 }
+
+- (BOOL)addChildren:(NSArray<Node *> *)items destination:(Node *)destination {
+    return [self.database addChildren:items destination:destination];
+}
+
+- (BOOL)validateAddChildren:(NSArray<Node *> *)items destination:(Node *)destination {
+    return [self.database validateAddChildren:items destination:destination];
+}
+
+
 
 - (BOOL)canRecycle:(NSUUID *)itemId {
     return [self.database canRecycle:itemId];
@@ -815,28 +884,10 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (void)deleteItems:(const NSArray<Node *> *)items {
     [self.database deleteItems:items];
-
-    
-    
-    for (Node* item in items) {
-        if([self isPinned:item.uuid]) {
-            [self togglePin:item.uuid];
-        }
-    }
 }
 
 - (BOOL)recycleItems:(const NSArray<Node *> *)items {
-    BOOL ret = [self.database recycleItems:items];
-    
-    if (ret) { 
-        for (Node* item in items) {
-            if([self isPinned:item.uuid]) {
-                [self togglePin:item.uuid];
-            }
-        }
-    }
-    
-    return ret;
+    return [self.database recycleItems:items];
 }
 
 - (BOOL)launchUrl:(Node *)item {
@@ -868,16 +919,11 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 #if TARGET_OS_IPHONE
 #ifndef IS_APP_EXTENSION
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        if (@available (iOS 10.0, *)) {
-            [UIApplication.sharedApplication openURL:launchableUrl options:@{} completionHandler:^(BOOL success) {
-                if (!success) {
-                    NSLog(@"Couldn't launch this URL!");
-                }
-            }];
-        }
-        else {
-            [UIApplication.sharedApplication openURL:launchableUrl];
-        }
+        [UIApplication.sharedApplication openURL:launchableUrl options:@{} completionHandler:^(BOOL success) {
+            if (!success) {
+                NSLog(@"Couldn't launch this URL!");
+            }
+        }];
     });
 #endif
 #else
@@ -902,36 +948,118 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
-- (NSArray<Node*>*)pinnedNodes {
-    return [self getNodesFromSerializationIds:self.pinnedSet];
+
+- (BOOL)formatSupportsTags {
+    return self.originalFormat == kKeePass || self.originalFormat == kKeePass4;
 }
 
-- (NSSet<NSString*>*)pinnedSet {
-    return self.cachedPinned;
+- (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag {
+    return [self.database getItemIdsForTag:tag];
 }
 
-- (BOOL)isPinned:(NSUUID *)itemId {
-    if(self.cachedPinned.count == 0) {
-        return NO;
+- (NSArray<Node *> *)itemsWithTag:(NSString *)tag {
+    return [[self.database getItemIdsForTag:tag] map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [self getItemById:obj];
+    }];
+}
+
+- (NSArray<Node *> *)entriesWithTag:(NSString *)tag {
+    return [[self itemsWithTag:tag] filter:^BOOL(Node * _Nonnull obj) {
+        return !obj.isGroup;
+    }];
+}
+
+- (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag {
+    return [self.database addTag:itemId tag:tag];
+}
+
+- (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag {
+    return [self.database removeTag:itemId tag:tag];
+}
+
+
+
+
+- (NSArray<Node *> *)legacyFavourites {
+    return [self getNodesFromSerializationIds:self.cachedLegacyFavourites];
+}
+
+- (NSSet<NSUUID *> *)favouriteIdsSet {
+    NSArray<Node*>* filtered = [self.legacyFavourites filter:^BOOL(Node * _Nonnull obj) {
+        return !obj.isGroup;
+    }];
+
+    NSSet<NSUUID*>* legacySet = [filtered map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
+    }].set;
+    
+    NSMutableSet<NSUUID*>* unionTagged = legacySet.mutableCopy;
+    if ( self.formatSupportsTags ) {
+        [unionTagged addObjectsFromArray:[self getItemIdsForTag:kCanonicalFavouriteTag]];
     }
     
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
-    
-    return [self.cachedPinned containsObject:sid];
+    return unionTagged;
 }
 
-- (void)togglePin:(NSUUID *)itemId {
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
+- (BOOL)isFavourite:(NSUUID *)itemId {
+    return [self.favouriteIdsSet containsObject:itemId];
+}
 
-    NSMutableSet<NSString*>* favs = self.cachedPinned.mutableCopy;
-    
-    if([self isPinned:itemId]) {
-        [favs removeObject:sid];
+- (NSArray<Node *> *)favourites {
+    return [self getItemsById:self.favouriteIdsSet.allObjects];
+}
+
+- (BOOL)toggleFavourite:(NSUUID *)itemId {
+    if ( ![self isFavourite:itemId] ) {
+        return [self addFavourite:itemId];
     }
     else {
-        [favs addObject:sid];
+        return [self removeFavourite:itemId];
     }
+} 
+
+- (BOOL)addFavourite:(NSUUID*)itemId {
+    if ( self.formatSupportsTags ) {
+        BOOL added = [self addTag:itemId tag:kCanonicalFavouriteTag];
+        return added;
+    }
+    else {
+        [self legacyAddFavourite:itemId];
+        return NO;
+    }
+}
+
+- (BOOL)removeFavourite:(NSUUID*)itemId {
+    BOOL needsSave = NO;
+    if ( self.formatSupportsTags ) {
+        BOOL removed = [self removeTag:itemId tag:kCanonicalFavouriteTag];
+        needsSave = removed;
+    }
+
+    [self legacyRemoveFavourite:itemId];
     
+    return needsSave;
+}
+
+- (void)legacyAddFavourite:(NSUUID*)itemId {
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
+    NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
+    
+    [favs addObject:sid];
+    
+    [self resetLegacyFavourites:favs];
+}
+
+- (void)legacyRemoveFavourite:(NSUUID*)itemId {
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
+    NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
+    
+    [favs removeObject:sid];
+    
+    [self resetLegacyFavourites:favs];
+}
+
+- (void)resetLegacyFavourites:(NSSet<NSString*>*)favs {
     
     
     __weak Model* weakSelf = self;
@@ -944,8 +1072,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:obj.uuid];
         return sid;
     }];
-    self.cachedPinned = [NSSet setWithArray:trimmed];
-
+    self.cachedLegacyFavourites = [NSSet setWithArray:trimmed];
     self.metadata.favourites = trimmed;
 }
 
@@ -955,8 +1082,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     PasswordGenerationConfig* config = self.applicationPreferences.passwordGenerationConfig;
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 }
-
-
 
 - (NSArray<Node*>*)getNodesFromSerializationIds:(NSSet<NSString*>*)set {
     NSMutableArray<Node*>* ret = @[].mutableCopy;
@@ -972,16 +1097,12 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     return [ret sortedArrayUsingComparator:finderStyleNodeComparator];
 }
 
-- (NSArray<Node *>*)allNodes {
+- (NSArray<Node *> *)allItems {
     return self.database.effectiveRootGroup.allChildren;
 }
 
--(NSArray<Node *> *)allRecords {
+-(NSArray<Node *> *)allEntries {
     return self.database.effectiveRootGroup.allChildRecords;
-}
-
--(NSArray<Node *> *)allGroups {
-    return self.database.effectiveRootGroup.allChildGroups;
 }
 
 
@@ -1035,31 +1156,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                descending:(BOOL)descending
         foldersSeparately:(BOOL)foldersSeparately {
     NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRoot : self.database.allSearchable;
-    
-    return [self searchNodes:nodes
-                  searchText:searchText
-                       scope:scope
-                 dereference:dereference
-       includeKeePass1Backup:includeKeePass1Backup
-           includeRecycleBin:includeRecycleBin
-              includeExpired:includeExpired
-               includeGroups:includeGroups
-             browseSortField:browseSortField
-                  descending:descending
-           foldersSeparately:foldersSeparately];
-}
 
-- (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
-                    searchText:(NSString *)searchText
-                         scope:(SearchScope)scope
-                   dereference:(BOOL)dereference
-         includeKeePass1Backup:(BOOL)includeKeePass1Backup
-             includeRecycleBin:(BOOL)includeRecycleBin
-                includeExpired:(BOOL)includeExpired
-                 includeGroups:(BOOL)includeGroups
-               browseSortField:(BrowseSortField)browseSortField
-                    descending:(BOOL)descending
-             foldersSeparately:(BOOL)foldersSeparately {
     NSMutableArray* results = [nodes mutableCopy]; 
     
     NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
@@ -1188,35 +1285,42 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
      includeRecycleBin:(BOOL)includeRecycleBin
         includeExpired:(BOOL)includeExpired
          includeGroups:(BOOL)includeGroups {
-    if(!includeKeePass1Backup) {
-        if (self.database.originalFormat == kKeePass1) {
-            Node* backupGroup = self.database.keePass1BackupNode;
-            if(backupGroup) {
-                [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
-                    return (obj != backupGroup && ![backupGroup contains:obj]);
-                }];
+    DatabaseFormat format = self.database.originalFormat;
+    Node* backupGroup = (!includeKeePass1Backup && format == kKeePass1) ? self.database.keePass1BackupNode : nil;
+    Node* recycleBin = (!includeRecycleBin && (format == kKeePass || format == kKeePass4 )) ? self.database.recycleBinNode : nil;
+
+    if ( !backupGroup && !recycleBin && includeExpired && includeGroups ) {
+        
+        return;
+    }
+
+    [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
+        if ( backupGroup ) {
+            if (obj == backupGroup || [backupGroup contains:obj]) {
+                return NO;
             }
         }
-    }
 
-    Node* recycleBin = self.database.recycleBinNode;
-    if(!includeRecycleBin && recycleBin) {
-        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return obj != recycleBin && ![recycleBin contains:obj];
-        }];
-    }
+        if ( recycleBin ) {
+            if (obj == recycleBin || [recycleBin contains:obj]) {
+                return NO;
+            }
+        }
 
-    if(!includeExpired) {
-        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return !obj.expired;
-        }];
-    }
-    
-    if(!includeGroups) {
-        [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return !obj.isGroup;
-        }];
-    }
+        if ( !includeExpired ) {
+            if ( obj.expired ) {
+                return NO;
+            }
+        }
+        
+        if ( !includeGroups ) {
+            if ( obj.isGroup ) {
+                return NO;
+            }
+        }
+
+        return YES;
+    }];
 }
 
 - (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items
@@ -1225,10 +1329,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                     foldersSeparately:(BOOL)foldersSeparately {
     BrowseSortField field = browseSortField;
     
-    if (field == kBrowseSortFieldEmail && self.database.originalFormat != kPasswordSafe) { 
-        field = kBrowseSortFieldTitle;
-    }
-    else if(field == kBrowseSortFieldNone && self.database.originalFormat == kPasswordSafe) {
+    if( field == kBrowseSortFieldNone && self.database.originalFormat == kPasswordSafe ) {
         field = kBrowseSortFieldTitle;
     }
     

@@ -33,11 +33,8 @@
     [super viewDidLoad];
 
     
-    
-    if(self.field == kBrowseSortFieldEmail && self.format != kPasswordSafe) {
-        self.field = kBrowseSortFieldTitle;
-    }
-    else if(self.field == kBrowseSortFieldNone && self.format == kPasswordSafe) {
+
+    if(self.field == kBrowseSortFieldNone && self.format == kPasswordSafe) {
         self.field = kBrowseSortFieldTitle;
     }
     
@@ -62,7 +59,8 @@
 
     
     
-    [self cell:self.cellEmail setHidden:self.format != kPasswordSafe];
+    [self cell:self.cellEmail setHidden:NO];
+    
     [self cell:self.cellCustom setHidden:self.format == kPasswordSafe];
     
     [self cell:self.cellAscending setHidden:self.field == kBrowseSortFieldNone];

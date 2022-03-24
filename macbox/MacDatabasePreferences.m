@@ -1064,7 +1064,9 @@
 }
 
 - (void)setAuditConfig:(DatabaseAuditorConfiguration *)auditConfig {
-    
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.auditConfig = auditConfig;
+    }];
 }
 
 - (NSArray<NSString *> *)auditExcludedItems {
@@ -1072,7 +1074,9 @@
 }
 
 - (void)setAuditExcludedItems:(NSArray<NSString *> *)auditExcludedItems {
-    
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.auditExcludedItems = auditExcludedItems;
+    }];
 }
 
 
@@ -1171,6 +1175,16 @@
     }];
 }
 
+- (NSUUID *)sideBarSelectedFavouriteId {
+    return self.metadata.sideBarSelectedFavouriteId;
+}
+
+- (void)setSideBarSelectedFavouriteId:(NSUUID *)sideBarSelectedFavouriteId {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.sideBarSelectedFavouriteId = sideBarSelectedFavouriteId;
+    }];
+}
+
 - (NSUUID *)sideBarSelectedGroup {
     return self.metadata.sideBarSelectedGroup;
 }
@@ -1201,6 +1215,16 @@
     }];
 }
 
+- (OGNavigationAuditCategory)sideBarSelectedAuditCategory {
+    return self.metadata.sideBarSelectedAuditCategory;
+}
+
+- (void)setSideBarSelectedAuditCategory:(OGNavigationAuditCategory)sideBarSelectedAuditCategory {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.sideBarSelectedAuditCategory = sideBarSelectedAuditCategory;
+    }];
+}
+
 - (NSArray<NSUUID *> *)browseSelectedItems {
     return self.metadata.browseSelectedItems;
 }
@@ -1218,6 +1242,26 @@
 - (void)setSearchText:(NSString *)searchText {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.searchText = searchText;
+    }];
+}
+
+- (BOOL)showChildCountOnFolderInSidebar {
+    return self.metadata.showChildCountOnFolderInSidebar;
+}
+
+- (void)setShowChildCountOnFolderInSidebar:(BOOL)showChildCountOnFolderInSidebar {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showChildCountOnFolderInSidebar = showChildCountOnFolderInSidebar;
+    }];
+}
+
+- (NSArray *)headerNodes {
+    return self.metadata.headerNodes;
+}
+
+- (void)setHeaderNodes:(NSArray *)headerNodes {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.headerNodes = headerNodes;
     }];
 }
 

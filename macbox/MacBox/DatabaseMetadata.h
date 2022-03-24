@@ -17,6 +17,9 @@
 #import "KeePassIconSet.h"
 #import "NextNavigationConstants.h"
 #import "SearchScope.h"
+#import "HeaderNodeState.h"
+
+@class HeaderNodeState;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -174,10 +177,14 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property OGNavigationContext sideBarNavigationContext;
 @property (nullable) NSUUID* sideBarSelectedGroup;
+@property (nullable) NSUUID* sideBarSelectedFavouriteId;
 @property (nullable) NSString* sideBarSelectedTag;
 @property OGNavigationSpecial sideBarSelectedSpecial;
+@property OGNavigationAuditCategory sideBarSelectedAuditCategory;
 @property NSArray<NSUUID*> *browseSelectedItems;
 @property NSString* searchText;
+@property BOOL showChildCountOnFolderInSidebar;
+@property NSArray<HeaderNodeState*>* headerNodes;
 
 @end
 

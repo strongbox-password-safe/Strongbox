@@ -17,6 +17,15 @@ NSString* quickTypeFormatString(QuickTypeAutoFillDisplayFormat format) {
         case kQuickTypeFormatTitleOnly:
             return NSLocalizedString(@"quick_type_format_title", @"Title");
             break;
+        case kQuickTypeFormatDatabaseThenTitleThenUsername:
+            return NSLocalizedString(@"quick_type_format_database_title_username", @"[Database] Title (Username)");
+            break;
+        case kQuickTypeFormatDatabaseThenTitle:
+            return NSLocalizedString(@"quick_type_format_database_title", @"[Database] Title");
+            break;
+        case kQuickTypeFormatDatabaseThenUsername:
+            return NSLocalizedString(@"quick_type_format_database_username", @"[Database] Username");
+            break;
         default:
             return NSLocalizedString(@"quick_type_format_username", @"Username");
             break;

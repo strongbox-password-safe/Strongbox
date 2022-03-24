@@ -8,6 +8,8 @@
 
 #import "Settings.h"
 #import "NotificationConstants.h"
+#import "Utils.h"
+#import "Constants.h"
 
 NSString* const kTitleColumn = @"TitleColumn";
 NSString* const kUsernameColumn = @"UsernameColumn";
@@ -56,10 +58,12 @@ static NSString* const kMiniaturizeOnCopy = @"miniaturizeOnCopy";
 static NSString* const kQuickRevealWithOptionKey = @"quickRevealWithOptionKey";
 static NSString* const kMarkdownNotes = @"markdownNotes";
 static NSString* const kShowPasswordGenInTray = @"showPasswordGenInTray";
-static NSString* const kNextGenUI = @"nextGenUI-Beta";
+static NSString* const kNextGenUI = @"nextGenUI-Production-17-Mar-2022";
 static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
 static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupplementaryTotpCustomFields";
-        
+static NSString* const kQuitOnAllWindowsClosed = @"quitOnAllWindowsClosed";
+static NSString* const kLastPromptedToUseNextGenUI = @"lastPromptedToUseNextGenUI";
+
 
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
@@ -107,14 +111,19 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (void)setBool:(NSString*)key value:(BOOL)value {
-    
-    
     [self.userDefaults setBool:value forKey:key];
-    
     [self.userDefaults synchronize];
 }
 
 
+
+- (BOOL)quitStrongboxOnAllWindowsClosed {
+    return [self getBool:kQuitOnAllWindowsClosed fallback:NO];
+}
+
+- (void)setQuitStrongboxOnAllWindowsClosed:(BOOL)quitStrongboxOnAllWindowsClosed {
+    [self setBool:kQuitOnAllWindowsClosed value:quitStrongboxOnAllWindowsClosed];
+}
 
 - (BOOL)addOtpAuthUrl {
     return [self getBool:kAddOtpAuthUrl fallback:YES];
@@ -176,8 +185,28 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kMiniaturizeOnCopy value:miniaturizeOnCopy];
 }
 
+- (NSDate *)lastPromptedToUseNextGenUI {
+    return [self.sharedAppGroupDefaults objectForKey:kLastPromptedToUseNextGenUI];
+}
+
+- (void)setLastPromptedToUseNextGenUI:(NSDate *)lastPromptedToUseNextGenUI {
+    [self.sharedAppGroupDefaults setObject:lastPromptedToUseNextGenUI forKey:kLastPromptedToUseNextGenUI];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)isAProBundle {
+    NSString* bundleId = [Utils getAppBundleId];
+    
+    return [bundleId isEqualToString:Constants.macProEditionBundleId];
+}
+
 - (BOOL)nextGenUI {
-    return [self getBool:kNextGenUI fallback:NO];
+    if (@available(macOS 11.0, *)) {
+        return [self getBool:kNextGenUI fallback:YES];
+    }
+    else {
+        return NO;
+    }
 }
 
 - (void)setNextGenUI:(BOOL)nextGenUI {
@@ -418,8 +447,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (NSDate*)endFreeTrialDate {
-    
-    
     return [self.userDefaults objectForKey:kEndFreeTrialDate];
 }
 

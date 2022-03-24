@@ -15,7 +15,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <textField horizontalHuggingPriority="252" verticalHuggingPriority="999" horizontalCompressionResistancePriority="249" translatesAutoresizingMaskIntoConstraints="NO" id="Qwk-tl-sWp">
-                    <rect key="frame" x="50" y="20" width="382" height="31"/>
+                    <rect key="frame" x="38" y="20" width="394" height="31"/>
                     <textFieldCell key="cell" selectable="YES" title="Title" id="VJ4-Rg-JL4">
                         <font key="font" textStyle="largeTitle" name=".SFNS-Regular"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -39,7 +39,7 @@
                 <constraint firstAttribute="bottom" secondItem="Qwk-tl-sWp" secondAttribute="bottom" constant="20" id="BCl-4y-gLE"/>
                 <constraint firstItem="Qwk-tl-sWp" firstAttribute="centerY" secondItem="xCl-YF-1uz" secondAttribute="centerY" id="IZm-4f-zh7"/>
                 <constraint firstItem="Qwk-tl-sWp" firstAttribute="top" secondItem="7mF-mB-o7T" secondAttribute="top" constant="20" id="Z4F-uE-HQc"/>
-                <constraint firstItem="Qwk-tl-sWp" firstAttribute="leading" secondItem="xCl-YF-1uz" secondAttribute="trailing" constant="20" id="ebD-DF-l0h"/>
+                <constraint firstItem="Qwk-tl-sWp" firstAttribute="leading" secondItem="xCl-YF-1uz" secondAttribute="trailing" constant="8" id="ebD-DF-l0h"/>
                 <constraint firstItem="xCl-YF-1uz" firstAttribute="leading" secondItem="7mF-mB-o7T" secondAttribute="leading" id="fud-yu-ANd"/>
             </constraints>
             <connections>

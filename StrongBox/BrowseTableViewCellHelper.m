@@ -158,7 +158,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     NSMutableArray<UIImage*> *flags = NSMutableArray.array;
     NSMutableDictionary<NSNumber*, UIColor*> *tintsMap = NSMutableDictionary.dictionary;
     
-    if([self.viewModel isPinned:node.uuid]) {
+    if([self.viewModel isFavourite:node.uuid]) {
         UIImage* image;
         if (@available(iOS 13.0, *)) {
            image = [UIImage systemImageNamed:@"star.fill"];

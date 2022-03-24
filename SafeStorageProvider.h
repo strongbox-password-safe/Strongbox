@@ -47,7 +47,7 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(NSDate*_Nullable modDat
               data:(NSData *)data
       parentFolder:(NSObject * _Nullable)parentFolder
     viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController
-        completion:(void (^)(METADATA_PTR metadata, const NSError *error))completion;
+        completion:(void (^)(METADATA_PTR _Nullable metadata, const NSError * _Nullable error))completion;
 
 - (void)pullDatabase:(METADATA_PTR )safeMetaData
        interactiveVC:(VIEW_CONTROLLER_PTR _Nullable)viewController
@@ -63,7 +63,7 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(NSDate*_Nullable modDat
 
 - (void)      list:(NSObject *_Nullable)parentFolder
     viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController
-        completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, const NSError *error))completion;
+        completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, const NSError * _Nullable error))completion;
 
 - (void)readWithProviderData:(NSObject * _Nullable)providerData
               viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController

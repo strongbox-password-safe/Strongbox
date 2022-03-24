@@ -106,7 +106,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         self.url = url == nil ? @"" : url;
         self.password = password == nil ? @"" : password;
         self.notes = notes == nil ? @"" : notes;
-        self.email = email == nil ? @"" : email;
+
         self.passwordHistory = [[PasswordHistory alloc] init];
         
         NSDate* date = [NSDate date];
@@ -125,6 +125,8 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         self.customData = @{}.mutableCopy;
         self.qualityCheck = YES;
         self.isExpanded = YES; 
+        
+        self.email = email == nil ? @"" : email;
     }
     
     return self;
@@ -280,7 +282,6 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     ret[@"url"] = self.url;
     ret[@"password"] = self.password;
     ret[@"notes"] = self.notes;
-    ret[@"email"] = self.email;
     
     if(self.passwordModified) {
         ret[@"passwordModified"] = @((NSUInteger)[self.passwordModified timeIntervalSince1970]);
@@ -378,8 +379,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     BOOL simpleEqual =  [self.username compare:other.username] == NSOrderedSame &&
                         [self.password compare:other.password] == NSOrderedSame &&
                         [self.url compare:other.url] == NSOrderedSame &&
-                        [self.notes compare:other.notes] == NSOrderedSame &&
-                        [self.email compare:other.email] == NSOrderedSame;
+                        [self.notes compare:other.notes] == NSOrderedSame;
 
     if ( !simpleEqual ) return NO;
     
@@ -483,7 +483,6 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     to.username = from.username;
     to.url = from.url;
     to.password = from.password;
-    to.email = from.email;
     to.notes = from.notes;
     
     to.customFields = [from cloneCustomFields];
@@ -558,6 +557,12 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     
     _notes = notes;
     self.hasCachedOtpToken = NO; 
+}
+
+- (NSDictionary<NSString *,StringValue *> *)customFieldsNoEmail {
+    NSMutableDictionary* ret = [self.mutableCustomFields mutableCopy];
+    [ret removeObjectForKey:kCanonicalEmailFieldName];
+    return [ret copy];
 }
 
 - (NSDictionary<NSString *,StringValue *> *)customFields {
@@ -1125,55 +1130,24 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
 
 
-- (NSString*)keePassEmailFieldKey {
-    NSArray<NSString*>* possibles = @[kDefaultKeePassEmailFieldKey];
-    
-    
-    for (NSString* key in possibles) {
-        if ( self.mutableCustomFields[key] != nil ) {
-            return key;
-        }
-    }
-    
-    return nil;
+- (NSString *)email {
+    StringValue* val = self.customFields[kCanonicalEmailFieldName];
+    return val ? val.value : @"";
 }
 
-- (NSString *)keePassEmail {
-    NSString* key = [self keePassEmailFieldKey];
-    if ( key ) {
-        return self.mutableCustomFields[key].value;
+- (void)setEmail:(NSString *)email {
+    if ( email.length ) {
+        [self setCustomField:kCanonicalEmailFieldName value:[StringValue valueWithString:email]];
     }
     else {
-        return @"";
-    }
-}
-
-- (void)setKeePassEmail:(NSString *)keePassEmail {
-    NSString* key = [self keePassEmailFieldKey];
-
-    if ( keePassEmail.length && key == nil ) {
-        key = kDefaultKeePassEmailFieldKey; 
-    }
-    
-    if ( key ) {
-        if ( keePassEmail.length ) {
-            StringValue* sv = self.customFields[key];
-            StringValue* newSv = [StringValue valueWithString:keePassEmail protected:sv ? sv.protected : NO];
-            [self setCustomField:key value:newSv];
-        }
-        else {
-            [self removeCustomField:key];
-        }
+        [self removeCustomField:kCanonicalEmailFieldName];
     }
 }
 
 
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"{ username = [%@]\n    email = [%@]\n    url = [%@]\n}",
-            self.username,
-            self.email,
-            self.url];
+    return [NSString stringWithFormat:@"{ username = [%@]\nurl = [%@]\n}", self.username, self.url];
 }
 
 @end

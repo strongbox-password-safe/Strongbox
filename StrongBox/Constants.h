@@ -19,7 +19,11 @@ extern const NSError* kUserInteractionRequiredError;
 extern const NSUInteger kMinimumDatabasePrefixLengthForValidation;
 extern const NSUInteger kStreamingSerializationChunkSize;
 extern const size_t kMaxAttachmentTableviewIconImageSize;
-extern NSString* const kDefaultKeePassEmailFieldKey;
+
+extern NSString* const kCanonicalEmailFieldName;
+extern NSString* const kCanonicalFavouriteTag;
+
+@property (readonly, class) NSString* macProEditionBundleId;
 
 @property (readonly, class) NSString* proEditionBundleId;
 @property (readonly, class) NSString* scotusEditionBundleId;
@@ -28,6 +32,7 @@ extern NSString* const kDefaultKeePassEmailFieldKey;
 extern NSString* const kStrongboxPasteboardName;
 extern NSString* const kDragAndDropInternalUti;
 extern NSString* const kDragAndDropExternalUti;
+extern NSString* const kDragAndDropSideBarHeaderMoveInternalUti;
 
 @end
 

@@ -306,14 +306,10 @@
 static UnlockDatabaseSequenceHelper *sharedInstance = nil; 
 
 - (BOOL)errorIndicatesWeShouldAskUseToRelocateDatabase:(NSError*)error {
-    if (@available(iOS 11.0, *)) {
-        return (error.code == NSFileProviderErrorNoSuchItem || 
-                error.code == NSFileReadNoPermissionError ||   
-                error.code == NSFileReadNoSuchFileError ||     
-                error.code == NSFileNoSuchFileError);
-    } else {
-        return NO;
-    }
+    return (error.code == NSFileProviderErrorNoSuchItem || 
+            error.code == NSFileReadNoPermissionError ||   
+            error.code == NSFileReadNoSuchFileError ||     
+            error.code == NSFileNoSuchFileError);
 }
 
 - (void)askAboutRelocatingDatabase:(CompositeKeyFactors*)factors {

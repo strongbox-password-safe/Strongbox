@@ -35,11 +35,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nonnull) NSString *password;
 @property (nonatomic, strong, nonnull) NSString *username;
-@property (nonatomic, strong, nonnull) NSString *email;
-@property (nonatomic, strong, nonnull) NSString* keePassEmail;
-@property (nonatomic, strong, nullable, readonly) NSString* keePassEmailFieldKey;
 @property (nonatomic, strong, nonnull) NSString *url;
 @property (nonatomic, strong, nonnull) NSString *notes;
+
+@property (nonnull) NSString *email; 
+
 @property (readonly, nonatomic, strong, nullable) NSDate *created;
 @property (readonly, nonatomic, strong, nullable) NSDate *modified;
 @property (readonly, nonatomic, strong, nullable) NSDate *accessed;
@@ -84,6 +84,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property (nonatomic, strong, nonnull) NSDictionary<NSString*, StringValue*> *customFields;
+@property (readonly, nonatomic, strong, nonnull) NSDictionary<NSString*, StringValue*> *customFieldsNoEmail;
+
 - (void)removeAllCustomFields;
 - (void)removeCustomField:(NSString*)key;
 - (void)setCustomField:(NSString*)key value:(StringValue*)value;

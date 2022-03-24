@@ -54,6 +54,10 @@
     [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatUsernameOnly) action:nil keyEquivalent:@""];
     [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatTitleOnly) action:nil keyEquivalent:@""];
 
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatDatabaseThenTitleThenUsername) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatDatabaseThenTitle) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatDatabaseThenUsername) action:nil keyEquivalent:@""];
+
     [self.popupAutoUnlock.menu removeAllItems];
     
     NSMutableArray<NSNumber*> *opts = [NSMutableArray arrayWithArray:@[@(-1), @(0), @(15), @(30), @(60), @(120), @(180), @(300), @(600), @(1200), @(1800), @(3600), @(2 * 3600), @(8 * 3600), @(24 * 3600), @(48 * 3600), @(72 * 3600)]];
@@ -251,7 +255,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                            customFields:meta.autoFillScanCustomFields
                                                                   notes:meta.autoFillScanNotes
                                            concealedCustomFieldsAsCreds:meta.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds];
+                                         unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds
+                                                               nickName:meta.nickName];
         
         [self bindUI];
     }
@@ -309,7 +314,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                            customFields:autoFillScanCustomFields
                                                                   notes:autoFillScanNotes
                                            concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
+                                         unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds
+                                                               nickName:meta.nickName];
     }
 
     [self bindUI];

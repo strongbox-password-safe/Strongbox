@@ -61,10 +61,8 @@ extern NSString* const kAsyncUpdateStarting;
 @property (nonatomic, readonly) BOOL isReadOnly;
 @property (readonly) BOOL isInOfflineMode;
 
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
-
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allItems;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allEntries;
 
 
 
@@ -91,8 +89,6 @@ extern NSString* const kAsyncUpdateStarting;
 - (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
                                 completion:(void(^_Nullable)(BOOL success))completion;
 
-- (void)update:(VIEW_CONTROLLER_PTR)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
-
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
 - (void)stopAndClearAuditor;
@@ -108,9 +104,15 @@ extern NSString* const kAsyncUpdateStarting;
 - (BOOL)isFlaggedByAudit:(NSUUID*)item;
 - (NSString*)getQuickAuditSummaryForNode:(NSUUID*)item;
 - (NSString*)getQuickAuditVeryBriefSummaryForNode:(NSUUID*)item;
+- (NSArray<NSString *>*)getQuickAuditAllIssuesVeryBriefSummaryForNode:(NSUUID *)item;
+- (NSArray<NSString *>*)getQuickAuditAllIssuesSummaryForNode:(NSUUID *)item;
+
+@property (readonly, nullable) DatabaseAuditReport* auditReport;
+
 - (NSSet<Node*>*)getSimilarPasswordNodeSet:(NSUUID*)node;
 - (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(NSUUID*)node;
-- (void)setItemAuditExclusion:(NSUUID*)item exclude:(BOOL)exclude;
+
+- (void)excludeFromAudit:(Node*)node exclude:(BOOL)exclude;
 - (BOOL)isExcludedFromAudit:(NSUUID*)item;
 - (NSArray<Node*>*)getExcludedAuditItems;
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;
@@ -120,21 +122,23 @@ extern NSString* const kAsyncUpdateStarting;
 
 
 - (Node*_Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title;
-- (Node*_Nullable)addItem:(Node *_Nonnull)parent item:(Node*)item;
+
+- (BOOL)validateAddChildren:(NSArray<Node *>*)items destination:(Node *)destination;
+
+- (BOOL)addChildren:(NSArray<Node *>*)items destination:(Node *)destination;
 
 - (void)deleteItems:(const NSArray<Node *> *)items;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items;
 
 - (BOOL)canRecycle:(NSUUID*_Nonnull)itemId;
 
-- (BOOL)isPinned:(NSUUID*)itemId;
-- (void)togglePin:(NSUUID*)itemId;
+- (BOOL)isFavourite:(NSUUID*)itemId;
+- (BOOL)toggleFavourite:(NSUUID*)itemId;
+@property (readonly) NSArray<Node*>* favourites;
 
 - (BOOL)launchUrl:(Node*)item;
 - (BOOL)launchUrlString:(NSString*)urlString;
 
-@property (readonly) NSSet<NSString*>* pinnedSet;
-@property (readonly) NSArray<Node*>* pinnedNodes;
 
 -(void)encrypt:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL userCancelled, NSString*_Nullable file, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
 
@@ -144,6 +148,10 @@ extern NSString* const kAsyncUpdateStarting;
 
 - (void)disableAndClearAutoFill;
 - (void)enableAutoFill;
+
+
+
+- (void)update:(VIEW_CONTROLLER_PTR)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
 
 
 
@@ -167,6 +175,8 @@ extern NSString* const kAsyncUpdateStarting;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
 
 
+
+- (NSArray<Node*>*)entriesWithTag:(NSString*)tag;
 
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope

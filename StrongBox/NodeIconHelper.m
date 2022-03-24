@@ -73,8 +73,8 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet() {
                                       @"desktopcomputer",
                                       @"phone.circle",
                                       @"at",
-                                      @"tv.circle",
-                                      @"tv.circle",
+                                      @"terminal.fill", 
+                                      @"terminal",      
                                       @"printer",
                                       @"perspective",
                                       @"square",
@@ -357,43 +357,48 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet() {
 }
 
 + (IMAGE_TYPE_PTR)getCustomIcon:(NodeIcon *)icon {
-    if (icon.cachedImage) {
-
+    if ( icon.cachedImage ) {
+        
         return icon.cachedImage;
     }
 
-    if (!icon.isCustom || icon.custom == nil) {
-        return nil;
-    }
+    @try {
+        if ( !icon.isCustom || icon.custom == nil ) {
+            return nil;
+        }
+            
         
-    
-    
-#if TARGET_OS_IPHONE
-    IMAGE_TYPE_PTR img = [UIImage imageWithData:icon.custom];
-#else
-    IMAGE_TYPE_PTR img = [[NSImage alloc] initWithData:icon.custom];
-#endif
+        
+    #if TARGET_OS_IPHONE
+        IMAGE_TYPE_PTR img = [UIImage imageWithData:icon.custom];
+    #else
+        IMAGE_TYPE_PTR img = [[NSImage alloc] initWithData:icon.custom];
+    #endif
 
-    if(!img) {
+        if(!img) {
+            return nil;
+        }
+        
+        IMAGE_TYPE_PTR image;
+        if(img.size.height != 48 || img.size.width != 48) {
+            image = scaleImage(img, CGSizeMake(48, 48));
+        }
+        
+        image = image ? image : img;
+        
+        if ( image ) {
+            icon.cachedImage = image;
+    
+        }
+        else {
+            NSLog(@"WARNWARN: Couldn't Load Image!");
+        }
+        
+        return image;
+    } @catch (NSException *exception) {
+        NSLog(@"Exception in getCustomIcon: [%@]", exception);
         return nil;
-    }
-    
-    IMAGE_TYPE_PTR image;
-    if(img.size.height != 48 || img.size.width != 48) {
-        image = scaleImage(img, CGSizeMake(48, 48));
-    }
-    
-    image = image ? image : img;
-    
-    if (image) {
-        icon.cachedImage = image;
-
-    }
-    else {
-        NSLog(@"WARNWARN: Couldn't Load Image!");
-    }
-    
-    return image;
+    } @finally { }
 }
 
 + (NSArray<IMAGE_TYPE_PTR>*)getKeePassIconSet {

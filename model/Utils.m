@@ -371,42 +371,54 @@ UIImage* scaleImage(UIImage* image, CGSize newSize) {
     }
 }
 #else
-NSImage* scaleImage(NSImage* image, CGSize newSize) {
-    if (!image || !image.isValid) {
-        return image;
-    }
-    
-    float heightToWidthRatio = image.size.height / image.size.width;
-    float scaleFactor = 1;
-    if(heightToWidthRatio > 1) {
-        scaleFactor = newSize.height / image.size.height;
-    } else {
-        scaleFactor = newSize.width / image.size.width;
-    }
-    
-    CGSize newSize2 = newSize;
-    newSize2.width = image.size.width * scaleFactor;
-    newSize2.height = image.size.height * scaleFactor;
 
-    NSImage *ret = [[NSImage alloc] initWithSize:newSize2];
-    if (!ret || !ret.isValid) {
+NSColor* NSColorFromRGB(NSUInteger rgbValue) {
+    return [NSColor colorWithCalibratedRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0];
+}
+
+NSImage* scaleImage(NSImage* image, CGSize newSize) {
+    @try {
+        if (!image || !image.isValid) {
+            return image;
+        }
+        
+        float heightToWidthRatio = image.size.height / image.size.width;
+        float scaleFactor = 1;
+        if(heightToWidthRatio > 1) {
+            scaleFactor = newSize.height / image.size.height;
+        } else {
+            scaleFactor = newSize.width / image.size.width;
+        }
+        
+        CGSize newSize2 = newSize;
+        newSize2.width = image.size.width * scaleFactor;
+        newSize2.height = image.size.height * scaleFactor;
+
+        @autoreleasepool { 
+            NSImage *ret = [[NSImage alloc] initWithSize:newSize2];
+            if (!ret || !ret.isValid) {
+                return image;
+            }
+            [ret lockFocus];
+            
+            NSRect thumbnailRect = { 0 };
+            
+            thumbnailRect.size.width = newSize2.width;
+            thumbnailRect.size.height = newSize2.height;
+            
+            [image drawInRect:thumbnailRect
+                     fromRect:NSZeroRect
+                    operation:NSCompositingOperationSourceOver
+                     fraction:1.0];
+            
+            [ret unlockFocus];
+            
+            return ret;
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"Exception in scaleImage: [%@]", exception);
         return image;
-    }
-    [ret lockFocus];
-    
-    NSRect thumbnailRect = { 0 };
-    
-    thumbnailRect.size.width = newSize2.width;
-    thumbnailRect.size.height = newSize2.height;
-    
-    [image drawInRect:thumbnailRect
-             fromRect:NSZeroRect
-            operation:NSCompositingOperationSourceOver
-             fraction:1.0];
-    
-    [ret unlockFocus];
-    
-    return ret;
+    } @finally { }
 }
 
 #endif

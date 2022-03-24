@@ -10,6 +10,7 @@
 #import "FileManager.h"
 
 NSString* const kStrongboxSFTPUrlScheme = @"sftp";
+NSString* const kStrongboxOneDriveUrlScheme = @"onedrive";
 NSString* const kStrongboxWebDAVUrlScheme = @"webdav";
 NSString* const kStrongboxFileUrlScheme = @"file";
 NSString* const kStrongboxSyncManagedFileUrlScheme = @"sb-sync-managed-file";
@@ -25,7 +26,10 @@ StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
     else if ( [scheme isEqualToString:kStrongboxWebDAVUrlScheme] ) {
         return kWebDAV;
     }
-    
+    else if ( [scheme isEqualToString:kStrongboxOneDriveUrlScheme] ) {
+        return kTwoDrive;
+    }
+
     return kMacFile;
 }
 

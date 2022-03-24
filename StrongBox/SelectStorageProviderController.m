@@ -31,13 +31,13 @@
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 
-#import "OneDriveStorageProvider.h"
 #import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 
 #endif
 
 #import "AppleICloudProvider.h"
+#import "Strongbox-Swift.h"
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
@@ -71,7 +71,8 @@
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
             GoogleDriveStorageProvider.sharedInstance,
             DropboxV2StorageProvider.sharedInstance,
-            OneDriveStorageProvider.sharedInstance,
+
+            TwoDriveStorageProvider.sharedInstance,
 #endif
         ]];
     }
@@ -91,9 +92,7 @@
     
     
     
-    if (@available(iOS 11.0, *)) {
-        [sp insertObject:FilesAppUrlBookmarkProvider.sharedInstance atIndex:0];
-    }
+    [sp insertObject:FilesAppUrlBookmarkProvider.sharedInstance atIndex:0];
 
     
     

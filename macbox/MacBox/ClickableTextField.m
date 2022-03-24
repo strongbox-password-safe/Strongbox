@@ -10,13 +10,19 @@
 
 @implementation ClickableTextField
 
-//- (void)mouseDown:(NSEvent *)event {
+- (void)mouseDown:(NSEvent *)event {
 //    NSLog(@"mouseDown");
-//}
+    // Must be overridden for mouseUp below to function
+}
 
-- (void)mouseUp:(NSEvent *)event {
-    
-    if(self.onClick) {
+- (void)resetCursorRects {
+    [self discardCursorRects];
+
+    [self addCursorRect:self.bounds cursor:NSCursor.pointingHandCursor];
+}
+
+- (void)mouseUp:(NSEvent *)event {    
+    if ( self.onClick ) {
         self.onClick();
     }
 }

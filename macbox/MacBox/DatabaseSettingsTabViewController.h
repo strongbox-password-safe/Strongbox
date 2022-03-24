@@ -15,8 +15,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseSettingsTabViewController : NSTabViewController
 
+typedef NS_ENUM(NSUInteger, DatabaseSettingsInitialTab) {
+    kDatabaseSettingsInitialTabGeneral,
+    kDatabaseSettingsInitialTabSideBar,
+    kDatabaseSettingsInitialTabTouchId,
+    kDatabaseSettingsInitialTabAutoFill,
+    kDatabaseSettingsInitialTabAudit,
+    kDatabaseSettingsInitialTabAdvanced,
+};
+
 + (instancetype)fromStoryboard;
-- (void)setModel:(ViewModel*)model initialTab:(NSInteger)initialTab;
+- (void)setModel:(ViewModel*)model initialTab:(DatabaseSettingsInitialTab)initialTab;
 
 @end
 

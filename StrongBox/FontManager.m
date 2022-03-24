@@ -45,7 +45,10 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
 
     UIFontDescriptor* desc = [self.regularFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     _italicFont = [UIFont fontWithDescriptor:desc size:0];
-
+    
+    UIFontDescriptor* desc2 = [self.headlineFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+    _headlineItalicFont = [UIFont fontWithDescriptor:desc2 size:0];
+    
     _easyReadFontForTotp = [UIFont fontWithName:kEasyReadFontName size:30.0];
 
     UIFont* customFont = [UIFont fontWithName:kEasyReadFontName size:UIFont.labelFontSize];
@@ -61,15 +64,9 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
 
 
 
-    if (@available(iOS 11.0, *)) {
-        _easyReadFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customFont];
-        _easyReadBoldFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customBoldFont];
-        _easyReadFontForLargeTextView = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleLargeTitle] scaledFontForFont:customFont];
-    } else {
-        _easyReadFont = customFont;
-        _easyReadBoldFont = customBoldFont;
-        _easyReadFontForLargeTextView = _easyReadFontForTotp;
-    }
+    _easyReadFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customFont];
+    _easyReadBoldFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customBoldFont];
+    _easyReadFontForLargeTextView = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleLargeTitle] scaledFontForFont:customFont];
     
 
 }

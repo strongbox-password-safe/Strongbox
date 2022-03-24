@@ -42,8 +42,17 @@
     
     NSInteger row = [self rowAtPoint:[self convertPoint:event.locationInWindow fromView:nil]];
     if (row >= 0) {
+        id item = [self itemAtRow:row];
         
-        if (! [self isRowSelected:row]) {
+        if ( self.delegate && [self.delegate respondsToSelector:@selector(outlineView:shouldSelectItem:)] ) {
+            if ( ![self.delegate outlineView:self shouldSelectItem:item] ) {
+                return nil;
+            }
+        }
+
+        
+
+        if (! [self isRowSelected:row] ) {
             
             [self selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         }
@@ -51,5 +60,11 @@
     
     return [super menuForEvent:event];
 }
+
+
+
+
+
+
 
 @end

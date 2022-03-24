@@ -255,7 +255,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                            customFields:self.viewModel.metadata.autoFillScanCustomFields
                                                                   notes:self.viewModel.metadata.autoFillScanNotes
                                            concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds];
+                                         unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds nickName:self.viewModel.metadata.nickName];
     }
     
     [self bind];
@@ -282,7 +282,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                                customFields:self.viewModel.metadata.autoFillScanCustomFields
                                                                       notes:self.viewModel.metadata.autoFillScanNotes
                                                concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
-                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds];
+                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds
+                                                                   nickName:self.viewModel.metadata.nickName];
         }
         
         [self bind];
@@ -332,7 +333,10 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 - (void)promptForQuickTypeFormat {
     NSArray<NSNumber*>* options = @[@(kQuickTypeFormatTitleThenUsername),
                                     @(kQuickTypeFormatUsernameOnly),
-                                    @(kQuickTypeFormatTitleOnly)];
+                                    @(kQuickTypeFormatTitleOnly),
+                                    @(kQuickTypeFormatDatabaseThenTitleThenUsername),
+                                    @(kQuickTypeFormatDatabaseThenTitle),
+                                    @(kQuickTypeFormatDatabaseThenUsername)];
     
     NSArray<NSString*>* optionsStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return quickTypeFormatString(obj.integerValue);
@@ -361,7 +365,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                                customFields:self.viewModel.metadata.autoFillScanCustomFields
                                                                       notes:self.viewModel.metadata.autoFillScanNotes
                                                concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
-                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds];
+                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds
+                                                                   nickName:self.viewModel.metadata.nickName];
 
             [self bind];
         }

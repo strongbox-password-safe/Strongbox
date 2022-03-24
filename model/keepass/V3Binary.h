@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context dbAttachment:(DatabaseAttachment*)dbAttachment;
 
+- (void)onCompletedWithStrangeProtectedAttribute:(NSData*)data;
+
 @property int id;
 @property BOOL compressed;
 

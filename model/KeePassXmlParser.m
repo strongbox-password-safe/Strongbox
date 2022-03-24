@@ -15,6 +15,7 @@
 #import "Utils.h"
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
+#import "NSData+GZIP.h"
 
 @interface KeePassXmlParser ()
 
@@ -88,8 +89,16 @@
 
 - (void)foundCharacters:(NSString *)string {
     id<XmlParsingDomainObject> currentHandler = [self.handlerStack lastObject];
+
+    BOOL protected = NO;
     
-    if (currentHandler.handlesStreamingText) {
+    if ( currentHandler.originalAttributes &&
+        (currentHandler.originalAttributes[kAttributeProtected] )) {
+        NSString* protectedString = currentHandler.originalAttributes[kAttributeProtected];
+        protected = protectedString.isKeePassXmlBooleanStringTrue;
+    }
+    
+    if ( currentHandler.isV3BinaryHack && !protected ) { 
         BOOL streamOk = [currentHandler appendStreamedText:string];
         if (!streamOk) {
             self.errorParse = [Utils createNSError:@"Error during foundCharacters streaming" errorCode:-1];
@@ -117,17 +126,35 @@
         
         if(protected) {
             NSString *string = self.mutableText;
-            NSString* decrypted = [self decryptProtected:string];
-
-            if (self.sanityCheckStreamDecryption && !decrypted) {
-                NSLog(@"🔴 WARN: Could not decrypt CipherText...");
+            
+            if ( completedObject.isV3BinaryHack ) {
+                V3Binary* v3Binary = (V3Binary*)completedObject;
                 
-                NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt protected text. This field is likely corrupt."];
-                self.problemDecrypting = [Utils createNSError:msg errorCode:-1];
-                [completedObject setXmlText:@"CORRUPT_PROTECTED_FIELD"];
+                NSData* data = [self decryptProtectedToData:string];
+        
+                BOOL compressed = NO;
+                if ( completedObject.originalAttributes &&
+                    (completedObject.originalAttributes[kBinaryCompressedAttribute] )) {
+                    NSString* compressedString = completedObject.originalAttributes[kBinaryCompressedAttribute];
+                    compressed = compressedString.isKeePassXmlBooleanStringTrue;
+                }
+
+                NSData* decompressed = compressed ? data.gunzippedData : data;
+                [v3Binary onCompletedWithStrangeProtectedAttribute:decompressed];
             }
             else {
-                [completedObject setXmlText:decrypted];
+                NSString* decrypted = [self decryptProtectedToString:string];
+            
+                if (self.sanityCheckStreamDecryption && !decrypted) {
+                    NSLog(@"🔴 WARN: Could not decrypt CipherText...");
+                    
+                    NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt protected text. This field is likely corrupt."];
+                    self.problemDecrypting = [Utils createNSError:msg errorCode:-1];
+                    [completedObject setXmlText:@"CORRUPT_PROTECTED_FIELD"];
+                }
+                else {
+                    [completedObject setXmlText:decrypted];
+                }
             }
         }
         else {
@@ -161,14 +188,20 @@
     }
 }
 
-- (NSString*)decryptProtected:(NSString*)ct {
+- (NSData*)decryptProtectedToData:(NSString*)ct {
+    NSData *ctData = [[NSData alloc] initWithBase64EncodedString:ct options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    
+    NSData* plaintext = [self.innerRandomStream xor:ctData];
+
+    return plaintext;
+}
+
+- (NSString*)decryptProtectedToString:(NSString*)ct {
     if(self.innerRandomStream == nil) { 
         return ct;
     }
     
-    NSData *ctData = [[NSData alloc] initWithBase64EncodedString:ct options:NSDataBase64DecodingIgnoreUnknownCharacters];
-    
-    NSData* plaintext = [self.innerRandomStream xor:ctData];
+    NSData* plaintext = [self decryptProtectedToData:ct];
 
     NSString* ret = [[NSString alloc] initWithData:plaintext encoding:NSUTF8StringEncoding];
     

@@ -26,8 +26,8 @@ enum BrowseViewColumn: String, CaseIterable {
     case historicalItemCount = "HistoricalItemCountColumn"
     case customIcon = "CustomIconColumn"
     case uuid = "UuidColumn"
+    case auditIssues = "AuditIsssuesColumn"
 
-    
     
 
 
@@ -71,6 +71,8 @@ enum BrowseViewColumn: String, CaseIterable {
             return false
         case .uuid:
             return false
+        case .auditIssues:
+            return false
         }
     }
 
@@ -110,8 +112,8 @@ enum BrowseViewColumn: String, CaseIterable {
             return NSLocalizedString("generic_fieldname_custom_icon", comment: "Custom Icon")
         case .uuid:
             return NSLocalizedString("generic_fieldname_id", comment: "ID")
-
-
+        case .auditIssues:
+            return NSLocalizedString("quick_view_title_audit_issues_title", comment: "Audit Issues")
 
 
         }

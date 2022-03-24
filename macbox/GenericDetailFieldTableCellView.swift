@@ -20,12 +20,29 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     @IBOutlet var stackViewStrength: NSStackView!
     @IBOutlet var stackViewParent: NSStackView!
 
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+
     override func awakeFromNib() {
         super.awakeFromNib()
 
         if #available(macOS 11, *) {
             buttonConcealReveal.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
             imageViewIcon.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
+        }
+
+        monitorForQuickRevealKey()
+    }
+
+    func monitorForQuickRevealKey() {
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(kUpdateNotificationQuickRevealStateChanged), object: nil, queue: nil) { [weak self] notification in
+            if let concealable = self?.concealable, concealable {
+
+                if let optionKeyDown = notification.object as? NSNumber {
+                    self?.concealed = !optionKeyDown.boolValue
+                }
+            }
         }
     }
 

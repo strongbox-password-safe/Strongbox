@@ -63,7 +63,7 @@
 
         
         
-        NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
+        NSArray* sortedKeys = [item.fields.customFieldsNoEmail.allKeys sortedArrayUsingComparator:finderStringComparator];
         for(NSString* key in sortedKeys) {
             if ( ![NodeFields isTotpCustomFieldKey:key] ) {
                 StringValue* sv = item.fields.customFields[key];

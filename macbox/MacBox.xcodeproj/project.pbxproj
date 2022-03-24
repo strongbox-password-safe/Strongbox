@@ -403,6 +403,20 @@
 		C80043BC26BD83D40090C90D /* WebDAVConnectionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C80043BA26BD83D40090C90D /* WebDAVConnectionsManager.m */; };
 		C80043C126BD900B0090C90D /* WebDAVConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80043C426BD900B0090C90D /* WebDAVConnectionsManager.storyboard */; };
 		C80043C226BD900B0090C90D /* WebDAVConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80043C426BD900B0090C90D /* WebDAVConnectionsManager.storyboard */; };
+		C8015EA627D9196F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EA527D9196F00F9F3B1 /* FastMaps.m */; };
+		C8015EA727D9196F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EA527D9196F00F9F3B1 /* FastMaps.m */; };
+		C8015EA827D9196F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EA527D9196F00F9F3B1 /* FastMaps.m */; };
+		C8015EA927D9196F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EA527D9196F00F9F3B1 /* FastMaps.m */; };
+		C803825F27B5591200AB075A /* AuditExcludedItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = C803825D27B5591200AB075A /* AuditExcludedItems.swift */; };
+		C803826027B5591200AB075A /* AuditExcludedItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = C803825D27B5591200AB075A /* AuditExcludedItems.swift */; };
+		C803826627B666E300AB075A /* ProLabelBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C803826527B666E300AB075A /* ProLabelBadge.swift */; };
+		C803826727B666E300AB075A /* ProLabelBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C803826527B666E300AB075A /* ProLabelBadge.swift */; };
+		C8039E5727AFDB7F00DCC981 /* twofactorauth.json in Resources */ = {isa = PBXBuildFile; fileRef = C8039E5627AFDB7F00DCC981 /* twofactorauth.json */; };
+		C8039E5827AFDB7F00DCC981 /* twofactorauth.json in Resources */ = {isa = PBXBuildFile; fileRef = C8039E5627AFDB7F00DCC981 /* twofactorauth.json */; };
+		C8039E6227B1767700DCC981 /* SingleLinePillTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8039E6127B1767700DCC981 /* SingleLinePillTableCellView.xib */; };
+		C8039E6327B1767700DCC981 /* SingleLinePillTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8039E6127B1767700DCC981 /* SingleLinePillTableCellView.xib */; };
+		C8039E6527B176D200DCC981 /* SingleLinePillTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8039E6427B176D200DCC981 /* SingleLinePillTableCellView.swift */; };
+		C8039E6627B176D200DCC981 /* SingleLinePillTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8039E6427B176D200DCC981 /* SingleLinePillTableCellView.swift */; };
 		C803D18C27281A5700DA217C /* all-types.1pif in Resources */ = {isa = PBXBuildFile; fileRef = C803D18B27281A5700DA217C /* all-types.1pif */; };
 		C806E6F82721A4E4007A1F28 /* KeePassIconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = C806E6F72721A4E4007A1F28 /* KeePassIconNames.swift */; };
 		C806E6F92721A4E4007A1F28 /* KeePassIconNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = C806E6F72721A4E4007A1F28 /* KeePassIconNames.swift */; };
@@ -462,6 +476,8 @@
 		C81756772735259100431A36 /* ConnectHardwareKey.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817567B2735259100431A36 /* ConnectHardwareKey.xib */; };
 		C81756782735259100431A36 /* ConnectHardwareKey.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817567B2735259100431A36 /* ConnectHardwareKey.xib */; };
 		C81756792735259100431A36 /* ConnectHardwareKey.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817567B2735259100431A36 /* ConnectHardwareKey.xib */; };
+		C8196F1D27E1035200876E13 /* SideBarSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8196F1C27E1035200876E13 /* SideBarSettings.swift */; };
+		C8196F1E27E1035200876E13 /* SideBarSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8196F1C27E1035200876E13 /* SideBarSettings.swift */; };
 		C819D6BE26BD921300886363 /* SFTPConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */; };
 		C819D6BF26BD921300886363 /* SFTPConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */; };
 		C81ABE4A25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
@@ -644,6 +660,16 @@
 		C84356822722EB4E00CBB0A1 /* SectionField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84356802722EB4E00CBB0A1 /* SectionField.swift */; };
 		C84356842722FC9700CBB0A1 /* JSONAny.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84356832722FC9700CBB0A1 /* JSONAny.swift */; };
 		C84356852722FC9700CBB0A1 /* JSONAny.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84356832722FC9700CBB0A1 /* JSONAny.swift */; };
+		C843C5DC27B6A20700E12CE8 /* OEXTokenFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5D527B6A20600E12CE8 /* OEXTokenFieldCell.m */; };
+		C843C5DD27B6A20700E12CE8 /* OEXTokenFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5D527B6A20600E12CE8 /* OEXTokenFieldCell.m */; };
+		C843C5DE27B6A20700E12CE8 /* OEXTokenTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5D627B6A20600E12CE8 /* OEXTokenTextStorage.m */; };
+		C843C5DF27B6A20700E12CE8 /* OEXTokenTextStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5D627B6A20600E12CE8 /* OEXTokenTextStorage.m */; };
+		C843C5E027B6A20700E12CE8 /* OEXTokenAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5D827B6A20600E12CE8 /* OEXTokenAttachmentCell.m */; };
+		C843C5E127B6A20700E12CE8 /* OEXTokenAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5D827B6A20600E12CE8 /* OEXTokenAttachmentCell.m */; };
+		C843C5E227B6A20700E12CE8 /* OEXTokenField.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5DB27B6A20600E12CE8 /* OEXTokenField.m */; };
+		C843C5E327B6A20700E12CE8 /* OEXTokenField.m in Sources */ = {isa = PBXBuildFile; fileRef = C843C5DB27B6A20600E12CE8 /* OEXTokenField.m */; };
+		C843C5E527B6A56200E12CE8 /* SBTokenAttachmentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C843C5E427B6A56200E12CE8 /* SBTokenAttachmentCell.swift */; };
+		C843C5E627B6A56200E12CE8 /* SBTokenAttachmentCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C843C5E427B6A56200E12CE8 /* SBTokenAttachmentCell.swift */; };
 		C84412AB279D7719006F4B8B /* UrlTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84412AA279D7719006F4B8B /* UrlTableCellView.swift */; };
 		C84412AC279D7719006F4B8B /* UrlTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84412AA279D7719006F4B8B /* UrlTableCellView.swift */; };
 		C84412AE279D772D006F4B8B /* UrlTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C84412AD279D772D006F4B8B /* UrlTableCellView.xib */; };
@@ -781,6 +807,7 @@
 		C84F181A2763C0050055C101 /* GenericDetailFieldTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C84F18182763C0050055C101 /* GenericDetailFieldTableCellView.xib */; };
 		C84F181C2763C04F0055C101 /* GenericDetailFieldTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84F181B2763C04F0055C101 /* GenericDetailFieldTableCellView.swift */; };
 		C84F181D2763C04F0055C101 /* GenericDetailFieldTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84F181B2763C04F0055C101 /* GenericDetailFieldTableCellView.swift */; };
+		C8579C5427AEECD900653664 /* Parse2FactorAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */; };
 		C8594240277F2AE60040F03D /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
 		C8594241277F2AE60040F03D /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
 		C8594243277F2AFA0040F03D /* TitleAndIconCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8594242277F2AFA0040F03D /* TitleAndIconCell.xib */; };
@@ -873,6 +900,8 @@
 		C86791782561A1910038310E /* AutoTypeAssociation.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791742561A1910038310E /* AutoTypeAssociation.m */; };
 		C86791792561A1910038310E /* AutoTypeAssociation.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791742561A1910038310E /* AutoTypeAssociation.m */; };
 		C867917A2561A1910038310E /* AutoTypeAssociation.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791742561A1910038310E /* AutoTypeAssociation.m */; };
+		C867ACE327BA969100FF1E6E /* PaddedRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C867ACE227BA969000FF1E6E /* PaddedRowView.swift */; };
+		C867ACE427BA969100FF1E6E /* PaddedRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C867ACE227BA969000FF1E6E /* PaddedRowView.swift */; };
 		C86846A9271F15B900D4565B /* OnePasswordImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86846A8271F15B900D4565B /* OnePasswordImporter.swift */; };
 		C86846AA271F15B900D4565B /* OnePasswordImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86846A8271F15B900D4565B /* OnePasswordImporter.swift */; };
 		C86846B3271F21CA00D4565B /* Import1PasswordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86846B2271F21CA00D4565B /* Import1PasswordTests.swift */; };
@@ -1108,16 +1137,24 @@
 		C89B8FDA2562D32C00B590C0 /* Sha256PassThroughOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C831366924A9200A00D475D9 /* Sha256PassThroughOutputStream.m */; };
 		C89B8FDB2562D32C00B590C0 /* GzipDecompressOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C831366124A91FDB00D475D9 /* GzipDecompressOutputStream.m */; };
 		C89B8FDC2562D32C00B590C0 /* AesOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C831366624A91FF200D475D9 /* AesOutputStream.m */; };
+		C89C944227B17ECE00F78928 /* PillView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C89C944127B17ECE00F78928 /* PillView.xib */; };
+		C89C944327B17ECE00F78928 /* PillView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C89C944127B17ECE00F78928 /* PillView.xib */; };
+		C89C944527B17EFC00F78928 /* PillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89C944427B17EFC00F78928 /* PillView.swift */; };
+		C89C944627B17EFC00F78928 /* PillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89C944427B17EFC00F78928 /* PillView.swift */; };
+		C89C944827B180DC00F78928 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89C944727B180DC00F78928 /* NibLoadable.swift */; };
+		C89C944927B180DC00F78928 /* NibLoadable.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89C944727B180DC00F78928 /* NibLoadable.swift */; };
+		C89F08F227E378D4003C8510 /* SideBarOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = C89F08F127E378D4003C8510 /* SideBarOutlineView.m */; };
+		C89F08F327E378D4003C8510 /* SideBarOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = C89F08F127E378D4003C8510 /* SideBarOutlineView.m */; };
+		C89F08F627E3906D003C8510 /* HeaderNodeState.m in Sources */ = {isa = PBXBuildFile; fileRef = C89F08F527E3906D003C8510 /* HeaderNodeState.m */; };
+		C89F08F727E3906D003C8510 /* HeaderNodeState.m in Sources */ = {isa = PBXBuildFile; fileRef = C89F08F527E3906D003C8510 /* HeaderNodeState.m */; };
+		C89F08F827E3906D003C8510 /* HeaderNodeState.m in Sources */ = {isa = PBXBuildFile; fileRef = C89F08F527E3906D003C8510 /* HeaderNodeState.m */; };
+		C89F08F927E3906D003C8510 /* HeaderNodeState.m in Sources */ = {isa = PBXBuildFile; fileRef = C89F08F527E3906D003C8510 /* HeaderNodeState.m */; };
 		C89F69D12747ECA20051BC50 /* AppPreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89F69D02747ECA20051BC50 /* AppPreferencesWindowController.swift */; };
 		C89F69D22747ECA20051BC50 /* AppPreferencesWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89F69D02747ECA20051BC50 /* AppPreferencesWindowController.swift */; };
 		C89F69D42747EDE30051BC50 /* AppPreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89F69D32747EDE30051BC50 /* AppPreferencesWindow.swift */; };
 		C89F69D52747EDE30051BC50 /* AppPreferencesWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89F69D32747EDE30051BC50 /* AppPreferencesWindow.swift */; };
 		C89F69DA274809130051BC50 /* GeneralPreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89F69D9274809130051BC50 /* GeneralPreferencesViewController.swift */; };
 		C89F69DB274809130051BC50 /* GeneralPreferencesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89F69D9274809130051BC50 /* GeneralPreferencesViewController.swift */; };
-		C8A101B525FBB8F200293456 /* SwiftUIViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A101B425FBB8F200293456 /* SwiftUIViewFactory.swift */; };
-		C8A101B625FBB8F200293456 /* SwiftUIViewFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A101B425FBB8F200293456 /* SwiftUIViewFactory.swift */; };
-		C8A101CE25FBB95A00293456 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A101CD25FBB95A00293456 /* SwiftUIView.swift */; };
-		C8A101CF25FBB95A00293456 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A101CD25FBB95A00293456 /* SwiftUIView.swift */; };
 		C8A213022742A89F004C686B /* NavigationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A213012742A89F004C686B /* NavigationContext.swift */; };
 		C8A213032742A89F004C686B /* NavigationContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A213012742A89F004C686B /* NavigationContext.swift */; };
 		C8A213052742B310004C686B /* Icon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A213042742B310004C686B /* Icon.swift */; };
@@ -1420,6 +1457,18 @@
 		C8CE9E0F26E558DC0007922F /* HmacBlockInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CE9E0B26E558DC0007922F /* HmacBlockInputStream.m */; };
 		C8CE9E1026E558DC0007922F /* HmacBlockInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CE9E0B26E558DC0007922F /* HmacBlockInputStream.m */; };
 		C8D8D3E1256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */; };
+		C8DA3DBB27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DBA27B3E3BB00862C17 /* AuditIssueTableCellView.xib */; };
+		C8DA3DBC27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DBA27B3E3BB00862C17 /* AuditIssueTableCellView.xib */; };
+		C8DA3DBE27B3E3D400862C17 /* AuditIssueTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DA3DBD27B3E3D400862C17 /* AuditIssueTableCellView.swift */; };
+		C8DA3DBF27B3E3D400862C17 /* AuditIssueTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DA3DBD27B3E3D400862C17 /* AuditIssueTableCellView.swift */; };
+		C8DA3DC227B3EBD000862C17 /* AuditDrillDown.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DA3DC127B3EBD000862C17 /* AuditDrillDown.swift */; };
+		C8DA3DC327B3EBD000862C17 /* AuditDrillDown.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DA3DC127B3EBD000862C17 /* AuditDrillDown.swift */; };
+		C8DA3DC527B3EBF100862C17 /* AuditConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DA3DC427B3EBF100862C17 /* AuditConfigurationViewController.swift */; };
+		C8DA3DC627B3EBF100862C17 /* AuditConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DA3DC427B3EBF100862C17 /* AuditConfigurationViewController.swift */; };
+		C8DA3DCD27B426FA00862C17 /* AuditConfigurationViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DD027B426FA00862C17 /* AuditConfigurationViewController.storyboard */; };
+		C8DA3DCE27B426FA00862C17 /* AuditConfigurationViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DD027B426FA00862C17 /* AuditConfigurationViewController.storyboard */; };
+		C8DA3DEF27B4277700862C17 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DF227B4277700862C17 /* AuditDrillDown.storyboard */; };
+		C8DA3DF027B4277700862C17 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DF227B4277700862C17 /* AuditDrillDown.storyboard */; };
 		C8DC76312497A79000C9C443 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC762A2497A79000C9C443 /* ChaCha20ReadStream.m */; };
 		C8DC76322497A79000C9C443 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC762A2497A79000C9C443 /* ChaCha20ReadStream.m */; };
 		C8DC76332497A79000C9C443 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC762B2497A79000C9C443 /* AesInputStream.m */; };
@@ -1498,8 +1547,6 @@
 		C8F1B3FF26D67F3D00B21A29 /* NextGen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F1B40226D67F3D00B21A29 /* NextGen.storyboard */; };
 		C8F1B43626D69B7900B21A29 /* SideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F1B43426D69B7900B21A29 /* SideBarViewController.swift */; };
 		C8F1B43726D69B7900B21A29 /* SideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F1B43426D69B7900B21A29 /* SideBarViewController.swift */; };
-		C8F1C4FA25E94D7B00E7BADD /* MyFirstSwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F1C4F925E94D7B00E7BADD /* MyFirstSwiftUIView.swift */; };
-		C8F1C4FB25E94D7B00E7BADD /* MyFirstSwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F1C4F925E94D7B00E7BADD /* MyFirstSwiftUIView.swift */; };
 		C8F32D6D272D98F30064D511 /* DatabaseUnlocker.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F32D67272D98F30064D511 /* DatabaseUnlocker.m */; };
 		C8F32D6E272D98F30064D511 /* DatabaseUnlocker.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F32D67272D98F30064D511 /* DatabaseUnlocker.m */; };
 		C8F32D6F272D98F30064D511 /* DatabaseUnlocker.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F32D67272D98F30064D511 /* DatabaseUnlocker.m */; };
@@ -1524,6 +1571,8 @@
 		C8F39F3925DD90A80045CAAB /* WebDAVConfigVC.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F39F3B25DD90A80045CAAB /* WebDAVConfigVC.storyboard */; };
 		C8F39F6E25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F39F7225DD91270045CAAB /* SyncLogViewController.storyboard */; };
 		C8F39F6F25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F39F7225DD91270045CAAB /* SyncLogViewController.storyboard */; };
+		C8F3FD6D27D6193600AD56B7 /* TwoDriveStorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */; };
+		C8F3FD6E27D6193600AD56B7 /* TwoDriveStorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */; };
 		C8F78FCB26CFF016002B0924 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8F78FC826CFF015002B0924 /* libssl.a */; };
 		C8F78FCC26CFF016002B0924 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8F78FC826CFF015002B0924 /* libssl.a */; };
 		C8F78FCD26CFF016002B0924 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8F78FC826CFF015002B0924 /* libssl.a */; };
@@ -2120,6 +2169,13 @@
 		C80043E826BD902C0090C90D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/WebDAVConnectionsManager.strings"; sourceTree = "<group>"; };
 		C800441426BD90730090C90D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/WebDAVConfigVC.strings"; sourceTree = "<group>"; };
 		C800441826BD907F0090C90D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/SFTPConfigurationVC.strings"; sourceTree = "<group>"; };
+		C8015EA427D9196F00F9F3B1 /* FastMaps.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FastMaps.h; path = ../model/FastMaps.h; sourceTree = "<group>"; };
+		C8015EA527D9196F00F9F3B1 /* FastMaps.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FastMaps.m; path = ../model/FastMaps.m; sourceTree = "<group>"; };
+		C803825D27B5591200AB075A /* AuditExcludedItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuditExcludedItems.swift; path = MacBox/AuditExcludedItems.swift; sourceTree = "<group>"; };
+		C803826527B666E300AB075A /* ProLabelBadge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ProLabelBadge.swift; path = MacBox/ProLabelBadge.swift; sourceTree = "<group>"; };
+		C8039E5627AFDB7F00DCC981 /* twofactorauth.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = twofactorauth.json; path = ../resources/twofactorauth.json; sourceTree = "<group>"; };
+		C8039E6127B1767700DCC981 /* SingleLinePillTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SingleLinePillTableCellView.xib; path = MacBox/SingleLinePillTableCellView.xib; sourceTree = "<group>"; };
+		C8039E6427B176D200DCC981 /* SingleLinePillTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SingleLinePillTableCellView.swift; path = MacBox/SingleLinePillTableCellView.swift; sourceTree = "<group>"; };
 		C803D18B27281A5700DA217C /* all-types.1pif */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = "all-types.1pif"; sourceTree = "<group>"; };
 		C803E1CD2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		C803E1CE2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
@@ -2195,6 +2251,10 @@
 		C8175697273525AA00431A36 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ConnectHardwareKey.strings; sourceTree = "<group>"; };
 		C8175699273525AB00431A36 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ConnectHardwareKey.strings; sourceTree = "<group>"; };
 		C81756A52735366C00431A36 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		C817619127E22C0100334AF3 /* Strongbox-AutoFill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-AutoFill-Bridging-Header.h"; sourceTree = "<group>"; };
+		C817619227E22C0100334AF3 /* Strongbox-Pro-AutoFill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Pro-AutoFill-Bridging-Header.h"; sourceTree = "<group>"; };
+		C8196F1C27E1035200876E13 /* SideBarSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SideBarSettings.swift; path = MacBox/SideBarSettings.swift; sourceTree = "<group>"; };
+		C8196F2227E10D1E00876E13 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		C819D6C026BD921300886363 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SFTPConnectionsManager.storyboard; sourceTree = "<group>"; };
 		C819D6C526BD921B00886363 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
 		C819D6C726BD922900886363 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
@@ -2362,6 +2422,15 @@
 		C843567D2722EB0000CBB0A1 /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Section.swift; path = ../model/import/1Password/Section.swift; sourceTree = "<group>"; };
 		C84356802722EB4E00CBB0A1 /* SectionField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SectionField.swift; path = ../model/import/1Password/SectionField.swift; sourceTree = "<group>"; };
 		C84356832722FC9700CBB0A1 /* JSONAny.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = JSONAny.swift; path = ../model/import/1Password/JSONAny.swift; sourceTree = "<group>"; };
+		C843C5D427B6A20600E12CE8 /* OEXTokenTextStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OEXTokenTextStorage.h; path = ../lib/OEXTokenField/OEXTokenTextStorage.h; sourceTree = "<group>"; };
+		C843C5D527B6A20600E12CE8 /* OEXTokenFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OEXTokenFieldCell.m; path = ../lib/OEXTokenField/OEXTokenFieldCell.m; sourceTree = "<group>"; };
+		C843C5D627B6A20600E12CE8 /* OEXTokenTextStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OEXTokenTextStorage.m; path = ../lib/OEXTokenField/OEXTokenTextStorage.m; sourceTree = "<group>"; };
+		C843C5D727B6A20600E12CE8 /* OEXTokenField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OEXTokenField.h; path = ../lib/OEXTokenField/OEXTokenField.h; sourceTree = "<group>"; };
+		C843C5D827B6A20600E12CE8 /* OEXTokenAttachmentCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OEXTokenAttachmentCell.m; path = ../lib/OEXTokenField/OEXTokenAttachmentCell.m; sourceTree = "<group>"; };
+		C843C5D927B6A20600E12CE8 /* OEXTokenAttachmentCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OEXTokenAttachmentCell.h; path = ../lib/OEXTokenField/OEXTokenAttachmentCell.h; sourceTree = "<group>"; };
+		C843C5DA27B6A20600E12CE8 /* OEXTokenFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OEXTokenFieldCell.h; path = ../lib/OEXTokenField/OEXTokenFieldCell.h; sourceTree = "<group>"; };
+		C843C5DB27B6A20600E12CE8 /* OEXTokenField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OEXTokenField.m; path = ../lib/OEXTokenField/OEXTokenField.m; sourceTree = "<group>"; };
+		C843C5E427B6A56200E12CE8 /* SBTokenAttachmentCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SBTokenAttachmentCell.swift; path = MacBox/SBTokenAttachmentCell.swift; sourceTree = "<group>"; };
 		C84412AA279D7719006F4B8B /* UrlTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UrlTableCellView.swift; path = MacBox/UrlTableCellView.swift; sourceTree = "<group>"; };
 		C84412AD279D772D006F4B8B /* UrlTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = UrlTableCellView.xib; path = MacBox/UrlTableCellView.xib; sourceTree = "<group>"; };
 		C84412B1279D78F6006F4B8B /* HyperlinkTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = HyperlinkTextField.swift; path = MacBox/HyperlinkTextField.swift; sourceTree = "<group>"; };
@@ -2494,6 +2563,7 @@
 		C84F18152763AE0A0055C101 /* NextGenWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NextGenWindow.swift; sourceTree = "<group>"; };
 		C84F18182763C0050055C101 /* GenericDetailFieldTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = GenericDetailFieldTableCellView.xib; path = Model/GenericDetailFieldTableCellView.xib; sourceTree = "<group>"; };
 		C84F181B2763C04F0055C101 /* GenericDetailFieldTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenericDetailFieldTableCellView.swift; sourceTree = "<group>"; };
+		C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parse2FactorAuth.swift; sourceTree = "<group>"; };
 		C8584C7C27A84B7B00686A08 /* NextNavigationConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NextNavigationConstants.h; path = MacBox/NextNavigationConstants.h; sourceTree = "<group>"; };
 		C859423F277F2AE60040F03D /* TitleAndIconCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TitleAndIconCell.swift; path = MacBox/TitleAndIconCell.swift; sourceTree = "<group>"; };
 		C8594242277F2AFA0040F03D /* TitleAndIconCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = TitleAndIconCell.xib; path = MacBox/TitleAndIconCell.xib; sourceTree = "<group>"; };
@@ -2599,6 +2669,7 @@
 		C86791722561A1910038310E /* AutoType.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AutoType.m; path = ../model/AutoType.m; sourceTree = "<group>"; };
 		C86791732561A1910038310E /* AutoType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AutoType.h; path = ../model/AutoType.h; sourceTree = "<group>"; };
 		C86791742561A1910038310E /* AutoTypeAssociation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AutoTypeAssociation.m; path = ../model/AutoTypeAssociation.m; sourceTree = "<group>"; };
+		C867ACE227BA969000FF1E6E /* PaddedRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PaddedRowView.swift; path = MacBox/PaddedRowView.swift; sourceTree = "<group>"; };
 		C86846A8271F15B900D4565B /* OnePasswordImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = OnePasswordImporter.swift; path = ../model/import/OnePasswordImporter.swift; sourceTree = "<group>"; };
 		C86846B1271F21C900D4565B /* MB1Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MB1Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		C86846B2271F21CA00D4565B /* Import1PasswordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Import1PasswordTests.swift; path = ../../StrongboxTests/Import1PasswordTests.swift; sourceTree = "<group>"; };
@@ -2721,6 +2792,13 @@
 		C8969FF725AF70FF006819E3 /* Argon2idKdfCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Argon2idKdfCipher.m; path = ../model/keepass/Argon2idKdfCipher.m; sourceTree = "<group>"; };
 		C89B444C2608D54400486824 /* MacFileBasedBookmarkStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacFileBasedBookmarkStorageProvider.h; sourceTree = "<group>"; };
 		C89B444D2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacFileBasedBookmarkStorageProvider.m; sourceTree = "<group>"; };
+		C89C944127B17ECE00F78928 /* PillView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PillView.xib; path = MacBox/PillView.xib; sourceTree = "<group>"; };
+		C89C944427B17EFC00F78928 /* PillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PillView.swift; path = MacBox/PillView.swift; sourceTree = "<group>"; };
+		C89C944727B180DC00F78928 /* NibLoadable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NibLoadable.swift; path = MacBox/NibLoadable.swift; sourceTree = "<group>"; };
+		C89F08F027E378D4003C8510 /* SideBarOutlineView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SideBarOutlineView.h; path = MacBox/SideBarOutlineView.h; sourceTree = "<group>"; };
+		C89F08F127E378D4003C8510 /* SideBarOutlineView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SideBarOutlineView.m; path = MacBox/SideBarOutlineView.m; sourceTree = "<group>"; };
+		C89F08F427E3906D003C8510 /* HeaderNodeState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = HeaderNodeState.h; path = MacBox/HeaderNodeState.h; sourceTree = "<group>"; };
+		C89F08F527E3906D003C8510 /* HeaderNodeState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = HeaderNodeState.m; path = MacBox/HeaderNodeState.m; sourceTree = "<group>"; };
 		C89F69D02747ECA20051BC50 /* AppPreferencesWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppPreferencesWindowController.swift; path = MacBox/AppPreferencesWindowController.swift; sourceTree = "<group>"; };
 		C89F69D32747EDE30051BC50 /* AppPreferencesWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppPreferencesWindow.swift; path = MacBox/AppPreferencesWindow.swift; sourceTree = "<group>"; };
 		C89F69D9274809130051BC50 /* GeneralPreferencesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GeneralPreferencesViewController.swift; path = MacBox/GeneralPreferencesViewController.swift; sourceTree = "<group>"; };
@@ -2728,9 +2806,6 @@
 		C89F6B8B247FC5AE0070E754 /* changelog-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-ios.txt"; path = "../build/changelog-ios.txt"; sourceTree = "<group>"; };
 		C89F6B8C247FC5AE0070E754 /* version-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-ios.txt"; path = "../build/version-ios.txt"; sourceTree = "<group>"; };
 		C89F6B8D247FC5AE0070E754 /* version-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-mac.txt"; path = "../build/version-mac.txt"; sourceTree = "<group>"; };
-		C8A101B425FBB8F200293456 /* SwiftUIViewFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftUIViewFactory.swift; path = MacBox/SwiftUIViewFactory.swift; sourceTree = "<group>"; };
-		C8A101CD25FBB95A00293456 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
-		C8A101D825FBBBF800293456 /* GroupDetailsViewController.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = GroupDetailsViewController.storyboard; path = MacBox/GroupDetailsViewController.storyboard; sourceTree = "<group>"; };
 		C8A213012742A89F004C686B /* NavigationContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NavigationContext.swift; path = ViewModel/NavigationContext.swift; sourceTree = "<group>"; };
 		C8A213042742B310004C686B /* Icon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Icon.swift; path = ViewModel/Icon.swift; sourceTree = "<group>"; };
 		C8A5EEFE27A5617800C5232D /* GroupPropertiesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = GroupPropertiesViewController.swift; path = MacBox/GroupPropertiesViewController.swift; sourceTree = "<group>"; };
@@ -2978,6 +3053,40 @@
 		C8CE9E0C26E558DC0007922F /* HmacBlockInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HmacBlockInputStream.h; path = ../HmacBlockInputStream.h; sourceTree = "<group>"; };
 		C8D8D3DE256FD572001BD8BE /* SelectAutoFillDatabaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectAutoFillDatabaseViewController.h; sourceTree = "<group>"; };
 		C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectAutoFillDatabaseViewController.m; sourceTree = "<group>"; };
+		C8DA3DBA27B3E3BB00862C17 /* AuditIssueTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AuditIssueTableCellView.xib; path = MacBox/AuditIssueTableCellView.xib; sourceTree = "<group>"; };
+		C8DA3DBD27B3E3D400862C17 /* AuditIssueTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuditIssueTableCellView.swift; path = MacBox/AuditIssueTableCellView.swift; sourceTree = "<group>"; };
+		C8DA3DC127B3EBD000862C17 /* AuditDrillDown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuditDrillDown.swift; path = MacBox/AuditDrillDown.swift; sourceTree = "<group>"; };
+		C8DA3DC427B3EBF100862C17 /* AuditConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuditConfigurationViewController.swift; path = MacBox/AuditConfigurationViewController.swift; sourceTree = "<group>"; };
+		C8DA3DCF27B426FA00862C17 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/AuditConfigurationViewController.storyboard; sourceTree = "<group>"; };
+		C8DA3DD227B426FE00862C17 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DD427B426FF00862C17 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DD627B4270100862C17 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DD827B4270200862C17 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DDA27B4270400862C17 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/AuditConfigurationViewController.strings"; sourceTree = "<group>"; };
+		C8DA3DDC27B4270500862C17 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DDE27B4270600862C17 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DE027B4270700862C17 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DE227B4270900862C17 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DE427B4270A00862C17 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DE627B4270B00862C17 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DE827B4270D00862C17 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8DA3DEA27B4270F00862C17 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AuditConfigurationViewController.strings"; sourceTree = "<group>"; };
+		C8DA3DEC27B4271000862C17 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AuditConfigurationViewController.strings"; sourceTree = "<group>"; };
+		C8DA3DF127B4277700862C17 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/AuditDrillDown.storyboard; sourceTree = "<group>"; };
+		C8DA3DF627B4277B00862C17 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AuditDrillDown.strings"; sourceTree = "<group>"; };
+		C8DA3DF827B4277D00862C17 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AuditDrillDown.strings"; sourceTree = "<group>"; };
+		C8DA3DFA27B4277E00862C17 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3DFC27B4278000862C17 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3DFE27B4278100862C17 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E0027B4278200862C17 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E0227B4278400862C17 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E0427B4278500862C17 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E0627B4278700862C17 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E0827B4278800862C17 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/AuditDrillDown.strings"; sourceTree = "<group>"; };
+		C8DA3E0A27B4278A00862C17 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E0C27B4278B00862C17 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E0E27B4278D00862C17 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8DA3E1027B4278E00862C17 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
 		C8DC76292497A79000C9C443 /* KP31HashedBlockStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KP31HashedBlockStream.h; path = ../model/KP31HashedBlockStream.h; sourceTree = "<group>"; };
 		C8DC762A2497A79000C9C443 /* ChaCha20ReadStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ChaCha20ReadStream.m; path = ../model/ChaCha20ReadStream.m; sourceTree = "<group>"; };
 		C8DC762B2497A79000C9C443 /* AesInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AesInputStream.m; path = ../model/AesInputStream.m; sourceTree = "<group>"; };
@@ -3089,7 +3198,6 @@
 		C8F1B42226D67F5900B21A29 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/NextGen.strings; sourceTree = "<group>"; };
 		C8F1B42426D67F5B00B21A29 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/NextGen.strings; sourceTree = "<group>"; };
 		C8F1B43426D69B7900B21A29 /* SideBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SideBarViewController.swift; path = MacBox/SideBarViewController.swift; sourceTree = "<group>"; };
-		C8F1C4F925E94D7B00E7BADD /* MyFirstSwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MyFirstSwiftUIView.swift; path = MacBox/MyFirstSwiftUIView.swift; sourceTree = "<group>"; };
 		C8F32D66272D98F30064D511 /* DatabaseUnlocker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseUnlocker.h; path = ../model/DatabaseUnlocker.h; sourceTree = "<group>"; };
 		C8F32D67272D98F30064D511 /* DatabaseUnlocker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseUnlocker.m; path = ../model/DatabaseUnlocker.m; sourceTree = "<group>"; };
 		C8F32D73272D9A2C0064D511 /* Model.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Model.h; path = ../StrongBox/Model.h; sourceTree = "<group>"; };
@@ -3127,6 +3235,7 @@
 		C8F39F8F25DD91470045CAAB /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SyncLogViewController.strings; sourceTree = "<group>"; };
 		C8F39F9125DD91490045CAAB /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SyncLogViewController.strings; sourceTree = "<group>"; };
 		C8F39F9325DD914A0045CAAB /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SyncLogViewController.strings; sourceTree = "<group>"; };
+		C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwoDriveStorageProvider.swift; path = ../model/TwoDriveStorageProvider.swift; sourceTree = "<group>"; };
 		C8F78FC826CFF015002B0924 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../../openssl-ssh/macOS/libssl.a"; sourceTree = "<group>"; };
 		C8F78FC926CFF016002B0924 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../../openssl-ssh/macOS/libcrypto.a"; sourceTree = "<group>"; };
 		C8F78FCA26CFF016002B0924 /* libssh2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssh2.a; path = "../../../openssl-ssh/macOS/libssh2.a"; sourceTree = "<group>"; };
@@ -3432,6 +3541,7 @@
 		4D29663621AD7318009B7936 /* MB1Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */,
 				C86846B2271F21CA00D4565B /* Import1PasswordTests.swift */,
 				4D2CB7E923D1BD05000A9ABC /* SecretStoreTests.m */,
 				4D29663721AD7318009B7936 /* MB1Tests.m */,
@@ -3616,6 +3726,7 @@
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
 				C8006BB526DA747C0020AF23 /* Main */,
+				C8DA3DC027B3EBA300862C17 /* Audit */,
 				4D14A13B224D211400C71ABF /* Node Details */,
 				C8E5C324275E7230006C15FE /* Sync */,
 				C817566A27351F3F00431A36 /* Hardware Key */,
@@ -3623,7 +3734,6 @@
 				C834321A270CAC8D009DFFF4 /* Markdown */,
 				C8F1B42526D68ADE00B21A29 /* System Tray */,
 				C8877459261E16BB00C01406 /* Edit Tags */,
-				C8F1C4F125E94D5200E7BADD /* SwiftUI */,
 				C8877392261DE80100C01406 /* About */,
 				4D88E6D123A924D100A75D1F /* Databases Manager */,
 				4D88E6D023A9249E00A75D1F /* App Preferences */,
@@ -3646,6 +3756,8 @@
 				4DF299812243CED70080F9DC /* CollectionViewHeader.h */,
 				4DF299822243CED70080F9DC /* CollectionViewHeader.m */,
 				C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */,
+				C89C944727B180DC00F78928 /* NibLoadable.swift */,
+				C803826527B666E300AB075A /* ProLabelBadge.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -3675,6 +3787,7 @@
 				C80735DE2614D97E006FA2FC /* TableViewWithRightClickSelect.h */,
 				C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */,
 				C8630E61274C0323002718DE /* AdvancedDatabasePreferences.swift */,
+				C8196F1C27E1035200876E13 /* SideBarSettings.swift */,
 			);
 			name = "Database Settings";
 			sourceTree = "<group>";
@@ -3809,6 +3922,7 @@
 		4DA50CFA244DFCFE00364781 /* Audit */ = {
 			isa = PBXGroup;
 			children = (
+				C8039E5527AFDB6E00DCC981 /* Resources */,
 				4DA50CFE244DFD2100364781 /* DatabaseAuditor.h */,
 				4DA50CFD244DFD2100364781 /* DatabaseAuditor.m */,
 				4DA50CFB244DFD2100364781 /* DatabaseAuditorConfiguration.h */,
@@ -3967,6 +4081,7 @@
 		4DE2CA3E23C38B5E00F76255 /* Original */ = {
 			isa = PBXGroup;
 			children = (
+				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
 				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
 				4DF59F5B1F30DB7A00D68BFE /* ViewController.m */,
 				C80C2BC1259A1DD300085E7F /* OutlineView.h */,
@@ -4045,8 +4160,9 @@
 		4DF347EF2074FA5A00148741 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				C8F32D72272D99FF0064D511 /* Model */,
+				C85B9D71246543BA00EEBFC9 /* Database */,
 				C85A840727983FAF004BCF22 /* KeePassIconSet.m */,
+				C8F32D72272D99FF0064D511 /* Model */,
 				4DCAE87C257E6E3600072D4B /* Sync */,
 				C8E0B1EA275BD47200A871F6 /* Database Metadata */,
 				C8864C192746B2D100D55C1C /* App Preferences */,
@@ -4060,7 +4176,6 @@
 				C85B9D7B2465453A00EEBFC9 /* YubiKey */,
 				C8F32D71272D99020064D511 /* Unlock Sequence */,
 				C86846A6271F157000D4565B /* Import */,
-				C85B9D71246543BA00EEBFC9 /* Database */,
 				C83F7D7826B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.h */,
 				C83F7D7926B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m */,
 				C8397AE52593989E000F5158 /* NodeIconHelper.h */,
@@ -4211,7 +4326,6 @@
 		C8006BB526DA747C0020AF23 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
 				C8EEDB0427A1949D00FBFA43 /* Lock Screen */,
 				C8F1B3F926D67EE000B21A29 /* NextGen */,
 				4DE2CA3E23C38B5E00F76255 /* Original */,
@@ -4219,6 +4333,14 @@
 				C875F83B279AB72000955D14 /* NotificationConstants.m */,
 			);
 			name = Main;
+			sourceTree = "<group>";
+		};
+		C8039E5527AFDB6E00DCC981 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C8039E5627AFDB7F00DCC981 /* twofactorauth.json */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		C806E6FD2721B6B5007A1F28 /* CSV */ = {
@@ -4266,7 +4388,6 @@
 		C81AC79927A066FC00EF5ED3 /* Split View */ = {
 			isa = PBXGroup;
 			children = (
-				C8F1B40226D67F3D00B21A29 /* NextGen.storyboard */,
 				C8867AD326D7B626001A3EE5 /* NextGenSplitViewController.swift */,
 				C8867AD726D7C592001A3EE5 /* DocumentViewController.swift */,
 				C84F18152763AE0A0055C101 /* NextGenWindow.swift */,
@@ -4411,6 +4532,21 @@
 			name = Detail;
 			sourceTree = "<group>";
 		};
+		C843C5D327B6A1F500E12CE8 /* OEXTokenField */ = {
+			isa = PBXGroup;
+			children = (
+				C843C5D927B6A20600E12CE8 /* OEXTokenAttachmentCell.h */,
+				C843C5D827B6A20600E12CE8 /* OEXTokenAttachmentCell.m */,
+				C843C5D727B6A20600E12CE8 /* OEXTokenField.h */,
+				C843C5DB27B6A20600E12CE8 /* OEXTokenField.m */,
+				C843C5DA27B6A20600E12CE8 /* OEXTokenFieldCell.h */,
+				C843C5D527B6A20600E12CE8 /* OEXTokenFieldCell.m */,
+				C843C5D427B6A20600E12CE8 /* OEXTokenTextStorage.h */,
+				C843C5D627B6A20600E12CE8 /* OEXTokenTextStorage.m */,
+			);
+			name = OEXTokenField;
+			sourceTree = "<group>";
+		};
 		C84412B0279D7794006F4B8B /* URL */ = {
 			isa = PBXGroup;
 			children = (
@@ -4434,6 +4570,7 @@
 		C8441B7D25CAEAFD0070C7FE /* Storage Providers */ = {
 			isa = PBXGroup;
 			children = (
+				C8F3FD6B27D6192300AD56B7 /* OneDrive */,
 				C8441C2F25CB00250070C7FE /* _Common */,
 				C89B44322608D41B00486824 /* File (Bookmark) */,
 				C8441C3025CB003C0070C7FE /* SFTP */,
@@ -4543,6 +4680,8 @@
 		C8441C3025CB003C0070C7FE /* SFTP */ = {
 			isa = PBXGroup;
 			children = (
+				C8441C3425CB009B0070C7FE /* SFTPStorageProvider.h */,
+				C8441C3225CB009B0070C7FE /* SFTPStorageProvider.m */,
 				C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */,
 				C81F164426BC2F2700CDAEAF /* SFTPConnections.h */,
 				C81F164226BC2F2700CDAEAF /* SFTPConnections.m */,
@@ -4552,8 +4691,6 @@
 				C8441C3625CB009B0070C7FE /* SFTPProviderData.m */,
 				C8441C3525CB009B0070C7FE /* SFTPSessionConfiguration.h */,
 				C8441C3125CB009A0070C7FE /* SFTPSessionConfiguration.m */,
-				C8441C3425CB009B0070C7FE /* SFTPStorageProvider.h */,
-				C8441C3225CB009B0070C7FE /* SFTPStorageProvider.m */,
 				C8F8CE3D25D57EC300C93840 /* SFTPConfigurationVC.storyboard */,
 				C8AFBF5425CC4014009D9519 /* SFTPConfigurationVC.h */,
 				C8AFBF5525CC4014009D9519 /* SFTPConfigurationVC.m */,
@@ -4645,6 +4782,7 @@
 		C84622B6276A49CC00322FD5 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
+				C8DA3DB927B3E39B00862C17 /* Audit Issue */,
 				C81B8D112799C335006387D0 /* Header */,
 				C81B8D072799B8FD006387D0 /* Attachments */,
 				C85A841627987828004BCF22 /* Metadata */,
@@ -4692,6 +4830,10 @@
 				C8594242277F2AFA0040F03D /* TitleAndIconCell.xib */,
 				C8594245277F2DDB0040F03D /* GenericAutoLayoutTableViewCell.xib */,
 				C8594248277F2E1E0040F03D /* GenericAutoLayoutTableViewCell.swift */,
+				C8039E6127B1767700DCC981 /* SingleLinePillTableCellView.xib */,
+				C8039E6427B176D200DCC981 /* SingleLinePillTableCellView.swift */,
+				C89C944127B17ECE00F78928 /* PillView.xib */,
+				C89C944427B17EFC00F78928 /* PillView.swift */,
 			);
 			name = "Custom Cells";
 			sourceTree = "<group>";
@@ -4708,6 +4850,7 @@
 		C85B9D6E2465426A00EEBFC9 /* UI Components */ = {
 			isa = PBXGroup;
 			children = (
+				C843C5D327B6A1F500E12CE8 /* OEXTokenField */,
 				C84412B1279D78F6006F4B8B /* HyperlinkTextField.swift */,
 				C875F850279C044B00955D14 /* AutoLayoutResizingTokenField.swift */,
 				C883F7592783519E0036D48A /* MMcGSecureTextField.h */,
@@ -4781,21 +4924,21 @@
 		C85B9D71246543BA00EEBFC9 /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				4DF347D52074FA1D00148741 /* PwSafe */,
+				C8DE8DA4258FD6C000B4D9EA /* Serialization */,
+				4D9E0948218250F6007BA1E7 /* KeePass */,
+				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
+				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
 				C82284962639BA9C00103002 /* ValueWithModDate.h */,
 				C82284972639BA9C00103002 /* ValueWithModDate.m */,
 				C8397AF525939A38000F5158 /* KeePassIconSet.h */,
 				C8397B3D25939C81000F5158 /* DatabaseFormat.h */,
 				C8DC76412497AFA600C9C443 /* DatabaseModelConfig.h */,
 				C8DC76422497AFA600C9C443 /* DatabaseModelConfig.m */,
-				4D9E0948218250F6007BA1E7 /* KeePass */,
-				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
-				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
 				4DF347FE2074FA6C00148741 /* Node.h */,
 				4DF348002074FA6C00148741 /* Node.m */,
 				4DF347FA2074FA6C00148741 /* NodeFields.h */,
 				4DF347F22074FA6B00148741 /* NodeFields.m */,
-				C8DE8DA4258FD6C000B4D9EA /* Serialization */,
-				4DF347D52074FA1D00148741 /* PwSafe */,
 				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
 				4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */,
 				4D01BA2B22BD31F00044226F /* SearchScope.h */,
@@ -4807,6 +4950,8 @@
 				C80B10832551F9D200FBDF72 /* CustomData.m */,
 				C8BFECB824781C660051D21E /* NodeHierarchyReconstructionData.h */,
 				C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */,
+				C8015EA427D9196F00F9F3B1 /* FastMaps.h */,
+				C8015EA527D9196F00F9F3B1 /* FastMaps.m */,
 			);
 			name = Database;
 			sourceTree = "<group>";
@@ -5001,6 +5146,7 @@
 				C88D6C6F27848DB8001F6593 /* PastedImagePreviewer.swift */,
 				C8CB82C82790812900F85A2C /* PastedImagePreviewer.storyboard */,
 				C8BE5926278B226200C9B1B8 /* QRCodeScanner.swift */,
+				C843C5E427B6A56200E12CE8 /* SBTokenAttachmentCell.swift */,
 			);
 			name = "Create-Edit";
 			sourceTree = "<group>";
@@ -5048,6 +5194,8 @@
 			isa = PBXGroup;
 			children = (
 				C87A992F255968D30002BEF8 /* FavIcon-Swift */,
+				C817619127E22C0100334AF3 /* Strongbox-AutoFill-Bridging-Header.h */,
+				C817619227E22C0100334AF3 /* Strongbox-Pro-AutoFill-Bridging-Header.h */,
 				C87A9930255968EA0002BEF8 /* Strongbox-Bridging-Header.h */,
 				C87A9931255968EA0002BEF8 /* Strongbox-Outright-Pro-Bridging-Header.h */,
 			);
@@ -5292,6 +5440,27 @@
 			name = "Database Onboarding";
 			sourceTree = "<group>";
 		};
+		C8DA3DB927B3E39B00862C17 /* Audit Issue */ = {
+			isa = PBXGroup;
+			children = (
+				C8DA3DBA27B3E3BB00862C17 /* AuditIssueTableCellView.xib */,
+				C8DA3DBD27B3E3D400862C17 /* AuditIssueTableCellView.swift */,
+			);
+			name = "Audit Issue";
+			sourceTree = "<group>";
+		};
+		C8DA3DC027B3EBA300862C17 /* Audit */ = {
+			isa = PBXGroup;
+			children = (
+				C8DA3DC127B3EBD000862C17 /* AuditDrillDown.swift */,
+				C8DA3DF227B4277700862C17 /* AuditDrillDown.storyboard */,
+				C8DA3DC427B3EBF100862C17 /* AuditConfigurationViewController.swift */,
+				C803825D27B5591200AB075A /* AuditExcludedItems.swift */,
+				C8DA3DD027B426FA00862C17 /* AuditConfigurationViewController.storyboard */,
+			);
+			name = Audit;
+			sourceTree = "<group>";
+		};
 		C8DC76282497A75F00C9C443 /* Streaming */ = {
 			isa = PBXGroup;
 			children = (
@@ -5388,6 +5557,7 @@
 		C8F1B3F926D67EE000B21A29 /* NextGen */ = {
 			isa = PBXGroup;
 			children = (
+				C8F1B40226D67F3D00B21A29 /* NextGen.storyboard */,
 				C8A213012742A89F004C686B /* NavigationContext.swift */,
 				C81AC79927A066FC00EF5ED3 /* Split View */,
 				C8F1B42F26D69AB600B21A29 /* Side Bar */,
@@ -5421,19 +5591,13 @@
 				C823F03B27A2DE32009FF675 /* SideBarViewNode.swift */,
 				C8A5EEFE27A5617800C5232D /* GroupPropertiesViewController.swift */,
 				C8A5EF0127A5618900C5232D /* GroupPropertiesViewController.storyboard */,
+				C867ACE227BA969000FF1E6E /* PaddedRowView.swift */,
+				C89F08F027E378D4003C8510 /* SideBarOutlineView.h */,
+				C89F08F127E378D4003C8510 /* SideBarOutlineView.m */,
+				C89F08F427E3906D003C8510 /* HeaderNodeState.h */,
+				C89F08F527E3906D003C8510 /* HeaderNodeState.m */,
 			);
 			name = "Side Bar";
-			sourceTree = "<group>";
-		};
-		C8F1C4F125E94D5200E7BADD /* SwiftUI */ = {
-			isa = PBXGroup;
-			children = (
-				C8A101B425FBB8F200293456 /* SwiftUIViewFactory.swift */,
-				C8F1C4F925E94D7B00E7BADD /* MyFirstSwiftUIView.swift */,
-				C8A101CD25FBB95A00293456 /* SwiftUIView.swift */,
-				C8A101D825FBBBF800293456 /* GroupDetailsViewController.storyboard */,
-			);
-			name = SwiftUI;
 			sourceTree = "<group>";
 		};
 		C8F32D71272D99020064D511 /* Unlock Sequence */ = {
@@ -5468,6 +5632,14 @@
 			name = Model;
 			sourceTree = "<group>";
 		};
+		C8F3FD6B27D6192300AD56B7 /* OneDrive */ = {
+			isa = PBXGroup;
+			children = (
+				C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */,
+			);
+			name = OneDrive;
+			sourceTree = "<group>";
+		};
 		C8F9AA6527495AC900C2D9E8 /* General */ = {
 			isa = PBXGroup;
 			children = (
@@ -5497,6 +5669,8 @@
 				C8B9463D2573D19E00932C46 /* PBXTargetDependency */,
 			);
 			name = "Strongbox-Pro";
+			packageProductDependencies = (
+			);
 			productName = MacBox;
 			productReference = 4D1FFB482403030100B75EA2 /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
@@ -5554,6 +5728,8 @@
 				4DE79B90255D987C00F59B10 /* PBXTargetDependency */,
 			);
 			name = Strongbox;
+			packageProductDependencies = (
+			);
 			productName = MacBox;
 			productReference = 4DF59F511F30DB7A00D68BFE /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
@@ -5600,6 +5776,7 @@
 					4DE79B82255D987C00F59B10 = {
 						CreatedOnToolsVersion = 12.2;
 						DevelopmentTeam = 4326J8XDF2;
+						LastSwiftMigration = 1320;
 						ProvisioningStyle = Automatic;
 					};
 					4DF59F501F30DB7A00D68BFE = {
@@ -5621,6 +5798,7 @@
 					};
 					C8B945632573D01A00932C46 = {
 						DevelopmentTeam = 4326J8XDF2;
+						LastSwiftMigration = 1320;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -5648,6 +5826,8 @@
 				"zh-Hant",
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
+			packageReferences = (
+			);
 			productRefGroup = 4DF59F521F30DB7A00D68BFE /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -5694,14 +5874,17 @@
 				C8B14B98274AA3D70055EB05 /* NewEntryDefaultsPreferences.storyboard in Resources */,
 				4D1FFB262403030100B75EA2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C8B946882573D59400932C46 /* AttachmentItem.xib in Resources */,
+				C8DA3DCE27B426FA00862C17 /* AuditConfigurationViewController.storyboard in Resources */,
 				4D1FFB272403030100B75EA2 /* PredefinedKeePassIcon.xib in Resources */,
 				4D1FFB282403030100B75EA2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D1FFB292403030100B75EA2 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				C8DA3DF027B4277700862C17 /* AuditDrillDown.storyboard in Resources */,
 				C85B9DB524655D6300EEBFC9 /* surnames.us.txt in Resources */,
 				C84594EF26D3E6AD00D5DF6B /* SystemTrayViewController.storyboard in Resources */,
 				4D1FFB2A2403030100B75EA2 /* Assets.xcassets in Resources */,
 				4D1FFB2B2403030100B75EA2 /* QRCodePresenter.storyboard in Resources */,
 				C875F848279B031500955D14 /* TagsTableCellView.xib in Resources */,
+				C89C944327B17ECE00F78928 /* PillView.xib in Resources */,
 				4D1FFB2C2403030100B75EA2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C8F9AA8C27495C3200C2D9E8 /* GeneralAppPreferences.storyboard in Resources */,
 				4D1FFB2D2403030100B75EA2 /* DownloadFavIcons.storyboard in Resources */,
@@ -5709,6 +5892,7 @@
 				4D1FFB2E2403030100B75EA2 /* Localizable.strings in Resources */,
 				C81B8D062799B8ED006387D0 /* AttachmentTableCellView.xib in Resources */,
 				C8F8CE6325D57F1C00C93840 /* AddDatabaseSelectStorageProvider.storyboard in Resources */,
+				C8039E6327B1767700DCC981 /* SingleLinePillTableCellView.xib in Resources */,
 				C84412C0279EFFA8006F4B8B /* LargeTextIndexedCharacter.xib in Resources */,
 				4D1FFB2F2403030100B75EA2 /* starwars_8k_2018.utf8.txt in Resources */,
 				C81ABE4C25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
@@ -5753,6 +5937,7 @@
 				4D1FFB3E2403030100B75EA2 /* eff_large_wordlist.utf8.txt in Resources */,
 				C84412B6279EED05006F4B8B /* LargeTextViewAndQrCode.storyboard in Resources */,
 				C88773D2261E02E600C01406 /* AboutViewController.storyboard in Resources */,
+				C8039E5827AFDB7F00DCC981 /* twofactorauth.json in Resources */,
 				4D1FFB3F2403030100B75EA2 /* NodeDetails.storyboard in Resources */,
 				C832A4AC2730272800768319 /* ManualCredentialsEntry.xib in Resources */,
 				C84622BA276A4A1000322FD5 /* TitleCellView.xib in Resources */,
@@ -5760,6 +5945,7 @@
 				C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
 				C8EDCD37250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
 				4D1FFB412403030100B75EA2 /* Credits.rtf in Resources */,
+				C8DA3DBC27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5828,14 +6014,17 @@
 				C8B14B97274AA3D70055EB05 /* NewEntryDefaultsPreferences.storyboard in Resources */,
 				4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C8B946872573D59400932C46 /* AttachmentItem.xib in Resources */,
+				C8DA3DCD27B426FA00862C17 /* AuditConfigurationViewController.storyboard in Resources */,
 				4DC805BF23A11749001E742E /* PredefinedKeePassIcon.xib in Resources */,
 				4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				C8DA3DEF27B4277700862C17 /* AuditDrillDown.storyboard in Resources */,
 				C85B9DB424655D6200EEBFC9 /* surnames.us.txt in Resources */,
 				C84594EE26D3E6AD00D5DF6B /* SystemTrayViewController.storyboard in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DF522B823C8BACE00CD948E /* QRCodePresenter.storyboard in Resources */,
 				C875F847279B031500955D14 /* TagsTableCellView.xib in Resources */,
+				C89C944227B17ECE00F78928 /* PillView.xib in Resources */,
 				4D216F7522CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C8F9AA8B27495C3200C2D9E8 /* GeneralAppPreferences.storyboard in Resources */,
 				4D1E77E223AFEBF4007240FA /* DownloadFavIcons.storyboard in Resources */,
@@ -5843,6 +6032,7 @@
 				C8F39F3825DD90A80045CAAB /* WebDAVConfigVC.storyboard in Resources */,
 				C81B8D052799B8ED006387D0 /* AttachmentTableCellView.xib in Resources */,
 				4D4A003D231317A900B69E09 /* Localizable.strings in Resources */,
+				C8039E6227B1767700DCC981 /* SingleLinePillTableCellView.xib in Resources */,
 				C84412BF279EFFA8006F4B8B /* LargeTextIndexedCharacter.xib in Resources */,
 				C8F8CE6225D57F1C00C93840 /* AddDatabaseSelectStorageProvider.storyboard in Resources */,
 				C81ABE4A25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
@@ -5887,6 +6077,7 @@
 				4D216F6E22CBCE0D000954D0 /* eff_large_wordlist.utf8.txt in Resources */,
 				C84412B5279EED05006F4B8B /* LargeTextViewAndQrCode.storyboard in Resources */,
 				C88773D0261E02E600C01406 /* AboutViewController.storyboard in Resources */,
+				C8039E5727AFDB7F00DCC981 /* twofactorauth.json in Resources */,
 				4D40B08423BFB8AA00BAD0D2 /* NodeDetails.storyboard in Resources */,
 				C832A4AB2730272700768319 /* ManualCredentialsEntry.xib in Resources */,
 				C84622B9276A4A1000322FD5 /* TitleCellView.xib in Resources */,
@@ -5894,6 +6085,7 @@
 				C85B9DB824655D6A00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
 				C8EDCD36250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
+				C8DA3DBB27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5993,11 +6185,15 @@
 				"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox-Pro/Pods-common-mac-Strongbox-Pro-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Down-macOS/Down.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/MSAL/MSAL.framework",
+				"${BUILT_PRODUCTS_DIR}/MSGraphClientSDK-macOS/MSGraphClientSDK.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Down.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSAL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSGraphClientSDK.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -6013,11 +6209,15 @@
 				"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Down-macOS/Down.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/MSAL/MSAL.framework",
+				"${BUILT_PRODUCTS_DIR}/MSGraphClientSDK-macOS/MSGraphClientSDK.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Down.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSAL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSGraphClientSDK.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -6074,6 +6274,7 @@
 				4D1FFA702403030100B75EA2 /* Binary.m in Sources */,
 				4D1FFA712403030100B75EA2 /* Entry.m in Sources */,
 				C837415825D2DD8F00EDE4F3 /* DocumentController.m in Sources */,
+				C8039E6627B176D200DCC981 /* SingleLinePillTableCellView.swift in Sources */,
 				C83741E725D30F6300EDE4F3 /* SyncStatusLogEntry.m in Sources */,
 				4D1FFA722403030100B75EA2 /* VariantDictionary.m in Sources */,
 				4D1FFA732403030100B75EA2 /* DatabaseConvenienceUnlockPreferences.m in Sources */,
@@ -6092,6 +6293,7 @@
 				C873EA5C26F2405400A71F2A /* XmlOutputStreamWriter.m in Sources */,
 				4D1FFA7F2403030100B75EA2 /* BookmarksHelper.m in Sources */,
 				4D1FFA802403030100B75EA2 /* Meta.m in Sources */,
+				C89F08F827E3906D003C8510 /* HeaderNodeState.m in Sources */,
 				4D1FFA812403030100B75EA2 /* MacKeePassHistoryViewController.m in Sources */,
 				C8DC76442497AFA600C9C443 /* DatabaseModelConfig.m in Sources */,
 				4D1FFA822403030100B75EA2 /* FavIconDownloader.m in Sources */,
@@ -6153,10 +6355,11 @@
 				C80A373026D7DE3100613555 /* LockScreenViewController.m in Sources */,
 				4D1FFA972403030100B75EA2 /* ref.c in Sources */,
 				C87A9940255968EA0002BEF8 /* URLRequestOperation.swift in Sources */,
+				C89C944627B17EFC00F78928 /* PillView.swift in Sources */,
 				4D1FFA982403030100B75EA2 /* KdbxSerializationCommon.m in Sources */,
 				4D1FFA992403030100B75EA2 /* NSDictionary+Extensions.m in Sources */,
 				C867340826739F860063237B /* MASLocalization.m in Sources */,
-				C8A101B625FBB8F200293456 /* SwiftUIViewFactory.swift in Sources */,
+				C843C5E327B6A20700E12CE8 /* OEXTokenField.m in Sources */,
 				C84412BE279EFFA8006F4B8B /* LargeTextIndexedCharacter.swift in Sources */,
 				C8453ED7254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */,
 				C84356792722EA3D00CBB0A1 /* SecureContents.swift in Sources */,
@@ -6179,8 +6382,10 @@
 				C80BFB8B26CD5F100065485A /* SystemTrayViewController.m in Sources */,
 				C85A840927983FAF004BCF22 /* KeePassIconSet.m in Sources */,
 				C8441CB925CB01AB0070C7FE /* NMSFTPFile.m in Sources */,
+				C803826027B5591200AB075A /* AuditExcludedItems.swift in Sources */,
 				C8E379EF25DC455F006A26BF /* SyncOperationState.m in Sources */,
 				4D1FFAA42403030100B75EA2 /* XmlSerializer.m in Sources */,
+				C843C5DD27B6A20700E12CE8 /* OEXTokenFieldCell.m in Sources */,
 				C83741DC25D30F4B00EDE4F3 /* ConcurrentCircularBuffer.m in Sources */,
 				4D1FFAA62403030100B75EA2 /* CustomField.m in Sources */,
 				C8DC76362497A79000C9C443 /* TwoFishReadStream.m in Sources */,
@@ -6189,6 +6394,7 @@
 				4D1FFAA82403030100B75EA2 /* KeePassCiphers.m in Sources */,
 				4D1FFAA92403030100B75EA2 /* CHCSVParser.m in Sources */,
 				C832A476272EC0FE00768319 /* macOSSpinnerUI.m in Sources */,
+				C89C944927B180DC00F78928 /* NibLoadable.swift in Sources */,
 				4D1FFAAA2403030100B75EA2 /* PasswordHistoryEntry.m in Sources */,
 				4D1FFAAB2403030100B75EA2 /* KdbEntry.m in Sources */,
 				C8E78B4325715C8700251153 /* MMWormholeCoordinatedFileTransiting.m in Sources */,
@@ -6203,6 +6409,7 @@
 				4DCE899E255D99FE002C02D9 /* AutoFillManager.m in Sources */,
 				C8441CAD25CB01AB0070C7FE /* NMSSHSession.m in Sources */,
 				C8E2CB1A2477D5270029E1CB /* DeletedObjects.m in Sources */,
+				C803826727B666E300AB075A /* ProLabelBadge.swift in Sources */,
 				C81AC79C27A06AA900EF5ED3 /* Collection+Extensions.swift in Sources */,
 				4D1FFAAF2403030100B75EA2 /* SecretStore.m in Sources */,
 				4DD30BB6255D9ACD000A923F /* QuickTypeRecordIdentifier.m in Sources */,
@@ -6210,6 +6417,7 @@
 				C887739E261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				C84356852722FC9700CBB0A1 /* JSONAny.swift in Sources */,
 				C81BBD0D2567E49A001BAB0D /* ClickableTextField.m in Sources */,
+				C843C5E627B6A56200E12CE8 /* SBTokenAttachmentCell.swift in Sources */,
 				C83741C625D30F0B00EDE4F3 /* ConcurrentMutableArray.m in Sources */,
 				4D1FFAB02403030100B75EA2 /* MacAlerts.m in Sources */,
 				4D1FFAB12403030100B75EA2 /* CryptoParameters.m in Sources */,
@@ -6221,15 +6429,18 @@
 				C8B501FB26ECB653003DE6A2 /* GZIPCompressOutputStream.m in Sources */,
 				C8DC76322497A79000C9C443 /* ChaCha20ReadStream.m in Sources */,
 				4D1FFAB52403030100B75EA2 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
+				C8DA3DBF27B3E3D400862C17 /* AuditIssueTableCellView.swift in Sources */,
 				4D1FFAB62403030100B75EA2 /* KeePassDatabase.m in Sources */,
 				4D1FFAB72403030100B75EA2 /* PwSafeSerialization.m in Sources */,
 				C86E0B96276FA2C60064D314 /* EntryViewModel.m in Sources */,
+				C8DA3DC627B3EBF100862C17 /* AuditConfigurationViewController.swift in Sources */,
 				C87A994C255968EB0002BEF8 /* DownloadTextOperation.swift in Sources */,
 				C8DC76382497A79000C9C443 /* KP31HashedBlockStream.m in Sources */,
 				C873EA6426F2408A00A71F2A /* MemoryProtection.m in Sources */,
 				C8441C3D25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8C0834F2569581F00FF280D /* CustomBackgroundTableView.m in Sources */,
 				4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */,
+				C8DA3DC327B3EBD000862C17 /* AuditDrillDown.swift in Sources */,
 				C81B8D142799DFAA006387D0 /* TotpTableCellView.swift in Sources */,
 				C837417225D2EFD600EDE4F3 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8441B8B25CAEB930070C7FE /* WebDAVSessionConfiguration.m in Sources */,
@@ -6244,6 +6455,7 @@
 				4D1FFABD2403030100B75EA2 /* Utils.m in Sources */,
 				C84412B9279EED23006F4B8B /* LargeTextViewAndQrCode.swift in Sources */,
 				4D1FFABE2403030100B75EA2 /* String.m in Sources */,
+				C8015EA827D9196F00F9F3B1 /* FastMaps.m in Sources */,
 				C8C8965C26CECAC600F1BC4D /* ykcore_osx.c in Sources */,
 				4D1FFABF2403030100B75EA2 /* ClipboardManager.m in Sources */,
 				C88F146C2781DFE400F93C10 /* FontManager.swift in Sources */,
@@ -6279,6 +6491,7 @@
 				4D1FFACB2403030100B75EA2 /* RootXmlDomainObject.m in Sources */,
 				4D1FFACC2403030100B75EA2 /* MMcG_MF_Base32Additions.m in Sources */,
 				4D1FFACD2403030100B75EA2 /* Salsa20Stream.m in Sources */,
+				C843C5DF27B6A20700E12CE8 /* OEXTokenTextStorage.m in Sources */,
 				C8B961A726D9219D00424FDA /* BrowseViewController.swift in Sources */,
 				C831365C24A91F2300D475D9 /* Constants.m in Sources */,
 				C8C8966A26CECAD200F1BC4D /* ykcrc.c in Sources */,
@@ -6340,11 +6553,11 @@
 				C85B9D912465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
 				C8EEDB0927A19B1500FBFA43 /* BrowseViewColumn.swift in Sources */,
 				C8441CA925CB01AB0070C7FE /* socket_helper.m in Sources */,
-				C8A101CF25FBB95A00293456 /* SwiftUIView.swift in Sources */,
 				C8B679A426271D4B00E295A3 /* PasswordStrength.m in Sources */,
 				C87A9942255968EA0002BEF8 /* XMLDocument.m in Sources */,
 				C83741F225D3129A00EDE4F3 /* MacSyncManager.m in Sources */,
 				C84D6CC7273D2A5600182B40 /* OnboardingDatabaseChangeRequests.m in Sources */,
+				C8196F1E27E1035200876E13 /* SideBarSettings.swift in Sources */,
 				C8969FEF25AF70EE006819E3 /* Argon2dKdfCipher.m in Sources */,
 				C80B10892551F9F400FBDF72 /* CustomDataItem.m in Sources */,
 				C875F852279C044B00955D14 /* AutoLayoutResizingTokenField.swift in Sources */,
@@ -6352,6 +6565,7 @@
 				4D1FFAE92403030100B75EA2 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D1FFAEA2403030100B75EA2 /* AppDelegate.m in Sources */,
 				4D1FFAEB2403030100B75EA2 /* blake2b.c in Sources */,
+				C89F08F327E378D4003C8510 /* SideBarOutlineView.m in Sources */,
 				4D1FFAEC2403030100B75EA2 /* AttachmentCollectionView.m in Sources */,
 				C837416725D2DE7200EDE4F3 /* MacUrlSchemes.m in Sources */,
 				C8BE5928278B226200C9B1B8 /* QRCodeScanner.swift in Sources */,
@@ -6417,15 +6631,16 @@
 				C85B9D8D2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
 				C8441CB525CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
 				4D1FFAFF2403030100B75EA2 /* NSArray+Extensions.m in Sources */,
+				C843C5E127B6A20700E12CE8 /* OEXTokenAttachmentCell.m in Sources */,
 				4D1FFB002403030100B75EA2 /* DatabasesManager.m in Sources */,
 				4D1FFB012403030100B75EA2 /* Group.m in Sources */,
 				C8441C2325CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C8B679D126271DB200E295A3 /* zxcvbn.c in Sources */,
 				C867341426739F860063237B /* MASShortcutValidator.m in Sources */,
 				C80A59AF2726EAC30042EA78 /* RecordType.swift in Sources */,
+				C867ACE427BA969100FF1E6E /* PaddedRowView.swift in Sources */,
 				4D1FFB022403030100B75EA2 /* Kdbx4Serialization.m in Sources */,
 				C8A213062742B310004C686B /* Icon.swift in Sources */,
-				C8F1C4FB25E94D7B00E7BADD /* MyFirstSwiftUIView.swift in Sources */,
 				C8A5EF0027A5617800C5232D /* GroupPropertiesViewController.swift in Sources */,
 				C822849A2639BA9C00103002 /* ValueWithModDate.m in Sources */,
 				4DCAE8BB257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
@@ -6442,6 +6657,7 @@
 				4D1FFB052403030100B75EA2 /* KeePassXmlParser.m in Sources */,
 				C832A4BF2730360200768319 /* MacCompositeKeyDeterminer.m in Sources */,
 				C845951F26D4126100D5DF6B /* MainWindow.m in Sources */,
+				C8F3FD6E27D6193600AD56B7 /* TwoDriveStorageProvider.swift in Sources */,
 				C832A453272EAB5400768319 /* CrossPlatform.m in Sources */,
 				C831366024A91FC200D475D9 /* Base64DecodeOutputStream.m in Sources */,
 				C867457D25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */,
@@ -6464,6 +6680,7 @@
 			files = (
 				C86846B3271F21CA00D4565B /* Import1PasswordTests.swift in Sources */,
 				4D29663821AD7318009B7936 /* MB1Tests.m in Sources */,
+				C8579C5427AEECD900653664 /* Parse2FactorAuth.swift in Sources */,
 				4D2CB7EA23D1BD05000A9ABC /* SecretStoreTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6590,6 +6807,8 @@
 				C89B8FDC2562D32C00B590C0 /* AesOutputStream.m in Sources */,
 				C8B5020026ECB660003DE6A2 /* HmacBlockOutputStream.m in Sources */,
 				C8B501F126ECB5B1003DE6A2 /* TwoFishOutputStream.m in Sources */,
+				C89F08F727E3906D003C8510 /* HeaderNodeState.m in Sources */,
+				C8015EA727D9196F00F9F3B1 /* FastMaps.m in Sources */,
 				C89B8F292562BCA800B590C0 /* MacAlerts.m in Sources */,
 				C8441CB025CB01AB0070C7FE /* NMSFTP.m in Sources */,
 				C89B8F862562D26800B590C0 /* CompositeKeyFactors.m in Sources */,
@@ -6748,6 +6967,7 @@
 				4D9E098121825108007BA1E7 /* Entry.m in Sources */,
 				C83741E525D30F6300EDE4F3 /* SyncStatusLogEntry.m in Sources */,
 				4D524CDA219B47DB00C22CB4 /* VariantDictionary.m in Sources */,
+				C8039E6527B176D200DCC981 /* SingleLinePillTableCellView.swift in Sources */,
 				C8E78B4225715C8700251153 /* MMWormholeCoordinatedFileTransiting.m in Sources */,
 				C8441C3725CB009B0070C7FE /* SFTPSessionConfiguration.m in Sources */,
 				4D6EB45E23DF26910045C8D5 /* DatabaseConvenienceUnlockPreferences.m in Sources */,
@@ -6766,6 +6986,7 @@
 				C873EA5A26F2405400A71F2A /* XmlOutputStreamWriter.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
 				4D55A56F23D743C40057CBA8 /* BookmarksHelper.m in Sources */,
+				C89F08F627E3906D003C8510 /* HeaderNodeState.m in Sources */,
 				C8DC76432497AFA600C9C443 /* DatabaseModelConfig.m in Sources */,
 				C8867AD826D7C592001A3EE5 /* DocumentViewController.swift in Sources */,
 				4D9E099121825108007BA1E7 /* Meta.m in Sources */,
@@ -6827,9 +7048,10 @@
 				4D524D28219B4B2A00C22CB4 /* ref.c in Sources */,
 				4D524D02219B48D300C22CB4 /* KdbxSerializationCommon.m in Sources */,
 				C867340726739F860063237B /* MASLocalization.m in Sources */,
+				C89C944527B17EFC00F78928 /* PillView.swift in Sources */,
 				C8453ED6254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */,
-				C8A101B525FBB8F200293456 /* SwiftUIViewFactory.swift in Sources */,
 				4DBFD387225CFE2F00290488 /* NSDictionary+Extensions.m in Sources */,
+				C843C5E227B6A20700E12CE8 /* OEXTokenField.m in Sources */,
 				C8DE8DAD258FD71300B4D9EA /* SampleItemsGenerator.m in Sources */,
 				C84412BD279EFFA8006F4B8B /* LargeTextIndexedCharacter.swift in Sources */,
 				C831366B24A9200A00D475D9 /* Sha256PassThroughOutputStream.m in Sources */,
@@ -6853,8 +7075,10 @@
 				C8441CB725CB01AB0070C7FE /* NMSFTPFile.m in Sources */,
 				C85A840827983FAF004BCF22 /* KeePassIconSet.m in Sources */,
 				4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */,
+				C803825F27B5591200AB075A /* AuditExcludedItems.swift in Sources */,
 				C8E379EE25DC455F006A26BF /* SyncOperationState.m in Sources */,
 				4D2CB4A42332D92900C2E084 /* XmlSerializer.m in Sources */,
+				C843C5DC27B6A20700E12CE8 /* OEXTokenFieldCell.m in Sources */,
 				C83741DA25D30F4B00EDE4F3 /* ConcurrentCircularBuffer.m in Sources */,
 				C8DC76352497A79000C9C443 /* TwoFishReadStream.m in Sources */,
 				4D29664121ADAC0B009B7936 /* CustomField.m in Sources */,
@@ -6863,6 +7087,7 @@
 				4D524CEB219B481200C22CB4 /* KeePassCiphers.m in Sources */,
 				4D524CAE219B474200C22CB4 /* CHCSVParser.m in Sources */,
 				C832A474272EC0FE00768319 /* macOSSpinnerUI.m in Sources */,
+				C89C944827B180DC00F78928 /* NibLoadable.swift in Sources */,
 				4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */,
 				C8E78B4825715C8700251153 /* MMWormhole.m in Sources */,
 				C8F1B43626D69B7900B21A29 /* SideBarViewController.swift in Sources */,
@@ -6877,6 +7102,7 @@
 				C8441CAB25CB01AB0070C7FE /* NMSSHSession.m in Sources */,
 				C8E2CB192477D5270029E1CB /* DeletedObjects.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
+				C803826627B666E300AB075A /* ProLabelBadge.swift in Sources */,
 				C81AC79B27A06AA900EF5ED3 /* Collection+Extensions.swift in Sources */,
 				4DD30BB5255D9ACD000A923F /* QuickTypeRecordIdentifier.m in Sources */,
 				C81BBD0C2567E49A001BAB0D /* ClickableTextField.m in Sources */,
@@ -6884,6 +7110,7 @@
 				C887739C261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				C84356842722FC9700CBB0A1 /* JSONAny.swift in Sources */,
 				4DACA5C023CCD40F00891366 /* SecretStore.m in Sources */,
+				C843C5E527B6A56200E12CE8 /* SBTokenAttachmentCell.swift in Sources */,
 				C83741C425D30F0B00EDE4F3 /* ConcurrentMutableArray.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* MacAlerts.m in Sources */,
 				4D524CF1219B481200C22CB4 /* CryptoParameters.m in Sources */,
@@ -6895,15 +7122,18 @@
 				C8DC76312497A79000C9C443 /* ChaCha20ReadStream.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
 				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
+				C8DA3DBE27B3E3D400862C17 /* AuditIssueTableCellView.swift in Sources */,
 				C87A994B255968EB0002BEF8 /* DownloadTextOperation.swift in Sources */,
 				C8DC76372497A79000C9C443 /* KP31HashedBlockStream.m in Sources */,
 				C86E0B95276FA2C60064D314 /* EntryViewModel.m in Sources */,
+				C8DA3DC527B3EBF100862C17 /* AuditConfigurationViewController.swift in Sources */,
 				C8441C3B25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */,
 				C873EA6226F2408A00A71F2A /* MemoryProtection.m in Sources */,
 				C8B501F026ECB5B1003DE6A2 /* TwoFishOutputStream.m in Sources */,
 				C8C0834E2569581F00FF280D /* CustomBackgroundTableView.m in Sources */,
 				C8E78B4E25715C8700251153 /* MMWormholeFileTransiting.m in Sources */,
+				C8DA3DC227B3EBD000862C17 /* AuditDrillDown.swift in Sources */,
 				C81B8D132799DFAA006387D0 /* TotpTableCellView.swift in Sources */,
 				C8441B8925CAEB930070C7FE /* WebDAVSessionConfiguration.m in Sources */,
 				C837417025D2EFD600EDE4F3 /* SyncAndMergeSequenceManager.m in Sources */,
@@ -6918,6 +7148,7 @@
 				C8C8965A26CECAC600F1BC4D /* ykcore_osx.c in Sources */,
 				C84412B8279EED23006F4B8B /* LargeTextViewAndQrCode.swift in Sources */,
 				4D9E098921825108007BA1E7 /* String.m in Sources */,
+				C8015EA627D9196F00F9F3B1 /* FastMaps.m in Sources */,
 				4DF522B623C8ABEF00CD948E /* ClipboardManager.m in Sources */,
 				C80C2BC3259A1DD300085E7F /* OutlineView.m in Sources */,
 				C88F146B2781DFE400F93C10 /* FontManager.swift in Sources */,
@@ -6953,6 +7184,7 @@
 				4DD2BAB9238BE44400513271 /* MMcG_MF_Base32Additions.m in Sources */,
 				C8B961A626D9219D00424FDA /* BrowseViewController.swift in Sources */,
 				4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */,
+				C843C5DE27B6A20700E12CE8 /* OEXTokenTextStorage.m in Sources */,
 				C8C8966826CECAD200F1BC4D /* ykcrc.c in Sources */,
 				C831365B24A91F2300D475D9 /* Constants.m in Sources */,
 				4D524CD5219B47DB00C22CB4 /* Kdbx4SerializationData.m in Sources */,
@@ -7014,11 +7246,11 @@
 				C87A9941255968EA0002BEF8 /* XMLDocument.m in Sources */,
 				C8EEDB0827A19B1500FBFA43 /* BrowseViewColumn.swift in Sources */,
 				C80B10882551F9F400FBDF72 /* CustomDataItem.m in Sources */,
-				C8A101CE25FBB95A00293456 /* SwiftUIView.swift in Sources */,
 				C8969FED25AF70EE006819E3 /* Argon2dKdfCipher.m in Sources */,
 				C83741F025D3129A00EDE4F3 /* MacSyncManager.m in Sources */,
 				4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				C84D6CC5273D2A5600182B40 /* OnboardingDatabaseChangeRequests.m in Sources */,
+				C8196F1D27E1035200876E13 /* SideBarSettings.swift in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
 				4D524D27219B4B2A00C22CB4 /* blake2b.c in Sources */,
 				C875F851279C044B00955D14 /* AutoLayoutResizingTokenField.swift in Sources */,
@@ -7026,6 +7258,7 @@
 				4DC46D0C219EDCD800D6C462 /* AttachmentCollectionView.m in Sources */,
 				4D9E098321825108007BA1E7 /* Times.m in Sources */,
 				4D8DE9BC21F898470043DDC0 /* OTPToken+Serialization.m in Sources */,
+				C89F08F227E378D4003C8510 /* SideBarOutlineView.m in Sources */,
 				C837416525D2DE7200EDE4F3 /* MacUrlSchemes.m in Sources */,
 				C8397ADC25939858000F5158 /* NodeIcon.m in Sources */,
 				C8BE5927278B226200C9B1B8 /* QRCodeScanner.swift in Sources */,
@@ -7091,15 +7324,16 @@
 				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,
 				C8441CB325CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
 				4D524CA4219B458B00C22CB4 /* DatabasesManager.m in Sources */,
+				C843C5E027B6A20700E12CE8 /* OEXTokenAttachmentCell.m in Sources */,
 				C8E0BA8F2571665A00641F33 /* AutoFillWormhole.m in Sources */,
 				4DF347E72074FA3500148741 /* Group.m in Sources */,
 				C8441C2125CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C8B679D026271DB200E295A3 /* zxcvbn.c in Sources */,
 				C867341326739F860063237B /* MASShortcutValidator.m in Sources */,
 				C80A59AE2726EAC30042EA78 /* RecordType.swift in Sources */,
+				C867ACE327BA969100FF1E6E /* PaddedRowView.swift in Sources */,
 				4D524CD4219B47DB00C22CB4 /* Kdbx4Serialization.m in Sources */,
 				C8A213052742B310004C686B /* Icon.swift in Sources */,
-				C8F1C4FA25E94D7B00E7BADD /* MyFirstSwiftUIView.swift in Sources */,
 				C8A5EEFF27A5617800C5232D /* GroupPropertiesViewController.swift in Sources */,
 				C82284982639BA9C00103002 /* ValueWithModDate.m in Sources */,
 				4DCAE8B9257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
@@ -7116,6 +7350,7 @@
 				4D2CB49B2332D82D00C2E084 /* KeePassXmlParser.m in Sources */,
 				C832A4BD2730360200768319 /* MacCompositeKeyDeterminer.m in Sources */,
 				C845951E26D4126100D5DF6B /* MainWindow.m in Sources */,
+				C8F3FD6D27D6193600AD56B7 /* TwoDriveStorageProvider.swift in Sources */,
 				C832A451272EAB5400768319 /* CrossPlatform.m in Sources */,
 				C831365F24A91FC200D475D9 /* Base64DecodeOutputStream.m in Sources */,
 				C867457B25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */,
@@ -7254,6 +7489,8 @@
 				C8B945B22573D01A00932C46 /* AesOutputStream.m in Sources */,
 				C8B5020126ECB661003DE6A2 /* HmacBlockOutputStream.m in Sources */,
 				C8B501F326ECB5B1003DE6A2 /* TwoFishOutputStream.m in Sources */,
+				C89F08F927E3906D003C8510 /* HeaderNodeState.m in Sources */,
+				C8015EA927D9196F00F9F3B1 /* FastMaps.m in Sources */,
 				C8B945B32573D01A00932C46 /* MacAlerts.m in Sources */,
 				C8441CB225CB01AB0070C7FE /* NMSFTP.m in Sources */,
 				C8B945B52573D01A00932C46 /* CompositeKeyFactors.m in Sources */,
@@ -7517,6 +7754,7 @@
 				C8FB342725B9F563003C0F24 /* nl */,
 				C86BB46625F91C3000425405 /* pt-BR */,
 				C8242D7E26FB70CE00D586A4 /* zh-Hant */,
+				C8196F2227E10D1E00876E13 /* en */,
 			);
 			name = DatabaseProperties.storyboard;
 			path = MacBox;
@@ -8176,6 +8414,52 @@
 			path = MacBox;
 			sourceTree = "<group>";
 		};
+		C8DA3DD027B426FA00862C17 /* AuditConfigurationViewController.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8DA3DCF27B426FA00862C17 /* Base */,
+				C8DA3DD227B426FE00862C17 /* uk */,
+				C8DA3DD427B426FF00862C17 /* sv */,
+				C8DA3DD627B4270100862C17 /* es */,
+				C8DA3DD827B4270200862C17 /* ru */,
+				C8DA3DDA27B4270400862C17 /* pt-BR */,
+				C8DA3DDC27B4270500862C17 /* nb */,
+				C8DA3DDE27B4270600862C17 /* ja */,
+				C8DA3DE027B4270700862C17 /* it */,
+				C8DA3DE227B4270900862C17 /* de */,
+				C8DA3DE427B4270A00862C17 /* fr */,
+				C8DA3DE627B4270B00862C17 /* nl */,
+				C8DA3DE827B4270D00862C17 /* cs */,
+				C8DA3DEA27B4270F00862C17 /* zh-Hant */,
+				C8DA3DEC27B4271000862C17 /* zh-Hans */,
+			);
+			name = AuditConfigurationViewController.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C8DA3DF227B4277700862C17 /* AuditDrillDown.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8DA3DF127B4277700862C17 /* Base */,
+				C8DA3DF627B4277B00862C17 /* zh-Hans */,
+				C8DA3DF827B4277D00862C17 /* zh-Hant */,
+				C8DA3DFA27B4277E00862C17 /* cs */,
+				C8DA3DFC27B4278000862C17 /* nl */,
+				C8DA3DFE27B4278100862C17 /* fr */,
+				C8DA3E0027B4278200862C17 /* de */,
+				C8DA3E0227B4278400862C17 /* it */,
+				C8DA3E0427B4278500862C17 /* ja */,
+				C8DA3E0627B4278700862C17 /* nb */,
+				C8DA3E0827B4278800862C17 /* pt-BR */,
+				C8DA3E0A27B4278A00862C17 /* ru */,
+				C8DA3E0C27B4278B00862C17 /* es */,
+				C8DA3E0E27B4278D00862C17 /* sv */,
+				C8DA3E1027B4278E00862C17 /* uk */,
+			);
+			name = AuditDrillDown.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
 		C8E5C33B275E76D0006C15FE /* MacConflictResolutionWizard.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -8464,7 +8748,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -8473,10 +8757,10 @@
 					"$(inherited)",
 					"$(SRCROOT)/../lib/openssl-ssh/macOS",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = 1.15.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
-				PRODUCT_MODULE_NAME = Strongbox_Pro;
+				PRODUCT_MODULE_NAME = Strongbox;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Strongbox-Outright-Pro-Bridging-Header.h";
@@ -8497,7 +8781,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -8506,10 +8790,10 @@
 					"$(inherited)",
 					"$(SRCROOT)/../lib/openssl-ssh/macOS",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = 1.15.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
-				PRODUCT_MODULE_NAME = Strongbox_Pro;
+				PRODUCT_MODULE_NAME = Strongbox;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Strongbox-Outright-Pro-Bridging-Header.h";
@@ -8581,13 +8865,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8610,6 +8895,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Strongbox-AutoFill-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -8619,13 +8907,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8646,6 +8935,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Strongbox-AutoFill-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -8700,7 +8991,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
@@ -8752,7 +9043,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -8770,7 +9061,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -8779,7 +9070,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../lib/openssl-ssh/macOS",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = 1.16.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
@@ -8801,7 +9092,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -8810,7 +9101,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../lib/openssl-ssh/macOS",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MARKETING_VERSION = 1.16.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
@@ -8826,13 +9117,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8856,6 +9148,10 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Strongbox-Pro-AutoFill-Bridging-Header.h";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "Strongbox_AutoFill-Swift.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -8865,13 +9161,14 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3058;
+				CURRENT_PROJECT_VERSION = 3066;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8893,6 +9190,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Strongbox-Pro-AutoFill-Bridging-Header.h";
+				SWIFT_OBJC_INTERFACE_HEADER_NAME = "Strongbox_AutoFill-Swift.h";
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};

@@ -188,16 +188,19 @@
     return [dateFormatter dateFromString:string];
 }
 
-+ (instancetype)fromYYYY_MM_DD_London_Time_String:(NSString *)string {
++ (instancetype)fromYYYY_MM_DD_London_Noon_Time_String:(NSString *)string {
     NSTimeZone* sourceTimeZone = [NSTimeZone timeZoneWithName:@"Europe/London"];
     
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
 
-
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
     [dateFormatter setTimeZone:sourceTimeZone];
     
-    return [dateFormatter dateFromString:string];
+    NSDate* ret = [dateFormatter dateFromString:string];
+    
+    NSTimeInterval twelveHours = 12 * 60 * 60; 
+    
+    return [ret dateByAddingTimeInterval:twelveHours];
 }
 
 - (BOOL)isInPast {
@@ -206,6 +209,29 @@
 
 - (BOOL)isInFuture {
     return [self isLaterThan:NSDate.date];
+}
+
+static NSString *dateFormatWithMillis = @"yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ";
+static NSString *dateFormatWithoutMillis = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
+
++ (instancetype)microsoftGraphDateFromString:(NSString *)dateString
+{
+    NSDate *date = nil;
+    if (dateString)
+    {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:dateFormatWithMillis];
+        NSLocale *posix = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        [dateFormatter setLocale:posix];
+        date = [dateFormatter dateFromString:dateString];
+        
+        if (!date)
+        {
+            [dateFormatter setDateFormat:dateFormatWithoutMillis];
+            date = [dateFormatter dateFromString:dateString];
+        }
+    }
+    return date;
 }
 
 @end

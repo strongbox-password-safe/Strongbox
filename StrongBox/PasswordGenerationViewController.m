@@ -297,23 +297,13 @@
     else if (cell == self.cellInfoDiceware) {
 #ifndef IS_APP_EXTENSION
         NSURL* url = [NSURL URLWithString:@"http:
-        if (@available (iOS 10.0, *)) {
-            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-        }
-        else {
-            [UIApplication.sharedApplication openURL:url];
-        }
+        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
 #endif
     }
     else if (cell == self.cellInfoXkcd) {
 #ifndef IS_APP_EXTENSION
         NSURL* url = [NSURL URLWithString:@"https:
-        if (@available (iOS 10.0, *)) {
-            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-        }
-        else {
-            [UIApplication.sharedApplication openURL:url];
-        }
+        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
 #endif
     }
     else if ( cell == self.cellAlgorithm ) {

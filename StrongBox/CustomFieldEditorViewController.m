@@ -217,8 +217,32 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 
 - (IBAction)onDone:(id)sender {
-    NSString* key = trim(self.keyTextField.text);
     NSString* value = [NSString stringWithString:self.textView.textStorage.string];
+    
+    if ( ![trim(value) isEqualToString:value] ) {
+        __weak CustomFieldEditorViewController* weakSelf = self;
+        
+        [Alerts twoOptionsWithCancel:self
+                               title:NSLocalizedString(@"field_tidy_title_tidy_up_field", @"Tidy Up Field?")
+                             message:NSLocalizedString(@"field_tidy_message_tidy_up_field", @"There are some blank characters (e.g. spaces, tabs) at the start or end of this field.\n\nShould Strongbox tidy up these extraneous characters?")
+                   defaultButtonText:NSLocalizedString(@"field_tidy_choice_tidy_up_field", @"Tidy Up")
+                    secondButtonText:NSLocalizedString(@"field_tidy_choice_dont_tidy", @"Don't Tidy")
+                              action:^(int response) {
+            if ( response == 0 ) {
+                [weakSelf postValidationSetAndDismiss:trim(value)];
+            }
+            else if ( response == 1) {
+                [weakSelf postValidationSetAndDismiss:value];
+            }
+        }];
+    }
+    else {
+        [self postValidationSetAndDismiss:value];
+    }
+}
+
+- (void)postValidationSetAndDismiss:(NSString*)value {
+    NSString* key = trim(self.keyTextField.text);
     BOOL protected = self.switchProtected.on;
 
     if(self.onDone) {

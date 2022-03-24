@@ -66,16 +66,12 @@
 
     
     self.auditStack.hidden = YES;
-    if (@available(iOS 11.0, *)) {
-        [self.linesStack setCustomSpacing:10.0f afterView:self.valueLabel];
-    }
+    [self.linesStack setCustomSpacing:10.0f afterView:self.valueLabel];   
     
-    if (@available(iOS 10.0, *)) {
-        self.keyLabel.adjustsFontForContentSizeCategory = YES;
-        self.valueText.adjustsFontForContentSizeCategory = YES;
-        self.valueLabel.adjustsFontForContentSizeCategory = YES;
-    }
-    
+    self.keyLabel.adjustsFontForContentSizeCategory = YES;
+    self.valueText.adjustsFontForContentSizeCategory = YES;
+    self.valueLabel.adjustsFontForContentSizeCategory = YES;
+
     self.selectAllOnEdit = NO;
     
 

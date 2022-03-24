@@ -172,14 +172,12 @@
 - (NSString*)getBiometricIdName {
     NSString* biometricIdName = NSLocalizedString(@"settings_touch_id_name", @"Touch ID");
     
-    if (@available(iOS 11.0, *)) {
-        NSError* error;
-        LAContext *localAuthContext = [[LAContext alloc] init];
-        
-        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
-            if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
-                biometricIdName = NSLocalizedString(@"settings_face_id_name", @"Face ID");
-            }
+    NSError* error;
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    
+    if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
+        if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
+            biometricIdName = NSLocalizedString(@"settings_face_id_name", @"Face ID");
         }
     }
     
@@ -187,14 +185,12 @@
 }
 
 - (BOOL)isFaceId {
-    if (@available(iOS 11.0, *)) {
-        NSError* error;
-        LAContext *localAuthContext = [[LAContext alloc] init];
-        
-        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
-            if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
-                return YES;
-            }
+    NSError* error;
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    
+    if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
+        if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
+            return YES;
         }
     }
     

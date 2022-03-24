@@ -85,7 +85,7 @@
 
 @property NSView* currentlyEditingUIControl;
 @property (nonnull, strong, nonatomic) NSArray<CustomField*> *customFields;
-@property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
+@property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController; 
 @property NSTimer* timerRefreshOtp;
 @property (nonnull, strong, nonatomic) NSArray *sortedAttachmentFileNames;
 @property NSArray<Node*>* groups;
@@ -514,7 +514,7 @@ static NSString* trimField(NSTextField* textField) {
     
     
     
-    NSMutableArray* groups = [self.model.activeGroups mutableCopy];
+    NSMutableArray* groups = [self.model.allActiveGroups mutableCopy];
     [groups addObject:self.model.rootGroup];
     
     self.groups = [groups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {

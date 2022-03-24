@@ -145,9 +145,8 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     
     NSError* error;
     NSUInteger options = NSJSONWritingPrettyPrinted;
-    if (@available(iOS 11.0, *)) {
-        options |= NSJSONWritingSortedKeys;
-    }
+    options |= NSJSONWritingSortedKeys;
+
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonDatabases options:options error:&error];
 
     if (error) {

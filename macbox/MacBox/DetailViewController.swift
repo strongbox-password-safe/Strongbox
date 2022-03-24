@@ -26,6 +26,8 @@ class DetailViewController: NSViewController {
     private var loadedDocument: Bool = false
     var currentAttachmentPreviewIndex: Int = 0 
 
+    var quickRevealButtonDown: Bool = false
+
     var dragAndDropPromiseQueue: OperationQueue = {
         let queue = OperationQueue()
         return queue
@@ -66,6 +68,7 @@ class DetailViewController: NSViewController {
     }
 
     @objc func refresh() {
+        NSLog("✅ DetailViewController::refresh")
         cached = nil
         tableView.reloadData()
     }
@@ -73,18 +76,23 @@ class DetailViewController: NSViewController {
     func loadFields() -> [DetailsViewField] {
         guard database.nextGenSelectedItems.count == 1,
               let uuid = database.nextGenSelectedItems.first,
+              let dbModel = database.commonModel,
               let selectedNode = database.getItemBy(uuid)
         else {
+            NSLog("✅ DetailViewController::load - empty")
             return []
         }
 
-        let model = EntryViewModel.fromNode(selectedNode, format: database.format, keePassEmailField: true) 
+        NSLog("✅ DetailViewController::load - Not Empty [%@]", String(describing: database.nextGenSelectedItems))
+
+        let model = EntryViewModel.fromNode(selectedNode, format: database.format, model: dbModel)
 
         var ret: [DetailsViewField] = []
 
         ret.append(getTitleField(model, selectedNode))
         ret.append(contentsOf: getUsernameFields(model, selectedNode))
         ret.append(contentsOf: getPasswordFields(model, selectedNode))
+        ret.append(contentsOf: getAuditIssueFields(model, selectedNode))
         ret.append(contentsOf: getTotpFields(model))
         ret.append(contentsOf: getEmailFields(model, selectedNode))
         ret.append(contentsOf: getExpiresFields(model))
@@ -128,12 +136,36 @@ class DetailViewController: NSViewController {
             return [DetailsViewField(name: NSLocalizedString("generic_fieldname_password", comment: "Password"),
                                      value: dereferencedPassword,
                                      fieldType: .customField,
-                                     concealed: !Settings.sharedInstance().revealPasswordsImmediately,
+                                     concealed: !Settings.sharedInstance().revealPasswordsImmediately && !quickRevealButtonDown,
                                      concealable: true,
                                      showStrength: true)]
         } else {
             return []
         }
+    }
+
+    func getAuditIssueFields(_: EntryViewModel, _ node: Node) -> [DetailsViewField] {
+        var ret: [DetailsViewField] = []
+
+        if database.isFlagged(byAudit: node.uuid) {
+
+
+            for issue in database.getQuickAuditAllIssuesSummary(forNode: node.uuid) {
+                ret.append(DetailsViewField(name: issue,
+                                            value: issue,
+                                            fieldType: .auditIssue,
+                                            object: node.uuid))
+            }
+        }
+
+        if database.isExcluded(fromAudit: node.uuid) {
+            ret.append(DetailsViewField(name: "", 
+                                        value: "",
+                                        fieldType: .auditIssue,
+                                        object: node.uuid))
+        }
+
+        return ret
     }
 
     func getTotpFields(_ model: EntryViewModel) -> [DetailsViewField] {
@@ -145,7 +177,7 @@ class DetailViewController: NSViewController {
     }
 
     func getEmailFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
-        if model.email.count > 0 { 
+        if model.email.count > 0 {
             return [DetailsViewField(name: NSLocalizedString("generic_fieldname_email", comment: "Email"),
                                      value: dereference(model.email, node: node),
                                      fieldType: .customField)]
@@ -237,7 +269,7 @@ class DetailViewController: NSViewController {
                 ret.append(DetailsViewField(name: field.key,
                                             value: deref,
                                             fieldType: .customField,
-                                            concealed: !Settings.sharedInstance().revealPasswordsImmediately,
+                                            concealed: !Settings.sharedInstance().revealPasswordsImmediately && !quickRevealButtonDown,
                                             concealable: concealable))
             }
         }
@@ -357,7 +389,22 @@ class DetailViewController: NSViewController {
             previewAttachment(field)
         case .notes, .title, .customField, .url, .totp:
             copyFieldToClipboard(field)
-        case .header, .metadata, .expiry, .tags:
+        case .header, .metadata, .expiry, .tags, .auditIssue:
+            break
+        }
+    }
+
+    func onShowQuickView() {
+        guard let field = selectedField else { return }
+
+        switch field.fieldType {
+        case .attachment:
+            previewAttachment(field)
+
+
+
+
+        default:
             break
         }
     }
@@ -401,7 +448,6 @@ class DetailViewController: NSViewController {
 
     
 
-    
     func getCopyFieldMenuItem(_ field: DetailsViewField) -> NSMenuItem {
         let sel = #selector(onCopyValueMenuItem(sender:))
 
@@ -545,6 +591,22 @@ class DetailViewController: NSViewController {
         return item
     }
 
+    func getCheckHaveIBeenPwnedForFieldMenuItem(_ field: DetailsViewField) -> NSMenuItem? {
+        let title = NSLocalizedString("check_field_with_hibp", comment: "Check with 'Have I Been Pwned?'")
+
+        let item = NSMenuItem(title: title, action: #selector(onCheckHaveIBeenPwnedForField(sender:)), keyEquivalent: "")
+        item.representedObject = field
+        item.target = self
+
+        item.isEnabled = Settings.sharedInstance().isProOrFreeTrial
+
+        if #available(macOS 11.0, *) {
+            item.image = NSImage(systemSymbolName: "exclamationmark.shield", accessibilityDescription: nil)
+        }
+
+        return item
+    }
+
     func onPopupMenuNeedsUpdate(_ menu: NSMenu, _ originalField: DetailsViewField) {
         while menu.items.count > 1 {
             menu.items.removeLast()
@@ -577,6 +639,10 @@ class DetailViewController: NSViewController {
             if field.fieldType == .customField, field.concealable {
                 if let menuItem = getToggleConcealRevealMenuItem(field) {
                     menu.addItem(menuItem)
+                }
+
+                if let menuItem2 = getCheckHaveIBeenPwnedForFieldMenuItem(field) {
+                    menu.addItem(menuItem2)
                 }
             }
             menu.addItem(getShowLargeTextViewMenuItem(field))
@@ -695,6 +761,15 @@ class DetailViewController: NSViewController {
         }
 
         toggleRevealConceal(field)
+    }
+
+    @objc
+    func onCheckHaveIBeenPwnedForField(sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem, let field = menuItem.representedObject as? DetailsViewField else {
+            return
+        }
+
+        checkHaveIBeenPwnedForField(field)
     }
 
     
@@ -816,11 +891,47 @@ class DetailViewController: NSViewController {
 
         cellView.onToggleConcealReveal(nil)
     }
+
+    func checkHaveIBeenPwnedForField(_ field: DetailsViewField) {
+        checkHaveIBeenPwned(field.value)
+    }
+
+    func checkHaveIBeenPwned(_ value: String) {
+        macOSSpinnerUI.sharedInstance().show(NSLocalizedString("audit_manual_pwn_progress_message", comment: "Checking HIBP"), viewController: self)
+
+        database.oneTimeHibpCheck(value) { [weak self] pwned, error in
+            macOSSpinnerUI.sharedInstance().dismiss()
+
+            DispatchQueue.main.async {
+                self?.onHibpResult(pwned, error)
+            }
+        }
+    }
+
+    func onHibpResult(_ pwned: Bool, _ error: Error?) {
+        if error != nil {
+            MacAlerts.error(error, window: view.window)
+        } else {
+            if !pwned {
+                MacAlerts.info(NSLocalizedString("audit_manual_pwn_check_result_title", comment: "Manual HIBP Result"),
+                               informativeText: NSLocalizedString("audit_manual_pwn_check_result_not_pwned", comment: "Your password has NOT been pwned as is likely secure."),
+                               window: view.window,
+                               completion: nil)
+            } else {
+                MacAlerts.info(NSLocalizedString("audit_manual_pwn_check_result_title", comment: "Manual HIBP Result"),
+                               informativeText: NSLocalizedString("audit_manual_pwn_check_result_pwned", comment: "This password is pwned and is vulnerable."),
+                               window: view.window,
+                               completion: nil)
+
+                database.restartBackgroundAudit() 
+            }
+        }
+    }
 }
 
 extension DetailViewController: DocumentViewController {
     func onDocumentLoaded() {
-        NSLog("🚀 DetailViewController::onDocumentLoaded")
+
 
         loadDocument()
     }
@@ -852,9 +963,27 @@ extension DetailViewController: DocumentViewController {
     }
 
     func listenToNotifications() {
+        
+
+        let auditNotificationsOfInterest: [String] = [
+
+                                                      kAuditCompletedNotificationKey]
+
+        for ofInterest in auditNotificationsOfInterest {
+            NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
+                guard let self = self else { return }
+                self.onAuditUpdateNotification(notification)
+            }
+        }
+
         let notificationsOfInterest: [String] = [kModelUpdateNotificationNextGenSelectedItemsChanged,
                                                  kModelUpdateNotificationDatabasePreferenceChanged,
-                                                 kModelUpdateNotificationItemEdited]
+                                                 kModelUpdateNotificationItemEdited,
+                                                 kModelUpdateNotificationTagsChanged,
+                                                 kModelUpdateNotificationHistoryItemRestored,
+                                                 kModelUpdateNotificationIconChanged,
+                                                 kModelUpdateNotificationItemsMoved,
+                                                 kModelUpdateNotificationTitleChanged]
 
         for ofInterest in notificationsOfInterest {
             NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
@@ -897,6 +1026,7 @@ extension DetailViewController: DocumentViewController {
         tableView.register(NSNib(nibNamed: NSNib.Name("TotpTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("TotpTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("TagsTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("TagsTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("UrlTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("UrlTableCellView"))
+        tableView.register(NSNib(nibNamed: AuditIssueTableCellView.nibName, bundle: nil), forIdentifier: AuditIssueTableCellView.reuseIdentifier)
 
         tableView.selectionHighlightStyle = .regular
         tableView.overrideValidateProposedFirstResponderForRow = { [weak self] row in
@@ -913,6 +1043,8 @@ extension DetailViewController: DocumentViewController {
                 
 
                 return self?.selectedField?.fieldType == .notes
+            } else if field.fieldType == .auditIssue {
+                return true
             } else {
                 return nil
             }
@@ -928,8 +1060,11 @@ extension DetailViewController: DocumentViewController {
         tableView.onEnterKey = { [weak self] in
             self?.performDefaultActionOnSelected()
         }
-        tableView.onSpaceBar = { [weak self] in
+        tableView.onAltEnter = { [weak self] in
             self?.onShowFieldPopupMenu()
+        }
+        tableView.onSpaceBar = { [weak self] in
+            self?.onShowQuickView()
         }
         tableView.onEscKey = { [weak self] in
             self?.synthesizer.stopSpeaking()
@@ -967,6 +1102,22 @@ extension DetailViewController: DocumentViewController {
                            .foregroundColor: NSColor.labelColor], range: NSMakeRange(0, header.count))
 
         return foo
+    }
+
+    func onAuditUpdateNotification(_ notification: Notification) {
+        
+        guard let dict = notification.object as? [String: Any], let model = dict["model"] as? Model else {
+            NSLog("🔴 Couldn't real model from notification")
+            return
+        }
+
+        if model != database.commonModel {
+            return
+        }
+
+        NSLog("✅ DetailViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
+
+        refresh()
     }
 }
 
@@ -1083,7 +1234,30 @@ extension DetailViewController: NSTableViewDelegate {
             cell.setContent(field, popupMenuUpdater: onPopupMenuNeedsUpdate)
 
             return cell
+        case .auditIssue:
+            guard let cell = tableView.makeView(withIdentifier: AuditIssueTableCellView.reuseIdentifier, owner: nil) as? AuditIssueTableCellView else {
+                return nil
+            }
+
+            guard let uuid = field.object as? UUID else { return nil }
+
+            weak var weakView = cell
+            cell.setContent(field.value) { [weak self] in
+                guard let self = self, let weakView = weakView else { return }
+                self.showAuditDrillDown(uuid, view: weakView)
+            }
+
+            return cell
         }
+    }
+
+    func showAuditDrillDown(_ uuid: UUID, view: NSView) {
+        let vc = AuditDrillDown.fromStoryboard()
+
+        vc.uuid = uuid
+        vc.database = database
+
+        present(vc, asPopoverRelativeTo: NSZeroRect, of: view, preferredEdge: NSRectEdge.maxY, behavior: .transient)
     }
 
     func tableView(_: NSTableView, rowViewForRow _: Int) -> NSTableRowView? {
@@ -1105,7 +1279,7 @@ extension DetailViewController: NSTableViewDelegate {
             return false
         }
 
-        return field.fieldType != .header && field.fieldType != .metadata && field.fieldType != .title
+        return field.fieldType != .header && field.fieldType != .metadata && field.fieldType != .auditIssue && field.fieldType != .title
     }
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {

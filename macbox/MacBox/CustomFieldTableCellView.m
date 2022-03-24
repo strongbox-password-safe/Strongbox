@@ -9,6 +9,7 @@
 #import "CustomFieldTableCellView.h"
 #import "Settings.h"
 #import "ColoredStringHelper.h"
+#import "Utils.h"
 
 @interface CustomFieldTableCellView ()
 
@@ -90,6 +91,8 @@
 }
 
 - (void)updateUI {
+    self.labelText.usesSingleLineMode = self.singleLine;
+
     if ( self.valueHidden ) {
         self.labelText.stringValue = @"••••••••••••";
         
@@ -103,7 +106,7 @@
         }
     }
     else {
-        [self.labelText setLineBreakMode:NSLineBreakByWordWrapping];
+        [self.labelText setLineBreakMode:self.singleLine ? NSLineBreakByClipping : NSLineBreakByWordWrapping];
     
         NSFont* font = self.protected ? [NSFont fontWithName:Settings.sharedInstance.easyReadFontName size:13.0f] : [NSFont systemFontOfSize:13.0f];
         
@@ -119,7 +122,13 @@
                                                                                                 font:font];
         }
         else {
-            self.labelText.stringValue = self.val;
+            NSString* limited = self.val;
+            if ( self.singleLine ) {
+                limited = [self.val substringWithRange:[self.val lineRangeForRange:NSMakeRange(0, 0)]];
+                limited = trim (limited);
+            }
+
+            self.labelText.stringValue = limited;
             self.labelText.textColor = self.plainTextColor;
         }
 
@@ -130,9 +139,7 @@
             [self.buttonShowHide setImage:[NSImage imageNamed:@"hide"]];
         }
     }
-        
-    self.labelText.usesSingleLineMode = self.singleLine;
-    
+            
     self.buttonShowHide.hidden = !self.protected;
 }
 

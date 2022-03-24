@@ -47,13 +47,10 @@
     [self unobserveClipboardChangeNotifications];
 #endif
     
-    if(@available(iOS 10.0, *)) {
-        [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                     options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
-    }
-    else {
-        [pasteboard setString:value];
-    }
+    
+    [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
+                 options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
+    
     
 #ifndef IS_APP_EXTENSION
     [self observeClipboardChangeNotifications];
@@ -63,26 +60,22 @@
 - (void)copyStringWithDefaultExpiration:(NSString *)value {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-    if(@available(iOS 10.0, *)) {
-        if(AppPreferences.sharedInstance.clearClipboardEnabled && AppPreferences.sharedInstance.clearClipboardAfterSeconds > 0) {
-            
-            
-            
-            NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:AppPreferences.sharedInstance.clearClipboardAfterSeconds];
-            
-            NSLog(@"Expiration: %@", expirationTime);
-            
-            [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) ,
-                                     UIPasteboardOptionExpirationDate : expirationTime }];
-        }
-        else {
-            [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
-        }
+
+    if(AppPreferences.sharedInstance.clearClipboardEnabled && AppPreferences.sharedInstance.clearClipboardAfterSeconds > 0) {
+        
+        
+        
+        NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:AppPreferences.sharedInstance.clearClipboardAfterSeconds];
+        
+        NSLog(@"Expiration: %@", expirationTime);
+        
+        [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
+                     options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) ,
+                                 UIPasteboardOptionExpirationDate : expirationTime }];
     }
     else {
-        [pasteboard setString:value];
+        [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
+                     options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
     }
 }
 
@@ -91,12 +84,10 @@
 - (void)onClipboardChangedNotification:(NSNotification*)note {
     NSLog(@"onClipboardChangedNotification: [%@]", note);
     
-    if (@available(ios 10.0, *)) {
-        if(![UIPasteboard.generalPasteboard hasStrings] &&
-           ![UIPasteboard.generalPasteboard hasImages] &&
-           ![UIPasteboard.generalPasteboard hasURLs]) {
-            return;
-        }
+    if(![UIPasteboard.generalPasteboard hasStrings] &&
+       ![UIPasteboard.generalPasteboard hasImages] &&
+       ![UIPasteboard.generalPasteboard hasURLs]) {
+        return;
     }
 
         

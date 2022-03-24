@@ -106,6 +106,14 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }
 }
 
+- (void)expressRefreshReceipt {
+    [[RMStore defaultStore] refreshReceiptOnSuccess:^{
+        NSLog(@"Receipt Refreshed OK");
+    } failure:^(NSError *error) {
+        NSLog(@"Erro Refreshing Receipt: [%@]", error);
+    }];
+}
+
 - (void)checkReceiptForTrialAndProEntitlements { 
     AppPreferences.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
     
@@ -283,6 +291,17 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     
     return iap != nil;
 }
+
+- (BOOL)hasActiveYearlySubscription {
+    NSDate* now = [NSDate date];
+    return [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kYearly forDate:now];
+}
+
+- (BOOL)hasActiveMonthlySubscription {
+    NSDate* now = [NSDate date];
+    return [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];
+}
+
 
 - (NSDate*)freeTrialPurchaseDate {
     if (RMAppReceipt.bundleReceipt == nil) {

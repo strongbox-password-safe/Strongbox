@@ -26,6 +26,9 @@ green:((float)((rgbValue & 0x00FF00) >>  8))/255.0 \
 blue:((float)((rgbValue & 0x0000FF) >>  0))/255.0 \
 alpha:1.0]
 
+#define RGBA(r,g,b,a) [NSColor colorWithCalibratedRed:r/255.f green:g/255.f blue:b/255.f alpha:a/255.f]
+
+
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
@@ -95,6 +98,8 @@ UIImage* scaleImage(UIImage* image, CGSize newSize);
 NSImage* scaleImage(NSImage* image, CGSize newSize);
 
 BOOL checkForScreenRecordingPermissionsOnMac(void);
+
+NSColor* NSColorFromRGB(NSUInteger rgbValue);
 
 #endif
 

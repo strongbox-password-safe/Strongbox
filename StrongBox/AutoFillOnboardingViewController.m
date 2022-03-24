@@ -32,7 +32,8 @@
                                                            customFields:self.model.metadata.autoFillScanCustomFields
                                                                   notes:self.model.metadata.autoFillScanNotes
                                            concealedCustomFieldsAsCreds:self.model.metadata.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.model.metadata.autoFillUnConcealedFieldsAsCreds];
+                                         unConcealedCustomFieldsAsCreds:self.model.metadata.autoFillUnConcealedFieldsAsCreds
+                                                               nickName:self.model.metadata.nickName];
     }
     
     if ( self.onDone ) {

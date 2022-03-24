@@ -8,11 +8,7 @@
 
 import Cocoa
 
-// TODO: Also allow rearrange of top level items, so like Tags can be dragged above Hierarchy for those who prefer tags
-// TODO: Collapseable / Expandable Headers
-// TODO: Also allow users to configure show/hide elements, e.g. no Hierarchy just Tags
 // TODO: Custom Order & allowing user move and re-arrange folders?
-// TODO: Header Icons
 // TODO: Need to scale down custom images
 
 class SideBarViewController: NSViewController, DocumentViewController {
@@ -20,24 +16,21 @@ class SideBarViewController: NSViewController, DocumentViewController {
         NSLog("😎 DEINIT [SideBarViewController]")
     }
 
+    private var headerNodeStates: [HeaderNodeState] = []
+    private var viewNodes: [SideBarViewNode] = []
+
     @IBOutlet var outlineView: OutlineView!
     @IBOutlet var contextMenu: NSMenu!
 
     private var loadedDocument: Bool = false
     private var database: ViewModel!
 
-    private var viewNodes: [SideBarViewNode] = []
-    var hierarchyHeader: SideBarViewNode?
-    var hierarchyRoot: SideBarViewNode?
-    var tagsHeader: SideBarViewNode?
-    var specialsHeader: SideBarViewNode?
-
     private var rootGroupForDisplay: Node {
         return database.rootGroup
     }
 
     func onDocumentLoaded() {
-        NSLog("🚀 SideBarViewController::onDocumentLoaded")
+
 
         loadDocument()
     }
@@ -55,7 +48,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
         database = doc.viewModel
         loadedDocument = true
 
-        outlineView.registerForDraggedTypes([NSPasteboard.PasteboardType(kDragAndDropInternalUti), NSPasteboard.PasteboardType(kDragAndDropExternalUti)])
+        outlineView.register(NSNib(nibNamed: NSNib.Name(TitleAndIconCell.NibIdentifier.rawValue), bundle: nil), forIdentifier: TitleAndIconCell.NibIdentifier)
+        outlineView.registerForDraggedTypes([NSPasteboard.PasteboardType(kDragAndDropInternalUti),
+                                             NSPasteboard.PasteboardType(kDragAndDropExternalUti),
+                                             NSPasteboard.PasteboardType(kDragAndDropSideBarHeaderMoveInternalUti)])
 
         outlineView.delegate = self
         outlineView.dataSource = self
@@ -72,6 +68,22 @@ class SideBarViewController: NSViewController, DocumentViewController {
             self.refresh()
         }
 
+        
+
+        let auditNotificationsOfInterest: [String] = [
+            
+            kAuditCompletedNotificationKey,
+        ]
+
+        for ofInterest in auditNotificationsOfInterest {
+            NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
+                guard let self = self else { return }
+                self.onAuditUpdateNotification(notification)
+            }
+        }
+
+        
+
         NotificationCenter.default.addObserver(forName: NSNotification.Name(kModelUpdateNotificationFullReload),
                                                object: nil, queue: nil)
         { [weak self] notification in
@@ -87,10 +99,15 @@ class SideBarViewController: NSViewController, DocumentViewController {
             }
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(kModelUpdateNotificationNextGenNavigationChanged), object: nil, queue: nil) { [weak self] _ in
-            guard let self = self else { return }
+        let navNotifications: [String] = [kModelUpdateNotificationNextGenSearchContextChanged,
+                                          kModelUpdateNotificationNextGenNavigationChanged]
 
-            self.onModelNavigationContextChanged()
+        for ofInterest in navNotifications {
+            NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] _ in
+                guard let self = self else { return }
+
+                self.onModelNavigationContextChanged()
+            }
         }
 
         let notificationsOfInterest: [String] = [kModelUpdateNotificationItemsAdded,
@@ -99,7 +116,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
                                                  kModelUpdateNotificationItemsUnDeleted,
                                                  kModelUpdateNotificationIconChanged,
                                                  kModelUpdateNotificationTitleChanged,
-                                                 kModelUpdateNotificationItemsMoved]
+                                                 kModelUpdateNotificationItemsMoved,
+                                                 kModelUpdateNotificationTagsChanged,
+                                                 kModelUpdateNotificationDatabasePreferenceChanged,
+                                                 kModelUpdateNotificationHistoryItemRestored]
 
         for ofInterest in notificationsOfInterest {
             NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
@@ -110,6 +130,22 @@ class SideBarViewController: NSViewController, DocumentViewController {
                 self.onNotificationReceived(notification)
             }
         }
+    }
+
+    func onAuditUpdateNotification(_ notification: Notification) {
+        
+        guard let dict = notification.object as? [String: Any], let model = dict["model"] as? Model else {
+            NSLog("🔴 Couldn't real model from notification")
+            return
+        }
+
+        if model != database.commonModel {
+            return
+        }
+
+        NSLog("✅ SideBarViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
+
+        refresh()
     }
 
     func onNotificationReceived(_ notification: Notification) {
@@ -136,64 +172,294 @@ class SideBarViewController: NSViewController, DocumentViewController {
         refresh()
     }
 
-    private func loadSideBarStructure() -> (structure: [SideBarViewNode], hierarchyRoot: SideBarViewNode, hierarchyHeader: SideBarViewNode, tagsHeader: SideBarViewNode?, specialsHeader: SideBarViewNode) {
-        var newData: [SideBarViewNode] = []
+    func loadHeaderNode(_ node: HeaderNode) -> SideBarViewNode? {
+        switch node {
+        case kHeaderNodeFavourites:
+            return loadFavouritesSideBarNodes()
+        case kHeaderNodeRegularHierarchy:
+            return loadHierarchyHeader()
+        case kHeaderNodeTags:
+            return loadTagsSideBarNodes()
+        case kHeaderNodeAuditIssues:
+            return loadAuditSideBarNodes()
+        case kHeaderNodeSpecial:
+            return loadQuickViewSideBarNodes()
+        default:
+            NSLog("🔴 Unknown HEader")
+            return nil
+        }
+    }
 
-        
+    func loadHierarchyHeader() -> SideBarViewNode {
+        let hierarchyHeader = SideBarViewNode(context: .none, title: NSLocalizedString("side_bar_hierarchy_folder_structure", comment: "Hierarchy"), image: Icon.houseFill.image(), parent: nil, children: [], headerNode: kHeaderNodeRegularHierarchy)
 
-        
-
-        let hierarchyHeader = SideBarViewNode(context: .none, title: NSLocalizedString("side_bar_hierarchy_folder_structure", comment: "Hierarchy"), image: Icon.house.image(), parent: nil, children: [], isHeaderNode: true)
         let hierarchyRoot = getHierarchicalViewNodesFor(rootGroupForDisplay, hierarchyHeader)
         hierarchyHeader.children = [hierarchyRoot]
-        newData += [hierarchyHeader]
 
-        
+        return hierarchyHeader
+    }
 
+    func loadFavouritesSideBarNodes() -> SideBarViewNode? {
+        let favourites = database.favourites.sorted { node1, node2 in
+            finderStyleNodeComparator(node1, node2) == .orderedAscending
+        }
+
+        if !favourites.isEmpty {
+            let favouritesHeader = SideBarViewNode(context: .none,
+                                                   title: NSLocalizedString("browse_vc_section_title_pinned", comment: "Favourites"),
+                                                   image: Icon.favourite.image(),
+                                                   parent: nil,
+                                                   children: [],
+                                                   headerNode: kHeaderNodeFavourites)
+
+            for favourite in favourites {
+                let image = NodeIconHelper.getIconFor(favourite, predefinedIconSet: database.iconSet, format: database.format)
+                let ret = SideBarViewNode(context: .favourites(favourite.uuid), title: favourite.title, image: image, parent: favouritesHeader, children: [])
+                favouritesHeader.children.append(ret)
+            }
+
+            return favouritesHeader
+        }
+
+        return nil
+    }
+
+    func loadTagsSideBarNodes() -> SideBarViewNode? {
         let sortedTags = database.tagSet.sorted { a, b in
             finderStringCompare(a, b) == .orderedAscending
         }
 
-        let tagsHeader = SideBarViewNode(context: .none, title: NSLocalizedString("item_details_username_field_tags", comment: "Tags"), image: Icon.tag.image(), parent: nil, children: [], isHeaderNode: true)
+        if sortedTags.isEmpty {
+            return nil
+        }
+
+        let tagsHeader = SideBarViewNode(context: .none, title: NSLocalizedString("item_details_username_field_tags", comment: "Tags"), image: Icon.tagFill.image(), parent: nil, children: [], headerNode: kHeaderNodeTags)
 
         let tagNodes = sortedTags.map { tag in
             SideBarViewNode(context: .tags(tag), title: tag, image: Icon.tag.image(), parent: tagsHeader)
         }
 
-        if !tagNodes.isEmpty {
-            tagsHeader.children = tagNodes
-            newData += [tagsHeader]
+        tagsHeader.children = tagNodes
+
+        return tagsHeader
+    }
+
+    func loadQuickViewSideBarNodes() -> SideBarViewNode {
+        let specialsHeader = SideBarViewNode(context: .none,
+                                             title: NSLocalizedString("quick_view_section_title_quick_views", comment: "Quick Views"),
+                                             image: Icon.viewFinderCircleFill.image(), headerNode: kHeaderNodeSpecial)
+
+        
+
+        let allEntriesNode = SideBarViewNode(context: .special(.allEntries), title: NSLocalizedString("quick_view_title_all_entries_title", comment: "All Entries"),
+                                             image: Icon.listStar.image(), parent: specialsHeader)
+
+        var specialNodes: [SideBarViewNode] = [allEntriesNode]
+
+        
+
+        var expired = false
+        var nearlyExpired = false
+        var totp = false
+        var attachment = false
+
+        for obj in database.allSearchableEntries {
+            if !expired {
+                expired = obj.fields.expired
+            }
+            if !nearlyExpired {
+                nearlyExpired = obj.fields.nearlyExpired
+            }
+            if !totp {
+                totp = obj.fields.otpToken != nil
+            }
+            if !attachment {
+                attachment = obj.fields.attachments.count > 0
+            }
+
+            if expired, nearlyExpired, totp, attachment {
+                break
+            }
         }
 
         
 
+        if expired {
+            let entry = SideBarViewNode(context: .special(.expiredEntries), title: NSLocalizedString("browse_vc_section_title_expired", comment: "Expired"),
+                                        image: Icon.expired.image(), parent: specialsHeader)
+
+            specialNodes.append(entry)
+        }
+
         
 
-        let specialsHeader = SideBarViewNode(context: .none,
-                                             title: NSLocalizedString("quick_view_section_title_quick_views", comment: "Quick Views"),
-                                             image: Icon.house.image(),
-                                             parent: nil, children: [], isHeaderNode: true)
-        let specialNodes: [SideBarViewNode] = [SideBarViewNode(context: .special(.allEntries), title: NSLocalizedString("quick_view_title_all_entries_title", comment: "All Entries"),
-                                                               image: Icon.listStar.image(), parent: specialsHeader)]
+        if nearlyExpired {
+            let entry = SideBarViewNode(context: .special(.nearlyExpiredEntries), title: NSLocalizedString("browse_vc_section_title_nearly_expired", comment: "Nearly Expired"),
+                                        image: Icon.nearlyExpired.image(), parent: specialsHeader)
+
+            specialNodes.append(entry)
+        }
+
+        
+
+        if totp {
+            let entry = SideBarViewNode(context: .special(.totpItems), title: NSLocalizedString("generic_fieldname_totp", comment: "TOTP"),
+                                        image: Icon.totp.image(), parent: specialsHeader)
+
+            specialNodes.append(entry)
+        }
+
+        
+
+        if attachment {
+            let entry = SideBarViewNode(context: .special(.itemsWithAttachments), title: NSLocalizedString("generic_fieldname_attachments", comment: "Attachments"),
+                                        image: Icon.attachment.image(), parent: specialsHeader)
+
+            specialNodes.append(entry)
+        }
+
+        
+
         specialsHeader.children = specialNodes
 
-        newData += [specialsHeader]
+        return specialsHeader
+    }
 
-        return (newData, hierarchyRoot, hierarchyHeader, tagsHeader, specialsHeader)
+    func loadAuditSideBarNodes() -> SideBarViewNode? {
+        guard let report = database.auditReport else {
+            NSLog("🔴 No Audit Report available - cannot load audit issues")
+            return nil
+        }
+
+        let auditHeader = SideBarViewNode(context: .none,
+                                          title: NSLocalizedString("quick_view_title_audit_issues_title", comment: "Audit Issues"),
+                                          image: Icon.auditShieldFill.image(),
+                                          parent: nil,
+                                          children: [],
+                                          headerNode: kHeaderNodeAuditIssues)
+
+        var auditNodes: [SideBarViewNode] = []
+
+        if !report.entriesWithNoPasswords.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.noPasswords),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_no_password_set", comment: "No Passwords"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.entriesWithDuplicatePasswords.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.duplicated),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_duplicated_password", comment: "Duplicated"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.entriesWithCommonPasswords.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.common),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_very_common_password", comment: "Common"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.entriesWithSimilarPasswords.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.similar),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_password_is_similar_to_another", comment: "Similar"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.entriesTooShort.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.tooShort),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_password_is_too_short", comment: "Short"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.entriesPwned.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.pwned),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_password_is_pwned", comment: "Pwned"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.entriesWithLowEntropyPasswords.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.lowEntropy),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_low_entropy", comment: "Weak/Entropy"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.entriesWithTwoFactorAvailable.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.twoFactorAvailable),
+                                                   title: NSLocalizedString("audit_quick_summary_very_brief_two_factor_available", comment: "2FA Available"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        if !report.allEntries.isEmpty {
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.allEntries),
+                                                   title: NSLocalizedString("audit_side_bar_nav_all_issues", comment: "All Issues"),
+                                                   image: Icon.auditShield.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemOrange)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        auditHeader.children = auditNodes
+
+        return auditNodes.isEmpty ? nil : auditHeader
+    }
+
+    var databaseHeaderNodes: [HeaderNodeState] {
+        get {
+            return database.headerNodes
+        }
+        set {
+            database.headerNodes = newValue
+        }
     }
 
     private func refresh() {
-        let newData = loadSideBarStructure()
+        let newHeaders = databaseHeaderNodes
+        var newData: [SideBarViewNode] = []
 
-        viewNodes = newData.structure
-        hierarchyHeader = newData.hierarchyHeader
-        hierarchyRoot = newData.hierarchyRoot
-        tagsHeader = newData.tagsHeader
-        specialsHeader = newData.specialsHeader
+        for header in newHeaders {
+            if let node = loadHeaderNode(header.header) {
+                newData += [node]
+            }
+        }
+
+        headerNodeStates = newHeaders
+        viewNodes = newData
 
         outlineView.reloadData()
 
-        expandBasicRequiredStructure()
+        expandStructure()
 
         bindSelectionToModelNavigationContext()
     }
@@ -201,8 +467,6 @@ class SideBarViewController: NSViewController, DocumentViewController {
     private func expandRegularHierarchyIfFieldIsExpanded(_ node: SideBarViewNode) {
         if case let .regularHierarchy(uuid) = node.context {
             guard let childNode = database.getItemBy(uuid) else { return }
-
-
 
             if childNode.fields.isExpanded {
                 outlineView.expandItem(node, expandChildren: true)
@@ -217,20 +481,21 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     var isPerformingProgrammaticExpandCollapse: Bool = false
-    private func expandBasicRequiredStructure() {
+
+    private func expandStructure() {
         isPerformingProgrammaticExpandCollapse = true
 
-        outlineView.expandItem(hierarchyHeader)
-        outlineView.expandItem(hierarchyRoot)
+        for header in headerNodeStates {
+            if header.expanded, let node = viewNodes.first(where: { $0.headerNode == header.header }) {
+                outlineView.expandItem(node)
 
-        if let hierarchyRoot = hierarchyRoot {
-            expandRegularHierarchyIfFieldIsExpanded(hierarchyRoot)
+                if header.header == kHeaderNodeRegularHierarchy {
+                    if let hierarchyRoot = node.children.first {
+                        expandRegularHierarchyIfFieldIsExpanded(hierarchyRoot)
+                    }
+                }
+            }
         }
-
-        if tagsHeader != nil {
-            outlineView.expandItem(tagsHeader)
-        }
-        outlineView.expandItem(specialsHeader)
 
         isPerformingProgrammaticExpandCollapse = false
     }
@@ -243,9 +508,19 @@ class SideBarViewController: NSViewController, DocumentViewController {
             image = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
         }
 
-        let ret = SideBarViewNode(context: .regularHierarchy(group.uuid), title: group.title, image: image, parent: parentNode, children: [])
+        let ret = SideBarViewNode(context: .regularHierarchy(group.uuid), title: group.title, image: image, parent: parentNode, children: [], databaseNodeChildCount: group.childRecords.count)
 
-        let sorted = group.childGroups.sorted(by: Node.sortTitleLikeFinder)
+        var sorted = group.childGroups.sorted(by: Node.sortTitleLikeFinder)
+
+        
+
+        if database.recycleBinEnabled, let recycleBinNode = database.recycleBinNode, let idx = sorted.firstIndex(of: recycleBinNode) {
+            sorted.remove(at: idx)
+
+            if database.showRecycleBinInBrowse {
+                sorted.append(recycleBinNode)
+            }
+        }
 
         ret.children = sorted.map { child in
             getHierarchicalViewNodesFor(child, ret)
@@ -255,14 +530,14 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func onModelNavigationContextChanged() {
-        NSLog("✅ SideBar::onModelNavigationContextChanged...")
+        NSLog("✅ SideBarViewController::onModelNavigationContextChanged...")
 
         bindSelectionToModelNavigationContext()
     }
 
     
 
-    func expandParentsOfItem(item: SideBarViewNode) {
+    func expandParentsOfItem(item: SideBarViewNode, expandCollapsedHeaderItem: Bool = true ) {
         var stack: [SideBarViewNode] = []
 
         var tmp = item
@@ -271,6 +546,15 @@ class SideBarViewController: NSViewController, DocumentViewController {
             stack.append(tmp)
         }
 
+        if let headerItem = stack.last, let headerNode = headerItem.headerNode, let header = headerNodeStates.first(where: { hns in
+            return hns.header == headerNode
+        })  {
+            if !header.expanded {
+                return
+            }
+        }
+        
+        
         while let group = stack.last {
 
 
@@ -281,12 +565,17 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func bindSelectionToModelNavigationContext() {
-        let navContext = getNavContextFromModel(database)
+        if isSearching {
+            outlineView.selectRowIndexes(IndexSet(), byExtendingSelection: false)
+            return
+        }
 
+        let navContext = navigationContext
 
+        NSLog("✅ SideBarViewController::bindSelectionToModelNavigationContext: [%@]", String(describing: navContext))
 
-        if let viewNode = findViewNode(for: navContext) {
-            expandParentsOfItem(item: viewNode)
+        if let viewNode = findViewNode(for: navigationContext) {
+            expandParentsOfItem(item: viewNode, expandCollapsedHeaderItem: false)
 
             let row = outlineView.row(forItem: viewNode)
 
@@ -294,11 +583,11 @@ class SideBarViewController: NSViewController, DocumentViewController {
                 outlineView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
                 return
             }
-        } else if navContext != .none {
+        } else if navContext == .none {
             return
         }
 
-        NSLog("🔴 bindSelectionToModelNavigationContext: Could not find this Nav Context!")
+        NSLog("🔴 SideBarViewController::bindSelectionToModelNavigationContext: Could not find this Nav Context!")
 
         outlineView.selectRowIndexes(IndexSet(), byExtendingSelection: false)
     }
@@ -308,33 +597,24 @@ class SideBarViewController: NSViewController, DocumentViewController {
         case .none:
             return nil
         case .favourites:
-            return nil 
+            let header = viewNodes.first { $0.headerNode == kHeaderNodeFavourites }
+            return header?.children.first { $0.context == navContext }
         case .regularHierarchy:
-            guard let hierarchyHeader = hierarchyHeader else {
-                NSLog("🔴 Hierarchy header not set")
-                return nil
-            }
-
-            let descendents = hierarchyHeader.allDescendents
-            let match = descendents.first { node in
-                node.context == navContext
-            }
-
+            let header = viewNodes.first { $0.headerNode == kHeaderNodeRegularHierarchy }
+            let descendents = header?.allDescendents
+            let match = descendents?.first { $0.context == navContext }
             return match
         case .tags:
-            return tagsHeader?.children.first(where: { tag in
-                tag.context == navContext
-            })
-        case .totps:
-            return nil 
+            let header = viewNodes.first { $0.headerNode == kHeaderNodeTags }
+            return header?.children.first { $0.context == navContext }
+        case .auditIssues:
+            let header = viewNodes.first { $0.headerNode == kHeaderNodeAuditIssues }
+            return header?.children.first { $0.context == navContext }
         case .special:
-            return specialsHeader?.children.first(where: { special in
-                special.context == navContext
-            })
+            let header = viewNodes.first { $0.headerNode == kHeaderNodeSpecial }
+            return header?.children.first { $0.context == navContext }
         }
     }
-
-    
 
     var windowController: WindowController {
         return view.window!.windowController as! WindowController
@@ -348,11 +628,17 @@ class SideBarViewController: NSViewController, DocumentViewController {
         return splitViewController.masterListView
     }
 
+    var navigationContext: NavigationContext {
+        return getNavContextFromModel(database)
+    }
 
+    var isSearching: Bool {
+        guard let database = database else { return false }
 
+        let text = database.nextGenSearchText
 
-
-
+        return !text.isEmpty
+    }
 }
 
 
@@ -380,41 +666,82 @@ extension SideBarViewController: NSOutlineViewDataSource {
 }
 
 extension SideBarViewController: NSOutlineViewDelegate {
+    func outlineView(_: NSOutlineView, shouldShowOutlineCellForItem item: Any) -> Bool {
+        guard let node = item as? SideBarViewNode else { return true }
+
+        switch node.context {
+        case .favourites(_), .tags(_), .auditIssues(_), .special:
+            return false
+        case .none, .regularHierarchy:
+            return true
+        }
+    }
+
     func outlineView(_ outlineView: NSOutlineView, viewFor _: NSTableColumn?, item: Any) -> NSView? {
-        guard let node = item as? SideBarViewNode,
-              let cell = outlineView.makeView(withIdentifier: node.cellIdentifier, owner: self) as? NSTableCellView
-        else {
-            return nil
-        }
+        guard let node = item as? SideBarViewNode else { return nil }
 
-        if !node.isHeaderNode {
-            cell.imageView?.image = node.image
-        }
+        let cell: NSTableCellView
 
-        let attr: NSAttributedString
-        if database.recycleBinEnabled, database.recycleBinNode != nil, node.context == .regularHierarchy(database.recycleBinNode!.uuid) {
-            attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.italicBodyFont])
+        if node.headerNode == nil {
+            let cell = outlineView.makeView(withIdentifier: TitleAndIconCell.NibIdentifier, owner: self) as! TitleAndIconCell
+
+            let attr: NSAttributedString
+            if database.recycleBinEnabled, database.recycleBinNode != nil, node.context == .regularHierarchy(database.recycleBinNode!.uuid) {
+                let style = NSMutableParagraphStyle()
+                style.lineBreakMode = .byTruncatingTail
+                attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.italicBodyFont, .paragraphStyle: style])
+
+                cell.setContent(attr, iconImage: node.image, topSpacing: 16.0)
+            } else {
+                let style = NSMutableParagraphStyle()
+                style.lineBreakMode = .byTruncatingTail
+                attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.bodyFont, .paragraphStyle: style])
+
+                var fav = false
+                if case .favourites = node.context {
+                    fav = true
+                }
+
+                cell.setContent(attr, iconImage: node.image, showLeadingFavStar: fav, count: database.showChildCountOnFolderInSidebar ? node.databaseNodeChildCount : nil)
+            }
+
+            return cell
         } else {
-            attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.bodyFont])
+            cell = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: "HeaderCell"), owner: self) as! NSTableCellView
+            cell.imageView?.image = nil 
+            cell.imageView?.isHidden = true
+            cell.textField?.stringValue = node.title
         }
-
-        cell.textField?.attributedStringValue = attr
 
         return cell
     }
 
     func outlineView(_: NSOutlineView, isGroupItem item: Any) -> Bool {
-        (item as! SideBarViewNode).isHeaderNode
+        guard let item = item as? SideBarViewNode else {
+            return false
+        }
+
+        return item.headerNode != nil
     }
 
-    func outlineView(_: NSOutlineView, shouldShowOutlineCellForItem item: Any) -> Bool {
-        let node = item as! SideBarViewNode
-        return node.context != .none
+    func outlineView(_: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
+        guard let item = item as? SideBarViewNode else { return nil }
+
+        if database.recycleBinEnabled, database.recycleBinNode != nil, item.context == .regularHierarchy(database.recycleBinNode!.uuid) {
+            return PaddedRowView()
+        }
+
+        return nil
     }
 
-    
     func outlineView(_: NSOutlineView, shouldSelectItem item: Any) -> Bool {
-        !(item as! SideBarViewNode).isHeaderNode
+        guard let item = item as? SideBarViewNode else { return false }
+
+        if item.context == .none {
+            return false
+        }
+
+        return true
     }
 
     @available(macOS 11.0, *)
@@ -426,17 +753,23 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
 
         guard let selected = outlineView.item(atRow: outlineView.selectedRow) as? SideBarViewNode else {
-            NSLog("🔴 Could not get selected.")
+            NSLog("🔴 outlineViewSelectionDidChange::Could not get selected.")
             return
         }
 
-        setModelNavigationContextWithViewNode(database, selected.context)
+        if selected.context != .none {
+            setModelNavigationContextWithViewNode(database, selected.context)
+        }
     }
 
     func outlineView(_: NSOutlineView, writeItems items: [Any], to pasteboard: NSPasteboard) -> Bool {
         guard let singleItem = items.first as? SideBarViewNode else { return false }
 
-        if case let .regularHierarchy(groupUuid) = singleItem.context {
+        if let headerNode = singleItem.headerNode {
+            pasteboard.setString(String(headerNode.rawValue), forType: NSPasteboard.PasteboardType(kDragAndDropSideBarHeaderMoveInternalUti))
+            return true
+        }
+        else if case let .regularHierarchy(groupUuid) = singleItem.context {
             if groupUuid == database.recycleBinNode?.uuid { 
                 return false
             }
@@ -449,170 +782,160 @@ extension SideBarViewController: NSOutlineViewDelegate {
         return false
     }
 
-    func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int) -> NSDragOperation {
-        guard let destinationItem = item as? SideBarViewNode else { return [] }
-
-        let destinationItemId: NodeIdentifier
-
-        switch destinationItem.context {
-        case let .regularHierarchy(group):
-            destinationItemId = group
-        default:
-            return [] 
-        }
-
-        guard let destination = database.getItemBy(destinationItemId) else {
-            return []
-        }
-
-        if let source = info.draggingSource as? NSOutlineView {
-            if source == outlineView || source == browseView.outlineView { 
-                if source == outlineView {
-                    NSLog("SideBar validateDrop: Internal move of Side Bar Items! - %d", index)
-
-
-
-                } else {
-                    NSLog("SideBar validateDrop: Drop from Browse View! - %@ - %d", String(describing: item), index)
-                }
-
-                guard let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String] else {
-                    return []
-                }
-
-                let sourceItems = serializationIds.compactMap { obj in
-                    database.getItemFromSerializationId(obj)
-                }
-
-                let valid = database.validateMove(sourceItems, destination: destination)
-
-                NSLog("SideBar::validateDrop: Internal Source (Browse View) - destination [%@] - valid = [%d]", String(describing: destination), valid)
-
-                if !valid {
-                    return []
-                }
-
-                if index == NSOutlineViewDropOnItemIndex { 
-                    return [.move]
-                } else {
-                    return []
-                }
-            }
-        }
-
-        guard let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)) else { return [] }
-
-        if index == NSOutlineViewDropOnItemIndex { 
-
-
-            return [.copy]
-        } else {
-            return []
-        }
-    }
-
-    func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
-        guard let destinationItem = item as? SideBarViewNode else { return false }
-
-        let destinationItemId: NodeIdentifier
-
-        switch destinationItem.context {
-        case let .regularHierarchy(group):
-            destinationItemId = group
+    func isValidNonHeaderDragDestination(_ context: NavigationContext) -> Bool {
+        switch context {
+        case .regularHierarchy(_), .tags:
+            return true
         default:
             return false 
         }
+    }
 
-        guard let destination = database.getItemBy(destinationItemId) else {
+    func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem item: Any?, proposedChildIndex index: Int) -> NSDragOperation {
+        guard let destinationItem = item as? SideBarViewNode,
+              let source = info.draggingSource as? NSOutlineView else { return [] }
+
+        if let _ = info.draggingPasteboard.string(forType: NSPasteboard.PasteboardType(kDragAndDropSideBarHeaderMoveInternalUti)) {
+            guard source == outlineView, destinationItem.headerNode != nil, index == NSOutlineViewDropOnItemIndex else { return [] }
+
+
+
+            return [.move]
+        }
+
+        guard isValidNonHeaderDragDestination(destinationItem.context) else {
+            return []
+        }
+
+        let sourceIsBrowseView = source == browseView.outlineView
+        let sourceIsThisDatabase = source == outlineView || sourceIsBrowseView
+
+        if sourceIsThisDatabase {
+            if case let .regularHierarchy(destinationGroupId) = destinationItem.context {
+                guard index == NSOutlineViewDropOnItemIndex,
+                      let destinationGroup = database.getItemBy(destinationGroupId),
+                      let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String]
+                else {
+                    return []
+                }
+
+                let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId($0) }
+                let valid = database.validateMove(sourceItems, destination: destinationGroup)
+
+
+
+                if valid {
+                    return [.move]
+                }
+            } else if case .tags = destinationItem.context, index == NSOutlineViewDropOnItemIndex, sourceIsBrowseView {
+
+                return [.copy]
+            }
+        } else {
+            guard case .regularHierarchy = destinationItem.context,
+                  let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)),
+                  index == NSOutlineViewDropOnItemIndex else { return [] }
+
+            NSLog("SideBar validateDrop: External Source - %d", index)
+            return [.copy]
+        }
+
+        return []
+    }
+
+    func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item: Any?, childIndex index: Int) -> Bool {
+        guard let destinationItem = item as? SideBarViewNode,
+              let source = info.draggingSource as? NSOutlineView else { return false }
+
+        if let headerString = info.draggingPasteboard.string(forType: NSPasteboard.PasteboardType(kDragAndDropSideBarHeaderMoveInternalUti)),
+           let headerInt = Int(headerString)
+        {
+            guard source == outlineView,
+                  destinationItem.headerNode != nil,
+                  let headerSrcIdx = headerNodeStates.firstIndex(where: { $0.header == HeaderNode(rawValue: headerInt) }),
+                  index == NSOutlineViewDropOnItemIndex else { return false }
+
+
+
+            var headersCopy = headerNodeStates
+
+            let theHeader = headersCopy[headerSrcIdx]
+            headersCopy.remove(at: headerSrcIdx)
+
+            if let headerDestIdx = headerNodeStates.firstIndex(where: { $0.header == destinationItem.headerNode }) {
+                headersCopy.insert(theHeader, at: headerDestIdx)
+            }
+
+            databaseHeaderNodes = headersCopy
+
+            refresh()
+
+            return true
+        }
+
+        guard isValidNonHeaderDragDestination(destinationItem.context) else {
             return false
         }
 
-        if let source = info.draggingSource as? NSOutlineView {
-            if source == outlineView {
-                NSLog("SideBar acceptDrop: Internal move of Side Bar Items! - %d", index)
+        let sourceIsBrowseView = source == browseView.outlineView
+        let sourceIsThisDatabase = source == outlineView || sourceIsBrowseView
 
-                return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destination, internal: true, clear: true) != 0
-            } else if source == browseView.outlineView {
-                NSLog("SideBar acceptDrop: Internal move of items from Browse! - %d", index)
-
-                return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destination, internal: true, clear: true) != 0
+        if case let .regularHierarchy(destinationGroupId) = destinationItem.context {
+            guard let destination = database.getItemBy(destinationGroupId) else {
+                return false
             }
+
+            NSLog("SideBar acceptDrop: [%@] of items", sourceIsThisDatabase ? "INTERNAL MOVE" : "EXTERNAL COPY")
+
+            return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destination, internal: sourceIsThisDatabase, clear: true) != 0
+        } else if case let .tags(tag) = destinationItem.context, index == NSOutlineViewDropOnItemIndex, sourceIsBrowseView {
+            guard let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String] else { return false }
+            let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId($0) }
+
+
+
+            database.addTag(toItems: sourceItems, tag: tag)
+            return true
         }
 
-        NSLog("SideBar acceptDrop: External Drop Source! - %d", index)
-        return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destination, internal: false, clear: true) != 0
+        return false
     }
 
     func outlineViewItemDidExpand(_ notification: Notification) {
-        guard let item = notification.userInfo?.values.first as? SideBarViewNode else { return }
+        guard !isPerformingProgrammaticExpandCollapse, let item = notification.userInfo?.values.first as? SideBarViewNode else { return }
 
-        if isPerformingProgrammaticExpandCollapse {
+        if let header = item.headerNode {
+            NSLog("outlineViewItemDidExpand = [%@]", String(describing: item.title))
 
-            return
-        }
-
-
-
-        if !database.isEffectivelyReadOnly {
-            if case let .regularHierarchy(uuid) = item.context {
-                if let node = database.getItemBy(uuid) {
-                    database.setGroupExpandedState(node, expanded: true)
-                }
+            if let idx = headerNodeStates.firstIndex(where: { $0.header == header }) {
+                headerNodeStates[idx].expanded = true
+                databaseHeaderNodes = headerNodeStates
             }
-        } else {
-            
+        }
+        else if !database.isEffectivelyReadOnly,
+                case let .regularHierarchy(uuid) = item.context,
+                let node = database.getItemBy(uuid)
+        {
+            database.setGroupExpandedState(node, expanded: true)
         }
     }
 
     func outlineViewItemDidCollapse(_ notification: Notification) {
-        guard let item = notification.userInfo?.values.first as? SideBarViewNode else { return }
+        guard !isPerformingProgrammaticExpandCollapse, let item = notification.userInfo?.values.first as? SideBarViewNode else { return }
 
-        if isPerformingProgrammaticExpandCollapse {
+        if let header = item.headerNode {
+            NSLog("outlineViewItemDidCollapse = [%@]", String(describing: item.title))
 
-            return
-        }
-
-
-
-        if !database.isEffectivelyReadOnly {
-            if case let .regularHierarchy(uuid) = item.context {
-                if let node = database.getItemBy(uuid) {
-                    database.setGroupExpandedState(node, expanded: false)
-                }
+            if let idx = headerNodeStates.firstIndex(where: { $0.header == header }) {
+                headerNodeStates[idx].expanded = false
+                databaseHeaderNodes = headerNodeStates
             }
-        } else {
-            
+        }
+        else if !database.isEffectivelyReadOnly,
+                case let .regularHierarchy(uuid) = item.context,
+                let node = database.getItemBy(uuid)
+        {
+            database.setGroupExpandedState(node, expanded: false)
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -11,9 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WindowController : NSWindowController
+@interface WindowController : NSWindowController <NSMenuItemValidation, NSMenuDelegate>
 
-- (void)updateContentView;
+- (void)changeContentView;
 - (BOOL)placeItemsOnPasteboard:(NSPasteboard*)pasteboard items:(NSArray<Node*>*)items;
 - (NSUInteger)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
                        destinationItem:(Node*)destinationItem
@@ -23,9 +23,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (IBAction)onCopyPassword:(id _Nullable)sender;
+- (IBAction)onCopyUsername:(id)sender;
+- (IBAction)onCopyEmail:(id)sender;
+- (IBAction)onCopyUrl:(id)sender;
+- (IBAction)onCopyNotes:(id)sender;
+- (IBAction)onCopyTotp:(id)sender;
+
 - (IBAction)onDelete:(id _Nullable)sender;
+- (IBAction)onGeneralDatabaseSettings:(id)sender;
 
 - (Node*_Nullable)getSingleSelectedItem; 
+
+- (void)onLock:(id)sender;
 
 @end
 

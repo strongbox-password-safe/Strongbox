@@ -54,6 +54,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
+- (void)rebuildFastMaps; 
+
+
+
 - (void)changeKeePassFormat:(DatabaseFormat)newFormat;
 
 - (void)performPreSerializationTidy;
@@ -97,10 +101,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-- (BOOL)validateAddChild:(Node*)item destination:(Node*)destination;
-- (BOOL)addChild:(Node*)item destination:(Node*)destination;
-- (BOOL)insertChild:(Node*)item destination:(Node*)destination atPosition:(NSInteger)position;
-- (void)removeChildFromParent:(Node*)item;
+- (BOOL)validateAddChildren:(NSArray<Node *>*)items destination:(Node *)destination;
+
+- (BOOL)addChildren:(NSArray<Node *>*)items destination:(Node *)destination;
+- (BOOL)addChildren:(NSArray<Node *>*)items destination:(Node *)destination suppressFastMapsRebuild:(BOOL)suppressFastMapsRebuild;
+
+- (BOOL)insertChildren:(NSArray<Node *>*)items
+           destination:(Node *)destination
+            atPosition:(NSInteger)position;
+
+- (void)removeChildren:(NSArray<NSUUID *>*)itemIds;
 
 
 
@@ -135,6 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *expiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *nearlyExpiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *attachmentEntries;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
@@ -160,7 +171,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularEmails;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularTags;
 
-@property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
@@ -172,6 +182,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (Node *_Nullable)getItemByCrossSerializationFriendlyId:(NSString*)serializationId;
 
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
+- (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag;
+
+- (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag;
+- (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag;
+
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 
 @end

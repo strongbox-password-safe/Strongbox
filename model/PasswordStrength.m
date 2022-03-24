@@ -54,11 +54,15 @@ double calculateCrackingTime(double entropy, NSUInteger guessesPerSecond) {
 }
 
 - (NSString *)summaryString {
+    NSString* entropy = [NSString stringWithFormat:@"%0.1f", self.entropy];
+    
     if ( self.showCharacterCount ) {
-        return [NSString stringWithFormat:@"%@ (%lu / %0.1f bits / %@)", self.category, (unsigned long)self.characterCount, self.entropy, self.timeToCrack];
+        NSString* fmt = NSLocalizedString (@"password_strength_summary_char_count_fmt", @"%@ (%@ / %@ bits / %@)");
+        return [NSString stringWithFormat:fmt, self.category, @(self.characterCount), entropy, self.timeToCrack];
     }
     else {
-        return [NSString stringWithFormat:@"%@ (%0.1f bits / %@)", self.category, self.entropy, self.timeToCrack];
+        NSString* fmt = NSLocalizedString (@"password_strength_summary_fmt", @"%@ (%@ bits / %@)");
+        return [NSString stringWithFormat:fmt, self.category, entropy, self.timeToCrack];
     }
 }
 

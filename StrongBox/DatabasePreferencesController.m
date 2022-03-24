@@ -58,12 +58,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-
-
-
-
-
-
     self.imageViewAudit.tintColor = UIColor.systemOrangeColor;
 
     self.imageViewPreferences.image = [UIImage imageNamed:@"list"];
@@ -136,6 +130,7 @@
     else if ([segue.identifier isEqualToString:@"segueToAudit"]) {
         AuditConfigurationVcTableViewController* vc = (AuditConfigurationVcTableViewController*)segue.destinationViewController;
         vc.model = self.viewModel;
+        vc.updateDatabase = self.updateDatabase;
         vc.onDone = self.onDone;
     }
     else if ( [segue.identifier isEqualToString:@"segueToAutoFillPreferences"] ) {
@@ -180,7 +175,7 @@
     else if ( [segue.identifier isEqualToString:@"segueToEncryption"] ) {
         UINavigationController* nav = segue.destinationViewController;
         EncryptionPreferencesViewController* vc = (EncryptionPreferencesViewController*)nav.topViewController;
-        vc.onChangedDatabaseEncryptionSettings = self.onChangedDatabaseEncryptionSettings;
+        vc.onChangedDatabaseEncryptionSettings = self.updateDatabase;
         vc.model = self.viewModel;
     }
 }

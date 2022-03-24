@@ -18,6 +18,7 @@
 @property NSSet<NSUUID*>* tooShort;
 @property NSSet<NSUUID*>* pwned;
 @property NSSet<NSUUID*>* lowEntropy;
+@property NSSet<NSUUID*>* twoFactorAvailable;
 
 @end
 
@@ -29,7 +30,8 @@
                                   similar:(nonnull NSDictionary<NSUUID *,NSSet<NSUUID *> *> *)similar
                                  tooShort:(NSSet<NSUUID *> *)tooShort
                                     pwned:(NSSet<NSUUID *> *)pwned
-                               lowEntropy:(NSSet<NSUUID *> *)lowEntropy {
+                               lowEntropy:(NSSet<NSUUID *> *)lowEntropy
+                       twoFactorAvailable:(NSSet<NSUUID *> *)twoFactorAvailable {
     self = [super init];
     
     if (self) {
@@ -40,6 +42,7 @@
         self.tooShort = tooShort.copy;
         self.pwned = pwned.copy;
         self.lowEntropy = lowEntropy.copy;
+        self.twoFactorAvailable = twoFactorAvailable;
     }
     
     return self;
@@ -81,9 +84,27 @@
     return self.lowEntropy;
 }
 
+- (NSSet<NSUUID *> *)entriesWithTwoFactorAvailable {
+    return self.twoFactorAvailable;
+}
+
+- (NSSet<NSUUID *> *)allEntries {
+    NSMutableSet* all = [NSMutableSet setWithSet:self.noPasswords];
+    
+    [all unionSet:self.entriesWithDuplicatePasswords];
+    [all unionSet:self.commonPasswords];
+    [all unionSet:self.entriesWithSimilarPasswords];
+    [all unionSet:self.tooShort];
+    [all unionSet:self.pwned];
+    [all unionSet:self.lowEntropy];
+    [all unionSet:self.twoFactorAvailable];
+    
+    return all;
+}
+
 - (NSString *)description {
-    return [NSString stringWithFormat:@"No Passswords = [%@], Duplicates = [%@], Common = [%@], Similar = [%@], tooShort = [%@], pwned = [%@], lowEntropy = [%@]",
-            self.noPasswords, self.duplicatedPasswords, self.commonPasswords, self.similarPasswords, self.tooShort, self.pwned, self.lowEntropy];
+    return [NSString stringWithFormat:@"No Passswords = [%@], Duplicates = [%@], Common = [%@], Similar = [%@], tooShort = [%@], pwned = [%@], lowEntropy = [%@], 2faAvail = [%@]",
+            self.noPasswords, self.duplicatedPasswords, self.commonPasswords, self.similarPasswords, self.tooShort, self.pwned, self.lowEntropy, self.twoFactorAvailable];
 }
 
 @end

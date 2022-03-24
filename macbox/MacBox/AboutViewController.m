@@ -55,7 +55,7 @@ static AboutViewController* sharedInstance;
 - (void)doInitialSetup {
     self.view.window.delegate = self;
     
-    NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+    NSString* fmt = Settings.sharedInstance.isAProBundle ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
     
     NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
     

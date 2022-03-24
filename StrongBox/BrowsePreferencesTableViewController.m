@@ -149,7 +149,7 @@
     self.switchShowRecycleBinInSearch.on = self.databaseMetaData.showRecycleBinInSearchResults;
     
     BrowseItemSubtitleField current = self.databaseMetaData.browseItemSubtitleField;
-    BrowseItemSubtitleField effective = (current == kBrowseItemSubtitleEmail && self.format != kPasswordSafe) ? kBrowseItemSubtitleNoField : current;
+    BrowseItemSubtitleField effective = current; 
     self.labelBrowseItemSubtitle.text = [self getBrowseItemSubtitleFieldName:effective];
     
     self.switchShowTotpBrowseView.on = !self.databaseMetaData.hideTotpInBrowse;
@@ -275,7 +275,7 @@
 }
 
 - (void)onChangeTapAction:(UITableViewCell*)cell {
-    NSArray<NSNumber*>* options = self.format == kPasswordSafe ? @[@(kBrowseTapActionNone),
+    NSArray<NSNumber*>* options = (YES) ? @[@(kBrowseTapActionNone), 
                                     @(kBrowseTapActionOpenDetails),
                                     @(kBrowseTapActionEdit),
                                     @(kBrowseTapActionCopyTitle),
@@ -417,9 +417,10 @@
     }];
     
     BrowseItemSubtitleField current = self.databaseMetaData.browseItemSubtitleField;
-    if(current == kBrowseItemSubtitleEmail && self.format != kPasswordSafe) {
-        current = kBrowseItemSubtitleNoField;
-    }
+    
+
+
+
     
     NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return obj.integerValue == current;

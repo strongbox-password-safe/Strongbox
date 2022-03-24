@@ -53,21 +53,11 @@
     }];
     
     if ( nodesWithEmails.count ) {
-        
-        
+        for (Node* nodeWithEmail in nodesWithEmails) {
+           [nodeWithEmail.fields setCustomField:kCanonicalEmailFieldName value:[StringValue valueWithString:nodeWithEmail.fields.email]];
+        }
 
-
-
-                for (Node* nodeWithEmail in nodesWithEmails) {
-                   [nodeWithEmail.fields setCustomField:kDefaultKeePassEmailFieldKey value:[StringValue valueWithString:nodeWithEmail.fields.email]];
-                }
-
-                completion ( YES, nodes );
-
-
-
-
-
+        completion(YES, nodes);
     }
     else {
         completion(YES, nodes);

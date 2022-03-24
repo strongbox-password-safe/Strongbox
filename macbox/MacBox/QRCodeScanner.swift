@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Foundation
 
 class QRCodeScanner: NSViewController, NSPopoverDelegate {
     @IBOutlet var stackViewPermissions: NSStackView!
@@ -208,6 +209,8 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
 
             if let qrc = features.first as? CIQRCodeFeature, let string = qrc.messageString {
                 let image = NSImage(cgImage: windowImage, size: .zero)
+
+
 
                 if let url = URL(string: string), let _ = OTPToken(url: url) {
                     completionHandler(ScanResult(totpString: string, ownerWindow: ownerWindow, image: image))

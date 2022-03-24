@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ClickableTextField : NSTextField
 
-@property (copy)void (^onClick)(void);
+@property (copy, nullable) void (^onClick)(void);
 
 @end
 

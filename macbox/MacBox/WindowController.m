@@ -44,6 +44,7 @@
 @interface WindowController ()
 
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
+@property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController; 
 
 @end
 
@@ -74,7 +75,7 @@ static NSString* getFreeTrialSuffix() {
     Document* doc = (Document*)self.document;
     
     NSMutableArray* statusii = NSMutableArray.array;
-    if ( doc.viewModel.offlineMode ) {
+    if ( doc.viewModel.offlineMode || doc.viewModel.alwaysOpenOffline ) {
         [statusii addObject:NSLocalizedString(@"database_offline_mode_window_suffix", @"Offline")];
     }
     if ( doc.viewModel.isEffectivelyReadOnly ) {
@@ -142,6 +143,9 @@ static NSString* getFreeTrialSuffix() {
         WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
         
         path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
+    }
+    else if ( metadata.storageProvider == kTwoDrive ) {
+        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
     }
     else if ( metadata.storageProvider == kMacFile ) {
         if ( (YES) ) {
@@ -232,7 +236,7 @@ static NSString* getFreeTrialSuffix() {
     }
 }
 
-- (void)updateContentView { 
+- (void)changeContentView {
     Document* doc = self.document;
 
     NSLog(@"WindowController::updateContentView - doc=[%@], doc.isLocked = [%hhd]", doc, doc.isLocked);
@@ -271,9 +275,15 @@ static NSString* getFreeTrialSuffix() {
         [self maybeOnboardDatabase];
 
         [self listenToEventsOfInterest];
+
+        if ( Settings.sharedInstance.nextGenUI ) {
+            self.window.titlebarAppearsTransparent = NO;
+        }
     }
     else {
         if ( Settings.sharedInstance.nextGenUI ) {
+            self.window.titlebarAppearsTransparent = YES;
+            
             if (@available(macOS 10.13, *)) {
                 self.window.toolbar = [[NSToolbar alloc] init];
             }
@@ -317,9 +327,11 @@ static NSString* getFreeTrialSuffix() {
 - (Node*)getSideBarSelectedItem {
     if ( Settings.sharedInstance.nextGenUI ) {
         if ( self.viewModel.nextGenNavigationContext == OGNavigationContextRegularHierarchy ) {
-            
-            
             NSUUID* uuid = self.viewModel.nextGenNavigationContextSideBarSelectedGroup;
+            return uuid ? [self.viewModel getItemById:uuid] : nil;
+        }
+        else if ( self.viewModel.nextGenNavigationContext == OGNavigationContextFavourites ) {
+            NSUUID* uuid = self.viewModel.nextGenNavigationSelectedFavouriteId;
             return uuid ? [self.viewModel getItemById:uuid] : nil;
         }
     }
@@ -329,9 +341,15 @@ static NSString* getFreeTrialSuffix() {
 
 - (NSArray<Node*>*)getSelectedItems {
     if ( Settings.sharedInstance.nextGenUI ) {
-        return [self.viewModel.nextGenSelectedItems map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-            return [self.viewModel getItemById:obj];
-        }];
+        if ( !self.viewModel.locked ) {
+            return [self.viewModel.nextGenSelectedItems map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+                return [self.viewModel getItemById:obj];
+            }];
+        }
+        else {
+            NSLog(@"🔴 getSelectedItems: Model is locked - cannot get selected items!");
+            return @[];
+        }
     }
     else {
         ViewController* vc = (ViewController*)self.contentViewController;
@@ -365,133 +383,365 @@ static NSString* getFreeTrialSuffix() {
 
 
 
+- (void)menuNeedsUpdate:(NSMenu *)menu {
+
+    
+    
+    
+    
+    
+    for (NSMenuItem *item in menu.itemArray) {
+        if ( item.action == @selector(onAddTagToItems:)) {
+            [self populateAddTagToItemsSubMenu:item.submenu];
+        }
+        else if (item.action == @selector(onRemoveTagFromItems:)) {
+            [self populateRemoveTagFromItemsSubMenu:item.submenu];
+        }
+    }
+}
+
+- (void)populateAddTagToItemsSubMenu:(NSMenu*)theMenu {
+
+    
+    [theMenu removeAllItems];
+    NSArray<Node*>* items = [self getSelectedItems];
+
+    BOOL isKeePass2 = self.viewModel && !self.viewModel.locked && (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+
+    if ( isKeePass2 && !self.viewModel.isEffectivelyReadOnly && items.count ) {
+        
+            
+        NSMutableSet* inter = nil;
+        for ( Node* item in items ) {
+            if ( inter == nil ) {
+                inter = item.fields.tags.mutableCopy;
+            }
+            else {
+                [inter intersectSet:item.fields.tags];
+            }
+        }
+        
+        NSMutableSet* withCommonRemoved = self.viewModel.tagSet.mutableCopy;
+        [withCommonRemoved minusSet:inter];
+        
+        
+        
+        NSArray<NSString*>* sortedTags = [withCommonRemoved.allObjects sortedArrayUsingComparator:finderStringComparator];
+        for (NSString* tag in sortedTags ) {
+            NSMenuItem* item  = [[NSMenuItem alloc] initWithTitle:tag action:@selector(onAddTagToItems:) keyEquivalent:@""];
+            if (@available(macOS 11.0, *)) {
+                item.image = [NSImage imageWithSystemSymbolName:@"tag" accessibilityDescription:nil];
+            }
+            [theMenu addItem:item];
+        }
+ 
+        [theMenu addItem:NSMenuItem.separatorItem];
+        
+        NSMenuItem* item  = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"new_tag_ellipsis", @"New Tag...") action:@selector(onAddNewTagToItems:) keyEquivalent:@""]; 
+        [theMenu addItem:item];
+    }
+}
+
+- (void)populateRemoveTagFromItemsSubMenu:(NSMenu*)theMenu {
+
+    
+    [theMenu removeAllItems];
+    NSArray<Node*>* items = [self getSelectedItems];
+    
+    BOOL isKeePass2 = self.viewModel && !self.viewModel.locked && (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+
+    if ( isKeePass2 && !self.viewModel.isEffectivelyReadOnly && items.count ) {
+        NSMutableSet* all = NSMutableSet.set;
+        
+        for ( Node* item in items ) {
+            [all addObjectsFromArray:item.fields.tags.allObjects];
+        }
+        
+        NSArray<NSString*>* sortedTags = [all.allObjects sortedArrayUsingComparator:finderStringComparator];
+        
+        for (NSString* tag in sortedTags) {
+            NSMenuItem* item  = [[NSMenuItem alloc] initWithTitle:tag action:@selector(onRemoveTagFromItems:) keyEquivalent:@""];
+            if (@available(macOS 11.0, *)) {
+                item.image = [NSImage imageWithSystemSymbolName:@"tag.slash" accessibilityDescription:nil];
+            }
+            [theMenu addItem:item];
+        }
+    }
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     SEL theAction = menuItem.action;
+        
+    if ( self.viewModel && !self.viewModel.locked ) {
+        BOOL isKeePass2 = self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4;
+        Node* item = [self getSingleSelectedItem];
+        NSArray<Node*>* items = [self getSelectedItems];
 
-    Node* item = nil;
-    NSArray<Node*>* items = nil;
-    
-    if(self.viewModel && !self.viewModel.locked) {
-        item = [self getSingleSelectedItem];
-        items = [self getSelectedItems];
+        if ( !self.viewModel.isEffectivelyReadOnly ) { 
+            if ( theAction == @selector(onSideBarCreateGroup:)) {
+                Node* item = [self getSideBarSelectedItem];
+                if ( item != nil && item.isGroup ) {
+                    return YES;
+                }
+            }
+            else if ( theAction == @selector(onToggleFavouriteItemInSideBar:)) {
+                Node* item = [self getSideBarSelectedItem];
+                if ( item != nil && !item.isGroup ) {
+                    BOOL favourite = [self.viewModel isFavourite:item.uuid];
+                    
+                    menuItem.title = favourite ? NSLocalizedString(@"browse_vc_action_unpin", @"Un-Favourite Item") : NSLocalizedString(@"browse_vc_action_pin", @"Favourite");
+                    
+                    if (@available(macOS 11.0, *)) {
+                        if ( menuItem.image != nil ) {
+                            menuItem.image = [NSImage imageWithSystemSymbolName:favourite ? @"star.slash" : @"star"  accessibilityDescription:nil];
+                        }
+                    }
+                    
+                    return YES;
+                }
+                else {
+                    menuItem.title = NSLocalizedString(@"browse_vc_action_pin", @"Favourite");
+                    return NO;
+                }
+            }
+            else if ( theAction == @selector(onToggleFavouriteItem:)) {
+                if ( item != nil  && !item.isGroup ) {
+                    BOOL favourite = [self.viewModel isFavourite:item.uuid];
+                    
+                    menuItem.title = favourite ? NSLocalizedString(@"browse_vc_action_unpin", @"Un-Favourite Item") : NSLocalizedString(@"browse_vc_action_pin", @"Favourite");
+                    
+                    if (@available(macOS 11.0, *)) {
+                        if ( menuItem.image != nil ) {
+                            menuItem.image = [NSImage imageWithSystemSymbolName:favourite ? @"star.slash" : @"star"  accessibilityDescription:nil];
+                        }
+                    }
+                    
+                    return YES;
+                }
+                else {
+                    menuItem.title = NSLocalizedString(@"browse_vc_action_pin", @"Favourite");
+                    return NO;
+                }
+            }
+            else if ( theAction == @selector(onToggleExclusionFromAudit:)) {
+                BOOL excluded = [self.viewModel isExcludedFromAudit:item.uuid];
+                
+                menuItem.title = excluded ? NSLocalizedString(@"action_include_in_audit", @"Include in Audit") : NSLocalizedString(@"action_exclude_from_audit", @"Exclude from Audit");
+                
+                return ( item != nil && ((!excluded && [self.viewModel isFlaggedByAudit:item.uuid] ) || excluded)) ;
+            }
+            else if ( theAction == @selector(onNewGroupWithItems:)) {
+                if ( items.count ) {
+                    return YES;
+                }
+
+                return NO;
+            }
+            else if ( theAction == @selector(onAddTagToItems:) || theAction == @selector(onAddNewTagToItems:)) {
+                if ( items.count && isKeePass2 ) {
+                    return YES;
+                }
+                
+                return NO;
+            }
+            else if ( theAction == @selector(onRemoveTagFromItems:)) {
+                if ( items.count && isKeePass2 ) {
+                    NSMutableSet* all = NSMutableSet.set;
+                    for ( item in items ) {
+                        [all addObjectsFromArray:item.fields.tags.allObjects];
+                    }
+                    
+                    return all.count > 0;
+                }
+                
+                return NO;
+            }
+            else if (theAction == @selector(onChangeMasterPassword:)) {
+                return YES;
+            }
+            else if (theAction == @selector( onRenameSideBarItem: )) {
+                Node* item = [self getSideBarSelectedItem];
+                
+                if( item == nil ) {
+                    return NO;
+                }
+                
+                return YES;
+            }
+            else if (theAction == @selector(onSetSideBarItemIcon:)) {
+                Node* item = [self getSideBarSelectedItem];
+                
+                if( self.viewModel.format == kPasswordSafe || item == nil ) {
+                    return NO;
+                }
+                
+                return YES;
+            }
+            else if (theAction == @selector(onSetItemIcon:)) {
+                if(self.viewModel.format == kPasswordSafe || items.count == 0) {
+                    return NO;
+                }
+                
+                return YES;
+            }
+            else if (theAction == @selector(onSideBarFindFavIcons:)) {
+                if ( !isKeePass2 ) {
+                    return NO;
+                }
+                
+                Node* item = [self getSideBarSelectedItem];
+                if( item == nil || !item.isGroup ) {
+                    return NO;
+                }
+                
+                NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly:@[item]];
+                
+                return entries.count != 0;
+            }
+            else if (theAction == @selector(onDownloadFavIcons:)) {
+                if ( !isKeePass2 ) {
+                    return NO;
+                }
+                
+                NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly];
+                
+                return entries.count != 0;
+            }
+            else if (theAction == @selector( onDeleteSideBarItem: )) {
+                Node* item = [self getSideBarSelectedItem];
+                
+                if( item == nil || item.uuid == self.viewModel.rootGroup.uuid ) {
+                    return NO;
+                }
+
+                BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+                    return ![self.viewModel canRecycle:obj];
+                }];
+                
+                NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
+                [menuItem setTitle:loc];
+            
+                return YES;
+            }
+            else if (theAction == @selector(onDelete:)) {
+                if ( Settings.sharedInstance.nextGenUI ) {
+                    if ( [self.window.firstResponder isKindOfClass:NSTextView.class] ) { 
+
+                        return NO;
+                    }
+                }
+                
+                
+                if (items.count == 0) {
+                    return NO;
+                }
+
+                BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+                    return ![self.viewModel canRecycle:obj];
+                }];
+                
+                if ( items.count  > 1) {
+                    NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_items", @"Recycle Items") : NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
+                    [menuItem setTitle:loc];
+                }
+                else {
+                    NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
+                    [menuItem setTitle:loc];
+                }
+
+                return YES;
+            }
+            else if (theAction == @selector(onDuplicateItem:)) {
+                return item != nil;
+            }
+            else if (theAction == @selector(paste:)) {
+                NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+                NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
+                NSLog(@"Validate Paste - %d", blah != nil);
+                return blah != nil;
+            }
+        }
+        
+        
+        
+        if ( theAction == @selector(onLock:) ) {
+            return YES;
+        }
+        else if ( theAction == @selector(onExportAsCsv:)) {
+            return YES;
+        }
+        else if(theAction == @selector(onPrintDatabase:)) {
+            return YES;
+        }
+        else if (theAction == @selector(onViewItemHistory:)) {
+            return
+                item != nil &&
+                !item.isGroup &&
+                item.fields.keePassHistory.count > 0 &&
+                (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+        }
+        else if (theAction == @selector( onSideBarItemProperties: )) {
+            Node* item = [self getSideBarSelectedItem];
+            
+            if( item == nil || !item.isGroup) {
+                return NO;
+            }
+            
+            return isKeePass2;
+        }
+        else if (theAction == @selector(onGeneralDatabaseSettings:)) {
+            return YES;
+        }
+        else if (theAction == @selector(onConvenienceUnlockProperties:)) {
+            return YES;
+        }
+        else if (theAction == @selector(onCopySelectedItemsToClipboard:)) {
+            return items.count > 0;
+        }
+        else if(theAction == @selector(onLaunchUrl:) ||
+                theAction == @selector(onCopyUrl:)) {
+            return item && !item.isGroup && item.fields.url.length;
+        }
+        else if (theAction == @selector(onCopyTitle:)) {
+            return item && !item.isGroup;
+        }
+        else if (theAction == @selector(onCopyUsername:)) {
+            return item && !item.isGroup;
+        }
+        else if (theAction == @selector(onCopyEmail:)) {
+            BOOL emailAvailable = item.fields.email.length;
+            return item && !item.isGroup && emailAvailable;
+        }
+        else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
+            return item && !item.isGroup && item.fields.password.length;
+        }
+        else if (theAction == @selector(onCopyPassword:)) {
+            return item && !item.isGroup && item.fields.password.length;
+        }
+        else if (theAction == @selector(onCopyTotp:)) {
+            return item && !item.isGroup && item.fields.otpToken;
+        }
+        else if (theAction == @selector(onCopyNotes:)) {
+            return item && !item.isGroup && item.fields.notes.length;
+        }
+        else if (theAction == @selector(onCopyAllFields:)) {
+            return item && !item.isGroup;
+        }
+        else if (theAction == @selector(copy:)) {
+            return items.count > 0;
+        }
+
     }
-
-
+    
+    
     
     if ( theAction == @selector(onVCToggleOfflineMode:)) {
         menuItem.state = self.databaseMetadata.offlineMode ? NSControlStateValueOn : NSControlStateValueOff;
         return !self.databaseMetadata.isLocalDeviceDatabase;
     }
-    else if ( theAction == @selector(onLock:) ) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onChangeMasterPassword:)) {
-        return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if(theAction == @selector(onPrintDatabase:)) { 
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector( onSideBarItemProperties: )) {
-        Node* item = [self getSideBarSelectedItem];
-        
-        if( item == nil || !item.isGroup) {
-            return NO;
-        }
-        
-        BOOL isKeePass2 = (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4); 
-        
-        return !self.viewModel.isEffectivelyReadOnly && isKeePass2;
-    }
-    else if (theAction == @selector( onRenameSideBarItem: )) {
-        Node* item = [self getSideBarSelectedItem];
-        
-        if( item == nil ) {
-            return NO;
-        }
-        
-        return !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector( onDeleteSideBarItem: )) {
-        Node* item = [self getSideBarSelectedItem];
-        
-        if( item == nil || item.uuid == self.viewModel.rootGroup.uuid ) {
-            return NO;
-        }
-        
-        return !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onSetSideBarItemIcon:)) {
-        Node* item = [self getSideBarSelectedItem];
-        
-        if( self.viewModel.format == kPasswordSafe || item == nil ) {
-            return NO;
-        }
-        
-        return !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onSetItemIcon:)) {
-        NSArray<Node*>* items = [self getSelectedItems];
-        
-        if(self.viewModel.format == kPasswordSafe || items.count == 0) {
-            return NO;
-        }
-        
-        return !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onSideBarFindFavIcons:)) {
-        BOOL isKeePass2 = (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4); 
-        
-        Node* item = [self getSideBarSelectedItem];
-        if( item == nil ) {
-            return NO;
-        }
-        
-        NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly:@[item]];
-        if( entries.count == 0 ) { 
-            return NO;
-        }
-        
-        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly && isKeePass2;
-    }
-    else if (theAction == @selector(onDownloadFavIcons:)) {
-        BOOL isKeePass2 = (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4); 
-        
-        NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly];
-        if( entries.count == 0 ) { 
-            return NO;
-        }
-        
-        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly && isKeePass2;
-    }
-    else if (theAction == @selector(onDelete:)) {
-        if (items.count == 0) {
-            return NO;
-        }
-
-        BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
-            return ![self.viewModel canRecycle:obj];
-        }];
-        
-        if ( items.count  > 1) {
-            NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_items", @"Recycle Items") : NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
-            [menuItem setTitle:loc];
-        }
-        else {
-            NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
-            [menuItem setTitle:loc];
-        }
-
-        return items.count > 0 && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onDuplicateItem:)) {
-        return item != nil && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if (theAction == @selector(onViewItemHistory:)) {
-        return
-            item != nil &&
-            !item.isGroup &&
-            item.fields.keePassHistory.count > 0 &&
-            (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+    else if ( theAction == @selector(onVCToggleShowEntryCountInSidebar:)) {
+        menuItem.state = self.viewModel.showChildCountOnFolderInSidebar ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
     }
     else if ( theAction == @selector(onVCToggleShowVerticalGridlines:)) {
         menuItem.state = self.viewModel.showVerticalGrid ? NSControlStateValueOn : NSControlStateValueOff;
@@ -525,55 +775,12 @@ static NSString* getFreeTrialSuffix() {
         menuItem.state = self.viewModel.showChangeNotifications ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
-    else if (theAction == @selector(onGeneralDatabaseSettings:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onConvenienceUnlockProperties:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onCopySelectedItemsToClipboard:)) {
-        return items.count > 0;
-    }
-    else if (theAction == @selector(copy:)) {
-        return items.count > 0;
-    }
-    else if (theAction == @selector(paste:)) {
-        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-        NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
-        NSLog(@"Validate Paste - %d", blah != nil);
-        return blah != nil && !self.viewModel.isEffectivelyReadOnly;
-    }
-    else if(theAction == @selector(onLaunchUrl:) ||
-            theAction == @selector(onCopyUrl:)) {
-        return item && !item.isGroup && item.fields.url.length;
-    }
-    else if (theAction == @selector(onCopyTitle:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyUsername:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyEmail:)) {
-        BOOL emailAvailable = self.viewModel.format == kPasswordSafe || item.fields.keePassEmail.length;
-        return item && !item.isGroup && emailAvailable;
-    }
-    else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
-        return item && !item.isGroup && item.fields.password.length;
-    }
-    else if (theAction == @selector(onCopyPassword:)) {
-        return item && !item.isGroup && item.fields.password.length;
-    }
-    else if (theAction == @selector(onCopyTotp:)) {
-        return item && !item.isGroup && item.fields.otpToken;
-    }
-    else if (theAction == @selector(onCopyNotes:)) {
-        return item && !item.isGroup && item.fields.notes.length;
-    }
-    else if (theAction == @selector(onCopyAllFields:)) {
-        return item && !item.isGroup;
-    }
 
-    return YES;
+    
+    
+    NSLog(@"🔴 WindowController::validateMenuItem [%@] - NO", NSStringFromSelector(theAction));
+    
+    return NO;
 }
 
 
@@ -607,6 +814,11 @@ static NSString* getFreeTrialSuffix() {
 }
 
 - (IBAction)onRenameSideBarItem:(id)sender {
+    if ( !self.viewModel || self.viewModel.locked || self.viewModel.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 Cannot edit locked or read-only database");
+        return;
+    }
+
     Node* item = [self getSideBarSelectedItem];
     if( item == nil ) {
         return;
@@ -634,6 +846,153 @@ static NSString* getFreeTrialSuffix() {
     vc.group = item;
     
     [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (IBAction)onSideBarCreateGroup:(id)sender {
+
+    
+    if ( !self.viewModel || self.viewModel.locked || self.viewModel.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 Cannot edit locked or read-only database");
+        return;
+    }
+
+    Node* parentGroup = [self getSideBarSelectedItem];
+    if ( !parentGroup || !parentGroup.isGroup ) {
+        return;
+    }
+    
+    NSString* loc = NSLocalizedString(@"browse_vc_enter_group_name_message", @"Please Enter the New Group Name:");
+    NSString* name = [[MacAlerts alloc] input:loc defaultValue:NSLocalizedString(@"browse_vc_group_name", @"Group Name") allowEmpty:NO];
+    
+    if ( name.length ) {
+        Node* newGroup;
+        if ( ![self.viewModel addNewGroup:parentGroup title:name group:&newGroup] ) {
+            [MacAlerts info:NSLocalizedString(@"browse_vc_cannot_create_group", @"Cannot create group")
+            informativeText:NSLocalizedString(@"browse_vc_cannot_create_group_message", @"Could not create a group with this name here, possibly because one with this name already exists.")
+                     window:self.window
+                 completion:nil];
+        }
+        else if ( newGroup ) {
+            [self.viewModel setNextGenNavigation:OGNavigationContextRegularHierarchy selectedGroup:newGroup.uuid];
+        }
+    }
+}
+
+
+
+- (IBAction)onNewGroupWithItems:(id)sender {
+    NSLog(@"onNewGroupWithItems: [%@]", sender);
+    
+    NSString* loc = NSLocalizedString(@"browse_vc_enter_group_name_message", "Please Enter the New Group Name:");
+    NSString* groupName = [[[MacAlerts alloc] init] input:loc defaultValue:@"" allowEmpty:NO];
+    
+    if ( groupName.length ) {
+        NSArray<Node*>* items = [self getSelectedItems];
+
+        if ( !self.viewModel.isEffectivelyReadOnly && items.count ) {
+            
+            NSUUID* parentGroupId = self.viewModel.nextGenNavigationContext == OGNavigationContextRegularHierarchy ? self.viewModel.nextGenNavigationContextSideBarSelectedGroup : self.viewModel.rootGroup.uuid;
+            Node* parentGroup =  [self.viewModel getItemById:parentGroupId];
+            
+            if ( parentGroup == nil ) {
+                NSLog(@"🔴 Could not find Parent Group!");
+                return;
+            }
+
+            Node* newGroup = nil;
+            if ( ![self.viewModel moveItemsIntoNewGroup:items parentGroup:parentGroup title:groupName group:&newGroup] ) {
+                NSLog(@"🔴 Could not move items into new group!");
+                
+                [MacAlerts info:NSLocalizedString(@"browse_vc_cannot_create_group", @"Cannot create group")
+                informativeText:NSLocalizedString(@"browse_vc_cannot_create_group_message", @"Could not create a group with this name here, possibly because one with this name already exists.")
+                         window:self.window
+                     completion:nil];
+            }
+            else {
+                [self.viewModel setNextGenNavigation:OGNavigationContextRegularHierarchy selectedGroup:newGroup.uuid];
+            }
+        }
+    }
+}
+
+
+
+- (IBAction)onToggleExclusionFromAudit:(id)sender {
+    NSLog(@"onToggleExclusionFromAudit: [%@]", sender);
+    
+    Node* item = [self getSingleSelectedItem];
+    
+    if ( item ) {
+        [self.viewModel setItemAuditExclusion:item exclude:![self.viewModel isExcludedFromAudit:item.uuid]];
+    }
+}
+
+
+
+- (IBAction)onToggleFavouriteItemInSideBar:(id)sender {
+
+    
+    Node* item = [self getSideBarSelectedItem];
+    
+    if ( item && !item.isGroup ) {
+        [self.viewModel toggleFavourite:item.uuid];
+    }
+}
+
+- (IBAction)onToggleFavouriteItem:(id)sender {
+
+    
+    Node* item = [self getSingleSelectedItem];
+    
+    if ( item ) {
+        [self.viewModel toggleFavourite:item.uuid];
+    }
+}
+
+
+
+- (IBAction)onAddTagToItems:(id)sender {
+
+    
+    NSMenuItem* menuItem = (NSMenuItem*)sender;
+    NSString* tag = menuItem.title;
+    [self addTagToItems:tag];
+}
+
+- (void)addTagToItems:(NSString*)tag {
+    NSArray<Node*>* items = [self getSelectedItems];
+    
+    BOOL isKeePass2 = self.viewModel && !self.viewModel.locked && (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+
+    if ( isKeePass2 && !self.viewModel.isEffectivelyReadOnly && tag.length && items.count ) {
+        [self.viewModel addTagToItems:items tag:tag];
+    }
+}
+
+- (IBAction)onAddNewTagToItems:(id)sender {
+
+    
+    NSString* loc = NSLocalizedString(@"mac_vc_please_enter_a_tag", "Enter a new tag to add to this item");
+    NSString* tag = [[[MacAlerts alloc] init] input:loc defaultValue:@"" allowEmpty:NO];
+    
+    if ( tag.length ) {
+        [self addTagToItems:tag];
+    }
+}
+
+- (IBAction)onRemoveTagFromItems:(id)sender {
+
+
+    NSMenuItem* menuItem = (NSMenuItem*)sender;
+    
+    BOOL isKeePass2 = self.viewModel && !self.viewModel.locked && (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+
+    NSString* tag = menuItem.title;
+    NSArray<Node*>* items = [self getSelectedItems];
+
+    if ( isKeePass2 && !self.viewModel.isEffectivelyReadOnly && tag.length && items.count ) {
+        [self.viewModel removeTagFromItems:items tag:tag];
+    }
 }
 
 
@@ -752,15 +1111,15 @@ static NSString* getFreeTrialSuffix() {
     }
 
     __weak WindowController* weakSelf = self;
-    SelectPredefinedIconController* selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
-    selectPredefinedIconController.customIcons = self.viewModel.customIcons.allObjects;
-    selectPredefinedIconController.hideSelectFile = self.viewModel.format == kKeePass1;
+    self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
+    self.selectPredefinedIconController.customIcons = self.viewModel.customIcons.allObjects;
+    self.selectPredefinedIconController.hideSelectFile = self.viewModel.format == kKeePass1;
     
     if ( Settings.sharedInstance.nextGenUI ) {
-        selectPredefinedIconController.iconSet = self.viewModel.iconSet;
+        self.selectPredefinedIconController.iconSet = self.viewModel.iconSet;
     }
     
-    selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
+    self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
         if(showFindFavIcons) {
             [weakSelf onDownloadFavIcons:nil];
         }
@@ -769,7 +1128,7 @@ static NSString* getFreeTrialSuffix() {
         }
     };
 
-    [self.window beginSheet:selectPredefinedIconController.window  completionHandler:nil];
+    [self.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
 }
 
 - (IBAction)onDownloadFavIcons:(id)sender {
@@ -898,6 +1257,10 @@ static NSString* getFreeTrialSuffix() {
 
 
 
+- (IBAction)onVCToggleShowEntryCountInSidebar:(id)sender {
+    self.viewModel.showChildCountOnFolderInSidebar = !self.viewModel.showChildCountOnFolderInSidebar;
+}
+
 - (IBAction)onVCToggleShowVerticalGridlines:(id)sender {
     self.viewModel.showVerticalGrid = !self.viewModel.showVerticalGrid;
 }
@@ -948,14 +1311,14 @@ static NSString* getFreeTrialSuffix() {
 
 - (IBAction)onGeneralDatabaseSettings:(id)sender {
     DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
-    [vc setModel:self.viewModel initialTab:0];
+    [vc setModel:self.viewModel initialTab:kDatabaseSettingsInitialTabGeneral];
     
     [self.contentViewController presentViewControllerAsSheet:vc];
 }
 
 - (IBAction)onConvenienceUnlockProperties:(id)sender {
     DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
-    [vc setModel:self.viewModel initialTab:1];
+    [vc setModel:self.viewModel initialTab:kDatabaseSettingsInitialTabTouchId];
     [self.contentViewController presentViewControllerAsSheet:vc];
 }
 
@@ -1042,34 +1405,29 @@ static NSString* getFreeTrialSuffix() {
         return @(delete);
     }];
 
+    Node* parentToSelectAfterDelete = nil;
+    if ( items.count == 1 && items.firstObject.isGroup ) {
+        Node* node = items.firstObject;
+        parentToSelectAfterDelete = node.parent;
+    }
+
     const NSArray<Node*> *toBeDeleted = grouped[@(NO)];
     const NSArray<Node*> *toBeRecycled = grouped[@(YES)];
 
     if ( toBeDeleted == nil ) {
-        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled];
+        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled parentToSelectAfterDelete:parentToSelectAfterDelete];
     }
     else {
         if ( toBeRecycled == nil ) {
-            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted];
+            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted parentToSelectAfterDelete:parentToSelectAfterDelete];
         }
         else { 
-            [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled];
-        }
-    }
-    
-    if ( Settings.sharedInstance.nextGenUI ) {
-        if ( items.count == 1 && items.firstObject.isGroup ) {
-            Node* node = items.firstObject;
-            Node* parent = node.parent;
-            
-            if ( parent ) {
-                [self.viewModel setNextGenNavigation:OGNavigationContextRegularHierarchy selectedGroup:parent.uuid];
-            }
+            [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled parentToSelectAfterDelete:parentToSelectAfterDelete];
         }
     }
 }
 
-- (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled {
+- (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled parentToSelectAfterDelete:(Node*)parentToSelectAfterDelete {
     [MacAlerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
   informativeText:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
            window:self.window
@@ -1088,11 +1446,22 @@ static NSString* getFreeTrialSuffix() {
                              window:self.window
                          completion:nil];
                    }
+                   else {
+                       [self onDeleteOrRecycleSuccessfullyDone:parentToSelectAfterDelete];
+                   }
                }
     }];
 }
 
-- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+- (void)onDeleteOrRecycleSuccessfullyDone:(Node*)parentToSelectAfterDelete {
+
+
+
+
+
+}
+
+- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items parentToSelectAfterDelete:(Node*)parentToSelectAfterDelete {
     NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
     
     NSString* message;
@@ -1111,11 +1480,12 @@ static NSString* getFreeTrialSuffix() {
               window:self.window completion:^(BOOL yesNo) {
         if (yesNo) {
             [self.viewModel deleteItems:items];
+            [self onDeleteOrRecycleSuccessfullyDone:parentToSelectAfterDelete];
         }
     }];
 }
 
-- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items parentToSelectAfterDelete:(Node*)parentToSelectAfterDelete {
     NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
     NSString* message;
     if (items.count > 1) {
@@ -1139,6 +1509,9 @@ static NSString* getFreeTrialSuffix() {
             informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
                      window:self.window
                  completion:nil];
+            }
+            else {
+                [self onDeleteOrRecycleSuccessfullyDone:parentToSelectAfterDelete];
             }
         }
     }];
@@ -1443,12 +1816,7 @@ static NSString* getFreeTrialSuffix() {
         return;
     }
     
-    if ( self.viewModel.format == kPasswordSafe ) {
-        [self dereferenceAndCopyToPasteboard:item.fields.email item:item];
-    }
-    else {
-        [self dereferenceAndCopyToPasteboard:item.fields.keePassEmail item:item];
-    }
+    [self dereferenceAndCopyToPasteboard:item.fields.email item:item];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_email", @"Email")]];

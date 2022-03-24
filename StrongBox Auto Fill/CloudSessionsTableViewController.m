@@ -15,6 +15,7 @@
 #import "OneDriveStorageProvider.h"
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "GoogleDriveManager.h"
+#import "Strongbox-Swift.h"
 
 @interface CloudSessionsTableViewController ()
 
@@ -29,11 +30,7 @@
     
     self.navigationController.toolbar.hidden = YES;
     self.navigationController.toolbarHidden = YES;
-    
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
-
+    self.navigationController.navigationBar.prefersLargeTitles = NO;
 
     self.tableView.tableFooterView = [UIView new];
     
@@ -161,12 +158,15 @@
             return;
         }
         
-        if ([OneDriveStorageProvider.sharedInstance isSignedIn]) {
+        if ( (YES ) ) { 
             [Alerts yesNo:self
                     title:NSLocalizedString(@"cloud_sessions_prompt_signout_onedrive_title", @"Sign out of OneDrive?")
                   message:NSLocalizedString(@"cloud_sessions_prompt_signout_onedrive_message", @"Are you sure you want to sign out of OneDrive?")
                    action:^(BOOL response) {
                        if (response) {
+                           [TwoDriveStorageProvider.sharedInstance signOutAll];
+
+                           
                            [OneDriveStorageProvider.sharedInstance signout:^(NSError *error) {
                                dispatch_async(dispatch_get_main_queue(), ^{
                                    if(!error) {

@@ -30,6 +30,7 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
     kAuditFlagTooShort,
     kAuditFlagPwned,
     kAuditFlagLowEntropy,
+    kAuditFlagTwoFactorAvailable,
 };
 
 typedef void (^AuditCompletionBlock)(BOOL userStopped);
@@ -62,6 +63,8 @@ typedef BOOL (^IsExcludedBlock)(Node* item);
 - (NSString *)getQuickAuditVeryBriefSummaryForNode:(NSUUID *)item;
 - (NSString*)getQuickAuditSummaryForNode:(NSUUID*)item;
 - (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(NSUUID*)node;
+- (NSArray<NSString *>*)getQuickAuditAllIssuesVeryBriefSummaryForNode:(NSUUID *)item;
+- (NSArray<NSString *>*)getQuickAuditAllIssuesSummaryForNode:(NSUUID *)item;
 
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditIssueCount;

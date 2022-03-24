@@ -79,11 +79,13 @@
 }
 
 - (void)bindUi {
-    if ( BiometricIdHelper.sharedInstance.isWatchUnlockAvailable ) {
+    if ( BiometricIdHelper.sharedInstance.isWatchUnlockAvailable) {
         self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock", @"Watch Unlock");
     }
     else {
-        self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Preferences > Security & Privacy)");
+        if ( Settings.sharedInstance.isProOrFreeTrial ) {
+            self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Preferences > Security & Privacy)");
+        }
     }
         
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;

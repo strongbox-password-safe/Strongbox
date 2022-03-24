@@ -111,7 +111,7 @@ NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationF
         self.windowController = [[NSStoryboard storyboardWithName:@"NextGen" bundle:nil] instantiateInitialController];
     }
     
-    [self.windowController updateContentView]; 
+    [self.windowController changeContentView]; 
     
     [self addWindowController:self.windowController];
 }
@@ -326,7 +326,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)startMonitoringManagedFile {
-    if ( !self.databaseMetadata || self.viewModel.locked || self.viewModel.offlineMode || !self.databaseMetadata.monitorForExternalChanges ) {
+    if ( !self.databaseMetadata ||
+        self.viewModel.locked ||
+        self.viewModel.offlineMode ||
+        !self.databaseMetadata.monitorForExternalChanges ) {
+        [self stopMonitoringManagedFile];
         return;
     }
         
@@ -374,6 +378,8 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)checkForRemoteChanges {
+
+
     self.pollingInProgress = YES;
     [MacSyncManager.sharedInstance pollForChanges:self.databaseMetadata
                                        completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
@@ -452,7 +458,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     WindowController* wc = self.windowController; 
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [wc updateContentView];
+        [wc changeContentView];
     });
     
     return YES;
@@ -557,11 +563,17 @@ fromConvenience:(BOOL)fromConvenience
                  fromConvenience:(BOOL)fromConvenience
                     selectedItem:(NSString *)selectedItem
                       completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
+    BOOL openOffline = self.databaseMetadata.offlineMode || self.databaseMetadata.alwaysOpenOffline; 
+
+    if ( openOffline != self.databaseMetadata.offlineMode ) {
+        self.databaseMetadata.offlineMode = openOffline;
+    }
+
     DatabaseUnlocker *unlocker = [DatabaseUnlocker unlockerForDatabase:self.databaseMetadata
                                                         viewController:viewController
                                                          forceReadOnly:NO
                                                         isAutoFillOpen:NO
-                                                           offlineMode:self.databaseMetadata.offlineMode];
+                                                           offlineMode:openOffline];
     
     unlocker.alertOnJustPwdWrong = alertOnJustPwdWrong;
     
@@ -600,7 +612,7 @@ fromConvenience:(BOOL)fromConvenience
         WindowController* wc = self.windowController;
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [wc updateContentView];
+            [wc changeContentView];
         });
 
         [self notifyFullModelReload];
@@ -619,11 +631,16 @@ fromConvenience:(BOOL)fromConvenience
         WindowController* wc = self.windowController;
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [wc updateContentView];
+            [wc changeContentView];
         });
     }
+    else {
+        [self notifyFullModelReload]; 
+    }
     
-    [self notifyFullModelReload]; 
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+        [self.viewModel restartBackgroundAudit];
+    });
     
     
     [NSFileCoordinator addFilePresenter:self];

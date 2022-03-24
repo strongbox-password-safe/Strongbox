@@ -15,6 +15,8 @@
 #import "EntryViewModel.h"
 #import "NextNavigationConstants.h"
 
+@class HeaderNodeState;
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kNotificationUserInfoKeyNode;
@@ -42,6 +44,8 @@ extern NSString* const kModelUpdateNotificationDatabaseUpdateStatusChanged;
 extern NSString* const kModelUpdateNotificationNextGenNavigationChanged;
 extern NSString* const kModelUpdateNotificationNextGenSelectedItemsChanged;
 extern NSString* const kModelUpdateNotificationNextGenSearchContextChanged;
+extern NSString* const kModelUpdateNotificationHistoryItemDeleted;
+extern NSString* const kModelUpdateNotificationHistoryItemRestored;
 
 extern NSString* const kModelUpdateNotificationItemsAdded;
 extern NSString* const kModelUpdateNotificationItemEdited;
@@ -119,6 +123,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (void)addItemTag:(Node* )item tag:(NSString*)tag;
 - (void)removeItemTag:(Node* )item tag:(NSString*)tag;
+- (void)addTagToItems:(const NSArray<Node *> *)items tag:(NSString*)tag;
+- (void)removeTagFromItems:(const NSArray<Node *> *)items tag:(NSString*)tag;
 
 
 
@@ -140,6 +146,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination;
 - (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination;
+- (BOOL)moveItemsIntoNewGroup:(const NSArray<Node *> *)items parentGroup:(Node *)parentGroup title:(NSString *)title group:(Node *_Nullable*_Nullable)group;
 
 - (BOOL)launchUrl:(Node*)item;
 - (BOOL)launchUrlString:(NSString*)urlString;
@@ -163,13 +170,24 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property (readonly) BOOL recycleBinEnabled; 
 @property (readonly, nullable) Node* recycleBinNode;
-- (void)createNewRecycleBinNode;
 @property (readonly, nullable) Node* keePass1BackupNode;
 
 
 
-@property (readonly) NSArray<Node*>* activeRecords;
-@property (readonly) NSArray<Node*>* activeGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *expiredEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *nearlyExpiredEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *attachmentEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableNoneExpiredEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allActiveEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allActiveGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allActive;
+
+
 
 @property (nonatomic, readonly, copy) NSSet<NSString*> * usernameSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * urlSet;
@@ -184,13 +202,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularEmails;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularTags;
 
-@property (nonatomic, readonly) NSString * mostPopularPassword;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
-
-
-@property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
-@property (nonatomic, copy, nullable) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
 
@@ -207,6 +220,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property BOOL showAlternatingRows;
 @property BOOL showVerticalGrid;
 @property BOOL showHorizontalGrid;
+@property BOOL showChildCountOnFolderInSidebar;
 @property NSArray<NSString*>* visibleColumns;
 @property BOOL downloadFavIconOnChange;
 @property BOOL promptedForAutoFetchFavIcon;
@@ -242,6 +256,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 
 
+- (NSArray<Node*>*)entriesWithTag:(NSString*)tag;
+
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope
               dereference:(BOOL)dereference
@@ -273,15 +289,47 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 
 
+- (BOOL)isFavourite:(NSUUID*)itemId;
+- (void)toggleFavourite:(NSUUID*)itemId;
+@property (readonly) NSArray<Node*>* favourites;
+
+
+
+- (void)restartBackgroundAudit;
+- (void)stopAndClearAuditor;
+
+@property (readonly, nullable) NSNumber* auditIssueCount;
+- (BOOL)isFlaggedByAudit:(NSUUID*)item;
+- (NSArray<NSString *>*)getQuickAuditAllIssuesVeryBriefSummaryForNode:(NSUUID *)item;
+- (NSArray<NSString *>*)getQuickAuditAllIssuesSummaryForNode:(NSUUID *)item;
+- (NSSet<Node*>*)getSimilarPasswordNodeSet:(NSUUID*)node;
+- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(NSUUID*)node;
+@property DatabaseAuditorConfiguration* auditConfig;
+@property (readonly) AuditState auditState;
+@property (readonly) NSUInteger auditHibpErrorCount;
+@property (readonly) NSUInteger auditIssueNodeCount;
+
+- (BOOL)isExcludedFromAudit:(NSUUID*)item;
+- (NSArray<Node*>*)getExcludedAuditItems;
+- (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError*_Nullable error))completion;
+- (void)setItemAuditExclusion:(Node*)node exclude:(BOOL)exclude;
+@property (readonly, nullable) DatabaseAuditReport* auditReport;
+
+
+
 @property (readonly) OGNavigationContext nextGenNavigationContext;
 @property (readonly) NSUUID* nextGenNavigationContextSideBarSelectedGroup;
 @property (readonly) NSString* nextGenNavigationContextSelectedTag;
 @property (readonly) OGNavigationSpecial nextGenNavigationContextSpecial;
+@property (readonly) OGNavigationAuditCategory nextGenNavigationContextAuditCategory;
+@property (readonly) NSUUID* nextGenNavigationSelectedFavouriteId;
 
 - (void)setNextGenNavigationNone;
 - (void)setNextGenNavigation:(OGNavigationContext)context selectedGroup:(NSUUID*_Nullable)selectedGroup;
 - (void)setNextGenNavigation:(OGNavigationContext)context tag:(NSString*)tag;
 - (void)setNextGenNavigation:(OGNavigationContext)context special:(OGNavigationSpecial)special;
+- (void)setNextGenNavigationToAuditIssues:(OGNavigationAuditCategory)category;
+- (void)setNextGenNavigationFavourite:(NSUUID*)nodeId;
 
 
 
@@ -291,6 +339,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property NSString* nextGenSearchText;
 @property SearchScope nextGenSearchScope;
+
+@property NSArray<HeaderNodeState*>* headerNodes;
 
 @end
 

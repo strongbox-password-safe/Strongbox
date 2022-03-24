@@ -13,19 +13,29 @@ typealias NodeIdentifier = UUID
 enum NavigationContext: Equatable {
     enum SpecialNavigationItem: Equatable {
         case allEntries
+        case totpItems
+        case itemsWithAttachments
+        case expiredEntries
+        case nearlyExpiredEntries
+    }
 
-        
-
-
-
-        
+    enum AuditNavigationCategory: Equatable {
+        case noPasswords
+        case duplicated
+        case common
+        case similar
+        case tooShort
+        case pwned
+        case lowEntropy
+        case twoFactorAvailable
+        case allEntries
     }
 
     case none 
     case favourites(_ node: NodeIdentifier)
     case regularHierarchy(_ group: NodeIdentifier)
     case tags(_ tag: String)
-    case totps(_ node: NodeIdentifier)
+    case auditIssues(_ category: AuditNavigationCategory)
     case special(_ item: SpecialNavigationItem)
 }
 
@@ -39,8 +49,8 @@ func convertToOgNavigationContext(_ context: NavigationContext) -> OGNavigationC
         return OGNavigationContextFavourites
     case .tags:
         return OGNavigationContextTags
-    case .totps:
-        return OGNavigationContextTotps
+    case .auditIssues:
+        return OGNavigationContextAuditIssues
     case .special:
         return OGNavigationContextSpecial
     }
@@ -50,6 +60,37 @@ func convertSpecialToOGSpecial(_ special: NavigationContext.SpecialNavigationIte
     switch special {
     case .allEntries:
         return OGNavigationSpecialAllItems
+    case .expiredEntries:
+        return OGNavigationSpecialExpired
+    case .nearlyExpiredEntries:
+        return OGNavigationSpecialNearlyExpired
+    case .totpItems:
+        return OGNavigationSpecialTotpItems
+    case .itemsWithAttachments:
+        return OGNavigationSpecialAttachmentItems
+    }
+}
+
+func convertAuditCategoryToOGCategory(_ category: NavigationContext.AuditNavigationCategory) -> OGNavigationAuditCategory {
+    switch category {
+    case .noPasswords:
+        return OGNavigationAuditCategoryNoPasswords
+    case .duplicated:
+        return OGNavigationAuditCategoryDuplicated
+    case .common:
+        return OGNavigationAuditCategoryCommon
+    case .similar:
+        return OGNavigationAuditCategorySimilar
+    case .tooShort:
+        return OGNavigationAuditCategoryTooShort
+    case .pwned:
+        return OGNavigationAuditCategoryPwned
+    case .lowEntropy:
+        return OGNavigationAuditCategoryLowEntropy
+    case .twoFactorAvailable:
+        return OGNavigationAuditCategoryTwoFactorAvailable
+    case .allEntries:
+        return OGNavigationAuditCategoryAllEntries
     }
 }
 
@@ -61,14 +102,14 @@ func setModelNavigationContextWithViewNode(_ database: ViewModel, _ context: Nav
         database.setNextGenNavigationNone()
     case let .regularHierarchy(groupId):
         database.setNextGenNavigation(convertToOgNavigationContext(context), selectedGroup: groupId)
-    case .favourites:
-        NSLog("✅ setModelNavigationContextWithViewNode: favourites") 
+    case let .favourites(nodeId):
+        database.setNextGenNavigationFavourite(nodeId)
     case let .tags(tag):
         database.setNextGenNavigation(convertToOgNavigationContext(context), tag: tag)
-    case .totps:
-        NSLog("✅ setModelNavigationContextWithViewNode: totps") 
     case let .special(special):
         database.setNextGenNavigation(convertToOgNavigationContext(context), special: convertSpecialToOGSpecial(special))
+    case let .auditIssues(category):
+        database.setNextGenNavigationToAuditIssues(convertAuditCategoryToOGCategory(category))
     }
 }
 
@@ -79,19 +120,46 @@ func getNavContextFromModel(_ database: ViewModel) -> NavigationContext {
     case OGNavigationContextNone:
         navContext = .none
     case OGNavigationContextFavourites:
-        
-        break
+        navContext = .favourites(database.nextGenNavigationSelectedFavouriteId)
     case OGNavigationContextRegularHierarchy:
         navContext = .regularHierarchy(database.nextGenNavigationContextSideBarSelectedGroup)
     case OGNavigationContextTags:
         navContext = .tags(database.nextGenNavigationContextSelectedTag)
-    case OGNavigationContextTotps:
-        
-        break
+    case OGNavigationContextAuditIssues:
+        switch database.nextGenNavigationContextAuditCategory {
+        case OGNavigationAuditCategoryNoPasswords:
+            navContext = .auditIssues(.noPasswords)
+        case OGNavigationAuditCategoryDuplicated:
+            navContext = .auditIssues(.duplicated)
+        case OGNavigationAuditCategoryCommon:
+            navContext = .auditIssues(.common)
+        case OGNavigationAuditCategorySimilar:
+            navContext = .auditIssues(.similar)
+        case OGNavigationAuditCategoryTooShort:
+            navContext = .auditIssues(.tooShort)
+        case OGNavigationAuditCategoryPwned:
+            navContext = .auditIssues(.pwned)
+        case OGNavigationAuditCategoryLowEntropy:
+            navContext = .auditIssues(.lowEntropy)
+        case OGNavigationAuditCategoryTwoFactorAvailable:
+            navContext = .auditIssues(.twoFactorAvailable)
+        case OGNavigationAuditCategoryAllEntries:
+            navContext = .auditIssues(.allEntries)
+        default:
+            NSLog("🔴 Unknown OG Nav Context")
+        }
     case OGNavigationContextSpecial:
         switch database.nextGenNavigationContextSpecial {
         case OGNavigationSpecialAllItems:
             navContext = .special(.allEntries)
+        case OGNavigationSpecialExpired:
+            navContext = .special(.expiredEntries)
+        case OGNavigationSpecialNearlyExpired:
+            navContext = .special(.nearlyExpiredEntries)
+        case OGNavigationSpecialTotpItems:
+            navContext = .special(.totpItems)
+        case OGNavigationSpecialAttachmentItems:
+            navContext = .special(.itemsWithAttachments)
         default:
             NSLog("🔴 Unknown OG Nav Context")
         }
@@ -101,36 +169,3 @@ func getNavContextFromModel(_ database: ViewModel) -> NavigationContext {
 
     return navContext
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

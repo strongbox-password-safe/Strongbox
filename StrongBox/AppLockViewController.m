@@ -101,7 +101,8 @@
                 NSLog(@"LAErrorUserFallback");
             }
             else {
-                [self incrementFailedUnlockCount];
+                NSLog(@"Biometric Fail: [%@]", error);
+
             }
         }}];
 }

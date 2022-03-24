@@ -32,6 +32,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 - (void)initialize;
 - (void)restorePrevious:(RestoreCompletionBlock)completion;
+- (void)expressRefreshReceipt;
 
 @property (readonly, nullable) SKProduct* monthlyProduct;
 @property (readonly, nullable) SKProduct* yearlyProduct;
@@ -46,6 +47,10 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 @property (readonly) BOOL hasPurchasedLifeTime;
 @property (readonly) BOOL hasPurchasedFreeTrial;
+
+@property (readonly) BOOL hasActiveYearlySubscription;
+@property (readonly) BOOL hasActiveMonthlySubscription;
+
 @property (readonly, nullable) NSDate* freeTrialPurchaseDate;
 
 @end

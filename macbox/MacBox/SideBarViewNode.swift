@@ -13,25 +13,28 @@ class SideBarViewNode {
     let title: String
     let image: NSImage
     var children: [SideBarViewNode]
-    let isHeaderNode: Bool
+    let headerNode : HeaderNode?
     let color: NSColor?
     let parent: SideBarViewNode?
+    let databaseNodeChildCount: Int?
 
     init(context: NavigationContext,
          title: String,
          image: NSImage,
-         parent: SideBarViewNode?,
+         parent: SideBarViewNode? = nil,
          children: [SideBarViewNode] = [],
-         isHeaderNode: Bool = false,
-         color: NSColor? = nil)
+         headerNode: HeaderNode? = nil,
+         color: NSColor? = nil,
+         databaseNodeChildCount: Int? = nil)
     {
         self.context = context
         self.title = title
         self.image = image
         self.parent = parent
         self.children = children
-        self.isHeaderNode = isHeaderNode
+        self.headerNode = headerNode
         self.color = color
+        self.databaseNodeChildCount = databaseNodeChildCount
     }
 
     var allDescendents: [SideBarViewNode] {
@@ -40,9 +43,5 @@ class SideBarViewNode {
         }
 
         return children + rec
-    }
-
-    var cellIdentifier: NSUserInterfaceItemIdentifier {
-        NSUserInterfaceItemIdentifier(rawValue: isHeaderNode ? "HeaderCell" : "DataCell")
     }
 }

@@ -26,14 +26,14 @@
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    
-    self.collectionView.dataSource = self;
-    self.collectionView.delegate = self;
+
+    self.predefinedIcons = [NodeIconHelper getIconSet:self.iconSet];
 
     self.buttonSelectFile.hidden = self.hideSelectFile;
     self.buttonFindFavIcons.hidden = self.hideFavIconButton;
-    
-    self.predefinedIcons = [NodeIconHelper getIconSet:self.iconSet];
+        
+    self.collectionView.dataSource = self;
+    self.collectionView.delegate = self;
 }
 
 - (BOOL)hasCustomIcons {

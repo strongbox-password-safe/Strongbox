@@ -29,7 +29,7 @@
 #import "DocumentController.h"
 #import "ClipboardManager.h"
 #import "BookmarksHelper.h"
-#import "DatabaseSettingsTabViewController.h"
+
 #import "MacHardwareKeyManager.h"
 #import "ColoredStringHelper.h"
 #import "NSString+Extensions.h"
@@ -322,18 +322,6 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
 }
 
-- (void)showGroupDetails {
-    if (@available(macOS 10.15, *)) {
-        NSViewController *vc = [SwiftUIViewFactory makeSwiftUIViewWithDismissHandler:^{
-            NSLog(@"Dismiss");
-        }];
-        
-        [self presentViewControllerAsSheet:vc];
-    } else {
-        
-    }
-}
-
 - (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
     __weak ViewController* weakSelf = self;
     
@@ -518,12 +506,14 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 }
 
-- (void)onDeleteHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
+- (void)onDeleteHistoryItem:(NSNotification*)notification {
     
     NSLog(@"Deleted History Item... no need to update UI");
 }
 
-- (void)onRestoreHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
+- (void)onRestoreHistoryItem:(NSNotification*)notification {
+
+ 
     self.itemsCache = nil; 
     Node* selectionToMaintain = [self getCurrentSelectedItem];
     [self.outlineView reloadData]; 
@@ -534,6 +524,8 @@ static NSString* const kNewEntryKey = @"newEntry";
         
     }
 }
+
+
 
 - (void)onItemsDeletedNotification:(NSNotification*)param {
     if(param.object != self.viewModel) {
@@ -805,11 +797,6 @@ static NSString* const kNewEntryKey = @"newEntry";
 - (void)stopObservingModelChanges {
 
 
-    if(self.viewModel) {
-        self.viewModel.onDeleteHistoryItem = nil;
-        self.viewModel.onRestoreHistoryItem = nil;
-    }
-
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationItemsMoved object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationItemsUnDeleted object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationItemsDeleted object:nil];
@@ -819,6 +806,8 @@ static NSString* const kNewEntryKey = @"newEntry";
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationExpiryChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationUrlChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationEmailChanged object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationHistoryItemDeleted object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationHistoryItemRestored object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationNotesChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationPasswordChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationIconChanged object:nil];
@@ -842,14 +831,8 @@ static NSString* const kNewEntryKey = @"newEntry";
     
     __weak ViewController* weakSelf = self;
     
-    if ( self.viewModel ) { 
-        self.viewModel.onDeleteHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
-            [weakSelf onDeleteHistoryItem:item historicalItem:historicalItem];
-        };
-        self.viewModel.onRestoreHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
-            [weakSelf onRestoreHistoryItem:item historicalItem:historicalItem];
-        };
-    }
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onDeleteHistoryItem:) name:kModelUpdateNotificationHistoryItemDeleted object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onRestoreHistoryItem:) name:kModelUpdateNotificationHistoryItemRestored object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onCustomFieldsChanged:) name:kModelUpdateNotificationCustomFieldsChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemTitleChanged:) name: kModelUpdateNotificationTitleChanged object:nil];
@@ -1005,7 +988,9 @@ static NSString* const kNewEntryKey = @"newEntry";
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
-    return [self.viewModel dereference:text node:node];
+    NSString* ret = [self.viewModel dereference:text node:node];
+    
+    return ret ? ret : text;
 }
 
 
@@ -1656,12 +1641,7 @@ static NSString* const kNewEntryKey = @"newEntry";
         return;
     }
     
-    if ( self.viewModel.format == kPasswordSafe ) {
-        [self dereferenceAndCopyToPasteboard:item.fields.email item:item];
-    }
-    else {
-        [self dereferenceAndCopyToPasteboard:item.fields.keePassEmail item:item];
-    }
+    [self dereferenceAndCopyToPasteboard:item.fields.email item:item];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_email", @"Email")]];

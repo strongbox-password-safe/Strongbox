@@ -117,9 +117,7 @@
                 
                 [NSLayoutConstraint activateConstraints:@[heightContraints,widthContraints]];
 
-                if (@available(iOS 11.0, *)) {
-                    [stackView setCustomSpacing:24 afterView:labelDescription ? labelDescription : labelTitle];
-                }
+                [stackView setCustomSpacing:24 afterView:labelDescription ? labelDescription : labelTitle];
 
                 [self bounce:button];
             }

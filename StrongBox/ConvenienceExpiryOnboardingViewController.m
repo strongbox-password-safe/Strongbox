@@ -32,9 +32,7 @@
     
     self.buttonDontRemindMe.backgroundColor = UIColor.systemOrangeColor;
     
-    if (@available(iOS 11.0, *)) {
-        [self.stackView setCustomSpacing:8.0f afterView:self.buttonDontRemindMe];
-    }
+    [self.stackView setCustomSpacing:8.0f afterView:self.buttonDontRemindMe];
 }
 
 - (IBAction)onDontRemindMe:(id)sender {

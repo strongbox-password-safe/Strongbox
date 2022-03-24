@@ -112,6 +112,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             return
         }
 
+        if model == nil { 
+            dismiss(nil)
+            return
+        }
+
         window.delegate = self
         window.setFrameUsingName(NSWindow.FrameAutosaveName(autosave))
 
@@ -123,12 +128,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId) else {
+        guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId),
+              let dbModel = database.commonModel else {
             NSLog("🔴 Could not load initial node!")
             return
         }
 
-        model = EntryViewModel.fromNode(node, format: database.format, keePassEmailField: true) 
+        model = EntryViewModel.fromNode(node, format: database.format, model: dbModel)
         preEditModelClone = model.clone()
 
         setupUI()
@@ -138,7 +144,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     var sortedGroups: [Node]!
     func setupLocationUI() {
-        let groups = database.activeGroups
+        let groups = database.allActiveGroups
 
         sortedGroups = groups.sorted { n1, n2 in
             let p1 = database.getGroupPathDisplayString(n1)
@@ -350,6 +356,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         
 
+        disableFieldsBasedOnFormat()
+
+        
+
         bindPasswordUI()
 
         if #available(macOS 11.0, *) {
@@ -359,6 +369,55 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             dummyKludge.isHidden = true 
         }
     }
+
+    func disableFieldsBasedOnFormat() {
+        if database.format == .keePass1 {
+            tableViewCustomFields.isEnabled = false
+            buttonAddField.isEnabled = false
+            tagsField.isEnabled = false
+            tagsField.placeholderString = NSLocalizedString("unsupported_by_database_format", comment: "Unsupported by Database Format")
+
+            textFieldEmail.isEnabled = false
+            textFieldEmail.placeholderString = NSLocalizedString("unsupported_by_database_format", comment: "Unsupported by Database Format")
+
+            tableViewCustomFields.emptyMessageProvider = { [weak self] in
+                self?.noneSingleSelectionMessageProvider()
+            }
+        } else if database.format == .passwordSafe {
+            tableViewAttachments.isEnabled = false
+            tableViewCustomFields.isEnabled = false
+            buttonAddField.isEnabled = false
+            tagsField.isEnabled = false
+            tagsField.placeholderString = NSLocalizedString("unsupported_by_database_format", comment: "Unsupported by Database Format")
+
+            tableViewCustomFields.emptyMessageProvider = { [weak self] in
+                self?.noneSingleSelectionMessageProvider()
+            }
+            tableViewAttachments.emptyMessageProvider = { [weak self] in
+                self?.noneSingleSelectionMessageProvider()
+            }
+        }
+    }
+
+    func noneSingleSelectionMessageProvider() -> NSAttributedString {
+        let paragraphStyle = NSParagraphStyle.default.mutableCopy() as! NSMutableParagraphStyle
+        paragraphStyle.alignment = .center
+
+        let attributes: [NSAttributedString.Key: Any] = [.paragraphStyle: paragraphStyle,
+                                                         .font: FontManager.shared.bodyFont,
+                                                         .foregroundColor: NSColor.secondaryLabelColor]
+
+        let final = NSLocalizedString("unsupported_by_database_format", comment: "Unsupported by Database Format")
+
+        let foo = NSMutableAttributedString(string: final, attributes: attributes)
+
+
+
+
+        return foo
+    }
+
+    
 
     func windowDidEndLiveResize(_: Notification) {
         view.window?.saveFrame(usingName: autosave)
@@ -375,14 +434,30 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             node = found
         } else {
-            guard let newEntryParentGroupId = newEntryParentGroupId,
-                  let parentGroup = database.getItemBy(newEntryParentGroupId)
+            var parentGroup : Node?
+            
+            if let newEntryParentGroupId = newEntryParentGroupId {
+                parentGroup = database.getItemBy(newEntryParentGroupId)
+            }
+            
+            if parentGroup == nil {
+                NSLog("🔴 Could not load parent node! Trying Root Group")
+                
+                if database.format == .keePass1 {
+                    parentGroup = database.rootGroup.childGroups.first
+                }
+                else {
+                    parentGroup = database.rootGroup
+                }
+            }
+
+            if let parentGroup = parentGroup {
+                node = createNewEntryNode(parentGroup)
+            }
             else {
                 NSLog("🔴 Could not load parent node!")
                 return nil
             }
-
-            node = createNewEntryNode(parentGroup)
         }
 
         return node
@@ -460,6 +535,30 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     @IBAction func onDone(_: Any) {
+        let value = model.password
+
+        if trim(value) != value {
+            MacAlerts.twoOptions(withCancel: NSLocalizedString("field_tidy_title_tidy_up_field", comment: "Tidy Up Field?"),
+                                 informativeText: NSLocalizedString("field_tidy_message_tidy_up_password", comment: "There are some blank characters (e.g. spaces, tabs) at the start or end of your password.\n\nShould Strongbox tidy up these extraneous characters?"),
+                                 option1AndDefault: NSLocalizedString("field_tidy_choice_tidy_up_field", comment: "Tidy Up"),
+                                 option2: NSLocalizedString("field_tidy_choice_dont_tidy", comment: "Don't Tidy"),
+                                 window: view.window)
+            { [weak self] response in
+                if response == 0 {
+                    self?.model.password = trim(value)
+                    self?.postValidationApplyChanges()
+                } else if response == 1 {
+                    self?.postValidationApplyChanges()
+                }
+            }
+        } else {
+            postValidationApplyChanges()
+        }
+    }
+
+    func postValidationApplyChanges() {
+        
+
         let nodeId: UUID
 
         if initialNodeId == nil {
@@ -471,7 +570,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             let success = model.apply(to: node,
                                       databaseFormat: database.format,
-                                      keePassEmailField: true, 
                                       legacySupplementaryTotp: Settings.sharedInstance().addLegacySupplementaryTotpCustomFields,
                                       addOtpAuthUrl: Settings.sharedInstance().addOtpAuthUrl)
 
@@ -613,7 +711,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         guard let textField = obj.object as? NSTextField else { return }
 
         if textField == passwordField {
-            model.password = trim(passwordField.stringValue)
+            model.password = passwordField.stringValue 
             onModelEdited()
             bindPasswordUI()
         } else if textField == tagsField {
@@ -633,23 +731,27 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
     }
 
+    var selectPredefinedIconController: SelectPredefinedIconController? 
     func onIconClicked() {
         if database.format == .passwordSafe {
             return
         }
 
-        let c = SelectPredefinedIconController(windowNibName: NSNib.Name("SelectPredefinedIconController"))
+        selectPredefinedIconController = SelectPredefinedIconController(windowNibName: NSNib.Name("SelectPredefinedIconController"))
+        guard let selectPredefinedIconController = selectPredefinedIconController else {
+            return
+        }
 
-        c.customIcons = Array(database.customIcons)
-        c.hideSelectFile = database.format == .keePass1
-        c.hideFavIconButton = false
-        c.onSelectedItem = { [weak self] (icon: NodeIcon?, showFindFavIcons: Bool) in
+        selectPredefinedIconController.customIcons = Array(database.customIcons)
+        selectPredefinedIconController.hideSelectFile = database.format == .keePass1
+        selectPredefinedIconController.hideFavIconButton = false
+        selectPredefinedIconController.onSelectedItem = { [weak self] (icon: NodeIcon?, showFindFavIcons: Bool) in
             guard let self = self else { return }
             self.onIconSelected(icon: icon, showFindFavIcons: showFindFavIcons)
         }
-        c.iconSet = database.iconSet
+        selectPredefinedIconController.iconSet = database.iconSet
 
-        view.window?.beginSheet(c.window!, completionHandler: nil)
+        view.window?.beginSheet(selectPredefinedIconController.window!, completionHandler: nil)
     }
 
     func onIconSelected(icon: NodeIcon?, showFindFavIcons: Bool) {
@@ -666,7 +768,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         
 
         let dummyNode = createNewEntryNode(database.rootGroup)
-        model.apply(to: dummyNode, databaseFormat: database.format, keePassEmailField: true, legacySupplementaryTotp: false, addOtpAuthUrl: true)
+        model.apply(to: dummyNode, databaseFormat: database.format, legacySupplementaryTotp: false, addOtpAuthUrl: true)
 
         vc.nodes = [dummyNode]
         vc.viewModel = database
@@ -1267,6 +1369,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         if let cell = popupButtonTagsSuggestions.cell as? NSPopUpButtonCell {
             cell.arrowPosition = popular.count == 0 ? .noArrow : .arrowAtBottom
         }
+
+        tagsField.explicitResizeToFitContent()
     }
 
     func tokenField(_: NSTokenField, completionsForSubstring substring: String, indexOfToken _: Int, indexOfSelectedItem _: UnsafeMutablePointer<Int>?) -> [Any]? {
@@ -1277,7 +1381,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         let allTags = database.tagSet
 
         return allTags.filter { tag in
-            tag.localizedStandardContains(substring) && !existingTags.contains(tag)
+            tag.starts(with: substring) && !existingTags.contains(tag)
         }
     }
 
@@ -1569,8 +1673,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self = self else { return }
 
             if go {
+                var offsetIndex = 0
                 self.tableViewCustomFields.selectedRowIndexes.forEach { row in
-                    self.model.removeCustomField(at: UInt(row))
+                    self.model.removeCustomField(at: UInt(row - offsetIndex))
+                    offsetIndex += 1
                 }
 
                 self.refreshCustomFields()
@@ -1711,6 +1817,7 @@ extension CreateEditViewController: NSTableViewDelegate {
         guard tableView == tableViewAttachments,
               dropOperation != .on,
               !dragSourceIsFromAttachments(draggingInfo: info),
+              canAddAttachment,
               let items = info.draggingPasteboard.pasteboardItems else { return dragOperation }
 
         if #available(macOS 10.13, *) { } else {
@@ -1751,7 +1858,7 @@ extension CreateEditViewController: NSTableViewDelegate {
                    row: Int,
                    dropOperation _: NSTableView.DropOperation) -> Bool
     {
-        guard tableView == tableViewAttachments else { return false }
+        guard tableView == tableViewAttachments, canAddAttachment else { return false }
 
         if #available(macOS 10.13, *) {
             let ret = handleDropOnToAttachmentsTable(tableView, draggingInfo: info, toRow: row)
@@ -1910,5 +2017,16 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
     @available(macOS 10.12, *)
     func operationQueue(for _: NSFilePromiseProvider) -> OperationQueue {
         return dragAndDropPromiseQueue
+    }
+}
+
+extension CreateEditViewController: OEXTokenFieldDelegate {
+    func tokenField(_: OEXTokenField!, attachmentCellForRepresentedObject representedObject: Any!) -> NSTextAttachmentCell! {
+        guard let representedObject = representedObject as? String else { return SBTokenAttachmentCell() }
+
+        let ret = SBTokenAttachmentCell(textCell: representedObject)
+        ret.representedObject = representedObject
+
+        return ret
     }
 }

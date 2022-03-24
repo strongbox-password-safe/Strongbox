@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL on;
 - (void)set:(NSString*)text on:(BOOL)on onChanged:(void(^)(BOOL on))onChanged;
+- (void)set:(NSString*)text on:(BOOL)on enabled:(BOOL)enabled onChanged:(void(^)(BOOL on))onChanged;
 
 @end
 

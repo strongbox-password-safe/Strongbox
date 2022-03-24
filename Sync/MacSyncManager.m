@@ -117,6 +117,7 @@
 
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(nonnull METADATA_PTR)database data:(NSData *)data file:(NSString *)file error:(NSError**)error {
     if ( database.readOnly ) { 
+        
         if ( error ) {
             *error = [Utils createNSError:NSLocalizedString(@"warn_database_is_ro_no_update", @"Your database is in Read Only mode and cannot be updated.") errorCode:-1];
         }

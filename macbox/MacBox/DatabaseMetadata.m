@@ -12,7 +12,6 @@
 #import "FileManager.h"
 #import "Settings.h"
 
-
 const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
 static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
 
@@ -53,6 +52,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.autoFillConcealedFieldsAsCreds = YES;
         self.iconSet = kKeePassIconSetSfSymbols;
         self.browseSelectedItems = @[];
+        self.auditConfig = DatabaseAuditorConfiguration.defaults;
+        self.showChildCountOnFolderInSidebar = YES;
+        self.headerNodes = HeaderNodeState.defaults;
     }
     
     return self;
@@ -291,6 +293,14 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeObject:self.sideBarSelectedGroup forKey:@"sideBarSelectedGroup"];
     [encoder encodeInteger:self.sideBarSelectedSpecial forKey:@"sideBarSelectedSpecial"];
     [encoder encodeObject:self.browseSelectedItems forKey:@"browseSelectedItems"];
+    
+    [encoder encodeObject:self.auditConfig forKey:@"auditorConfig"];
+    [encoder encodeInteger:self.sideBarSelectedAuditCategory forKey:@"sideBarSelectedAuditCategory"];
+    
+    [encoder encodeObject:self.sideBarSelectedFavouriteId forKey:@"sideBarSelectedFavouriteId"];
+    [encoder encodeBool:self.showChildCountOnFolderInSidebar forKey:@"showChildCountOnFolderInSidebar"];
+    
+    [encoder encodeObject:self.headerNodes forKey:@"headerNodes2"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -596,9 +606,13 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         else {
             self.sideBarSelectedGroup = nil;
         }
-        
+
         if ( [decoder containsValueForKey:@"sideBarSelectedSpecial"] ) {
             self.sideBarSelectedSpecial = [decoder decodeIntegerForKey:@"sideBarSelectedSpecial"];
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarSelectedAuditCategory"] ) {
+            self.sideBarSelectedAuditCategory = [decoder decodeIntegerForKey:@"sideBarSelectedAuditCategory"];
         }
         
         if ( [decoder containsValueForKey:@"browseSelectedItems"] ) {
@@ -606,6 +620,34 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         }
         else {
             self.browseSelectedItems = @[];
+        }
+        
+        if ( [decoder containsValueForKey:@"auditorConfig"]) {
+            self.auditConfig = [decoder decodeObjectForKey:@"auditorConfig"];
+        }
+        else {
+            self.auditConfig = DatabaseAuditorConfiguration.defaults;
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarSelectedFavouriteId"] ) {
+            self.sideBarSelectedFavouriteId = [decoder decodeObjectForKey:@"sideBarSelectedFavouriteId"];
+        }
+        else {
+            self.sideBarSelectedFavouriteId = nil;
+        }
+        
+        if ( [decoder containsValueForKey:@"showChildCountOnFolderInSidebar"] ) {
+            self.showChildCountOnFolderInSidebar = [decoder decodeBoolForKey:@"showChildCountOnFolderInSidebar"];
+        }
+        else {
+            self.showChildCountOnFolderInSidebar = YES;
+        }
+        
+        if ( [decoder containsValueForKey:@"headerNodes2"] ) {
+            self.headerNodes = [decoder decodeObjectForKey:@"headerNodes2"];
+        }
+        else {
+            self.headerNodes = HeaderNodeState.defaults;
         }
     }
     
@@ -677,23 +719,15 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     
 }
 
-- (DatabaseAuditorConfiguration *)auditConfig {
-    DatabaseAuditorConfiguration* foo = DatabaseAuditorConfiguration.defaults;
-    foo.auditInBackground = NO;
-    
-    return foo;
-}
-
-- (void)setAuditConfig:(DatabaseAuditorConfiguration *)auditConfig {
-    
-}
-
 - (NSArray<NSString *> *)auditExcludedItems {
-    return @[];
+    NSString* key = [NSString stringWithFormat:@"auditExcludedItems-%@", self.uuid];
+    NSArray* ret = [SecretStore.sharedInstance getSecureObject:key];
+    return ret ? ret : @[];
 }
 
 - (void)setAuditExcludedItems:(NSArray<NSString *> *)auditExcludedItems {
-    
+    NSString* key = [NSString stringWithFormat:@"auditExcludedItems-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureObject:auditExcludedItems forIdentifier:key];
 }
 
 

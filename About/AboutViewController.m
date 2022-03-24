@@ -80,10 +80,6 @@
     [Alerts info:self title:@"Done" message:@"Debug Info copied to clipboard"];
 }
 
-- (IBAction)onDone:(id)sender {
-    self.onDone();
-}
-
 - (IBAction)onUpgradeOptions:(id)sender {
     [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
 }

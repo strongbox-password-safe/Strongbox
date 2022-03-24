@@ -8,7 +8,6 @@
 
 #import "KeePassHistoryController.h"
 #import "NodeIconHelper.h"
-#import "RecordView.h"
 #import "Alerts.h"
 #import "ItemDetailsViewController.h"
 #import "BrowseItemCell.h"
@@ -96,26 +95,11 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (@available(iOS 11.0, *)) {
-        [self performSegueWithIdentifier:@"HistoryToItemDetails" sender:@(indexPath.row)];
-    }
-    else {
-        Node* node = self.items[indexPath.row];
-        [self performSegueWithIdentifier:@"segueToRecordView" sender:node];
-    }
+    [self performSegueWithIdentifier:@"HistoryToItemDetails" sender:@(indexPath.row)];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueToRecordView"]) {
-        Node *record = (Node *)sender;
-
-        RecordView *vc = segue.destinationViewController;
-        vc.record = record;
-        vc.parentGroup = record.parent;
-        vc.viewModel = self.viewModel;
-        vc.isHistoricalEntry = YES;
-    }
-    else if ([segue.identifier isEqualToString:@"HistoryToItemDetails"]) {
+    if ([segue.identifier isEqualToString:@"HistoryToItemDetails"]) {
         NSNumber *index = (NSNumber *)sender;
         
         ItemDetailsViewController *vc = segue.destinationViewController;

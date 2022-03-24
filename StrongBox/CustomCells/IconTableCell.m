@@ -39,9 +39,8 @@
     }
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
-    if (@available(iOS 10.0, *)) {
-        self.titleLabel.adjustsFontForContentSizeCategory = YES;
-    }
+    
+    self.titleLabel.adjustsFontForContentSizeCategory = YES;
     
     self.titleLabel.onEdited = ^(NSString * _Nonnull text) {
         [self onTitleValueEdited];

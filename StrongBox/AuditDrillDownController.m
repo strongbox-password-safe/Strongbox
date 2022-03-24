@@ -147,7 +147,9 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 
             BOOL excluded = [self.model isExcludedFromAudit:self.itemId];
             
-            [cell set:NSLocalizedString(@"audit_drill_down_audit_this_item_preference_title", @"Audit this Item") on:!excluded onChanged:^(BOOL on) {
+            [cell set:NSLocalizedString(@"audit_drill_down_audit_this_item_preference_title", @"Audit this Item") on:!excluded
+             enabled:!self.model.isReadOnly
+            onChanged:^(BOOL on) {
                 [self onAuditOnOff:on];
             }];
             
@@ -175,6 +177,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     }
     else if (indexPath.section == kSectionBasicIdx) {
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"auditDrillDownBasicCellId" forIndexPath:indexPath];
+        cell.accessoryType = UITableViewCellAccessoryNone;
         
         if (@available(iOS 13.0, *)) {
             cell.imageView.image = [UIImage systemImageNamed:@"checkmark.shield"];
@@ -224,12 +227,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     if (indexPath.section == kSectionSimalarIdx || indexPath.section == kSectionDuplicatedIdx) {
         Node* node = indexPath.section == kSectionDuplicatedIdx ? self.duplicates[indexPath.row] : self.similars[indexPath.row];
         
-        if (@available(iOS 11.0, *)) {
-            [self performSegueWithIdentifier:@"segueToItemDetails" sender:node];
-        }
-        else {
-            
-        }
+        [self performSegueWithIdentifier:@"segueToItemDetails" sender:node];
     }
     else if (indexPath.section == kSectionSettingsIdx) {
         if ( indexPath.row == 1) {
@@ -364,8 +362,21 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 
 
 - (void)onAuditOnOff:(BOOL)on {
-    [self.model setItemAuditExclusion:self.itemId exclude:!on];
+    if ( self.model.isReadOnly ) {
+        [self refreshItems];
+        return;
+    }
+    
+    Node* item = [self.model.database getItemById:self.itemId];
+    if ( !item ) {
+        NSLog(@"WARNWARN: Could not find item to check for HIBP");
+        return;
+    }
 
+    [self.model excludeFromAudit:item exclude:!on];
+
+    self.updateDatabase();
+    
     [self.model restartBackgroundAudit];
     
     [self refreshItems];
@@ -403,7 +414,10 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     else if (flag.intValue == kAuditFlagLowEntropy) {
         return NSLocalizedString(@"audit_quick_summary_password_low_entropy", @"Password is weak (low entropy)");
     }
-
+    else if (flag.intValue == kAuditFlagTwoFactorAvailable) {
+        return NSLocalizedString(@"audit_quick_summary_two_factor_available", @"2 Factor Authentication is available for this domain.");
+    }
+    
     return NSLocalizedString(@"generic_unknown", @"Unknown");
 }
 
@@ -479,6 +493,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     else if ([segue.identifier isEqualToString:@"segueToDatabaseAuditPreferences"]) {
         AuditConfigurationVcTableViewController *vc = segue.destinationViewController;
         vc.model = self.model;
+        vc.updateDatabase = self.updateDatabase;
         vc.onDone = self.onDone;
         vc.hideShowAllAuditIssues = self.hideShowAllAuditIssues;
     }

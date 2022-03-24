@@ -127,6 +127,21 @@ class FontManager: NSObject {
     }()
 
     @objc
+    let headlineItalicFont: NSFont = {
+        let font: NSFont
+
+        if #available(macOS 11.0, *) {
+            font = NSFont.preferredFont(forTextStyle: .headline)
+        } else {
+            font = NSFont.systemFont(ofSize: HeadLinePointSize)
+        }
+
+        let ret = NSFontManager.shared.convert(font, toHaveTrait: .italicFontMask)
+
+        return ret
+    }()
+
+    @objc
     let caption1Font: NSFont = {
         if #available(macOS 11.0, *) {
             return NSFont.preferredFont(forTextStyle: .caption1)

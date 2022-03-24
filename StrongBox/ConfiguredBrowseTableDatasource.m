@@ -91,7 +91,7 @@ const NSUInteger kSectionIdxLast = 3;
 
 
 - (NSArray<Node*>*)loadPinnedItems {
-    if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.pinnedSet.count) {
+    if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.favourites.count) {
         return @[];
     }
     
@@ -99,7 +99,7 @@ const NSUInteger kSectionIdxLast = 3;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
     
-    return [self.viewModel filterAndSortForBrowse:self.viewModel.pinnedNodes.mutableCopy
+    return [self.viewModel filterAndSortForBrowse:self.viewModel.favourites.mutableCopy
                             includeKeePass1Backup:YES
                                 includeRecycleBin:YES
                                    includeExpired:YES
@@ -114,9 +114,7 @@ const NSUInteger kSectionIdxLast = 3;
         return @[];
     }
     
-    NSArray<Node*>* ne = [self.viewModel.database.effectiveRootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.nearlyExpired;
-    }];
+    NSArray<Node*>* ne = self.viewModel.database.nearlyExpiredEntries;
 
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
@@ -137,9 +135,7 @@ const NSUInteger kSectionIdxLast = 3;
         return @[];
     }
     
-    NSArray<Node*>* exp = [self.viewModel.database.effectiveRootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.expired;
-    }];
+    NSArray<Node*>* exp = self.viewModel.database.expiredEntries;
 
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;

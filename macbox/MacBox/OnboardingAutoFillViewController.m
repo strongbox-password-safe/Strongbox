@@ -97,7 +97,8 @@
                                                            customFields:self.database.autoFillScanCustomFields
                                                                   notes:self.database.autoFillScanNotes
                                            concealedCustomFieldsAsCreds:self.database.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.database.autoFillUnConcealedFieldsAsCreds];
+                                         unConcealedCustomFieldsAsCreds:self.database.autoFillUnConcealedFieldsAsCreds
+                                                               nickName:self.database.nickName];
     }
 
     

@@ -112,7 +112,7 @@ extension LargeTextViewAndQrCode: NSCollectionViewDataSource {
         let colored = ColoredStringHelper.getColorizedAttributedString(character, colorize: colorize, darkMode: dark, colorBlind: colorBlind, font: FontManager.shared.largeTextEasyReadFont)
 
         item.labelCharacter.attributedStringValue = colored
-        item.labelIndex.stringValue = String(indexPath.item)
+        item.labelIndex.stringValue = String(indexPath.item + 1)
 
         return item
     }

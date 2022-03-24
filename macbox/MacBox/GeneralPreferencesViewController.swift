@@ -19,11 +19,18 @@ class GeneralPreferencesViewController: NSViewController {
     @IBOutlet var autoLockStepper: NSStepper!
     @IBOutlet var hideDockIcon: NSButton!
     @IBOutlet var showInSystemTray: NSButton!
+    @IBOutlet var quitWhenAllClosed: NSButton!
+    @IBOutlet var useNextGenUI: NSButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         shortcutView.associatedUserDefaultsKey = kPreferenceGlobalShowShortcut
+
+        if #available(macOS 11.0, *) {
+        } else {
+            useNextGenUI.isHidden = true
+        }
 
         bindUI()
     }
@@ -35,7 +42,12 @@ class GeneralPreferencesViewController: NSViewController {
         showInSystemTray.state = Settings.sharedInstance().showSystemTrayIcon ? .on : .off
         hideDockIcon.isEnabled = Settings.sharedInstance().showSystemTrayIcon
         hideDockIcon.state = Settings.sharedInstance().hideDockIconOnAllMinimized ? .on : .off
+        quitWhenAllClosed.isEnabled = !Settings.sharedInstance().showSystemTrayIcon
+        quitWhenAllClosed.state = Settings.sharedInstance().quitStrongboxOnAllWindowsClosed ? .on : .off
+
         miniaturizeOnCopy.state = Settings.sharedInstance().miniaturizeOnCopy ? .on : .off
+
+        useNextGenUI.state = Settings.sharedInstance().nextGenUI ? .on : .off
     }
 
     func bindAutoLock() {
@@ -112,6 +124,8 @@ class GeneralPreferencesViewController: NSViewController {
         Settings.sharedInstance().showSystemTrayIcon = showInSystemTray.state == .on
         Settings.sharedInstance().hideDockIconOnAllMinimized = hideDockIcon.state == .on
         Settings.sharedInstance().miniaturizeOnCopy = miniaturizeOnCopy.state == .on
+        Settings.sharedInstance().quitStrongboxOnAllWindowsClosed = quitWhenAllClosed.state == .on
+        Settings.sharedInstance().nextGenUI = useNextGenUI.state == .on
 
         bindUI()
 

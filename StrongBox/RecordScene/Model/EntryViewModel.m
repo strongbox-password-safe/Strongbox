@@ -60,7 +60,6 @@
                                                             url:@"https:
                                                           notes:notes
                                                           email:@"markmc@gmail.com"
-                                           keePassEmailFieldKey:kDefaultKeePassEmailFieldKey
                                                         expires:nil
                                                            tags:nil
                                                            totp:token
@@ -74,8 +73,8 @@
     return ret;
 }
 
-+ (instancetype)fromNode:(Node *)item format:(DatabaseFormat)format keePassEmailField:(BOOL)keePassEmailField {
-    NSArray<ItemMetadataEntry*>* metadata = [EntryViewModel getMetadataFromItem:item format:format];
++ (instancetype)fromNode:(Node *)item format:(DatabaseFormat)format model:(Model *)model {
+    NSArray<ItemMetadataEntry*>* metadata = [EntryViewModel getMetadataFromItem:item format:format model:model];
     
     
     
@@ -84,24 +83,13 @@
    
     
     
-    NSArray<CustomFieldViewModel*>* customFieldModels = [item.fields.customFields map:^id(NSString *key, StringValue* value) {
+    NSArray<CustomFieldViewModel*>* customFieldModels = [item.fields.customFieldsNoEmail map:^id(NSString *key, StringValue* value) {
         return [CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected];
     }];
     
     
     
-    NSString* email = @"";
-    NSString* keePassEmailFieldKey = nil;
-    
-    if ( format == kPasswordSafe ) {
-        email = item.fields.email;
-    }
-    else if ( format == kKeePass || format == kKeePass4 ) {
-        if ( keePassEmailField ) {
-            email = item.fields.keePassEmail;
-            keePassEmailFieldKey = item.fields.keePassEmailFieldKey;
-        }
-    }
+    NSString* email = item.fields.email;
     
     EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
                                                        username:item.fields.username
@@ -109,7 +97,6 @@
                                                             url:item.fields.url
                                                           notes:item.fields.notes
                                                           email:email
-                                           keePassEmailFieldKey:keePassEmailFieldKey
                                                         expires:item.fields.expires
                                                            tags:item.fields.tags
                                                            totp:item.fields.otpToken
@@ -123,7 +110,7 @@
     return ret;
 }
 
-+ (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item format:(DatabaseFormat)format {
++ (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item format:(DatabaseFormat)format model:(Model *)model {
     NSMutableArray<ItemMetadataEntry*>* metadata = [NSMutableArray array];
 
     [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
@@ -151,7 +138,13 @@
 
 
 
+
+    NSString* path = [model.database getPathDisplayString:item.parent includeRootGroup:YES rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
     
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_fieldname_location", @"Location")
+                                                  value:path
+                                               copyable:NO]];
+
     return metadata;
 }
 
@@ -161,7 +154,6 @@
                           url:(NSString *)url
                         notes:(NSString *)notes
                         email:(NSString *)email
-         keePassEmailFieldKey:(NSString *_Nullable)keePassEmailFieldKey
                       expires:(NSDate*)expires
                          tags:(NSSet<NSString*>*)tags
                          totp:(OTPToken *)totp
@@ -179,7 +171,6 @@
         self.totp = totp ? [OTPToken tokenWithURL:totp.url secret:totp.secret] : nil;
         self.url = url;
         self.email = email;
-        self.keePassEmailFieldKey = keePassEmailFieldKey;
         self.expires = expires;
         self.mutableTags = tags ? tags.mutableCopy : [NSMutableSet set];
         self.notes = notes;
@@ -208,7 +199,6 @@
                                                               url:self.url
                                                             notes:self.notes
                                                             email:self.email
-                                             keePassEmailFieldKey:self.keePassEmailFieldKey
                                                           expires:self.expires
                                                              tags:self.mutableTags
                                                              totp:self.totp
@@ -366,7 +356,6 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
 
 - (BOOL)applyToNode:(Node*)ret
      databaseFormat:(DatabaseFormat)databaseFormat
-  keePassEmailField:(BOOL)keePassEmailField
 legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
       addOtpAuthUrl:(BOOL)addOtpAuthUrl {
     if (! [ret setTitle:self.title keePassGroupTitleRules:NO] ) {
@@ -391,14 +380,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 
     
     
-    if ( databaseFormat == kPasswordSafe ) {
-        ret.fields.email = self.email;
-    }
-    else if ( databaseFormat == kKeePass || databaseFormat == kKeePass4 ) {
-        if ( keePassEmailField ) {
-            ret.fields.keePassEmail = self.email;
-        }
-    }
+    ret.fields.email = self.email;
     
     
 
@@ -422,6 +404,8 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
     
     [ret.fields.tags removeAllObjects];
     [ret.fields.tags addObjectsFromArray:self.tags];
+    
+    
     
     
     

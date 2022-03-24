@@ -103,7 +103,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             md[@(i)] = dispatch_queue_create(queueName.UTF8String, provider.supportsConcurrentRequests ? DISPATCH_QUEUE_CONCURRENT : DISPATCH_QUEUE_SERIAL);
         }
 #else
-        NSArray<NSNumber*> *supportedProvidersOnMac = @[@(kSFTP), @(kWebDAV), @(kMacFile)];
+        NSArray<NSNumber*> *supportedProvidersOnMac = @[@(kSFTP), @(kWebDAV), @(kMacFile), @(kTwoDrive)];
         for (NSNumber* providerIdNum in supportedProvidersOnMac) {
             int i = providerIdNum.intValue;
             id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:i];

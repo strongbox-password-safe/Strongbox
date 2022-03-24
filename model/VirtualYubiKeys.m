@@ -76,9 +76,8 @@ NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeys
     
     NSError* error;
     NSUInteger options = NSJSONWritingPrettyPrinted;
-    if (@available(iOS 11.0, *)) {
-        options |= NSJSONWritingSortedKeys;
-    }
+    options |= NSJSONWritingSortedKeys;
+    
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonArray options:options error:&error];
 
     if (error) {

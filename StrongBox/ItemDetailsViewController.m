@@ -171,10 +171,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
     
     self.navigationController.navigationBarHidden = NO;
-
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
+    self.navigationController.navigationBar.prefersLargeTitles = NO;
 
     [self listenToNotifications];
 
@@ -566,35 +563,63 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    BOOL changesToSave = self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone];
+    if ( self.isEditing && changesToSave ) {
+        if ( ![trim(self.model.password) isEqualToString:self.model.password] ) {
+            __weak ItemDetailsViewController* weakSelf = self;
+            
+            [Alerts twoOptionsWithCancel:self
+                                   title:NSLocalizedString(@"field_tidy_title_tidy_up_field", @"Tidy Up Field?")
+                                 message:NSLocalizedString(@"field_tidy_message_tidy_up_password", @"There are some blank characters (e.g. spaces, tabs) at the start or end of your password.\n\nShould Strongbox tidy up these extraneous characters?")
+                       defaultButtonText:NSLocalizedString(@"field_tidy_choice_tidy_up_field", @"Tidy Up")
+                        secondButtonText:NSLocalizedString(@"field_tidy_choice_dont_tidy", @"Don't Tidy")
+                                  action:^(int response) {
+                if ( response == 0 ) {
+                    weakSelf.model.password = trim(weakSelf.model.password);
+                    [weakSelf postValidationSetEditing:editing animated:animated];
+                }
+                else if ( response == 1) {
+                    [weakSelf postValidationSetEditing:editing animated:animated];
+                }
+            }];
+        }
+        else {
+            [self postValidationSetEditing:editing animated:animated];
+        }
+    }
+    else {
+        [self postValidationSetEditing:editing animated:animated];
+    }
+}
+
+- (void)postValidationSetEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     
     [DatabasePreferences setEditing:self.databaseModel.metadata editing:editing];
     
-    if (@available(iOS 11.0, *)) { 
-        [self.tableView performBatchUpdates:^{
-            [self prepareTableViewForEditing];
-        } completion:^(BOOL finished) {
-            if ( self.isEditing ) {
-                self.preEditModelClone = [self.model clone];
-                UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]];
-                [cell becomeFirstResponder];
+    [self.tableView performBatchUpdates:^{
+        [self prepareTableViewForEditing];
+    } completion:^(BOOL finished) {
+        if ( self.isEditing ) {
+            self.preEditModelClone = [self.model clone];
+            UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]];
+            [cell becomeFirstResponder];
+        }
+        else {
+            if( self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone] ) {
+                self.urlJustChanged = [self.model.url compare:self.preEditModelClone.url] != NSOrderedSame;
+                self.preEditModelClone = nil;
+                [self onDone];
+                return; 
             }
             else {
-                if( self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone] ) {
-                    self.urlJustChanged = [self.model.url compare:self.preEditModelClone.url] != NSOrderedSame;
-                    self.preEditModelClone = nil;
-                    [self onDone];
-                    return; 
-                }
-                else {
-                    NSLog(@"No changes detected... switching back to view mode...");
-                }
-                self.preEditModelClone = nil;
+                NSLog(@"No changes detected... switching back to view mode...");
             }
-            
-            [self bindNavBar];
-        }];
-    }
+            self.preEditModelClone = nil;
+        }
+        
+        [self bindNavBar];
+    }];
 }
 
 #pragma mark - Table view data source
@@ -753,14 +778,6 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
                 BOOL shouldHideTotpFields = self.databaseModel.metadata.hideTotpCustomFieldsInViewMode && !self.editing;
                 if (shouldHideTotpFields && [NodeFields isTotpCustomFieldKey:f.key]) {
                     return CGFLOAT_MIN;
-                }
-                
-                
-                
-                if ( self.emailFieldEnabled && self.databaseFormat != kPasswordSafe ) {
-                    if ( [self.model.keePassEmailFieldKey isEqualToString:f.key] ) {
-                        return CGFLOAT_MIN;
-                    }
                 }
             }
 #ifdef IS_APP_EXTENSION
@@ -926,14 +943,12 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     
     NSUInteger idx = [self.model insertAttachment:filename attachment:attachment];
     
-    if (@available(iOS 11.0, *)) { 
-        [self.tableView performBatchUpdates:^{
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + 1 inSection:kAttachmentsSectionIdx]] 
-                                  withRowAnimation:UITableViewRowAnimationAutomatic];
-        } completion:^(BOOL finished) {
-            [self onModelEdited];
-        }];
-    }
+    [self.tableView performBatchUpdates:^{
+        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + 1 inSection:kAttachmentsSectionIdx]] 
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+    } completion:^(BOOL finished) {
+        [self onModelEdited];
+    }];
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
@@ -1031,6 +1046,11 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         vc.onDone = ^(BOOL showAllAuditIssues, UIViewController * _Nonnull viewControllerToDismiss) { 
             [viewControllerToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         };
+        
+        __weak ItemDetailsViewController* weakSelf = self;
+        vc.updateDatabase = ^{
+            [weakSelf updateAndSync];
+        };
     }
 }
 
@@ -1055,21 +1075,19 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     }
     
     NSUInteger idx = [self.model insertCustomField:field];
-    if (@available(iOS 11.0, *)) { 
-        [self.tableView performBatchUpdates:^{
-           if(oldIdx != -1) {
-                [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIdx + kSimpleRowCount
-                                                                            inSection:kSimpleFieldsSectionIdx]]
-                                      withRowAnimation:UITableViewRowAnimationAutomatic];
-           }
-            
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + kSimpleRowCount
+    [self.tableView performBatchUpdates:^{
+       if(oldIdx != -1) {
+            [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIdx + kSimpleRowCount
                                                                         inSection:kSimpleFieldsSectionIdx]]
                                   withRowAnimation:UITableViewRowAnimationAutomatic];
-        } completion:^(BOOL finished) {
-            [self onModelEdited];
-        }];
-    }
+       }
+        
+        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + kSimpleRowCount
+                                                                    inSection:kSimpleFieldsSectionIdx]]
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+    } completion:^(BOOL finished) {
+        [self onModelEdited];
+    }];
 }
 
 - (UIImage*)getIconImageFromModel {
@@ -1332,11 +1350,13 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
 - (void)applyModelChangesToDatabaseNode:(void (^)(Node* item))completion {
     Node* ret;
-
+    
     if ( self.createNewItem ) {
         ret = [self createNewEntryNode];
         Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
-        Node* added = [self.databaseModel addItem:parentGroup item:ret];
+        
+        BOOL added = [self.databaseModel addChildren:@[ret] destination:parentGroup]; 
+        
         if ( !added ) {
             completion(nil);
             return;
@@ -1350,12 +1370,13 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
     if ( ![self.model applyToNode:ret
                    databaseFormat:self.databaseFormat
-                keePassEmailField:AppPreferences.sharedInstance.keePassEmailField
           legacySupplementaryTotp:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
                     addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl] ) {
         completion(nil);
         return;
     }
+    
+    [self.databaseModel.database rebuildFastMaps];
     
     
     
@@ -1672,7 +1693,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         cell.password = self.model.password;
         
         cell.onPasswordEdited = ^(NSString * _Nonnull password) {
-            weakSelf.model.password = trim(password);
+            weakSelf.model.password = password;
             [weakSelf onModelEdited];
         };
         
@@ -2131,16 +2152,7 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (BOOL)emailFieldEnabled {
-    if ( self.databaseFormat == kPasswordSafe ) {
-        return YES;
-    }
-    else if ( self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4 ) {
-        if ( AppPreferences.sharedInstance.keePassEmailField ) {
-            return YES;
-        }
-    }
-    
-    return NO;
+    return YES; 
 }
 
 - (EntryViewModel*)refreshViewModel {
@@ -2162,7 +2174,9 @@ suggestionProvider:^NSString*(NSString *text) {
         }
     }
 
-    return [EntryViewModel fromNode:item format:format keePassEmailField:AppPreferences.sharedInstance.keePassEmailField];
+    return [EntryViewModel fromNode:item
+                             format:format
+                              model:self.databaseModel];
 }
 
 - (void)performFullReload {
@@ -2211,6 +2225,8 @@ suggestionProvider:^NSString*(NSString *text) {
     item.fields.passwordHistory = changed;
     [item touch:YES touchParents:NO];
         
+    [self.databaseModel.database rebuildFastMaps];
+    
     [self refreshPublishAndSyncAfterModelEdit];
 }
 
@@ -2230,15 +2246,13 @@ suggestionProvider:^NSString*(NSString *text) {
             self.itemId = item.uuid;
             self.model = [self refreshViewModel];
             
-            if (@available(iOS 11.0, *)) {
-                [self.tableView performBatchUpdates:^{
-                    [self prepareTableViewForEditing];
-                } completion:^(BOOL finished) {
-                    [self bindNavBar];
-            
-                    [self refreshPublishAndSyncAfterModelEdit];
-                }];
-            }
+            [self.tableView performBatchUpdates:^{
+                [self prepareTableViewForEditing];
+            } completion:^(BOOL finished) {
+                [self bindNavBar];
+        
+                [self refreshPublishAndSyncAfterModelEdit];
+            }];
         }
     }];
 }

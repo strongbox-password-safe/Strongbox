@@ -35,9 +35,7 @@
     
     self.textView.font = self.configuredValueFont;
     
-    if (@available(iOS 10.0, *)) {
-        self.textView.adjustsFontForContentSizeCategory = YES;
-    }
+    self.textView.adjustsFontForContentSizeCategory = YES;
     
     self.textView.userInteractionEnabled = YES; 
     self.textView.accessibilityLabel = NSLocalizedString(@"notes_cell_textview_accessibility_label", @"Notes Text View");

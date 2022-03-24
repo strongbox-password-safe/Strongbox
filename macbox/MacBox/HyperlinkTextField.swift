@@ -15,7 +15,7 @@ class HyperlinkTextField: NSTextField {
         attributedStringValue = NSAttributedString(string: "<Not Set>")
     }
 
-    var parsedUrl: URL? {
+    private var parsedUrl: URL? {
         let str = href as NSString
         return str.urlExtendedParse
     }

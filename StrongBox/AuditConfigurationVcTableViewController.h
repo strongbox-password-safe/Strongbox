@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hideShowAllAuditIssues;
 
 @property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues, UIViewController* viewControllerToDismiss);
+@property (nonatomic, copy) void (^updateDatabase)(void);
 
 @end
 

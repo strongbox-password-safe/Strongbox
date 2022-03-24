@@ -21,17 +21,11 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var showManagerOnAllClosed: NSButton!
     @IBOutlet var hideManagerAfterLaunching: NSButton!
     @IBOutlet var allowClipboardHandoff: NSButton!
-    @IBOutlet var useNextGenUI: NSButton!
     @IBOutlet var addTotpOtpAuth: NSButton!
     @IBOutlet var addLegacyTotpFields: NSButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        if #available(macOS 11.0, *) {
-        } else {
-            useNextGenUI.isHidden = true
-        }
 
         bindUI()
 
@@ -66,8 +60,6 @@ class AdvancedAppPreferences: NSViewController {
         
 
         showManagerOnAllClosed.isEnabled = !settings.runningAsATrayApp
-
-        useNextGenUI.state = Settings.sharedInstance().nextGenUI ? .on : .off
     }
 
     @IBAction func onChanged(_: Any) {
@@ -85,8 +77,6 @@ class AdvancedAppPreferences: NSViewController {
         Settings.sharedInstance().clipboardHandoff = allowClipboardHandoff.state == .on
         Settings.sharedInstance().addLegacySupplementaryTotpCustomFields = addLegacyTotpFields.state == .on
         Settings.sharedInstance().addOtpAuthUrl = addTotpOtpAuth.state == .on
-
-        Settings.sharedInstance().nextGenUI = useNextGenUI.state == .on
 
         bindUI()
 

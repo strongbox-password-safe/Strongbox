@@ -7,7 +7,6 @@
 //
 
 #import "AutoFillNewRecordSettingsController.h"
-//#import "Settings.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
 
@@ -22,9 +21,7 @@
     
     [self bindToSettings];
 
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
+    self.navigationController.navigationBar.prefersLargeTitles = NO;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

@@ -20,6 +20,7 @@ class DetailsViewField {
         case expiry
         case tags
         case url
+        case auditIssue
     }
 
     var name: String = ""
@@ -31,7 +32,14 @@ class DetailsViewField {
     var object: Any?
     var showStrength: Bool = false
 
-    init(name: String, value: String, fieldType: FieldType, concealed: Bool = false, concealable: Bool = false, icon: NodeIcon? = nil, object: Any? = nil, showStrength: Bool = false) {
+    init(name: String, value: String,
+         fieldType: FieldType,
+         concealed: Bool = false,
+         concealable: Bool = false,
+         icon: NodeIcon? = nil,
+         object: Any? = nil,
+         showStrength: Bool = false)
+    {
         self.name = name
         self.value = value
         self.fieldType = fieldType

@@ -68,14 +68,10 @@ static NSString* const kGroupAllItems = @"all-items";
     self.searchController.obscuresBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
 
-    if (@available(iOS 11.0, *)) {
-        self.navigationItem.searchController = self.searchController;
-        
-        self.navigationItem.hidesSearchBarWhenScrolling = NO;
-    } else {
-        self.tableView.tableHeaderView = self.searchController.searchBar;
-        [self.searchController.searchBar sizeToFit];
-    }
+    self.navigationItem.searchController = self.searchController;
+    
+    self.navigationItem.hidesSearchBarWhenScrolling = NO;
+
     self.searchController.searchBar.enablesReturnKeyAutomatically = NO; 
         
     
@@ -316,7 +312,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     BOOL descending = self.model.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
     
-    return [self.model filterAndSortForBrowse:self.model.allRecords.mutableCopy
+    return [self.model filterAndSortForBrowse:self.model.allEntries.mutableCopy
                         includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
                             includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
                                includeExpired:self.model.metadata.showExpiredInSearch
@@ -327,7 +323,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)loadPinnedItems {
-    if( !self.model.pinnedSet.count || !AppPreferences.sharedInstance.autoFillShowPinned ) {
+    if( !self.model.favourites.count || !AppPreferences.sharedInstance.autoFillShowPinned ) {
         return @[];
     }
     
@@ -335,7 +331,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     BOOL descending = self.model.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
     
-    return [self.model filterAndSortForBrowse:self.model.pinnedNodes.mutableCopy
+    return [self.model filterAndSortForBrowse:self.model.favourites.mutableCopy
                         includeKeePass1Backup:NO
                             includeRecycleBin:NO
                                includeExpired:YES
@@ -980,7 +976,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if ( !item.isGroup ) {
         
 
-        if ( self.model.database.originalFormat == kPasswordSafe && item.fields.email.length ) {
+        if ( item.fields.email.length ) {
             [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_email" item:item handler:^(__kindof UIAction * _Nonnull action) {
                 [weakSelf copyEmail:item];
             }]];
@@ -997,7 +993,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         
         
         NSMutableArray* customFields = [NSMutableArray array];
-        NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
+        NSArray* sortedKeys = [item.fields.customFieldsNoEmail.allKeys sortedArrayUsingComparator:finderStringComparator];
         for(NSString* key in sortedKeys) {
             if ( ![NodeFields isTotpCustomFieldKey:key] ) {
                 [customFields addObject:[self getContextualMenuGenericCopy:key item:item handler:^(__kindof UIAction * _Nonnull action) {

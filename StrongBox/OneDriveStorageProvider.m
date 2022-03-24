@@ -20,7 +20,7 @@
 
 static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
-@implementation OneDriveStorageProvider
+@implementation OneDriveStorageProvider 
 
 + (instancetype)sharedInstance {
     static OneDriveStorageProvider *sharedInstance = nil;
@@ -209,7 +209,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         ODItem* item = (ODItem*)providerData;
         
 
-                
+
         NSDate* dtMod = item.lastModifiedDateTime;
         NSDate* dtMod2 = options.onlyIfModifiedDifferentFrom;
     
@@ -295,31 +295,35 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
                 completion(kUpdateResultError, nil, error);
                 return;
             }
-            
-            ODItemContentRequest *request;
-            request = [[[self.odClient drives:item.parentReference.driveId] items:item.id] contentRequest];
-            
-            if (viewController) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD showWithStatus:@"Updating..."];
-                });
-            }
-            
-            [request uploadFromData:data completion:^(ODItem *response, NSError *error) {
-                if (viewController) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [SVProgressHUD dismiss];
-                    });
-                }
-                
-                if (error) {
-                    completion(kUpdateResultError, nil, error);
-                }
-                else {
-                    completion(kUpdateResultSuccess, response.lastModifiedDateTime, nil);
-                }
-            }];
+
+            [self upload:safeMetaData item:item interactiveVC:viewController data:data completion:completion];
         }];
+    }];
+}
+
+- (void)upload:(DatabasePreferences *)safeMetaData item:(ODItem*)item interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+    ODItemContentRequest *request;
+    request = [[[self.odClient drives:item.parentReference.driveId] items:item.id] contentRequest];
+    
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"Updating..."];
+        });
+    }
+    
+    [request uploadFromData:data completion:^(ODItem *response, NSError *error) {
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
+        
+        if (error) {
+            completion(kUpdateResultError, nil, error);
+        }
+        else {
+            completion(kUpdateResultSuccess, response.lastModifiedDateTime, nil);
+        }
     }];
 }
 

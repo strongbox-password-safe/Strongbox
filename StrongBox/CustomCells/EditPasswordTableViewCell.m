@@ -54,9 +54,7 @@
     self.valueTextView.delegate = self;
     self.valueTextView.font = FontManager.sharedInstance.easyReadFont;
     
-    if (@available(iOS 10.0, *)) {
-        self.valueTextView.adjustsFontForContentSizeCategory = YES;
-    }
+    self.valueTextView.adjustsFontForContentSizeCategory = YES;
     
     self.valueTextView.accessibilityLabel = NSLocalizedString(@"edit_password_cell_value_textfield_accessibility_label", @"Password Text Field");
 

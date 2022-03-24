@@ -10,6 +10,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="TagItem" customModule="Strongbox" customModuleProvider="target">
             <connections>
                 <outlet property="label" destination="egZ-n0-1IQ" id="VoS-vs-OAt"/>
+                <outlet property="tagIcon" destination="aTg-cN-A6w" id="fWi-vM-Z0F"/>
                 <outlet property="view" destination="fbJ-pO-FBh" id="ZyQ-M8-NJK"/>
             </connections>
         </customObject>

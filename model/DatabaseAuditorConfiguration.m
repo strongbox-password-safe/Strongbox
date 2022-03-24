@@ -20,6 +20,8 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
 - (instancetype)init {
     self = [super init];
     if (self) {
+        self.checkForTwoFactorAvailable = NO;
+        
         self.auditInBackground = YES;
         self.checkForNoPasswords = NO;
         self.checkForDuplicatedPasswords = YES;
@@ -38,12 +40,15 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         self.lastKnownAuditIssueCount = nil;
         self.showAuditPopupNotifications = YES;
         self.hibpCaveatAccepted = NO;
-        self.hibpCheckForNewBreachesIntervalSeconds = 24 * 60 * 60; 
+        self.hibpCheckForNewBreachesIntervalSeconds = 7 * 24 * 60 * 60; 
         self.lastHibpOnlineCheck = nil;
-        self.showCachedHibpHits = YES;
     }
         
     return self;
+}
+
+- (BOOL)showCachedHibpHits {
+    return YES;
 }
 
 
@@ -66,10 +71,11 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     if (jsonDictionary[@"showAuditPopupNotifications"] != nil ) ret.showAuditPopupNotifications = ((NSNumber*)(jsonDictionary[@"showAuditPopupNotifications"])).boolValue;
     if (jsonDictionary[@"hibpCaveatAccepted"] != nil ) ret.hibpCaveatAccepted = ((NSNumber*)(jsonDictionary[@"hibpCaveatAccepted"])).boolValue;
     if (jsonDictionary[@"hibpCheckForNewBreachesIntervalSeconds"] != nil ) ret.hibpCheckForNewBreachesIntervalSeconds = ((NSNumber*)(jsonDictionary[@"hibpCheckForNewBreachesIntervalSeconds"])).unsignedIntegerValue;
-    if (jsonDictionary[@"showCachedHibpHits"] != nil ) ret.showCachedHibpHits = ((NSNumber*)(jsonDictionary[@"showCachedHibpHits"])).boolValue;
+
     if (jsonDictionary[@"lastHibpOnlineCheck"] != nil ) ret.lastHibpOnlineCheck = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastHibpOnlineCheck"])).doubleValue];
     if (jsonDictionary[@"lastKnownAuditIssueCount"] != nil ) ret.lastKnownAuditIssueCount = ((NSNumber*)(jsonDictionary[@"lastKnownAuditIssueCount"]));
     if (jsonDictionary[@"lowEntropyThreshold"] != nil ) ret.lowEntropyThreshold = ((NSNumber*)(jsonDictionary[@"lowEntropyThreshold"])).unsignedIntegerValue;
+    if (jsonDictionary[@"checkForTwoFactorAvailable"] != nil ) ret.checkForTwoFactorAvailable = ((NSNumber*)(jsonDictionary[@"checkForTwoFactorAvailable"])).boolValue;
 
     return ret;
 }
@@ -90,8 +96,9 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         @"showAuditPopupNotifications" : @(self.showAuditPopupNotifications),
         @"hibpCaveatAccepted" : @(self.hibpCaveatAccepted),
         @"hibpCheckForNewBreachesIntervalSeconds" : @(self.hibpCheckForNewBreachesIntervalSeconds),
-        @"showCachedHibpHits" : @(self.showCachedHibpHits),
+
         @"lowEntropyThreshold" : @(self.lowEntropyThreshold),
+        @"checkForTwoFactorAvailable" : @(self.checkForTwoFactorAvailable),
     }];
 
     if( self.lastHibpOnlineCheck != nil) {
@@ -103,6 +110,53 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     }
 
     return ret;
+}
+
+
+
+- (instancetype)initWithCoder:(NSCoder *)coder {
+    if (self) {
+        self.auditInBackground = [coder decodeBoolForKey:@"auditInBackground"];
+        self.checkForNoPasswords = [coder decodeBoolForKey:@"checkForNoPasswords"];
+        self.checkForDuplicatedPasswords = [coder decodeBoolForKey:@"checkForDuplicatedPasswords"];
+        self.caseInsensitiveMatchForDuplicates = [coder decodeBoolForKey:@"caseInsensitiveMatchForDuplicates"];
+        self.checkForCommonPasswords = [coder decodeBoolForKey:@"checkForCommonPasswords"];
+        self.checkForLowEntropy = [coder decodeBoolForKey:@"checkForLowEntropy"];
+        self.checkForSimilarPasswords = [coder decodeBoolForKey:@"checkForSimilarPasswords"];
+        self.levenshteinSimilarityThreshold = [coder decodeFloatForKey:@"levenshteinSimilarityThreshold"];
+        self.minimumLength = [coder decodeIntegerForKey:@"minimumLength"];
+        self.checkForMinimumLength = [coder decodeBoolForKey:@"checkForMinimumLength"];
+        self.checkHibp = [coder decodeBoolForKey:@"checkHibp"];
+        self.showAuditPopupNotifications = [coder decodeBoolForKey:@"showAuditPopupNotifications"];
+        self.hibpCaveatAccepted = [coder decodeBoolForKey:@"hibpCaveatAccepted"];
+        self.hibpCheckForNewBreachesIntervalSeconds = [coder decodeIntegerForKey:@"hibpCheckForNewBreachesIntervalSeconds"];
+        self.lowEntropyThreshold = [coder decodeIntegerForKey:@"lowEntropyThreshold"];
+        self.checkForTwoFactorAvailable = [coder decodeBoolForKey:@"checkForTwoFactorAvailable"];
+        self.lastHibpOnlineCheck = [coder decodeObjectForKey:@"lastHibpOnlineCheck"];
+        self.lastKnownAuditIssueCount = [coder decodeObjectForKey:@"lastKnownAuditIssueCount"];
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeBool:self.auditInBackground forKey:@"auditInBackground"];
+    [coder encodeBool:self.checkForNoPasswords forKey:@"checkForNoPasswords"];
+    [coder encodeBool:self.checkForDuplicatedPasswords forKey:@"checkForDuplicatedPasswords"];
+    [coder encodeBool:self.caseInsensitiveMatchForDuplicates forKey:@"caseInsensitiveMatchForDuplicates"];
+    [coder encodeBool:self.checkForCommonPasswords forKey:@"checkForCommonPasswords"];
+    [coder encodeBool:self.checkForLowEntropy forKey:@"checkForLowEntropy"];
+    [coder encodeBool:self.checkForSimilarPasswords forKey:@"checkForSimilarPasswords"];
+    [coder encodeFloat:self.levenshteinSimilarityThreshold forKey:@"levenshteinSimilarityThreshold"];
+    [coder encodeInteger:self.minimumLength forKey:@"minimumLength"];
+    [coder encodeBool:self.checkForMinimumLength forKey:@"checkForMinimumLength"];
+    [coder encodeBool:self.checkHibp forKey:@"checkHibp"];
+    [coder encodeBool:self.showAuditPopupNotifications forKey:@"showAuditPopupNotifications"];
+    [coder encodeBool:self.hibpCaveatAccepted forKey:@"hibpCaveatAccepted"];
+    [coder encodeInteger:self.hibpCheckForNewBreachesIntervalSeconds forKey:@"hibpCheckForNewBreachesIntervalSeconds"];
+    [coder encodeInteger:self.lowEntropyThreshold forKey:@"lowEntropyThreshold"];
+    [coder encodeBool:self.checkForTwoFactorAvailable forKey:@"checkForTwoFactorAvailable"];
+    [coder encodeObject:self.lastHibpOnlineCheck forKey:@"lastHibpOnlineCheck"];
+    [coder encodeObject:self.lastKnownAuditIssueCount forKey:@"lastKnownAuditIssueCount"];
 }
 
 @end

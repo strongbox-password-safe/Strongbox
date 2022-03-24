@@ -8,8 +8,17 @@
 
 import Cocoa
 
-class AutoResizingTokenField: NSTokenField {
-    var editing = false
+class AutoResizingTokenField: OEXTokenField {
+    private var editing = false
+    private var explicitResizeRequest = false
+
+    func explicitResizeToFitContent() {
+        explicitResizeRequest = true
+        _ = intrinsicContentSize
+        explicitResizeRequest = false
+
+        invalidateIntrinsicContentSize()
+    }
 
     override func textDidChange(_ notification: Notification) {
         super.textDidChange(notification)
@@ -37,7 +46,7 @@ class AutoResizingTokenField: NSTokenField {
             lastIntrinsicSize = super.intrinsicContentSize
         }
 
-        if editing {
+        if editing || explicitResizeRequest { 
             let size = cell!.cellSize(forBounds: NSMakeRect(0, 0, bounds.size.width, CGFloat.greatestFiniteMagnitude))
 
 

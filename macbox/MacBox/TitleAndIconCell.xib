@@ -9,43 +9,109 @@
         <customObject id="-2" userLabel="File's Owner"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <tableCellView identifier="TitleAndIconCell" id="fmY-e4-6vb" customClass="TitleAndIconCell" customModule="Strongbox" customModuleProvider="target">
-            <rect key="frame" x="0.0" y="0.0" width="138" height="28"/>
+        <tableCellView identifier="TitleAndIconCell" misplaced="YES" id="fmY-e4-6vb" customClass="TitleAndIconCell" customModule="Strongbox" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="114" height="28"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="00V-dE-Msw">
-                    <rect key="frame" x="0.0" y="4" width="20" height="20"/>
-                    <constraints>
-                        <constraint firstAttribute="height" constant="20" id="Mqc-Jy-YcN"/>
-                        <constraint firstAttribute="width" constant="20" id="v61-Mu-h3l"/>
-                    </constraints>
-                    <imageCell key="cell" controlSize="large" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="YrB-0l-fFf"/>
-                    <color key="contentTintColor" name="linkColor" catalog="System" colorSpace="catalog"/>
-                </imageView>
-                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xFE-JC-Tbi">
-                    <rect key="frame" x="26" y="6" width="114" height="16"/>
-                    <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Title" id="nFB-2M-q9N">
-                        <font key="font" textStyle="body" name=".SFNS-Regular"/>
-                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                    </textFieldCell>
-                </textField>
+                <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u0E-UW-krg">
+                    <rect key="frame" x="0.0" y="4" width="110" height="20"/>
+                    <subviews>
+                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="M8t-M4-jkb" userLabel="Favourite Icon">
+                            <rect key="frame" x="0.0" y="-1" width="16.5" height="23"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="16" id="JBm-hm-1Rn"/>
+                                <constraint firstAttribute="width" constant="16" id="sNr-lm-keB"/>
+                            </constraints>
+                            <imageCell key="cell" controlSize="large" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="star.fill" catalog="system" id="2GS-i4-IYm"/>
+                            <color key="contentTintColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
+                        </imageView>
+                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="00V-dE-Msw">
+                            <rect key="frame" x="20" y="0.0" width="20" height="20"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="20" id="Mqc-Jy-YcN"/>
+                                <constraint firstAttribute="width" constant="20" id="v61-Mu-h3l"/>
+                            </constraints>
+                            <imageCell key="cell" controlSize="large" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" id="YrB-0l-fFf"/>
+                            <color key="contentTintColor" name="linkColor" catalog="System" colorSpace="catalog"/>
+                        </imageView>
+                        <stackView distribution="fill" orientation="horizontal" alignment="firstBaseline" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7d0-Y2-rAJ">
+                            <rect key="frame" x="44" y="2" width="50" height="16"/>
+                            <subviews>
+                                <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="xFE-JC-Tbi">
+                                    <rect key="frame" x="-2" y="0.0" width="31" height="16"/>
+                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="Title" usesSingleLineMode="YES" id="nFB-2M-q9N">
+                                        <font key="font" textStyle="body" name=".SFNS-Regular"/>
+                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                                <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QJv-c6-EeN">
+                                    <rect key="frame" x="29" y="1" width="23" height="13"/>
+                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" allowsUndo="NO" sendsActionOnEndEditing="YES" title="(12)" usesSingleLineMode="YES" id="eff-dk-071">
+                                        <font key="font" textStyle="caption1" name=".SFNS-Regular"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                    </textFieldCell>
+                                </textField>
+                            </subviews>
+                            <constraints>
+                                <constraint firstItem="xFE-JC-Tbi" firstAttribute="baseline" secondItem="QJv-c6-EeN" secondAttribute="firstBaseline" constant="1" id="QlD-iC-amb"/>
+                            </constraints>
+                            <visibilityPriorities>
+                                <integer value="1000"/>
+                                <integer value="1000"/>
+                            </visibilityPriorities>
+                            <customSpacing>
+                                <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
+                            </customSpacing>
+                        </stackView>
+                        <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="SJA-gK-cG1" userLabel="Trailing Favourite Icon">
+                            <rect key="frame" x="98" y="1" width="12.5" height="19"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="12" id="u95-le-bx1"/>
+                                <constraint firstAttribute="height" constant="12" id="zcY-50-3Q1"/>
+                            </constraints>
+                            <imageCell key="cell" controlSize="large" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="star.fill" catalog="system" id="WIp-Jj-BWe"/>
+                            <color key="contentTintColor" name="systemYellowColor" catalog="System" colorSpace="catalog"/>
+                        </imageView>
+                    </subviews>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
             </subviews>
             <constraints>
-                <constraint firstItem="00V-dE-Msw" firstAttribute="leading" secondItem="fmY-e4-6vb" secondAttribute="leading" id="3Lf-Uv-Vwh"/>
-                <constraint firstItem="00V-dE-Msw" firstAttribute="top" secondItem="fmY-e4-6vb" secondAttribute="top" constant="4" id="6Zq-ng-hXe"/>
-                <constraint firstAttribute="bottom" secondItem="00V-dE-Msw" secondAttribute="bottom" constant="4" id="Wjg-4w-jKU"/>
-                <constraint firstAttribute="trailing" secondItem="xFE-JC-Tbi" secondAttribute="trailing" id="bCZ-U9-J50"/>
-                <constraint firstItem="xFE-JC-Tbi" firstAttribute="leading" secondItem="00V-dE-Msw" secondAttribute="trailing" constant="8" id="jVX-rK-K1d"/>
-                <constraint firstItem="xFE-JC-Tbi" firstAttribute="centerY" secondItem="fmY-e4-6vb" secondAttribute="centerY" id="zev-EU-ecY"/>
+                <constraint firstItem="u0E-UW-krg" firstAttribute="leading" secondItem="fmY-e4-6vb" secondAttribute="leading" id="6yU-R6-tHa"/>
+                <constraint firstItem="u0E-UW-krg" firstAttribute="top" secondItem="fmY-e4-6vb" secondAttribute="top" constant="4" id="DUG-tj-x6b"/>
+                <constraint firstAttribute="bottom" secondItem="u0E-UW-krg" secondAttribute="bottom" constant="4" id="DhH-2O-fjj"/>
+                <constraint firstAttribute="trailing" secondItem="u0E-UW-krg" secondAttribute="trailing" id="jXX-6r-mdl"/>
             </constraints>
             <connections>
+                <outlet property="bottomSpaceConstraint" destination="DhH-2O-fjj" id="Vlq-JW-g2y"/>
+                <outlet property="childCount" destination="QJv-c6-EeN" id="J9h-B4-0pT"/>
+                <outlet property="favStarIcon" destination="M8t-M4-jkb" id="L4v-ua-iBb"/>
                 <outlet property="icon" destination="00V-dE-Msw" id="hLF-MD-iGR"/>
                 <outlet property="imageView" destination="00V-dE-Msw" id="6vh-yr-34K"/>
+                <outlet property="leadingSpaceConstraint" destination="6yU-R6-tHa" id="vgM-p4-L0Z"/>
                 <outlet property="textField" destination="xFE-JC-Tbi" id="OlJ-v9-iK0"/>
                 <outlet property="title" destination="xFE-JC-Tbi" id="OkS-Sd-GDp"/>
+                <outlet property="topSpaceConstraint" destination="DUG-tj-x6b" id="iTp-06-ly3"/>
+                <outlet property="trailingFavStar" destination="SJA-gK-cG1" id="Ndx-D3-3zq"/>
             </connections>
-            <point key="canvasLocation" x="146" y="-39.5"/>
+            <point key="canvasLocation" x="205.5" y="-40"/>
         </tableCellView>
     </objects>
+    <resources>
+        <image name="star.fill" catalog="system" width="17" height="16"/>
+    </resources>
 </document>

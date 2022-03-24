@@ -10,6 +10,7 @@ import Cocoa
 
 class TagItem: NSCollectionViewItem {
     @IBOutlet var label: NSTextField!
+    @IBOutlet var tagIcon: NSImageView!
 
     static let reuseIdentifier = NSUserInterfaceItemIdentifier("TagItemReuseIdentifier")
 
@@ -19,6 +20,11 @@ class TagItem: NSCollectionViewItem {
         view.wantsLayer = true
         view.layer?.backgroundColor = NSColor.linkColor.cgColor
         view.layer?.cornerRadius = 8.0
+
+        label.textColor = .white
+        if #available(macOS 10.14, *) {
+            tagIcon.contentTintColor = .white
+        }
 
         if #available(macOS 10.13, *) {
 

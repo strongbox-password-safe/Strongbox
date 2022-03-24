@@ -13,6 +13,8 @@
 
 @interface V3Binary ()
 
+@property BOOL completionDone;
+
 @end
 
 @implementation V3Binary
@@ -38,7 +40,7 @@
     return self;
 }
 
-- (BOOL)handlesStreamingText {
+- (BOOL)isV3BinaryHack {
     return YES;
 }
 
@@ -48,6 +50,11 @@
     return ret >= 0;
 }
 
+- (void)onCompletedWithStrangeProtectedAttribute:(NSData*)data {
+    self.completionDone = YES;
+    self.dbAttachment = [[DatabaseAttachment alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:NO];
+}
+
 - (void)onCompleted {
     NSString* identifier = self.originalAttributes[kBinaryIdAttribute];
     self.id = identifier.intValue;
@@ -55,12 +62,14 @@
     NSString* compressed = self.originalAttributes[kBinaryCompressedAttribute];
     self.compressed = [compressed isEqualToString:kAttributeValueTrue];
 
-    [self.dbAttachment closeWriteStream];
+    if ( !self.completionDone ) {
+        [self.dbAttachment closeWriteStream];
+    }
 }
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer {
-    
-    NSMutableDictionary* attributes = self.originalAttributes ? self.originalAttributes.mutableCopy : @{}.mutableCopy;
+    NSMutableDictionary* attributes = @{}.mutableCopy;
+
     attributes[kBinaryIdAttribute] = @(self.id).stringValue;
     if(self.compressed) {
         attributes[kBinaryCompressedAttribute] = kAttributeValueTrue;
@@ -83,6 +92,5 @@
 
     return [serializer writeElement:self.originalElementName text:b64 attributes:attributes];
 }
-
 
 @end

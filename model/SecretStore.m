@@ -101,16 +101,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
             return nil;
         }
         
-#if TARGET_OS_IPHONE
-        if (@available(ios 10.0, *)) {
-            return [self decryptAndDeserializeData:object identifier:identifier];
-        }
-        else {
-            return object;
-        }
-#else
-        return   [self decryptAndDeserializeData:object identifier:identifier];
-#endif
+        return [self decryptAndDeserializeData:object identifier:identifier];
     }
     else if(expiryMode == kExpiresAtTime) {
         NSDate* expiry = wrapped[kWrappedObjectExpiryKey];
@@ -171,16 +162,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return YES;
     }
     
-#if TARGET_OS_IPHONE
-    if (@available(ios 10.0, *)) {
-        return [self wrapSerializeAndEncryptObject:object forIdentifier:identifier expiryMode:expiryMode expiresAt:expiresAt];
-    }
-    else {
-        return [self wrapAndSerializeObject:object forIdentifier:identifier expiryMode:expiryMode expiresAt:expiresAt];
-    }
-#else
     return [self wrapSerializeAndEncryptObject:object forIdentifier:identifier expiryMode:expiryMode expiresAt:expiresAt];
-#endif
 }
 
 - (BOOL)wrapAndSerializeObject:(id)object forIdentifier:(NSString *)identifier expiryMode:(SecretExpiryMode)expiryMode expiresAt:(NSDate *)expiresAt {
@@ -278,8 +260,8 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
             return NO;
         }
 
-        NSData* dataObject = (__bridge NSData *)cipherTextMemOnly;
-        self.ephemeralObjectStore[identifier] = dataObject;
+
+        self.ephemeralObjectStore[identifier] = (__bridge NSData *)cipherTextMemOnly;
     }
 
     
@@ -355,12 +337,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 + (CFStringRef)keyType {
 #if TARGET_OS_IPHONE
-    if (@available(iOS 10.0, *)) {
-        return kSecAttrKeyTypeECSECPrimeRandom;
-    }
-    else {
-        return kSecAttrKeyTypeEC;
-    }
+    return kSecAttrKeyTypeECSECPrimeRandom;
 #else
     if (@available(macOS 10.12, *)) {
         return kSecAttrKeyTypeECSECPrimeRandom;
@@ -373,12 +350,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 + (SecKeyAlgorithm)algorithm {
 #if TARGET_OS_IPHONE
-    if (@available(iOS 11.0, *)) {
-        return kSecKeyAlgorithmECIESEncryptionStandardVariableIVX963SHA256AESGCM;
-    }
-    else {
-        return kSecKeyAlgorithmECIESEncryptionCofactorX963SHA256AESGCM;
-    }
+    return kSecKeyAlgorithmECIESEncryptionStandardVariableIVX963SHA256AESGCM;
 #else
     if (@available(macOS 10.13, *)) {
         return kSecKeyAlgorithmECIESEncryptionStandardVariableIVX963SHA256AESGCM;
@@ -532,16 +504,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         }
     }
     
-#if TARGET_OS_IPHONE
-    if (@available(ios 10.0, *)) {
-        return [self decryptAndDeserializeData:keychainBlob identifier:identifier];
-    }
-    else {
-        return [self deserializeKeychainBlob:keychainBlob identifier:identifier];
-    }
-#else
     return [self decryptAndDeserializeData:keychainBlob identifier:identifier];
-#endif
 }
 
 - (id)decryptAndDeserializeData:(NSData*)encrypted identifier:(NSString *)identifier {

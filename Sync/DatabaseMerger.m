@@ -95,21 +95,28 @@
     if ( ![self manageAdditionsAndEdits] ) {
         return NO;
     }
+    [self.mine rebuildFastMaps];
     
     if (self.canCompareNodeLocations) {
         if (![self manageMoves]) {
             return NO;
         }
+        
+        [self.mine rebuildFastMaps];
     }
     
     if (self.canDetectDeletions) {
         [self manageDeletions];
+        
+        [self.mine rebuildFastMaps];
     }
     
     [self manageDatabaseProperties];
     
     [self.mine performPreSerializationTidy];
 
+    [self.mine rebuildFastMaps];
+    
     return YES;
 }
 
@@ -264,7 +271,7 @@
     NSInteger position = [self determineBestPosition:myEquivalentParentContainer theirParentGroup:theirParentContainer theirVersion:theirVersion];
     Node *ours = [theirVersion cloneAsChildOf:myEquivalentParentContainer];
     
-    return [self.mine insertChild:ours destination:myEquivalentParentContainer atPosition:position];
+    return [self.mine insertChildren:@[ours] destination:myEquivalentParentContainer atPosition:position];
 }
 
 - (BOOL)mergeTheirGroupIn:(Node*)theirVersion myVersion:(Node*)myVersion {
@@ -493,10 +500,11 @@
         }
     }
     
-    for (Node* toDelete in toBeDeleted) {
-        NSLog(@"Deleting: [%@]", toDelete);
-        [self.mine removeChildFromParent:toDelete];
-    }
+    NSArray<NSUUID*>* uuids = [toBeDeleted map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
+    }];
+    
+    [self.mine removeChildren:uuids];
 }
 
 - (NSUInteger)determineBestPosition:(Node*)myProspectiveParentGroup theirParentGroup:(Node*)theirParentGroup theirVersion:(Node*)theirVersion {

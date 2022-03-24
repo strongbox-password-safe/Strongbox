@@ -44,7 +44,7 @@
     return self;
 }
 
-- (BOOL)handlesStreamingText {
+- (BOOL)isV3BinaryHack {
     return NO;
 }
 

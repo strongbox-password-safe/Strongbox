@@ -126,7 +126,7 @@ static NSString* const kDisableFavIconFeature = @"disableFavIconFeature";
 static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetworkStorageOptions";
 
 static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
-static NSString* const kKeePassEmailField = @"keePassEmailField";
+
 
 static NSString* const kExportItemsPreserveUUIDs = @"exportItemsPreserveUUIDs";
 static NSString* const kExportItemsReplaceExisting = @"exportItemsReplaceExisting";
@@ -192,7 +192,7 @@ static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
 }
 
 - (BOOL)markdownNotes {
-    return [self getBool:kMarkdownNotes];
+    return [self getBool:kMarkdownNotes fallback:YES];
 }
 
 - (void)setMarkdownNotes:(BOOL)markdownNotes {
@@ -271,13 +271,13 @@ static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
     [self setBool:kExportItemsReplaceExisting value:exportItemsReplaceExisting];
 }
 
-- (BOOL)keePassEmailField {
-    return [self getBool:kKeePassEmailField];
-}
 
-- (void)setKeePassEmailField:(BOOL)keePassEmailField {
-    [self setBool:kKeePassEmailField value:keePassEmailField];
-}
+
+
+
+
+
+
 
 - (BOOL)useIsolatedDropbox {
     return [self getBool:kUseIsolatedDropbox];

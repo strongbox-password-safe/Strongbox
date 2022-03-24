@@ -9,7 +9,6 @@
 import Cocoa
 
 class TagsTableCellView: NSTableCellView, NSCollectionViewDataSource, NSCollectionViewDelegate, NSCollectionViewDelegateFlowLayout {
-    @IBOutlet var tagsLabel: NSTextField!
     @IBOutlet var collectionView: NSCollectionView!
     @IBOutlet var heightConstraint: NSLayoutConstraint!
 

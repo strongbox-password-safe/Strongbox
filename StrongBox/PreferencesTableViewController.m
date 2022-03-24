@@ -16,50 +16,41 @@
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
 #import "SelectItemTableViewController.h"
-#import "AutoFillNewRecordSettingsController.h"
-#import "CloudSessionsTableViewController.h"
-#import "AboutViewController.h"
 #import "AdvancedPreferencesTableViewController.h"
-#import "KeyFilesTableViewController.h"
-#import "PasswordGenerationViewController.h"
 #import "DebugHelper.h"
 #import "BiometricsManager.h"
 #import "ClipboardManager.h"
 #import "CustomizationManager.h"
 #import "Strongbox-Swift.h"
+#import "ProUpgradeIAPManager.h"
+#import "Model.h"
 
-@interface PreferencesTableViewController ()
+@interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
-@property (weak, nonatomic) IBOutlet UISwitch *appLockOnPreferences;
-@property (weak, nonatomic) IBOutlet UISwitch *switchDeleteDataEnabled;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellDeleteDataAttempts;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellCloudSessions;
-@property (weak, nonatomic) IBOutlet UILabel *labelDeleteDataAttemptCount;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutVersion;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutHelp;
-@property (weak, nonatomic) IBOutlet UILabel *labelVersion;
-@property (weak, nonatomic) IBOutlet UILabel *labelCloudSessions;
-@property (weak, nonatomic) IBOutlet UISwitch *clearClipboardEnabled;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellClearClipboardDelay;
-@property (weak, nonatomic) IBOutlet UILabel *labelClearClipboardDelay;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellAppLockDelay;
-@property (weak, nonatomic) IBOutlet UILabel *labelAppLockDelay;
-@property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
-@property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowTips;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordGeneration;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellManageKeyFiles;
-@property (weak, nonatomic) IBOutlet UISwitch *appLockPasscodeFallback;
-@property (weak, nonatomic) IBOutlet UILabel *labelAppLockPasscodeFallback;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrivacyShield;
-@property (weak, nonatomic) IBOutlet UILabel *labelPrivacyShield;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordStrength;
-@property (weak, nonatomic) IBOutlet UILabel *labelPasswordStrengthAlgo;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellAdversaryStrength;
-@property (weak, nonatomic) IBOutlet UILabel *labelAdversary;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellUseICloud;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellTipJar;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAppIcon;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellContactSupport;
+
+@property (weak, nonatomic) IBOutlet UILabel *labelVersion;
+@property (weak, nonatomic) IBOutlet UILabel *labelProStatus;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowTips;
+
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewTipJar;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewAbout;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewHelp;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewAppIcon;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewShowTips;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewPrivacyShield;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewAppLock;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewAdvanced;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewLicense;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewContactSupport;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewClipboard;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellProStatus;
 
 @end
 
@@ -69,24 +60,30 @@
     self.onDone();
 }
 
-- (void)bindGeneral {
-    self.labelPrivacyShield.text = stringForPrivacyShieldMode(AppPreferences.sharedInstance.appPrivacyShieldMode);
-    self.labelPasswordStrengthAlgo.text = stringForPasswordStrengthAlgo(AppPreferences.sharedInstance.passwordStrengthConfig.algorithm);
-    self.labelAdversary.text = stringForAdversaryStrength(AppPreferences.sharedInstance.passwordStrengthConfig.adversaryGuessesPerSecond);
-}
-
 
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    [self customizeUI];
     
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = YES;
-        self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeAlways;
-        [self.navigationController.navigationBar sizeToFit];
-    }
+    [self bindVersionAndProStatus];
+    [self bindHideTips];
     
-    if ( CustomizationManager.isScotusEdition || CustomizationManager.isGrapheneEdition ) {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onProStatusChanged:)
+                                               name:kProStatusChangedNotificationKey
+                                             object:nil];
+}
+
+- (void)onProStatusChanged:(id)param {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self bindVersionAndProStatus];
+    });
+}
+
+- (void)customizeUI {
+    if ( CustomizationManager.isScotusEdition || CustomizationManager.isGrapheneEdition ) { 
         [self cell:self.cellTipJar setHidden:YES];
     }
     else {
@@ -94,72 +91,118 @@
         NSLog(@"Tips Loaded: [%hhd]", TipJarLogic.sharedInstance.isLoaded);
     }
     
-    [self bindCloudSessions];
-    [self bindAboutButton];
-    [self bindHideTips];
-    [self bindClearClipboard];
-    [self bindAppLock];
-    [self customizeAppLockSectionFooter];
-    [self bindAppLock2Preferences];
-    [self bindGeneral];
+    if ( !UIApplication.sharedApplication.supportsAlternateIcons ) {
+        [self cell:self.cellAppIcon setHidden:YES];
+    }
+    
+    
+    
+    if (@available(iOS 13.0, *)) {
+        if (@available(iOS 15.0, *)) {
+            self.imageViewAbout.image = [UIImage systemImageNamed:@"lock.shield"];
+        }
+        else {
+            self.imageViewAbout.image = [UIImage systemImageNamed:@"lock.shield"];
+        }
+    } else {
+        self.imageViewAbout.hidden = YES;
+    }
+
+    if (@available(iOS 13.0, *)) {
+        self.imageViewTipJar.image = [UIImage systemImageNamed:@"gift"];
+        self.imageViewTipJar.tintColor = UIColor.systemYellowColor;
+    } else {
+        self.imageViewTipJar.hidden = YES;
+    }
+    
+    if (@available(iOS 13.0, *)) {
+        self.imageViewHelp.image = [UIImage systemImageNamed:@"questionmark.circle"];
+
+            self.imageViewHelp.tintColor = UIColor.systemPurpleColor;
+
+    } else {
+        self.imageViewHelp.hidden = YES;
+    }
+    
+    if (@available(iOS 13.0, *)) {
+        self.imageViewAppIcon.image = [UIImage systemImageNamed:@"photo"];
+    } else {
+        self.imageViewAppIcon.hidden = YES;
+    }
+    if (@available(iOS 13.0, *)) {
+        self.imageViewShowTips.image = [UIImage systemImageNamed:@"text.bubble"];
+    } else {
+        self.imageViewShowTips.hidden = YES;
+    }
+    if (@available(iOS 13.0, *)) {
+        if (@available(iOS 15.0, *)) {
+            self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"checkerboard.shield"];
+        }
+        else {
+            self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"shield"];
+        }
+    } else {
+        self.imageViewPrivacyShield.hidden = YES;
+    }
+    
+    if (@available(iOS 13.0, *)) {
+        self.imageViewAppLock.image = [UIImage systemImageNamed:@"lock.circle"];
+    } else {
+        self.imageViewAppLock.hidden = YES;
+    }
+
+    if (@available(iOS 13.0, *)) {
+        if (@available(iOS 15.0, *)) {
+            self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear.circle"];
+        }
+        else {
+            self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear"];
+        }
+    } else {
+        self.imageViewAdvanced.hidden = YES;
+    }
+
+    if (@available(iOS 14.0, *)) {
+        BOOL licensed = AppPreferences.sharedInstance.isPro;
+        NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
+        
+        self.imageViewLicense.image =  [UIImage systemImageNamed:license];
+        self.imageViewLicense.tintColor = licensed ? nil : UIColor.systemOrangeColor;
+    } else {
+        self.imageViewLicense.hidden = YES;
+    }
+
+    if (@available(iOS 13.0, *)) {
+        if ( AppPreferences.sharedInstance.isPro ) {
+            self.imageViewContactSupport.image =  [UIImage systemImageNamed:@"bubble.left"];
+            self.imageViewContactSupport.tintColor = UIColor.systemPurpleColor;
+        }
+        else {
+            [self cell:self.cellContactSupport setHidden:YES];
+        }
+
+    } else {
+        self.imageViewContactSupport.hidden = YES;
+    }
+    
+    if (@available(iOS 13.0, *)) {
+        self.imageViewClipboard.image =  [UIImage systemImageNamed:@"doc.on.doc"];
+    } else {
+        self.imageViewClipboard.hidden = YES;
+    }
+    
+    [self reloadDataAnimated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    if(cell == self.cellDeleteDataAttempts) {
-        [self promptForInteger:
-         NSLocalizedString(@"prefs_vc_delete_data_attempt_count", @"Delete Data Failed Attempt Count")
-                       options:@[@3, @5, @10, @15]
-             formatAsIntervals:NO
-                  currentValue:AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
-                        }
-                        [self bindAppLock];
-                    }];
-    }
-    else if(cell == self.cellAboutVersion) {
-        
-    }
-    else if ( cell == self.cellTipJar ) {
+    if ( cell == self.cellTipJar ) {
         [self performSegueWithIdentifier:@"segueToTipJar" sender:nil];
     }
     else if(cell == self.cellAboutHelp) {
         [self onHelp];
-    }
-    else if (cell == self.cellClearClipboardDelay) {
-        [self promptForInteger:NSLocalizedString(@"prefs_vc_clear_clipboard_delay", @"Clear Clipboard Delay")
-                       options:@[@30, @45, @60, @90, @120, @180]
-             formatAsIntervals:YES
-                  currentValue:AppPreferences.sharedInstance.clearClipboardAfterSeconds
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            AppPreferences.sharedInstance.clearClipboardAfterSeconds = selectedValue;
-                        }
-                        [self bindClearClipboard];
-                    }];
-    }
-    else if (cell == self.cellAppLockDelay) {
-        [self promptForInteger:NSLocalizedString(@"prefs_vc_app_lock_delay", @"App Lock Delay")
-                       options:@[@0, @60, @120, @180, @300, @600, @900]
-             formatAsIntervals:YES
-                  currentValue:AppPreferences.sharedInstance.appLockDelay
-                    completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            AppPreferences.sharedInstance.appLockDelay = selectedValue;
-                        }
-                        [self bindAppLock];
-                    }];
-    }
-    else if (cell == self.cellPasswordGeneration) {
-        [self performSegueWithIdentifier:@"seguePrefToPasswordPrefs" sender:nil];
-    }
-    else if (cell == self.cellManageKeyFiles) {
-        [self performSegueWithIdentifier:@"segueToManageKeyFiles" sender:nil];
     }
     else if ( cell == self.cellPrivacyShield ) {
         NSArray<NSNumber*>* options = @[@(kAppPrivacyShieldModeNone),
@@ -178,119 +221,119 @@
             if ( success ) {
                 AppPreferences.sharedInstance.appPrivacyShieldMode = selectedIndex;
             }
-            [self bindGeneral];
         }];
     }
-    else if ( cell == self.cellPasswordStrength ) {
-        NSArray<NSNumber*>* options = @[@(kPasswordStrengthAlgorithmBasic),
-                                        @(kPasswordStrengthAlgorithmZxcvbn)];
-        
-        NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-            return stringForPasswordStrengthAlgo(obj.integerValue);
-        }];
-        
-        [self promptForChoice:NSLocalizedString(@"prefs_vc_password_strength_algorithm", @"Password Strength Algorithm")
-                      options:optionStrings
-         currentlySelectIndex:AppPreferences.sharedInstance.passwordStrengthConfig.algorithm
-                   completion:^(BOOL success, NSInteger selectedIndex) {
-            if ( success ) {
-                PasswordStrengthConfig* config = AppPreferences.sharedInstance.passwordStrengthConfig;
-                config.algorithm = selectedIndex;
-                AppPreferences.sharedInstance.passwordStrengthConfig = config;
-            }
-             
-            [self bindGeneral];
-        }];
+    else if ( cell == self.cellAppIcon ) {
+        [self showAppIconCustomization];
     }
-    else if ( cell == self.cellAdversaryStrength ) {
-        NSArray<NSNumber*>* options = @[
-            @(1000),
-            @(1000000),
-            @(1000000000),
-            @(100000000000),
-            @(100000000000000),
-            @(1000000000000000)];
-        
-        NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-            return stringForAdversaryStrength(obj.integerValue);
-        }];
-
-        NSUInteger selected = [options indexOfObject:@(AppPreferences.sharedInstance.passwordStrengthConfig.adversaryGuessesPerSecond)];
-        
-        [self promptForChoice:NSLocalizedString(@"prefs_vc_password_strength_adversary_crack_rate", @"Adversary Guess Rate")
-                      options:optionStrings
-         currentlySelectIndex:selected
-                   completion:^(BOOL success, NSInteger selectedIndex) {
-            if ( success ) {
-                PasswordStrengthConfig* config = AppPreferences.sharedInstance.passwordStrengthConfig;
-                config.adversaryGuessesPerSecond = options[selectedIndex].unsignedIntegerValue;
-                AppPreferences.sharedInstance.passwordStrengthConfig = config;
-            }
-            [self bindGeneral];
-        }];
+    else if ( cell == self.cellContactSupport ) {
+        [self composeEmail];
+    }
+    else if ( cell == self.cellProStatus ) {
+        [self showUpgradeScreenIfAppropriate];
     }
 }
 
-- (void)customizeAppLockSectionFooter {
-    [self.segmentAppLock setEnabled:BiometricsManager.isBiometricIdAvailable forSegmentAtIndex:2];
-    [self.segmentAppLock setTitle:[BiometricsManager.sharedInstance getBiometricIdName] forSegmentAtIndex:2];
-    [self.segmentAppLock setEnabled:BiometricsManager.isBiometricIdAvailable forSegmentAtIndex:3]; 
+- (void)showAppIconCustomization {
+    UINavigationController* vc = [CustomAppIconViewController fromStoryboard];
+    
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
     [self.navigationController setNavigationBarHidden:NO];
-
-    
-    
-    [self bindCloudSessions];
 }
 
-- (void)bindAboutButton {
+- (void)showUpgradeScreenIfAppropriate {
+    if ( CustomizationManager.isAProBundle || ( AppPreferences.sharedInstance.isPro && ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime )) {
+        return;
+    }
+    
+    [self performSegueWithIdentifier:@"segueToUpgradeScreen" sender:nil];
+}
+
+- (void)bindVersionAndProStatus {
     NSString *aboutString;
-    if([[AppPreferences sharedInstance] isPro]) {
-        aboutString = [NSString stringWithFormat:
-                       NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@"), [Utils getAppVersion]];
+    
+    if( AppPreferences.sharedInstance.isPro ) {
+        aboutString = [NSString stringWithFormat:NSLocalizedString(@"about_strongbox_pro_version_fmt", @"Pro Version %@"), [Utils getAppVersion]];
     }
     else {
-        if(AppPreferences.sharedInstance.hasOptedInToFreeTrial) {
-            if([[AppPreferences sharedInstance] isFreeTrial]) {
-                aboutString = [NSString stringWithFormat:
-                               NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt2", @"About Strongbox %@ (Pro Trial - %@ days left)"),
-                               [Utils getAppVersion], @((long)AppPreferences.sharedInstance.freeTrialDaysLeft)];
-            }
-            else {
-                aboutString = [NSString stringWithFormat:
-                               NSLocalizedString(@"prefs_vc_app_version_info_free_fmt", @"About Strongbox %@ (Free version - Please Upgrade)"), [Utils getAppVersion]];
-            }
-        }
-        else {
-            aboutString = [NSString stringWithFormat:
-                           NSLocalizedString(@"prefs_vc_app_version_info_free_fmt", @"About Strongbox %@ (Free version - Please Upgrade)"), [Utils getAppVersion]];
-        }
+        aboutString = [NSString stringWithFormat:NSLocalizedString(@"about_strongbox_free_version_fmt", @"Version %@"), [Utils getAppVersion]];
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     self.labelVersion.text = aboutString;
-}
-
-- (void)bindCloudSessions {
-    self.switchUseICloud.on = [[AppPreferences sharedInstance] iCloudOn] && AppPreferences.sharedInstance.iCloudAvailable;
-    self.switchUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
-    
-    self.labelUseICloud.text = AppPreferences.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
-                                                                            NSLocalizedString(@"prefs_vc_use_icloud_disabled", @"Use iCloud (Unavailable)");
-    self.labelUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
-    
-    if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
-        [self cell:self.cellCloudSessions setHidden:YES];
+        
+    if (@available(iOS 13.0, *)) {
+        self.labelProStatus.textColor = UIColor.labelColor;
+        self.cellProStatus.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleDefault;
     }
     
-    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        [self cell:self.cellUseICloud setHidden:YES];
+    if ( CustomizationManager.isAProBundle ) {
+        self.labelProStatus.text = NSLocalizedString(@"pro_status_lifetime_pro", @"Lifetime Pro");
+        self.cellProStatus.accessoryType = UITableViewCellAccessoryNone;
+        self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
+    else {
+        if ( AppPreferences.sharedInstance.isPro ) {
+            if ( ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime ) { 
+                self.labelProStatus.text = NSLocalizedString(@"pro_status_lifetime_pro", @"Lifetime Pro");
+                self.cellProStatus.accessoryType = UITableViewCellAccessoryNone;
+                self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
+            }
+            else if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription ){
+                self.labelProStatus.text = NSLocalizedString(@"pro_status_yearly_pro", @"Pro (Yearly subscription)");
+            }
+            else if ( ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription ) {
+                self.labelProStatus.text = NSLocalizedString(@"pro_status_monthly_pro", @"Pro (Monthly subscription)");
+            }
+            else {
+                self.labelProStatus.text = @"Pro <Unknown License>"; 
+                self.cellProStatus.accessoryType = UITableViewCellAccessoryNone;
+                self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
+            }
+        }
+        else if ( AppPreferences.sharedInstance.isFreeTrial ) {
+            self.labelProStatus.text = [NSString stringWithFormat:NSLocalizedString(@"pro_status_free_trial_days_left_fmt", @"Free Trial (%@ days left)"), @(AppPreferences.sharedInstance.freeTrialDaysLeft)];
+        }
+        else if ( AppPreferences.sharedInstance.hasOptedInToFreeTrial || AppPreferences.sharedInstance.daysInstalled > 60 ) {
+            self.labelProStatus.text = NSLocalizedString(@"pro_status_unlicensed_please_upgrade", @"Unlicensed (Please Upgrade)");
+            self.labelProStatus.textColor = UIColor.systemRedColor;
+        }
+        else {
+            self.labelProStatus.text = NSLocalizedString(@"pro_status_unlicensed", @"Unlicensed");
+        }
     }
     
-    [self reloadDataAnimated:NO];
+    
+    if (@available(iOS 14.0, *)) {
+        BOOL licensed = AppPreferences.sharedInstance.isPro;
+        NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
+        self.imageViewLicense.image =  [UIImage systemImageNamed:license];
+        self.imageViewLicense.tintColor = licensed ? nil : UIColor.systemOrangeColor;
+    }
+    
+    [self cell:self.cellContactSupport setHidden:!AppPreferences.sharedInstance.isPro];
 }
 
 - (void)bindHideTips {
@@ -302,214 +345,26 @@
     [self bindHideTips];
 }
 
-- (IBAction)onAppLockChanged:(id)sender {
-    if(self.segmentAppLock.selectedSegmentIndex == kPinCode || self.segmentAppLock.selectedSegmentIndex == kBoth) {
-        [self requestAppLockPinCodeAndConfirm];
-    }
-    else {
-        AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
-        [self bindAppLock];
-    }
-}
-
-- (void)requestAppLockPinCodeAndConfirm {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
-    PinEntryController* vc1 = (PinEntryController*)[storyboard instantiateInitialViewController];
-    vc1.isDatabasePIN = NO;
-    
-    vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
-        if(response == kPinEntryResponseOk ) {
-            PinEntryController* vc2 = (PinEntryController*)[storyboard instantiateInitialViewController];
-            vc2.info = NSLocalizedString(@"prefs_vc_confirm_pin", @"Confirm PIN");
-            vc2.isDatabasePIN = NO;
-            vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
-                if(response2 == kPinEntryResponseOk ) {
-                    if ([pin isEqualToString:confirmPin]) {
-                        AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
-                        AppPreferences.sharedInstance.appLockPin = pin;
-                        [self bindAppLock];
-                    }
-                    else {
-                        [Alerts warn:self
-                               title:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_title", @"PINs do not match")
-                             message:NSLocalizedString(@"prefs_vc_pins_dont_match_warning_message", @"Your PINs do not match.")
-                          completion:nil];
-                        
-                        [self bindAppLock];
-                    }
-                }
-                else {
-                    [self bindAppLock];
-                }
-            };
-            
-            [self presentViewController:vc2 animated:YES completion:nil];
-        }
-        else {
-            [self bindAppLock];
-        }
-    };
-
-    [self presentViewController:vc1 animated:YES completion:nil];
-}
 
 - (BOOL)hasLocalOrICloudSafes {
     return (DatabasePreferences.localDeviceDatabases.count + DatabasePreferences.iCloudDatabases.count) > 0;
 }
 
-- (IBAction)onUseICloud:(id)sender {
-    NSLog(@"Setting iCloudOn to %d", self.switchUseICloud.on);
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        [[AppPreferences sharedInstance] setICloudOn:self.switchUseICloud.on];
-        
-        [self bindCloudSessions];
-
-}
-
-- (IBAction)onDeleteDataChanged:(id)sender {
-    if(self.switchDeleteDataEnabled.on) {
-        AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = 5; 
-        
-        [Alerts info:self
-               title:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_title", @"DATA DELETION: Care Required")
-             message:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_message", @"Please be extremely careful as this will delete permanently any local device databases and all preferences.")];
-    }
-    else {
-        AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = 0; 
-    }
-    
-    [self bindAppLock];
-}
-
 - (void)onHelp {
-    [Alerts yesNo:self
-            title:NSLocalizedString(@"prompt_title_copy_debug_info", @"Copy Debug Info?")
-          message:NSLocalizedString(@"prompt_message_copy_debug_info", @"Would you like to copy some helpful debug information that you can share with support before proceeding?")
-           action:^(BOOL response) {
-        if ( response ) {
-            [ClipboardManager.sharedInstance copyStringWithNoExpiration:[DebugHelper getAboutDebugString]];
-        }
-    
+
+
+
+
+
+
+
+
         NSURL* url = [NSURL URLWithString:@"https:
-        if (@available (iOS 10.0, *)) {
-            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-        }
-        else {
-            [UIApplication.sharedApplication openURL:url];
-        }
-    }];
-}
+        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
 
-- (IBAction)onSwitchClearClipboardEnable:(id)sender {
-    AppPreferences.sharedInstance.clearClipboardEnabled = self.clearClipboardEnabled.on;
-    
-    [self bindClearClipboard];
-}
-
-- (void)bindClearClipboard {
-    NSInteger seconds = AppPreferences.sharedInstance.clearClipboardAfterSeconds;
-    BOOL enabled = AppPreferences.sharedInstance.clearClipboardEnabled;
-    
-    self.clearClipboardEnabled.on = enabled;
-    self.cellClearClipboardDelay.userInteractionEnabled = enabled;
-    
-    NSLog(@"clearClipboard: [%d, %ld]", enabled, (long)seconds);
-    
-    if(!enabled) {
-        self.labelClearClipboardDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-    }
-    else {
-        self.labelClearClipboardDelay.text = [Utils formatTimeInterval:seconds];
-    }
 }
 
 
-
-- (void)bindAppLock {
-    NSInteger mode = AppPreferences.sharedInstance.appLockMode;
-    NSNumber* seconds = @(AppPreferences.sharedInstance.appLockDelay);
-
-    NSInteger effectiveMode = mode;
-    if (mode == kBiometric && !BiometricsManager.isBiometricIdAvailable) {
-        effectiveMode = kNoLock;
-    }
-    else if(mode == kBoth && !BiometricsManager.isBiometricIdAvailable) {
-        effectiveMode = kPinCode;
-    }
-
-    [self.segmentAppLock setSelectedSegmentIndex:effectiveMode];
-    
-    self.labelAppLockDelay.text = effectiveMode == kNoLock ?
-    NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled") : [Utils formatTimeInterval:seconds.integerValue];
-    
-    if (@available(iOS 13.0, *)) {
-        self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.tertiaryLabelColor : UIColor.labelColor;
-    }
-    else {
-        self.labelAppLockDelay.textColor = effectiveMode == kNoLock ? UIColor.lightGrayColor : UIColor.darkTextColor;
-    }
-    
-    self.cellAppLockDelay.userInteractionEnabled = effectiveMode != kNoLock;
-    
-    self.appLockOnPreferences.enabled = effectiveMode != kNoLock;
-    self.appLockPasscodeFallback.enabled = effectiveMode == kBiometric || effectiveMode == kBoth;
-
-    NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
-    
-    BOOL deleteOnOff = AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
-    BOOL deleteEnabled = effectiveMode != kNoLock;
-    
-    self.switchDeleteDataEnabled.enabled = deleteEnabled;
-    
-    self.switchDeleteDataEnabled.on = deleteOnOff;
-    self.cellDeleteDataAttempts.userInteractionEnabled = deleteOnOff && deleteEnabled;
-    
-    NSString* str = @(AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
-    
-    self.labelDeleteDataAttemptCount.text = deleteOnOff && deleteEnabled ? str : NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-    
-    if (@available(iOS 13.0, *)) {
-        self.labelDeleteDataAttemptCount.textColor = !(deleteOnOff && deleteEnabled) ? UIColor.tertiaryLabelColor : UIColor.labelColor;
-    }
-    else {
-        self.labelDeleteDataAttemptCount.textColor = !(deleteOnOff && deleteEnabled) ? UIColor.lightGrayColor : UIColor.darkTextColor;
-    }
-    
-    NSString* fmt = NSLocalizedString(@"app_lock_allow_device_passcode_fallback_for_biometric_fmt", @"Passcode Fallback for %@");
-    self.labelAppLockPasscodeFallback.text = [NSString stringWithFormat:fmt, BiometricsManager.sharedInstance.biometricIdName];
-}
-
-- (IBAction)onAppLock2PreferencesChanged:(id)sender {
-    NSLog(@"Generic Preference Changed: [%@]", sender);
-
-    AppPreferences.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
-    AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
-    
-    [self bindAppLock2Preferences];
-}
-
-- (void)bindAppLock2Preferences {
-    self.appLockOnPreferences.on = AppPreferences.sharedInstance.appLockAppliesToPreferences;
-    self.appLockPasscodeFallback.on = AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio;
-}
 
 static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
     if ( mode == kAppPrivacyShieldModeBlur ) {
@@ -524,75 +379,6 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
     else {
         return NSLocalizedString(@"app_privacy_shield_mode_blue_screen", @"Blue Screen");
     }
-}
-
-static NSString* stringForAdversaryStrength(NSUInteger strength){
-    NSNumber* number = @(strength);
-    
-    
-    
-    long long num = [number longLongValue];
-
-    int s = ( (num < 0) ? -1 : (num > 0) ? 1 : 0 );
-    NSString* sign = (s == -1 ? @"-" : @"" );
-
-    num = llabs(num);
-
-    if (num < 1000000) {
-
-        return [NSString stringWithFormat:NSLocalizedString(@"adversary_guess_rate_fmt", @"%@ / second"), @(num)];
-    }
-    
-    int exp = (int) (log10l(num) / 3.f); 
-
-    NSArray* units = @[ NSLocalizedString(@"number_suffix_thousand", @"Thousand"),
-                        NSLocalizedString(@"number_suffix_million", @"Million"),
-                        NSLocalizedString(@"number_suffix_billion", @"Billion"),
-                        NSLocalizedString(@"number_suffix_trillion", @"Trillion"),
-                        NSLocalizedString(@"number_suffix_quadrillion", @"Quadrillion"),
-                        NSLocalizedString(@"number_suffix_quintillion", @"Quintillion")];
-
-    NSString* numerator = [NSString stringWithFormat:@"%@%d %@" ,sign, (int)(num / pow(1000, exp)), [units objectAtIndex:(exp-1)]];
-    
-    return [NSString stringWithFormat:NSLocalizedString(@"adversary_guess_rate_fmt", @"%@ / second"), numerator];
-}
-
-static NSString* stringForPasswordStrengthAlgo(PasswordStrengthAlgorithm algo ){
-    if ( algo == kPasswordStrengthAlgorithmZxcvbn ) {
-        return NSLocalizedString(@"password_strength_algo_zxcvbn_title", @"Zxcvbn (Smart)");
-    }
-    else {
-        return NSLocalizedString(@"password_strength_algo_basic_title", @"Basic (Pooled Entropy)");
-    }
-}
-
-- (void)promptForInteger:(NSString*)title
-                 options:(NSArray<NSNumber*>*)options
-       formatAsIntervals:(BOOL)formatAsIntervals
-            currentValue:(NSInteger)currentValue
-              completion:(void(^)(BOOL success, NSInteger selectedValue))completion {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
-    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
-    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
-    
-    NSArray<NSString*>* items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return formatAsIntervals ? [Utils formatTimeInterval:obj.integerValue] : obj.stringValue;
-    }];
-    vc.groupItems = @[items];
-    
-    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
-    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
-    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
-        NSIndexSet* set = selectedIndices.firstObject;
-        
-        NSInteger selectedValue = options[set.firstIndex].integerValue;
-        [self.navigationController popViewControllerAnimated:YES];
-        completion(YES, selectedValue);
-    };
-    
-    vc.title = title;
-    
-    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)promptForChoice:(NSString*)title
@@ -623,34 +409,53 @@ static NSString* stringForPasswordStrengthAlgo(PasswordStrengthAlgorithm algo ){
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if([segue.identifier isEqualToString:@"seguePrefToPasswordPrefs"]) {
-        
-
-
-
-        PasswordGenerationViewController* vc = (PasswordGenerationViewController*)segue.destinationViewController;
-        vc.onDone = self.onDone;
-    }
-    else if ([segue.identifier isEqualToString:@"seguePrefsToNewEntryDefaults"]) {
-        AutoFillNewRecordSettingsController* vc = (AutoFillNewRecordSettingsController*)segue.destinationViewController;
-        vc.onDone = self.onDone;
-    }
-    else if ([segue.identifier isEqualToString:@"seguePrefsToAdvanced"]) {
+    if ([segue.identifier isEqualToString:@"seguePrefsToAdvanced"]) {
         AdvancedPreferencesTableViewController* vc = (AdvancedPreferencesTableViewController*)segue.destinationViewController;
         vc.onDone = self.onDone;
     }
-    else if ([segue.identifier isEqualToString:@"seguePrefsToCloudSessions"]) {
-        CloudSessionsTableViewController* vc = (CloudSessionsTableViewController*)segue.destinationViewController;
-        vc.onDone = self.onDone;
+}
+
+
+
+
+- (void)composeEmail {
+    NSString* debugInfo = [DebugHelper getAboutDebugString];
+    NSString* subject = @"Support Request";
+    
+    if(![MFMailComposeViewController canSendMail]) {
+        NSString* str = [NSString stringWithFormat:@"mailto:support@strongboxsafe.com?subject=%@", [subject stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLHostAllowedCharacterSet]]];
+        NSURL* url = [NSURL URLWithString:str];
+
+        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:^(BOOL success) {
+            if (!success) {
+                [Alerts info:self
+                       title:NSLocalizedString(@"prefs_vc_info_email_not_available_title", @"Email Not Available")
+                     message:NSLocalizedString(@"prefs_vc_info_email_not_available_message", @"It looks like email is not setup on this device.\n\nContact support@strongboxsafe.com for help.")];
+            }
+        }];
     }
-    else if ([segue.identifier isEqualToString:@"seguePrefsToAbout"]) {
-        AboutViewController* vc = (AboutViewController*)segue.destinationViewController;
-        vc.onDone = self.onDone;
+    else {
+        MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
+        
+        [picker setSubject:subject];
+        [picker setToRecipients:@[@"support@strongboxsafe.com"]];
+        [picker setMessageBody:[NSString stringWithFormat:@"<Please Include as much detail as possible about your issue here>\n\n\n------------------------------------\n%@", debugInfo] isHTML:NO];
+        picker.mailComposeDelegate = self;
+        
+        [self presentViewController:picker animated:YES completion:^{ }];
     }
-    else if ([segue.identifier isEqualToString:@"segueToManageKeyFiles"]) {
-        KeyFilesTableViewController* vc = (KeyFilesTableViewController*)segue.destinationViewController;
-        vc.manageMode = YES;
-    }
+}
+
+- (void)mailComposeController:(MFMailComposeViewController *)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:^{
+        if(result == MFMailComposeResultFailed || error) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_email_error_sending", @"Error Sending")
+                    error:error];
+        }
+    }];
 }
 
 @end

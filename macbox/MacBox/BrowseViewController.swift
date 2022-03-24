@@ -58,6 +58,7 @@ class BrowseViewController: NSViewController {
 
         outlineView.register(NSNib(nibNamed: NSNib.Name(TitleAndIconCell.NibIdentifier.rawValue), bundle: nil), forIdentifier: TitleAndIconCell.NibIdentifier)
         outlineView.register(NSNib(nibNamed: NSNib.Name("CustomFieldTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("CustomFieldValueCellIdentifier"))
+        outlineView.register(NSNib(nibNamed: NSNib.Name(SingleLinePillTableCellView.NibIdentifier.rawValue), bundle: nil), forIdentifier: SingleLinePillTableCellView.NibIdentifier)
     }
 
     @objc func onRulesRowsDidChange(_: NSMenuItem) {
@@ -156,6 +157,7 @@ class BrowseViewController: NSViewController {
         outlineView.autosaveTableColumns = true
 
         outlineView.headerView?.menu = columnsMenu
+        outlineView.menu?.delegate = windowController
     }
 
     func bindSearchParameters() {
@@ -207,11 +209,32 @@ class BrowseViewController: NSViewController {
     }
 
     func listenToModelUpdateNotifications() {
+
+
+
+
+
+
         NotificationCenter.default.addObserver(forName: NSNotification.Name(kModelUpdateNotificationFullReload),
                                                object: nil, queue: nil)
         { [weak self] notification in
             self?.onDocumentUpdateNotificationReceived(notification)
         }
+
+        
+
+        let auditNotificationsOfInterest: [String] = [
+            
+                                                      kAuditCompletedNotificationKey]
+
+        for ofInterest in auditNotificationsOfInterest {
+            NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
+                guard let self = self else { return }
+                self.onAuditUpdateNotification(notification)
+            }
+        }
+
+        
 
         let notificationsOfInterest: [String] = [kModelUpdateNotificationItemsAdded,
                                                  kModelUpdateNotificationItemEdited,
@@ -220,8 +243,13 @@ class BrowseViewController: NSViewController {
                                                  kModelUpdateNotificationNextGenNavigationChanged,
                                                  kModelUpdateNotificationNextGenSearchContextChanged,
                                                  kModelUpdateNotificationIconChanged,
+                                                 kModelUpdateNotificationDatabasePreferenceChanged,
                                                  kModelUpdateNotificationItemsMoved,
-                                                 kModelUpdateNotificationNextGenSelectedItemsChanged]
+                                                 kModelUpdateNotificationTitleChanged,
+                                                 kModelUpdateNotificationTagsChanged,
+                                                 kModelUpdateNotificationNextGenSelectedItemsChanged,
+                                                 kModelUpdateNotificationHistoryItemRestored,
+                                                 kModelUpdateNotificationHistoryItemDeleted]
 
         for ofInterest in notificationsOfInterest {
             NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
@@ -249,34 +277,42 @@ class BrowseViewController: NSViewController {
         }
     }
 
+    func onAuditUpdateNotification(_ notification: Notification) {
+        
+        guard let dict = notification.object as? [String: Any], let model = dict["model"] as? Model else {
+            NSLog("🔴 Couldn't real model from notification")
+            return
+        }
+
+        if model != database.commonModel {
+            return
+        }
+        
+        if !isSearching, case .auditIssues = navigationContext {
+            NSLog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+
+            refresh()
+        }
+    }
+
     func onModelNotificationReceived(_ notification: Notification) {
-        guard let notifyModel = notification.object as? ViewModel else {
+        guard let notifyModel = notification.object as? ViewModel, notifyModel == database else {
             return
         }
 
-        if notifyModel != database {
-            return
+        if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenSelectedItemsChanged) {
+            NSLog("BrowseViewController::-Notify: Selected Items Changed")
+            bindSelectionToModel(selectFirstItemIfSelectionNotFound: false)
+        } else if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenNavigationChanged) ||
+            notification.name == NSNotification.Name(kModelUpdateNotificationNextGenSearchContextChanged) ||
+            notification.name == NSNotification.Name(kModelUpdateNotificationItemsDeleted)
+        {
+            NSLog("BrowseViewController::-Notify: Navigation/Search Context/Delete - will select first item if can't maintain selection")
+            refresh(maintainSelectionIfPossible: true, selectFirstItemIfSelectionNotFound: true)
+        } else {
+            NSLog("BrowseViewController::-Notify: Model Update notification received - refreshing...")
+            refresh(maintainSelectionIfPossible: true, selectFirstItemIfSelectionNotFound: false)
         }
-
-        if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenNavigationChanged) {
-            NSLog("Browse-Notify: Nav Changed")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenSearchContextChanged) {
-            NSLog("Browse-Notify: Search Changed")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationItemsAdded) {
-            NSLog("Browse-Notify: Items Added")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationItemEdited) {
-            NSLog("Browse-Notify: Items Edited")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationItemsDeleted) {
-            NSLog("Browse-Notify: Items Deleted")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationItemsUnDeleted) {
-            NSLog("Browse-Notify: Items Un-Deleted")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationIconChanged) {
-            NSLog("Browse-Notify: Icon Changed")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenSelectedItemsChanged) {
-            NSLog("Browse-Notify: Selected Ites Changed")
-        }
-
-        refresh()
     }
 
     func getRowIndicesForItemIds(itemIds: [UUID]) -> IndexSet {
@@ -289,26 +325,47 @@ class BrowseViewController: NSViewController {
         return IndexSet(indices)
     }
 
-    func refresh() {
-
+    func refresh(maintainSelectionIfPossible: Bool = true, selectFirstItemIfSelectionNotFound: Bool = false) {
+        NSLog("✅ BrowseViewController::refresh() - [%@]", database.nextGenSelectedItems)
 
         adjustHeightConstraintsWithAnimation() 
+
+        outlineView.usesAlternatingRowBackgroundColors = database.showAlternatingRows
+
+        if database.showVerticalGrid, database.showHorizontalGrid {
+            outlineView.gridStyleMask = [.solidVerticalGridLineMask, .solidHorizontalGridLineMask]
+        } else if database.showVerticalGrid {
+            outlineView.gridStyleMask = [.solidVerticalGridLineMask]
+        } else if database.showHorizontalGrid {
+            outlineView.gridStyleMask = [.solidHorizontalGridLineMask]
+        } else {
+            outlineView.gridStyleMask = []
+        }
 
         clearCacheAndReloadItems()
         outlineView.reloadData()
 
-        
+        if maintainSelectionIfPossible {
+            bindSelectionToModel(selectFirstItemIfSelectionNotFound: selectFirstItemIfSelectionNotFound)
+        }
+    }
 
+    func bindSelectionToModel(selectFirstItemIfSelectionNotFound: Bool = false) {
         let selected = database.nextGenSelectedItems
         let selectedIndices = getRowIndicesForItemIds(itemIds: selected)
 
+        NSLog("✅ BrowseViewController::bindSelectionToModel() - [%@], selectedRowIndices = [%@]", database.nextGenSelectedItems, String(describing: selectedIndices))
+
         if selectedIndices.isEmpty {
             if items.count == 0 {
+                NSLog("✅ BrowseViewController::bindSelectionToModel - current selection not found, empty group/view - Selecting None")
                 database.nextGenSelectedItems = [] 
-            } else {
+            } else if selectFirstItemIfSelectionNotFound {
+                NSLog("✅ BrowseViewController::bindSelectionToModel - current selection not found - Selecting First Item")
                 outlineView.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false) 
             }
         } else {
+            NSLog("✅ BrowseViewController::bindSelectionToModel - Maintaining Selection OK = [%@]",  String(describing: selectedIndices.first))
             outlineView.selectRowIndexes(selectedIndices, byExtendingSelection: false)
         }
     }
@@ -414,6 +471,11 @@ class BrowseViewController: NSViewController {
             return compareStrings(str1, str2, ascending: ascending)
         case .uuid:
             return keePassStringIdFromUuid(ascending ? node1.uuid : node2.uuid).compare(keePassStringIdFromUuid(ascending ? node2.uuid : node1.uuid))
+        case .auditIssues:
+            let auditIssues1 = database.getQuickAuditAllIssuesVeryBriefSummary(forNode: node1.uuid)
+            let auditIssues2 = database.getQuickAuditAllIssuesVeryBriefSummary(forNode: node2.uuid)
+
+            return compareInts(auditIssues1.count, auditIssues2.count, ascending: ascending)
         }
     }
 
@@ -450,8 +512,11 @@ class BrowseViewController: NSViewController {
     func getTitleCell(node: Node) -> NSTableCellView {
         let cell = outlineView.makeView(withIdentifier: TitleAndIconCell.NibIdentifier, owner: self) as! TitleAndIconCell
 
-        cell.icon.objectValue = getIconForNode(node)
-        cell.title.stringValue = dereference(text: node.title, node: node)
+        let title = dereference(text: node.title, node: node)
+        let icon = getIconForNode(node)
+        let favourite = database.isFavourite(node.uuid)
+
+        cell.setContent(NSAttributedString(string: title), iconImage: icon, showTrailingFavStar: favourite, contentTintColor: .linkColor)
 
         return cell
     }
@@ -481,6 +546,14 @@ class BrowseViewController: NSViewController {
         return cell
     }
 
+    func getPillsCell(_ items: [String], color: NSColor, backgroundColor: NSColor, icon: NSImage) -> NSTableCellView {
+        let cell = outlineView.makeView(withIdentifier: SingleLinePillTableCellView.NibIdentifier, owner: nil) as! SingleLinePillTableCellView
+
+        cell.setContent(items, color: color, backgroundColor: backgroundColor, icon: icon)
+
+        return cell
+    }
+
     func dereference(text: String, node: Node) -> String {
         return database.dereference(text, node: node)
     }
@@ -500,12 +573,6 @@ class BrowseViewController: NSViewController {
         }
 
         return false
-    }
-
-    @objc func onOutlineViewDoubleClicked(_: Any) {
-        if outlineView.selectedRowIndexes.count == 1 {
-            editSelected()
-        }
     }
 
     func editSelected() {
@@ -537,7 +604,7 @@ extension BrowseViewController: NSMenuItemValidation, NSMenuDelegate {
 
 extension BrowseViewController: DocumentViewController {
     func onDocumentLoaded() {
-        NSLog("🚀 MasterViewController::onDocumentLoaded")
+
 
         loadDocument()
     }
@@ -559,9 +626,6 @@ extension BrowseViewController: DocumentViewController {
 
         bindSearchParameters()
 
-        outlineView.delegate = self
-        outlineView.dataSource = self
-
         outlineView.doubleAction = #selector(onOutlineViewDoubleClicked)
         outlineView.onEnterKey = { [weak self] in
             guard let self = self else { return }
@@ -572,6 +636,15 @@ extension BrowseViewController: DocumentViewController {
             self.deleteSelected()
         }
 
+        
+        
+        refresh() 
+        outlineView.delegate = self
+        outlineView.dataSource = self
+        bindSelectionToModel(selectFirstItemIfSelectionNotFound: false) 
+        
+        
+        
         listenToModelUpdateNotifications()
     }
 }
@@ -584,10 +657,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
             item.uuid
         }
 
-
-
-
-
+        NSLog("✅ BrowseViewController::outlineViewSelectionDidChange: [%@]", selectedUuids)
 
         database.nextGenSelectedItems = selectedUuids
     }
@@ -618,7 +688,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
         case .url:
             cell = getDereferencedGenericCell(item.fields.url, node: item)
         case .email:
-            cell = getDereferencedGenericCell(item.fields.email, node: item) 
+            cell = getDereferencedGenericCell(item.fields.email, node: item)
         case .notes:
             cell = getDereferencedGenericCell(item.fields.notes, node: item)
         case .created:
@@ -635,7 +705,10 @@ extension BrowseViewController: NSOutlineViewDelegate {
             cell = getGenericCell(String(item.fields.customFields.count))
         case .tags:
             let tagArray: [String] = item.fields.tags.allObjects as! [String]
-            cell = getGenericCell(tagArray.joined(separator: ", "))
+            let sorted = tagArray.sorted { a, b in
+                compareStrings(a, b) == .orderedAscending
+            }
+            cell = getPillsCell(sorted, color: .white, backgroundColor: .linkColor, icon: Icon.tag.image())
         case .path:
             let path = database.getParentGroupPathDisplayString(item)
             cell = getGenericCell(path)
@@ -649,8 +722,12 @@ extension BrowseViewController: NSOutlineViewDelegate {
         case .uuid:
             let str = keePassStringIdFromUuid(item.uuid)
             cell = getGenericCell(str, node: item)
-
-
+        case .auditIssues:
+            let issues = database.getQuickAuditAllIssuesVeryBriefSummary(forNode: item.uuid)
+            let sorted = issues.sorted { a, b in
+                compareStrings(a, b) == .orderedAscending
+            }
+            cell = getPillsCell(sorted, color: .white, backgroundColor: .orange, icon: Icon.auditShield.image())
 
 
 
@@ -745,12 +822,40 @@ extension BrowseViewController: NSOutlineViewDelegate {
             return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destinationItem, internal: false, clear: true) != 0
         }
     }
+
+    @objc func onOutlineViewDoubleClicked(_: Any) {
+        guard outlineView.selectedRowIndexes.count == 1 else { return }
+
+        let colIdx = outlineView.clickedColumn
+        let rowIdx = outlineView.clickedRow
+
+        guard colIdx != -1, rowIdx != -1, let _ = outlineView.item(atRow: rowIdx) as? Node, let column = outlineView.tableColumns[safe: colIdx], let col = BrowseViewColumn(rawValue: column.identifier.rawValue) else {
+            return
+        }
+
+        switch col {
+        case .username:
+            NSApplication.shared.sendAction(#selector(WindowController.onCopyUsername(_:)), to: nil, from: self)
+        case .password:
+            NSApplication.shared.sendAction(#selector(WindowController.onCopyPassword(_:)), to: nil, from: self)
+        case .url:
+            NSApplication.shared.sendAction(#selector(WindowController.onCopyUrl(_:)), to: nil, from: self)
+        case .email:
+            NSApplication.shared.sendAction(#selector(WindowController.onCopyEmail(_:)), to: nil, from: self)
+        case .notes:
+            NSApplication.shared.sendAction(#selector(WindowController.onCopyNotes(_:)), to: nil, from: self)
+        case .totp:
+            NSApplication.shared.sendAction(#selector(WindowController.onCopyTotp(_:)), to: nil, from: self)
+        default:
+            editSelected()
+        }
+    }
 }
 
 extension BrowseViewController: NSOutlineViewDataSource {
     var items: [Node] {
         if sortedItemsCache == nil {
-
+            NSLog("🔴 BrowseViewController::Cache MISS!")
             sortedItemsCache = loadAndSortItems()
         }
 
@@ -773,7 +878,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
     }
 
     func loadAndSortItems() -> [Node] {
-
+        NSLog("✅ BrowseViewController::loadAndSortItems - searching = [%hhd] - navContext = [%@]", isSearching, String(describing: navigationContext))
 
         let unsorted: [Node]
 
@@ -789,9 +894,10 @@ extension BrowseViewController: NSOutlineViewDataSource {
                 unsorted = loadTagChildEntries(tag)
             case let .special(special):
                 unsorted = loadSpecial(special)
-            default:
-                NSLog("🔴 Unhandled Navigation in getItems: [%@]", String(reflecting: navigationContext))
-                unsorted = []
+            case let .auditIssues(category):
+                unsorted = loadAuditIssues(category)
+            case let .favourites(nodeId):
+                unsorted = loadFavourites(nodeId)
             }
         }
 
@@ -800,32 +906,97 @@ extension BrowseViewController: NSOutlineViewDataSource {
         return sortedItemsCache!
     }
 
-    func loadSpecial(_ special: NavigationContext.SpecialNavigationItem) -> [Node] {
-        switch special {
-        case .allEntries:
-            let mut = NSMutableArray(array: database.rootGroup.allChildRecords)
-            return database.filterAndSort(forBrowse: mut,
-                                          includeKeePass1Backup: false,
-                                          includeRecycleBin: false,
-                                          includeExpired: true,
-                                          includeGroups: false,
-                                          browseSortField: .none,
-                                          descending: false,
-                                          foldersSeparately: false)
+    func loadFavourites(_ nodeId: NodeIdentifier) -> [Node] {
+        guard let node = database.getItemBy(nodeId) else {
+            NSLog("🔴 could not find favourite: [%@]", String(describing: nodeId))
+            return []
+        }
+
+        if node.isGroup {
+            return node.childRecords
+        } else {
+            return [node]
         }
     }
 
+    func loadSpecial(_ special: NavigationContext.SpecialNavigationItem) -> [Node] {
+        switch special {
+        case .allEntries:
+            return loadAllEntries()
+        case .expiredEntries:
+            return loadExpired()
+        case .nearlyExpiredEntries:
+            return loadNearlyExpired()
+        case .totpItems:
+            return loadTotps()
+        case .itemsWithAttachments:
+            return loadAttachmentEntries()
+        }
+    }
+
+    func loadAllEntries() -> [Node] {
+        let mut = NSMutableArray(array: database.rootGroup.allChildRecords)
+
+        return database.filterAndSort(forBrowse: mut,
+                                      includeKeePass1Backup: false,
+                                      includeRecycleBin: false,
+                                      includeExpired: true,
+                                      includeGroups: false,
+                                      browseSortField: .none,
+                                      descending: false,
+                                      foldersSeparately: false)
+    }
+
+    func getItemsByUuid(_ ids: Set<NodeIdentifier>) -> [Node] {
+        ids.compactMap { database.getItemBy($0) }
+    }
+
+    func loadAuditIssues(_ category: NavigationContext.AuditNavigationCategory) -> [Node] {
+        guard let report = database.auditReport else {
+            NSLog("🔴 No Audit Report available - cannot load audit issues")
+            return []
+        }
+
+        switch category {
+        case .noPasswords:
+            return getItemsByUuid(report.entriesWithNoPasswords)
+        case .duplicated:
+            return getItemsByUuid(report.entriesWithDuplicatePasswords)
+        case .common:
+            return getItemsByUuid(report.entriesWithCommonPasswords)
+        case .similar:
+            return getItemsByUuid(report.entriesWithSimilarPasswords)
+        case .tooShort:
+            return getItemsByUuid(report.entriesTooShort)
+        case .pwned:
+            return getItemsByUuid(report.entriesPwned)
+        case .lowEntropy:
+            return getItemsByUuid(report.entriesWithLowEntropyPasswords)
+        case .twoFactorAvailable:
+            return getItemsByUuid(report.entriesWithTwoFactorAvailable)
+        case .allEntries:
+            return getItemsByUuid(report.allEntries)
+        }
+    }
+
+    func loadExpired() -> [Node] {
+        return database.expiredEntries
+    }
+
+    func loadNearlyExpired() -> [Node] {
+        return database.nearlyExpiredEntries
+    }
+
+    func loadTotps() -> [Node] {
+        return database.totpEntries
+    }
+
+    func loadAttachmentEntries() -> [Node] {
+        return database.attachmentEntries
+    }
+
     func loadTagChildEntries(_ tag: String) -> [Node] {
-        return database.search(tag,
-                               scope: .tags,
-                               dereference: false,
-                               includeKeePass1Backup: false,
-                               includeRecycleBin: false,
-                               includeExpired: true,
-                               includeGroups: false,
-                               browseSortField: .none,
-                               descending: false,
-                               foldersSeparately: false)
+        return database.entries(withTag: tag)
     }
 
     func loadHierarchyChildEntries(_ parentGroup: UUID) -> [Node] {

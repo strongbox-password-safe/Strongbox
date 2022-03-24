@@ -145,9 +145,7 @@
     
     
     if(!AppPreferences.sharedInstance.isPro) {
-        if (@available(iOS 11.0, *)) {
-            self.navigationController.navigationBar.prefersLargeTitles = NO;
-        }
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
         self.title = NSLocalizedString(@"pins_config_vc_title_pro_only", @"PIN Codes (Pro Feature Only)");
     }
     

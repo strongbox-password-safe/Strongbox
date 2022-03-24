@@ -322,29 +322,33 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 
 - (void)doAppStartupTasksOnceOnly {
     if ( !self.hasDoneAppStartupTasks ) {
-        self.hasDoneAppStartupTasks = YES;
-        
-        NSLog(@"doAppStartupTasksOnceOnly - Doing tasks as they have not yet been done");
-        
-        if( self.startupDatabases.count ) {
-            [self launchStartupDatabases];
-        }
-        else if ( self.documents.count == 0 ) {
-            if ( !Settings.sharedInstance.runningAsATrayApp ) {
-                NSLog(@"Empty Startup - Showing Manager...");
-                
-                [DBManagerPanel.sharedInstance show];
-            }
-            else {
-                NSLog(@"Empty Startup - Running as a Tray App - Not Showing DB Manager...");
-            }
-        }
-        
-        [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
+        [self doAppStartupTasksOnceOnly2];
     }
     else {
         NSLog(@"doAppStartupTasksOnceOnly - Tasks Already Done - NOP");
     }
+}
+
+- (void)doAppStartupTasksOnceOnly2 {
+    self.hasDoneAppStartupTasks = YES;
+    
+    NSLog(@"doAppStartupTasksOnceOnly - Doing tasks as they have not yet been done");
+    
+    if( self.startupDatabases.count ) {
+        [self launchStartupDatabases];
+    }
+    else if ( self.documents.count == 0 ) {
+        if ( !Settings.sharedInstance.runningAsATrayApp ) {
+            NSLog(@"Empty Startup - Showing Manager...");
+            
+            [DBManagerPanel.sharedInstance show];
+        }
+        else {
+            NSLog(@"Empty Startup - Running as a Tray App - Not Showing DB Manager...");
+        }
+    }
+    
+    [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 }
 
 - (void)performEmptyLaunchTasksIfNecessary {

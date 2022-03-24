@@ -61,6 +61,8 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.mac.pro";
 static NSString * const kBundledFreemiumBundleId = @"com.markmcguill.strongbox"; 
 
+NSString* const kUpdateNotificationQuickRevealStateChanged = @"kUpdateNotificationQuickRevealStateChanged";
+
 
 
 const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
@@ -138,6 +140,25 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         [self maybeHideDockIconIfAllMiniaturized:nil];
     });
+    
+    [self monitorForQuickRevealKey];
+}
+
+- (void)monitorForQuickRevealKey {
+    [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskFlagsChanged
+                                          handler:^NSEvent * _Nullable(NSEvent * _Nonnull event) {
+        if ( ( event.keyCode == 58 || event.keyCode == 61 ) && Settings.sharedInstance.quickRevealWithOptionKey ) {
+            BOOL optionKeyDown = ((event.modifierFlags & NSEventModifierFlagOption) == NSEventModifierFlagOption);
+
+
+
+            [NSNotificationCenter.defaultCenter postNotificationName:kUpdateNotificationQuickRevealStateChanged
+                                                              object:@(optionKeyDown)
+                                                            userInfo:nil];
+        }
+        
+        return event;
+    }];
 }
 
 - (void)customizeForNonPro {
@@ -266,7 +287,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)showHideDockIcon:(BOOL)show {
-
+    NSLog(@"AppDelegate::showHideDockIcon: %ld", (long)show);
 
     if ( show ) {
         [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
@@ -276,7 +297,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         [NSApp activateIgnoringOtherApps:YES];
         [NSApp arrangeInFront:nil];
         
-
+        NSLog(@"showHideDockIcon: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
+        
         [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     }
     else {
@@ -414,7 +436,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [NSApp arrangeInFront:nil];
     
-
+    NSLog(@"showAndActivateStrongbox: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     
     [NSApp activateIgnoringOtherApps:YES];
@@ -443,7 +465,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-
+    NSLog(@"applicationDidBecomeActive");
 
     if(self.autoLockWorkBlock) {
         dispatch_block_cancel(self.autoLockWorkBlock);
@@ -453,7 +475,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     
     
-    [self showHideDockIcon:YES]; 
+    [self showAndActivateStrongbox:nil];
 }
 
 - (ViewController*)getActiveViewController {
@@ -602,7 +624,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if( topLevelMenuItem &&  index != NSNotFound) {
         NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
         
-        NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+        NSString* fmt = Settings.sharedInstance.isAProBundle ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
         
         NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
 
@@ -1071,6 +1093,10 @@ static NSInteger clipboardChangeCount;
 
 - (void)publishTotpUpdateNotification {
     [NSNotificationCenter.defaultCenter postNotificationName:kTotpUpdateNotification object:nil];
+}
+
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
+    return !Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.quitStrongboxOnAllWindowsClosed;
 }
 
 @end

@@ -12,6 +12,7 @@ class TableViewWithKeyDownEvents: NSTableView {
     var onDeleteKey: (() -> Void)?
     var onSpaceBar: (() -> Void)?
     var onEnterKey: (() -> Void)?
+    var onAltEnter: (() -> Void)?
     var onEscKey: (() -> Void)?
 
     override func keyDown(with event: NSEvent) {
@@ -25,7 +26,11 @@ class TableViewWithKeyDownEvents: NSTableView {
         {
             onDeleteKey?()
         } else if key == Character(UnicodeScalar(NSEnterCharacter)!) || event.keyCode == 36, onEnterKey != nil {
-            onEnterKey?()
+            if event.modifierFlags.contains(.option) {
+                onAltEnter?()
+            } else {
+                onEnterKey?()
+            }
         } else if key == Character(" "), onSpaceBar != nil {
             onSpaceBar?()
         } else if event.keyCode == 53, onEscKey != nil {

@@ -35,6 +35,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
 
 
+@property NSSet<NSUUID*>* twoFactorAvailable;
 @property NSSet<NSUUID*>* commonPasswords;
 @property NSSet<NSUUID*>* lowEntropy;
 @property NSDictionary<NSString*, NSSet<NSUUID*>*>* duplicatedPasswords;
@@ -66,6 +67,17 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
 @implementation DatabaseAuditor
 
+const static NSSet<NSString*>* kTwoFactorDomains;
+
++ (void)initialize {
+    if(self == [DatabaseAuditor class]) {
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            kTwoFactorDomains = [DatabaseAuditor loadTwoFactorDomains];
+        });
+    }
+}
+
 - (instancetype)initWithPro:(BOOL)pro { 
     return [self initWithPro:pro strengthConfig:nil isExcluded:nil saveConfig:nil];
 }
@@ -76,6 +88,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     if (self) {
         self.state = kAuditStateInitial;
     
+        self.twoFactorAvailable = NSSet.set;
         self.commonPasswords = NSSet.set;
         self.lowEntropy = NSSet.set;
         self.duplicatedPasswords = @{};
@@ -99,6 +112,21 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     }
     
     return self;
+}
+
++ (NSSet<NSString*>*)loadTwoFactorDomains {
+    NSString *path = [NSBundle.mainBundle pathForResource:@"twofactorauth" ofType:@"json"];
+    
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    
+    if ( data ) {
+        NSArray<NSString*> *domains = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+        return domains.set;
+    }
+    
+    NSLog(@"🔴 Could not load twofactorauth.json");
+    
+    return NSSet.set;
 }
 
 - (BOOL)start:(DatabaseModel*)database
@@ -159,7 +187,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
                                                                                  similar:self.similar
                                                                                 tooShort:self.tooShort
                                                                                    pwned:self.mutablePwnedNodes.snapshot
-                                                                              lowEntropy:self.lowEntropy];
+                                                                              lowEntropy:self.lowEntropy
+                                                                      twoFactorAvailable:self.twoFactorAvailable];
     
     return report;
 }
@@ -198,9 +227,97 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         if ([flags containsObject:@(kAuditFlagLowEntropy)]) {
             return NSLocalizedString(@"audit_quick_summary_very_brief_low_entropy", @"Weak/Entropy");
         }
+        
+        if ([flags containsObject:@(kAuditFlagTwoFactorAvailable)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_brief_two_factor_available", @"2FA Available");
+        }
     }
     
     return @"";
+}
+
+- (NSArray<NSString *>*)getQuickAuditAllIssuesVeryBriefSummaryForNode:(NSUUID *)item {
+    NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
+    
+    NSMutableArray<NSString*>* ret = NSMutableArray.array;
+    
+    if (flags.anyObject != nil) {
+        if ([flags containsObject:@(kAuditFlagNoPassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_no_password_set", @"No Password")];
+        }
+
+        if ([flags containsObject:@(kAuditFlagCommonPassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_very_common_password", @"Weak/Common")];
+        }
+
+        if ([flags containsObject:@(kAuditFlagPwned)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_password_is_pwned", @"Pwned")];
+        }
+
+        if ([flags containsObject:@(kAuditFlagDuplicatePassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_duplicated_password", @"Duplicated")];
+        }
+
+        if ([flags containsObject:@(kAuditFlagSimilarPassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_password_is_similar_to_another", @"Similar")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagTooShort)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_password_is_too_short", @"Short")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagLowEntropy)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_low_entropy", @"Weak/Entropy")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagTwoFactorAvailable)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_brief_two_factor_available", @"2FA Available")];
+        }
+    }
+    
+    return ret;
+}
+
+- (NSArray<NSString *>*)getQuickAuditAllIssuesSummaryForNode:(NSUUID *)item {
+    NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
+    
+    NSMutableArray<NSString*>* ret = NSMutableArray.array;
+    
+    if (flags.anyObject != nil) {
+        if ([flags containsObject:@(kAuditFlagNoPassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_no_password_set", @"Audit: No password set")];
+        }
+
+        if ([flags containsObject:@(kAuditFlagCommonPassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_very_common_password", @"Audit: Password is very common")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagPwned)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_pwned", @"Audit: Password is Pwned (HIBP)")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagDuplicatePassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_duplicated_password", @"Audit: Password is duplicated in another entry")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagSimilarPassword)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_password_is_similar_to_another", @"Audit: Password is similar to one in another entry.")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagTooShort)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_password_is_too_short", @"Audit: Password is too short.")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagLowEntropy)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_password_low_entropy", @"Password is weak (low entropy)")];
+        }
+        
+        if ([flags containsObject:@(kAuditFlagTwoFactorAvailable)]) {
+            [ret addObject:NSLocalizedString(@"audit_quick_summary_two_factor_available", @"2 Factor Authentication is available for this domain.")];
+        }
+    }
+    
+    return ret;
 }
 
 - (NSString *)getQuickAuditSummaryForNode:(NSUUID *)item {
@@ -233,6 +350,10 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         
         if ([flags containsObject:@(kAuditFlagLowEntropy)]) {
             return NSLocalizedString(@"audit_quick_summary_password_low_entropy", @"Password is weak (low entropy)");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagTwoFactorAvailable)]) {
+            return NSLocalizedString(@"audit_quick_summary_two_factor_available", @"2 Factor Authentication is available for this domain.");
         }
     }
     
@@ -270,6 +391,10 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         [ret addObject:@(kAuditFlagLowEntropy)];
     }
     
+    if ( [self.twoFactorAvailable containsObject:node] ) {
+        [ret addObject:@(kAuditFlagTwoFactorAvailable)];
+    }
+    
     return ret;
 }
 
@@ -282,7 +407,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     [set addObjectsFromArray:self.tooShort.allObjects];
     [set addObjectsFromArray:self.mutablePwnedNodes.arraySnapshot];
     [set addObjectsFromArray:self.lowEntropy.allObjects];
-    
+    [set addObjectsFromArray:self.twoFactorAvailable.allObjects];
+
     return set.count;
 }
 
@@ -293,7 +419,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
             self.similarPasswordsNodeSet.count +
             self.tooShort.count +
             self.mutablePwnedNodes.count +
-            self.lowEntropy.count;
+            self.lowEntropy.count +
+    self.twoFactorAvailable.count;
 }
 
 - (NSUInteger)haveIBeenPwnedErrorCount {
@@ -424,7 +551,62 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
     
     
+    self.twoFactorAvailable = [self checkForTwoFactorAvailable];
     
+    
+
+    
+}
+
+- (NSSet<NSUUID*>*)checkForTwoFactorAvailable {
+    if ( !self.config.checkForTwoFactorAvailable ) {
+        return NSSet.set;
+    }
+
+    NSArray<Node*>* results = [self.auditableNonEmptyPasswordNodes filter:^BOOL(Node * _Nonnull obj) {
+        if ( obj.fields.otpToken ) {
+            return NO;
+        }
+        
+        NSString* urlStr = obj.fields.url;
+        if ( urlStr.length == 0 ) {
+            return NO;
+        }
+        NSURL* url = urlStr.urlExtendedParse;
+        if( url == nil || url.host.length == 0 ) {
+            return NO;
+        }
+        
+        NSString* host = url.host; 
+        NSArray<NSString*>* comp = [host componentsSeparatedByString:@"."];
+        
+        
+        
+        if ( comp.count > 2 ) {
+            unsigned long lastIdx = comp.count - 1;
+            NSString* reconstructed = [NSString stringWithFormat:@"%@.%@.%@", comp[lastIdx-2], comp[lastIdx-1], comp[lastIdx]].lowercaseString;
+
+            
+            if ( [kTwoFactorDomains containsObject:reconstructed] ) {
+                return YES;
+            }
+        }
+        
+        if ( comp.count > 1 ) {
+            unsigned long lastIdx = comp.count - 1;
+            NSString* reconstructed = [NSString stringWithFormat:@"%@.%@", comp[lastIdx-1], comp[lastIdx]].lowercaseString;
+
+            if ( [kTwoFactorDomains containsObject:reconstructed] ) {
+                return YES;
+            }
+        }
+
+        return NO;
+    }];
+    
+    return [results map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
+    }].set;
 }
 
 - (NSSet<NSUUID*>*)checkForNoPasswords {
@@ -588,8 +770,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 - (void)checkHibp {
 
 
-    if(!self.config.showCachedHibpHits && !self.config.checkHibp) {
-        
+    if(!self.config.checkHibp) {
         return;
     }
     
@@ -676,7 +857,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     else  {
           NSMutableURLRequest *request = [self getHibpUrlRequest:sha1HexPassword];
 
-          UrlRequestOperation* op = [[UrlRequestOperation alloc] initWithRequest:request.copy dataTaskCompletionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+          UrlRequestOperation* op = [[UrlRequestOperation alloc] initWithRequest:request.copy
+                                                       dataTaskCompletionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
               if (error) {
                   NSLog(@"ERROR: [%@]", error);
                   completion(NO, error);

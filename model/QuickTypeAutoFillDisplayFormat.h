@@ -13,6 +13,9 @@ typedef NS_ENUM (NSInteger, QuickTypeAutoFillDisplayFormat) {
     kQuickTypeFormatTitleThenUsername,
     kQuickTypeFormatUsernameOnly,
     kQuickTypeFormatTitleOnly,
+    kQuickTypeFormatDatabaseThenTitleThenUsername,
+    kQuickTypeFormatDatabaseThenTitle,
+    kQuickTypeFormatDatabaseThenUsername,
 };
 
 NSString* quickTypeFormatString(QuickTypeAutoFillDisplayFormat format);

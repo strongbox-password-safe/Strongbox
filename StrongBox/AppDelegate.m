@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import "RecordView.h"
 #import "BrowseSafeView.h"
 #import "PasswordHistoryViewController.h"
 #import "PreviousPasswordsTableViewController.h"
@@ -28,11 +27,14 @@
 #import "VirtualYubiKeys.h"
 #import "AppLockViewController.h"
 #import "CustomizationManager.h"
+#import "MemoryOnlyURLProtocol.h"
+#import "Strongbox-Swift.h"
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 
 #import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
 #import "GoogleDriveManager.h"
+#import "MSAL/MSAL.h"
 
 #endif
 
@@ -65,11 +67,14 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     [self installTopLevelExceptionHandlers];
     
+    
+    
     [self initializeDropbox];
     
     [self performEarlyBasicICloudInitialization];
     
     [self initializeInstallSettingsAndLaunchCount];
+    
     
     
     
@@ -180,6 +185,9 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     else if ([url.absoluteString hasPrefix:@"com.googleusercontent.apps"]) {
         return [GoogleDriveManager.sharedInstance handleUrl:url];
     }
+    else if ([url.scheme isEqualToString:@"strongbox-twodrive"]) {
+        return [MSALPublicClientApplication handleMSALResponse:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]];
+    }
 #endif
     else {
         SafesViewController *safesViewController = [self getInitialViewController];
@@ -270,11 +278,9 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         
         
         if ( launchCount > 30 ) { 
-            if (@available( iOS 10.3,*)) {
 #ifndef DEBUG
-                [SKStoreReviewController requestReview];
+            [SKStoreReviewController requestReview];
 #endif
-            }
         }
         
         

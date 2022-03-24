@@ -180,9 +180,7 @@
     
     self.navigationItem.hidesBackButton = YES;
     
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
+    self.navigationController.navigationBar.prefersLargeTitles = NO;
     
     [self bindProOrFreeTrialUi];
 }
@@ -689,12 +687,7 @@
     UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
     [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
     
-    if (@available(iOS 10.0, *)) {
-        self.tableView.refreshControl = refreshControl;
-    }
-    else {
-        [self.tableView addSubview:refreshControl];
-    }
+    self.tableView.refreshControl = refreshControl;
 }
 
 - (void)onManualPulldownRefresh {
@@ -938,12 +931,7 @@
 }
 
 - (void)showUnlockedDatabase:(Model*)model {
-    if (@available(iOS 11.0, *)) { 
-        [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
-    }
-    else {
-        [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
-    }
+    [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
 }
 
 
@@ -1634,19 +1622,13 @@
 
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueToMasterDetail"] || [segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
-        BrowseSafeView *vc;
-        if ([segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
-            vc = segue.destinationViewController;
-        }
-        else {
-            MasterDetailViewController *svc = segue.destinationViewController;
-            svc.viewModel = (Model*)sender;
-            
-            UINavigationController *nav = [svc.viewControllers firstObject];
-            vc = (BrowseSafeView*)nav.topViewController;
-        }
+    if ( [segue.identifier isEqualToString:@"segueToMasterDetail"] ) {
+        MasterDetailViewController *svc = segue.destinationViewController;
+        svc.viewModel = (Model*)sender;
         
+        UINavigationController *nav = [svc.viewControllers firstObject];
+        BrowseSafeView *vc = (BrowseSafeView*)nav.topViewController;
+    
         vc.viewModel = (Model *)sender;
         vc.currentGroupId = vc.viewModel.database.effectiveRootGroup.uuid;
         self.unlockedDatabase = vc.viewModel.metadata;
@@ -1958,12 +1940,7 @@
                                       action:^(BOOL response) {
                     if ( response ) {
                         NSURL* url = [NSURL URLWithString:@"https:
-                        if (@available (iOS 10.0, *)) {
-                            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-                        }
-                        else {
-                            [UIApplication.sharedApplication openURL:url];
-                        }
+                        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
                     }
                 }];
             }
@@ -2000,12 +1977,7 @@
                                       action:^(int response) {
                     if ( response == 0 ) {
                         NSURL* url = [NSURL URLWithString:@"https:
-                        if (@available (iOS 10.0, *)) {
-                            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-                        }
-                        else {
-                            [UIApplication.sharedApplication openURL:url];
-                        }
+                        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
                     }
                     else if ( response == 1) {
                         [self onCreateNewExpressDatabase:name password:password forceLocal:YES];
@@ -2214,6 +2186,8 @@
         else {
             [self.buttonUpgrade setTitle:upgradeButtonTitle];
         }
+        
+        [CustomAppIconObjCHelper downgradeProIconIfInUse];
     }
     else {
         [self.buttonUpgrade setEnabled:NO];

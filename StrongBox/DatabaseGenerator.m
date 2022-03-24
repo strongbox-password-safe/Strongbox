@@ -37,11 +37,11 @@
             
             Node* childGroup = [[Node alloc] initAsGroup:title parent:db.effectiveRootGroup keePassGroupTitleRules:NO uuid:nil];
             
-            [db addChild:childGroup destination:db.effectiveRootGroup];
+            [db addChildren:@[childGroup] destination:db.effectiveRootGroup];
             
             for (int j = 0; j < entryCount; j++) {
                 Node* childEntry = [self createSampleEntry:j parentGroup:childGroup];
-                [db addChild:childEntry destination:childGroup];
+                [db addChildren:@[childEntry] destination:childGroup];
             }
         }
     }

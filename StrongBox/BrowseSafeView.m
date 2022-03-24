@@ -9,7 +9,6 @@
 #import "BrowseSafeView.h"
 #import "PwSafeSerialization.h"
 #import "SelectDestinationGroupController.h"
-#import "RecordView.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
 #import "DatabaseOperations.h"
@@ -253,7 +252,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                 NSLog(@"Reducing Argon2 Memory after Onboard Request...");
                 const int kReducedArgonMemory = 32 * 1024 * 1024;
                 enc.argonMemory = kReducedArgonMemory;
-
                 changed = YES;
             }
             
@@ -304,9 +302,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
     [self refreshNavBarTitle];
     
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
+    self.navigationController.navigationBar.prefersLargeTitles = NO;
 
     self.navigationController.toolbarHidden = NO;
     self.navigationController.toolbar.hidden = NO;
@@ -692,10 +688,16 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (void)onAuditCompleted:(id)param {
     NSNotification* note = param;
-    NSNumber* numNote = note.object;
-    
-    NSLog(@"Audit Completed... [%@]-[%@]", self, numNote);
-    
+    NSDictionary* dict = note.object;
+
+    Model* model = dict[@"model"];
+    if ( model != self.viewModel ) {
+        return;
+    }
+
+    NSNumber* numNote = dict[@"userStopped"];
+    NSLog(@"✅ Audit Completed... [%@]- userStopped = [%@]", self, numNote);
+
     if (numNote.boolValue) { 
         return;
     }
@@ -879,16 +881,11 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)addSearchBarToNav {
-    if (@available(iOS 11.0, *)) {
-        self.navigationItem.searchController = self.searchController;
-        
-        
-        
-        self.navigationItem.hidesSearchBarWhenScrolling = ![self isDisplayingRootGroup];
-    } else {
-        self.tableView.tableHeaderView = self.searchController.searchBar;
-        [self.searchController.searchBar sizeToFit];
-    }
+    self.navigationItem.searchController = self.searchController;
+    
+    
+    
+    self.navigationItem.hidesSearchBarWhenScrolling = ![self isDisplayingRootGroup];
 }
 
 - (void)setupTips {
@@ -955,12 +952,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
         [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
 
-        if (@available(iOS 10.0, *)) {
-            self.tableView.refreshControl = refreshControl;
-        }
-        else {
-            [self.tableView addSubview:refreshControl];
-        }
+        self.tableView.refreshControl = refreshControl;
     }
 }
 
@@ -1188,14 +1180,14 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (UIContextualAction*)getPinAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
     Node *item = [self getNodeFromIndexPath:indexPath];
     
-    BOOL pinned = [self.viewModel isPinned:item.uuid];
+    BOOL pinned = [self.viewModel isFavourite:item.uuid];
     
     UIContextualAction *pinAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
                                                                                title:pinned ?
                                                                                                            NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") :
                                                                                                            NSLocalizedString(@"browse_vc_action_pin", @"Pin")
                                                                              handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
-        [self togglePinEntry:item];
+        [self toggleFavourite:item];
         completionHandler(YES);
     }];
 
@@ -1245,7 +1237,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
     Node *item = [self getNodeFromIndexPath:indexPath];
 
-    return [UISwipeActionsConfiguration configurationWithActions:item.isGroup ? @[pinAction] : @[auditAction, pinAction]];
+    return [UISwipeActionsConfiguration configurationWithActions:item.isGroup ? @[] : @[auditAction, pinAction]];
 }
 
 - (UISwipeActionsConfiguration *)getLegacyLeftSlideActions:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)) {
@@ -1264,15 +1256,16 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
     if(!self.viewModel.isReadOnly) {
         if(item.isGroup) {
-            return self.viewModel.database.originalFormat != kPasswordSafe ?    [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, setIconAction, pinAction]] :
-                                                                        [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, pinAction]];
+            return self.viewModel.database.originalFormat != kPasswordSafe ?
+            [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, setIconAction]] :
+            [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction]];
         }
         else {
             return [UISwipeActionsConfiguration configurationWithActions:@[removeAction, duplicateItemAction, setIconAction, pinAction]];
         }
     }
     else {
-        return [UISwipeActionsConfiguration configurationWithActions:item.isGroup ? @[pinAction] : @[auditAction, pinAction]];
+        return [UISwipeActionsConfiguration configurationWithActions:item.isGroup ? @[] : @[auditAction]];
     }
 }
 
@@ -1429,24 +1422,24 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }];
 
     UITableViewRowAction *pinAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                         title:[self.viewModel isPinned:item.uuid] ?
+                                                                         title:[self.viewModel isFavourite:item.uuid] ?
                                        NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") :
                                        NSLocalizedString(@"browse_vc_action_pin", @"Pin")
                                                                                  handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-                                                                                     [self togglePinEntry:item];
+                                                                                     [self toggleFavourite:item];
                                                                                  }];
     pinAction.backgroundColor = UIColor.magentaColor;
     
     if(!self.viewModel.isReadOnly) {
         if(item.isGroup) {
-            return self.viewModel.database.originalFormat != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
+            return self.viewModel.database.originalFormat != kPasswordSafe ? @[removeAction, renameAction, setIconAction] : @[removeAction, renameAction];
         }
         else {
             return @[removeAction, duplicateItemAction, auditItemAction, pinAction];
         }
     }
     else {
-        return item.isGroup ? @[pinAction] : @[auditItemAction, pinAction];
+        return item.isGroup ? @[] : @[auditItemAction];
     }
 }
 
@@ -1454,10 +1447,18 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     [self performSegueWithIdentifier:@"segueToAuditDrillDown" sender:item.uuid];
 }
 
-- (void)togglePinEntry:(Node*)item {
-    [self.viewModel togglePin:item.uuid];
+- (void)toggleFavourite:(Node*)item {
+    if ( item.isGroup || self.viewModel.isReadOnly ) {
+        return; 
+    }
     
-    [self refresh];
+    BOOL needsSave = [self.viewModel toggleFavourite:item.uuid];
+    
+    if ( needsSave ) {
+        [self updateAndRefresh];
+    }
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:item.uuid]; 
 }
 
 - (void)duplicateItem:(Node*)item {
@@ -1488,12 +1489,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             
             [item touch:NO touchParents:YES];
             
-            Node* done = [self.viewModel addItem:item.parent item:dupe];
+            BOOL done = [self.viewModel addChildren:@[dupe] destination:item.parent];
 
             [self updateAndRefresh];
             
             if ( done && editAfter ) {
-                [self editEntry:done];
+                [self editEntry:dupe];
             }
         }
         
@@ -1750,16 +1751,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueToRecord"]) {
-        Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
-
-        Node *record = (Node *)sender;
-        RecordView *vc = segue.destinationViewController;
-        vc.record = record;
-        vc.parentGroup = currentGroup;
-        vc.viewModel = self.viewModel;
-    }
-    else if ([segue.identifier isEqualToString:@"segueToItemDetails"]) {
+    if ([segue.identifier isEqualToString:@"segueToItemDetails"]) {
         ItemDetailsViewController *vc = segue.destinationViewController;
         
         NSDictionary* params = (NSDictionary*)sender;
@@ -1789,6 +1781,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                     [weakSelf showAllAuditIssues];
                 }
             }];
+        };
+        vc.updateDatabase = ^{
+            [weakSelf updateAndRefresh];
         };
     }
     else if ([segue.identifier isEqualToString:@"segueMasterDetailToDetail"]) {
@@ -1847,14 +1842,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                 }
             }
             [weakSelf updateAndRefresh];
-        
         };
         
         vc.onSetMasterCredentials = ^(NSString * _Nullable password, NSString * _Nullable keyFileBookmark, NSData * _Nullable oneTimeKeyFileData, YubiKeyHardwareConfiguration * _Nullable yubiConfig) {
             [weakSelf setCredentials:password keyFileBookmark:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
         };
         
-        vc.onChangedDatabaseEncryptionSettings = ^{
+        vc.updateDatabase = ^{
             [weakSelf updateAndRefresh];
         };
         
@@ -2107,25 +2101,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             [self updateSplitViewDetailsView:item editMode:editImmediately];
         }
         else {
-            if (@available(iOS 11.0, *)) {
-                [self performSegueWithIdentifier:@"segueToItemDetails" sender:@{ kItemToEditParam : item, kEditImmediatelyParam : @(editImmediately) } ];
-            }
-            else {
-                [self performSegueWithIdentifier:@"segueToRecord" sender:item];
-            }
+            [self performSegueWithIdentifier:@"segueToItemDetails" sender:@{ kItemToEditParam : item, kEditImmediatelyParam : @(editImmediately) } ];
         }
     }
     else { 
-        if (@available(iOS 11.0, *)) {
-            if(self.splitViewController) {
-                [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:nil];
-            }
-            else {
-                [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
-            }
+        if(self.splitViewController) {
+            [self performSegueWithIdentifier:@"segueMasterDetailToDetail" sender:nil];
         }
         else {
-            [self performSegueWithIdentifier:@"segueToRecord" sender:nil];
+            [self performSegueWithIdentifier:@"segueToItemDetails" sender:nil];
         }
     }
 }
@@ -2568,7 +2552,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     
     
-    NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
+    NSArray* sortedKeys = [item.fields.customFieldsNoEmail.allKeys sortedArrayUsingComparator:finderStringComparator];
     for(NSString* key in sortedKeys) {
         if ( ![NodeFields isTotpCustomFieldKey:key] ) {
             StringValue* sv = item.fields.customFields[key];
@@ -2659,9 +2643,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (UIMenu*)getContextualMenuNonMutators:(NSIndexPath*)indexPath item:(Node*)item  API_AVAILABLE(ios(13.0)){
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     
-    
-    
-    [ma addObject:[self getContextualMenuTogglePinAction:indexPath item:item]];
     if (!item.isGroup) [ma addObject:[self getContextualMenuAuditSettingsAction:indexPath item:item]];
     if (item.fields.password.length) [ma addObject:[self getContextualMenuShowLargePasswordAction:indexPath item:item]];
     
@@ -2762,7 +2743,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         
 
-        if (self.viewModel.database.originalFormat == kPasswordSafe && item.fields.email.length ) {
+        if ( item.fields.email.length ) {
             [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_email" item:item handler:^(__kindof UIAction * _Nonnull action) {
                 [weakSelf copyEmail:item];
             }]];
@@ -2770,7 +2751,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         
 
-        if (item.fields.notes.length) {
+        if ( item.fields.notes.length ) {
             [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_notes" item:item handler:^(__kindof UIAction * _Nonnull action) {
                 [weakSelf copyNotes:item];
             }]];
@@ -2832,6 +2813,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     if (!self.viewModel.isReadOnly) {
         
+        
+        if (!item.isGroup) [ma addObject:[self getContextualMenuTogglePinAction:indexPath item:item]];
+
+        
     
         [ma addObject:[self getContextualMenuMoveAction:indexPath item:item]];
 
@@ -2879,7 +2864,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 - (UIAction*)getContextualMenuTogglePinAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
-    BOOL pinned = [self.viewModel isPinned:item.uuid];
+    BOOL pinned = [self.viewModel isFavourite:item.uuid];
     NSString* title = pinned ? NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") : NSLocalizedString(@"browse_vc_action_pin", @"Pin");
 
     __weak BrowseSafeView* weakSelf = self;
@@ -2887,7 +2872,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     return [ContextMenuHelper getItem:title
                            systemImage:pinned ? @"star.slash" : @"star"
                                handler:^(__kindof UIAction * _Nonnull action) {
-         [weakSelf togglePinEntry:item];
+         [weakSelf toggleFavourite:item];
     }];
 }
 
@@ -3573,7 +3558,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         return obj.uuid;
     }].set;
 
-    NSSet<NSUUID*>* destIds = [destinationModel.allNodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+    NSSet<NSUUID*>* destIds = [destinationModel.allItems map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;
     }].set;
     
@@ -3613,9 +3598,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     BOOL failOccurred = NO;
     for ( Node* exportItem in itemsToExport ) {
-        Node* added = [destinationModel addItem:destinationGroup item:exportItem];
+        BOOL added = [destinationModel addChildren:@[exportItem] destination:destinationGroup];
         
-        if ( added == nil ) {
+        if ( !added ) {
             NSLog(@"Failed to exportItem: [%@]", exportItem);
             failOccurred = YES;
         }

@@ -14,6 +14,7 @@
 #import "MutableOrderedDictionary.h"
 #import "Node.h"
 #import "DatabaseFormat.h"
+#import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,11 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)demoItem;
 
-+ (instancetype)fromNode:(Node *)item format:(DatabaseFormat)format keePassEmailField:(BOOL)keePassEmailField;
++ (instancetype)fromNode:(Node *)item format:(DatabaseFormat)format model:(Model*)model;
 
 - (BOOL)applyToNode:(Node*)ret
      databaseFormat:(DatabaseFormat)databaseFormat
-  keePassEmailField:(BOOL)keePassEmailField
 legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
       addOtpAuthUrl:(BOOL)addOtpAuthUrl;
 
@@ -49,7 +49,6 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 @property NSString* url;
 @property NSString* notes;
 @property NSString* email;
-@property (nullable) NSString* keePassEmailFieldKey;
 @property (nullable) NSDate* expires;
 
 @property (nullable) OTPToken* totp;

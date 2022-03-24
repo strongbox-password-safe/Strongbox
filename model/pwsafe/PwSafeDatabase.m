@@ -225,6 +225,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     fields.notes = record.notes;
     fields.passwordHistory = record.passwordHistory;
     fields.email = record.email;
+        
     fields.expires = record.expires;
     
     [fields setTouchPropertiesWithCreated:record.created accessed:record.accessed modified:record.modified locationChanged:nil usageCount:nil]; 

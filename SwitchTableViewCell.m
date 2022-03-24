@@ -27,8 +27,13 @@
 }
 
 - (void)set:(NSString *)text on:(BOOL)on onChanged:(void (^)(BOOL))onChanged {
+    [self set:text on:on enabled:YES onChanged:onChanged];
+}
+
+- (void)set:(NSString *)text on:(BOOL)on enabled:(BOOL)enabled onChanged:(void (^)(BOOL))onChanged {
     self.labelText.text = text;
     self.switchOnOff.on = on;
+    self.switchOnOff.enabled = enabled;
     self.onChanged = onChanged;
 }
 

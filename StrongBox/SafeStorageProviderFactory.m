@@ -10,35 +10,35 @@
 
 #if TARGET_OS_IPHONE
 
-#import "LocalDeviceStorageProvider.h"
+    #import "LocalDeviceStorageProvider.h"
 
-#ifndef IS_APP_EXTENSION
+    #ifndef IS_APP_EXTENSION
+        #ifndef NO_SFTP_WEBDAV_SP
+            #import "SFTPStorageProvider.h"
+            #import "WebDAVStorageProvider.h"
+        #endif
+        #import "AppleICloudProvider.h"
+        #import "FilesAppUrlBookmarkProvider.h"
+    #endif
 
-#ifndef NO_SFTP_WEBDAV_SP
-#import "SFTPStorageProvider.h"
-#import "WebDAVStorageProvider.h"
-#endif
+    #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+        #import "OneDriveStorageProvider.h"
+        #import "GoogleDriveStorageProvider.h"
+        #import "DropboxV2StorageProvider.h"
 
-#import "AppleICloudProvider.h"
-#import "FilesAppUrlBookmarkProvider.h"
-
-#endif
-
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-
-#import "OneDriveStorageProvider.h"
-#import "GoogleDriveStorageProvider.h"
-#import "DropboxV2StorageProvider.h"
-
-#endif
+        #import "Strongbox-Swift.h" 
+    #endif
 
 #else
 
-#import "MacUrlSchemes.h"
-#import "MacFileBasedBookmarkStorageProvider.h"
-#import "SFTPStorageProvider.h"
-#import "WebDAVStorageProvider.h"
+    #import "MacUrlSchemes.h"
+    #import "MacFileBasedBookmarkStorageProvider.h"
+    #import "SFTPStorageProvider.h"
+    #import "WebDAVStorageProvider.h"
 
+    #ifndef IS_APP_EXTENSION
+        #import "Strongbox-Swift.h"
+    #endif
 #endif
 
 @implementation SafeStorageProviderFactory
@@ -67,10 +67,16 @@
     else if(providerId == kOneDrive) {
         return [OneDriveStorageProvider sharedInstance];
     }
+    else if ( providerId == kTwoDrive ) {
+        return TwoDriveStorageProvider.sharedInstance;
+    }
 #endif
 #else
     if (providerId == kMacFile) {
         return MacFileBasedBookmarkStorageProvider.sharedInstance;
+    }
+    else if ( providerId == kTwoDrive ) {
+        return TwoDriveStorageProvider.sharedInstance;
     }
 #endif
 #ifndef NO_SFTP_WEBDAV_SP
@@ -155,7 +161,7 @@
         }
         return _displayName;
     }
-    else if(provider == kOneDrive) {
+    else if(provider == kOneDrive || provider == kTwoDrive ) {
         _displayName = NSLocalizedString(@"storage_provider_name_onedrive", @"OneDrive");
         if([_displayName isEqualToString:@"storage_provider_name_onedrive"]) {
             _displayName = @"OneDrive";
@@ -202,6 +208,10 @@
     else if (provider == kLocalDevice) {
         return @"iphone_x";
     }
+#else
+    else if (provider == kMacFile) {
+        return @"lock";
+    }
 #endif
     else if (provider == kGoogleDrive) {
         return @"google-drive-2021";
@@ -210,6 +220,9 @@
         return @"Dropbox-2021";
     }
     else if(provider == kOneDrive) {
+        return @"onedrive-2021";
+    }
+    else if(provider == kTwoDrive) {
         return @"onedrive-2021";
     }
     else if(provider == kFilesAppUrlBookmark) {
@@ -225,6 +238,53 @@
         return @"SafeStorageProviderFactory::getIcon Unknown";
     }
 }
+
+#if TARGET_OS_IPHONE
+
+#else
++ (NSImage*)getImageForProvider:(StorageProvider)provider {
+    if (provider == kiCloud) {
+        if (@available(macOS 11.0, *)) {
+            return [NSImage imageWithSystemSymbolName:@"icloud.fill" accessibilityDescription:nil];
+        }
+        else {
+            return [NSImage imageNamed:@"cloud"];
+        }
+    }
+    else if (provider == kMacFile) {
+        if (@available(macOS 12.0, *)) {
+            return [NSImage imageWithSystemSymbolName:@"lock.laptopcomputer" accessibilityDescription:nil];
+        } else {
+            return [NSImage imageNamed:@"lock"];
+        }
+    }
+    else if (provider == kGoogleDrive) {
+        return [NSImage imageNamed:@"google-drive-2021"];
+    }
+    else if (provider == kDropbox) {
+        return [NSImage imageNamed:@"Dropbox-2021"];
+    }
+    else if(provider == kOneDrive) {
+        return [NSImage imageNamed:@"onedrive-2021"];
+    }
+    else if(provider == kTwoDrive) {
+        return [NSImage imageNamed:@"onedrive-2021"];
+    }
+    else if(provider == kFilesAppUrlBookmark) {
+        return [NSImage imageNamed:@"lock"];
+    }
+    else if(provider == kSFTP) {
+        return [NSImage imageNamed:@"cloud-sftp"];
+    }
+    else if(provider == kWebDAV) {
+        return [NSImage imageNamed:@"cloud-webdav"];
+    }
+    else {
+        NSLog(@"SafeStorageProviderFactory::getImageForProvider Unknown");
+        return nil;
+    }
+}
+#endif
 
 @end
 

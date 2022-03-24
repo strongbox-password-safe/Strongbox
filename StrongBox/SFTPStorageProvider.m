@@ -127,7 +127,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     SFTPProviderData* providerData = makeProviderData(path, configuration);
     METADATA_PTR metadata = [self getDatabasePreferences:nickName providerData:providerData];
 
-    [sftp disconnect];
+    [sftp.session disconnect];
 
     completion(metadata, nil);
 }
@@ -159,7 +159,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
             [self listWithSftpSession:sftp parentFolder:parentFolder viewController:viewController configuration:configuration completion:completion];
                               
             if(!self.maintainSessionForListing) {
-                [sftp disconnect];
+                [sftp.session disconnect];
             }
         }];
     }
@@ -242,7 +242,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
             completion(kUpdateResultSuccess, attr.modificationDate, nil);
         }
         
-        [sftp disconnect];
+        [sftp.session disconnect];
     }];
 }
 
@@ -321,7 +321,8 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
 }
 
-- (void)getModDate:(METADATA_PTR)safeMetaData completion:(StorageProviderGetModDateCompletionBlock)completion {
+- (void)getModDate:(METADATA_PTR)safeMetaData
+        completion:(StorageProviderGetModDateCompletionBlock)completion {
     SFTPProviderData* foo = [self getProviderDataFromMetaData:safeMetaData];
     SFTPSessionConfiguration* connection = [self getConnectionFromProviderData:foo];
     
@@ -337,17 +338,24 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     [self connectAndAuthenticate:connection
                   viewController:nil
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
-        if(sftp == nil || error) {
+        if ( sftp == nil || error ) {
             completion(nil, error);
             return;
         }
                 
         NMSFTPFile* attr = [sftp infoForFileAtPath:foo.filePath];
-        if(!attr) {
+        if ( !attr ) {
+            [sftp.session disconnect];
+
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
             completion(nil, error);
             return;
         }
+        
+
+        [sftp.session disconnect];
+        
+
         
         completion(attr.modificationDate, nil);
     }];
@@ -381,6 +389,8 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
         
         NMSFTPFile* attr = [sftp infoForFileAtPath:foo.filePath];
         if(!attr) {
+            [sftp.session disconnect];
+
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
             completionHandler(kReadResultError, nil, nil, error);
             return;
@@ -391,6 +401,10 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                 [self dismissProgressSpinner];
             }
 
+            [sftp.session disconnect];
+            NMSSHSession *sess = [sftp session];
+            [sess disconnect];
+            
             completionHandler(kReadResultModifiedIsSameAsLocal, nil, nil, error);
             return;
         }
@@ -403,11 +417,14 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
      
         if(!data) {
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+            
+            [sftp.session disconnect];
+
             completionHandler(kReadResultError, nil, nil, error);
             return;
         }
         
-        [sftp disconnect];
+        [sftp.session disconnect];
         
         completionHandler(kReadResultSuccess, data, attr.modificationDate, nil);
     }];
@@ -439,7 +456,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 - (NMSFTP*)connectAndAuthenticateWithSessionConfiguration:(SFTPSessionConfiguration*)sessionConfiguration
                                            viewController:viewController
                                                     error:(NSError**)error {
-    
+
     
     if ( ( sessionConfiguration.authenticationMode == kPrivateKey && sessionConfiguration.privateKey == nil ) || ( sessionConfiguration.authenticationMode == kUsernamePassword && sessionConfiguration.password == nil ) ) {
         if ( error ) {

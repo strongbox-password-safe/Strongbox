@@ -93,16 +93,18 @@
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault
                                                                             title:NSLocalizedString(@"audit_excluded_items_vc_action_unclude", @"Unexclude")
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self.model setItemAuditExclusion:item.uuid exclude:NO];
+        [self.model excludeFromAudit:item exclude:NO];
         
         [self refreshItems];
         
         [self.model restartBackgroundAudit];
+        
+        self.updateDatabase(); 
     }];
     
     removeAction.backgroundColor = UIColor.systemOrangeColor;
     
-    return @[removeAction];
+    return self.model.isReadOnly ? @[] : @[removeAction];
 }
 
 @end

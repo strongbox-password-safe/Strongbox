@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL auditInBackground;
 @property BOOL checkForNoPasswords;
+@property BOOL checkForTwoFactorAvailable;
 @property BOOL checkForDuplicatedPasswords;
 @property BOOL caseInsensitiveMatchForDuplicates;
 @property BOOL checkForCommonPasswords;
@@ -39,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSUInteger hibpCheckForNewBreachesIntervalSeconds;
 @property (nullable) NSDate* lastHibpOnlineCheck;
-@property BOOL showCachedHibpHits;
+@property (readonly) BOOL showCachedHibpHits;
 
 @end
 

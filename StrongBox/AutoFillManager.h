@@ -26,7 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
                            customFields:(BOOL)customFields
                                   notes:(BOOL)notes
            concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
-         unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds;
+         unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
+                               nickName:(NSString*)nickName;
 
 - (void)clearAutoFillQuickTypeDatabase;
 

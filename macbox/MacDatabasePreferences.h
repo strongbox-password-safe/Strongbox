@@ -18,6 +18,8 @@
 #import "KeePassIconSet.h"
 #import "NextNavigationConstants.h"
 
+@class HeaderNodeState;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MacDatabasePreferences : NSObject
@@ -144,8 +146,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSUUID* sideBarSelectedGroup;
 @property (nullable) NSString* sideBarSelectedTag;
 @property OGNavigationSpecial sideBarSelectedSpecial;
+@property OGNavigationAuditCategory sideBarSelectedAuditCategory;
+@property (nullable) NSUUID* sideBarSelectedFavouriteId;
 @property NSArray<NSUUID*>* browseSelectedItems;
 @property NSString* searchText;
+
+@property BOOL showChildCountOnFolderInSidebar;
+
+@property NSArray<HeaderNodeState*>* headerNodes;
 
 @end
 

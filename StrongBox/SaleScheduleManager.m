@@ -41,10 +41,23 @@
         
         
         self.schedule = @[
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-11-26"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-11-30"]], 
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-12-24"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-12-27"]], 
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2022-03-17"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-03-21"]], 
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2022-06-03"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-06-07"]], 
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-11-26"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-11-30"]], 
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-12-24"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-12-27"]], 
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-03-17"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-03-21"]], 
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-06-03"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-06-07"]], 
+
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-09-02"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-09-05"]], 
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-11-25"]   
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-11-29"]],
         ];
     }
     

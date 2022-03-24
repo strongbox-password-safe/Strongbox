@@ -114,8 +114,17 @@
     NSString* value = [NSString stringWithString:self.textViewValue.textStorage.string];
     BOOL protected = self.checkboxConcealable.state == NSControlStateValueOn;
 
-    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+    const NSSet<NSString*> *keePassReserved;
 
+    if ( Settings.sharedInstance.nextGenUI ) {
+        NSMutableSet* set = [Entry reservedCustomFieldKeys].mutableCopy;
+        [set addObject:kCanonicalEmailFieldName];
+        keePassReserved = [set copy];
+    }
+    else {
+        keePassReserved = [Entry reservedCustomFieldKeys];
+    }
+    
     if ( self.field ) { 
         BOOL same = ([key isEqualToString:self.field.key] && [value isEqualToString:self.field.value] && self.field.protected == protected);
         if ( same ) {

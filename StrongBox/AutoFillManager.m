@@ -102,13 +102,14 @@ static NSString* const kMailToScheme = @"mailto";
 
 
 - (void)updateAutoFillQuickTypeDatabase:(DatabaseModel *)database
-                           databaseUuid:(NSString *)databaseUuid
+                            databaseUuid:(NSString *)databaseUuid
                             displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                             alternativeUrls:(BOOL)alternativeUrls
                             customFields:(BOOL)customFields
                             notes:(BOOL)notes
                             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
-                            unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds {
+                            unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
+                            nickName:(NSString *)nickName {
     if (! self.isPossible || database == nil) {
         return;
     }
@@ -125,7 +126,8 @@ static NSString* const kMailToScheme = @"mailto";
                                   customFields:customFields
                                          notes:notes
                   concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
-                unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
+                unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds
+                                      nickName:nickName];
     }
 }
 
@@ -136,7 +138,8 @@ static NSString* const kMailToScheme = @"mailto";
                             customFields:(BOOL)customFields
                                    notes:(BOOL)notes
             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
-          unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABLE(ios(12.0), macosx(11.0)) {
+          unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
+                            nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macosx(11.0)) {
     [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
         if(state.enabled) {
             [self onGotAutoFillStoreOK:database
@@ -146,7 +149,7 @@ static NSString* const kMailToScheme = @"mailto";
                           customFields:customFields
                                  notes:notes
           concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
-        unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
+        unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds nickName:nickName];
         }
         else {
             NSLog(@"AutoFill Credential Store Disabled...");
@@ -161,7 +164,8 @@ static NSString* const kMailToScheme = @"mailto";
                 customFields:(BOOL)customFields
                        notes:(BOOL)notes
 concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
-unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABLE(ios(12.0), macosx(11.0)) {
+unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
+                    nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macosx(11.0)) {
     NSLog(@"Updating Quick Type AutoFill Database...");
     
     NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
@@ -175,7 +179,7 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABL
                                                                                                customFields:customFields
                                                                                                       notes:notes
                                                                                concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
-                                                                             unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
+                                                                             unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds nickName:nickName];
             [identities addObjectsFromArray:nodeIdenitities];
         }
     }
@@ -204,7 +208,8 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABL
                                                              customFields:(BOOL)customFields
                                                                     notes:(BOOL)notes
                                             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
-                                          unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABLE(ios(12.0), macos(11.0)) {
+                                          unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
+                                nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macos(11.0)) {
     NSMutableSet<NSString*> *uniqueUrls = [NSMutableSet set];
 
     NSMutableArray<NSString*> *explicitUrls = [NSMutableArray array];
@@ -280,7 +285,9 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABL
                                                   databaseUuid:databaseUuid
                                                  displayFormat:displayFormat
                                                       fieldKey:nil
-                                                    fieldValue:nil];
+                                                    fieldValue:nil
+                                                      nickName:nickName];
+        
         [identities addObject:iden];
         
         for ( NSString* key in node.fields.customFields.allKeys ) {
@@ -288,12 +295,26 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABL
                 StringValue* sv = node.fields.customFields[key];
                 
                 if ( concealedCustomFieldsAsCreds && sv.protected ) {
-                    ASPasswordCredentialIdentity* iden = [self getIdentity:node url:url database:database databaseUuid:databaseUuid displayFormat:displayFormat fieldKey:key fieldValue:sv.value];
+                    ASPasswordCredentialIdentity* iden = [self getIdentity:node
+                                                                       url:url
+                                                                  database:database
+                                                              databaseUuid:databaseUuid
+                                                             displayFormat:displayFormat
+                                                                  fieldKey:key
+                                                                fieldValue:sv.value
+                                                                  nickName:nickName];
                     [identities addObject:iden];
 
                 }
                 else if ( unConcealedCustomFieldsAsCreds && !sv.protected ) {
-                    ASPasswordCredentialIdentity* iden = [self getIdentity:node url:url database:database databaseUuid:databaseUuid displayFormat:displayFormat fieldKey:key fieldValue:sv.value];
+                    ASPasswordCredentialIdentity* iden = [self getIdentity:node
+                                                                       url:url
+                                                                  database:database
+                                                              databaseUuid:databaseUuid
+                                                             displayFormat:displayFormat
+                                                                  fieldKey:key
+                                                                fieldValue:sv.value
+                                                                  nickName:nickName];
                     [identities addObject:iden];
                 }
             }
@@ -310,7 +331,8 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABL
                                 databaseUuid:(NSString*)databaseUuid
                                 displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                                     fieldKey:(NSString*)fieldKey
-                                  fieldValue:(NSString*)fieldValue  API_AVAILABLE(ios(12.0), macos(11.0)) {
+                                  fieldValue:(NSString*)fieldValue
+                            nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macos(11.0)) {
     QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString fieldKey:fieldKey];
     ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
     
@@ -332,6 +354,15 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABL
     }
     else if ( displayFormat == kQuickTypeFormatUsernameOnly && username.length ) {
         quickTypeText = username;
+    }
+    else if ( displayFormat == kQuickTypeFormatDatabaseThenTitleThenUsername && username.length) {
+      quickTypeText = [NSString stringWithFormat:@"[%@] %@ (%@)", nickName, title, username];
+    }
+    else if ( displayFormat == kQuickTypeFormatDatabaseThenUsername && username.length) {
+      quickTypeText = [NSString stringWithFormat:@"[%@] %@", nickName, username];
+    }
+    else if ( displayFormat == kQuickTypeFormatDatabaseThenTitle) {
+      quickTypeText = [NSString stringWithFormat:@"[%@] %@", nickName, title];
     }
     else if ( fieldKey != nil ) {
         quickTypeText = username;

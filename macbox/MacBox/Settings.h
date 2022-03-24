@@ -77,6 +77,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL closeManagerOnLaunch;
 @property BOOL makeLocalRollingBackups;
 
+@property (nullable) NSDate* lastPromptedToUseNextGenUI;
+
 @property BOOL nextGenUI;
 @property BOOL miniaturizeOnCopy;
 @property BOOL quickRevealWithOptionKey;
@@ -100,6 +102,10 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL addLegacySupplementaryTotpCustomFields;
 @property BOOL addOtpAuthUrl;
+
+@property BOOL quitStrongboxOnAllWindowsClosed;
+
+@property (readonly) BOOL isAProBundle;
 
 @end
 

@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ExcludedItemsViewController : UITableViewController
 
 @property Model* model;
+@property (nonatomic, copy) void (^updateDatabase)(void);
 
 @end
 

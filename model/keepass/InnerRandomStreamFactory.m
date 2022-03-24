@@ -19,7 +19,9 @@
     return [InnerRandomStreamFactory getStream:streamId key:key createNewKeyIfAbsent:YES];
 }
 
-+ (id<InnerRandomStream>)getStream:(uint32_t)streamId key:(NSData *)key createNewKeyIfAbsent:(BOOL)createNewKeyIfAbsent {
++ (id<InnerRandomStream>)getStream:(uint32_t)streamId
+                               key:(NSData *)key
+              createNewKeyIfAbsent:(BOOL)createNewKeyIfAbsent {
     if(streamId == kInnerStreamSalsa20) {
         if (key != nil || createNewKeyIfAbsent) {
             return [[Salsa20Stream alloc] initWithKey:key];

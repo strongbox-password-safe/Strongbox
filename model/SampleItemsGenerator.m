@@ -39,20 +39,20 @@
                             keePassGroupTitleRules:NO
                                               uuid:nil];
 
-    [database addChild:sampleFolder destination:parent];
+    [database addChildren:@[sampleFolder] destination:parent];
 
     NodeFields *fields = [[NodeFields alloc] initWithUsername:NSLocalizedString(@"model_sample_entry_username", @"username")
                                                           url:@"https:
                                                      password:password
                                                         notes:@""
-                                                        email:@"user@gmail.com"];
+                                                        email:@""];
     
     Node* sampleEntry = [[Node alloc] initAsRecord:NSLocalizedString(@"model_sample_entry_title", @"Sample")
                                          parent:parent
                                          fields:fields
                                            uuid:nil];
     
-    [database addChild:sampleEntry destination:parent];
+    [database addChildren:@[sampleEntry] destination:parent]; 
 }
 
 @end

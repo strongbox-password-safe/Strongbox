@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)appendStreamedText:(NSString*)text;
 
-@property (readonly) BOOL handlesStreamingText;
+@property (readonly) BOOL isV3BinaryHack;
 @property (readonly) NSString* originalElementName;
 @property (readonly) NSString* originalText;
 @property (readonly) NSDictionary<NSString*, NSString*> *originalAttributes;

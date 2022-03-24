@@ -11,12 +11,4 @@ import Cocoa
 class TitleCellView: NSTableCellView {
     @IBOutlet var titleLabel: NSTextField!
     @IBOutlet var image: NSImageView!
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-    }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-    }
 }

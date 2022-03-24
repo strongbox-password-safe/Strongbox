@@ -33,7 +33,10 @@
 - (NSArray *)map:(id (^)(id obj, NSUInteger idx))block {
     NSMutableArray *result = [NSMutableArray arrayWithCapacity:[self count]];
     [self enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        [result addObject:block(obj, idx)];
+        id res = block(obj, idx);
+        if ( res ) {
+            [result addObject:res];
+        }
     }];
     return [result copy];
 }

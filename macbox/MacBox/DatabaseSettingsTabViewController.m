@@ -41,25 +41,37 @@
     self.view.window.delegate = self; 
 }
 
-- (void)setModel:(ViewModel *)model initialTab:(NSInteger)initialTab {
+- (void)setModel:(ViewModel *)model initialTab:(DatabaseSettingsInitialTab)initialTab {
     self.viewModel = model;
     self.initialTab = initialTab;
     
     [self initializeTabs];
+    
+    if ( !Settings.sharedInstance.nextGenUI ) {
+        [self removeTabViewItem:self.tabViewItems[4]];
+    }
 }
 
 - (void)initializeTabs {
     NSTabViewItem* generalItem = self.tabViewItems[0];
-    NSTabViewItem* convenienceUnlockItem = self.tabViewItems[1];
-    NSTabViewItem* autoFillItem = self.tabViewItems[2];
-    NSTabViewItem* advanced = self.tabViewItems[3];
+    NSTabViewItem* sideBarItem = self.tabViewItems[1];
+    NSTabViewItem* convenienceUnlockItem = self.tabViewItems[2];
+    NSTabViewItem* autoFillItem = self.tabViewItems[3];
+    NSTabViewItem* auditItem = self.tabViewItems[4];
+    NSTabViewItem* advanced = self.tabViewItems[5];
 
     GeneralDatabaseSettings* general = (GeneralDatabaseSettings*)generalItem.viewController;
     general.model = self.viewModel;
     
+    SideBarSettings* sideBarSettings = (SideBarSettings*)sideBarItem.viewController;
+    sideBarSettings.model = self.viewModel;
+        
     DatabaseConvenienceUnlockPreferences* preferences = (DatabaseConvenienceUnlockPreferences*)convenienceUnlockItem.viewController;
     preferences.model = self.viewModel;
 
+    AuditConfigurationViewController* audit = (AuditConfigurationViewController*)auditItem.viewController;
+    audit.database = self.viewModel;
+    
     AdvancedDatabasePreferences* advancedPreferences = (AdvancedDatabasePreferences*)advanced.viewController;
     advancedPreferences.model = self.viewModel;
 
