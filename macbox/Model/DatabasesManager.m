@@ -207,8 +207,11 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     }
 
     StorageProvider provider = storageProviderFromUrl(url);
+     
+    NSString* nickName = [url.lastPathComponent stringByDeletingPathExtension];
+    nickName = nickName ? nickName : NSLocalizedString(@"generic_unknown", @"Unknown");
     
-    safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
+    safe = [[DatabaseMetadata alloc] initWithNickName:nickName
                                       storageProvider:provider
                                               fileUrl:url
                                           storageInfo:fileIdentifier];

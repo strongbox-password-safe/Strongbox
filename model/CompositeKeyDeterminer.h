@@ -22,12 +22,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSUInteger, GetCompositeKeyResult) {
     kGetCompositeKeyResultError,
     kGetCompositeKeyResultUserCancelled,
     kGetCompositeKeyResultDuressIndicated,
     kGetCompositeKeyResultSuccess,
-} GetCompositeKeyResult;
+};
 
 typedef void(^CompositeKeyDeterminedBlock)(GetCompositeKeyResult result, CompositeKeyFactors*_Nullable factors, BOOL fromConvenience, NSError*_Nullable error);
 

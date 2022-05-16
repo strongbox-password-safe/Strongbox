@@ -44,6 +44,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     @IBOutlet var buttonCancel: NSButton!
     @IBOutlet var buttonDone: NSButton!
+    @IBOutlet weak var buttonSave: NSButton!
+    
     @IBOutlet var imageViewIcon: ClickableImageView!
     @IBOutlet var textFieldTitle: MMcGACTextField!
     @IBOutlet var textFieldUsername: MMcGACTextField!
@@ -86,15 +88,12 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBOutlet var tagsField: AutoResizingTokenField!
     @IBOutlet var progressTotp: NSProgressIndicator!
     @IBOutlet var popupLocation: NSPopUpButton!
-    @IBOutlet var buttonScanForTotp: NSButton!
 
     
     
 
     @IBOutlet var dummyKludge: NSSecureTextField!
     @IBOutlet var dummyKludgeWidthConstraint: NSLayoutConstraint!
-
-    
 
     class func instantiateFromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: "CreateEditViewController", bundle: nil)
@@ -129,16 +128,18 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         super.viewDidLoad()
 
         guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId),
-              let dbModel = database.commonModel else {
+              let dbModel = database.commonModel else
+        {
             NSLog("🔴 Could not load initial node!")
             return
         }
 
-        model = EntryViewModel.fromNode(node, format: database.format, model: dbModel)
+        model = EntryViewModel.fromNode(node, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
         preEditModelClone = model.clone()
 
         setupUI()
 
+        bindUiToModel()
         bindDoneButtonState()
     }
 
@@ -158,8 +159,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             let item = NSMenuItem(title: title, action: #selector(onChangeLocation(sender:)), keyEquivalent: "")
 
-            
-            item.image = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
+            var icon = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
+            if let gi = group.icon, gi.isCustom {
+                icon = scaleImage(icon, CGSize(width: 16, height: 16))
+            }
+            item.image = icon
 
             popupLocation.menu?.addItem(item)
         }
@@ -178,68 +182,28 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             
 
-            let image2 = database.rootGroup.isUsingKeePassDefaultIcon ? Icon.house.image() : NodeIconHelper.getIconFor(database.rootGroup, predefinedIconSet: database.iconSet, format: database.format)
+            var icon = database.rootGroup.isUsingKeePassDefaultIcon ? Icon.house.image() : NodeIconHelper.getIconFor(database.rootGroup, predefinedIconSet: database.iconSet, format: database.format)
 
-            item.image = image2
+            if let gi = database.rootGroup.icon, gi.isCustom {
+                icon = scaleImage(icon, CGSize(width: 16, height: 16))
+            }
+            item.image = icon
 
             popupLocation.menu?.insertItem(item, at: 0)
             sortedGroups.insert(database.rootGroup, at: 0)
         }
     }
 
-    @objc func onChangeLocation(sender: Any?) {
-        guard let sender = sender as? NSMenuItem else {
-            return
-        }
-
-        guard let idx = popupLocation.menu?.index(of: sender) else {
-            NSLog("🔴 Could not find this menu item in the menu?!")
-            return
-        }
-
-        let node = sortedGroups[idx]
-
-
-
-        model.parentGroupUuid = node.uuid
-
-        onModelEdited()
-
-        bindLocation()
-    }
-
-    func bindLocation() {
-        guard let idx = sortedGroups.firstIndex(where: { group in
-            if model.parentGroupUuid == nil {
-                return group == database.rootGroup
-            } else {
-                return group.uuid == model.parentGroupUuid
-            }
-        })
-        else {
-            NSLog("🔴 Could not find this items parent group in the sorted groups list!")
-            return
-        }
-
-        popupLocation.selectItem(at: idx)
-    }
-
-    func setupUI() {
-        
-
-        setupLocationUI()
-
-        
-
+    func setupIcon() {
         imageViewIcon.clickable = true
         imageViewIcon.showClickableBorder = true
         imageViewIcon.onClick = { [weak self] in
             guard let self = self else { return }
             self.onIconClicked()
         }
+    }
 
-        
-
+    func setupTitle() {
         textFieldTitle.onTextDidChange = { [weak self] in
             guard let self = self else { return }
             self.model.title = trim(self.textFieldTitle.stringValue)
@@ -249,9 +213,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self = self else { return }
             self.handlePasteImageIntoField()
         }
+    }
 
-        
-
+    func setupUsername() {
         textFieldUsername.completions = Array(database.usernameSet)
         textFieldUsername.completionEnabled = database.showAutoCompleteSuggestions
         textFieldUsername.onTextDidChange = { [weak self] in
@@ -269,9 +233,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         popupButtonUsernameSuggestions.menu?.delegate = self
+    }
 
-        
-
+    func setupUrl() {
         textFieldUrl.completions = Array(database.urlSet)
         textFieldUrl.completionEnabled = database.showAutoCompleteSuggestions
         textFieldUrl.onTextDidChange = { [weak self] in
@@ -283,9 +247,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self = self else { return }
             self.handlePasteImageIntoField()
         }
+    }
 
-        
-
+    func setupEmail() {
         textFieldEmail.completions = Array(database.emailSet)
         textFieldEmail.completionEnabled = database.showAutoCompleteSuggestions
         textFieldEmail.onTextDidChange = { [weak self] in
@@ -298,9 +262,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self = self else { return }
             self.handlePasteImageIntoField()
         }
+    }
 
-        
-
+    func setupPassword() {
         if #available(macOS 11.0, *) {
             buttonPasswordPreferences.image = NSImage(systemSymbolName: "gear", accessibilityDescription: nil)
             buttonPasswordPreferences.symbolConfiguration = .init(scale: .large)
@@ -312,62 +276,50 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         passwordField.concealed = !Settings.sharedInstance().revealPasswordsImmediately
         popupButtonAlternativeSuggestions.menu?.delegate = self
 
-        
-
-        textViewNotes.delegate = self
-        popupButtonNotesSuggestions.menu?.delegate = self
-
-        borderScrollNotes.wantsLayer = true
-        borderScrollNotes.layer?.cornerRadius = 5
-
-        
-
-        setupAttachments()
-
-        
-
-        setupCustomFieldsTable()
-
-        
-
-        setupTOTP()
-
-        
-
-        setupExpiry()
-
-        
-
-        setupTags()
-
-        
-
-        textFieldTitle.stringValue = model.title
-        imageViewIcon.image = NodeIconHelper.getNodeIcon(model.icon, predefinedIconSet: database.iconSet)
-        textFieldUsername.stringValue = model.username
-        textFieldUrl.stringValue = model.url
-        textFieldEmail.stringValue = model.email
-        passwordField.stringValue = model.password
-        textViewNotes.string = model.notes
-        bindTOTP()
-        bindExpiry()
-        bindTags()
-        bindLocation()
-
-        
-
-        disableFieldsBasedOnFormat()
-
-        
-
-        bindPasswordUI()
-
         if #available(macOS 11.0, *) {
             dummyKludge.contentType = .oneTimeCode
             dummyKludgeWidthConstraint.constant = 0.0
         } else {
             dummyKludge.isHidden = true 
         }
+    }
+
+    func setupNotes() {
+        textViewNotes.delegate = self
+        popupButtonNotesSuggestions.menu?.delegate = self
+
+        borderScrollNotes.wantsLayer = true
+        borderScrollNotes.layer?.cornerRadius = 5
+    }
+
+    func setupTOTP() {
+        if #available(macOS 11.0, *) {
+            buttonRemoveTOTP.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
+            buttonRemoveTOTP.contentTintColor = .systemOrange
+        }
+
+        NotificationCenter.default.addObserver(forName: .totpUpdate, object: nil, queue: nil) { [weak self] _ in
+            guard let self = self else { return }
+            self.bindTOTP()
+        }
+    }
+    
+    func setupUI() {
+        setupLocationUI()
+        setupIcon()
+        setupTitle()
+        setupUsername()
+        setupUrl()
+        setupEmail()
+        setupPassword()
+        setupNotes()
+        setupAttachments()
+        setupCustomFieldsTable()
+        setupTOTP()
+        setupExpiry()
+        setupTags()
+
+        disableFieldsBasedOnFormat()
     }
 
     func disableFieldsBasedOnFormat() {
@@ -417,6 +369,58 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         return foo
     }
 
+    @objc func onChangeLocation(sender: Any?) {
+        guard let sender = sender as? NSMenuItem else {
+            return
+        }
+
+        guard let idx = popupLocation.menu?.index(of: sender) else {
+            NSLog("🔴 Could not find this menu item in the menu?!")
+            return
+        }
+
+        let node = sortedGroups[idx]
+
+
+
+        model.parentGroupUuid = node.uuid
+
+        onModelEdited()
+
+        bindLocation()
+    }
+
+    func bindLocation() {
+        guard let idx = sortedGroups.firstIndex(where: { group in
+            if model.parentGroupUuid == nil {
+                return group == database.rootGroup
+            } else {
+                return group.uuid == model.parentGroupUuid
+            }
+        })
+        else {
+            NSLog("🔴 Could not find this items parent group in the sorted groups list!")
+            return
+        }
+
+        popupLocation.selectItem(at: idx)
+    }
+
+    func bindUiToModel() {
+        textFieldTitle.stringValue = model.title
+        imageViewIcon.image = NodeIconHelper.getNodeIcon(model.icon, predefinedIconSet: database.iconSet)
+        textFieldUsername.stringValue = model.username
+        textFieldUrl.stringValue = model.url
+        textFieldEmail.stringValue = model.email
+        passwordField.stringValue = model.password
+        textViewNotes.string = model.notes
+        bindTOTP()
+        bindExpiry()
+        bindTags()
+        bindLocation()
+        bindPasswordUI()
+    }
+
     
 
     func windowDidEndLiveResize(_: Notification) {
@@ -434,15 +438,15 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             node = found
         } else {
-            var parentGroup : Node?
-            
+            var parentGroup: Node?
+
             if let newEntryParentGroupId = newEntryParentGroupId {
                 parentGroup = database.getItemBy(newEntryParentGroupId)
             }
-            
+
             if parentGroup == nil {
                 NSLog("🔴 Could not load parent node! Trying Root Group")
-                
+
                 if database.format == .keePass1 {
                     parentGroup = database.rootGroup.childGroups.first
                 }
@@ -462,6 +466,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         return node
     }
+
+    let CustomFieldDragAndDropId: String = "com.markmcguill.strongbox.drag.and.drop.Custom-Field-Edit-Reorder"
 
     fileprivate func setupCustomFieldsTable() {
         borderScrollCustomFields.wantsLayer = true
@@ -483,6 +489,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         tableViewCustomFields.onDeleteKey = { [weak self] in
             self?.onRemoveField(nil)
         }
+
+        
+
+        tableViewCustomFields.registerForDraggedTypes([NSPasteboard.PasteboardType(CustomFieldDragAndDropId)])
 
         tableViewCustomFields.delegate = self
         tableViewCustomFields.dataSource = self
@@ -534,7 +544,15 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                        completion: nil)
     }
 
-    @IBAction func onDone(_: Any) {
+    @IBAction func onSaveAndDismiss(_: Any) {
+        save(dismissAfterSave: true)
+    }
+
+    @IBAction func onSave(_: Any) {
+        save(dismissAfterSave: false)
+    }
+
+    func save(dismissAfterSave: Bool) {
         let value = model.password
 
         if trim(value) != value {
@@ -542,23 +560,20 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                  informativeText: NSLocalizedString("field_tidy_message_tidy_up_password", comment: "There are some blank characters (e.g. spaces, tabs) at the start or end of your password.\n\nShould Strongbox tidy up these extraneous characters?"),
                                  option1AndDefault: NSLocalizedString("field_tidy_choice_tidy_up_field", comment: "Tidy Up"),
                                  option2: NSLocalizedString("field_tidy_choice_dont_tidy", comment: "Don't Tidy"),
-                                 window: view.window)
-            { [weak self] response in
+                                 window: view.window) { [weak self] response in
                 if response == 0 {
                     self?.model.password = trim(value)
-                    self?.postValidationApplyChanges()
+                    self?.postValidationSave(dismissAfterSave: dismissAfterSave)
                 } else if response == 1 {
-                    self?.postValidationApplyChanges()
+                    self?.postValidationSave(dismissAfterSave: dismissAfterSave)
                 }
             }
         } else {
-            postValidationApplyChanges()
+            postValidationSave(dismissAfterSave: dismissAfterSave)
         }
     }
 
-    func postValidationApplyChanges() {
-        
-
+    func postValidationSave(dismissAfterSave: Bool) {
         let nodeId: UUID
 
         if initialNodeId == nil {
@@ -606,10 +621,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         
 
-        setIconAndExit(nodeId)
+        setIconAndSave(nodeId, dismissAfterSave: dismissAfterSave)
     }
 
-    func setIconAndExit(_ nodeId: UUID) {
+    func setIconAndSave(_ nodeId: UUID, dismissAfterSave: Bool) {
         guard let node = database.getItemBy(nodeId) else {
             NSLog("🔴 Could not load node for setIconAndExit")
             messageProblemSaving()
@@ -619,7 +634,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         if iconExplicitlyChanged {
             iconExplicitlyChanged = false
             database.setItemIcon(node, icon: model.icon)
-            dismissAndSelectItem(node)
+            onSaveDone(node, dismissAfterSave: dismissAfterSave)
         } else {
             let urlChanged = model.url.compare(preEditModelClone.url) != .orderedSame
 
@@ -641,25 +656,25 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                             self.database.promptedForAutoFetchFavIcon = true
                                             self.database.downloadFavIconOnChange = yesNo
 
-                                            self.maybeDownloadFavIconAndExit(node)
+                                            self.maybeDownloadFavIconAndExit(node, dismissAfterSave: dismissAfterSave)
                                         })
                     } else {
-                        maybeDownloadFavIconAndExit(node)
+                        maybeDownloadFavIconAndExit(node, dismissAfterSave: dismissAfterSave)
                     }
                 } else {
-                    dismissAndSelectItem(node)
+                    onSaveDone(node, dismissAfterSave: dismissAfterSave)
                 }
             } else {
-                dismissAndSelectItem(node)
+                onSaveDone(node, dismissAfterSave: dismissAfterSave)
             }
         }
     }
 
-    func maybeDownloadFavIconAndExit(_ node: Node) {
+    func maybeDownloadFavIconAndExit(_ node: Node, dismissAfterSave: Bool) {
         if database.downloadFavIconOnChange {
             let url = node.fields.url.urlExtendedParse
             if url == nil {
-                dismissAndSelectItem(node)
+                onSaveDone(node, dismissAfterSave: dismissAfterSave)
                 return
             }
 
@@ -676,23 +691,45 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                             self.database.setItemIcon(node, icon: NodeIcon.withCustomImage(maybeImage!))
                         }
 
-                        self.dismissAndSelectItem(node)
+                        self.onSaveDone(node, dismissAfterSave: dismissAfterSave)
                     }
                 }
             }
         } else {
-            dismissAndSelectItem(node)
+            onSaveDone(node, dismissAfterSave: dismissAfterSave)
         }
     }
 
-    func dismissAndSelectItem(_ node: Node) {
-        NSLog("✅ dismissAndSelectItem")
-        database.nextGenSelectedItems = [node.uuid]
-        dismiss(nil)
+    func onSaveDone(_ node: Node, dismissAfterSave: Bool) {
+        NSLog("✅ onSaveDone")
+
+        if dismissAfterSave {
+            database.nextGenSelectedItems = [node.uuid]
+            dismiss(nil)
+        }
+        else {
+            guard let dbModel = database.commonModel else {
+                NSLog("🔴 Could not load common model!")
+                messageProblemSaving()
+                return
+            }
+
+            model = EntryViewModel.fromNode(node, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
+            preEditModelClone = model.clone()
+
+            bindUiToModel()
+
+            bindDoneButtonState()
+        }
     }
 
     func onModelEdited() {
         bindDoneButtonState()
+    }
+
+    @objc
+    var isEditsInProgress: Bool {
+        return model.isDifferent(from: preEditModelClone)
     }
 
     func bindDoneButtonState() {
@@ -700,6 +737,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         let isSaveable = model.isValid() && (isDifferent || initialNodeId == nil)
 
         buttonDone.isEnabled = isSaveable
+        buttonSave.isEnabled = isSaveable
+        
         buttonCancel.title = isDifferent ? NSLocalizedString("discard_changes", comment: "Discard Changes") : NSLocalizedString("generic_cancel", comment: "Cancel")
 
         if #available(macOS 10.12.2, *) {
@@ -743,8 +782,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         selectPredefinedIconController.customIcons = Array(database.customIcons)
-        selectPredefinedIconController.hideSelectFile = database.format == .keePass1
-        selectPredefinedIconController.hideFavIconButton = false
+        selectPredefinedIconController.hideSelectFile = !database.formatSupportsCustomIcons
+        selectPredefinedIconController.hideFavIconButton = !database.formatSupportsCustomIcons
         selectPredefinedIconController.onSelectedItem = { [weak self] (icon: NodeIcon?, showFindFavIcons: Bool) in
             guard let self = self else { return }
             self.onIconSelected(icon: icon, showFindFavIcons: showFindFavIcons)
@@ -1118,7 +1157,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     var canAddAttachment: Bool {
         if database.format == .keePass1 {
-            return model.attachments.count() == 0
+            return model.attachments.count == 0
         }
 
         return database.format != .passwordSafe
@@ -1206,22 +1245,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         NotificationCenter.default.removeObserver(self)
     }
 
-    func setupTOTP() {
-        if #available(macOS 11.0, *) {
-            buttonRemoveTOTP.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
-            buttonRemoveTOTP.contentTintColor = .systemOrange
-            buttonScanForTotp.image = NSImage(systemSymbolName: "qrcode.viewfinder", accessibilityDescription: nil)
-            buttonScanForTotp.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
-
-
-        }
-
-        NotificationCenter.default.addObserver(forName: .totpUpdate, object: nil, queue: nil) { [weak self] _ in
-            guard let self = self else { return }
-            self.bindTOTP()
-        }
-    }
-
     @IBOutlet var stackViewTotpOptions: NSStackView!
     @objc func bindTOTP() {
         stackViewTOTPDisplay.isHidden = model.totp == nil
@@ -1241,6 +1264,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             progressTotp.doubleValue = remainingSeconds
         }
     }
+
 
     @IBAction func onAddTOTP(_: Any) {
         let alert = MacAlerts()
@@ -1279,6 +1303,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
     }
 
+    @IBAction func onScanForTotpQRCode(_ sender: Any) {
+        performSegue(withIdentifier: NSStoryboardSegue.Identifier("segueToQrCodeScanner"), sender: nil)
+    }
+    
     override func prepare(for segue: NSStoryboardSegue, sender _: Any?) {
         if segue.identifier == "segueToQrCodeScanner" {
             if let vc = segue.destinationController as? QRCodeScanner {
@@ -1454,9 +1482,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         let selectedIdx = tableViewAttachments.selectedRow
-        if selectedIdx >= 0, selectedIdx < model.attachments.count() {
+        if selectedIdx >= 0, selectedIdx < model.attachments.count {
             let key = model.attachments.allKeys()[selectedIdx]
-            guard let attachment = model.attachments.objectForKeyedSubscript(key) as? DatabaseAttachment else {
+            guard let attachment = model.attachments[key] else {
                 return
             }
             let oldTitle = key as String
@@ -1528,9 +1556,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             return
         }
 
-        if idx >= 0, idx < model.attachments.count() {
+        if idx >= 0, idx < model.attachments.count {
             let key = model.attachments.allKeys()[idx]
-            guard let attachment = model.attachments.objectForKeyedSubscript(key) as? DatabaseAttachment else {
+            guard let attachment = model.attachments[key] else {
                 return
             }
 
@@ -1668,8 +1696,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     @IBAction func onRemoveField(_: Any?) {
         MacAlerts.areYouSure(NSLocalizedString("are_you_sure_delete_custom_field_s", comment: "Are you sure you want to delete the selected field(s)?"),
-                             window: view.window)
-        { [weak self] go in
+                             window: view.window) { [weak self] go in
             guard let self = self else { return }
 
             if go {
@@ -1698,7 +1725,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self = self else { return }
 
             let field = CustomFieldViewModel.customField(withKey: key, value: value, protected: protected)
-            self.model.insertCustomField(field)
+            self.model.addCustomField(field)
             self.refreshCustomFields()
             self.onModelEdited()
         }
@@ -1730,7 +1757,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             let field = CustomFieldViewModel.customField(withKey: key, value: value, protected: protected)
 
             self.model.removeCustomField(at: UInt(idx))
-            self.model.insertCustomField(field)
+            self.model.addCustomField(field)
 
             self.refreshCustomFields()
             self.onModelEdited()
@@ -1747,7 +1774,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 extension CreateEditViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
         if tableView == tableViewAttachments {
-            return Int(model.attachments.count())
+            return Int(model.attachments.count)
         } else if tableView == tableViewCustomFields {
             return Int(model.customFields.count)
         }
@@ -1759,15 +1786,16 @@ extension CreateEditViewController: NSTableViewDataSource {
         if tableView == tableViewAttachments {
             let attachmentKey = model.attachments.allKeys()
             let key = attachmentKey[row]
-            guard let attachment = model.attachments.objectForKeyedSubscript(key) as? DatabaseAttachment else { return nil }
+            guard let attachment = model.attachments[key] else { return nil }
 
             if tableColumn?.identifier.rawValue == "Name" {
                 let identifier = TitleAndIconCell.NibIdentifier
 
                 let cell = tableView.makeView(withIdentifier: identifier, owner: nil) as! TitleAndIconCell
 
-                cell.icon.image = AttachmentPreviewHelper.shared.getPreviewImage(key as String, attachment)
+                cell.setContent(NSAttributedString(string: key as String))
 
+                cell.icon.image = AttachmentPreviewHelper.shared.getPreviewImage(key as String, attachment)
                 cell.title.stringValue = key as String
                 cell.title.isEditable = true
                 cell.title.action = #selector(onAttachmentNameEdited)
@@ -1812,45 +1840,53 @@ extension CreateEditViewController: NSTableViewDelegate {
                    proposedRow _: Int,
                    proposedDropOperation dropOperation: NSTableView.DropOperation) -> NSDragOperation
     {
-        var dragOperation: NSDragOperation = []
+        if tableView == tableViewAttachments {
+            var dragOperation: NSDragOperation = []
 
-        guard tableView == tableViewAttachments,
-              dropOperation != .on,
-              !dragSourceIsFromAttachments(draggingInfo: info),
-              canAddAttachment,
-              let items = info.draggingPasteboard.pasteboardItems else { return dragOperation }
+            guard dropOperation != .on,
+                  !dragSourceIsFromAttachments(draggingInfo: info),
+                  canAddAttachment,
+                  let items = info.draggingPasteboard.pasteboardItems else { return dragOperation }
 
-        if #available(macOS 10.13, *) { } else {
-            return dragOperation
-        }
-
-        for item in items {
-            var type: NSPasteboard.PasteboardType
-            if #available(macOS 11.0, *) {
-                type = NSPasteboard.PasteboardType(UTType.image.identifier)
-            } else {
-                type = (kUTTypeData as NSPasteboard.PasteboardType)
-            }
-
-            if item.availableType(from: [type]) != nil {
-
-                dragOperation = [.copy]
+            if #available(macOS 10.13, *) { } else {
                 return dragOperation
             }
-        }
 
-        if dragOperation == [] {
-            let options = [NSPasteboard.ReadingOptionKey.urlReadingFileURLsOnly: true] as [NSPasteboard.ReadingOptionKey: Any]
-
-            if let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self], options: options) {
-                if !urls.isEmpty {
-
-                    dragOperation = [.copy]
+            for item in items {
+                var type: NSPasteboard.PasteboardType
+                if #available(macOS 11.0, *) {
+                    type = NSPasteboard.PasteboardType(UTType.image.identifier)
+                } else {
+                    type = (kUTTypeData as NSPasteboard.PasteboardType)
                 }
+
+                if item.availableType(from: [type]) != nil {
+                    
+                    dragOperation = [.copy]
+                    return dragOperation
+                }
+            }
+
+            if dragOperation == [] {
+                let options = [NSPasteboard.ReadingOptionKey.urlReadingFileURLsOnly: true] as [NSPasteboard.ReadingOptionKey: Any]
+
+                if let urls = info.draggingPasteboard.readObjects(forClasses: [NSURL.self], options: options) {
+                    if !urls.isEmpty {
+                        
+                        dragOperation = [.copy]
+                    }
+                }
+            }
+
+            return dragOperation
+        }
+        else if tableView == tableViewCustomFields {
+            if dropOperation == .above, !model.sortCustomFields {
+                return [.move]
             }
         }
 
-        return dragOperation
+        return []
     }
 
     func tableView(_ tableView: NSTableView,
@@ -1858,29 +1894,64 @@ extension CreateEditViewController: NSTableViewDelegate {
                    row: Int,
                    dropOperation _: NSTableView.DropOperation) -> Bool
     {
-        guard tableView == tableViewAttachments, canAddAttachment else { return false }
+        if tableView == tableViewAttachments {
+            guard canAddAttachment else { return false }
 
-        if #available(macOS 10.13, *) {
-            let ret = handleDropOnToAttachmentsTable(tableView, draggingInfo: info, toRow: row)
+            if #available(macOS 10.13, *) {
+                let ret = handleDropOnToAttachmentsTable(tableView, draggingInfo: info, toRow: row)
 
-            if !ret {
-                MacAlerts.info(NSLocalizedString("edit_item_could_not_add_item_as_attachment", comment: "There was an error adding this item as an Attachment"), window: view.window)
+                if !ret {
+                    MacAlerts.info(NSLocalizedString("edit_item_could_not_add_item_as_attachment", comment: "There was an error adding this item as an Attachment"), window: view.window)
+                }
+
+                return ret
             }
-
-            return ret
-        } else {
-            return false
+            else {
+                return false
+            }
         }
+        else if tableView == tableViewCustomFields {
+            if let str = info.draggingPasteboard.string(forType: NSPasteboard.PasteboardType(CustomFieldDragAndDropId)),
+               let sourceRow = UInt(str)
+            {
+                var insertAtIndex = UInt(row)
+
+                if sourceRow < row {
+                    insertAtIndex = insertAtIndex - 1
+                }
+
+                if sourceRow != insertAtIndex {
+                    NSLog("Custom Field Drop: [%d insert at %d]", sourceRow, insertAtIndex)
+
+                    model.moveCustomField(at: sourceRow, to: insertAtIndex)
+
+                    refreshCustomFields()
+
+                    onModelEdited()
+
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
-        if #available(macOS 10.13, *) {
-            return pasteboardWriterForRow(tableView, row: row)
-        } else {
-            return nil
+        if tableView == tableViewAttachments {
+            if #available(macOS 10.13, *) {
+                return pasteboardWriterForRow(tableView, row: row)
+            }
         }
+        else if tableView == tableViewCustomFields, !model.sortCustomFields {
+            let item = NSPasteboardItem()
+            item.setString(String(row), forType: NSPasteboard.PasteboardType(CustomFieldDragAndDropId))
+            return item
+        }
+
+        return nil
     }
 
     @available(macOS 10.13, *)
@@ -1892,16 +1963,20 @@ extension CreateEditViewController: NSTableViewDelegate {
         let filenameExtension = key.pathExtension
 
         var provider: NSFilePromiseProvider
-
+        
         if #available(macOS 11.0, *) {
-            let typeIdentifier = UTType(filenameExtension: filenameExtension)
-            provider = NSFilePromiseProvider(fileType: typeIdentifier!.identifier, delegate: self)
-        } else {
-            let typeIdentifier =
-                UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, filenameExtension as CFString, nil)
-            provider = NSFilePromiseProvider(fileType: typeIdentifier!.takeRetainedValue() as String, delegate: self)
+            let typeIdentifier = UTType(filenameExtension: filenameExtension) ?? UTType.data
+            provider = NSFilePromiseProvider(fileType: typeIdentifier.identifier, delegate: self)
         }
-
+        else {
+            guard let typeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, filenameExtension as CFString, nil) else {
+                NSLog("🔴 Could not determine typeIdentifier for filename [%@]", key)
+                return nil
+            }
+            
+            provider = NSFilePromiseProvider(fileType: typeIdentifier.takeRetainedValue() as String, delegate: self)
+        }
+        
         provider.userInfo = [FilePromiseProviderUserInfoKeys.filename: filename]
 
         return provider
@@ -1918,7 +1993,7 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
             return
         }
 
-        if idx >= 0 && idx < model.attachments.count() {
+        if idx >= 0 && idx < model.attachments.count {
             QLPreviewPanel.shared().makeKeyAndOrderFront(self)
         }
     }
@@ -1933,9 +2008,9 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
             return nil
         }
 
-        if idx >= 0, idx < model.attachments.count() {
+        if idx >= 0, idx < model.attachments.count {
             let key = model.attachments.allKeys()[idx]
-            guard let attachment = model.attachments.objectForKeyedSubscript(key) as? DatabaseAttachment else {
+            guard let attachment = model.attachments[key] else {
                 return nil
             }
 
@@ -2000,7 +2075,7 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
         do {
             if let userInfo = filePromiseProvider.userInfo as? [String: Any],
                let filename = userInfo[FilePromiseProviderUserInfoKeys.filename] as? String,
-               let attachment = model.attachments.objectForKeyedSubscript(filename as NSString) as? DatabaseAttachment
+               let attachment = model.attachments[filename as NSString]
             {
                 try attachment.nonPerformantFullData.write(to: url)
             } else {

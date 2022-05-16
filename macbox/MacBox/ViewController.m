@@ -37,7 +37,6 @@
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "NSDate+Extensions.h"
-#import "DatabaseOnboardingTabViewController.h"
 #import "DatabasesManagerVC.h"
 #import "AutoFillManager.h"
 
@@ -217,12 +216,6 @@ static NSString* const kNewEntryKey = @"newEntry";
     [self customizeUi];
     
     [self onDocumentLoaded];
-}
-
-- (void)viewDidAppear {
-    [super viewDidAppear];
-        
-    [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
 }
 
 - (void)listenToEventsOfInterest {
@@ -1852,8 +1845,6 @@ static NSString* const kNewEntryKey = @"newEntry";
     NSLog(@"ViewController::onPreferencesChanged - Refreshing View.");
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
-
         if( self.viewModel && !self.viewModel.locked) {
             Node* currentSelection = [self getCurrentSelectedItem];
                   

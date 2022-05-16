@@ -21,6 +21,7 @@ extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 @interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
 
 - (void)randomlyShowUpgradeMessage;
+- (IBAction)onUpgradeToFullVersion:(id)sender;
 - (void)showUpgradeModal:(NSInteger)delay;
 - (void)clearClipboardWhereAppropriate;
 

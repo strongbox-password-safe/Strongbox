@@ -25,7 +25,7 @@
     self.model.metadata.autoFillOnboardingDone = YES;
 
     if( self.model.metadata.quickTypeEnabled ) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model
                                                            databaseUuid:self.model.metadata.uuid
                                                           displayFormat:self.model.metadata.quickTypeDisplayFormat
                                                         alternativeUrls:self.model.metadata.autoFillScanAltUrls

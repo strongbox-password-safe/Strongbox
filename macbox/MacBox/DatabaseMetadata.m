@@ -37,9 +37,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.autoReloadAfterExternalChanges = YES;
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
-
+        self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
         self.showQuickView = YES;
-        self.outlineViewTitleIsReadonly = YES;
+        self.outlineViewTitleIsReadonly = NO;
         self.outlineViewEditableFieldsAreReadonly = YES;
         self.concealEmptyProtectedFields = YES;
         self.startWithSearch = YES;
@@ -221,7 +221,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.quickWormholeFillEnabled forKey:@"quickWormholeFillEnabled"];
     [encoder encodeInteger:self.quickTypeDisplayFormat forKey:@"quickTypeDisplayFormat"];
 
-    [encoder encodeInteger:self.conflictResolutionStrategy forKey:@"conflictResolutionStrategy"];
+    [encoder encodeInteger:self.conflictResolutionStrategy forKey:@"conflictResolutionStrategy2"];
     [encoder encodeObject:self.outstandingUpdateId forKey:@"outstandingUpdateId"];
     [encoder encodeObject:self.lastSyncRemoteModDate forKey:@"lastSyncRemoteModDate"];
     [encoder encodeObject:self.lastSyncAttempt forKey:@"lastSyncAttempt"];
@@ -301,6 +301,8 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.showChildCountOnFolderInSidebar forKey:@"showChildCountOnFolderInSidebar"];
     
     [encoder encodeObject:self.headerNodes forKey:@"headerNodes2"];
+    
+    [encoder encodeBool:self.customSortOrderForFields forKey:@"customSortOrderForFields"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -410,12 +412,11 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.autoReloadAfterExternalChanges = [decoder decodeBoolForKey:@"autoReloadAfterExternalChanges"];
         }
         
-        if([decoder containsValueForKey:@"conflictResolutionStrategy"]) {
-            self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
-            
+        if([decoder containsValueForKey:@"conflictResolutionStrategy2"]) {
+            self.conflictResolutionStrategy = [decoder decodeIntegerForKey:@"conflictResolutionStrategy2"];
         }
         else {
-            self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
+            self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
         }
         
         if ( [decoder containsValueForKey:@"maxBackupKeepCount"] ) {
@@ -648,6 +649,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         }
         else {
             self.headerNodes = HeaderNodeState.defaults;
+        }
+        
+        if ( [decoder containsValueForKey:@"customSortOrderForFields"] ) {
+            self.customSortOrderForFields = [decoder decodeBoolForKey:@"customSortOrderForFields"];
         }
     }
     

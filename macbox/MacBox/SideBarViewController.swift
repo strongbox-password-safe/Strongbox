@@ -8,9 +8,6 @@
 
 import Cocoa
 
-// TODO: Custom Order & allowing user move and re-arrange folders?
-// TODO: Need to scale down custom images
-
 class SideBarViewController: NSViewController, DocumentViewController {
     deinit {
         NSLog("😎 DEINIT [SideBarViewController]")
@@ -53,6 +50,8 @@ class SideBarViewController: NSViewController, DocumentViewController {
                                              NSPasteboard.PasteboardType(kDragAndDropExternalUti),
                                              NSPasteboard.PasteboardType(kDragAndDropSideBarHeaderMoveInternalUti)])
 
+
+        
         outlineView.delegate = self
         outlineView.dataSource = self
 
@@ -117,6 +116,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
                                                  kModelUpdateNotificationIconChanged,
                                                  kModelUpdateNotificationTitleChanged,
                                                  kModelUpdateNotificationItemsMoved,
+                                                 kModelUpdateNotificationItemReOrdered,
                                                  kModelUpdateNotificationTagsChanged,
                                                  kModelUpdateNotificationDatabasePreferenceChanged,
                                                  kModelUpdateNotificationHistoryItemRestored]
@@ -510,22 +510,29 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
         let ret = SideBarViewNode(context: .regularHierarchy(group.uuid), title: group.title, image: image, parent: parentNode, children: [], databaseNodeChildCount: group.childRecords.count)
 
-        var sorted = group.childGroups.sorted(by: Node.sortTitleLikeFinder)
-
-        
-
-        if database.recycleBinEnabled, let recycleBinNode = database.recycleBinNode, let idx = sorted.firstIndex(of: recycleBinNode) {
-            sorted.remove(at: idx)
-
-            if database.showRecycleBinInBrowse {
-                sorted.append(recycleBinNode)
+        if database.isKeePass2Format, !database.sortKeePassNodes {
+            ret.children = group.childGroups.map { child in
+                getHierarchicalViewNodesFor(child, ret)
             }
         }
+        else {
+            var sorted = group.childGroups.sorted(by: Node.sortTitleLikeFinder)
 
-        ret.children = sorted.map { child in
-            getHierarchicalViewNodesFor(child, ret)
+            
+
+            if database.recycleBinEnabled, let recycleBinNode = database.recycleBinNode, let idx = sorted.firstIndex(of: recycleBinNode) {
+                sorted.remove(at: idx)
+
+                if database.showRecycleBinInBrowse {
+                    sorted.append(recycleBinNode)
+                }
+            }
+
+            ret.children = sorted.map { child in
+                getHierarchicalViewNodesFor(child, ret)
+            }
         }
-
+        
         return ret
     }
 
@@ -686,7 +693,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
             let cell = outlineView.makeView(withIdentifier: TitleAndIconCell.NibIdentifier, owner: self) as! TitleAndIconCell
 
             let attr: NSAttributedString
-            if database.recycleBinEnabled, database.recycleBinNode != nil, node.context == .regularHierarchy(database.recycleBinNode!.uuid) {
+            if database.isKeePass2Format, database.sortKeePassNodes, database.recycleBinEnabled, database.recycleBinNode != nil, node.context == .regularHierarchy(database.recycleBinNode!.uuid) {
                 let style = NSMutableParagraphStyle()
                 style.lineBreakMode = .byTruncatingTail
                 attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.italicBodyFont, .paragraphStyle: style])
@@ -727,7 +734,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
     func outlineView(_: NSOutlineView, rowViewForItem item: Any) -> NSTableRowView? {
         guard let item = item as? SideBarViewNode else { return nil }
 
-        if database.recycleBinEnabled, database.recycleBinNode != nil, item.context == .regularHierarchy(database.recycleBinNode!.uuid) {
+        if database.isKeePass2Format, database.sortKeePassNodes, database.recycleBinEnabled, database.recycleBinNode != nil, item.context == .regularHierarchy(database.recycleBinNode!.uuid) {
             return PaddedRowView()
         }
 
@@ -750,7 +757,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
     }
 
     func outlineViewSelectionDidChange(_: Notification) {
-
+        NSLog("outlineViewSelectionDidChange: selected = %d", outlineView.selectedRow)
 
         guard let selected = outlineView.item(atRow: outlineView.selectedRow) as? SideBarViewNode else {
             NSLog("🔴 outlineViewSelectionDidChange::Could not get selected.")
@@ -812,20 +819,39 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
         if sourceIsThisDatabase {
             if case let .regularHierarchy(destinationGroupId) = destinationItem.context {
-                guard index == NSOutlineViewDropOnItemIndex,
-                      let destinationGroup = database.getItemBy(destinationGroupId),
+                guard let destinationGroup = database.getItemBy(destinationGroupId),
                       let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String]
                 else {
                     return []
                 }
 
+
+
                 let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId($0) }
                 let valid = database.validateMove(sourceItems, destination: destinationGroup)
 
+                if sourceIsBrowseView {
+                    if index == NSOutlineViewDropOnItemIndex {
+                        if valid {
+                            return [.move]
+                        }
+                    }
+                }
+                else {
+                    if index == NSOutlineViewDropOnItemIndex {
 
 
-                if valid {
-                    return [.move]
+                        if valid {
+                            return [.move]
+                        }
+                    }
+                    
+                    else {
+                        if database.isKeePass2Format, !database.sortKeePassNodes {
+                            NSLog("✅ SideBarViewController::validateDrop: Internal Source - REORDER - %d", index)
+                            return [.move]
+                        }
+                    }
                 }
             } else if case .tags = destinationItem.context, index == NSOutlineViewDropOnItemIndex, sourceIsBrowseView {
 
@@ -885,9 +911,41 @@ extension SideBarViewController: NSOutlineViewDelegate {
                 return false
             }
 
-            NSLog("SideBar acceptDrop: [%@] of items", sourceIsThisDatabase ? "INTERNAL MOVE" : "EXTERNAL COPY")
+            if index == NSOutlineViewDropOnItemIndex {
 
-            return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destination, internal: sourceIsThisDatabase, clear: true) != 0
+
+                return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destination, internal: sourceIsThisDatabase, clear: true) != 0
+            }
+            else {
+                guard let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType( kDragAndDropInternalUti) ) as? [String] else {
+                    return false
+                }
+                
+                let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId( $0 ) }
+                
+                guard sourceItems.count == 1, let sourceItem = sourceItems.first else { return false }
+                
+                if destination.uuid != sourceItem.parent?.uuid {
+
+
+                    if !database.move([sourceItem], destination: destination) {
+                        return false
+                    }
+                }
+
+                guard let sourceIdx = sourceItem.parent?.children.firstIndex(of: sourceItem) else { return false }
+                
+                let adjustedIdx = sourceIdx < index ? (index - 1) : index
+                
+                NSLog("SideBar acceptDrop: REORDER of item - Source [%@] => Dest [%@] index = [%d]", sourceItem.title, destination.title, adjustedIdx)
+                
+                if database.reorderItem(sourceItem.uuid, idx: adjustedIdx) != -1 {
+                    info.draggingPasteboard.clearContents()
+                    return true
+                }
+                
+                return false
+            }
         } else if case let .tags(tag) = destinationItem.context, index == NSOutlineViewDropOnItemIndex, sourceIsBrowseView {
             guard let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String] else { return false }
             let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId($0) }

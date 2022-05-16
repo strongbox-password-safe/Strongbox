@@ -1402,6 +1402,10 @@
 		C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02F0249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
+		C812B06428255D9000E47941 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B06328255D9000E47941 /* DiffDrillDownDetailer.m */; };
+		C812B06528255D9000E47941 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B06328255D9000E47941 /* DiffDrillDownDetailer.m */; };
+		C812B06628255D9000E47941 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B06328255D9000E47941 /* DiffDrillDownDetailer.m */; };
+		C812B06728255D9000E47941 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B06328255D9000E47941 /* DiffDrillDownDetailer.m */; };
 		C812CD2827C3A715006C6F72 /* calendar-1-ipad-pro@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C812CD2527C3A715006C6F72 /* calendar-1-ipad-pro@2x.png */; };
 		C812CD2927C3A715006C6F72 /* calendar-1-ipad-pro@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C812CD2527C3A715006C6F72 /* calendar-1-ipad-pro@2x.png */; };
 		C812CD2A27C3A715006C6F72 /* calendar-1-ipad-pro@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C812CD2527C3A715006C6F72 /* calendar-1-ipad-pro@2x.png */; };
@@ -2768,6 +2772,10 @@
 		C85120A9257C03FD002D7607 /* UnifiedDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = C85120A7257C03FD002D7607 /* UnifiedDatabaseMetadata.m */; };
 		C85120AA257C03FD002D7607 /* UnifiedDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = C85120A7257C03FD002D7607 /* UnifiedDatabaseMetadata.m */; };
 		C85120AB257C03FD002D7607 /* UnifiedDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = C85120A7257C03FD002D7607 /* UnifiedDatabaseMetadata.m */; };
+		C85179062826A07900A09797 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C85179072826A07A00A09797 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C85179082826A07A00A09797 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C85179092826A07B00A09797 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
 		C85972F7273AD9E000435811 /* OnboardingDatabaseChangeRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = C85972F6273AD9E000435811 /* OnboardingDatabaseChangeRequests.m */; };
 		C85972F8273AD9E000435811 /* OnboardingDatabaseChangeRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = C85972F6273AD9E000435811 /* OnboardingDatabaseChangeRequests.m */; };
 		C85972F9273AD9E000435811 /* OnboardingDatabaseChangeRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = C85972F6273AD9E000435811 /* OnboardingDatabaseChangeRequests.m */; };
@@ -3580,7 +3588,6 @@
 		C8AF2F2426692CA600F845B1 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		C8AF2F2526692CA600F845B1 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14802074F5F700CE9CAE /* PwSafeSerialization.m */; };
 		C8AF2F2626692CA600F845B1 /* BiometricsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D637C59236187A800C273B3 /* BiometricsManager.m */; };
-		C8AF2F2726692CA600F845B1 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
 		C8AF2F2826692CA600F845B1 /* KdbSerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B1EAE2194B2D900ECAF0D /* KdbSerializationData.m */; };
 		C8AF2F2926692CA600F845B1 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C8AF2F2A26692CA600F845B1 /* Kdbx4SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7D32188ABCB00CF1663 /* Kdbx4SerializationData.m */; };
@@ -4202,7 +4209,6 @@
 		C8D8743625BC714D0093B4C7 /* duplicate-id.xml in Resources */ = {isa = PBXBuildFile; fileRef = C8D8743525BC714D0093B4C7 /* duplicate-id.xml */; };
 		C8D87CB424E82967007E8E54 /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
 		C8D87CB524E82968007E8E54 /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
-		C8D87CB624E82B23007E8E54 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
 		C8DA59C825504DD10063D4DD /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DA59C725504DD10063D4DD /* CustomData.m */; };
 		C8DA59C925504DD10063D4DD /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DA59C725504DD10063D4DD /* CustomData.m */; };
 		C8DA59CA25504DD10063D4DD /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DA59C725504DD10063D4DD /* CustomData.m */; };
@@ -4944,7 +4950,6 @@
 		C8E350BD26CBDF0700E8246A /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		C8E350BE26CBDF0700E8246A /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14802074F5F700CE9CAE /* PwSafeSerialization.m */; };
 		C8E350BF26CBDF0700E8246A /* BiometricsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D637C59236187A800C273B3 /* BiometricsManager.m */; };
-		C8E350C026CBDF0700E8246A /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
 		C8E350C126CBDF0700E8246A /* KdbSerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B1EAE2194B2D900ECAF0D /* KdbSerializationData.m */; };
 		C8E350C226CBDF0700E8246A /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C8E350C326CBDF0700E8246A /* Kdbx4SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7D32188ABCB00CF1663 /* Kdbx4SerializationData.m */; };
@@ -5180,7 +5185,6 @@
 		C8E351BC26CBDF0700E8246A /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A622C9473F003E9B68 /* diceware.wordlist.utf8.txt */; };
 		C8E351BD26CBDF0700E8246A /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8E351C326CBE0B000E8246A /* Strongbox-Auto-Fill-Graphene.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C8E351C126CBDF0700E8246A /* Strongbox-Auto-Fill-Graphene.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		C8E5C32F275E765B006C15FE /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
 		C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EA246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EB246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
@@ -6625,6 +6629,8 @@
 		C80DDAB42600D68A00C9A01F /* OfflineDetectedBehaviour.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineDetectedBehaviour.h; path = StrongBox/OfflineDetectedBehaviour.h; sourceTree = "<group>"; };
 		C80E02EB249372D5005A4129 /* ChaCha20ReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ChaCha20ReadStream.h; path = model/ChaCha20ReadStream.h; sourceTree = "<group>"; };
 		C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ChaCha20ReadStream.m; path = model/ChaCha20ReadStream.m; sourceTree = "<group>"; };
+		C812B06228255D8F00E47941 /* DiffDrillDownDetailer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DiffDrillDownDetailer.h; path = model/DiffDrillDownDetailer.h; sourceTree = "<group>"; };
+		C812B06328255D9000E47941 /* DiffDrillDownDetailer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DiffDrillDownDetailer.m; path = model/DiffDrillDownDetailer.m; sourceTree = "<group>"; };
 		C812CD2527C3A715006C6F72 /* calendar-1-ipad-pro@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "calendar-1-ipad-pro@2x.png"; sourceTree = "<group>"; };
 		C812CD2627C3A715006C6F72 /* calendar-1-ipad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "calendar-1-ipad@2x.png"; sourceTree = "<group>"; };
 		C812CD2727C3A715006C6F72 /* calendar-1-ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "calendar-1-ipad.png"; sourceTree = "<group>"; };
@@ -8214,6 +8220,8 @@
 		4D192DD7257E8D0900FE90DC /* Merge */ = {
 			isa = PBXGroup;
 			children = (
+				C812B06228255D8F00E47941 /* DiffDrillDownDetailer.h */,
+				C812B06328255D9000E47941 /* DiffDrillDownDetailer.m */,
 				4D88447D257E921400CC3FC6 /* MergeWizard.storyboard */,
 				4D192DE5257E914B00FE90DC /* MergeInitialViewController.h */,
 				4D192DE6257E914B00FE90DC /* MergeInitialViewController.m */,
@@ -9191,38 +9199,38 @@
 		4DAE98822270B4E200A811C4 /* CustomCells */ = {
 			isa = PBXGroup;
 			children = (
-				4D669522242E5FD4005A98D7 /* WSTagsField */,
-				C8B4408227022B0A0033BC0E /* MarkdownNotesTableViewCell.xib */,
-				C8B4408B27022B400033BC0E /* MarkdownCell.h */,
-				C8B4408C27022B400033BC0E /* MarkdownCell.m */,
-				C8E913BB26FE0F0700EBC30D /* NotesTableViewCell.h */,
-				C8E913BC26FE0F0700EBC30D /* NotesTableViewCell.m */,
-				C8E913BA26FE0F0700EBC30D /* NotesTableViewCell.xib */,
-				4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */,
-				4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */,
-				4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */,
+				4DAE988A2270B4E200A811C4 /* EditAttachmentCell.h */,
+				4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */,
+				4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */,
+				4D2259F722C6C463005547EA /* EditDateCell.h */,
+				4D2259F822C6C463005547EA /* EditDateCell.m */,
+				4D2259F422C6C28A005547EA /* EditDateCell.xib */,
 				4D770F892303249D00CBE244 /* EditPasswordCell.xib */,
 				4DAE988D2270B4E200A811C4 /* EditPasswordTableViewCell.h */,
 				4DAE98952270B4E200A811C4 /* EditPasswordTableViewCell.m */,
-				4D770F8D230324A800CBE244 /* IconTableCell.xib */,
-				4DE498BB2271E911007EF98C /* IconTableCell.h */,
-				4DE498BC2271E911007EF98C /* IconTableCell.m */,
-				4DAE98882270B4E200A811C4 /* EditAttachmentCell.xib */,
-				4DAE98892270B4E200A811C4 /* ViewAttachmentCell.xib */,
-				4DAE988A2270B4E200A811C4 /* EditAttachmentCell.h */,
-				4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */,
 				4DAE988C2270B4E200A811C4 /* GenericBasicCell.h */,
 				4DAE98962270B4E200A811C4 /* GenericBasicCell.m */,
-				4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */,
-				4DE498BF2271F746007EF98C /* TotpCell.xib */,
-				4DE498C12271F85B007EF98C /* TotpCell.h */,
-				4DE498C22271F85B007EF98C /* TotpCell.m */,
-				4D2259F422C6C28A005547EA /* EditDateCell.xib */,
-				4D2259F722C6C463005547EA /* EditDateCell.h */,
-				4D2259F822C6C463005547EA /* EditDateCell.m */,
+				4DAE98832270B4E200A811C4 /* GenericBasicCell.xib */,
+				4DAE98912270B4E200A811C4 /* GenericKeyValueTableViewCell.h */,
+				4DAE98872270B4E200A811C4 /* GenericKeyValueTableViewCell.m */,
+				4DAE98902270B4E200A811C4 /* GenericKeyValueTableViewCell.xib */,
+				4DE498BB2271E911007EF98C /* IconTableCell.h */,
+				4DE498BC2271E911007EF98C /* IconTableCell.m */,
+				4D770F8D230324A800CBE244 /* IconTableCell.xib */,
+				C8B4408B27022B400033BC0E /* MarkdownCell.h */,
+				C8B4408C27022B400033BC0E /* MarkdownCell.m */,
+				C8B4408227022B0A0033BC0E /* MarkdownNotesTableViewCell.xib */,
+				C8E913BB26FE0F0700EBC30D /* NotesTableViewCell.h */,
+				C8E913BC26FE0F0700EBC30D /* NotesTableViewCell.m */,
+				C8E913BA26FE0F0700EBC30D /* NotesTableViewCell.xib */,
 				4D66953C242E6185005A98D7 /* TagsViewCell.xib */,
 				4D669541242E680F005A98D7 /* TagsViewTableViewCell.h */,
 				4D669542242E6810005A98D7 /* TagsViewTableViewCell.m */,
+				4DE498C12271F85B007EF98C /* TotpCell.h */,
+				4DE498C22271F85B007EF98C /* TotpCell.m */,
+				4DE498BF2271F746007EF98C /* TotpCell.xib */,
+				4DAE98892270B4E200A811C4 /* ViewAttachmentCell.xib */,
+				4D669522242E5FD4005A98D7 /* WSTagsField */,
 			);
 			name = CustomCells;
 			path = StrongBox/CustomCells;
@@ -14175,6 +14183,7 @@
 				4D40EEF11ED878DB006532F8 /* StorageBrowserItem.m in Sources */,
 				C85972F7273AD9E000435811 /* OnboardingDatabaseChangeRequests.m in Sources */,
 				4D376E4722AC4B4000BDB93A /* BrowsePreferencesTableViewController.m in Sources */,
+				C812B06428255D9000E47941 /* DiffDrillDownDetailer.m in Sources */,
 				4D1BF4FE232441D2007DF0E6 /* GZipInputStream.m in Sources */,
 				4D3AC32321908D4A0010CFCD /* Keys.m in Sources */,
 				C8DA59C825504DD10063D4DD /* CustomData.m in Sources */,
@@ -14669,6 +14678,7 @@
 				C8CDAAF0266BE56000AEDAE5 /* UpgradeToProOnboardingModule.m in Sources */,
 				4DC4E08E23488BAA000743C4 /* BackupsManager.m in Sources */,
 				C85972F8273AD9E000435811 /* OnboardingDatabaseChangeRequests.m in Sources */,
+				C812B06528255D9000E47941 /* DiffDrillDownDetailer.m in Sources */,
 				4D08B5CA234C9613003D1953 /* GCDWebServerFileRequest.m in Sources */,
 				4DFF34C6238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DC4E08F23488BAA000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
@@ -15082,8 +15092,8 @@
 				4DC4E1DA23488BAE000743C4 /* ChaCha20Stream.m in Sources */,
 				4D3A0F302587AB1B003D7BE8 /* Platform.m in Sources */,
 				4DC4E1DD23488BAE000743C4 /* BackupItem.m in Sources */,
-				C8E5C32F275E765B006C15FE /* SyncAndMergeSequenceManager.m in Sources */,
 				4D79F7F6244DDBE200C278A5 /* DatabaseAuditorConfiguration.m in Sources */,
+				C85179072826A07A00A09797 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8A0796726248A9B00B48539 /* zxcvbn.c in Sources */,
 				4DC4E1DE23488BAE000743C4 /* Binary.m in Sources */,
 				C8B5A30625599E8D0087CED1 /* DDXMLElement.m in Sources */,
@@ -15382,7 +15392,6 @@
 				4D1884D921709E3C001AE6B0 /* twofish.c in Sources */,
 				4D1884D821709E2D001AE6B0 /* PwSafeSerialization.m in Sources */,
 				4D637C5B236187A800C273B3 /* BiometricsManager.m in Sources */,
-				C8D87CB624E82B23007E8E54 /* SyncAndMergeSequenceManager.m in Sources */,
 				4D5B1EB02194B2D900ECAF0D /* KdbSerializationData.m in Sources */,
 				C8AAD4E424E832FA00E941BC /* StorageBrowserItem.m in Sources */,
 				4DB1B7D52188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
@@ -15400,6 +15409,7 @@
 				4D3A0F2E2587AB1B003D7BE8 /* Platform.m in Sources */,
 				4DE4665A233D2E8C00398A65 /* BackupItem.m in Sources */,
 				4D79F7F5244DDBE200C278A5 /* DatabaseAuditorConfiguration.m in Sources */,
+				C85179062826A07900A09797 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8A0796526248A9B00B48539 /* zxcvbn.c in Sources */,
 				4D5F5B90218B66C500A0739A /* Binary.m in Sources */,
 				C8B5A30425599E8D0087CED1 /* DDXMLElement.m in Sources */,
@@ -15752,6 +15762,7 @@
 				C8A4AEF4273BD6F00043D42F /* AutomaticLockingPreferences.m in Sources */,
 				C84331F226692A7C00D496D2 /* PasswordStrengthUIHelper.m in Sources */,
 				C84331F326692A7C00D496D2 /* CustomStorageProviderTableViewCell.m in Sources */,
+				C812B06628255D9000E47941 /* DiffDrillDownDetailer.m in Sources */,
 				C84331F426692A7C00D496D2 /* QuickLaunchOnboardingViewController.m in Sources */,
 				C84331F526692A7C00D496D2 /* AttachmentsPoolViewController.m in Sources */,
 				C87116CC27BD54350079027F /* ProLabel.swift in Sources */,
@@ -16175,7 +16186,6 @@
 				C8AF2F2426692CA600F845B1 /* twofish.c in Sources */,
 				C8AF2F2526692CA600F845B1 /* PwSafeSerialization.m in Sources */,
 				C8AF2F2626692CA600F845B1 /* BiometricsManager.m in Sources */,
-				C8AF2F2726692CA600F845B1 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8AF2F2826692CA600F845B1 /* KdbSerializationData.m in Sources */,
 				C8AF2F2926692CA600F845B1 /* StorageBrowserItem.m in Sources */,
 				C8AF2F2A26692CA600F845B1 /* Kdbx4SerializationData.m in Sources */,
@@ -16193,6 +16203,7 @@
 				C8AF2F3426692CA600F845B1 /* Platform.m in Sources */,
 				C8AF2F3526692CA600F845B1 /* BackupItem.m in Sources */,
 				C8AF2F3626692CA600F845B1 /* DatabaseAuditorConfiguration.m in Sources */,
+				C85179082826A07A00A09797 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8AF2F3726692CA600F845B1 /* zxcvbn.c in Sources */,
 				C8AF2F3826692CA600F845B1 /* Binary.m in Sources */,
 				C8AF2F3926692CA600F845B1 /* DDXMLElement.m in Sources */,
@@ -16456,6 +16467,7 @@
 				C8E34E5626CBDEF700E8246A /* UpgradeToProOnboardingModule.m in Sources */,
 				C8E34E5726CBDEF700E8246A /* GenericOnboardingModule.m in Sources */,
 				C8E34E5826CBDEF700E8246A /* PasswordMaker.m in Sources */,
+				C812B06728255D9000E47941 /* DiffDrillDownDetailer.m in Sources */,
 				C8E34E5A26CBDEF700E8246A /* ConcurrentMutableDictionary.m in Sources */,
 				C8E34E5B26CBDEF700E8246A /* NSMutableArray+Extensions.m in Sources */,
 				C8E34E5C26CBDEF700E8246A /* BackupsBrowserTableViewController.m in Sources */,
@@ -16960,7 +16972,6 @@
 				C8E350BD26CBDF0700E8246A /* twofish.c in Sources */,
 				C8E350BE26CBDF0700E8246A /* PwSafeSerialization.m in Sources */,
 				C8E350BF26CBDF0700E8246A /* BiometricsManager.m in Sources */,
-				C8E350C026CBDF0700E8246A /* SyncAndMergeSequenceManager.m in Sources */,
 				C8E350C126CBDF0700E8246A /* KdbSerializationData.m in Sources */,
 				C8E350C226CBDF0700E8246A /* StorageBrowserItem.m in Sources */,
 				C8E350C326CBDF0700E8246A /* Kdbx4SerializationData.m in Sources */,
@@ -16978,6 +16989,7 @@
 				C8E350CD26CBDF0700E8246A /* Platform.m in Sources */,
 				C8E350CE26CBDF0700E8246A /* BackupItem.m in Sources */,
 				C8E350CF26CBDF0700E8246A /* DatabaseAuditorConfiguration.m in Sources */,
+				C85179092826A07B00A09797 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8E350D026CBDF0700E8246A /* zxcvbn.c in Sources */,
 				C8E350D126CBDF0700E8246A /* Binary.m in Sources */,
 				C8E350D226CBDF0700E8246A /* DDXMLElement.m in Sources */,
@@ -18775,7 +18787,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -18864,7 +18876,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -18952,7 +18964,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19032,7 +19044,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -19115,7 +19127,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19192,7 +19204,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19267,7 +19279,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19351,7 +19363,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";
@@ -19492,7 +19504,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19575,7 +19587,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -19661,7 +19673,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19739,7 +19751,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19810,7 +19822,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19894,7 +19906,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19981,7 +19993,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -20059,7 +20071,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4181;
+				CURRENT_PROJECT_VERSION = 4192;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";

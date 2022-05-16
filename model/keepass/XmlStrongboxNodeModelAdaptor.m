@@ -217,6 +217,18 @@
     
     
     [ret removeAllStrings];
+    
+    
+    
+    
+    
+    
+    ret.title = node.title;
+    ret.username = node.fields.username;
+    ret.password = node.fields.password;
+    ret.url = node.fields.url;
+    ret.notes = node.fields.notes;
+    
     for (NSString* key in node.fields.customFields.allKeys) {
         StringValue* value = node.fields.customFields[key];
         [ret setString:key value:value.value protected:value.protected];
@@ -377,8 +389,8 @@
     
     
     
-    for (NSString* key in childEntry.customStrings.allKeys) {
-        StringValue* value = childEntry.customStrings[key];
+    for (NSString* key in childEntry.customStringValues.allKeys) {
+        StringValue* value = childEntry.customStringValues[key];
         [fields setCustomField:key value:value];
     }
 

@@ -122,7 +122,7 @@
 
     CGSize sizeThatFits = [self.downTextView sizeThatFits:self.frame.size];
 
-    float newHeight = sizeThatFits.height;
+    float newHeight = sizeThatFits.height * 1.4; 
 
 
 

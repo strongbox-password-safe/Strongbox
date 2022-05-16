@@ -14,7 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseCellView : NSTableCellView
 
 - (void)setWithDatabase:(MacDatabasePreferences*)metadata;
-- (void)setWithDatabase:(MacDatabasePreferences*)metadata autoFill:(BOOL)autoFill wormholeUnlocked:(BOOL)wormholeUnlocked;
+
+- (void)setWithDatabase:(MacDatabasePreferences*)metadata
+nickNameEditClickEnabled:(BOOL)nickNameEditClickEnabled
+          showSyncState:(BOOL)showSyncState
+indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
+       wormholeUnlocked:(BOOL)wormholeUnlocked
+               disabled:(BOOL)disabled;
 
 @property (copy)void (^onBeginEditingNickname)(DatabaseCellView* cell);
 @property (copy)void (^onEndEditingNickname)(DatabaseCellView* cell);

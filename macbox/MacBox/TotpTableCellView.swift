@@ -18,7 +18,8 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
     @IBOutlet var progressTotp: NSProgressIndicator!
     @IBOutlet var labelTotp: NSTextField!
     @IBOutlet var popupButton: NSPopUpButton!
-
+    @IBOutlet weak var copyButton: NSButton!
+    
     override func awakeFromNib() {
         super.awakeFromNib()
 
@@ -33,14 +34,21 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
     }
 
     var popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)?
+    var onCopyButton: ((DetailsViewField?) -> Void)?
+
     var field: DetailsViewField?
 
-    func setContent(_ field: DetailsViewField, popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil) {
+    func setContent(_ field: DetailsViewField,
+                    popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
+                    onCopyButton: ((DetailsViewField?) -> Void)? = nil) {
         self.field = field
         labelFieldName.stringValue = field.name
         self.popupMenuUpdater = popupMenuUpdater
         popupButton.menu?.delegate = self
 
+        self.onCopyButton = onCopyButton;
+        self.copyButton.isHidden = onCopyButton == nil
+        
         token = field.object as? OTPToken
     }
 
@@ -75,6 +83,10 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
         popupButton.performClick(nil)
     }
 
+    @IBAction func onCopy(_ sender: Any) {
+        self.onCopyButton?(self.field)
+    }
+    
     func menuNeedsUpdate(_ menu: NSMenu) {
 
 

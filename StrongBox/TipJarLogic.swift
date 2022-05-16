@@ -142,4 +142,14 @@ class TipJarLogic: NSObject {
             completion(error)
         }
     }
+    
+    func restorePrevious ( completion: @escaping (_ error: Error?) -> Void ) {
+        RMStore.default().restoreTransactions { transactions in
+            NSLog("Transactions Restoreed!")
+            completion(nil)
+        } failure: { error in
+            NSLog("Something went wrong: error = [%@]", error?.localizedDescription ?? "nil")
+            completion(error)
+        }
+    }
 }

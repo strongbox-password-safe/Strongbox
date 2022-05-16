@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -36,38 +36,67 @@
                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VlX-TP-gto">
-                    <rect key="frame" x="370" y="34" width="42" height="19"/>
-                    <popUpButtonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="zMR-do-i0T" id="nu8-e4-Eoj">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
-                        <font key="font" textStyle="body" name=".SFNS-Regular"/>
-                        <menu key="menu" autoenablesItems="NO" id="uNR-re-F6u">
-                            <items>
-                                <menuItem state="on" hidden="YES" id="zMR-do-i0T">
-                                    <imageReference key="image" image="ellipsis.circle" catalog="system" symbolScale="large"/>
-                                </menuItem>
-                                <menuItem title="Item 2" id="X7r-mJ-WXx"/>
-                                <menuItem title="Item 3" id="F6X-u1-FPs"/>
-                            </items>
-                        </menu>
-                    </popUpButtonCell>
-                    <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
-                </popUpButton>
+                <stackView distribution="fill" orientation="horizontal" alignment="top" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="kXu-x6-S21">
+                    <rect key="frame" x="350" y="36" width="62" height="18"/>
+                    <subviews>
+                        <button toolTip="Copy" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="CFb-VG-7gN" userLabel="Copy Button">
+                            <rect key="frame" x="0.0" y="-7" width="20" height="33"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="18" id="2uO-cG-gov"/>
+                                <constraint firstAttribute="width" constant="20" id="U3P-yK-zGG"/>
+                            </constraints>
+                            <buttonCell key="cell" type="inline" bezelStyle="inline" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="h0b-UX-oZt">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                <font key="font" metaFont="smallSystemBold"/>
+                                <imageReference key="image" image="doc.on.doc" catalog="system" symbolScale="large"/>
+                            </buttonCell>
+                            <connections>
+                                <action selector="onCopy:" target="c22-O7-iKe" id="8eu-En-rex"/>
+                            </connections>
+                        </button>
+                        <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VlX-TP-gto">
+                            <rect key="frame" x="20" y="-1" width="42" height="19"/>
+                            <popUpButtonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="zMR-do-i0T" id="nu8-e4-Eoj">
+                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
+                                <font key="font" textStyle="body" name=".SFNS-Regular"/>
+                                <menu key="menu" autoenablesItems="NO" id="uNR-re-F6u">
+                                    <items>
+                                        <menuItem state="on" hidden="YES" id="zMR-do-i0T">
+                                            <imageReference key="image" image="ellipsis.circle" catalog="system" symbolScale="large"/>
+                                        </menuItem>
+                                        <menuItem title="Item 2" id="X7r-mJ-WXx"/>
+                                        <menuItem title="Item 3" id="F6X-u1-FPs"/>
+                                    </items>
+                                </menu>
+                            </popUpButtonCell>
+                            <color key="contentTintColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
+                        </popUpButton>
+                    </subviews>
+                    <visibilityPriorities>
+                        <integer value="1000"/>
+                        <integer value="1000"/>
+                    </visibilityPriorities>
+                    <customSpacing>
+                        <real value="3.4028234663852886e+38"/>
+                        <real value="3.4028234663852886e+38"/>
+                    </customSpacing>
+                </stackView>
             </subviews>
             <constraints>
+                <constraint firstItem="bCh-EQ-71x" firstAttribute="centerY" secondItem="kXu-x6-S21" secondAttribute="centerY" id="Ahe-1t-jwX"/>
                 <constraint firstItem="bCh-EQ-71x" firstAttribute="top" secondItem="7vo-hi-a1d" secondAttribute="bottom" id="HOj-KY-7Cd"/>
+                <constraint firstAttribute="trailing" secondItem="kXu-x6-S21" secondAttribute="trailing" id="TTR-f0-9Tw"/>
                 <constraint firstItem="bCh-EQ-71x" firstAttribute="width" secondItem="P8u-ZS-vrP" secondAttribute="width" id="TtX-fh-not"/>
                 <constraint firstAttribute="bottom" secondItem="P8u-ZS-vrP" secondAttribute="bottom" constant="8" id="Yad-pJ-pNt"/>
                 <constraint firstItem="P8u-ZS-vrP" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="azi-pZ-VPH"/>
-                <constraint firstItem="VlX-TP-gto" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bCh-EQ-71x" secondAttribute="trailing" constant="8" symbolic="YES" id="c7x-bD-vuF"/>
                 <constraint firstItem="bCh-EQ-71x" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="d1v-lX-F9f"/>
                 <constraint firstItem="7vo-hi-a1d" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" constant="8" id="igr-Fh-rXJ"/>
+                <constraint firstItem="kXu-x6-S21" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bCh-EQ-71x" secondAttribute="trailing" constant="8" symbolic="YES" id="nUM-jt-VP8"/>
                 <constraint firstItem="7vo-hi-a1d" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="uYD-cg-b0e"/>
-                <constraint firstAttribute="trailing" secondItem="VlX-TP-gto" secondAttribute="trailing" id="z7Q-x7-Zd6"/>
-                <constraint firstItem="VlX-TP-gto" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="zNG-Re-Q9E"/>
                 <constraint firstItem="P8u-ZS-vrP" firstAttribute="top" secondItem="bCh-EQ-71x" secondAttribute="bottom" id="zvY-CS-93v"/>
             </constraints>
             <connections>
+                <outlet property="copyButton" destination="CFb-VG-7gN" id="2YS-7P-7QL"/>
                 <outlet property="labelFieldName" destination="7vo-hi-a1d" id="1uc-rs-Mq3"/>
                 <outlet property="labelTotp" destination="bCh-EQ-71x" id="hFK-SG-01X"/>
                 <outlet property="popupButton" destination="VlX-TP-gto" id="gNE-5w-uAQ"/>
@@ -77,6 +106,7 @@
         </customView>
     </objects>
     <resources>
+        <image name="doc.on.doc" catalog="system" width="21" height="24"/>
         <image name="ellipsis.circle" catalog="system" width="20" height="20"/>
     </resources>
 </document>

@@ -23,7 +23,7 @@ class OnePasswordImporter: NSObject {
 
         var ret: [String: Data] = [:]
 
-        guard let attachmentFileWrappers = valWrapperDirectory.fileWrappers else {
+        guard valWrapperDirectory.isDirectory, let attachmentFileWrappers = valWrapperDirectory.fileWrappers else {
             return ret
         }
 

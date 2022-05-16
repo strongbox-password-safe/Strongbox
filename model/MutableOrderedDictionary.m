@@ -7,10 +7,12 @@
 //
 
 #import "MutableOrderedDictionary.h"
+#import "NSDictionary+Extensions.h"
+#import "NSArray+Extensions.h"
 
 @interface MutableOrderedDictionary ()
 
-@property NSMutableArray<NSString*> *keys;
+@property NSMutableArray<NSString*> *orderedKeys;
 @property NSMutableDictionary<NSString*, NSObject*> *kvps;
 
 @end
@@ -20,45 +22,105 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.keys = [NSMutableArray array];
+        self.orderedKeys = [NSMutableArray array];
         self.kvps = [NSMutableDictionary dictionary];
     }
     return self;
+}
+
+- (id)copy {
+    return [self clone];
+}
+
+- (id)mutableCopy {
+    return [self clone];
+}
+
+- (instancetype)clone {
+    MutableOrderedDictionary *ret = [[MutableOrderedDictionary alloc] init];
+    
+    for (id key in self.allKeys) {
+        id value = self.kvps[key];
+        [ret addKey:key andValue:value];
+    }
+    
+    return ret;
 }
 
 - (void)remove:(id)key {
     self[key] = nil;
 }
 
+- (void)removeObjectForKey:(id)key {
+    self[key] = nil;
+}
+
 - (void)setObject:(id)obj forKeyedSubscript:(id)key {
-    [self addKey:key andValue:obj];
+    [self updateOrAddKey:key andValue:obj];
+}
+
+- (void)updateOrAddKey:(id)key andValue:(id)value {
+    if ( self.kvps[key] ) {
+        if(value != nil) {
+            [self.kvps setValue:value forKey:key];
+        }
+        else {
+            [self.orderedKeys removeObject:key];
+            [self.kvps removeObjectForKey:key];
+        }
+    }
+    else {
+        if(value != nil) {
+            [self.orderedKeys addObject:key];
+            [self.kvps setValue:value forKey:key];
+        }
+    }
 }
 
 - (void)addKey:(id)key andValue:(id)value {
     if(self.kvps[key]) {
-        [self.keys removeObject:key];
+        [self.orderedKeys removeObject:key];
         [self.kvps removeObjectForKey:key];
     }
 
     if(value != nil) {
-        [self.keys addObject:key];
+        [self.orderedKeys addObject:key];
         [self.kvps setValue:value forKey:key];
     }
 }
 
 - (void)insertKey:(id)key withValue:(id)value atIndex:(NSUInteger)atIndex {
-    if(self.kvps[key]) {
+    if ( self.kvps[key] ) {
+        NSLog(@"🔴 insertKey - Key already exists");
         return;
     }
 
-    if(value != nil) {
-        [self.keys insertObject:key atIndex:atIndex];
+    if ( value != nil ) {
+        [self.orderedKeys insertObject:key atIndex:atIndex];
         [self.kvps setValue:value forKey:key];
     }
 }
 
+- (NSArray<id>*)keys {
+    return self.allKeys;
+}
+
 - (NSArray<id>*)allKeys {
-    return [self.keys copy];
+    return [self.orderedKeys copy];
+}
+
+- (NSArray<id>*)allValues {
+    return [self.allKeys map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
+        return self.kvps[obj];
+    }];
+}
+
+- (id)objectForKey:(id)key {
+    return [self.kvps objectForKey:key];
+}
+
+- (id)objectForCaseInsensitiveKey:(id)key {
+    return [self.kvps objectForCaseInsensitiveKey:key];
 }
 
 - (id)objectForKeyedSubscript:(id)key {
@@ -73,11 +135,16 @@
     }
 }
 
+- (void)removeAllObjects {
+    [self.orderedKeys removeAllObjects];
+    [self.kvps removeAllObjects];
+}
+
 - (BOOL)containsKey:(id)key {
     return [self.kvps objectForKey:key] != nil;
 }
 
--(NSUInteger)count {
+- (NSUInteger)count {
     return [self.kvps count];
 }
 
@@ -108,7 +175,13 @@
         return NO;
     }
     
-    return [self.kvps isEqualToDictionary:other.kvps];
+    BOOL ret = [self.kvps isEqualToDictionary:other.kvps];
+    
+    if ( ret ) {
+        return YES;
+    }
+    
+    return NO;
 }
 
 @end

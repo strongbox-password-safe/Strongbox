@@ -44,6 +44,7 @@ NSString* const kModelUpdateNotificationItemEdited = @"kModelUpdateNotificationI
 NSString* const kModelUpdateNotificationHistoryItemDeleted = @"kModelUpdateNotificationHistoryItemDeleted";
 NSString* const kModelUpdateNotificationHistoryItemRestored = @"kModelUpdateNotificationHistoryItemRestored";
 
+NSString* const kModelUpdateNotificationItemReOrdered = @"kModelUpdateNotificationItemReOrdered";
 
 NSString* const kModelUpdateNotificationDatabasePreferenceChanged = @"kModelUpdateNotificationDatabasePreferenceChanged";
 NSString* const kModelUpdateNotificationDatabaseUpdateStatusChanged = @"kModelUpdateNotificationDatabaseUpdateStatusChanged";
@@ -143,6 +144,10 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 - (UnifiedDatabaseMetadata*)metadata {
     return self.database.meta;
+}
+
+- (BOOL)isKeePass2Format {
+    return self.format == kKeePass || self.format == kKeePass4;
 }
 
 - (NSSet<NodeIcon*>*)customIcons {
@@ -1672,6 +1677,64 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     });
 }
 
+- (void)renameTag:(NSString *)from to:(NSString*)to {
+    [self renameTag:from to:to modified:nil];
+}
+
+- (void)renameTag:(NSString *)from to:(NSString*)to modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    if ( self.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 addTagToItems - Model is RO!");
+        return;
+    }
+    
+    if ( to.length == 0 || from.length == 0 || [from isEqualToString:to] ) {
+        NSLog(@"🔴 renameTag - invalid to or from");
+        return;
+    }
+    
+    [self.document.undoManager beginUndoGrouping];
+
+    for ( Node* item in [self entriesWithTag:from] ) {
+        NSDate* oldModified = item.fields.modified;
+
+        if(self.document.undoManager.isUndoing) {
+            if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+        }
+        else {
+            Node* cloneForHistory = [item cloneForHistory];
+            [item.fields.keePassHistory addObject:cloneForHistory];
+        }
+
+        [item.fields.tags removeObject:from];
+        [item.fields.tags addObject:to];
+
+        [self touchAndModify:item modDate:modified];
+
+        [[self.document.undoManager prepareWithInvocationTarget:self] renameTag:to to:from modified:oldModified];
+    }
+
+    if(!self.document.undoManager.isUndoing) {
+        NSString* loc = NSLocalizedString(@"action_rename_tag", @"Rename Tag");
+        [self.document.undoManager setActionName:loc];
+    }
+    [self.document.undoManager endUndoGrouping];
+
+    [self.database rebuildFastMaps];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
+    });
+}
+
+- (void)deleteTag:(NSString *)tag {
+    NSArray<Node*>* entries = [self entriesWithTag:tag];
+    
+    [self removeTagFromItems:entries tag:tag];
+}
+
 
 
 - (NSString*)getDefaultTitle {
@@ -2000,6 +2063,29 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
 
     return YES;
+}
+
+- (NSInteger)reorderItem:(NSUUID *)nodeId idx:(NSInteger)idx {
+    if ( self.locked ) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    if ( self.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 move - Model is RO!");
+        return NO;
+    }
+    
+    NSInteger prevIdx = [self.innerModel reorderItem:nodeId idx:idx];
+    
+    if ( prevIdx != -1 ) {
+        [[self.document.undoManager prepareWithInvocationTarget:self] reorderItem:nodeId idx:prevIdx];
+        
+        [self.document.undoManager setActionName:NSLocalizedString(@"mac_undo_action_move_item", @"Move Item")];
+
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemReOrdered object:self userInfo:@{ }];
+    }
+    
+    return prevIdx;
 }
 
 
@@ -2384,14 +2470,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     self.databaseMetadata.showRecycleBinInSearchResults = showRecycleBinInSearchResults;
 }
 
-- (BOOL)sortKeePassNodes {
-    return !self.databaseMetadata.uiDoNotSortKeePassNodesInBrowseView;
-}
-
-- (void)setSortKeePassNodes:(BOOL)sortKeePassNodes {
-    self.databaseMetadata.uiDoNotSortKeePassNodesInBrowseView = !sortKeePassNodes;
-}
-
 - (BOOL)showRecycleBinInBrowse {
     return !self.databaseMetadata.doNotShowRecycleBinInBrowse;
 }
@@ -2587,7 +2665,8 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)setNextGenNavigationNone {
-    if ( self.nextGenNavigationContext != OGNavigationContextNone ) {
+    if ( self.nextGenNavigationContext != OGNavigationContextNone ||
+        self.databaseMetadata.searchText.length ) {
         self.databaseMetadata.searchText = @""; 
         self.databaseMetadata.sideBarNavigationContext = OGNavigationContextNone;
         
@@ -2598,7 +2677,9 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)setNextGenNavigation:(OGNavigationContext)context selectedGroup:(NSUUID *)selectedGroup {
-    if ( self.nextGenNavigationContext != context || ![self.nextGenNavigationContextSideBarSelectedGroup isEqualTo:selectedGroup] ) {
+    if ( self.nextGenNavigationContext != context ||
+        ![self.nextGenNavigationContextSideBarSelectedGroup isEqualTo:selectedGroup] ||
+        self.databaseMetadata.searchText.length ) {
         self.databaseMetadata.searchText = @""; 
         self.databaseMetadata.sideBarNavigationContext = context;
         self.databaseMetadata.sideBarSelectedGroup = selectedGroup;
@@ -2613,7 +2694,9 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)setNextGenNavigation:(OGNavigationContext)context tag:(NSString *)tag {
-    if ( self.nextGenNavigationContext != context || ![self.nextGenNavigationContextSelectedTag isEqualToString:tag] ) {
+    if ( self.nextGenNavigationContext != context ||
+        ![self.nextGenNavigationContextSelectedTag isEqualToString:tag] ||
+        self.databaseMetadata.searchText.length ) {
         self.databaseMetadata.searchText = @""; 
         self.databaseMetadata.sideBarNavigationContext = context;
         self.databaseMetadata.sideBarSelectedTag = tag;
@@ -2628,7 +2711,9 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)setNextGenNavigation:(OGNavigationContext)context special:(OGNavigationSpecial)special {
-    if ( self.nextGenNavigationContext != context || self.nextGenNavigationContextSpecial != special ) {
+    if ( self.nextGenNavigationContext != context ||
+        self.nextGenNavigationContextSpecial != special ||
+        self.databaseMetadata.searchText.length ) {
         self.databaseMetadata.searchText = @""; 
         self.databaseMetadata.sideBarNavigationContext = context;
         self.databaseMetadata.sideBarSelectedSpecial = special;
@@ -2640,7 +2725,9 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)setNextGenNavigationToAuditIssues:(OGNavigationAuditCategory)category {
-    if ( self.nextGenNavigationContext != OGNavigationContextAuditIssues || self.nextGenNavigationContextAuditCategory != category ) {
+    if ( self.nextGenNavigationContext != OGNavigationContextAuditIssues ||
+        self.nextGenNavigationContextAuditCategory != category ||
+        self.databaseMetadata.searchText.length ) {
         self.databaseMetadata.searchText = @""; 
         self.databaseMetadata.sideBarNavigationContext = OGNavigationContextAuditIssues;
         self.databaseMetadata.sideBarSelectedAuditCategory = category;
@@ -2652,7 +2739,9 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)setNextGenNavigationFavourite:(NSUUID *)nodeId {
-    if ( self.nextGenNavigationContext != OGNavigationContextFavourites || ![self.nextGenNavigationSelectedFavouriteId isEqual:nodeId] ) {
+    if ( self.nextGenNavigationContext != OGNavigationContextFavourites ||
+        ![self.nextGenNavigationSelectedFavouriteId isEqual:nodeId] ||
+        self.databaseMetadata.searchText.length ) {
         self.databaseMetadata.searchText = @""; 
         self.databaseMetadata.sideBarNavigationContext = OGNavigationContextFavourites;
         self.databaseMetadata.sideBarSelectedFavouriteId = nodeId;
@@ -2734,5 +2823,34 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     
     [self publishDatabasePreferencesChangedNotification];
 }
+
+- (BOOL)customSortOrderForFields {
+    return self.databaseMetadata.customSortOrderForFields;
+}
+
+- (void)setCustomSortOrderForFields:(BOOL)customSortOrderForFields {
+    self.databaseMetadata.customSortOrderForFields = customSortOrderForFields;
+}
+
+- (BOOL)sortKeePassNodes {
+    return !self.databaseMetadata.uiDoNotSortKeePassNodesInBrowseView;
+}
+
+- (void)setSortKeePassNodes:(BOOL)sortKeePassNodes {
+    self.databaseMetadata.uiDoNotSortKeePassNodesInBrowseView = !sortKeePassNodes;
+}
+
+- (ConflictResolutionStrategy)conflictResolutionStrategy {
+    return self.databaseMetadata.conflictResolutionStrategy;
+}
+
+- (void)setConflictResolutionStrategy:(ConflictResolutionStrategy)conflictResolutionStrategy {
+    self.databaseMetadata.conflictResolutionStrategy = conflictResolutionStrategy;
+}
+
+- (BOOL)formatSupportsCustomIcons {
+    return self.innerModel.formatSupportsCustomIcons;
+}
+
 
 @end

@@ -178,6 +178,7 @@
     NSURL* dir = metadata.backupsDirectory; 
     if(!dir) {
         NSLog(@"Could not get backup directory");
+
         return @[];
     }
 

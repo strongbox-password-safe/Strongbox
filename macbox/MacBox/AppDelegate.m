@@ -40,6 +40,7 @@
 #import "MacSyncManager.h"
 #import "macOSSpinnerUI.h"
 #import "Constants.h"
+#import "Serializator.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -286,6 +287,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
+- (BOOL)isHiddenToTray {
+    return NSApp.activationPolicy != NSApplicationActivationPolicyRegular;
+}
+
 - (void)showHideDockIcon:(BOOL)show {
     NSLog(@"AppDelegate::showHideDockIcon: %ld", (long)show);
 
@@ -424,7 +429,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)showAndActivateStrongbox:(NSString*_Nullable)databaseUuid {
-    NSLog(@"showAndActivateStrongbox");
+    NSLog(@"🚀 showAndActivateStrongbox: [%@] - BEGIN", databaseUuid);
 
     [self showHideDockIcon:YES];
     
@@ -436,7 +441,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [NSApp arrangeInFront:nil];
     
-    NSLog(@"showAndActivateStrongbox: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
+
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     
     [NSApp activateIgnoringOtherApps:YES];
@@ -452,6 +457,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     else {
         [dc performEmptyLaunchTasksIfNecessary];
     }
+    
+    NSLog(@"🚀 showAndActivateStrongbox: [%@] - END", databaseUuid);
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -465,17 +472,22 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-    NSLog(@"applicationDidBecomeActive");
+    NSLog(@"✅ applicationDidBecomeActive - START");
 
     if(self.autoLockWorkBlock) {
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
     }
-    
-    
-    
-    
-    [self showAndActivateStrongbox:nil];
+        
+    if ( [self isHiddenToTray] ) {
+        
+        
+        
+        
+        
+
+        [self showAndActivateStrongbox:nil];
+    }
 }
 
 - (ViewController*)getActiveViewController {
@@ -646,8 +658,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(renameDocument:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(revertDocumentToSaved:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(moveDocument:)];
-
-
+    
+#ifndef DEBUG
+    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(onDumpXml:)];
+    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(onFactoryReset:)];
+#endif
+    
     
     
     
@@ -821,7 +837,7 @@ static NSInteger clipboardChangeCount;
 - (void)onStrongboxDidChangeClipboard {
     NSLog(@"onApplicationDidChangeClipboard...");
     
-    if(Settings.sharedInstance.clearClipboardEnabled) {
+    if ( Settings.sharedInstance.clearClipboardEnabled ) {
         clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
         NSLog(@"Clipboard Changed and Clear Clipboard Enabled... Recording Change Count as [%ld]", (long)clipboardChangeCount);
         [self scheduleClipboardClearTask];
@@ -829,14 +845,16 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)scheduleClipboardClearTask {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
-       dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-           [self clearClipboardWhereAppropriate];
-       });
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+        
+        
+        [self clearClipboardWhereAppropriate];
+    });
 }
 
 - (void)clearClipboardWhereAppropriate {
-    if(clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount) {
+    if ( clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount ) {
         NSLog(@"General Clipboard change count matches after time delay... Clearing Clipboard");
         [NSPasteboard.generalPasteboard clearContents];
     }
@@ -1097,6 +1115,85 @@ static NSInteger clipboardChangeCount;
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
     return !Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.quitStrongboxOnAllWindowsClosed;
+}
+
+- (IBAction)onDumpXml:(id)sender {
+    NSOpenPanel* openPanel = NSOpenPanel.openPanel;
+    if ( [openPanel runModal] == NSModalResponseOK ) {
+        NSData* data = [NSData dataWithContentsOfURL:openPanel.URL];
+        
+        MacAlerts *a = [[MacAlerts alloc] init];
+        NSString* password = [a input:@"Password" defaultValue:@"" allowEmpty:YES];
+
+        NSString* xml = [Serializator expressToXml:data password:password];
+        
+        NSLog(@"XML Dump: \n%@", xml);
+    }
+}
+
+- (IBAction)onFactoryReset:(id)sender {
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 @end

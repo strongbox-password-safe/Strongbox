@@ -75,8 +75,6 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDropboxAppFolder;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNativeKeePassEmail;
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellMigrateOneDrives;
-
 @end
 
 @implementation AdvancedPreferencesTableViewController
@@ -111,13 +109,7 @@
     }
     
     [self cell:self.cellNativeKeePassEmail setHidden:YES];
-    
-    BOOL hasOneDrives = [DatabasePreferences.allDatabases anyMatch:^BOOL(DatabasePreferences * _Nonnull obj) {
-        return obj.storageProvider == kOneDrive;
-    }];
-    
-    [self cell:self.cellMigrateOneDrives setHidden:!hasOneDrives];
-    
+        
     [self bindPreferences];
     [self bindCloudSessions];
     [self bindGeneral];
@@ -199,15 +191,6 @@
                 AppPreferences.sharedInstance.passwordStrengthConfig = config;
             }
             [self bindGeneral];
-        }];
-    }
-    else if ( cell == self.cellMigrateOneDrives ) {
-        [Alerts areYouSure:self
-                   message:@"Are you sure you want to migrate your OneDrives to MSAL?"
-                    action:^(BOOL response) {
-            if ( response ) {
-                [self migrateAllOneDrivesToTwoDrives];
-            }
         }];
     }
 }
@@ -458,14 +441,6 @@ static NSString* stringForPasswordStrengthAlgo(PasswordStrengthAlgorithm algo ){
     }
     else {
         return NSLocalizedString(@"password_strength_algo_basic_title", @"Basic (Pooled Entropy)");
-    }
-}
-
-- (void)migrateAllOneDrivesToTwoDrives {
-    for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
-        if ( database.storageProvider == kOneDrive ) {
-            database.storageProvider = kTwoDrive;
-        }
     }
 }
 

@@ -62,6 +62,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchColorizeProtectedCustomFields;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellFetchFavIcon;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchSortCustomFields;
+
 
 @end
 
@@ -129,7 +131,8 @@
     self.databaseMetaData.hideTotpCustomFieldsInViewMode = !self.switchShowTotpCustom.on;
     self.databaseMetaData.colorizePasswords = self.switchColorizePasswords.on;
     self.databaseMetaData.colorizeProtectedCustomFields = self.switchColorizeProtectedCustomFields.on;
-    
+    self.databaseMetaData.customSortOrderForFields = !self.switchSortCustomFields.on;
+
     [self bindPreferences];
 
     [self notifyDatabaseViewPreferencesChanged];
@@ -186,6 +189,7 @@
     
     self.switchColorizePasswords.on = self.databaseMetaData.colorizePasswords;
     self.switchColorizeProtectedCustomFields.on = self.databaseMetaData.colorizeProtectedCustomFields;
+    self.switchSortCustomFields.on = !self.databaseMetaData.customSortOrderForFields;
 }
 
 - (NSString*)getTapActionString:(BrowseTapAction)action {

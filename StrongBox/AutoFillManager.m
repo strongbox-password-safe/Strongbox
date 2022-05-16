@@ -13,6 +13,7 @@
 #import "SprCompilation.h"
 #import "NSString+Extensions.h"
 #import "CommonDatabasePreferences.h"
+#import "Utils.h"
 
 #if TARGET_OS_IPHONE
 #import "SVProgressHUD.h"
@@ -101,7 +102,7 @@ static NSString* const kMailToScheme = @"mailto";
 
 
 
-- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel *)database
+- (void)updateAutoFillQuickTypeDatabase:(Model*)database
                             databaseUuid:(NSString *)databaseUuid
                             displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                             alternativeUrls:(BOOL)alternativeUrls
@@ -131,7 +132,7 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
 
-- (void)_updateAutoFillQuickTypeDatabase:(DatabaseModel*)database
+- (void)_updateAutoFillQuickTypeDatabase:(Model*)database
                             databaseUuid:(NSString*)databaseUuid
                            displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                          alternativeUrls:(BOOL)alternativeUrls
@@ -157,7 +158,35 @@ static NSString* const kMailToScheme = @"mailto";
     }];
 }
 
-- (void)onGotAutoFillStoreOK:(DatabaseModel*)database
+- (NSArray<Node*>*)sortedNodesWithFavouritesFirst:(Model*)database {
+    NSArray<Node*>* allEntries = database.database.allSearchableNoneExpiredEntries;
+    
+    NSArray<Node*>* sortedEntries = [allEntries sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        Node* n1 = (Node*)obj1;
+        Node* n2 = (Node*)obj2;
+        
+        BOOL f1 = [database isFavourite:n1.uuid];
+        BOOL f2 = [database isFavourite:n2.uuid];
+        
+        if ( ( !f1 && !f2 ) || ( f1  &&  f2 ) ) {
+            NSComparisonResult retTitle = finderStringCompare(n1.title, n2.title);
+            
+            if ( retTitle == NSOrderedSame ) {
+                return finderStringCompare( n1.fields.username, n2.fields.username );
+            }
+            else {
+                return retTitle;
+            }
+        }
+        else {
+            return f1 ? NSOrderedAscending : NSOrderedDescending;
+        }
+    }];
+    
+    return sortedEntries;
+}
+
+- (void)onGotAutoFillStoreOK:(Model*)database
                 databaseUuid:(NSString*)databaseUuid
                displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
              alternativeUrls:(BOOL)alternativeUrls
@@ -170,7 +199,9 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
     
     NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
     @try {
-        for ( Node* node in database.allSearchableNoneExpiredEntries ) {
+        NSArray<Node*>* sortedNodes = [self sortedNodesWithFavouritesFirst:database];
+        
+        for ( Node* node in sortedNodes ) {
             NSArray<ASPasswordCredentialIdentity*>* nodeIdenitities = [self getPasswordCredentialIdentities:node
                                                                                                    database:database
                                                                                                databaseUuid:databaseUuid
@@ -180,28 +211,31 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                                                                                       notes:notes
                                                                                concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
                                                                              unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds nickName:nickName];
+            
             [identities addObjectsFromArray:nodeIdenitities];
         }
     }
     @finally { }
-    
+                 
     
     NSUInteger databasesUsingQuickType = [self getDatabasesUsingQuickTypeCount];
 
     if(databasesUsingQuickType < 2) { 
-        [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
+        [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities
+                                                                              completion:^(BOOL success, NSError * _Nullable error) {
             NSLog(@"Replaced All Credential Identities... [%d] - [%@]", success, error);
         }];
     }
     else {
-        [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
+        [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities
+                                                             completion:^(BOOL success, NSError * _Nullable error) {
             NSLog(@"Saved Credential Identities (%lu items)... [%d] - [%@]", (unsigned long) identities.count, success, error);
         }];
     }
 }
     
 - (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentities:(Node*)node
-                                                                database:(DatabaseModel*)database
+                                                                database:(Model*)database
                                                              databaseUuid:(NSString*)databaseUuid
                                                             displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                                                           alternativeUrls:(BOOL)alternativeUrls
@@ -319,15 +353,21 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                 }
             }
         }
-        
     }
-                                              
+
+    [identities sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        ASPasswordCredentialIdentity* i1 = obj1;
+        ASPasswordCredentialIdentity* i2 = obj2;
+
+        return finderStringCompare(i1.user, i2.user);
+    }];
+
     return identities;
 }
                                 
 - (ASPasswordCredentialIdentity*)getIdentity:(Node*)node
                                          url:(NSString*)url
-                                    database:(DatabaseModel*)database
+                                    database:(Model*)database
                                 databaseUuid:(NSString*)databaseUuid
                                 displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                                     fieldKey:(NSString*)fieldKey
@@ -336,7 +376,7 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
     QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString fieldKey:fieldKey];
     ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
     
-                                                        NSString* username;
+    NSString* username;
     if ( fieldKey == nil ) {
         username = [database dereference:node.fields.username node:node];
     }
@@ -366,6 +406,10 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
     }
     else if ( fieldKey != nil ) {
         quickTypeText = username;
+    }
+    
+    if ( [database isFavourite:node.uuid] ) {
+        quickTypeText = [NSString stringWithFormat:@"⭐️ %@", quickTypeText];
     }
     
     return [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:quickTypeText recordIdentifier:[recordIdentifier toJson]];

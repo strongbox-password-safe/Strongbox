@@ -61,6 +61,9 @@ extern NSString* const kAsyncUpdateStarting;
 @property (nonatomic, readonly) BOOL isReadOnly;
 @property (readonly) BOOL isInOfflineMode;
 
+@property (readonly) BOOL formatSupportsCustomIcons;
+@property (readonly) BOOL formatSupportsTags;
+
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allItems;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allEntries;
 
@@ -107,6 +110,8 @@ extern NSString* const kAsyncUpdateStarting;
 - (NSArray<NSString *>*)getQuickAuditAllIssuesVeryBriefSummaryForNode:(NSUUID *)item;
 - (NSArray<NSString *>*)getQuickAuditAllIssuesSummaryForNode:(NSUUID *)item;
 
+- (void)replaceEntireUnderlyingDatabaseWith:(DatabaseModel*)newDatabase; 
+
 @property (readonly, nullable) DatabaseAuditReport* auditReport;
 
 - (NSSet<Node*>*)getSimilarPasswordNodeSet:(NSUUID*)node;
@@ -120,6 +125,9 @@ extern NSString* const kAsyncUpdateStarting;
 - (void)closeAndCleanup;
 
 
+
+- (NSInteger)reorderItem:(NSUUID*)nodeId idx:(NSInteger)idx;
+- (NSInteger)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node*)parentGroup;
 
 - (Node*_Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title;
 

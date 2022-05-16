@@ -105,4 +105,8 @@ class SideBarSettings: NSViewController {
 
         bindUI()
     }
+
+    @IBAction func onClose(_: Any) {
+        view.window?.cancelOperation(nil)
+    }
 }

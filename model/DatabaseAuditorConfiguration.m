@@ -38,7 +38,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         self.checkHibp = NO; 
         
         self.lastKnownAuditIssueCount = nil;
-        self.showAuditPopupNotifications = YES;
+        self.showAuditPopupNotifications = NO;
         self.hibpCaveatAccepted = NO;
         self.hibpCheckForNewBreachesIntervalSeconds = 7 * 24 * 60 * 60; 
         self.lastHibpOnlineCheck = nil;
@@ -68,7 +68,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     if (jsonDictionary[@"minimumLength"] != nil ) ret.minimumLength = ((NSNumber*)(jsonDictionary[@"minimumLength"])).unsignedIntegerValue;
     if (jsonDictionary[@"checkForMinimumLength"] != nil ) ret.checkForMinimumLength = ((NSNumber*)(jsonDictionary[@"checkForMinimumLength"])).boolValue;
     if (jsonDictionary[@"checkHibp"] != nil ) ret.checkHibp = ((NSNumber*)(jsonDictionary[@"checkHibp"])).boolValue;
-    if (jsonDictionary[@"showAuditPopupNotifications"] != nil ) ret.showAuditPopupNotifications = ((NSNumber*)(jsonDictionary[@"showAuditPopupNotifications"])).boolValue;
+    if (jsonDictionary[@"showAuditPopupNotifications2"] != nil ) ret.showAuditPopupNotifications = ((NSNumber*)(jsonDictionary[@"showAuditPopupNotifications2"])).boolValue;
     if (jsonDictionary[@"hibpCaveatAccepted"] != nil ) ret.hibpCaveatAccepted = ((NSNumber*)(jsonDictionary[@"hibpCaveatAccepted"])).boolValue;
     if (jsonDictionary[@"hibpCheckForNewBreachesIntervalSeconds"] != nil ) ret.hibpCheckForNewBreachesIntervalSeconds = ((NSNumber*)(jsonDictionary[@"hibpCheckForNewBreachesIntervalSeconds"])).unsignedIntegerValue;
 
@@ -93,7 +93,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         @"minimumLength" : @(self.minimumLength),
         @"checkForMinimumLength" : @(self.checkForMinimumLength),
         @"checkHibp" : @(self.checkHibp),
-        @"showAuditPopupNotifications" : @(self.showAuditPopupNotifications),
+        @"showAuditPopupNotifications2" : @(self.showAuditPopupNotifications),
         @"hibpCaveatAccepted" : @(self.hibpCaveatAccepted),
         @"hibpCheckForNewBreachesIntervalSeconds" : @(self.hibpCheckForNewBreachesIntervalSeconds),
 
@@ -127,13 +127,20 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         self.minimumLength = [coder decodeIntegerForKey:@"minimumLength"];
         self.checkForMinimumLength = [coder decodeBoolForKey:@"checkForMinimumLength"];
         self.checkHibp = [coder decodeBoolForKey:@"checkHibp"];
-        self.showAuditPopupNotifications = [coder decodeBoolForKey:@"showAuditPopupNotifications"];
         self.hibpCaveatAccepted = [coder decodeBoolForKey:@"hibpCaveatAccepted"];
         self.hibpCheckForNewBreachesIntervalSeconds = [coder decodeIntegerForKey:@"hibpCheckForNewBreachesIntervalSeconds"];
         self.lowEntropyThreshold = [coder decodeIntegerForKey:@"lowEntropyThreshold"];
         self.checkForTwoFactorAvailable = [coder decodeBoolForKey:@"checkForTwoFactorAvailable"];
         self.lastHibpOnlineCheck = [coder decodeObjectForKey:@"lastHibpOnlineCheck"];
         self.lastKnownAuditIssueCount = [coder decodeObjectForKey:@"lastKnownAuditIssueCount"];
+
+        if ( [coder containsValueForKey:@"showAuditPopupNotifications2"] ) {
+            self.showAuditPopupNotifications = [coder decodeBoolForKey:@"showAuditPopupNotifications2"];
+        }
+        else {
+            self.showAuditPopupNotifications = NO;
+        }
+
     }
     return self;
 }
@@ -150,7 +157,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     [coder encodeInteger:self.minimumLength forKey:@"minimumLength"];
     [coder encodeBool:self.checkForMinimumLength forKey:@"checkForMinimumLength"];
     [coder encodeBool:self.checkHibp forKey:@"checkHibp"];
-    [coder encodeBool:self.showAuditPopupNotifications forKey:@"showAuditPopupNotifications"];
+    [coder encodeBool:self.showAuditPopupNotifications forKey:@"showAuditPopupNotifications2"];
     [coder encodeBool:self.hibpCaveatAccepted forKey:@"hibpCaveatAccepted"];
     [coder encodeInteger:self.hibpCheckForNewBreachesIntervalSeconds forKey:@"hibpCheckForNewBreachesIntervalSeconds"];
     [coder encodeInteger:self.lowEntropyThreshold forKey:@"lowEntropyThreshold"];

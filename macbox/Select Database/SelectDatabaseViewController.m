@@ -6,7 +6,7 @@
 //  Copyright © 2020 Mark McGuill. All rights reserved.
 //
 
-#import "SelectAutoFillDatabaseViewController.h"
+#import "SelectDatabaseViewController.h"
 #import "CustomBackgroundTableView.h"
 #import "DatabaseCellView.h"
 #import "NSArray+Extensions.h"
@@ -16,7 +16,7 @@
 
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
-@interface SelectAutoFillDatabaseViewController () <NSTableViewDelegate, NSTableViewDataSource>
+@interface SelectDatabaseViewController () <NSTableViewDelegate, NSTableViewDataSource>
 
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
 @property (nonatomic, strong) NSArray<MacDatabasePreferences*>* databases;
@@ -28,7 +28,11 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
 @end
 
-@implementation SelectAutoFillDatabaseViewController
+@implementation SelectDatabaseViewController
+
++ (instancetype)fromStoryboard {
+    return [[SelectDatabaseViewController alloc] initWithNibName:@"SelectAutoFillDatabaseViewController" bundle:nil];
+}
 
 - (void)viewWillAppear {
     [super viewWillAppear];
@@ -52,7 +56,9 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
         [self refresh];
         
-        [self checkWormholeForUnlockedDatabases];
+        if ( self.autoFillMode ) {
+            [self checkWormholeForUnlockedDatabases];
+        }
     }
 }
 
@@ -63,7 +69,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         self.firstAppearanceDone = YES;
         self.view.window.frameAutosaveName = @"SelectAutoFillDatabase-AutoSave";
     
-        if ( self.databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
+        if ( self.autoFillMode && self.databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
             NSLog(@"Single Database Launching...");
         
             MacDatabasePreferences* database = self.databases.firstObject;
@@ -128,10 +134,8 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 }
 
 - (void)refresh {
-    self.databases = [MacDatabasePreferences filteredDatabases:^BOOL(MacDatabasePreferences * _Nonnull database) {
-        return database.autoFillEnabled;
-    }];
-    
+    self.databases = MacDatabasePreferences.allDatabases;
+        
     [self.tableView reloadData];
     
     if (self.tableView.numberOfRows > 0) {
@@ -169,9 +173,29 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
     
     BOOL wormholeDetectedUnlocked = [self.unlockedDatabases containsObject:database.uuid];
-    [result setWithDatabase:database autoFill:YES wormholeUnlocked:wormholeDetectedUnlocked];
+    
+    BOOL disabled = self.disabledDatabases && [self.disabledDatabases containsObject:database.uuid];
+    
+    [result setWithDatabase:database
+   nickNameEditClickEnabled:NO
+              showSyncState:NO
+   indicateAutoFillDisabled:self.autoFillMode
+           wormholeUnlocked:wormholeDetectedUnlocked
+                   disabled:disabled];
     
     return result;
+}
+
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
+    MacDatabasePreferences* database = [self.databases objectAtIndex:row];
+
+    BOOL disabled = self.disabledDatabases && [self.disabledDatabases containsObject:database.uuid];
+    
+    if ( disabled || ( self.autoFillMode && !database.autoFillEnabled )) {
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {

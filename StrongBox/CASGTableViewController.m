@@ -76,7 +76,7 @@
     self.selectedName = self.initialName;
     self.selectedFormat = self.initialFormat;
     
-    if (self.initialKeyFileBookmark) {
+    if ( self.initialKeyFileBookmark ) {
         NSURL* url = [BookmarksHelper getExpressReadOnlyUrlFromBookmark:self.initialKeyFileBookmark];
         self.selectedKeyFileUrl = url;
     }

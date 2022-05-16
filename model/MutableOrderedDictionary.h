@@ -13,16 +13,28 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MutableOrderedDictionary<KeyType, ValueType> : NSObject
 
 - (void)addKey:(KeyType)key andValue:(ValueType _Nullable)value;
+
+- (instancetype)clone;
+
 - (void)insertKey:(KeyType)key withValue:(ValueType)value atIndex:(NSUInteger)atIndex;
 - (void)remove:(KeyType)key;
+- (void)removeObjectForKey:(KeyType)key;
+- (void)removeAllObjects;
+
+@property (readonly) NSArray<KeyType>* keys;
 
 - (NSArray<KeyType>*)allKeys;
-- (NSUInteger)count;
+- (NSArray<ValueType>*)allValues;
 
-- (id)objectForKeyedSubscript:(KeyType)key;
+@property (readonly) NSUInteger count;
+
+- (ValueType)objectForKey:(KeyType)key;
+
+- (ValueType)objectForCaseInsensitiveKey:(KeyType)key;
+
+- (ValueType)objectForKeyedSubscript:(KeyType)key;
 - (void)setObject:(ValueType _Nullable)obj forKeyedSubscript:(KeyType)key;
 
-- (void)addAll:(MutableOrderedDictionary*)other;
 
 @property (readonly) NSDictionary<KeyType, ValueType>* dictionary;
 

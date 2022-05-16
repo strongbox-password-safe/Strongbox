@@ -89,7 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL autoReloadAfterExternalChanges;
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
-@property BOOL makeBackups;  
+@property BOOL makeBackups;
 @property (readonly) BOOL isLocalDeviceDatabase;
 @property BOOL offlineMode; 
 @property BOOL alwaysOpenOffline;
@@ -154,6 +154,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL showChildCountOnFolderInSidebar;
 
 @property NSArray<HeaderNodeState*>* headerNodes;
+
+@property BOOL customSortOrderForFields;
 
 @end
 

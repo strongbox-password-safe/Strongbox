@@ -203,6 +203,7 @@
                                 mute:@(NO)
                       propertyGroups:nil
                       strictConflict:@(NO)
+                         contentHash:nil
                            inputData:data]
       setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *networkError) {
         if (viewController) {

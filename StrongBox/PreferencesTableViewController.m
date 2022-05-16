@@ -24,6 +24,7 @@
 #import "Strongbox-Swift.h"
 #import "ProUpgradeIAPManager.h"
 #import "Model.h"
+#import "AppDelegate.h"
 
 @interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
 
@@ -74,6 +75,10 @@
                                            selector:@selector(onProStatusChanged:)
                                                name:kProStatusChangedNotificationKey
                                              object:nil];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self maybeRequestReview];
+    });
 }
 
 - (void)onProStatusChanged:(id)param {
@@ -456,6 +461,23 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
                     error:error];
         }
     }];
+}
+
+- (void)maybeRequestReview {
+    AppDelegate* appDelegate = (AppDelegate*)UIApplication.sharedApplication.delegate;
+    
+    NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:appDelegate.appLaunchTime];
+    NSInteger launchCount = AppPreferences.sharedInstance.launchCount;
+
+    double minutes = timeDifference / 60;
+
+    
+    
+    if( minutes > 60 && launchCount > 45 ) {
+#ifndef DEBUG
+        [SKStoreReviewController requestReview];
+#endif
+    }
 }
 
 @end

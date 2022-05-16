@@ -19,6 +19,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     @IBOutlet var progressStrength: NSProgressIndicator!
     @IBOutlet var stackViewStrength: NSStackView!
     @IBOutlet var stackViewParent: NSStackView!
+    @IBOutlet var copyButton: NSButton!
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -37,8 +38,9 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
 
     func monitorForQuickRevealKey() {
         NotificationCenter.default.addObserver(forName: NSNotification.Name(kUpdateNotificationQuickRevealStateChanged), object: nil, queue: nil) { [weak self] notification in
-            if let concealable = self?.concealable, concealable {
+            if let concealable = self?.concealable, concealable, (self?.containingWindow?.isKeyWindow ?? false) {
 
+                
                 if let optionKeyDown = notification.object as? NSNumber {
                     self?.concealed = !optionKeyDown.boolValue
                 }
@@ -58,6 +60,8 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
 
     var value: String = ""
     var popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)?
+    var onCopyButton: ((DetailsViewField?) -> Void)?
+
     var field: DetailsViewField?
     var concealable: Bool = false
     var textColorOverride: NSColor?
@@ -95,10 +99,15 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
             }
         }
     }
-
-    func setContent(_ field: DetailsViewField?, popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil, image: NSImage? = nil) {
+    weak var containingWindow : NSWindow? = nil
+    
+    func setContent(_ field: DetailsViewField?,
+                    popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
+                    image: NSImage? = nil,
+                    onCopyButton: ((DetailsViewField?) -> Void)? = nil,
+                    containingWindow : NSWindow? = nil ) {
         self.field = field
-
+        
         textColorOverride = nil
 
         var name = "<Not Set>"
@@ -148,8 +157,12 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         self.popupMenuUpdater = popupMenuUpdater
         buttonPopup.menu?.delegate = self
 
+        self.onCopyButton = onCopyButton;
+        self.copyButton.isHidden = onCopyButton == nil
+        
         self.value = value
         self.concealed = concealable && concealed
+        self.containingWindow = containingWindow
     }
 
     @IBAction func onToggleConcealReveal(_: Any?) {
@@ -170,5 +183,9 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         }
 
         popupMenuUpdater?(menu, field)
+    }
+    
+    @IBAction func onCopy(_ sender: Any) {
+        self.onCopyButton?(self.field)
     }
 }

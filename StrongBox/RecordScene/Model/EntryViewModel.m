@@ -13,6 +13,7 @@
 #import "NodeIcon.h"
 #import "Constants.h"
 #import "NSDictionary+Extensions.h"
+#import "NSArray+Extensions.h"
 #import "NSDate+Extensions.h"
 
 @interface EntryViewModel()
@@ -68,12 +69,15 @@
                                                     attachments:attachments
                                                        metadata:metadata
                                                      hasHistory:YES
-                                                parentGroupUuid:nil];
+                                                parentGroupUuid:nil sortCustomFields:YES];
     
     return ret;
 }
 
-+ (instancetype)fromNode:(Node *)item format:(DatabaseFormat)format model:(Model *)model {
++ (instancetype)fromNode:(Node *)item
+                  format:(DatabaseFormat)format
+                   model:(Model *)model
+        sortCustomFields:(BOOL)sortCustomFields {
     NSArray<ItemMetadataEntry*>* metadata = [EntryViewModel getMetadataFromItem:item format:format model:model];
     
     
@@ -83,20 +87,20 @@
    
     
     
-    NSArray<CustomFieldViewModel*>* customFieldModels = [item.fields.customFieldsNoEmail map:^id(NSString *key, StringValue* value) {
-        return [CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected];
-    }];
+    NSMutableArray<CustomFieldViewModel*>* customFieldModels = NSMutableArray.array;
+    for ( NSString* key in item.fields.customFieldsNoEmail.allKeys ) {
+        StringValue* value = item.fields.customFieldsNoEmail[key];
+        [customFieldModels addObject:[CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected]];
+    }
     
     
-    
-    NSString* email = item.fields.email;
     
     EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
                                                        username:item.fields.username
                                                        password:item.fields.password
                                                             url:item.fields.url
                                                           notes:item.fields.notes
-                                                          email:email
+                                                          email:item.fields.email
                                                         expires:item.fields.expires
                                                            tags:item.fields.tags
                                                            totp:item.fields.otpToken
@@ -105,7 +109,8 @@
                                                     attachments:item.fields.attachments
                                                        metadata:metadata
                                                      hasHistory:historyAvailable
-                                                parentGroupUuid:item.parent.uuid];
+                                                parentGroupUuid:item.parent.uuid
+                                               sortCustomFields:sortCustomFields];
     
     return ret;
 }
@@ -163,7 +168,7 @@
                      metadata:(nonnull NSArray<ItemMetadataEntry *> *)metadata
                    hasHistory:(BOOL)hasHistory
               parentGroupUuid:(NSUUID*_Nullable)parentGroupUuid
-{
+             sortCustomFields:(BOOL)sortCustomFields {
     if (self = [super init]) {
         self.title = title;
         self.username = username;
@@ -175,7 +180,14 @@
         self.mutableTags = tags ? tags.mutableCopy : [NSMutableSet set];
         self.notes = notes;
         self.icon = icon;
-        self.mutableCustomFields = customFields ? [[customFields sortedArrayUsingComparator:customFieldKeyComparator] mutableCopy] : [NSMutableArray array];
+        
+        NSArray<CustomFieldViewModel*>* tmp = customFields ? customFields : @[];
+        
+        self.sortCustomFields = sortCustomFields;
+        if ( sortCustomFields ) {
+            tmp = [tmp sortedArrayUsingComparator:customFieldKeyComparator];
+        }
+        self.mutableCustomFields = tmp.mutableCopy;
         
         self.mutableAttachments = [[MutableOrderedDictionary alloc] init];
         NSArray<NSString*>* sortedFilenames = [attachments.allKeys sortedArrayUsingComparator:finderStringComparator];
@@ -207,7 +219,8 @@
                                                       attachments:self.attachments.dictionary
                                                          metadata:self.metadata
                                                        hasHistory:self.hasHistory
-                                                  parentGroupUuid:self.parentGroupUuid];
+                                                  parentGroupUuid:self.parentGroupUuid
+                                                 sortCustomFields:self.sortCustomFields];
 
     return model;
 }
@@ -258,7 +271,17 @@
     if ( self.customFields.count != other.customFields.count ) {
         return YES;
     }
-    
+
+
+
+
+
+
+
+
+
+
+
     for(int i=0;i<self.customFields.count;i++) {
         CustomFieldViewModel* a = self.customFields[i];
         CustomFieldViewModel* b = other.customFields[i];
@@ -311,15 +334,42 @@
     [self.mutableCustomFields removeObjectAtIndex:index];
 }
 
-- (NSUInteger)insertCustomField:(CustomFieldViewModel*)field {
-    NSUInteger idx = [self.mutableCustomFields indexOfObject:field
-                                               inSortedRange:NSMakeRange(0, self.mutableCustomFields.count)
-                                                     options:NSBinarySearchingInsertionIndex
-                                             usingComparator:customFieldKeyComparator];
-    
-    [self.mutableCustomFields insertObject:field atIndex:idx];
-    
-    return idx;
+- (NSUInteger)addCustomField:(CustomFieldViewModel *)field {
+    if ( self.sortCustomFields ) {
+        NSUInteger idx = [self.mutableCustomFields indexOfObject:field
+                                                   inSortedRange:NSMakeRange(0, self.mutableCustomFields.count)
+                                                         options:NSBinarySearchingInsertionIndex
+                                                 usingComparator:customFieldKeyComparator];
+        
+        [self.mutableCustomFields insertObject:field atIndex:idx];
+        
+        return idx;
+    }
+    else {
+        [self.mutableCustomFields addObject:field];
+        return self.mutableCustomFields.count - 1;
+    }
+}
+
+- (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx {
+    if ( self.sortCustomFields ) {
+        NSLog(@"🔴 moveCustomFieldAtIndex called while sortCustomFields ON");
+    }
+    else {
+        if ( ! ( sourceIdx >= 0 && sourceIdx < self.mutableCustomFields.count && destinationIdx >= 0 && destinationIdx < self.mutableCustomFields.count && sourceIdx != destinationIdx ) ) {
+            NSLog(@"🔴 moveCustomFieldAtIndex with invalid indices %ld -> %ld", sourceIdx, destinationIdx);
+            return;
+        }
+
+        id object = [self.mutableCustomFields objectAtIndex:sourceIdx];
+        [self.mutableCustomFields removeObjectAtIndex:sourceIdx];
+        [self.mutableCustomFields insertObject:object atIndex:destinationIdx];
+
+
+
+
+
+    }
 }
 
 - (void)resetTags:(NSSet<NSString*>*)tags {
@@ -372,11 +422,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 
     
 
-    [ret.fields removeAllCustomFields];
-    for (CustomFieldViewModel *field in self.customFields) {
-        StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
-        [ret.fields setCustomField:field.key value:value];
-    }
+    [self applyCustomFieldEdits:ret];
 
     
     
@@ -412,6 +458,69 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
     
     
     return YES;
+}
+
+- (void)applyCustomFieldEdits:(Node*)ret {
+    if ( self.sortCustomFields ) {
+        [self applyCustomFieldEditsConservingOrder:ret];
+    }
+    else {
+        [self applyCustomFieldEditsReplacingOrder:ret];
+    }
+}
+
+- (void)applyCustomFieldEditsConservingOrder:(Node*)ret {
+    MutableOrderedDictionary<NSString*, StringValue*> *toBeAppliedMap = [[MutableOrderedDictionary alloc] init];
+    for ( CustomFieldViewModel* field in self.customFields ) {
+        StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
+        [toBeAppliedMap addKey:field.key andValue:value];
+    }
+    
+    NSArray<NSString*> *toBeAppliedKeys = [self.customFields map:^id _Nonnull(CustomFieldViewModel * _Nonnull obj, NSUInteger idx) {
+        return obj.key;
+    }];
+    
+    NSArray<NSString*>* existingKeys = ret.fields.customFieldsNoEmail.allKeys; 
+
+    NSMutableSet* toBeAppliedSet = toBeAppliedKeys.set.mutableCopy;
+    NSMutableSet* deletedSet = existingKeys.set.mutableCopy;
+    [deletedSet minusSet:toBeAppliedSet];
+
+    NSMutableSet* addedSet = toBeAppliedKeys.set.mutableCopy;
+    NSMutableSet* existingSet = existingKeys.set.mutableCopy;
+    [addedSet minusSet:existingSet];
+
+    NSMutableSet* editSet = toBeAppliedKeys.set.mutableCopy;
+    [editSet intersectSet:existingSet];
+    
+    
+
+    for ( NSString* key in deletedSet ) {
+        [ret.fields removeCustomField:key];
+    }
+
+    
+    
+    for ( NSString* key in editSet ) {
+        StringValue* value = toBeAppliedMap[key];
+        [ret.fields setCustomField:key value:value];
+    }
+    
+    
+    
+    for ( NSString* key in addedSet ) {
+        StringValue* value = toBeAppliedMap[key];
+        [ret.fields setCustomField:key value:value];
+    }
+}
+
+- (void)applyCustomFieldEditsReplacingOrder:(Node*)ret {
+    [ret.fields removeAllCustomFields];
+    
+    for (CustomFieldViewModel *field in self.customFields) {
+        StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
+        [ret.fields setCustomField:field.key value:value];
+    }
 }
 
 @end

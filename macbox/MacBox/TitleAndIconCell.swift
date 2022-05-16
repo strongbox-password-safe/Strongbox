@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class TitleAndIconCell: NSTableCellView {
+class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
     @IBOutlet var icon: NSImageView!
     @IBOutlet var title: NSTextField!
     @IBOutlet var topSpaceConstraint: NSLayoutConstraint!
@@ -24,12 +24,13 @@ class TitleAndIconCell: NSTableCellView {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-
-        title.action = nil
-        title.isEditable = false
+        
+        favStarIcon.isHidden = true
+        trailingFavStar.isHidden = true
     }
 
     func setContent(_ attributedTitle: NSAttributedString,
+                    editable : Bool = false,
                     iconImage: NSImage? = nil,
                     topSpacing: CGFloat = 4.0,
                     bottomSpacing: CGFloat = 4.0,
@@ -37,12 +38,16 @@ class TitleAndIconCell: NSTableCellView {
                     showLeadingFavStar: Bool = false,
                     showTrailingFavStar: Bool = false,
                     contentTintColor: NSColor? = nil,
-                    count: Int? = nil)
+                    count: Int? = nil,
+                    onTitleEdited : (( _ text : String ) -> Void )? = nil)
     {
         favStarIcon.isHidden = !showLeadingFavStar
         trailingFavStar.isHidden = !showTrailingFavStar
 
         title.attributedStringValue = attributedTitle
+        title.isEditable = editable
+        self.onTitleEdited = onTitleEdited
+
         icon.image = iconImage
 
         if #available(macOS 10.14, *) {
@@ -59,5 +64,11 @@ class TitleAndIconCell: NSTableCellView {
         topSpaceConstraint.constant = topSpacing
         bottomSpaceConstraint.constant = bottomSpacing
         leadingSpaceConstraint.constant = leadingSpace
+    }
+    
+    var onTitleEdited : (( _ text : String ) -> Void )? = nil
+    
+    @IBAction func onEdited(_ sender: Any) {
+        onTitleEdited?( title.stringValue )
     }
 }

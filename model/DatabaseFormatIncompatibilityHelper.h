@@ -26,6 +26,8 @@ typedef void (^IncompatibilityCompletionBlock)(BOOL go, NSArray<Node*>*_Nullable
                    confirmChangesBlock:(IncompatibilityConfirmChangesBlock)confirmChangesBlock
                             completion:(IncompatibilityCompletionBlock)completion;
 
++ (NSArray<Node*>*)processPasswordSafeToKeePass2:(NSArray<Node*>*)nodes;
+
 @end
 
 NS_ASSUME_NONNULL_END

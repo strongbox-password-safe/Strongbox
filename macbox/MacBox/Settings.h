@@ -107,6 +107,12 @@ extern NSString* const kCustomFieldsColumn;
 
 @property (readonly) BOOL isAProBundle;
 
+@property BOOL showCopyFieldButton;
+@property BOOL lockEvenIfEditing;
+
+
+
 @end
+
 
 NS_ASSUME_NONNULL_END

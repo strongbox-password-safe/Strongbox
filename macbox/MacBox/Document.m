@@ -465,10 +465,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)lock:(NSString*)selectedItem {
-    if(self.isDocumentEdited) {
-        NSLog(@"Cannot lock document with edits!");
+    if( self.isDocumentEdited ) {
+        NSLog(@"⚠️ Cannot lock document with edits!");
         return;
     }
+    
     
     
     [self.undoManager removeAllActions];
@@ -691,7 +692,7 @@ fromConvenience:(BOOL)fromConvenience
             [MacAlerts twoOptions:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
                   informativeText:NSLocalizedString(@"sync_status_error_updating_try_again_prompt", @"There was an error updating your database. Would you like to try updating again, or would you prefer to revert to the latest successful update?")
                 option1AndDefault:NSLocalizedString(@"sync_status_error_updating_try_again_action", @"Try Again")
-                          option2:NSLocalizedString(@"sync_status_error_updating_revert_action", @"Revert to Latest")
+                          option2:NSLocalizedString(@"generic_cancel", @"Cancel")
                            window:self.windowController.window
                        completion:^(NSUInteger option) {
                 dispatch_async(dispatch_get_main_queue(), ^{

@@ -186,6 +186,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL showChildCountOnFolderInSidebar;
 @property NSArray<HeaderNodeState*>* headerNodes;
 
+@property BOOL customSortOrderForFields;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -12,10 +12,12 @@
 #import "SimpleXmlValueExtractor.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
+#import "MutableOrderedDictionary.h"
 
 @interface Entry ()
 
-@property (nonatomic) NSMutableDictionary<NSString*, StringValue*> *strings;
+@property (nonatomic) MutableOrderedDictionary<NSString*, StringValue*> *strings;
+@property (nonatomic, readonly) MutableOrderedDictionary<NSString*, StringValue*> *nonCustomStringValues;
 
 @end
 
@@ -52,7 +54,7 @@ const static NSSet<NSString*> *wellKnownKeys;
         self.uuid = NSUUID.UUID;
         self.times = [[Times alloc] initWithXmlElementName:kTimesElementName context:context];
         self.history = [[History alloc] initWithXmlElementName:kHistoryElementName context:context];
-        self.strings = [NSMutableDictionary dictionary];
+        self.strings = [[MutableOrderedDictionary alloc] init];
         self.binaries = [NSMutableArray array];
         self.tags = [NSMutableSet set];
         self.icon = nil; 
@@ -360,12 +362,25 @@ const static NSSet<NSString*> *wellKnownKeys;
     [self.strings removeAllObjects];
 }
 
-- (NSDictionary<NSString *,StringValue *> *)allStrings {
+- (MutableOrderedDictionary<NSString *,StringValue *> *)allStringValues {
     return self.strings;
 }
 
-- (NSDictionary<NSString *,StringValue *> *)customStrings {
-    NSMutableDictionary<NSString*, StringValue*> *ret = [NSMutableDictionary dictionary];
+- (MutableOrderedDictionary<NSString *,StringValue *> *)nonCustomStringValues {
+    MutableOrderedDictionary<NSString*, StringValue*> *ret = [[MutableOrderedDictionary alloc] init];
+    
+    for (NSString* key in self.strings.allKeys) {
+        if([wellKnownKeys containsObject:key]) {
+            StringValue* string = self.strings[key];
+            ret[key] = string;
+        }
+    }
+    
+    return ret;
+}
+
+- (MutableOrderedDictionary<NSString *,StringValue *> *)customStringValues {
+    MutableOrderedDictionary<NSString*, StringValue*> *ret = [[MutableOrderedDictionary alloc] init];
     
     for (NSString* key in self.strings.allKeys) {
         if(![wellKnownKeys containsObject:key]) {
@@ -401,9 +416,42 @@ const static NSSet<NSString*> *wellKnownKeys;
     if (!(self.customIcon == nil && other.customIcon == nil) && ![self.customIcon isEqual:other.customIcon]) {
         return NO;
     }
-    if (!(self.allStrings == nil && other.allStrings == nil) && !stringsAreEqual(self.allStrings, other.allStrings)) {
+
+    
+    
+
+
+
+
+
+
+
+
+
+    if ( ![self.title isEqualToString:other.title] ) {
         return NO;
     }
+    
+    if ( ![self.username isEqualToString:other.username] ) {
+        return NO;
+    }
+    
+    if ( ![self.password isEqualToString:other.password] ) {
+        return NO;
+    }
+    
+    if ( ![self.url isEqualToString:other.url] ) {
+        return NO;
+    }
+    
+    if ( ![self.notes isEqualToString:other.notes] ) {
+        return NO;
+    }
+    
+    if ( ![self.customStringValues isEqual:other.customStringValues] ) {
+        return NO;
+    }
+    
     if (![self.binaries isEqual:other.binaries]) {
         return NO;
     }
@@ -438,33 +486,9 @@ const static NSSet<NSString*> *wellKnownKeys;
     return YES;
 }
 
-BOOL stringsAreEqual(NSDictionary<NSString *,StringValue *> * a, NSDictionary<NSString *,StringValue *> * b) {
-    return matchesSemantically(a, b) && matchesSemantically(b,a);
-}
-
-BOOL matchesSemantically(NSDictionary<NSString *,StringValue *> * a, NSDictionary<NSString *,StringValue *> * b) {
-    for(NSString* key in a.allKeys) {
-        StringValue *bVal = b[key];
-        if(bVal) {
-            StringValue *aVal = a[key];
-            if(![aVal isEqual:bVal]) {
-                return NO;
-            }
-        }
-        else {
-            StringValue *aVal = a[key];
-            if(aVal.value.length != 0) {
-                return NO;
-            }
-        }
-    }
-    
-    return YES;
-}
-
 - (NSString *)description {
     return [NSString stringWithFormat:@"[%@]-[%@]-[%@]-[%@]-[%@]\nUUID = [%@]\nTimes = [%@], iconId = [%@]/[%@]\ncustomFields = [%@]",
-            self.title, self.username, self.password, self.url, self.notes, self.uuid, self.times, self.icon, self.customIcon, self.customStrings];
+            self.title, self.username, self.password, self.url, self.notes, self.uuid, self.times, self.icon, self.customIcon, self.customStringValues];
 }
 
 @end

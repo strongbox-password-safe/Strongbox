@@ -106,6 +106,11 @@
 }
 
 - (NSURL*)getLocalWorkingCacheUrlForDatabase:(NSString*)databaseUuid {
+    if ( databaseUuid == nil ) {
+        NSLog(@"🔴 databaseUuid is nil in WorkingCopyManager::getLocalWorkingCacheUrlForDatabase?!");
+        return nil;
+    }
+    
     return [FileManager.sharedInstance.syncManagerLocalWorkingCachesDirectory URLByAppendingPathComponent:databaseUuid];
 }
 

@@ -513,7 +513,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
 
     if ( node.parent != self ) {
-        NSLog(@"⚠️ Node parent field is not correctly set to this node. Patching parent, please fix whatever broken code led here...");
+        NSLog(@"🔴 Node parent field is not correctly set to this node. Patching parent, please fix whatever broken code led here...");
         [node internalPatchParent:self];
     }
     
@@ -750,11 +750,22 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
             return NO;
         }
 
-        if (!( ( self.icon == nil && other.icon == nil ) ||
-              (self.icon && ([self.icon isEqual:other.icon])))) {
-            return NO;
+        if (!( self.isUsingKeePassDefaultIcon && other.isUsingKeePassDefaultIcon ) ) {
+            if ( self.icon != nil ) {
+                if ( ![self.icon isEqual:other.icon] ) {
+                    return NO;
+                }
+            }
+            else if ( other.icon != nil ) {
+                if ( ![other.icon isEqual:self.icon] ) {
+                    return NO;
+                }
+            }
+            else {
+                
+            }
         }
-
+            
         return [self.fields isSyncEqualTo:other.fields
                         isForUIDiffReport:(self.isGroup && isForUIDiffReport)
                              checkHistory:!self.isGroup && checkHistory];

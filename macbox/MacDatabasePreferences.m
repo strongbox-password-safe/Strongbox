@@ -1265,4 +1265,14 @@
     }];
 }
 
+- (BOOL)customSortOrderForFields {
+    return self.metadata.customSortOrderForFields;
+}
+
+- (void)setCustomSortOrderForFields:(BOOL)customSortOrderForFields {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.customSortOrderForFields = customSortOrderForFields;
+    }];
+}
+
 @end

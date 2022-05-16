@@ -34,6 +34,9 @@
 #import "macOSSpinnerUI.h"
 #import "BiometricIdHelper.h"
 #import "DatabaseOnboardingTabViewController.h"
+#import "Serializator.h"
+#import "DatabaseFormatIncompatibilityHelper.h"
+#import "DatabaseMerger.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -45,10 +48,15 @@
 
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController; 
+@property (readonly, nullable) ViewModel* viewModel;
 
 @end
 
 @implementation WindowController
+
+- (void)dealloc {
+    NSLog(@"😎 DEALLOC [%@]", self);
+}
 
 static NSString* getFreeTrialSuffix() {
     if(![Settings sharedInstance].fullVersion) {
@@ -241,6 +249,8 @@ static NSString* getFreeTrialSuffix() {
 
     NSLog(@"WindowController::updateContentView - doc=[%@], doc.isLocked = [%hhd]", doc, doc.isLocked);
     
+    [self bindFloatWindowOnTop];
+    
     CGRect oldFrame = self.contentViewController.view.frame;
     NSViewController* vc;
     
@@ -288,8 +298,6 @@ static NSString* getFreeTrialSuffix() {
                 self.window.toolbar = [[NSToolbar alloc] init];
             }
         }
-        
-        [self unsubscribeFromNotifications];
     }
 }
 
@@ -318,6 +326,16 @@ static NSString* getFreeTrialSuffix() {
 
         if ( [vc getSelectedItems].count == 1 ) {
             return [vc getCurrentSelectedItem];
+        }
+    }
+    
+    return nil;
+}
+
+- (NSString*)getSideBarSelectedTag {
+    if ( Settings.sharedInstance.nextGenUI ) {
+        if ( self.viewModel.nextGenNavigationContext == OGNavigationContextTags ) {
+            return self.viewModel.nextGenNavigationContextSelectedTag;
         }
     }
     
@@ -561,11 +579,15 @@ static NSString* getFreeTrialSuffix() {
             }
             else if (theAction == @selector( onRenameSideBarItem: )) {
                 Node* item = [self getSideBarSelectedItem];
+                NSString* tag = [self getSideBarSelectedTag];
                 
-                if( item == nil ) {
+                BOOL nodeSelected = item != nil;
+                BOOL tagSelected = tag != nil;
+                
+                if( !nodeSelected  && !tagSelected ) {
                     return NO;
                 }
-                
+
                 return YES;
             }
             else if (theAction == @selector(onSetSideBarItemIcon:)) {
@@ -609,19 +631,30 @@ static NSString* getFreeTrialSuffix() {
             }
             else if (theAction == @selector( onDeleteSideBarItem: )) {
                 Node* item = [self getSideBarSelectedItem];
+                NSString* tag = [self getSideBarSelectedTag];
                 
-                if( item == nil || item.uuid == self.viewModel.rootGroup.uuid ) {
+                BOOL nodeSelected = ( item != nil && item.uuid != self.viewModel.rootGroup.uuid );
+                BOOL tagSelected = tag != nil;
+                
+                if( !nodeSelected  && !tagSelected ) {
                     return NO;
                 }
 
-                BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
-                    return ![self.viewModel canRecycle:obj];
-                }];
+                if ( nodeSelected ) {
+                    BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+                        return ![self.viewModel canRecycle:obj];
+                    }];
+                    
+                    NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
+                    [menuItem setTitle:loc];
                 
-                NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
-                [menuItem setTitle:loc];
-            
-                return YES;
+                    return YES;
+                }
+                else if ( tagSelected ) {
+                    NSString* loc = NSLocalizedString(@"generic_action_delete", @"Delete");
+                    [menuItem setTitle:loc];
+                    return YES;
+                }
             }
             else if (theAction == @selector(onDelete:)) {
                 if ( Settings.sharedInstance.nextGenUI ) {
@@ -666,6 +699,12 @@ static NSString* getFreeTrialSuffix() {
         
         if ( theAction == @selector(onLock:) ) {
             return YES;
+        }
+        else if ( theAction == @selector(onCompareAndMerge:)) { 
+            return YES;
+        }
+        else if ( theAction == @selector(onExportAsKeePass2:)) {
+            return !isKeePass2;
         }
         else if ( theAction == @selector(onExportAsCsv:)) {
             return YES;
@@ -723,6 +762,9 @@ static NSString* getFreeTrialSuffix() {
         }
         else if (theAction == @selector(onCopyNotes:)) {
             return item && !item.isGroup && item.fields.notes.length;
+        }
+        else if (theAction == @selector(onCopyUsernameAndPassword:)) {
+            return item && !item.isGroup;
         }
         else if (theAction == @selector(onCopyAllFields:)) {
             return item && !item.isGroup;
@@ -806,11 +848,27 @@ static NSString* getFreeTrialSuffix() {
 
 - (IBAction)onDeleteSideBarItem:(id)sender {
     Node* item = [self getSideBarSelectedItem];
-    if( item == nil ) {
+    NSString* tag = [self getSideBarSelectedTag];
+    
+    BOOL nodeSelected = ( item != nil && item.uuid != self.viewModel.rootGroup.uuid );
+    BOOL tagSelected = tag != nil;
+    
+    if( !nodeSelected  && !tagSelected ) {
         return;
     }
-    
-    [self onDeleteItems:@[item]];
+
+    if ( nodeSelected ) {
+        [self onDeleteItems:@[item]];
+    }
+    else if ( tagSelected ) {
+        [MacAlerts areYouSure:NSLocalizedString(@"are_you_sure_delete_tag_message", @"Are you sure you want to delete this tag?")
+                       window:self.window
+                   completion:^(BOOL response) {
+            if ( response ) {
+                [self.viewModel deleteTag:tag];
+            }
+        }];
+    }
 }
 
 - (IBAction)onRenameSideBarItem:(id)sender {
@@ -820,18 +878,34 @@ static NSString* getFreeTrialSuffix() {
     }
 
     Node* item = [self getSideBarSelectedItem];
-    if( item == nil ) {
+    NSString* tag = [self getSideBarSelectedTag];
+    
+    BOOL nodeSelected = item != nil;
+    BOOL tagSelected = tag != nil;
+    
+    if( !nodeSelected  && !tagSelected ) {
         return;
     }
-    
-    MacAlerts* ma = [[MacAlerts alloc] init];
-    NSString* text = [ma input:NSLocalizedString(@"browse_vc_rename_item", @"Rename Item") defaultValue:item.title allowEmpty:NO];
-    
-    if ( text && [Utils trim:text].length ) {
-        NSString* newTitle = [Utils trim:text];
 
-        if ( ![self.viewModel setItemTitle:item title:newTitle] ) {
-            NSLog(@"🔴 Could not rename item!");
+    if ( nodeSelected ) {
+        MacAlerts* ma = [[MacAlerts alloc] init];
+        NSString* text = [ma input:NSLocalizedString(@"browse_vc_rename_item", @"Rename Item") defaultValue:item.title allowEmpty:NO];
+        
+        if ( text && [Utils trim:text].length ) {
+            NSString* newTitle = [Utils trim:text];
+
+            if ( ![self.viewModel setItemTitle:item title:newTitle] ) {
+                NSLog(@"🔴 Could not rename item!");
+            }
+        }
+    }
+    else if ( tagSelected ) {
+        MacAlerts* ma = [[MacAlerts alloc] init];
+        NSString* text = [ma input:NSLocalizedString(@"browse_vc_rename_item", @"Rename Item") defaultValue:tag allowEmpty:NO];
+
+        if ( text && [Utils trim:text].length ) {
+            NSString* newTitle = [Utils trim:text];
+            [self.viewModel renameTag:tag to:newTitle];
         }
     }
 }
@@ -1007,11 +1081,38 @@ static NSString* getFreeTrialSuffix() {
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
 
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onDatabasePreferencesChanged:) name:kModelUpdateNotificationDatabasePreferenceChanged object:nil];
+
     NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
     [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onScreenLocked) name:notificationName object:nil];
     
     NSString* notificationName2 = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"sessionDidMoveOffConsole"]; 
     [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onSessionDidMoveOffConsole) name:notificationName2 object:nil];
+}
+
+- (void)onPreferencesChanged:(NSNotification*)notification {
+    NSLog(@"WindowController::onPreferencesChanged");
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self bindFloatWindowOnTop];
+    });
+}
+
+- (void)bindFloatWindowOnTop {
+    [self.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
+}
+
+- (void)onDatabasePreferencesChanged:(NSNotification*)notification {
+    if ( notification.object != self.viewModel ) {
+        return;
+    }
+
+    NSLog(@"WindowController::onDatabasePreferencesChanged");
+    
+    [self synchronizeWindowTitleWithDocumentName]; 
 }
 
 - (void)unsubscribeFromNotifications {
@@ -1022,7 +1123,7 @@ static NSString* getFreeTrialSuffix() {
 }
 
 - (void)onAutoLock:(NSNotification*)notification {
-    if(self.viewModel && !self.viewModel.locked && !self.viewModel.document.isDocumentEdited) {
+    if( self.viewModel && !self.viewModel.locked ) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self onLock:nil];
         });
@@ -1030,22 +1131,44 @@ static NSString* getFreeTrialSuffix() {
 }
 
 - (void)onSessionDidMoveOffConsole {
-    if ( self.viewModel.lockOnScreenLock ) {
+    if ( self.viewModel && !self.viewModel.locked && self.viewModel.lockOnScreenLock ) {
         NSLog(@"onSessionDidMoveOffConsole: Locking Database");
         [self onLock:nil];
     }
 }
 
 - (void)onScreenLocked {
-    if ( self.viewModel.lockOnScreenLock ) {
+    if ( self.viewModel && !self.viewModel.locked && self.viewModel.lockOnScreenLock ) {
         NSLog(@"onScreenLocked: Locking Database");
         [self onLock:nil];
     }
 }
 
+- (BOOL)isNextGenEditsInProgress {
+    if ( Settings.sharedInstance.nextGenUI ) {
+        NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
+        
+        for ( NSViewController* presented in vc.presentedViewControllers ) {
+            if ( [presented isKindOfClass:CreateEditViewController.class] ) {
+                CreateEditViewController* editVc = (CreateEditViewController*)presented;
+                return editVc.isEditsInProgress;
+            }
+        }
+    }
+    
+    return NO;
+}
+
 - (void)onLock:(id)sender {
     if(self.viewModel && !self.viewModel.locked) {
-        if([self.viewModel.document isDocumentEdited]) {
+        BOOL isEditing = [self isNextGenEditsInProgress];
+        
+        if ( isEditing && !Settings.sharedInstance.lockEvenIfEditing ) {
+            NSLog(@"⚠️ NOT Locking because there is an edit in progress.");
+            return;
+        }
+        
+        if ( self.viewModel.document.isDocumentEdited ) {
 
 
 
@@ -1074,6 +1197,15 @@ static NSString* getFreeTrialSuffix() {
     Document* doc = self.document;
 
     if ( Settings.sharedInstance.nextGenUI ) {
+        
+        
+        NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
+
+        
+        for ( NSViewController* presented in vc.presentedViewControllers ) {
+            [vc dismissViewController:presented];
+        }
+        
         [doc lock:nil];
     }
     else {
@@ -1091,7 +1223,7 @@ static NSString* getFreeTrialSuffix() {
     
     
 
-    if ( Settings.sharedInstance.clearClipboardEnabled) {
+    if ( Settings.sharedInstance.clearClipboardEnabled ) {
         AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
         [appDelegate clearClipboardWhereAppropriate];
     }
@@ -1113,7 +1245,8 @@ static NSString* getFreeTrialSuffix() {
     __weak WindowController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
     self.selectPredefinedIconController.customIcons = self.viewModel.customIcons.allObjects;
-    self.selectPredefinedIconController.hideSelectFile = self.viewModel.format == kKeePass1;
+    self.selectPredefinedIconController.hideSelectFile = !self.viewModel.formatSupportsCustomIcons;
+    self.selectPredefinedIconController.hideFavIconButton = !self.viewModel.formatSupportsCustomIcons;
     
     if ( Settings.sharedInstance.nextGenUI ) {
         self.selectPredefinedIconController.iconSet = self.viewModel.iconSet;
@@ -1540,7 +1673,16 @@ static NSString* getFreeTrialSuffix() {
 
 
 - (id)copy:(id)sender {
-    NSLog(@"WindowController::copy");
+    NSLog(@"WindowController::copy - [%@]", self.window.firstResponder );
+
+    if ( Settings.sharedInstance.nextGenUI ) {
+        NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
+        DetailViewController* detail = vc.childViewControllers[2];
+
+        if ( [detail handleCopy] ) { 
+            return nil;
+        }
+    }
     
     NSArray<Node*>* selected = [self getSelectedItems];
     
@@ -1782,6 +1924,10 @@ static NSString* getFreeTrialSuffix() {
     [self copyNotes:[self getSingleSelectedItem]];
 }
 
+- (IBAction)onCopyUsernameAndPassword:(id)sender {
+    [self copyUsernameAndPassword:[self getSingleSelectedItem]];
+}
+
 - (IBAction)onCopyAllFields:(id)sender {
     [self copyAllFields:[self getSingleSelectedItem]];
 }
@@ -1867,6 +2013,19 @@ static NSString* getFreeTrialSuffix() {
     Node* item = [self getSingleSelectedItem];
     
     [self.viewModel launchUrl:item];
+}
+
+- (void)copyUsernameAndPassword:(Node*)item {
+    NSMutableArray<NSString*>* fields = NSMutableArray.array;
+    
+    [fields addObject:[self dereference:item.fields.username node:item]];
+    [fields addObject:[self dereference:item.fields.password node:item]];
+    
+    NSString* allString = [fields componentsJoinedByString:@"\n"];
+    [ClipboardManager.sharedInstance copyConcealedString:allString];
+    
+    NSString* loc = NSLocalizedString(@"generic_copied", @"Copied");
+    [self showPopupChangeToastNotification:loc];
 }
 
 - (void)copyAllFields:(Node*)item {
@@ -1985,7 +2144,7 @@ static NSString* getFreeTrialSuffix() {
     vc.autoFill = shouldPromptForAutoFillEnrol;
     vc.ckfs = compositeKeyFactors;
     vc.databaseUuid = self.databaseMetadata.uuid;
-    vc.model = self.viewModel.database;
+    vc.viewModel = self.viewModel;
     
     [self.contentViewController presentViewControllerAsSheet:vc];
 }
@@ -2025,6 +2184,226 @@ static NSString* getFreeTrialSuffix() {
     }
     
     return nil;
+}
+
+
+
+- (IBAction)onExportAsKeePass2:(id)sender {
+    if ( self.viewModel == nil || self.viewModel.locked || self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4 ) {
+        return;
+    }
+
+    Node* root = self.viewModel.rootGroup;    
+    if ( self.viewModel.format == kKeePass1 && root.childGroups.count == 1 ) { 
+         root = root.childGroups[0];
+    }
+
+    
+    
+    Node* databaseRoot = [[Node alloc] initAsRoot:nil childRecordsAllowed:YES];
+    Node* clonedRootGroup = [root cloneOrDuplicate:YES cloneUuid:YES cloneRecursive:YES newTitle:nil parentNode:databaseRoot];
+    [databaseRoot addChild:clonedRootGroup keePassGroupTitleRules:YES];
+
+    DatabaseModel* newModel = [[DatabaseModel alloc] initWithFormat:kKeePass4
+                                                compositeKeyFactors:self.viewModel.compositeKeyFactors
+                                                           metadata:[UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass4]
+                                                               root:databaseRoot];
+    
+    if ( newModel == nil ) {
+        [MacAlerts info:NSLocalizedString(@"generic_error", @"Error") window:self.window];
+        NSLog(@"🔴 Couldn't create model.");
+        return;
+    }
+
+    
+    
+    NSData* data = [Serializator expressToData:newModel format:kKeePass4];
+    if ( data == nil ) {
+        [MacAlerts info:NSLocalizedString(@"generic_error", @"Error") window:self.window];
+        NSLog(@"🔴 Couldn't serialize.");
+        return;
+    }
+
+    
+    
+    NSURL* fileUrl = self.viewModel.databaseMetadata.fileUrl;
+    NSString* withoutExtension = [fileUrl.path.lastPathComponent stringByDeletingPathExtension];
+    
+    NSSavePanel* panel = NSSavePanel.savePanel;
+    panel.nameFieldStringValue = [NSString stringWithFormat:@"%@.kdbx", withoutExtension];
+    
+    if ( [panel runModal] == NSModalResponseOK ) {
+        NSError* error;
+        
+        if (! [data writeToURL:panel.URL options:kNilOptions error:&error] ) {
+            NSLog(@"🔴 Could not write to file: [%@]", error);
+            [MacAlerts error:error window:self.window];
+        }
+        else {
+            [MacAlerts info:NSLocalizedString(@"generic_done", @"Done") window:self.window];
+        }
+    }
+}
+
+- (IBAction)onCompareAndMerge:(id)sender {
+    CompareAndMergeWizard* wizard = [CompareAndMergeWizard fromStoryboard];
+    
+    __weak WindowController* weakSelf = self;
+    
+    wizard.firstModel = self.viewModel;
+    wizard.onSelectedSecondDatabase = ^(DatabaseModel * secondModel, MacDatabasePreferences * secondModelMetadata, NSURL * secondModelUrl) {
+        [weakSelf compare:secondModel secondModelMetadata:secondModelMetadata secondModelUrl:secondModelUrl];
+    };
+
+    [self.contentViewController presentViewControllerAsSheet:wizard];
+}
+    
+- (void)compare:(DatabaseModel*)secondModel
+secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
+ secondModelUrl:(NSURL*)secondModelUrl {
+    CompareDatabasesViewController* vc = [CompareDatabasesViewController fromStoryboard];
+    
+    vc.firstModel = self.viewModel.commonModel;
+    vc.secondModel = secondModel;
+    vc.secondModelTitle = secondModelMetadata ? secondModelMetadata.nickName : secondModelUrl.absoluteString;
+    
+    __weak WindowController* weakSelf = self;
+    
+    vc.onDone = ^(BOOL mergeRequested, BOOL synchronize) {
+        if ( mergeRequested ) {
+            [weakSelf onMergeOrSynchronize:secondModel
+                       secondModelMetadata:secondModelMetadata
+                            secondModelUrl:secondModelUrl
+                               synchronize:synchronize];
+        }
+    };
+    
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (void)onMergeOrSynchronize:(DatabaseModel*)secondModel
+         secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
+              secondModelUrl:(NSURL*)secondModelUrl
+                 synchronize:(BOOL)synchronize {
+    if ( self.viewModel.readOnly || (synchronize && secondModelMetadata != nil && secondModelMetadata.readOnly ) ) {
+        [MacAlerts info:NSLocalizedString(@"generic_error", @"Error")
+        informativeText:NSLocalizedString(@"merge_cannot_merge_because_read_only", @"Cannot Merge because your database is Read-Only")
+                 window:self.window
+             completion:nil];
+        return;
+    }
+    
+    
+    
+    DatabaseModel* merged = [self.viewModel.database clone];
+    DatabaseMerger* syncer = [DatabaseMerger mergerFor:merged theirs:secondModel];
+    BOOL success = [syncer merge];
+
+    if ( !success ) {
+        NSLog(@"🔴 Unsuccessful Merge/Synchronize");
+        
+        [MacAlerts info:NSLocalizedString(@"generic_error", @"Error")
+        informativeText:NSLocalizedString(@"merge_view_merge_title_error", @"There was an problem merging this database.")
+                 window:self.window
+             completion:nil];
+    }
+    else {
+        [self.viewModel.commonModel replaceEntireUnderlyingDatabaseWith:merged];
+        
+        [self.viewModel update:self.contentViewController
+                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( error ) {
+                    [MacAlerts error:error window:self.window];
+                }
+                else if ( !userCancelled ) {
+                    if ( synchronize ) {
+                        [self synchronizeSecondDatabase:self.viewModel.database secondModelMetadata:secondModelMetadata secondModelUrl:secondModelUrl];
+                    }
+                    else {
+                        [self messageMergeDoneSuccess];
+                    }
+                }
+            });
+        }];
+    }
+}
+
+- (void)synchronizeSecondDatabase:(DatabaseModel*)mergedDatabase
+              secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
+                   secondModelUrl:(NSURL*)secondModelUrl {
+    if ( secondModelMetadata ) {
+        Model* model = [[Model alloc] initWithDatabase:mergedDatabase metaData:secondModelMetadata forcedReadOnly:NO isAutoFill:NO offlineMode:NO];
+        [model update:self.contentViewController handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( error ) {
+                    [MacAlerts error:error window:self.window];
+                }
+                else if ( !userCancelled ) {
+                    [self messageMergeDoneSuccess];
+                }
+            });
+        }];
+    }
+    else {
+        [self encryptForMerge:mergedDatabase completion:^(NSData *data) {
+            if ( data ) {
+                NSError* error;
+                if ( ![data writeToURL:secondModelUrl options:kNilOptions error:&error] ) {
+                    [MacAlerts error:error window:self.window];
+                }
+                else {
+                    [self messageMergeDoneSuccess];
+                }
+            }
+        }];
+    }
+}
+
+- (void)encryptForMerge:(DatabaseModel*)merged completion:(void (^)(NSData* data))completion {
+    [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:self.contentViewController];
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory]; 
+        [outputStream open];
+        
+        [Serializator getAsData:merged
+                         format:merged.originalFormat
+                   outputStream:outputStream
+                     completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            
+            [outputStream close];
+            NSData* mergedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [macOSSpinnerUI.sharedInstance dismiss];
+                
+                if (userCancelled) {
+                    completion ( nil );
+                }
+                else if (error) {
+                    [MacAlerts error:error window:self.window];
+                    completion ( nil );
+                }
+                else {
+                    completion ( mergedData );
+                }
+            });
+        }];
+    });
+}
+
+- (void)messageMergeDoneSuccess {
+    [MacAlerts info:NSLocalizedString(@"merge_view_merge_title_success", @"Merge Successful")
+    informativeText:NSLocalizedString(@"merge_view_merge_message_success", @"The Merge was successful and your database is now up to date.")
+             window:self.window
+         completion:nil];
+}
+
+- (void)close {
+    [super close];
+    
+    NSLog(@"✅ Closing WindowController!");
 }
 
 @end

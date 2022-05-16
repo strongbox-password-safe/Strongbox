@@ -23,10 +23,17 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var allowClipboardHandoff: NSButton!
     @IBOutlet var addTotpOtpAuth: NSButton!
     @IBOutlet var addLegacyTotpFields: NSButton!
-
+    @IBOutlet weak var showCopyFieldsButton: NSButton!
+    @IBOutlet var useNextGenUI: NSButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        if #available(macOS 11.0, *) {
+        } else {
+            useNextGenUI.isHidden = true
+        }
+        
         bindUI()
 
         NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
@@ -54,12 +61,16 @@ class AdvancedAppPreferences: NSViewController {
         addLegacyTotpFields.state = settings.addLegacySupplementaryTotpCustomFields ? .on : .off
         addTotpOtpAuth.state = settings.addOtpAuthUrl ? .on : .off
 
+        showCopyFieldsButton.state = settings.showCopyFieldButton ? .on : .off
+        
         useColorBindPalette.isEnabled = settings.colorizePasswords
         hideKeyFile.isEnabled = !settings.doNotRememberKeyFile
 
         
 
         showManagerOnAllClosed.isEnabled = !settings.runningAsATrayApp
+        
+        useNextGenUI.state = settings.nextGenUI ? .on : .off
     }
 
     @IBAction func onChanged(_: Any) {
@@ -77,6 +88,8 @@ class AdvancedAppPreferences: NSViewController {
         Settings.sharedInstance().clipboardHandoff = allowClipboardHandoff.state == .on
         Settings.sharedInstance().addLegacySupplementaryTotpCustomFields = addLegacyTotpFields.state == .on
         Settings.sharedInstance().addOtpAuthUrl = addTotpOtpAuth.state == .on
+        Settings.sharedInstance().showCopyFieldButton = showCopyFieldsButton.state == .on
+        Settings.sharedInstance().nextGenUI = useNextGenUI.state == .on
 
         bindUI()
 

@@ -30,6 +30,8 @@ class TipJarViewController: UITableViewController {
     @IBOutlet var cellTermsOfUse: UITableViewCell!
     @IBOutlet var cellPrivacyPolicy: UITableViewCell!
 
+    @IBOutlet weak var cellRestore: UITableViewCell!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -98,6 +100,12 @@ class TipJarViewController: UITableViewController {
             purchaseInProgress = true
 
             TipJarLogic.sharedInstance.purchase(.huge, completion: onPurchaseCompleted)
+        }
+        else if cell == cellRestore {
+            iOSSpinnerUI.sharedInstance().show(nil, viewController: self)
+            purchaseInProgress = true
+
+            TipJarLogic.sharedInstance.restorePrevious(completion: onPurchaseCompleted)
         }
         else if cell == cellPrivacyPolicy {
             let url = URL (string: "https:

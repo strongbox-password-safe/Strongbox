@@ -83,8 +83,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property (nonatomic, strong, nonnull) NSDictionary<NSString*, StringValue*> *customFields;
-@property (readonly, nonatomic, strong, nonnull) NSDictionary<NSString*, StringValue*> *customFieldsNoEmail;
+@property (nonatomic, strong, nonnull) MutableOrderedDictionary<NSString*, StringValue*> *customFields;
+@property (readonly, nonatomic, strong, nonnull) MutableOrderedDictionary<NSString*, StringValue*> *customFieldsNoEmail;
 
 - (void)removeAllCustomFields;
 - (void)removeCustomField:(NSString*)key;

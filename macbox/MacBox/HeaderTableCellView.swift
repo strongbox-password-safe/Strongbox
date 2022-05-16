@@ -12,18 +12,22 @@ class HeaderTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMe
     @IBOutlet var labelHeader: NSTextField!
     @IBOutlet var buttonDisclosure: NSButton!
     @IBOutlet var popupButton: NSPopUpButton!
-
+    @IBOutlet weak var copyButton: NSButton!
+    
     override func awakeFromNib() {
         buttonDisclosure.isHidden = true
     }
 
     var popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)?
+    var onCopyClickedCallback : (() -> Void)?
     var field: DetailsViewField?
 
-    func setContent(_ field: DetailsViewField, popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil) {
+    func setContent(_ field: DetailsViewField, popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil, showCopyButton : Bool = false, onCopyClicked: (() -> Void)? = nil) {
         self.field = field
         self.popupMenuUpdater = popupMenuUpdater
-
+        self.copyButton.isHidden = !showCopyButton
+        self.onCopyClickedCallback = onCopyClicked
+        
         labelHeader.stringValue = field.name
 
         popupButton.menu?.delegate = self
@@ -35,6 +39,12 @@ class HeaderTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMe
         onDisclosureClicked?(buttonDisclosure.state == .on)
     }
 
+    @IBAction func onCopyClicked(_ sender: Any) {
+        NSLog("onCopyClicked")
+        
+        onCopyClickedCallback?()
+    }
+    
     func showPopupButtonMenu() {
         NSLog("✅ showPopupButton")
 

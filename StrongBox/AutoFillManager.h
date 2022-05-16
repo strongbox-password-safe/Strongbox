@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DatabaseModel.h"
+#import "Model.h"
 #import "QuickTypeAutoFillDisplayFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL isPossible;
 @property (readonly) BOOL isOnForStrongbox;
 
-- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database
+- (void)updateAutoFillQuickTypeDatabase:(Model*)database
                            databaseUuid:(NSString*)databaseUuid
                           displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                         alternativeUrls:(BOOL)alternativeUrls

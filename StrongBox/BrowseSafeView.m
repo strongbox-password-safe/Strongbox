@@ -806,8 +806,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)reorderPendingItems {
-    NSLog(@"Reordering...");
-    
     for (MMcGPair<NSIndexPath*, NSIndexPath*> *moveOp in self.reorderItemOperations) {
         NSUInteger srcIndex;
         NSUInteger destIndex;
@@ -840,7 +838,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             destIndex = moveOp.b.row;
         }
         
-        BOOL s = [self.viewModel.database reorderChildFrom:srcIndex to:destIndex parentGroup:currentGroup];
+        BOOL s = [self.viewModel reorderChildFrom:srcIndex to:destIndex parentGroup:currentGroup] != -1;
         
         if (s) {
             NSLog(@"Reordering: %lu -> %lu Successful", (unsigned long)srcIndex, (unsigned long)destIndex);

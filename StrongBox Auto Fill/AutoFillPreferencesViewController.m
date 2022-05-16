@@ -248,7 +248,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds = self.suggestUnconcealed.on;
 
     if ( self.switchQuickTypeAutoFill.on ) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel
                                                            databaseUuid:self.viewModel.metadata.uuid
                                                           displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
                                                         alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
@@ -275,7 +275,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
             
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel
                                                                databaseUuid:self.viewModel.metadata.uuid
                                                               displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
                                                             alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
@@ -358,7 +358,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
             
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
             
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel
                                                                databaseUuid:self.viewModel.metadata.uuid
                                                               displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
                                                             alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls

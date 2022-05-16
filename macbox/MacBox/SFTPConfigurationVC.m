@@ -105,28 +105,27 @@
         if (result == NSModalResponseOK) {
             NSLog(@"onLocateKey: %@", openPanel.URL);
 
-            NSData* key = [NSData dataWithContentsOfURL:openPanel.URL];
-            NSString* privateKey = [[NSString alloc] initWithData:key encoding:NSUTF8StringEncoding];
-
-            if(privateKey != nil) {
-                self.privateKey = privateKey;
-                self.textFieldPrivateKey.stringValue = [openPanel.URL lastPathComponent];
+            NSError* error;
+            NSData* key = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
+            
+            if ( key == nil ) {
+                NSLog(@"Error: [%@]", error);
+                [MacAlerts error:error window:self.view.window];
             }
             else {
-                [MacAlerts info:NSLocalizedString(@"sftp_vc_warn_invalid_key_title", @"Invalid Key")
-                informativeText:NSLocalizedString(@"sftp_vc_warn_invalid_key_message", @"This does not look like a valid private key")
-                         window:self.view.window
-                     completion:nil];
+                NSString* privateKey = [[NSString alloc] initWithData:key encoding:NSUTF8StringEncoding];
+
+                if(privateKey != nil) {
+                    self.privateKey = privateKey;
+                    self.textFieldPrivateKey.stringValue = [openPanel.URL lastPathComponent];
+                }
+                else {
+                    [MacAlerts info:NSLocalizedString(@"sftp_vc_warn_invalid_key_title", @"Invalid Key")
+                    informativeText:NSLocalizedString(@"sftp_vc_warn_invalid_key_message", @"This does not look like a valid private key")
+                             window:self.view.window
+                         completion:nil];
+                }
             }
-            
-
-
-
-
-
-
-
-
         }
 
         [self bindUi];

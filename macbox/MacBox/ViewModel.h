@@ -46,6 +46,7 @@ extern NSString* const kModelUpdateNotificationNextGenSelectedItemsChanged;
 extern NSString* const kModelUpdateNotificationNextGenSearchContextChanged;
 extern NSString* const kModelUpdateNotificationHistoryItemDeleted;
 extern NSString* const kModelUpdateNotificationHistoryItemRestored;
+extern NSString* const kModelUpdateNotificationItemReOrdered;
 
 extern NSString* const kModelUpdateNotificationItemsAdded;
 extern NSString* const kModelUpdateNotificationItemEdited;
@@ -79,6 +80,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property (nullable, readonly) Model* commonModel;
 @property (readonly, nonatomic) DatabaseModel* database;
+
+@property (readonly) BOOL formatSupportsCustomIcons;
 
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
 
@@ -126,6 +129,9 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (void)addTagToItems:(const NSArray<Node *> *)items tag:(NSString*)tag;
 - (void)removeTagFromItems:(const NSArray<Node *> *)items tag:(NSString*)tag;
 
+- (void)renameTag:(NSString *)from to:(NSString*)to;
+- (void)deleteTag:(NSString*)tag;
+
 
 
 - (BOOL)addItem:(Node*)item parent:(Node*)parent;
@@ -143,6 +149,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (BOOL)canRecycle:(Node*_Nonnull)item;
 
 
+
+- (NSInteger)reorderItem:(NSUUID *)nodeId idx:(NSInteger)idx;
 
 - (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination;
 - (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination;
@@ -173,6 +181,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (readonly, nullable) Node* keePass1BackupNode;
 
 
+
+@property (readonly) BOOL isKeePass2Format;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *expiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *nearlyExpiredEntries;
@@ -341,6 +351,10 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property SearchScope nextGenSearchScope;
 
 @property NSArray<HeaderNodeState*>* headerNodes;
+
+@property BOOL customSortOrderForFields;
+
+@property ConflictResolutionStrategy conflictResolutionStrategy;
 
 @end
 

@@ -66,17 +66,32 @@
     
     self.uuid = nil;
     self.originalNickName = nil;
+    self.alphaValue = 1.0f;
+    
+    if ( @available(macOS 10.14, *) ) {
+        self.imageView.contentTintColor = nil;
+    }
 }
 
 - (void)setWithDatabase:(MacDatabasePreferences*)metadata {
-    [self setWithDatabase:metadata autoFill:NO wormholeUnlocked:NO];
+    [self setWithDatabase:metadata
+ nickNameEditClickEnabled:YES
+            showSyncState:YES
+ indicateAutoFillDisabled:NO
+         wormholeUnlocked:NO
+                 disabled:NO];
 }
 
-- (void)setWithDatabase:(MacDatabasePreferences*)metadata autoFill:(BOOL)autoFill wormholeUnlocked:(BOOL)wormholeUnlocked {
+- (void)setWithDatabase:(MacDatabasePreferences *)metadata
+nickNameEditClickEnabled:(BOOL)nickNameEditClickEnabled
+          showSyncState:(BOOL)showSyncState
+indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
+       wormholeUnlocked:(BOOL)wormholeUnlocked
+               disabled:(BOOL)disabled {
     self.uuid = metadata.uuid;
     self.originalNickName = metadata.nickName;
     
-    self.gestureRecognizerClick.enabled = !autoFill;
+    self.gestureRecognizerClick.enabled = nickNameEditClickEnabled;
     
     self.textFieldName.stringValue = @"";
     self.textFieldSubtitleLeft.stringValue = @"";
@@ -93,13 +108,27 @@
     self.imageViewUnlocked.hidden = !wormholeUnlocked;
     
     @try {
-        [self determineFields:metadata autoFill:autoFill];
+        [self determineFields:metadata];
     
+        if ( disabled || ( indicateAutoFillDisabled && !metadata.autoFillEnabled ) ) {
+            if ( indicateAutoFillDisabled && !metadata.autoFillEnabled ) {
+                self.textFieldSubtitleLeft.stringValue = NSLocalizedString(@"db_management_disable_done", @"AutoFill Disabled");
+            }
+            
+            self.imageViewProvider.image = [NSImage imageNamed:@"cancel"];
+            
+            if (@available(macOS 10.14, *)) {
+                self.imageViewProvider.contentTintColor = NSColor.secondaryLabelColor;
+            }
+            
+            self.alphaValue = 0.75f;
+        }
+        
         self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
         self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
         self.imageViewReadOnly.hidden = !metadata.readOnly;
 
-        SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [MacSyncManager.sharedInstance getSyncStatus:metadata].state;
+        SyncOperationState syncState = showSyncState ? [MacSyncManager.sharedInstance getSyncStatus:metadata].state : kSyncOperationStateInitial;
         
         if (syncState == kSyncOperationStateInProgress ||
             syncState == kSyncOperationStateError ||
@@ -142,7 +171,7 @@
     }
 }
 
-- (void)determineFields:(MacDatabasePreferences*)metadata autoFill:(BOOL)autoFill {
+- (void)determineFields:(MacDatabasePreferences*)metadata {
     NSString* path = @"";
     NSString* fileSize = @"";
     NSString* fileMod = @"";
@@ -233,7 +262,7 @@
 }
 
 - (void)controlTextDidChange:(NSNotification *)obj {
-    NSLog(@"controlTextDidChange!");
+
     
     if ( obj.object == self.textFieldName ) {
         NSString* raw = self.textFieldName.stringValue;

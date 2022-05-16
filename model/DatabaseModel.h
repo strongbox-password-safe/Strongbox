@@ -96,8 +96,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-- (BOOL)reorderItem:(Node*)item to:(NSInteger)to; 
-- (BOOL)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:parentGroup;
+- (NSInteger)reorderItem:(Node*)item to:(NSInteger)to; 
+- (NSInteger)reorderItem:(NSUUID*)nodeId idx:(NSInteger)idx;
+- (NSInteger)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:parentGroup;
 
 
 
@@ -150,6 +151,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
 
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableIncludingRecycled;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRootIncludingRecycled;
+
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableNoneExpiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allActiveEntries;
@@ -186,6 +190,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag;
 - (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag;
+
+
 
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 

@@ -12,5 +12,6 @@
 
 @property (strong, nonatomic) UIWindow *window;
 @property (readonly) BOOL isAppLocked;
+@property NSDate* appLaunchTime;
 
 @end

@@ -21,7 +21,7 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "KeyFileParser.h"
 #import "ManualCredentialsEntry.h"
-#import "SelectAutoFillDatabaseViewController.h"
+#import "SelectDatabaseViewController.h"
 #import "SelectCredential.h"
 #import "MMWormhole.h"
 #import "AutoFillWormhole.h"
@@ -37,7 +37,7 @@
 
 @interface CredentialProviderViewController ()
 
-@property SelectAutoFillDatabaseViewController* selectDbVc;
+@property SelectDatabaseViewController* selectDbVc;
 @property MMWormhole* wormhole;
 
 @property NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers;
@@ -292,8 +292,9 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
     self.serviceIdentifiers = serviceIdentifiers;
     
-    self.selectDbVc = [[SelectAutoFillDatabaseViewController alloc] initWithNibName:@"SelectAutoFillDatabaseViewController" bundle:nil];
-
+    self.selectDbVc = [SelectDatabaseViewController fromStoryboard];
+    self.selectDbVc.autoFillMode = YES;
+    
     if ( !self.wormhole ) {
         self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
                                                              optionalDirectory:kAutoFillWormholeName];

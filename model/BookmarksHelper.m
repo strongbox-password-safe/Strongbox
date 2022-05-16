@@ -41,11 +41,20 @@
     
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource]; 
 
-    NSData *bookmark = [url bookmarkDataWithOptions:options
-                     includingResourceValuesForKeys:nil
-                                      relativeToURL:nil
-                                              error:error];
-
+    NSData *bookmark;
+    @try {
+        bookmark = [url bookmarkDataWithOptions:options
+                 includingResourceValuesForKeys:nil
+                                  relativeToURL:nil
+                                          error:error];
+    } @catch (NSException *exception) {
+        NSLog(@"🔴 Exception getBookmarkDataFromUrl [%@]", exception);
+        if ( error ) {
+            *error = [Utils createNSError:exception.reason errorCode:-1234];
+        }
+        return nil;
+    }
+    
     if ( securitySucceeded ) {
         [BookmarksHelper stopAccessingSecurityScopedResource:url];
     }
@@ -104,18 +113,28 @@
     #endif
 
     BOOL bookmarkDataIsStale;
-    NSURL* bookmarkFileURL = [NSURL URLByResolvingBookmarkData:bookmark
-                                                       options:options
-                                                 relativeToURL:nil
-                                           bookmarkDataIsStale:&bookmarkDataIsStale
-                                                         error:error];
-
-    if(!bookmarkFileURL) {
+    
+    NSURL* bookmarkFileURL;
+    @try {
+        bookmarkFileURL = [NSURL URLByResolvingBookmarkData:bookmark
+                                                    options:options
+                                              relativeToURL:nil
+                                        bookmarkDataIsStale:&bookmarkDataIsStale
+                                                      error:error];
+    } @catch (NSException *exception) {
+        NSLog(@"🔴 Exception getUrlFromBookmarkData [%@]", exception);
+        if ( error ) {
+            *error = [Utils createNSError:exception.reason errorCode:-1234];
+        }
+        return nil;
+    }
+    
+    if ( !bookmarkFileURL ) {
         
         return nil;
     }
     
-    if(bookmarkDataIsStale) {
+    if ( bookmarkDataIsStale ) {
         BOOL securitySucceeded = [bookmarkFileURL startAccessingSecurityScopedResource]; 
 
     

@@ -16,6 +16,7 @@
 #import "KeePassGroupOrEntry.h"
 #import "CustomData.h"
 #import "KeePassXmlAutoType.h"
+#import "MutableOrderedDictionary.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -54,8 +55,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property (nonatomic, readonly) NSDictionary<NSString*, StringValue*> *customStrings;
-@property (nonatomic, readonly) NSDictionary<NSString*, StringValue*> *allStrings;
+
+
+
+@property (nonatomic, readonly) MutableOrderedDictionary<NSString*, StringValue*> *customStringValues;
+@property (nonatomic, readonly) MutableOrderedDictionary<NSString*, StringValue*> *allStringValues;
 
 
 @property BOOL qualityCheck;

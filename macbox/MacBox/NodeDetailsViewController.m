@@ -1010,8 +1010,8 @@ static NSString* trimField(NSTextField* textField) {
     __weak NodeDetailsViewController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
     self.selectPredefinedIconController.customIcons = self.model.customIcons.allObjects;
-    self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
-    self.selectPredefinedIconController.hideFavIconButton = NO;
+    self.selectPredefinedIconController.hideSelectFile = !self.model.formatSupportsCustomIcons;
+    self.selectPredefinedIconController.hideFavIconButton = !self.model.formatSupportsCustomIcons;
     
     self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
         if(showFindFavIcons) {

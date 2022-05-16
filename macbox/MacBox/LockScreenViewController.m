@@ -143,8 +143,6 @@
 - (void)viewDidAppear {
     [super viewDidAppear];
         
-    [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
-
     [self setInitialFocus];
 }
 

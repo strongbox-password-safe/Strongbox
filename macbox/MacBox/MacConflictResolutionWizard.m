@@ -7,8 +7,12 @@
 //
 
 #import "MacConflictResolutionWizard.h"
+#import "Settings.h"
 
 @interface MacConflictResolutionWizard ()
+
+@property (weak) IBOutlet NSButton *buttonSyncLater;
+@property (weak) IBOutlet NSButton *buttonCompareFirst;
 
 @end
 
@@ -25,6 +29,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.buttonSyncLater.hidden = YES;
+    self.buttonCompareFirst.hidden = !Settings.sharedInstance.isProOrFreeTrial;
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -64,6 +70,22 @@
     
     if ( self.completion ) {
         self.completion(kConflictWizardResultForcePullRemote);
+    }
+}
+
+- (IBAction)onAlwaysAutoMerge:(id)sender {
+    [self dismissController:self];
+    
+    if ( self.completion ) {
+        self.completion(kConflictWizardResultAlwaysAutoMerge);
+    }
+}
+
+- (IBAction)onCompare:(id)sender {
+    [self dismissController:self];
+    
+    if ( self.completion ) {
+        self.completion(kConflictWizardResultCompare);
     }
 }
 

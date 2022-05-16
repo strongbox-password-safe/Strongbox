@@ -90,7 +90,7 @@
 
     if ( quickTypeWasTurnedOn ) {
         NSLog(@"AutoFill QuickType was turned on - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.commonModel
                                                            databaseUuid:self.database.uuid
                                                           displayFormat:self.database.quickTypeDisplayFormat
                                                         alternativeUrls:self.database.autoFillScanAltUrls

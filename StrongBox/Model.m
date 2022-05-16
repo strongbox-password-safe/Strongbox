@@ -60,7 +60,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 @property (readonly) id<ApplicationPreferences> applicationPreferences;
 @property (readonly) id<SyncManagement> syncManagement;
 @property (readonly) id<SpinnerUI> spinnerUi;
-@property (readonly) BOOL formatSupportsTags;
 @property (readonly) NSArray<Node*>* legacyFavourites;
 
 @end
@@ -275,6 +274,16 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
+- (void)replaceEntireUnderlyingDatabaseWith:(DatabaseModel*)newDatabase {
+    self.theDatabase = newDatabase;
+    
+    [self restartBackgroundAudit];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:nil];
+    });
+}
+
 - (void)clearAsyncUpdateState {
     [self.asyncUpdatesStack clear];
     self.lastAsyncUpdateResult = nil;
@@ -423,7 +432,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                           completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         if ( result == kSyncAndMergeSuccess ) {
             if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database
+                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
                                                                    databaseUuid:self.metadata.uuid
                                                                   displayFormat:self.metadata.quickTypeDisplayFormat
                                                                 alternativeUrls:self.metadata.autoFillScanAltUrls
@@ -483,7 +492,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
-- (void)update:(VIEW_CONTROLLER_PTR)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
+- (void)update:(VIEW_CONTROLLER_PTR)viewController
+       handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
     if(self.isReadOnly) {
         handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
         return;
@@ -522,7 +532,9 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     });
 }
 
-- (void)onEncryptionDone:(VIEW_CONTROLLER_PTR)viewController streamingFile:(NSString*)streamingFile completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
+- (void)onEncryptionDone:(VIEW_CONTROLLER_PTR)viewController
+           streamingFile:(NSString*)streamingFile
+              completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
     if (self.isDuressDummyMode) {
         NSData* data = [NSData dataWithContentsOfFile:streamingFile];
         [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
@@ -559,7 +571,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                        completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
             if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
                 if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database
+                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
                                                                        databaseUuid:self.metadata.uuid
                                                                       displayFormat:self.metadata.quickTypeDisplayFormat
                                                                     alternativeUrls:self.metadata.autoFillScanAltUrls
@@ -876,6 +888,14 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     return [self.database validateAddChildren:items destination:destination];
 }
 
+- (NSInteger)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node *)parentGroup {
+    return [self.database reorderChildFrom:from to:to parentGroup:parentGroup];
+}
+
+- (NSInteger)reorderItem:(NSUUID *)nodeId idx:(NSInteger)idx {
+    return [self.database reorderItem:nodeId idx:idx];
+}
+
 
 
 - (BOOL)canRecycle:(NSUUID *)itemId {
@@ -948,10 +968,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
-
-- (BOOL)formatSupportsTags {
-    return self.originalFormat == kKeePass || self.originalFormat == kKeePass4;
-}
 
 - (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag {
     return [self.database getItemIdsForTag:tag];
@@ -1155,7 +1171,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
           browseSortField:(BrowseSortField)browseSortField
                descending:(BOOL)descending
         foldersSeparately:(BOOL)foldersSeparately {
-    NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRoot : self.database.allSearchable;
+    NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRootIncludingRecycled : self.database.allSearchableIncludingRecycled;
 
     NSMutableArray* results = [nodes mutableCopy]; 
     
@@ -1426,6 +1442,14 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     }
     
     return result;
+}
+
+- (BOOL)formatSupportsCustomIcons {
+    return self.originalFormat == kKeePass || self.originalFormat == kKeePass4;
+}
+
+- (BOOL)formatSupportsTags {
+    return self.originalFormat == kKeePass || self.originalFormat == kKeePass4;
 }
 
 @end

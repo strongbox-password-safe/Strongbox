@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (Node*_Nullable)getSingleSelectedItem; 
 
-- (void)onLock:(id)sender;
+- (void)onLock:(id _Nullable)sender;
 
 @end
 

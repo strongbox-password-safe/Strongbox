@@ -30,7 +30,9 @@ class BrowseViewController: NSViewController {
 
     private var loadedDocument: Bool = false
     private var database: ViewModel!
+
     private var sortedItemsCache: [Node]?
+    var unsorted: [Node] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -245,6 +247,7 @@ class BrowseViewController: NSViewController {
                                                  kModelUpdateNotificationIconChanged,
                                                  kModelUpdateNotificationDatabasePreferenceChanged,
                                                  kModelUpdateNotificationItemsMoved,
+                                                 kModelUpdateNotificationItemReOrdered,
                                                  kModelUpdateNotificationTitleChanged,
                                                  kModelUpdateNotificationTagsChanged,
                                                  kModelUpdateNotificationNextGenSelectedItemsChanged,
@@ -342,7 +345,7 @@ class BrowseViewController: NSViewController {
             outlineView.gridStyleMask = []
         }
 
-        clearCacheAndReloadItems()
+        loadAndSortItems()
         outlineView.reloadData()
 
         if maintainSelectionIfPossible {
@@ -381,8 +384,6 @@ class BrowseViewController: NSViewController {
     }
 
     func sortNodes(_ unsorted: [Node]) -> [Node] {
-        
-
         let objcItems = unsorted as NSArray
 
 
@@ -450,7 +451,7 @@ class BrowseViewController: NSViewController {
         case .attachmentCount:
             return compareInts(node1.fields.attachments.count, node2.fields.attachments.count, ascending: ascending)
         case .customFieldCount:
-            return compareInts(node1.fields.customFields.count, node2.fields.customFields.count, ascending: ascending)
+            return compareInts(Int ( node1.fields.customFields.count ), Int ( node2.fields.customFields.count ), ascending: ascending)
         case .tags:
             let tagArray1: [String] = node1.fields.tags.allObjects as! [String]
             let t1 = tagArray1.joined(separator: ", ")
@@ -462,8 +463,8 @@ class BrowseViewController: NSViewController {
             let path2 = database.getParentGroupPathDisplayString(node2)
             return compareStrings(path1, path2, ascending: ascending)
         case .historicalItemCount:
-            let count1 = database.format == .passwordSafe ? node1.fields.passwordHistory.entries.count : node1.fields.keePassHistory.count 
-            let count2 = database.format == .passwordSafe ? node2.fields.passwordHistory.entries.count : node2.fields.keePassHistory.count 
+            let count1 = database.format == .passwordSafe ? node1.fields.passwordHistory.entries.count : node1.fields.keePassHistory.count
+            let count2 = database.format == .passwordSafe ? node2.fields.passwordHistory.entries.count : node2.fields.keePassHistory.count
             return compareInts(count1, count2, ascending: ascending)
         case .customIcon:
             let str1 = localizedYesOrNoFromBool(node1.icon?.isCustom ?? false)
@@ -515,12 +516,24 @@ class BrowseViewController: NSViewController {
         let title = dereference(text: node.title, node: node)
         let icon = getIconForNode(node)
         let favourite = database.isFavourite(node.uuid)
+        
+        let possiblyDereferencedText = database.isDereferenceableText(node.title)
+        let editable = !possiblyDereferencedText && !database.isEffectivelyReadOnly && !database.outlineViewTitleIsReadonly
 
-        cell.setContent(NSAttributedString(string: title), iconImage: icon, showTrailingFavStar: favourite, contentTintColor: .linkColor)
+        cell.setContent(NSAttributedString(string: title), editable: editable, iconImage: icon, showTrailingFavStar: favourite, contentTintColor: .linkColor) { [weak self] text in
+            self?.onTitleEdited(text, node: node)
+        }
 
         return cell
     }
 
+    func onTitleEdited ( _ text : String, node : Node) {
+        let trimmed = trim(text)
+        if trimmed != node.title {
+            database.setItemTitle(node, title: trimmed)
+        }
+    }
+    
     func getDereferencedGenericCell(_ text: String, node: Node, concealable: Bool = false) -> NSTableCellView {
         return getGenericCell(text, node: node, concealable: concealable, dereference: true)
     }
@@ -713,7 +726,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
             let path = database.getParentGroupPathDisplayString(item)
             cell = getGenericCell(path)
         case .historicalItemCount:
-            let count = database.format == .passwordSafe ? item.fields.passwordHistory.entries.count : item.fields.keePassHistory.count 
+            let count = database.format == .passwordSafe ? item.fields.passwordHistory.entries.count : item.fields.keePassHistory.count
             let str = String(count)
             cell = getGenericCell(str)
         case .customIcon:
@@ -760,35 +773,22 @@ extension BrowseViewController: NSOutlineViewDelegate {
     }
 
     func outlineView(_ outlineView: NSOutlineView, validateDrop info: NSDraggingInfo, proposedItem _: Any?, proposedChildIndex index: Int) -> NSDragOperation {
-
-
-
-
-
-
-
-
-
-
-
-
-
         if let source = info.draggingSource as? NSOutlineView, source == outlineView {
-            return [] 
+            if database.isKeePass2Format, !database.sortKeePassNodes {
+                guard index != NSOutlineViewDropOnItemIndex, let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String] else {
+                    return []
+                }
 
+                let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId($0) }
+                guard sourceItems.count == 1 else { return [] }
+                
 
-
-
-
-
-
-
-
-
-
-
-
-
+                
+                return [.move] 
+            }
+            else {
+                return []
+            }
         } else {
 
 
@@ -802,10 +802,34 @@ extension BrowseViewController: NSOutlineViewDelegate {
         }
     }
 
-    func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item _: Any?, childIndex _: Int) -> Bool {
+    func outlineView(_ outlineView: NSOutlineView, acceptDrop info: NSDraggingInfo, item _: Any?, childIndex index: Int) -> Bool {
         if let source = info.draggingSource as? NSOutlineView, source == outlineView {
+            if database.isKeePass2Format, !database.sortKeePassNodes {
+                guard index != NSOutlineViewDropOnItemIndex,
+                    let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String] else {
+                    return false
+                }
+
+                let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId($0) }
+
+                guard sourceItems.count == 1, let sourceItem = sourceItems.first else { return false }
+                
+
+                                
+                guard let sourceIdx = sourceItem.parent?.children.firstIndex(of: sourceItem) else { return false }
+                let adjustedIdx = sourceIdx < index ? (index - 1) : index
+
+                NSLog("Browse validateDrop: REORDER of item - Source [%@] => index = [%d]", sourceItem.title, adjustedIdx)
+                
+                if database.reorderItem(sourceItem.uuid, idx: adjustedIdx) != -1 {
+                    info.draggingPasteboard.clearContents()
+                    return true
+                }
+            }
+            
             return false
-        } else {
+        }
+        else {
             let destinationItemId: NodeIdentifier
 
             switch navigationContext {
@@ -856,7 +880,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
     var items: [Node] {
         if sortedItemsCache == nil {
             NSLog("🔴 BrowseViewController::Cache MISS!")
-            sortedItemsCache = loadAndSortItems()
+            loadAndSortItems()
         }
 
         return sortedItemsCache!
@@ -864,23 +888,19 @@ extension BrowseViewController: NSOutlineViewDataSource {
 
     func reSortItems() {
         if sortedItemsCache != nil {
-            sortedItemsCache = sortNodes(sortedItemsCache!)
+            sortedItemsCache = sortItems()
         } else {
-
-            clearCacheAndReloadItems()
+            loadAndSortItems()
         }
     }
 
-    func clearCacheAndReloadItems() {
-
-
-        _ = loadAndSortItems()
+    func loadAndSortItems() {
+        loadItems()
+        sortedItemsCache = sortItems()
     }
 
-    func loadAndSortItems() -> [Node] {
+    func loadItems() {
         NSLog("✅ BrowseViewController::loadAndSortItems - searching = [%hhd] - navContext = [%@]", isSearching, String(describing: navigationContext))
-
-        let unsorted: [Node]
 
         if isSearching {
             unsorted = loadSearchItems()
@@ -900,12 +920,23 @@ extension BrowseViewController: NSOutlineViewDataSource {
                 unsorted = loadFavourites(nodeId)
             }
         }
-
-        sortedItemsCache = sortNodes(unsorted)
-
-        return sortedItemsCache!
     }
 
+    func sortItems ( ) -> [Node] {
+        if case .regularHierarchy = navigationContext, database.isKeePass2Format, !database.sortKeePassNodes {
+            if let sortDescriptor = outlineView.sortDescriptors.first,
+                let col = BrowseViewColumn(rawValue: sortDescriptor.key!), col != .title {
+                return sortNodes(unsorted)
+            }
+            else {
+                return unsorted
+            }
+        }
+        else {
+            return sortNodes(unsorted)
+        }
+    }
+    
     func loadFavourites(_ nodeId: NodeIdentifier) -> [Node] {
         guard let node = database.getItemBy(nodeId) else {
             NSLog("🔴 could not find favourite: [%@]", String(describing: nodeId))
@@ -1023,7 +1054,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
     }
 
     func loadSearchItems() -> [Node] {
-        NSLog("loadSearchItems...")
+        NSLog("✅ loadSearchItems... [%hhd]", database.showRecycleBinInSearchResults)
 
         let text = database.nextGenSearchText
         let scope = database.nextGenSearchScope
@@ -1051,10 +1082,21 @@ extension BrowseViewController: NSOutlineViewDataSource {
 
 
 
-        reSortItems()
-
-        outlineView.reloadData()
-
+        if let firstDes = outlineView.sortDescriptors.first,
+           let col = BrowseViewColumn(rawValue: firstDes.key!), col == .title,
+                case .regularHierarchy = navigationContext, database.isKeePass2Format, !database.sortKeePassNodes {
+            NSLog("✅ Title column sort clicked")
+            
+            MacAlerts.info(NSLocalizedString("browse_cannot_sort_by_title_title", comment: "Cannot Sort"),
+                           informativeText: NSLocalizedString("browse_cannot_sort_by_title_message", comment: "You cannot sort by Title here because you have disabled sorting in Database Settings."),
+                           window: view.window,
+                           completion: nil)
+        }
+        else {
+            reSortItems()
+            outlineView.reloadData()
+        }
+        
 
 
     }

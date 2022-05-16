@@ -403,7 +403,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 }
 
 - (void)setEditing:(SafeMetaData *)database editing:(BOOL)editing {
-    NSLog(@"setEditing: %@ => %hhd", database.nickName, editing);
+    NSLog(@"SafesList::setEditing: %@ => %hhd", database.nickName, editing);
     
     if ( editing ) {
         [self.editingSet addObject:database.uuid];

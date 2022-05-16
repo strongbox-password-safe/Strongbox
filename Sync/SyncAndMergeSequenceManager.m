@@ -38,11 +38,15 @@
 #import "MacCompositeKeyDeterminer.h"
 #import "MacConflictResolutionWizard.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_AutoFill-Swift.h"
+#endif
+
 #endif
 
 NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
-
-
 
 @interface SyncAndMergeSequenceManager ()
 
@@ -333,7 +337,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                  remoteModified:(NSDate*)remoteModified
                      parameters:(SyncParameters*)parameters
                      completion:(SyncAndMergeCompletionBlock)completion {
-    
     NSDate* localModDate;
     NSURL* localCopy = [self getExistingLocalCopy:databaseUuid modified:&localModDate];
     NSData* localData;
@@ -391,7 +394,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
              message:[NSString stringWithFormat:@"Source DB has changed since last sync. Last Sync Source Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
 
     ConflictResolutionStrategy strategy = database.conflictResolutionStrategy;
-    
     
 #if TARGET_OS_IPHONE
     
@@ -480,12 +482,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
     wiz.remoteStorage = [SafeStorageProviderFactory getStorageDisplayName:database];
-    
     wiz.completion = ^(ConflictResolutionWizardResult result) {
 #if TARGET_OS_IPHONE
         [parameters.interactiveVC dismissViewControllerAnimated:YES completion:^{
-#else
-    
 #endif
             [self doConflictResolutionWizardChoice:databaseUuid
                                             syncId:syncId
@@ -788,8 +787,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 [self synchronizeModels:databaseUuid syncId:syncId localUrl:localUrl remoteUrl:remoteUrl parameters:parameters compareFirst:compareFirst mine:mine theirs:model.database completion:completion];
             }
             else if ( result == kUnlockDatabaseResultError ) {
-                
-                
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not unlock Source copy."]];
                 [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error ? error : innerStreamError];
                 completion(kSyncAndMergeError, NO, error);
@@ -864,10 +861,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
                 
 
-#if TARGET_OS_IPHONE 
-                METADATA_PTR metadata = [self databaseMetadataFromDatabaseId:databaseUuid];
+                METADATA_PTR metadata = [self databaseMetadataFromDatabaseId:databaseUuid]; 
                 metadata.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
-#endif
                 
                 if ( parameters.interactiveVC ) {
                     [self.alertingUi error:parameters.interactiveVC
@@ -893,40 +888,86 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
           compareFirst:(BOOL)compareFirst
          interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
             completion:(SyncAndMergeCompletionBlock)completion {
-    if (compareFirst) {
-#if TARGET_OS_IPHONE 
-        UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"CompareDatabases" bundle:nil];
-        DatabaseDiffAndMergeViewController* vc = (DatabaseDiffAndMergeViewController*)[storyboard instantiateInitialViewController];
-
-        vc.isCompareForMerge = YES;
-        vc.isSyncInitiated = YES;
-        
-        METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
-        
-        vc.firstDatabase = [[Model alloc] initWithDatabase:mine metaData:database forcedReadOnly:NO isAutoFill:NO];
-        vc.secondDatabase = [[Model alloc] initWithDatabase:merged metaData:database forcedReadOnly:YES isAutoFill:NO];
-        vc.onDone = ^(BOOL mergeRequested, Model * _Nullable first, Model * _Nullable second) {
-            [interactiveVC dismissViewControllerAnimated:YES completion:^{
-                if (mergeRequested) {
-                    [self mergeLocalAndRemote:databaseUuid merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
-                }
-                else {
-                    [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Compare & Merge"];
-                    [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
-                }
-            }];
-        };
-
-        UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
-        [interactiveVC presentViewController:nav animated:YES completion:nil];
-#endif
+    if ( compareFirst ) {
+        [self compare:databaseUuid mine:mine merged:merged syncId:syncId interactiveVC:interactiveVC completion:completion];
     }
     else {
         [self mergeLocalAndRemote:databaseUuid merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
     }
 }
 
-- (void)mergeLocalAndRemote:(NSString*)databaseUuid merged:(DatabaseModel*)merged interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC syncId:(NSUUID*)syncId completion:(SyncAndMergeCompletionBlock)completion {
+#if TARGET_OS_IPHONE
+
+- (void)compare:(NSString*)databaseUuid
+           mine:(DatabaseModel*)mine
+         merged:(DatabaseModel*)merged
+         syncId:(NSUUID*)syncId
+  interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
+     completion:(SyncAndMergeCompletionBlock)completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"CompareDatabases" bundle:nil];
+    DatabaseDiffAndMergeViewController* vc = (DatabaseDiffAndMergeViewController*)[storyboard instantiateInitialViewController];
+
+    vc.isCompareForMerge = YES;
+    vc.isSyncInitiated = YES;
+    
+    METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
+    
+    vc.firstDatabase = [[Model alloc] initWithDatabase:mine metaData:database forcedReadOnly:NO isAutoFill:NO];
+    vc.secondDatabase = [[Model alloc] initWithDatabase:merged metaData:database forcedReadOnly:YES isAutoFill:NO];
+    vc.onDone = ^(BOOL mergeRequested, Model * _Nullable first, Model * _Nullable second) {
+        [interactiveVC dismissViewControllerAnimated:YES completion:^{
+            if (mergeRequested) {
+                [self mergeLocalAndRemote:databaseUuid merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
+            }
+            else {
+                [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Compare & Merge"];
+                [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
+            }
+        }];
+    };
+
+    UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    [interactiveVC presentViewController:nav animated:YES completion:nil];
+}
+
+#else
+
+- (void)compare:(NSString*)databaseUuid
+           mine:(DatabaseModel*)mine
+         merged:(DatabaseModel*)merged
+         syncId:(NSUUID*)syncId
+  interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
+     completion:(SyncAndMergeCompletionBlock)completion {
+    CompareDatabasesViewController* vc = [CompareDatabasesViewController fromStoryboard];
+
+    vc.isCompareForMerge = YES;
+    vc.isSyncInitiated = YES;
+
+    METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
+
+    vc.firstModel = [[Model alloc] initWithDatabase:mine metaData:database forcedReadOnly:NO isAutoFill:NO];
+    vc.secondModel = merged;
+
+    vc.onDone = ^(BOOL mergeRequested, BOOL synchronize) {
+        if (mergeRequested) {
+            [self mergeLocalAndRemote:databaseUuid merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
+        }
+        else {
+            [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Compare & Merge"];
+            [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
+        }
+    };
+
+    [interactiveVC presentViewControllerAsSheet:vc];
+}
+
+#endif
+    
+- (void)mergeLocalAndRemote:(NSString*)databaseUuid
+                     merged:(DatabaseModel*)merged
+              interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
+                     syncId:(NSUUID*)syncId
+                 completion:(SyncAndMergeCompletionBlock)completion {
     if (merged.originalFormat != kKeePass && merged.originalFormat != kKeePass4) {
         if ( interactiveVC ) {
             [self.alertingUi areYouSure:interactiveVC
@@ -955,11 +996,14 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }
 }
 
-- (void)mergeLocalAndRemoteAfterWarn:(NSString*)databaseUuid merged:(DatabaseModel*)merged interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC syncId:(NSUUID*)syncId completion:(SyncAndMergeCompletionBlock)completion {
+- (void)mergeLocalAndRemoteAfterWarn:(NSString*)databaseUuid
+                              merged:(DatabaseModel*)merged
+                       interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
+                              syncId:(NSUUID*)syncId
+                          completion:(SyncAndMergeCompletionBlock)completion {
     [self.spinnerUi show:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:interactiveVC];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        
         NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory]; 
         [outputStream open];
         

@@ -228,17 +228,17 @@
     }
 }
 
-- (void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe innerStreamError:(NSError*)innerStreamError {
+- (void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe
+            innerStreamError:(NSError*)innerStreamError {
     [self doHapticFeedback:YES];
     
     if ( innerStreamError ) {
         
-        NSLog(@"🔴 WARNWARN: Encountered Inner Stream Error - Forcing Database ReadOnly..."); 
+        
+        NSLog(@"🔴 WARNWARN: Encountered Inner Stream Error - Forcing Database ReadOnly...");
         self.forcedReadOnly = YES;
     }
-        
-    [self updateQuickTypeAutoFill:openedSafe];
-    
+            
     [self updateUnlockCountAndLikelyFormat:openedSafe];
 
     [self refreshConvenienceUnlockIfNecessary:openedSafe];
@@ -249,6 +249,8 @@
                                             isAutoFill:self.isAutoFillOpen
                                            offlineMode:self.offlineMode];
     
+    [self updateQuickTypeAutoFill:viewModel];
+
     self.completion(kUnlockDatabaseResultSuccess, viewModel, innerStreamError, nil);
 }
 
@@ -386,7 +388,7 @@
     return NO;
 }
 
-- (void)updateQuickTypeAutoFill:(DatabaseModel*)openedSafe {
+- (void)updateQuickTypeAutoFill:(Model*)openedSafe {
     if ( self.database.autoFillEnabled && self.database.quickTypeEnabled && !self.isAutoFillOpen ) {
         
         

@@ -20,8 +20,7 @@
 
 @implementation MBAutoGrowingTextView
 
--(id)initWithFrame:(CGRect)frame
-{
+-(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     
     if (self) {
@@ -31,8 +30,7 @@
     return self;
 }
 
--(id) initWithCoder:(NSCoder *)aDecoder
-{
+-(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
         [self associateConstraints];
@@ -40,8 +38,7 @@
     return self;
 }
 
--(void)associateConstraints
-{
+-(void)associateConstraints {
     
     
     
@@ -61,7 +58,6 @@
             }
         }
     }
-
 }
 
 - (void)layoutSubviews {
@@ -83,7 +79,7 @@
     
     
     CGSize sizeThatFits = [self sizeThatFits:self.frame.size];
-    float newHeight = sizeThatFits.height;
+    float newHeight = sizeThatFits.height * 1.2; 
 
     
     if (self.maxHeightConstraint) {

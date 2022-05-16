@@ -543,7 +543,9 @@
 
     module.button1 = NSLocalizedString(@"generic_lets_go", @"Let's Go");
     module.button2 = NSLocalizedString(@"generic_postpone", @"Postpone");
-
+    module.button3 = NSLocalizedString(@"generic_dont_remind_me", @"Don't Remind Me");
+    module.button3Color = UIColor.systemOrangeColor;
+    
     module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
         if ( buttonIdCancelIsZero == 0 ) {
             onDone(NO, YES); 
@@ -570,6 +572,10 @@
             NSUInteger days = model.metadata.scheduleExportIntervalDays;
             model.metadata.nextScheduledExport = [model.metadata.nextScheduledExport dateByAddingTimeInterval:days * 24 * 60 * 60];
             
+            onDone(NO, NO);
+        }
+        else if ( buttonIdCancelIsZero == 3 ) {
+            model.metadata.scheduledExport = NO;
             onDone(NO, NO);
         }
     };

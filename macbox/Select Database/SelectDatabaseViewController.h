@@ -12,11 +12,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SelectAutoFillDatabaseViewController : NSViewController
+@interface SelectDatabaseViewController : NSViewController
+
++ (instancetype)fromStoryboard;
 
 @property (nonatomic, copy) void (^onDone)(BOOL userCancelled, MacDatabasePreferences*_Nullable database);
 @property MMWormhole* wormhole;
-
+@property BOOL autoFillMode;
+@property (nullable) NSSet<NSString*>* disabledDatabases;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -63,6 +63,8 @@ static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
 static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupplementaryTotpCustomFields";
 static NSString* const kQuitOnAllWindowsClosed = @"quitOnAllWindowsClosed";
 static NSString* const kLastPromptedToUseNextGenUI = @"lastPromptedToUseNextGenUI";
+static NSString* const kShowCopyFieldButton = @"showCopyFieldButton";
+static NSString* const kLockEvenIfEditing = @"lockEvenIfEditing";
 
 
 
@@ -90,7 +92,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kDefaultAppGroupName];
     
     if(defaults == nil) {
-        NSLog(@"ERROR: Could not get NSUserDefaults for Suite Name: [%@]", kDefaultAppGroupName);
+        NSLog(@"🔴 ERROR: Could not get NSUserDefaults for Suite Name: [%@]", kDefaultAppGroupName);
     }
     
     return defaults;
@@ -116,6 +118,28 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+
+
+
+
+
+
+- (BOOL)lockEvenIfEditing {
+    return [self getBool:kLockEvenIfEditing fallback:YES];
+}
+
+- (void)setLockEvenIfEditing:(BOOL)lockEvenIfEditing {
+    [self setBool:kLockEvenIfEditing value:lockEvenIfEditing];
+}
+
+- (BOOL)showCopyFieldButton {
+    return [self getBool:kShowCopyFieldButton fallback:YES];
+}
+
+- (void)setShowCopyFieldButton:(BOOL)showCopyFieldButton {
+    [self setBool:kShowCopyFieldButton value:showCopyFieldButton];
+}
 
 - (BOOL)quitStrongboxOnAllWindowsClosed {
     return [self getBool:kQuitOnAllWindowsClosed fallback:NO];

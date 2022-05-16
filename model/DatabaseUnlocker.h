@@ -10,13 +10,13 @@
 #import "CompositeKeyFactors.h"
 #import "Model.h"
 
-typedef enum : NSUInteger {
+typedef NS_ENUM(NSUInteger, UnlockDatabaseResult) {
     kUnlockDatabaseResultError,
     kUnlockDatabaseResultUserCancelled,
     kUnlockDatabaseResultSuccess,
     kUnlockDatabaseResultViewDebugSyncLogRequested,
     kUnlockDatabaseResultIncorrectCredentials,
-} UnlockDatabaseResult;
+};
 
 typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, NSError*_Nullable innerStreamError, NSError*_Nullable error);
 

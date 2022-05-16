@@ -483,18 +483,47 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 
-- (BOOL)reorderItem:(Node *)item to:(NSInteger)to {
-    NSLog(@"reorderItem: %@ > %lu", item, (unsigned long)index);
+- (NSInteger)reorderItem:(NSUUID*)nodeId idx:(NSInteger)idx {
+    Node* node = [self getItemById:nodeId];
+
+    if ( node ) {
+        return [self reorderItem:node to:idx];
+    }
+    
+    NSLog(@"🔴 reorderItem - failed could not find item");
+    
+    return -1;
+}
+
+- (NSInteger)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node *)parentGroup {
+
+    
+    if (from < 0 || from >= parentGroup.children.count) {
+        return -1;
+    }
+    if(from == to) {
+        return from;
+    }
+    
+
+
+    Node* item = parentGroup.children[from];
+    
+    return [self reorderItem:item to:to];
+}
+
+- (NSInteger)reorderItem:(Node *)item to:(NSInteger)to {
+
 
     if (item.parent == nil) {
         NSLog(@"WARNWARN: Cannot change order of item, parent is nil");
-        return NO;
+        return -1;
     }
 
-    NSUInteger currentIndex = [item.parent.children indexOfObject:item];
+    NSInteger currentIndex = [item.parent.children indexOfObject:item];
     if (currentIndex == NSNotFound) {
         NSLog(@"WARNWARN: Cannot change order of item, item not found in parent!");
-        return NO;
+        return -1;
     }
 
     if (to >= item.parent.children.count || to < -1) {
@@ -507,27 +536,13 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if (ret) {
         [item touchLocationChanged];
     }
-    
-    
-    
-    return ret;
-}
-
-- (BOOL)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node*)parentGroup {
-    NSLog(@"reorderItem: %lu > %lu", (unsigned long)from, (unsigned long)to);
-    
-    if (from < 0 || from >= parentGroup.children.count) {
-        return NO;
-    }
-    if(from == to) {
-        return YES;
+    else {
+        return -1;
     }
     
-    NSLog(@"reorderItem Ok: %lu > %lu", (unsigned long)from, (unsigned long)to);
-
-    Node* item = parentGroup.children[from];
     
-    return [self reorderItem:item to:to];
+    
+    return currentIndex;
 }
 
 
@@ -708,16 +723,20 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly includeExpired:YES];
 }
 
-- (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly
-    includeExpired:(BOOL)includeExpired {
-    return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly trueRoot:NO includeExpired:includeExpired];
+- (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly includeExpired:(BOOL)includeExpired {
+    return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly includeExpired:includeExpired includeRecycled:NO];
+}
+
+- (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly includeExpired:(BOOL)includeExpired includeRecycled:(BOOL)includeRecycled {
+    return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly includeExpired:includeExpired includeRecycled:includeRecycled trueRoot:NO];
 }
 
 - (NSArray<Node *> *)filterItems:(BOOL)includeGroups
                   includeEntries:(BOOL)includeEntries
                   searchableOnly:(BOOL)searchableOnly
-                        trueRoot:(BOOL)trueRoot
-                  includeExpired:(BOOL)includeExpired {
+                  includeExpired:(BOOL)includeExpired
+                 includeRecycled:(BOOL)includeRecycled
+                        trueRoot:(BOOL)trueRoot {
     Node* root = trueRoot ? self.rootNode : self.effectiveRootGroup;
     DatabaseFormat format = self.format;
     Node* keePass1BackupNode = (format == kKeePass1) ? self.keePass1BackupNode : nil;
@@ -741,16 +760,17 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             }
         }
         
-        if (!( recycler != nil && (node == recycler || [recycler contains:node]) )) {
-            if ( !includeExpired && node.expired ) {
+        if ( !includeRecycled ) {
+            if ( recycler != nil && (node == recycler || [recycler contains:node]) ) {
                 return NO;
             }
-            
-            return YES;
         }
-        else {
+        
+        if ( !includeExpired && node.expired ) {
             return NO;
         }
+        
+        return YES;
     }];
 }
 
@@ -873,11 +893,9 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
     if ( self.rootNode ) {
         uuidMap[self.rootNode.uuid] = self.rootNode;
-        DatabaseFormat format = self.format;
-        Node* keePass1BackupNode = (format == kKeePass1) ? self.keePass1BackupNode : nil;
-        Node* kp2RecycleBin = (format == kKeePass || format == kKeePass4 ) ? self.recycleBinNode : nil;
-        Node* recycler = kp2RecycleBin ? kp2RecycleBin : keePass1BackupNode;
 
+        
+        
         for (Node* node in self.rootNode.allChildren) { 
             Node* existing = uuidMap[node.uuid];
             
@@ -887,7 +905,27 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             else {
                 uuidMap[node.uuid] = node;
             }
-                        
+        }
+        FastMaps* newMaps = [[FastMaps alloc] initWithUuidMap:uuidMap
+                                              withExpiryDates:expirySet
+                                              withAttachments:attachmentSet
+                                                    withTotps:totpSet
+                                                       tagMap:tagMap
+                                                  usernameSet:usernameSet
+                                                     emailSet:emailSet
+                                                       urlSet:urlSet
+                                            customFieldKeySet:customFieldKeySet];
+
+        _fastMaps = newMaps;
+        
+        
+
+        DatabaseFormat format = self.format;
+        Node* keePass1BackupNode = (format == kKeePass1) ? self.keePass1BackupNode : nil;
+        Node* kp2RecycleBin = (format == kKeePass || format == kKeePass4 ) ? self.recycleBinNode : nil;
+        Node* recycler = kp2RecycleBin ? kp2RecycleBin : keePass1BackupNode;
+
+        for (Node* node in self.rootNode.allChildren) { 
             if ( recycler != nil && (node == recycler || [recycler contains:node]) ) {
                 continue;
             }
@@ -1161,6 +1199,10 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [self filterItems:NO includeEntries:YES searchableOnly:YES includeExpired:NO];
 }
 
+- (NSArray<Node *> *)allSearchableAndRecycledEntries {
+    return [self filterItems:NO includeEntries:YES searchableOnly:YES includeExpired:NO includeRecycled:YES];
+}
+
 - (NSArray<Node *> *)allSearchableEntries {
     return [self filterItems:NO includeEntries:YES searchableOnly:YES];
 }
@@ -1169,12 +1211,20 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [self filterItems:YES includeEntries:NO searchableOnly:YES];
 }
 
+- (NSArray<Node *> *)allSearchableIncludingRecycled {
+    return [self filterItems:YES includeEntries:YES searchableOnly:YES includeExpired:YES includeRecycled:YES];
+}
+
+- (NSArray<Node *> *)allSearchableTrueRootIncludingRecycled {
+    return [self filterItems:YES includeEntries:YES searchableOnly:YES includeExpired:YES includeRecycled:YES trueRoot:YES];
+}
+
 - (NSArray<Node *> *)allSearchable {
     return [self filterItems:YES includeEntries:YES searchableOnly:YES];
 }
 
 - (NSArray<Node *> *)allSearchableTrueRoot {
-    return [self filterItems:YES includeEntries:YES searchableOnly:YES trueRoot:YES includeExpired:YES];
+    return [self filterItems:YES includeEntries:YES searchableOnly:YES includeExpired:YES includeRecycled:NO trueRoot:YES];
 }
 
 - (NSArray<Node *> *)allActiveEntries {

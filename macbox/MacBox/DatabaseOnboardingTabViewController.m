@@ -59,7 +59,7 @@
     };
     
     autoFillVc.databaseUuid = self.databaseUuid;
-    autoFillVc.model = self.model;
+    autoFillVc.viewModel = self.viewModel;
 }
 
 - (void)viewWillAppear {

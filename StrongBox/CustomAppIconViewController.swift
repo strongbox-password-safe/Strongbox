@@ -43,7 +43,23 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: CustomAppIconSectionHeader.reuseIdentifier)
 
-        let grouped = Dictionary(grouping: CustomAppIcon.allCases, by: { $0.category })
+
+        
+        let allowedIcons : [CustomAppIcon] = [
+            .proBadge,
+            .regular,
+            .zero,
+            .black,
+            .bluey,
+            .iridescent,
+            .lightBlue,
+            .midnightFire,
+            .red,
+            .water,
+            .original
+        ]
+        
+        let grouped = Dictionary(grouping: allowedIcons, by: { $0.category })
         icons = CustomAppIconCategory.allCases.compactMap { grouped[$0] }
 
         let layout = UICollectionViewFlowLayout() 

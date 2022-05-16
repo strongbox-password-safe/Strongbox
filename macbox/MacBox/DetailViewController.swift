@@ -73,6 +73,36 @@ class DetailViewController: NSViewController {
         tableView.reloadData()
     }
 
+    @objc
+    func handleCopy( ) -> Bool {
+        if ( isNotesSelectedSomeText ) {
+            NSLog("Some Notes Text Selected not copying");
+            return true
+        }
+
+        if self.view.window?.firstResponder == tableView,
+            let selectedField = selectedField {
+            NSLog("There is a field selected... copying");
+            copyFieldToClipboard(selectedField)
+            return true
+        }
+        
+        return false
+    }
+    
+    @objc
+    var isNotesSelectedSomeText : Bool {
+        let notesField = fields.first { field in
+            return field.fieldType == .notes
+        }
+        
+        if let notesField = notesField, let cellView = cellViewForField(notesField) as? NotesTableCellView {
+            return cellView.isSomeTextSelected
+        }
+        
+        return false
+    }
+    
     func loadFields() -> [DetailsViewField] {
         guard database.nextGenSelectedItems.count == 1,
               let uuid = database.nextGenSelectedItems.first,
@@ -85,7 +115,7 @@ class DetailViewController: NSViewController {
 
         NSLog("✅ DetailViewController::load - Not Empty [%@]", String(describing: database.nextGenSelectedItems))
 
-        let model = EntryViewModel.fromNode(selectedNode, format: database.format, model: dbModel)
+        let model = EntryViewModel.fromNode(selectedNode, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
 
         var ret: [DetailsViewField] = []
 
@@ -280,14 +310,14 @@ class DetailViewController: NSViewController {
     fileprivate func loadAttachments(_ model: EntryViewModel) -> [DetailsViewField] {
         var ret: [DetailsViewField] = []
 
-        if model.attachments.count() > 0 {
+        if model.attachments.count > 0 {
             ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_attachments", comment: "Attachments"),
                                         value: "",
                                         fieldType: .header,
                                         object: DetailsViewField.FieldType.attachment))
 
             for key in model.attachments.allKeys() {
-                guard let attachment = model.attachments.objectForKeyedSubscript(key) as? DatabaseAttachment else {
+                guard let attachment = model.attachments[key] else {
                     continue
                 }
 
@@ -387,9 +417,9 @@ class DetailViewController: NSViewController {
         switch field.fieldType {
         case .attachment:
             previewAttachment(field)
-        case .notes, .title, .customField, .url, .totp:
+        case .title, .customField, .url, .totp:
             copyFieldToClipboard(field)
-        case .header, .metadata, .expiry, .tags, .auditIssue:
+        case .header, .metadata, .expiry, .tags, .auditIssue, .notes:
             break
         }
     }
@@ -1038,12 +1068,14 @@ extension DetailViewController: DocumentViewController {
                 return true
             } else if field.fieldType == .url {
                 return true
-            } else if field.fieldType == .notes {
-                
-                
+            }
 
-                return self?.selectedField?.fieldType == .notes
-            } else if field.fieldType == .auditIssue {
+
+
+
+
+
+            else if field.fieldType == .auditIssue {
                 return true
             } else {
                 return nil
@@ -1140,6 +1172,12 @@ extension DetailViewController: NSTableViewDataSource {
 }
 
 extension DetailViewController: NSTableViewDelegate {
+    func onCopyField ( field :  DetailsViewField? ) {
+        if let field = field {
+            copyFieldToClipboard(field)
+        }
+    }
+    
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         guard let field = fields[safe: row] else {
             NSLog("🔴 TableViewDelegate (viewFor:) called with out of range row = [%d]", row)
@@ -1152,8 +1190,14 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.setContent(field, popupMenuUpdater: onPopupMenuNeedsUpdate)
+            cell.setContent(field,
+                            popupMenuUpdater: onPopupMenuNeedsUpdate,
+                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? onCopyField : nil)
+
             cell.onLaunch = { [weak self] in
+                self?.launchUrl(field)
+            }
+            cell.onLaunchAndCopy = { [weak self] in
                 self?.launchAndCopyPassword(field)
             }
             return cell
@@ -1180,7 +1224,10 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.setContent(field, popupMenuUpdater: onPopupMenuNeedsUpdate)
+            cell.setContent(field,
+                            popupMenuUpdater: onPopupMenuNeedsUpdate,
+                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? onCopyField : nil,
+                            containingWindow: view.window)
 
             return cell
         case .title:
@@ -1199,7 +1246,10 @@ extension DetailViewController: NSTableViewDelegate {
 
             let subtype = field.object as? DetailsViewField.FieldType
 
-            cell.setContent(field, popupMenuUpdater: subtype == .some(.notes) ? onPopupMenuNeedsUpdate(_:_:) : nil)
+            cell.setContent(field,
+                            popupMenuUpdater: subtype == .some(.notes) ? onPopupMenuNeedsUpdate(_:_:) : nil,
+                            showCopyButton: subtype == .some(.notes),
+            onCopyClicked: subtype == .some(.notes) ? onCopyEntiresNotes : nil)
 
             return cell
         case .metadata:
@@ -1231,7 +1281,9 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.setContent(field, popupMenuUpdater: onPopupMenuNeedsUpdate)
+            cell.setContent(field,
+                            popupMenuUpdater: onPopupMenuNeedsUpdate,
+                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? onCopyField : nil)
 
             return cell
         case .auditIssue:
@@ -1251,6 +1303,10 @@ extension DetailViewController: NSTableViewDelegate {
         }
     }
 
+    func onCopyEntiresNotes() {
+        NSApplication.shared.sendAction(#selector(WindowController.onCopyNotes(_:)), to: nil, from: self)
+    }
+    
     func showAuditDrillDown(_ uuid: UUID, view: NSView) {
         let vc = AuditDrillDown.fromStoryboard()
 
@@ -1302,11 +1358,16 @@ extension DetailViewController: NSTableViewDelegate {
         var provider: NSFilePromiseProvider
 
         if #available(macOS 11.0, *) {
-            let typeIdentifier = UTType(filenameExtension: filenameExtension)
-            provider = NSFilePromiseProvider(fileType: typeIdentifier!.identifier, delegate: self)
-        } else {
-            let typeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, filenameExtension as CFString, nil)
-            provider = NSFilePromiseProvider(fileType: typeIdentifier!.takeRetainedValue() as String, delegate: self)
+            let typeIdentifier = UTType(filenameExtension: filenameExtension) ?? UTType.data
+            provider = NSFilePromiseProvider(fileType: typeIdentifier.identifier, delegate: self)
+        }
+        else {
+            guard let typeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, filenameExtension as CFString, nil) else {
+                NSLog("🔴 Could not determine typeIdentifier for filename [%@]", field.name)
+                return nil
+            }
+            
+            provider = NSFilePromiseProvider(fileType: typeIdentifier.takeRetainedValue() as String, delegate: self)
         }
 
         provider.userInfo = [CreateEditViewController.FilePromiseProviderUserInfoKeys.filename: filename]

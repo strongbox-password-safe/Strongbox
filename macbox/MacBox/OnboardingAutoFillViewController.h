@@ -8,14 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import "MacDatabasePreferences.h"
-#import "DatabaseModel.h"
+#import "ViewModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface OnboardingAutoFillViewController : NSViewController
 
 @property NSString* databaseUuid;
-@property DatabaseModel* model;
+@property ViewModel* viewModel;
 
 @end
 

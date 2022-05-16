@@ -1391,4 +1391,14 @@
     self.metadata.convenienceMasterPassword = convenienceMasterPassword;
 }
 
+- (BOOL)customSortOrderForFields {
+    return self.metadata.customSortOrderForFields;
+}
+
+- (void)setCustomSortOrderForFields:(BOOL)customSortOrderForFields {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.customSortOrderForFields = customSortOrderForFields;
+    }];
+}
+
 @end

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -31,7 +31,7 @@
                                     </imageCell>
                                 </imageView>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="755" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="QIi-zb-pgg">
-                                    <rect key="frame" x="32" y="0.0" width="343" height="35"/>
+                                    <rect key="frame" x="32" y="0.0" width="319" height="35"/>
                                     <subviews>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="756" translatesAutoresizingMaskIntoConstraints="NO" id="E09-m7-aQ1">
                                             <rect key="frame" x="-2" y="20" width="68" height="15"/>
@@ -66,7 +66,7 @@
                                     </customSpacing>
                                 </stackView>
                                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dv6-Iy-mdC">
-                                    <rect key="frame" x="387" y="0.0" width="72" height="35"/>
+                                    <rect key="frame" x="363" y="0.0" width="96" height="35"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KRW-0U-CxE">
                                             <rect key="frame" x="0.0" y="-4" width="26.5" height="43"/>
@@ -80,8 +80,23 @@
                                                 <action selector="onToggleConcealReveal:" target="9j9-GE-iaI" id="1vr-nT-hWc"/>
                                             </connections>
                                         </button>
+                                        <button toolTip="Copy" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="gVS-ka-7Oc" userLabel="Copy Button">
+                                            <rect key="frame" x="30" y="2" width="20" height="33"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="20" id="gpR-ig-HLm"/>
+                                                <constraint firstAttribute="height" constant="18" id="hcC-lC-RgQ"/>
+                                            </constraints>
+                                            <buttonCell key="cell" type="inline" bezelStyle="inline" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="Nki-se-4MV">
+                                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                                <font key="font" metaFont="smallSystemBold"/>
+                                                <imageReference key="image" image="doc.on.doc" catalog="system" symbolScale="large"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onCopy:" target="9j9-GE-iaI" id="7H7-pk-pdV"/>
+                                            </connections>
+                                        </button>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hee-uk-bky">
-                                            <rect key="frame" x="30" y="8" width="42" height="19"/>
+                                            <rect key="frame" x="54" y="8" width="42" height="19"/>
                                             <popUpButtonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="qbS-tJ-37j" id="gNQ-2x-jPy">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                                 <font key="font" textStyle="body" name=".SFNS-Regular"/>
@@ -105,8 +120,10 @@
                                     <visibilityPriorities>
                                         <integer value="1000"/>
                                         <integer value="1000"/>
+                                        <integer value="1000"/>
                                     </visibilityPriorities>
                                     <customSpacing>
+                                        <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                         <real value="3.4028234663852886e+38"/>
                                     </customSpacing>
@@ -178,6 +195,7 @@
             <connections>
                 <outlet property="buttonConcealReveal" destination="KRW-0U-CxE" id="k9J-xp-X5A"/>
                 <outlet property="buttonPopup" destination="hee-uk-bky" id="D6H-y4-19w"/>
+                <outlet property="copyButton" destination="gVS-ka-7Oc" id="FXV-Dn-qkJ"/>
                 <outlet property="imageViewIcon" destination="lhh-yh-jJp" id="imp-cL-TaQ"/>
                 <outlet property="labelStrength" destination="CKt-8O-7b2" id="KZX-c3-IMh"/>
                 <outlet property="progressStrength" destination="1EF-gZ-a6t" id="eyP-cm-3fp"/>
@@ -190,6 +208,7 @@
         </customView>
     </objects>
     <resources>
+        <image name="doc.on.doc" catalog="system" width="21" height="24"/>
         <image name="ellipsis.circle" catalog="system" width="20" height="20"/>
         <image name="eye" catalog="system" width="26" height="17"/>
         <image name="timer" catalog="system" width="20" height="20"/>

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype _Nullable)withCustomImage:(IMAGE_TYPE_PTR)image;
 #endif
 
-+ (instancetype)withCustom:(NSData*)custom; 
++ (instancetype)withCustom:(NSData*)custom;
 + (instancetype)withCustom:(NSData*)custom name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
 + (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*)uuid name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
 + (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*)uuid name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified preferredOrder:(NSInteger)preferredOrder;

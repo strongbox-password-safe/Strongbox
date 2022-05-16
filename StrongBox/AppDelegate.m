@@ -42,7 +42,6 @@
 
 @interface AppDelegate ()
 
-@property NSDate* appLaunchTime;
 @property AppLockViewController* lockScreenVc;
 @property UIImageView* privacyScreen;
 @property NSInteger privacyScreenPresentationIdentifier; 
@@ -267,27 +266,9 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
     double minutes = timeDifference / 60;
 
-
     if( minutes > 30 ) {
-        
-        
-        NSInteger launchCount = AppPreferences.sharedInstance.launchCount;
-
-        
-
-        
-        
-        if ( launchCount > 30 ) { 
-#ifndef DEBUG
-            [SKStoreReviewController requestReview];
-#endif
-        }
-        
-        
-        
         [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
-    }
-    
+    }    
 }
 
 - (void)initializeDropbox {

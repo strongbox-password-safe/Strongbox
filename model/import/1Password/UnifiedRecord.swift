@@ -341,7 +341,7 @@ class UnifiedRecord: Decodable {
             }
         }
 
-        if key.count == 0 || entry.fields.customFields.keys.contains(key) {
+        if key.count == 0 || entry.fields.customFields.keys.contains(key as NSString) {
             let uniqueKey = key + "-" + UUID().uuidString
             entry.fields.setCustomField(uniqueKey, value: StringValue(string: value, protected: concealed))
         } else {

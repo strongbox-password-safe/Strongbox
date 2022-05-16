@@ -223,6 +223,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL kdbx4UpgradeDontAskAgain;
 @property (nullable) NSDate* lastAskedAboutKdbx4Upgrade;
 
+@property BOOL customSortOrderForFields;
+
 @end
 
 NS_ASSUME_NONNULL_END

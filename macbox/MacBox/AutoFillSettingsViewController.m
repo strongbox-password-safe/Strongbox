@@ -248,7 +248,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 
         MacDatabasePreferences* meta = self.model.databaseMetadata;
 
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel.database
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel
                                                            databaseUuid:meta.uuid
                                                           displayFormat:meta.quickTypeDisplayFormat
                                                         alternativeUrls:meta.autoFillScanAltUrls
@@ -307,7 +307,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 
         NSLog(@"AutoFill QuickType was turned off - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel.database
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel
                                                            databaseUuid:meta.uuid
                                                           displayFormat:meta.quickTypeDisplayFormat
                                                         alternativeUrls:autoFillScanAltUrls

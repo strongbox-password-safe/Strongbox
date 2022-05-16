@@ -421,11 +421,9 @@
         BOOL isEditing = [DatabasePreferences isEditing:self.unlockedDatabase];
         BOOL dontLockIfEditing = !self.unlockedDatabase.lockEvenIfEditing;
         
-        if ( isEditing ) {
-            if ( dontLockIfEditing ) {
-                NSLog(@"Not locking database because user is currently editing.");
-                return NO;
-            }
+        if ( isEditing && dontLockIfEditing ) {
+            NSLog(@"Not locking database because user is currently editing.");
+            return NO;
         }
         
         NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.unlockedDatabaseWentIntoBackgroundAt];
@@ -476,7 +474,15 @@
     NSLog(@"onDeviceLocked - Device Lock detected - locking open database if so configured...");
     
     if ( self.unlockedDatabase && self.unlockedDatabase.autoLockOnDeviceLock ) {
-        [self lockUnlockedDatabase:nil];
+        BOOL isEditing = [DatabasePreferences isEditing:self.unlockedDatabase];
+        BOOL dontLockIfEditing = !self.unlockedDatabase.lockEvenIfEditing;
+        
+        if ( isEditing && dontLockIfEditing ) {
+            NSLog(@"Not locking database because user is currently editing.");
+        }
+        else {
+            [self lockUnlockedDatabase:nil];
+        }
     }
 }
 
@@ -2316,20 +2322,22 @@
         [document openWithCompletionHandler:^(BOOL success) {
             [SVProgressHUD dismiss];
             
-            NSData* data = document.data ? document.data.copy : nil; 
-            
-            NSError* error;
-            NSDictionary* att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-            NSDate* mod = att.fileModificationDate;
-            
-            [document closeWithCompletionHandler:nil];
-            
-            
-            
-            
-            [FileManager.sharedInstance deleteAllInboxItems];
-                    
-            [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
+            if ( document ) {
+                NSData* data = document.data ? document.data.copy : nil; 
+                
+                NSError* error;
+                NSDictionary* att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+                NSDate* mod = att.fileModificationDate;
+                
+                [document closeWithCompletionHandler:nil];
+                
+                
+                
+                
+                [FileManager.sharedInstance deleteAllInboxItems];
+                        
+                [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
+            }
         }];
     });
 }

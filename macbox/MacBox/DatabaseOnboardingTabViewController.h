@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "MacDatabasePreferences.h"
 #import "CompositeKeyFactors.h"
-#import "DatabaseModel.h"
+#import "ViewModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSString* databaseUuid;
 @property CompositeKeyFactors *ckfs;
-@property DatabaseModel* model;
+@property ViewModel* viewModel;
 
 @end
 

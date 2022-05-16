@@ -179,6 +179,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 @property DatabaseAuditorConfiguration* auditConfig;
 
+@property BOOL customSortOrderForFields;
+
 @end
 
 NS_ASSUME_NONNULL_END

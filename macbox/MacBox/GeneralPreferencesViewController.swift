@@ -20,17 +20,12 @@ class GeneralPreferencesViewController: NSViewController {
     @IBOutlet var hideDockIcon: NSButton!
     @IBOutlet var showInSystemTray: NSButton!
     @IBOutlet var quitWhenAllClosed: NSButton!
-    @IBOutlet var useNextGenUI: NSButton!
-
+    @IBOutlet weak var lockEvenIfEditing: NSButton!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
         shortcutView.associatedUserDefaultsKey = kPreferenceGlobalShowShortcut
-
-        if #available(macOS 11.0, *) {
-        } else {
-            useNextGenUI.isHidden = true
-        }
 
         bindUI()
     }
@@ -46,8 +41,7 @@ class GeneralPreferencesViewController: NSViewController {
         quitWhenAllClosed.state = Settings.sharedInstance().quitStrongboxOnAllWindowsClosed ? .on : .off
 
         miniaturizeOnCopy.state = Settings.sharedInstance().miniaturizeOnCopy ? .on : .off
-
-        useNextGenUI.state = Settings.sharedInstance().nextGenUI ? .on : .off
+        lockEvenIfEditing.state = Settings.sharedInstance().lockEvenIfEditing ? .on : .off
     }
 
     func bindAutoLock() {
@@ -125,8 +119,8 @@ class GeneralPreferencesViewController: NSViewController {
         Settings.sharedInstance().hideDockIconOnAllMinimized = hideDockIcon.state == .on
         Settings.sharedInstance().miniaturizeOnCopy = miniaturizeOnCopy.state == .on
         Settings.sharedInstance().quitStrongboxOnAllWindowsClosed = quitWhenAllClosed.state == .on
-        Settings.sharedInstance().nextGenUI = useNextGenUI.state == .on
-
+        Settings.sharedInstance().lockEvenIfEditing = lockEvenIfEditing.state == .on
+        
         bindUI()
 
         notifyChanged()

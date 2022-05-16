@@ -515,6 +515,8 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         BOOL saveable = [self.model isValid] && (isDifferent || self.createNewItem);
         self.editButtonItem.enabled = saveable;
         self.navigationItem.leftBarButtonItem = self.cancelOrDiscardBarButton;
+        
+        NSLog(@"bindNavBar: saveable = [%hhd] isDifferent = [%hhd]", saveable, isDifferent);
     }
     else {
         self.navigationItem.leftItemsSupplementBackButton = YES;
@@ -763,7 +765,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
             }
         }
         else if(indexPath.row == kRowTags) {
-            if(self.model.tags.count == 0 && shouldHideEmpty) {
+            if ( ( self.model.tags.count == 0 && shouldHideEmpty ) || !self.databaseModel.formatSupportsTags ) {
                 return CGFLOAT_MIN;
             }
         }
@@ -884,7 +886,46 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     return self.editing;
 }
 
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ( !self.model.sortCustomFields && indexPath.section == kSimpleFieldsSectionIdx && self.model.customFields.count > 1 ) {
+        NSInteger customFieldIdx = indexPath.row - kSimpleRowCount;
+        
+        if ( customFieldIdx >= 0 && customFieldIdx < self.model.customFields.count ) { 
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+    if ( proposedDestinationIndexPath.section == kSimpleFieldsSectionIdx && self.model.customFields.count > 1 ) {
+        NSInteger customFieldIdx = proposedDestinationIndexPath.row - kSimpleRowCount;
+        
+        if ( customFieldIdx >= 0 && customFieldIdx < self.model.customFields.count ) { 
+            return proposedDestinationIndexPath;
+        }
+    }
+
+    return sourceIndexPath;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    if ( sourceIndexPath.section == kSimpleFieldsSectionIdx && destinationIndexPath.section == kSimpleFieldsSectionIdx && self.model.customFields.count > 1 ) {
+        NSInteger sourceIdx = sourceIndexPath.row - kSimpleRowCount;
+        NSInteger destIdx = destinationIndexPath.row - kSimpleRowCount;
+
+        if ( sourceIdx >= 0 && sourceIdx < self.model.customFields.count && destIdx >= 0 && destIdx < self.model.customFields.count && sourceIdx != destIdx ) {
+            NSLog(@"Move: [%ld] -> [%ld]", (long)sourceIdx, destIdx);
+            [self.model moveCustomFieldAtIndex:sourceIdx to:destIdx];
+            [self onModelEdited];
+        }
+    }
+}
+
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"commitEditingStyle");
+    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         if(indexPath.section == kAttachmentsSectionIdx && indexPath.row > 0) {
             NSString* filename = self.model.attachments.allKeys[indexPath.row - 1];
@@ -1074,7 +1115,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         }
     }
     
-    NSUInteger idx = [self.model insertCustomField:field];
+    NSUInteger idx = [self.model addCustomField:field];
     [self.tableView performBatchUpdates:^{
        if(oldIdx != -1) {
             [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIdx + kSimpleRowCount
@@ -1355,7 +1396,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         ret = [self createNewEntryNode];
         Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
         
-        BOOL added = [self.databaseModel addChildren:@[ret] destination:parentGroup]; 
+        BOOL added = [self.databaseModel addChildren:@[ret] destination:parentGroup];
         
         if ( !added ) {
             completion(nil);
@@ -2176,7 +2217,8 @@ suggestionProvider:^NSString*(NSString *text) {
 
     return [EntryViewModel fromNode:item
                              format:format
-                              model:self.databaseModel];
+                              model:self.databaseModel
+                   sortCustomFields:!self.databaseModel.metadata.customSortOrderForFields];
 }
 
 - (void)performFullReload {

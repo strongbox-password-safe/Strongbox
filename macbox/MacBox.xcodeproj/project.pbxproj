@@ -172,7 +172,6 @@
 		4D1FFB2F2403030100B75EA2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
 		4D1FFB312403030100B75EA2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
 		4D1FFB322403030100B75EA2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
-		4D1FFB332403030100B75EA2 /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */; };
 		4D1FFB342403030100B75EA2 /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF2216136D10054C8D0 /* formatV3.txt */; };
 		4D1FFB352403030100B75EA2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
 		4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A923A116E9001E742E /* ChangeMasterPasswordWindowController.xib */; };
@@ -218,7 +217,6 @@
 		4D37D873244E074B00C3182D /* DatabaseAuditorConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50D00244DFD2100364781 /* DatabaseAuditorConfiguration.m */; };
 		4D37D874244E074E00C3182D /* DatabaseAuditReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50CFF244DFD2100364781 /* DatabaseAuditReport.m */; };
 		4D37D875244E075200C3182D /* NSString+Levenshtein.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50D02244DFD2100364781 /* NSString+Levenshtein.m */; };
-		4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */; };
 		4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */; };
 		4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */; };
 		4D40B08423BFB8AA00BAD0D2 /* NodeDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B08623BFB8AA00BAD0D2 /* NodeDetails.storyboard */; };
@@ -468,6 +466,10 @@
 		C810337C2749632600869513 /* AppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C810337E2749632600869513 /* AppPreferences.storyboard */; };
 		C81033A0274963AE00869513 /* FavIconsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C810339E274963AE00869513 /* FavIconsPreferences.swift */; };
 		C81033A1274963AE00869513 /* FavIconsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C810339E274963AE00869513 /* FavIconsPreferences.swift */; };
+		C812B05C2825576400E47941 /* DrillDownDiff.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C812B05B2825576400E47941 /* DrillDownDiff.storyboard */; };
+		C812B05D2825576400E47941 /* DrillDownDiff.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C812B05B2825576400E47941 /* DrillDownDiff.storyboard */; };
+		C812B06028255A4300E47941 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */; };
+		C812B06128255A4300E47941 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */; };
 		C81756722735220900431A36 /* PleaseConnectHardwareKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C81756712735220900431A36 /* PleaseConnectHardwareKey.m */; };
 		C81756732735220900431A36 /* PleaseConnectHardwareKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C81756712735220900431A36 /* PleaseConnectHardwareKey.m */; };
 		C81756742735220900431A36 /* PleaseConnectHardwareKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C81756712735220900431A36 /* PleaseConnectHardwareKey.m */; };
@@ -556,9 +558,7 @@
 		C831367624A9203A00D475D9 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C831367324A9203A00D475D9 /* cencode.c */; };
 		C831367724A9203A00D475D9 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C831367324A9203A00D475D9 /* cencode.c */; };
 		C832A451272EAB5400768319 /* CrossPlatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A450272EAB5400768319 /* CrossPlatform.m */; };
-		C832A452272EAB5400768319 /* CrossPlatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A450272EAB5400768319 /* CrossPlatform.m */; };
 		C832A453272EAB5400768319 /* CrossPlatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A450272EAB5400768319 /* CrossPlatform.m */; };
-		C832A454272EAB5400768319 /* CrossPlatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A450272EAB5400768319 /* CrossPlatform.m */; };
 		C832A474272EC0FE00768319 /* macOSSpinnerUI.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A473272EC0FE00768319 /* macOSSpinnerUI.m */; };
 		C832A475272EC0FE00768319 /* macOSSpinnerUI.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A473272EC0FE00768319 /* macOSSpinnerUI.m */; };
 		C832A476272EC0FE00768319 /* macOSSpinnerUI.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A473272EC0FE00768319 /* macOSSpinnerUI.m */; };
@@ -807,6 +807,28 @@
 		C84F181A2763C0050055C101 /* GenericDetailFieldTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C84F18182763C0050055C101 /* GenericDetailFieldTableCellView.xib */; };
 		C84F181C2763C04F0055C101 /* GenericDetailFieldTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84F181B2763C04F0055C101 /* GenericDetailFieldTableCellView.swift */; };
 		C84F181D2763C04F0055C101 /* GenericDetailFieldTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C84F181B2763C04F0055C101 /* GenericDetailFieldTableCellView.swift */; };
+		C851790A2826A12E00A09797 /* CrossPlatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A450272EAB5400768319 /* CrossPlatform.m */; };
+		C851790B2826A12F00A09797 /* CrossPlatform.m in Sources */ = {isa = PBXBuildFile; fileRef = C832A450272EAB5400768319 /* CrossPlatform.m */; };
+		C851790C2826A13500A09797 /* MacSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C83741EF25D3129A00EDE4F3 /* MacSyncManager.m */; };
+		C851790D2826A13600A09797 /* MacSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C83741EF25D3129A00EDE4F3 /* MacSyncManager.m */; };
+		C851790E2826A14F00A09797 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C837416F25D2EFD600EDE4F3 /* SyncAndMergeSequenceManager.m */; };
+		C851790F2826A15000A09797 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C837416F25D2EFD600EDE4F3 /* SyncAndMergeSequenceManager.m */; };
+		C85179122826A21900A09797 /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
+		C85179132826A21A00A09797 /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
+		C85179142826A29500A09797 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81AC79A27A06AA900EF5ED3 /* Collection+Extensions.swift */; };
+		C85179152826A29600A09797 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81AC79A27A06AA900EF5ED3 /* Collection+Extensions.swift */; };
+		C85179162826A32100A09797 /* DiffDrillDownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF82823F3D400334D2B /* DiffDrillDownViewController.swift */; };
+		C85179172826A32100A09797 /* DiffDrillDownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF82823F3D400334D2B /* DiffDrillDownViewController.swift */; };
+		C85179182826A33600A09797 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */; };
+		C85179192826A33600A09797 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */; };
+		C851791A2826A35200A09797 /* DrillDownDiff.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C812B05B2825576400E47941 /* DrillDownDiff.storyboard */; };
+		C851791B2826A35300A09797 /* DrillDownDiff.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C812B05B2825576400E47941 /* DrillDownDiff.storyboard */; };
+		C851791E2826A35B00A09797 /* CompareDatabases.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BBBDD82823F1FF00334D2B /* CompareDatabases.storyboard */; };
+		C851791F2826A35C00A09797 /* CompareDatabases.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BBBDD82823F1FF00334D2B /* CompareDatabases.storyboard */; };
+		C85179312826D0C400A09797 /* SelectAutoFillDatabaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AC925714A2A00251153 /* SelectAutoFillDatabaseViewController.xib */; };
+		C85179322826D0C500A09797 /* SelectAutoFillDatabaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AC925714A2A00251153 /* SelectAutoFillDatabaseViewController.xib */; };
+		C85179332826D0C900A09797 /* SelectDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectDatabaseViewController.m */; };
+		C85179342826D0C900A09797 /* SelectDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectDatabaseViewController.m */; };
 		C8579C5427AEECD900653664 /* Parse2FactorAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */; };
 		C8594240277F2AE60040F03D /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
 		C8594241277F2AE60040F03D /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
@@ -1270,7 +1292,7 @@
 		C8B945962573D01A00932C46 /* AutoType.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791722561A1910038310E /* AutoType.m */; };
 		C8B945972573D01A00932C46 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4A32332D92900C2E084 /* XmlSerializer.m */; };
 		C8B945982573D01A00932C46 /* GzipDecompressOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C831366124A91FDB00D475D9 /* GzipDecompressOutputStream.m */; };
-		C8B945992573D01A00932C46 /* SelectAutoFillDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */; };
+		C8B945992573D01A00932C46 /* SelectDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectDatabaseViewController.m */; };
 		C8B9459B2573D01A00932C46 /* cdecode.c in Sources */ = {isa = PBXBuildFile; fileRef = C831367224A9203A00D475D9 /* cdecode.c */; };
 		C8B9459C2573D01A00932C46 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC763E2497A90700C9C443 /* FileManager.m */; };
 		C8B9459D2573D01A00932C46 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB1219B479800C22CB4 /* Kdb1Database.m */; };
@@ -1392,6 +1414,16 @@
 		C8B961AF26D97C5E00424FDA /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B961AD26D97C5E00424FDA /* DetailViewController.swift */; };
 		C8BB7530261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */; };
 		C8BB7531261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */; };
+		C8BBBDD52823F1FF00334D2B /* CompareDatabases.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BBBDD82823F1FF00334D2B /* CompareDatabases.storyboard */; };
+		C8BBBDD62823F1FF00334D2B /* CompareDatabases.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BBBDD82823F1FF00334D2B /* CompareDatabases.storyboard */; };
+		C8BBBDF62823F3AE00334D2B /* CompareDatabasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF52823F3AE00334D2B /* CompareDatabasesViewController.swift */; };
+		C8BBBDF72823F3AE00334D2B /* CompareDatabasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF52823F3AE00334D2B /* CompareDatabasesViewController.swift */; };
+		C8BBBDF92823F3D400334D2B /* DiffDrillDownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF82823F3D400334D2B /* DiffDrillDownViewController.swift */; };
+		C8BBBDFA2823F3D400334D2B /* DiffDrillDownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF82823F3D400334D2B /* DiffDrillDownViewController.swift */; };
+		C8BBBE00282401E700334D2B /* CompareAndMergeWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDFE282401E700334D2B /* CompareAndMergeWizard.swift */; };
+		C8BBBE01282401E700334D2B /* CompareAndMergeWizard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDFE282401E700334D2B /* CompareAndMergeWizard.swift */; };
+		C8BBBE072824113D00334D2B /* CompareAndMergeWizard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BBBE0A2824113D00334D2B /* CompareAndMergeWizard.storyboard */; };
+		C8BBBE082824113D00334D2B /* CompareAndMergeWizard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BBBE0A2824113D00334D2B /* CompareAndMergeWizard.storyboard */; };
 		C8BE5927278B226200C9B1B8 /* QRCodeScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BE5926278B226200C9B1B8 /* QRCodeScanner.swift */; };
 		C8BE5928278B226200C9B1B8 /* QRCodeScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BE5926278B226200C9B1B8 /* QRCodeScanner.swift */; };
 		C8BFECBA24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */; };
@@ -1408,6 +1440,8 @@
 		C8C1F7612570353A009991D4 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75E2570353A009991D4 /* regdom.c */; };
 		C8C2F5922705DBEC0002C94D /* SBDownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C2F5912705DBEC0002C94D /* SBDownTextView.swift */; };
 		C8C2F5932705DBEC0002C94D /* SBDownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C2F5912705DBEC0002C94D /* SBDownTextView.swift */; };
+		C8C5DF9728328A0300A1EEFE /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C5DF9A28328A0300A1EEFE /* FavIconResultTableCell.xib */; };
+		C8C5DF9828328A0300A1EEFE /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C5DF9A28328A0300A1EEFE /* FavIconResultTableCell.xib */; };
 		C8C60F432667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
 		C8C60F442667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
 		C8C60F452667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
@@ -1456,7 +1490,7 @@
 		C8CE9E0E26E558DC0007922F /* HmacBlockInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CE9E0B26E558DC0007922F /* HmacBlockInputStream.m */; };
 		C8CE9E0F26E558DC0007922F /* HmacBlockInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CE9E0B26E558DC0007922F /* HmacBlockInputStream.m */; };
 		C8CE9E1026E558DC0007922F /* HmacBlockInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CE9E0B26E558DC0007922F /* HmacBlockInputStream.m */; };
-		C8D8D3E1256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */; };
+		C8D8D3E1256FD572001BD8BE /* SelectDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectDatabaseViewController.m */; };
 		C8DA3DBB27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DBA27B3E3BB00862C17 /* AuditIssueTableCellView.xib */; };
 		C8DA3DBC27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DBA27B3E3BB00862C17 /* AuditIssueTableCellView.xib */; };
 		C8DA3DBE27B3E3D400862C17 /* AuditIssueTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8DA3DBD27B3E3D400862C17 /* AuditIssueTableCellView.swift */; };
@@ -1508,10 +1542,6 @@
 		C8E379EF25DC455F006A26BF /* SyncOperationState.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E379EC25DC455F006A26BF /* SyncOperationState.m */; };
 		C8E5C32D275E72F7006C15FE /* MacConflictResolutionWizard.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E5C32C275E72F7006C15FE /* MacConflictResolutionWizard.m */; };
 		C8E5C32E275E72F7006C15FE /* MacConflictResolutionWizard.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E5C32C275E72F7006C15FE /* MacConflictResolutionWizard.m */; };
-		C8E5C330275E76BB006C15FE /* MacSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C83741EF25D3129A00EDE4F3 /* MacSyncManager.m */; };
-		C8E5C331275E76BC006C15FE /* MacSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C83741EF25D3129A00EDE4F3 /* MacSyncManager.m */; };
-		C8E5C332275E76C0006C15FE /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C837416F25D2EFD600EDE4F3 /* SyncAndMergeSequenceManager.m */; };
-		C8E5C333275E76C1006C15FE /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C837416F25D2EFD600EDE4F3 /* SyncAndMergeSequenceManager.m */; };
 		C8E5C336275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8E5C33B275E76D0006C15FE /* MacConflictResolutionWizard.storyboard */; };
 		C8E5C337275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8E5C33B275E76D0006C15FE /* MacConflictResolutionWizard.storyboard */; };
 		C8E5C338275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8E5C33B275E76D0006C15FE /* MacConflictResolutionWizard.storyboard */; };
@@ -1526,6 +1556,8 @@
 		C8E6D500246D5C7600AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4FE246D5C7600AFFE13 /* WordList.m */; };
 		C8E6D503246D71E800AFFE13 /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D502246D71E800AFFE13 /* DeletedObject.m */; };
 		C8E6D504246D71E800AFFE13 /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D502246D71E800AFFE13 /* DeletedObject.m */; };
+		C8E75668282D42C70059FF0A /* CompareDatabasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF52823F3AE00334D2B /* CompareDatabasesViewController.swift */; };
+		C8E75669282D42C80059FF0A /* CompareDatabasesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8BBBDF52823F3AE00334D2B /* CompareDatabasesViewController.swift */; };
 		C8E78AC725714A2A00251153 /* SelectAutoFillDatabaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AC925714A2A00251153 /* SelectAutoFillDatabaseViewController.xib */; };
 		C8E78ACE25714A3900251153 /* SelectCredential.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AD025714A3900251153 /* SelectCredential.xib */; };
 		C8E78B4225715C8700251153 /* MMWormholeCoordinatedFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E78B3325715C8600251153 /* MMWormholeCoordinatedFileTransiting.m */; };
@@ -1737,7 +1769,6 @@
 		4D2CB7E923D1BD05000A9ABC /* SecretStoreTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStoreTests.m; path = ../../StrongboxTests/SecretStoreTests.m; sourceTree = "<group>"; };
 		4D3587A624104AF100318688 /* ColoredStringHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColoredStringHelper.h; path = ../StrongBox/ColoredStringHelper.h; sourceTree = "<group>"; };
 		4D3587A724104AF100318688 /* ColoredStringHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColoredStringHelper.m; path = ../StrongBox/ColoredStringHelper.m; sourceTree = "<group>"; };
-		4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = FavIconResultTableCell.xib; path = MacBox/FavIconResultTableCell.xib; sourceTree = "<group>"; };
 		4D3F190123AE5A2E008A58AF /* FavIconResultTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FavIconResultTableCellView.h; sourceTree = "<group>"; };
 		4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FavIconResultTableCellView.m; sourceTree = "<group>"; };
 		4D40B07023BFB5AC00BAD0D2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
@@ -2233,6 +2264,9 @@
 		C81033982749634200869513 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AppPreferences.strings"; sourceTree = "<group>"; };
 		C810339A2749634400869513 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AppPreferences.strings"; sourceTree = "<group>"; };
 		C810339E274963AE00869513 /* FavIconsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FavIconsPreferences.swift; path = MacBox/FavIconsPreferences.swift; sourceTree = "<group>"; };
+		C812B05B2825576400E47941 /* DrillDownDiff.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = DrillDownDiff.storyboard; sourceTree = "<group>"; };
+		C812B05E28255A4300E47941 /* DiffDrillDownDetailer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DiffDrillDownDetailer.h; path = ../model/DiffDrillDownDetailer.h; sourceTree = "<group>"; };
+		C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DiffDrillDownDetailer.m; path = ../model/DiffDrillDownDetailer.m; sourceTree = "<group>"; };
 		C81756702735220900431A36 /* PleaseConnectHardwareKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PleaseConnectHardwareKey.h; path = MacBox/PleaseConnectHardwareKey.h; sourceTree = "<group>"; };
 		C81756712735220900431A36 /* PleaseConnectHardwareKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PleaseConnectHardwareKey.m; path = MacBox/PleaseConnectHardwareKey.m; sourceTree = "<group>"; };
 		C817567A2735259100431A36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConnectHardwareKey.xib; sourceTree = "<group>"; };
@@ -2254,7 +2288,6 @@
 		C817619127E22C0100334AF3 /* Strongbox-AutoFill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-AutoFill-Bridging-Header.h"; sourceTree = "<group>"; };
 		C817619227E22C0100334AF3 /* Strongbox-Pro-AutoFill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Pro-AutoFill-Bridging-Header.h"; sourceTree = "<group>"; };
 		C8196F1C27E1035200876E13 /* SideBarSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SideBarSettings.swift; path = MacBox/SideBarSettings.swift; sourceTree = "<group>"; };
-		C8196F2227E10D1E00876E13 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		C819D6C026BD921300886363 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SFTPConnectionsManager.storyboard; sourceTree = "<group>"; };
 		C819D6C526BD921B00886363 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
 		C819D6C726BD922900886363 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
@@ -2955,6 +2988,39 @@
 		C8BB755A261E241700D6FCB1 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
 		C8BB755C261E241900D6FCB1 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
 		C8BB755E261E241A00D6FCB1 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BBBDD72823F1FF00334D2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/CompareDatabases.storyboard; sourceTree = "<group>"; };
+		C8BBBDDA2823F20300334D2B /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDDC2823F20600334D2B /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDDE2823F20800334D2B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDE02823F20900334D2B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDE22823F20B00334D2B /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/CompareDatabases.strings"; sourceTree = "<group>"; };
+		C8BBBDE42823F20C00334D2B /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDE62823F20E00334D2B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDE82823F21000334D2B /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDEA2823F21200334D2B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDEC2823F21300334D2B /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDEE2823F21500334D2B /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDF02823F21600334D2B /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8BBBDF22823F21700334D2B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/CompareDatabases.strings"; sourceTree = "<group>"; };
+		C8BBBDF42823F21800334D2B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/CompareDatabases.strings"; sourceTree = "<group>"; };
+		C8BBBDF52823F3AE00334D2B /* CompareDatabasesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CompareDatabasesViewController.swift; path = MacBox/CompareDatabasesViewController.swift; sourceTree = "<group>"; };
+		C8BBBDF82823F3D400334D2B /* DiffDrillDownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DiffDrillDownViewController.swift; path = MacBox/DiffDrillDownViewController.swift; sourceTree = "<group>"; };
+		C8BBBDFE282401E700334D2B /* CompareAndMergeWizard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CompareAndMergeWizard.swift; path = MacBox/CompareAndMergeWizard.swift; sourceTree = "<group>"; };
+		C8BBBE092824113D00334D2B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/CompareAndMergeWizard.storyboard; sourceTree = "<group>"; };
+		C8BBBE0C2824114000334D2B /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE0E2824114200334D2B /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE102824114300334D2B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE122824114500334D2B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE142824114600334D2B /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/CompareAndMergeWizard.strings"; sourceTree = "<group>"; };
+		C8BBBE162824114800334D2B /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE182824114A00334D2B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE1A2824114C00334D2B /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE1C2824114D00334D2B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE1E2824114F00334D2B /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE202824115000334D2B /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE222824115200334D2B /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8BBBE242824115300334D2B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/CompareAndMergeWizard.strings"; sourceTree = "<group>"; };
+		C8BBBE262824115500334D2B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/CompareAndMergeWizard.strings"; sourceTree = "<group>"; };
 		C8BE5926278B226200C9B1B8 /* QRCodeScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = QRCodeScanner.swift; path = MacBox/QRCodeScanner.swift; sourceTree = "<group>"; };
 		C8BFECB824781C660051D21E /* NodeHierarchyReconstructionData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeHierarchyReconstructionData.h; path = ../model/NodeHierarchyReconstructionData.h; sourceTree = "<group>"; };
 		C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeHierarchyReconstructionData.m; path = ../model/NodeHierarchyReconstructionData.m; sourceTree = "<group>"; };
@@ -2974,6 +3040,21 @@
 		C8C1F75F2570353A009991D4 /* regdom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = regdom.h; path = ../../lib/psl/regdom.h; sourceTree = "<group>"; };
 		C8C1F7602570353A009991D4 /* tld-canon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tld-canon.h"; path = "../../lib/psl/tld-canon.h"; sourceTree = "<group>"; };
 		C8C2F5912705DBEC0002C94D /* SBDownTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SBDownTextView.swift; path = ../model/SBDownTextView.swift; sourceTree = "<group>"; };
+		C8C5DF9928328A0300A1EEFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/FavIconResultTableCell.xib; sourceTree = "<group>"; };
+		C8C5DF9B28328A0D00A1EEFE /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DF9C28328A1000A1EEFE /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DF9D28328A1200A1EEFE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DF9E28328A1400A1EEFE /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DF9F28328A1700A1EEFE /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/FavIconResultTableCell.strings"; sourceTree = "<group>"; };
+		C8C5DFA028328A1A00A1EEFE /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DFA128328A1C00A1EEFE /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DFA228328A2000A1EEFE /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DFA328328A2200A1EEFE /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DFA428328A2400A1EEFE /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DFA528328A2700A1EEFE /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DFA628328A2900A1EEFE /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8C5DFA728328A2B00A1EEFE /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/FavIconResultTableCell.strings"; sourceTree = "<group>"; };
+		C8C5DFA828328A2E00A1EEFE /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/FavIconResultTableCell.strings"; sourceTree = "<group>"; };
 		C8C60F412667F990005832BD /* StrongboxErrorCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxErrorCodes.m; path = ../model/StrongboxErrorCodes.m; sourceTree = "<group>"; };
 		C8C60F422667F990005832BD /* StrongboxErrorCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxErrorCodes.h; path = ../model/StrongboxErrorCodes.h; sourceTree = "<group>"; };
 		C8C8963126CEC24F00F1BC4D /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -3051,8 +3132,8 @@
 		C8CE9E0926E558A10007922F /* HmacBlockOutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HmacBlockOutputStream.m; path = ../model/HmacBlockOutputStream.m; sourceTree = "<group>"; };
 		C8CE9E0B26E558DC0007922F /* HmacBlockInputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HmacBlockInputStream.m; path = ../HmacBlockInputStream.m; sourceTree = "<group>"; };
 		C8CE9E0C26E558DC0007922F /* HmacBlockInputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HmacBlockInputStream.h; path = ../HmacBlockInputStream.h; sourceTree = "<group>"; };
-		C8D8D3DE256FD572001BD8BE /* SelectAutoFillDatabaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectAutoFillDatabaseViewController.h; sourceTree = "<group>"; };
-		C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectAutoFillDatabaseViewController.m; sourceTree = "<group>"; };
+		C8D8D3DE256FD572001BD8BE /* SelectDatabaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectDatabaseViewController.h; sourceTree = "<group>"; };
+		C8D8D3DF256FD572001BD8BE /* SelectDatabaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectDatabaseViewController.m; sourceTree = "<group>"; };
 		C8DA3DBA27B3E3BB00862C17 /* AuditIssueTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = AuditIssueTableCellView.xib; path = MacBox/AuditIssueTableCellView.xib; sourceTree = "<group>"; };
 		C8DA3DBD27B3E3D400862C17 /* AuditIssueTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuditIssueTableCellView.swift; path = MacBox/AuditIssueTableCellView.swift; sourceTree = "<group>"; };
 		C8DA3DC127B3EBD000862C17 /* AuditDrillDown.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AuditDrillDown.swift; path = MacBox/AuditDrillDown.swift; sourceTree = "<group>"; };
@@ -3725,10 +3806,12 @@
 			children = (
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
+				C8BBBDD12823F1CF00334D2B /* Compare & Merge */,
+				C85179302826CEDD00A09797 /* Select Database */,
+				C8F1B3F926D67EE000B21A29 /* NextGen */,
 				C8006BB526DA747C0020AF23 /* Main */,
 				C8DA3DC027B3EBA300862C17 /* Audit */,
 				4D14A13B224D211400C71ABF /* Node Details */,
-				C8E5C324275E7230006C15FE /* Sync */,
 				C817566A27351F3F00431A36 /* Hardware Key */,
 				4DE79B86255D987C00F59B10 /* Strongbox AutoFill */,
 				C834321A270CAC8D009DFFF4 /* Markdown */,
@@ -3813,7 +3896,7 @@
 				4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */,
 				4D88E6CC23A9190700A75D1F /* FavIconDownloader.h */,
 				4D88E6CD23A9190700A75D1F /* FavIconDownloader.m */,
-				4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */,
+				C8C5DF9A28328A0300A1EEFE /* FavIconResultTableCell.xib */,
 				4D3F190123AE5A2E008A58AF /* FavIconResultTableCellView.h */,
 				4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */,
 			);
@@ -4101,9 +4184,6 @@
 				C80798792563123400FE0CA7 /* ManualCredentialsEntry.h */,
 				C807987A2563123400FE0CA7 /* ManualCredentialsEntry.m */,
 				C8AA2172256BD15900E9FF8D /* ManualCredentialsEntry.xib */,
-				C8D8D3DE256FD572001BD8BE /* SelectAutoFillDatabaseViewController.h */,
-				C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */,
-				C8E78AC925714A2A00251153 /* SelectAutoFillDatabaseViewController.xib */,
 				C8C1F70C25700976009991D4 /* SelectCredential.h */,
 				C8C1F70D25700976009991D4 /* SelectCredential.m */,
 				C8E78AD025714A3900251153 /* SelectCredential.xib */,
@@ -4327,7 +4407,6 @@
 			isa = PBXGroup;
 			children = (
 				C8EEDB0427A1949D00FBFA43 /* Lock Screen */,
-				C8F1B3F926D67EE000B21A29 /* NextGen */,
 				4DE2CA3E23C38B5E00F76255 /* Original */,
 				C875F83A279AB72000955D14 /* NotificationConstants.h */,
 				C875F83B279AB72000955D14 /* NotificationConstants.m */,
@@ -4821,6 +4900,16 @@
 				C837418425D2F18B00EDE4F3 /* MMcGPair.m */,
 			);
 			name = MMcGPair;
+			sourceTree = "<group>";
+		};
+		C85179302826CEDD00A09797 /* Select Database */ = {
+			isa = PBXGroup;
+			children = (
+				C8D8D3DE256FD572001BD8BE /* SelectDatabaseViewController.h */,
+				C8D8D3DF256FD572001BD8BE /* SelectDatabaseViewController.m */,
+				C8E78AC925714A2A00251153 /* SelectAutoFillDatabaseViewController.xib */,
+			);
+			path = "Select Database";
 			sourceTree = "<group>";
 		};
 		C859423E277F2AAF0040F03D /* Custom Cells */ = {
@@ -5424,6 +5513,24 @@
 			name = Build;
 			sourceTree = "<group>";
 		};
+		C8BBBDD12823F1CF00334D2B /* Compare & Merge */ = {
+			isa = PBXGroup;
+			children = (
+				C8E5C33B275E76D0006C15FE /* MacConflictResolutionWizard.storyboard */,
+				C8E5C32B275E72F7006C15FE /* MacConflictResolutionWizard.h */,
+				C8E5C32C275E72F7006C15FE /* MacConflictResolutionWizard.m */,
+				C812B05B2825576400E47941 /* DrillDownDiff.storyboard */,
+				C8BBBDD82823F1FF00334D2B /* CompareDatabases.storyboard */,
+				C8BBBDF52823F3AE00334D2B /* CompareDatabasesViewController.swift */,
+				C8BBBDF82823F3D400334D2B /* DiffDrillDownViewController.swift */,
+				C8BBBE0A2824113D00334D2B /* CompareAndMergeWizard.storyboard */,
+				C8BBBDFE282401E700334D2B /* CompareAndMergeWizard.swift */,
+				C812B05E28255A4300E47941 /* DiffDrillDownDetailer.h */,
+				C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */,
+			);
+			name = "Compare & Merge";
+			sourceTree = "<group>";
+		};
 		C8C08355256978E600FF280D /* Database Onboarding */ = {
 			isa = PBXGroup;
 			children = (
@@ -5519,16 +5626,6 @@
 				C8C8965926CECAC600F1BC4D /* ykcore_osx.c */,
 			);
 			name = src;
-			sourceTree = "<group>";
-		};
-		C8E5C324275E7230006C15FE /* Sync */ = {
-			isa = PBXGroup;
-			children = (
-				C8E5C33B275E76D0006C15FE /* MacConflictResolutionWizard.storyboard */,
-				C8E5C32B275E72F7006C15FE /* MacConflictResolutionWizard.h */,
-				C8E5C32C275E72F7006C15FE /* MacConflictResolutionWizard.m */,
-			);
-			name = Sync;
 			sourceTree = "<group>";
 		};
 		C8E78B3225715C6700251153 /* MMWormhole */ = {
@@ -5878,6 +5975,7 @@
 				4D1FFB272403030100B75EA2 /* PredefinedKeePassIcon.xib in Resources */,
 				4D1FFB282403030100B75EA2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D1FFB292403030100B75EA2 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				C8BBBE082824113D00334D2B /* CompareAndMergeWizard.storyboard in Resources */,
 				C8DA3DF027B4277700862C17 /* AuditDrillDown.storyboard in Resources */,
 				C85B9DB524655D6300EEBFC9 /* surnames.us.txt in Resources */,
 				C84594EF26D3E6AD00D5DF6B /* SystemTrayViewController.storyboard in Resources */,
@@ -5899,10 +5997,11 @@
 				C8A5EF0727A568E800C5232D /* NextGen-Sidebar.storyboard in Resources */,
 				C8F8CE3A25D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
 				4D1FFB312403030100B75EA2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
+				C812B05D2825576400E47941 /* DrillDownDiff.storyboard in Resources */,
 				4D1FFB322403030100B75EA2 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C8BB7531261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */,
 				C85A841C27988B42004BCF22 /* NotesTableCellView.xib in Resources */,
-				4D1FFB332403030100B75EA2 /* FavIconResultTableCell.xib in Resources */,
+				C8C5DF9828328A0300A1EEFE /* FavIconResultTableCell.xib in Resources */,
 				4D1FFB342403030100B75EA2 /* formatV3.txt in Resources */,
 				C875F86A279C595100955D14 /* TagItem.xib in Resources */,
 				C867342B2673A09B0063237B /* MAS-Localizable.strings in Resources */,
@@ -5913,6 +6012,7 @@
 				C81B8D102799C331006387D0 /* HeaderTableCellView.xib in Resources */,
 				4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				C8594247277F2DDB0040F03D /* GenericAutoLayoutTableViewCell.xib in Resources */,
+				C85179322826D0C500A09797 /* SelectAutoFillDatabaseViewController.xib in Resources */,
 				C80043B126BD7C6E0090C90D /* ConnectionCellView.xib in Resources */,
 				C8F39F6F25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */,
 				4D1FFB372403030100B75EA2 /* formatV4.txt in Resources */,
@@ -5946,6 +6046,7 @@
 				C8EDCD37250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
 				4D1FFB412403030100B75EA2 /* Credits.rtf in Resources */,
 				C8DA3DBC27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */,
+				C8BBBDD62823F1FF00334D2B /* CompareDatabases.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -5969,8 +6070,10 @@
 				C8E78ACE25714A3900251153 /* SelectCredential.xib in Resources */,
 				C8877336261DD64900C01406 /* Backups.storyboard in Resources */,
 				4DE79B8C255D987C00F59B10 /* CredentialProviderViewController.xib in Resources */,
+				C851791E2826A35B00A09797 /* CompareDatabases.storyboard in Resources */,
 				C8E5C337275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */,
 				C8C1F75925702E7B009991D4 /* AutoFillCredentialCell.xib in Resources */,
+				C851791A2826A35200A09797 /* DrillDownDiff.storyboard in Resources */,
 				C86FED1925C326A800386DD9 /* PressYubiKeyWindow.xib in Resources */,
 				C82DB4332753C911006B7573 /* AutoFillLoading.storyboard in Resources */,
 				C89B8F682562C27800B590C0 /* Localizable.strings in Resources */,
@@ -6018,6 +6121,7 @@
 				4DC805BF23A11749001E742E /* PredefinedKeePassIcon.xib in Resources */,
 				4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				C8BBBE072824113D00334D2B /* CompareAndMergeWizard.storyboard in Resources */,
 				C8DA3DEF27B4277700862C17 /* AuditDrillDown.storyboard in Resources */,
 				C85B9DB424655D6200EEBFC9 /* surnames.us.txt in Resources */,
 				C84594EE26D3E6AD00D5DF6B /* SystemTrayViewController.storyboard in Resources */,
@@ -6039,11 +6143,12 @@
 				4DC8059223A11493001E742E /* starwars_8k_2018.utf8.txt in Resources */,
 				C8A5EF0627A568E800C5232D /* NextGen-Sidebar.storyboard in Resources */,
 				C8F8CE3825D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
+				C812B05C2825576400E47941 /* DrillDownDiff.storyboard in Resources */,
 				4DC8059323A11493001E742E /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C8BB7530261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */,
 				C85A841B27988B42004BCF22 /* NotesTableCellView.xib in Resources */,
 				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
-				4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */,
+				C8C5DF9728328A0300A1EEFE /* FavIconResultTableCell.xib in Resources */,
 				C875F869279C595100955D14 /* TagItem.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
 				C8594243277F2AFA0040F03D /* TitleAndIconCell.xib in Resources */,
@@ -6053,6 +6158,7 @@
 				C81B8D0F2799C331006387D0 /* HeaderTableCellView.xib in Resources */,
 				4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				C8594246277F2DDB0040F03D /* GenericAutoLayoutTableViewCell.xib in Resources */,
+				C85179312826D0C400A09797 /* SelectAutoFillDatabaseViewController.xib in Resources */,
 				C80043B026BD7C6E0090C90D /* ConnectionCellView.xib in Resources */,
 				4DC805A723A116E9001E742E /* ChangeMasterPasswordWindowController.xib in Resources */,
 				C8F39F6E25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */,
@@ -6086,6 +6192,7 @@
 				C8EDCD36250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
 				C8DA3DBB27B3E3BB00862C17 /* AuditIssueTableCellView.xib in Resources */,
+				C8BBBDD52823F1FF00334D2B /* CompareDatabases.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6098,8 +6205,10 @@
 				C8B946162573D01A00932C46 /* SelectCredential.xib in Resources */,
 				C8877338261DD64900C01406 /* Backups.storyboard in Resources */,
 				C8B946172573D01A00932C46 /* CredentialProviderViewController.xib in Resources */,
+				C851791F2826A35C00A09797 /* CompareDatabases.storyboard in Resources */,
 				C8E5C339275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */,
 				C8B946192573D01A00932C46 /* AutoFillCredentialCell.xib in Resources */,
+				C851791B2826A35300A09797 /* DrillDownDiff.storyboard in Resources */,
 				C86FED1F25C326A900386DD9 /* PressYubiKeyWindow.xib in Resources */,
 				C82DB4342753C911006B7573 /* AutoFillLoading.storyboard in Resources */,
 				C8B9461C2573D01A00932C46 /* Localizable.strings in Resources */,
@@ -6302,6 +6411,7 @@
 				C8B501F226ECB5B1003DE6A2 /* TwoFishOutputStream.m in Sources */,
 				4D1FFA832403030100B75EA2 /* NSData+GZIP.m in Sources */,
 				4D1FFA842403030100B75EA2 /* SelectPredefinedIconController.m in Sources */,
+				C8BBBDFA2823F3D400334D2B /* DiffDrillDownViewController.swift in Sources */,
 				4D1FFA852403030100B75EA2 /* ViewModel.m in Sources */,
 				4D1FFA872403030100B75EA2 /* KdbSerialization.m in Sources */,
 				C87A994E255968EB0002BEF8 /* CheckURLExistsOperation.swift in Sources */,
@@ -6345,6 +6455,7 @@
 				4D1FFA922403030100B75EA2 /* DecryptionParameters.m in Sources */,
 				4D1FFA932403030100B75EA2 /* KeePassFile.m in Sources */,
 				C80B10812551F92700FBDF72 /* MutableOrderedDictionary.m in Sources */,
+				C8BBBE01282401E700334D2B /* CompareAndMergeWizard.swift in Sources */,
 				4D37D875244E075200C3182D /* NSString+Levenshtein.m in Sources */,
 				C80A59B52726EF7C0042EA78 /* Field.swift in Sources */,
 				4D1FFA942403030100B75EA2 /* UpgradeWindowController.m in Sources */,
@@ -6451,6 +6562,7 @@
 				C8B946492573D44B00932C46 /* AutoFillSettingsViewController.m in Sources */,
 				4DD7840A2412CE6C00E45D1C /* ColoredStringHelper.m in Sources */,
 				C8E78B4925715C8700251153 /* MMWormhole.m in Sources */,
+				C8BBBDF72823F3AE00334D2B /* CompareDatabasesViewController.swift in Sources */,
 				4D1FFABC2403030100B75EA2 /* NodeFields.m in Sources */,
 				4D1FFABD2403030100B75EA2 /* Utils.m in Sources */,
 				C84412B9279EED23006F4B8B /* LargeTextViewAndQrCode.swift in Sources */,
@@ -6470,6 +6582,7 @@
 				C860C9402744255B00A28341 /* PasswordGenerationPreferences.swift in Sources */,
 				C81F165426BC432A00CDAEAF /* SFTPConnectionsManager.m in Sources */,
 				C81F164726BC2F2800CDAEAF /* SFTPConnections.m in Sources */,
+				C85179332826D0C900A09797 /* SelectDatabaseViewController.m in Sources */,
 				4D1FFAC62403030100B75EA2 /* ChaCha20Stream.m in Sources */,
 				4D1FFAC72403030100B75EA2 /* QRCodePresenterPopover.m in Sources */,
 				C8867AD526D7B820001A3EE5 /* NextGenSplitViewController.swift in Sources */,
@@ -6578,6 +6691,7 @@
 				4D37D874244E074E00C3182D /* DatabaseAuditReport.m in Sources */,
 				4D1FFAEE2403030100B75EA2 /* OTPToken+Serialization.m in Sources */,
 				C8441B8725CAEB930070C7FE /* WebDAVProviderData.m in Sources */,
+				C812B06128255A4300E47941 /* DiffDrillDownDetailer.m in Sources */,
 				C8C8968926CECB9300F1BC4D /* YubiKeyConfiguration.m in Sources */,
 				4D1FFAEF2403030100B75EA2 /* SprCompilation.m in Sources */,
 				4D1FFAF02403030100B75EA2 /* StringValue.m in Sources */,
@@ -6695,7 +6809,9 @@
 				C8441BD925CAFBB10070C7FE /* NSDateRFC1123.m in Sources */,
 				C890D26F259109430001E38B /* ConcurrentMutableDictionary.m in Sources */,
 				C89B8F9B2562D2CA00B590C0 /* Times.m in Sources */,
+				C851790E2826A14F00A09797 /* SyncAndMergeSequenceManager.m in Sources */,
 				C86E607F2562D609001953AD /* cencode.c in Sources */,
+				C8E75668282D42C70059FF0A /* CompareDatabasesViewController.swift in Sources */,
 				C807987C2563123400FE0CA7 /* ManualCredentialsEntry.m in Sources */,
 				C8397ADD25939858000F5158 /* NodeIcon.m in Sources */,
 				C8441BF525CAFBB10070C7FE /* DAVRequests.m in Sources */,
@@ -6741,7 +6857,6 @@
 				C86E602E2562D510001953AD /* KP31HashedBlockStream.m in Sources */,
 				C837416625D2DE7200EDE4F3 /* MacUrlSchemes.m in Sources */,
 				C89B8FA52562D2CA00B590C0 /* Root.m in Sources */,
-				C8E5C330275E76BB006C15FE /* MacSyncManager.m in Sources */,
 				C80798352562DEEC00FE0CA7 /* NSString+Extensions.m in Sources */,
 				C8441CBC25CB01AB0070C7FE /* NMSSHChannel.m in Sources */,
 				C89B8F7A2562D24A00B590C0 /* KeePassDatabase.m in Sources */,
@@ -6764,7 +6879,7 @@
 				C89B8FA92562D2CA00B590C0 /* XmlSerializer.m in Sources */,
 				C8969FF925AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
 				C89B8FDB2562D32C00B590C0 /* GzipDecompressOutputStream.m in Sources */,
-				C8D8D3E1256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m in Sources */,
+				C8D8D3E1256FD572001BD8BE /* SelectDatabaseViewController.m in Sources */,
 				C80735E12614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8441C3C25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8441CB425CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
@@ -6790,12 +6905,13 @@
 				C89B8F8D2562D2CA00B590C0 /* History.m in Sources */,
 				C837419225D2F1B900EDE4F3 /* DiffSummary.m in Sources */,
 				C80798322562DEEC00FE0CA7 /* NSData+Extensions.m in Sources */,
+				C851790C2826A13500A09797 /* MacSyncManager.m in Sources */,
 				C86E60342562D52D001953AD /* PasswordHistory.m in Sources */,
 				C89B8F912562D2CA00B590C0 /* KeePassXmlParser.m in Sources */,
 				C84D6CC6273D2A5600182B40 /* OnboardingDatabaseChangeRequests.m in Sources */,
 				C83741DB25D30F4B00EDE4F3 /* ConcurrentCircularBuffer.m in Sources */,
 				C89B8F812562D25A00B590C0 /* NodeFields.m in Sources */,
-				C8E5C332275E76C0006C15FE /* SyncAndMergeSequenceManager.m in Sources */,
+				C851790A2826A12E00A09797 /* CrossPlatform.m in Sources */,
 				C86E60952562D649001953AD /* thread.c in Sources */,
 				C82DB42E2753C6EB006B7573 /* AutoFillLoadingVC.m in Sources */,
 				C8C8968226CECB9300F1BC4D /* PressHardwareKeyWindow.m in Sources */,
@@ -6883,6 +6999,7 @@
 				C86E60492562D554001953AD /* CustomDataItem.m in Sources */,
 				C86E602B2562D510001953AD /* ChaCha20ReadStream.m in Sources */,
 				C86E60702562D5C1001953AD /* WordList.m in Sources */,
+				C85179122826A21900A09797 /* TitleAndIconCell.swift in Sources */,
 				C89B8F332562BCBD00B590C0 /* DatabaseMetadata.m in Sources */,
 				C89B8F942562D2CA00B590C0 /* AesKdfCipher.m in Sources */,
 				C8F32D83272DA4830064D511 /* ConcurrentMutableStack.m in Sources */,
@@ -6890,6 +7007,7 @@
 				C86E60962562D649001953AD /* encoding.c in Sources */,
 				C89B8F3D2562BCD400B590C0 /* SecretStore.m in Sources */,
 				C86E60392562D52D001953AD /* Field.m in Sources */,
+				C85179162826A32100A09797 /* DiffDrillDownViewController.swift in Sources */,
 				C8DE8DAE258FD71300B4D9EA /* SampleItemsGenerator.m in Sources */,
 				C8441BE925CAFBB10070C7FE /* DAVRequest.m in Sources */,
 				C89B8F9D2562D2CA00B590C0 /* DecryptionParameters.m in Sources */,
@@ -6909,7 +7027,6 @@
 				C832A482272ECC6E00768319 /* MacOSAlertingUI.m in Sources */,
 				C8441B8625CAEB930070C7FE /* WebDAVProviderData.m in Sources */,
 				C81F1DF22602152C00251A2F /* MergeDryRunReport.m in Sources */,
-				C832A452272EAB5400768319 /* CrossPlatform.m in Sources */,
 				C81F1DE3260214FB00251A2F /* DatabaseDiffer.m in Sources */,
 				C89B8FD92562D32C00B590C0 /* Base64DecodeOutputStream.m in Sources */,
 				C89B8FBB2562D2FE00B590C0 /* KeePassCiphers.m in Sources */,
@@ -6922,6 +7039,7 @@
 				C89B8FC02562D2FE00B590C0 /* CryptoParameters.m in Sources */,
 				C80798342562DEEC00FE0CA7 /* NSDate+Extensions.m in Sources */,
 				C832A49A272EFD4A00768319 /* DatabaseAuditorConfiguration.m in Sources */,
+				C85179182826A33600A09797 /* DiffDrillDownDetailer.m in Sources */,
 				C89B8F9C2562D2CA00B590C0 /* DatabaseAttachment.m in Sources */,
 				C86E60932562D649001953AD /* core.c in Sources */,
 				C8441B9C25CAEC300070C7FE /* StorageProviderReadOptions.m in Sources */,
@@ -6933,6 +7051,7 @@
 				C8441BDD25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
 				C8E0B1EE275BD49000A871F6 /* MacDatabasePreferences.m in Sources */,
 				C8C1F7612570353A009991D4 /* regdom.c in Sources */,
+				C85179142826A29500A09797 /* Collection+Extensions.swift in Sources */,
 				C8F39EB625DD81900045CAAB /* WebDAVConfigVC.m in Sources */,
 				C867916C2561A1630038310E /* KeePassXmlAutoTypeAssociation.m in Sources */,
 				C89B8F802562D25A00B590C0 /* Node.m in Sources */,
@@ -6995,6 +7114,7 @@
 				4D88E6CE23A9190700A75D1F /* FavIconDownloader.m in Sources */,
 				4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */,
 				4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */,
+				C8BBBDF92823F3D400334D2B /* DiffDrillDownViewController.swift in Sources */,
 				C87A994D255968EB0002BEF8 /* CheckURLExistsOperation.swift in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
 				C87A9949255968EB0002BEF8 /* IconExtraction.swift in Sources */,
@@ -7038,6 +7158,7 @@
 				4DA50D06244DFD2100364781 /* NSString+Levenshtein.m in Sources */,
 				4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
+				C8BBBE00282401E700334D2B /* CompareAndMergeWizard.swift in Sources */,
 				4D524C9F219B44F300C22CB4 /* twofish.c in Sources */,
 				C80A59B42726EF7C0042EA78 /* Field.swift in Sources */,
 				C80A372F26D7DE3100613555 /* LockScreenViewController.m in Sources */,
@@ -7144,6 +7265,7 @@
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
 				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
 				4DF348022074FA6C00148741 /* NodeFields.m in Sources */,
+				C8BBBDF62823F3AE00334D2B /* CompareDatabasesViewController.swift in Sources */,
 				4DF348052074FA6C00148741 /* Utils.m in Sources */,
 				C8C8965A26CECAC600F1BC4D /* ykcore_osx.c in Sources */,
 				C84412B8279EED23006F4B8B /* LargeTextViewAndQrCode.swift in Sources */,
@@ -7163,6 +7285,7 @@
 				C860C93F2744255B00A28341 /* PasswordGenerationPreferences.swift in Sources */,
 				4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */,
 				4D524CF0219B481200C22CB4 /* ChaCha20Stream.m in Sources */,
+				C85179342826D0C900A09797 /* SelectDatabaseViewController.m in Sources */,
 				C8867AD426D7B626001A3EE5 /* NextGenSplitViewController.swift in Sources */,
 				4DF522BB23C8BBA900CD948E /* QRCodePresenterPopover.m in Sources */,
 				C8B961AE26D97C5E00424FDA /* DetailViewController.swift in Sources */,
@@ -7271,6 +7394,7 @@
 				4DEA5897224BFA7300013808 /* StringValue.m in Sources */,
 				C8C8968726CECB9300F1BC4D /* YubiKeyConfiguration.m in Sources */,
 				4D22DA3E22609CBB00561AF7 /* MBProgressHUD.m in Sources */,
+				C812B06028255A4300E47941 /* DiffDrillDownDetailer.m in Sources */,
 				4D524CEC219B481200C22CB4 /* ChaCha20Cipher.m in Sources */,
 				4D59DA57224D3C5100D1D6E4 /* CustomFieldTableCellView.m in Sources */,
 				4DE0CB712232C0F200E109F9 /* History.m in Sources */,
@@ -7377,7 +7501,9 @@
 				C8441BDB25CAFBB10070C7FE /* NSDateRFC1123.m in Sources */,
 				C890D271259109430001E38B /* ConcurrentMutableDictionary.m in Sources */,
 				C8B9456A2573D01A00932C46 /* Times.m in Sources */,
+				C851790F2826A15000A09797 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8B9456B2573D01A00932C46 /* cencode.c in Sources */,
+				C8E75669282D42C80059FF0A /* CompareDatabasesViewController.swift in Sources */,
 				C8B9456C2573D01A00932C46 /* ManualCredentialsEntry.m in Sources */,
 				C8397ADF25939858000F5158 /* NodeIcon.m in Sources */,
 				C8441BF725CAFBB10070C7FE /* DAVRequests.m in Sources */,
@@ -7423,7 +7549,6 @@
 				C8B945862573D01A00932C46 /* KP31HashedBlockStream.m in Sources */,
 				C837416825D2DE7200EDE4F3 /* MacUrlSchemes.m in Sources */,
 				C8B945872573D01A00932C46 /* Root.m in Sources */,
-				C8E5C331275E76BC006C15FE /* MacSyncManager.m in Sources */,
 				C8B945882573D01A00932C46 /* NSString+Extensions.m in Sources */,
 				C8441CBE25CB01AB0070C7FE /* NMSSHChannel.m in Sources */,
 				C8B945892573D01A00932C46 /* KeePassDatabase.m in Sources */,
@@ -7446,7 +7571,7 @@
 				C8B945972573D01A00932C46 /* XmlSerializer.m in Sources */,
 				C8969FFB25AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
 				C8B945982573D01A00932C46 /* GzipDecompressOutputStream.m in Sources */,
-				C8B945992573D01A00932C46 /* SelectAutoFillDatabaseViewController.m in Sources */,
+				C8B945992573D01A00932C46 /* SelectDatabaseViewController.m in Sources */,
 				C80735E32614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8441C3E25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8441CB625CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
@@ -7472,12 +7597,13 @@
 				C8B945A82573D01A00932C46 /* History.m in Sources */,
 				C837419425D2F1B900EDE4F3 /* DiffSummary.m in Sources */,
 				C8B945AA2573D01A00932C46 /* NSData+Extensions.m in Sources */,
+				C851790D2826A13600A09797 /* MacSyncManager.m in Sources */,
 				C8B945AD2573D01A00932C46 /* PasswordHistory.m in Sources */,
 				C8B945AE2573D01A00932C46 /* KeePassXmlParser.m in Sources */,
 				C84D6CC8273D2A5600182B40 /* OnboardingDatabaseChangeRequests.m in Sources */,
 				C83741DD25D30F4B00EDE4F3 /* ConcurrentCircularBuffer.m in Sources */,
 				C8B945AF2573D01A00932C46 /* NodeFields.m in Sources */,
-				C8E5C333275E76C1006C15FE /* SyncAndMergeSequenceManager.m in Sources */,
+				C851790B2826A12F00A09797 /* CrossPlatform.m in Sources */,
 				C8B945B02573D01A00932C46 /* thread.c in Sources */,
 				C82DB42F2753C6EB006B7573 /* AutoFillLoadingVC.m in Sources */,
 				C8C8968426CECB9300F1BC4D /* PressHardwareKeyWindow.m in Sources */,
@@ -7565,6 +7691,7 @@
 				C8B945E02573D01A00932C46 /* CustomDataItem.m in Sources */,
 				C8B945E12573D01A00932C46 /* ChaCha20ReadStream.m in Sources */,
 				C8B945E22573D01A00932C46 /* WordList.m in Sources */,
+				C85179132826A21A00A09797 /* TitleAndIconCell.swift in Sources */,
 				C8B945E32573D01A00932C46 /* DatabaseMetadata.m in Sources */,
 				C8B945E42573D01A00932C46 /* AesKdfCipher.m in Sources */,
 				C8F32D85272DA4830064D511 /* ConcurrentMutableStack.m in Sources */,
@@ -7572,6 +7699,7 @@
 				C8B945E72573D01A00932C46 /* encoding.c in Sources */,
 				C8B945E82573D01A00932C46 /* SecretStore.m in Sources */,
 				C8B945E92573D01A00932C46 /* Field.m in Sources */,
+				C85179172826A32100A09797 /* DiffDrillDownViewController.swift in Sources */,
 				C8DE8DB0258FD71300B4D9EA /* SampleItemsGenerator.m in Sources */,
 				C8441BEB25CAFBB10070C7FE /* DAVRequest.m in Sources */,
 				C8B945EA2573D01A00932C46 /* DecryptionParameters.m in Sources */,
@@ -7591,7 +7719,6 @@
 				C832A484272ECC6E00768319 /* MacOSAlertingUI.m in Sources */,
 				C8441B8825CAEB930070C7FE /* WebDAVProviderData.m in Sources */,
 				C81F1DF42602152C00251A2F /* MergeDryRunReport.m in Sources */,
-				C832A454272EAB5400768319 /* CrossPlatform.m in Sources */,
 				C81F1DE5260214FB00251A2F /* DatabaseDiffer.m in Sources */,
 				C8B945F72573D01A00932C46 /* Base64DecodeOutputStream.m in Sources */,
 				C8B945F82573D01A00932C46 /* KeePassCiphers.m in Sources */,
@@ -7604,6 +7731,7 @@
 				C8B945FD2573D01A00932C46 /* CryptoParameters.m in Sources */,
 				C8B945FE2573D01A00932C46 /* NSDate+Extensions.m in Sources */,
 				C832A49B272EFD4A00768319 /* DatabaseAuditorConfiguration.m in Sources */,
+				C85179192826A33600A09797 /* DiffDrillDownDetailer.m in Sources */,
 				C8B945FF2573D01A00932C46 /* DatabaseAttachment.m in Sources */,
 				C8B946002573D01A00932C46 /* core.c in Sources */,
 				C8441B9E25CAEC300070C7FE /* StorageProviderReadOptions.m in Sources */,
@@ -7615,6 +7743,7 @@
 				C8441BDF25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
 				C8E0B1F0275BD49000A871F6 /* MacDatabasePreferences.m in Sources */,
 				C8B946082573D01A00932C46 /* regdom.c in Sources */,
+				C85179152826A29600A09797 /* Collection+Extensions.swift in Sources */,
 				C8F39EC025DD81920045CAAB /* WebDAVConfigVC.m in Sources */,
 				C8B946092573D01A00932C46 /* KeePassXmlAutoTypeAssociation.m in Sources */,
 				C8B9460A2573D01A00932C46 /* Node.m in Sources */,
@@ -7754,7 +7883,6 @@
 				C8FB342725B9F563003C0F24 /* nl */,
 				C86BB46625F91C3000425405 /* pt-BR */,
 				C8242D7E26FB70CE00D586A4 /* zh-Hant */,
-				C8196F2227E10D1E00876E13 /* en */,
 			);
 			name = DatabaseProperties.storyboard;
 			path = MacBox;
@@ -8345,6 +8473,75 @@
 			path = MacBox;
 			sourceTree = "<group>";
 		};
+		C8BBBDD82823F1FF00334D2B /* CompareDatabases.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8BBBDD72823F1FF00334D2B /* Base */,
+				C8BBBDDA2823F20300334D2B /* uk */,
+				C8BBBDDC2823F20600334D2B /* sv */,
+				C8BBBDDE2823F20800334D2B /* es */,
+				C8BBBDE02823F20900334D2B /* ru */,
+				C8BBBDE22823F20B00334D2B /* pt-BR */,
+				C8BBBDE42823F20C00334D2B /* nb */,
+				C8BBBDE62823F20E00334D2B /* ja */,
+				C8BBBDE82823F21000334D2B /* it */,
+				C8BBBDEA2823F21200334D2B /* de */,
+				C8BBBDEC2823F21300334D2B /* fr */,
+				C8BBBDEE2823F21500334D2B /* nl */,
+				C8BBBDF02823F21600334D2B /* cs */,
+				C8BBBDF22823F21700334D2B /* zh-Hant */,
+				C8BBBDF42823F21800334D2B /* zh-Hans */,
+			);
+			name = CompareDatabases.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C8BBBE0A2824113D00334D2B /* CompareAndMergeWizard.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8BBBE092824113D00334D2B /* Base */,
+				C8BBBE0C2824114000334D2B /* uk */,
+				C8BBBE0E2824114200334D2B /* sv */,
+				C8BBBE102824114300334D2B /* es */,
+				C8BBBE122824114500334D2B /* ru */,
+				C8BBBE142824114600334D2B /* pt-BR */,
+				C8BBBE162824114800334D2B /* nb */,
+				C8BBBE182824114A00334D2B /* ja */,
+				C8BBBE1A2824114C00334D2B /* it */,
+				C8BBBE1C2824114D00334D2B /* de */,
+				C8BBBE1E2824114F00334D2B /* fr */,
+				C8BBBE202824115000334D2B /* nl */,
+				C8BBBE222824115200334D2B /* cs */,
+				C8BBBE242824115300334D2B /* zh-Hant */,
+				C8BBBE262824115500334D2B /* zh-Hans */,
+			);
+			name = CompareAndMergeWizard.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C8C5DF9A28328A0300A1EEFE /* FavIconResultTableCell.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8C5DF9928328A0300A1EEFE /* Base */,
+				C8C5DF9B28328A0D00A1EEFE /* uk */,
+				C8C5DF9C28328A1000A1EEFE /* sv */,
+				C8C5DF9D28328A1200A1EEFE /* es */,
+				C8C5DF9E28328A1400A1EEFE /* ru */,
+				C8C5DF9F28328A1700A1EEFE /* pt-BR */,
+				C8C5DFA028328A1A00A1EEFE /* nb */,
+				C8C5DFA128328A1C00A1EEFE /* ja */,
+				C8C5DFA228328A2000A1EEFE /* it */,
+				C8C5DFA328328A2200A1EEFE /* de */,
+				C8C5DFA428328A2400A1EEFE /* fr */,
+				C8C5DFA528328A2700A1EEFE /* nl */,
+				C8C5DFA628328A2900A1EEFE /* cs */,
+				C8C5DFA728328A2B00A1EEFE /* zh-Hant */,
+				C8C5DFA828328A2E00A1EEFE /* zh-Hans */,
+			);
+			name = FavIconResultTableCell.xib;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
 		C8CB82C82790812900F85A2C /* PastedImagePreviewer.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -8741,6 +8938,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4615C234123A7AE34AABF61B /* Pods-common-mac-Strongbox-Pro.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur-Pro";
 				CLANG_ENABLE_MODULES = YES;
@@ -8748,7 +8946,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -8774,6 +8972,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A7A658167DFD24D820135E96 /* Pods-common-mac-Strongbox-Pro.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur-Pro";
 				CLANG_ENABLE_MODULES = YES;
@@ -8781,7 +8980,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -8872,7 +9071,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8914,7 +9113,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -9054,6 +9253,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9336D582CE379900DEDAFB72 /* Pods-common-mac-Strongbox.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
 				CLANG_ENABLE_MODULES = YES;
@@ -9061,7 +9261,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -9085,6 +9285,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A7CD3048033B4834F0CAF082 /* Pods-common-mac-Strongbox.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
 				CLANG_ENABLE_MODULES = YES;
@@ -9092,7 +9293,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -9124,7 +9325,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -9168,7 +9369,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3066;
+				CURRENT_PROJECT_VERSION = 3078;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

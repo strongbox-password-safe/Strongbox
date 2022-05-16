@@ -22,7 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)demoItem;
 
-+ (instancetype)fromNode:(Node *)item format:(DatabaseFormat)format model:(Model*)model;
++ (instancetype)fromNode:(Node *)item
+                  format:(DatabaseFormat)format
+                   model:(Model*)model
+        sortCustomFields:(BOOL)sortCustomFields;
 
 - (BOOL)applyToNode:(Node*)ret
      databaseFormat:(DatabaseFormat)databaseFormat
@@ -31,16 +34,12 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 
 - (instancetype)init NS_UNAVAILABLE;
 
-
 - (instancetype)clone;
 - (BOOL)isValid;
 - (BOOL)isDifferentFrom:(EntryViewModel*)other;
 
 - (void)removeAttachment:(NSString*)filename; 
 - (NSUInteger)insertAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment;
-
-- (void)removeCustomFieldAtIndex:(NSUInteger)index;
-- (NSUInteger)insertCustomField:(CustomFieldViewModel*)field;
 
 @property (nullable) NodeIcon* icon;
 @property NSString* title;
@@ -64,6 +63,12 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 @property BOOL hasHistory;
 
 @property (nullable) NSUUID* parentGroupUuid;
+
+@property BOOL sortCustomFields;
+
+- (void)removeCustomFieldAtIndex:(NSUInteger)index;
+- (NSUInteger)addCustomField:(CustomFieldViewModel*)field;
+- (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx;
 
 @end
 

@@ -429,6 +429,15 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.lastAskedAboutKdbx4Upgrade = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastAskedAboutKdbx4Upgrade"])).doubleValue];
     }
     
+    
+    
+    if ( jsonDictionary[@"customSortOrderForFields"] != nil ) {
+        ret.customSortOrderForFields = ((NSNumber*)jsonDictionary[@"customSortOrderForFields"]).boolValue;
+    }
+    else {
+        ret.customSortOrderForFields = NO;
+    }
+    
     return ret;
 }
 
@@ -514,6 +523,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"autoFillUnConcealedFieldsAsCreds" : @(self.autoFillUnConcealedFieldsAsCreds),
         @"argon2MemReductionDontAskAgain" : @(self.argon2MemReductionDontAskAgain),
         @"kdbx4UpgradeDontAskAgain" : @(self.kdbx4UpgradeDontAskAgain),
+        @"customSortOrderForFields" : @(self.customSortOrderForFields),
     }];
     
     if (self.nickName != nil) {

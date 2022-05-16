@@ -19,7 +19,7 @@
                    confirmChangesBlock:(IncompatibilityConfirmChangesBlock)confirmChangesBlock
                             completion:(IncompatibilityCompletionBlock)completion {
     if (sourceFormat == kPasswordSafe && (destinationFormat == kKeePass || destinationFormat == kKeePass4)) {
-        [DatabaseFormatIncompatibilityHelper processPasswordSafeToKeePass2:nodes confirmChangesBlock:confirmChangesBlock completion:completion];
+        [DatabaseFormatIncompatibilityHelper processPasswordSafeToKeePass2:nodes completion:completion];
     }
     else if (sourceFormat == kPasswordSafe && destinationFormat == kKeePass1) {
         [DatabaseFormatIncompatibilityHelper processPasswordSafeToKeePass1:nodes destinationIsRootGroup:destinationIsRootGroup confirmChangesBlock:confirmChangesBlock completion:completion];
@@ -39,8 +39,13 @@
 }
 
 + (void)processPasswordSafeToKeePass2:(NSArray<Node*>*)nodes
-                  confirmChangesBlock:(IncompatibilityConfirmChangesBlock)confirmChangesBlock
                            completion:(IncompatibilityCompletionBlock)completion {
+    NSArray<Node*>* ret = [DatabaseFormatIncompatibilityHelper processPasswordSafeToKeePass2:nodes];
+    
+    completion(YES, ret);
+}
+
++ (NSArray<Node*>*)processPasswordSafeToKeePass2:(NSArray<Node*>*)nodes {
     
     
     NSArray<Node*>* allRecords = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
@@ -56,12 +61,9 @@
         for (Node* nodeWithEmail in nodesWithEmails) {
            [nodeWithEmail.fields setCustomField:kCanonicalEmailFieldName value:[StringValue valueWithString:nodeWithEmail.fields.email]];
         }
-
-        completion(YES, nodes);
     }
-    else {
-        completion(YES, nodes);
-    }
+    
+    return nodes;
 }
 
 + (void)processPasswordSafeToKeePass1:(NSArray<Node*>*)nodes

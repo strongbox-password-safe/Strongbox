@@ -195,8 +195,25 @@
     
     
     for (NSString* key in thee.customData.allKeys) {
-        if(theirsIsNewer || ![me.customData objectForKey:key]) {
+        NSDate* meMod = me.customData[key].modified;
+        NSDate* theeMod = thee.customData[key].modified;
+
+        if (meMod != nil && theeMod != nil ) {
+            if ( [theeMod isLaterThan:meMod] ) {
+                me.customData[key] = thee.customData[key];
+            }
+        }
+        else if ( meMod != nil ) {
+            
+        }
+        else if ( theeMod != nil ) {
             me.customData[key] = thee.customData[key];
+        }
+        else
+        {
+            if (theirsIsNewer || ![me.customData objectForKey:key]) {
+                me.customData[key] = thee.customData[key];
+            }
         }
     }
 }
@@ -447,6 +464,7 @@
 
         if (theirs && [theirs.fields.locationChanged isLaterThan:node.fields.locationChanged]) {
             [node.fields touchLocationChanged:theirs.fields.locationChanged];
+            node.fields.previousParentGroup = theirs.fields.previousParentGroup;
         }
         
         return YES;

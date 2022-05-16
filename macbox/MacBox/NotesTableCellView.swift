@@ -36,6 +36,10 @@ class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
         textViewMarkdown.string = "<Not Set>"
     }
 
+    var isSomeTextSelected : Bool {
+        return textViewMarkdown.selectedRange().length > 0
+    }
+    
     func setMarkdownOrText(string: String, markdown: Bool = false) {
         textViewMarkdown.markdownEnabled = markdown
         textViewMarkdown.string = string
