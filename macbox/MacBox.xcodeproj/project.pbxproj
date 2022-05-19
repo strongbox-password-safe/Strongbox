@@ -2287,6 +2287,56 @@
 		C81756A52735366C00431A36 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
 		C817619127E22C0100334AF3 /* Strongbox-AutoFill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-AutoFill-Bridging-Header.h"; sourceTree = "<group>"; };
 		C817619227E22C0100334AF3 /* Strongbox-Pro-AutoFill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Pro-AutoFill-Bridging-Header.h"; sourceTree = "<group>"; };
+		C818DFED2833C0A7003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/MacConflictResolutionWizard.strings; sourceTree = "<group>"; };
+		C818DFEE2833C0A8003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C818DFEF2833C0A8003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C818DFF02833C0A8003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/NextGen.strings; sourceTree = "<group>"; };
+		C818DFF12833C0A9003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = "pl.lproj/NextGen-Sidebar.strings"; sourceTree = "<group>"; };
+		C818DFF22833C0A9003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = "pl.lproj/NextGen-Master.strings"; sourceTree = "<group>"; };
+		C818DFF32833C0AA003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/CreateEditViewController.strings; sourceTree = "<group>"; };
+		C818DFF42833C0AA003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/QrCodeWindowScanner.strings; sourceTree = "<group>"; };
+		C818DFF52833C0AB003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/PastedImagePreviewer.strings; sourceTree = "<group>"; };
+		C818DFF62833C0AB003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Main.strings; sourceTree = "<group>"; };
+		C818DFF72833C0AB003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C818DFF82833C0AC003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C818DFF92833C0AC003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C818DFFA2833C0AC003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		C818DFFB2833C0AD003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C818DFFC2833C0AD003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/ConnectHardwareKey.strings; sourceTree = "<group>"; };
+		C818DFFD2833C0AE003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SystemTrayViewController.strings; sourceTree = "<group>"; };
+		C818DFFE2833C0AE003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C818DFFF2833C0AE003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C818E0002833C0AF003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/DatabasesManager.strings; sourceTree = "<group>"; };
+		C818E0012833C0AF003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Backups.strings; sourceTree = "<group>"; };
+		C818E0022833C0B0003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AutoFillAppLevelPreferences.strings; sourceTree = "<group>"; };
+		C818E0032833C0B0003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AdvancedAppPreferences.strings; sourceTree = "<group>"; };
+		C818E0042833C0B0003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/NewEntryDefaultsPreferences.strings; sourceTree = "<group>"; };
+		C818E0052833C0B0003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/FavIconPreferences.strings; sourceTree = "<group>"; };
+		C818E0062833C0B1003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/GeneralAppPreferences.strings; sourceTree = "<group>"; };
+		C818E0072833C0B1003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
+		C818E0082833C0B2003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AppPreferences.strings; sourceTree = "<group>"; };
+		C818E0092833C0B2003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		C818E00A2833C0B2003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/DatabaseOnboarding.strings; sourceTree = "<group>"; };
+		C818E00B2833C0B2003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
+		C818E00C2833C0B3003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
+		C818E00D2833C0B3003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
+		C818E00E2833C0B3003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		C818E00F2833C0B4003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		C818E0102833C0B4003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C818E0112833C0B5003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SyncLogViewController.strings; sourceTree = "<group>"; };
+		C818E0122833C0B5003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		C818E0132833C0B5003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
+		C818E0142833C0B5003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C818E0152833C0B6003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SFTPConfigurationVC.strings; sourceTree = "<group>"; };
+		C818E0162833C0B6003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/WebDAVConfigVC.strings; sourceTree = "<group>"; };
+		C818E0172833C0B7003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C818E0182833C0B7003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AddDatabaseSelectStorageProvider.strings; sourceTree = "<group>"; };
+		C818E0192833C0BC003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SelectAutoFillDatabaseViewController.strings; sourceTree = "<group>"; };
+		C818E01A2833C0BC003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/CredentialProviderViewController.strings; sourceTree = "<group>"; };
+		C818E01B2833C0BD003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/ManualCredentialsEntry.strings; sourceTree = "<group>"; };
+		C818E01C2833C0BD003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SelectCredential.strings; sourceTree = "<group>"; };
+		C818E01D2833C0BE003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AutoFillLoading.strings; sourceTree = "<group>"; };
+		C818E01E2833C0D6003EE3B3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = ../StrongBox/pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8196F1C27E1035200876E13 /* SideBarSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SideBarSettings.swift; path = MacBox/SideBarSettings.swift; sourceTree = "<group>"; };
 		C819D6C026BD921300886363 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SFTPConnectionsManager.storyboard; sourceTree = "<group>"; };
 		C819D6C526BD921B00886363 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
@@ -5921,6 +5971,7 @@
 				nl,
 				"pt-BR",
 				"zh-Hant",
+				pl,
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
 			packageReferences = (
@@ -7792,6 +7843,7 @@
 				C8FB343125B9F564003C0F24 /* nl */,
 				C86BB46B25F91C3300425405 /* pt-BR */,
 				C8242D8026FB70F100D586A4 /* zh-Hant */,
+				C818E00F2833C0B4003EE3B3 /* pl */,
 			);
 			name = DownloadFavIcons.storyboard;
 			path = MacBox;
@@ -7815,6 +7867,7 @@
 				C8FB343225B9F564003C0F24 /* nl */,
 				C86BB46D25F91C3400425405 /* pt-BR */,
 				C8242D8326FB717E00D586A4 /* zh-Hant */,
+				C818E0122833C0B5003EE3B3 /* pl */,
 			);
 			name = MacKeePassHistory.storyboard;
 			path = MacBox;
@@ -7838,6 +7891,7 @@
 				C8FB342825B9F563003C0F24 /* nl */,
 				C86BB46725F91C3100425405 /* pt-BR */,
 				C8242D8526FB71E000D586A4 /* zh-Hant */,
+				C818DFFA2833C0AC003EE3B3 /* pl */,
 			);
 			name = NodeDetails.storyboard;
 			path = MacBox;
@@ -7861,6 +7915,7 @@
 				C8FB343A25B9F566003C0F24 /* nl */,
 				C86BB47625F91C6300425405 /* pt-BR */,
 				C8242D8C26FB748700D586A4 /* zh-Hant */,
+				C818E01E2833C0D6003EE3B3 /* pl */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -7883,6 +7938,7 @@
 				C8FB342725B9F563003C0F24 /* nl */,
 				C86BB46625F91C3000425405 /* pt-BR */,
 				C8242D7E26FB70CE00D586A4 /* zh-Hant */,
+				C818E0092833C0B2003EE3B3 /* pl */,
 			);
 			name = DatabaseProperties.storyboard;
 			path = MacBox;
@@ -7906,6 +7962,7 @@
 				C8FB342625B9F563003C0F24 /* nl */,
 				C86BB46525F91C3000425405 /* pt-BR */,
 				C8242D8B26FB729E00D586A4 /* zh-Hant */,
+				C818E00C2833C0B3003EE3B3 /* pl */,
 			);
 			name = UpgradeWindowController.xib;
 			path = MacBox;
@@ -7930,6 +7987,7 @@
 				C86BB46925F91C3200425405 /* pt-BR */,
 				C8242D7C26FB709F00D586A4 /* zh-Hant */,
 				C81756A52735366C00431A36 /* en */,
+				C818E00E2833C0B3003EE3B3 /* pl */,
 			);
 			name = ChangeMasterPasswordWindowController.xib;
 			path = MacBox;
@@ -7953,6 +8011,7 @@
 				C8FB342925B9F564003C0F24 /* nl */,
 				C86BB46825F91C3100425405 /* pt-BR */,
 				C8242D8926FB726900D586A4 /* zh-Hant */,
+				C818E00D2833C0B3003EE3B3 /* pl */,
 			);
 			name = SelectPredefinedIconController.xib;
 			path = MacBox;
@@ -7976,6 +8035,7 @@
 				C8FB343425B9F565003C0F24 /* nl */,
 				C86BB46E25F91C3500425405 /* pt-BR */,
 				C8242D8626FB720E00D586A4 /* zh-Hant */,
+				C818E0132833C0B5003EE3B3 /* pl */,
 			);
 			name = PredefinedKeePassIcon.xib;
 			path = MacBox;
@@ -7992,6 +8052,7 @@
 				C8445C1F256FB3AD00AF1110 /* cs */,
 				C8FB342525B9F563003C0F24 /* nl */,
 				C86BB46425F91C2F00425405 /* pt-BR */,
+				C818E00B2833C0B2003EE3B3 /* pl */,
 			);
 			name = CheckboxCell.xib;
 			path = MacBox;
@@ -8015,6 +8076,7 @@
 				C8FB343525B9F565003C0F24 /* nl */,
 				C86BB47225F91C3700425405 /* pt-BR */,
 				C844B425273992D90023AD74 /* zh-Hant */,
+				C818E01A2833C0BC003EE3B3 /* pl */,
 			);
 			name = CredentialProviderViewController.xib;
 			sourceTree = "<group>";
@@ -8037,6 +8099,7 @@
 				C8FB342425B9F562003C0F24 /* nl */,
 				C86BB46325F91C2E00425405 /* pt-BR */,
 				C8242D8426FB71C800D586A4 /* zh-Hant */,
+				C818DFF62833C0AB003EE3B3 /* pl */,
 			);
 			name = Main.storyboard;
 			path = MacBox;
@@ -8060,6 +8123,7 @@
 				C80043E426BD90280090C90D /* nl */,
 				C80043E626BD90290090C90D /* cs */,
 				C80043E826BD902C0090C90D /* zh-Hant */,
+				C818E0172833C0B7003EE3B3 /* pl */,
 			);
 			name = WebDAVConnectionsManager.storyboard;
 			path = MacBox;
@@ -8083,6 +8147,7 @@
 				C81033962749634000869513 /* cs */,
 				C81033982749634200869513 /* zh-Hant */,
 				C810339A2749634400869513 /* zh-Hans */,
+				C818E0082833C0B2003EE3B3 /* pl */,
 			);
 			name = AppPreferences.storyboard;
 			path = MacBox;
@@ -8106,6 +8171,7 @@
 				C8175695273525A800431A36 /* es */,
 				C8175697273525AA00431A36 /* sv */,
 				C8175699273525AB00431A36 /* uk */,
+				C818DFFC2833C0AD003EE3B3 /* pl */,
 			);
 			name = ConnectHardwareKey.xib;
 			path = MacBox;
@@ -8129,6 +8195,7 @@
 				C819D6DD26BD923400886363 /* uk */,
 				C819D6DF26BD923500886363 /* sv */,
 				C819D6E126BD923600886363 /* es */,
+				C818E0142833C0B5003EE3B3 /* pl */,
 			);
 			name = SFTPConnectionsManager.storyboard;
 			path = MacBox;
@@ -8152,6 +8219,7 @@
 				C823F05927A31CDB009FF675 /* cs */,
 				C823F05B27A31CDC009FF675 /* zh-Hant */,
 				C823F05D27A31CDE009FF675 /* zh-Hans */,
+				C818DFF22833C0A9003EE3B3 /* pl */,
 			);
 			name = "NextGen-Master.storyboard";
 			path = MacBox;
@@ -8175,6 +8243,7 @@
 				C82DB44E2753C95E006B7573 /* cs */,
 				C82DB4502753C95F006B7573 /* zh-Hant */,
 				C82DB4522753C960006B7573 /* zh-Hans */,
+				C818E01D2833C0BE003EE3B3 /* pl */,
 			);
 			name = AutoFillLoading.storyboard;
 			sourceTree = "<group>";
@@ -8197,6 +8266,7 @@
 				C845951226D3E6C600D5DF6B /* es */,
 				C845951426D3E6C700D5DF6B /* sv */,
 				C845951626D3E6C900D5DF6B /* uk */,
+				C818DFFD2833C0AE003EE3B3 /* pl */,
 			);
 			name = SystemTrayViewController.storyboard;
 			path = MacBox;
@@ -8220,6 +8290,7 @@
 				C862A027260B9D9A00DEDB8E /* fr */,
 				C862A029260B9D9B00DEDB8E /* de */,
 				C8242D8126FB710100D586A4 /* zh-Hant */,
+				C818DFF92833C0AC003EE3B3 /* pl */,
 			);
 			name = EditCustomField.storyboard;
 			path = MacBox;
@@ -8243,6 +8314,7 @@
 				C8630E58274BE3A3002718DE /* cs */,
 				C8630E5A274BE3A5002718DE /* zh-Hant */,
 				C8630E5C274BE3A6002718DE /* zh-Hans */,
+				C818E0022833C0B0003EE3B3 /* pl */,
 			);
 			name = AutoFillAppLevelPreferences.storyboard;
 			path = MacBox;
@@ -8285,6 +8357,7 @@
 				C8877364261DD65C00C01406 /* sv */,
 				C8877366261DD65D00C01406 /* uk */,
 				C8242D7B26FB706D00D586A4 /* zh-Hant */,
+				C818E0012833C0AF003EE3B3 /* pl */,
 			);
 			name = Backups.storyboard;
 			path = MacBox;
@@ -8308,6 +8381,7 @@
 				C8877414261E02FA00C01406 /* sv */,
 				C8877416261E02FB00C01406 /* uk */,
 				C8242D7926FB704200D586A4 /* zh-Hant */,
+				C818DFFF2833C0AE003EE3B3 /* pl */,
 			);
 			name = AboutViewController.storyboard;
 			path = MacBox;
@@ -8331,6 +8405,7 @@
 				C8A5EF2327A5690F00C5232D /* es */,
 				C8A5EF2527A5691000C5232D /* sv */,
 				C8A5EF2727A5691200C5232D /* uk */,
+				C818DFF12833C0A9003EE3B3 /* pl */,
 			);
 			name = "NextGen-Sidebar.storyboard";
 			path = MacBox;
@@ -8354,6 +8429,7 @@
 				C8FB342225B9F562003C0F24 /* nl */,
 				C86BB46125F91C2D00425405 /* pt-BR */,
 				C8242D7D26FB70BD00D586A4 /* zh-Hant */,
+				C818E00A2833C0B2003EE3B3 /* pl */,
 			);
 			name = DatabaseOnboarding.storyboard;
 			path = MacBox;
@@ -8377,6 +8453,7 @@
 				C8FB343625B9F565003C0F24 /* nl */,
 				C86BB47325F91C3800425405 /* pt-BR */,
 				C832A4AA2730272500768319 /* zh-Hant */,
+				C818E01B2833C0BD003EE3B3 /* pl */,
 			);
 			name = ManualCredentialsEntry.xib;
 			sourceTree = "<group>";
@@ -8399,6 +8476,7 @@
 				C8B14B8C274A991A0055EB05 /* cs */,
 				C8B14B8E274A991B0055EB05 /* zh-Hant */,
 				C8B14B90274A991C0055EB05 /* zh-Hans */,
+				C818E0052833C0B0003EE3B3 /* pl */,
 			);
 			name = FavIconPreferences.storyboard;
 			path = MacBox;
@@ -8422,6 +8500,7 @@
 				C8B14BB2274AA3F10055EB05 /* cs */,
 				C8B14BB4274AA3F30055EB05 /* zh-Hant */,
 				C8B14BB6274AA3F60055EB05 /* zh-Hans */,
+				C818E0042833C0B0003EE3B3 /* pl */,
 			);
 			name = NewEntryDefaultsPreferences.storyboard;
 			path = MacBox;
@@ -8445,6 +8524,7 @@
 				C8B14BD8274AA9F20055EB05 /* cs */,
 				C8B14BDA274AA9F40055EB05 /* zh-Hant */,
 				C8B14BDC274AA9F70055EB05 /* zh-Hans */,
+				C818E0032833C0B0003EE3B3 /* pl */,
 			);
 			name = AdvancedAppPreferences.storyboard;
 			path = MacBox;
@@ -8468,6 +8548,7 @@
 				C8BB755C261E241900D6FCB1 /* sv */,
 				C8BB755E261E241A00D6FCB1 /* uk */,
 				C8242D8226FB711100D586A4 /* zh-Hant */,
+				C818DFFE2833C0AE003EE3B3 /* pl */,
 			);
 			name = EditTagsPopover.storyboard;
 			path = MacBox;
@@ -8491,6 +8572,7 @@
 				C8BBBDF02823F21600334D2B /* cs */,
 				C8BBBDF22823F21700334D2B /* zh-Hant */,
 				C8BBBDF42823F21800334D2B /* zh-Hans */,
+				C818DFEE2833C0A8003EE3B3 /* pl */,
 			);
 			name = CompareDatabases.storyboard;
 			path = MacBox;
@@ -8514,6 +8596,7 @@
 				C8BBBE222824115200334D2B /* cs */,
 				C8BBBE242824115300334D2B /* zh-Hant */,
 				C8BBBE262824115500334D2B /* zh-Hans */,
+				C818DFEF2833C0A8003EE3B3 /* pl */,
 			);
 			name = CompareAndMergeWizard.storyboard;
 			path = MacBox;
@@ -8537,6 +8620,7 @@
 				C8C5DFA628328A2900A1EEFE /* cs */,
 				C8C5DFA728328A2B00A1EEFE /* zh-Hant */,
 				C8C5DFA828328A2E00A1EEFE /* zh-Hans */,
+				C818E0102833C0B4003EE3B3 /* pl */,
 			);
 			name = FavIconResultTableCell.xib;
 			path = MacBox;
@@ -8560,6 +8644,7 @@
 				C8CB82E22790817000F85A2C /* es */,
 				C8CB82E42790817100F85A2C /* sv */,
 				C8CB82E62790817200F85A2C /* uk */,
+				C818DFF52833C0AB003EE3B3 /* pl */,
 			);
 			name = PastedImagePreviewer.storyboard;
 			path = MacBox;
@@ -8583,6 +8668,7 @@
 				C8CB8304279081A800F85A2C /* it */,
 				C8CB8306279081AA00F85A2C /* ja */,
 				C8CB8308279081AB00F85A2C /* nb */,
+				C818DFF42833C0AA003EE3B3 /* pl */,
 			);
 			name = QrCodeWindowScanner.storyboard;
 			path = MacBox;
@@ -8606,6 +8692,7 @@
 				C8CB8324279081E300F85A2C /* cs */,
 				C8CB8326279081E400F85A2C /* zh-Hant */,
 				C8CB8328279081E500F85A2C /* zh-Hans */,
+				C818DFF32833C0AA003EE3B3 /* pl */,
 			);
 			name = CreateEditViewController.storyboard;
 			path = MacBox;
@@ -8629,6 +8716,7 @@
 				C8DA3DE827B4270D00862C17 /* cs */,
 				C8DA3DEA27B4270F00862C17 /* zh-Hant */,
 				C8DA3DEC27B4271000862C17 /* zh-Hans */,
+				C818DFF82833C0AC003EE3B3 /* pl */,
 			);
 			name = AuditConfigurationViewController.storyboard;
 			path = MacBox;
@@ -8652,6 +8740,7 @@
 				C8DA3E0C27B4278B00862C17 /* es */,
 				C8DA3E0E27B4278D00862C17 /* sv */,
 				C8DA3E1027B4278E00862C17 /* uk */,
+				C818DFF72833C0AB003EE3B3 /* pl */,
 			);
 			name = AuditDrillDown.storyboard;
 			path = MacBox;
@@ -8675,6 +8764,7 @@
 				C8E5C353275E76E4006C15FE /* cs */,
 				C8E5C355275E76E5006C15FE /* zh-Hant */,
 				C8E5C357275E76EA006C15FE /* zh-Hans */,
+				C818DFED2833C0A7003EE3B3 /* pl */,
 			);
 			name = MacConflictResolutionWizard.storyboard;
 			path = MacBox;
@@ -8698,6 +8788,7 @@
 				C8FB343725B9F566003C0F24 /* nl */,
 				C86BB47425F91C3800425405 /* pt-BR */,
 				C844B426273992E60023AD74 /* zh-Hant */,
+				C818E0192833C0BC003EE3B3 /* pl */,
 			);
 			name = SelectAutoFillDatabaseViewController.xib;
 			sourceTree = "<group>";
@@ -8720,6 +8811,7 @@
 				C8FB343825B9F566003C0F24 /* nl */,
 				C86BB47525F91C3900425405 /* pt-BR */,
 				C844B427273992ED0023AD74 /* zh-Hant */,
+				C818E01C2833C0BD003EE3B3 /* pl */,
 			);
 			name = SelectCredential.xib;
 			sourceTree = "<group>";
@@ -8742,6 +8834,7 @@
 				C8FB343925B9F566003C0F24 /* nl */,
 				C86BB45F25F91C2C00425405 /* pt-BR */,
 				C8242D8726FB722400D586A4 /* zh-Hant */,
+				C818DFFB2833C0AD003EE3B3 /* pl */,
 			);
 			name = PressYubiKeyWindow.xib;
 			path = MacBox;
@@ -8765,6 +8858,7 @@
 				C8F1B42026D67F5800B21A29 /* es */,
 				C8F1B42226D67F5900B21A29 /* sv */,
 				C8F1B42426D67F5B00B21A29 /* uk */,
+				C818DFF02833C0A8003EE3B3 /* pl */,
 			);
 			name = NextGen.storyboard;
 			path = MacBox;
@@ -8788,6 +8882,7 @@
 				C8F39F6325DD90CF0045CAAB /* ja */,
 				C86BB47025F91C3600425405 /* pt-BR */,
 				C800441426BD90730090C90D /* zh-Hant */,
+				C818E0162833C0B6003EE3B3 /* pl */,
 			);
 			name = WebDAVConfigVC.storyboard;
 			path = MacBox;
@@ -8811,6 +8906,7 @@
 				C8F39F9325DD914A0045CAAB /* uk */,
 				C86BB46C25F91C3400425405 /* pt-BR */,
 				C8242D8A26FB728400D586A4 /* zh-Hant */,
+				C818E0112833C0B5003EE3B3 /* pl */,
 			);
 			name = SyncLogViewController.storyboard;
 			path = MacBox;
@@ -8834,6 +8930,7 @@
 				C8F8CE3225D57BEF00C93840 /* uk */,
 				C86BB46225F91C2E00425405 /* pt-BR */,
 				C8242D7F26FB70DD00D586A4 /* zh-Hant */,
+				C818E0002833C0AF003EE3B3 /* pl */,
 			);
 			name = DatabasesManager.storyboard;
 			path = MacBox;
@@ -8857,6 +8954,7 @@
 				C8F8CE5C25D57F0C00C93840 /* uk */,
 				C86BB46F25F91C3600425405 /* pt-BR */,
 				C800441826BD907F0090C90D /* zh-Hant */,
+				C818E0152833C0B6003EE3B3 /* pl */,
 			);
 			name = SFTPConfigurationVC.storyboard;
 			path = MacBox;
@@ -8880,6 +8978,7 @@
 				C8F8CE8925D57F2F00C93840 /* uk */,
 				C86BB47125F91C3700425405 /* pt-BR */,
 				C8242D7A26FB705C00D586A4 /* zh-Hant */,
+				C818E0182833C0B7003EE3B3 /* pl */,
 			);
 			name = AddDatabaseSelectStorageProvider.storyboard;
 			path = MacBox;
@@ -8903,6 +9002,7 @@
 				C8F9AA8427495C2100C2D9E8 /* cs */,
 				C8F9AA8627495C2600C2D9E8 /* zh-Hant */,
 				C8F9AA8827495C2700C2D9E8 /* zh-Hans */,
+				C818E0072833C0B1003EE3B3 /* pl */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = MacBox;
@@ -8926,6 +9026,7 @@
 				C8F9AAA627495C4600C2D9E8 /* cs */,
 				C8F9AAA827495C4800C2D9E8 /* zh-Hant */,
 				C8F9AAAA27495C4A00C2D9E8 /* zh-Hans */,
+				C818E0062833C0B1003EE3B3 /* pl */,
 			);
 			name = GeneralAppPreferences.storyboard;
 			path = MacBox;
@@ -8946,7 +9047,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -8980,7 +9081,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -9071,7 +9172,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -9113,7 +9214,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -9261,7 +9362,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -9293,7 +9394,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -9325,7 +9426,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -9369,7 +9470,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3078;
+				CURRENT_PROJECT_VERSION = 3079;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
