@@ -7,12 +7,23 @@
 //
 
 #import "DropboxV2StorageProvider.h"
-#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "Utils.h"
-#import "SVProgressHUD.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
+#import "real-secrets.h"
+
+#if TARGET_OS_IPHONE
+
+#import "SVProgressHUD.h"
 #import "AppPreferences.h"
+
+#else
+
+#import "macOSSpinnerUI.h"
+#import "MacUrlSchemes.h"
+
+#endif
 
 @implementation DropboxV2StorageProvider
 
@@ -24,10 +35,6 @@
         sharedInstance = [[DropboxV2StorageProvider alloc] init];
     });
     return sharedInstance;
-}
-
-- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
-    
 }
 
 - (instancetype)init {
@@ -48,13 +55,93 @@
     }
 }
 
+
+
+- (BOOL)isAuthorized {
+    return DBClientsManager.authorizedClient != nil;
+}
+
+- (void)signOut {
+    [DBClientsManager unlinkAndResetClients];
+}
+
+- (void)initialize:(BOOL)useIsolatedDropbox {
+#if TARGET_OS_IPHONE
+    if ( useIsolatedDropbox ) {
+        [DBClientsManager setupWithAppKey:DROPBOX_APP_ISOLATED_KEY];
+    }
+    else {
+        [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
+    }
+#else
+    if ( useIsolatedDropbox ) {
+        [DBClientsManager setupWithAppKeyDesktop:DROPBOX_APP_ISOLATED_KEY];
+    }
+    else {
+        [DBClientsManager setupWithAppKeyDesktop:DROPBOX_APP_KEY];
+    }
+#endif
+}
+
+- (void)dismissProgressSpinner {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IPHONE
+        [SVProgressHUD dismiss];
+#else
+        [macOSSpinnerUI.sharedInstance dismiss];
+#endif
+    });
+}
+
+- (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IPHONE
+        [SVProgressHUD showWithStatus:message];
+#else
+        [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
+#endif
+    });
+}
+
+- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    NSString* path = [self getPathFromDatabaseMetadata:safeMetaData];
+
+    [self performTaskWithAuthorizationIfNecessary:nil task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
+        if (error) {
+            completion(nil, error);
+        }
+        else if (userInteractionRequired) {
+            completion(nil, [Utils createNSError:@"User Interaction Required from getModDate" errorCode:346]);
+        }
+        else {
+            DBUserClient *client = DBClientsManager.authorizedClient;
+            
+            
+            
+            [[client.filesRoutes getMetadata:path] setResponseBlock:^(DBFILESMetadata * _Nullable result, DBFILESGetMetadataError * _Nullable routeError, DBRequestError * _Nullable networkError) {
+                if (result) {
+                    DBFILESFileMetadata* metadata = (DBFILESFileMetadata*)result;
+                    
+
+                    
+                    completion(metadata.serverModified, nil);
+                }
+                else {
+                    completion(nil, [Utils createNSError:@"Error getModDate" errorCode:347]);
+                }
+            }];
+        }
+    }];
+
+}
+
 - (void)    create:(NSString *)nickName
          extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(DatabasePreferences *metadata, const NSError *error))completion {
-    [SVProgressHUD show];
+    viewController:(VIEW_CONTROLLER_PTR)viewController
+        completion:(void (^)(METADATA_PTR metadata, const NSError *error))completion {
+    [self showProgressSpinner:@"" viewController:viewController];
 
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
 
@@ -67,30 +154,25 @@
                     path:path
                     data:data
               completion:^(StorageProviderUpdateResult result, NSDate * _Nullable newRemoteModDate, const NSError * _Nullable error) {
-      dispatch_async(dispatch_get_main_queue(), ^{
-          [SVProgressHUD dismiss];
-      });
+        [self dismissProgressSpinner];
 
-      if (error == nil) {
-          DatabasePreferences *metadata = [DatabasePreferences templateDummyWithNickName:nickName
-                                                          storageProvider:self.storageId
-                                                                 fileName:desiredFilename
-                                                           fileIdentifier:parentFolderPath];
-
-          completion(metadata, error);
-      }
-      else {
-          completion(nil, error);
-      }
+        if (error == nil) {
+            METADATA_PTR metadata = [self getDatabaseMetadata:desiredFilename parentPath:parentFolderPath nickName:nickName];
+            
+            completion(metadata, nil);
+        }
+        else {
+            completion(nil, error);
+        }
     }];
 }
 
-- (void)pullDatabase:(DatabasePreferences *)safeMetaData
-    interactiveVC:(UIViewController *)viewController
+- (void)pullDatabase:(METADATA_PTR )safeMetaData
+    interactiveVC:(VIEW_CONTROLLER_PTR )viewController
            options:(StorageProviderReadOptions *)options
         completion:(StorageProviderReadCompletionBlock)completion {
-    NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
-    
+    NSString* path = [self getPathFromDatabaseMetadata:safeMetaData];
+
     [self performTaskWithAuthorizationIfNecessary:viewController
                                              task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
         if (error) {
@@ -106,7 +188,7 @@
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
-              viewController:(UIViewController *)viewController
+              viewController:(VIEW_CONTROLLER_PTR )viewController
                      options:(StorageProviderReadOptions *)options
                   completion:(StorageProviderReadCompletionBlock)completionHandler {
     DBFILESFileMetadata *file = (DBFILESFileMetadata *)providerData;
@@ -114,13 +196,12 @@
 }
 
 - (void)readFileWithPath:(NSString *)path
-          viewController:(UIViewController*)viewController
+          viewController:(VIEW_CONTROLLER_PTR )viewController
                  options:(StorageProviderReadOptions *)options
               completion:(StorageProviderReadCompletionBlock)completion {
     if (viewController) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-        });
+        [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")
+                   viewController:viewController];
     }
 
     DBUserClient *client = DBClientsManager.authorizedClient;
@@ -131,14 +212,12 @@
         if (result) {
             DBFILESFileMetadata* metadata = (DBFILESFileMetadata*)result;
             
-            NSLog(@"Dropbox Date Modified: [%@]", metadata.serverModified);
+
 
             if (options && options.onlyIfModifiedDifferentFrom) {
                 if ([metadata.serverModified isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom]) {
                     if (viewController) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [SVProgressHUD dismiss];
-                        });
+                        [self dismissProgressSpinner];
                     }
                     
                     completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
@@ -150,9 +229,7 @@
               setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *networkError,
                                  NSData *fileContents) {
                 if (viewController) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [SVProgressHUD dismiss];
-                    });
+                    [self dismissProgressSpinner];
                 }
 
                 if (result) {
@@ -173,49 +250,64 @@
         }
         else {
             if (viewController) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
+                [self dismissProgressSpinner];
             }
-
-            NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@\n", routeError, networkError];
-            completion(kReadResultError, nil, nil, [Utils createNSError:message errorCode:-1]);
+            
+            if ( routeError && routeError.tag == DBFILESGetMetadataErrorPath && routeError.isPath ) {
+                NSLog(@"🔴 Dropbox - Could not find file at path [%@]", path);
+                completion(kReadResultError, nil, nil, [Utils createNSError:[NSString stringWithFormat:@"Could not find file at %@", path] errorCode:-1]);
+            }
+            else
+            {
+                NSString *message = [[NSString alloc] initWithFormat:@"🔴 %@\n%@\n", routeError, networkError];
+                completion(kReadResultError, nil, nil, [Utils createNSError:message errorCode:-1]);
+            }
         }
     }];
 }
 
-- (void)pushDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
-    NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
+- (void)pushDatabase:(METADATA_PTR )safeMetaData interactiveVC:(VIEW_CONTROLLER_PTR )viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+    NSString* path = [self getPathFromDatabaseMetadata:safeMetaData];
+    
     [self createOrUpdate:viewController path:path data:data completion:completion];
 }
 
-- (void)createOrUpdate:(UIViewController*)viewController path:(NSString *)path data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)createOrUpdate:(VIEW_CONTROLLER_PTR )viewController path:(NSString *)path data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     if (viewController) {
-        [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+        [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:viewController];
     }
     
     DBUserClient *client = DBClientsManager.authorizedClient;
     
-    [[[client.filesRoutes uploadData:path
-                                mode:[[DBFILESWriteMode alloc] initWithOverwrite]
-                          autorename:@(NO)
-                      clientModified:nil
-                                mute:@(NO)
-                      propertyGroups:nil
-                      strictConflict:@(NO)
-                         contentHash:nil
-                           inputData:data]
-      setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *networkError) {
+    DBUploadTask* request = [client.filesRoutes uploadData:path
+                                           mode:[[DBFILESWriteMode alloc] initWithOverwrite]
+                                     autorename:@(NO)
+                                 clientModified:nil
+                                           mute:@(NO)
+                                 propertyGroups:nil
+                                 strictConflict:@(NO)
+                                    contentHash:nil
+                                      inputData:data];
+    
+    [[request setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *networkError) {
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            [self dismissProgressSpinner];
         }
 
         if (result) {
             completion(kUpdateResultSuccess, result.serverModified, nil);
         }
         else {
+            if ( routeError.isPath ) {
+                DBFILESUploadWriteFailed* writeFailed = routeError.path;
+                if ( writeFailed && writeFailed.reason ) {
+                    if ( writeFailed.reason.isInsufficientSpace ) {
+                        completion(kUpdateResultError, nil, [Utils createNSError:@"You have run out of space on Dropbox." errorCode:-1]);
+                        return;
+                    }
+                }
+            }
+            
             NSString *message = [self handleRequestError:networkError];
             if ( !message) {
                 message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
@@ -229,7 +321,7 @@
 }
 
 - (void)      list:(NSObject *)parentFolder
-    viewController:(UIViewController *)viewController
+    viewController:(VIEW_CONTROLLER_PTR )viewController
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     [self performTaskWithAuthorizationIfNecessary:viewController
                                              task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
@@ -237,84 +329,22 @@
             completion(userCancelled, nil, error);
         }
         else {
-            [self listFolder:parentFolder completion:completion];
+            [self listFolder:parentFolder viewController:viewController completion:completion];
         }
     }];
 }
 
-- (void (^)(NSURL * _Nonnull))openUrlHandler {
-    return ^(NSURL * _Nonnull url) {
-        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-    };
-}
-
-- (void)performTaskWithAuthorizationIfNecessary:(UIViewController *)viewController
-                                           task:(void (^)(BOOL userCancelled, BOOL userInteractionRequired, NSError *error))task {
-    if (!DBClientsManager.authorizedClient) {
-        if (!viewController) {
-            task(NO, YES, nil);
-            return;
-        }
-        
-        NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
-        id __block token = [center addObserverForName:@"isDropboxLinked"
-                                               object:nil
-                                                queue:nil
-                                           usingBlock:^(NSNotification *_Nonnull note) {
-            [center removeObserver:token];
-  
-            if (DBClientsManager.authorizedClient) {
-                NSLog(@"Linked");
-                task(NO, NO, nil);
-            }
-            else {
-                NSLog(@"Not Linked");
-                DBOAuthResult *authResult = (DBOAuthResult *)note.object;
-                NSLog(@"Error: %@", authResult);
-                task(authResult.tag == DBAuthCancel, NO, [Utils createNSError:[NSString stringWithFormat:@"Could not create link to Dropbox: [%@]", authResult] errorCode:-1]);
-            }
-        }];
-
-
-        
-        (void)token;
-        
-        
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss]; 
-            
-            NSArray<NSString*>* minimalScopes = @[ @"account_info.read",
-                                                   @"files.metadata.read",
-                                                   @"files.metadata.write",
-                                                   @"files.content.read",
-                                                   @"files.content.write"];
-            
-            DBScopeRequest *scopeRequest = [[DBScopeRequest alloc] initWithScopeType:DBScopeTypeUser
-                                                                              scopes:minimalScopes
-                                                                includeGrantedScopes:NO];
-            
-            [DBClientsManager authorizeFromControllerV2:UIApplication.sharedApplication
-                                             controller:viewController
-                                  loadingStatusDelegate:nil
-                                                openURL:[self openUrlHandler]
-                                           scopeRequest:scopeRequest];
-        });
-    }
-    else {
-        task(NO, NO, nil);
-    }
-}
-
 - (void)listFolder:(NSObject *)parentFolder
+    viewController:(VIEW_CONTROLLER_PTR )viewController
         completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion {
-    [SVProgressHUD show];
+    [self showProgressSpinner:@"" viewController:viewController];
 
     NSMutableArray<StorageBrowserItem *> *items = [[NSMutableArray alloc] init];
     DBFILESMetadata *parent = (DBFILESMetadata *)parentFolder;
     
     [[DBClientsManager.authorizedClient.filesRoutes listFolder:parent ? parent.pathLower : @""] setResponseBlock:^(DBFILESListFolderResult *_Nullable response, DBFILESListFolderError *_Nullable routeError,
                         DBRequestError *_Nullable networkError) {
+        
          if (response) {
             NSArray<DBFILESMetadata *> *entries = response.entries;
             NSString *cursor = response.cursor;
@@ -328,10 +358,7 @@
                               completion:completion];
             }
             else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
-
+                [self dismissProgressSpinner];
                 completion(NO, items, nil);
             }
          }
@@ -341,10 +368,8 @@
                 message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
             }
 
-             dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
-
+            [self dismissProgressSpinner];
+             
             completion(NO, nil, [Utils createNSError:message errorCode:-1]);
          }
      }];
@@ -385,24 +410,20 @@
                               completion:completion];
             }
             else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
-
+                [self dismissProgressSpinner];
+                
                 completion(NO, items, nil);
             }
          }
          else {
-            NSString *message = [self handleRequestError:networkError];
-            if ( !message) {
-                message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
-            }
+             NSString *message = [self handleRequestError:networkError];
+             if ( !message) {
+                 message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
+             }
 
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
-
-            completion(NO, nil, [Utils createNSError:message errorCode:-1]);
+             [self dismissProgressSpinner];
+             
+             completion(NO, nil, [Utils createNSError:message errorCode:-1]);
          }
      }];
 }
@@ -423,29 +444,151 @@
             item.folder = true;
         }
 
+        item.identifier = entry.pathDisplay;
+        
         [ret addObject:item];
     }
 
     return ret;
 }
 
-- (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
+- (METADATA_PTR )getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
     DBFILESFileMetadata *file = (DBFILESFileMetadata *)providerData;
     NSString *parent = (file.pathLower).stringByDeletingLastPathComponent;
 
-    return [DatabasePreferences templateDummyWithNickName:nickName
-                                  storageProvider:self.storageId
-                                         fileName:file.name
-                                   fileIdentifier:parent];
+    return [self getDatabaseMetadata:file.name parentPath:parent nickName:nickName];
 }
 
-- (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
-      completion:(void (^)(UIImage *image))completionHandler {
+- (METADATA_PTR)getDatabaseMetadata:(NSString*)filename parentPath:(NSString*)parentPath nickName:(NSString*)nickName {
+#if TARGET_OS_IPHONE
+            METADATA_PTR metadata = [DatabasePreferences templateDummyWithNickName:nickName
+                                                                   storageProvider:self.storageId
+                                                                          fileName:filename
+                                                                    fileIdentifier:parentPath];
+#else
+            NSString* escapedFilename = [filename stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
+            NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@:
+            
+            METADATA_PTR metadata = [MacDatabasePreferences templateDummyWithNickName:nickName
+                                                                      storageProvider:self.storageId
+                                                                              fileUrl:url
+                                                                          storageInfo:parentPath];
+#endif
+    
+    return metadata;
+}
+
+-(NSString*)getPathFromDatabaseMetadata:(METADATA_PTR )safeMetaData {
+#if TARGET_OS_IPHONE
+    NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
+#else
+    NSString *path = [NSString pathWithComponents:@[safeMetaData.storageInfo, safeMetaData.fileUrl.lastPathComponent]];
+#endif
+
+    return path;
+}
+
+- (void)loadIcon:(NSObject *)providerData viewController:(VIEW_CONTROLLER_PTR )viewController
+      completion:(void (^)(IMAGE_TYPE_PTR image))completionHandler {
     
 }
 
-- (void)delete:(DatabasePreferences *)safeMetaData completion:(void (^)(const NSError *))completion {
+- (void)delete:(METADATA_PTR )safeMetaData completion:(void (^)(const NSError *))completion {
     
+}
+
+- (void)performTaskWithAuthorizationIfNecessary:(VIEW_CONTROLLER_PTR )viewController
+                                           task:(void (^)(BOOL userCancelled, BOOL userInteractionRequired, NSError *error))task {
+    if (!DBClientsManager.authorizedClient) {
+        if (!viewController) {
+            task(NO, YES, nil);
+            return;
+        }
+        
+        [self listenForDropboxAuthCompletion:task];
+        
+        
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self dismissProgressSpinner];
+            
+            NSArray<NSString*>* minimalScopes = @[ @"account_info.read",
+                                                   @"files.metadata.read",
+                                                   @"files.metadata.write",
+                                                   @"files.content.read",
+                                                   @"files.content.write"];
+            
+            DBScopeRequest *scopeRequest = [[DBScopeRequest alloc] initWithScopeType:DBScopeTypeUser
+                                                                              scopes:minimalScopes
+                                                                includeGrantedScopes:NO];
+            
+#if TARGET_OS_IPHONE
+            [DBClientsManager authorizeFromControllerV2:UIApplication.sharedApplication
+                                             controller:viewController
+                                  loadingStatusDelegate:nil
+                                                openURL:^(NSURL *url) { [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil]; }
+                                           scopeRequest:scopeRequest];
+#else
+            [DBClientsManager authorizeFromControllerDesktopV2:[NSWorkspace sharedWorkspace]
+                                                    controller:viewController
+                                         loadingStatusDelegate:nil
+                                                       openURL:^(NSURL *url) { [[NSWorkspace sharedWorkspace] openURL:url]; }
+                                                  scopeRequest:scopeRequest];
+#endif
+        });
+    }
+    else {
+        task(NO, NO, nil);
+    }
+}
+
+- (BOOL)handleAuthRedirectUrl:(NSURL*)url {
+    return [DBClientsManager handleRedirectURL:url completion:^(DBOAuthResult * _Nullable authResult) {
+        if (authResult != nil) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"isDropboxLinked" object:authResult];
+        }
+        else {
+            NSLog(@"🔴 Dropbox URL - No Auth Result!!");
+        }
+    }];
+}
+
+- (void)listenForDropboxAuthCompletion:(void (^)(BOOL userCancelled, BOOL userInteractionRequired, NSError *error))task {
+    NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
+    
+    
+    
+    id __block token = [center addObserverForName:@"isDropboxLinked"
+                                           object:nil
+                                            queue:nil
+                                       usingBlock:^(NSNotification *_Nonnull note) {
+        [center removeObserver:token];
+
+        DBOAuthResult *authResult = (DBOAuthResult *)note.object;
+        
+        if ([authResult isSuccess]) {
+            NSLog(@"✅ Success! User is logged into Dropbox.");
+        }
+        else if ([authResult isCancel]) {
+            NSLog(@"⚠️ Authorization flow was manually canceled by user!");
+        }
+        else if ([authResult isError]) {
+            NSLog(@"🔴 Error: %@", authResult);
+        }
+
+        if ( DBClientsManager.authorizedClient ) {
+            NSLog(@"✅ Dropbox Linked");
+            task(NO, NO, nil);
+        }
+        else {
+            NSLog(@"🔴 Not Linked");
+            NSLog(@"Error: %@", authResult);
+            task(authResult.tag == DBAuthCancel, NO, [Utils createNSError:[NSString stringWithFormat:@"Could not create link to Dropbox: [%@]", authResult] errorCode:-1]);
+        }
+    }];
+    
+    
+    (void)token;
 }
 
 @end

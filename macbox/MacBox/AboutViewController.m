@@ -17,6 +17,7 @@
 @property BOOL hasLoaded;
 @property (weak) IBOutlet NSTextField *labelAbout;
 @property (unsafe_unretained) IBOutlet NSTextView *textView;
+@property (weak) IBOutlet NSTextField *labelLicense;
 
 @end
 
@@ -55,12 +56,18 @@ static AboutViewController* sharedInstance;
 - (void)doInitialSetup {
     self.view.window.delegate = self;
     
-    NSString* fmt = Settings.sharedInstance.isAProBundle ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+
+    
+    NSString* fmt = NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
     
     NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
     
     self.view.window.title = about;
     self.labelAbout.stringValue = about;
+    
+    
+    self.labelLicense.hidden = !Settings.sharedInstance.fullVersion;
+    
 }
 
 - (void)cancel:(id)sender { 

@@ -14,6 +14,7 @@
 #import "NSArray+Extensions.h"
 #import "SafeStorageProviderFactory.h"
 #import "WorkingCopyManager.h"
+#import "ProUpgradeIAPManager.h"
 
 #if TARGET_OS_IPHONE
 
@@ -91,9 +92,21 @@ static NSString *ModelIdentifier()
 
 #if TARGET_OS_IPHONE
     [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION]];
+    [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", AppPreferences.sharedInstance.numberOfEntitlementCheckFails]];
+    [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", AppPreferences.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
 #else
     [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber]]];
+    [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", Settings.sharedInstance.numberOfEntitlementCheckFails]];
+    [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", Settings.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
 #endif
+
+    [debugLines addObject:[NSString stringWithFormat:@"LLIAPP: %hhd", ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro]];
+    [debugLines addObject:[NSString stringWithFormat:@"AMS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription]];
+    [debugLines addObject:[NSString stringWithFormat:@"AYS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription]];
+    [debugLines addObject:[NSString stringWithFormat:@"FTA: %hhd", ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable]];
+    [debugLines addObject:[NSString stringWithFormat:@"PFT: %hhd", ProUpgradeIAPManager.sharedInstance.hasPurchasedFreeTrial]];
+    [debugLines addObject:[NSString stringWithFormat:@"FTPD: %@", ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate.friendlyDateTimeStringBothPrecise]];
+        
     
 
     [debugLines addObject:@"--------------------"];

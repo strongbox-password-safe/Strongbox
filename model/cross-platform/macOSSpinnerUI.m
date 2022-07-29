@@ -62,6 +62,9 @@
 }
 
 - (void)show:(nonnull NSString *)message view:(NSView*)view {
+    if (!message) {
+        message = @"";
+    }
     if ( NSThread.isMainThread ) {
         [self innerShow:message view:view];
     }

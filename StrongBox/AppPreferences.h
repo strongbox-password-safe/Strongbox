@@ -36,15 +36,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSInteger clearClipboardAfterSeconds;
 @property (nullable) NSData* duressDummyData;
 
-@property (readonly) BOOL freeTrialHasBeenOptedInAndExpired;
+
+
+- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
+
 @property (readonly) NSInteger freeTrialDaysLeft;
-@property (readonly) BOOL isProOrFreeTrial;
-@property (readonly) BOOL isPro;
 @property (readonly) BOOL isFreeTrial;
 @property (readonly) BOOL hasOptedInToFreeTrial;
-- (void)setPro:(BOOL)value;
 @property NSDate *freeTrialEnd;
-- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
+
+@property (readonly) BOOL freeTrialHasBeenOptedInAndExpired; 
+@property (readonly) BOOL isProOrFreeTrial;
+
+
+
+@property (readonly) BOOL isPro;
+- (void)setPro:(BOOL)value;
 
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL monitorInternetConnectivity;
@@ -93,7 +100,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSUInteger numberOfEntitlementCheckFails;
 
 @property (readonly) NSUInteger launchCount;
-
 - (void)resetLaunchCount;
 - (void)incrementLaunchCount;
 
@@ -178,6 +184,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL markdownNotes;
 
 @property BOOL autoFillLongTapPreview;
+@property BOOL hideTipJar;
+
+@property BOOL useParentGroupIconOnCreate;
+
+@property BOOL stripUnusedIconsOnSave;
 
 @end
 

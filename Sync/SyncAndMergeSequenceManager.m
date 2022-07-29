@@ -101,21 +101,32 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         NSMutableDictionary* md = NSMutableDictionary.dictionary;
         
 #if TARGET_OS_IPHONE
-        for (int i=0;i<kStorageProviderCount;i++) {
-            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:i];
-            NSString* queueName = [NSString stringWithFormat:@"SB-SProv-Queue-%@", [SafeStorageProviderFactory getStorageDisplayNameForProvider:i]];
-            md[@(i)] = dispatch_queue_create(queueName.UTF8String, provider.supportsConcurrentRequests ? DISPATCH_QUEUE_CONCURRENT : DISPATCH_QUEUE_SERIAL);
-        }
+        NSArray<NSNumber*> *supported = @[@(kGoogleDrive),
+                                          @(kDropbox),
+                                          @(kLocalDevice),
+                                          @(kiCloud),
+                                          @(kFilesAppUrlBookmark),
+                                          @(kSFTP),
+                                          @(kWebDAV),
+                                          @(kTwoDrive),
+        ];
 #else
-        NSArray<NSNumber*> *supportedProvidersOnMac = @[@(kSFTP), @(kWebDAV), @(kMacFile), @(kTwoDrive)];
-        for (NSNumber* providerIdNum in supportedProvidersOnMac) {
+        NSArray<NSNumber*> *supported = @[@(kSFTP),
+                                          @(kWebDAV),
+                                          @(kMacFile),
+                                          @(kTwoDrive),
+                                          @(kGoogleDrive),
+                                          @(kDropbox)];
+#endif
+
+        for (NSNumber* providerIdNum in supported) {
             int i = providerIdNum.intValue;
+
             id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:i];
             NSString* queueName = [NSString stringWithFormat:@"SB-SProv-Queue-%@", [SafeStorageProviderFactory getStorageDisplayNameForProvider:i]];
             md[providerIdNum] = dispatch_queue_create(queueName.UTF8String, provider.supportsConcurrentRequests ? DISPATCH_QUEUE_CONCURRENT : DISPATCH_QUEUE_SERIAL);
         }
-#endif
-        
+
         self.storageProviderSerializedQueues = md.copy;
     }
     return self;
@@ -168,6 +179,13 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
 
         dispatch_queue_t storageProviderQueue = self.storageProviderSerializedQueues[@(database.storageProvider)];
+        
+        if ( storageProviderQueue == nil ) {
+            NSLog(@"🔴 No Storage Provider Queue for this Provider!");
+            request.completion(kSyncAndMergeError, NO, [Utils createNSError:@"No Storage Provider Queue for this Provider!" errorCode:-1]);
+            return;
+        }
+        
         dispatch_async(storageProviderQueue, ^{
             __block BOOL done = NO; 
             

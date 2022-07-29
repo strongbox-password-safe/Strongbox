@@ -13,8 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ContextMenuHelper : NSObject
 
-// TODO: All Context menu items created through here...
-
 + (UIAction*)getItem:(NSString*)title image:(UIImage*)image handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
 
 + (UIAction*)getItem:(NSString*)title systemImage:(NSString*)systemImage handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));

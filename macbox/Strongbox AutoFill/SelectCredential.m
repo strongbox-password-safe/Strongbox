@@ -146,11 +146,11 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     if(serviceId) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = serviceId.identifier.urlExtendedParse;
-
             
-
             
-
+            
+            
+            
             if (url) {
                 NSArray* items = [self getMatchingItems:url.absoluteString scope:kSearchScopeUrl];
                 if(items.count) {
@@ -158,26 +158,33 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
                     return;
                 }
                 else {
-                    NSLog(@"No matches for URL: %@", url.absoluteString);
+
                 }
-
                 
+                
+                
+                if ( url.host.length ) { 
+                    items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
+                    if(items.count) {
+                        self.searchField.stringValue = url.host;
+                        return;
+                    }
+                    else {
 
-                items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
-                if(items.count) {
-                    self.searchField.stringValue = url.host;
-                    return;
+                    }
+                    
+                    NSString* domain = getDomain(url.host);
+                    [self smartInitializeSearchFromDomain:domain];
                 }
                 else {
-                    NSLog(@"No matches for URL: %@", url.host);
+                    NSString* domain = getDomain(url.absoluteString);
+                    [self smartInitializeSearchFromDomain:domain];
                 }
-
-
-                NSString* domain = getDomain(url.host);
-                [self smartInitializeSearchFromDomain:domain];
             }
             else {
-                NSLog(@"No matches for URL: %@", url);
+
+                NSString* domain = getDomain(serviceId.identifier);
+                [self smartInitializeSearchFromDomain:domain];
             }
         }
         else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {

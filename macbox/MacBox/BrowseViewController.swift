@@ -8,6 +8,12 @@
 
 import Cocoa
 
+//class NoSortIndicatorTableHeaderCell : NSTableHeaderCell {
+//    override func drawSortIndicator(withFrame cellFrame: NSRect, in controlView: NSView, ascending: Bool, priority: Int) {
+//
+//    }
+//}
+
 class BrowseViewController: NSViewController {
     deinit {
         NSLog("😎 DEINIT [MasterViewController]")
@@ -923,9 +929,22 @@ extension BrowseViewController: NSOutlineViewDataSource {
     }
 
     func sortItems ( ) -> [Node] {
+
+
+
+
+
+
         if case .regularHierarchy = navigationContext, database.isKeePass2Format, !database.sortKeePassNodes {
             if let sortDescriptor = outlineView.sortDescriptors.first,
                 let col = BrowseViewColumn(rawValue: sortDescriptor.key!), col != .title {
+                
+
+
+
+
+
+
                 return sortNodes(unsorted)
             }
             else {
@@ -1077,25 +1096,32 @@ extension BrowseViewController: NSOutlineViewDataSource {
         return false
     }
 
-    func outlineView(_ outlineView: NSOutlineView, sortDescriptorsDidChange _: [NSSortDescriptor]) {
+    func outlineView(_ outlineView: NSOutlineView, sortDescriptorsDidChange oldDescriptors : [NSSortDescriptor]) {
 
 
 
 
         if let firstDes = outlineView.sortDescriptors.first,
-           let col = BrowseViewColumn(rawValue: firstDes.key!), col == .title,
-                case .regularHierarchy = navigationContext, database.isKeePass2Format, !database.sortKeePassNodes {
-            NSLog("✅ Title column sort clicked")
-            
-            MacAlerts.info(NSLocalizedString("browse_cannot_sort_by_title_title", comment: "Cannot Sort"),
-                           informativeText: NSLocalizedString("browse_cannot_sort_by_title_message", comment: "You cannot sort by Title here because you have disabled sorting in Database Settings."),
-                           window: view.window,
-                           completion: nil)
+           let col = BrowseViewColumn(rawValue: firstDes.key!),
+            col == .title,
+           case .regularHierarchy = navigationContext, database.isKeePass2Format, !database.sortKeePassNodes {
+           if let prevFirstDes = oldDescriptors.first,
+              firstDes.key == prevFirstDes.key {
+               NSLog("✅ Title column sort clicked again")
+                
+               
+               MacAlerts.info(NSLocalizedString("browse_cannot_sort_by_title_title", comment: "Cannot Sort"),
+                               informativeText: NSLocalizedString("browse_cannot_sort_by_title_message", comment: "You cannot sort by Title here because you have disabled sorting in Database Settings."),
+                               window: view.window,
+                               completion: nil)
+               
+               return
+            }
         }
-        else {
-            reSortItems()
-            outlineView.reloadData()
-        }
+        
+        reSortItems()
+        outlineView.reloadData()
+
         
 
 

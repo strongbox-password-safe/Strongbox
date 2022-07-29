@@ -21,11 +21,16 @@
 }
 
 - (BOOL)shouldDisplay {
-    if( AppPreferences.sharedInstance.isProOrFreeTrial || ![self userHasAlreadyTriedAppForMoreThan90Days] ) {
+    if( AppPreferences.sharedInstance.isProOrFreeTrial ) {
+        return NO;
+
+    }
+    
+    if ( ![self userHasAlreadyTriedAppForMoreThan90Days] ) {
         return NO;
     }
-
-    const NSUInteger percentageChanceOfShowing = 1;
+    
+    const NSUInteger percentageChanceOfShowing = 1; 
     NSInteger random = arc4random_uniform(100);
 
     return (random < percentageChanceOfShowing);
@@ -48,7 +53,7 @@
 }
 
 - (BOOL)userHasAlreadyTriedAppForMoreThan90Days {
-    return (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || AppPreferences.sharedInstance.daysInstalled > 90);
+    return AppPreferences.sharedInstance.daysInstalled > 90;
 }
 
 @end

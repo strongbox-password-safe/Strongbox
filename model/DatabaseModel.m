@@ -4,7 +4,6 @@
 #import "SprCompilation.h"
 #import "NSArray+Extensions.h"
 #import "NSMutableArray+Extensions.h"
-#import "DatabaseAuditor.h"
 #import "NSData+Extensions.h"
 #import "NSDate+Extensions.h"
 #import "KeePassConstants.h"
@@ -12,6 +11,7 @@
 #import "MinimalPoolHelper.h"
 #import "NSString+Extensions.h"
 #import "FastMaps.h"
+#import "CrossPlatform.h"
 
 #if TARGET_OS_IPHONE
 #import "KissXML.h" 
@@ -27,8 +27,9 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 @property (nonatomic) NSDictionary<NSUUID*, NodeIcon*> *backingIconPool;
 @property (nonatomic) DatabaseFormat format;
 @property (nonatomic, nonnull, readonly) UnifiedDatabaseMetadata* metadata;
-
 @property (readonly) FastMaps* fastMaps;
+
+@property (readonly) id<ApplicationPreferences> preferences;
 
 @end
 
@@ -133,6 +134,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 
+- (id<ApplicationPreferences>)preferences {
+    return CrossPlatformDependencies.defaults.applicationPreferences;
+}
+
+
+
 - (NSArray<DatabaseAttachment *> *)attachmentPool {
     return [MinimalPoolHelper getMinimalAttachmentPool:self.rootNode];
 }
@@ -144,7 +151,8 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
             
-    const BOOL stripUnusedIcons = NO; 
+    const BOOL stripUnusedIcons = self.preferences.stripUnusedIconsOnSave;
+    
     NSMutableDictionary<NSUUID*, NodeIcon*>* newIconPool = stripUnusedIcons ? @{}.mutableCopy : self.backingIconPool.mutableCopy;
     
     for (Node* node in allNodes) {
@@ -160,8 +168,6 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     self.backingIconPool = newIconPool.copy;
     
-    
-
     return self.backingIconPool.copy;
 }
 

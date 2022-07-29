@@ -18,7 +18,7 @@ typedef NS_ENUM (NSUInteger, StorageProvider) {
     kMacFile,
 #endif
     kiCloud,
-    kOneDrive,
+    kOneDrive_Deprecated,
     kFilesAppUrlBookmark,
     kSFTP,
     kWebDAV,

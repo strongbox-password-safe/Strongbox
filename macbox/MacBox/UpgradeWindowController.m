@@ -10,16 +10,20 @@
 #import "MacAlerts.h"
 #import "Settings.h"
 
-#define kFontName @"Futura-Bold"
+//#define kFontName @"Futura-Bold"
 
-@interface UpgradeWindowController ()
+@interface UpgradeWindowController () // Remove this class completely? We can't actually - too many existing customers
 
-@property (nonatomic, strong) SKProduct *product;
+
 @property (nonatomic) NSInteger cancelDelay;
 @property (nonatomic) BOOL isPurchasing;
 
 @property NSInteger secondsRemaining;
 @property NSTimer *countdownTimer;
+
+@property (weak) IBOutlet NSButton *buttonNoThanks;
+@property (weak) IBOutlet NSButton *buttonUpgrade;
+@property (weak) IBOutlet NSProgressIndicator *progressIndicator;
 
 @end
 
@@ -27,19 +31,17 @@
 
 static UpgradeWindowController *sharedInstance = nil;
 
-+ (void)show:(SKProduct*)product cancelDelay:(NSInteger)cancelDelay {
-    if (!sharedInstance)
-    {
++ (void)show:(NSInteger)cancelDelay {
+    if (!sharedInstance) {
         sharedInstance = [[UpgradeWindowController alloc] initWithWindowNibName:@"UpgradeWindowController"];
-        sharedInstance.product = product;
+
         sharedInstance.cancelDelay = cancelDelay;
     }
  
     [sharedInstance showWindow:nil];
 }
 
-- (void)windowWillClose:(NSNotification *)notification
-{
+- (void)windowWillClose:(NSNotification *)notification {
     if ([notification object] == [self window] && self == sharedInstance) {
         sharedInstance = nil;
     }
@@ -69,7 +71,7 @@ static UpgradeWindowController *sharedInstance = nil;
     [self.window setLevel:NSModalPanelWindowLevel]; 
     [self.window setHidesOnDeactivate:YES];
     
-    [self customizeButtonsBasedOnProduct];
+
     
     [[SKPaymentQueue defaultQueue] addTransactionObserver:self];
     
@@ -78,120 +80,7 @@ static UpgradeWindowController *sharedInstance = nil;
     }
 }
 
-- (NSString*)getPriceTextFromProduct {
-    NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
-    formatter.numberStyle = NSNumberFormatterCurrencyStyle;
-    formatter.locale = self.product.priceLocale;
-    NSString* localCurrency = [formatter stringFromNumber:self.product.price];
-    return [NSString stringWithFormat:@"(%@)*", localCurrency];
-}
-
-- (void) customizeButtonsBasedOnProduct {
-    [self.buttonUpgrade.layer setBackgroundColor:[NSColor redColor].CGColor];
-    self.buttonUpgrade.layer.cornerRadius = 15;
-    
-    NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
-    [style setParagraphSpacing:1.0f];
-    [style setAlignment:NSTextAlignmentCenter];
-    [style setLineBreakMode:NSLineBreakByWordWrapping];
-    
-    NSFont *font1 = [NSFont fontWithName:kFontName size:32.0f];
-    NSFont *font2 = [NSFont fontWithName:kFontName size:16.0f];
-    
-    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
-    
-    
-    
-    NSColor *upgradeButtonSubtitleColor;
-    NSColor *upgradeButtonTitleColor;
-    
-    if([osxMode isEqualToString:@"Dark"]) {
-        upgradeButtonSubtitleColor = [NSColor colorWithRed:255/255 green:255/255 blue:0/255 alpha:1]; 
-        upgradeButtonTitleColor = [NSColor whiteColor];
-    }
-    else {
-        upgradeButtonSubtitleColor = [NSColor controlTextColor]; 
-        upgradeButtonTitleColor = [NSColor controlTextColor];
-    }
-    
-    NSDictionary *dict1;
-    if(font1) {
-        dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSFontAttributeName:font1,
-                  NSForegroundColorAttributeName: upgradeButtonTitleColor,
-                  NSParagraphStyleAttributeName:style}; 
-    }
-    else {
-        dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSForegroundColorAttributeName:upgradeButtonTitleColor,
-                  NSParagraphStyleAttributeName:style}; 
-    }
-    
-    NSDictionary *dict2;
-    if(font2) {
-        dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSFontAttributeName:font2,
-                  NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                  NSParagraphStyleAttributeName:style}; 
-    }
-    else {
-        dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                  NSParagraphStyleAttributeName:style}; 
-    }
-    
-    if(self.product != nil) {
-        NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
-        
-        NSString* loc = NSLocalizedString(@"mac_upgrade_button_title", @"Upgrade");
-
-        loc = [loc stringByAppendingString:@"\n"];
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:loc attributes:dict1]];
-        
-        NSString* priceText = [self getPriceTextFromProduct];
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:priceText attributes:dict2]];
-        
-        self.buttonUpgrade.enabled = YES;
-        self.buttonRestore.enabled = YES;
-        self.buttonUpgrade.stringValue = attString.string;
-        
-        [self.buttonUpgrade setAttributedTitle:attString];
-        
-        
-    }
-    else {
-        NSFont *font3 = [NSFont fontWithName:kFontName size:16.0f];
-
-        NSDictionary *dict3;
-        if(font3) {
-            dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                      NSFontAttributeName:font3,
-                      NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                      NSParagraphStyleAttributeName:style}; 
-        }
-        else {
-            dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                      NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                      NSParagraphStyleAttributeName:style}; 
-        }
-
-        NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
-
-        NSString* loc = NSLocalizedString(@"mac_upgrade_momentarily_unavailble", @"Upgrade Momentarily Unavailable\nPlease Check Your Connection and Try Again Later");
-        
-        [attString appendAttributedString:[[NSAttributedString alloc] initWithString:loc
-                                                                          attributes:dict3]];
-        [self.buttonUpgrade setAttributedTitle:attString];
-
-        NSString* loc2 = NSLocalizedString(@"mac_restore_momentarily_unavailble", @"Restore Momentarily Unavailable");
-        [self.buttonRestore setTitle:loc2];
-    
-        self.buttonUpgrade.enabled = NO;
-        self.buttonRestore.enabled = NO;
-    }
-}
-
-- (void) startNoThanksCountdown {
+- (void)startNoThanksCountdown {
     NSLog(@"Starting No Thanks Countdown with %ld delay", (long)self.cancelDelay);
     
     [self.buttonNoThanks setEnabled:NO];
@@ -242,29 +131,28 @@ static UpgradeWindowController *sharedInstance = nil;
 }
 
 - (IBAction)onPurchase:(id)sender {
-    if ([SKPaymentQueue canMakePayments]) {
-        self.isPurchasing = YES;
-        self.buttonUpgrade.enabled = NO;
-        self.buttonRestore.enabled = NO;
-        self.buttonNoThanks.enabled = NO;
-        [self.textViewDetails setTextColor: [NSColor disabledControlTextColor]];
-        [self showProgressIndicator];
-        
-        SKPayment *payment = [SKPayment paymentWithProduct:self.product];
-        [[SKPaymentQueue defaultQueue] addPayment:payment];
-    }
-    else{
-        NSString* loc = NSLocalizedString(@"mac_upgrade_purchases_disabled_on_device", @"Purchases Are Disabled on Your Device.");
-        [MacAlerts info:loc window:self.window];
-    }
+    [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"upgrade_vc_old_freemium_upgrade_options_title", @"Strongbox Upgrade Options")
+                    informativeText:NSLocalizedString(@"upgrade_vc_strongbox_unified_message", @"Strongbox is now available for both iOS and macOS as a unified App.\n\nIf you have already purchased Strongbox then click 'Restore' below.\n\nIf you are new and want to Upgrade, the best way to do that is via the unified Strongbox app. Click 'View Strongbox Unified App' below to view on the App Store.")
+                  option1AndDefault:NSLocalizedString(@"upgrade_vc_old_freemium_upgrade_view_unified", @"View Strongbox Unified")
+                            option2:NSLocalizedString(@"upgrade_vc_old_freemium_upgrade_restore_pro", @"Restore my Pro Purchase")
+                             window:self.window
+                         completion:^(int response) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( response == 0 ) {
+                [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"itms-apps:
+                [self onNoThanks:nil];
+            }
+            else if ( response == 1 ) {
+                [self onRestore:nil];
+            }
+        });
+    }];
 }
 
 - (IBAction)onRestore:(id)sender {
     self.isPurchasing = NO;
     self.buttonUpgrade.enabled = NO;
-    self.buttonRestore.enabled = NO;
     self.buttonNoThanks.enabled = NO;
-    [self.textViewDetails setTextColor: [NSColor disabledControlTextColor]];
     [self showProgressIndicator];
 
     [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
@@ -376,9 +264,122 @@ updatedTransactions:(NSArray *)transactions {
     }
 }
 
-- (IBAction)onAppleFamilySharing:(id)sender {
-    [[NSWorkspace sharedWorkspace] openURL:
-    [NSURL URLWithString:@"macappstore:
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

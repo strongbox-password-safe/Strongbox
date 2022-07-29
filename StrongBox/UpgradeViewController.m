@@ -16,37 +16,35 @@
 #import "SaleScheduleManager.h"
 #import "Utils.h"
 #import "NSDate+Extensions.h"
+#import "Strongbox-Swift.h"
 
 @interface UpgradeViewController () <UIAdaptivePresentationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *buttonViewMonthly;
 @property (weak, nonatomic) IBOutlet UIView *buttonViewYearly;
-@property (weak, nonatomic) IBOutlet UIView *buttonViewLifeTime;
-@property (weak, nonatomic) IBOutlet UIButton *buttonRestorePrevious;
-
 @property (weak, nonatomic) IBOutlet UILabel *buttonMonthlyTitle;
 @property (weak, nonatomic) IBOutlet UILabel *buttonYearlyTitle;
-@property (weak, nonatomic) IBOutlet UILabel *buttonLifeTimeTitle;
-
 @property (weak, nonatomic) IBOutlet UILabel *monthlyPrice;
 @property (weak, nonatomic) IBOutlet UILabel *yearlyBonusLabel;
 @property (weak, nonatomic) IBOutlet UILabel *yearlyPrice;
-@property (weak, nonatomic) IBOutlet UILabel *lifeTimePrice;
-@property (weak, nonatomic) IBOutlet UILabel *lifeTimeBonusLabel;
 
-@property (weak, nonatomic) IBOutlet UILabel *developerMessage;
-@property (weak, nonatomic) IBOutlet UILabel *freeTrialExpiryIndicator;
-@property (weak, nonatomic) IBOutlet UILabel *upgradeForFeaturesSubLabel;
-
-@property (weak, nonatomic) IBOutlet UIView *viewFreeTrialInfo;
-@property (weak, nonatomic) IBOutlet UIView *buttonStartFreeTrial;
-@property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialTitle;
-@property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubtitle;
-@property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubSubTitle;
 @property (weak, nonatomic) IBOutlet UITextView *termsAndConditionsTextView;
+@property (weak, nonatomic) IBOutlet UIStackView *mainStack;
+
+@property (weak, nonatomic) IBOutlet UIStackView *carouselStack;
+@property (weak, nonatomic) IBOutlet ZKCarousel *carousel;
+@property (weak, nonatomic) IBOutlet UILabel *reviewPerson1;
+@property (weak, nonatomic) IBOutlet UILabel *reviewPerson2;
+@property (weak, nonatomic) IBOutlet UILabel *reviewPerson3;
+@property (weak, nonatomic) IBOutlet UILabel *reviewPerson4;
+@property (weak, nonatomic) IBOutlet UILabel *reviewPerson5;
+
+@property (weak, nonatomic) IBOutlet UIButton *buttonRestorePrevious;
 
 @property (weak, nonatomic) IBOutlet UIStackView *stackSale;
 @property (weak, nonatomic) IBOutlet UILabel *labelSaleTimeRemaining;
+@property (weak, nonatomic) IBOutlet UIView *freeTrialBadge;
+@property (weak, nonatomic) IBOutlet UILabel *labelFirstMonthsFree;
 
 @end
 
@@ -57,11 +55,6 @@
 
     [self setupUi];
     
-    [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(onProStatusChanged:)
-                                               name:kProStatusChangedNotificationKey
-                                             object:nil];
-    
     [self bindUi];
     
     ProUpgradeIAPManager.sharedInstance.productsAvailableNotify = ^{
@@ -70,19 +63,133 @@
         });
     };
     
-    self.presentationController.delegate = self;
-
     [ProUpgradeIAPManager.sharedInstance initialize]; 
 }
 
 - (void)setupUi {
+    [self setupCarousel];
+    
+    [self setupReviews];
+    
+    [self setupPricing];
+    
+    [self fixStrangeTermsAndConditions];
+    
+    [self.mainStack setCustomSpacing:0.0 afterView:self.carouselStack];
+    
+    self.presentationController.delegate = self;
+}
+
+- (void)setupCarousel {
+    NSString* fmt = BiometricsManager.sharedInstance.isFaceId ? NSLocalizedString(@"upgrade_vc_feature_face_id_pin_code", @"Face ID & PIN Code Unlock") :
+                                                                NSLocalizedString(@"upgrade_vc_feature_touch_id_pin_code", @"Touch ID & PIN Code Unlock");
+    
+    ZKCarouselSlide* biometricUnlock = [[ZKCarouselSlide alloc] initWithImage:[self getRoundedImage:@"upgrade_carousel_face_id"]
+                                                                        title:fmt
+                                                                         body:NSLocalizedString(@"upgrade_vc_feature_subtitle_biometric", @"Super Fast, Secure & Convenient")
+                                                                         tint:UIColor.whiteColor];
+
+    ZKCarouselSlide* yubikey = [[ZKCarouselSlide alloc] initWithImage:[self getRoundedImage:@"upgrade_carousel_yubikey4"]
+                                                               title:@"YubiKey"
+                                                                body:NSLocalizedString(@"upgrade_vc_feature_subtitle_yubikey", @"Use a YubiKey as a second factor")
+                                                                tint:UIColor.whiteColor];
+    
+    ZKCarouselSlide* auditing = [[ZKCarouselSlide alloc] initWithImage:[self getRoundedImage:@"upgrade_carousel_auditing"]
+                                                               title:NSLocalizedString(@"upgrade_vc_feature_auditing", @"Advanced Auditing")
+                                                                body:NSLocalizedString(@"upgrade_vc_feature_subtitle_auditing", @"HIBP & Similar Passwords")
+                                                                tint:UIColor.whiteColor];
+
+    ZKCarouselSlide* support = [[ZKCarouselSlide alloc] initWithImage:[self getRoundedImage:@"upgrade_carousel_support"]
+                                                               title:NSLocalizedString(@"upgrade_vc_feature_support", @"Premium Support")
+                                                                body:NSLocalizedString(@"upgrade_vc_feature_subtitle_support", @"We're here for you")
+                                                                tint:UIColor.whiteColor];
+
+    ZKCarouselSlide* compare = [[ZKCarouselSlide alloc] initWithImage:[self getRoundedImage:@"upgrade_carousel_compare"]
+                                                               title:NSLocalizedString(@"upgrade_vc_feature_compare_and_merge", @"Compare & Merge")
+                                                                body:NSLocalizedString(@"upgrade_vc_feature_subtitle_compare_and_merge", @"View & Combine Revisions")
+                                                                tint:UIColor.whiteColor];
+
+    UIImage* image = [UIImage imageNamed:@"upgrade_carousel_offline"];
+    if (@available(iOS 13.0, *)) {
+        image = [UIImage systemImageNamed:@"bolt.circle.fill"];
+    }
+    
+    ZKCarouselSlide* offline = [[ZKCarouselSlide alloc] initWithImage:image
+                                                                title:NSLocalizedString(@"upgrade_vc_feature_offline_editing", @"Offline Editing")
+                                                                 body:NSLocalizedString(@"upgrade_vc_feature_subtitle_offline_editing", @"Edit Offline, Sync Later")
+                                                                 tint:UIColor.systemYellowColor];
+    
+    ZKCarouselSlide* customAppIcons = [[ZKCarouselSlide alloc] initWithImage:[self getRoundedImage:@"upgrade_carousel_custom_app_icon"]
+                                                                       title:NSLocalizedString(@"upgrade_vc_feature_custom_app_icon", @"Custom App Icons")
+                                                                        body:NSLocalizedString(@"upgrade_vc_feature_subtitle_custom_app_icon", @"Customize your Strongbox")
+                                                                        tint:UIColor.whiteColor];
+    
+    ZKCarouselSlide* favIconDownloader = [[ZKCarouselSlide alloc] initWithImage:[self getRoundedImage:@"upgrade_carousel_favicon"]
+                                                                          title:NSLocalizedString(@"upgrade_vc_feature_favicon_downloader", @"Favicon Downloader")
+                                                                           body:NSLocalizedString(@"upgrade_vc_feature_subtitle_favicon_downloader", @"Make your entries stand out")
+                                                                           tint:UIColor.whiteColor];
+
+    UIImage* image2 = [UIImage imageNamed:@"upgrade_carousel_heart"];
+    if (@available(iOS 13.0, *)) {
+        image2 = [UIImage systemImageNamed:@"heart.circle"];
+    }
+
+    ZKCarouselSlide* indieDev = [[ZKCarouselSlide alloc] initWithImage:image2
+                                                                 title:NSLocalizedString(@"upgrade_vc_feature_support_indie", @"Support Indie Development")
+                                                                  body:NSLocalizedString(@"upgrade_vc_feature_subtitle_support_indie", @"Help us stay awesome!")
+                                                                  tint:UIColor.systemPurpleColor];
+
+    self.carousel.slides = @[
+        yubikey,
+        biometricUnlock,
+        customAppIcons,
+        compare,
+        indieDev,
+        support,
+        auditing,
+        favIconDownloader,
+        offline,
+    ];
+    
+    self.carousel.interval = 5.0;
+    [self.carousel start];
+}
+
+- (void)setupReviews {
+    const CGFloat kRadius = 15.0f;
+
+    self.reviewPerson1.layer.cornerRadius = kRadius;
+    self.reviewPerson1.clipsToBounds = YES;
+
+    self.reviewPerson2.layer.cornerRadius = kRadius;
+    self.reviewPerson2.clipsToBounds = YES;
+
+    self.reviewPerson3.layer.cornerRadius = kRadius;
+    self.reviewPerson3.clipsToBounds = YES;
+
+    self.reviewPerson4.layer.cornerRadius = kRadius;
+    self.reviewPerson4.clipsToBounds = YES;
+
+    self.reviewPerson5.layer.cornerRadius = kRadius;
+    self.reviewPerson5.clipsToBounds = YES;
+}
+
+- (void)setupPricing {
     const CGFloat kRadius = 10.0f;
     
     self.buttonViewMonthly.layer.cornerRadius = kRadius;
-    self.buttonViewYearly.layer.cornerRadius = kRadius;
-    self.buttonViewLifeTime.layer.cornerRadius = kRadius;
-    self.buttonStartFreeTrial.layer.cornerRadius = kRadius;
     
+    if (@available(iOS 13.0, *)) {
+        if ( self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ) {
+            self.buttonViewMonthly.backgroundColor = UIColor.systemGray5Color;
+        }
+        else {
+            self.buttonViewMonthly.backgroundColor = UIColor.systemGray5Color;
+        }
+    }
+    
+    self.buttonViewYearly.layer.cornerRadius = kRadius;
+
     UITapGestureRecognizer *m = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                         action:@selector(onMonthly)];
     [self.buttonViewMonthly addGestureRecognizer:m];
@@ -90,21 +197,50 @@
     UITapGestureRecognizer *y = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                         action:@selector(onYearly)];
     [self.buttonViewYearly addGestureRecognizer:y];
+    
+    [self customizeFreeTrialBadge];
+}
 
-    UITapGestureRecognizer *l = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                        action:@selector(onLifeTime)];
-    [self.buttonViewLifeTime addGestureRecognizer:l];
-
-    UITapGestureRecognizer *trial = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                            action:@selector(onStartFreeTrial)];
-    [self.buttonStartFreeTrial addGestureRecognizer:trial];
+- (void)customizeFreeTrialBadge {
+    UIBezierPath* bezierPath = [UIBezierPath bezierPath];
+    
+    CGFloat width = self.freeTrialBadge.frame.size.width;
+    CGFloat height = self.freeTrialBadge.frame.size.height;
+    CGFloat foo = height * 0.7;
+    
+    
+    [bezierPath moveToPoint:CGPointMake(0, foo)];
+    
+    
+    [bezierPath addLineToPoint:CGPointMake(width/2, height)];
+    
+    
+    [bezierPath addLineToPoint:CGPointMake(width, foo)];
+    
+    
+    [bezierPath addLineToPoint:CGPointMake(width, 0)];
+    
+    
+    [bezierPath addLineToPoint:CGPointMake(0, 0)];
+    
+    bezierPath.lineJoinStyle = kCGLineJoinRound;
 
     
+    [bezierPath closePath];
 
-    [self bindDeveloperMessage];
-
-    [self bindFreeTrialInfo];
     
+    CAShapeLayer *mask = [CAShapeLayer layer];
+    
+    
+    
+    mask.path = bezierPath.CGPath;
+    
+    
+    
+    self.freeTrialBadge.layer.mask = mask;
+}
+
+- (void)fixStrangeTermsAndConditions {
     
     
     static NSString* const kTextViewInterfaceBuilderId = @"k2u-lE-LrX.text";
@@ -114,93 +250,30 @@
     }
 }
 
-- (void)bindFreeTrialInfo {
-    if ([AppPreferences.sharedInstance isPro]) {
-        self.buttonStartFreeTrial.hidden = YES;
-        self.viewFreeTrialInfo.hidden = YES;
-    }
-    else if (AppPreferences.sharedInstance.freeTrialEnd) {
-        self.buttonStartFreeTrial.hidden = YES;
-        self.viewFreeTrialInfo.hidden = NO;
-        
-        NSInteger daysRemaining = AppPreferences.sharedInstance.freeTrialDaysLeft;
-
-        if (AppPreferences.sharedInstance.isFreeTrial) {
-            NSString* loc = NSLocalizedString(@"upgrade_vc_you_have_n_days_remaining_fmt", @"You have %ld days left in your Pro trial");
-            self.freeTrialExpiryIndicator.text = [NSString stringWithFormat:loc, daysRemaining];
-        }
-        else {
-            NSString* loc = NSLocalizedString(@"upgrade_vc_your_free_trial_expired", @"Your free trial of Strongbox Pro has expired.");
-            self.freeTrialExpiryIndicator.text = loc;
-        }
-
-        if (daysRemaining < 28) {
-            if (daysRemaining < 14) {
-                self.freeTrialExpiryIndicator.textColor = UIColor.systemRedColor;
-            }
-            else {
-                self.freeTrialExpiryIndicator.textColor = UIColor.systemOrangeColor;
-            }
-        }
-        
-        NSString* loc = NSLocalizedString(@"generic_biometric_unlock_fmt", @"%@ Unlock");
-        NSString* biometricUnlockFeature = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
-
-        NSString* loc2 = NSLocalizedString(@"upgrade_vc_enjoy_features_by_upgrading_fmt", @"Enjoy %@ and other Pro features by Upgrading!");
-        NSString* localized = [NSString stringWithFormat:loc2, biometricUnlockFeature];
-
-        self.upgradeForFeaturesSubLabel.text = localized;
-    }
-    else {
-        self.buttonStartFreeTrial.hidden = NO;
-        self.viewFreeTrialInfo.hidden = YES;
-        
-        NSString* loc = NSLocalizedString(@"upgrade_vc_start_your_free_trial", @"90 Day Trial");
-        NSString* loc2 = NSLocalizedString(@"upgrade_vc_start_your_free_trial_price_free", @"Free");
-        NSString* loc3 = NSLocalizedString(@"upgrade_vc_start_your_free_trial_subtitle", @"No subscription or commitment required!");
-
-        self.buttonStartFreeTrialTitle.text = loc;
-        self.buttonStartFreeTrialSubtitle.text = loc2;
-        self.buttonStartFreeTrialSubSubTitle.text = loc3;
-    }
-}
-
-- (void)bindDeveloperMessage {
-    NSString* loc = NSLocalizedString(@"generic_biometric_unlock_fmt", @"%@ Unlock");
-    NSString* biometricUnlockFeature = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
-    NSString* str = NSLocalizedString(@"upgrade_short_developer_message_fmt", @"");
-    self.developerMessage.text = [NSString stringWithFormat:str, biometricUnlockFeature];
-}
-
-- (void)onProStatusChanged:(id)param {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self bindUi];
-    });
-}
-
 - (void)bindUi {
-    [self bindSale];
     [self bindMonthlyPricing];
     [self bindYearlyPricing];
-    [self bindLifeTimePricing];
+    [self bindSale];
 }
 
-- (void)bindSale {
-    self.stackSale.hidden = !SaleScheduleManager.sharedInstance.saleNowOn;
-    
-    NSDate* endDate = SaleScheduleManager.sharedInstance.currentSaleEndDate;
-    if ( endDate ) {
-        NSTimeInterval interval = [endDate timeIntervalSinceDate:NSDate.date];
-        
-        NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
-        
-        fmt.allowedUnits =  NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute;
-        fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
-        fmt.includesTimeRemainingPhrase = YES;
-        fmt.maximumUnitCount = 1;
-        
-        self.labelSaleTimeRemaining.text = [fmt stringFromTimeInterval:interval];
-    }
+- (void)bindSale { 
+    self.stackSale.hidden = YES; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)bindMonthlyPricing {
@@ -228,11 +301,12 @@
 
     self.buttonYearlyTitle.text = NSLocalizedString(@"upgrade_vc_yearly_subscription_title", @"Monthly");
     self.yearlyPrice.text = NSLocalizedString(@"generic_loading", @"Loading...");
+    self.labelFirstMonthsFree.hidden = YES;
     self.yearlyBonusLabel.text = @"";
     self.buttonViewYearly.userInteractionEnabled = NO;
     
     SKProduct* product = ProUpgradeIAPManager.sharedInstance.yearlyProduct;
-    if(state == kReady && product) {
+    if ( state == kReady && product ) {
         SKProduct* monthlyProduct = ProUpgradeIAPManager.sharedInstance.monthlyProduct;
         
         NSString * bonusText;
@@ -243,8 +317,23 @@
         else {
             bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_fmt", @"%@ / month"), [self getPriceTextFromProduct:product divisor:12]];
         }
+        NSString* priceText = [self getPriceTextFromProduct:product];
         
-        self.yearlyPrice.text = [self getPriceTextFromProduct:product];
+        NSString* fmt;
+        if ( ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
+            self.freeTrialBadge.hidden = NO;
+            fmt = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_year_with_free_trial_fmt", @"then %@ every year"), priceText];
+            self.yearlyBonusLabel.hidden = YES;
+            self.labelFirstMonthsFree.hidden = NO;
+        }
+        else {
+            self.freeTrialBadge.hidden = YES;
+            fmt = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_year_fmt", @"%@ / year"), priceText];
+            self.yearlyBonusLabel.hidden = NO;
+            self.labelFirstMonthsFree.hidden = YES;
+        }
+        
+        self.yearlyPrice.text = fmt;
         self.yearlyBonusLabel.text = bonusText;
         
         self.buttonViewYearly.userInteractionEnabled = YES;
@@ -254,50 +343,106 @@
     }
 }
 
-- (void)bindLifeTimePricing {
-    UpgradeManagerState state = ProUpgradeIAPManager.sharedInstance.state;
 
-    self.buttonLifeTimeTitle.text = NSLocalizedString(@"upgrade_vc_lifetime_purchase_title", @"Lifetime");
-    self.lifeTimePrice.text = NSLocalizedString(@"generic_loading", @"Loading...");
-    self.buttonViewLifeTime.userInteractionEnabled = NO;
-    self.lifeTimeBonusLabel.text = @"";
+
+- (IBAction)onLifer:(id)sender {
+    SKStoreProductViewController *vc = [[SKStoreProductViewController alloc] init];
     
-    SKProduct* product = ProUpgradeIAPManager.sharedInstance.lifeTimeProduct;
-    if(state == kReady && product) {
-        NSString * priceText = [self getPriceTextFromProduct:product];
-        self.lifeTimePrice.text = priceText;
-        self.lifeTimeBonusLabel.text = NSLocalizedString(@"upgrade_vc_lifetime_subtitle_no_sub", @"(No Subscription)");
-        self.buttonViewLifeTime.userInteractionEnabled = YES;
-    }
-    else if(state == kCouldNotGetProducts) {
-        self.lifeTimePrice.text = NSLocalizedString(@"upgrade_vc_price_not_currently_available", @"Unavailable... Check your network connection");
-    }
-}
-
-- (IBAction)onFreeProComparisonChart:(id)sender {
-    [self performSegueWithIdentifier:@"segueToFreeProComparison" sender:nil];
-}
-
-- (IBAction)onNoThanks:(id)sender {
-    [self dismiss];
-}
-
-- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
-
-
-    if ( self.onDone ) {
-        self.onDone();
-    }
-}
-
-- (void)dismiss {
-    [SVProgressHUD dismiss];
-    
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-        if ( self.onDone ) {
-            self.onDone();
+    [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(1481853033) }
+                  completionBlock:^(BOOL result, NSError * _Nullable error) {
+        if ( !result ) {
+            NSLog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
         }
     }];
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (IBAction)onRestorePurchase:(id)sender {
+    [self enableButtons:NO];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
+    
+    BOOL optedInToFreeTrial = AppPreferences.sharedInstance.hasOptedInToFreeTrial; 
+    
+    [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self enableButtons:YES];
+            [SVProgressHUD dismiss];
+            
+            if(error) {
+                [Alerts error:self
+                        title:NSLocalizedString(@"upgrade_vc_problem_restoring", @"Issue Restoring Purchase")
+                        error:error];
+            }
+            else {
+                BOOL freeTrialStarted = AppPreferences.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial; 
+                
+                if(!AppPreferences.sharedInstance.isPro && !freeTrialStarted) {
+                    [Alerts info:self
+                           title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
+                         message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
+                      completion:nil];
+                }
+                else {
+                    dispatch_async(dispatch_get_main_queue(), ^(void) {
+                        [self dismiss];
+                    });
+                }
+            }
+        });
+    }];
+}
+
+- (void)onMonthly {
+    [self purchase:ProUpgradeIAPManager.sharedInstance.monthlyProduct];
+}
+
+- (void)onYearly {
+    [self purchase:ProUpgradeIAPManager.sharedInstance.yearlyProduct];
+}
+
+- (void)purchase:(SKProduct*)product {
+    if ( ProUpgradeIAPManager.sharedInstance.state != kReady || product == nil ) {
+        [Alerts warn:self
+               title:NSLocalizedString(@"upgrade_vc_product_error_title", @"Product Error")
+             message:NSLocalizedString(@"upgrade_vc_product_error_message", @"Could not access Upgrade Products on App Store. Please try again later.")];
+    }
+    else {
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_purchasing", @"Purchasing...")];
+        [self enableButtons:NO];
+
+        [ProUpgradeIAPManager.sharedInstance purchaseAndCheckReceipts:product completion:^(NSError * _Nullable error) {
+            [self enableButtons:YES];
+            [SVProgressHUD dismiss];
+
+            if ( error == nil ) { 
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    [self dismiss];
+                });
+            }
+            else if ( error.code != SKErrorPaymentCancelled ) {
+                [Alerts error:self
+                        title:NSLocalizedString(@"upgrade_vc_error_purchasing", @"Problem Purchasing")
+                        error:error];
+            }
+        }];
+    }
+}
+
+- (void)enableButtons:(BOOL)enable {
+    self.buttonViewMonthly.userInteractionEnabled = enable;
+    self.buttonViewYearly.userInteractionEnabled = enable;
+    self.buttonRestorePrevious.enabled = enable;
+}
+
+- (UIImage*)getRoundedImage:(NSString*)name {
+    UIImage* img = [UIImage imageNamed:name];
+    
+    if ( img != nil ) {
+        return [Utils makeRoundedImage:img radius:30];
+    }
+    
+    return nil;
 }
 
 - (NSString *)getPriceTextFromProduct:(SKProduct*)product {
@@ -320,7 +465,13 @@
 - (NSDecimalNumber*)getEffectivePrice:(SKProduct*)product {
     if (@available(iOS 11.2, *)) {
         if(product.introductoryPrice) {
-            return product.introductoryPrice.price;
+            if ( [product.introductoryPrice.price isEqual:NSDecimalNumber.zero] ) {
+
+                return product.price;
+            }
+            else {
+                return product.introductoryPrice.price;
+            }
         }
     }
 
@@ -337,108 +488,34 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
     return [[num decimalNumberByDividingBy:monthlyPrice] intValue];
 }
 
-- (void)onMonthly {
-    [self purchase:ProUpgradeIAPManager.sharedInstance.monthlyProduct];
-}
-
-- (void)onYearly {
-    [self purchase:ProUpgradeIAPManager.sharedInstance.yearlyProduct];
-}
-
-- (void)onLifeTime {
-    [self purchase:ProUpgradeIAPManager.sharedInstance.lifeTimeProduct];
-}
-
-- (IBAction)onIHaveQuestions:(id)sender {
-    [self performSegueWithIdentifier:@"segueToQuestions" sender:nil];
-}
-
-- (IBAction)onRestorePurchase:(id)sender {
-    [self enableButtons:NO];
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
-    
-    BOOL optedInToFreeTrial = AppPreferences.sharedInstance.hasOptedInToFreeTrial;
-    
-    [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self enableButtons:YES];
-            [SVProgressHUD dismiss];
-            
-            if(error) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"upgrade_vc_problem_restoring", @"Issue Restoring Purchase")
-                        error:error];
-            }
-            else {
-                BOOL freeTrialStarted = AppPreferences.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
-                
-                if(!AppPreferences.sharedInstance.isPro && !freeTrialStarted) {
-                    [Alerts info:self
-                           title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
-                         message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
-                      completion:nil];
-                }
-                else {
-                    dispatch_async(dispatch_get_main_queue(), ^(void) {
-                        [self dismiss];
-                    });
-                }
-            }
-        });
+- (IBAction)onFreeProComparisonChart:(id)sender {
+    [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https:
+                                     options:@{}
+                           completionHandler:^(BOOL success) {
+        if (!success) {
+            NSLog(@"Couldn't launch this URL!");
+        }
     }];
 }
 
-- (void)purchase:(SKProduct*)product {
-    if(ProUpgradeIAPManager.sharedInstance.state != kReady || product == nil) {
-        [Alerts warn:self
-               title:NSLocalizedString(@"upgrade_vc_product_error_title", @"Product Error")
-             message:NSLocalizedString(@"upgrade_vc_product_error_message", @"Could not access Upgrade Products on App Store. Please try again later.")];
-    }
-    else {
-        [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_purchasing", @"Purchasing...")];
-        [self enableButtons:NO];
+- (IBAction)onNoThanks:(id)sender {
+    [self dismiss];
+}
 
-        [ProUpgradeIAPManager.sharedInstance purchaseAndCheckReceipts:product completion:^(NSError * _Nullable error) {
-            [self enableButtons:YES];
-            [SVProgressHUD dismiss];
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
 
-            if (error == nil) {
-                
-                
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    [self dismiss];
-                });
-            }
-            else{
-                [Alerts error:self
-                        title:NSLocalizedString(@"upgrade_vc_error_purchasing", @"Problem Purchasing")
-                        error:error];
-            }
-        }];
+
+    if ( self.onDone ) {
+        self.onDone();
     }
 }
 
-- (void)enableButtons:(BOOL)enable {
-    self.buttonViewMonthly.userInteractionEnabled = enable;
-    self.buttonViewYearly.userInteractionEnabled = enable;
-    self.buttonViewLifeTime.userInteractionEnabled = enable;
-    self.buttonStartFreeTrial.userInteractionEnabled = enable;
-    self.buttonRestorePrevious.enabled = enable;
-}
-
-- (void)onStartFreeTrial {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"Loading...")];
-    [self enableButtons:NO];
+- (void)dismiss {
+    [SVProgressHUD dismiss];
     
-    [ProUpgradeIAPManager.sharedInstance startFreeTrial:^(NSError * _Nullable error) {
-        [self enableButtons:YES];
-        [SVProgressHUD dismiss];
-
-        if (!error) {
-            [self dismiss];
-        }
-        else {
-            [Alerts error:self title:@"Could not start Free Trial" error:error completion:nil];
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+        if ( self.onDone ) {
+            self.onDone();
         }
     }];
 }

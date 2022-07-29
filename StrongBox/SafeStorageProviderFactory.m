@@ -9,7 +9,6 @@
 #import "SafeStorageProviderFactory.h"
 
 #if TARGET_OS_IPHONE
-
     #import "LocalDeviceStorageProvider.h"
 
     #ifndef IS_APP_EXTENSION
@@ -22,22 +21,21 @@
     #endif
 
     #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-        #import "OneDriveStorageProvider.h"
         #import "GoogleDriveStorageProvider.h"
         #import "DropboxV2StorageProvider.h"
 
         #import "Strongbox-Swift.h" 
     #endif
-
 #else
-
     #import "MacUrlSchemes.h"
     #import "MacFileBasedBookmarkStorageProvider.h"
     #import "SFTPStorageProvider.h"
     #import "WebDAVStorageProvider.h"
-
+    
     #ifndef IS_APP_EXTENSION
         #import "Strongbox-Swift.h"
+        #import "GoogleDriveStorageProvider.h"
+        #import "DropboxV2StorageProvider.h"
     #endif
 #endif
 
@@ -64,9 +62,6 @@
     {
         return [DropboxV2StorageProvider sharedInstance];
     }
-    else if(providerId == kOneDrive) {
-        return [OneDriveStorageProvider sharedInstance];
-    }
     else if ( providerId == kTwoDrive ) {
         return TwoDriveStorageProvider.sharedInstance;
     }
@@ -77,6 +72,12 @@
     }
     else if ( providerId == kTwoDrive ) {
         return TwoDriveStorageProvider.sharedInstance;
+    }
+    else if (providerId == kGoogleDrive) {
+        return [GoogleDriveStorageProvider sharedInstance];
+    }
+    else if (providerId == kDropbox) {
+        return DropboxV2StorageProvider.sharedInstance;
     }
 #endif
 #ifndef NO_SFTP_WEBDAV_SP
@@ -161,7 +162,7 @@
         }
         return _displayName;
     }
-    else if(provider == kOneDrive || provider == kTwoDrive ) {
+    else if( provider == kTwoDrive ) {
         _displayName = NSLocalizedString(@"storage_provider_name_onedrive", @"OneDrive");
         if([_displayName isEqualToString:@"storage_provider_name_onedrive"]) {
             _displayName = @"OneDrive";
@@ -219,9 +220,6 @@
     else if (provider == kDropbox) {
         return @"Dropbox-2021";
     }
-    else if(provider == kOneDrive) {
-        return @"onedrive-2021";
-    }
     else if(provider == kTwoDrive) {
         return @"onedrive-2021";
     }
@@ -263,9 +261,6 @@
     }
     else if (provider == kDropbox) {
         return [NSImage imageNamed:@"Dropbox-2021"];
-    }
-    else if(provider == kOneDrive) {
-        return [NSImage imageNamed:@"onedrive-2021"];
     }
     else if(provider == kTwoDrive) {
         return [NSImage imageNamed:@"onedrive-2021"];

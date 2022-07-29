@@ -181,6 +181,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL customSortOrderForFields;
 
+@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
+@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
+
 @end
 
 NS_ASSUME_NONNULL_END

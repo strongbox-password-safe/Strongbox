@@ -88,166 +88,196 @@ nickNameEditClickEnabled:(BOOL)nickNameEditClickEnabled
 indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
        wormholeUnlocked:(BOOL)wormholeUnlocked
                disabled:(BOOL)disabled {
-    self.uuid = metadata.uuid;
-    self.originalNickName = metadata.nickName;
+    [self resetUi:metadata];
     
     self.gestureRecognizerClick.enabled = nickNameEditClickEnabled;
-    
-    self.textFieldName.stringValue = @"";
-    self.textFieldSubtitleLeft.stringValue = @"";
-    self.textFieldSubtitleTopRight.stringValue = @"";
-    self.textFieldSubtitleBottomRight.stringValue = @"";
-    
-    self.imageViewQuickLaunch.hidden = YES;
-    self.imageViewOutstandingUpdate.hidden = YES;
-    self.imageViewReadOnly.hidden = YES;
-    self.imageViewSyncing.hidden = YES;
-    self.syncProgressIndicator.hidden = YES;
-    [self.syncProgressIndicator stopAnimation:nil];
-    
     self.imageViewUnlocked.hidden = !wormholeUnlocked;
     
     @try {
-        [self determineFields:metadata];
+        self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:metadata.storageProvider];
+
+        [self bindTextFields:metadata];
     
-        if ( disabled || ( indicateAutoFillDisabled && !metadata.autoFillEnabled ) ) {
-            if ( indicateAutoFillDisabled && !metadata.autoFillEnabled ) {
-                self.textFieldSubtitleLeft.stringValue = NSLocalizedString(@"db_management_disable_done", @"AutoFill Disabled");
-            }
-            
-            self.imageViewProvider.image = [NSImage imageNamed:@"cancel"];
-            
-            if (@available(macOS 10.14, *)) {
-                self.imageViewProvider.contentTintColor = NSColor.secondaryLabelColor;
-            }
-            
-            self.alphaValue = 0.75f;
-        }
+        [self bindEnableDisabled:metadata disabled:disabled indicateAutoFillDisabled:indicateAutoFillDisabled];
+
+        [self bindIndicators:metadata];
         
-        self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
-        self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
-        self.imageViewReadOnly.hidden = !metadata.readOnly;
-
-        SyncOperationState syncState = showSyncState ? [MacSyncManager.sharedInstance getSyncStatus:metadata].state : kSyncOperationStateInitial;
-        
-        if (syncState == kSyncOperationStateInProgress ||
-            syncState == kSyncOperationStateError ||
-            syncState == kSyncOperationStateBackgroundButUserInteractionRequired ) { 
-            
-            self.imageViewSyncing.hidden = NO;
-            self.imageViewSyncing.image = syncState == kSyncOperationStateError ? [NSImage imageNamed:@"error"] : [NSImage imageNamed:@"syncronize"];
-            
-            if (@available(macOS 10.14, *)) {
-                NSColor *tint = (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
-                self.imageViewSyncing.contentTintColor = tint;
-            }
-            
-            if ( syncState == kSyncOperationStateInProgress ) {
-                self.syncProgressIndicator.hidden = NO;
-                [self.syncProgressIndicator startAnimation:nil];
-            }
-        }
-        else if ( metadata.asyncUpdateId != nil ) {
-            self.imageViewSyncing.hidden = NO;
-            
-            self.imageViewSyncing.image = [NSImage imageNamed:@"syncronize"];
-            
-            if (@available(macOS 11.0, *)) {
-                self.imageViewSyncing.image = [NSImage imageWithSystemSymbolName:@"function" accessibilityDescription:nil];
-                self.imageViewSyncing.controlSize = NSControlSizeLarge;
-            }
-
-            if (@available(macOS 10.14, *)) {
-                NSColor *tint = NSColor.systemYellowColor;
-                self.imageViewSyncing.contentTintColor = tint;
-            }
-
-            self.syncProgressIndicator.hidden = NO;
-            [self.syncProgressIndicator startAnimation:nil];
-        }
+        [self bindSyncState:metadata showSyncState:showSyncState];
     }
     @catch (NSException *exception) {
         NSLog(@"Exception getting display attributes for database: %@", exception);
     }
 }
 
-- (void)determineFields:(MacDatabasePreferences*)metadata {
+- (void)resetUi:(MacDatabasePreferences*)metadata {
+    self.uuid = metadata.uuid;
+    self.originalNickName = metadata.nickName;
+    self.textFieldName.stringValue = @"";
+    self.textFieldSubtitleLeft.stringValue = @"";
+    self.textFieldSubtitleTopRight.stringValue = @"";
+    self.textFieldSubtitleBottomRight.stringValue = @"";
+    self.imageViewQuickLaunch.hidden = YES;
+    self.imageViewOutstandingUpdate.hidden = YES;
+    self.imageViewReadOnly.hidden = YES;
+    self.imageViewSyncing.hidden = YES;
+    self.syncProgressIndicator.hidden = YES;
+    [self.syncProgressIndicator stopAnimation:nil];
+}
+
+- (void)bindIndicators:(MacDatabasePreferences*)metadata {
+    self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
+    self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
+    self.imageViewReadOnly.hidden = !metadata.readOnly;
+}
+
+- (void)bindEnableDisabled:(MacDatabasePreferences*)metadata disabled:(BOOL)disabled indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled {
+    if ( disabled || ( indicateAutoFillDisabled && !metadata.autoFillEnabled ) ) {
+        if ( indicateAutoFillDisabled && !metadata.autoFillEnabled ) {
+            self.textFieldSubtitleLeft.stringValue = NSLocalizedString(@"db_management_disable_done", @"AutoFill Disabled");
+        }
+        
+        self.imageViewProvider.image = [NSImage imageNamed:@"cancel"];
+        
+        if (@available(macOS 10.14, *)) {
+            self.imageViewProvider.contentTintColor = NSColor.secondaryLabelColor;
+        }
+        
+        self.alphaValue = 0.75f;
+    }
+}
+
+- (void)bindTextFields:(MacDatabasePreferences*)metadata {
+    if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] && ![metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+        [self bindTextFieldsForNoneFileDatabase:metadata];
+    }
+    else {
+        [self bindTextFieldsForFileDatabase:metadata];
+    }
+}
+
+- (void)bindTextFieldsForFileDatabase:(MacDatabasePreferences*)metadata {
     NSString* path = @"";
     NSString* fileSize = @"";
     NSString* fileMod = @"";
-    
     NSString* title = metadata.nickName ? metadata.nickName : @"";
+
     
-    self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:metadata.storageProvider];
     
-    if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] && ![metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-        if ( metadata.storageProvider == kSFTP ) {
-            SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
-            
-            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
-        }
-        else if ( metadata.storageProvider == kWebDAV ) {
-            WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
-            
-            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
-        }
-        else {
-            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
-        }
-        
-        NSDate* modDate;
-        unsigned long long size;
-        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata.uuid
-                                                                             modified:&modDate
-                                                                             fileSize:&size];
-        
-        if ( workingCopy ) {
-            fileSize = friendlyFileSizeString(size);
-            fileMod = modDate.friendlyDateTimeStringPrecise;
-        }
+    
+    
+    
+    
+    NSURL* url;
+    
+    if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+        url = fileUrlFromManagedUrl(metadata.fileUrl);
     }
     else {
-        
-        
-        
-        
-        
-        
-        NSURL* url;
-        
-        if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-            url = fileUrlFromManagedUrl(metadata.fileUrl);
+        url = metadata.fileUrl;
+    }
+    
+    if ( url ) {
+        if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
+            path = getFriendlyICloudPath(url.path);
+            self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:kiCloud];
         }
         else {
-            url = metadata.fileUrl;
+            path = [NSString stringWithFormat:@"%@ (%@)", getPathRelativeToUserHome(url.path), [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
         }
         
-        if ( url ) {
-            if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
-                path = getFriendlyICloudPath(url.path);
-                self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:kiCloud];
-            }
-            else {
-                path = [NSString stringWithFormat:@"%@ (%@)", getPathRelativeToUserHome(url.path), [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
-            }
-            
-            NSError* error;
-            NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-            if (error) {
-                NSLog(@"Error getting attributes of database file: [%@]", error);
-                path = [NSString stringWithFormat:@"(%ld) %@", (long)error.code, error.localizedDescription];
-            }
-            else {
-                fileSize = friendlyFileSizeString(attr.fileSize);
-                fileMod = attr.fileModificationDate.friendlyDateTimeStringPrecise;
-            }
+        NSError* error;
+        NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+        if (error) {
+            NSLog(@"Error getting attributes of database file: [%@]", error);
+            path = [NSString stringWithFormat:@"(%ld) %@", (long)error.code, error.localizedDescription];
         }
+        else {
+            fileSize = friendlyFileSizeString(attr.fileSize);
+            fileMod = attr.fileModificationDate.friendlyDateTimeStringPrecise;
+        }
+    }
+
+    self.textFieldName.stringValue = title;
+    self.textFieldSubtitleLeft.stringValue = path;
+    self.textFieldSubtitleTopRight.stringValue = fileSize;
+    self.textFieldSubtitleBottomRight.stringValue = fileMod;
+}
+
+- (void)bindTextFieldsForNoneFileDatabase:(MacDatabasePreferences*)metadata {
+    NSString* path = @"";
+    NSString* fileSize = @"";
+    NSString* fileMod = @"";
+    NSString* title = metadata.nickName ? metadata.nickName : @"";
+
+    if ( metadata.storageProvider == kSFTP ) {
+        SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+        
+        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
+    }
+    else if ( metadata.storageProvider == kWebDAV ) {
+        WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+        
+        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
+    }
+    else {
+        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
+    }
+    
+    NSDate* modDate;
+    unsigned long long size;
+    NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata.uuid
+                                                                         modified:&modDate
+                                                                         fileSize:&size];
+    
+    if ( workingCopy ) {
+        fileSize = friendlyFileSizeString(size);
+        fileMod = modDate.friendlyDateTimeStringPrecise;
     }
     
     self.textFieldName.stringValue = title;
     self.textFieldSubtitleLeft.stringValue = path;
     self.textFieldSubtitleTopRight.stringValue = fileSize;
     self.textFieldSubtitleBottomRight.stringValue = fileMod;
+}
+
+- (void)bindSyncState:(MacDatabasePreferences *)metadata showSyncState:(BOOL)showSyncState {
+    SyncOperationState syncState = showSyncState ? [MacSyncManager.sharedInstance getSyncStatus:metadata].state : kSyncOperationStateInitial;
+    
+    if (syncState == kSyncOperationStateInProgress ||
+        syncState == kSyncOperationStateError ||
+        syncState == kSyncOperationStateBackgroundButUserInteractionRequired ) { 
+        
+        self.imageViewSyncing.hidden = NO;
+        self.imageViewSyncing.image = syncState == kSyncOperationStateError ? [NSImage imageNamed:@"error"] : [NSImage imageNamed:@"syncronize"];
+        
+        if (@available(macOS 10.14, *)) {
+            NSColor *tint = (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
+            self.imageViewSyncing.contentTintColor = tint;
+        }
+        
+        if ( syncState == kSyncOperationStateInProgress ) {
+            self.syncProgressIndicator.hidden = NO;
+            [self.syncProgressIndicator startAnimation:nil];
+        }
+    }
+    else if ( metadata.asyncUpdateId != nil ) {
+        self.imageViewSyncing.hidden = NO;
+        
+        self.imageViewSyncing.image = [NSImage imageNamed:@"syncronize"];
+        
+        if (@available(macOS 11.0, *)) {
+            self.imageViewSyncing.image = [NSImage imageWithSystemSymbolName:@"function" accessibilityDescription:nil];
+            self.imageViewSyncing.controlSize = NSControlSizeLarge;
+        }
+
+        if (@available(macOS 10.14, *)) {
+            NSColor *tint = NSColor.systemYellowColor;
+            self.imageViewSyncing.contentTintColor = tint;
+        }
+
+        self.syncProgressIndicator.hidden = NO;
+        [self.syncProgressIndicator startAnimation:nil];
+    }
 }
 
 - (void)onNicknameClick {

@@ -24,6 +24,9 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     var masterListView: BrowseViewController {
         return children[1] as! BrowseViewController
     }
+    var detailView: DetailViewController {
+        return children[2] as! DetailViewController
+    }
 
     var navigationContext: NavigationContext {
         return getNavContextFromModel(database)
@@ -89,7 +92,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     override func viewDidAppear() {
         super.viewDidAppear()
 
-        if database != nil, database.nextGenSearchText.count > 0 {
+        if database != nil, database.nextGenSearchText.count > 0 || database.startWithSearch {
             onFind(nil)
         }
     }
@@ -321,6 +324,87 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
         return selected
     }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    var popouts : [UUID : PopOutDetailsWindowController] = [:] 
+    
+    @objc func onPopOutDetails(_: Any?) {
+        guard database.nextGenSelectedItems.count == 1, let uuid = database.nextGenSelectedItems.first else {
+            NSLog("✅ onPopOutDetails - Selection invalid")
+            return
+        }
+        
+        if let existing = popouts[uuid] {
+            existing.showWindow(nil)
+        }
+        else {
+            let popout = PopOutDetailsWindowController.fromStoryboard()
+            
+            popout.load(model: database, uuid: uuid)
+            
+            popouts[uuid] = popout
+            
+            popout.showWindow(nil)
+        }
+    }
+    
+    @objc func onLockDoneKillAllWindows() {
+        
+        
+                
+        if let presentedViewControllers = presentedViewControllers {
+            for presented in presentedViewControllers {
+                dismiss(presented)
+            }
+        }
+        
+        for popout in popouts.values {
+            popout.close()
+        }
+        
+        popouts.removeAll()
+    }
+    
+    @objc var editsInProgress : Bool {
+        if let presentedViewControllers = presentedViewControllers {
+            for presentedViewController in presentedViewControllers {
+                if let editVc = presentedViewController as? CreateEditViewController {
+                    if editVc.isEditsInProgress {
+                        return true
+                    }
+                }
+            }
+        }
+        
+        for popout in popouts.values {
+            if popout.isEditsInProgress {
+                return true
+            }
+        }
+        
+        return false
+    }
 }
 
 extension NextGenSplitViewController: NSToolbarDelegate {
@@ -335,6 +419,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         static let detailTracking = NSToolbarItem.Identifier("detailViewToolbarTrackingIdentifier")
         static let databasePreferences = NSToolbarItem.Identifier("databasePreferencesToolbarItem")
         static let lockDatabase = NSToolbarItem.Identifier("lockDatabaseToolbarItem")
+        static let popoutDetails = NSToolbarItem.Identifier("popoutDetailsToolbarItem")
     }
 
     func setupToolbar() {
@@ -367,6 +452,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
                     ToolbarItemIdentifiers.lockDatabase,
                     ToolbarItemIdentifiers.detailTracking,
                     ToolbarItemIdentifiers.editEntry,
+                    ToolbarItemIdentifiers.popoutDetails,
                     NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.toggleDetails]
         } else {
@@ -387,6 +473,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
                     ToolbarItemIdentifiers.lockDatabase,
                     ToolbarItemIdentifiers.detailTracking,
                     ToolbarItemIdentifiers.editEntry,
+                    ToolbarItemIdentifiers.popoutDetails,
                     NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.toggleDetails]
         } else {
@@ -409,6 +496,27 @@ extension NextGenSplitViewController: NSToolbarDelegate {
             
             return NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.searchField)
         }
+    }
+
+    func getPopOutDetailsToolbarItem() -> NSToolbarItem {
+        let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.popoutDetails)
+
+        let loc = NSLocalizedString("action_verb_popout_details_window", comment: "Pop Out Details")
+
+        toolbarItem.label = loc
+        toolbarItem.paletteLabel = loc
+        toolbarItem.toolTip = loc
+        toolbarItem.isEnabled = true
+        toolbarItem.target = self
+        toolbarItem.action = #selector(onPopOutDetails)
+
+        if #available(macOS 11.0, *) {
+            toolbarItem.image = NSImage(systemSymbolName: "arrow.up.forward.square", accessibilityDescription: nil)
+        } else {
+            toolbarItem.image = NSImage(named: NSImage.folderName) 
+        }
+
+        return toolbarItem
     }
 
     func getCreateGroupToolbarItem() -> NSToolbarItem {
@@ -569,6 +677,8 @@ extension NextGenSplitViewController: NSToolbarDelegate {
             return NSToolbarItem(itemIdentifier: NSToolbarItem.Identifier.flexibleSpace)
         } else if itemIdentifier == ToolbarItemIdentifiers.toggleDetails {
             return getToggleDetailsToolbarItem()
+        } else if itemIdentifier == ToolbarItemIdentifiers.popoutDetails {
+            return getPopOutDetailsToolbarItem()
         } else if itemIdentifier == ToolbarItemIdentifiers.toggleSideBar {
             return getToggleSidebarToolbarItem()
         } else if itemIdentifier == ToolbarItemIdentifiers.databasePreferences {
@@ -624,14 +734,18 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
             return !database.locked
         } else if action == #selector(onCreateGroup) {
             return !database.locked && !database.isEffectivelyReadOnly
-        } else if action == #selector(onLockDatabase) {
+        }
+        else if action == #selector(onPopOutDetails(_:)) {
+            return !database.locked
+        }
+        else if action == #selector(onLockDatabase) {
             return !database.locked && !database.isEffectivelyReadOnly
         }
         else if action == #selector(onCreateRecord) {
             if database.format == .keePass1 { 
-                if case .regularHierarchy(let selectedGroup) = navigationContext {
+                if case let .regularHierarchy(selectedGroup) = navigationContext {
                     if selectedGroup == database.rootGroup.uuid {
-                        return false;
+                        return false
                     }
                 }
             }

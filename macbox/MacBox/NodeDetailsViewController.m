@@ -39,6 +39,7 @@
 #import "EditTagsViewController.h"
 #import "PasswordStrengthTester.h"
 #import "PasswordStrengthUIHelper.h"
+#import "NSArray+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -604,7 +605,7 @@ static NSString* trimField(NSTextField* textField) {
     self.buttonGenerate.enabled = !self.isEffectivelyReadOnly;
     self.buttonSettings.enabled = !self.isEffectivelyReadOnly;
         
-    self.checkboxExpires.state = self.node.fields.expires == nil ? NSOffState : NSOnState;
+    self.checkboxExpires.state = self.node.fields.expires == nil ? NSControlStateValueOff : NSControlStateValueOn;
     self.datePickerExpires.dateValue = self.node.fields.expires;
     
     self.checkboxExpires.enabled = !self.isEffectivelyReadOnly;
@@ -1396,7 +1397,7 @@ static NSString* trimField(NSTextField* textField) {
     savePanel.nameFieldStringValue = filename;
     
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
+        if (result == NSModalResponseOK) {
             DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
             
             NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
@@ -1436,7 +1437,7 @@ static NSString* trimField(NSTextField* textField) {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     openPanel.allowsMultipleSelection = YES;
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
+        if (result == NSModalResponseOK) {
             for (NSURL* url in openPanel.URLs) {
                 NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:url.path];
                 DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithStream:stream protectedInMemory:YES compressed:YES];
@@ -1521,7 +1522,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onExpiresCheckbox:(id)sender {
-    if(self.checkboxExpires.state == NSOnState) {
+    if(self.checkboxExpires.state == NSControlStateValueOn) {
         NSCalendar *cal = [NSCalendar currentCalendar];
         NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:30 toDate:[NSDate date] options:0];
         [self.model setItemExpires:self.node expiry:date];

@@ -42,10 +42,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.outlineViewTitleIsReadonly = NO;
         self.outlineViewEditableFieldsAreReadonly = YES;
         self.concealEmptyProtectedFields = YES;
-        self.startWithSearch = YES;
+        self.startWithSearch = NO;
         self.lockOnScreenLock = YES;
         self.visibleColumns = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
-        
         self.autoFillScanAltUrls = YES;
         self.autoFillScanCustomFields = YES;
         self.autoFillScanNotes = YES;
@@ -55,6 +54,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
         self.showChildCountOnFolderInSidebar = YES;
         self.headerNodes = HeaderNodeState.defaults;
+        self.autoFillCopyTotp = YES;
     }
     
     return self;
@@ -303,6 +303,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeObject:self.headerNodes forKey:@"headerNodes2"];
     
     [encoder encodeBool:self.customSortOrderForFields forKey:@"customSortOrderForFields"];
+    [encoder encodeBool:self.autoFillCopyTotp forKey:@"autoFillCopyTotp"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -653,6 +654,13 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         
         if ( [decoder containsValueForKey:@"customSortOrderForFields"] ) {
             self.customSortOrderForFields = [decoder decodeBoolForKey:@"customSortOrderForFields"];
+        }
+        
+        if ( [decoder containsValueForKey:@"autoFillCopyTotp"] ) {
+            self.autoFillCopyTotp = [decoder decodeBoolForKey:@"autoFillCopyTotp"];
+        }
+        else {
+            self.autoFillCopyTotp = YES;
         }
     }
     

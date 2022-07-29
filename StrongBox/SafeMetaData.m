@@ -23,8 +23,6 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 @interface SafeMetaData ()
 
-@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
-@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
 @property BOOL isEnrolledForConvenience; 
 @property BOOL isAutoFillMemOnlyConveniencePasswordHasBeenStored; 
 @property (nullable) NSDate* convenienceExpiresAt;

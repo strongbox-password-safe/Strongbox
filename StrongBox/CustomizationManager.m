@@ -10,8 +10,12 @@
 #import "Utils.h"
 #import "Constants.h"
 #import "AppPreferences.h"
+#import "Strongbox-Swift.h"
 
 @interface CustomizationManager ()
+
+@property (readonly, class) BOOL isScotusEdition;
+@property (readonly, class) BOOL isGrapheneEdition;
 
 @end
 
@@ -35,6 +39,7 @@
         AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
         AppPreferences.sharedInstance.backupFiles = NO;
         AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
+        AppPreferences.sharedInstance.hideTipJar = YES;
     }
     else if ( self.isGrapheneEdition ) {
         NSLog(@"Graphene Edition... customizing...");
@@ -44,6 +49,7 @@
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
+        AppPreferences.sharedInstance.hideTipJar = YES; 
     }
     else {
         AppPreferences.sharedInstance.disableFavIconFeature = NO;
@@ -51,29 +57,24 @@
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = NO;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = NO;
+        AppPreferences.sharedInstance.hideTipJar = NO;
     }
 }
 
 + (BOOL)isAProBundle {
-    return self.isProEdition || self.isScotusEdition || self.isGrapheneEdition;
+    return StrongboxProductBundle.isAProBundle;
 }
 
-+ (BOOL)isProEdition {
-    NSString* bundleId = [Utils getAppBundleId];
-
-    return [bundleId isEqualToString:Constants.proEditionBundleId];
++ (BOOL)isUnifiedProEdition {
+    return StrongboxProductBundle.isUnifiedProBundle;
 }
 
 + (BOOL)isScotusEdition {
-    NSString* bundleId = [Utils getAppBundleId];
-
-    return [bundleId isEqualToString:Constants.scotusEditionBundleId];
+    return StrongboxProductBundle.isScotusEdition;
 }
 
 + (BOOL)isGrapheneEdition {
-    NSString* bundleId = [Utils getAppBundleId];
-
-    return [bundleId isEqualToString:Constants.grapheneEditionBundleId];
+    return StrongboxProductBundle.isZeroEdition;
 }
 
 @end

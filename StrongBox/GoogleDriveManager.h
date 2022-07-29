@@ -7,44 +7,47 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-#import <GoogleSignIn/GoogleSignIn.h>
-#import "GTLRDrive.h"
 #import "SafeStorageProvider.h"
 
-@interface GoogleDriveManager : NSObject <GIDSignInDelegate>
+#import <GoogleAPIClientForREST/GTLRDrive.h>
+
+@interface GoogleDriveManager : NSObject
 
 + (GoogleDriveManager *)sharedInstance;
 
 @property (NS_NONATOMIC_IOSONLY, getter = isAuthorized, readonly) BOOL authorized;
 
-- (void)                signout;
+- (void)signout;
 
 - (BOOL)handleUrl:(NSURL*)url;
 
-- (void)                      create:(UIViewController *)viewController
-                           withTitle:(NSString *)title
-                            withData:(NSData *)data
-                        parentFolder:(NSObject *)parent
-                          completion:(void (^)(GTLRDrive_File *file, NSError *error))handler;
+- (void)create:(VIEW_CONTROLLER_PTR)viewController
+     withTitle:(NSString *)title
+      withData:(NSData *)data
+  parentFolder:(NSObject *)parent
+    completion:(void (^)(GTLRDrive_File *file, NSError *error))handler;
 
-- (void)readWithOnlyFileId:(UIViewController *)viewController
+- (void)getModDate:(NSString *)parentOrJson
+          fileName:(NSString *)fileName
+        completion:(StorageProviderGetModDateCompletionBlock)handler;
+
+- (void)readWithOnlyFileId:(VIEW_CONTROLLER_PTR)viewController
             fileIdentifier:(NSString *)fileIdentifier
               dateModified:(NSDate*)dateModified
                 completion:(StorageProviderReadCompletionBlock)handler ;
 
-- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)handler;
+- (void)read:(VIEW_CONTROLLER_PTR)viewController parentOrJson:(NSString *)parentOrJson fileName:(NSString *)fileName options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)handler;
 
-- (void)update:(UIViewController *)viewController
-parentFileIdentifier:(NSString *)parentFileIdentifier
+- (void)update:(VIEW_CONTROLLER_PTR)viewController
+  parentOrJson:(NSString *)parentOrJson
       fileName:(NSString *)fileName
       withData:(NSData *)data
     completion:(StorageProviderUpdateCompletionBlock)handler;
 
-- (void)getFilesAndFolders:(UIViewController *)viewController
-          withParentFolder:(NSString *)parentFolderIdentifier
+- (void)getFilesAndFolders:(VIEW_CONTROLLER_PTR)viewController
+    parentFolderIdentifier:(NSString *)parentFolderIdentifier
                 completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler;
 
-- (void)fetchUrl:(UIViewController *)viewController withUrl:(NSString *)url completion:(void (^)(NSData *data, NSError *error))handler;
+- (void)fetchUrl:(VIEW_CONTROLLER_PTR)viewController withUrl:(NSString *)url completion:(void (^)(NSData *data, NSError *error))handler;
 
 @end

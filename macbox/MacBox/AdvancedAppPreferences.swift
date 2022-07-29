@@ -23,8 +23,12 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var allowClipboardHandoff: NSButton!
     @IBOutlet var addTotpOtpAuth: NSButton!
     @IBOutlet var addLegacyTotpFields: NSButton!
-    @IBOutlet weak var showCopyFieldsButton: NSButton!
+    @IBOutlet var showCopyFieldsButton: NSButton!
     @IBOutlet var useNextGenUI: NSButton!
+    @IBOutlet var blockScreenshots: NSButton!
+    @IBOutlet var useIsolatedDropbox: NSButton!
+    @IBOutlet var newEntryUsesParentGroupIcon: NSButton!
+    @IBOutlet weak var stripUnusedIcons: NSButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,7 +37,7 @@ class AdvancedAppPreferences: NSViewController {
         } else {
             useNextGenUI.isHidden = true
         }
-        
+
         bindUI()
 
         NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
@@ -62,15 +66,32 @@ class AdvancedAppPreferences: NSViewController {
         addTotpOtpAuth.state = settings.addOtpAuthUrl ? .on : .off
 
         showCopyFieldsButton.state = settings.showCopyFieldButton ? .on : .off
-        
+
         useColorBindPalette.isEnabled = settings.colorizePasswords
         hideKeyFile.isEnabled = !settings.doNotRememberKeyFile
 
         
 
         showManagerOnAllClosed.isEnabled = !settings.runningAsATrayApp
-        
+
         useNextGenUI.state = settings.nextGenUI ? .on : .off
+
+        blockScreenshots.state = settings.screenCaptureBlocked ? .on : .off
+        useIsolatedDropbox.state = settings.useIsolatedDropbox ? .on : .off
+        newEntryUsesParentGroupIcon.state = settings.useParentGroupIconOnCreate ? .on : .off;
+        
+        stripUnusedIcons.state = Settings.sharedInstance().stripUnusedIconsOnSave ? .on : .off
+    }
+
+    @IBAction func onUseDropboxIsolated(_ sender: Any) {
+        onChanged(sender)
+
+        DropboxV2StorageProvider.sharedInstance().signOut()
+
+        MacAlerts.info(NSLocalizedString("generic_restart_required", comment: "Restart Required"),
+                       informativeText: NSLocalizedString("generic_restart_required_for_changes_to_take_effect", comment: "You must restart Strongbox for these changes to take effect."),
+                       window: view.window,
+                       completion: nil)
     }
 
     @IBAction func onChanged(_: Any) {
@@ -90,7 +111,11 @@ class AdvancedAppPreferences: NSViewController {
         Settings.sharedInstance().addOtpAuthUrl = addTotpOtpAuth.state == .on
         Settings.sharedInstance().showCopyFieldButton = showCopyFieldsButton.state == .on
         Settings.sharedInstance().nextGenUI = useNextGenUI.state == .on
-
+        Settings.sharedInstance().screenCaptureBlocked = blockScreenshots.state == .on
+        Settings.sharedInstance().useIsolatedDropbox = useIsolatedDropbox.state == .on
+        Settings.sharedInstance().useParentGroupIconOnCreate = newEntryUsesParentGroupIcon.state == .on
+        Settings.sharedInstance().stripUnusedIconsOnSave = stripUnusedIcons.state == .on
+        
         bindUI()
 
         notifyChanged()

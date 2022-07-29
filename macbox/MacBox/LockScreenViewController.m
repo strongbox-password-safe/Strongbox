@@ -51,7 +51,6 @@
 @property (weak) IBOutlet NSButton *buttonToggleRevealMasterPasswordTip;
 @property (weak) IBOutlet NSStackView *stackViewUnlock;
 @property (weak) IBOutlet NSStackView *stackViewMasterPasswordHeader;
-@property (weak) IBOutlet NSButton *upgradeButton;
 @property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
 
 @property BOOL currentYubiKeySlot1IsBlocking;
@@ -64,6 +63,15 @@
 @property (weak) IBOutlet NSButton *checkboxAutoPromptOnActivate;
 @property (weak) IBOutlet NSStackView *stackViewUnlockButtons;
 @property (weak) IBOutlet NSStackView *yubiKeyHeaderStack;
+
+@property (weak) IBOutlet NSView *quickTrialStartContainer;
+
+@property (weak) IBOutlet NSStackView *upperLockContainerStack;
+
+@property (weak) IBOutlet ClickableTextField *labelLearnMore;
+
+@property (weak) IBOutlet NSTextField *labelPricing;
+@property (weak) IBOutlet NSButton *buttonFreeTrialOrUpgrade;
 
 @end
 
@@ -108,6 +116,35 @@
     
     self.textFieldMasterPassword.delegate = self;
     
+    
+    
+    if (@available(macOS 11.0, *)) {
+        NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+        
+        [self.buttonUnlockWithPassword setImage:[NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil]];
+        self.buttonUnlockWithPassword.symbolConfiguration = imageConfig;
+        
+        [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
+        self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
+    }
+    
+    
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(bindProOrFreeTrial)
+                                               name:kProStatusChangedNotificationKey
+                                             object:nil];
+
+    
+    
+    self.quickTrialStartContainer.wantsLayer = YES;
+    NSColor *colour = ColorFromRGB(0x2C2C2E);
+    self.quickTrialStartContainer.layer.backgroundColor = colour.CGColor;
+    self.quickTrialStartContainer.layer.cornerRadius = 10;
+    self.labelLearnMore.onClick = ^{
+        [self onLearnMoreUpgradeScreen];
+    };
+
     [self bindProOrFreeTrial];
 }
 
@@ -270,18 +307,98 @@
 }
 
 - (void)bindProOrFreeTrial {
-    if (!Settings.sharedInstance.fullVersion && !Settings.sharedInstance.freeTrial) {
-        NSMutableAttributedString *attrTitle = [[NSMutableAttributedString alloc] initWithString:self.upgradeButton.title];
-        NSUInteger len = [attrTitle length];
-        NSRange range = NSMakeRange(0, len);
-        [attrTitle addAttribute:NSForegroundColorAttributeName value:NSColor.systemRedColor range:range];
-        [attrTitle addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:NSFont.systemFontSize] range:range];
+    self.quickTrialStartContainer.hidden = YES; 
 
-        [attrTitle fixAttributesInRange:range];
-        [self.upgradeButton setAttributedTitle:attrTitle];
+    if ( !Settings.sharedInstance.isProOrFreeTrial ) {
+        if ( ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
+            [self bindFreeTrialPanel];
+        }
+        else {
+            [self bindUpgradePanel];
+        }
     }
+}
+
+- (void)bindFreeTrialPanel {
+    self.quickTrialStartContainer.hidden = NO;
+    self.labelLearnMore.hidden = NO;
     
-    self.upgradeButton.hidden = Settings.sharedInstance.fullVersion;
+    NSString* priceText = [self getPriceTextFromProduct:ProUpgradeIAPManager.sharedInstance.yearlyProduct];
+    NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"price_per_year_after_free_trial_fmt", @"Then %@ every year"), priceText];
+    
+    self.labelPricing.stringValue = fmt;
+    self.labelPricing.hidden = NO;
+    
+    [self.buttonFreeTrialOrUpgrade setAction:@selector(onQuickStartFreeTrialOrYearly)];
+}
+
+- (void)bindUpgradePanel {
+    self.quickTrialStartContainer.hidden = NO;
+    
+    self.labelPricing.hidden = YES;
+
+    [self.buttonFreeTrialOrUpgrade setTitle:NSLocalizedString(@"generic_upgrade_to_pro", @"Upgrade To Pro")];
+
+    if ( MacCustomizationManager.isUnifiedFreemiumBundle && ProUpgradeIAPManager.sharedInstance.yearlyProduct ) {
+        NSString* priceText = [self getPriceTextFromProduct:ProUpgradeIAPManager.sharedInstance.yearlyProduct];
+        NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_year_fmt", @"%@ / year"), priceText];
+        self.labelPricing.stringValue = fmt;
+        self.labelPricing.hidden = NO;
+
+        self.labelLearnMore.hidden = NO;
+
+        [self.buttonFreeTrialOrUpgrade setAction:@selector(onQuickStartFreeTrialOrYearly)];
+    }
+    else {
+        self.labelLearnMore.hidden = YES;
+        [self.buttonFreeTrialOrUpgrade setAction:@selector(onLearnMoreUpgradeScreen)];
+    }
+}
+
+- (void)onLearnMoreUpgradeScreen {
+    if ( MacCustomizationManager.isUnifiedFreemiumBundle ) {
+        UnifiedUpgrade* vc = [UnifiedUpgrade fromStoryboard];
+        vc.naggy = NO;
+        vc.isPresentedAsSheet = YES;
+
+        [self presentViewControllerAsSheet:vc];
+    }
+    else {
+        [UpgradeWindowController show:0];
+    }
+}
+
+- (void)onQuickStartFreeTrialOrYearly {
+    SKProduct* product = ProUpgradeIAPManager.sharedInstance.yearlyProduct;
+    
+    if ( product ) {
+        [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"upgrade_vc_progress_purchasing", @"Purchasing...")
+                             viewController:self];
+
+        [ProUpgradeIAPManager.sharedInstance purchaseAndCheckReceipts:product
+                                                           completion:^(NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [macOSSpinnerUI.sharedInstance dismiss];
+
+                if ( error && error.code != SKErrorPaymentCancelled ) {
+                    NSLog(@"⚠️ Purchase done with error = [%@]", error);
+                    [MacAlerts error:error window:self.view.window];
+                }
+            });
+        }];
+    }
+}
+
+- (NSString*)getPriceTextFromProduct:(SKProduct*)product {
+    if ( product == nil ) {
+        return NSLocalizedString(@"generic_loading", @"Loading...");
+    }
+    else {
+        NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
+        formatter.numberStyle = NSNumberFormatterCurrencyStyle;
+        formatter.locale = product.priceLocale;
+        return [formatter stringFromNumber:product.price];
+    }
 }
 
 - (void)bindShowAdvancedOnUnlockScreen {
@@ -290,7 +407,7 @@
     self.checkboxShowAdvanced.state = show ? NSControlStateValueOn : NSControlStateValueOff;
     
     self.checkboxAllowEmpty.hidden = !show;
-    self.checkboxAllowEmpty.state = Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSOnState : NSOffState;
+    self.checkboxAllowEmpty.state = Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSControlStateValueOn : NSControlStateValueOff;
 
     self.labelUnlockKeyFileHeader.hidden = !show;
     self.keyFilePopup.hidden = !show;
@@ -300,10 +417,13 @@
 
 - (void)bindUnlockButtons {
     BOOL enabled = [self manualCredentialsAreValid];
-    
     [self.buttonUnlockWithPassword setEnabled:enabled];
 
     [self bindBiometricButtonOnLockScreen];
+    
+    BOOL bioAvailable = self.buttonUnlockWithTouchId.enabled && !self.buttonUnlockWithTouchId.hidden;
+    
+    self.buttonUnlockWithPassword.hidden = !enabled && bioAvailable;
 }
 
 - (void)bindBiometricButtonOnLockScreen {
@@ -356,9 +476,24 @@
             convenienceTitle = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
         }
         else if ( touchEnabled ) {
+            if (@available(macOS 11.0, *)) {
+                NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+                
+                [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
+                self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
+            }
+
             convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_id", @"Unlock with Touch ID");
         }
         else {
+            
+            if (@available(macOS 11.0, *)) {
+                NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+                
+                [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"lock.open.applewatch" accessibilityDescription:nil]];
+                self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
+            }
+
             convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_apple_watch", @"Unlock with Watch");
         }
 
@@ -677,7 +812,7 @@
 - (void)onBrowseForKeyFile {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
+        if (result == NSModalResponseOK) {
             NSLog(@"Open Key File: %@", openPanel.URL);
             
             NSError* error;
@@ -720,7 +855,7 @@
 }
 
 - (IBAction)onAllowEmptyChanged:(id)sender {
-    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.checkboxAllowEmpty.state == NSOnState;
+    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.checkboxAllowEmpty.state == NSControlStateValueOn;
     
     [self bindUnlockButtons];
 }
@@ -729,11 +864,6 @@
     self.viewModel.showAdvancedUnlockOptions = !self.viewModel.showAdvancedUnlockOptions;
     
     [self bindShowAdvancedOnUnlockScreen];
-}
-
-- (IBAction)onUpgrade:(id)sender {
-    AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-    [appDelegate showUpgradeModal:0];
 }
 
 
@@ -882,8 +1012,8 @@
 
 - (void)controlTextDidChange:(id)obj {
 
-    BOOL enabled = [self manualCredentialsAreValid];
-    [self.buttonUnlockWithPassword setEnabled:enabled];
+    [self bindUnlockButtons];
+
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
@@ -980,7 +1110,7 @@
     
 
     if (commandSelector == NSSelectorFromString(@"noop:")) { 
-        if ( (event.modifierFlags & NSCommandKeyMask ) == NSCommandKeyMask) {
+        if ( (event.modifierFlags & NSEventModifierFlagCommand ) == NSEventModifierFlagCommand) {
             NSString *chars = event.charactersIgnoringModifiers;
             unichar aChar = [chars characterAtIndex:0];
 

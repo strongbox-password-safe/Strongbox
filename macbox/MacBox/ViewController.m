@@ -46,11 +46,11 @@
 #import "SyncAndMergeSequenceManager.h"
 #import "PasswordStrengthTester.h"
 #import "StrongboxErrorCodes.h"
-#import "macOSSpinnerUI.h"
 #import "MBProgressHUD.h"
 #import "WindowController.h"
 #import "PasswordStrengthUIHelper.h"
 #import "Constants.h"
+#import "NSArray+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -443,7 +443,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     
     NSMutableArray<NSString*>* newColumns = [self.viewModel.visibleColumns mutableCopy];
     
-    if(menuItem.state == NSOnState) 
+    if(menuItem.state == NSControlStateValueOn) 
     {
         [newColumns removeObject:menuItem.identifier];
         self.viewModel.visibleColumns = newColumns;
@@ -2062,7 +2062,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     savePanel.nameFieldStringValue = filename;
     
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
+        if (result == NSModalResponseOK) {
             DatabaseAttachment* dbAttachment = self.attachments[filename];
             NSInputStream* inStream = [dbAttachment getPlainTextInputStream];
             NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
@@ -2321,7 +2321,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
 
     if (commandSelector == NSSelectorFromString(@"noop:")) { 
-        if ( (event.modifierFlags & NSCommandKeyMask ) == NSCommandKeyMask) {
+        if ( (event.modifierFlags & NSEventModifierFlagCommand ) == NSEventModifierFlagCommand) {
             NSString *chars = event.charactersIgnoringModifiers;
             unichar aChar = [chars characterAtIndex:0];
 
@@ -2336,7 +2336,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
     if(control == self.searchField) {
         if (commandSelector == NSSelectorFromString(@"noop:")) { 
-            if ( (event.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) {
+            if ( (event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand) {
                 NSString *chars = event.charactersIgnoringModifiers;
                 unichar aChar = [chars characterAtIndex:0];
 

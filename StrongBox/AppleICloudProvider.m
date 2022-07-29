@@ -70,6 +70,8 @@ suggestedFilename:nil
 }
 
 - (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    NSLog(@"🔴 AppleiCloudProvider::getModDate not impl!");
+
     
 }
 

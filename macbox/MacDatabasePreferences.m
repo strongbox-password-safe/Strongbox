@@ -1275,4 +1275,14 @@
     }];
 }
 
+- (BOOL)autoFillCopyTotp {
+    return self.metadata.autoFillCopyTotp;
+}
+
+- (void)setAutoFillCopyTotp:(BOOL)autoFillCopyTotp {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.autoFillCopyTotp = autoFillCopyTotp;
+    }];
+}
+
 @end

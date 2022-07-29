@@ -20,11 +20,6 @@ const NSUInteger kMinimumDatabasePrefixLengthForValidation = 192;
 const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; 
 const size_t kMaxAttachmentTableviewIconImageSize = 4 * 1024 * 1024;
 
-static NSString * const kMacProEditionBundleId = @"com.markmcguill.strongbox.mac.pro";
-static NSString * const kProEditionBundleId = @"com.markmcguill.strongbox.pro";
-static NSString * const kScotusEditionBundleId = @"com.markmcguill.strongbox.scotus";
-static NSString * const kGrapheneEditionBundleId = @"com.markmcguill.strongbox.graphene";
-
 NSString* const kCanonicalEmailFieldName = @"Email";
 NSString* const kCanonicalFavouriteTag = @"Favorite";
 
@@ -32,22 +27,6 @@ NSString* const kCanonicalFavouriteTag = @"Favorite";
     if(self == [Constants class]) {
         kUserInteractionRequiredError = [Utils createNSError:kStorageProviderUserInteractionRequiredErrorMessage errorCode:kStorageProviderUserInteractionRequiredErrorCode];
     }
-}
-
-+ (NSString *)macProEditionBundleId {
-    return kMacProEditionBundleId;
-}
-
-+ (NSString *)proEditionBundleId {
-    return kProEditionBundleId;
-}
-
-+ (NSString *)scotusEditionBundleId {
-    return kScotusEditionBundleId;
-}
-
-+ (NSString *)grapheneEditionBundleId {
-    return kGrapheneEditionBundleId;
 }
 
 NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";

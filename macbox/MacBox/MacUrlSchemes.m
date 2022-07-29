@@ -11,6 +11,9 @@
 
 NSString* const kStrongboxSFTPUrlScheme = @"sftp";
 NSString* const kStrongboxOneDriveUrlScheme = @"onedrive";
+NSString* const kStrongboxGoogleDriveUrlScheme = @"googledrive";
+NSString* const kStrongboxDropboxUrlScheme = @"dropbox";
+
 NSString* const kStrongboxWebDAVUrlScheme = @"webdav";
 NSString* const kStrongboxFileUrlScheme = @"file";
 NSString* const kStrongboxSyncManagedFileUrlScheme = @"sb-sync-managed-file";
@@ -28,6 +31,12 @@ StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
     }
     else if ( [scheme isEqualToString:kStrongboxOneDriveUrlScheme] ) {
         return kTwoDrive;
+    }
+    else if ( [scheme isEqualToString:kStrongboxGoogleDriveUrlScheme ] ) {
+        return kGoogleDrive;
+    }
+    else if ( [scheme isEqualToString:kStrongboxDropboxUrlScheme ] ) {
+        return kDropbox;
     }
 
     return kMacFile;

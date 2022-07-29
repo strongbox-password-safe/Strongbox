@@ -121,7 +121,6 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
 @property (readonly) BOOL isEffectivelyReadOnly;
 @property (readonly) DatabaseFormat databaseFormat;
-@property (readonly) BOOL emailFieldEnabled;
 
 @end
 
@@ -746,7 +745,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
             return CGFLOAT_MIN;
         }
         else if ( indexPath.row == kRowEmail ) {
-            if ( !self.emailFieldEnabled || (shouldHideEmpty && !self.model.email.length)) {
+            if ( shouldHideEmpty && !self.model.email.length ) {
                 return CGFLOAT_MIN;
             }
         }
@@ -1386,7 +1385,13 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
 
     Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
-    return [[Node alloc] initAsRecord:title parent:parentGroup fields:fields uuid:nil];
+    Node* node = [[Node alloc] initAsRecord:title parent:parentGroup fields:fields uuid:nil];
+    
+    if ( parentGroup && !parentGroup.isUsingKeePassDefaultIcon && AppPreferences.sharedInstance.useParentGroupIconOnCreate ) {
+        node.icon = parentGroup.icon;
+    }
+    
+    return node;
 }
 
 - (void)applyModelChangesToDatabaseNode:(void (^)(Node* item))completion {

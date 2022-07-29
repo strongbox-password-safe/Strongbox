@@ -21,6 +21,7 @@ typedef NS_ENUM(NSUInteger, DatabaseSettingsInitialTab) {
     kDatabaseSettingsInitialTabTouchId,
     kDatabaseSettingsInitialTabAutoFill,
     kDatabaseSettingsInitialTabAudit,
+    kDatabaseSettingsInitialTabEncryption,
     kDatabaseSettingsInitialTabAdvanced,
 };
 

@@ -23,6 +23,8 @@
 @property ViewModel* viewModel;
 @property NSInteger initialTab;
 
+@property (readonly) BOOL encryptionChanged;
+@property EncryptionSettings* encryptionSettings;
 @end
 
 @implementation DatabaseSettingsTabViewController
@@ -32,8 +34,56 @@
     return (DatabaseSettingsTabViewController*)[sb instantiateInitialController];
 }
 
+- (BOOL)encryptionChanged {
+    return self.encryptionSettings.isDirty;
+}
+
+- (void)promptToApplyChanges:(void (^)(BOOL cancelled))completion {
+    [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"generic_apply_changes", @"Apply Changes")
+                    informativeText:NSLocalizedString(@"are_you_sure_change_encryption_settings", @"Are you sure you want to change your database encryption settings?")
+                  option1AndDefault:NSLocalizedString(@"generic_apply_changes", @"Apply Changes")
+                            option2:NSLocalizedString(@"discard_changes", @"Discard Changes")
+                             window:self.view.window
+                         completion:^(int response) {
+        if ( response == 0 ) {
+            [self.encryptionSettings applyCurrentChanges];
+            completion(NO);
+        }
+        else if ( response == 1) {
+            [self.encryptionSettings discardCurrentChanges];
+            completion(NO);
+        }
+        else {
+            completion(YES);
+        }
+    }];
+}
+
 - (void)cancel:(id)sender { 
-   [self.view.window close];
+    if ( self.encryptionChanged ) {
+        [self promptToApplyChanges:^(BOOL cancelled) {
+            if ( !cancelled ) {
+                [self.view.window close];
+            }
+        }];
+    }
+    else {
+        [self.view.window close];
+    }
+}
+
+- (BOOL)tabView:(NSTabView *)tabView shouldSelectTabViewItem:(NSTabViewItem *)tabViewItem {
+    if ( self.encryptionChanged ) {
+        [self promptToApplyChanges:^(BOOL cancelled) {
+            if ( !cancelled ) {
+                [self.tabView selectTabViewItem:tabViewItem];
+            }
+        }];
+        return NO;
+    }
+    else {
+        return [super tabView:tabView shouldSelectTabViewItem:tabViewItem];
+    }
 }
 
 - (void)viewWillAppear {
@@ -58,7 +108,8 @@
     NSTabViewItem* convenienceUnlockItem = self.tabViewItems[2];
     NSTabViewItem* autoFillItem = self.tabViewItems[3];
     NSTabViewItem* auditItem = self.tabViewItems[4];
-    NSTabViewItem* advanced = self.tabViewItems[5];
+    NSTabViewItem* encryption = self.tabViewItems[5];
+    NSTabViewItem* advanced = self.tabViewItems[6];
 
     GeneralDatabaseSettings* general = (GeneralDatabaseSettings*)generalItem.viewController;
     general.model = self.viewModel;
@@ -71,7 +122,10 @@
 
     AuditConfigurationViewController* audit = (AuditConfigurationViewController*)auditItem.viewController;
     audit.database = self.viewModel;
-    
+
+    self.encryptionSettings = (EncryptionSettings*)encryption.viewController;
+    self.encryptionSettings.model = self.viewModel;
+
     AdvancedDatabasePreferences* advancedPreferences = (AdvancedDatabasePreferences*)advanced.viewController;
     advancedPreferences.model = self.viewModel;
 

@@ -83,7 +83,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     if (pro) {
         NSLog(@"EXIT: Success");
         
-        if ( totp.length) {
+        if ( totp.length && unlockedDatabase.autoFillCopyTotp ) {
             [ClipboardManager.sharedInstance copyConcealedString:totp];
             NSLog(@"Copied TOTP to Pasteboard...");
             

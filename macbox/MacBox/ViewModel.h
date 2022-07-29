@@ -14,8 +14,10 @@
 #import "MacDatabasePreferences.h"
 #import "EntryViewModel.h"
 #import "NextNavigationConstants.h"
+#import "EncryptionSettingsViewModel.h"
 
 @class HeaderNodeState;
+@class Document;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,8 +57,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initLocked:(NSDocument*)document databaseUuid:(NSString*)databaseUuid;
-- (instancetype)initUnlocked:(NSDocument *)document
+- (instancetype)initLocked:(Document*)document databaseUuid:(NSString*)databaseUuid;
+- (instancetype)initUnlocked:(Document *)document
                 databaseUuid:(NSString*)databaseUuid
                        model:(Model *)model;
 
@@ -65,7 +67,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property (nonatomic, readonly) NSString *databaseUuid;
 
-@property (nonatomic, readonly, weak) NSDocument*  document;
+@property (nonatomic, readonly, weak) Document*  document;
 @property (nonatomic, readonly) BOOL locked;
 @property (nonatomic, readonly) NSURL* fileUrl;
 @property (nonatomic, readonly) Node* rootGroup;
@@ -294,6 +296,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
                                descending:(BOOL)descending
                         foldersSeparately:(BOOL)foldersSeparately
                          tieBreakUseTitle:(BOOL)tieBreakUseTitle;
+
+- (void)applyEncryptionSettingsViewModelChanges:(EncryptionSettingsViewModel*)encryptionSettings;
 
 @property KeePassIconSet iconSet;
 

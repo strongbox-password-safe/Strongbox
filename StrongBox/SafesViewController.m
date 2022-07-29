@@ -91,6 +91,7 @@
 #import "CSV.h"
 #import "NSString+Extensions.h"
 #import "SafesList.h"
+#import "VirtualYubiKeys.h"
 
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate>
 
@@ -113,6 +114,8 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonDice;
 @property BOOL openingDatabaseInProgress;
 @property NSString* importFormat;
+
+@property (nullable) NSString* overrideQuickLaunchWithAppShortcutQuickLaunchUuid;
 
 @end
 
@@ -142,6 +145,8 @@
             
     [self setFreeTrialEndDateBasedOnIapPurchase]; 
 
+    [self checkForBrokenVirtualHardwareKeys];
+    
     
     
     
@@ -166,6 +171,37 @@
             NSLog(@"SafesViewController::viewDidLoad -> App Is Locked");
         }
     });
+}
+
+- (void)checkForBrokenVirtualHardwareKeys {
+    NSMutableSet<NSString*>* broken = NSMutableSet.set;
+    
+    for ( VirtualYubiKey* key in VirtualYubiKeys.sharedInstance.snapshot ) {
+        if ( key.secretIsNoLongerPresent ) {
+            NSLog(@"🔴 Found broken Virtual Hardware Key [%@]", key.identifier);
+            [broken addObject:key.identifier];
+        }
+    }
+    
+    for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
+        YubiKeyHardwareConfiguration* yubiConfig = database.yubiKeyConfig;
+        
+        if ( yubiConfig && yubiConfig.mode == kVirtual && [broken containsObject:yubiConfig.virtualKeyIdentifier] ) {
+            NSLog(@"🔴 Found database using broken Virtual Hardware Key [%@] - fixing", database.nickName);
+            database.yubiKeyConfig = nil;
+        }
+        
+        yubiConfig = database.autoFillYubiKeyConfig;
+        if ( yubiConfig && yubiConfig.mode == kVirtual && [broken containsObject:yubiConfig.virtualKeyIdentifier] ) {
+            NSLog(@"🔴 Found database using broken Virtual Hardware Key for AutoFill [%@] - fixing", database.nickName);
+            database.autoFillYubiKeyConfig = nil;
+        }
+    }
+    
+    for ( NSString* ident in broken ) {
+        NSLog(@"🔴 Deleting broken Virtual Hardware Key [%@]", ident);
+        [VirtualYubiKeys.sharedInstance deleteKey:ident];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -219,6 +255,56 @@
     self.tableView.separatorStyle = AppPreferences.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
 
     [self.tableView reloadData];
+    
+    [self updateDynamicAppIconShortcuts];
+    
+    [self bindProOrFreeTrialUi];
+}
+
+- (void)updateDynamicAppIconShortcuts {
+    NSMutableArray<UIApplicationShortcutIcon*>* shortcuts = [[NSMutableArray alloc] init];
+    
+    for ( DatabasePreferences* database in self.collection ) {
+        UIMutableApplicationShortcutItem *mutableShortcutItem = [[UIMutableApplicationShortcutItem alloc] initWithType:@"quick-launch"  localizedTitle:database.nickName];
+
+        mutableShortcutItem.userInfo = @{ @"uuid" : database.uuid };
+        
+        if (@available(iOS 13.0, *)) {
+            if (@available(iOS 14.0, *)) {
+                mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithSystemImageName:@"cylinder.split.1x2"]; 
+            }
+            else {
+                mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithTemplateImageName:@"rocket"]; 
+            }
+        }
+        
+
+        
+        [shortcuts addObject:mutableShortcutItem.copy];
+    }
+
+
+    
+    [[UIApplication sharedApplication] setShortcutItems:shortcuts.copy];
+}
+
+- (void)performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem {
+    NSLog(@"✅ performActionForShortcutItem: [%@]", shortcutItem.type);
+
+    if ( [shortcutItem.type isEqualToString:@"quick-launch"] ) {
+        NSString* uuid = (NSString*)shortcutItem.userInfo[@"uuid"];
+        
+        if ( uuid ) {
+            DatabasePreferences* database = [DatabasePreferences fromUuid:uuid];
+            if ( database ) {
+                NSLog(@"Quick Launching database from App Shortcut = [%@]", database.nickName);
+                self.overrideQuickLaunchWithAppShortcutQuickLaunchUuid = uuid;
+            }
+        }
+    }
+    else if ( [shortcutItem.type isEqualToString:@"sync-all"] ) {
+        [SyncManager.sharedInstance backgroundSyncAll];
+    }
 }
 
 - (void)customizeUI {
@@ -339,7 +425,7 @@
         if ( weakSelf.enqueuedImportUrl ) {
             [weakSelf processEnqueuedImport];
         }
-        else if ( quickLaunchWhenDone && AppPreferences.sharedInstance.quickLaunchUuid ) {
+        else if ( quickLaunchWhenDone ) {
             [weakSelf openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
         }
     }];
@@ -700,7 +786,7 @@
     [SyncManager.sharedInstance backgroundSyncAll];
     
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.tableView.refreshControl endRefreshing];
     });
 }
@@ -874,7 +960,19 @@
          openOffline:(BOOL)openOffline
  noConvenienceUnlock:(BOOL)noConvenienceUnlock
  biometricPreCleared:(BOOL)biometricPreCleared {
-    NSLog(@"======================== OPEN DATABASE: %@ ============================", safe);
+    NSLog(@"======================== OPEN DATABASE: %@ ============================", safe.nickName);
+    
+    if ( safe.storageProvider == kOneDrive_Deprecated && !openOffline ) { 
+        [Alerts okCancel:self
+                   title:NSLocalizedString(@"pick_creds_vc_cannot_create_new_unsupported_storage_type_title", @"Unsupported Storage")
+                 message:NSLocalizedString(@"onedrive_readd_required", @"You need to re-add your OneDrive database due to a library update. Tap OK to get started...")
+                  action:^(BOOL response) {
+            if ( response ) {
+                [self onAddExistingSafe];
+            }
+        }];
+        return;
+    }
     
     biometricPreCleared = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics && biometricPreCleared;
     
@@ -2152,46 +2250,48 @@
     self.navigationController.toolbarHidden =  [[AppPreferences sharedInstance] isPro];
     self.navigationController.toolbar.hidden = [[AppPreferences sharedInstance] isPro];
     
-    if(![[AppPreferences sharedInstance] isPro]) {
+    if( !AppPreferences.sharedInstance.isPro ) {
+        NSString *upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Upgrade Button Title asking to Please Upgrade");
+        
+        [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
         [self.buttonUpgrade setEnabled:YES];
-    
-        NSString *upgradeButtonTitle;
 
-        if (AppPreferences.sharedInstance.hasOptedInToFreeTrial) {
-            if([[AppPreferences sharedInstance] isFreeTrial]) {
+        if ( AppPreferences.sharedInstance.hasOptedInToFreeTrial ) {
+            if( AppPreferences.sharedInstance.isFreeTrial ) {
                 NSInteger daysLeft = AppPreferences.sharedInstance.freeTrialDaysLeft;
                 
                 if(daysLeft > 30) {
                     upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title", @"Upgrade Button Title - Upgrade Info")];
+                    [self.buttonUpgrade setTintColor:nil];
                 }
                 else {
                     upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title_days_remaining", @"Upgrade Button Title with Days remaining of pro trial version"),
                                       (long)daysLeft];
+                    [self.buttonUpgrade setTintColor:nil];
                 }
                 
                 if(daysLeft < 10) {
                     [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
                 }
             }
-            else {
-                upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Upgrade Button Title asking to Please Upgrade");
-                [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
-            }
         }
-        else {
+        else if ( ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
             upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Upgrade Button Title - Upgrade Info");
             if (AppPreferences.sharedInstance.daysInstalled > 60) {
                 [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
             }
+            else {
+                [self.buttonUpgrade setTintColor:nil];
+            }
         }
         
-        if ( SaleScheduleManager.sharedInstance.saleNowOn ) {
-            [self.buttonUpgrade setTitle:NSLocalizedString(@"safesvc_upgrade_button_sale_now_on_title", @"🚀 20% Off Now 🚀 Go Pro 🔥")];
-            [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
-        }
-        else {
+
+
+
+
+
             [self.buttonUpgrade setTitle:upgradeButtonTitle];
-        }
+
         
         [CustomAppIconObjCHelper downgradeProIconIfInUse];
     }
@@ -2259,7 +2359,7 @@
 }
 
 - (void)openQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self internalOpenQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
     });
 }
@@ -2267,20 +2367,23 @@
 - (void)internalOpenQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication {
     
 
+    NSString* overrideQuickLaunchUuid = self.overrideQuickLaunchWithAppShortcutQuickLaunchUuid;
+    self.overrideQuickLaunchWithAppShortcutQuickLaunchUuid = nil;
+
+    if( !AppPreferences.sharedInstance.quickLaunchUuid && overrideQuickLaunchUuid == nil ) {
+        
+        return;
+    }
+
     if(![self isVisibleViewController]) {
         NSLog(@"Not opening Quick Launch database as not at top of the Nav Stack");
         return;
     }
     
-    if(!AppPreferences.sharedInstance.quickLaunchUuid) {
+    NSString* uuid = overrideQuickLaunchUuid == nil ? AppPreferences.sharedInstance.quickLaunchUuid : overrideQuickLaunchUuid;
+    
+    DatabasePreferences* safe = [DatabasePreferences fromUuid:uuid];
         
-        return;
-    }
-    
-    DatabasePreferences* safe = [DatabasePreferences.allDatabases firstOrDefault:^BOOL(DatabasePreferences * _Nonnull obj) {
-        return [obj.uuid isEqualToString:AppPreferences.sharedInstance.quickLaunchUuid];
-    }];
-    
     if(!safe) {
         NSLog(@"Not opening Quick Launch database as configured database not found");
         return;
@@ -2322,7 +2425,7 @@
         [document openWithCompletionHandler:^(BOOL success) {
             [SVProgressHUD dismiss];
             
-            if ( document ) {
+            if ( document && [document isKindOfClass:StrongboxUIDocument.class] ) {
                 NSData* data = document.data ? document.data.copy : nil; 
                 
                 NSError* error;
@@ -2337,6 +2440,9 @@
                 [FileManager.sharedInstance deleteAllInboxItems];
                         
                 [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
+            }
+            else {
+                [self onReadImportedFile:NO data:nil url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:nil];
             }
         }];
     });
@@ -2445,7 +2551,7 @@
 - (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace modDate:(NSDate*)modDate {
     if(editInPlace == NO) {
         NSString* filename = url.lastPathComponent;
-        if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && AppPreferences.sharedInstance.iCloudOn == NO) {
+        if ( [LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] ) { 
             [Alerts twoOptionsWithCancel:self
                                    title:NSLocalizedString(@"safesvc_update_existing_database_title", @"Update Existing Database?")
                                  message:NSLocalizedString(@"safesvc_update_existing_question", @"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?")
@@ -2502,51 +2608,51 @@
     
 
     
-    if(AppPreferences.sharedInstance.iCloudOn) {
-        [Alerts twoOptionsWithCancel:self
-                               title:NSLocalizedString(@"safesvc_copy_database_to_location_title", @"Copy to iCloud or Local?")
-                             message:NSLocalizedString(@"safesvc_copy_database_to_location_message", @"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?")
-                   defaultButtonText:NSLocalizedString(@"safesvc_copy_database_option_to_local", @"Copy to Local Device Only")
-                    secondButtonText:NSLocalizedString(@"safesvc_copy_database_option_to_icloud", @"Copy to iCloud")
-                              action:^(int response) {
-                                  if(response == 0) {
-                                      [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
-                                  }
-                                  else if(response == 1) {
-                                      [self importToICloud:url format:format nickName:nickName extension:extension data:data modDate:modDate];
-                                  }
-                              }];
-    }
-    else {
-        [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
+
 }
 
-- (void)importToICloud:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
-    NSString *suggestedFilename = url.lastPathComponent;
-    
-     
-    
-    [AppleICloudProvider.sharedInstance create:nickName
-                                     extension:extension
-                                          data:data
-                             suggestedFilename:suggestedFilename
-                                  parentFolder:nil
-                                viewController:self
-                                    completion:^(DatabasePreferences *metadata, NSError *error) {
-         dispatch_async(dispatch_get_main_queue(), ^(void) {
-             if (error == nil) {
-                 metadata.likelyFormat = format;
-                 [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
-             }
-             else {
-                 [Alerts error:self
-                         title:NSLocalizedString(@"safesvc_error_importing_title", @"Error Importing Database")
-                         error:error];
-             }
-         });
-     }];
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
     

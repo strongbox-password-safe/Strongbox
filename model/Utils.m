@@ -348,6 +348,7 @@ NSData* getRandomData(uint32_t length) {
 }
 
 #if TARGET_OS_IPHONE
+
 UIImage* scaleImage(UIImage* image, CGSize newSize) {
     float heightToWidthRatio = image.size.height / image.size.width;
     float scaleFactor = 1;
@@ -370,6 +371,23 @@ UIImage* scaleImage(UIImage* image, CGSize newSize) {
         return newImage;
     }
 }
+
++ (UIImage *)makeRoundedImage:(UIImage*)image radius:(float)radius {
+    CALayer *imageLayer = [CALayer layer];
+    imageLayer.frame = CGRectMake(0, 0, image.size.width, image.size.height);
+    imageLayer.contents = (id) image.CGImage;
+
+    imageLayer.masksToBounds = YES;
+    imageLayer.cornerRadius = radius;
+
+    UIGraphicsBeginImageContext(image.size);
+    [imageLayer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *roundedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return roundedImage;
+}
+
 #else
 
 NSColor* NSColorFromRGB(NSUInteger rgbValue) {

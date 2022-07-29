@@ -74,6 +74,9 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDetectIfOffline;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDropboxAppFolder;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNativeKeePassEmail;
+@property (weak, nonatomic) IBOutlet UISwitch *switchNewEntryUsesParentGroupIcon;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchStripUnusedIcons;
 
 @end
 
@@ -245,6 +248,9 @@
 
     AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     AppPreferences.sharedInstance.markdownNotes = self.switchMarkdownNotes.on;
+    AppPreferences.sharedInstance.useParentGroupIconOnCreate = self.switchNewEntryUsesParentGroupIcon.on;
+    
+    AppPreferences.sharedInstance.stripUnusedIconsOnSave = self.switchStripUnusedIcons.on;
     
     [self bindPreferences];
 }
@@ -302,6 +308,8 @@
     
     self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;
     self.switchMarkdownNotes.on = AppPreferences.sharedInstance.markdownNotes;
+    self.switchNewEntryUsesParentGroupIcon.on = AppPreferences.sharedInstance.useParentGroupIconOnCreate;
+    self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;
 }
 
 - (void)bindCloudSessions {

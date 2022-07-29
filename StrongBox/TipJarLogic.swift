@@ -6,7 +6,9 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
+#if !os(macOS)
 import UIKit
+#endif
 
 extension Notification.Name {
     enum Tips {
@@ -52,11 +54,25 @@ class TipJarLogic: NSObject {
     }
 
     private func getProductId(_ tip: Tip) -> String {
+#if !os(macOS)
         if CustomizationManager.isAProBundle { 
             return String(format: "pro.%@", tip.rawValue)
         } else {
             return tip.rawValue
         }
+#else
+        if MacCustomizationManager.isUnifiedBundle { 
+            if MacCustomizationManager.isAProBundle { 
+                return String(format: "pro.%@", tip.rawValue)
+            } else {
+                return tip.rawValue
+            }
+        }
+        else {
+            NSLog("🔴 Tips not available on macOS standalone bundles!!");
+            return tip.rawValue;
+        }
+#endif
     }
 
     private func loadTips() {

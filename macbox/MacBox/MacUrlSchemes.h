@@ -15,6 +15,9 @@ extern NSString* const kStrongboxSFTPUrlScheme;
 extern NSString* const kStrongboxWebDAVUrlScheme;
 extern NSString* const kStrongboxFileUrlScheme;
 extern NSString* const kStrongboxSyncManagedFileUrlScheme;
+extern NSString* const kStrongboxOneDriveUrlScheme;
+extern NSString* const kStrongboxGoogleDriveUrlScheme;
+extern NSString* const kStrongboxDropboxUrlScheme;
 
 StorageProvider storageProviderFromUrl(NSURL* url);
 StorageProvider storageProviderFromUrlScheme(NSString* scheme);

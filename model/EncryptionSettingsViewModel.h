@@ -11,27 +11,27 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef enum : NSUInteger {
+typedef NS_ENUM (NSUInteger, KdfAlgorithm) {
     kKdfAlgorithmUnknown,
     kKdfAlgorithmArgon2d,
     kKdfAlgorithmArgon2id,
     kKdfAlgorithmAes256,
     kKdfAlgorithmSha256,
-} KdfAlgorithm;
+};
 
-typedef enum : NSUInteger {
+typedef NS_ENUM (NSUInteger, EncryptionAlgorithm) {
     kEncryptionAlgorithmUnknown,
     kEncryptionAlgorithmTwoFish256,
     kEncryptionAlgorithmChaCha20,
     kEncryptionAlgorithmAes256,
-} EncryptionAlgorithm;
+};
 
-typedef enum : NSUInteger {
+typedef NS_ENUM (NSUInteger, InnerStreamAlgorithm) {
     kInnerStreamAlgorithmUnknown,
     kInnerStreamAlgorithmPlainText,
     kInnerStreamAlgorithmSalsa20,
     kInnerStreamAlgorithmChaCha20,
-} InnerStreamAlgorithm;
+};
 
 
 @interface EncryptionSettingsViewModel : NSObject
@@ -65,7 +65,6 @@ typedef enum : NSUInteger {
 @property (readonly) BOOL formatIsEditable;
 @property (readonly) BOOL kdfIsEditable;
 @property (readonly) BOOL encryptionIsEditable;
-@property (readonly) BOOL compressionIsEditable;
 
 @property (readonly) CGFloat minKdfIterations;
 @property (readonly) CGFloat maxKdfIterations;

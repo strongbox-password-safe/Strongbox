@@ -88,7 +88,7 @@ uint32_t getRandomUint32(void);
 
 #if TARGET_OS_IPHONE
 UIImage* scaleImage(UIImage* image, CGSize newSize);
-
++ (UIImage *)makeRoundedImage:(UIImage*)image radius:(float)radius;
 + (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize;
 
 #else

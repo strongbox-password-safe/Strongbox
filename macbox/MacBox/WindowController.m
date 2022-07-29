@@ -59,7 +59,14 @@
 }
 
 static NSString* getFreeTrialSuffix() {
-    if(![Settings sharedInstance].fullVersion) {
+    if ( Settings.sharedInstance.isPro ) {
+        return @"";
+    }
+    
+    if ( MacCustomizationManager.isUnifiedFreemiumBundle ) {
+        return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
+    }
+    else {
         if (![Settings sharedInstance].freeTrial) {
             return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
         }
@@ -75,8 +82,6 @@ static NSString* getFreeTrialSuffix() {
             }
         }
     }
-    
-    return @"";
 }
 
 - (NSArray *)getStatusSuffixii {
@@ -152,7 +157,7 @@ static NSString* getFreeTrialSuffix() {
         
         path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
     }
-    else if ( metadata.storageProvider == kTwoDrive ) {
+    else if ( metadata.storageProvider == kTwoDrive || metadata.storageProvider == kGoogleDrive || metadata.storageProvider == kDropbox ) {
         path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
     }
     else if ( metadata.storageProvider == kMacFile ) {
@@ -244,6 +249,12 @@ static NSString* getFreeTrialSuffix() {
     }
 }
 
+- (void)bindScreenCaptureAllowed {
+    BOOL blocked = Settings.sharedInstance.screenCaptureBlocked;
+    
+    [self.window setSharingType:blocked ? NSWindowSharingNone : NSWindowSharingReadOnly];
+}
+
 - (void)changeContentView {
     Document* doc = self.document;
 
@@ -251,6 +262,8 @@ static NSString* getFreeTrialSuffix() {
     
     [self bindFloatWindowOnTop];
     
+    [self bindScreenCaptureAllowed];
+        
     CGRect oldFrame = self.contentViewController.view.frame;
     NSViewController* vc;
     
@@ -641,9 +654,7 @@ static NSString* getFreeTrialSuffix() {
                 }
 
                 if ( nodeSelected ) {
-                    BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
-                        return ![self.viewModel canRecycle:obj];
-                    }];
+                    BOOL deleteWillOccur = ![self.viewModel canRecycle:item];
                     
                     NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
                     [menuItem setTitle:loc];
@@ -732,6 +743,9 @@ static NSString* getFreeTrialSuffix() {
             return YES;
         }
         else if (theAction == @selector(onConvenienceUnlockProperties:)) {
+            return YES;
+        }
+        else if (theAction == @selector(onDatabaseEncryptionSettings:)) {
             return YES;
         }
         else if (theAction == @selector(onCopySelectedItemsToClipboard:)) {
@@ -1079,6 +1093,8 @@ static NSString* getFreeTrialSuffix() {
     
     
 
+    [self unsubscribeFromNotifications]; 
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
@@ -1098,6 +1114,7 @@ static NSString* getFreeTrialSuffix() {
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self bindFloatWindowOnTop];
+        [self bindScreenCaptureAllowed];
     });
 }
 
@@ -1148,12 +1165,7 @@ static NSString* getFreeTrialSuffix() {
     if ( Settings.sharedInstance.nextGenUI ) {
         NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
         
-        for ( NSViewController* presented in vc.presentedViewControllers ) {
-            if ( [presented isKindOfClass:CreateEditViewController.class] ) {
-                CreateEditViewController* editVc = (CreateEditViewController*)presented;
-                return editVc.isEditsInProgress;
-            }
-        }
+        return vc.editsInProgress;
     }
     
     return NO;
@@ -1201,10 +1213,8 @@ static NSString* getFreeTrialSuffix() {
         
         NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
 
-        
-        for ( NSViewController* presented in vc.presentedViewControllers ) {
-            [vc dismissViewController:presented];
-        }
+                
+        [vc onLockDoneKillAllWindows];
         
         [doc lock:nil];
     }
@@ -1452,6 +1462,13 @@ static NSString* getFreeTrialSuffix() {
 - (IBAction)onConvenienceUnlockProperties:(id)sender {
     DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
     [vc setModel:self.viewModel initialTab:kDatabaseSettingsInitialTabTouchId];
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (IBAction)onDatabaseEncryptionSettings:(id)sender {
+    DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
+    [vc setModel:self.viewModel initialTab:kDatabaseSettingsInitialTabEncryption];
+    
     [self.contentViewController presentViewControllerAsSheet:vc];
 }
 

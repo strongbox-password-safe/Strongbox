@@ -36,22 +36,22 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 @property (readonly, nullable) SKProduct* monthlyProduct;
 @property (readonly, nullable) SKProduct* yearlyProduct;
-@property (readonly, nullable) SKProduct* lifeTimeProduct;
-@property (readonly, nullable) SKProduct* freeTrialProduct;
+
+@property (readonly) BOOL isFreeTrialAvailable;
 
 - (void)purchaseAndCheckReceipts:(SKProduct*)product completion:(PurchaseCompletionBlock)completion;
 
 - (void)performScheduledProEntitlementsCheckIfAppropriate;
 
-- (void)startFreeTrial:(PurchaseCompletionBlock)completion;
-
-@property (readonly) BOOL hasPurchasedLifeTime;
-@property (readonly) BOOL hasPurchasedFreeTrial;
-
 @property (readonly) BOOL hasActiveYearlySubscription;
 @property (readonly) BOOL hasActiveMonthlySubscription;
+@property (readonly) BOOL isLegacyLifetimeIAPPro;
+
+
 
 @property (readonly, nullable) NSDate* freeTrialPurchaseDate;
+@property (readonly) BOOL hasPurchasedFreeTrial;
+
 
 @end
 

@@ -22,4 +22,9 @@
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 @property (nonatomic, readonly) BOOL privacyOptInRequired;
 
+- (void)initialize:(BOOL)useIsolatedDropbox;
+- (BOOL)handleAuthRedirectUrl:(NSURL*)url;
+@property (readonly) BOOL isAuthorized;
+- (void)signOut;
+    
 @end

@@ -34,6 +34,7 @@
         return YES;
     }
 #endif
+    
     if ( metadata.makeBackups ) {
         NSDate* now = NSDate.date;
         NSString* filename = [NSString stringWithFormat:@"%@.bak", now.fileNameCompatibleDateTimePrecise];

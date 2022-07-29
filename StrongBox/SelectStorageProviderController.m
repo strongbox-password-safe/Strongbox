@@ -69,10 +69,9 @@
     if ( !AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
         [sp addObjectsFromArray:@[
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-            GoogleDriveStorageProvider.sharedInstance,
-            DropboxV2StorageProvider.sharedInstance,
-
             TwoDriveStorageProvider.sharedInstance,
+            DropboxV2StorageProvider.sharedInstance,
+            GoogleDriveStorageProvider.sharedInstance,
 #endif
         ]];
     }

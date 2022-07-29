@@ -9,7 +9,6 @@
 #import "AppDelegate.h"
 #import "DocumentController.h"
 #import "Settings.h"
-#import "UpgradeWindowController.h"
 #import "MacAlerts.h"
 #import "Utils.h"
 #import "Strongbox.h"
@@ -41,30 +40,15 @@
 #import "macOSSpinnerUI.h"
 #import "Constants.h"
 #import "Serializator.h"
+#import "MacCustomizationManager.h"
+#import "ProUpgradeIAPManager.h"
+#import "UpgradeWindowController.h"
+#import "GoogleDriveStorageProvider.h"
+#import "DropboxV2StorageProvider.h"
 
-#ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
-#else
-#import "Strongbox_Auto_Fill-Swift.h"
-#endif
-
-
-
-#define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
-
-
-
-static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
-static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.monthly";
-static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
-static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial";
-
-static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.mac.pro";
-static NSString * const kBundledFreemiumBundleId = @"com.markmcguill.strongbox"; 
 
 NSString* const kUpdateNotificationQuickRevealStateChanged = @"kUpdateNotificationQuickRevealStateChanged";
-
-
 
 const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 const NSInteger kTopLevelMenuItemTagFile = 1111;
@@ -77,15 +61,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 @property (strong) IBOutlet NSMenu *systemTraymenu;
 @property NSStatusItem* statusItem;
 
-@property (nonatomic, strong) SKProductsRequest *productsRequest;
-@property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
-@property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 @property NSTimer* clipboardChangeWatcher;
 @property NSInteger currentClipboardVersion;
 @property NSPopover* systemTrayPopover;
 @property NSDate* systemTrayPopoverClosedAt;
 @property NSTimer* timerRefreshOtp;
+@property NSDate* appLaunchTime;
 
 @end
 
@@ -105,6 +87,32 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+    
+    
+    
+    
+    
+
+    [self initializeInstallSettingsAndLaunchCount];
+    
+    [self doInitialSetup];
+
+    [self listenToEvents];
+            
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self doAppOnboarding];
+    });
+}
+
+- (void)initializeInstallSettingsAndLaunchCount {
+    [Settings.sharedInstance incrementLaunchCount];
+    
+    if(Settings.sharedInstance.installDate == nil) {
+        Settings.sharedInstance.installDate = NSDate.date;
+    }
+}
+
+- (void)doInitialSetup {
 #ifdef DEBUG
     
     
@@ -113,15 +121,15 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 #else
     [self cleanupWorkingDirectories];
 #endif
+    
+    self.appLaunchTime = [NSDate date];
 
-    [self applyCustomizations];
+    [MacCustomizationManager applyCustomizations];
 
+    [self removeUnwantedMenuItems];
 
-
-
-
-
-
+    [self setupSystemTrayPopover];
+    
     [self showHideSystemStatusBarIcon];
     
     [self installGlobalHotKeys];
@@ -129,20 +137,52 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [self clearAsyncUpdateIds]; 
     
     [self startRefreshOtpTimer];
-    
-    
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [self bindFreeOrProStatus];
+
+    if ( !MacCustomizationManager.isAProBundle ) {
+        [ProUpgradeIAPManager.sharedInstance initialize]; 
+    }
+}
+
+- (void)doAppOnboarding {
+    [MacOnboardingManager beginAppOnboardingWithCompletion:^{
+        NSLog(@"✅ Onboarding Completed...");
+
+        
+
         DocumentController* dc = NSDocumentController.sharedDocumentController;
         
         [dc onAppStartup];
         
-        [self listenToEvents];
-        
         [self maybeHideDockIconIfAllMiniaturized:nil];
-    });
-    
-    [self monitorForQuickRevealKey];
+        
+        [self monitorForQuickRevealKey];
+    }];
+}
+
+- (void)setupSystemTrayPopover {
+    self.systemTrayPopover = [[NSPopover alloc] init];
+    self.systemTrayPopover.behavior = NSPopoverBehaviorTransient ;
+    self.systemTrayPopover.animates = NO;
+
+    SystemTrayViewController *vc = [SystemTrayViewController instantiateFromStoryboard];
+    vc.onShowClicked = ^(NSString * _Nullable databaseToShowUuid) {
+        [self onSystemTrayShow:databaseToShowUuid];
+    };
+    vc.popover = self.systemTrayPopover;
+
+    self.systemTrayPopover.contentViewController = vc;
+    self.systemTrayPopover.delegate = self;
+}
+
+- (void)performedScheduledEntitlementsCheck {
+    NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
+    double minutes = timeDifference / 60;
+
+    if( minutes > 30 ) {
+        [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
+    }
 }
 
 - (void)monitorForQuickRevealKey {
@@ -160,24 +200,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         return event;
     }];
-}
-
-- (void)customizeForNonPro {
-    if(!Settings.sharedInstance.fullVersion) {
-        [self getValidIapProducts];
-
-        if(![Settings sharedInstance].freeTrial) {
-            
-
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(180 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {
-                [self randomlyShowUpgradeMessage];
-            });
-        }
-    
-        if([Settings sharedInstance].endFreeTrialDate == nil) {
-            [self initializeFreeTrialAndShowWelcomeMessage];
-        }
-    }
 }
 
 - (void)listenToEvents {
@@ -200,9 +222,31 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
                                              selector:@selector(onPreferencesChanged:)
                                                  name:kPreferencesChangedNotification
                                                object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotificationKey object:nil];
+    
+    
+    
+    [NSAppleEventManager.sharedAppleEventManager setEventHandler:self
+                                                     andSelector:@selector(handleGetURLEvent:withReplyEvent:)
+                                                   forEventClass:kInternetEventClass
+                                                      andEventID:kAEGetURL];
 }
 
+- (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+    NSString *URLString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+    NSURL *url = [NSURL URLWithString:URLString];
 
+
+    
+    if ( [url.absoluteString hasPrefix:@"com.googleusercontent.apps"] ) {
+        [GoogleDriveManager.sharedInstance handleUrl:url];
+    }
+    else if ([url.absoluteString hasPrefix:@"db"]) {
+        [DropboxV2StorageProvider.sharedInstance handleAuthRedirectUrl:url];
+        [NSRunningApplication.currentApplication activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
+    }
+}
 
 - (BOOL)isWindowOfInterest:(NSNotification*)notification {
     return ( [notification.object isMemberOfClass:MainWindow.class] ||
@@ -317,48 +361,15 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [FileManager.sharedInstance deleteAllTmpWorkingFiles];
 }
 
-- (void)applyCustomizations {
-    if([self isProFamilyEdition]) {
-        NSLog(@"Initial launch of Pro/Family Edition... setting Pro");
-        [Settings.sharedInstance setFullVersion:YES];
-    }
-    
-    [self customizeMenu];
-    [self customizeForNonPro];
-    
-    self.systemTrayPopover = [[NSPopover alloc] init];
-    self.systemTrayPopover.behavior = NSPopoverBehaviorTransient ;
-    self.systemTrayPopover.animates = NO;
-    
-    SystemTrayViewController *vc = [SystemTrayViewController instantiateFromStoryboard];
-    vc.onShowClicked = ^(NSString * _Nullable databaseToShowUuid) {
-        [self onSystemTrayShow:databaseToShowUuid];
-    };
-    vc.popover = self.systemTrayPopover;
-    
-    self.systemTrayPopover.contentViewController = vc;
-    self.systemTrayPopover.delegate = self;
-}
-
-- (BOOL)isProFamilyEdition {
-    NSString* bundleId = [Utils getAppBundleId];
-    return [bundleId isEqualToString:kProFamilyEditionBundleId];
-}
-
-- (BOOL)isBundledFreemiumEdition {
-    NSString* bundleId = [Utils getAppBundleId];
-    return [bundleId isEqualToString:kBundledFreemiumBundleId];
-}
-
-- (void)showHideSystemStatusBarIcon {   
+- (void)showHideSystemStatusBarIcon {
     if (Settings.sharedInstance.showSystemTrayIcon) {
         if (!self.statusItem) {
             NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
             statusImage.size = NSMakeSize(18.0, 18.0);
             self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-            self.statusItem.image = statusImage;
+            self.statusItem.button.image = statusImage;
             self.statusItem.highlightMode = YES;
-            self.statusItem.enabled = YES;
+            self.statusItem.button.enabled = YES;
 
 
 
@@ -474,6 +485,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     NSLog(@"✅ applicationDidBecomeActive - START");
 
+    [self performedScheduledEntitlementsCheck];
+    
     if(self.autoLockWorkBlock) {
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
@@ -490,29 +503,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-- (ViewController*)getActiveViewController {
-    if(NSApplication.sharedApplication.keyWindow) {
-        NSWindow *window = NSApplication.sharedApplication.keyWindow;
-        NSDocument* doc = [NSDocumentController.sharedDocumentController documentForWindow:window];
-        
-        if(doc && doc.windowControllers.count) {
-            NSWindowController* windowController = [doc.windowControllers firstObject];
-            NSViewController* vc = windowController.contentViewController;
-            
-            if(vc && [vc isKindOfClass:ViewController.class]) {
-                return (ViewController*)vc;
-            }
-        }
-    }
-    
-    return nil;
-}
-
 - (void)applicationDidResignActive:(NSNotification *)notification {
     NSInteger timeout = [[Settings sharedInstance] autoLockTimeoutSeconds];
     
     if(timeout != 0) {
         self.autoLockWorkBlock = dispatch_block_create(0, ^{
+
+            
             [[NSNotificationCenter defaultCenter] postNotificationName:kAutoLockTime object:nil];
             self.autoLockWorkBlock = nil;
         });
@@ -521,94 +518,48 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-- (void)initializeFreeTrialAndShowWelcomeMessage {
-    NSCalendar *cal = [NSCalendar currentCalendar];
-    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:3 toDate:[NSDate date] options:0];
-    
-    [Settings sharedInstance].endFreeTrialDate = date;
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        NSString* loc = NSLocalizedString(@"mac_welcome_to_strongbox_title", @"Welcome to Strongbox");
-        NSString* loc2 = NSLocalizedString(@"mac_welcome_to_strongbox_message", @"Hi and welcome to Strongbox!\n\n"
-                                @"I hope you'll really like the app, and find it useful. You can enjoy this fully featured Pro version of Strongbox for the next three months. "
-                                @"After that point, you will be transitioned to the regular version of Strongbox.\n\n"
-                                @"You can always find out more at any time by tapping 'Upgrade to Pro' in the Strongbox menu item.\n\n"
-                                @"Thanks!\n-Mark");
-
-        [MacAlerts info:loc
-     informativeText:loc2
-              window:[NSApplication sharedApplication].mainWindow 
-          completion:nil];
-    });
-}
-
 - (void)randomlyShowUpgradeMessage {
     NSUInteger random = arc4random_uniform(100);
     
     NSUInteger showPercentage = 15;
     if(random < showPercentage) {
-        [((AppDelegate*)[[NSApplication sharedApplication] delegate]) showUpgradeModal:1];
-    }
-}
-
-
-
-- (void)getValidIapProducts {
-    NSLog(@"getValidIapProducts");
-    
-    NSSet *productIdentifiers = [self isBundledFreemiumEdition] ? [NSSet setWithArray:@[kIapProId, kYearly, kMonthly, kIapFreeTrial]] : [NSSet setWithArray:@[kIapFullVersionStoreId]];
-    self.productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
-    self.productsRequest.delegate = self;
-    [self.productsRequest start];
-}
-
-- (void)productsRequest:(SKProductsRequest *)request
-     didReceiveResponse:(SKProductsResponse *)response {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self appStoreProductRequestCompleted:response.products error:nil];
-    });
-}
-
-- (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self appStoreProductRequestCompleted:nil error:error];
-    });
-}
-
-- (void)appStoreProductRequestCompleted:(NSArray<SKProduct *> *)products error:(NSError*)error {
-    NSLog(@"products = [%@]", products);
-    
-    if(products) {
-        NSUInteger count = [products count];
-        if (count > 0) {
-            self.validProducts = products;
-            for (SKProduct *validProduct in self.validProducts) {
-                NSLog(@"%@", validProduct.productIdentifier);
-                NSLog(@"%@", validProduct.localizedTitle);
-                NSLog(@"%@", validProduct.localizedDescription);
-                NSLog(@"%@", validProduct.price);
-            }
-        }
-    }
-    else {
-        
-        
+        [((AppDelegate*)[[NSApplication sharedApplication] delegate]) showUpgradeModal:YES];
     }
 }
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
     SEL theAction = [anItem action];
     
-    if (theAction == @selector(onUpgradeToFullVersion:)) {
-        return self.validProducts != nil;
-    }
-    
     if (theAction == @selector(onFloatOnTopToggle:)) {
         NSMenuItem* item = (NSMenuItem*) anItem;
-        [item setState:Settings.sharedInstance.floatOnTop ? NSOnState : NSOffState];
+        [item setState:Settings.sharedInstance.floatOnTop ? NSControlStateValueOn : NSControlStateValueOff];
+    }
+    else if (theAction == @selector(signOutOfOneDrive:)) {
+
+
+
+        return YES;
+    }
+    else if (theAction == @selector(signOutOfDropbox:)) {
+        return DropboxV2StorageProvider.sharedInstance.isAuthorized;
+    }
+    else if (theAction == @selector(signOutOfGoogleDrive:)) {
+        return GoogleDriveManager.sharedInstance.isAuthorized;
     }
 
     return YES;
+}
+
+- (IBAction)signOutOfGoogleDrive:(id)sender {
+    [GoogleDriveManager.sharedInstance signout];
+}
+
+- (IBAction)signOutOfOneDrive:(id)sender {
+    [TwoDriveStorageProvider.sharedInstance signOutAll];
+}
+
+- (IBAction)signOutOfDropbox:(id)sender {
+    [DropboxV2StorageProvider.sharedInstance signOut];
 }
 
 
@@ -622,30 +573,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferenceGlobalShowShortcut toAction:^{
         [self showAndActivateStrongbox:nil];
     }];
-}
-
-- (void)customizeMenu {
-    [self removeUnwantedMenuItems];
-
-    NSMenu* topLevelMenuItem = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagStrongbox].submenu;
-    
-    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        return obj.action == @selector(onAbout:);
-    }];
-    
-    if( topLevelMenuItem &&  index != NSNotFound) {
-        NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
-        
-        NSString* fmt = Settings.sharedInstance.isAProBundle ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
-        
-        NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
-
-        menuItem.title = about;
-    }
-    
-    if ( Settings.sharedInstance.fullVersion ) {
-        [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onUpgradeToFullVersion:)];
-    }
 }
 
 - (IBAction)onAbout:(id)sender {
@@ -744,17 +671,25 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (IBAction)onUpgradeToFullVersion:(id)sender {
-    [self showUpgradeModal:0];
+    [self showUpgradeModal:NO];
 }
 
-- (void)showUpgradeModal:(NSInteger)delay {
-    if(!self.validProducts || self.validProducts == 0) {
-        [self getValidIapProducts];
+- (void)showUpgradeModal:(BOOL)naggy {
+    if ( MacCustomizationManager.isUnifiedFreemiumBundle ) {
+        UnifiedUpgrade* uu = [UnifiedUpgrade fromStoryboard];
+
+        uu.naggy = naggy;
+        
+        [uu presentInNewWindow];
     }
     else {
-        SKProduct* product = [_validProducts objectAtIndex:0];        
-        [UpgradeWindowController show:product cancelDelay:delay];
+        [UpgradeWindowController show:naggy ? 1 : 0];
     }
+}
+
+- (IBAction)onShowTipJar:(id)sender {
+    TipJarViewController* vc = [TipJarViewController fromStoryboard];
+    [vc presentInNewWindow];
 }
 
 
@@ -1079,8 +1014,6 @@ static NSInteger clipboardChangeCount;
     [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabGeneral];
 }
 
-
-
 - (void)clearAsyncUpdateIds {
     for (MacDatabasePreferences* preferences in MacDatabasePreferences.allDatabases) {
         if ( preferences.asyncUpdateId != nil ) {
@@ -1088,8 +1021,6 @@ static NSInteger clipboardChangeCount;
         }
     }
 }
-
-
 
 - (void)startRefreshOtpTimer {
     NSLog(@"startRefreshOtpTimer");
@@ -1194,6 +1125,47 @@ static NSInteger clipboardChangeCount;
 
 
 
+}
+
+- (void)onProStatusChanged:(id)param {
+    NSLog(@"✅ AppDelegate: Pro Status Changed!");
+
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self bindFreeOrProStatus];
+    });
+}
+
+- (void)bindFreeOrProStatus {
+    if ( MacCustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro ) { 
+        [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onUpgradeToFullVersion:)];
+    }
+    
+    if ( !MacCustomizationManager.isUnifiedBundle ) {
+        [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onShowTipJar:)];
+    }
+    
+    NSMenu* topLevelMenuItem = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagStrongbox].submenu;
+    if ( topLevelMenuItem ) {
+        NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return obj.action == @selector(onAbout:);
+        }];
+
+        if( index != NSNotFound) {
+            NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
+            NSString* fmt = (Settings.sharedInstance.fullVersion && !MacCustomizationManager.isUnifiedBundle) ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+            menuItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+        }
+        
+        index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return obj.action == @selector(onUpgradeToFullVersion:);
+        }];
+
+        if( index != NSNotFound) {
+            NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
+            NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"upgrade_vc_change_my_license", @"Change My License...") : NSLocalizedString(@"mac_upgrade_button_title", @"Upgrade");
+            menuItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+        }
+    }
 }
 
 @end

@@ -62,6 +62,10 @@
     return [[VirtualYubiKey alloc] initFromIdentidier:identifier name:name autoFillOnly:numAfOnly.boolValue];
 }
 
+- (BOOL)secretIsNoLongerPresent {
+    return self.secret == nil;
+}
+
 - (NSString *)secret {
     NSString *key = [NSString stringWithFormat:@"%@-virtual-yubikey", self.identifier];
     return [SecretStore.sharedInstance getSecureString:key];

@@ -7,8 +7,6 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import <StoreKit/StoreKit.h>
-#import "NSArray+Extensions.h"
 
 #define kAutoLockTime @"autoLockTime"
 
@@ -18,11 +16,12 @@ extern const NSInteger kTopLevelMenuItemTagView;
 
 extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 
-@interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate>
 
-- (void)randomlyShowUpgradeMessage;
 - (IBAction)onUpgradeToFullVersion:(id)sender;
-- (void)showUpgradeModal:(NSInteger)delay;
+
+
+
 - (void)clearClipboardWhereAppropriate;
 
 @end

@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clearSecret;
 
+@property (readonly) BOOL secretIsNoLongerPresent; 
+
 @end
 
 NS_ASSUME_NONNULL_END

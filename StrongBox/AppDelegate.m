@@ -32,7 +32,7 @@
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 
-#import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
+#import "DropboxV2StorageProvider.h"
 #import "GoogleDriveManager.h"
 #import "MSAL/MSAL.h"
 
@@ -80,7 +80,6 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     
     
-    
 
     self.appIsLocked = AppPreferences.sharedInstance.appLockMode != kNoLock;
     
@@ -102,6 +101,13 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     NSLog(@"STARTUP - Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
 
     return YES;
+}
+
+- (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
+    SafesViewController *safesViewController = [self getInitialViewController];
+    [safesViewController performActionForShortcutItem:shortcutItem];
+
+    completionHandler(YES);
 }
 
 - (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
@@ -173,13 +179,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     }
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if ([url.absoluteString hasPrefix:@"db"]) {
-        [DBClientsManager handleRedirectURL:url completion:^(DBOAuthResult * _Nullable authResult) {
-            if (authResult != nil) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"isDropboxLinked" object:authResult];
-            }
-        }];
-
-        return YES;
+        return [DropboxV2StorageProvider.sharedInstance handleAuthRedirectUrl:url];
     }
     else if ([url.absoluteString hasPrefix:@"com.googleusercontent.apps"]) {
         return [GoogleDriveManager.sharedInstance handleUrl:url];
@@ -273,12 +273,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
 - (void)initializeDropbox {
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    if ( ( AppPreferences.sharedInstance.useIsolatedDropbox ) ) {
-        [DBClientsManager setupWithAppKey:DROPBOX_APP_ISOLATED_KEY];
-    }
-    else {
-        [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
-    }
+    [DropboxV2StorageProvider.sharedInstance initialize:AppPreferences.sharedInstance.useIsolatedDropbox];
 #endif
 }
 

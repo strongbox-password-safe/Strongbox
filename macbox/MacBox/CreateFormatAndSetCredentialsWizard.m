@@ -132,7 +132,7 @@
                   
     [openPanel beginSheetModalForWindow:self.window
                       completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton) {
+        if (result == NSModalResponseOK) {
             NSError* error;
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];
             
@@ -152,25 +152,25 @@
 }
 
 - (IBAction)onUseAKeyFile:(id)sender {
-    self.useAKeyFile = self.checkboxUseAKeyFile.state == NSOnState;
+    self.useAKeyFile = self.checkboxUseAKeyFile.state == NSControlStateValueOn;
     [self bindUi];
 }
 
 - (void)setUIFromFormat {
     if(self.selectedDatabaseFormat == kPasswordSafe) {
-        self.checkboxUseAKeyFile.state = NSOffState;
+        self.checkboxUseAKeyFile.state = NSControlStateValueOff;
         self.checkboxUseAKeyFile.enabled = NO;
-        self.checkboxUseAPassword.state = NSOnState;
+        self.checkboxUseAPassword.state = NSControlStateValueOn;
         self.checkboxUseAPassword.enabled = NO;
-        self.checkboxUseYubiKey.state = NSOffState;
+        self.checkboxUseYubiKey.state = NSControlStateValueOff;
         self.checkboxUseYubiKey.enabled = NO;
     }
     else {
-        self.checkboxUseAPassword.state = NSOnState;
+        self.checkboxUseAPassword.state = NSControlStateValueOn;
         self.checkboxUseAPassword.enabled = YES;
-        self.checkboxUseAKeyFile.state = NSOffState;
+        self.checkboxUseAKeyFile.state = NSControlStateValueOff;
         self.checkboxUseAKeyFile.enabled = YES;
-        self.checkboxUseYubiKey.state = NSOffState;
+        self.checkboxUseYubiKey.state = NSControlStateValueOff;
         
         BOOL isPro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
         self.checkboxUseYubiKey.enabled = isPro && self.selectedDatabaseFormat != kKeePass1;
@@ -183,16 +183,16 @@
 
     switch (self.selectedDatabaseFormat) {
         case kPasswordSafe:
-            self.formatPasswordSafe.state = NSOnState;
+            self.formatPasswordSafe.state = NSControlStateValueOn;
             break;
         case kKeePass4:
-            self.formatKeePass2Advanced.state = NSOnState;
+            self.formatKeePass2Advanced.state = NSControlStateValueOn;
             break;
         case kKeePass:
-            self.formatKeePass2Standard.state = NSOnState;
+            self.formatKeePass2Standard.state = NSControlStateValueOn;
             break;
         case kKeePass1:
-            self.formatKeePass1.state = NSOnState;
+            self.formatKeePass1.state = NSControlStateValueOn;
             break;
         default:
             break;
@@ -200,16 +200,16 @@
 }
 
 - (void)setFormatFromUI {
-    if(self.formatPasswordSafe.state == NSOnState) {
+    if(self.formatPasswordSafe.state == NSControlStateValueOn) {
         _selectedDatabaseFormat = kPasswordSafe;
     }
-    else if(self.formatKeePass2Advanced.state == NSOnState) {
+    else if(self.formatKeePass2Advanced.state == NSControlStateValueOn) {
         _selectedDatabaseFormat = kKeePass4;
     }
-    else if(self.formatKeePass2Standard.state == NSOnState) {
+    else if(self.formatKeePass2Standard.state == NSControlStateValueOn) {
         _selectedDatabaseFormat = kKeePass;
     }
-    else if(self.formatKeePass1.state == NSOnState) {
+    else if(self.formatKeePass1.state == NSControlStateValueOn) {
         _selectedDatabaseFormat = kKeePass1;
     }
 }
@@ -224,7 +224,7 @@
 }
 
 - (IBAction)onUseAYubiKey:(id)sender {
-    self.useAYubiKey = self.checkboxUseYubiKey.state == NSOnState;
+    self.useAYubiKey = self.checkboxUseYubiKey.state == NSControlStateValueOn;
     
     if (self.useAYubiKey) {
         [self updateYubiKeyUi];
@@ -238,7 +238,7 @@
 - (void)bindUi {
     
     
-    if(self.checkboxUseAPassword.state == NSOnState) {
+    if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
         self.textFieldNew.enabled = YES;
         self.textFieldConfirm.enabled = YES;
     }
@@ -253,7 +253,7 @@
     
     
     
-    self.checkboxUseAKeyFile.state = self.useAKeyFile ? NSOnState : NSOffState;
+    self.checkboxUseAKeyFile.state = self.useAKeyFile ? NSControlStateValueOn : NSControlStateValueOff;
     self.buttonBrowse.enabled = self.useAKeyFile;
     self.labelKeyFilePath.enabled = self.useAKeyFile;
     
@@ -263,7 +263,7 @@
     
     
     
-    self.checkboxUseYubiKey.state = self.useAYubiKey ? NSOnState : NSOffState;
+    self.checkboxUseYubiKey.state = self.useAYubiKey ? NSControlStateValueOn : NSControlStateValueOff;
     self.popupYubiKey.enabled = self.useAYubiKey;
     
     
@@ -395,7 +395,7 @@
     self.labelPasswordsMatch.stringValue = @"";
     self.labelPasswordsMatch.textColor = [NSColor redColor];
     
-    if(self.checkboxUseAPassword.state == NSOnState) {
+    if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
         if(![self.textFieldNew.stringValue isEqualToString:self.textFieldConfirm.stringValue]) {
             if(self.textFieldConfirm.stringValue.length) {
                 NSString* loc = NSLocalizedString(@"mac_passwords_dont_match", @"Passwords don't match");
@@ -409,7 +409,7 @@
     
     
     if(self.selectedDatabaseFormat == kKeePass1 || self.selectedDatabaseFormat == kPasswordSafe) {
-        if(self.checkboxUseAPassword.state == NSOnState) {
+        if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
             if(self.textFieldNew.stringValue.length == 0) {
                 NSString* loc = NSLocalizedString(@"mac_password_cannot_be_empty", @"Password cannot be Empty");
                 self.labelPasswordsMatch.stringValue = loc;
@@ -438,7 +438,7 @@
     
     
     
-    if (self.checkboxUseAPassword.state == NSOffState && !self.useAKeyFile && !self.useAYubiKey) {
+    if (self.checkboxUseAPassword.state == NSControlStateValueOff && !self.useAKeyFile && !self.useAYubiKey) {
         NSString* loc = NSLocalizedString(@"mac_you_must_use_at_least_a_password_or_key_file", @"You must use at least one of either a password, a key file or a hardware key for your master credentials.");
         
         self.labelPasswordsMatch.stringValue = loc;
@@ -467,7 +467,7 @@
     
     
     _selectedPassword = nil;
-    if(self.checkboxUseAPassword.state == NSOnState) {
+    if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
         if([self.textFieldNew.stringValue isEqualToString:self.textFieldConfirm.stringValue]) {
             _selectedPassword = self.textFieldNew.stringValue;
         }

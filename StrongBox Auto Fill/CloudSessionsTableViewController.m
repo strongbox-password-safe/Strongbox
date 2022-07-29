@@ -11,9 +11,7 @@
 #import "CloudSessionsTableViewController.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
-
-#import "OneDriveStorageProvider.h"
-#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
+#import "DropboxV2StorageProvider.h"
 #import "GoogleDriveManager.h"
 #import "Strongbox-Swift.h"
 
@@ -55,24 +53,6 @@
     return cell;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if(indexPath.row == 0) {
@@ -88,7 +68,6 @@
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
-
 
 - (void)onSignoutGoogleDrive {
     [Alerts checkThirdPartyLibOptInOK:self completion:^(BOOL optInOK) {
@@ -127,13 +106,13 @@
             return;
         }
         
-        if (DBClientsManager.authorizedClient) {
+        if ( DropboxV2StorageProvider.sharedInstance.isAuthorized ) {
             [Alerts yesNo:self
                     title:NSLocalizedString(@"cloud_sessions_prompt_unlink_dropbox_title", @"Unlink Dropbox?")
                   message:NSLocalizedString(@"cloud_sessions_prompt_unlink_dropbox_message", @"Are you sure you want to unlink Strongbox from Dropbox?")
                    action:^(BOOL response) {
                        if (response) {
-                           [DBClientsManager unlinkAndResetClients];
+                           [DropboxV2StorageProvider.sharedInstance signOut];
                            
                            [Alerts info:self
                                   title:NSLocalizedString(@"cloud_sessions_prompt_dropbox_unlink_success_title", @"Unlink Successful")
@@ -165,26 +144,6 @@
                    action:^(BOOL response) {
                        if (response) {
                            [TwoDriveStorageProvider.sharedInstance signOutAll];
-
-                           
-                           [OneDriveStorageProvider.sharedInstance signout:^(NSError *error) {
-                               dispatch_async(dispatch_get_main_queue(), ^{
-                                   if(!error) {
-                                       
-                                       [Alerts info:self
-                                              title:NSLocalizedString(@"cloud_sessions_prompt_onedrive_signout_success_title", @"Signout Successful")
-                                            message:NSLocalizedString(@"cloud_sessions_prompt_onedrive_signout_success_message", @"You have successfully signed out of OneDrive.")
-                                         completion:^{
-                                                [self.navigationController popViewControllerAnimated:YES];
-                                            }];
-                                   }
-                                   else {
-                                       [Alerts error:self
-                                               title:NSLocalizedString(@"cloud_sessions_prompt_onedrive_signout_error", @"Error Signing out of OneDrive")
-                                               error:error];
-                                   }
-                               });
-                           }];
                        }
                    }];
         }

@@ -21,7 +21,6 @@
 #import "MacSyncManager.h"
 #import "Document.h"
 #import "WebDAVStorageProvider.h"
-
 #import "MacUrlSchemes.h"
 #import "BackupsViewController.h"
 #import "BackupsManager.h"
@@ -32,7 +31,8 @@
 #import "NSDate+Extensions.h"
 #import "macOSSpinnerUI.h"
 #import "DatabasesManager.h"
-
+#import "GoogleDriveStorageProvider.h"
+#import "DropboxV2StorageProvider.h"
 #import "Strongbox-Swift.h"
 
 
@@ -133,13 +133,26 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotificationKey object:nil];
+    
+    [self bindVersionSubtitle];
+    
+    [self startRefreshTimer];
+}
 
+- (void)bindVersionSubtitle {
     NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
     
     NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
     self.textFieldVersion.stringValue = about;
+}
 
-    [self startRefreshTimer];
+- (void)onProStatusChanged:(id)param {
+    NSLog(@"✅ DatabasesManagerVC: Pro Status Changed!");
+    
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self bindVersionSubtitle];
+    });
 }
 
 - (void)loadDatabases {
@@ -368,6 +381,18 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [NSDocumentController.sharedDocumentController newDocument:nil];
 }
 
+- (IBAction)onAddGoogleDriveDatabase:(id)sender {
+    GoogleDriveStorageProvider* storageProvider = GoogleDriveStorageProvider.sharedInstance;
+    
+    [self showStorageBrowserForProvider:storageProvider];
+}
+
+- (IBAction)onAddDropboxDatabase:(id)sender {
+    DropboxV2StorageProvider* storageProvider = DropboxV2StorageProvider.sharedInstance;
+    
+    [self showStorageBrowserForProvider:storageProvider];
+}
+
 - (IBAction)onAddOneDriveDatabase:(id)sender {
     TwoDriveStorageProvider* storageProvider = TwoDriveStorageProvider.sharedInstance;
     
@@ -579,13 +604,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
         return Settings.sharedInstance.isProOrFreeTrial;
     }
-    else if ( theAction == @selector(onAddOneDriveDatabase:)) {
+    else if ( theAction == @selector(onAddOneDriveDatabase:) ) {
         return YES;
     }
-    else if ( theAction == @selector(onOpenFromFiles:)) {
+    else if ( theAction == @selector(onAddGoogleDriveDatabase:) ) {
         return YES;
     }
-    else if ( theAction == @selector(onNewDatabase:)) {
+    else if ( theAction == @selector(onAddDropboxDatabase:) ) {
+        return YES;
+    }
+    else if ( theAction == @selector(onOpenFromFiles:) ) {
+        return YES;
+    }
+    else if ( theAction == @selector(onNewDatabase:) ) {
         return YES;
     }
     else if (theAction == @selector(onRemove:)) {

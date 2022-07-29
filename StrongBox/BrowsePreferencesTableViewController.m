@@ -151,8 +151,8 @@
     self.switchShowKeePass1BackupFolder.on = self.databaseMetaData.showKeePass1BackupGroup;
     self.switchShowRecycleBinInSearch.on = self.databaseMetaData.showRecycleBinInSearchResults;
     
-    BrowseItemSubtitleField current = self.databaseMetaData.browseItemSubtitleField;
-    BrowseItemSubtitleField effective = current; 
+    BrowseItemSubtitleField effective = self.databaseMetaData.browseItemSubtitleField;
+    
     self.labelBrowseItemSubtitle.text = [self getBrowseItemSubtitleFieldName:effective];
     
     self.switchShowTotpBrowseView.on = !self.databaseMetaData.hideTotpInBrowse;
@@ -279,7 +279,7 @@
 }
 
 - (void)onChangeTapAction:(UITableViewCell*)cell {
-    NSArray<NSNumber*>* options = (YES) ? @[@(kBrowseTapActionNone), 
+    NSArray<NSNumber*>* options = @[@(kBrowseTapActionNone),
                                     @(kBrowseTapActionOpenDetails),
                                     @(kBrowseTapActionEdit),
                                     @(kBrowseTapActionCopyTitle),
@@ -288,17 +288,7 @@
                                     @(kBrowseTapActionCopyUrl),
                                     @(kBrowseTapActionCopyEmail),
                                     @(kBrowseTapActionCopyNotes),
-                                    @(kBrowseTapActionCopyTotp)]
-                                                    :
-                                    @[@(kBrowseTapActionNone),
-                                      @(kBrowseTapActionOpenDetails),
-                                      @(kBrowseTapActionEdit),
-                                      @(kBrowseTapActionCopyTitle),
-                                      @(kBrowseTapActionCopyUsername),
-                                      @(kBrowseTapActionCopyPassword),
-                                      @(kBrowseTapActionCopyUrl),
-                                      @(kBrowseTapActionCopyNotes),
-                                      @(kBrowseTapActionCopyTotp)];
+                                    @(kBrowseTapActionCopyTotp)];
     
     NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return [self getTapActionString:(BrowseTapAction)obj.integerValue];
@@ -421,11 +411,7 @@
     }];
     
     BrowseItemSubtitleField current = self.databaseMetaData.browseItemSubtitleField;
-    
-
-
-
-    
+        
     NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return obj.integerValue == current;
     }];

@@ -73,7 +73,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSLog(@"=====================================================================");
 }
 
-- (instancetype)initLocked:(NSDocument*)document
+- (instancetype)initLocked:(Document*)document
               databaseUuid:(NSString*)databaseUuid {
     if (self = [super init]) {
         _document = document;
@@ -86,7 +86,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     return self;
 }
 
-- (instancetype)initUnlocked:(NSDocument *)document
+- (instancetype)initUnlocked:(Document *)document
                 databaseUuid:(NSString*)databaseUuid
                        model:(Model *)model {
     if ( self = [self initLocked:document databaseUuid:databaseUuid] ) {
@@ -2090,6 +2090,22 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 
 
+- (void)applyEncryptionSettingsViewModelChanges:(EncryptionSettingsViewModel *)encryptionSettings {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    if ( self.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 setGroupExpandedState - Model is RO!");
+        return;
+    }
+    
+    [encryptionSettings applyToDatabaseModel:self.database];
+
+    [self.document updateChangeCount:NSChangeDone];
+}
+
+
+
 - (BOOL)launchUrl:(Node *)item {
     return [self.innerModel launchUrl:item];
 }
@@ -2101,6 +2117,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 - (Node*)getDefaultNewEntryNode:(Node *_Nonnull)parentGroup {
     AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
+    BOOL useParentGroupIcon = Settings.sharedInstance.useParentGroupIconOnCreate;
     
     
     
@@ -2141,6 +2158,10 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
     Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields uuid:nil];
 
+    if ( useParentGroupIcon && !parentGroup.isUsingKeePassDefaultIcon ) {
+        record.icon = parentGroup.icon;
+    }
+    
     return record;
 }
 

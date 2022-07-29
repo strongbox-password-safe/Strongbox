@@ -10,6 +10,7 @@
 #import "NotificationConstants.h"
 #import "Utils.h"
 #import "Constants.h"
+#import "Model.h"
 
 NSString* const kTitleColumn = @"TitleColumn";
 NSString* const kUsernameColumn = @"UsernameColumn";
@@ -29,7 +30,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 static NSString* const kFullVersion = @"fullVersion";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* const kAutoLockTimeout = @"autoLockTimeout";
-static NSString* const kWarnedAboutTouchId = @"warnedAboutTouchId";
+
 static NSString* const kAlwaysShowPassword = @"alwaysShowPassword";
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kAutoSave = @"autoSave";
@@ -65,6 +66,24 @@ static NSString* const kQuitOnAllWindowsClosed = @"quitOnAllWindowsClosed";
 static NSString* const kLastPromptedToUseNextGenUI = @"lastPromptedToUseNextGenUI";
 static NSString* const kShowCopyFieldButton = @"showCopyFieldButton";
 static NSString* const kLockEvenIfEditing = @"lockEvenIfEditing";
+static NSString* const kScreenCaptureBlocked = @"screenCaptureBlocked";
+
+
+
+static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
+static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
+static NSString* const kAppHasBeenDowngradedToFreeEdition = @"appHasBeenDowngradedToFreeEdition";
+static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"hasPromptedThatAppHasBeenDowngradedToFreeEdition";
+static NSString* const kHasPromptedThatFreeTrialWillEndSoon = @"hasPromptedThatFreeTrialWillEndSoon";
+
+static NSString* const kHasShownFirstRunWelcome = @"hasShownFirstRunWelcome";
+static NSString* const kFreeTrialNudgeCount = @"freeTrialNudgeCount";
+static NSString* const kLastFreeTrialNudge = @"lastFreeTrialNudge";
+static NSString* const kInstallDate = @"installDate";
+static NSString* const kLaunchCountKey = @"launchCountKey";
+static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
+static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
+static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 
 
 
@@ -124,6 +143,177 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+
+- (BOOL)stripUnusedIconsOnSave {
+    return YES;
+    
+    return [self getBool:kStripUnusedIconsOnSave];
+}
+
+- (void)setStripUnusedIconsOnSave:(BOOL)stripUnusedIconsOnSave {
+    return [self setBool:kStripUnusedIconsOnSave value:stripUnusedIconsOnSave];
+}
+
+- (BOOL)useParentGroupIconOnCreate {
+    return [self getBool:kUseParentGroupIconOnCreate fallback:YES];
+}
+
+- (void)setUseParentGroupIconOnCreate:(BOOL)useParentGroupIconOnCreate {
+    [self setBool:kUseParentGroupIconOnCreate value:useParentGroupIconOnCreate];
+}
+
+- (BOOL)useIsolatedDropbox {
+    return [self getBool:kUseIsolatedDropbox];
+}
+
+- (void)setUseIsolatedDropbox:(BOOL)useIsolatedDropbox {
+    [self setBool:kUseIsolatedDropbox value:useIsolatedDropbox];
+}
+
+
+
+- (NSDate *)installDate {
+    return [self.userDefaults objectForKey:kInstallDate];
+}
+
+- (void)setInstallDate:(NSDate *)installDate {
+    [self.userDefaults setObject:installDate forKey:kInstallDate];
+}
+
+- (NSInteger)daysInstalled {
+    NSDate* installDate = self.installDate;
+
+    if(!installDate) {
+        return 0;
+    }
+    
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [gregorian components:NSCalendarUnitDay
+                                                fromDate:installDate
+                                                  toDate:[NSDate date]
+                                                 options:0];
+
+    NSInteger daysInstalled = [components day];
+    
+    return daysInstalled;
+}
+
+- (NSUInteger)launchCount {
+    return [self.userDefaults integerForKey:kLaunchCountKey];
+}
+
+- (void)incrementLaunchCount {
+    NSUInteger launchCount = self.launchCount;
+    
+    launchCount++;
+    
+    NSLog(@"Application has been launched %ld times", (long)launchCount);
+    
+    [self.userDefaults setInteger:launchCount forKey:kLaunchCountKey];
+    [self.userDefaults synchronize];
+}
+
+
+
+- (NSUInteger)freeTrialOrUpgradeNudgeCount {
+    return [self.sharedAppGroupDefaults integerForKey:kFreeTrialNudgeCount];
+}
+
+- (void)setFreeTrialOrUpgradeNudgeCount:(NSUInteger)freeTrialOrUpgradeNudgeCount {
+    [self.sharedAppGroupDefaults setInteger:freeTrialOrUpgradeNudgeCount forKey:kFreeTrialNudgeCount];
+}
+
+- (NSDate *)lastFreeTrialOrUpgradeNudge {
+    NSDate* ret = [self.sharedAppGroupDefaults objectForKey:kLastFreeTrialNudge];
+    
+    return ret ? ret : NSDate.date;
+}
+
+- (void)setLastFreeTrialOrUpgradeNudge:(NSDate *)lastFreeTrialOrUpgradeNudge {
+    [self.sharedAppGroupDefaults setObject:lastFreeTrialOrUpgradeNudge forKey:kLastFreeTrialNudge];
+}
+
+- (NSDate *)lastEntitlementCheckAttempt {
+    NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
+    
+    return [userDefaults objectForKey:kLastEntitlementCheckAttempt];
+}
+
+- (void)setLastEntitlementCheckAttempt:(NSDate *)lastEntitlementCheckAttempt {
+    NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
+    [userDefaults setObject:lastEntitlementCheckAttempt forKey:kLastEntitlementCheckAttempt];
+    [userDefaults synchronize];
+}
+
+- (NSUInteger)numberOfEntitlementCheckFails {
+    NSInteger ret =  [self.sharedAppGroupDefaults integerForKey:kNumberOfEntitlementCheckFails];
+    return ret;
+}
+
+- (void)setNumberOfEntitlementCheckFails:(NSUInteger)numberOfEntitlementCheckFails {
+    [self.sharedAppGroupDefaults setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)appHasBeenDowngradedToFreeEdition {
+    return [self getBool:kAppHasBeenDowngradedToFreeEdition];
+}
+
+- (void)setAppHasBeenDowngradedToFreeEdition:(BOOL)appHasBeenDowngradedToFreeEdition {
+    [self setBool:kAppHasBeenDowngradedToFreeEdition value:appHasBeenDowngradedToFreeEdition];
+}
+
+- (BOOL)hasPromptedThatAppHasBeenDowngradedToFreeEdition {
+    return [self getBool:kHasPromptedThatAppHasBeenDowngradedToFreeEdition];
+}
+
+- (void)setHasPromptedThatAppHasBeenDowngradedToFreeEdition:(BOOL)hasPromptedThatAppHasBeenDowngradedToFreeEdition {
+    [self setBool:kHasPromptedThatAppHasBeenDowngradedToFreeEdition value:hasPromptedThatAppHasBeenDowngradedToFreeEdition];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)setPro:(BOOL)value {
+    [self setFullVersion:value];
+}
+
+
+
+
+
+
+
+
+
+
+
+- (BOOL)screenCaptureBlocked {
+    return [self getBool:kScreenCaptureBlocked fallback:YES];
+}
+
+- (void)setScreenCaptureBlocked:(BOOL)screenCaptureBlocked {
+    [self setBool:kScreenCaptureBlocked value:screenCaptureBlocked];
+}
 
 - (BOOL)lockEvenIfEditing {
     return [self getBool:kLockEvenIfEditing fallback:YES];
@@ -216,12 +406,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (void)setLastPromptedToUseNextGenUI:(NSDate *)lastPromptedToUseNextGenUI {
     [self.sharedAppGroupDefaults setObject:lastPromptedToUseNextGenUI forKey:kLastPromptedToUseNextGenUI];
     [self.sharedAppGroupDefaults synchronize];
-}
-
-- (BOOL)isAProBundle {
-    NSString* bundleId = [Utils getAppBundleId];
-    
-    return [bundleId isEqualToString:Constants.macProEditionBundleId];
 }
 
 - (BOOL)nextGenUI {
@@ -411,20 +595,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     return _arr;
 }
 
-- (BOOL)warnedAboutTouchId {
-    return [self getBool:kWarnedAboutTouchId];
-}
-
-- (void)setWarnedAboutTouchId:(BOOL)warnedAboutTouchId {
-    [self setBool:kWarnedAboutTouchId value:warnedAboutTouchId];
-}
-
 - (BOOL)fullVersion {
     return [self getBool:kFullVersion];
 }
 
 - (void)setFullVersion:(BOOL)value {
     [self setBool:kFullVersion value:value];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
 }
 
 - (BOOL)isProOrFreeTrial {
@@ -442,8 +620,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (BOOL)freeTrial {
     NSDate* date = self.endFreeTrialDate;
     
-    if(date == nil) {
-        return YES;
+    if ( date == nil ) {
+        return NO;
     }
     
     BOOL ret = !([date timeIntervalSinceNow] < 0);
@@ -472,14 +650,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (NSDate*)endFreeTrialDate {
     return [self.userDefaults objectForKey:kEndFreeTrialDate];
-}
-
-- (void)setEndFreeTrialDate:(NSDate *)endFreeTrialDate {
-    
-    
-    [self.userDefaults setObject:endFreeTrialDate forKey:kEndFreeTrialDate];
-    
-    [self.userDefaults synchronize];
 }
 
 - (NSInteger)autoLockTimeoutSeconds {
@@ -604,6 +774,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setDatabasesAreAlwaysReadOnly:(BOOL)databasesAreAlwaysReadOnly {
     
+}
+
+- (BOOL)hasShownFirstRunWelcome {
+    return [self getBool:kHasShownFirstRunWelcome];
+}
+
+- (void)setHasShownFirstRunWelcome:(BOOL)hasShownFirstRunWelcome {
+    [self setBool:kHasShownFirstRunWelcome value:hasShownFirstRunWelcome];
 }
 
 @end

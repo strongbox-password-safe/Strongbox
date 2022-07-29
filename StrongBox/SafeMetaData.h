@@ -126,8 +126,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hideTotpCustomFieldsInViewMode;
 
 
+
 @property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
 @property (readonly) BOOL mainAppAndAutoFillYubiKeyConfigsIncoherent;
+@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
+@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
 
 @property DatabaseAuditorConfiguration* auditConfig;
 

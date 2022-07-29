@@ -15,8 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)applyCustomizations;
 
 @property (readonly, class) BOOL isAProBundle;
-@property (readonly, class) BOOL isScotusEdition;
-@property (readonly, class) BOOL isGrapheneEdition;
+@property (readonly, class) BOOL isUnifiedProEdition;
 
 @end
 

@@ -21,9 +21,12 @@ class DetailViewController: NSViewController {
     @IBOutlet var tableView: TableViewWithKeyDownEvents!
 
     let synthesizer = NSSpeechSynthesizer()
+
     private weak var document: Document!
     private var database: ViewModel!
     private var loadedDocument: Bool = false
+    private var fixedItemUuid: UUID? 
+
     var currentAttachmentPreviewIndex: Int = 0 
 
     var quickRevealButtonDown: Bool = false
@@ -74,43 +77,58 @@ class DetailViewController: NSViewController {
     }
 
     @objc
-    func handleCopy( ) -> Bool {
-        if ( isNotesSelectedSomeText ) {
-            NSLog("Some Notes Text Selected not copying");
-            return true
+    func handleCopy() -> Bool {
+        guard view.window?.firstResponder == tableView, let selectedField = selectedField else {
+            return false
+        }
+                
+        if selectedField.fieldType == .notes {
+            if let cellView = cellViewForField(selectedField) as? NotesTableCellView {
+                if cellView.isSomeTextSelected {
+                    NSLog("Some Notes Text Selected not copying")
+                    cellView.copySelectedText()
+                    let loc = NSLocalizedString("mac_notes_partially_copied_to_clipboard", comment: "Notes (Partially) Copied") 
+            
+                    showPopupToast(loc, view: cellView)
+
+                    return true
+                }
+            }
         }
 
-        if self.view.window?.firstResponder == tableView,
-            let selectedField = selectedField {
-            NSLog("There is a field selected... copying");
-            copyFieldToClipboard(selectedField)
-            return true
-        }
+        NSLog("There is a field selected... copying")
+
+        copyFieldToClipboard(selectedField)
         
-        return false
-    }
-    
-    @objc
-    var isNotesSelectedSomeText : Bool {
-        let notesField = fields.first { field in
-            return field.fieldType == .notes
-        }
-        
-        if let notesField = notesField, let cellView = cellViewForField(notesField) as? NotesTableCellView {
-            return cellView.isSomeTextSelected
-        }
-        
-        return false
+        return true
     }
     
     func loadFields() -> [DetailsViewField] {
-        guard database.nextGenSelectedItems.count == 1,
-              let uuid = database.nextGenSelectedItems.first,
-              let dbModel = database.commonModel,
-              let selectedNode = database.getItemBy(uuid)
-        else {
+        let selectedNode: Node
+
+        guard let dbModel = database.commonModel else {
             NSLog("✅ DetailViewController::load - empty")
             return []
+        }
+
+        if let fixedItemUuid = fixedItemUuid {
+            guard let node = database.getItemBy(fixedItemUuid) else {
+                NSLog("✅ DetailViewController::load - empty")
+                return []
+            }
+
+            selectedNode = node
+        }
+        else {
+            guard database.nextGenSelectedItems.count == 1,
+                  let uuid = database.nextGenSelectedItems.first,
+                  let node = database.getItemBy(uuid)
+            else {
+                NSLog("✅ DetailViewController::load - empty")
+                return []
+            }
+
+            selectedNode = node
         }
 
         NSLog("✅ DetailViewController::load - Not Empty [%@]", String(describing: database.nextGenSelectedItems))
@@ -963,19 +981,26 @@ extension DetailViewController: DocumentViewController {
     func onDocumentLoaded() {
 
 
-        loadDocument()
+        load()
     }
 
-    func loadDocument() {
+    func load(explicitDocument: Document? = nil, explicitItemUuid: UUID? = nil) {
         if loadedDocument {
             return
         }
 
-        guard let doc = view.window?.windowController?.document as? Document else {
-            NSLog("🔴 DetailViewController::load Document not set!")
-            return
+        if let explicitDocument = explicitDocument {
+            document = explicitDocument
+            fixedItemUuid = explicitItemUuid
         }
-        document = doc
+        else {
+            guard let doc = view.window?.windowController?.document as? Document else {
+                NSLog("🔴 DetailViewController::load Document not set!")
+                return
+            }
+            document = doc
+        }
+
         database = document.viewModel
         loadedDocument = true
 
@@ -996,8 +1021,9 @@ extension DetailViewController: DocumentViewController {
         
 
         let auditNotificationsOfInterest: [String] = [
-
-                                                      kAuditCompletedNotificationKey]
+            
+            kAuditCompletedNotificationKey,
+        ]
 
         for ofInterest in auditNotificationsOfInterest {
             NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
@@ -1046,6 +1072,39 @@ extension DetailViewController: DocumentViewController {
         }
     }
 
+    func overrideValidateProposedFirstResponderForRow(row: Int) -> Bool? {
+        guard let field = fields[safe: row] else {
+            return false
+        }
+
+
+        
+        if field.fieldType == .metadata {
+            return true
+        }
+        else if field.fieldType == .url {
+            return true
+        }
+        else if field.fieldType == .notes {
+            
+            
+            
+
+            if view.window?.firstResponder == tableView { 
+                return selectedField?.fieldType == .notes
+            }
+            else {
+                return false
+            }
+        }
+        else if field.fieldType == .auditIssue {
+            return true
+        }
+        else {
+            return nil
+        }
+    }
+
     func setupUI() {
         tableView.register(NSNib(nibNamed: NSNib.Name("GenericDetailFieldTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("GenericDetailFieldTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("TitleCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("TitleCellView"))
@@ -1059,28 +1118,7 @@ extension DetailViewController: DocumentViewController {
         tableView.register(NSNib(nibNamed: AuditIssueTableCellView.nibName, bundle: nil), forIdentifier: AuditIssueTableCellView.reuseIdentifier)
 
         tableView.selectionHighlightStyle = .regular
-        tableView.overrideValidateProposedFirstResponderForRow = { [weak self] row in
-            guard let field = self?.fields[safe: row] else {
-                return false
-            }
-
-            if field.fieldType == .metadata {
-                return true
-            } else if field.fieldType == .url {
-                return true
-            }
-
-
-
-
-
-
-            else if field.fieldType == .auditIssue {
-                return true
-            } else {
-                return nil
-            }
-        }
+        tableView.overrideValidateProposedFirstResponderForRow = overrideValidateProposedFirstResponderForRow(row:)
 
         if #available(macOS 10.13, *) {
             tableView.registerForDraggedTypes([.fileURL])
@@ -1172,12 +1210,12 @@ extension DetailViewController: NSTableViewDataSource {
 }
 
 extension DetailViewController: NSTableViewDelegate {
-    func onCopyField ( field :  DetailsViewField? ) {
+    func onCopyField(field: DetailsViewField?) {
         if let field = field {
             copyFieldToClipboard(field)
         }
     }
-    
+
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         guard let field = fields[safe: row] else {
             NSLog("🔴 TableViewDelegate (viewFor:) called with out of range row = [%d]", row)
@@ -1249,7 +1287,7 @@ extension DetailViewController: NSTableViewDelegate {
             cell.setContent(field,
                             popupMenuUpdater: subtype == .some(.notes) ? onPopupMenuNeedsUpdate(_:_:) : nil,
                             showCopyButton: subtype == .some(.notes),
-            onCopyClicked: subtype == .some(.notes) ? onCopyEntiresNotes : nil)
+                            onCopyClicked: subtype == .some(.notes) ? onCopyEntiresNotes : nil)
 
             return cell
         case .metadata:
@@ -1306,7 +1344,7 @@ extension DetailViewController: NSTableViewDelegate {
     func onCopyEntiresNotes() {
         NSApplication.shared.sendAction(#selector(WindowController.onCopyNotes(_:)), to: nil, from: self)
     }
-    
+
     func showAuditDrillDown(_ uuid: UUID, view: NSView) {
         let vc = AuditDrillDown.fromStoryboard()
 
@@ -1366,7 +1404,7 @@ extension DetailViewController: NSTableViewDelegate {
                 NSLog("🔴 Could not determine typeIdentifier for filename [%@]", field.name)
                 return nil
             }
-            
+
             provider = NSFilePromiseProvider(fileType: typeIdentifier.takeRetainedValue() as String, delegate: self)
         }
 

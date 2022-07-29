@@ -35,7 +35,7 @@
         self.navigationItem.title = about;
     }
 
-    self.upgradeOptions.hidden = CustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime; 
+    self.upgradeOptions.hidden = CustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro; 
     
     self.debugTextView.layer.cornerRadius = 2.0f;
     if (@available(iOS 13.0, *)) {

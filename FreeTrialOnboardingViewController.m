@@ -8,23 +8,26 @@
 
 #import "FreeTrialOnboardingViewController.h"
 #import "BiometricsManager.h"
-#import "FreemiumStartFreeTrialViewController.h"
 #import "ProUpgradeIAPManager.h"
 #import "Alerts.h"
 #import "SVProgressHUD.h"
 #import "Model.h"
 #import "AppPreferences.h"
+#import "UpgradeViewController.h"
 
 @interface FreeTrialOnboardingViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonTryPro;
-@property (weak, nonatomic) IBOutlet UIButton *buttonUseFree;
 @property (weak, nonatomic) IBOutlet UILabel *labelBiometricUnlockFeature;
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOK1;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOK2;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOK3;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOK4;
+
+@property (weak, nonatomic) IBOutlet UILabel *labelPrice;
+
+@property SKProduct* yearly;
 
 @end
 
@@ -53,15 +56,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.yearly = ProUpgradeIAPManager.sharedInstance.yearlyProduct;
+
     [self setupUi];
-        
-    
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged) name:kProStatusChangedNotificationKey object:nil];
 }
 
 - (void)setupUi {
     self.buttonTryPro.layer.cornerRadius = 5.0f;
-    self.buttonUseFree.layer.cornerRadius = 5.0f;
     
     
     
@@ -73,35 +74,52 @@
     NSString* loc = NSLocalizedString(@"generic_biometric_unlock_fmt", @"%@ Unlock");
     NSString* fmt = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
     self.labelBiometricUnlockFeature.text = fmt;
+    
+    NSString* priceText = [self getPriceTextFromProduct:self.yearly];
+    
+    NSString* priceFmt = NSLocalizedString(@"price_per_year_after_free_trial_fmt", "Then %@ every year");
+    
+    self.labelPrice.text = [NSString stringWithFormat:priceFmt, priceText];
 }
 
-- (IBAction)onTryPro:(id)sender {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-    [self performSegueWithIdentifier:@"segueToStartTrial" sender:nil];
+- (NSString *)getPriceTextFromProduct:(SKProduct*)product {
+    return [self getPriceTextFromProduct:product divisor:1];
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    FreemiumStartFreeTrialViewController* vc = segue.destinationViewController;
-    vc.onDone = ^(BOOL purchasedOrRestoredFreeTrial) {
-        if ( purchasedOrRestoredFreeTrial ) {
-            [self onDismiss:nil];
+- (NSString *)getPriceTextFromProduct:(SKProduct*)product divisor:(int)divisor {
+    NSNumberFormatter* formatter = [[NSNumberFormatter alloc] init];
+    formatter.numberStyle = NSNumberFormatterCurrencyStyle;
+    formatter.locale = product.priceLocale;
+    
+    NSDecimalNumber* div = [NSDecimalNumber decimalNumberWithMantissa:divisor exponent:0 isNegative:NO];
+    NSDecimalNumber* price = [[self getEffectivePrice:product] decimalNumberByDividingBy:div];
+    
+    NSString* localCurrency = [formatter stringFromNumber:price];
+    NSString* priceText = [NSString stringWithFormat:@"%@", localCurrency];
+    return priceText;
+}
+
+- (NSDecimalNumber*)getEffectivePrice:(SKProduct*)product {
+    if (@available(iOS 11.2, *)) {
+        if(product.introductoryPrice) {
+            if ( [product.introductoryPrice.price isEqual:NSDecimalNumber.zero] ) {
+
+                return product.price;
+            }
+            else {
+                return product.introductoryPrice.price;
+            }
         }
-    };
-}
-
-- (void)onProStatusChanged {
-    if ( AppPreferences.sharedInstance.isProOrFreeTrial ) {
-        [self onDismiss:nil];
     }
+
+    return product.price;
 }
 
 - (IBAction)onAskMeLater:(id)sender {
-    [self onDismiss:sender];
+    [self onDismiss];
 }
 
-- (IBAction)onDismiss:(id)sender {
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-
+- (void)onDismiss {
     __weak FreeTrialOnboardingViewController* weakSelf = self;
 
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -110,6 +128,35 @@
             weakSelf.onDone = nil; 
         }
     });
+}
+
+- (IBAction)onTryPro:(id)sender {
+    [ProUpgradeIAPManager.sharedInstance purchaseAndCheckReceipts:self.yearly
+                                                       completion:^(NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                if ( error.code != SKErrorPaymentCancelled ) {
+                    [Alerts error:self error:error];
+                }
+            }
+            else {
+                [self onDismiss];
+            }
+        });
+    }];
+}
+
+- (IBAction)onLearnMore:(id)sender {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Upgrade" bundle:nil];
+    UpgradeViewController* vc = [storyboard instantiateInitialViewController];
+
+    vc.onDone = ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onDismiss];
+        });
+    };
+    
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 @end

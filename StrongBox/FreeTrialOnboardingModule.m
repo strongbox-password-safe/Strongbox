@@ -9,6 +9,7 @@
 #import "FreeTrialOnboardingModule.h"
 #import "FreeTrialOnboardingViewController.h"
 #import "AppPreferences.h"
+#import "ProUpgradeIAPManager.h"
 
 @implementation FreeTrialOnboardingModule
 
@@ -25,10 +26,10 @@
         return NO;
     }
 
-    if ( AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired ) {
+    if ( !ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
         return NO;
     }
-     
+         
     if ( AppPreferences.sharedInstance.freeTrialNudgeCount == 0 ) { 
         return YES;
     }

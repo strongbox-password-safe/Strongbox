@@ -88,7 +88,7 @@
 }
 
 - (void)customizeUI {
-    if ( CustomizationManager.isScotusEdition || CustomizationManager.isGrapheneEdition ) { 
+    if ( AppPreferences.sharedInstance.hideTipJar ) { 
         [self cell:self.cellTipJar setHidden:YES];
     }
     else {
@@ -252,7 +252,7 @@
 }
 
 - (void)showUpgradeScreenIfAppropriate {
-    if ( CustomizationManager.isAProBundle || ( AppPreferences.sharedInstance.isPro && ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime )) {
+    if ( CustomizationManager.isAProBundle || ( AppPreferences.sharedInstance.isPro && ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro )) {
         return;
     }
     
@@ -268,24 +268,7 @@
     else {
         aboutString = [NSString stringWithFormat:NSLocalizedString(@"about_strongbox_free_version_fmt", @"Version %@"), [Utils getAppVersion]];
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
+        
     self.labelVersion.text = aboutString;
         
     if (@available(iOS 13.0, *)) {
@@ -301,7 +284,7 @@
     }
     else {
         if ( AppPreferences.sharedInstance.isPro ) {
-            if ( ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime ) { 
+            if ( ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro ) { 
                 self.labelProStatus.text = NSLocalizedString(@"pro_status_lifetime_pro", @"Lifetime Pro");
                 self.cellProStatus.accessoryType = UITableViewCellAccessoryNone;
                 self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -329,6 +312,7 @@
             self.labelProStatus.text = NSLocalizedString(@"pro_status_unlicensed", @"Unlicensed");
         }
     }
+    
     
     
     if (@available(iOS 14.0, *)) {

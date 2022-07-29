@@ -585,7 +585,7 @@
 }
 
 - (void)toggleShowHidePasswordText:(UIButton*)sender {
-    if(sender.selected){
+    if ( sender.selected ){
         [sender setSelected:FALSE];
     } else {
         [sender setSelected:TRUE];

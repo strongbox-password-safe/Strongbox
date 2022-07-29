@@ -109,7 +109,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (void)loadAndValidateNodesAndUrls {
-    BOOL overwriteExisting = self.buttonIncludeItemsWithCustomIcons.state == NSOnState;
+    BOOL overwriteExisting = self.buttonIncludeItemsWithCustomIcons.state == NSControlStateValueOn;
     
     self.validNodes = @[];
     self.validUniqueUrls = @[];

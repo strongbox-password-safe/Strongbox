@@ -69,14 +69,21 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         self.firstAppearanceDone = YES;
         self.view.window.frameAutosaveName = @"SelectAutoFillDatabase-AutoSave";
     
-        if ( self.autoFillMode && self.databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
+        NSUInteger count = [self.databases filter:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+            return obj.autoFillEnabled;
+        }].count;
+        
+        if ( self.autoFillMode && count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
             NSLog(@"Single Database Launching...");
         
             MacDatabasePreferences* database = self.databases.firstObject;
             
-            [self dismissViewController:self];
+            __weak SelectDatabaseViewController* weakSelf = self;
             
-            self.onDone(NO, database);
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [weakSelf dismissViewController:self];
+                weakSelf.onDone(NO, database);
+            });
         }
     }
 }
@@ -137,9 +144,13 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     self.databases = MacDatabasePreferences.allDatabases;
         
     [self.tableView reloadData];
-    
-    if (self.tableView.numberOfRows > 0) {
-        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+
+    NSUInteger idx = [self.databases indexOfFirstMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+        return obj.autoFillEnabled;
+    }];
+
+    if ( idx != NSNotFound ) {
+        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
     }
     
     [self bindSelectedButton];
@@ -156,6 +167,11 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     
     if (row != NSNotFound) {
         MacDatabasePreferences* database = self.databases[row];
+        
+        if ( [self isDisabled:database] ) {
+            NSLog(@"🔴 Database is disabled! Cannot select");
+            return;
+        }
         
         [self dismissViewController:self];
         
@@ -189,13 +205,17 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
     MacDatabasePreferences* database = [self.databases objectAtIndex:row];
 
-    BOOL disabled = self.disabledDatabases && [self.disabledDatabases containsObject:database.uuid];
-    
-    if ( disabled || ( self.autoFillMode && !database.autoFillEnabled )) {
+    if ( [self isDisabled:database] ) {
         return NO;
     }
     
     return YES;
+}
+
+- (BOOL)isDisabled:(MacDatabasePreferences*)database {
+    BOOL disabled = ( ( self.disabledDatabases && [self.disabledDatabases containsObject:database.uuid] ) || ( self.autoFillMode && !database.autoFillEnabled ) );
+    
+    return disabled;
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
@@ -204,7 +224,15 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
 - (void)bindSelectedButton {
     NSUInteger row = self.tableView.selectedRowIndexes.firstIndex;
-    self.buttonSelect.enabled = (row != NSNotFound);
+
+    if ( row == NSNotFound ){
+        self.buttonSelect.enabled = NO;
+        return;
+    }
+    
+    MacDatabasePreferences* database = [self.databases objectAtIndex:row];
+
+    self.buttonSelect.enabled = ![self isDisabled:database];
 }
 
 @end

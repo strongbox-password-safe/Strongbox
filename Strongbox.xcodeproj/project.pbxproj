@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -179,7 +179,6 @@
 		4D2259F622C6C28B005547EA /* EditDateCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D2259F422C6C28A005547EA /* EditDateCell.xib */; };
 		4D2259F922C6C463005547EA /* EditDateCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2259F822C6C463005547EA /* EditDateCell.m */; };
 		4D2259FA22C6C463005547EA /* EditDateCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2259F822C6C463005547EA /* EditDateCell.m */; };
-		4D23DBEE241ABF9A002471D7 /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
 		4D24C76D238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */; };
 		4D24C76E238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */; };
 		4D24C76F238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */; };
@@ -218,7 +217,6 @@
 		4D2F6C3B21807C7E007931E4 /* Times.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C2E21807C7E007931E4 /* Times.m */; };
 		4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C3021807C7E007931E4 /* Entry.m */; };
 		4D2F6C3D21807C7E007931E4 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C3021807C7E007931E4 /* Entry.m */; };
-		4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */; };
 		4D2F6C4421807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C4321807CF9007931E4 /* BaseXmlDomainObjectHandler.m */; };
 		4D2F6C4521807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C4321807CF9007931E4 /* BaseXmlDomainObjectHandler.m */; };
 		4D305766224B4F8F00C36287 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D305765224B4F8F00C36287 /* StringValue.m */; };
@@ -359,8 +357,6 @@
 		4D4761362437531C00E312D9 /* FreeTrialOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4761332437531C00E312D9 /* FreeTrialOnboardingViewController.m */; };
 		4D47613D2437577400E312D9 /* FreemiumOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D4761422437577400E312D9 /* FreemiumOnboarding.storyboard */; };
 		4D47613F2437577400E312D9 /* FreemiumOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D4761422437577400E312D9 /* FreemiumOnboarding.storyboard */; };
-		4D47615324376F7800E312D9 /* FreemiumStartFreeTrialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47615224376F7800E312D9 /* FreemiumStartFreeTrialViewController.m */; };
-		4D47615424376F7800E312D9 /* FreemiumStartFreeTrialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47615224376F7800E312D9 /* FreemiumStartFreeTrialViewController.m */; };
 		4D4766E02178C82B00C4358F /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4766C52178C82900C4358F /* SerializationData.m */; };
 		4D4766E12178C82B00C4358F /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4766C52178C82900C4358F /* SerializationData.m */; };
 		4D4766F22178C82B00C4358F /* DecryptionParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4766D72178C82B00C4358F /* DecryptionParameters.m */; };
@@ -757,7 +753,6 @@
 		4DC4E04E23488BAA000743C4 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F7D22CBCEC1000954D0 /* PasswordMaker.m */; };
 		4DC4E04F23488BAA000743C4 /* NMSSHChannel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D326E6C22302BED00DCD8C7 /* NMSSHChannel.m */; };
 		4DC4E05023488BAA000743C4 /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7E39DA22675AC000EC940E /* NSMutableArray+Extensions.m */; };
-		4DC4E05123488BAA000743C4 /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */; };
 		4DC4E05223488BAA000743C4 /* BackupsBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1F580C233E19EC00A01FB4 /* BackupsBrowserTableViewController.m */; };
 		4DC4E05323488BAA000743C4 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C1B21807C25007931E4 /* XmlSerializer.m */; };
 		4DC4E05523488BAA000743C4 /* SelectItemTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */; };
@@ -1241,8 +1236,6 @@
 		4DD755F4232F093900758824 /* XmlComparisonElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755F2232F093900758824 /* XmlComparisonElement.m */; };
 		4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */; };
 		4DD85C8122E8FB2700700192 /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
-		4DD9D98A241D36BF00267D49 /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
-		4DD9D98D241D377900267D49 /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
 		4DDA015322425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4DDA015222425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml */; };
 		4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
 		4DDA01572242621400C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
@@ -1344,6 +1337,7 @@
 		7F800566C7279897A5A289F3 /* Pods_common_ios_Strongbox_Auto_Fill_Graphene.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C257BE33521D908853157F4 /* Pods_common_ios_Strongbox_Auto_Fill_Graphene.framework */; };
 		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
 		A48C8E61567AED835379AE87 /* Pods_common_ios_Strongbox_Auto_Fill_SCOTUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0EBDD7C6D61177E5FA4008E3 /* Pods_common_ios_Strongbox_Auto_Fill_SCOTUS.framework */; };
+		C80027DF28855CBF00C2C0FB /* AutoFillSmartSearchTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C80027DE28855CBF00C2C0FB /* AutoFillSmartSearchTests.m */; };
 		C8015EAC27D91B9F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EAA27D91B9F00F9F3B1 /* FastMaps.m */; };
 		C8015EAD27D91B9F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EAA27D91B9F00F9F3B1 /* FastMaps.m */; };
 		C8015EAE27D91B9F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EAA27D91B9F00F9F3B1 /* FastMaps.m */; };
@@ -2056,7 +2050,6 @@
 		C82284932639B37100103002 /* ValueWithModDate.m in Sources */ = {isa = PBXBuildFile; fileRef = C82284912639B37100103002 /* ValueWithModDate.m */; };
 		C82284942639B37100103002 /* ValueWithModDate.m in Sources */ = {isa = PBXBuildFile; fileRef = C82284912639B37100103002 /* ValueWithModDate.m */; };
 		C82284952639B37100103002 /* ValueWithModDate.m in Sources */ = {isa = PBXBuildFile; fileRef = C82284912639B37100103002 /* ValueWithModDate.m */; };
-		C8261B9927D133C100B502A4 /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = C8261B9827D133C100B502A4 /* MSAL */; };
 		C82BEDD5265D5BFD00A3D8E8 /* RandomizerPopOverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C82BEDD4265D5BFD00A3D8E8 /* RandomizerPopOverViewController.m */; };
 		C82BEDD6265D5BFD00A3D8E8 /* RandomizerPopOverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C82BEDD4265D5BFD00A3D8E8 /* RandomizerPopOverViewController.m */; };
 		C82D62BF266E1FA400949030 /* OnboardingManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C82D62BE266E1FA400949030 /* OnboardingManager.m */; };
@@ -2121,7 +2114,6 @@
 		C83C190A27BD216F00654F3C /* CustomAppIconViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83C190827BD216F00654F3C /* CustomAppIconViewController.swift */; };
 		C83C190B27BD216F00654F3C /* CustomAppIconViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83C190827BD216F00654F3C /* CustomAppIconViewController.swift */; };
 		C83C190C27BD216F00654F3C /* CustomAppIconViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83C190827BD216F00654F3C /* CustomAppIconViewController.swift */; };
-		C83CB79427D13934007859AB /* MSAL in Frameworks */ = {isa = PBXBuildFile; productRef = C83CB79327D13934007859AB /* MSAL */; };
 		C83D139925EE835800F8DFC1 /* SelectItemTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */; };
 		C83D139F25EE835900F8DFC1 /* SelectItemTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */; };
 		C83D13A625EE836500F8DFC1 /* SelectItem.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0F722F89D870095F51F /* SelectItem.storyboard */; };
@@ -2191,7 +2183,6 @@
 		C843317326692A7C00D496D2 /* SyncLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7124E178FC00416031 /* SyncLogViewController.m */; };
 		C843317426692A7C00D496D2 /* XMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9915255961DD0002BEF8 /* XMLDocument.m */; };
 		C843317526692A7C00D496D2 /* zxcvbn.c in Sources */ = {isa = PBXBuildFile; fileRef = C8A0796326248A9A00B48539 /* zxcvbn.c */; };
-		C843317626692A7C00D496D2 /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
 		C843317826692A7C00D496D2 /* AutoCompleteTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */; };
 		C843317A26692A7C00D496D2 /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B5A2DE25599E8B0087CED1 /* DDXMLNode.m */; };
 		C843317B26692A7C00D496D2 /* SelectDatabaseFormatTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D67B1E02191DA5A00B0D29A /* SelectDatabaseFormatTableViewController.m */; };
@@ -2275,7 +2266,6 @@
 		C84331CF26692A7C00D496D2 /* LargeTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */; };
 		C84331D026692A7C00D496D2 /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
 		C84331D126692A7C00D496D2 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E149421832C1500A41CA0 /* core.c */; };
-		C84331D226692A7C00D496D2 /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
 		C84331D326692A7C00D496D2 /* YubiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2561AE233FEAEA00179B84 /* YubiManager.m */; };
 		C84331D426692A7C00D496D2 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
 		C84331D526692A7C00D496D2 /* RMStoreUserDefaultsPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */; };
@@ -2311,7 +2301,6 @@
 		C84331F526692A7C00D496D2 /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
 		C84331F626692A7C00D496D2 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		C84331F726692A7C00D496D2 /* AppAutoFillOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E319426668D97007211D0 /* AppAutoFillOnboardingModule.m */; };
-		C84331F826692A7C00D496D2 /* FreemiumStartFreeTrialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47615224376F7800E312D9 /* FreemiumStartFreeTrialViewController.m */; };
 		C84331F926692A7C00D496D2 /* GCDWebServerResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D08B593234C9613003D1953 /* GCDWebServerResponse.m */; };
 		C84331FA26692A7C00D496D2 /* FirstUnlockWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8EE86AC264ADE690043C7D9 /* FirstUnlockWelcomeViewController.m */; };
 		C84331FB26692A7C00D496D2 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
@@ -2423,7 +2412,6 @@
 		C843327126692A7C00D496D2 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F8024E1D6E800416031 /* NSDate+Extensions.m */; };
 		C843327226692A7C00D496D2 /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972D221C01E7100F384C9 /* WebDAVProviderData.m */; };
 		C843327326692A7C00D496D2 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
-		C843327426692A7C00D496D2 /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
 		C843327526692A7C00D496D2 /* AddNewVirtualYubiKeyController.m in Sources */ = {isa = PBXBuildFile; fileRef = C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */; };
 		C843327626692A7C00D496D2 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD621F4C26700E2B194 /* OTPToken.m */; };
 		C843327726692A7C00D496D2 /* WelcomeCreateDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D12085922A7C26800139570 /* WelcomeCreateDatabaseViewController.m */; };
@@ -2684,6 +2672,10 @@
 		C848450627580941001CAA05 /* AsyncUpdateJob.m in Sources */ = {isa = PBXBuildFile; fileRef = C84844FF27580941001CAA05 /* AsyncUpdateJob.m */; };
 		C848450727580941001CAA05 /* AsyncUpdateJob.m in Sources */ = {isa = PBXBuildFile; fileRef = C84844FF27580941001CAA05 /* AsyncUpdateJob.m */; };
 		C848450827580941001CAA05 /* AsyncUpdateJob.m in Sources */ = {isa = PBXBuildFile; fileRef = C84844FF27580941001CAA05 /* AsyncUpdateJob.m */; };
+		C8493851285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8493850285774FE0079D1E8 /* StrongboxProductBundle.swift */; };
+		C8493852285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8493850285774FE0079D1E8 /* StrongboxProductBundle.swift */; };
+		C8493853285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8493850285774FE0079D1E8 /* StrongboxProductBundle.swift */; };
+		C8493854285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8493850285774FE0079D1E8 /* StrongboxProductBundle.swift */; };
 		C849E587265EA19400D23ED6 /* ScheduledExport.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C849E58A265EA19400D23ED6 /* ScheduledExport.storyboard */; };
 		C849E588265EA19400D23ED6 /* ScheduledExport.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C849E58A265EA19400D23ED6 /* ScheduledExport.storyboard */; };
 		C84AE6CD27453E3600C27778 /* Reachabil1ty.m in Sources */ = {isa = PBXBuildFile; fileRef = C84AE6CC27453E3600C27778 /* Reachabil1ty.m */; };
@@ -3022,6 +3014,30 @@
 		C87A991C255961DE0002BEF8 /* HTMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9916255961DD0002BEF8 /* HTMLDocument.m */; };
 		C87A991D255961DE0002BEF8 /* HTMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9916255961DD0002BEF8 /* HTMLDocument.m */; };
 		C87A991E255961DE0002BEF8 /* HTMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9916255961DD0002BEF8 /* HTMLDocument.m */; };
+		C87E2B322867174000BA9079 /* SlideCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2E2867173F00BA9079 /* SlideCell.swift */; };
+		C87E2B332867174000BA9079 /* SlideCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2E2867173F00BA9079 /* SlideCell.swift */; };
+		C87E2B342867174000BA9079 /* SlideCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2E2867173F00BA9079 /* SlideCell.swift */; };
+		C87E2B352867174000BA9079 /* SlideCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2E2867173F00BA9079 /* SlideCell.swift */; };
+		C87E2B362867174000BA9079 /* ZKCarouselSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2F2867173F00BA9079 /* ZKCarouselSlide.swift */; };
+		C87E2B372867174000BA9079 /* ZKCarouselSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2F2867173F00BA9079 /* ZKCarouselSlide.swift */; };
+		C87E2B382867174000BA9079 /* ZKCarouselSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2F2867173F00BA9079 /* ZKCarouselSlide.swift */; };
+		C87E2B392867174000BA9079 /* ZKCarouselSlide.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B2F2867173F00BA9079 /* ZKCarouselSlide.swift */; };
+		C87E2B3A2867174000BA9079 /* ZKCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B302867173F00BA9079 /* ZKCarousel.swift */; };
+		C87E2B3B2867174000BA9079 /* ZKCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B302867173F00BA9079 /* ZKCarousel.swift */; };
+		C87E2B3C2867174000BA9079 /* ZKCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B302867173F00BA9079 /* ZKCarousel.swift */; };
+		C87E2B3D2867174000BA9079 /* ZKCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B302867173F00BA9079 /* ZKCarousel.swift */; };
+		C87E2B3E2867174000BA9079 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87E2B312867173F00BA9079 /* Slide.xib */; };
+		C87E2B3F2867174000BA9079 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87E2B312867173F00BA9079 /* Slide.xib */; };
+		C87E2B402867174000BA9079 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87E2B312867173F00BA9079 /* Slide.xib */; };
+		C87E2B412867174000BA9079 /* Slide.xib in Resources */ = {isa = PBXBuildFile; fileRef = C87E2B312867173F00BA9079 /* Slide.xib */; };
+		C87E2B43286717AD00BA9079 /* ZKCarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B42286717AD00BA9079 /* ZKCarouselCell.swift */; };
+		C87E2B44286717AD00BA9079 /* ZKCarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B42286717AD00BA9079 /* ZKCarouselCell.swift */; };
+		C87E2B45286717AD00BA9079 /* ZKCarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B42286717AD00BA9079 /* ZKCarouselCell.swift */; };
+		C87E2B46286717AD00BA9079 /* ZKCarouselCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B42286717AD00BA9079 /* ZKCarouselCell.swift */; };
+		C87E2B48286717E400BA9079 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B47286717E400BA9079 /* Extensions.swift */; };
+		C87E2B49286717E400BA9079 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B47286717E400BA9079 /* Extensions.swift */; };
+		C87E2B4A286717E400BA9079 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B47286717E400BA9079 /* Extensions.swift */; };
+		C87E2B4B286717E400BA9079 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87E2B47286717E400BA9079 /* Extensions.swift */; };
 		C87F792324AA4A3000C90A1B /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C87F792224AA4A3000C90A1B /* StreamUtils.m */; };
 		C87F792424AA4A3000C90A1B /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C87F792224AA4A3000C90A1B /* StreamUtils.m */; };
 		C87F792524AA4A3000C90A1B /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C87F792224AA4A3000C90A1B /* StreamUtils.m */; };
@@ -3036,6 +3052,10 @@
 		C885EDCD259CF776002BB50A /* DiffSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = C885EDCB259CF776002BB50A /* DiffSummary.m */; };
 		C885EDCE259CF776002BB50A /* DiffSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = C885EDCB259CF776002BB50A /* DiffSummary.m */; };
 		C885EDCF259CF776002BB50A /* DiffSummary.m in Sources */ = {isa = PBXBuildFile; fileRef = C885EDCB259CF776002BB50A /* DiffSummary.m */; };
+		C8863CC6287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8863CC5287C2713001A1E97 /* MMcGSwiftUtils.swift */; };
+		C8863CC7287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8863CC5287C2713001A1E97 /* MMcGSwiftUtils.swift */; };
+		C8863CC8287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8863CC5287C2713001A1E97 /* MMcGSwiftUtils.swift */; };
+		C8863CC9287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8863CC5287C2713001A1E97 /* MMcGSwiftUtils.swift */; };
 		C886575927E633610091FB83 /* weird-attachment-secret.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = C886575827E633610091FB83 /* weird-attachment-secret.kdbx */; };
 		C886575B27E635510091FB83 /* weird-attachment-demo.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = C886575A27E635500091FB83 /* weird-attachment-demo.kdbx */; };
 		C886885E25B878D1004C5D6B /* PropertySwitchTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C886885D25B878D1004C5D6B /* PropertySwitchTableViewCell.xib */; };
@@ -3444,9 +3464,6 @@
 		C8A8DBAA2484F024009C673F /* AuditDrillDownController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A8DBA92484F024009C673F /* AuditDrillDownController.m */; };
 		C8A8DBAB2484F024009C673F /* AuditDrillDownController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A8DBA92484F024009C673F /* AuditDrillDownController.m */; };
 		C8A8DBAE2484F66E009C673F /* UpgradeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDEA21C241918A8002EEA02 /* UpgradeViewController.m */; };
-		C8A8DBAF2484F68F009C673F /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
-		C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
-		C8A8DBB12484F68F009C673F /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
 		C8AA7795253F266C00C9CED5 /* MergeDryRunReport.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AA7794253F266C00C9CED5 /* MergeDryRunReport.m */; };
 		C8AA7796253F266C00C9CED5 /* MergeDryRunReport.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AA7794253F266C00C9CED5 /* MergeDryRunReport.m */; };
 		C8AA7797253F266C00C9CED5 /* MergeDryRunReport.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AA7794253F266C00C9CED5 /* MergeDryRunReport.m */; };
@@ -4343,7 +4360,6 @@
 		C8E34E2026CBDEF700E8246A /* SyncLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7124E178FC00416031 /* SyncLogViewController.m */; };
 		C8E34E2126CBDEF700E8246A /* XMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9915255961DD0002BEF8 /* XMLDocument.m */; };
 		C8E34E2226CBDEF700E8246A /* zxcvbn.c in Sources */ = {isa = PBXBuildFile; fileRef = C8A0796326248A9A00B48539 /* zxcvbn.c */; };
-		C8E34E2326CBDEF700E8246A /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
 		C8E34E2526CBDEF700E8246A /* AutoCompleteTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */; };
 		C8E34E2726CBDEF700E8246A /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B5A2DE25599E8B0087CED1 /* DDXMLNode.m */; };
 		C8E34E2826CBDEF700E8246A /* SelectDatabaseFormatTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D67B1E02191DA5A00B0D29A /* SelectDatabaseFormatTableViewController.m */; };
@@ -4429,7 +4445,6 @@
 		C8E34E7D26CBDEF700E8246A /* LargeTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */; };
 		C8E34E7E26CBDEF700E8246A /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
 		C8E34E7F26CBDEF700E8246A /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E149421832C1500A41CA0 /* core.c */; };
-		C8E34E8026CBDEF700E8246A /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
 		C8E34E8126CBDEF700E8246A /* YubiManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2561AE233FEAEA00179B84 /* YubiManager.m */; };
 		C8E34E8226CBDEF700E8246A /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
 		C8E34E8326CBDEF700E8246A /* RMStoreUserDefaultsPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */; };
@@ -4466,7 +4481,6 @@
 		C8E34EA426CBDEF700E8246A /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
 		C8E34EA526CBDEF700E8246A /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		C8E34EA626CBDEF700E8246A /* AppAutoFillOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E319426668D97007211D0 /* AppAutoFillOnboardingModule.m */; };
-		C8E34EA726CBDEF700E8246A /* FreemiumStartFreeTrialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D47615224376F7800E312D9 /* FreemiumStartFreeTrialViewController.m */; };
 		C8E34EA826CBDEF700E8246A /* GCDWebServerResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D08B593234C9613003D1953 /* GCDWebServerResponse.m */; };
 		C8E34EA926CBDEF700E8246A /* FirstUnlockWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8EE86AC264ADE690043C7D9 /* FirstUnlockWelcomeViewController.m */; };
 		C8E34EAA26CBDEF700E8246A /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
@@ -4579,7 +4593,6 @@
 		C8E34F1E26CBDEF700E8246A /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F8024E1D6E800416031 /* NSDate+Extensions.m */; };
 		C8E34F1F26CBDEF700E8246A /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972D221C01E7100F384C9 /* WebDAVProviderData.m */; };
 		C8E34F2026CBDEF700E8246A /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
-		C8E34F2126CBDEF700E8246A /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
 		C8E34F2226CBDEF700E8246A /* AddNewVirtualYubiKeyController.m in Sources */ = {isa = PBXBuildFile; fileRef = C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */; };
 		C8E34F2326CBDEF700E8246A /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD621F4C26700E2B194 /* OTPToken.m */; };
 		C8E34F2426CBDEF700E8246A /* WelcomeCreateDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D12085922A7C26800139570 /* WelcomeCreateDatabaseViewController.m */; };
@@ -5572,8 +5585,6 @@
 		4D2259F422C6C28A005547EA /* EditDateCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EditDateCell.xib; sourceTree = "<group>"; };
 		4D2259F722C6C463005547EA /* EditDateCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EditDateCell.h; sourceTree = "<group>"; };
 		4D2259F822C6C463005547EA /* EditDateCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EditDateCell.m; sourceTree = "<group>"; };
-		4D23DBEC241ABF9A002471D7 /* FreeProChartViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FreeProChartViewController.h; path = StrongBox/FreeProChartViewController.h; sourceTree = "<group>"; };
-		4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FreeProChartViewController.m; path = StrongBox/FreeProChartViewController.m; sourceTree = "<group>"; };
 		4D24C76B238B9D1A000F8461 /* MMcG_MF_Base32Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMcG_MF_Base32Additions.m; path = lib/Base32/MMcG_MF_Base32Additions.m; sourceTree = "<group>"; };
 		4D24C76C238B9D1A000F8461 /* MMcG_MF_Base32Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMcG_MF_Base32Additions.h; path = lib/Base32/MMcG_MF_Base32Additions.h; sourceTree = "<group>"; };
 		4D2561AB233FE98900179B84 /* libYubiKit.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libYubiKit.a; path = lib/YubiKit/debug_universal/libYubiKit.a; sourceTree = "<group>"; };
@@ -5650,8 +5661,6 @@
 		4D2F6C3121807C7E007931E4 /* Times.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Times.h; path = model/keepass/Times.h; sourceTree = SOURCE_ROOT; };
 		4D2F6C3221807C7E007931E4 /* KeePassGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassGroup.h; path = model/keepass/KeePassGroup.h; sourceTree = SOURCE_ROOT; };
 		4D2F6C3321807C7E007931E4 /* String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = String.h; path = model/keepass/String.h; sourceTree = SOURCE_ROOT; };
-		4D2F6C3E21807CD1007931E4 /* OneDriveStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OneDriveStorageProvider.h; path = StrongBox/OneDriveStorageProvider.h; sourceTree = "<group>"; };
-		4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OneDriveStorageProvider.m; path = StrongBox/OneDriveStorageProvider.m; sourceTree = "<group>"; };
 		4D2F6C4221807CF9007931E4 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = SOURCE_ROOT; };
 		4D2F6C4321807CF9007931E4 /* BaseXmlDomainObjectHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BaseXmlDomainObjectHandler.m; path = model/keepass/BaseXmlDomainObjectHandler.m; sourceTree = SOURCE_ROOT; };
 		4D2F82331F754FB0001688C9 /* Strongbox.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Strongbox.entitlements; path = StrongBox/Strongbox.entitlements; sourceTree = "<group>"; };
@@ -5851,8 +5860,6 @@
 		4D4761322437531C00E312D9 /* FreeTrialOnboardingViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FreeTrialOnboardingViewController.h; sourceTree = "<group>"; };
 		4D4761332437531C00E312D9 /* FreeTrialOnboardingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FreeTrialOnboardingViewController.m; sourceTree = "<group>"; };
 		4D4761412437577400E312D9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/FreemiumOnboarding.storyboard; sourceTree = "<group>"; };
-		4D47615124376F7800E312D9 /* FreemiumStartFreeTrialViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FreemiumStartFreeTrialViewController.h; path = StrongBox/FreemiumStartFreeTrialViewController.h; sourceTree = "<group>"; };
-		4D47615224376F7800E312D9 /* FreemiumStartFreeTrialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FreemiumStartFreeTrialViewController.m; path = StrongBox/FreemiumStartFreeTrialViewController.m; sourceTree = "<group>"; };
 		4D4766C52178C82900C4358F /* SerializationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SerializationData.m; path = model/keepass/SerializationData.m; sourceTree = SOURCE_ROOT; };
 		4D4766D42178C82A00C4358F /* SerializationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializationData.h; path = model/keepass/SerializationData.h; sourceTree = SOURCE_ROOT; };
 		4D4766D72178C82B00C4358F /* DecryptionParameters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DecryptionParameters.m; path = model/keepass/DecryptionParameters.m; sourceTree = SOURCE_ROOT; };
@@ -6385,10 +6392,6 @@
 		4DD8D59823CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/EditPasswordCell.strings"; sourceTree = "<group>"; };
 		4DD8D59923CC9F2A00E7F57B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/IconTableCell.strings"; sourceTree = "<group>"; };
 		4DD8D59A23CCA0CC00E7F57B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/RMStore.strings; sourceTree = "<group>"; };
-		4DD9D988241D36BF00267D49 /* UpgradeAnswerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UpgradeAnswerViewController.h; path = StrongBox/UpgradeAnswerViewController.h; sourceTree = "<group>"; };
-		4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UpgradeAnswerViewController.m; path = StrongBox/UpgradeAnswerViewController.m; sourceTree = "<group>"; };
-		4DD9D98B241D377900267D49 /* UpgradeQuestionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UpgradeQuestionsViewController.h; path = StrongBox/UpgradeQuestionsViewController.h; sourceTree = "<group>"; };
-		4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UpgradeQuestionsViewController.m; path = StrongBox/UpgradeQuestionsViewController.m; sourceTree = "<group>"; };
 		4DDA015222425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "corrupt-recycly-bin-values.xml"; sourceTree = "<group>"; };
 		4DDA01542242621400C7F0E2 /* NSUUID+Zero.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSUUID+Zero.h"; path = "StrongBox/NSUUID+Zero.h"; sourceTree = "<group>"; };
 		4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSUUID+Zero.m"; path = "StrongBox/NSUUID+Zero.m"; sourceTree = "<group>"; };
@@ -6503,6 +6506,7 @@
 		AD40CFBB2444B3C938D95238 /* Pods-common-ios-Strongbox-Auto-Fill-Graphene.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-Auto-Fill-Graphene.debug.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-Auto-Fill-Graphene/Pods-common-ios-Strongbox-Auto-Fill-Graphene.debug.xcconfig"; sourceTree = "<group>"; };
 		B334D311C2C16E63E02F5A2C /* Pods-common-ios-Strongbox-iOS-SCOTUS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-iOS-SCOTUS.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-iOS-SCOTUS/Pods-common-ios-Strongbox-iOS-SCOTUS.release.xcconfig"; sourceTree = "<group>"; };
 		BC51A717B2012F1FB87A0177 /* Pods_common_ios_Strongbox_Auto_Fill_Pro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill_Pro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C80027DE28855CBF00C2C0FB /* AutoFillSmartSearchTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillSmartSearchTests.m; path = StrongboxTests/AutoFillSmartSearchTests.m; sourceTree = "<group>"; };
 		C8015EAA27D91B9F00F9F3B1 /* FastMaps.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FastMaps.m; path = model/FastMaps.m; sourceTree = "<group>"; };
 		C8015EAB27D91B9F00F9F3B1 /* FastMaps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FastMaps.h; path = model/FastMaps.h; sourceTree = "<group>"; };
 		C8039E5A27AFE76D00DCC981 /* twofactorauth.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = twofactorauth.json; path = resources/twofactorauth.json; sourceTree = "<group>"; };
@@ -6898,6 +6902,7 @@
 		C8413C3C25925C0700BD9DE8 /* MinimalPoolHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MinimalPoolHelper.m; path = model/MinimalPoolHelper.m; sourceTree = "<group>"; };
 		C8413C562592843800BD9DE8 /* NodeIcon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIcon.h; path = model/NodeIcon.h; sourceTree = "<group>"; };
 		C8413C572592843800BD9DE8 /* NodeIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeIcon.m; path = model/NodeIcon.m; sourceTree = "<group>"; };
+		C841A2FA28902BD600472D23 /* Strongbox-NoNetworking.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Strongbox-NoNetworking.entitlements"; path = "StrongBox/Strongbox-NoNetworking.entitlements"; sourceTree = "<group>"; };
 		C843333B2461666C00E2E550 /* Deliverfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; fileEncoding = 4; name = Deliverfile; path = fastlane/Deliverfile; sourceTree = "<group>"; };
 		C843333E2461668F00E2E550 /* Fastfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Fastfile; path = fastlane/Fastfile; sourceTree = "<group>"; };
 		C84333402461668F00E2E550 /* Appfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Appfile; path = fastlane/Appfile; sourceTree = "<group>"; };
@@ -6951,6 +6956,7 @@
 		C846FE94261240E10019EB7E /* AsyncUpdateResultViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AsyncUpdateResultViewController.m; path = StrongBox/AsyncUpdateResultViewController.m; sourceTree = "<group>"; };
 		C84844FF27580941001CAA05 /* AsyncUpdateJob.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AsyncUpdateJob.m; path = model/AsyncUpdateJob.m; sourceTree = "<group>"; };
 		C848450027580941001CAA05 /* AsyncUpdateJob.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AsyncUpdateJob.h; path = model/AsyncUpdateJob.h; sourceTree = "<group>"; };
+		C8493850285774FE0079D1E8 /* StrongboxProductBundle.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StrongboxProductBundle.swift; path = model/StrongboxProductBundle.swift; sourceTree = "<group>"; };
 		C849D1DA253C815A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SyncLog.strings; sourceTree = "<group>"; };
 		C849D1DB253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = StrongBox/ja.lproj/Main.strings; sourceTree = "<group>"; };
 		C849D1DC253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
@@ -7224,6 +7230,12 @@
 		C87A9914255961DD0002BEF8 /* XMLDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLDocument.h; path = LibXML2/XMLDocument.h; sourceTree = "<group>"; };
 		C87A9915255961DD0002BEF8 /* XMLDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLDocument.m; path = LibXML2/XMLDocument.m; sourceTree = "<group>"; };
 		C87A9916255961DD0002BEF8 /* HTMLDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HTMLDocument.m; path = LibXML2/HTMLDocument.m; sourceTree = "<group>"; };
+		C87E2B2E2867173F00BA9079 /* SlideCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SlideCell.swift; path = lib/ZKCarousel/SlideCell.swift; sourceTree = "<group>"; };
+		C87E2B2F2867173F00BA9079 /* ZKCarouselSlide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ZKCarouselSlide.swift; path = lib/ZKCarousel/ZKCarouselSlide.swift; sourceTree = "<group>"; };
+		C87E2B302867173F00BA9079 /* ZKCarousel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ZKCarousel.swift; path = lib/ZKCarousel/ZKCarousel.swift; sourceTree = "<group>"; };
+		C87E2B312867173F00BA9079 /* Slide.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = Slide.xib; path = lib/ZKCarousel/Slide.xib; sourceTree = "<group>"; };
+		C87E2B42286717AD00BA9079 /* ZKCarouselCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ZKCarouselCell.swift; path = lib/ZKCarousel/ZKCarouselCell.swift; sourceTree = "<group>"; };
+		C87E2B47286717E400BA9079 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = lib/ZKCarousel/Extensions.swift; sourceTree = "<group>"; };
 		C87F792124AA4A3000C90A1B /* StreamUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StreamUtils.h; path = model/StreamUtils.h; sourceTree = "<group>"; };
 		C87F792224AA4A3000C90A1B /* StreamUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StreamUtils.m; path = model/StreamUtils.m; sourceTree = "<group>"; };
 		C8855FB824854E8E001EE933 /* SwitchTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SwitchTableCell.xib; path = StrongBox/SwitchTableCell.xib; sourceTree = "<group>"; };
@@ -7241,6 +7253,7 @@
 		C8855FEE24857D4C001EE933 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = StrongBox/uk.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
 		C885EDCA259CF776002BB50A /* DiffSummary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DiffSummary.h; path = model/DiffSummary.h; sourceTree = SOURCE_ROOT; };
 		C885EDCB259CF776002BB50A /* DiffSummary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DiffSummary.m; path = model/DiffSummary.m; sourceTree = SOURCE_ROOT; };
+		C8863CC5287C2713001A1E97 /* MMcGSwiftUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MMcGSwiftUtils.swift; path = model/MMcGSwiftUtils.swift; sourceTree = "<group>"; };
 		C886575827E633610091FB83 /* weird-attachment-secret.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "weird-attachment-secret.kdbx"; sourceTree = "<group>"; };
 		C886575A27E635500091FB83 /* weird-attachment-demo.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "weird-attachment-demo.kdbx"; sourceTree = "<group>"; };
 		C886885D25B878D1004C5D6B /* PropertySwitchTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = PropertySwitchTableViewCell.xib; path = StrongBox/PropertySwitchTableViewCell.xib; sourceTree = "<group>"; };
@@ -7791,7 +7804,6 @@
 			files = (
 				C8B5A2DC2559948A0087CED1 /* Security.framework in Frameworks */,
 				C8B5A2D9255994650087CED1 /* Foundation.framework in Frameworks */,
-				C8261B9927D133C100B502A4 /* MSAL in Frameworks */,
 				4D1BF503232455A4007DF0E6 /* libxml2.2.dylib in Frameworks */,
 				4D51ED7F229ABDC4002B05A7 /* AudioToolbox.framework in Frameworks */,
 				4D326E9F2230311A00DCD8C7 /* libz.1.dylib in Frameworks */,
@@ -7811,7 +7823,6 @@
 			files = (
 				C8B5A2D225596EE10087CED1 /* Security.framework in Frameworks */,
 				C8B5A2CF25596E380087CED1 /* Foundation.framework in Frameworks */,
-				C83CB79427D13934007859AB /* MSAL in Frameworks */,
 				C8F78FC026CFEE30002B0924 /* libssl.a in Frameworks */,
 				C8E9143D275579690014C908 /* StoreKit.framework in Frameworks */,
 				4DC4E11723488BAA000743C4 /* libxml2.2.dylib in Frameworks */,
@@ -7981,17 +7992,12 @@
 		4D06943622083E2000FB826C /* Upgrade */ = {
 			isa = PBXGroup;
 			children = (
+				C87E2B2D2867171200BA9079 /* ZKCarousel */,
 				4D9677E923102BFB004AF091 /* Upgrade.storyboard */,
 				4D06943722083E5200FB826C /* ProUpgradeIAPManager.h */,
 				4D06943822083E5200FB826C /* ProUpgradeIAPManager.m */,
 				4DDEA21B241918A8002EEA02 /* UpgradeViewController.h */,
 				4DDEA21C241918A8002EEA02 /* UpgradeViewController.m */,
-				4D23DBEC241ABF9A002471D7 /* FreeProChartViewController.h */,
-				4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */,
-				4DD9D988241D36BF00267D49 /* UpgradeAnswerViewController.h */,
-				4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */,
-				4DD9D98B241D377900267D49 /* UpgradeQuestionsViewController.h */,
-				4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */,
 			);
 			name = Upgrade;
 			sourceTree = "<group>";
@@ -8350,6 +8356,7 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C80027DE28855CBF00C2C0FB /* AutoFillSmartSearchTests.m */,
 				4D98344621775F3800731FFC /* test-files */,
 				C8CE9E0626E51F620007922F /* FuzzTests.m */,
 				C850F879263815BE00FE64D7 /* KDBX4_1.m */,
@@ -8562,8 +8569,6 @@
 				4D4761422437577400E312D9 /* FreemiumOnboarding.storyboard */,
 				4D4761322437531C00E312D9 /* FreeTrialOnboardingViewController.h */,
 				4D4761332437531C00E312D9 /* FreeTrialOnboardingViewController.m */,
-				4D47615124376F7800E312D9 /* FreemiumStartFreeTrialViewController.h */,
-				4D47615224376F7800E312D9 /* FreemiumStartFreeTrialViewController.m */,
 				C8F14A01266631290063514C /* FreeTrialOnboardingModule.h */,
 				C8F14A02266631290063514C /* FreeTrialOnboardingModule.m */,
 			);
@@ -8691,8 +8696,6 @@
 		4D556F1522B8126300E16027 /* OneDrive */ = {
 			isa = PBXGroup;
 			children = (
-				4D2F6C3E21807CD1007931E4 /* OneDriveStorageProvider.h */,
-				4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */,
 				C892689E27D0FC1B00146CBD /* TwoDriveStorageProvider.swift */,
 			);
 			name = OneDrive;
@@ -9335,6 +9338,7 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				C8493850285774FE0079D1E8 /* StrongboxProductBundle.swift */,
 				4D3652162184A34600A56519 /* AppDelegate.m */,
 				C8CFCDDA266945F10058B4E0 /* CustomizationManager.h */,
 				C8CFCDDB266945F10058B4E0 /* CustomizationManager.m */,
@@ -9351,6 +9355,7 @@
 				C8F14A0526663D110063514C /* Configuration.storekit */,
 				C8F14A0626663F030063514C /* StoreKitTestCertificate.cer */,
 				C8AA778F253F22FE00C9CED5 /* Strongbox-iOS.xctestplan */,
+				C841A2FA28902BD600472D23 /* Strongbox-NoNetworking.entitlements */,
 				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
@@ -10287,6 +10292,19 @@
 			name = Swift;
 			sourceTree = "<group>";
 		};
+		C87E2B2D2867171200BA9079 /* ZKCarousel */ = {
+			isa = PBXGroup;
+			children = (
+				C87E2B47286717E400BA9079 /* Extensions.swift */,
+				C87E2B312867173F00BA9079 /* Slide.xib */,
+				C87E2B2E2867173F00BA9079 /* SlideCell.swift */,
+				C87E2B302867173F00BA9079 /* ZKCarousel.swift */,
+				C87E2B42286717AD00BA9079 /* ZKCarouselCell.swift */,
+				C87E2B2F2867173F00BA9079 /* ZKCarouselSlide.swift */,
+			);
+			name = ZKCarousel;
+			sourceTree = "<group>";
+		};
 		C88B8E4A27BE6B7000790783 /* Bluey */ = {
 			isa = PBXGroup;
 			children = (
@@ -10555,6 +10573,7 @@
 				4D17579D1C8361D200E6356F /* IOsUtils.m */,
 				C8053F7F24E1D68500416031 /* NSDate+Extensions.h */,
 				C8053F8024E1D6E800416031 /* NSDate+Extensions.m */,
+				C8863CC5287C2713001A1E97 /* MMcGSwiftUtils.swift */,
 			);
 			name = McGuill;
 			sourceTree = "<group>";
@@ -11135,7 +11154,6 @@
 				4DBE5B2F1C8356C700C310BC /* Resources */,
 				6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */,
 				4D67FDF0216F3FA2005C0E12 /* Embed App Extensions */,
-				D7ABA54D5C5AAFEF38260C52 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -11143,9 +11161,6 @@
 				4DE48A61216F54A300C9C991 /* PBXTargetDependency */,
 			);
 			name = "Strongbox-iOS";
-			packageProductDependencies = (
-				C8261B9827D133C100B502A4 /* MSAL */,
-			);
 			productName = StrongBox;
 			productReference = 4DBE5B311C8356C700C310BC /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
@@ -11161,7 +11176,6 @@
 				4DC4E12223488BAA000743C4 /* Resources */,
 				4D058EEB2348A79C00F8B536 /* Embed App Extensions */,
 				27770DC6BEA7CCCC65222D78 /* [CP] Embed Pods Frameworks */,
-				7CF79A230E3303D8297F0627 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -11169,9 +11183,6 @@
 				4D058EEA2348A79C00F8B536 /* PBXTargetDependency */,
 			);
 			name = "Strongbox-iOS-Pro";
-			packageProductDependencies = (
-				C83CB79327D13934007859AB /* MSAL */,
-			);
 			productName = StrongBox;
 			productReference = 4DC4E16E23488BAA000743C4 /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
@@ -11428,9 +11439,6 @@
 				pl,
 			);
 			mainGroup = 4DBE5B281C8356C700C310BC;
-			packageReferences = (
-				C8261B9727D133C100B502A4 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */,
-			);
 			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -11699,6 +11707,7 @@
 				C812CD5327C3A790006C6F72 /* calendar-2-ipad-pro@2x.png in Resources */,
 				C807987626540583001A32F4 /* ConvenienceUnlockOnboardingModule.storyboard in Resources */,
 				C812CE3527C3B16C006C6F72 /* landscape-ipad@2x.png in Resources */,
+				C87E2B3E2867174000BA9079 /* Slide.xib in Resources */,
 				4DE7F0D222F89D1D0095F51F /* Welcome.storyboard in Resources */,
 				C8D47A0627C3BA4E0011C53A /* bluey-ipad-pro@2x.png in Resources */,
 				4D770F8A230324A800CBE244 /* IconTableCell.xib in Resources */,
@@ -11982,6 +11991,7 @@
 				C812CD5427C3A790006C6F72 /* calendar-2-ipad-pro@2x.png in Resources */,
 				C807987726540583001A32F4 /* ConvenienceUnlockOnboardingModule.storyboard in Resources */,
 				C812CE3627C3B16C006C6F72 /* landscape-ipad@2x.png in Resources */,
+				C87E2B3F2867174000BA9079 /* Slide.xib in Resources */,
 				4DC4E14B23488BAA000743C4 /* Welcome.storyboard in Resources */,
 				C8D47A0727C3BA4E0011C53A /* bluey-ipad-pro@2x.png in Resources */,
 				4DC4E14C23488BAA000743C4 /* IconTableCell.xib in Resources */,
@@ -12717,6 +12727,7 @@
 				C812CDC127C3A9CA006C6F72 /* modern-calculator-ipad-pro@2x.png in Resources */,
 				C812CE5A27C3B1BE006C6F72 /* code-ipad-pro@2x.png in Resources */,
 				C843334C26692A7C00D496D2 /* Welcome.storyboard in Resources */,
+				C87E2B402867174000BA9079 /* Slide.xib in Resources */,
 				C812CE7627C3B224006C6F72 /* binary-ipad.png in Resources */,
 				C843334D26692A7C00D496D2 /* IconTableCell.xib in Resources */,
 				C88B8FF527BE98E800790783 /* multi-colour-jr@3x.png in Resources */,
@@ -13217,6 +13228,7 @@
 				C812CD5627C3A790006C6F72 /* calendar-2-ipad-pro@2x.png in Resources */,
 				C8E34FFE26CBDEF700E8246A /* ConvenienceUnlockOnboardingModule.storyboard in Resources */,
 				C812CE3827C3B16C006C6F72 /* landscape-ipad@2x.png in Resources */,
+				C87E2B412867174000BA9079 /* Slide.xib in Resources */,
 				C8E34FFF26CBDEF700E8246A /* Welcome.storyboard in Resources */,
 				C8D47A0927C3BA4E0011C53A /* bluey-ipad-pro@2x.png in Resources */,
 				C8E3500026CBDEF700E8246A /* IconTableCell.xib in Resources */,
@@ -13553,33 +13565,31 @@
 				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Pro/Pods-common-ios-Strongbox-iOS-Pro-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Down-iOS/Down.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/AppAuth-iOS/AppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMAppAuth-iOS/GTMAppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher-iOS/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST-iOS/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleSignIn-iOS/GoogleSignIn.framework",
+				"${BUILT_PRODUCTS_DIR}/MSAL-iOS/MSAL.framework",
 				"${BUILT_PRODUCTS_DIR}/MSGraphClientSDK-iOS/MSGraphClientSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
-				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
-				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial-iOS/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
-				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Down.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSGraphClientSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleSignIn.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSAL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSGraphClientSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -13635,55 +13645,35 @@
 				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Down-iOS/Down.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/AppAuth-iOS/AppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMAppAuth-iOS/GTMAppAuth.framework",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher-iOS/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST-iOS/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleSignIn-iOS/GoogleSignIn.framework",
+				"${BUILT_PRODUCTS_DIR}/MSAL-iOS/MSAL.framework",
 				"${BUILT_PRODUCTS_DIR}/MSGraphClientSDK-iOS/MSGraphClientSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
-				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
-				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
-				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
-				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial-iOS/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
-				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Down.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSGraphClientSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleSignIn.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSAL.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MSGraphClientSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		7CF79A230E3303D8297F0627 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Pro/Pods-common-ios-Strongbox-iOS-Pro-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Pro/Pods-common-ios-Strongbox-iOS-Pro-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		82ADEB68650D5D350DB3DA98 /* [CP] Check Pods Manifest.lock */ = {
@@ -13888,24 +13878,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Graphene/Pods-common-ios-Strongbox-iOS-Graphene-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D7ABA54D5C5AAFEF38260C52 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		E4414104AF4EAE8B5F06F894 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -13962,6 +13934,7 @@
 				4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */,
 				C86E9085246D9D4C0029623A /* DeletesAndMovesTest.m in Sources */,
 				C8F92293248A813B000F8292 /* CyrillicUrlTests.m in Sources */,
+				C80027DF28855CBF00C2C0FB /* AutoFillSmartSearchTests.m in Sources */,
 				C89BA19D2494F0A800CC8579 /* KdbxStreamingTests.m in Sources */,
 				4DD41FBA2182FBFB00FDDBB5 /* Kdbx4DatabaseTests.m in Sources */,
 				4D1BF4FB23244150007DF0E6 /* ZlibStreamTests.m in Sources */,
@@ -14041,6 +14014,7 @@
 				4D3652172184A34600A56519 /* AppDelegate.m in Sources */,
 				4DF97F2221BF101B0090A55E /* DAVListingParser.m in Sources */,
 				4D5B1EA32194A56300ECAF0D /* KdbGroup.m in Sources */,
+				C87E2B3A2867174000BA9079 /* ZKCarousel.swift in Sources */,
 				4DD59F541D3A5A7300F864ED /* main.m in Sources */,
 				C8DE8D8B258F900400B4D9EA /* Serializator.m in Sources */,
 				4DA12F02219837830000CEBB /* CustomIconList.m in Sources */,
@@ -14073,6 +14047,7 @@
 				4D4554AE2285C0BB0015C236 /* BrowseItemCell.m in Sources */,
 				C8413C582592843800BD9DE8 /* NodeIcon.m in Sources */,
 				C8A175B525A0BBC8002734E7 /* SelectComparisonTypeViewController.m in Sources */,
+				C87E2B48286717E400BA9079 /* Extensions.swift in Sources */,
 				C8F507DD26DE2E5E00F2FD85 /* TouchDownGestureRecognizer.m in Sources */,
 				4D8C148E2074F5F800CE9CAE /* PwSafeDatabase.m in Sources */,
 				4D792A70222EF46A00250086 /* RMAppReceipt.m in Sources */,
@@ -14105,7 +14080,6 @@
 				4D216F7F22CBCEC1000954D0 /* PasswordMaker.m in Sources */,
 				4D326E8D22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
-				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
 				C8969FD225AF6838006819E3 /* Argon2idKdfCipher.m in Sources */,
 				C80B3CBD2752811100FFB400 /* TipJarLogic.swift in Sources */,
 				4D1F580D233E19EC00A01FB4 /* BackupsBrowserTableViewController.m in Sources */,
@@ -14167,6 +14141,7 @@
 				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				C8DDE39724DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
 				C8650086258CDA87002951BA /* UIColor+Extensions.m in Sources */,
+				C87E2B322867174000BA9079 /* SlideCell.swift in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
 				C8AA7795253F266C00C9CED5 /* MergeDryRunReport.m in Sources */,
 				4DE46659233D2BBD00398A65 /* BackupItem.m in Sources */,
@@ -14178,6 +14153,7 @@
 				4DD85C8122E8FB2700700192 /* AttachmentsPoolViewController.m in Sources */,
 				C864397F2667C29F0058A09F /* LastCrashReportModule.m in Sources */,
 				4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */,
+				C87E2B43286717AD00BA9079 /* ZKCarouselCell.swift in Sources */,
 				4D08B5B1234C9613003D1953 /* GCDWebServerResponse.m in Sources */,
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
 				4DBC7A4A2279DC1600CA534D /* CollapsibleTableViewHeader.m in Sources */,
@@ -14233,7 +14209,6 @@
 				4D766D5F22204EED00AEF439 /* IconsCollectionViewController.m in Sources */,
 				C822848C2639B02200103002 /* CustomDataWithModDate.m in Sources */,
 				4D3E1484218326BE00A41CA0 /* KdfParameters.m in Sources */,
-				4DD9D98D241D377900267D49 /* UpgradeQuestionsViewController.m in Sources */,
 				C87A990B255961280002BEF8 /* DetectedIcon.swift in Sources */,
 				C88F8133245D90C500B0B998 /* NSData+Extensions.m in Sources */,
 				C89F939925A7612E009E0724 /* DatabaseUnlocker.m in Sources */,
@@ -14328,7 +14303,6 @@
 				C8B5A2FF25599E8D0087CED1 /* DDXMLElementAdditions.m in Sources */,
 				4D08B5BD234C9613003D1953 /* GCDWebServerFileResponse.m in Sources */,
 				4DF972D321C01E7100F384C9 /* WebDAVProviderData.m in Sources */,
-				4D23DBEE241ABF9A002471D7 /* FreeProChartViewController.m in Sources */,
 				C8453EDA254DCA2A006BE885 /* LoggingInputStream.m in Sources */,
 				C87A98F7255961280002BEF8 /* DownloadTextOperation.swift in Sources */,
 				4D004CE021F4C26700E2B194 /* OTPToken.m in Sources */,
@@ -14383,7 +14357,6 @@
 				4D004CDC21F4C26700E2B194 /* OTPToken+Persistence.m in Sources */,
 				C8053F7A24E181CF00416031 /* SyncLogEntryTableViewCell.m in Sources */,
 				C846FE802612267D0019EB7E /* AsyncUpdateResult.m in Sources */,
-				4DD9D98A241D36BF00267D49 /* UpgradeAnswerViewController.m in Sources */,
 				4D18F2362257987E00768E18 /* SprCompilation.m in Sources */,
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
 				4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */,
@@ -14425,6 +14398,7 @@
 				C83F7D7E26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				4DF97F2421BF101B0090A55E /* DAVRequests.m in Sources */,
 				4DAE98BE2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
+				C8863CC6287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */,
 				4DAE98BC2270B4E200A811C4 /* EditPasswordTableViewCell.m in Sources */,
 				4D792A6F222EF46A00250086 /* RMStoreAppReceiptVerifier.m in Sources */,
 				C896D31F27C006C300C5D223 /* AppLockConfigurationViewController.m in Sources */,
@@ -14455,9 +14429,11 @@
 				C8BF5217264ACD0A00D3A689 /* ConvenienceUnlockOnboardingViewController.m in Sources */,
 				4D08B5C1234C9613003D1953 /* GCDWebServerStreamedResponse.m in Sources */,
 				C8DF4AD524E69E3B00F0F74E /* ConcurrentCircularBuffer.m in Sources */,
+				C87E2B362867174000BA9079 /* ZKCarouselSlide.swift in Sources */,
 				4D3A0F432587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m in Sources */,
 				4DF97F2321BF101B0090A55E /* DAVRequestGroup.m in Sources */,
 				C8ED5DDF248E6C6400B84EBD /* HmacBlockInputStream.m in Sources */,
+				C8493851285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */,
 				C8679112256168270038310E /* KeePassXmlAutoType.m in Sources */,
 				4D526AA624407C8F00B0B700 /* Constants.swift in Sources */,
 				4D08B5BF234C9613003D1953 /* GCDWebServerDataResponse.m in Sources */,
@@ -14482,7 +14458,6 @@
 				4D9597B922A28825008DB224 /* SelectedStorageParameters.m in Sources */,
 				4DAE98C62270B4E200A811C4 /* CustomFieldViewModel.m in Sources */,
 				C8EC1CE02653C89400B0ED79 /* GenericOnboardingViewController.m in Sources */,
-				4D47615324376F7800E312D9 /* FreemiumStartFreeTrialViewController.m in Sources */,
 				4D0835D92284759F00CA7405 /* ItemDetailsViewController.m in Sources */,
 				C8EE86A9264ADE0A0043C7D9 /* FirstUnlockWelcomeModule.m in Sources */,
 				4D305766224B4F8F00C36287 /* StringValue.m in Sources */,
@@ -14536,6 +14511,7 @@
 				C8B5A30125599E8D0087CED1 /* DDXMLElementAdditions.m in Sources */,
 				C87A8CD22495101100356966 /* AppPreferences.m in Sources */,
 				4D9AFB252449D66A00376240 /* NSString+Levenshtein.m in Sources */,
+				C87E2B3B2867174000BA9079 /* ZKCarousel.swift in Sources */,
 				4DC4E02623488BAA000743C4 /* NSArray+Extensions.m in Sources */,
 				C872B73224A64B7F0042CE02 /* Base64DecodeOutputStream.m in Sources */,
 				C8DE8D8D258F900400B4D9EA /* Serializator.m in Sources */,
@@ -14558,7 +14534,6 @@
 				C8053F7324E178FC00416031 /* SyncLogViewController.m in Sources */,
 				C87A9919255961DE0002BEF8 /* XMLDocument.m in Sources */,
 				C8A0796626248A9B00B48539 /* zxcvbn.c in Sources */,
-				C8A8DBAF2484F68F009C673F /* FreeProChartViewController.m in Sources */,
 				4DC4E03123488BAA000743C4 /* WebDAVStorageProvider.m in Sources */,
 				4DC4E03223488BAA000743C4 /* AutoCompleteTextField.m in Sources */,
 				4DC4E03323488BAA000743C4 /* NMSSHHostConfig.m in Sources */,
@@ -14568,6 +14543,7 @@
 				4DC4E03623488BAA000743C4 /* RMStoreTransaction.m in Sources */,
 				4D160A90245314040097C730 /* QuickViewConfig.m in Sources */,
 				C82BEDD6265D5BFD00A3D8E8 /* RandomizerPopOverViewController.m in Sources */,
+				C87E2B49286717E400BA9079 /* Extensions.swift in Sources */,
 				C8413C5A2592843800BD9DE8 /* NodeIcon.m in Sources */,
 				C8F507DE26DE2E5E00F2FD85 /* TouchDownGestureRecognizer.m in Sources */,
 				C8A175B725A0BBC8002734E7 /* SelectComparisonTypeViewController.m in Sources */,
@@ -14619,7 +14595,6 @@
 				4DC4E04F23488BAA000743C4 /* NMSSHChannel.m in Sources */,
 				C8FA2A1A24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4DC4E05023488BAA000743C4 /* NSMutableArray+Extensions.m in Sources */,
-				4DC4E05123488BAA000743C4 /* OneDriveStorageProvider.m in Sources */,
 				C82D62C0266E1FA400949030 /* OnboardingManager.m in Sources */,
 				4DC4E05223488BAA000743C4 /* BackupsBrowserTableViewController.m in Sources */,
 				4DC4E05323488BAA000743C4 /* XmlSerializer.m in Sources */,
@@ -14661,7 +14636,7 @@
 				4D7F5A3D236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DFD46D4240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				4DC4E06123488BAA000743C4 /* core.c in Sources */,
-				C8A8DBB12484F68F009C673F /* UpgradeQuestionsViewController.m in Sources */,
+				C87E2B332867174000BA9079 /* SlideCell.swift in Sources */,
 				4DC4E06223488BAA000743C4 /* YubiManager.m in Sources */,
 				C88F813B245D935A00B0B998 /* NSString+Extensions.m in Sources */,
 				4DC4E06323488BAA000743C4 /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -14673,6 +14648,7 @@
 				4DC4E06823488BAA000743C4 /* Root.m in Sources */,
 				4D526AB424407C8F00B0B700 /* WSTag.swift in Sources */,
 				4DC4E06923488BAA000743C4 /* NMSSHConfig.m in Sources */,
+				C87E2B44286717AD00BA9079 /* ZKCarouselCell.swift in Sources */,
 				C86439802667C29F0058A09F /* LastCrashReportModule.m in Sources */,
 				4DC4E06B23488BAA000743C4 /* IOsUtils.m in Sources */,
 				4DC4E06C23488BAA000743C4 /* KeePassCiphers.m in Sources */,
@@ -14701,7 +14677,6 @@
 				C84D6CDE273D407D00182B40 /* Section.swift in Sources */,
 				4DC4E07923488BAA000743C4 /* AutoFillManager.m in Sources */,
 				C83E319626668D97007211D0 /* AppAutoFillOnboardingModule.m in Sources */,
-				4D47615424376F7800E312D9 /* FreemiumStartFreeTrialViewController.m in Sources */,
 				4D08B5B2234C9613003D1953 /* GCDWebServerResponse.m in Sources */,
 				C8EE86AE264ADE690043C7D9 /* FirstUnlockWelcomeViewController.m in Sources */,
 				4DC4E07A23488BAA000743C4 /* twofish.c in Sources */,
@@ -14847,7 +14822,6 @@
 				C8991AD824B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				C8DB05F326EE2ABB006328D8 /* GZIPCompressOutputStream.m in Sources */,
 				C84D6CEE273D407D00182B40 /* UnifiedRecord.swift in Sources */,
-				C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */,
 				C88D10C3253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */,
 				4DC4E0C523488BAA000743C4 /* OTPToken.m in Sources */,
 				C84D6CF2273D407D00182B40 /* JSONAny.swift in Sources */,
@@ -14920,6 +14894,7 @@
 				C8B440AA27039D590033BC0E /* StrongboxFontCollection.swift in Sources */,
 				C83F7D7F26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				4DC4E0EC23488BAA000743C4 /* CryptoParameters.m in Sources */,
+				C8863CC7287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */,
 				C872B72524A64A160042CE02 /* cdecode.c in Sources */,
 				4DC4E0ED23488BAA000743C4 /* CustomIcon.m in Sources */,
 				C896D32027C006C300C5D223 /* AppLockConfigurationViewController.m in Sources */,
@@ -14950,9 +14925,11 @@
 				C8BF5218264ACD0A00D3A689 /* ConvenienceUnlockOnboardingViewController.m in Sources */,
 				C8DDE39324DEB6FA00873392 /* SyncParameters.m in Sources */,
 				4DC4E0FC23488BAA000743C4 /* CASGTableViewController.m in Sources */,
+				C87E2B372867174000BA9079 /* ZKCarouselSlide.swift in Sources */,
 				4DC4E0FD23488BAA000743C4 /* CustomField.m in Sources */,
 				4DC4E0FE23488BAA000743C4 /* KeyFilesTableViewController.m in Sources */,
 				C8650088258CDA87002951BA /* UIColor+Extensions.m in Sources */,
+				C8493852285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */,
 				4DC4E0FF23488BAA000743C4 /* OTPToken+Generation.m in Sources */,
 				C87A9905255961280002BEF8 /* IconExtraction.swift in Sources */,
 				4D08B5C2234C9613003D1953 /* GCDWebServerStreamedResponse.m in Sources */,
@@ -15650,6 +15627,7 @@
 				C843314C26692A7C00D496D2 /* DDXMLDocument.m in Sources */,
 				C843314D26692A7C00D496D2 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				C843314E26692A7C00D496D2 /* InnerRandomStreamFactory.m in Sources */,
+				C87E2B3C2867174000BA9079 /* ZKCarousel.swift in Sources */,
 				C843314F26692A7C00D496D2 /* AutoFillOnboardingModule.m in Sources */,
 				C843315026692A7C00D496D2 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				C843315126692A7C00D496D2 /* StrongboxErrorCodes.m in Sources */,
@@ -15693,7 +15671,6 @@
 				C843317326692A7C00D496D2 /* SyncLogViewController.m in Sources */,
 				C843317426692A7C00D496D2 /* XMLDocument.m in Sources */,
 				C843317526692A7C00D496D2 /* zxcvbn.c in Sources */,
-				C843317626692A7C00D496D2 /* FreeProChartViewController.m in Sources */,
 				C843317826692A7C00D496D2 /* AutoCompleteTextField.m in Sources */,
 				C843317A26692A7C00D496D2 /* DDXMLNode.m in Sources */,
 				C843317B26692A7C00D496D2 /* SelectDatabaseFormatTableViewController.m in Sources */,
@@ -15713,6 +15690,7 @@
 				C843318926692A7C00D496D2 /* HmacBlockInputStream.m in Sources */,
 				C843318A26692A7C00D496D2 /* BrowseItemCell.m in Sources */,
 				C843318B26692A7C00D496D2 /* ConvenienceUnlockOnboardingModule.m in Sources */,
+				C8863CC8287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */,
 				C843318C26692A7C00D496D2 /* PwSafeDatabase.m in Sources */,
 				C843318D26692A7C00D496D2 /* RMAppReceipt.m in Sources */,
 				C843318E26692A7C00D496D2 /* SwitchTableViewCell.m in Sources */,
@@ -15784,7 +15762,6 @@
 				C84331D026692A7C00D496D2 /* ColoredStringHelper.m in Sources */,
 				C896D32127C006C300C5D223 /* AppLockConfigurationViewController.m in Sources */,
 				C84331D126692A7C00D496D2 /* core.c in Sources */,
-				C84331D226692A7C00D496D2 /* UpgradeQuestionsViewController.m in Sources */,
 				C84331D326692A7C00D496D2 /* YubiManager.m in Sources */,
 				C84331D426692A7C00D496D2 /* NSString+Extensions.m in Sources */,
 				C84331D526692A7C00D496D2 /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -15831,7 +15808,6 @@
 				C8B93B712710642B00E06F12 /* MasterPasswordExplanationViewController.m in Sources */,
 				C84331F626692A7C00D496D2 /* AutoFillManager.m in Sources */,
 				C84331F726692A7C00D496D2 /* AppAutoFillOnboardingModule.m in Sources */,
-				C84331F826692A7C00D496D2 /* FreemiumStartFreeTrialViewController.m in Sources */,
 				C84331F926692A7C00D496D2 /* GCDWebServerResponse.m in Sources */,
 				C84331FA26692A7C00D496D2 /* FirstUnlockWelcomeViewController.m in Sources */,
 				C84331FB26692A7C00D496D2 /* twofish.c in Sources */,
@@ -15921,6 +15897,7 @@
 				C843324926692A7C00D496D2 /* BackupsTableViewController.m in Sources */,
 				C843324A26692A7C00D496D2 /* SelectDestinationGroupController.m in Sources */,
 				C832A48A272ECD4A00768319 /* IOSAlertingUI.m in Sources */,
+				C87E2B45286717AD00BA9079 /* ZKCarouselCell.swift in Sources */,
 				C843324B26692A7C00D496D2 /* IconViewCell.m in Sources */,
 				C843324D26692A7C00D496D2 /* CustomData.m in Sources */,
 				C843324E26692A7C00D496D2 /* UnifiedDatabaseMetadata.m in Sources */,
@@ -15945,6 +15922,7 @@
 				C843326226692A7C00D496D2 /* String.m in Sources */,
 				C8AB3AD026EBBCCB002D6FCC /* (null) in Sources */,
 				C843326326692A7C00D496D2 /* regdom.c in Sources */,
+				C87E2B4A286717E400BA9079 /* Extensions.swift in Sources */,
 				C843326426692A7C00D496D2 /* MutableOrderedDictionary.m in Sources */,
 				C843326626692A7C00D496D2 /* EditDateCell.m in Sources */,
 				C843326726692A7C00D496D2 /* ConcurrentMutableArray.m in Sources */,
@@ -15961,7 +15939,6 @@
 				C843327126692A7C00D496D2 /* NSDate+Extensions.m in Sources */,
 				C843327226692A7C00D496D2 /* WebDAVProviderData.m in Sources */,
 				C843327326692A7C00D496D2 /* StorageProviderReadOptions.m in Sources */,
-				C843327426692A7C00D496D2 /* UpgradeAnswerViewController.m in Sources */,
 				C843327526692A7C00D496D2 /* AddNewVirtualYubiKeyController.m in Sources */,
 				C8E0B1E4275B7AB800A871F6 /* DatabasePreferences.m in Sources */,
 				C843327626692A7C00D496D2 /* OTPToken.m in Sources */,
@@ -16002,6 +15979,7 @@
 				C8343220270CD6AE009DFFF4 /* ContextMenuHelper.m in Sources */,
 				C843329326692A7C00D496D2 /* AutoFillOnboardingViewController.m in Sources */,
 				C843329426692A7C00D496D2 /* PinsConfigurationController.m in Sources */,
+				C8493853285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */,
 				C843329526692A7C00D496D2 /* ChaCha20Cipher.m in Sources */,
 				C843329626692A7C00D496D2 /* BrowseTableViewCellHelper.m in Sources */,
 				C843329726692A7C00D496D2 /* Constants.m in Sources */,
@@ -16040,6 +16018,7 @@
 				C84332B726692A7C00D496D2 /* DAVRequests.m in Sources */,
 				C84332B826692A7C00D496D2 /* GenericBasicCell.m in Sources */,
 				C84332B926692A7C00D496D2 /* EditPasswordTableViewCell.m in Sources */,
+				C87E2B382867174000BA9079 /* ZKCarouselSlide.swift in Sources */,
 				C84332BA26692A7C00D496D2 /* RMStoreAppReceiptVerifier.m in Sources */,
 				C84332BB26692A7C00D496D2 /* iCloudSafesCoordinator.m in Sources */,
 				C84332BC26692A7C00D496D2 /* ExportOptionsTableViewController.m in Sources */,
@@ -16066,6 +16045,7 @@
 				C84332D126692A7C00D496D2 /* OTPToken+Generation.m in Sources */,
 				C84332D326692A7C00D496D2 /* GCDWebServerStreamedResponse.m in Sources */,
 				C84332D526692A7C00D496D2 /* DAVRequestGroup.m in Sources */,
+				C87E2B342867174000BA9079 /* SlideCell.swift in Sources */,
 				C84332D626692A7C00D496D2 /* GCDWebServerDataResponse.m in Sources */,
 				C8D3B3D426B8654600C3A9E8 /* WebDAVConnectionsViewController.m in Sources */,
 				C84332D726692A7C00D496D2 /* KP31HashedBlockStream.m in Sources */,
@@ -16479,7 +16459,6 @@
 				C8E34E2026CBDEF700E8246A /* SyncLogViewController.m in Sources */,
 				C8E34E2126CBDEF700E8246A /* XMLDocument.m in Sources */,
 				C8E34E2226CBDEF700E8246A /* zxcvbn.c in Sources */,
-				C8E34E2326CBDEF700E8246A /* FreeProChartViewController.m in Sources */,
 				C8E34E2526CBDEF700E8246A /* AutoCompleteTextField.m in Sources */,
 				C8E34E2726CBDEF700E8246A /* DDXMLNode.m in Sources */,
 				C8E34E2826CBDEF700E8246A /* SelectDatabaseFormatTableViewController.m in Sources */,
@@ -16513,6 +16492,7 @@
 				C8E34E4526CBDEF700E8246A /* AsyncUpdateResultViewController.m in Sources */,
 				C8E34E4626CBDEF700E8246A /* ScheduledExportConfigurationViewController.m in Sources */,
 				C8E34E4726CBDEF700E8246A /* SetNodeIconUiHelper.m in Sources */,
+				C8493854285774FE0079D1E8 /* StrongboxProductBundle.swift in Sources */,
 				C8E34E4826CBDEF700E8246A /* ISO8601DateFormatter.m in Sources */,
 				C8E34E4926CBDEF700E8246A /* StatisticsPropertiesViewController.m in Sources */,
 				C8E34E4A26CBDEF700E8246A /* UpgradeViewController.m in Sources */,
@@ -16570,7 +16550,6 @@
 				C8E34E7D26CBDEF700E8246A /* LargeTextViewController.m in Sources */,
 				C8E34E7E26CBDEF700E8246A /* ColoredStringHelper.m in Sources */,
 				C8E34E7F26CBDEF700E8246A /* core.c in Sources */,
-				C8E34E8026CBDEF700E8246A /* UpgradeQuestionsViewController.m in Sources */,
 				C8E34E8126CBDEF700E8246A /* YubiManager.m in Sources */,
 				C8E34E8226CBDEF700E8246A /* NSString+Extensions.m in Sources */,
 				C8E34E8326CBDEF700E8246A /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -16617,7 +16596,7 @@
 				C8B93B722710642B00E06F12 /* MasterPasswordExplanationViewController.m in Sources */,
 				C8E34EA526CBDEF700E8246A /* AutoFillManager.m in Sources */,
 				C8E34EA626CBDEF700E8246A /* AppAutoFillOnboardingModule.m in Sources */,
-				C8E34EA726CBDEF700E8246A /* FreemiumStartFreeTrialViewController.m in Sources */,
+				C87E2B46286717AD00BA9079 /* ZKCarouselCell.swift in Sources */,
 				C8E34EA826CBDEF700E8246A /* GCDWebServerResponse.m in Sources */,
 				C8E34EA926CBDEF700E8246A /* FirstUnlockWelcomeViewController.m in Sources */,
 				C8E34EAA26CBDEF700E8246A /* twofish.c in Sources */,
@@ -16652,6 +16631,7 @@
 				C8E34EC126CBDEF700E8246A /* CustomDataWithModDate.m in Sources */,
 				C8E34EC326CBDEF700E8246A /* NodeHierarchyReconstructionData.m in Sources */,
 				C8E34EC426CBDEF700E8246A /* ConfiguredBrowseTableDatasource.m in Sources */,
+				C87E2B392867174000BA9079 /* ZKCarouselSlide.swift in Sources */,
 				C8E34EC526CBDEF700E8246A /* UrlRequestOperation.m in Sources */,
 				C8E34EC626CBDEF700E8246A /* DatabaseUnlocker.m in Sources */,
 				C8E34EC726CBDEF700E8246A /* AdvancedPreferencesTableViewController.m in Sources */,
@@ -16690,6 +16670,7 @@
 				C8E34EE726CBDEF700E8246A /* KeePassXmlModelAdaptor.m in Sources */,
 				C8E34EE826CBDEF700E8246A /* DatabaseDiffAndMergeViewController.m in Sources */,
 				C8E34EE926CBDEF700E8246A /* encoding.c in Sources */,
+				C87E2B3D2867174000BA9079 /* ZKCarousel.swift in Sources */,
 				C8E34EEA26CBDEF700E8246A /* Platform.m in Sources */,
 				C8E34EEB26CBDEF700E8246A /* FavIconDownloadOptions.m in Sources */,
 				C8E34EEC26CBDEF700E8246A /* Field.m in Sources */,
@@ -16746,8 +16727,8 @@
 				C8E34F1D26CBDEF700E8246A /* NSString+DDXML.m in Sources */,
 				C8E34F1E26CBDEF700E8246A /* NSDate+Extensions.m in Sources */,
 				C8E34F1F26CBDEF700E8246A /* WebDAVProviderData.m in Sources */,
+				C87E2B352867174000BA9079 /* SlideCell.swift in Sources */,
 				C8E34F2026CBDEF700E8246A /* StorageProviderReadOptions.m in Sources */,
-				C8E34F2126CBDEF700E8246A /* UpgradeAnswerViewController.m in Sources */,
 				C8E34F2226CBDEF700E8246A /* AddNewVirtualYubiKeyController.m in Sources */,
 				C8E34F2326CBDEF700E8246A /* OTPToken.m in Sources */,
 				C8B4409927038D480033BC0E /* SBColorCollection.swift in Sources */,
@@ -16831,6 +16812,7 @@
 				C8E34F6826CBDEF700E8246A /* RMStoreAppReceiptVerifier.m in Sources */,
 				C8E34F6926CBDEF700E8246A /* iCloudSafesCoordinator.m in Sources */,
 				C8E34F6A26CBDEF700E8246A /* ExportOptionsTableViewController.m in Sources */,
+				C8863CC9287C2713001A1E97 /* MMcGSwiftUtils.swift in Sources */,
 				C8E34F6B26CBDEF700E8246A /* LoggingInputStream.m in Sources */,
 				C8E34F6C26CBDEF700E8246A /* MFIKeyInteractionViewController.swift in Sources */,
 				C832A4B52730344700768319 /* IOSCompositeKeyDeterminer.m in Sources */,
@@ -16860,6 +16842,7 @@
 				C8E34F8926CBDEF700E8246A /* AesCipher.m in Sources */,
 				C8E34F8A26CBDEF700E8246A /* KeePassFile.m in Sources */,
 				C8E34F8B26CBDEF700E8246A /* XMLWriter.m in Sources */,
+				C87E2B4B286717E400BA9079 /* Extensions.swift in Sources */,
 				C8E34F8C26CBDEF700E8246A /* VersionConflictController.m in Sources */,
 				C8E34F8D26CBDEF700E8246A /* SyncManager.m in Sources */,
 				C8E34F8F26CBDEF700E8246A /* NSDateRFC1123.m in Sources */,
@@ -18721,11 +18704,7 @@
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = StrongboxTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -18767,11 +18746,7 @@
 				);
 				INFOPLIST_FILE = StrongboxTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.StrongboxTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -18790,6 +18765,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -18847,6 +18823,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -18910,7 +18887,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 5002;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -18927,10 +18904,7 @@
 				);
 				INFOPLIST_FILE = "StrongBox/StrongBox-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
@@ -18941,10 +18915,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-framework",
-					"\"ADAL\"",
-					"-framework",
-					"\"Base32\"",
 					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
@@ -18963,8 +18933,6 @@
 					"\"MTBBarcodeScanner\"",
 					"-framework",
 					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"OneDriveSDK\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -18999,7 +18967,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 5002;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19016,10 +18984,7 @@
 				);
 				INFOPLIST_FILE = "StrongBox/StrongBox-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
@@ -19030,10 +18995,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-framework",
-					"\"ADAL\"",
-					"-framework",
-					"\"Base32\"",
 					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
@@ -19052,8 +19013,6 @@
 					"\"MTBBarcodeScanner\"",
 					"-framework",
 					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"OneDriveSDK\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -19087,7 +19046,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19103,10 +19062,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-iOS-Pro-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
@@ -19117,8 +19073,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-framework",
-					"\"ADAL\"",
 					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
@@ -19131,8 +19085,6 @@
 					"\"MTBBarcodeScanner\"",
 					"-framework",
 					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"OneDriveSDK\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -19167,7 +19119,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -19183,10 +19135,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-iOS-Pro-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
@@ -19197,8 +19146,6 @@
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
-					"-framework",
-					"\"ADAL\"",
 					"-framework",
 					"\"CoreGraphics\"",
 					"-framework",
@@ -19211,8 +19158,6 @@
 					"\"MTBBarcodeScanner\"",
 					"-framework",
 					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"OneDriveSDK\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -19250,7 +19195,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19268,11 +19213,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-Auto-Fill-Pro-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -19327,7 +19268,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19345,11 +19286,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-Auto-Fill-Pro-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -19402,7 +19339,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 5002;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19427,11 +19364,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -19486,7 +19419,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 5002;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";
@@ -19511,11 +19444,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -19569,11 +19498,7 @@
 				);
 				INFOPLIST_FILE = FastlaneStrongboxUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -19601,11 +19526,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = FastlaneStrongboxUITests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.phoebecode.FastlaneStrongboxUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -19627,7 +19548,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19653,10 +19574,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-iOS-SCOTUS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
@@ -19710,7 +19628,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -19736,10 +19654,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-iOS-SCOTUS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
@@ -19796,7 +19711,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19815,11 +19730,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-Auto-Fill-SCOTUS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -19874,7 +19785,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19893,11 +19804,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-Auto-Fill-SCOTUS-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -19945,7 +19852,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19970,10 +19877,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-iOS-Graphene-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
@@ -20029,7 +19933,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -20054,10 +19958,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-iOS-Graphene-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
@@ -20116,7 +20017,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -20135,11 +20036,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-Auto-Fill-Graphene-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -20194,7 +20091,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4197;
+				CURRENT_PROJECT_VERSION = 4221;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -20213,11 +20110,7 @@
 				);
 				INFOPLIST_FILE = "Strongbox-Auto-Fill-Graphene-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib/openssl-ssh/iOS",
@@ -20357,30 +20250,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		C8261B9727D133C100B502A4 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/AzureAD/microsoft-authentication-library-for-objc";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		C8261B9827D133C100B502A4 /* MSAL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C8261B9727D133C100B502A4 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */;
-			productName = MSAL;
-		};
-		C83CB79327D13934007859AB /* MSAL */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C8261B9727D133C100B502A4 /* XCRemoteSwiftPackageReference "microsoft-authentication-library-for-objc" */;
-			productName = MSAL;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4DBE5B291C8356C700C310BC /* Project object */;
 }

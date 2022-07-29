@@ -141,7 +141,7 @@ static NSString* const kGroupAllItems = @"all-items";
     if (!self.doneFirstAppearanceTasks) {
         self.doneFirstAppearanceTasks = YES;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.45  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
             [self smartInitializeSearch];
 
             [self.searchController.searchBar becomeFirstResponder];
@@ -176,7 +176,10 @@ static NSString* const kGroupAllItems = @"all-items";
 - (void)smartInitializeSearch {
     NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
     
-    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+    ASCredentialServiceIdentifier *serviceId =
+        
+        [serviceIdentifiers firstObject];
+    
     if(serviceId) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = serviceId.identifier.urlExtendedParse;
@@ -189,31 +192,36 @@ static NSString* const kGroupAllItems = @"all-items";
                 NSArray* items = [self getMatchingItems:url.absoluteString scope:kSearchScopeUrl];
                 if(items.count) {
                     [self.searchController.searchBar setText:url.absoluteString];
-                    [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
                     return;
                 }
                 else {
-                    NSLog(@"No matches for URL: %@", url.absoluteString);
-                }
-                
-                
-                
-                items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
-                if(items.count) {
-                    [self.searchController.searchBar setText:url.host];
-                    [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
-                    return;
-                }
-                else {
-                    NSLog(@"No matches for URL: %@", url.host);
-                }
 
+                }
                 
-                NSString* domain = getDomain(url.host);
-                [self smartInitializeSearchFromDomain:domain];
+                
+                
+                if ( url.host.length ) { 
+                    items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
+                    if(items.count) {
+                        [self.searchController.searchBar setText:url.host];
+                        return;
+                    }
+                    else {
+
+                    }
+                    
+                    NSString* domain = getDomain(url.host);
+                    [self smartInitializeSearchFromDomain:domain];
+                }
+                else {
+                    NSString* domain = getDomain(url.absoluteString);
+                    [self smartInitializeSearchFromDomain:domain];
+                }
             }
             else {
-                NSLog(@"No matches for URL: %@", url);
+
+                NSString* domain = getDomain(serviceId.identifier);
+                [self smartInitializeSearchFromDomain:domain];
             }
         }
         else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
@@ -236,7 +244,7 @@ static NSString* const kGroupAllItems = @"all-items";
     NSArray* items = [self getMatchingItems:domain scope:kSearchScopeUrl];
     if(items.count) {
         [self.searchController.searchBar setText:domain];
-        [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
+
         return;
     }
     else {
@@ -248,7 +256,7 @@ static NSString* const kGroupAllItems = @"all-items";
     items = [self getMatchingItems:domain scope:kSearchScopeAll];
     if(items.count) {
         [self.searchController.searchBar setText:domain];
-        [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeAll];
+
         return;
     }
     else {
@@ -259,7 +267,7 @@ static NSString* const kGroupAllItems = @"all-items";
     
     NSString * searchTerm = getCompanyOrOrganisationNameFromDomain(domain);
     [self.searchController.searchBar setText:searchTerm];
-    [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeAll];
+
 }
 
 NSString *getDomain(NSString* host) {

@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)onAppLockScreenWillBeDismissed:(void (^ __nullable)(void))completion;
 - (void)onAppLockScreenWasDismissed:(BOOL)userJustCompletedBiometricAuthentication;
 - (void)handleUrlSchemeNavigationRequest:(NSURL*)url;
+- (void)performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem;
 
 @end
 

@@ -8,24 +8,31 @@
 
 #import "GoogleDriveManager.h"
 #import "Utils.h"
-#import "GTMSessionFetcherService.h"
-#import "SVProgressHUD.h"
 #import "real-secrets.h"
-#import "AppPreferences.h"
 #import "NSDate+Extensions.h"
+#import <GoogleSignIn/GoogleSignIn.h>
+
+#if TARGET_OS_IPHONE
+
+#import "SVProgressHUD.h"
+#import "AppPreferences.h"
+
+#else
+
+#import "MacAlerts.h"
+#import "macOSSpinnerUI.h"
+
+#endif
+
+@interface GoogleDriveManager ()
+
+@property (readonly) GTLRDriveService *driveService;
+
+@end
 
 static NSString *const kMimeType = @"application/octet-stream";
 
 typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractionRequired, NSError *error);
-
-@interface GoogleDriveManager ()
-
-
-
-@property (copy) Authenticationcompletion pendingAuthCompletion;
-@property BOOL pendingAuthCompletionIsBackgroundSync;
-
-@end
 
 @implementation GoogleDriveManager
 
@@ -37,18 +44,6 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         sharedInstance = [[GoogleDriveManager alloc] init];
     });
     return sharedInstance;
-}
-
-- (instancetype)init {
-    if(self = [super init]) {
-        [GIDSignIn sharedInstance].clientID = GOOGLE_CLIENT_ID;
-    }
-    
-    return self;
-}
-
-- (BOOL)handleUrl:(NSURL*)url {
-    return [GIDSignIn.sharedInstance handleURL:url];
 }
 
 - (GTLRDriveService *)driveService {
@@ -63,107 +58,145 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     return service;
 }
 
+
+
+- (void)dismissProgressSpinner {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IPHONE
+        [SVProgressHUD dismiss];
+#else
+        [macOSSpinnerUI.sharedInstance dismiss];
+#endif
+    });
+}
+
+- (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IPHONE
+        [SVProgressHUD showWithStatus:message];
+#else
+        [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
+#endif
+    });
+}
+
+
+
 - (BOOL)isAuthorized {
     return GIDSignIn.sharedInstance.hasPreviousSignIn;
 }
 
 - (void)signout {
-    [[GIDSignIn sharedInstance] signOut];
-    [[GIDSignIn sharedInstance] disconnect];
+    [GIDSignIn.sharedInstance signOut];
+    
+    [GIDSignIn.sharedInstance disconnectWithCallback:^(NSError * _Nullable error) {
+        NSLog(@"✅ GIDSignIn.sharedInstance disconnectWithCallback finished with [%@]", error);
+    }];
 }
 
-- (void)authenticate:(UIViewController*)viewController
+- (BOOL)handleUrl:(NSURL*)url {
+    NSLog(@"✅ GoogleDriveManager::handleUrl with [%@]", url);    
+    return [GIDSignIn.sharedInstance handleURL:url];
+}
+
+- (void)authenticate:(VIEW_CONTROLLER_PTR)viewController
           completion:(Authenticationcompletion)completion {
     if (!viewController) { 
-        GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
-        signIn.delegate = self;
-        signIn.scopes = @[kGTLRAuthScopeDrive];
+
 
         
-        
-        NSLog(@"Google Drive Sign In - Background Mode - Thread [%@] - completion = [%@]", NSThread.currentThread, completion);
-        
-        self.pendingAuthCompletion = completion;
-        self.pendingAuthCompletionIsBackgroundSync = YES;
-            
-        [signIn restorePreviousSignIn];
+        [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user,
+                                                                        NSError * _Nullable error) {
+
+
+            [self onDidSignInForUser:user
+                          completion:completion
+                      backgroundSync:YES
+                           withError:error];
+        }];
+
     }
     else {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
-            NSLog(@"Google Drive Sign In - Foreground Interactive Mode - Thread [%@]", NSThread.currentThread);
 
-            
-            GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
-            signIn.delegate = self;
-        
-            signIn.scopes = @[kGTLRAuthScopeDrive];
+            if ( GIDSignIn.sharedInstance.hasPreviousSignIn ) {
+                [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user,
+                                                                                NSError * _Nullable error) {
 
-            self.pendingAuthCompletion = completion;
-            self.pendingAuthCompletionIsBackgroundSync = NO;
 
-            signIn.presentingViewController = viewController;
-            
-            if(signIn.hasPreviousSignIn) {
-                [signIn restorePreviousSignIn];
+                    [self onDidSignInForUser:user completion:completion backgroundSync:NO withError:error];
+                }];
             }
             else {
+#if TARGET_OS_IPHONE
                 AppPreferences.sharedInstance.suppressAppBackgroundTriggers = YES;
-                [signIn signIn];
+#endif
+
+                [GIDSignIn.sharedInstance signInWithConfiguration:[[GIDConfiguration alloc] initWithClientID:GOOGLE_CLIENT_ID]
+#if TARGET_OS_IPHONE
+                                         presentingViewController:viewController
+#else
+                                                 presentingWindow:viewController.view.window
+#endif
+                                                             hint:nil
+                                                 additionalScopes:@[kGTLRAuthScopeDrive]
+                                                         callback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
+                    NSLog(@"✅ GoogleDriveManager::authenticate - signInWithConfiguration in done with error = [%@] and user = [%@]", error, user);
+
+                    [self onDidSignInForUser:user completion:completion backgroundSync:NO withError:error];
+                }];
             }
         });
     }
 }
 
-- (void)      signIn:(GIDSignIn *)signIn
-    didSignInForUser:(GIDGoogleUser *)user
-           withError:(NSError *)error {
+- (void)onDidSignInForUser:(GIDGoogleUser *)user
+                completion:(Authenticationcompletion)completion
+            backgroundSync:(BOOL)backgroundSync
+                 withError:(NSError *)error {
     if (error != nil) {
-        NSLog(@"Google Sign In Error: %@", error);
+        NSLog(@"🔴 Google Sign In Error: %@", error);
         self.driveService.authorizer = nil;
     }
     else {
-        NSLog(@"Google Sign In OK - %@", NSThread.currentThread);
+
         self.driveService.authorizer = user.authentication.fetcherAuthorizer;
     }
     
+#if TARGET_OS_IPHONE
     AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO;
+#endif
+    
+    
+    
 
+    if ( error.code == kGIDSignInErrorCodeHasNoAuthInKeychain ) {
+        if ( !backgroundSync ) {
+            NSLog(@"⚠️ Interactive Sync but no auth in keychain for Google Drive");
+            
+            
+            
 
-    Authenticationcompletion authCompletion = self.pendingAuthCompletion;
-    
-    
-    
-    BOOL backgroundSyncAuthCompletionMode = self.pendingAuthCompletionIsBackgroundSync;
-
-    
-    
-    self.pendingAuthCompletion = nil;
-    
-    if(error.code == kGIDSignInErrorCodeHasNoAuthInKeychain) {
-        if(!backgroundSyncAuthCompletionMode) {
-            return; 
+            
+            completion(NO, NO, error);
         }
         else {
-            if (authCompletion) {
-                NSLog(@"User Interaction Required for Google Auth - but in Background Sync mode...");
-                NSLog(@"Google Callback: %@", authCompletion);
-                authCompletion(NO, YES, nil);
+            if ( completion ) {
 
 
+                completion(NO, YES, nil);
             }
         }
     }
     else {
-        if (authCompletion) {
-            NSLog(@"Google Callback: %@", authCompletion);
-            authCompletion(error.code == kGIDSignInErrorCodeCanceled, NO, error);
+        if ( completion ) {
 
-
+            completion(error.code == kGIDSignInErrorCodeCanceled, NO, error);
         }
         else {
-            NSLog(@"EEEEEK - Good Sign In but no AutoCompletion!! NOP - [%@]", NSThread.currentThread);
+            NSLog(@"🔴 EEEEEK - Good Sign In but no AutoCompletion!! NOP - [%@]", NSThread.currentThread);
         }
     }
 }
@@ -181,7 +214,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     return trimmed;
 }
 
-- (void)  create:(UIViewController*)viewController
+- (void)  create:(VIEW_CONTROLLER_PTR)viewController
        withTitle:(NSString *)titleNick
         withData:(NSData *)data
     parentFolder:(NSObject *)parentFolder
@@ -236,19 +269,21 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     }];
 }
 
-- (void)readWithOnlyFileId:(UIViewController *)viewController
+- (void)readWithOnlyFileId:(VIEW_CONTROLLER_PTR)viewController
             fileIdentifier:(NSString *)fileIdentifier
               dateModified:(NSDate*)dateModified
                 completion:(StorageProviderReadCompletionBlock)handler {
     [self getFile:fileIdentifier dateModified:dateModified viewController:viewController handler:handler];
 }
 
-- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)handler {
-    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
-
+- (void)read:(VIEW_CONTROLLER_PTR)viewController
+parentOrJson:(NSString *)parentOrJson
+    fileName:(NSString *)fileName
+     options:(StorageProviderReadOptions *)options
+  completion:(StorageProviderReadCompletionBlock)handler {
     [self authenticate:viewController
             completion:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
-        NSLog(@"Google Authenticate done [UserCancelled = %hhd]-[error = %@]", userCancelled, error);
+
         if (error) {
             NSLog(@"%@", error);
             handler(kReadResultError, nil, nil, error);
@@ -257,7 +292,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
             handler(kReadResultBackgroundReadButUserInteractionRequired, nil, nil, nil);
         }
         else {
-            [self    _read:parentFileIdentifier
+            [self    _read:parentOrJson
                   fileName:fileName
             viewController:viewController
                    options:options
@@ -266,27 +301,21 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     }];
 }
 
-- (void)_read:(NSString *)parentFileIdentifier
+- (void)_read:(NSString *)parentOrJson
      fileName:(NSString *)fileName
-viewController:(UIViewController*)viewController
+viewController:(VIEW_CONTROLLER_PTR)viewController
       options:(StorageProviderReadOptions *)options
    completion:(StorageProviderReadCompletionBlock)handler {
-    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
-
     if (viewController) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
-        });
+        [self showProgressSpinner:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...") viewController:viewController];
     }
     
-    [self findSafeFile:parentFileIdentifier
+    [self findSafeFile:parentOrJson
               fileName:fileName
             completion:^(GTLRDrive_File *file, NSError *error)
     {
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            [self dismissProgressSpinner];
         }
         
         if(error) {
@@ -317,22 +346,56 @@ viewController:(UIViewController*)viewController
     }];
 }
 
-- (void)update:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName withData:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)handler {
-    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
+- (void)getModDate:(NSString *)parentOrJson
+          fileName:(NSString *)fileName
+        completion:(StorageProviderGetModDateCompletionBlock)handler {
+    [self authenticate:nil completion:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
 
+        if ( error ) {
+            NSLog(@"%@", error);
+            handler(nil, error);
+        }
+        else if (userInteractionRequired) {
+            handler(nil, [Utils createNSError:@"User Interaction Required from getModDate" errorCode:346]);
+        }
+        else {
+            [self _getModDate:parentOrJson fileName:fileName completion:handler];
+        }
+    }];
+}
+
+- (void)_getModDate:(NSString *)parentOrJson
+           fileName:(NSString *)fileName
+         completion:(StorageProviderGetModDateCompletionBlock)handler {
+    [self findSafeFile:parentOrJson fileName:fileName completion:^(GTLRDrive_File *file, NSError *error) {
+        if ( error ) {
+            NSLog(@"_getModDate: %@", error);
+            handler(nil, error);
+        }
+        else {
+            if ( !file ) {
+                NSLog(@"Google Drive::_getModDate No such file found...");
+                error = [Utils createNSError:@"Your database file could not be found on Google Drive. Try removing the database and re-adding it." errorCode:-1];
+                handler(nil, error);
+            }
+            else {
+
+                handler(file.modifiedTime.date, nil);
+            }
+        }
+    }];
+}
+
+- (void)update:(VIEW_CONTROLLER_PTR)viewController parentOrJson:(NSString *)parentOrJson fileName:(NSString *)fileName withData:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)handler {
     if (viewController) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
-        });
+        [self showProgressSpinner:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...") viewController:viewController];
     }
     
-    [self findSafeFile:parentFileIdentifier
+    [self findSafeFile:parentOrJson
               fileName:fileName
             completion:^(GTLRDrive_File *file, NSError *error) {
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            [self dismissProgressSpinner];
         }
         
         if (error || !file) {
@@ -345,16 +408,12 @@ viewController:(UIViewController*)viewController
             query.fields = @"modifiedTime";
 
             if (viewController) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
-                });
+                [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:viewController];
             }
             
             [self.driveService executeQuery:query completionHandler:^(GTLRServiceTicket *callbackTicket, GTLRDrive_File *uploadedFile, NSError *callbackError) {
                 if (viewController) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [SVProgressHUD dismiss];
-                    });
+                    [self dismissProgressSpinner];
                 }
 
                 handler(callbackError ? kUpdateResultError : kUpdateResultSuccess, uploadedFile.modifiedTime.date, callbackError);
@@ -363,58 +422,64 @@ viewController:(UIViewController*)viewController
     }];
 }
 
-- (void)getFilesAndFolders:(UIViewController*)viewController
-          withParentFolder:(NSString *)parentFolderIdentifier
+- (void)getFilesAndFolders:(VIEW_CONTROLLER_PTR)viewController
+    parentFolderIdentifier:(NSString *)parentFolderIdentifier
                 completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler {
-    parentFolderIdentifier = parentFolderIdentifier ? parentFolderIdentifier : @"root";
-
     [self authenticate:viewController completion:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
         if (error) {
             NSLog(@"%@", error);
             handler(userCancelled, nil, nil, error);
         }
         else {
-            [self _getFilesAndFolders:parentFolderIdentifier completion:handler];
+            [self _getFilesAndFolders:viewController parentFolderIdentifier:parentFolderIdentifier completion:handler];
         }
     }];
 }
 
-- (void)_getFilesAndFolders:(NSString *)parentFileIdentifier
+- (void)_getFilesAndFolders:(VIEW_CONTROLLER_PTR)viewController
+     parentFolderIdentifier:(NSString *)parentFolderIdentifier
                  completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD show];
-    });
+    [self showProgressSpinner:NSLocalizedString(@"", @"") viewController:viewController];
+
+
+
+
+
+
+
+
+
+
 
     GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
-    
-    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
+    parentFolderIdentifier = parentFolderIdentifier ? parentFolderIdentifier : @"root";
 
-    if(![parentFileIdentifier isEqualToString:@"root"]) {
-        query.q = [NSString stringWithFormat:@"('%@' in parents) and trashed=false", parentFileIdentifier];
+    if(![parentFolderIdentifier isEqualToString:@"root"]) {
+        query.q = [NSString stringWithFormat:@"('%@' in parents) and trashed=false", parentFolderIdentifier];
     }
     else {
         query.q = [NSString stringWithFormat:@"(sharedWithMe or ('root' in parents)) and trashed=false"];
-        
     }
     
-    query.fields = @"kind,nextPageToken,files(mimeType,id,name,iconLink,parents,size,modifiedTime)";
+    query.fields = @"kind,nextPageToken,files(mimeType,id,name,iconLink,parents,size,modifiedTime,ownedByMe)";
 
+
+    query.pageSize = 1000;
+    query.orderBy = @"name";
+    
     [[self driveService] executeQuery:query
-                    completionHandler:^(GTLRServiceTicket *ticket,
-                                              GTLRDrive_FileList *fileList,
-                                              NSError *error)
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+                    completionHandler:^(GTLRServiceTicket *ticket, GTLRDrive_FileList *fileList, NSError *error) {
+        [self dismissProgressSpinner];
         
         if (error == nil) {
             NSMutableArray *driveFolders = [[NSMutableArray alloc] init];
             NSMutableArray *driveFiles = [[NSMutableArray alloc] init];
 
-            
+
             
             for (GTLRDrive_File *file in fileList.files) {
+
+                
                 if ([file.mimeType isEqual:@"application/vnd.google-apps.folder"]) {
                     [driveFolders addObject:file];
                 }
@@ -427,63 +492,53 @@ viewController:(UIViewController*)viewController
         }
         else {
             NSLog(@"An error occurred: %@", error);
-
             handler(NO, nil, nil, error);
         }
     }];
 }
 
-- (void)getFile:(NSString *)fileIdentifier
-   dateModified:(NSDate*)dateModified
- viewController:(UIViewController*)viewController
-        handler:(StorageProviderReadCompletionBlock)handler {
-    GTLRDriveQuery_FilesGet *query = [GTLRDriveQuery_FilesGet queryForMediaWithFileId:fileIdentifier];
-    
-    if (viewController) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-        });
-    }
-    
-    [[self driveService] executeQuery:query
-                    completionHandler:^(GTLRServiceTicket *ticket, GTLRDataObject *data, NSError *error) {
-        if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
-        }
-        
-        if (error != nil) {
-            NSLog(@"Could not GET file. An error occurred: %@", error);
-            handler(kReadResultError, nil, nil, error);
-        }
-        else {
-            handler(kReadResultSuccess, data.data, dateModified, nil);
-        }
-    }];
-}
-
-- (void)findSafeFile:(NSString *)parentFileIdentifier
+- (void)findSafeFile:(NSString *)parentOrJson2
             fileName:(NSString *)fileName
           completion:(void (^)(GTLRDrive_File *file, NSError *error))handler {
-    parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
+    
     GTLRDriveQuery_FilesList *query = [GTLRDriveQuery_FilesList query];
 
     fileName = [fileName stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
     fileName = [fileName stringByReplacingOccurrencesOfString:@"'" withString:@"\\\'"];
     fileName = [fileName stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
 
-    query.q = [NSString stringWithFormat:@"name = '%@' and '%@' in parents and trashed=false", fileName, parentFileIdentifier ? parentFileIdentifier : @"root" ];
-    query.fields = @"files(id,name,modifiedTime)"; 
+    NSString* parentFolderIdentifier = [self getParentFolderId:parentOrJson2];
+    BOOL ownedByMe = [self getOwnedByMe:parentOrJson2];
     
+    if ( ownedByMe ) {
+        query.q = [NSString stringWithFormat:@"name = '%@' and '%@' in parents and trashed=false", fileName, parentFolderIdentifier ? parentFolderIdentifier : @"root" ];
+    }
+    else {
+        if ( parentFolderIdentifier.length ) {
+            query.q = [NSString stringWithFormat:@"name = '%@' and '%@' in parents and trashed=false", fileName, parentFolderIdentifier ];
+        }
+        else {
+            query.q = [NSString stringWithFormat:@"name = '%@' and trashed=false", fileName ];
+        }
+    }
+    
+    query.fields = @"files(id,parents,name,modifiedTime)"; 
+
+
+    query.pageSize = 1000;
+    query.orderBy = @"name";
+
     [[self driveService] executeQuery:query
-                    completionHandler:^(GTLRServiceTicket *ticket,
-                                              GTLRDrive_FileList *fileList,
-                                              NSError *error) {
+                    completionHandler:^(GTLRServiceTicket *ticket, GTLRDrive_FileList *fileList, NSError *error) {
         if (!error) {
+
+            
             if (fileList.files != nil && fileList.files.count > 0) {
                 GTLRDrive_File *file = fileList.files[0];
+                
+
+                
                 handler(file, error);
             }
             else {
@@ -496,7 +551,7 @@ viewController:(UIViewController*)viewController
     }];
 }
 
-- (void)fetchUrl:(UIViewController *)viewController
+- (void)fetchUrl:(VIEW_CONTROLLER_PTR)viewController
          withUrl:(NSString *)url
       completion:(void (^)(NSData *data, NSError *error))handler {
     GTMSessionFetcher *fetcher = [[self driveService].fetcherService fetcherWithURLString:url];
@@ -509,6 +564,82 @@ viewController:(UIViewController*)viewController
 
         handler(data, error);
     }];
+}
+
+- (void)getFile:(NSString *)fileIdentifier
+   dateModified:(NSDate*)dateModified
+ viewController:(VIEW_CONTROLLER_PTR)viewController
+        handler:(StorageProviderReadCompletionBlock)handler {
+    NSLog(@"✅ getFile - fileIdentifier = [%@]", fileIdentifier);
+
+    GTLRDriveQuery_FilesGet *query = [GTLRDriveQuery_FilesGet queryForMediaWithFileId:fileIdentifier];
+    
+    if (viewController) {
+        [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...") viewController:viewController];
+    }
+    
+    [[self driveService] executeQuery:query
+                    completionHandler:^(GTLRServiceTicket *ticket, GTLRDataObject *data, NSError *error) {
+        if (viewController) {
+            [self dismissProgressSpinner];
+        }
+        
+        if (error != nil) {
+            NSLog(@"Could not GET file. An error occurred: %@", error);
+            handler(kReadResultError, nil, nil, error);
+        }
+        else {
+            handler(kReadResultSuccess, data.data, dateModified, nil);
+        }
+    }];
+}
+
+
+
+- (BOOL)getOwnedByMe:(NSString*)parentOrJson {
+    NSDictionary* dict = [self getJsonDict:parentOrJson];
+    
+    if ( dict ) {
+        NSNumber *ownedByMe = dict[@"ownedByMe"];
+        return ownedByMe == nil ? YES : ownedByMe.boolValue;
+    }
+    else {
+        return YES;
+    }
+}
+
+- (NSString*)getParentFolderId:(NSString*)parentOrJson {
+    NSDictionary* dict = [self getJsonDict:parentOrJson];
+    
+    if ( dict ) {
+        NSString *parent = dict[@"parent"];
+        return parent;
+    }
+    else {
+        return parentOrJson;
+    }
+}
+
+- (NSDictionary*)getJsonDict:(NSString*)parentOrJson {
+    if ( !parentOrJson ) {
+        return nil;
+    }
+    
+    NSData* data = [parentOrJson dataUsingEncoding:NSUTF8StringEncoding];
+    if ( !data ) {
+        NSLog(@"🔴 Error creating dataUsingEncoding Google Drive database...");
+        return nil;
+    }
+
+    NSError* error;
+    NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    
+    if ( !dict ) {
+        NSLog(@"🔴 Error creating JSONObjectWithData Google Drive database: [%@]", error);
+        return nil;
+    }
+    
+    return dict;
 }
 
 @end

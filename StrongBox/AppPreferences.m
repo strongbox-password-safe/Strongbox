@@ -141,6 +141,9 @@ static NSString* const kDisableThirdPartyStorageOptions = @"disableThirdPartySto
 static NSString* const kSuppressAppBackgroundTriggers = @"suppressAppBackgroundTriggers";
 static NSString* const kMarkdownNotes = @"markdownNotes";
 static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
+static NSString* const kHideTipJar = @"hideTipJar";
+static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
+static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 
 @implementation AppPreferences
 
@@ -182,6 +185,30 @@ static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
 }
 
 
+
+- (BOOL)stripUnusedIconsOnSave {
+    return [self getBool:kStripUnusedIconsOnSave];
+}
+
+- (void)setStripUnusedIconsOnSave:(BOOL)stripUnusedIconsOnSave {
+    return [self setBool:kStripUnusedIconsOnSave value:stripUnusedIconsOnSave];
+}
+
+- (BOOL)useParentGroupIconOnCreate {
+    return [self getBool:kUseParentGroupIconOnCreate fallback:YES];
+}
+
+- (void)setUseParentGroupIconOnCreate:(BOOL)useParentGroupIconOnCreate {
+    [self setBool:kUseParentGroupIconOnCreate value:useParentGroupIconOnCreate];
+}
+
+- (BOOL)hideTipJar {
+    return [self getBool:kHideTipJar];
+}
+
+- (void)setHideTipJar:(BOOL)hideTipJar {
+    return [self setBool:kHideTipJar value:hideTipJar];
+}
 
 - (BOOL)autoFillLongTapPreview {
     return [self getBool:kAutoFillLongTapPreview fallback:YES];
@@ -1162,7 +1189,6 @@ static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
     NSInteger ret =  [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kNumberOfEntitlementCheckFails];
     return ret;
 }
-
 
 - (void)setNumberOfEntitlementCheckFails:(NSUInteger)numberOfEntitlementCheckFails {
     [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];

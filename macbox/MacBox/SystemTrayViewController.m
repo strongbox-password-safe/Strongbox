@@ -42,6 +42,9 @@
 
 @property NSFont* fontMenlo;
 
+@property NSString* currentBasic;
+@property NSString* currentDiceware;
+
 @end
 
 @implementation SystemTrayViewController
@@ -87,7 +90,7 @@
     [super viewWillAppear];
 
 
-
+    
     [self bindUI];
     
     [self sizePopoverToFit];
@@ -248,18 +251,18 @@
 - (IBAction)onRefresh:(id)sender {
     PasswordGenerationConfig* basicConfig = Settings.sharedInstance.trayPasswordGenerationConfig;
 
-    NSString* basic = [PasswordMaker.sharedInstance generateBasicForConfig:basicConfig];
+    self.currentBasic = [PasswordMaker.sharedInstance generateBasicForConfig:basicConfig];
     
     
     
-    NSString* dice = [PasswordMaker.sharedInstance generateDicewareForConfig:Settings.sharedInstance.passwordGenerationConfig];
+    self.currentDiceware = [PasswordMaker.sharedInstance generateDicewareForConfig:Settings.sharedInstance.passwordGenerationConfig];
 
     
 
 
     
-    self.basic.attributedStringValue = [self getAttributedString:basic];
-    self.diceWare.attributedStringValue = [self getAttributedString:dice allowMultiLine:YES];
+    self.basic.attributedStringValue = [self getAttributedString:self.currentBasic];
+    self.diceWare.attributedStringValue = [self getAttributedString:self.currentDiceware allowMultiLine:YES];
     
 
 
@@ -288,7 +291,6 @@
                                                     darkMode:dark
                                                   colorBlind:colorBlind
                                                         font:nil];
-    
     
     NSMutableAttributedString* text = ret.mutableCopy;
     
@@ -328,13 +330,13 @@
 }
 
 - (void)onBasicClick {
-    [ClipboardManager.sharedInstance copyConcealedString:self.basic.stringValue];
+    [ClipboardManager.sharedInstance copyConcealedString:self.currentBasic];
     
     [self showToastNotification:NSLocalizedString(@"item_details_password_copied", @"Password Copied") view:self.basic];
 }
 
 - (void)onDiceClick {
-    [ClipboardManager.sharedInstance copyConcealedString:self.diceWare.stringValue];
+    [ClipboardManager.sharedInstance copyConcealedString:self.currentDiceware];
 
     [self showToastNotification:NSLocalizedString(@"item_details_password_copied", @"Password Copied") view:self.diceWare];
 }
@@ -401,3 +403,4 @@
 }
 
 @end
+

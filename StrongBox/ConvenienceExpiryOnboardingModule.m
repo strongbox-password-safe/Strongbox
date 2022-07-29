@@ -30,6 +30,7 @@
     return ( !self.model.metadata.convenienceExpiryOnboardingDone &&
             AppPreferences.sharedInstance.isProOrFreeTrial &&
             self.model.metadata.isConvenienceUnlockEnabled &&
+            self.model.metadata.convenienceExpiryPeriod == -1 &&
             self.model.metadata.conveniencePasswordHasBeenStored &&
             self.model.metadata.convenienceMasterPassword.length ); 
 }

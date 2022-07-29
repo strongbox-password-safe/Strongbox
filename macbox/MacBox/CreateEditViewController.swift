@@ -122,6 +122,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         
 
         window.initialFirstResponder = textFieldTitle
+        
+        bindScreenCaptureBlock()
     }
 
     override func viewDidLoad() {
@@ -140,9 +142,16 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         setupUI()
 
         bindUiToModel()
+        
         bindDoneButtonState()
     }
 
+    func bindScreenCaptureBlock() {
+        if let window = view.window {
+            window.sharingType = Settings.sharedInstance().screenCaptureBlocked ? .none : .readOnly
+        }
+    }
+    
     var sortedGroups: [Node]!
     func setupLocationUI() {
         let groups = database.allActiveGroups
@@ -716,7 +725,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             model = EntryViewModel.fromNode(node, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
             preEditModelClone = model.clone()
-
+            
+            initialNodeId = node.uuid 
+            
             bindUiToModel()
 
             bindDoneButtonState()
@@ -1077,9 +1088,16 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     @objc func skipDummyKludgeAutoFillAvoidanceField(_ sender: Any?) {
-        if let textViewFound = view.window?.firstResponder as? NSTextView, let dummyView = view.window?.fieldEditor(false, for: dummyKludge) {
+        guard let event = view.window?.currentEvent, event.type == .keyDown else { 
+
+            return
+        }
+
+        if let textViewFound = view.window?.firstResponder as? NSTextView,
+            let dummyView = view.window?.fieldEditor(false, for: dummyKludge) {
             if textViewFound == dummyView {
                 if let textFieldFrom = sender as? NSTextField {
+
                     if textFieldFrom == textFieldUsername {
                         view.window?.makeFirstResponder(passwordField)
                     } else if textFieldFrom == passwordField {

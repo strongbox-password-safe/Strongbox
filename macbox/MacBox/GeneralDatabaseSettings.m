@@ -65,7 +65,7 @@
     self.checkboxReloadForeignChanges.enabled = self.model.monitorForExternalChanges;
     
     self.checkboxLockOnLockScreen.state = self.model.lockOnScreenLock ? NSControlStateValueOn : NSControlStateValueOff;
-    self.checkboxAutoDownloadFavIcon.state = self.model.downloadFavIconOnChange ? NSOnState : NSOffState;
+    self.checkboxAutoDownloadFavIcon.state = self.model.downloadFavIconOnChange ? NSControlStateValueOn : NSControlStateValueOff;
 
     if ( !Settings.sharedInstance.fullVersion ) {
         self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
@@ -77,10 +77,10 @@
 - (IBAction)onSettingChanged:(id)sender {
     self.model.monitorForExternalChanges = self.checkboxMonitor.state == NSControlStateValueOn;
     self.model.monitorForExternalChangesInterval = self.stepperMonitorInterval.integerValue;
-    self.model.autoReloadAfterExternalChanges = self.checkboxReloadForeignChanges.state == NSOnState;
+    self.model.autoReloadAfterExternalChanges = self.checkboxReloadForeignChanges.state == NSControlStateValueOn;
     
     self.model.lockOnScreenLock = self.checkboxLockOnLockScreen.state == NSControlStateValueOn;
-    self.model.downloadFavIconOnChange = self.checkboxAutoDownloadFavIcon.state == NSOnState;
+    self.model.downloadFavIconOnChange = self.checkboxAutoDownloadFavIcon.state == NSControlStateValueOn;
 
     [self bindUI];
     

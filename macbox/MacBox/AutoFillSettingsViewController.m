@@ -41,6 +41,8 @@
 @property (weak) IBOutlet NSView *wormholeOptionView;
 @property (weak) IBOutlet NSView *quickTypeHeaderView;
 @property (weak) IBOutlet NSView *convenienceUnlockOptionView;
+@property (weak) IBOutlet NSButton *switchCopyTotp;
+@property (weak) IBOutlet NSStackView *stackViewWarningStatus;
 
 @end
 
@@ -137,6 +139,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         featureIsAvailable = NO;
     }
     
+    self.stackViewWarningStatus.hidden = NO;
     if ( !pro ) {
         self.labelProWarning.hidden = NO;
     }
@@ -144,16 +147,17 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         self.labelProWarning.hidden = NO;
         self.labelProWarning.stringValue = NSLocalizedString(@"autofill_app_preferences_only_avail_big_sur", @"AutoFill is only available on macOS Big Sur+");
         self.labelProWarning.textColor = NSColor.systemOrangeColor;
-        self.labelProWarning.alignment = NSCenterTextAlignment;
+        self.labelProWarning.alignment = NSTextAlignmentCenter;
     }
-    else if ( isOnForStrongbox ) {
-        self.labelProWarning.hidden = NO;
-        self.labelProWarning.stringValue = NSLocalizedString(@"strongbox_is_enabled_for_autofill", @"✅ Strongbox is enabled for Password AutoFill");
-        self.labelProWarning.textColor = NSColor.secondaryLabelColor;
-        self.labelProWarning.alignment = NSLeftTextAlignment;
-    }
+
+
+
+
+
+
     else {
-        self.labelProWarning.hidden = YES;
+        self.stackViewWarningStatus.hidden = YES;
+
     }
 
     self.viewInstructions.hidden = isOnForStrongbox || !pro || !featureIsAvailable;
@@ -174,6 +178,12 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     self.useWormholeIfUnlocked.enabled = autoFillOn;
     self.wormholeOptionView.hidden = !autoFillOn;
 
+    
+    
+    self.switchCopyTotp.enabled = AutoFillManager.sharedInstance.isPossible && isOnForStrongbox;
+    self.switchCopyTotp.state = meta.autoFillCopyTotp ? NSControlStateValueOn : NSControlStateValueOff;
+    self.switchCopyTotp.hidden = !autoFillOn;
+    
     
     
     self.quickTypeHeaderView.hidden = !autoFillOn;
@@ -267,6 +277,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     BOOL oldEnabled = self.model.databaseMetadata.autoFillEnabled;
 
     BOOL autoFillEnabled = self.enableAutoFill.state == NSControlStateValueOn;
+    BOOL autoFillCopyTotp = self.switchCopyTotp.state == NSControlStateValueOn;
+    
     BOOL quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
     BOOL quickWormholeFillEnabled = self.useWormholeIfUnlocked.state == NSControlStateValueOn;
 
@@ -278,6 +290,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     BOOL unConcealedCustomFieldsAsCreds = self.addUnconcealedFields.state == NSControlStateValueOn;
     
     self.model.databaseMetadata.autoFillEnabled = autoFillEnabled;
+    self.model.databaseMetadata.autoFillCopyTotp = autoFillCopyTotp;
     self.model.databaseMetadata.quickTypeEnabled = quickTypeEnabled;
     self.model.databaseMetadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
     self.model.databaseMetadata.autoFillScanAltUrls = autoFillScanAltUrls;

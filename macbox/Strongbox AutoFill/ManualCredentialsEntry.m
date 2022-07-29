@@ -62,6 +62,14 @@
     self.textFieldPassword.delegate = self;
     [self fixStackViewSpacing];
 
+    
+    if (@available(macOS 11.0, *)) {
+        NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+        
+        [self.buttonUnlock setImage:[NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil]];
+        self.buttonUnlock.symbolConfiguration = imageConfig;
+    }
+    
     self.concealed = YES;
     
     self.selectedKeyFileBookmark = [self contextAwareKeyFileBookmark];

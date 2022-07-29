@@ -1,73 +1,91 @@
 workspace 'StrongBox'
 
+use_frameworks!
+
 abstract_target 'common-mac' do
     project 'macbox/MacBox.xcodeproj'
-    platform :osx, '10.12'
-    use_frameworks!
-
+    platform :osx, '10.15'
+    
     pod 'libsodium'
     pod 'Down'
 
-    target 'Strongbox' do
-      pod 'MSAL', '1.2.0'
+    target 'Mac-Freemium' do
+      pod 'MSAL'
       pod 'MSGraphClientSDK'
+      pod 'GoogleAPIClientForREST/Drive'
+      pod 'GoogleSignIn'
+      pod 'ObjectiveDropboxOfficial'
     end
 
-    target 'Strongbox-Pro' do
-        pod 'MSAL', '1.2.0'
+    target 'Mac-Pro' do
+        pod 'MSAL'
         pod 'MSGraphClientSDK'
+        pod 'GoogleAPIClientForREST/Drive'
+        pod 'GoogleSignIn'
+        pod 'ObjectiveDropboxOfficial'
     end
 
-    target 'Strongbox-AutoFill' do
+    target 'Mac-Unified-Freemium' do
+      pod 'MSAL'
+      pod 'MSGraphClientSDK'
+      pod 'GoogleAPIClientForREST/Drive'
+      pod 'GoogleSignIn'
+      pod 'ObjectiveDropboxOfficial'
     end
 
-    target 'Strongbox-Pro-AutoFill' do
+    target 'Mac-Unified-Pro' do
+      pod 'MSAL'
+      pod 'MSGraphClientSDK'
+      pod 'GoogleAPIClientForREST/Drive'
+      pod 'GoogleSignIn'
+      pod 'ObjectiveDropboxOfficial'
+    end
+
+    target 'Mac-Freemium-AutoFill' do
+    end
+
+    target 'Mac-Unified-Freemium-AutoFill' do
+    end
+    
+    target 'Mac-Unified-Pro-AutoFill' do
+    end
+
+    target 'Mac-Pro-AutoFill' do
     end
 end
 
 abstract_target 'common-ios' do
     project 'Strongbox.xcodeproj'
     platform :ios, '11.0'
-    use_frameworks!
 
     pod 'libsodium'    
     pod 'Down'
    
     target 'Strongbox-iOS' do
-        use_frameworks!
-
         pod 'ISMessages'
         pod 'MTBBarcodeScanner'
         pod 'ObjectiveDropboxOfficial'
-        pod 'OneDriveSDK'
         pod 'GoogleAPIClientForREST/Drive'
-        pod 'GoogleSignIn', '5.0.2'
-
+        pod 'GoogleSignIn'
+        pod 'MSAL'
         pod 'MSGraphClientSDK'
     end
 
     target 'Strongbox-iOS-Pro' do
-        use_frameworks!
-
         pod 'ISMessages'
         pod 'MTBBarcodeScanner'
         pod 'ObjectiveDropboxOfficial'
-        pod 'OneDriveSDK'
         pod 'GoogleAPIClientForREST/Drive'
-        pod 'GoogleSignIn', '5.0.2'
-
+        pod 'GoogleSignIn'
+        pod 'MSAL'
         pod 'MSGraphClientSDK'
     end    
 
     target 'Strongbox-iOS-SCOTUS' do
-        use_frameworks!
-
-        pod 'ISMessages'        
+        pod 'ISMessages'
     end    
 
     target 'Strongbox-iOS-Graphene' do
-        use_frameworks!
-
         pod 'MTBBarcodeScanner'
         pod 'ISMessages'
     end  

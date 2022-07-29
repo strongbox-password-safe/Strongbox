@@ -38,7 +38,7 @@
         self.history = @[];
     }
  
-    self.showPasswordsCheckbox.state = NSOffState;
+    self.showPasswordsCheckbox.state = NSControlStateValueOff;
     self.tableViewHistory.dataSource = self;
     self.tableViewHistory.delegate = self;
     self.tableViewHistory.doubleAction = @selector(onDoubleClick:);
@@ -101,7 +101,7 @@
     }
     else if([tableColumn.identifier isEqualToString:@"Password"]) {
         cell = [self.tableViewHistory makeViewWithIdentifier:@"HistoryPlainCellIdentifier" owner:nil];
-        cell.textField.stringValue = self.showPasswordsCheckbox.state == NSOnState ? item.fields.password : @"*************" ;
+        cell.textField.stringValue = self.showPasswordsCheckbox.state == NSControlStateValueOn ? item.fields.password : @"*************" ;
     }
     else if([tableColumn.identifier isEqualToString:@"URL"]) {
         cell = [self.tableViewHistory makeViewWithIdentifier:@"HistoryPlainCellIdentifier" owner:nil];

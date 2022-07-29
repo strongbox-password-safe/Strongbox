@@ -12,9 +12,8 @@
 
 - (IBAction)onCheckboxClicked:(id)sender {
     if(self.onClicked) {
-        self.onClicked(self.checkbox.state == NSOnState);
+        self.onClicked(self.checkbox.state == NSControlStateValueOn);
     }
 }
-
 
 @end

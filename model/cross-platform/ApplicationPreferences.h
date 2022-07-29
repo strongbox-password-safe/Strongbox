@@ -23,6 +23,24 @@ NS_ASSUME_NONNULL_BEGIN
 @property PasswordStrengthConfig* passwordStrengthConfig;
 @property BOOL checkPinYin;
 
+@property (nullable) NSDate* lastEntitlementCheckAttempt;
+@property NSUInteger numberOfEntitlementCheckFails;
+@property BOOL appHasBeenDowngradedToFreeEdition; 
+@property BOOL hasPromptedThatAppHasBeenDowngradedToFreeEdition;
+
+@property (readonly) BOOL isPro;
+- (void)setPro:(BOOL)value;
+
+#if TARGET_OS_IPHONE 
+@property BOOL hasPromptedThatFreeTrialWillEndSoon;
+@property (readonly) BOOL hasOptedInToFreeTrial;
+@property NSDate *freeTrialEnd;
+- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
+#endif
+
+@property BOOL stripUnusedIconsOnSave;
+@property BOOL useIsolatedDropbox;
+
 @end
 
 NS_ASSUME_NONNULL_END

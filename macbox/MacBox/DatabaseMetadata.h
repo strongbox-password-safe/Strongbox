@@ -188,6 +188,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property BOOL customSortOrderForFields;
 
+@property BOOL autoFillCopyTotp;
+
 @end
 
 NS_ASSUME_NONNULL_END

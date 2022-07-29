@@ -36,14 +36,18 @@ extern NSString* const kCustomFieldsColumn;
 + (NSArray<NSString*> *)kAllColumns;
 
 @property (nonatomic) BOOL fullVersion;
+
+
 @property (nonatomic, readonly) BOOL freeTrial;
 @property (nonatomic, readonly) NSInteger freeTrialDaysRemaining;
-@property (nonatomic, strong) NSDate* endFreeTrialDate;
-
-@property (readonly) BOOL isPro;
+@property (nonatomic, nullable, readonly) NSDate* endFreeTrialDate;
 @property (readonly) BOOL isFreeTrial;
 
-@property (nonatomic) BOOL warnedAboutTouchId;
+
+
+@property (readonly) BOOL isPro;
+
+
 
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
 
@@ -105,12 +109,38 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL quitStrongboxOnAllWindowsClosed;
 
-@property (readonly) BOOL isAProBundle;
-
 @property BOOL showCopyFieldButton;
 @property BOOL lockEvenIfEditing;
 
+@property BOOL screenCaptureBlocked;
 
+@property BOOL hasShownFirstRunWelcome;
+
+@property NSUInteger freeTrialOrUpgradeNudgeCount;
+@property NSDate* lastFreeTrialOrUpgradeNudge;
+
+
+
+
+@property (nullable) NSDate* lastEntitlementCheckAttempt;
+@property NSUInteger numberOfEntitlementCheckFails;
+@property BOOL appHasBeenDowngradedToFreeEdition; 
+@property BOOL hasPromptedThatAppHasBeenDowngradedToFreeEdition;
+- (void)setPro:(BOOL)value;
+
+
+
+@property (nonatomic) NSDate* installDate;
+@property (nonatomic, readonly) NSInteger daysInstalled;
+@property (readonly) NSUInteger launchCount;
+- (void)incrementLaunchCount;
+
+
+
+@property BOOL useIsolatedDropbox;
+@property BOOL useParentGroupIconOnCreate;
+
+@property BOOL stripUnusedIconsOnSave;
 
 @end
 

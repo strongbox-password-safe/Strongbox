@@ -7,11 +7,11 @@
 //
 
 #import "OnboardingManager.h"
+#import "OnboardingModule.h"
+
 #import "AppPreferences.h"
 #import "iCloudSafesCoordinator.h"
 #import "FileManager.h"
-
-#import "OnboardingModule.h"
 #import "FirstUnlockWelcomeModule.h"
 #import "ConvenienceUnlockOnboardingModule.h"
 #import "QuickLaunchOnboardingModule.h"
@@ -23,7 +23,6 @@
 #import "AppAutoFillOnboardingModule.h"
 #import "LastCrashReportModule.h"
 #import "UpgradeToProOnboardingModule.h"
-
 #import "UpgradeViewController.h"
 #import "BiometricsManager.h"
 #import "WorkingCopyManager.h"
@@ -55,7 +54,7 @@
 
 
 
-- (void)startAppOnboarding:(UIViewController*)presentingViewController completion:(void (^ _Nullable)(void))completion {
+- (void)startAppOnboarding:(VIEW_CONTROLLER_PTR)presentingViewController completion:(void (^ _Nullable)(void))completion {
     if ( self.appOnboardingInProcess ) {
         NSLog(@"Onboarding Already in Progress, ignoring repeated call");
         return;
@@ -65,7 +64,7 @@
 
 
     self.appOnboardingInProcess = YES;
-    
+
     id<OnboardingModule> welcomeToStrongbox = [self getFirstRunWelcomeToStrongboxModule];
     id<OnboardingModule> freeTrial = [self getFreeTrialOnboardingModule];
     id<OnboardingModule> iCloud = [self getICloudOnboardingModule];
@@ -76,9 +75,8 @@
     id<OnboardingModule> freeTrialEndingSoon = [self getFreeTrialEndingSoonModule];
     id<OnboardingModule> downgraded = [self getHasBeenDowngradedModule];
     id<OnboardingModule> upgradeToPro = [self getUpgradeToProModule];
-    
     id<OnboardingModule> finalAllSetWelcomeToStrongbox = [self getFirstRunFinalWelcomeToStrongboxModule];
-
+    
     NSArray<id<OnboardingModule>> *onboardingItems = @[welcomeToStrongbox,
                                                        iCloud,
                                                        iCloudMigration,
@@ -90,7 +88,8 @@
                                                        downgraded,
                                                        upgradeToPro,
                                                        finalAllSetWelcomeToStrongbox];
-    
+
+
     UINavigationController* nav = [[UINavigationController alloc] init];
     
     nav.navigationBarHidden = YES;
@@ -112,7 +111,7 @@
     }];
 }
 
-- (void)startDatabaseOnboarding:(UIViewController*)presentingViewController model:(Model*)model completion:(void (^ _Nullable)(void))completion {
+- (void)startDatabaseOnboarding:(VIEW_CONTROLLER_PTR)presentingViewController model:(Model*)model completion:(void (^ _Nullable)(void))completion {
     
     
     
@@ -170,6 +169,61 @@
     
     [self showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:0 stopOnboarding:NO nav:nav completion:completion];
 }
+
+
+
+- (void)showNextOnboardingModule:(VIEW_CONTROLLER_PTR)presentingViewController
+                           model:(Model*)model
+                 onboardingItems:(NSArray<id<OnboardingModule>>*)onboardingItems
+                           index:(NSUInteger)index
+                  stopOnboarding:(BOOL)stopOnboarding
+                             nav:(UINavigationController*)nav
+                      completion:(void (^ _Nullable)(void))completion {
+
+    
+    if ( index >= onboardingItems.count || stopOnboarding ) { 
+        if ( nav.presentingViewController ) {
+            [nav.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                if ( completion ) {
+                    completion();
+                }
+            }];
+        }
+        else {
+            if ( completion ) {
+                completion();
+            }
+        }
+    }
+    else {
+        id<OnboardingModule> module = onboardingItems[index];
+        
+        if ( [module shouldDisplay] ) {
+            __weak OnboardingManager* weakSelf = self;
+            VIEW_CONTROLLER_PTR vc = [module instantiateViewController:^(BOOL databaseModified, BOOL stopOnboarding) {
+                
+                [weakSelf showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:(index + 1) stopOnboarding:stopOnboarding nav:nav completion:completion];
+            }];
+            
+            if ( vc ) {
+                [nav pushViewController:vc animated:YES]; 
+
+                if ( !nav.presentingViewController ) {
+                    [presentingViewController presentViewController:nav animated:YES completion:nil];
+                }
+            }
+            else {
+                NSLog(@"WARNWARN: Could not instantiate view controller for onboarding module");
+                [self showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:(index + 1) stopOnboarding:stopOnboarding nav:nav completion:completion];
+            }
+        }
+        else {
+            [self showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:(index + 1) stopOnboarding:stopOnboarding nav:nav completion:completion];
+        }
+    }
+}
+
+
 
 - (id<OnboardingModule>)getFirstRunWelcomeToStrongboxModule {
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:nil];
@@ -793,62 +847,6 @@
 
     return module;
 }
-
-
-
-- (void)showNextOnboardingModule:(UIViewController*)presentingViewController
-                           model:(Model*)model
-                 onboardingItems:(NSArray<id<OnboardingModule>>*)onboardingItems
-                           index:(NSUInteger)index
-                  stopOnboarding:(BOOL)stopOnboarding
-                             nav:(UINavigationController*)nav
-                      completion:(void (^ _Nullable)(void))completion {
-
-    
-    if ( index >= onboardingItems.count || stopOnboarding ) { 
-        if ( nav.presentingViewController ) {
-            [nav.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                if ( completion ) {
-                    completion();
-                }
-            }];
-        }
-        else {
-            if ( completion ) {
-                completion();
-            }
-        }
-    }
-    else {
-        id<OnboardingModule> module = onboardingItems[index];
-        
-        if ( [module shouldDisplay] ) {
-            __weak OnboardingManager* weakSelf = self;
-            UIViewController* vc = [module instantiateViewController:^(BOOL databaseModified, BOOL stopOnboarding) {
-                
-                [weakSelf showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:(index + 1) stopOnboarding:stopOnboarding nav:nav completion:completion];
-            }];
-            
-            if ( vc ) {
-                [nav pushViewController:vc animated:YES]; 
-
-                if ( !nav.presentingViewController ) {
-                    [presentingViewController presentViewController:nav animated:YES completion:nil];
-                }
-            }
-            else {
-                NSLog(@"WARNWARN: Could not instantiate view controller for onboarding module");
-                [self showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:(index + 1) stopOnboarding:stopOnboarding nav:nav completion:completion];
-            }
-        }
-        else {
-            [self showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:(index + 1) stopOnboarding:stopOnboarding nav:nav completion:completion];
-        }
-    }
-}
-
-
-
 
 - (NSArray<DatabasePreferences*>*)getLocalDeviceSafes {
     return [DatabasePreferences forAllDatabasesOfProvider:kLocalDevice];

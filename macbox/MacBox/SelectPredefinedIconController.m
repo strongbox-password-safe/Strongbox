@@ -92,7 +92,7 @@
 - (IBAction)onSelectFromFile:(id)sender {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result){
-        if (result == NSFileHandlingPanelOKButton) {
+        if (result == NSModalResponseOK) {
             NSLog(@"%@", openPanel.URL.path);
             
             NSError* error;

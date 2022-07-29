@@ -9,6 +9,20 @@
 #import <Foundation/Foundation.h>
 #import "Model.h"
 
+#if TARGET_OS_IPHONE
+
+#import <UIKit/UIKit.h>
+
+typedef UIViewController* VIEW_CONTROLLER_PTR;
+
+#else
+
+#import <Cocoa/Cocoa.h>
+
+typedef NSViewController* VIEW_CONTROLLER_PTR;
+
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^OnboardingModuleDoneBlock)(BOOL databaseModified, BOOL stopOnboarding);
@@ -25,7 +39,7 @@ typedef void (^OnboardingModuleDoneBlock)(BOOL databaseModified, BOOL stopOnboar
 
 
 
-- (UIViewController*)instantiateViewController:(OnboardingModuleDoneBlock)onDone;
+- (VIEW_CONTROLLER_PTR)instantiateViewController:(OnboardingModuleDoneBlock)onDone;
 
 @end
 

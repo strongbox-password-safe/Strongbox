@@ -754,6 +754,26 @@
     }];
 }
 
+- (YubiKeyHardwareConfiguration *)yubiKeyConfig {
+    return self.metadata.yubiKeyConfig;
+}
+
+- (void)setYubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.yubiKeyConfig = yubiKeyConfig;
+    }];
+}
+
+- (YubiKeyHardwareConfiguration *)autoFillYubiKeyConfig {
+    return self.metadata.autoFillYubiKeyConfig;
+}
+
+- (void)setAutoFillYubiKeyConfig:(YubiKeyHardwareConfiguration *)autoFillYubiKeyConfig {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.autoFillYubiKeyConfig = autoFillYubiKeyConfig;
+    }];
+}
+
 
 
 - (DatabaseAuditorConfiguration *)auditConfig {
@@ -1329,7 +1349,7 @@
 
 
 - (BOOL)isConvenienceUnlockEnabled {
-    return self.isTouchIdEnabled;
+    return self.metadata.isConvenienceUnlockEnabled;
 }
 
 - (BOOL)isTouchIdEnabled {

@@ -12,22 +12,29 @@
 #import "RMStore.h"
 #import "RMStoreAppReceiptVerifier.h"
 #import "RMAppReceipt.h"
-#import "Alerts.h"
-#import "AppPreferences.h"
 #import "Model.h"
+#import "CrossPlatform.h"
+
+#if TARGET_OS_IPHONE
 #import "CustomizationManager.h"
+#elif TARGET_OS_MAC
+#import "MacCustomizationManager.h"
+#endif
 
 static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
 static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.monthly";
-static NSString* const k3Monthly =  @"com.strongbox.markmcguill.upgrade.pro.3monthly";
 static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
-static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial";
+static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial"; 
 
 @interface ProUpgradeIAPManager ()
 
 @property (nonatomic) UpgradeManagerState readyState;
 @property (nonatomic, strong) NSDictionary<NSString*, SKProduct *> *products;
 @property (nonatomic) RMStoreAppReceiptVerifier* receiptVerifier;
+
+@property (readonly) id<ApplicationPreferences> preferences;
+
+@property (readonly, nullable) SKProduct* lifeTimeProduct;
 
 @end
 
@@ -43,12 +50,18 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     return sharedInstance;
 }
 
+- (id<ApplicationPreferences>)preferences {
+    return CrossPlatformDependencies.defaults.applicationPreferences;
+}
+
 -(UpgradeManagerState)state {
     return self.readyState;
 }
 
 - (void)initialize {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        NSLog(@"✅ ProUpgradeIAPManager::initialize - Loading Products and Checking Receipt for entitlements");
+        
         [self loadAppStoreProducts];
         
         
@@ -66,43 +79,45 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 }
 
 - (void)performScheduledProEntitlementsCheckIfAppropriate {
-    if(AppPreferences.sharedInstance.lastEntitlementCheckAttempt != nil) {
+    if ( self.preferences.lastEntitlementCheckAttempt != nil ) {
         NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
         
         NSDateComponents *components = [gregorian components:NSCalendarUnitDay
-                                                    fromDate:AppPreferences.sharedInstance.lastEntitlementCheckAttempt
+                                                    fromDate:self.preferences.lastEntitlementCheckAttempt
                                                       toDate:[NSDate date]
                                                      options:0];
         
         NSInteger days = [components day];
         
-        NSLog(@"%ld days since last entitlement check... [%@]", (long)days, AppPreferences.sharedInstance.lastEntitlementCheckAttempt);
+        NSLog(@"%ld days since last entitlement check... [%@]", (long)days, self.preferences.lastEntitlementCheckAttempt);
         
         if ( days == 0 ) { 
             NSLog(@"Already checked entitlements today... not rechecking...");
             return;
         }
-        
-        
-        
-        if(AppPreferences.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 5) {
+                
+        if ( self.preferences.numberOfEntitlementCheckFails == 0 && days < 4 ) {
+            
+
             NSLog(@"We had a successful check recently, not rechecking...");
             return;
         }
         else {
-            NSLog(@"Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)AppPreferences.sharedInstance.numberOfEntitlementCheckFails, (long)days);
+            NSLog(@"Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)self.preferences.numberOfEntitlementCheckFails, (long)days);
         }
     }
 
     NSLog(@"Performing Scheduled Check of Entitlements...");
     
-    if ( AppPreferences.sharedInstance.numberOfEntitlementCheckFails < 10 ) {
+    
+    
+    if ( self.preferences.numberOfEntitlementCheckFails < 5 ) {
         [self checkReceiptForTrialAndProEntitlements];
     }
     else {
-        AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = YES;
-        AppPreferences.sharedInstance.hasPromptedThatAppHasBeenDowngradedToFreeEdition = NO;
-        [AppPreferences.sharedInstance setPro:NO];
+        self.preferences.appHasBeenDowngradedToFreeEdition = YES;
+        self.preferences.hasPromptedThatAppHasBeenDowngradedToFreeEdition = NO;
+        [self.preferences setPro:NO];
     }
 }
 
@@ -115,7 +130,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 }
 
 - (void)checkReceiptForTrialAndProEntitlements { 
-    AppPreferences.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
+    self.preferences.lastEntitlementCheckAttempt = [NSDate date];
     
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
     if ( [verificator verifyAppReceipt] ) {
@@ -132,46 +147,51 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
             }
             else {
                 NSLog(@"Receipt not good even after refresh");
-                AppPreferences.sharedInstance.numberOfEntitlementCheckFails++;
+                self.preferences.numberOfEntitlementCheckFails++;
             }
         } failure:^(NSError *error) {
             NSLog(@"Refresh Receipt - Error [%@]", error);
-            AppPreferences.sharedInstance.numberOfEntitlementCheckFails++;
+            self.preferences.numberOfEntitlementCheckFails++;
         }];
     }
 }
 
 - (void)checkVerifiedReceiptIsEntitledToPro {
-    AppPreferences.sharedInstance.numberOfEntitlementCheckFails = 0;
-    
+    self.preferences.numberOfEntitlementCheckFails = 0;
+
+#if TARGET_OS_IPHONE
     NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
-    if ( freeTrialPurchaseDate && !AppPreferences.sharedInstance.hasOptedInToFreeTrial ) {
+    if ( freeTrialPurchaseDate && !self.preferences.hasOptedInToFreeTrial ) {
         NSLog(@"Found Free Trial Purchase: [%@] - Setting free trial end date accordingly", freeTrialPurchaseDate);
-        NSDate* endDate = [AppPreferences.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
-        AppPreferences.sharedInstance.freeTrialEnd = endDate;
+        NSDate* endDate = [self.preferences calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
+        self.preferences.freeTrialEnd = endDate;
 
         
         [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
     }
+#endif
     
+#if TARGET_OS_IPHONE
     if ( CustomizationManager.isAProBundle ) {
+#elif TARGET_OS_MAC
+    if ( MacCustomizationManager.isAProBundle ) {
+#endif
         NSLog(@"Upgrading App to Pro as Receipt is Good and this is a Pro edition...");
-        [AppPreferences.sharedInstance setPro:YES];
-        AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = NO;
+        [self.preferences setPro:YES];
+        self.preferences.appHasBeenDowngradedToFreeEdition = NO;
     }
     else if ( [self receiptHasProEntitlements] ) {
         NSLog(@"Upgrading App to Pro as Entitlement found in Receipt...");
-        [AppPreferences.sharedInstance setPro:YES];
-        
-        AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = NO;
+        [self.preferences setPro:YES];
+        self.preferences.appHasBeenDowngradedToFreeEdition = NO;
     }
     else {
-        if ( AppPreferences.sharedInstance.isPro ) {
+        if ( self.preferences.isPro ) {
 
             
             NSLog(@"PRO Entitlement NOT found in Receipt, incrementing fail count to allow for grace period but very likely app not entitled to Pro...");
                       
-            AppPreferences.sharedInstance.numberOfEntitlementCheckFails++;
+            self.preferences.numberOfEntitlementCheckFails++;
 
             
 
@@ -189,12 +209,11 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     
     NSDate* now = [NSDate date];
     BOOL monthly = [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];
-    BOOL threeMonthly = [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:k3Monthly forDate:now];
     BOOL yearly = [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kYearly forDate:now];
     
-    NSLog(@"Found Lifetime=%d, Monthly=%d, 3 Monthly=%d, Yearly=%d", lifetime, monthly, threeMonthly, yearly);
+    NSLog(@"Found Lifetime=%d, Monthly=%d, Yearly=%d", lifetime, monthly, yearly);
     
-    return lifetime || monthly || threeMonthly || yearly;
+    return lifetime || monthly || yearly;
 }
 
 - (void)loadAppStoreProducts {
@@ -227,8 +246,12 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 }
 
 - (void)checkForSaleAndNotify {
+#if TARGET_OS_IPHONE
     if (@available(iOS 11.2, *)) {
-        if(self.yearlyProduct.introductoryPrice) {
+#else
+    if (@available(macOS 10.13.2, *)) {
+#endif
+      if(self.yearlyProduct.introductoryPrice) {
             [NSNotificationCenter.defaultCenter postNotificationName:kAppStoreSaleNotificationKey object:nil];
         }
     }
@@ -243,14 +266,18 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         NSLog(@"Restore Done Successfully: [%@]", transactions);
 
         for (SKPaymentTransaction* pt in transactions) {
-            NSLog(@"%@-%@", pt.originalTransaction.payment.productIdentifier, pt.originalTransaction.transactionDate);
+            NSLog(@"Restored: %@-%@", pt.originalTransaction.payment.productIdentifier, pt.originalTransaction.transactionDate);
         }
         
         [self checkReceiptForTrialAndProEntitlements];
         
-        completion(nil);
+        if ( completion ) {
+            completion(nil);
+        }
     } failure:^(NSError *error) {
-        completion(error);
+        if ( completion ) {
+            completion(error);
+        }
     }];
 }
 
@@ -292,6 +319,10 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     return iap != nil;
 }
 
+- (BOOL)isLegacyLifetimeIAPPro {
+    return self.hasPurchasedLifeTime;
+}
+
 - (BOOL)hasActiveYearlySubscription {
     NSDate* now = [NSDate date];
     return [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kYearly forDate:now];
@@ -301,7 +332,6 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     NSDate* now = [NSDate date];
     return [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];
 }
-
 
 - (NSDate*)freeTrialPurchaseDate {
     if (RMAppReceipt.bundleReceipt == nil) {
@@ -337,16 +367,6 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }
 }
 
-- (void)startFreeTrial:(PurchaseCompletionBlock)completion {
-    if ( self.freeTrialProduct ) {
-        [self purchaseAndCheckReceipts:self.freeTrialProduct completion:completion];
-    }
-    else {
-        NSLog(@"Free Trial product unavailable");
-        completion([Utils createNSError:@"Free Trial product unavailable" errorCode:-2345]);
-    }
-}
-
 
 
 - (SKProduct *)monthlyProduct {
@@ -361,8 +381,21 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     return self.availableProducts[kIapProId];
 }
 
-- (SKProduct *)freeTrialProduct {
-    return self.availableProducts[kIapFreeTrial];
+- (BOOL)isFreeTrialAvailable {
+#if TARGET_OS_IPHONE
+    if (@available(iOS 11.2, *)) {
+#else
+    if (@available(macOS 10.13.2, *)) {
+#endif
+        SKProduct* product = self.yearlyProduct;        
+        SKProductDiscount* introPrice = product ? product.introductoryPrice : nil;
+        
+        BOOL ret = (introPrice != nil) && [introPrice.price isEqual:NSDecimalNumber.zero];
+        
+        return ret;
+    }
+    
+    return NO;
 }
-
+    
 @end

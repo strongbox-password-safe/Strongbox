@@ -40,6 +40,10 @@ class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
         return textViewMarkdown.selectedRange().length > 0
     }
     
+    func copySelectedText () {
+        textViewMarkdown.copy(self)
+    }
+    
     func setMarkdownOrText(string: String, markdown: Bool = false) {
         textViewMarkdown.markdownEnabled = markdown
         textViewMarkdown.string = string

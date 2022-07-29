@@ -15,8 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-- (void)startAppOnboarding:(UIViewController*)presentingViewController completion:(void (^ _Nullable)(void))completion;
-- (void)startDatabaseOnboarding:(UIViewController*)presentingViewController model:(Model*)model completion:(void (^ _Nullable)(void))completion;
+- (void)startAppOnboarding:(VIEW_CONTROLLER_PTR)presentingViewController completion:(void (^ _Nullable)(void))completion;
+- (void)startDatabaseOnboarding:(VIEW_CONTROLLER_PTR)presentingViewController model:(Model*)model completion:(void (^ _Nullable)(void))completion;
 
 @end
 

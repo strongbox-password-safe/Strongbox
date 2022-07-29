@@ -59,7 +59,14 @@
             [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-11-25"]   
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-11-29"]],
             
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-03-17"]     
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-03-20"]],
             
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-07-14"]     
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-07-17"]],
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-24"]     
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-28"]],
         ];
     }
     
