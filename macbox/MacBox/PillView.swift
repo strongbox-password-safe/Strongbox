@@ -28,8 +28,6 @@ class PillView: NSView, NibLoadable {
             imagePill.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
         }
 
-        if #available(macOS 10.14, *) {
-            imagePill.contentTintColor = color
-        }
+        imagePill.contentTintColor = color
     }
 }

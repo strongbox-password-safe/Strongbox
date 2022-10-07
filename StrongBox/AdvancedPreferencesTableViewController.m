@@ -77,6 +77,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchNewEntryUsesParentGroupIcon;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStripUnusedIcons;
+@property (weak, nonatomic) IBOutlet UISwitch *pinCodeHapticFeedback;
 
 @end
 
@@ -247,6 +248,8 @@
 
 
     AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
+    AppPreferences.sharedInstance.pinCodeHapticFeedback = self.pinCodeHapticFeedback.on;
+
     AppPreferences.sharedInstance.markdownNotes = self.switchMarkdownNotes.on;
     AppPreferences.sharedInstance.useParentGroupIconOnCreate = self.switchNewEntryUsesParentGroupIcon.on;
     
@@ -307,6 +310,8 @@
 
     
     self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;
+    self.pinCodeHapticFeedback.on = AppPreferences.sharedInstance.pinCodeHapticFeedback;
+
     self.switchMarkdownNotes.on = AppPreferences.sharedInstance.markdownNotes;
     self.switchNewEntryUsesParentGroupIcon.on = AppPreferences.sharedInstance.useParentGroupIconOnCreate;
     self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;

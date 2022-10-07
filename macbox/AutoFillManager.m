@@ -14,17 +14,10 @@
 #import "NSString+Extensions.h"
 #import "CommonDatabasePreferences.h"
 #import "Utils.h"
-
-#if TARGET_OS_IPHONE
-#import "SVProgressHUD.h"
-#else
-
-#endif
+#import "ConcurrentMutableDictionary.h"
+#import "AutoFillCommon.h"
 
 
-
-static NSString* const kOtpAuthScheme = @"otpauth";
-static NSString* const kMailToScheme = @"mailto";
 
 @implementation AutoFillManager 
 
@@ -39,67 +32,6 @@ static NSString* const kMailToScheme = @"mailto";
     return sharedInstance;
 }
 
-- (BOOL)isPossible {
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
-    if (@available(macOS 11.0, *)) {
-#endif
-        return YES;
-    }
-    else {
-        return NO;
-    }
-}
-
-- (BOOL)isOnForStrongbox {
-    __block BOOL ret = NO;
-    
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
-    if (@available(macOS 11.0, *)) {
-#endif
-        dispatch_group_t g = dispatch_group_create();
-        dispatch_group_enter(g);
-
-        [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
-            ret = state.enabled;
-
-            dispatch_group_leave(g);
-        }];
-
-        dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
-    }
-
-    return ret;
-}
-
-- (void)clearAutoFillQuickTypeDatabase {
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
-    if (@available(macOS 11.0, *)) {
-#endif
-        NSLog(@"Clearing Quick Type AutoFill Database...");
-        
-        [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
-            if(state.enabled) {
-                [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:nil];
-                NSLog(@"Cleared Quick Type AutoFill Database...");
-            }
-            else {
-                NSLog(@"AutoFill QuickType store not enabled. Not Clearing Quick Type AutoFill Database...");
-            }
-        }];
-    }
-}
-
-
-
-
-
-
 
 
 - (void)updateAutoFillQuickTypeDatabase:(Model*)database
@@ -110,7 +42,7 @@ static NSString* const kMailToScheme = @"mailto";
                             notes:(BOOL)notes
                             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
                             unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
-                            nickName:(NSString *)nickName {
+                            nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macos(11.0)) {
     if (! self.isPossible || database == nil) {
         return;
     }
@@ -233,7 +165,7 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
         }];
     }
 }
-    
+                                
 - (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentities:(Node*)node
                                                                 database:(Model*)database
                                                              databaseUuid:(NSString*)databaseUuid
@@ -244,73 +176,13 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
                                           unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                 nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macos(11.0)) {
-    NSMutableSet<NSString*> *uniqueUrls = [NSMutableSet set];
-
-    NSMutableArray<NSString*> *explicitUrls = [NSMutableArray array];
+    NSSet<NSString*>* uniqueUrls = [AutoFillCommon getUniqueUrlsForNode:database.database
+                                                                   node:node
+                                                        alternativeUrls:alternativeUrls
+                                                           customFields:customFields
+                                                                  notes:notes];
     
-    
-    
-    NSString* urlField = [database dereference:node.fields.url node:node];
-    if(urlField.length) {
-        [explicitUrls addObject:urlField];
-    }
-    
-    
-    
-    if ( alternativeUrls ) {
-        for ( NSString* altUrl in node.fields.alternativeUrls) {
-            if(altUrl.length) {
-                NSString* derefed = [database dereference:altUrl node:node];
-                [explicitUrls addObject:derefed];
-            }
-        }
-    }
-    
-    
-
-    for ( NSString* expUrl in explicitUrls ) {
-        NSURL* parsed = expUrl.urlExtendedParse;
-
-        if ( parsed ) {
-            NSURLComponents* components = [NSURLComponents componentsWithURL:parsed resolvingAgainstBaseURL:NO];
-            
-            if ( !components.scheme.length ) { 
-                NSString* urlString = [NSString stringWithFormat:@"https:
-                [uniqueUrls addObject:urlString];
-            }
-            else {
-                [uniqueUrls addObject:expUrl];
-            }
-        }
-        else {
-            [uniqueUrls addObject:expUrl];
-        }
-    }
-    
-    
-    
-    if ( customFields ) {
-        for(NSString* key in node.fields.customFields.allKeys) {
-            if ( ![NodeFields isAlternativeURLCustomFieldKey:key] ) { 
-                StringValue* strValue = node.fields.customFields[key];
-                NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
-                [uniqueUrls addObjectsFromArray:foo];
-            }
-        }
-    }
-    
-    
-
-    if ( notes) {
-        NSString* notesField = [database dereference:node.fields.notes node:node];
-
-        if(notesField.length) {
-            NSArray<NSString*> *foo = [self findUrlsInString:notesField];
-            [uniqueUrls addObjectsFromArray:foo];
-        }
-    }
-    
-    NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
+    NSMutableArray<ASPasswordCredentialIdentity*> *passwordIdentities = [NSMutableArray array];
 
     for ( NSString* url in uniqueUrls ) {
         ASPasswordCredentialIdentity* iden = [self getIdentity:node
@@ -322,8 +194,21 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                                     fieldValue:nil
                                                       nickName:nickName];
         
-        [identities addObject:iden];
-        
+        [passwordIdentities addObject:iden];
+    }
+
+    [passwordIdentities sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        ASPasswordCredentialIdentity* i1 = obj1;
+        ASPasswordCredentialIdentity* i2 = obj2;
+
+        return finderStringCompare(i1.user, i2.user);
+    }];
+
+    
+
+    NSMutableArray<ASPasswordCredentialIdentity*> *customFieldIdentities = [NSMutableArray array];
+
+    for ( NSString* url in uniqueUrls ) {
         for ( NSString* key in node.fields.customFields.allKeys ) {
             if ( ![NodeFields isAlternativeURLCustomFieldKey:key] && ![NodeFields isTotpCustomFieldKey:key] ) {
                 StringValue* sv = node.fields.customFields[key];
@@ -337,7 +222,7 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                                                   fieldKey:key
                                                                 fieldValue:sv.value
                                                                   nickName:nickName];
-                    [identities addObject:iden];
+                    [customFieldIdentities addObject:iden];
 
                 }
                 else if ( unConcealedCustomFieldsAsCreds && !sv.protected ) {
@@ -349,20 +234,22 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                                                   fieldKey:key
                                                                 fieldValue:sv.value
                                                                   nickName:nickName];
-                    [identities addObject:iden];
+                    [customFieldIdentities addObject:iden];
                 }
             }
         }
     }
 
-    [identities sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+    [customFieldIdentities sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         ASPasswordCredentialIdentity* i1 = obj1;
         ASPasswordCredentialIdentity* i2 = obj2;
 
         return finderStringCompare(i1.user, i2.user);
     }];
 
-    return identities;
+    [passwordIdentities addObjectsFromArray:customFieldIdentities];
+    
+    return passwordIdentities;
 }
                                 
 - (ASPasswordCredentialIdentity*)getIdentity:(Node*)node
@@ -414,36 +301,6 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
     
     return [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:quickTypeText recordIdentifier:[recordIdentifier toJson]];
 }
-
-- (NSArray<NSString*>*)findUrlsInString:(NSString*)target {
-    if(!target.length) {
-        return @[];
-    }
-    
-    NSError *error;
-    NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
-    
-    NSMutableArray<NSString*>* urls = [NSMutableArray array];
-    
-    if(detector) {
-        NSArray *matches = [detector matchesInString:target
-                                             options:0
-                                               range:NSMakeRange(0, [target length])];
-        for (NSTextCheckingResult *match in matches) {
-            if ([match resultType] == NSTextCheckingTypeLink) {
-                NSURL *url = [match URL];
-                if(url && url.scheme && ![url.scheme isEqualToString:kOtpAuthScheme] && ![url.scheme isEqualToString:kMailToScheme]) {
-                    [urls addObject:url.absoluteString];
-                }
-            }
-        }
-    }
-    else {
-        NSLog(@"Error finding Urls: %@", error);
-    }
-    
-    return urls;
-}
         
 - (NSUInteger)getDatabasesUsingQuickTypeCount {
 #if TARGET_OS_IPHONE
@@ -459,5 +316,62 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
         
     return databasesUsingQuickType;
 }
+
+- (BOOL)isPossible {
+#if TARGET_OS_IPHONE
+    if (@available(iOS 12.0, *)) {
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
+
+- (BOOL)isOnForStrongbox {
+    __block BOOL ret = NO;
+    
+#if TARGET_OS_IPHONE
+    if (@available(iOS 12.0, *)) {
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
+        dispatch_group_t g = dispatch_group_create();
+        dispatch_group_enter(g);
+
+        [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
+            ret = state.enabled;
+
+            dispatch_group_leave(g);
+        }];
+
+        dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+    }
+
+    return ret;
+}
+
+- (void)clearAutoFillQuickTypeDatabase API_AVAILABLE(ios(12.0), macos(11.0)) {
+#if TARGET_OS_IPHONE
+    if (@available(iOS 12.0, *)) {
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
+        NSLog(@"Clearing Quick Type AutoFill Database...");
+        
+        [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
+            if(state.enabled) {
+                [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:nil];
+                NSLog(@"Cleared Quick Type AutoFill Database...");
+            }
+            else {
+                NSLog(@"AutoFill QuickType store not enabled. Not Clearing Quick Type AutoFill Database...");
+            }
+        }];
+    }
+}
+
     
 @end

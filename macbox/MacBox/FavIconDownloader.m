@@ -181,9 +181,8 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 - (void)bindStartStopStatusImage:(NSUInteger)errored {
     if(self.validUniqueUrls.count == 0) {
         [self.imageViewStartStop setImage:[NSImage imageNamed:@"cancel"]];
-        if (@available(macOS 10.14, *)) {
-            [self.imageViewStartStop setContentTintColor:NSColor.redColor];
-        }
+        [self.imageViewStartStop setContentTintColor:NSColor.redColor];
+        
         self.imageViewStartStop.enabled = NO;
         return;
     }
@@ -195,35 +194,26 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     }
     else if(self.status == kFavIconBulkStatusInProgress) {
         [self.imageViewStartStop setImage:[NSImage imageNamed:@"Pause"]];
-        if (@available(macOS 10.14, *)) {
-            [self.imageViewStartStop setContentTintColor:nil];
-        }
+        [self.imageViewStartStop setContentTintColor:nil];
+        
         self.imageViewStartStop.enabled = YES;
     }
     else if(self.status == kFavIconBulkStatusPausing) {
-        if (@available(macOS 10.14, *)) {
-            [self.imageViewStartStop setContentTintColor:NSColor.systemGrayColor];
-        }
+        [self.imageViewStartStop setContentTintColor:NSColor.systemGrayColor];
         self.imageViewStartStop.enabled = NO;
     }
     else if(self.status == kFavIconBulkStatusDone) {
         if(errored == 0) {
             [self.imageViewStartStop setImage:[NSImage imageNamed:@"ok"]];
-            if (@available(macOS 10.14, *)) {
-                [self.imageViewStartStop setContentTintColor:NSColor.systemGreenColor];
-            }
+            [self.imageViewStartStop setContentTintColor:NSColor.systemGreenColor];
         }
         else if (errored == self.validUniqueUrls.count) {
             [self.imageViewStartStop setImage:[NSImage imageNamed:@"cancel"]];
-            if (@available(macOS 10.14, *)) {
-                [self.imageViewStartStop setContentTintColor:NSColor.redColor];
-            }
+            [self.imageViewStartStop setContentTintColor:NSColor.redColor];
         }
         else {
             [self.imageViewStartStop setImage:[NSImage imageNamed:@"ok"]];
-            if (@available(macOS 10.14, *)) {
-                [self.imageViewStartStop setContentTintColor:NSColor.systemYellowColor];
-            }
+            [self.imageViewStartStop setContentTintColor:NSColor.systemYellowColor];
         }
     }
 }

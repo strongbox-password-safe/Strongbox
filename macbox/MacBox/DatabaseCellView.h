@@ -25,6 +25,8 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
 @property (copy)void (^onBeginEditingNickname)(DatabaseCellView* cell);
 @property (copy)void (^onEndEditingNickname)(DatabaseCellView* cell);
 
+- (void)onChangeNickname;
+
 @end
 
 NS_ASSUME_NONNULL_END

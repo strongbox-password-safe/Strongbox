@@ -18,7 +18,6 @@
 #endif
 
 static NSString* const kKeePass1BackupGroupName = @"Backup";
-static NSString* const kDefaultRecycleBinTitle = @"Recycle Bin";
 static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 @interface DatabaseModel ()
@@ -711,8 +710,16 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (void)createNewRecycleBinNode {
-    Node* recycleBin = [[Node alloc] initAsGroup:kDefaultRecycleBinTitle parent:self.effectiveRootGroup keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules uuid:nil];
+    NSString* title = NSLocalizedString(@"generic_recycle_bin_name", @"Recycle Bin");
+    
+    Node* recycleBin = [[Node alloc] initAsGroup:title parent:self.effectiveRootGroup keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules uuid:nil];
+    
     recycleBin.icon = [NodeIcon withPreset:43];
+    
+    
+    
+    recycleBin.fields.enableSearching = @(NO);
+    recycleBin.fields.enableAutoType = @(NO);
     
     [self addChildren:@[recycleBin] destination:self.effectiveRootGroup];
 
@@ -896,7 +903,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     NSCountedSet<NSString*> *emailSet = NSCountedSet.set;
     NSCountedSet<NSString*> *urlSet = NSCountedSet.set;
     NSCountedSet<NSString*> *customFieldKeySet = NSCountedSet.set;
-
+    
     if ( self.rootNode ) {
         uuidMap[self.rootNode.uuid] = self.rootNode;
 
@@ -912,6 +919,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                 uuidMap[node.uuid] = node;
             }
         }
+        
         FastMaps* newMaps = [[FastMaps alloc] initWithUuidMap:uuidMap
                                               withExpiryDates:expirySet
                                               withAttachments:attachmentSet
@@ -1001,7 +1009,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             }
         }
     }
-
+    
     FastMaps* newMaps = [[FastMaps alloc] initWithUuidMap:uuidMap
                                           withExpiryDates:expirySet
                                           withAttachments:attachmentSet

@@ -145,7 +145,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( jsonDictionary[@"nickName"] != nil ) ret.nickName = jsonDictionary[@"nickName"];
     if ( jsonDictionary[@"fileName"] != nil ) ret.fileName = jsonDictionary[@"fileName"];
     if ( jsonDictionary[@"fileIdentifier"] != nil ) ret.fileIdentifier = jsonDictionary[@"fileIdentifier"];
-    if ( jsonDictionary[@"keyFileBookmark"] != nil ) ret.keyFileBookmark = jsonDictionary[@"keyFileBookmark"];
+    
     if ( jsonDictionary[@"autoLockTimeoutSeconds"] != nil ) ret.autoLockTimeoutSeconds = jsonDictionary[@"autoLockTimeoutSeconds"];
     if ( jsonDictionary[@"detailsViewCollapsedSections"] != nil ) ret.detailsViewCollapsedSections = jsonDictionary[@"detailsViewCollapsedSections"];
     if ( jsonDictionary[@"failedPinAttempts"] != nil ) ret.failedPinAttempts = ((NSNumber*)jsonDictionary[@"failedPinAttempts"]).intValue;
@@ -436,7 +436,19 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.customSortOrderForFields = NO;
     }
     
+    
+    
+    NSString* kfb = jsonDictionary[@"keyFileBookmark"];
+    NSString* kffn = jsonDictionary[@"keyFileFileName"];
+    
+    [ret setKeyFile:kfb keyFileFileName:kffn];
+
     return ret;
+}
+
+- (void)setKeyFile:(NSString*)keyFileBookmark keyFileFileName:(NSString*)keyFileFileName {
+    _keyFileBookmark = keyFileBookmark;
+    _keyFileFileName = keyFileFileName;
 }
 
 - (NSDictionary *)getJsonSerializationDictionary {
@@ -533,9 +545,14 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if (self.fileIdentifier != nil) {
         ret[@"fileIdentifier"] = self.fileIdentifier;
     }
+    
     if (self.keyFileBookmark != nil) {
         ret[@"keyFileBookmark"] = self.keyFileBookmark;
     }
+    if (self.keyFileFileName != nil) {
+        ret[@"keyFileFileName"] = self.keyFileFileName;
+    }
+
     if (self.autoLockTimeoutSeconds != nil) {
         ret[@"autoLockTimeoutSeconds"] = self.autoLockTimeoutSeconds;
     }

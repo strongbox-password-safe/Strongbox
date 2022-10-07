@@ -1951,12 +1951,13 @@
         }
         else {
             [self onCreateNewDatabase:storageParams
-                                     name:credentials.name
-                                 password:credentials.password
-                          keyFileBookmark:credentials.keyFileBookmark
-                           onceOffKeyFile:credentials.oneTimeKeyFileData
-                            yubiKeyConfig:credentials.yubiKeyConfig
-                                   format:credentials.format];
+                                 name:credentials.name
+                             password:credentials.password
+                      keyFileBookmark:credentials.keyFileBookmark
+                      keyFileFileName:credentials.keyFileFileName
+                       onceOffKeyFile:credentials.oneTimeKeyFileData
+                        yubiKeyConfig:credentials.yubiKeyConfig
+                               format:credentials.format];
         }
     }
     else {
@@ -2020,6 +2021,7 @@
                        name:(NSString*)name
                    password:(NSString*)password
             keyFileBookmark:(NSString*)keyFileBookmark
+            keyFileFileName:(NSString*)keyFileFileName
              onceOffKeyFile:(NSData*)onceOffKeyFile
               yubiKeyConfig:(YubiKeyHardwareConfiguration*)yubiKeyConfig
                      format:(DatabaseFormat)format {
@@ -2027,6 +2029,7 @@
                                    name:name
                                password:password
                         keyFileBookmark:keyFileBookmark
+                        keyFileFileName:keyFileFileName
                      onceOffKeyFileData:onceOffKeyFile
                           yubiKeyConfig:yubiKeyConfig
                           storageParams:storageParams
@@ -2990,25 +2993,17 @@
 #pragma GCC diagnostic pop
 
 - (void)import1Password:(NSURL*)url {
-    NSError* error;
-    
-    Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
-    [self addImportedDatabaseWithRoot:root error:error];
+    NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
+    NSString* msg = NSLocalizedString(@"1password_import_warning_msg", @"The import process isn't perfect and some features of 1Password such as named sections are not available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
+        [self addImportedDatabaseWithRoot:root error:error];
+    }];
 }
 
 - (void)importCsv:(NSURL*)url {

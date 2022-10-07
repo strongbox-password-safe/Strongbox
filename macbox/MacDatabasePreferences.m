@@ -1245,6 +1245,16 @@
     }];
 }
 
+- (SearchScope)searchScope {
+    return self.metadata.searchScope;
+}
+
+- (void)setSearchScope:(SearchScope)searchScope {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.searchScope = searchScope;
+    }];
+}
+
 - (BOOL)showChildCountOnFolderInSidebar {
     return self.metadata.showChildCountOnFolderInSidebar;
 }

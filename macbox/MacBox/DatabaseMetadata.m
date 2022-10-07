@@ -55,6 +55,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.showChildCountOnFolderInSidebar = YES;
         self.headerNodes = HeaderNodeState.defaults;
         self.autoFillCopyTotp = YES;
+        self.searchScope = kSearchScopeTitle;
     }
     
     return self;
@@ -304,6 +305,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     
     [encoder encodeBool:self.customSortOrderForFields forKey:@"customSortOrderForFields"];
     [encoder encodeBool:self.autoFillCopyTotp forKey:@"autoFillCopyTotp"];
+    [encoder encodeInteger:self.searchScope forKey:@"searchScope"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -661,6 +663,13 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         }
         else {
             self.autoFillCopyTotp = YES;
+        }
+        
+        if ( [decoder containsValueForKey:@"searchScope"] ) {
+            self.searchScope = (SearchScope)[decoder decodeIntegerForKey:@"searchScope"];
+        }
+        else {
+            self.searchScope = kSearchScopeTitle;
         }
     }
     

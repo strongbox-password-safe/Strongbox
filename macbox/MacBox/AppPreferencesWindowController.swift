@@ -14,7 +14,6 @@ public class AppPreferencesWindowController: NSWindowController {
     public enum AppPreferencesTab: Int {
         case general
         case passwordGeneration
-        case autoFill
         case favIcon
         case newEntryDefaults
         case advanced

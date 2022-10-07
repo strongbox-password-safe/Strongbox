@@ -144,6 +144,7 @@ static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
 static NSString* const kHideTipJar = @"hideTipJar";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
+static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
 
 @implementation AppPreferences
 
@@ -185,6 +186,14 @@ static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 }
 
 
+
+- (BOOL)pinCodeHapticFeedback {
+    return [self getBool:kPinCodeHapticFeedback fallback:YES];
+}
+
+- (void)setPinCodeHapticFeedback:(BOOL)pinCodeHapticFeedback {
+    [self setBool:kPinCodeHapticFeedback value:pinCodeHapticFeedback];
+}
 
 - (BOOL)stripUnusedIconsOnSave {
     return [self getBool:kStripUnusedIconsOnSave];

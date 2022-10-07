@@ -349,7 +349,15 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     
     var popouts : [UUID : PopOutDetailsWindowController] = [:] 
     
+    @objc func onPopOutDetailsAndPin(_: Any?) {
+        popOutDetails(pin: true)
+    }
+ 
     @objc func onPopOutDetails(_: Any?) {
+        popOutDetails()
+    }
+    
+    func popOutDetails(pin : Bool = false) {
         guard database.nextGenSelectedItems.count == 1, let uuid = database.nextGenSelectedItems.first else {
             NSLog("✅ onPopOutDetails - Selection invalid")
             return
@@ -423,7 +431,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
     }
 
     func setupToolbar() {
-        let toolbar = NSToolbar(identifier: "nextgen-toolbar-identifier-version-6.0")
+        let toolbar = NSToolbar(identifier: "nextgen-toolbar-identifier-version-7.0")
 
         toolbar.autosavesConfiguration = true
         toolbar.delegate = self

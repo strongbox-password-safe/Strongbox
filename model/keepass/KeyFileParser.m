@@ -12,6 +12,7 @@
 #import "NSString+Extensions.h"
 #import "BookmarksHelper.h"
 #import "Utils.h"
+#import "FileManager.h"
 
 #import "Sha256PassThroughOutputStream.h"
 #import "StreamUtils.h"
@@ -274,21 +275,78 @@ BOOL isAll64CharactersAreHex(NSData* data) {
 
 + (NSData *)getNonePerformantKeyFileDigest:(NSData *)data checkForXml:(BOOL)checkForXml {
     return [self getDigestFromSources:nil
+                      keyFileFileName:nil
                    onceOffKeyFileData:data
                                format:checkForXml ? kKeePass4 : kKeePass1 error:nil];
 }
 
 + (NSData *)getDigestFromBookmark:(NSString *)keyFileBookmark
+                  keyFileFileName:(NSString*)keyFileFileName
                            format:(DatabaseFormat)format
                             error:(NSError **)error {
-    return [KeyFileParser getDigestFromSources:keyFileBookmark onceOffKeyFileData:nil format:format error:error];
+    return [KeyFileParser getDigestFromSources:keyFileBookmark
+                               keyFileFileName:nil
+                            onceOffKeyFileData:nil
+                                        format:format
+                                         error:error];
+}
+
+static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseFormat format, NSURL *keyFileUrl) {
+    NSError* attrError;
+    NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:keyFileUrl.path error:&attrError];
+    
+    if ( !attributes || attrError ) {
+        if ( error ) {
+            *error = attrError;
+        }
+        
+        NSLog(@"WARNWARN: Could not read Key File URL File Size.");
+        
+        return nil;
+    }
+    
+    unsigned long long fileSize = attributes.fileSize;
+    
+    BOOL securitySucceeded = [keyFileUrl startAccessingSecurityScopedResource];
+    NSInputStream* inStream = [NSInputStream inputStreamWithURL:keyFileUrl];
+    
+    NSData* ret = [KeyFileParser getDigest:inStream streamLength:fileSize checkForXml:format != kKeePass1];
+    
+    if ( securitySucceeded ) {
+        [keyFileUrl stopAccessingSecurityScopedResource];
+    }
+    
+    return ret;
+}
+
++ (NSData * _Nullable)getByBookmark:(NSError **)error
+                             format:(DatabaseFormat)format
+                    keyFileBookmark:(NSString *)keyFileBookmark {
+    NSString* updated;
+    NSURL* keyFileUrl = [BookmarksHelper getUrlFromBookmark:keyFileBookmark
+                                                   readOnly:YES
+                                            updatedBookmark:&updated
+                                                      error:error];
+    
+    if ( keyFileUrl ) {
+        return getByUrl(error, format, keyFileUrl);
+    }
+    else {
+        if ( error ) {
+            *error = [Utils createNSError:@"Could not read Key File Bookmark" errorCode:-123456];
+        }
+        
+        NSLog(@"WARNWARN: Could not read Key File Bookmark.");
+        return nil;
+    }
 }
 
 + (NSData *)getDigestFromSources:(NSString *)keyFileBookmark
+                 keyFileFileName:(NSString*)keyFileFileName
               onceOffKeyFileData:(NSData *)onceOffKeyFileData
                           format:(DatabaseFormat)format
                            error:(NSError *__autoreleasing  _Nullable *)error {
-    if ( !keyFileBookmark && !onceOffKeyFileData ) {
+    if ( !keyFileBookmark && !onceOffKeyFileData && !keyFileFileName ) {
         NSLog(@"WARNWARN: No Sources is nil");
         
         if ( error ) {
@@ -297,56 +355,31 @@ BOOL isAll64CharactersAreHex(NSData* data) {
         
         return nil;
     }
-    
+        
     if ( keyFileBookmark ) {
-        NSString* updated;
-        NSURL* keyFileUrl = [BookmarksHelper getUrlFromBookmark:keyFileBookmark
-                                                       readOnly:YES
-                                                updatedBookmark:&updated
-                                                          error:error];
-        if ( keyFileUrl ) {
-            NSError* attrError;
-            NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:keyFileUrl.path error:&attrError];
-            
-            if ( !attributes || attrError ) {
-                if ( error ) {
-                    *error = attrError;
-                }
-
-                NSLog(@"WARNWARN: Could not read Key File URL File Size.");
-                
-                return nil;
-            }
-            
-            unsigned long long fileSize = attributes.fileSize;
-            
-            BOOL securitySucceeded = [keyFileUrl startAccessingSecurityScopedResource];
-            NSInputStream* inStream = [NSInputStream inputStreamWithURL:keyFileUrl];
-
-            NSData* ret = [KeyFileParser getDigest:inStream streamLength:fileSize checkForXml:format != kKeePass1];
-            
-            if ( securitySucceeded ) {
-                [keyFileUrl stopAccessingSecurityScopedResource];
-            }
-            
-            return ret;
-        }
-        else {
-            if ( error ) {
-                *error = [Utils createNSError:@"Could not read Key File Bookmark" errorCode:-123456];
-            }
-
-            NSLog(@"WARNWARN: Could not read Key File Bookmark.");
-            return nil;
+        NSData* bookmarkData = [KeyFileParser getByBookmark:error format:format keyFileBookmark:keyFileBookmark];
+        
+        if ( bookmarkData ) {
+            return bookmarkData;
         }
     }
-    else {
+    
+#if TARGET_OS_IPHONE 
+    if ( keyFileFileName ) {
+        NSURL* localGroupFile = [FileManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:keyFileFileName];
+        return getByUrl(error, format, localGroupFile);
+    }
+#endif
+
+    if ( onceOffKeyFileData ) {
         NSInputStream* inStream = [NSInputStream inputStreamWithData:onceOffKeyFileData];
         
         return [KeyFileParser getDigest:inStream
                            streamLength:onceOffKeyFileData.length
                             checkForXml:format != kKeePass1];
     }
+
+    return nil;
 }
 
 @end

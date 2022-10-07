@@ -22,12 +22,6 @@ class TagItem: NSCollectionViewItem {
         view.layer?.cornerRadius = 8.0
 
         label.textColor = .white
-        if #available(macOS 10.14, *) {
-            tagIcon.contentTintColor = .white
-        }
-
-        if #available(macOS 10.13, *) {
-
-        }
+        tagIcon.contentTintColor = .white
     }
 }

@@ -50,6 +50,7 @@ class UnifiedUpgrade: NSViewController {
     @IBOutlet var buttonLifetime: ClickableTextField!
     @IBOutlet var buttonRestorePurchases: ClickableTextField!
     
+    @IBOutlet var labelFreeTrial: NSTextField!
     @IBOutlet var labelMonthlyPrice: NSTextField!
     @IBOutlet var labelYearlyPrice: NSTextField!
     @IBOutlet var labelYearlySaving: NSTextField!
@@ -67,7 +68,7 @@ class UnifiedUpgrade: NSViewController {
     @objc var naggy: Bool = false
     @objc var isPresentedAsSheet: Bool = false
 
-    var completion : (() -> Void)? = nil
+    var completion: (() -> Void)?
     
     @objc
     class func fromStoryboard() -> Self {
@@ -87,33 +88,7 @@ class UnifiedUpgrade: NSViewController {
         window.title = NSLocalizedString("mac_upgrade_button_title", comment: "Upgrade")
         window.makeKeyAndOrderFront(self)
     }
-    
-    func customizeFreeTrialBadge() {
-        yearlyFreeTrialBadge.wantsLayer = true
-        yearlyFreeTrialBadge.layer?.backgroundColor = NSColor.systemOrange.cgColor
         
-        let bezierPath = NSBezierPath()
-
-        let width = yearlyFreeTrialBadge.frame.width
-        let height = yearlyFreeTrialBadge.frame.height
-        
-        let foo = height * 0.3
-        
-        bezierPath.move(to: NSPoint(x: 0, y: foo))
-        bezierPath.line(to: NSPoint(x: width / 2, y: 0))
-        bezierPath.line(to: NSPoint(x: width, y: foo))
-        bezierPath.line(to: NSPoint(x: width, y: height))
-        bezierPath.line(to: NSPoint(x: 0, y: height))
-        
-        bezierPath.lineJoinStyle = .round
-        bezierPath.close()
-        
-        let mask = CAShapeLayer()
-        mask.path = bezierPath.cgPath
-        
-        yearlyFreeTrialBadge.layer?.mask = mask
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -126,9 +101,7 @@ class UnifiedUpgrade: NSViewController {
         yearlyBackgroundView.wantsLayer = true
         yearlyBackgroundView.layer?.backgroundColor = backgroundColor.cgColor
         yearlyBackgroundView.layer?.cornerRadius = 10
-        
-        customizeFreeTrialBadge()
-        
+                
         
         
         buttonDismissSheet.isHidden = !isPresentedAsSheet
@@ -159,6 +132,16 @@ class UnifiedUpgrade: NSViewController {
         labelPrivacy.onClick = { [weak self] in
             self?.onPrivacy()
         }
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        
+        
+        
+        ProUpgradeIAPManager.sharedInstance().productsAvailableNotify = { [weak self] in
+            self?.updatePrices()
+        }
         
         updatePrices()
     }
@@ -166,6 +149,35 @@ class UnifiedUpgrade: NSViewController {
     func updatePrices() {
         bindMonthlyPricing()
         bindYearlyPricing()
+        customizeFreeTrialBadge()
+    }
+
+    func customizeFreeTrialBadge() {
+        yearlyFreeTrialBadge.wantsLayer = true
+        yearlyFreeTrialBadge.layer?.backgroundColor = NSColor.systemOrange.cgColor
+        
+        let bezierPath = NSBezierPath()
+        
+
+        
+        let height = yearlyFreeTrialBadge.frame.height
+        let width = yearlyFreeTrialBadge.frame.width
+
+        let foo = height * 0.3
+        
+        bezierPath.move(to: NSPoint(x: 0, y: foo))
+        bezierPath.line(to: NSPoint(x: width / 2, y: 0))
+        bezierPath.line(to: NSPoint(x: width, y: foo))
+        bezierPath.line(to: NSPoint(x: width, y: height))
+        bezierPath.line(to: NSPoint(x: 0, y: height))
+        
+        bezierPath.lineJoinStyle = .round
+        bezierPath.close()
+        
+        let mask = CAShapeLayer()
+        mask.path = bezierPath.cgPath
+        
+        yearlyFreeTrialBadge.layer?.mask = mask
     }
 
     func bindMonthlyPricing() {
@@ -347,7 +359,7 @@ class UnifiedUpgrade: NSViewController {
         dismissAndComplete()
     }
     
-    func dismissAndComplete () {
+    func dismissAndComplete() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             

@@ -201,8 +201,10 @@
 }
 
 - (IBAction)onButtonAll:(id)sender {
-    self.showAll = !self.showAll;
-    [self refresh];
+    
+    
+
+
 }
 
 @end

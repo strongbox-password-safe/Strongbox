@@ -285,6 +285,7 @@
     if( keyFileBookmark ) {
         NSError *keyFileParseError;
         keyFileDigest = [KeyFileParser getDigestFromBookmark:keyFileBookmark
+                                             keyFileFileName:nil
                                                       format:formatKeyFileHint
                                                        error:&keyFileParseError];
                 

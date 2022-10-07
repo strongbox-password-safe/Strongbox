@@ -84,6 +84,7 @@ static NSString* const kLaunchCountKey = @"launchCountKey";
 static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
+static NSString* const kRunBrowserAutoFillProxyServer = @"runBrowserAutoFillProxyServer";
 
 
 
@@ -144,9 +145,15 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+- (BOOL)runBrowserAutoFillProxyServer {
+    return [self getBool:kRunBrowserAutoFillProxyServer fallback:NO]; 
+}
+
+- (void)setRunBrowserAutoFillProxyServer:(BOOL)runBrowserAutoFillProxyServer {
+    [self setBool:kRunBrowserAutoFillProxyServer value:runBrowserAutoFillProxyServer];
+}
+
 - (BOOL)stripUnusedIconsOnSave {
-    return YES;
-    
     return [self getBool:kStripUnusedIconsOnSave];
 }
 

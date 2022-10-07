@@ -951,12 +951,16 @@
     }
 }
 
-- (void)unlockWithCkfs:(CompositeKeyFactors*)compositeKeyFactors fromConvenience:(BOOL)fromConvenience {
+- (void)unlockWithCkfs:(CompositeKeyFactors*)compositeKeyFactors
+       fromConvenience:(BOOL)fromConvenience {
     NSLog(@"LockScreenViewController::unlockWithCkfs ENTER");
     
     
     
-    if ( self.databaseMetadata.storageProvider != kMacFile && !Settings.sharedInstance.isProOrFreeTrial ) {
+    StorageProvider provider = self.databaseMetadata.storageProvider;
+    BOOL sftpOrDav = provider == kSFTP || provider == kWebDAV;
+    
+    if ( sftpOrDav && !Settings.sharedInstance.isProOrFreeTrial ) {
         [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                  window:self.view.window];
         return;
@@ -1003,8 +1007,105 @@
             [self showIncorrectPasswordToast];
         }
         else if (error) {
-            [MacAlerts error:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") error:error window:self.view.window];
+            if ( self.databaseMetadata.storageProvider == kMacFile && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
+                [self askAboutRelocatingDatabase:ckfs fromConvenience:fromConvenience];
+            }
+            else {
+                [MacAlerts error:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") error:error window:self.view.window];
+            }
         }
+    }
+}
+
+
+
+- (BOOL)errorIndicatesWeShouldAskUseToRelocateDatabase:(NSError*)error {
+    return (error.code == NSFileReadNoPermissionError ||   
+            error.code == NSFileReadNoSuchFileError ||     
+            error.code == NSFileNoSuchFileError);
+}
+
+- (void)askAboutRelocatingDatabase:(CompositeKeyFactors*)factors fromConvenience:(BOOL)fromConvenience {
+    NSString* relocateDatabase = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db", @"Locate Database...");
+    
+    [MacAlerts customOptionWithCancel:NSLocalizedString(@"relocate_database_title", @"Relocate Database")
+                      informativeText:NSLocalizedString(@"relocate_database_msg", @"Strongbox's reference to this database has become invalid or the database cannot be found.\n\nPlease reselect this database from your files for Strongbox.")
+                    option1AndDefault:relocateDatabase
+                               window:self.view.window
+                           completion:^(BOOL go) {
+        if ( go ) {
+            [self onRelocateFilesBasedDatabase:factors fromConvenience:fromConvenience];
+        }
+    }];
+}
+
+- (void)onRelocateFilesBasedDatabase:(CompositeKeyFactors*)factors fromConvenience:(BOOL)fromConvenience {
+    NSOpenPanel* panel = NSOpenPanel.openPanel;
+    
+    NSURL* url;
+    
+    if ( [self.databaseMetadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+        url = fileUrlFromManagedUrl(self.databaseMetadata.fileUrl);
+    }
+    else {
+        url = self.databaseMetadata.fileUrl;
+    }
+    
+    [panel setDirectoryURL:url]; 
+
+    if ( [panel runModal] == NSModalResponseOK ) {
+        NSLog (@"Reselected URL = [%@]", panel.URL);
+        
+        NSError* err;
+        NSData* data = [NSData dataWithContentsOfURL:panel.URL options:kNilOptions error:&err];
+ 
+        if ( !data || err ) {
+            [MacAlerts error:err window:self.view.window];
+        }
+        else {
+            [self readReselectedFilesDatabase:data url:panel.URL databaseFileName:url.lastPathComponent factors:factors fromConvenience:fromConvenience];
+        }
+    }
+}
+
+- (void)readReselectedFilesDatabase:(NSData*)data url:(NSURL*)url databaseFileName:(NSString*)databaseFileName factors:(CompositeKeyFactors*)factors fromConvenience:(BOOL)fromConvenience {
+    NSError* error;
+
+    if (![Serializator isValidDatabaseWithPrefix:data error:&error]) {
+        [MacAlerts error:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
+                   error:error
+                  window:self.view.window];
+        return;
+    }
+
+    if([url.lastPathComponent compare:databaseFileName] != NSOrderedSame) {
+        [MacAlerts yesNo:NSLocalizedString(@"open_sequence_database_different_filename_title",@"Different Filename")
+         informativeText:NSLocalizedString(@"open_sequence_database_different_filename_message",@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?")
+                  window:self.view.window
+              completion:^(BOOL yesNo) {
+            if(yesNo) {
+               [self updateFilesBookmarkWithRelocatedUrl:url factors:factors fromConvenience:fromConvenience];
+            }
+        }];
+    }
+    else {
+        [self updateFilesBookmarkWithRelocatedUrl:url factors:factors fromConvenience:fromConvenience];
+    }
+}
+
+- (void)updateFilesBookmarkWithRelocatedUrl:(NSURL*)url factors:(CompositeKeyFactors*)factors fromConvenience:(BOOL)fromConvenience {
+    NSError* error;
+    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url readOnly:NO error:&error];
+    if (!fileIdentifier || error ) {
+        [MacAlerts error:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
+                   error:error
+                  window:self.view.window];
+    }
+    else {
+        self.databaseMetadata.storageInfo = fileIdentifier;
+        self.databaseMetadata.fileUrl = managedUrlFromFileUrl(url);
+
+        [self unlockWithCkfs:factors fromConvenience:fromConvenience];
     }
 }
 

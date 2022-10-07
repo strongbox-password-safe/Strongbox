@@ -9,7 +9,7 @@
 #ifndef SearchScope_h
 #define SearchScope_h
 
-typedef NS_ENUM (unsigned int, SearchScope) {
+typedef NS_ENUM (NSInteger, SearchScope) {
     kSearchScopeTitle,
     kSearchScopeUsername,
     kSearchScopePassword,

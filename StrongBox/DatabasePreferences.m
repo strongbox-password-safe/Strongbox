@@ -308,9 +308,13 @@
     return self.metadata.keyFileBookmark;
 }
 
-- (void)setKeyFileBookmark:(NSString *)keyFileBookmark {
+- (NSString *)keyFileFileName {
+    return self.metadata.keyFileFileName;
+}
+
+- (void)setKeyFile:(NSString*)keyFileBookmark keyFileFileName:(NSString*)keyFileFileName {
     [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.keyFileBookmark = keyFileBookmark;
+        [metadata setKeyFile:keyFileBookmark keyFileFileName:keyFileFileName];
     }];
 }
 

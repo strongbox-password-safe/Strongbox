@@ -97,6 +97,7 @@ extern NSString* const kAsyncUpdateStarting;
 - (void)stopAndClearAuditor;
 
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
+- (NSArray<Node*>*)getItemsById:(NSArray<NSUUID*>*)ids;
 
 @property (readonly) AuditState auditState;
 @property (readonly, nullable) NSNumber* auditIssueCount;

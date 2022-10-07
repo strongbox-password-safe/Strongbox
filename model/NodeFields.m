@@ -197,7 +197,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     NSNumber* ie = ((NSNumber*)dict[@"isExpanded"]);
     NSNumber* qc = ((NSNumber*)dict[@"qualityCheck"]);
     
-    NSUUID* ppg = dict[@"previousParentGroup"];
+    NSString* ppg = dict[@"previousParentGroup"];
     
     NodeFields* ret = [[NodeFields alloc] initWithUsername:username
                                                        url:url
@@ -209,7 +209,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     
     ret.passwordModified = passwordModified != nil ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
     ret.expires = expires != nil ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
-    ret.previousParentGroup = ppg;
+    ret.previousParentGroup = ppg ? [[NSUUID alloc] initWithUUIDString:ppg] : nil;
     
     
     
@@ -346,7 +346,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         ret[@"overrideURL"] = self.overrideURL;
     }
     if (self.previousParentGroup) {
-        ret[@"previousParentGroup"] = self.previousParentGroup;
+        ret[@"previousParentGroup"] = self.previousParentGroup.UUIDString;
     }
     
     ret [@"isExpanded"] = @(self.isExpanded);

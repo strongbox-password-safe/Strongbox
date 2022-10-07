@@ -49,10 +49,7 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
         self.onTitleEdited = onTitleEdited
 
         icon.image = iconImage
-
-        if #available(macOS 10.14, *) {
-            icon.contentTintColor = contentTintColor
-        }
+        icon.contentTintColor = contentTintColor
 
         if let count = count {
             childCount.isHidden = false

@@ -748,6 +748,9 @@ static NSString* getFreeTrialSuffix() {
         else if (theAction == @selector(onDatabaseEncryptionSettings:)) {
             return YES;
         }
+        else if (theAction == @selector(onDatabaseAutoFillSettings:)) {
+            return YES;
+        }
         else if (theAction == @selector(onCopySelectedItemsToClipboard:)) {
             return items.count > 0;
         }
@@ -1462,6 +1465,13 @@ static NSString* getFreeTrialSuffix() {
 - (IBAction)onConvenienceUnlockProperties:(id)sender {
     DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
     [vc setModel:self.viewModel initialTab:kDatabaseSettingsInitialTabTouchId];
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (IBAction)onDatabaseAutoFillSettings:(id)sender {
+    DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
+    [vc setModel:self.viewModel initialTab:kDatabaseSettingsInitialTabAutoFill];
+    
     [self.contentViewController presentViewControllerAsSheet:vc];
 }
 

@@ -294,7 +294,8 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 #else
     NSURLComponents* components = [[NSURLComponents alloc] init];
     components.scheme = kStrongboxSFTPUrlScheme;
-    components.path = foo.filePath;
+    components.path = [foo.filePath hasPrefix:@"/"] ? foo.filePath : [@"/" stringByAppendingString:foo.filePath]; 
+    NSLog(@"%@", components.URL);
     
     
     

@@ -30,14 +30,10 @@ class AuditIssueTableCellView: NSTableCellView {
     func setContent(_ issue: String, onClick: (() -> Void)? = nil) {
         if issue.count == 0 {
             labelIssue.stringValue = NSLocalizedString("audit_status_item_is_exluded", comment: "Item is excluded from Audits")
-            if #available(macOS 10.14, *) {
-                icon.contentTintColor = .secondaryLabelColor
-            }
+            icon.contentTintColor = .secondaryLabelColor
         } else {
             labelIssue.stringValue = issue
-            if #available(macOS 10.14, *) {
-                icon.contentTintColor = .systemOrange
-            }
+            icon.contentTintColor = .systemOrange
         }
 
         labelIssue.onClick = onClick

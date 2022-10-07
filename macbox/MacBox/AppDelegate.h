@@ -23,6 +23,7 @@ extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 
 
 - (void)clearClipboardWhereAppropriate;
+- (void)onStrongboxDidChangeClipboard; 
 
 @end
 

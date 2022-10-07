@@ -119,8 +119,7 @@
     else if([segue.identifier isEqualToString:@"segueToOperations"]) {
         DatabaseOperations *vc = (DatabaseOperations *)segue.destinationViewController;
         vc.viewModel = self.viewModel;
-        vc.onDatabaseBulkIconUpdate = self.onDatabaseBulkIconUpdate;
-        vc.onSetMasterCredentials = self.onSetMasterCredentials;
+        vc.onDatabaseBulkIconUpdate = self.onDatabaseBulkIconUpdate;    
     }
     else if([segue.identifier isEqualToString:@"segueToViewPreferences"]) {
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)segue.destinationViewController;
@@ -162,6 +161,7 @@
                 if(success) {
                     [weakSelf setCredentials:creds.password
                              keyFileBookmark:creds.keyFileBookmark
+                             keyFileFileName:creds.keyFileFileName
                           oneTimeKeyFileData:creds.oneTimeKeyFileData
                                   yubiConfig:creds.yubiKeyConfig];
                 }
@@ -186,9 +186,10 @@
 
 - (void)setCredentials:(NSString*)password
        keyFileBookmark:(NSString*)keyFileBookmark
+       keyFileFileName:(NSString*)keyFileFileName
     oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    self.onSetMasterCredentials(password, keyFileBookmark, oneTimeKeyFileData, yubiConfig);
+    self.onSetMasterCredentials(password, keyFileBookmark, keyFileFileName, oneTimeKeyFileData, yubiConfig);
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

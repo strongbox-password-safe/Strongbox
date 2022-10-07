@@ -338,18 +338,11 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 }
 
 - (NSString*)getSuggestedDatabaseNameUsingDeviceName {
-    NSString* name = [IOsUtils nameFromDeviceName];
-    name = [SafesList trimDatabaseNickName:name];
-
-    NSString *suggestion = name.length ?
-    [NSString stringWithFormat:
-        NSLocalizedString(@"casg_suggested_database_name_users_database_fmt", @"%@'s Database"), name] :
-        NSLocalizedString(@"casg_suggested_database_name_default", @"My Database");
+    NSString *suggestion = NSLocalizedString(@"casg_suggested_database_name_default", @"My Database");
    
     int attempt = 2;
     while(![self isUnique:suggestion] && attempt < 100) {
-        suggestion = [NSString stringWithFormat:
-                      NSLocalizedString(@"casg_suggested_database_name_users_database_number_suffix_fmt2", @"%@'s Database %@"), name, @(attempt++)];
+        suggestion = [NSString stringWithFormat:@"%@ %@", suggestion, @(attempt++)];
     }
     
     return [self isUnique:suggestion] ? suggestion : nil;

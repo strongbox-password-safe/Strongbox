@@ -263,8 +263,10 @@
 }
 
 - (void)performLightHapticFeedback {
-    UIImpactFeedbackGenerator* gen = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
-    [gen impactOccurred];
+    if ( AppPreferences.sharedInstance.pinCodeHapticFeedback ) {
+        UIImpactFeedbackGenerator* gen = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
+        [gen impactOccurred];
+    }
 }
 
 - (void)updateEnteredTextLabel {

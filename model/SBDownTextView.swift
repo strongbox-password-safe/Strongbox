@@ -65,9 +65,7 @@ import Foundation
         super.init(coder: coder)
 
         #if os(macOS)
-            if #available(OSX 10.14, *) {
-                usesAdaptiveColorMappingForDarkAppearance = true
-            }
+            usesAdaptiveColorMappingForDarkAppearance = true
         #endif
     }
 
@@ -90,9 +88,7 @@ import Foundation
         
         linkTextAttributes = [:]
         #if os(macOS)
-            if #available(OSX 10.14, *) {
-                usesAdaptiveColorMappingForDarkAppearance = true
-            }
+            usesAdaptiveColorMappingForDarkAppearance = true
         #endif
     }
 

@@ -37,7 +37,7 @@ class AdvancedAppPreferences: NSViewController {
         } else {
             useNextGenUI.isHidden = true
         }
-
+        
         bindUI()
 
         NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
@@ -82,7 +82,7 @@ class AdvancedAppPreferences: NSViewController {
         
         stripUnusedIcons.state = Settings.sharedInstance().stripUnusedIconsOnSave ? .on : .off
     }
-
+     
     @IBAction func onUseDropboxIsolated(_ sender: Any) {
         onChanged(sender)
 

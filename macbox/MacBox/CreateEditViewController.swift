@@ -512,12 +512,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     func bindCustomFieldsButtons() {
         buttonRemoveField.isEnabled = tableViewCustomFields.selectedRowIndexes.count != 0
         buttonEditField.isEnabled = tableViewCustomFields.selectedRowIndexes.count == 1
-
-        if #available(macOS 10.14, *) {
-            buttonRemoveField.contentTintColor = tableViewCustomFields.selectedRowIndexes.count != 0 ? NSColor.systemOrange : nil
-
-            buttonEditField.contentTintColor = tableViewCustomFields.selectedRowIndexes.count == 1 ? NSColor.linkColor : nil
-        }
+        buttonRemoveField.contentTintColor = tableViewCustomFields.selectedRowIndexes.count != 0 ? NSColor.systemOrange : nil
+        buttonEditField.contentTintColor = tableViewCustomFields.selectedRowIndexes.count == 1 ? NSColor.linkColor : nil
     }
 
     func refreshCustomFields() {
@@ -554,7 +550,15 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     @IBAction func onSaveAndDismiss(_: Any) {
-        save(dismissAfterSave: true)
+        let isDifferent = model.isDifferent(from: preEditModelClone)
+        let isSaveable = (isDifferent || initialNodeId == nil)
+
+        if isSaveable {
+            save(dismissAfterSave: true)
+        }
+        else if !isDifferent { 
+            dismiss(nil)
+        }
     }
 
     @IBAction func onSave(_: Any) {
@@ -745,9 +749,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func bindDoneButtonState() {
         let isDifferent = model.isDifferent(from: preEditModelClone)
-        let isSaveable = model.isValid() && (isDifferent || initialNodeId == nil)
+        let isSaveable = isDifferent || initialNodeId == nil
 
-        buttonDone.isEnabled = isSaveable
+        buttonDone.isEnabled = isSaveable || !isDifferent
+        
+        buttonDone.title = isSaveable ?  NSLocalizedString("mac_create_or_edit_commit_changes_and_close", comment: "Commit & Close (⌘⏎)") :
+        NSLocalizedString("mac_create_or_edit_commit_close", comment: "Close (⌘⏎)");
+        
         buttonSave.isEnabled = isSaveable
         
         buttonCancel.title = isDifferent ? NSLocalizedString("discard_changes", comment: "Discard Changes") : NSLocalizedString("generic_cancel", comment: "Cancel")
@@ -1163,14 +1171,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         buttonDeleteAttachment.isEnabled = tableViewAttachments.selectedRowIndexes.count != 0
         buttonSaveAs.isEnabled = tableViewAttachments.selectedRowIndexes.count == 1
         buttonPreview.isEnabled = tableViewAttachments.selectedRowIndexes.count != 0
-
-        if #available(macOS 10.14, *) {
-            buttonDeleteAttachment.contentTintColor = tableViewAttachments.selectedRowIndexes.count != 0 ? NSColor.systemOrange : nil
-
-            buttonSaveAs.contentTintColor = tableViewAttachments.selectedRowIndexes.count == 1 ? NSColor.linkColor : nil
-
-            buttonPreview.contentTintColor = tableViewAttachments.selectedRowIndexes.count != 0 ? NSColor.linkColor : nil
-        }
+        buttonDeleteAttachment.contentTintColor = tableViewAttachments.selectedRowIndexes.count != 0 ? NSColor.systemOrange : nil
+        buttonSaveAs.contentTintColor = tableViewAttachments.selectedRowIndexes.count == 1 ? NSColor.linkColor : nil
+        buttonPreview.contentTintColor = tableViewAttachments.selectedRowIndexes.count != 0 ? NSColor.linkColor : nil
     }
 
     var canAddAttachment: Bool {

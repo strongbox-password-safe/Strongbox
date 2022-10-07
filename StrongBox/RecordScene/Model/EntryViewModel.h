@@ -35,7 +35,6 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)clone;
-- (BOOL)isValid;
 - (BOOL)isDifferentFrom:(EntryViewModel*)other;
 
 - (void)removeAttachment:(NSString*)filename; 

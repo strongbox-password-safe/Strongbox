@@ -370,7 +370,10 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"AUTOFILL: unlockDatabase ENTER");
 
-    if ( !Settings.sharedInstance.isProOrFreeTrial && database.storageProvider != kMacFile ) {
+    StorageProvider provider = database.storageProvider;
+    BOOL sftpOrDav = provider == kSFTP || provider == kWebDAV;
+    
+    if ( sftpOrDav && !Settings.sharedInstance.isProOrFreeTrial ) {
         [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
         informativeText:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                  window:self.view.window

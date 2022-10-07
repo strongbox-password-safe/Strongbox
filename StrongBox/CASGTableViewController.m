@@ -285,6 +285,7 @@
         }
         else {
             creds.keyFileBookmark = bookmark;
+            creds.keyFileFileName = self.selectedKeyFileUrl.lastPathComponent;
         }
     }
     

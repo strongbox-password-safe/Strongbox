@@ -457,11 +457,17 @@ class SideBarViewController: NSViewController, DocumentViewController {
         headerNodeStates = newHeaders
         viewNodes = newData
 
+        let scrollOffset = outlineView.enclosingScrollView?.contentView.bounds.origin
+        
         outlineView.reloadData()
 
         expandStructure()
 
         bindSelectionToModelNavigationContext()
+        
+        if let scrollOffset = scrollOffset {
+            outlineView.enclosingScrollView?.contentView.scroll(scrollOffset)
+        }
     }
 
     private func expandRegularHierarchyIfFieldIsExpanded(_ node: SideBarViewNode) {

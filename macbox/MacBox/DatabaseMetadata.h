@@ -183,6 +183,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property OGNavigationAuditCategory sideBarSelectedAuditCategory;
 @property NSArray<NSUUID*> *browseSelectedItems;
 @property NSString* searchText;
+@property SearchScope searchScope;
 @property BOOL showChildCountOnFolderInSidebar;
 @property NSArray<HeaderNodeState*>* headerNodes;
 

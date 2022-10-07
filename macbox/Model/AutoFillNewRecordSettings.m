@@ -7,6 +7,14 @@
 //
 
 #import "AutoFillNewRecordSettings.h"
+#import "SecretStore.h"
+
+static NSString* const kNewEntryDefaultsCustomTitle = @"Strongbox-NewEntryDefaults-Custom-Title";
+static NSString* const kNewEntryDefaultsCustomUsername = @"Strongbox-NewEntryDefaults-Custom-Username";
+static NSString* const kNewEntryDefaultsCustomPassword = @"Strongbox-NewEntryDefaults-Custom-Password";
+static NSString* const kNewEntryDefaultsCustomEmail = @"Strongbox-NewEntryDefaults-Custom-Email";
+static NSString* const kNewEntryDefaultsCustomUrl = @"Strongbox-NewEntryDefaults-Custom-Url";
+static NSString* const kNewEntryDefaultsCustomNotes = @"Strongbox-NewEntryDefaults-Custom-Notes";
 
 @implementation AutoFillNewRecordSettings
 
@@ -36,37 +44,119 @@
 
 - (void)encodeWithCoder:(NSCoder *)aCoder{
     [aCoder encodeObject:@(self.titleAutoFillMode) forKey:@"titleAutoFillMode"];
-    [aCoder encodeObject:self.titleCustomAutoFill forKey:@"titleCustomAutoFill"];
     [aCoder encodeObject:@(self.usernameAutoFillMode) forKey:@"usernameAutoFillMode"];
-    [aCoder encodeObject:self.usernameCustomAutoFill forKey:@"usernameCustomAutoFill"];
     [aCoder encodeObject:@(self.passwordAutoFillMode) forKey:@"passwordAutoFillMode"];
-    [aCoder encodeObject:self.passwordCustomAutoFill forKey:@"passwordCustomAutoFill"];
     [aCoder encodeObject:@(self.emailAutoFillMode) forKey:@"emailAutoFillMode"];
-    [aCoder encodeObject:self.emailCustomAutoFill forKey:@"emailCustomAutoFill"];
     [aCoder encodeObject:@(self.urlAutoFillMode) forKey:@"urlAutoFillMode"];
-    [aCoder encodeObject:self.urlCustomAutoFill forKey:@"urlCustomAutoFill"];
     [aCoder encodeObject:@(self.notesAutoFillMode) forKey:@"notesAutoFillMode"];
-    [aCoder encodeObject:self.notesCustomAutoFill forKey:@"notesCustomAutoFill"];
+
 }
 
 -(id)initWithCoder:(NSCoder *)aDecoder{
     if(self = [super init]){
         NSNumber* obj = [aDecoder decodeObjectForKey:@"titleAutoFillMode"];
         self.titleAutoFillMode = (AutoFillMode)obj.longValue;
-        self.titleCustomAutoFill = [aDecoder decodeObjectForKey:@"titleCustomAutoFill"];
         self.usernameAutoFillMode = (AutoFillMode)((NSNumber*)[aDecoder decodeObjectForKey:@"usernameAutoFillMode"]).longValue;
-        self.usernameCustomAutoFill = [aDecoder decodeObjectForKey:@"usernameCustomAutoFill"];
         self.passwordAutoFillMode = (AutoFillMode)((NSNumber*)[aDecoder decodeObjectForKey:@"passwordAutoFillMode"]).longValue;
-        self.passwordCustomAutoFill = [aDecoder decodeObjectForKey:@"passwordCustomAutoFill"];
         self.emailAutoFillMode = (AutoFillMode)((NSNumber*)[aDecoder decodeObjectForKey:@"emailAutoFillMode"]).longValue;
-        self.emailCustomAutoFill = [aDecoder decodeObjectForKey:@"emailCustomAutoFill"];
         self.urlAutoFillMode = (AutoFillMode)((NSNumber*)[aDecoder decodeObjectForKey:@"urlAutoFillMode"]).longValue;
-        self.urlCustomAutoFill = [aDecoder decodeObjectForKey:@"urlCustomAutoFill"];
         self.notesAutoFillMode = (AutoFillMode)((NSNumber*)[aDecoder decodeObjectForKey:@"notesAutoFillMode"]).longValue;
-        self.notesCustomAutoFill = [aDecoder decodeObjectForKey:@"notesCustomAutoFill"];
+        
+        NSString* titleCustomAutoFill = [aDecoder decodeObjectForKey:@"titleCustomAutoFill"];
+        NSString* usernameCustomAutoFill = [aDecoder decodeObjectForKey:@"usernameCustomAutoFill"];
+        NSString* passwordCustomAutoFill = [aDecoder decodeObjectForKey:@"passwordCustomAutoFill"];
+        NSString* emailCustomAutoFill = [aDecoder decodeObjectForKey:@"emailCustomAutoFill"];
+        NSString* urlCustomAutoFill = [aDecoder decodeObjectForKey:@"urlCustomAutoFill"];
+        NSString* notesCustomAutoFill = [aDecoder decodeObjectForKey:@"notesCustomAutoFill"];
+        
+        
+        
+        if ( titleCustomAutoFill ) {
+            self.titleCustomAutoFill = titleCustomAutoFill;
+        }
+        
+        if ( usernameCustomAutoFill ) {
+            self.usernameCustomAutoFill = usernameCustomAutoFill;
+        }
+        
+        if ( passwordCustomAutoFill ) {
+            self.passwordCustomAutoFill = passwordCustomAutoFill;
+        }
+        
+        if ( emailCustomAutoFill ) {
+            self.emailCustomAutoFill = emailCustomAutoFill;
+        }
+        
+        if ( urlCustomAutoFill ) {
+            self.urlCustomAutoFill = urlCustomAutoFill;
+        }
+        
+        if ( notesCustomAutoFill ) {
+            self.notesCustomAutoFill = notesCustomAutoFill;
+        }
     }
     
     return self;
+}
+
+
+
+- (NSString *)titleCustomAutoFill {
+    return [SecretStore.sharedInstance getSecureString:kNewEntryDefaultsCustomTitle];
+}
+
+- (void)setTitleCustomAutoFill:(NSString *)titleCustomAutoFill {
+    [SecretStore.sharedInstance setSecureString:titleCustomAutoFill forIdentifier:kNewEntryDefaultsCustomTitle];
+}
+
+
+
+- (NSString *)usernameCustomAutoFill {
+    return [SecretStore.sharedInstance getSecureString:kNewEntryDefaultsCustomUsername];
+}
+
+- (void)setUsernameCustomAutoFill:(NSString *)usernameCustomAutoFill {
+    [SecretStore.sharedInstance setSecureString:usernameCustomAutoFill forIdentifier:kNewEntryDefaultsCustomUsername];
+}
+
+
+
+- (NSString *)passwordCustomAutoFill {
+    return [SecretStore.sharedInstance getSecureString:kNewEntryDefaultsCustomPassword];
+}
+
+- (void)setPasswordCustomAutoFill:(NSString *)passwordCustomAutoFill {
+    [SecretStore.sharedInstance setSecureString:passwordCustomAutoFill forIdentifier:kNewEntryDefaultsCustomPassword];
+}
+
+
+
+- (NSString *)emailCustomAutoFill {
+    return [SecretStore.sharedInstance getSecureString:kNewEntryDefaultsCustomEmail];
+}
+
+- (void)setEmailCustomAutoFill:(NSString *)emailCustomAutoFill {
+    [SecretStore.sharedInstance setSecureString:emailCustomAutoFill forIdentifier:kNewEntryDefaultsCustomEmail];
+}
+
+
+
+- (NSString *)urlCustomAutoFill {
+    return [SecretStore.sharedInstance getSecureString:kNewEntryDefaultsCustomUrl];
+}
+
+- (void)setUrlCustomAutoFill:(NSString *)urlCustomAutoFill {
+    [SecretStore.sharedInstance setSecureString:urlCustomAutoFill forIdentifier:kNewEntryDefaultsCustomUrl];
+}
+
+
+
+- (NSString *)notesCustomAutoFill {
+    return [SecretStore.sharedInstance getSecureString:kNewEntryDefaultsCustomNotes];
+}
+
+- (void)setNotesCustomAutoFill:(NSString *)notesCustomAutoFill {
+    [SecretStore.sharedInstance setSecureString:notesCustomAutoFill forIdentifier:kNewEntryDefaultsCustomNotes];
 }
 
 @end

@@ -106,10 +106,12 @@ static const int kMaxFailedPinAttempts = 3;
         
         [self onGotCredentials:self.database.autoFillConvenienceAutoUnlockPassword
                keyFileBookmark:self.database.keyFileBookmark
+               keyFileFileName:self.database.keyFileFileName
             oneTimeKeyFileData:nil
                       readOnly:self.database.readOnly
           yubikeyConfiguration:self.database.contextAwareYubiKeyConfig
                usedConvenience:YES];
+        
         return;
     }
 
@@ -264,6 +266,7 @@ static const int kMaxFailedPinAttempts = 3;
             
             [self onConvenienceMethodsSucceeded:password
                                 keyFileBookmark:self.database.keyFileBookmark
+                                keyFileFileName:self.database.keyFileFileName
                              oneTimeKeyFileData:nil
                                        readOnly:self.database.readOnly
                            yubikeyConfiguration:self.database.contextAwareYubiKeyConfig];
@@ -361,6 +364,7 @@ static const int kMaxFailedPinAttempts = 3;
         else {
             [self onConvenienceMethodsSucceeded:password
                                 keyFileBookmark:self.database.keyFileBookmark
+                                keyFileFileName:self.database.keyFileFileName
                              oneTimeKeyFileData:nil
                                        readOnly:self.database.readOnly
                            yubikeyConfiguration:self.database.contextAwareYubiKeyConfig];
@@ -475,6 +479,7 @@ static const int kMaxFailedPinAttempts = 3;
             if(success) {
                 [self onGotCredentials:creds.password
                        keyFileBookmark:creds.keyFileBookmark
+                       keyFileFileName:creds.keyFileFileName
                     oneTimeKeyFileData:creds.oneTimeKeyFileData
                               readOnly:creds.readOnly
                   yubikeyConfiguration:creds.yubiKeyConfig
@@ -493,6 +498,7 @@ static const int kMaxFailedPinAttempts = 3;
 
 - (void)onConvenienceMethodsSucceeded:(NSString*)password
                       keyFileBookmark:(NSString*)keyFileBookmark
+                      keyFileFileName:(NSString*)keyFileFileName
                    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                              readOnly:(BOOL)readOnly
                  yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration {
@@ -502,6 +508,7 @@ static const int kMaxFailedPinAttempts = 3;
     
     [self onGotCredentials:pw
            keyFileBookmark:self.database.keyFileBookmark
+           keyFileFileName:keyFileFileName
         oneTimeKeyFileData:nil
                   readOnly:self.database.readOnly
       yubikeyConfiguration:self.database.contextAwareYubiKeyConfig
@@ -510,13 +517,17 @@ static const int kMaxFailedPinAttempts = 3;
 
 - (void)onGotCredentials:(NSString*)password
          keyFileBookmark:(NSString*)keyFileBookmark
+         keyFileFileName:(NSString*)keyFileFileName
       oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                 readOnly:(BOOL)readOnly
     yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration
          usedConvenience:(BOOL)usedConvenience {
     NSData* keyFileDigest = nil;
     
-    if( keyFileBookmark || oneTimeKeyFileData ) {
+    BOOL usingImportedKeyFile = keyFileBookmark || keyFileFileName;
+    BOOL keyFileInvolved = usingImportedKeyFile || oneTimeKeyFileData;
+    
+    if( keyFileInvolved ) {
         NSError *error;
         DatabaseFormat format = kKeePass4;
         
@@ -526,6 +537,7 @@ static const int kMaxFailedPinAttempts = 3;
         }
 
         keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+                                            keyFileFileName:keyFileFileName
                                          onceOffKeyFileData:oneTimeKeyFileData
                                                      format:format
                                                       error:&error];
@@ -542,7 +554,7 @@ static const int kMaxFailedPinAttempts = 3;
                 self.database.hasBeenPromptedForConvenience = NO; 
             }
 
-            if(keyFileBookmark && self.isAutoFillOpen) {
+            if ( usingImportedKeyFile && self.isAutoFillOpen ) {
                     [Alerts error:self.viewController
                             title:NSLocalizedString(@"open_sequence_error_reading_key_file_autofill_context", @"Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences")
                             error:error
@@ -561,17 +573,29 @@ static const int kMaxFailedPinAttempts = 3;
                 return;
             }
         }
+        else if ( keyFileFileName == nil && keyFileBookmark != nil) {
+            
+            
+            NSURL* keyFileUrl = [BookmarksHelper getExpressReadOnlyUrlFromBookmark:keyFileBookmark];
+            
+            if ( keyFileUrl ) {
+                [self.database setKeyFile:keyFileBookmark keyFileFileName:keyFileUrl.lastPathComponent];
+            }
+        }
     }
     
     
 
     BOOL readOnlyChanged = self.database.readOnly != readOnly;
-    BOOL keyFileChanged = (!(self.database.keyFileBookmark == nil && keyFileBookmark == nil)) && (![self.database.keyFileBookmark isEqual:keyFileBookmark]);
+    BOOL keyFileBookMarkChanged = (!(self.database.keyFileBookmark == nil && keyFileBookmark == nil)) && (![self.database.keyFileBookmark isEqual:keyFileBookmark]);
+    BOOL keyFileFileNameChanged = (!(self.database.keyFileFileName == nil && keyFileFileName == nil)) && (![self.database.keyFileFileName isEqual:keyFileFileName]);
+    BOOL keyFileChanged = keyFileBookMarkChanged || keyFileFileNameChanged;
+    
     BOOL yubikeyChanged = (!(self.database.contextAwareYubiKeyConfig == nil && yubiKeyConfiguration == nil)) && (![self.database.contextAwareYubiKeyConfig isEqual:yubiKeyConfiguration]);
     
     if(readOnlyChanged || keyFileChanged || yubikeyChanged) {
         self.database.readOnly = readOnly;
-        self.database.keyFileBookmark = keyFileBookmark;
+        [self.database setKeyFile:keyFileBookmark keyFileFileName:keyFileFileName];
         self.database.contextAwareYubiKeyConfig = yubiKeyConfiguration;
     }
     

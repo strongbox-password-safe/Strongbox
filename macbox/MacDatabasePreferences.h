@@ -17,6 +17,7 @@
 #import "BrowseSortField.h"
 #import "KeePassIconSet.h"
 #import "NextNavigationConstants.h"
+#import "SearchScope.h"
 
 @class HeaderNodeState;
 
@@ -150,6 +151,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSUUID* sideBarSelectedFavouriteId;
 @property NSArray<NSUUID*>* browseSelectedItems;
 @property NSString* searchText;
+@property SearchScope searchScope;
 
 @property BOOL showChildCountOnFolderInSidebar;
 

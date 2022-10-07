@@ -142,6 +142,8 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL stripUnusedIconsOnSave;
 
+@property BOOL runBrowserAutoFillProxyServer;
+
 @end
 
 

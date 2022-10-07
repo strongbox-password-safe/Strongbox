@@ -180,34 +180,24 @@ static NSString* const kColumnLog = @"log";
     switch(state) {
         case kSyncOperationStateInProgress:
             stateImage.image = [NSImage imageNamed:@"syncronize"];
-            if (@available(macOS 10.14, *)) {
-                stateImage.contentTintColor = NSColor.systemBlueColor;
-            }
+            stateImage.contentTintColor = NSColor.systemBlueColor;
             break;
         case kSyncOperationStateUserCancelled:
         case kSyncOperationStateBackgroundButUserInteractionRequired:
             stateImage.image = [NSImage imageNamed:@"syncronize"];
-            if (@available(macOS 10.14, *)) {
-                stateImage.contentTintColor = NSColor.systemYellowColor;
-            }
+            stateImage.contentTintColor = NSColor.systemYellowColor;
             break;
         case kSyncOperationStateError:
             stateImage.image = [NSImage imageNamed:@"error"];
-            if (@available(macOS 10.14, *)) {
-                stateImage.contentTintColor = NSColor.systemRedColor;
-            }
+            stateImage.contentTintColor = NSColor.systemRedColor;
             break;
         case kSyncOperationStateInitial:
             stateImage.image = [NSImage imageNamed:@"ok"];
-            if (@available(macOS 10.14, *)) {
-                stateImage.contentTintColor = NSColor.systemBlueColor;
-            }
+            stateImage.contentTintColor = NSColor.systemBlueColor;
         case kSyncOperationStateDone:
         default:
             stateImage.image = [NSImage imageNamed:@"ok"];
-            if (@available(macOS 10.14, *)) {
-                stateImage.contentTintColor = NSColor.systemGreenColor;
-            }
+            stateImage.contentTintColor = NSColor.systemGreenColor;
             break;
     }
 }

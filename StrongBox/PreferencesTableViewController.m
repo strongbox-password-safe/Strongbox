@@ -285,7 +285,7 @@
     else {
         if ( AppPreferences.sharedInstance.isPro ) {
             if ( ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro ) { 
-                self.labelProStatus.text = NSLocalizedString(@"pro_status_lifetime_pro", @"Lifetime Pro");
+                self.labelProStatus.text = NSLocalizedString(@"pro_status_lifetime_pro_iap", @"Lifetime Pro (In-App Purchase)");
                 self.cellProStatus.accessoryType = UITableViewCellAccessoryNone;
                 self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
             }
@@ -296,7 +296,7 @@
                 self.labelProStatus.text = NSLocalizedString(@"pro_status_monthly_pro", @"Pro (Monthly subscription)");
             }
             else {
-                self.labelProStatus.text = @"Pro <Unknown License>"; 
+                self.labelProStatus.text = NSLocalizedString(@"pro_badge_text", @"Pro"); 
                 self.cellProStatus.accessoryType = UITableViewCellAccessoryNone;
                 self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
             }

@@ -84,7 +84,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int failedPinAttempts;
 @property (nonatomic) BOOL autoFillEnabled;
 @property (nonatomic) BOOL hasUnresolvedConflicts;
-@property (nullable) NSString* keyFileBookmark;
+
+@property (nullable, readonly) NSString* keyFileBookmark;
+@property (nullable, readonly) NSString* keyFileFileName;
+- (void)setKeyFile:(NSString*)keyFileBookmark keyFileFileName:(NSString*)keyFileFileName;
+
 @property DatabaseFormat likelyFormat;
 @property (nonatomic) BOOL readOnly;
 @property BrowseViewType browseViewType;

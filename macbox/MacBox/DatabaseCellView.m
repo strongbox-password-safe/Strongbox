@@ -68,9 +68,7 @@
     self.originalNickName = nil;
     self.alphaValue = 1.0f;
     
-    if ( @available(macOS 10.14, *) ) {
-        self.imageView.contentTintColor = nil;
-    }
+    self.imageView.contentTintColor = nil;
 }
 
 - (void)setWithDatabase:(MacDatabasePreferences*)metadata {
@@ -137,10 +135,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
         }
         
         self.imageViewProvider.image = [NSImage imageNamed:@"cancel"];
-        
-        if (@available(macOS 10.14, *)) {
-            self.imageViewProvider.contentTintColor = NSColor.secondaryLabelColor;
-        }
+        self.imageViewProvider.contentTintColor = NSColor.secondaryLabelColor;
         
         self.alphaValue = 0.75f;
     }
@@ -250,11 +245,9 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
         self.imageViewSyncing.hidden = NO;
         self.imageViewSyncing.image = syncState == kSyncOperationStateError ? [NSImage imageNamed:@"error"] : [NSImage imageNamed:@"syncronize"];
         
-        if (@available(macOS 10.14, *)) {
-            NSColor *tint = (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
-            self.imageViewSyncing.contentTintColor = tint;
-        }
-        
+        NSColor *tint = (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
+        self.imageViewSyncing.contentTintColor = tint;
+
         if ( syncState == kSyncOperationStateInProgress ) {
             self.syncProgressIndicator.hidden = NO;
             [self.syncProgressIndicator startAnimation:nil];
@@ -270,14 +263,16 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
             self.imageViewSyncing.controlSize = NSControlSizeLarge;
         }
 
-        if (@available(macOS 10.14, *)) {
-            NSColor *tint = NSColor.systemYellowColor;
-            self.imageViewSyncing.contentTintColor = tint;
-        }
+        NSColor *tint = NSColor.systemYellowColor;
+        self.imageViewSyncing.contentTintColor = tint;
 
         self.syncProgressIndicator.hidden = NO;
         [self.syncProgressIndicator startAnimation:nil];
     }
+}
+
+- (void)onChangeNickname {
+    [self onNicknameClick];
 }
 
 - (void)onNicknameClick {

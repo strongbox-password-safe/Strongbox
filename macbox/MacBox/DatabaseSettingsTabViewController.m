@@ -113,12 +113,16 @@
 
     GeneralDatabaseSettings* general = (GeneralDatabaseSettings*)generalItem.viewController;
     general.model = self.viewModel;
-    
+
     SideBarSettings* sideBarSettings = (SideBarSettings*)sideBarItem.viewController;
     sideBarSettings.model = self.viewModel;
         
     DatabaseConvenienceUnlockPreferences* preferences = (DatabaseConvenienceUnlockPreferences*)convenienceUnlockItem.viewController;
     preferences.model = self.viewModel;
+
+    NSViewController* iv = autoFillItem.viewController;
+    AutoFillSettingsViewController* af = (AutoFillSettingsViewController*)iv;
+    af.model = self.viewModel;
 
     AuditConfigurationViewController* audit = (AuditConfigurationViewController*)auditItem.viewController;
     audit.database = self.viewModel;
@@ -128,10 +132,6 @@
 
     AdvancedDatabasePreferences* advancedPreferences = (AdvancedDatabasePreferences*)advanced.viewController;
     advancedPreferences.model = self.viewModel;
-
-    NSViewController* iv = autoFillItem.viewController;
-    AutoFillSettingsViewController* af = (AutoFillSettingsViewController*)iv;
-    af.model = self.viewModel;
 
     self.selectedTabViewItemIndex = self.initialTab;
 }

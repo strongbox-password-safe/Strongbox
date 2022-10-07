@@ -91,11 +91,13 @@ static NSString *ModelIdentifier()
     
 
 #if TARGET_OS_IPHONE
-    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION]];
+    NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
+    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION, pro]];
     [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", AppPreferences.sharedInstance.numberOfEntitlementCheckFails]];
     [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", AppPreferences.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
 #else
-    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber]]];
+    NSString* pro = Settings.sharedInstance.isPro ? @"P" : @"";
+    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], pro]];
     [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", Settings.sharedInstance.numberOfEntitlementCheckFails]];
     [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", Settings.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
 #endif
@@ -158,7 +160,6 @@ static NSString *ModelIdentifier()
     }
 
 #if TARGET_OS_IPHONE
-    NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
     NSString* isFreeTrial = [[AppPreferences sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)AppPreferences.sharedInstance.installDate.timeIntervalSince1970;
     [debugLines addObject:[NSString stringWithFormat:@"Ep: %ld", epoch]];
@@ -265,6 +266,7 @@ static NSString *ModelIdentifier()
 
         NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
         jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
+        jsonDict[@"keyFileFileName"] = jsonDict[@"keyFileFileName"] ? @"<redacted>" : @"<Not Set>";
         NSString *thisSafe = [jsonDict description];
         [debugLines addObject:thisSafe];
     }

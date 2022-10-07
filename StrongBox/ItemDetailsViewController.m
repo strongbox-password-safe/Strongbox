@@ -511,7 +511,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     if( self.isEditing ) {
         self.navigationItem.leftItemsSupplementBackButton = NO;
         BOOL isDifferent = [self.model isDifferentFrom:self.preEditModelClone];
-        BOOL saveable = [self.model isValid] && (isDifferent || self.createNewItem);
+        BOOL saveable = isDifferent || self.createNewItem;
         self.editButtonItem.enabled = saveable;
         self.navigationItem.leftBarButtonItem = self.cancelOrDiscardBarButton;
         

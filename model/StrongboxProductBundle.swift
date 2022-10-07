@@ -99,5 +99,5 @@ public class StrongboxProductBundle : NSObject {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
-    }
+    }    
 }

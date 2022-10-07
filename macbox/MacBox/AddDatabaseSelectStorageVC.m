@@ -154,18 +154,14 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
     StorageBrowserItem *sbi = item;
 
     cell.textField.stringValue = sbi.name;
-    if (@available(macOS 10.14, *)) {
-        cell.imageView.contentTintColor = nil;
-    }
+    cell.imageView.contentTintColor = nil;
     
     if ( [sbi.identifier isEqualToString:kLoadingItemIdentifier] ) {
         cell.imageView.image = [NSImage imageNamed:@"syncronize"];
     }
     else if ([sbi.identifier isEqualToString:kLoadingItemErrorIdentifier]) {
         cell.imageView.image = [NSImage imageNamed:@"cancel"];
-        if (@available(macOS 10.14, *)) {
-            cell.imageView.contentTintColor = NSColor.systemRedColor;
-        }
+        cell.imageView.contentTintColor = NSColor.systemRedColor;
     }
     else {
         cell.imageView.image = sbi.folder ?  [NSImage imageNamed:@"KPXC_C48_Folder"] : [NSImage imageNamed:@"KPXC_C22_ASCII"];

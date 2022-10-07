@@ -45,6 +45,7 @@
 #import "UpgradeWindowController.h"
 #import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
+#import "AutoFillProxyServer.h"
 
 #import "Strongbox-Swift.h"
 
@@ -101,7 +102,17 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self doAppOnboarding];
+        
+        [self startAutoFillProxyServer];
     });
+}
+
+- (void)startAutoFillProxyServer {
+    if ( Settings.sharedInstance.runBrowserAutoFillProxyServer ) {
+        if ( ![AutoFillProxyServer.sharedInstance start] ) {
+            NSLog(@"🔴 Failed to start AutoFillProxyServer.");
+        }
+    }
 }
 
 - (void)initializeInstallSettingsAndLaunchCount {
@@ -143,6 +154,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if ( !MacCustomizationManager.isAProBundle ) {
         [ProUpgradeIAPManager.sharedInstance initialize]; 
     }
+    
+    [DropboxV2StorageProvider.sharedInstance initialize:Settings.sharedInstance.useIsolatedDropbox];
 }
 
 - (void)doAppOnboarding {
@@ -541,10 +554,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         return YES;
     }
     else if (theAction == @selector(signOutOfDropbox:)) {
-        return DropboxV2StorageProvider.sharedInstance.isAuthorized;
+        return YES; 
     }
     else if (theAction == @selector(signOutOfGoogleDrive:)) {
-        return GoogleDriveManager.sharedInstance.isAuthorized;
+        return YES; 
     }
 
     return YES;
@@ -867,40 +880,47 @@ static NSInteger clipboardChangeCount;
 
 - (IBAction)import1Password1Pif:(id)sender {
     [DBManagerPanel.sharedInstance show]; 
-    
-    NSOpenPanel* panel = NSOpenPanel.openPanel;
-    
-    NSString* loc = NSLocalizedString(@"mac_choose_file_import", @"Choose file to Import");
-    [panel setTitle:loc];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setCanChooseDirectories:NO];
-    [panel setCanChooseFiles:YES];
-    [panel setFloatingPanel:NO];
-    panel.allowedFileTypes = @[@"1pif"];
 
-    NSInteger result = [panel runModal];
-    if(result == NSModalResponseOK) {
-        NSURL* url = panel.URLs.firstObject;
+    NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
+    NSString* msg = NSLocalizedString(@"1password_import_warning_msg", @"The import process isn't perfect and some features of 1Password such as named sections are not available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+    
+    [MacAlerts info:title
+    informativeText:msg
+             window:NSApplication.sharedApplication.mainWindow
+         completion:^{
+        NSOpenPanel* panel = NSOpenPanel.openPanel;
         
-        if ( url ) {
-            NSError* error;
-            Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
+        NSString* loc = NSLocalizedString(@"mac_choose_file_import", @"Choose file to Import");
+        [panel setTitle:loc];
+        [panel setAllowsMultipleSelection:NO];
+        [panel setCanChooseDirectories:NO];
+        [panel setCanChooseFiles:YES];
+        [panel setFloatingPanel:NO];
+        panel.allowedFileTypes = @[@"1pif"];
+
+        NSInteger result = [panel runModal];
+        if(result == NSModalResponseOK) {
+            NSURL* url = panel.URLs.firstObject;
             
-            
-            if ( error ) {
-                [MacAlerts error:error window:NSApplication.sharedApplication.mainWindow];
+            if ( url ) {
+                NSError* error;
+                Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
+                
+                if ( error ) {
+                    [MacAlerts error:error window:NSApplication.sharedApplication.mainWindow];
+                }
+                else {
+                    [self addImportedDatabase:root];
+                }
             }
             else {
-                [self addImportedDatabase:root];
+                [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
+                informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
+                         window:NSApplication.sharedApplication.mainWindow
+                     completion:nil];
             }
         }
-        else {
-            [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
-            informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
-                     window:NSApplication.sharedApplication.mainWindow
-                 completion:nil];
-        }
-    }
+    }];
 }
 
 - (void)addImportedDatabase:(Node*)root {

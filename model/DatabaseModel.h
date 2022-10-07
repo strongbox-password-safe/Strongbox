@@ -186,12 +186,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (Node *_Nullable)getItemByCrossSerializationFriendlyId:(NSString*)serializationId;
 
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
+- (NSArray<Node*>*)getItemsById:(NSArray<NSUUID*>*)ids;
 - (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag;
 
 - (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag;
 - (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag;
-
-
 
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 

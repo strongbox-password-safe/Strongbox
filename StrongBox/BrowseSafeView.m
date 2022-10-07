@@ -1842,8 +1842,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             [weakSelf updateAndRefresh];
         };
         
-        vc.onSetMasterCredentials = ^(NSString * _Nullable password, NSString * _Nullable keyFileBookmark, NSData * _Nullable oneTimeKeyFileData, YubiKeyHardwareConfiguration * _Nullable yubiConfig) {
-            [weakSelf setCredentials:password keyFileBookmark:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
+        vc.onSetMasterCredentials = ^(NSString * _Nullable password, NSString * _Nullable keyFileBookmark, NSString * _Nullable keyFileFileName, NSData * _Nullable oneTimeKeyFileData, YubiKeyHardwareConfiguration * _Nullable yubiConfig) {
+            [weakSelf setCredentials:password
+                     keyFileBookmark:keyFileBookmark
+                     keyFileFileName:keyFileFileName
+                  oneTimeKeyFileData:oneTimeKeyFileData
+                          yubiConfig:yubiConfig];
         };
         
         vc.updateDatabase = ^{
@@ -1908,6 +1912,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                 if(success) {
                         [self setCredentials:creds.password
                              keyFileBookmark:creds.keyFileBookmark
+                             keyFileFileName:creds.keyFileFileName
                           oneTimeKeyFileData:creds.oneTimeKeyFileData
                                   yubiConfig:creds.yubiKeyConfig];
                 }
@@ -3174,18 +3179,23 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)setCredentials:(NSString*)password
        keyFileBookmark:(NSString*)keyFileBookmark
+       keyFileFileName:(NSString*)keyFileFileName
     oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
     CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
         
-    if(keyFileBookmark != nil || oneTimeKeyFileData != nil) {
+    BOOL usingImportedKeyFile = keyFileBookmark || keyFileFileName;
+    BOOL keyFileInvolved = usingImportedKeyFile || oneTimeKeyFileData;
+    
+    if( keyFileInvolved ) {
         NSError* error;
         NSData* keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+                                                    keyFileFileName:keyFileFileName
                                                  onceOffKeyFileData:oneTimeKeyFileData
                                                              format:self.viewModel.database.originalFormat
                                                               error:&error];
         
-        if(keyFileDigest == nil) {
+        if ( keyFileDigest == nil ) {
             [Alerts error:self
                     title:NSLocalizedString(@"db_management_error_title_couldnt_change_credentials", @"Could not change credentials")
                     error:error];
@@ -3206,7 +3216,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     [self updateAndRefresh:NO synchronousCompletion:^(BOOL synchronousUpdateCompleted) {
         if ( synchronousUpdateCompleted ) {
-            [self onSuccessfulCredentialsChanged:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
+            [self onSuccessfulCredentialsChanged:keyFileBookmark
+                                 keyFileFileName:keyFileFileName
+                              oneTimeKeyFileData:oneTimeKeyFileData
+                                      yubiConfig:yubiConfig];
         }
         else { 
             self.viewModel.database.ckfs = rollbackCkf;
@@ -3215,6 +3228,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)onSuccessfulCredentialsChanged:(NSString*)keyFileBookmark
+                       keyFileFileName:(NSString*)keyFileFileName
                     oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
     if ( self.viewModel.metadata.isConvenienceUnlockEnabled ) {
@@ -3231,7 +3245,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         }
     }
     
-    self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
+    [self.viewModel.metadata setKeyFile:keyFileBookmark keyFileFileName:keyFileFileName];
     self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
     
     dispatch_async(dispatch_get_main_queue(), ^{

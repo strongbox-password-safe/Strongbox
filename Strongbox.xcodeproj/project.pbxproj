@@ -600,8 +600,6 @@
 		4D8C14922074F5F900CE9CAE /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C148A2074F5F800CE9CAE /* Record.m */; };
 		4D8C14972074F63B00CE9CAE /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		4D8C14992074F64A00CE9CAE /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14982074F64A00CE9CAE /* crypt_argchk.c */; };
-		4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
-		4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8EA82522316B4300B47035 /* KdbxHistory.m */; };
 		4D8FBEEB21A9A70F004797FA /* kp2-keyfile.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FBEE821A9A70F004797FA /* kp2-keyfile.kdbx */; };
 		4D8FBEEC21A9A70F004797FA /* ferrari.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 4D8FBEE921A9A70F004797FA /* ferrari.jpg */; };
@@ -786,7 +784,6 @@
 		4DC4E07623488BAA000743C4 /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D67B1E32191FD0400B0D29A /* XmlProcessingContext.m */; };
 		4DC4E07723488BAA000743C4 /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		4DC4E07823488BAA000743C4 /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
-		4DC4E07923488BAA000743C4 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		4DC4E07A23488BAA000743C4 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		4DC4E07B23488BAA000743C4 /* CollapsibleTableViewHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */; };
 		4DC4E07C23488BAA000743C4 /* KeePassHistoryController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC95E9D2231AA3B00DE4E9F /* KeePassHistoryController.m */; };
@@ -1030,7 +1027,6 @@
 		4DC4E19D23488BAE000743C4 /* DatabaseCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE18BB922F09A3F007D902D /* DatabaseCell.m */; };
 		4DC4E19E23488BAE000743C4 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4DC4E19F23488BAE000743C4 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD321F4C26700E2B194 /* OTPToken+Generation.m */; };
-		4DC4E1A023488BAE000743C4 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		4DC4E1A123488BAE000743C4 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		4DC4E1A223488BAE000743C4 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */; };
 		4DC4E1A423488BAE000743C4 /* SimpleXmlValueExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC3F83223215A58002BDEF7 /* SimpleXmlValueExtractor.m */; };
@@ -2028,8 +2024,6 @@
 		C81A5FE625B74B9100038963 /* DatabasePropertiesVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C81A5FE425B74B9100038963 /* DatabasePropertiesVC.m */; };
 		C81A5FE725B74B9100038963 /* DatabasePropertiesVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C81A5FE425B74B9100038963 /* DatabasePropertiesVC.m */; };
 		C81A5FE825B74B9100038963 /* DatabasePropertiesVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C81A5FE425B74B9100038963 /* DatabasePropertiesVC.m */; };
-		C81B739426E63F25007B1F1A /* FastlaneStrongboxUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81B739326E63F25007B1F1A /* FastlaneStrongboxUITests.swift */; };
-		C81B739C26E642F4007B1F1A /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81B739B26E642F4007B1F1A /* SnapshotHelper.swift */; };
 		C8217FEA2652B023007F1DFF /* QuickLaunchOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C8217FE92652B023007F1DFF /* QuickLaunchOnboardingModule.m */; };
 		C8217FEB2652B023007F1DFF /* QuickLaunchOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C8217FE92652B023007F1DFF /* QuickLaunchOnboardingModule.m */; };
 		C8217FEE2652B0B8007F1DFF /* QuickLaunchOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8217FED2652B0B8007F1DFF /* QuickLaunchOnboardingViewController.m */; };
@@ -2299,7 +2293,6 @@
 		C84331F326692A7C00D496D2 /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		C84331F426692A7C00D496D2 /* QuickLaunchOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8217FED2652B0B8007F1DFF /* QuickLaunchOnboardingViewController.m */; };
 		C84331F526692A7C00D496D2 /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
-		C84331F626692A7C00D496D2 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		C84331F726692A7C00D496D2 /* AppAutoFillOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E319426668D97007211D0 /* AppAutoFillOnboardingModule.m */; };
 		C84331F926692A7C00D496D2 /* GCDWebServerResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D08B593234C9613003D1953 /* GCDWebServerResponse.m */; };
 		C84331FA26692A7C00D496D2 /* FirstUnlockWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8EE86AC264ADE690043C7D9 /* FirstUnlockWelcomeViewController.m */; };
@@ -3457,6 +3450,8 @@
 		C8A22049249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
 		C8A2204A249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
 		C8A2204B249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
+		C8A4390928D61584007462D7 /* ObjCExceptionCatcherForSwift.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A4390828D61584007462D7 /* ObjCExceptionCatcherForSwift.m */; };
+		C8A4390A28D61584007462D7 /* ObjCExceptionCatcherForSwift.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A4390828D61584007462D7 /* ObjCExceptionCatcherForSwift.m */; };
 		C8A4AEF2273BD6F00043D42F /* AutomaticLockingPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A4AEF1273BD6F00043D42F /* AutomaticLockingPreferences.m */; };
 		C8A4AEF3273BD6F00043D42F /* AutomaticLockingPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A4AEF1273BD6F00043D42F /* AutomaticLockingPreferences.m */; };
 		C8A4AEF4273BD6F00043D42F /* AutomaticLockingPreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A4AEF1273BD6F00043D42F /* AutomaticLockingPreferences.m */; };
@@ -3548,7 +3543,6 @@
 		C8AF2EE426692CA600F845B1 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD321F4C26700E2B194 /* OTPToken+Generation.m */; };
 		C8AF2EE526692CA600F845B1 /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
 		C8AF2EE626692CA600F845B1 /* DatabaseMerger.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseMerger.m */; };
-		C8AF2EE726692CA600F845B1 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		C8AF2EE826692CA600F845B1 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		C8AF2EE926692CA600F845B1 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */; };
 		C8AF2EEA26692CA600F845B1 /* SimpleXmlValueExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC3F83223215A58002BDEF7 /* SimpleXmlValueExtractor.m */; };
@@ -4479,7 +4473,6 @@
 		C8E34EA226CBDEF700E8246A /* CustomStorageProviderTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA6335B1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m */; };
 		C8E34EA326CBDEF700E8246A /* QuickLaunchOnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8217FED2652B0B8007F1DFF /* QuickLaunchOnboardingViewController.m */; };
 		C8E34EA426CBDEF700E8246A /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
-		C8E34EA526CBDEF700E8246A /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		C8E34EA626CBDEF700E8246A /* AppAutoFillOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E319426668D97007211D0 /* AppAutoFillOnboardingModule.m */; };
 		C8E34EA826CBDEF700E8246A /* GCDWebServerResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D08B593234C9613003D1953 /* GCDWebServerResponse.m */; };
 		C8E34EA926CBDEF700E8246A /* FirstUnlockWelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8EE86AC264ADE690043C7D9 /* FirstUnlockWelcomeViewController.m */; };
@@ -4906,7 +4899,6 @@
 		C8E3507D26CBDF0700E8246A /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD321F4C26700E2B194 /* OTPToken+Generation.m */; };
 		C8E3507E26CBDF0700E8246A /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
 		C8E3507F26CBDF0700E8246A /* DatabaseMerger.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseMerger.m */; };
-		C8E3508026CBDF0700E8246A /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C72B822525E160016A5CC /* AutoFillManager.m */; };
 		C8E3508126CBDF0700E8246A /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		C8E3508226CBDF0700E8246A /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6FE2BF2194451D00EB9997 /* Kdb1Database.m */; };
 		C8E3508326CBDF0700E8246A /* SimpleXmlValueExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC3F83223215A58002BDEF7 /* SimpleXmlValueExtractor.m */; };
@@ -5198,6 +5190,22 @@
 		C8E351BC26CBDF0700E8246A /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D36B0A622C9473F003E9B68 /* diceware.wordlist.utf8.txt */; };
 		C8E351BD26CBDF0700E8246A /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8E351C326CBE0B000E8246A /* Strongbox-Auto-Fill-Graphene.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C8E351C126CBDF0700E8246A /* Strongbox-Auto-Fill-Graphene.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C8E6164028BD22AF006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164128BD22AF006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164228BD22AF006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164328BD22AF006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164428BD22C3006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164528BD22C3006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164628BD22C4006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164728BD22C4006A6E56 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */; };
+		C8E6164A28BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
+		C8E6164B28BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
+		C8E6164C28BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
+		C8E6164D28BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
+		C8E6164E28BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
+		C8E6164F28BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
+		C8E6165028BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
+		C8E6165128BD22E3006A6E56 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */; };
 		C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EA246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EB246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
@@ -5324,13 +5332,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C8E3503126CBDF0700E8246A;
 			remoteInfo = "Strongbox-Auto-Fill-Graphene";
-		};
-		C81B739626E63F25007B1F1A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 4DBE5B291C8356C700C310BC /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 4DC4E01323488BAA000743C4;
-			remoteInfo = "Strongbox-iOS-Pro";
 		};
 		C822CDC326E61B0100AF7AB1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -6158,8 +6159,6 @@
 		4D8C148B2074F5F800CE9CAE /* Field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Field.h; path = model/pwsafe/Field.h; sourceTree = SOURCE_ROOT; };
 		4D8C14962074F63B00CE9CAE /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = model/pwsafe/twofish/twofish.c; sourceTree = SOURCE_ROOT; };
 		4D8C14982074F64A00CE9CAE /* crypt_argchk.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crypt_argchk.c; path = model/pwsafe/twofish/crypt_argchk.c; sourceTree = SOURCE_ROOT; };
-		4D8C72B722525E160016A5CC /* AutoFillManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillManager.h; path = StrongBox/AutoFillManager.h; sourceTree = "<group>"; };
-		4D8C72B822525E160016A5CC /* AutoFillManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillManager.m; path = StrongBox/AutoFillManager.m; sourceTree = "<group>"; };
 		4D8EA82522316B4300B47035 /* KdbxHistory.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxHistory.m; path = StrongboxTests/KdbxHistory.m; sourceTree = "<group>"; };
 		4D8FBEE821A9A70F004797FA /* kp2-keyfile.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "kp2-keyfile.kdbx"; sourceTree = "<group>"; };
 		4D8FBEE921A9A70F004797FA /* ferrari.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = ferrari.jpg; sourceTree = "<group>"; };
@@ -6782,7 +6781,6 @@
 		C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillPreferencesViewController.m; path = "StrongBox Auto Fill/AutoFillPreferencesViewController.m"; sourceTree = "<group>"; };
 		C81A5FE325B74B9100038963 /* DatabasePropertiesVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabasePropertiesVC.h; path = StrongBox/DatabasePropertiesVC.h; sourceTree = "<group>"; };
 		C81A5FE425B74B9100038963 /* DatabasePropertiesVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasePropertiesVC.m; path = StrongBox/DatabasePropertiesVC.m; sourceTree = "<group>"; };
-		C81B739126E63F25007B1F1A /* FastlaneStrongboxUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FastlaneStrongboxUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C81B739326E63F25007B1F1A /* FastlaneStrongboxUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FastlaneStrongboxUITests.swift; sourceTree = "<group>"; };
 		C81B739526E63F25007B1F1A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C81B739B26E642F4007B1F1A /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SnapshotHelper.swift; path = fastlane/SnapshotHelper.swift; sourceTree = SOURCE_ROOT; };
@@ -7089,6 +7087,7 @@
 		C85FD9E8265BB549003B5BE0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/EmptyDetails.strings; sourceTree = "<group>"; };
 		C85FD9EA265BB54B003B5BE0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/EmptyDetails.strings; sourceTree = "<group>"; };
 		C85FD9EC265BB556003B5BE0 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/EmptyDetails.strings; sourceTree = "<group>"; };
+		C860FEB128A043E000DE19CE /* Matchfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Matchfile; path = fastlane/Matchfile; sourceTree = "<group>"; };
 		C86255B026B6E7B600C909BD /* DuplicateOptionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuplicateOptionsViewController.h; path = StrongBox/DuplicateOptionsViewController.h; sourceTree = "<group>"; };
 		C86255B126B6E7B600C909BD /* DuplicateOptionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DuplicateOptionsViewController.m; path = StrongBox/DuplicateOptionsViewController.m; sourceTree = "<group>"; };
 		C864397D2667C29F0058A09F /* LastCrashReportModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LastCrashReportModule.h; path = StrongBox/LastCrashReportModule.h; sourceTree = "<group>"; };
@@ -7348,8 +7347,7 @@
 		C89CD4D6265FA51D00B46FD1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/RandomizerPopOver.strings"; sourceTree = "<group>"; };
 		C89F6B82247FC5A20070E754 /* changelog-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-ios.txt"; path = "build/changelog-ios.txt"; sourceTree = "<group>"; };
 		C89F6B83247FC5A30070E754 /* changelog-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-mac.txt"; path = "build/changelog-mac.txt"; sourceTree = "<group>"; };
-		C89F6B84247FC5A30070E754 /* version-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-mac.txt"; path = "build/version-mac.txt"; sourceTree = "<group>"; };
-		C89F6B85247FC5A30070E754 /* version-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-ios.txt"; path = "build/version-ios.txt"; sourceTree = "<group>"; };
+		C89F6B85247FC5A30070E754 /* version.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = version.txt; path = build/version.txt; sourceTree = "<group>"; };
 		C89F939725A7612E009E0724 /* DatabaseUnlocker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseUnlocker.h; path = model/DatabaseUnlocker.h; sourceTree = "<group>"; };
 		C89F939825A7612E009E0724 /* DatabaseUnlocker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseUnlocker.m; path = model/DatabaseUnlocker.m; sourceTree = "<group>"; };
 		C89F93A525A7722D009E0724 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ConflictResolutionWizard.strings"; sourceTree = "<group>"; };
@@ -7379,6 +7377,8 @@
 		C8A175B425A0BBC8002734E7 /* SelectComparisonTypeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SelectComparisonTypeViewController.m; path = StrongBox/SelectComparisonTypeViewController.m; sourceTree = "<group>"; };
 		C8A22046249158AD0025B8B0 /* AesInputStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesInputStream.h; path = model/AesInputStream.h; sourceTree = "<group>"; };
 		C8A22047249158AD0025B8B0 /* AesInputStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesInputStream.m; path = model/AesInputStream.m; sourceTree = "<group>"; };
+		C8A4390728D61584007462D7 /* ObjCExceptionCatcherForSwift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ObjCExceptionCatcherForSwift.h; path = model/ObjCExceptionCatcherForSwift.h; sourceTree = "<group>"; };
+		C8A4390828D61584007462D7 /* ObjCExceptionCatcherForSwift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ObjCExceptionCatcherForSwift.m; path = model/ObjCExceptionCatcherForSwift.m; sourceTree = "<group>"; };
 		C8A4AEF0273BD6F00043D42F /* AutomaticLockingPreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutomaticLockingPreferences.h; path = StrongBox/AutomaticLockingPreferences.h; sourceTree = "<group>"; };
 		C8A4AEF1273BD6F00043D42F /* AutomaticLockingPreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutomaticLockingPreferences.m; path = StrongBox/AutomaticLockingPreferences.m; sourceTree = "<group>"; };
 		C8A8DBA82484F024009C673F /* AuditDrillDownController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AuditDrillDownController.h; path = StrongBox/AuditDrillDownController.h; sourceTree = "<group>"; };
@@ -7619,6 +7619,10 @@
 		C8E3503026CBDEF800E8246A /* Strongbox-iOS-Graphene-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS-Graphene-Info.plist"; path = "/Users/strongbox/dev/strongbox/Strongbox-iOS-Graphene-Info.plist"; sourceTree = "<absolute>"; };
 		C8E351C126CBDF0700E8246A /* Strongbox-Auto-Fill-Graphene.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox-Auto-Fill-Graphene.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8E351C226CBDF0700E8246A /* Strongbox-Auto-Fill-Graphene-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-Auto-Fill-Graphene-Info.plist"; path = "/Users/strongbox/dev/strongbox/Strongbox-Auto-Fill-Graphene-Info.plist"; sourceTree = "<absolute>"; };
+		C8E6163E28BD22AF006A6E56 /* AutoFillManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AutoFillManager.h; path = macbox/AutoFillManager.h; sourceTree = "<group>"; };
+		C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AutoFillManager.m; path = macbox/AutoFillManager.m; sourceTree = "<group>"; };
+		C8E6164828BD22E2006A6E56 /* AutoFillCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AutoFillCommon.h; path = macbox/AutoFillCommon.h; sourceTree = "<group>"; };
+		C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AutoFillCommon.m; path = macbox/AutoFillCommon.m; sourceTree = "<group>"; };
 		C8E6D4E7246D43EA00AFFE13 /* WordList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = model/WordList.h; sourceTree = "<group>"; };
 		C8E6D4E8246D43EA00AFFE13 /* WordList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = model/WordList.m; sourceTree = "<group>"; };
 		C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
@@ -7630,6 +7634,7 @@
 		C8E913BC26FE0F0700EBC30D /* NotesTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotesTableViewCell.m; sourceTree = "<group>"; };
 		C8E9DA9C245DAD4C0093F97C /* UrlRequestOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UrlRequestOperation.h; path = StrongBox/UrlRequestOperation.h; sourceTree = "<group>"; };
 		C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UrlRequestOperation.m; path = StrongBox/UrlRequestOperation.m; sourceTree = "<group>"; };
+		C8EB70F328A1464D0017C9A9 /* Podfile */ = {isa = PBXFileReference; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		C8EC1CD72653C85200B0ED79 /* GenericOnboardSlide.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = GenericOnboardSlide.storyboard; path = StrongBox/GenericOnboardSlide.storyboard; sourceTree = "<group>"; };
 		C8EC1CDA2653C87600B0ED79 /* GenericOnboardingModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GenericOnboardingModule.h; path = StrongBox/GenericOnboardingModule.h; sourceTree = "<group>"; };
 		C8EC1CDB2653C87600B0ED79 /* GenericOnboardingModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GenericOnboardingModule.m; path = StrongBox/GenericOnboardingModule.m; sourceTree = "<group>"; };
@@ -7861,13 +7866,6 @@
 				4D5F5B96218B828600A0739A /* QuickLook.framework in Frameworks */,
 				4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */,
 				9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C81B738E26E63F25007B1F1A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -8697,6 +8695,8 @@
 			isa = PBXGroup;
 			children = (
 				C892689E27D0FC1B00146CBD /* TwoDriveStorageProvider.swift */,
+				C8A4390728D61584007462D7 /* ObjCExceptionCatcherForSwift.h */,
+				C8A4390828D61584007462D7 /* ObjCExceptionCatcherForSwift.m */,
 			);
 			name = OneDrive;
 			sourceTree = "<group>";
@@ -9382,7 +9382,6 @@
 				C8AF302726692CA600F845B1 /* Strongbox-Auto-Fill-Scotus.appex */,
 				C8E3502F26CBDEF700E8246A /* Strongbox.app */,
 				C8E351C126CBDF0700E8246A /* Strongbox-Auto-Fill-Graphene.appex */,
-				C81B739126E63F25007B1F1A /* FastlaneStrongboxUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -9872,14 +9871,14 @@
 		C84333362461662800E2E550 /* Build */ = {
 			isa = PBXGroup;
 			children = (
+				C843333D2461667C00E2E550 /* Fastlane */,
+				C8EB70F328A1464D0017C9A9 /* Podfile */,
 				C837AA3525B20C18001BD692 /* ship-it.sh */,
 				C8DEE079249A62AB00CF2AFE /* git-version.h */,
 				C89F6B82247FC5A20070E754 /* changelog-ios.txt */,
 				C89F6B83247FC5A30070E754 /* changelog-mac.txt */,
-				C89F6B85247FC5A30070E754 /* version-ios.txt */,
-				C89F6B84247FC5A30070E754 /* version-mac.txt */,
+				C89F6B85247FC5A30070E754 /* version.txt */,
 				C8433341246166CE00E2E550 /* plists */,
-				C843333D2461667C00E2E550 /* Fastlane */,
 				4DE48A5F216F54A300C9C991 /* Strongbox_Auto_Fill.entitlements */,
 			);
 			name = Build;
@@ -9888,6 +9887,7 @@
 		C843333D2461667C00E2E550 /* Fastlane */ = {
 			isa = PBXGroup;
 			children = (
+				C860FEB128A043E000DE19CE /* Matchfile */,
 				C843333E2461668F00E2E550 /* Fastfile */,
 				C843333B2461666C00E2E550 /* Deliverfile */,
 				C84333402461668F00E2E550 /* Appfile */,
@@ -10915,8 +10915,10 @@
 		C8D38FD32708790A004C261D /* AutoFill */ = {
 			isa = PBXGroup;
 			children = (
-				4D8C72B722525E160016A5CC /* AutoFillManager.h */,
-				4D8C72B822525E160016A5CC /* AutoFillManager.m */,
+				C8E6164828BD22E2006A6E56 /* AutoFillCommon.h */,
+				C8E6164928BD22E2006A6E56 /* AutoFillCommon.m */,
+				C8E6163E28BD22AF006A6E56 /* AutoFillManager.h */,
+				C8E6163F28BD22AF006A6E56 /* AutoFillManager.m */,
 			);
 			name = AutoFill;
 			sourceTree = "<group>";
@@ -11223,24 +11225,6 @@
 			productReference = 4DE48A55216F54A300C9C991 /* Strongbox-Auto-Fill.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		C81B739026E63F25007B1F1A /* FastlaneStrongboxUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C81B739A26E63F25007B1F1A /* Build configuration list for PBXNativeTarget "FastlaneStrongboxUITests" */;
-			buildPhases = (
-				C81B738D26E63F25007B1F1A /* Sources */,
-				C81B738E26E63F25007B1F1A /* Frameworks */,
-				C81B738F26E63F25007B1F1A /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				C81B739726E63F25007B1F1A /* PBXTargetDependency */,
-			);
-			name = FastlaneStrongboxUITests;
-			productName = FastlaneStrongboxUITests;
-			productReference = C81B739126E63F25007B1F1A /* FastlaneStrongboxUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 		C843313F26692A7C00D496D2 /* Strongbox-iOS-SCOTUS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C843337826692A7C00D496D2 /* Build configuration list for PBXNativeTarget "Strongbox-iOS-SCOTUS" */;
@@ -11343,7 +11327,7 @@
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = 4326J8XDF2;
 						LastSwiftMigration = 1130;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -11365,18 +11349,18 @@
 					4DC4E01323488BAA000743C4 = {
 						DevelopmentTeam = 4326J8XDF2;
 						LastSwiftMigration = 1130;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					4DC4E17023488BAE000743C4 = {
 						DevelopmentTeam = 4326J8XDF2;
 						LastSwiftMigration = 1130;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					4DE48A54216F54A300C9C991 = {
 						CreatedOnToolsVersion = 10.0;
 						DevelopmentTeam = 4326J8XDF2;
 						LastSwiftMigration = 1130;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -11392,26 +11376,21 @@
 							};
 						};
 					};
-					C81B739026E63F25007B1F1A = {
-						CreatedOnToolsVersion = 12.5.1;
-						ProvisioningStyle = Automatic;
-						TestTargetID = 4DC4E01323488BAA000743C4;
-					};
 					C843313F26692A7C00D496D2 = {
 						DevelopmentTeam = 4326J8XDF2;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					C8AF2E9726692CA600F845B1 = {
 						DevelopmentTeam = 4326J8XDF2;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					C8E34DEA26CBDEF700E8246A = {
 						DevelopmentTeam = 4326J8XDF2;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					C8E3503126CBDF0700E8246A = {
 						DevelopmentTeam = 4326J8XDF2;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -11452,7 +11431,6 @@
 				C8AF2E9726692CA600F845B1 /* Strongbox-Auto-Fill-SCOTUS */,
 				C8E3503126CBDF0700E8246A /* Strongbox-Auto-Fill-Graphene */,
 				4D25E8EA2175F4CD00ACF108 /* StrongboxTests */,
-				C81B739026E63F25007B1F1A /* FastlaneStrongboxUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -12534,13 +12512,6 @@
 				C812CFFB27C3B9A6006C6F72 /* light-blue-ipad.png in Resources */,
 				C812CEB627C3B2F5006C6F72 /* multi-colour-jr-ipad.png in Resources */,
 				C812CF8F27C3B7AF006C6F72 /* jolly-roger-ipad@2x.png in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C81B738F26E63F25007B1F1A /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -14070,6 +14041,7 @@
 				4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */,
 				C8B98CC226494609002EC313 /* ConvenienceUnlockPreferences.m in Sources */,
 				4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
+				C8A4390928D61584007462D7 /* ObjCExceptionCatcherForSwift.m in Sources */,
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
 				C846FE95261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */,
 				C88F1300265BAD8D0024AD24 /* ScheduledExportConfigurationViewController.m in Sources */,
@@ -14152,7 +14124,6 @@
 				4DA6335C1F62E8F8000A0E9D /* CustomStorageProviderTableViewCell.m in Sources */,
 				4DD85C8122E8FB2700700192 /* AttachmentsPoolViewController.m in Sources */,
 				C864397F2667C29F0058A09F /* LastCrashReportModule.m in Sources */,
-				4D8C72B922525E160016A5CC /* AutoFillManager.m in Sources */,
 				C87E2B43286717AD00BA9079 /* ZKCarouselCell.swift in Sources */,
 				4D08B5B1234C9613003D1953 /* GCDWebServerResponse.m in Sources */,
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
@@ -14244,6 +14215,7 @@
 				C8DDE3A924DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
 				4D160A8E245314040097C730 /* QuickViewConfig.m in Sources */,
+				C8E6164028BD22AF006A6E56 /* AutoFillManager.m in Sources */,
 				4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D556F2F22B832EB00E16027 /* BrowseItemTotpCell.m in Sources */,
 				C84AE6CD27453E3600C27778 /* Reachabil1ty.m in Sources */,
@@ -14371,6 +14343,7 @@
 				C892689F27D0FC1B00146CBD /* TwoDriveStorageProvider.swift in Sources */,
 				4D4767072179013900C4358F /* RootXmlDomainObject.m in Sources */,
 				C8413C3D25925C0700BD9DE8 /* MinimalPoolHelper.m in Sources */,
+				C8E6164A28BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				4D0835D1228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
 				4D4D3FE02409CE1C0056A7E2 /* ProgressHudView.swift in Sources */,
 				C86255B226B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */,
@@ -14567,6 +14540,7 @@
 				4DC4E04123488BAA000743C4 /* KeePassGroup.m in Sources */,
 				4DC4E04223488BAA000743C4 /* thread.c in Sources */,
 				4DC4E04323488BAA000743C4 /* PasswordHistory.m in Sources */,
+				C8A4390A28D61584007462D7 /* ObjCExceptionCatcherForSwift.m in Sources */,
 				C8B98CC326494609002EC313 /* ConvenienceUnlockPreferences.m in Sources */,
 				C8F8A3A22589001B00B9297C /* DiffDrilldownTableViewController.m in Sources */,
 				4D08B5B0234C9613003D1953 /* GCDWebUploader.m in Sources */,
@@ -14675,7 +14649,6 @@
 				4DC4E07823488BAA000743C4 /* AttachmentsPoolViewController.m in Sources */,
 				C818C94026E3D8D2007ACC0C /* HmacBlockOutputStream.m in Sources */,
 				C84D6CDE273D407D00182B40 /* Section.swift in Sources */,
-				4DC4E07923488BAA000743C4 /* AutoFillManager.m in Sources */,
 				C83E319626668D97007211D0 /* AppAutoFillOnboardingModule.m in Sources */,
 				4D08B5B2234C9613003D1953 /* GCDWebServerResponse.m in Sources */,
 				C8EE86AE264ADE690043C7D9 /* FirstUnlockWelcomeViewController.m in Sources */,
@@ -14741,6 +14714,7 @@
 				C85D9BBD254D8820000482C8 /* PlaintextInnerStream.m in Sources */,
 				4DC4E09B23488BAA000743C4 /* GZipInputStream.m in Sources */,
 				C8B2C6E32493882300F6EA12 /* TwoFishReadStream.m in Sources */,
+				C8E6164128BD22AF006A6E56 /* AutoFillManager.m in Sources */,
 				4DC4E09C23488BAA000743C4 /* Keys.m in Sources */,
 				4DC4E09D23488BAA000743C4 /* AppleICloudProvider.m in Sources */,
 				4DC4E09E23488BAA000743C4 /* BaseXmlDomainObjectHandler.m in Sources */,
@@ -14868,6 +14842,7 @@
 				4DC4E0D923488BAA000743C4 /* Entry.m in Sources */,
 				4DC4E0DA23488BAA000743C4 /* OTPToken+Persistence.m in Sources */,
 				C8413C3F25925C0700BD9DE8 /* MinimalPoolHelper.m in Sources */,
+				C8E6164B28BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				4DC4E0DB23488BAA000743C4 /* SprCompilation.m in Sources */,
 				4DC4E0DC23488BAA000743C4 /* DatabaseModel.m in Sources */,
 				C86255B326B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */,
@@ -15052,7 +15027,6 @@
 				4DC4E19F23488BAE000743C4 /* OTPToken+Generation.m in Sources */,
 				4DFD46D5240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				C85DC8AD253CB23F004E51C9 /* DatabaseMerger.m in Sources */,
-				4DC4E1A023488BAE000743C4 /* AutoFillManager.m in Sources */,
 				4DC4E1A123488BAE000743C4 /* ClipboardManager.m in Sources */,
 				4DC4E1A223488BAE000743C4 /* Kdb1Database.m in Sources */,
 				4DC4E1A423488BAE000743C4 /* SimpleXmlValueExtractor.m in Sources */,
@@ -15088,6 +15062,7 @@
 				4DC4E1B923488BAE000743C4 /* DAVResponseItem.m in Sources */,
 				4DC4E1BA23488BAE000743C4 /* blake2b.c in Sources */,
 				C848450627580941001CAA05 /* AsyncUpdateJob.m in Sources */,
+				C8E6164528BD22C3006A6E56 /* AutoFillManager.m in Sources */,
 				4DC4E1BB23488BAE000743C4 /* CustomIconList.m in Sources */,
 				C88F813C245D935A00B0B998 /* NSString+Extensions.m in Sources */,
 				4DC4E1BD23488BAE000743C4 /* XmlProcessingContext.m in Sources */,
@@ -15196,6 +15171,7 @@
 				4DC4E20323488BAE000743C4 /* DAVCredentials.m in Sources */,
 				C8DDE39424DEB6FA00873392 /* SyncParameters.m in Sources */,
 				4D160A91245314040097C730 /* QuickViewConfig.m in Sources */,
+				C8E6164F28BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				4DC4E20623488BAE000743C4 /* DAVSession.m in Sources */,
 				4DC4E20723488BAE000743C4 /* IconViewCell.m in Sources */,
 				C87116CF27BD54350079027F /* ProLabel.swift in Sources */,
@@ -15368,7 +15344,6 @@
 				4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */,
 				4DFD46D3240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				C85DC8A9253CB23E004E51C9 /* DatabaseMerger.m in Sources */,
-				4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D2CB4922332CBE400C2E084 /* ClipboardManager.m in Sources */,
 				4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */,
 				4DC3F83423215A58002BDEF7 /* SimpleXmlValueExtractor.m in Sources */,
@@ -15404,6 +15379,7 @@
 				4DF972CD21C01ABF00F384C9 /* DAVResponseItem.m in Sources */,
 				4D3E149F21832CC700A41CA0 /* blake2b.c in Sources */,
 				C848450527580941001CAA05 /* AsyncUpdateJob.m in Sources */,
+				C8E6164428BD22C3006A6E56 /* AutoFillManager.m in Sources */,
 				4DA12F03219837830000CEBB /* CustomIconList.m in Sources */,
 				C88F813A245D935A00B0B998 /* NSString+Extensions.m in Sources */,
 				4D67B1E52191FD0400B0D29A /* XmlProcessingContext.m in Sources */,
@@ -15512,6 +15488,7 @@
 				4DF972C821C01ABF00F384C9 /* DAVCredentials.m in Sources */,
 				C8DDE39224DEB6FA00873392 /* SyncParameters.m in Sources */,
 				4D160A8F245314040097C730 /* QuickViewConfig.m in Sources */,
+				C8E6164E28BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				4DF972CE21C01ABF00F384C9 /* DAVSession.m in Sources */,
 				4D766D5422204E4A00AEF439 /* IconViewCell.m in Sources */,
 				C87116CE27BD54350079027F /* ProLabel.swift in Sources */,
@@ -15601,15 +15578,6 @@
 				4D6B5057238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4D3AC320219074C40010CFCD /* VariantObject.m in Sources */,
 				4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C81B738D26E63F25007B1F1A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C81B739426E63F25007B1F1A /* FastlaneStrongboxUITests.swift in Sources */,
-				C81B739C26E642F4007B1F1A /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -15806,7 +15774,6 @@
 				C84331F526692A7C00D496D2 /* AttachmentsPoolViewController.m in Sources */,
 				C87116CC27BD54350079027F /* ProLabel.swift in Sources */,
 				C8B93B712710642B00E06F12 /* MasterPasswordExplanationViewController.m in Sources */,
-				C84331F626692A7C00D496D2 /* AutoFillManager.m in Sources */,
 				C84331F726692A7C00D496D2 /* AppAutoFillOnboardingModule.m in Sources */,
 				C84331F926692A7C00D496D2 /* GCDWebServerResponse.m in Sources */,
 				C84331FA26692A7C00D496D2 /* FirstUnlockWelcomeViewController.m in Sources */,
@@ -15849,6 +15816,7 @@
 				C843321826692A7C00D496D2 /* StrongboxUIDocument.m in Sources */,
 				C843321926692A7C00D496D2 /* BackupsManager.m in Sources */,
 				C843321A26692A7C00D496D2 /* GCDWebServerFileRequest.m in Sources */,
+				C8E6164228BD22AF006A6E56 /* AutoFillManager.m in Sources */,
 				C843321B26692A7C00D496D2 /* FavIconDownloadResultsViewController.m in Sources */,
 				C843321C26692A7C00D496D2 /* IconsSectionHeaderReusableView.m in Sources */,
 				C843322126692A7C00D496D2 /* VirtualYubiKey.m in Sources */,
@@ -16033,6 +16001,7 @@
 				C84332C326692A7C00D496D2 /* Csv.m in Sources */,
 				C84332C426692A7C00D496D2 /* PasswordStrength.m in Sources */,
 				C84D6CDB273D407D00182B40 /* Field.swift in Sources */,
+				C8E6164C28BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				C84332C926692A7C00D496D2 /* PreferencesTableViewController.m in Sources */,
 				C84332CA26692A7C00D496D2 /* DebugHelper.m in Sources */,
 				C84332CB26692A7C00D496D2 /* ConvenienceUnlockOnboardingViewController.m in Sources */,
@@ -16165,7 +16134,6 @@
 				C8AF2EE426692CA600F845B1 /* OTPToken+Generation.m in Sources */,
 				C8AF2EE526692CA600F845B1 /* ColoredStringHelper.m in Sources */,
 				C8AF2EE626692CA600F845B1 /* DatabaseMerger.m in Sources */,
-				C8AF2EE726692CA600F845B1 /* AutoFillManager.m in Sources */,
 				C8AF2EE826692CA600F845B1 /* ClipboardManager.m in Sources */,
 				C8AF2EE926692CA600F845B1 /* Kdb1Database.m in Sources */,
 				C8AF2EEA26692CA600F845B1 /* SimpleXmlValueExtractor.m in Sources */,
@@ -16201,6 +16169,7 @@
 				C8AF2F0A26692CA600F845B1 /* DAVResponseItem.m in Sources */,
 				C8AF2F0B26692CA600F845B1 /* blake2b.c in Sources */,
 				C848450727580941001CAA05 /* AsyncUpdateJob.m in Sources */,
+				C8E6164628BD22C4006A6E56 /* AutoFillManager.m in Sources */,
 				C8AF2F0C26692CA600F845B1 /* CustomIconList.m in Sources */,
 				C8AF2F0D26692CA600F845B1 /* NSString+Extensions.m in Sources */,
 				C8AF2F0E26692CA600F845B1 /* XmlProcessingContext.m in Sources */,
@@ -16309,6 +16278,7 @@
 				C8AF2F7126692CA600F845B1 /* DAVCredentials.m in Sources */,
 				C8AF2F7326692CA600F845B1 /* SyncParameters.m in Sources */,
 				C8AF2F7426692CA600F845B1 /* QuickViewConfig.m in Sources */,
+				C8E6165028BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				C8AF2F7526692CA600F845B1 /* DAVSession.m in Sources */,
 				C8AF2F7626692CA600F845B1 /* IconViewCell.m in Sources */,
 				C87116D027BD54350079027F /* ProLabel.swift in Sources */,
@@ -16488,6 +16458,7 @@
 				C896D32227C006C300C5D223 /* AppLockConfigurationViewController.m in Sources */,
 				C8E34E4226CBDEF700E8246A /* DiffDrilldownTableViewController.m in Sources */,
 				C8E34E4326CBDEF700E8246A /* GCDWebUploader.m in Sources */,
+				C8E6164328BD22AF006A6E56 /* AutoFillManager.m in Sources */,
 				C8E34E4426CBDEF700E8246A /* Times.m in Sources */,
 				C8E34E4526CBDEF700E8246A /* AsyncUpdateResultViewController.m in Sources */,
 				C8E34E4626CBDEF700E8246A /* ScheduledExportConfigurationViewController.m in Sources */,
@@ -16584,6 +16555,7 @@
 				C8E34E9C26CBDEF700E8246A /* Kdbx4SerializationData.m in Sources */,
 				C8E34E9D26CBDEF700E8246A /* NSData+Extensions.m in Sources */,
 				C8E34E9E26CBDEF700E8246A /* StaticDataTableViewController.m in Sources */,
+				C8E6164D28BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				C8E34E9F26CBDEF700E8246A /* WelcomeAddDatabaseViewController.m in Sources */,
 				C8F17B1A2751402700AB177B /* TipJarViewController.swift in Sources */,
 				C83C190C27BD216F00654F3C /* CustomAppIconViewController.swift in Sources */,
@@ -16594,7 +16566,6 @@
 				C8E34EA326CBDEF700E8246A /* QuickLaunchOnboardingViewController.m in Sources */,
 				C8E34EA426CBDEF700E8246A /* AttachmentsPoolViewController.m in Sources */,
 				C8B93B722710642B00E06F12 /* MasterPasswordExplanationViewController.m in Sources */,
-				C8E34EA526CBDEF700E8246A /* AutoFillManager.m in Sources */,
 				C8E34EA626CBDEF700E8246A /* AppAutoFillOnboardingModule.m in Sources */,
 				C87E2B46286717AD00BA9079 /* ZKCarouselCell.swift in Sources */,
 				C8E34EA826CBDEF700E8246A /* GCDWebServerResponse.m in Sources */,
@@ -16954,7 +16925,6 @@
 				C8E3507D26CBDF0700E8246A /* OTPToken+Generation.m in Sources */,
 				C8E3507E26CBDF0700E8246A /* ColoredStringHelper.m in Sources */,
 				C8E3507F26CBDF0700E8246A /* DatabaseMerger.m in Sources */,
-				C8E3508026CBDF0700E8246A /* AutoFillManager.m in Sources */,
 				C8E3508126CBDF0700E8246A /* ClipboardManager.m in Sources */,
 				C8E3508226CBDF0700E8246A /* Kdb1Database.m in Sources */,
 				C8E3508326CBDF0700E8246A /* SimpleXmlValueExtractor.m in Sources */,
@@ -16990,6 +16960,7 @@
 				C8E350A326CBDF0700E8246A /* DAVResponseItem.m in Sources */,
 				C8E350A426CBDF0700E8246A /* blake2b.c in Sources */,
 				C848450827580941001CAA05 /* AsyncUpdateJob.m in Sources */,
+				C8E6164728BD22C4006A6E56 /* AutoFillManager.m in Sources */,
 				C8E350A526CBDF0700E8246A /* CustomIconList.m in Sources */,
 				C8E350A626CBDF0700E8246A /* NSString+Extensions.m in Sources */,
 				C8E350A726CBDF0700E8246A /* XmlProcessingContext.m in Sources */,
@@ -17098,6 +17069,7 @@
 				C8E3510A26CBDF0700E8246A /* DAVCredentials.m in Sources */,
 				C8E3510C26CBDF0700E8246A /* SyncParameters.m in Sources */,
 				C8E3510D26CBDF0700E8246A /* QuickViewConfig.m in Sources */,
+				C8E6165128BD22E3006A6E56 /* AutoFillCommon.m in Sources */,
 				C8E3510E26CBDF0700E8246A /* DAVSession.m in Sources */,
 				C8E3510F26CBDF0700E8246A /* IconViewCell.m in Sources */,
 				C87116D127BD54350079027F /* ProLabel.swift in Sources */,
@@ -17207,11 +17179,6 @@
 			isa = PBXTargetDependency;
 			target = C8E3503126CBDF0700E8246A /* Strongbox-Auto-Fill-Graphene */;
 			targetProxy = C80368FC26CBE5CA007F84C3 /* PBXContainerItemProxy */;
-		};
-		C81B739726E63F25007B1F1A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 4DC4E01323488BAA000743C4 /* Strongbox-iOS-Pro */;
-			targetProxy = C81B739626E63F25007B1F1A /* PBXContainerItemProxy */;
 		};
 		C822CDC426E61B0100AF7AB1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -18886,8 +18853,8 @@
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5002;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -18945,7 +18912,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -18966,8 +18933,8 @@
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5002;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19025,7 +18992,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -19045,8 +19012,8 @@
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19097,7 +19064,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.pro";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -19118,10 +19085,10 @@
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -19170,7 +19137,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.pro";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -19192,10 +19159,10 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19243,7 +19210,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro.autofill;
 				PRODUCT_MODULE_NAME = Strongbox_Auto_Fill;
 				PRODUCT_NAME = "Strongbox-Auto-Fill-Pro";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.pro.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -19265,10 +19232,10 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19314,7 +19281,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro.autofill;
 				PRODUCT_MODULE_NAME = Strongbox_Auto_Fill;
 				PRODUCT_NAME = "Strongbox-Auto-Fill-Pro";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.pro.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -19338,8 +19305,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5002;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19393,7 +19360,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.autofill;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -19418,10 +19385,10 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5002;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -19471,69 +19438,12 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.autofill;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
-			};
-			name = Release;
-		};
-		C81B739826E63F25007B1F1A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = FastlaneStrongboxUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.phoebecode.FastlaneStrongboxUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Strongbox-iOS-Pro";
-			};
-			name = Debug;
-		};
-		C81B739926E63F25007B1F1A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				INFOPLIST_FILE = FastlaneStrongboxUITests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.5;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.phoebecode.FastlaneStrongboxUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Strongbox-iOS-Pro";
 			};
 			name = Release;
 		};
@@ -19547,8 +19457,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox/Strongbox-NoNetworking.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19605,7 +19515,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.scotus;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.scotus";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(SWIFT_MODULE_NAME)-Swift.h";
@@ -19627,10 +19537,10 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox/Strongbox-NoNetworking.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
@@ -19685,7 +19595,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.scotus;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.scotus";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(SWIFT_MODULE_NAME)-Swift.h";
@@ -19710,8 +19620,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19760,7 +19670,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.scotus.autofill;
 				PRODUCT_MODULE_NAME = Strongbox_Auto_Fill;
 				PRODUCT_NAME = "Strongbox-Auto-Fill-Scotus";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.scotus.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -19784,8 +19694,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -19832,7 +19742,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.scotus.autofill;
 				PRODUCT_MODULE_NAME = Strongbox_Auto_Fill;
 				PRODUCT_NAME = "Strongbox-Auto-Fill-Scotus";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.scotus.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -19851,8 +19761,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox/Strongbox-NoNetworking.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19910,7 +19820,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.graphene;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.graphene";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(SWIFT_MODULE_NAME)-Swift.h";
@@ -19932,8 +19842,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox/Strongbox-NoNetworking.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -19991,7 +19901,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.graphene;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE = "";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.graphene";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "$(SWIFT_MODULE_NAME)-Swift.h";
@@ -20016,8 +19926,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -20066,7 +19976,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.graphene.autofill;
 				PRODUCT_MODULE_NAME = Strongbox_Auto_Fill;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.graphene.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -20090,8 +20000,8 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox Auto Fill/Strongbox_Auto_Fill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4221;
+				CODE_SIGN_STYLE = Manual;
+				CURRENT_PROJECT_VERSION = 4262;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -20138,7 +20048,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.graphene.autofill;
 				PRODUCT_MODULE_NAME = Strongbox_Auto_Fill;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
+				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.graphene.autofill";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -20200,15 +20110,6 @@
 			buildConfigurations = (
 				4DE48A64216F54A300C9C991 /* Debug */,
 				4DE48A65216F54A300C9C991 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C81B739A26E63F25007B1F1A /* Build configuration list for PBXNativeTarget "FastlaneStrongboxUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C81B739826E63F25007B1F1A /* Debug */,
-				C81B739926E63F25007B1F1A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

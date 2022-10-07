@@ -24,6 +24,8 @@ extern NSString* const kModelUpdateNotificationFullReload;
 @property BOOL wasJustLocked; 
 @property (readonly) BOOL isModelLocked;
 
+- (NSArray<Node*>*)autoFillUrlCredentialMatchesForUrl:(NSString*)urlString;
+
 - (void)lock:(NSString* _Nullable)selectedItem;
 
 - (void)unlock:(CompositeKeyFactors *)compositeKeyFactors

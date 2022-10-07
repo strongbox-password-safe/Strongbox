@@ -214,9 +214,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 }
 
 - (NSArray<Node *>*)getItemsById:(NSArray<NSUUID *>*)ids {
-    return [ids map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [self.database getItemById:obj];
-    }];
+    return [self.database getItemsById:ids];
 }
 
 - (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 

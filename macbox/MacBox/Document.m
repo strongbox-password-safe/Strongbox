@@ -1081,4 +1081,10 @@ fromConvenience:(BOOL)fromConvenience
     }
 }
 
+
+
+- (NSArray<Node*>*)autoFillUrlCredentialMatchesForUrl:(NSString *)urlString {
+    return [self.viewModel getAutoFillMatchingNodesForUrl:urlString];
+}
+
 @end

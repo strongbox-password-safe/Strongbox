@@ -154,7 +154,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
         return;
     }
     
-    NSURL* maybeManagedSyncUrl = [self maybeManagedSyncURL:URL];
+    NSURL* maybeManagedSyncUrl = managedUrlFromFileUrl(URL);
     
     MacDatabasePreferences* dbm = [MacDatabasePreferences addOrGet:maybeManagedSyncUrl];
     
@@ -183,10 +183,6 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     }];
 }
 
-- (NSURL*)maybeManagedSyncURL:(NSURL*)url {
-    return managedUrlFromFileUrl(url);
-}
-
 - (void)openDocumentWithContentsOfURL:(NSURL *)url
                               display:(BOOL)displayDocument
                     completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
@@ -213,7 +209,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 
     NSLog(@"openDocumentWithContentsOfURL: [%@] => Metadata = [%@]", url, database);
 
-    NSURL* maybeManaged = database ? url : [self maybeManagedSyncURL:url];
+    NSURL* maybeManaged = database ? url : managedUrlFromFileUrl(url);
 
     [super openDocumentWithContentsOfURL:maybeManaged
                                  display:displayDocument

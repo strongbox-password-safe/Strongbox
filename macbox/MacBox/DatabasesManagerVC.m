@@ -34,6 +34,7 @@
 #import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 #import "Strongbox-Swift.h"
+#import "AboutViewController.h"
 
 
 
@@ -51,7 +52,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
 @property NSTimer* timerRefresh;
 @property BOOL hasLoaded;
-@property (weak) IBOutlet NSTextField *textFieldVersion;
+@property (weak) IBOutlet ClickableTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonProperties;
 
 @end
@@ -145,6 +146,9 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
     self.textFieldVersion.stringValue = about;
+    self.textFieldVersion.onClick = ^{
+        [AboutViewController show];
+    };
 }
 
 - (void)onProStatusChanged:(id)param {
@@ -554,6 +558,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             return YES;
         }
     }
+    else if (theAction == @selector(onChangeNickname:)) {
+        if(self.tableView.selectedRow != -1) {
+            return YES;
+        }
+    }
     else if (theAction == @selector(onExportDatabase:)) {
         if(self.tableView.selectedRow != -1) {
             return YES;
@@ -813,6 +822,14 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
         database.readOnly = !database.readOnly;
+    }
+}
+
+- (IBAction)onChangeNickname:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        DatabaseCellView *view = [self.tableView viewAtColumn:0 row:self.tableView.selectedRow makeIfNecessary:NO];
+        
+        [view onChangeNickname];
     }
 }
 

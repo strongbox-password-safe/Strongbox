@@ -11,6 +11,10 @@
 #import "Settings.h"
 #import "ClipboardManager.h"
 #import "DebugHelper.h"
+#import "MacCustomizationManager.h"
+#import "ProUpgradeIAPManager.h"
+#import "ClickableTextField.h"
+#import "AppDelegate.h"
 
 @interface AboutViewController () <NSWindowDelegate>
 
@@ -18,6 +22,8 @@
 @property (weak) IBOutlet NSTextField *labelAbout;
 @property (unsafe_unretained) IBOutlet NSTextView *textView;
 @property (weak) IBOutlet NSTextField *labelLicense;
+@property (weak) IBOutlet NSImageView *imageViewLicense;
+@property (weak) IBOutlet ClickableTextField *labelChangeLicense;
 
 @end
 
@@ -56,18 +62,11 @@ static AboutViewController* sharedInstance;
 - (void)doInitialSetup {
     self.view.window.delegate = self;
     
+    self.labelChangeLicense.onClick = ^{
+        [self showUpgradeScreen];
+    };
 
-    
-    NSString* fmt = NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
-    
-    NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
-    
-    self.view.window.title = about;
-    self.labelAbout.stringValue = about;
-    
-    
-    self.labelLicense.hidden = !Settings.sharedInstance.fullVersion;
-    
+    [self bindVersionAndProStatus];
 }
 
 - (void)cancel:(id)sender { 
@@ -91,6 +90,82 @@ static AboutViewController* sharedInstance;
     NSString* debugInfo = [NSString stringWithString:self.textView.textStorage.string];
     
     [ClipboardManager.sharedInstance copyConcealedString:debugInfo];
+}
+
+- (void)bindVersionAndProStatus {
+    NSString* fmt = NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+    NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+    self.view.window.title = about;
+    self.labelAbout.stringValue = [Utils getAppVersion];
+    
+    
+
+    self.labelLicense.textColor = NSColor.labelColor;
+    BOOL linkToUpgradeScreen = NO;
+    
+    if ( MacCustomizationManager.isAProBundle ) {
+        self.labelLicense.stringValue = NSLocalizedString(@"pro_status_lifetime_pro", @"Lifetime Pro");
+    }
+    else {
+        if ( Settings.sharedInstance.isPro ) {
+            if ( ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro ) { 
+                self.labelLicense.stringValue = NSLocalizedString(@"pro_status_lifetime_pro_iap", @"Lifetime Pro (In-App Purchase)");
+            }
+            else if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription ){
+                self.labelLicense.stringValue = NSLocalizedString(@"pro_status_yearly_pro", @"Pro (Yearly subscription)");
+                linkToUpgradeScreen = YES;
+            }
+            else if ( ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription ) {
+                self.labelLicense.stringValue = NSLocalizedString(@"pro_status_monthly_pro", @"Pro (Monthly subscription)");
+                linkToUpgradeScreen = YES;
+            }
+            else {
+                self.labelLicense.stringValue = NSLocalizedString(@"pro_badge_text", @"Pro"); 
+            }
+        }
+        else if ( Settings.sharedInstance.daysInstalled > 60 ) {
+            self.labelLicense.stringValue = NSLocalizedString(@"pro_status_unlicensed_please_upgrade", @"Unlicensed (Please Upgrade)");
+            self.labelLicense.textColor = NSColor.systemRedColor;
+            NSLocalizedString(@"generic_upgrade_ellipsis", @"Upgrade...");
+            linkToUpgradeScreen = YES;
+        }
+        else {
+            self.labelLicense.stringValue = NSLocalizedString(@"pro_status_unlicensed", @"Unlicensed");
+            self.labelChangeLicense.stringValue = NSLocalizedString(@"generic_upgrade_ellipsis", @"Upgrade...");
+            linkToUpgradeScreen = YES;
+        }
+    }
+    
+    self.labelChangeLicense.hidden = !linkToUpgradeScreen;
+    
+    
+    
+    BOOL licensed = Settings.sharedInstance.isPro;
+    NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
+    
+    if (@available(macOS 11.0, *)) {
+        NSImage* image = [NSImage imageWithSystemSymbolName:license  accessibilityDescription:nil];
+        self.imageViewLicense.image = image;
+                
+        NSImageSymbolConfiguration* scaleConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+
+        if (@available(macOS 12.0, *)) {
+            NSImageSymbolConfiguration* proConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemGreenColor, NSColor.systemBlueColor]];
+            NSImageSymbolConfiguration* noneProConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemRedColor, NSColor.systemOrangeColor]];
+            NSImageSymbolConfiguration* imageConfig = licensed ? proConfig : noneProConfig;
+            
+            self.imageViewLicense.symbolConfiguration = [scaleConfig configurationByApplyingConfiguration:imageConfig];
+            
+        } else {
+            self.imageViewLicense.symbolConfiguration = scaleConfig;
+            self.imageViewLicense.contentTintColor = licensed ? NSColor.systemBlueColor : NSColor.systemOrangeColor;
+        }
+    }
+}
+
+- (void)showUpgradeScreen {
+    [NSApplication.sharedApplication sendAction:@selector(onUpgradeToFullVersion:) to:nil from:self];
+    [self onDone:nil];
 }
 
 @end

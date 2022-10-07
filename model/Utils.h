@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)insertTimestampInFilename:(NSString *)title;
 + (nullable NSString *)hostname;
 + (NSString *)getUsername;
++ (NSURL*)userHomeDirectoryEvenInSandbox;
 
 NSString* keePassStringIdFromUuid(NSUUID* uuid);
 NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);

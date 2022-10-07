@@ -189,6 +189,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL useParentGroupIconOnCreate;
 
 @property BOOL stripUnusedIconsOnSave;
+@property BOOL pinCodeHapticFeedback;
 
 @end
 

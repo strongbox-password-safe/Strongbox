@@ -91,16 +91,18 @@
     
     
     
-    [sp insertObject:FilesAppUrlBookmarkProvider.sharedInstance atIndex:0];
-
-    
-    
     if ( !self.existing &&
         AppPreferences.sharedInstance.iCloudOn &&
         !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
+
+        [sp addObject:AppleICloudProvider.sharedInstance];
     }
         
+    
+    
+
+    [sp addObject:FilesAppUrlBookmarkProvider.sharedInstance];
+
     
     
     if (!self.existing) {

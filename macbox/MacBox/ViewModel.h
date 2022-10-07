@@ -111,7 +111,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
-    
+
 - (void)removeItemAttachment:(Node*)item filename:(NSString*)filename;
 - (void)addItemAttachment:(Node*)item filename:(NSString*)filename attachment:(DatabaseAttachment*)attachment;
 
@@ -359,6 +359,18 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property BOOL customSortOrderForFields;
 
 @property ConflictResolutionStrategy conflictResolutionStrategy;
+
+
+
+- (NSArray<Node*>*)getAutoFillMatchingNodesForUrl:(NSString *)urlString;
+
+- (void)rebuildAutoFillDomainNodeMap; 
+
+
+
+- (void)copyUsername:(NSUUID*)itemId;
+- (void)copyPassword:(NSUUID*)itemId;
+- (void)copyTotp:(NSUUID*)itemId;
 
 @end
 

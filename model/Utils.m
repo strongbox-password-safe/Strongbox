@@ -10,6 +10,7 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
+#include <pwd.h>
 
 #import <CoreImage/CoreImage.h>
 
@@ -635,5 +636,17 @@ BOOL checkForScreenRecordingPermissionsOnMac(void) {
 
 
 
+
++ (NSURL*)userHomeDirectoryEvenInSandbox {
+    const char *home = getpwuid(getuid())->pw_dir;
+    
+    NSString *path = [[NSFileManager defaultManager]
+                      stringWithFileSystemRepresentation:home
+                      length:strlen(home)];
+
+    NSURL *url = [NSURL fileURLWithPath:path isDirectory:YES];
+    
+    return url;
+}
 
 @end

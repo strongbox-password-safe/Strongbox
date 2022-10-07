@@ -225,10 +225,6 @@
     return model;
 }
 
-- (BOOL)isValid {
-    return YES;
-}
-
 - (BOOL)isDifferentFrom:(EntryViewModel *)other {
     BOOL simpleEqual =  [self.title compare:other.title] == NSOrderedSame &&
                         [self.username compare:other.username] == NSOrderedSame &&
