@@ -110,7 +110,7 @@ class CompareDatabasesViewController: NSViewController {
         }
         else {
             buttonMergeSynchronize.isHidden = false
-            buttonMergeSynchronize.isEnabled = Settings.sharedInstance().isProOrFreeTrial
+            buttonMergeSynchronize.isEnabled = Settings.sharedInstance().isPro
         }
     }
         
@@ -189,7 +189,7 @@ class CompareDatabasesViewController: NSViewController {
 
         rows.append(Row(type: .header, text: NSLocalizedString("diff_view_section_header_summary", comment: "Summary")))
     
-        if !Settings.sharedInstance().isProOrFreeTrial {
+        if !Settings.sharedInstance().isPro {
             rows.append(Row(type: .nonFunctional,
                             text: NSLocalizedString("generic_pro_feature_only_please_upgrade", comment: "Pro feature only. Please Upgrade."),
                             icon: NSImage(named: "star"),

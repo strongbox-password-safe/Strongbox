@@ -76,7 +76,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 }
 
 - (void)exitWithCredential:(MacDatabasePreferences*)unlockedDatabase username:(NSString*)username password:(NSString*)password totp:(NSString*)totp {
-    BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL pro = Settings.sharedInstance.isPro;
     
     [self markLastUnlockedAtTime:unlockedDatabase];
     
@@ -140,7 +140,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
     self.quickTypeMode = YES;
     
-    BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL pro = Settings.sharedInstance.isPro;
 
     if ( !pro ) {
         [self exitWithUserInteractionRequired];
@@ -373,7 +373,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     StorageProvider provider = database.storageProvider;
     BOOL sftpOrDav = provider == kSFTP || provider == kWebDAV;
     
-    if ( sftpOrDav && !Settings.sharedInstance.isProOrFreeTrial ) {
+    if ( sftpOrDav && !Settings.sharedInstance.isPro ) {
         [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
         informativeText:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                  window:self.view.window

@@ -55,3 +55,4 @@
 #import "DatabaseDiffer.h"
 #import "macOSSpinnerUI.h"
 #import "DiffDrillDownDetailer.h"
+#import "AutoFillCommon.h"

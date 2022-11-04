@@ -121,6 +121,8 @@ class GeneralPreferencesViewController: NSViewController {
         Settings.sharedInstance().quitStrongboxOnAllWindowsClosed = quitWhenAllClosed.state == .on
         Settings.sharedInstance().lockEvenIfEditing = lockEvenIfEditing.state == .on
         
+        
+        
         bindUI()
 
         notifyChanged()

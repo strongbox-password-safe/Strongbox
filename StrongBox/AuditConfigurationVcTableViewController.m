@@ -150,21 +150,22 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
     
     
-    self.switchHibp.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
+    BOOL pro = AppPreferences.sharedInstance.isPro;
+    self.switchHibp.enabled = pro;
 
-    self.labelCheckHaveIBeenPwned.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
-    self.labelLastOnlineCheckHeader.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
-    self.labelOnlineCheckInterval.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
+    self.labelCheckHaveIBeenPwned.textColor = pro ? nil : secondary;
+    self.labelLastOnlineCheckHeader.textColor = pro && self.switchHibp.on ? nil : secondary;
+    self.labelOnlineCheckInterval.textColor = pro && self.switchHibp.on ? nil : secondary;
 
-    self.labelCheckHaveIBeenPwned.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.labelCheckHaveIBeenPwned.textColor = pro ? nil : secondary;
 
     
 
-    self.switchSimilar.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
-    self.sliderSimilar.enabled = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchSimilar.on;
-    self.labelSimilar.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
-    self.labelSimilarityThresholdTitle.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
-    self.labelCheckSimilar.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.switchSimilar.enabled = pro;
+    self.sliderSimilar.enabled = pro && self.switchSimilar.on;
+    self.labelSimilar.textColor = pro && self.switchSimilar.on ? nil : secondary;
+    self.labelSimilarityThresholdTitle.textColor = pro && self.switchSimilar.on ? nil : secondary;
+    self.labelCheckSimilar.textColor = pro ? nil : secondary;
 
     
     
@@ -190,11 +191,11 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == kSectionIdxHibp && !AppPreferences.sharedInstance.isProOrFreeTrial) {
+    if(section == kSectionIdxHibp && !AppPreferences.sharedInstance.isPro) {
         return NSLocalizedString(@"audit_hibp_pro_only_title", @"Have I Been Pwned? (Pro Edition Only)");
     }
     
-    if(section == kSectionIdxSimilarPasswords && !AppPreferences.sharedInstance.isProOrFreeTrial) {
+    if(section == kSectionIdxSimilarPasswords && !AppPreferences.sharedInstance.isPro) {
         return NSLocalizedString(@"audit_similar_passwords_pro_only_title", @"Similar Passwords (Pro Edition Only");
     }
 

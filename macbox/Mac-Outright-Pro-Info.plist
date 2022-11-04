@@ -70,7 +70,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.56.5</string>
+	<string>1.56.6</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -99,7 +99,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>5042</string>
+	<string>5048</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<true/>
 	<key>ITSEncryptionExportComplianceCode</key>

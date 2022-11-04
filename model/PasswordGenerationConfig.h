@@ -78,6 +78,16 @@ typedef NS_ENUM (NSInteger, PasswordGenerationSaltConfig) {
 @property PasswordGenerationHackerifyLevel hackerify;
 @property PasswordGenerationSaltConfig saltConfig;
 
+
+
+@property BOOL dicewareAddNumber;
+@property BOOL dicewareAddUpper;
+@property BOOL dicewareAddLower;
+@property BOOL dicewareAddSymbols;
+@property BOOL dicewareAddLatin1Supplement;
+
+@property NSString* basicExcludedCharacters;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -34,6 +34,23 @@ public class StrongboxProductBundle : NSObject {
                 return true
             }
         }
+        
+        var displayName : String {
+            switch self {
+            case .unifiedFreemium:
+                return "Universal (macOS & iOS, Freemium)"
+            case .unifiedPro:
+                return "Universal (macOS & iOS, Outright Pro)"
+            case .zero:
+                return "Zero"
+            case .scotus:
+                return "SCOTUS"
+            case .macOSStandaloneFreemium:
+                return "Non-Universal (macOS only, Freemium)"
+            case .macOSStandalonePro:
+                return "Non-Universal (macOS only, Outright Pro)"
+            }
+        }
     }
     
     @objc class var isUnifiedProBundle : Bool {
@@ -99,5 +116,22 @@ public class StrongboxProductBundle : NSObject {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
-    }    
+    }
+    
+    @objc class var isTestFlightBuild : Bool {
+        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+    }
+    
+    @objc class var displayName : String {
+        let bundleId = Utils.getAppBundleId()
+        
+        if let bundle = BundleIdentifiers(rawValue: bundleId) {
+            NSLog("✅ Recognized Product Bundle: [%@] - [%hhd]", String(describing: bundle), bundle.isPro)
+            return bundle.displayName
+        }
+        else {
+            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.displayName")
+            return NSLocalizedString("generic_unknown", comment: "Unknown")
+        }
+    }
 }

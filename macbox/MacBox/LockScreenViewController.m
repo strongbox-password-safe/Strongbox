@@ -101,7 +101,7 @@
 }
 
 - (void)customizeUi {
-    NSString* fmt2 = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    NSString* fmt2 = Settings.sharedInstance.isPro ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
     
     NSString* about = [NSString stringWithFormat:fmt2, [Utils getAppVersion]];
     self.textFieldVersion.stringValue = about;
@@ -309,7 +309,7 @@
 - (void)bindProOrFreeTrial {
     self.quickTrialStartContainer.hidden = YES; 
 
-    if ( !Settings.sharedInstance.isProOrFreeTrial ) {
+    if ( !Settings.sharedInstance.isPro ) {
         if ( ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
             [self bindFreeTrialPanel];
         }
@@ -462,7 +462,7 @@
     if ( !touchEnabled && !watchEnabled ) {
         [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_bio_unavailable", @"Biometrics/Watch Unavailable")];
     }
-    else if ( !Settings.sharedInstance.isProOrFreeTrial ) {
+    else if ( !Settings.sharedInstance.isPro ) {
         [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_pro_only", @"Biometrics/Watch Unlock (Pro Only)")];
     }
     else if( expired ) {
@@ -619,7 +619,7 @@
 }
 
 - (void)onGotAvailableYubiKey:(HardwareKeyData*)yk {
-    if (!Settings.sharedInstance.isProOrFreeTrial ) {
+    if ( !Settings.sharedInstance.isPro ) {
         [self addNoneProHardwareKeyMenuItem];
         self.yubiKeyPopup.enabled = NO;
         return;
@@ -960,7 +960,7 @@
     StorageProvider provider = self.databaseMetadata.storageProvider;
     BOOL sftpOrDav = provider == kSFTP || provider == kWebDAV;
     
-    if ( sftpOrDav && !Settings.sharedInstance.isProOrFreeTrial ) {
+    if ( sftpOrDav && !Settings.sharedInstance.isPro ) {
         [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                  window:self.view.window];
         return;

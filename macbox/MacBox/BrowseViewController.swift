@@ -433,21 +433,21 @@ class BrowseViewController: NSViewController {
     private func compareNodes(_ node1: Node, _ node2: Node, _ column: BrowseViewColumn, _ ascending: Bool) -> ComparisonResult {
         switch column {
         case .title:
-            return database.compareNodes(forSort: node1, node2: node2, field: .title, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .title, descending: !ascending, foldersSeparately: false)
         case .username:
-            return database.compareNodes(forSort: node1, node2: node2, field: .username, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .username, descending: !ascending, foldersSeparately: false)
         case .password:
-            return database.compareNodes(forSort: node1, node2: node2, field: .password, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .password, descending: !ascending, foldersSeparately: false)
         case .url:
-            return database.compareNodes(forSort: node1, node2: node2, field: .url, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .url, descending: !ascending, foldersSeparately: false)
         case .email:
-            return database.compareNodes(forSort: node1, node2: node2, field: .email, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .email, descending: !ascending, foldersSeparately: false)
         case .notes:
-            return database.compareNodes(forSort: node1, node2: node2, field: .notes, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .notes, descending: !ascending, foldersSeparately: false)
         case .created:
-            return database.compareNodes(forSort: node1, node2: node2, field: .created, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .created, descending: !ascending, foldersSeparately: false)
         case .modified:
-            return database.compareNodes(forSort: node1, node2: node2, field: .modified, descending: !ascending, foldersSeparately: false, tieBreakUseTitle: false)
+            return database.compareNodes(forSort: node1, node2: node2, field: .modified, descending: !ascending, foldersSeparately: false)
         case .expires:
             return compareDates(node1.fields.expires, node2.fields.expires, ascending: ascending)
         case .totp:

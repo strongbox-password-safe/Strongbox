@@ -172,7 +172,7 @@
         self.checkboxUseAKeyFile.enabled = YES;
         self.checkboxUseYubiKey.state = NSControlStateValueOff;
         
-        BOOL isPro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+        BOOL isPro = Settings.sharedInstance.isPro;
         self.checkboxUseYubiKey.enabled = isPro && self.selectedDatabaseFormat != kKeePass1;
         
         if (!isPro) {

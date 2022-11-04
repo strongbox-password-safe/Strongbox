@@ -14,6 +14,7 @@
 #import "Model.h"
 #import "AppPreferences.h"
 #import "UpgradeViewController.h"
+#import "Utils.h"
 
 @interface FreeTrialOnboardingViewController ()
 
@@ -26,6 +27,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOK4;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelPrice;
+@property (weak, nonatomic) IBOutlet UIStackView *yubiKeyFeature;
 
 @property SKProduct* yearly;
 
@@ -80,6 +82,8 @@
     NSString* priceFmt = NSLocalizedString(@"price_per_year_after_free_trial_fmt", "Then %@ every year");
     
     self.labelPrice.text = [NSString stringWithFormat:priceFmt, priceText];
+    
+    self.yubiKeyFeature.hidden = Utils.isiPadPro;
 }
 
 - (NSString *)getPriceTextFromProduct:(SKProduct*)product {

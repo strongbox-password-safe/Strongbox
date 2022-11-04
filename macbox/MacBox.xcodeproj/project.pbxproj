@@ -503,6 +503,70 @@
 		C810337C2749632600869513 /* AppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C810337E2749632600869513 /* AppPreferences.storyboard */; };
 		C81033A0274963AE00869513 /* FavIconsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C810339E274963AE00869513 /* FavIconsPreferences.swift */; };
 		C81033A1274963AE00869513 /* FavIconsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C810339E274963AE00869513 /* FavIconsPreferences.swift */; };
+		C8127D0E2905771800F48390 /* Import1PasswordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86846B2271F21CA00D4565B /* Import1PasswordTests.swift */; };
+		C8127D0F2905771D00F48390 /* MB1Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29663721AD7318009B7936 /* MB1Tests.m */; };
+		C8127D102905772700F48390 /* Parse2FactorAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */; };
+		C8127D112905772B00F48390 /* SecretStoreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB7E923D1BD05000A9ABC /* SecretStoreTests.m */; };
+		C8127D122905778000F48390 /* mark-attachments.1pif in Resources */ = {isa = PBXBuildFile; fileRef = C8CB833C2791E01300F85A2C /* mark-attachments.1pif */; };
+		C8127D132905778200F48390 /* all-types.1pif in Resources */ = {isa = PBXBuildFile; fileRef = C803D18B27281A5700DA217C /* all-types.1pif */; };
+		C8127D142905778500F48390 /* Test.1pif in Resources */ = {isa = PBXBuildFile; fileRef = C80A59A92726E9920042EA78 /* Test.1pif */; };
+		C8127D152905778800F48390 /* 1Password-6.7.1.1pif in Resources */ = {isa = PBXBuildFile; fileRef = C80A59B6272715C90042EA78 /* 1Password-6.7.1.1pif */; };
+		C8127D1629057F2300F48390 /* BrowserAutoFillManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6162F28BD15A2006A6E56 /* BrowserAutoFillManager.swift */; };
+		C8127D1729057F2400F48390 /* BrowserAutoFillManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6162F28BD15A2006A6E56 /* BrowserAutoFillManager.swift */; };
+		C8127D1829057F2400F48390 /* BrowserAutoFillManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6162F28BD15A2006A6E56 /* BrowserAutoFillManager.swift */; };
+		C8127D1929057F2500F48390 /* BrowserAutoFillManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6162F28BD15A2006A6E56 /* BrowserAutoFillManager.swift */; };
+		C8127D1A29057F2700F48390 /* BrowserAutoFillManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6162F28BD15A2006A6E56 /* BrowserAutoFillManager.swift */; };
+		C8127D1B29057F2800F48390 /* BrowserAutoFillManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6162F28BD15A2006A6E56 /* BrowserAutoFillManager.swift */; };
+		C8127D1C29057FCE00F48390 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FD28BD107A006A6E56 /* Constant.swift */; };
+		C8127D1D29057FCF00F48390 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FD28BD107A006A6E56 /* Constant.swift */; };
+		C8127D1E29057FCF00F48390 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FD28BD107A006A6E56 /* Constant.swift */; };
+		C8127D1F29057FD000F48390 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FD28BD107A006A6E56 /* Constant.swift */; };
+		C8127D2029057FD000F48390 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FD28BD107A006A6E56 /* Constant.swift */; };
+		C8127D2129057FD100F48390 /* Constant.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FD28BD107A006A6E56 /* Constant.swift */; };
+		C8127D2229057FD600F48390 /* BasicRulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160628BD107A006A6E56 /* BasicRulesParser.swift */; };
+		C8127D2329057FD600F48390 /* DomainParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FE28BD107A006A6E56 /* DomainParser.swift */; };
+		C8127D2429057FD600F48390 /* ParsedHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160828BD107A006A6E56 /* ParsedHost.swift */; };
+		C8127D2529057FD600F48390 /* RulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160528BD107A006A6E56 /* RulesParser.swift */; };
+		C8127D2629057FD600F48390 /* BasicRulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160628BD107A006A6E56 /* BasicRulesParser.swift */; };
+		C8127D2729057FD600F48390 /* DomainParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FE28BD107A006A6E56 /* DomainParser.swift */; };
+		C8127D2829057FD600F48390 /* ParsedHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160828BD107A006A6E56 /* ParsedHost.swift */; };
+		C8127D2929057FD600F48390 /* RulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160528BD107A006A6E56 /* RulesParser.swift */; };
+		C8127D2A29057FD700F48390 /* BasicRulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160628BD107A006A6E56 /* BasicRulesParser.swift */; };
+		C8127D2B29057FD700F48390 /* DomainParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FE28BD107A006A6E56 /* DomainParser.swift */; };
+		C8127D2C29057FD700F48390 /* ParsedHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160828BD107A006A6E56 /* ParsedHost.swift */; };
+		C8127D2D29057FD700F48390 /* RulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160528BD107A006A6E56 /* RulesParser.swift */; };
+		C8127D2E29057FD800F48390 /* BasicRulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160628BD107A006A6E56 /* BasicRulesParser.swift */; };
+		C8127D2F29057FD800F48390 /* DomainParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FE28BD107A006A6E56 /* DomainParser.swift */; };
+		C8127D3029057FD800F48390 /* ParsedHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160828BD107A006A6E56 /* ParsedHost.swift */; };
+		C8127D3129057FD800F48390 /* RulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160528BD107A006A6E56 /* RulesParser.swift */; };
+		C8127D3229057FD800F48390 /* BasicRulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160628BD107A006A6E56 /* BasicRulesParser.swift */; };
+		C8127D3329057FD800F48390 /* DomainParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FE28BD107A006A6E56 /* DomainParser.swift */; };
+		C8127D3429057FD800F48390 /* ParsedHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160828BD107A006A6E56 /* ParsedHost.swift */; };
+		C8127D3529057FD800F48390 /* RulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160528BD107A006A6E56 /* RulesParser.swift */; };
+		C8127D3629057FD900F48390 /* BasicRulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160628BD107A006A6E56 /* BasicRulesParser.swift */; };
+		C8127D3729057FD900F48390 /* DomainParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E615FE28BD107A006A6E56 /* DomainParser.swift */; };
+		C8127D3829057FD900F48390 /* ParsedHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160828BD107A006A6E56 /* ParsedHost.swift */; };
+		C8127D3929057FD900F48390 /* RulesParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160528BD107A006A6E56 /* RulesParser.swift */; };
+		C8127D3A29057FDE00F48390 /* public_suffix_list.dat in Resources */ = {isa = PBXBuildFile; fileRef = C8E6160028BD107A006A6E56 /* public_suffix_list.dat */; };
+		C8127D3B29057FDE00F48390 /* public_suffix_list.dat in Resources */ = {isa = PBXBuildFile; fileRef = C8E6160028BD107A006A6E56 /* public_suffix_list.dat */; };
+		C8127D3C29057FDF00F48390 /* public_suffix_list.dat in Resources */ = {isa = PBXBuildFile; fileRef = C8E6160028BD107A006A6E56 /* public_suffix_list.dat */; };
+		C8127D3D29057FE000F48390 /* public_suffix_list.dat in Resources */ = {isa = PBXBuildFile; fileRef = C8E6160028BD107A006A6E56 /* public_suffix_list.dat */; };
+		C8127D3E29057FE000F48390 /* public_suffix_list.dat in Resources */ = {isa = PBXBuildFile; fileRef = C8E6160028BD107A006A6E56 /* public_suffix_list.dat */; };
+		C8127D3F29057FE100F48390 /* public_suffix_list.dat in Resources */ = {isa = PBXBuildFile; fileRef = C8E6160028BD107A006A6E56 /* public_suffix_list.dat */; };
+		C8127D4029057FE700F48390 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160428BD107A006A6E56 /* Rule.swift */; };
+		C8127D4129057FE700F48390 /* RuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160328BD107A006A6E56 /* RuleLabel.swift */; };
+		C8127D4229057FE800F48390 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160428BD107A006A6E56 /* Rule.swift */; };
+		C8127D4329057FE800F48390 /* RuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160328BD107A006A6E56 /* RuleLabel.swift */; };
+		C8127D4429057FE900F48390 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160428BD107A006A6E56 /* Rule.swift */; };
+		C8127D4529057FE900F48390 /* RuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160328BD107A006A6E56 /* RuleLabel.swift */; };
+		C8127D4629057FE900F48390 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160428BD107A006A6E56 /* Rule.swift */; };
+		C8127D4729057FE900F48390 /* RuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160328BD107A006A6E56 /* RuleLabel.swift */; };
+		C8127D4829057FEA00F48390 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160428BD107A006A6E56 /* Rule.swift */; };
+		C8127D4929057FEA00F48390 /* RuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160328BD107A006A6E56 /* RuleLabel.swift */; };
+		C8127D4A29057FEA00F48390 /* Rule.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160428BD107A006A6E56 /* Rule.swift */; };
+		C8127D4B29057FEA00F48390 /* RuleLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E6160328BD107A006A6E56 /* RuleLabel.swift */; };
+		C8127D4C2905800900F48390 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163528BD1645006A6E56 /* AutoFillCommon.m */; };
+		C8127D4D2905800900F48390 /* AutoFillCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6163528BD1645006A6E56 /* AutoFillCommon.m */; };
 		C812B05C2825576400E47941 /* DrillDownDiff.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C812B05B2825576400E47941 /* DrillDownDiff.storyboard */; };
 		C812B05D2825576400E47941 /* DrillDownDiff.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C812B05B2825576400E47941 /* DrillDownDiff.storyboard */; };
 		C812B06028255A4300E47941 /* DiffDrillDownDetailer.m in Sources */ = {isa = PBXBuildFile; fileRef = C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */; };
@@ -631,6 +695,7 @@
 		C82A91AC28882AFE00C7E736 /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C82A91A428882AFE00C7E736 /* GoogleDriveManager.m */; };
 		C82A91AD28882AFE00C7E736 /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C82A91A428882AFE00C7E736 /* GoogleDriveManager.m */; };
 		C82A91AE28882AFE00C7E736 /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C82A91A428882AFE00C7E736 /* GoogleDriveManager.m */; };
+		C82CA977290573AA00D607F2 /* BrowserAutoFillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C82CA976290573AA00D607F2 /* BrowserAutoFillTests.swift */; };
 		C82DB42E2753C6EB006B7573 /* AutoFillLoadingVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C82DB42D2753C6EB006B7573 /* AutoFillLoadingVC.m */; };
 		C82DB42F2753C6EB006B7573 /* AutoFillLoadingVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C82DB42D2753C6EB006B7573 /* AutoFillLoadingVC.m */; };
 		C82DB4332753C911006B7573 /* AutoFillLoading.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C82DB4362753C911006B7573 /* AutoFillLoading.storyboard */; };
@@ -1672,7 +1737,6 @@
 		C849381B285763230079D1E8 /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C80B10832551F9D200FBDF72 /* CustomData.m */; };
 		C849381C285763230079D1E8 /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC325CAFBB10070C7FE /* DAVRequestGroup.m */; };
 		C849381D285763230079D1E8 /* MacDatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E0B1EC275BD49000A871F6 /* MacDatabasePreferences.m */; };
-		C849381E285763230079D1E8 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75E2570353A009991D4 /* regdom.c */; };
 		C849381F285763230079D1E8 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81AC79A27A06AA900EF5ED3 /* Collection+Extensions.swift */; };
 		C8493820285763230079D1E8 /* WebDAVConfigVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F39EAB25DD7CBA0045CAAB /* WebDAVConfigVC.m */; };
 		C8493821285763230079D1E8 /* KeePassXmlAutoTypeAssociation.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791652561A1630038310E /* KeePassXmlAutoTypeAssociation.m */; };
@@ -2488,7 +2552,6 @@
 		C8493B7828577D530079D1E8 /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C80B10832551F9D200FBDF72 /* CustomData.m */; };
 		C8493B7928577D530079D1E8 /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC325CAFBB10070C7FE /* DAVRequestGroup.m */; };
 		C8493B7A28577D530079D1E8 /* MacDatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E0B1EC275BD49000A871F6 /* MacDatabasePreferences.m */; };
-		C8493B7B28577D530079D1E8 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75E2570353A009991D4 /* regdom.c */; };
 		C8493B7C28577D530079D1E8 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81AC79A27A06AA900EF5ED3 /* Collection+Extensions.swift */; };
 		C8493B7D28577D530079D1E8 /* WebDAVConfigVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F39EAB25DD7CBA0045CAAB /* WebDAVConfigVC.m */; };
 		C8493B7E28577D530079D1E8 /* KeePassXmlAutoTypeAssociation.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791652561A1630038310E /* KeePassXmlAutoTypeAssociation.m */; };
@@ -2756,6 +2819,7 @@
 		C87073A92589356A0002070A /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = C87073A62589356A0002070A /* Platform.m */; };
 		C87073AA2589356A0002070A /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = C87073A62589356A0002070A /* Platform.m */; };
 		C871F115285A4AD000F4A731 /* UnifiedUpgrade.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C871F117285A4AD000F4A731 /* UnifiedUpgrade.storyboard */; };
+		C87229C9290D8A4200436735 /* NativeMessagingManifestInstallHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C820507428E06DFE00FFBDED /* NativeMessagingManifestInstallHelper.swift */; };
 		C873EA5A26F2405400A71F2A /* XmlOutputStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = C873EA5926F2405400A71F2A /* XmlOutputStreamWriter.m */; };
 		C873EA5B26F2405400A71F2A /* XmlOutputStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = C873EA5926F2405400A71F2A /* XmlOutputStreamWriter.m */; };
 		C873EA5C26F2405400A71F2A /* XmlOutputStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = C873EA5926F2405400A71F2A /* XmlOutputStreamWriter.m */; };
@@ -3700,7 +3764,6 @@
 		C899656428A1441B0069FA51 /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C80B10832551F9D200FBDF72 /* CustomData.m */; };
 		C899656528A1441B0069FA51 /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC325CAFBB10070C7FE /* DAVRequestGroup.m */; };
 		C899656628A1441B0069FA51 /* MacDatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E0B1EC275BD49000A871F6 /* MacDatabasePreferences.m */; };
-		C899656728A1441B0069FA51 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75E2570353A009991D4 /* regdom.c */; };
 		C899656828A1441B0069FA51 /* Collection+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81AC79A27A06AA900EF5ED3 /* Collection+Extensions.swift */; };
 		C899656928A1441B0069FA51 /* WebDAVConfigVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F39EAB25DD7CBA0045CAAB /* WebDAVConfigVC.m */; };
 		C899656A28A1441B0069FA51 /* KeePassXmlAutoTypeAssociation.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791652561A1630038310E /* KeePassXmlAutoTypeAssociation.m */; };
@@ -4059,7 +4122,6 @@
 		C8B946032573D01A00932C46 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */; };
 		C8B946052573D01A00932C46 /* MMWormholeFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E78B3C25715C8700251153 /* MMWormholeFileTransiting.m */; };
 		C8B946072573D01A00932C46 /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C80B10832551F9D200FBDF72 /* CustomData.m */; };
-		C8B946082573D01A00932C46 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75E2570353A009991D4 /* regdom.c */; };
 		C8B946092573D01A00932C46 /* KeePassXmlAutoTypeAssociation.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791652561A1630038310E /* KeePassXmlAutoTypeAssociation.m */; };
 		C8B9460A2573D01A00932C46 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF348002074FA6C00148741 /* Node.m */; };
 		C8B9460B2573D01A00932C46 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096521825104007BA1E7 /* AesCipher.m */; };
@@ -4109,7 +4171,6 @@
 		C8C1F73D257010AE009991D4 /* NSMutableArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F73B257010AE009991D4 /* NSMutableArray+Extensions.m */; };
 		C8C1F75325702E65009991D4 /* AutoFillCredentialCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75225702E65009991D4 /* AutoFillCredentialCell.m */; };
 		C8C1F75925702E7B009991D4 /* AutoFillCredentialCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C1F75825702E7B009991D4 /* AutoFillCredentialCell.xib */; };
-		C8C1F7612570353A009991D4 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75E2570353A009991D4 /* regdom.c */; };
 		C8C2F5922705DBEC0002C94D /* SBDownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C2F5912705DBEC0002C94D /* SBDownTextView.swift */; };
 		C8C2F5932705DBEC0002C94D /* SBDownTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C2F5912705DBEC0002C94D /* SBDownTextView.swift */; };
 		C8C5B69628DF3B2100FA6F96 /* DatabaseSummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C5B69528DF3B2100FA6F96 /* DatabaseSummary.swift */; };
@@ -4401,6 +4462,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = C83CE60F28AAA7CF00E482E6;
 			remoteInfo = afproxy;
+		};
+		C82CA978290573AA00D607F2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4DF59F491F30DB7A00D68BFE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C849385528577D4D0079D1E8;
+			remoteInfo = "Mac-Unified-Pro";
 		};
 		C83CE61828AAAA4C00E482E6 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -5340,6 +5408,8 @@
 		C82A91A428882AFE00C7E736 /* GoogleDriveManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GoogleDriveManager.m; path = ../StrongBox/GoogleDriveManager.m; sourceTree = "<group>"; };
 		C82A91A528882AFE00C7E736 /* GoogleDriveStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GoogleDriveStorageProvider.h; path = ../StrongBox/GoogleDriveStorageProvider.h; sourceTree = "<group>"; };
 		C82A91A628882AFE00C7E736 /* GoogleDriveManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GoogleDriveManager.h; path = ../StrongBox/GoogleDriveManager.h; sourceTree = "<group>"; };
+		C82CA974290573A900D607F2 /* MB2Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MB2Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C82CA976290573AA00D607F2 /* BrowserAutoFillTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserAutoFillTests.swift; sourceTree = "<group>"; };
 		C82DB42C2753C6EB006B7573 /* AutoFillLoadingVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoFillLoadingVC.h; sourceTree = "<group>"; };
 		C82DB42D2753C6EB006B7573 /* AutoFillLoadingVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoFillLoadingVC.m; sourceTree = "<group>"; };
 		C82DB4352753C911006B7573 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/AutoFillLoading.storyboard; sourceTree = "<group>"; };
@@ -6115,9 +6185,6 @@
 		C8C1F75125702E65009991D4 /* AutoFillCredentialCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoFillCredentialCell.h; sourceTree = "<group>"; };
 		C8C1F75225702E65009991D4 /* AutoFillCredentialCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoFillCredentialCell.m; sourceTree = "<group>"; };
 		C8C1F75825702E7B009991D4 /* AutoFillCredentialCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AutoFillCredentialCell.xib; sourceTree = "<group>"; };
-		C8C1F75E2570353A009991D4 /* regdom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = regdom.c; path = ../../lib/psl/regdom.c; sourceTree = "<group>"; };
-		C8C1F75F2570353A009991D4 /* regdom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = regdom.h; path = ../../lib/psl/regdom.h; sourceTree = "<group>"; };
-		C8C1F7602570353A009991D4 /* tld-canon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tld-canon.h"; path = "../../lib/psl/tld-canon.h"; sourceTree = "<group>"; };
 		C8C2F5912705DBEC0002C94D /* SBDownTextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SBDownTextView.swift; path = ../model/SBDownTextView.swift; sourceTree = "<group>"; };
 		C8C5B69528DF3B2100FA6F96 /* DatabaseSummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseSummary.swift; sourceTree = "<group>"; };
 		C8C5DF9928328A0300A1EEFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/FavIconResultTableCell.xib; sourceTree = "<group>"; };
@@ -6565,6 +6632,13 @@
 				C847979425895647002CEEE7 /* CloudKit.framework in Frameworks */,
 				4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */,
 				5AA0B0664822FE7D8552F21F /* Pods_common_mac_Mac_Freemium.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C82CA971290573A900D607F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7389,9 +7463,6 @@
 				C8C1F75125702E65009991D4 /* AutoFillCredentialCell.h */,
 				C8C1F75225702E65009991D4 /* AutoFillCredentialCell.m */,
 				C8C1F75825702E7B009991D4 /* AutoFillCredentialCell.xib */,
-				C8C1F75E2570353A009991D4 /* regdom.c */,
-				C8C1F75F2570353A009991D4 /* regdom.h */,
-				C8C1F7602570353A009991D4 /* tld-canon.h */,
 				C8C1F74225701395009991D4 /* BrowseSortField.h */,
 				C8C1F73C257010AE009991D4 /* NSMutableArray+Extensions.h */,
 				C8C1F73B257010AE009991D4 /* NSMutableArray+Extensions.m */,
@@ -7497,6 +7568,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4DF347EF2074FA5A00148741 /* Logic */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
 				C8B9D494247E9F3800F6B9F5 /* Build */,
 				4D524D2B219B503F00C22CB4 /* View */,
@@ -7507,7 +7579,6 @@
 				C849384C285774D00079D1E8 /* StrongboxProductBundle.swift */,
 				C8493843285766D00079D1E8 /* MacCustomizationManager.h */,
 				C8493844285766D00079D1E8 /* MacCustomizationManager.m */,
-				4DF347EF2074FA5A00148741 /* Logic */,
 				C87A995325596A240002BEF8 /* Swift */,
 				C8441B7D25CAEAFD0070C7FE /* Storage Providers */,
 				C81F1DD02602146600251A2F /* Compare and Merge */,
@@ -7516,6 +7587,7 @@
 				4D29660621AD6EFB009B7936 /* MacUnitTests */,
 				4D29661421AD6FB2009B7936 /* MBTests */,
 				4D29663621AD7318009B7936 /* MB1Tests */,
+				C82CA975290573A900D607F2 /* MB2Tests */,
 				4DF59F521F30DB7A00D68BFE /* Products */,
 				4D1D6F3A1F386CB700D2B8EC /* Frameworks */,
 				83A5026A689FD4BF4431C710 /* Pods */,
@@ -7538,6 +7610,7 @@
 				C899658A28A1441B0069FA51 /* Mac-Graphene-AutoFill.appex */,
 				C83CE61028AAA7CF00E482E6 /* afproxy */,
 				C8DA4D1328AAAF0F004E3F4A /* afproxy-debug-harness */,
+				C82CA974290573A900D607F2 /* MB2Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -7803,6 +7876,14 @@
 				C82A91A328882AFE00C7E736 /* GoogleDriveStorageProvider.m */,
 			);
 			name = " Google Drive";
+			sourceTree = "<group>";
+		};
+		C82CA975290573A900D607F2 /* MB2Tests */ = {
+			isa = PBXGroup;
+			children = (
+				C82CA976290573AA00D607F2 /* BrowserAutoFillTests.swift */,
+			);
+			path = MB2Tests;
 			sourceTree = "<group>";
 		};
 		C82E643D288994AA0019289E /* Dropbox */ = {
@@ -9323,6 +9404,24 @@
 			productReference = 4DF59F511F30DB7A00D68BFE /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
 		};
+		C82CA973290573A900D607F2 /* MB2Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C82CA97C290573AA00D607F2 /* Build configuration list for PBXNativeTarget "MB2Tests" */;
+			buildPhases = (
+				C82CA970290573A900D607F2 /* Sources */,
+				C82CA971290573A900D607F2 /* Frameworks */,
+				C82CA972290573A900D607F2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C82CA979290573AA00D607F2 /* PBXTargetDependency */,
+			);
+			name = MB2Tests;
+			productName = MB2Tests;
+			productReference = C82CA974290573A900D607F2 /* MB2Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		C83CE60F28AAA7CF00E482E6 /* afproxy */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C83CE61628AAA7D000E482E6 /* Build configuration list for PBXNativeTarget "afproxy" */;
@@ -9503,6 +9602,7 @@
 			isa = PBXProject;
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Original;
+				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1300;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
@@ -9539,6 +9639,12 @@
 								enabled = 1;
 							};
 						};
+					};
+					C82CA973290573A900D607F2 = {
+						CreatedOnToolsVersion = 14.0.1;
+						DevelopmentTeam = 4326J8XDF2;
+						ProvisioningStyle = Automatic;
+						TestTargetID = C849385528577D4D0079D1E8;
 					};
 					C83CE60F28AAA7CF00E482E6 = {
 						CreatedOnToolsVersion = 13.4.1;
@@ -9643,11 +9749,12 @@
 				C8B945632573D01A00932C46 /* Mac-Pro-AutoFill */,
 				C8493724285763230079D1E8 /* Mac-Unified-Freemium-AutoFill */,
 				C8493A8128577D530079D1E8 /* Mac-Unified-Pro-AutoFill */,
-				4D29663421AD7318009B7936 /* MB1Tests */,
 				C899622E28A144130069FA51 /* Mac-Graphene */,
 				C899646F28A1441B0069FA51 /* Mac-Graphene-AutoFill */,
 				C83CE60F28AAA7CF00E482E6 /* afproxy */,
 				C8DA4D1228AAAF0F004E3F4A /* afproxy-debug-harness */,
+				4D29663421AD7318009B7936 /* MB1Tests */,
+				C82CA973290573A900D607F2 /* MB2Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -9792,6 +9899,7 @@
 				C8877336261DD64900C01406 /* Backups.storyboard in Resources */,
 				4DE79B8C255D987C00F59B10 /* CredentialProviderViewController.xib in Resources */,
 				C851791E2826A35B00A09797 /* CompareDatabases.storyboard in Resources */,
+				C8127D3A29057FDE00F48390 /* public_suffix_list.dat in Resources */,
 				C8E5C337275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */,
 				C8C1F75925702E7B009991D4 /* AutoFillCredentialCell.xib in Resources */,
 				C851791A2826A35200A09797 /* DrillDownDiff.storyboard in Resources */,
@@ -9927,6 +10035,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C82CA972290573A900D607F2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C8127D142905778500F48390 /* Test.1pif in Resources */,
+				C8127D152905778800F48390 /* 1Password-6.7.1.1pif in Resources */,
+				C8127D122905778000F48390 /* mark-attachments.1pif in Resources */,
+				C8127D132905778200F48390 /* all-types.1pif in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C84936B12857631D0079D1E8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -10056,6 +10175,7 @@
 				C8493830285763230079D1E8 /* Backups.storyboard in Resources */,
 				C8493831285763230079D1E8 /* CredentialProviderViewController.xib in Resources */,
 				C8493832285763230079D1E8 /* CompareDatabases.storyboard in Resources */,
+				C8127D3C29057FDF00F48390 /* public_suffix_list.dat in Resources */,
 				C8493833285763230079D1E8 /* MacConflictResolutionWizard.storyboard in Resources */,
 				C8493834285763230079D1E8 /* AutoFillCredentialCell.xib in Resources */,
 				C8493835285763230079D1E8 /* DrillDownDiff.storyboard in Resources */,
@@ -10199,6 +10319,7 @@
 				C8493B8D28577D530079D1E8 /* Backups.storyboard in Resources */,
 				C8493B8E28577D530079D1E8 /* CredentialProviderViewController.xib in Resources */,
 				C8493B8F28577D530079D1E8 /* CompareDatabases.storyboard in Resources */,
+				C8127D3D29057FE000F48390 /* public_suffix_list.dat in Resources */,
 				C8493B9028577D530079D1E8 /* MacConflictResolutionWizard.storyboard in Resources */,
 				C8493B9128577D530079D1E8 /* AutoFillCredentialCell.xib in Resources */,
 				C8493B9228577D530079D1E8 /* DrillDownDiff.storyboard in Resources */,
@@ -10224,6 +10345,7 @@
 				C89963FD28A144130069FA51 /* CheckboxCell.xib in Resources */,
 				C89963FE28A144130069FA51 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				C89963FF28A144130069FA51 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				C8127D3E29057FE000F48390 /* public_suffix_list.dat in Resources */,
 				C899640028A144130069FA51 /* CreateEditViewController.storyboard in Resources */,
 				C899640128A144130069FA51 /* MacKeePassHistory.storyboard in Resources */,
 				C899640228A144130069FA51 /* SFTPConnectionsManager.storyboard in Resources */,
@@ -10341,6 +10463,7 @@
 				C899657928A1441B0069FA51 /* Backups.storyboard in Resources */,
 				C899657A28A1441B0069FA51 /* CredentialProviderViewController.xib in Resources */,
 				C899657B28A1441B0069FA51 /* CompareDatabases.storyboard in Resources */,
+				C8127D3F29057FE100F48390 /* public_suffix_list.dat in Resources */,
 				C899657C28A1441B0069FA51 /* MacConflictResolutionWizard.storyboard in Resources */,
 				C899657D28A1441B0069FA51 /* AutoFillCredentialCell.xib in Resources */,
 				C899657E28A1441B0069FA51 /* DrillDownDiff.storyboard in Resources */,
@@ -10366,6 +10489,7 @@
 				C8877338261DD64900C01406 /* Backups.storyboard in Resources */,
 				C8B946172573D01A00932C46 /* CredentialProviderViewController.xib in Resources */,
 				C851791F2826A35C00A09797 /* CompareDatabases.storyboard in Resources */,
+				C8127D3B29057FDE00F48390 /* public_suffix_list.dat in Resources */,
 				C8E5C339275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */,
 				C8B946192573D01A00932C46 /* AutoFillCredentialCell.xib in Resources */,
 				C851791B2826A35300A09797 /* DrillDownDiff.storyboard in Resources */,
@@ -11298,6 +11422,7 @@
 				C89B8FBD2562D2FE00B590C0 /* KeePass2TagPackage.m in Sources */,
 				C86E602D2562D510001953AD /* AesInputStream.m in Sources */,
 				C89B8E612562953D00B590C0 /* BaseXmlDomainObjectHandler.m in Sources */,
+				C8127D2329057FD600F48390 /* DomainParser.swift in Sources */,
 				C89B8F792562D24A00B590C0 /* Kdbx4Database.m in Sources */,
 				C8397AD925939858000F5158 /* MinimalPoolHelper.m in Sources */,
 				C83741B225D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
@@ -11352,16 +11477,19 @@
 				C8441BD525CAFBB10070C7FE /* ISO8601DateFormatter.m in Sources */,
 				C8C8968E26CECB9300F1BC4D /* MacHardwareKeyManager.m in Sources */,
 				C81BBD0E2567E49A001BAB0D /* ClickableTextField.m in Sources */,
+				C8127D2229057FD600F48390 /* BasicRulesParser.swift in Sources */,
 				C89B8F902562D2CA00B590C0 /* Kdbx4SerializationData.m in Sources */,
 				C8E6163A28BD174B006A6E56 /* AutoFillCommon.m in Sources */,
 				C86791772561A1910038310E /* AutoType.m in Sources */,
 				C89B8FA92562D2CA00B590C0 /* XmlSerializer.m in Sources */,
 				C8969FF925AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
+				C8127D1C29057FCE00F48390 /* Constant.swift in Sources */,
 				C89B8FDB2562D32C00B590C0 /* GzipDecompressOutputStream.m in Sources */,
 				C8D8D3E1256FD572001BD8BE /* SelectDatabaseViewController.m in Sources */,
 				C80735E12614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8441C3C25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8441CB425CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
+				C8127D1629057F2300F48390 /* BrowserAutoFillManager.swift in Sources */,
 				C86E60842562D614001953AD /* cdecode.c in Sources */,
 				C86E604E2562D561001953AD /* FileManager.m in Sources */,
 				C832A475272EC0FE00768319 /* macOSSpinnerUI.m in Sources */,
@@ -11398,6 +11526,7 @@
 				C8441CA825CB01AB0070C7FE /* socket_helper.m in Sources */,
 				C8E5C35A275E7707006C15FE /* MacConflictResolutionWizard.m in Sources */,
 				C8441CAC25CB01AB0070C7FE /* NMSSHSession.m in Sources */,
+				C8127D4329057FE800F48390 /* RuleLabel.swift in Sources */,
 				C86E60972562D649001953AD /* blake2b.c in Sources */,
 				C89B8FDC2562D32C00B590C0 /* AesOutputStream.m in Sources */,
 				C8B5020026ECB660003DE6A2 /* HmacBlockOutputStream.m in Sources */,
@@ -11457,6 +11586,7 @@
 				C83741BA25D30E8B00EDE4F3 /* WorkingCopyManager.m in Sources */,
 				C8441BED25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */,
 				C8C8968826CECB9300F1BC4D /* YubiKeyConfiguration.m in Sources */,
+				C8127D2429057FD600F48390 /* ParsedHost.swift in Sources */,
 				C807983A2562DF1B00FE0CA7 /* StreamUtils.m in Sources */,
 				C873EA5B26F2405400A71F2A /* XmlOutputStreamWriter.m in Sources */,
 				C89B8FA22562D2CA00B590C0 /* DeletedObject.m in Sources */,
@@ -11475,6 +11605,7 @@
 				C807983F2562DF8E00FE0CA7 /* NSURL+QueryItems.m in Sources */,
 				C86E60492562D554001953AD /* CustomDataItem.m in Sources */,
 				C86E602B2562D510001953AD /* ChaCha20ReadStream.m in Sources */,
+				C8127D2529057FD600F48390 /* RulesParser.swift in Sources */,
 				C86E60702562D5C1001953AD /* WordList.m in Sources */,
 				C85179122826A21900A09797 /* TitleAndIconCell.swift in Sources */,
 				C89B8F332562BCBD00B590C0 /* DatabaseMetadata.m in Sources */,
@@ -11493,6 +11624,7 @@
 				C8877446261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				C89B8F2E2562BCAF00B590C0 /* AutoFillManager.m in Sources */,
 				C8868D7B2740021200934FEA /* MBProgressHUD.m in Sources */,
+				C8127D4229057FE800F48390 /* Rule.swift in Sources */,
 				C807984E2562E22E00FE0CA7 /* ClipboardManager.m in Sources */,
 				C89B8F9A2562D2CA00B590C0 /* RootXmlDomainObject.m in Sources */,
 				C89B8FBA2562D2FE00B590C0 /* InnerRandomStreamFactory.m in Sources */,
@@ -11528,7 +11660,6 @@
 				C86E603F2562D540001953AD /* CustomData.m in Sources */,
 				C8441BDD25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
 				C8E0B1EE275BD49000A871F6 /* MacDatabasePreferences.m in Sources */,
-				C8C1F7612570353A009991D4 /* regdom.c in Sources */,
 				C85179142826A29500A09797 /* Collection+Extensions.swift in Sources */,
 				C8F39EB625DD81900045CAAB /* WebDAVConfigVC.m in Sources */,
 				C867916C2561A1630038310E /* KeePassXmlAutoTypeAssociation.m in Sources */,
@@ -12018,6 +12149,18 @@
 				C85A841827988B2B004BCF22 /* NotesTableCellView.swift in Sources */,
 				4D8DE9BF21F898470043DDC0 /* OTPAlgorithm.m in Sources */,
 				4D4A003A2312CC5400B69E09 /* SerializationPackage.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C82CA970290573A900D607F2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C82CA977290573AA00D607F2 /* BrowserAutoFillTests.swift in Sources */,
+				C8127D112905772B00F48390 /* SecretStoreTests.m in Sources */,
+				C8127D0E2905771800F48390 /* Import1PasswordTests.swift in Sources */,
+				C8127D0F2905771D00F48390 /* MB1Tests.m in Sources */,
+				C8127D102905772700F48390 /* Parse2FactorAuth.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -12537,6 +12680,7 @@
 				C8493736285763230079D1E8 /* KeePass2TagPackage.m in Sources */,
 				C8493737285763230079D1E8 /* AesInputStream.m in Sources */,
 				C8493738285763230079D1E8 /* BaseXmlDomainObjectHandler.m in Sources */,
+				C8127D2B29057FD700F48390 /* DomainParser.swift in Sources */,
 				C8493739285763230079D1E8 /* Kdbx4Database.m in Sources */,
 				C849373A285763230079D1E8 /* MinimalPoolHelper.m in Sources */,
 				C849373B285763230079D1E8 /* DatabaseSyncOperationalData.m in Sources */,
@@ -12591,16 +12735,19 @@
 				C849376B285763230079D1E8 /* ISO8601DateFormatter.m in Sources */,
 				C849376C285763230079D1E8 /* MacHardwareKeyManager.m in Sources */,
 				C849376D285763230079D1E8 /* ClickableTextField.m in Sources */,
+				C8127D2A29057FD700F48390 /* BasicRulesParser.swift in Sources */,
 				C849376E285763230079D1E8 /* Kdbx4SerializationData.m in Sources */,
 				C8E6163C28BD174D006A6E56 /* AutoFillCommon.m in Sources */,
 				C849376F285763230079D1E8 /* AutoType.m in Sources */,
 				C8493770285763230079D1E8 /* XmlSerializer.m in Sources */,
 				C8493771285763230079D1E8 /* Argon2idKdfCipher.m in Sources */,
+				C8127D1E29057FCF00F48390 /* Constant.swift in Sources */,
 				C8493772285763230079D1E8 /* GzipDecompressOutputStream.m in Sources */,
 				C8493773285763230079D1E8 /* SelectDatabaseViewController.m in Sources */,
 				C8493774285763230079D1E8 /* TableViewWithRightClickSelect.m in Sources */,
 				C8493775285763230079D1E8 /* SFTPStorageProvider.m in Sources */,
 				C8493776285763230079D1E8 /* NMSSHConfig.m in Sources */,
+				C8127D1829057F2400F48390 /* BrowserAutoFillManager.swift in Sources */,
 				C8493777285763230079D1E8 /* cdecode.c in Sources */,
 				C8493778285763230079D1E8 /* FileManager.m in Sources */,
 				C8493779285763230079D1E8 /* macOSSpinnerUI.m in Sources */,
@@ -12637,6 +12784,7 @@
 				C8493798285763230079D1E8 /* socket_helper.m in Sources */,
 				C8493799285763230079D1E8 /* MacConflictResolutionWizard.m in Sources */,
 				C849379A285763230079D1E8 /* NMSSHSession.m in Sources */,
+				C8127D4529057FE900F48390 /* RuleLabel.swift in Sources */,
 				C849379B285763230079D1E8 /* blake2b.c in Sources */,
 				C849379C285763230079D1E8 /* AesOutputStream.m in Sources */,
 				C849379D285763230079D1E8 /* HmacBlockOutputStream.m in Sources */,
@@ -12696,6 +12844,7 @@
 				C84937D4285763230079D1E8 /* WorkingCopyManager.m in Sources */,
 				C84937D5285763230079D1E8 /* DAVBaseRequest.m in Sources */,
 				C84937D6285763230079D1E8 /* YubiKeyConfiguration.m in Sources */,
+				C8127D2C29057FD700F48390 /* ParsedHost.swift in Sources */,
 				C84937D8285763230079D1E8 /* StreamUtils.m in Sources */,
 				C84937D9285763230079D1E8 /* XmlOutputStreamWriter.m in Sources */,
 				C84937DA285763230079D1E8 /* DeletedObject.m in Sources */,
@@ -12714,6 +12863,7 @@
 				C84937E7285763230079D1E8 /* NSURL+QueryItems.m in Sources */,
 				C84937E8285763230079D1E8 /* CustomDataItem.m in Sources */,
 				C84937E9285763230079D1E8 /* ChaCha20ReadStream.m in Sources */,
+				C8127D2D29057FD700F48390 /* RulesParser.swift in Sources */,
 				C84937EA285763230079D1E8 /* WordList.m in Sources */,
 				C84937EB285763230079D1E8 /* TitleAndIconCell.swift in Sources */,
 				C84937EC285763230079D1E8 /* DatabaseMetadata.m in Sources */,
@@ -12732,6 +12882,7 @@
 				C84937F9285763230079D1E8 /* EditTagsViewController.m in Sources */,
 				C84937FA285763230079D1E8 /* AutoFillManager.m in Sources */,
 				C84937FB285763230079D1E8 /* MBProgressHUD.m in Sources */,
+				C8127D4429057FE900F48390 /* Rule.swift in Sources */,
 				C84937FC285763230079D1E8 /* ClipboardManager.m in Sources */,
 				C84937FD285763230079D1E8 /* RootXmlDomainObject.m in Sources */,
 				C84937FE285763230079D1E8 /* InnerRandomStreamFactory.m in Sources */,
@@ -12767,7 +12918,6 @@
 				C849381B285763230079D1E8 /* CustomData.m in Sources */,
 				C849381C285763230079D1E8 /* DAVRequestGroup.m in Sources */,
 				C849381D285763230079D1E8 /* MacDatabasePreferences.m in Sources */,
-				C849381E285763230079D1E8 /* regdom.c in Sources */,
 				C849381F285763230079D1E8 /* Collection+Extensions.swift in Sources */,
 				C8493820285763230079D1E8 /* WebDAVConfigVC.m in Sources */,
 				C8493821285763230079D1E8 /* KeePassXmlAutoTypeAssociation.m in Sources */,
@@ -13282,6 +13432,7 @@
 				C8493A9328577D530079D1E8 /* KeePass2TagPackage.m in Sources */,
 				C8493A9428577D530079D1E8 /* AesInputStream.m in Sources */,
 				C8493A9528577D530079D1E8 /* BaseXmlDomainObjectHandler.m in Sources */,
+				C8127D2F29057FD800F48390 /* DomainParser.swift in Sources */,
 				C8493A9628577D530079D1E8 /* Kdbx4Database.m in Sources */,
 				C8493A9728577D530079D1E8 /* MinimalPoolHelper.m in Sources */,
 				C8493A9828577D530079D1E8 /* DatabaseSyncOperationalData.m in Sources */,
@@ -13336,16 +13487,19 @@
 				C8493AC828577D530079D1E8 /* ISO8601DateFormatter.m in Sources */,
 				C8493AC928577D530079D1E8 /* MacHardwareKeyManager.m in Sources */,
 				C8493ACA28577D530079D1E8 /* ClickableTextField.m in Sources */,
+				C8127D2E29057FD800F48390 /* BasicRulesParser.swift in Sources */,
 				C8493ACB28577D530079D1E8 /* Kdbx4SerializationData.m in Sources */,
 				C8E6163D28BD174D006A6E56 /* AutoFillCommon.m in Sources */,
 				C8493ACC28577D530079D1E8 /* AutoType.m in Sources */,
 				C8493ACD28577D530079D1E8 /* XmlSerializer.m in Sources */,
 				C8493ACE28577D530079D1E8 /* Argon2idKdfCipher.m in Sources */,
+				C8127D1F29057FD000F48390 /* Constant.swift in Sources */,
 				C8493ACF28577D530079D1E8 /* GzipDecompressOutputStream.m in Sources */,
 				C8493AD028577D530079D1E8 /* SelectDatabaseViewController.m in Sources */,
 				C8493AD128577D530079D1E8 /* TableViewWithRightClickSelect.m in Sources */,
 				C8493AD228577D530079D1E8 /* SFTPStorageProvider.m in Sources */,
 				C8493AD328577D530079D1E8 /* NMSSHConfig.m in Sources */,
+				C8127D1929057F2500F48390 /* BrowserAutoFillManager.swift in Sources */,
 				C8493AD428577D530079D1E8 /* cdecode.c in Sources */,
 				C8493AD528577D530079D1E8 /* FileManager.m in Sources */,
 				C8493AD628577D530079D1E8 /* macOSSpinnerUI.m in Sources */,
@@ -13382,6 +13536,7 @@
 				C8493AF528577D530079D1E8 /* socket_helper.m in Sources */,
 				C8493AF628577D530079D1E8 /* MacConflictResolutionWizard.m in Sources */,
 				C8493AF728577D530079D1E8 /* NMSSHSession.m in Sources */,
+				C8127D4729057FE900F48390 /* RuleLabel.swift in Sources */,
 				C8493AF828577D530079D1E8 /* blake2b.c in Sources */,
 				C8493AF928577D530079D1E8 /* AesOutputStream.m in Sources */,
 				C8493AFA28577D530079D1E8 /* HmacBlockOutputStream.m in Sources */,
@@ -13441,6 +13596,7 @@
 				C8493B3128577D530079D1E8 /* WorkingCopyManager.m in Sources */,
 				C8493B3228577D530079D1E8 /* DAVBaseRequest.m in Sources */,
 				C8493B3328577D530079D1E8 /* YubiKeyConfiguration.m in Sources */,
+				C8127D3029057FD800F48390 /* ParsedHost.swift in Sources */,
 				C8493B3528577D530079D1E8 /* StreamUtils.m in Sources */,
 				C8493B3628577D530079D1E8 /* XmlOutputStreamWriter.m in Sources */,
 				C8493B3728577D530079D1E8 /* DeletedObject.m in Sources */,
@@ -13459,6 +13615,7 @@
 				C8493B4428577D530079D1E8 /* NSURL+QueryItems.m in Sources */,
 				C8493B4528577D530079D1E8 /* CustomDataItem.m in Sources */,
 				C8493B4628577D530079D1E8 /* ChaCha20ReadStream.m in Sources */,
+				C8127D3129057FD800F48390 /* RulesParser.swift in Sources */,
 				C8493B4728577D530079D1E8 /* WordList.m in Sources */,
 				C8493B4828577D530079D1E8 /* TitleAndIconCell.swift in Sources */,
 				C8493B4928577D530079D1E8 /* DatabaseMetadata.m in Sources */,
@@ -13477,6 +13634,7 @@
 				C8493B5628577D530079D1E8 /* EditTagsViewController.m in Sources */,
 				C8493B5728577D530079D1E8 /* AutoFillManager.m in Sources */,
 				C8493B5828577D530079D1E8 /* MBProgressHUD.m in Sources */,
+				C8127D4629057FE900F48390 /* Rule.swift in Sources */,
 				C8493B5928577D530079D1E8 /* ClipboardManager.m in Sources */,
 				C8493B5A28577D530079D1E8 /* RootXmlDomainObject.m in Sources */,
 				C8493B5B28577D530079D1E8 /* InnerRandomStreamFactory.m in Sources */,
@@ -13512,7 +13670,6 @@
 				C8493B7828577D530079D1E8 /* CustomData.m in Sources */,
 				C8493B7928577D530079D1E8 /* DAVRequestGroup.m in Sources */,
 				C8493B7A28577D530079D1E8 /* MacDatabasePreferences.m in Sources */,
-				C8493B7B28577D530079D1E8 /* regdom.c in Sources */,
 				C8493B7C28577D530079D1E8 /* Collection+Extensions.swift in Sources */,
 				C8493B7D28577D530079D1E8 /* WebDAVConfigVC.m in Sources */,
 				C8493B7E28577D530079D1E8 /* KeePassXmlAutoTypeAssociation.m in Sources */,
@@ -13535,6 +13692,7 @@
 				C899623828A144130069FA51 /* HmacBlockInputStream.m in Sources */,
 				C899623928A144130069FA51 /* SyncDatabaseRequest.m in Sources */,
 				C899623A28A144130069FA51 /* BackupItem.m in Sources */,
+				C8127D3329057FD800F48390 /* DomainParser.swift in Sources */,
 				C899623B28A144130069FA51 /* MASShortcutView.m in Sources */,
 				C899623C28A144130069FA51 /* HmacBlockOutputStream.m in Sources */,
 				C899623D28A144130069FA51 /* DAVRequests.m in Sources */,
@@ -13604,7 +13762,9 @@
 				C899627D28A144130069FA51 /* StreamUtils.m in Sources */,
 				C899627E28A144130069FA51 /* CustomData.m in Sources */,
 				C899627F28A144130069FA51 /* AutoFillAppLevelPreferences.swift in Sources */,
+				C8127D4929057FEA00F48390 /* RuleLabel.swift in Sources */,
 				C899628028A144130069FA51 /* KeePassXmlAutoType.m in Sources */,
+				C8127D4C2905800900F48390 /* AutoFillCommon.m in Sources */,
 				C899628128A144130069FA51 /* PasswordStrengthTester.m in Sources */,
 				C899628228A144130069FA51 /* ISO8601DateFormatter.m in Sources */,
 				C899628328A144130069FA51 /* ClickableSecureTextField.m in Sources */,
@@ -13627,6 +13787,7 @@
 				C899629428A144130069FA51 /* Field.swift in Sources */,
 				C899629528A144130069FA51 /* PassiveDummyScrollView.swift in Sources */,
 				C899629628A144130069FA51 /* twofish.c in Sources */,
+				C8127D3529057FD800F48390 /* RulesParser.swift in Sources */,
 				C899629728A144130069FA51 /* KeePass2TagPackage.m in Sources */,
 				C899629828A144130069FA51 /* GeneralPreferencesViewController.swift in Sources */,
 				C899629928A144130069FA51 /* LockScreenViewController.m in Sources */,
@@ -13666,6 +13827,7 @@
 				C89962BB28A144130069FA51 /* OEXTokenFieldCell.m in Sources */,
 				C89962BC28A144130069FA51 /* ConcurrentCircularBuffer.m in Sources */,
 				C89962BD28A144130069FA51 /* CustomField.m in Sources */,
+				C8127D4829057FEA00F48390 /* Rule.swift in Sources */,
 				C89962BE28A144130069FA51 /* TwoFishReadStream.m in Sources */,
 				C89962BF28A144130069FA51 /* PleaseConnectHardwareKey.m in Sources */,
 				C89962C028A144130069FA51 /* NSCheckboxTableCellView.m in Sources */,
@@ -13722,6 +13884,7 @@
 				C89962F228A144130069FA51 /* CustomBackgroundTableView.m in Sources */,
 				C89962F328A144130069FA51 /* AttachmentItem.m in Sources */,
 				C89962F428A144130069FA51 /* AuditDrillDown.swift in Sources */,
+				C8127D2029057FD000F48390 /* Constant.swift in Sources */,
 				C89962F528A144130069FA51 /* TotpTableCellView.swift in Sources */,
 				C89962F628A144130069FA51 /* SyncAndMergeSequenceManager.m in Sources */,
 				C89962F728A144130069FA51 /* WebDAVSessionConfiguration.m in Sources */,
@@ -13835,6 +13998,7 @@
 				C899636328A144130069FA51 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				C899636428A144130069FA51 /* Keys.m in Sources */,
 				C899636528A144130069FA51 /* CustomIconList.m in Sources */,
+				C8127D3429057FD800F48390 /* ParsedHost.swift in Sources */,
 				C8A4391128D61733007462D7 /* ObjCExceptionCatcherForSwift.m in Sources */,
 				C85B04ED28BE72EE00323009 /* ApplePasswordManagerQuirks.swift in Sources */,
 				C899636628A144130069FA51 /* RMStoreTransaction.m in Sources */,
@@ -13866,7 +14030,9 @@
 				C899638028A144130069FA51 /* blake2b.c in Sources */,
 				C899638128A144130069FA51 /* SideBarOutlineView.m in Sources */,
 				C899638228A144130069FA51 /* AttachmentCollectionView.m in Sources */,
+				C87229C9290D8A4200436735 /* NativeMessagingManifestInstallHelper.swift in Sources */,
 				C899638328A144130069FA51 /* MacUrlSchemes.m in Sources */,
+				C8127D1A29057F2700F48390 /* BrowserAutoFillManager.swift in Sources */,
 				C899638428A144130069FA51 /* QRCodeScanner.swift in Sources */,
 				C899638528A144130069FA51 /* DBManagerPanel.swift in Sources */,
 				C899638628A144130069FA51 /* OpenContents.swift in Sources */,
@@ -13908,6 +14074,7 @@
 				C89963AA28A144130069FA51 /* TableViewWithKeyDownEvents.swift in Sources */,
 				C89963AB28A144130069FA51 /* V3Binary.m in Sources */,
 				C89963AC28A144130069FA51 /* Field.m in Sources */,
+				C8127D3229057FD800F48390 /* BasicRulesParser.swift in Sources */,
 				C89963AD28A144130069FA51 /* StrongboxFontCollection.swift in Sources */,
 				C89963AE28A144130069FA51 /* TitleCellView.swift in Sources */,
 				C89963AF28A144130069FA51 /* DatabasesManagerWindow.swift in Sources */,
@@ -14014,6 +14181,7 @@
 				C899648E28A1441B0069FA51 /* ValueWithModDate.m in Sources */,
 				C899648F28A1441B0069FA51 /* NSUUID+Zero.m in Sources */,
 				C899649028A1441B0069FA51 /* Binary.m in Sources */,
+				C8127D2129057FD100F48390 /* Constant.swift in Sources */,
 				C899649128A1441B0069FA51 /* SFTPSessionConfiguration.m in Sources */,
 				C899649228A1441B0069FA51 /* NMSSHHostConfig.m in Sources */,
 				C899649328A1441B0069FA51 /* SyncParameters.m in Sources */,
@@ -14025,6 +14193,7 @@
 				C899649928A1441B0069FA51 /* SyncStatus.m in Sources */,
 				C899649A28A1441B0069FA51 /* NodeHierarchyReconstructionData.m in Sources */,
 				C899649B28A1441B0069FA51 /* NMSSHLogger.m in Sources */,
+				C8127D4A29057FEA00F48390 /* Rule.swift in Sources */,
 				C899649C28A1441B0069FA51 /* MutableOrderedDictionary.m in Sources */,
 				C899649D28A1441B0069FA51 /* OTPAlgorithm.m in Sources */,
 				C899649E28A1441B0069FA51 /* AutoFillWormhole.m in Sources */,
@@ -14037,12 +14206,14 @@
 				C89964A528A1441B0069FA51 /* KP31HashedBlockStream.m in Sources */,
 				C89964A628A1441B0069FA51 /* MacUrlSchemes.m in Sources */,
 				C89964A728A1441B0069FA51 /* Root.m in Sources */,
+				C8127D1B29057F2800F48390 /* BrowserAutoFillManager.swift in Sources */,
 				C89964A828A1441B0069FA51 /* NSString+Extensions.m in Sources */,
 				C89964A928A1441B0069FA51 /* NMSSHChannel.m in Sources */,
 				C89964AA28A1441B0069FA51 /* KeePassDatabase.m in Sources */,
 				C89964AB28A1441B0069FA51 /* Model.m in Sources */,
 				C89964AC28A1441B0069FA51 /* NodeIconHelper.m in Sources */,
 				C89964AD28A1441B0069FA51 /* KdbxSerializationCommon.m in Sources */,
+				C8127D4B29057FEA00F48390 /* RuleLabel.swift in Sources */,
 				C89964AE28A1441B0069FA51 /* SprCompilation.m in Sources */,
 				C89964AF28A1441B0069FA51 /* FavIconDownloadOptions.m in Sources */,
 				C89964B028A1441B0069FA51 /* KeePassGroup.m in Sources */,
@@ -14094,6 +14265,8 @@
 				C89964DD28A1441B0069FA51 /* NodeFields.m in Sources */,
 				C89964DE28A1441B0069FA51 /* CrossPlatform.m in Sources */,
 				C89964DF28A1441B0069FA51 /* thread.c in Sources */,
+				C8127D3629057FD900F48390 /* BasicRulesParser.swift in Sources */,
+				C8127D4D2905800900F48390 /* AutoFillCommon.m in Sources */,
 				C89964E028A1441B0069FA51 /* AutoFillLoadingVC.m in Sources */,
 				C89964E128A1441B0069FA51 /* PressHardwareKeyWindow.m in Sources */,
 				C89964E228A1441B0069FA51 /* DAVCredentials.m in Sources */,
@@ -14126,6 +14299,7 @@
 				C89964FD28A1441B0069FA51 /* AutoFillNewRecordSettings.m in Sources */,
 				C89964FE28A1441B0069FA51 /* NSMutableArray+Extensions.m in Sources */,
 				C89964FF28A1441B0069FA51 /* twofish.c in Sources */,
+				C8127D3729057FD900F48390 /* DomainParser.swift in Sources */,
 				C899650028A1441B0069FA51 /* V3Binary.m in Sources */,
 				C899650128A1441B0069FA51 /* KeyFileParser.m in Sources */,
 				C899650228A1441B0069FA51 /* ChaCha20Stream.m in Sources */,
@@ -14185,6 +14359,7 @@
 				C899653828A1441B0069FA51 /* Kdbx4Serialization.m in Sources */,
 				C899653928A1441B0069FA51 /* encoding.c in Sources */,
 				C899653A28A1441B0069FA51 /* SecretStore.m in Sources */,
+				C8127D3929057FD900F48390 /* RulesParser.swift in Sources */,
 				C899653B28A1441B0069FA51 /* Field.m in Sources */,
 				C899653C28A1441B0069FA51 /* DiffDrillDownViewController.swift in Sources */,
 				C899653D28A1441B0069FA51 /* SampleItemsGenerator.m in Sources */,
@@ -14211,6 +14386,7 @@
 				C899655228A1441B0069FA51 /* KeePassCiphers.m in Sources */,
 				C899655328A1441B0069FA51 /* SFTPProviderData.m in Sources */,
 				C899655428A1441B0069FA51 /* DatabasesManager.m in Sources */,
+				C8127D3829057FD900F48390 /* ParsedHost.swift in Sources */,
 				C899655528A1441B0069FA51 /* OutlineView.m in Sources */,
 				C85B04C128BE38F200323009 /* ThreadSafeDictionary.swift in Sources */,
 				C899655628A1441B0069FA51 /* MMcG_MF_Base32Additions.m in Sources */,
@@ -14230,7 +14406,6 @@
 				C899656428A1441B0069FA51 /* CustomData.m in Sources */,
 				C899656528A1441B0069FA51 /* DAVRequestGroup.m in Sources */,
 				C899656628A1441B0069FA51 /* MacDatabasePreferences.m in Sources */,
-				C899656728A1441B0069FA51 /* regdom.c in Sources */,
 				C899656828A1441B0069FA51 /* Collection+Extensions.swift in Sources */,
 				C899656928A1441B0069FA51 /* WebDAVConfigVC.m in Sources */,
 				C899656A28A1441B0069FA51 /* KeePassXmlAutoTypeAssociation.m in Sources */,
@@ -14263,6 +14438,7 @@
 				C8B9456F2573D01A00932C46 /* KeePass2TagPackage.m in Sources */,
 				C8B945702573D01A00932C46 /* AesInputStream.m in Sources */,
 				C8B945712573D01A00932C46 /* BaseXmlDomainObjectHandler.m in Sources */,
+				C8127D2729057FD600F48390 /* DomainParser.swift in Sources */,
 				C8B945722573D01A00932C46 /* Kdbx4Database.m in Sources */,
 				C8397ADB25939858000F5158 /* MinimalPoolHelper.m in Sources */,
 				C83741B425D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
@@ -14317,16 +14493,19 @@
 				C8441BD725CAFBB10070C7FE /* ISO8601DateFormatter.m in Sources */,
 				C8C8969026CECB9300F1BC4D /* MacHardwareKeyManager.m in Sources */,
 				C8B945932573D01A00932C46 /* ClickableTextField.m in Sources */,
+				C8127D2629057FD600F48390 /* BasicRulesParser.swift in Sources */,
 				C8B945942573D01A00932C46 /* Kdbx4SerializationData.m in Sources */,
 				C8E6163B28BD174C006A6E56 /* AutoFillCommon.m in Sources */,
 				C8B945962573D01A00932C46 /* AutoType.m in Sources */,
 				C8B945972573D01A00932C46 /* XmlSerializer.m in Sources */,
 				C8969FFB25AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
+				C8127D1D29057FCF00F48390 /* Constant.swift in Sources */,
 				C8B945982573D01A00932C46 /* GzipDecompressOutputStream.m in Sources */,
 				C8B945992573D01A00932C46 /* SelectDatabaseViewController.m in Sources */,
 				C80735E32614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8441C3E25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8441CB625CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
+				C8127D1729057F2400F48390 /* BrowserAutoFillManager.swift in Sources */,
 				C8B9459B2573D01A00932C46 /* cdecode.c in Sources */,
 				C8B9459C2573D01A00932C46 /* FileManager.m in Sources */,
 				C832A477272EC0FE00768319 /* macOSSpinnerUI.m in Sources */,
@@ -14363,6 +14542,7 @@
 				C8441CAA25CB01AB0070C7FE /* socket_helper.m in Sources */,
 				C8E5C35B275E7707006C15FE /* MacConflictResolutionWizard.m in Sources */,
 				C8441CAE25CB01AB0070C7FE /* NMSSHSession.m in Sources */,
+				C8127D4129057FE700F48390 /* RuleLabel.swift in Sources */,
 				C8B945B12573D01A00932C46 /* blake2b.c in Sources */,
 				C8B945B22573D01A00932C46 /* AesOutputStream.m in Sources */,
 				C8B5020126ECB661003DE6A2 /* HmacBlockOutputStream.m in Sources */,
@@ -14422,6 +14602,7 @@
 				C83741BC25D30E8B00EDE4F3 /* WorkingCopyManager.m in Sources */,
 				C8441BEF25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */,
 				C8C8968A26CECB9300F1BC4D /* YubiKeyConfiguration.m in Sources */,
+				C8127D2829057FD600F48390 /* ParsedHost.swift in Sources */,
 				C8B945D72573D01A00932C46 /* StreamUtils.m in Sources */,
 				C873EA5D26F2405400A71F2A /* XmlOutputStreamWriter.m in Sources */,
 				C8B945D82573D01A00932C46 /* DeletedObject.m in Sources */,
@@ -14440,6 +14621,7 @@
 				C8B945DF2573D01A00932C46 /* NSURL+QueryItems.m in Sources */,
 				C8B945E02573D01A00932C46 /* CustomDataItem.m in Sources */,
 				C8B945E12573D01A00932C46 /* ChaCha20ReadStream.m in Sources */,
+				C8127D2929057FD600F48390 /* RulesParser.swift in Sources */,
 				C8B945E22573D01A00932C46 /* WordList.m in Sources */,
 				C85179132826A21A00A09797 /* TitleAndIconCell.swift in Sources */,
 				C8B945E32573D01A00932C46 /* DatabaseMetadata.m in Sources */,
@@ -14458,6 +14640,7 @@
 				C8877448261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				C8B945ED2573D01A00932C46 /* AutoFillManager.m in Sources */,
 				C8868D7C2740021200934FEA /* MBProgressHUD.m in Sources */,
+				C8127D4029057FE700F48390 /* Rule.swift in Sources */,
 				C8B945EE2573D01A00932C46 /* ClipboardManager.m in Sources */,
 				C8B945EF2573D01A00932C46 /* RootXmlDomainObject.m in Sources */,
 				C8B945F02573D01A00932C46 /* InnerRandomStreamFactory.m in Sources */,
@@ -14493,7 +14676,6 @@
 				C8B946072573D01A00932C46 /* CustomData.m in Sources */,
 				C8441BDF25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
 				C8E0B1F0275BD49000A871F6 /* MacDatabasePreferences.m in Sources */,
-				C8B946082573D01A00932C46 /* regdom.c in Sources */,
 				C85179152826A29600A09797 /* Collection+Extensions.swift in Sources */,
 				C8F39EC025DD81920045CAAB /* WebDAVConfigVC.m in Sources */,
 				C8B946092573D01A00932C46 /* KeePassXmlAutoTypeAssociation.m in Sources */,
@@ -14537,6 +14719,11 @@
 			isa = PBXTargetDependency;
 			target = C83CE60F28AAA7CF00E482E6 /* afproxy */;
 			targetProxy = C827E45F28B512DB0000EA6D /* PBXContainerItemProxy */;
+		};
+		C82CA979290573AA00D607F2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C849385528577D4D0079D1E8 /* Mac-Unified-Pro */;
+			targetProxy = C82CA978290573AA00D607F2 /* PBXContainerItemProxy */;
 		};
 		C83CE61928AAAA4C00E482E6 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -15874,7 +16061,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -15910,7 +16097,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -16002,7 +16189,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16047,7 +16234,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16197,7 +16384,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -16230,7 +16417,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -16247,6 +16434,71 @@
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.markmcguill.strongbox.mac macos";
 				SWIFT_OBJC_BRIDGING_HEADER = "Strongbox-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		C82CA97A290573AA00D607F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5048;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.MB2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Strongbox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Strongbox";
+			};
+			name = Debug;
+		};
+		C82CA97B290573AA00D607F2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5048;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.MB2Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = macosx;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Strongbox.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Strongbox";
 			};
 			name = Release;
 		};
@@ -16321,7 +16573,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Freemium-Info.plist";
@@ -16356,7 +16608,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Freemium-Info.plist";
@@ -16390,7 +16642,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16435,7 +16687,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16475,7 +16727,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Pro-Info.plist";
@@ -16485,7 +16737,7 @@
 					"$(SRCROOT)/../lib/openssl-ssh/macOS",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.15.8;
+				MARKETING_VERSION = 1.56.6;
 				OTHER_SWIFT_FLAGS = "$(inherited) -D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro;
 				PRODUCT_MODULE_NAME = Strongbox;
@@ -16510,7 +16762,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Pro-Info.plist";
@@ -16520,7 +16772,7 @@
 					"$(SRCROOT)/../lib/openssl-ssh/macOS",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.15.8;
+				MARKETING_VERSION = 1.56.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.pro;
 				PRODUCT_MODULE_NAME = Strongbox;
 				PRODUCT_NAME = Strongbox;
@@ -16544,7 +16796,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16589,7 +16841,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16628,7 +16880,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Graphene-Info.plist";
@@ -16662,7 +16914,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Graphene-Info.plist";
@@ -16696,7 +16948,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16741,7 +16993,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16782,7 +17034,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16827,7 +17079,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5042;
+				CURRENT_PROJECT_VERSION = 5048;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16944,6 +17196,15 @@
 			buildConfigurations = (
 				4DF59F691F30DB7A00D68BFE /* Debug */,
 				4DF59F6A1F30DB7A00D68BFE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C82CA97C290573AA00D607F2 /* Build configuration list for PBXNativeTarget "MB2Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C82CA97A290573AA00D607F2 /* Debug */,
+				C82CA97B290573AA00D607F2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

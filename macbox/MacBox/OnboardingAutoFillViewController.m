@@ -90,15 +90,8 @@
 
     if ( quickTypeWasTurnedOn ) {
         NSLog(@"AutoFill QuickType was turned on - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.commonModel
-                                                           databaseUuid:self.database.uuid
-                                                          displayFormat:self.database.quickTypeDisplayFormat
-                                                        alternativeUrls:self.database.autoFillScanAltUrls
-                                                           customFields:self.database.autoFillScanCustomFields
-                                                                  notes:self.database.autoFillScanNotes
-                                           concealedCustomFieldsAsCreds:self.database.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.database.autoFillUnConcealedFieldsAsCreds
-                                                               nickName:self.database.nickName];
+
+        [self updateAutoFillDatabases];
     }
 
     
@@ -107,6 +100,20 @@
     self.database.quickWormholeFillEnabled = quickWormholeFillEnabled;
     
     [self bindUI];
+}
+
+- (void)updateAutoFillDatabases {
+    [self.viewModel rebuildAutoFillDomainNodeMap];
+    
+    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.commonModel
+                                                       databaseUuid:self.database.uuid
+                                                      displayFormat:self.database.quickTypeDisplayFormat
+                                                    alternativeUrls:self.database.autoFillScanAltUrls
+                                                       customFields:self.database.autoFillScanCustomFields
+                                                              notes:self.database.autoFillScanNotes
+                                       concealedCustomFieldsAsCreds:self.database.autoFillConcealedFieldsAsCreds
+                                     unConcealedCustomFieldsAsCreds:self.database.autoFillUnConcealedFieldsAsCreds
+                                                           nickName:self.database.nickName];
 }
 
 - (IBAction)onDone:(id)sender {

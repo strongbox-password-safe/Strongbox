@@ -51,7 +51,7 @@ class AutoFillAppLevelPreferences: NSViewController {
     }
 
     func bindUI() {
-        let pro = Settings.sharedInstance().isProOrFreeTrial
+        let pro = Settings.sharedInstance().isPro
         let isOnForStrongbox = AutoFillManager.sharedInstance().isOnForStrongbox
         let featureIsAvailable: Bool
 

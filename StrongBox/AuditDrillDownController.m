@@ -74,7 +74,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     
     self.flags = [self.model getQuickAuditFlagsForNode:self.itemId];
     self.basicRows = [self getBasicRows:self.flags];
-    self.actions = ([self.flags containsObject:@(kAuditFlagPwned)] || !AppPreferences.sharedInstance.isProOrFreeTrial || AppPreferences.sharedInstance.disableNetworkBasedFeatures) ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
+    self.actions = ([self.flags containsObject:@(kAuditFlagPwned)] || !AppPreferences.sharedInstance.isPro || AppPreferences.sharedInstance.disableNetworkBasedFeatures) ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
     
     self.duplicates = [[mute.allObjects filter:^BOOL(Node * _Nonnull obj) {
         return ![obj.uuid isEqual:self.itemId];

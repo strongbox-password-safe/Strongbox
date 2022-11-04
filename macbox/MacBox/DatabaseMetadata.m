@@ -46,8 +46,8 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.lockOnScreenLock = YES;
         self.visibleColumns = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
         self.autoFillScanAltUrls = YES;
-        self.autoFillScanCustomFields = YES;
-        self.autoFillScanNotes = YES;
+        self.autoFillScanCustomFields = NO;
+        self.autoFillScanNotes = NO;
         self.autoFillConcealedFieldsAsCreds = YES;
         self.iconSet = kKeePassIconSetSfSymbols;
         self.browseSelectedItems = @[];
@@ -55,7 +55,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.showChildCountOnFolderInSidebar = YES;
         self.headerNodes = HeaderNodeState.defaults;
         self.autoFillCopyTotp = YES;
-        self.searchScope = kSearchScopeTitle;
+        self.searchScope = kSearchScopeAll;
     }
     
     return self;
@@ -72,7 +72,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.monitorForExternalChangesInterval = storageProvider == kMacFile ? 5 : 30; 
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
-        self.autoPromptForConvenienceUnlockOnActivate = YES;
+        self.autoPromptForConvenienceUnlockOnActivate = NO;
     }
     
     return self;

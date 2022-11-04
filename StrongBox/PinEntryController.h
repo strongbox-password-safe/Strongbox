@@ -13,6 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PinEntryController : UIViewController
 
++ (instancetype)newControllerForAppLock;
++ (instancetype)newControllerForDatabaseUnlock;
+
 @property (nonatomic, copy) void (^onDone)(PinEntryResponse response, NSString* _Nullable pin);
 
 @property NSUInteger pinLength; 
@@ -20,7 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* info;
 @property NSString* warning;
 @property BOOL showFallbackOption;
-@property BOOL isDatabasePIN;
 
 @end
 

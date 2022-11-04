@@ -13,10 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface IconTableCell : UITableViewCell
 
 @property (nonatomic, copy, nullable) void (^onIconTapped)(void);
+@property (nonatomic, copy, nullable) void (^onConfigureDefaultsTapped)(void);
 
 - (void)setModel:(NSString*)value
             icon:(UIImage*)icon
          editing:(BOOL)editing
+        newEntry:(BOOL)newEntry
  selectAllOnEdit:(BOOL)selectAllOnEdit
  useEasyReadFont:(BOOL)useEasyReadFont;
 

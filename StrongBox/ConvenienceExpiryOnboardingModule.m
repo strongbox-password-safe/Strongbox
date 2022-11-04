@@ -28,7 +28,7 @@
 
 - (BOOL)shouldDisplay {
     return ( !self.model.metadata.convenienceExpiryOnboardingDone &&
-            AppPreferences.sharedInstance.isProOrFreeTrial &&
+            AppPreferences.sharedInstance.isPro &&
             self.model.metadata.isConvenienceUnlockEnabled &&
             self.model.metadata.convenienceExpiryPeriod == -1 &&
             self.model.metadata.conveniencePasswordHasBeenStored &&

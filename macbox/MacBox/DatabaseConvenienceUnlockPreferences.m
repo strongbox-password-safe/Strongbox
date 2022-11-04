@@ -83,7 +83,7 @@
         self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock", @"Watch Unlock");
     }
     else {
-        if ( Settings.sharedInstance.isProOrFreeTrial ) {
+        if ( Settings.sharedInstance.isPro ) {
             self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Preferences > Security & Privacy)");
         }
     }
@@ -91,7 +91,7 @@
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
     BOOL methodAvailable = watchAvailable || touchAvailable;
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isPro;
 
     MacDatabasePreferences* meta = self.model.databaseMetadata;
     
@@ -121,7 +121,7 @@
 - (NSString*)getSecureStorageSummary {
     MacDatabasePreferences* meta = self.model.databaseMetadata;
     
-    BOOL featureAvailable = Settings.sharedInstance.isProOrFreeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isPro;
     if( !featureAvailable ) {
         return NSLocalizedString(@"mac_convenience_summary_only_available_on_pro", @"Convenience Unlock is only available in the Pro version of Strongbox. Please consider upgrading to support development.");
     }

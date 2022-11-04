@@ -28,7 +28,7 @@
 }
 
 - (BOOL)shouldDisplay {
-    return !self.model.metadata.hasBeenPromptedForConvenience && AppPreferences.sharedInstance.isProOrFreeTrial;
+    return !self.model.metadata.hasBeenPromptedForConvenience && AppPreferences.sharedInstance.isPro;
 }
 
 - (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {

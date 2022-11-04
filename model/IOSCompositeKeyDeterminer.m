@@ -117,7 +117,7 @@ static const int kMaxFailedPinAttempts = 3;
 
     BOOL convenienceUnlockIsDesirable = !self.noConvenienceUnlock &&
                                         self.database.conveniencePasswordHasBeenStored &&
-                                        AppPreferences.sharedInstance.isProOrFreeTrial &&
+                                        AppPreferences.sharedInstance.isPro &&
                                         !( self.isAutoFillOpen && self.database.mainAppAndAutoFillYubiKeyConfigsIncoherent ); 
         
     
@@ -237,12 +237,10 @@ static const int kMaxFailedPinAttempts = 3;
 
 
 - (void)promptForConveniencePin:(NSString*)password {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
-    PinEntryController* vc = (PinEntryController*)[storyboard instantiateInitialViewController];
+    PinEntryController* vc = PinEntryController.newControllerForDatabaseUnlock;
     
     vc.pinLength = self.database.conveniencePin.length;
     vc.showFallbackOption = YES;
-    vc.isDatabasePIN = YES;
     
     if(self.database.failedPinAttempts > 0) {
         vc.warning = [NSString stringWithFormat:
@@ -253,7 +251,7 @@ static const int kMaxFailedPinAttempts = 3;
         [self onPinEntered:password response:response pin:pin];
     };
     
-    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    vc.modalPresentationStyle = Utils.isiPad ? UIModalPresentationFormSheet : UIModalPresentationFullScreen;
     [self.viewController presentViewController:vc animated:YES completion:nil];
 }
 
@@ -628,7 +626,7 @@ static const int kMaxFailedPinAttempts = 3;
 
 - (void)getYubiKeyChallengeResponse:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration challenge:(NSData*)challenge completion:(YubiKeyCRResponseBlock)completion {
 #ifndef IS_APP_EXTENSION
-    if([AppPreferences.sharedInstance isProOrFreeTrial] || yubiKeyConfiguration.mode == kVirtual) {
+    if([AppPreferences.sharedInstance isPro] || yubiKeyConfiguration.mode == kVirtual) {
         [YubiManager.sharedInstance getResponse:yubiKeyConfiguration
                                       challenge:challenge
                                      completion:completion];

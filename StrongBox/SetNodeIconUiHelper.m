@@ -47,8 +47,8 @@
     }
     else {
         BOOL favIconPossible = node ? (node.isGroup || node.fields.url.urlExtendedParse != nil) : [self smartDetermineUrlFromHint:urlOverride] != nil;
-        
-        if (favIconPossible) {
+
+        if (favIconPossible && !AppPreferences.sharedInstance.disableFavIconFeature) {
             UIAlertController *alertController =
             [UIAlertController alertControllerWithTitle:
              NSLocalizedString(@"set_icon_vc_select_icon_source_title", @"Select Icon Source")
@@ -77,7 +77,7 @@
             UIAlertAction *fourthAction = nil;
             
             if(node && node.isGroup) {
-                fourthAction = [UIAlertAction actionWithTitle:AppPreferences.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:AppPreferences.sharedInstance.isPro ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons", @"Download FavIcons") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons_pro_only", @"Download FavIcons (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -86,7 +86,7 @@
                 }];
             }
             else {
-                fourthAction = [UIAlertAction actionWithTitle:AppPreferences.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:AppPreferences.sharedInstance.isPro ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon", @"Download FavIcon") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon_pro_only", @"Download FavIcon (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -99,7 +99,7 @@
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { self.completionBlock(NO, NO,  nil); }];
             
-            fourthAction.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
+            fourthAction.enabled = AppPreferences.sharedInstance.isPro;
             
             [alertController addAction:defaultAction];
             [alertController addAction:secondAction];

@@ -126,7 +126,7 @@
         self.labelRemoveDatabaseWarning2.textColor = [UIColor systemOrangeColor];
     }
     
-    if( !AppPreferences.sharedInstance.isProOrFreeTrial ) {
+    if( !AppPreferences.sharedInstance.isPro ) {
         self.buttonPinOnOff.enabled = NO;
         self.buttonChangePin.enabled = NO;
         self.buttonDuressPinOnOff.enabled = NO;
@@ -203,10 +203,7 @@
 }
 
 - (void)getNewPin:(BOOL)duressPin {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
-    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
-    
-    pinEntryVc.isDatabasePIN = YES;
+    PinEntryController* pinEntryVc = PinEntryController.newControllerForDatabaseUnlock;
     
     pinEntryVc.info = duressPin ? NSLocalizedString(@"pins_config_vc_enter_duress_pin", @"Enter Duress PIN") : @"";
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {

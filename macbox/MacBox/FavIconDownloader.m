@@ -166,7 +166,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 
     self.progressView.doubleValue = self.validUniqueUrls.count == 0 ? 0 : (((float)self.results.count / (float)self.validUniqueUrls.count) * 100);
 
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isPro;
     
     if(!featureAvailable) {
         NSString* loc = NSLocalizedString(@"mac_button_set_favicons_pro_only", @"Set Icons (Pro Only)");

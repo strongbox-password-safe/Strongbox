@@ -24,7 +24,6 @@
 static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
 static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.monthly";
 static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
-static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial"; 
 
 @interface ProUpgradeIAPManager ()
 
@@ -111,7 +110,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     
     
     
-    if ( self.preferences.numberOfEntitlementCheckFails < 5 ) {
+    if ( self.preferences.numberOfEntitlementCheckFails < 4 ) {
         [self checkReceiptForTrialAndProEntitlements];
     }
     else {
@@ -158,18 +157,6 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 
 - (void)checkVerifiedReceiptIsEntitledToPro {
     self.preferences.numberOfEntitlementCheckFails = 0;
-
-#if TARGET_OS_IPHONE
-    NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
-    if ( freeTrialPurchaseDate && !self.preferences.hasOptedInToFreeTrial ) {
-        NSLog(@"Found Free Trial Purchase: [%@] - Setting free trial end date accordingly", freeTrialPurchaseDate);
-        NSDate* endDate = [self.preferences calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
-        self.preferences.freeTrialEnd = endDate;
-
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
-    }
-#endif
     
 #if TARGET_OS_IPHONE
     if ( CustomizationManager.isAProBundle ) {
@@ -220,7 +207,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     self.readyState = kWaitingOnAppStoreProducts;
     self.products = @{};
 
-    NSSet *products = [NSSet setWithArray:@[kIapProId, kMonthly, kYearly, kIapFreeTrial]];
+    NSSet *products = [NSSet setWithArray:@[kIapProId, kMonthly, kYearly]];
     
     [[RMStore defaultStore] requestProducts:products success:^(NSArray *products, NSArray *invalidProductIdentifiers) {
         self.products = [NSMutableDictionary dictionary];
@@ -300,12 +287,6 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }];
 }
 
-
-
-- (BOOL)hasPurchasedFreeTrial {
-    return self.freeTrialPurchaseDate != nil;
-}
-
 - (BOOL)hasPurchasedLifeTime {
     if (RMAppReceipt.bundleReceipt == nil) {
         NSLog(@"bundleReceipt = nil");
@@ -331,40 +312,6 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 - (BOOL)hasActiveMonthlySubscription {
     NSDate* now = [NSDate date];
     return [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];
-}
-
-- (NSDate*)freeTrialPurchaseDate {
-    if (RMAppReceipt.bundleReceipt == nil) {
-        NSLog(@"bundleReceipt = nil");
-        return nil;
-    }
-
-    RMAppReceiptIAP *freeTrialIap = [RMAppReceipt.bundleReceipt.inAppPurchases firstOrDefault:^BOOL(RMAppReceiptIAP *iap) {
-        return [iap.productIdentifier isEqualToString:kIapFreeTrial];
-    }];
-    
-    if (freeTrialIap) {
-        NSDate* date;
-        if ( freeTrialIap.originalPurchaseDate ) {
-            date = freeTrialIap.originalPurchaseDate;
-        }
-        else {
-            NSLog(@"Could not get original purchase date using purchaseDate instead");
-            date = freeTrialIap.purchaseDate;
-        }
-        
-        if (date) {
-            return date;
-        }
-        else {
-            NSLog(@"Could not determine Free Trial Purchase date...");
-            return nil;
-        }
-    }
-    else {
-        NSLog(@"No Free Trial Purchase Found...");
-        return nil;
-    }
 }
 
 

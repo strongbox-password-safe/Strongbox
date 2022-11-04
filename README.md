@@ -122,3 +122,5 @@ I use many different libraries in the app here are just a few:
 - Common Passwords List from https://github.com/danielmiessler/SecLists
 - Finnish & Icelandic diceware word lists - SmirGel
 - Down (Swift Markdown library) - https://github.com/johnxnguyen/Down
+- OTPAuth - https://github.com/hectorm/otpauth
+- SwiftDomainParser - https://github.com/Dashlane/SwiftDomainParser

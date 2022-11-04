@@ -697,21 +697,21 @@
         }
         else {
             if (self.selectedYubiKeyConfig.mode == kMfi) {
-                self.cellYubiKey.textLabel.text = AppPreferences.sharedInstance.isProOrFreeTrial ?
+                self.cellYubiKey.textLabel.text = AppPreferences.sharedInstance.isPro ?
                     NSLocalizedString(@"casg_yubikey_configured_mfi", @"Lightning") :
                     NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-                self.cellYubiKey.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+                self.cellYubiKey.textLabel.textColor = AppPreferences.sharedInstance.isPro ? nil : UIColor.systemRedColor;
             }
             else {
-                self.cellYubiKey.textLabel.text = AppPreferences.sharedInstance.isProOrFreeTrial ?
+                self.cellYubiKey.textLabel.text = AppPreferences.sharedInstance.isPro ?
                     NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
                     NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-                self.cellYubiKey.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+                self.cellYubiKey.textLabel.textColor = AppPreferences.sharedInstance.isPro ? nil : UIColor.systemRedColor;
             }
     
             self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
                 NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
-            self.cellYubiKey.detailTextLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+            self.cellYubiKey.detailTextLabel.textColor = AppPreferences.sharedInstance.isPro ? nil : UIColor.systemRedColor;
         }
         
         self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];

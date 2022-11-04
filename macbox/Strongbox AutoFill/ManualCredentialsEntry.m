@@ -442,7 +442,7 @@
 }
 
 - (void)onGotAvailableYubiKey:(HardwareKeyData*)yk {
-    if (!Settings.sharedInstance.fullVersion && !Settings.sharedInstance.freeTrial) {
+    if ( !Settings.sharedInstance.isPro ) {
         [self addNoneProHardwareKeyMenuItem];
         self.yubiKeyPopup.enabled = NO;
         return;

@@ -18,6 +18,8 @@
 
 @property BOOL useEasyReadFont;
 @property BOOL selectAllOnEdit;
+@property (weak, nonatomic) IBOutlet UIButton *buttonCofigureDefaults;
+@property (weak, nonatomic) IBOutlet UIStackView *stackConfigureDefaults;
 
 @end
 
@@ -78,6 +80,7 @@
 - (void)setModel:(NSString*)value
             icon:(UIImage*)icon
          editing:(BOOL)editing
+        newEntry:(BOOL)newEntry
  selectAllOnEdit:(BOOL)selectAllOnEdit
  useEasyReadFont:(BOOL)useEasyReadFont {
     self.titleLabel.text = value;
@@ -105,6 +108,14 @@
     self.iconImage.image = icon;
     self.iconImage.hidden = icon == nil;
 
+    
+    
+#ifndef IS_APP_EXTENSION
+    self.stackConfigureDefaults.hidden = !newEntry;
+#else
+    self.stackConfigureDefaults.hidden = YES;
+#endif
+    
     
     
 #ifndef IS_APP_EXTENSION
@@ -165,6 +176,12 @@
 
 - (UIFont*)configuredValueFont {
     return self.useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.title2Font;
+}
+
+- (IBAction)onConfigureDefaults:(id)sender {
+    if ( self.onConfigureDefaultsTapped ) {
+        self.onConfigureDefaultsTapped();
+    }
 }
 
 @end

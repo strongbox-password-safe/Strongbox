@@ -30,7 +30,7 @@
     
     self.navigationController.navigationBarHidden = YES;
     
-    BOOL pro = AppPreferences.sharedInstance.isProOrFreeTrial;
+    BOOL pro = AppPreferences.sharedInstance.isPro;
     self.buttonCompare.enabled = pro;
 
 

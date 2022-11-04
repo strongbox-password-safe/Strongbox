@@ -121,7 +121,7 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
     override func collectionView(_: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let icon = icons[indexPath.section][indexPath.row]
 
-        if icon.isPro && !AppPreferences.sharedInstance().isProOrFreeTrial {
+        if icon.isPro && !AppPreferences.sharedInstance().isPro {
             Alerts.info(self,
                         title: NSLocalizedString("mac_autofill_pro_feature_title", comment: "Pro Feature"),
                         message: NSLocalizedString("custom_app_icon_pro_only", comment: "This icon is only available for Pro users."))

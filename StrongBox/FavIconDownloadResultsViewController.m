@@ -14,6 +14,9 @@
 #import "Alerts.h"
 #import "AppPreferences.h"
 #import "NSString+Extensions.h"
+#import "BrowseItemCell.h"
+
+static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 @interface FavIconDownloadResultsViewController ()
 
@@ -34,7 +37,8 @@
     [super viewDidLoad];
 
     self.tableView.tableFooterView = UIView.new;
-    
+    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
+
     self.nodeSelected = @{}.mutableCopy;
     
     NSMutableArray* success = @[].mutableCopy;
@@ -57,7 +61,7 @@
     self.successful = [success sortedArrayUsingComparator:finderStyleNodeComparator];
     self.failed = [fail sortedArrayUsingComparator:finderStyleNodeComparator];
     
-    self.title = AppPreferences.sharedInstance.isProOrFreeTrial ? NSLocalizedString(@"favicon_results_title", @"FavIcon Results") : NSLocalizedString(@"favicon_results_title_pro_only", @"FavIcon Results (Pro Only)");
+    self.title = AppPreferences.sharedInstance.isPro ? NSLocalizedString(@"favicon_results_title", @"FavIcon Results") : NSLocalizedString(@"favicon_results_title_pro_only", @"FavIcon Results (Pro Only)");
                       
     [self refresh];
 }
@@ -79,15 +83,22 @@
 }
 
 - (NSArray<UIImage*>*)getImagesForNode:(Node*)node {
-    return self.results[self.singleNodeUrlOverride ? self.singleNodeUrlOverride : node.fields.url.urlExtendedParse];
+    NSArray<UIImage*> *ret = self.results[self.singleNodeUrlOverride ? self.singleNodeUrlOverride : node.fields.url.urlExtendedParse];
+    
+    return [ret sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        UIImage* imageA = obj1;
+        UIImage* imageB = obj2;
+        
+        return imageA.size.width == imageB.size.width ? NSOrderedSame : ( imageA.size.width > imageB.size.width ? NSOrderedAscending : NSOrderedDescending);
+    }];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:@"favicon-downloaded-result" forIndexPath:indexPath];
-    
+
+
     Node* node = indexPath.section == 0 ? self.successful[indexPath.row] : self.failed[indexPath.row];
 
-    cell.textLabel.text = node.title;
+
     
     UIImage* image = nil;
     
@@ -96,6 +107,79 @@
     
     image = (images && selectedIndex != nil && selectedIndex.intValue < images.count && selectedIndex.intValue >= 0) ? images[selectedIndex.intValue] : nil;
 
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+  
+
+
+    
+    
+    
+    BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
+
+    
+    
+    image = image ? image : [UIImage imageNamed:@"error"];
+    
+    if( image.size.height != image.size.width && MIN(image.size.width, image.size.height) > 512 ) {
+        NSLog(@"🔴 Down scaling icon...");
+        image = scaleImage(image, CGSizeMake(128, 128));
+    }
+    
+    
+    
+    NSString* subtitle;
+    if (images.count > 1) {
+        subtitle = [NSString stringWithFormat:NSLocalizedString(@"favicon_results_n_icons_found_with_xy_resolution_fmt", @"%lu Icons Found (%dx%d selected)"),
+                                     (unsigned long)images.count,
+                                     (int)image.size.width,
+                                     (int)image.size.height];
+    }
+    else {
+        subtitle = image ? [NSString stringWithFormat:NSLocalizedString(@"favicon_results_one_icon_found_with_xy_resolution_fmt", @"%dx%d selected"),
+                                             (int)image.size.width,
+                                             (int)image.size.height] : NSLocalizedString(@"favicon_results_no_icons_found", @"No FavIcons Found");
+    }
+
+    
+    
+
+    image = image ? image : [UIImage imageNamed:@"error"];
+
+    [cell setRecord:node.title
+           subtitle:subtitle
+               icon:image
+      groupLocation:@""
+              flags:@[]
+     flagTintColors:@{}
+            expired:NO
+           otpToken:nil
+           hideIcon:NO
+              audit:@""];
+    
+    
     if(indexPath.section == 0) {
         cell.accessoryType = images.count > 1 ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     }
@@ -103,24 +187,7 @@
         cell.accessoryType = UITableViewCellAccessoryNone;
     }
     
-    if (images.count > 1) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"favicon_results_n_icons_found_with_xy_resolution_fmt", @"%lu Icons Found (%dx%d selected)"),
-                                     (unsigned long)images.count,
-                                     (int)image.size.width,
-                                     (int)image.size.height];
-    }
-    else {
-        cell.detailTextLabel.text = image ? [NSString stringWithFormat:NSLocalizedString(@"favicon_results_one_icon_found_with_xy_resolution_fmt", @"%dx%d selected"),
-                                             (int)image.size.width,
-                                             (int)image.size.height] : NSLocalizedString(@"favicon_results_no_icons_found", @"No FavIcons Found");
-    }
-    
     cell.detailTextLabel.textColor = image ? nil : UIColor.systemRedColor;
-
-    if(image && (image.size.height != 32 || image.size.width != 32)) {
-        image = scaleImage(image, CGSizeMake(32, 32));
-    }
-    cell.imageView.image = image ? image : [UIImage imageNamed:@"error"];
 
     return cell;
 }
@@ -205,7 +272,7 @@
 }
 
 - (void)refresh {
-    self.doneButton.enabled = self.successful.count > 0 && AppPreferences.sharedInstance.isProOrFreeTrial;
+    self.doneButton.enabled = self.successful.count > 0 && AppPreferences.sharedInstance.isPro;
     [self.tableView reloadData];
 }
 

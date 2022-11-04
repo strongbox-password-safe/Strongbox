@@ -35,19 +35,8 @@ extern NSString* const kCustomFieldsColumn;
 
 + (NSArray<NSString*> *)kAllColumns;
 
-@property (nonatomic) BOOL fullVersion;
-
-
-@property (nonatomic, readonly) BOOL freeTrial;
-@property (nonatomic, readonly) NSInteger freeTrialDaysRemaining;
-@property (nonatomic, nullable, readonly) NSDate* endFreeTrialDate;
-@property (readonly) BOOL isFreeTrial;
-
-
-
 @property (readonly) BOOL isPro;
-
-
+- (void)setPro:(BOOL)value;
 
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
 
@@ -95,7 +84,6 @@ extern NSString* const kCustomFieldsColumn;
 @property (nullable) NSData* duressDummyData;
 @property BOOL databasesAreAlwaysReadOnly;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
-@property (readonly) BOOL isProOrFreeTrial;
 @property PasswordStrengthConfig* passwordStrengthConfig;
 
 
@@ -126,7 +114,6 @@ extern NSString* const kCustomFieldsColumn;
 @property NSUInteger numberOfEntitlementCheckFails;
 @property BOOL appHasBeenDowngradedToFreeEdition; 
 @property BOOL hasPromptedThatAppHasBeenDowngradedToFreeEdition;
-- (void)setPro:(BOOL)value;
 
 
 
@@ -135,14 +122,13 @@ extern NSString* const kCustomFieldsColumn;
 @property (readonly) NSUInteger launchCount;
 - (void)incrementLaunchCount;
 
-
-
 @property BOOL useIsolatedDropbox;
 @property BOOL useParentGroupIconOnCreate;
 
 @property BOOL stripUnusedIconsOnSave;
 
 @property BOOL runBrowserAutoFillProxyServer;
+@property (readonly) BOOL expressUpdateSyncPerfImprovementEnabled;
 
 @end
 

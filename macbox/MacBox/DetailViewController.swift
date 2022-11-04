@@ -646,7 +646,7 @@ class DetailViewController: NSViewController {
         item.representedObject = field
         item.target = self
 
-        item.isEnabled = Settings.sharedInstance().isProOrFreeTrial
+        item.isEnabled = Settings.sharedInstance().isPro
 
         if #available(macOS 11.0, *) {
             item.image = NSImage(systemSymbolName: "exclamationmark.shield", accessibilityDescription: nil)

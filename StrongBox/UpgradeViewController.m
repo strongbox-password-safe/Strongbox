@@ -138,9 +138,8 @@
                                                                  title:NSLocalizedString(@"upgrade_vc_feature_support_indie", @"Support Indie Development")
                                                                   body:NSLocalizedString(@"upgrade_vc_feature_subtitle_support_indie", @"Help us stay awesome!")
                                                                   tint:UIColor.systemPurpleColor];
-
-    self.carousel.slides = @[
-        yubikey,
+    
+    NSMutableArray* mutSlides = @[
         biometricUnlock,
         customAppIcons,
         compare,
@@ -149,7 +148,13 @@
         auditing,
         favIconDownloader,
         offline,
-    ];
+    ].mutableCopy;
+    
+    if ( !Utils.isiPadPro ) {
+        [mutSlides insertObject:yubikey atIndex:0];
+    }
+    
+    self.carousel.slides = mutSlides;
     
     self.carousel.interval = 5.0;
     [self.carousel start];
@@ -361,9 +366,7 @@
 - (IBAction)onRestorePurchase:(id)sender {
     [self enableButtons:NO];
     [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
-    
-    BOOL optedInToFreeTrial = AppPreferences.sharedInstance.hasOptedInToFreeTrial; 
-    
+        
     [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self enableButtons:YES];
@@ -375,9 +378,7 @@
                         error:error];
             }
             else {
-                BOOL freeTrialStarted = AppPreferences.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial; 
-                
-                if(!AppPreferences.sharedInstance.isPro && !freeTrialStarted) {
+                if( !AppPreferences.sharedInstance.isPro ) {
                     [Alerts info:self
                            title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
                          message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")

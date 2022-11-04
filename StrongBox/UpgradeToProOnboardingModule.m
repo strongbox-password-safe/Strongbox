@@ -21,7 +21,7 @@
 }
 
 - (BOOL)shouldDisplay {
-    if( AppPreferences.sharedInstance.isProOrFreeTrial ) {
+    if( AppPreferences.sharedInstance.isPro ) {
         return NO;
 
     }

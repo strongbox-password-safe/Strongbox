@@ -332,9 +332,11 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         return;
     }
     
-    [self.innerModel reloadDatabaseFromLocalWorkingCopy:viewController completion:completion];
-    
-    [self rebuildAutoFillDomainNodeMap];
+    [self.innerModel reloadDatabaseFromLocalWorkingCopy:viewController completion:^(BOOL success) {
+        [self rebuildAutoFillDomainNodeMap];
+
+        completion(success);
+    }];
 }
 
 
@@ -2673,9 +2675,8 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                     node2:(Node *)node2
                                     field:(BrowseSortField)field
                                descending:(BOOL)descending
-                        foldersSeparately:(BOOL)foldersSeparately
-                         tieBreakUseTitle:(BOOL)tieBreakUseTitle {
-    return [self.innerModel compareNodesForSort:node1 node2:node2 field:field descending:descending foldersSeparately:foldersSeparately tieBreakUseTitle:tieBreakUseTitle];
+                        foldersSeparately:(BOOL)foldersSeparately {
+    return [self.innerModel compareNodesForSort:node1 node2:node2 field:field descending:descending foldersSeparately:foldersSeparately];
 }
 
 
@@ -2923,6 +2924,8 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)rebuildAutoFillDomainNodeMap {
+    NSLog(@"ViewModel::rebuildAutoFillDomainNodeMap");
+    
     if ( !self.locked ) {
         if ( self.databaseMetadata.autoFillEnabled ) {
             _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self.database

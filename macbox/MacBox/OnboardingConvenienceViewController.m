@@ -45,7 +45,7 @@
 
 - (void)bindUI {
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isPro;
     BOOL conveniencePossible = touchAvailable && featureAvailable;
     BOOL convenienceEnabled = (self.database.isTouchIdEnabled && touchAvailable);
     

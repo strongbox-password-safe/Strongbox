@@ -36,7 +36,7 @@
 }
 
 - (void)bindUI {
-    BOOL pro = Settings.sharedInstance.isProOrFreeTrial;
+    BOOL pro = Settings.sharedInstance.isPro;
     MacDatabasePreferences* meta = self.model.databaseMetadata;
     BOOL safariPossible = [self safariAutoFillIsAvailableOnPlatform];
     BOOL safariEnabled = AutoFillManager.sharedInstance.isOnForStrongbox;

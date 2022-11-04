@@ -142,7 +142,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)bindVersionSubtitle {
-    NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    NSString* fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
     
     NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
     self.textFieldVersion.stringValue = about;
@@ -603,7 +603,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             NSMenuItem* item = (NSMenuItem*)anItem;
             item.title = NSLocalizedString(@"mac_add_sftp_pro_only", @"Add SFTP Database... (Pro)");
         }
-        return Settings.sharedInstance.isProOrFreeTrial;
+        return Settings.sharedInstance.isPro;
     }
     else if ( theAction == @selector(onAddWebDav:)) {
         if ( !Settings.sharedInstance.isPro ) {
@@ -611,7 +611,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             item.title = NSLocalizedString(@"mac_add_webdav_pro_only",  @"Add WebDAV Database... (Pro)");
         }
 
-        return Settings.sharedInstance.isProOrFreeTrial;
+        return Settings.sharedInstance.isPro;
     }
     else if ( theAction == @selector(onAddOneDriveDatabase:) ) {
         return YES;

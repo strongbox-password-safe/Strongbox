@@ -64,6 +64,7 @@ public enum CustomAppIcon: CaseIterable {
         case .proBadge, .regular, .zero, .black, .bluey, .iridescent, .lightBlue, .midnightFire, .red, .water, .original:
             return .strongbox
         }
+        
     }
 
     var plistKey: String {
@@ -156,7 +157,7 @@ public class CustomAppIconObjCHelper: NSObject {
     @objc
     public static func downgradeProIconIfInUse() {
         if #available(iOS 10.3, *) {
-            guard !AppPreferences.sharedInstance().isProOrFreeTrial,
+            guard !AppPreferences.sharedInstance().isPro,
                   let iconName = UIApplication.shared.alternateIconName,
                   let icon = CustomAppIcon.allCases.first(where: { $0.plistKey == iconName }) else { return }
 

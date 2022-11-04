@@ -143,7 +143,7 @@ import Foundation
 
             
             let urlCredentialMatches = nodes.map { node in
-                convertNodeToAutoFillCredential(database, node)
+                convertNodeToAutoFillCredential(database, document, node)
             }
             
             credentials += urlCredentialMatches
@@ -173,11 +173,8 @@ import Foundation
         }
     }
     
-    func convertNodeToAutoFillCredential(_ database : MacDatabasePreferences, _ node: Node) -> AutoFillCredential {
-        
-        
-        
-        var iconBase64Encoded = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4
+    func convertNodeToAutoFillCredential(_ database : MacDatabasePreferences, _ document : Document, _ node: Node) -> AutoFillCredential {
+        var iconBase64Encoded = ""
         
         if let b64 = getNodeIconPngData(node) {
             iconBase64Encoded = String(format: "data:image/png;base64,%@", b64)
@@ -187,13 +184,13 @@ import Foundation
         
         let credential = AutoFillCredential(uuid: node.uuid,
                                             databaseId: database.uuid,
-                                            title: node.title,
-                                            username: node.fields.username,
-                                            password: node.fields.password,
-                                            url: node.fields.url,
+                                            title: document.viewModel.dereference(node.title, node: node),
+                                            username: document.viewModel.dereference(node.fields.username, node: node),
+                                            password: document.viewModel.dereference(node.fields.password, node: node),
+                                            url: document.viewModel.dereference(node.fields.url, node: node),
                                             totp: node.fields.otpToken?.url(true).absoluteString ?? "",
                                             icon: iconBase64Encoded,
-                                            customFields: [:])
+                                            customFields: [:])         
         
         return credential
     }

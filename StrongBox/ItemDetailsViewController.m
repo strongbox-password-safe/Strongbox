@@ -56,6 +56,7 @@
 #endif
 
 #import "DatabasePreferences.h"
+#import "AutoFillNewRecordSettingsController.h"
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
@@ -515,7 +516,14 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         self.editButtonItem.enabled = saveable;
         self.navigationItem.leftBarButtonItem = self.cancelOrDiscardBarButton;
         
-        NSLog(@"bindNavBar: saveable = [%hhd] isDifferent = [%hhd]", saveable, isDifferent);
+
+
+
+
+
+
+        
+
     }
     else {
         self.navigationItem.leftItemsSupplementBackButton = YES;
@@ -1442,7 +1450,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 #ifndef IS_APP_EXTENSION
             
             BOOL formatGood = (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4);
-            BOOL featureAvailable = AppPreferences.sharedInstance.isProOrFreeTrial && !AppPreferences.sharedInstance.disableFavIconFeature;
+            BOOL featureAvailable = AppPreferences.sharedInstance.isPro && !AppPreferences.sharedInstance.disableFavIconFeature;
             
             BOOL favIconFetchPossible = (featureAvailable && formatGood && isValidUrl(self.model.url));
 
@@ -2111,6 +2119,7 @@ suggestionProvider:^NSString*(NSString *text) {
     [cell setModel:[self maybeDereference:self.model.title]
               icon:[self getIconImageFromModel]
            editing:self.editing
+          newEntry:self.createNewItem
    selectAllOnEdit:self.createNewItem
    useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
 
@@ -2118,6 +2127,9 @@ suggestionProvider:^NSString*(NSString *text) {
         if(self.isEditing) {
             cell.onIconTapped = ^{
                 [weakSelf onChangeIcon];
+            };
+            cell.onConfigureDefaultsTapped = ^{
+                [weakSelf onConfigureDefaults];
             };
         }
         else {
@@ -2195,10 +2207,6 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (DatabaseFormat)databaseFormat {
     return self.databaseModel.database.originalFormat;
-}
-
-- (BOOL)emailFieldEnabled {
-    return YES; 
 }
 
 - (EntryViewModel*)refreshViewModel {
@@ -2427,6 +2435,24 @@ suggestionProvider:^NSString*(NSString *text) {
             });
         }
     }
+}
+
+- (void)onConfigureDefaults {
+#ifndef IS_APP_EXTENSION
+    AutoFillNewRecordSettingsController* vc = AutoFillNewRecordSettingsController.fromStoryboard;
+    
+    vc.onDone = ^{
+        [self dismissViewControllerAnimated:YES completion:nil];
+    };
+    
+    
+    UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    
+    nav.toolbarHidden = YES;
+    nav.toolbar.hidden = YES;
+    
+    [self presentViewController:nav animated:YES completion:nil];
+#endif
 }
 
 @end

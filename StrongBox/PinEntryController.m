@@ -9,6 +9,7 @@
 #import "PinEntryController.h"
 #import "AppPreferences.h"
 #import "FontManager.h"
+#import "Utils.h"
 
 @interface PinEntryController () <UIAdaptivePresentationControllerDelegate>
 
@@ -36,13 +37,38 @@
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *topConstraint;
 @property (weak, nonatomic) IBOutlet UIStackView *bottomButtonsStack;
 @property (weak, nonatomic) IBOutlet UIStackView *keyPadRowsStack;
+@property (weak, nonatomic) IBOutlet UIButton *buttonDeleteCancel;
 
 @property (readonly) UIColor* borderColor;
 @property (readonly) UIColor* labelColor;
 
+@property BOOL isDatabasePIN;
+
 @end
 
 @implementation PinEntryController
+
++ (instancetype)newControllerForAppLock {
+    return [PinEntryController instantiateFromStoryboard:NO];
+}
+
++ (instancetype)newControllerForDatabaseUnlock {
+    return [PinEntryController instantiateFromStoryboard:YES];
+}
+
++ (instancetype)instantiateFromStoryboard:(BOOL)databasePIN {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* vc1 = (PinEntryController*)[storyboard instantiateInitialViewController];
+    
+    vc1.isDatabasePIN = databasePIN;
+    if (@available(iOS 13.0, *)) {
+        vc1.modalInPresentation = !Utils.isiPad;
+    }
+    
+    vc1.modalPresentationStyle = Utils.isiPad ? UIModalPresentationFormSheet : UIModalPresentationFullScreen;
+    
+    return vc1;
+}
 
 - (BOOL)shouldAutorotate {
     if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ) {
@@ -68,27 +94,6 @@
     self.presentationController.delegate = self;
 
     [self setupUi];
-
-    self.buttonFallback.hidden = !self.showFallbackOption;
-    [self.buttonCancel setTitle:NSLocalizedString(@"generic_cancel", @"Cancel") forState:UIControlStateNormal];
-    [self.buttonCancel setTitle:NSLocalizedString(@"generic_cancel", @"Cancel") forState:UIControlStateHighlighted];
-    
-    
-    
-    if ( self.pinLength > 0 && AppPreferences.sharedInstance.instantPinUnlocking ) {
-        self.buttonDone.alpha = 0.0;
-    }
-    else {
-        self.buttonDone.alpha = 1.0;
-    }
-    
-    self.labelWarning.text = self.warning;
-    self.labelWarning.hidden = self.warning.length == 0;
-    if(self.warning.length) {
-        [self.stackView setCustomSpacing:4 afterView:self.logo];
-    }
-    
-    self.enteredText = @"";
     
     [self adjustForOrientation];
     
@@ -104,7 +109,7 @@
 - (void)adjustForOrientation {
     if ( UIDeviceOrientationIsLandscape([UIDevice currentDevice].orientation) &&  UIDevice.currentDevice.userInterfaceIdiom != UIUserInterfaceIdiomPad ) {
         self.logo.hidden = YES;
-        self.bottomButtonsStack.hidden = YES;
+
         
         [self.stackView setCustomSpacing:0 afterView:self.logo];
         [self.stackView setCustomSpacing:0 afterView:self.labelWarning];
@@ -143,8 +148,35 @@
     
     self.buttonDelete.backgroundColor = UIColor.clearColor;
     self.buttonCancel.backgroundColor = UIColor.clearColor;
+    
+    self.buttonDelete.enabled = NO;
+    self.buttonCancel.enabled = NO;
+    
+    [self.buttonDelete setTitle:@"" forState:UIControlStateNormal];
+    [self.buttonCancel setTitle:@"" forState:UIControlStateNormal];
+    
+    
+    self.buttonFallback.hidden = !self.showFallbackOption;
 
     
+
+    
+    
+    
+    if ( self.pinLength > 0 && AppPreferences.sharedInstance.instantPinUnlocking ) {
+        self.buttonDone.alpha = 0.0;
+    }
+    else {
+        self.buttonDone.alpha = 1.0;
+    }
+    
+    self.labelWarning.text = self.warning;
+    self.labelWarning.hidden = self.warning.length == 0;
+    if(self.warning.length) {
+        [self.stackView setCustomSpacing:4 afterView:self.logo];
+    }
+    
+    self.enteredText = @"";
 }
 
 - (UIColor*)labelColor {
@@ -169,17 +201,22 @@
     const CGFloat buttonWidth = button.frame.size.width;
     
     UIColor* backgroundColor = UIColor.clearColor;
-    UIColor* insideCircleColor = UIColor.clearColor;
+    UIColor* insideCircleColor = UIColor.lightGrayColor;
     
-    
+    if (@available(iOS 13.0, *)) {
+        insideCircleColor = UIColor.quaternaryLabelColor;
+    }
 
-    UIBezierPath* circlePath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(buttonWidth/2, buttonWidth/2) radius:33.0f startAngle:0 endAngle:M_PI * 2 clockwise:YES];
+    
+    
+    UIBezierPath* circlePath = [UIBezierPath bezierPathWithArcCenter:CGPointMake(buttonWidth/2, buttonWidth/2) radius:42.0f startAngle:0 endAngle:M_PI * 2 clockwise:YES];
     
     CAShapeLayer* circleLayer = CAShapeLayer.layer;
     circleLayer.path = circlePath.CGPath;
     circleLayer.fillColor = insideCircleColor.CGColor;
-    circleLayer.strokeColor = self.labelColor.CGColor;
-    circleLayer.lineWidth = 1.0f;
+
+    
+
 
     
     
@@ -199,18 +236,6 @@
 
     [button setTitleColor:self.labelColor forState:UIControlStateNormal];
     [button setTitleColor:self.labelColor forState:UIControlStateHighlighted];
-}
-
-- (void)validateButtonsUi {
-    if ( self.pinLength > 0 && AppPreferences.sharedInstance.instantPinUnlocking ) {
-        self.buttonDone.enabled = NO;
-    }
-    else {
-        self.buttonDone.enabled = self.enteredText.length > 3;
-    }
-    
-    self.buttonDelete.enabled = self.enteredText.length > 0;
-    [self.buttonDelete setTitleColor:self.enteredText.length > 0 ? self.labelColor : UIColor.lightGrayColor forState:UIControlStateNormal];
 }
 
 - (IBAction)onOK:(id)sender {
@@ -249,9 +274,7 @@
         }
     }
     
-    [self updateEnteredTextLabel];
-    
-    [self validateButtonsUi];
+    [self bindUI];
     
     if(self.pinLength > 0 && self.enteredText.length == self.pinLength && AppPreferences.sharedInstance.instantPinUnlocking) {
         
@@ -262,11 +285,29 @@
     }
 }
 
-- (void)performLightHapticFeedback {
-    if ( AppPreferences.sharedInstance.pinCodeHapticFeedback ) {
-        UIImpactFeedbackGenerator* gen = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
-        [gen impactOccurred];
+- (void)bindUI {
+    [self updateEnteredTextLabel];
+    
+    [self validateButtonsUi];
+}
+
+- (void)validateButtonsUi {
+    if ( self.pinLength > 0 && AppPreferences.sharedInstance.instantPinUnlocking ) {
+        self.buttonDone.enabled = NO;
     }
+    else {
+        self.buttonDone.enabled = self.enteredText.length > 3;
+    }
+    
+    self.buttonDelete.enabled = self.enteredText.length > 0;
+    [self.buttonDelete setTitleColor:self.enteredText.length > 0 ? self.labelColor : UIColor.lightGrayColor forState:UIControlStateNormal];
+    
+    NSString* title = self.enteredText.length > 0 ? NSLocalizedString(@"generic_action_delete", @"Delete") : NSLocalizedString(@"generic_cancel", @"Cancel");
+    
+    [UIView performWithoutAnimation:^{
+        [self.buttonDeleteCancel setTitle:title forState:UIControlStateNormal];
+        [self.buttonDeleteCancel layoutIfNeeded];
+    }];
 }
 
 - (void)updateEnteredTextLabel {
@@ -299,6 +340,24 @@
 
     
     self.onDone(kPinEntryResponseCancel, nil); 
+}
+
+- (void)performLightHapticFeedback {
+    if ( AppPreferences.sharedInstance.pinCodeHapticFeedback ) {
+        UIImpactFeedbackGenerator* gen = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
+        [gen impactOccurred];
+    }
+}
+
+- (IBAction)onDeleteOrCancel:(id)sender {
+    if ( self.enteredText.length > 0 ) {
+        self.enteredText = [self.enteredText substringToIndex:self.enteredText.length-1];
+        [self performLightHapticFeedback];
+        [self bindUI];
+    }
+    else {
+        [self onCancel:nil];
+    }
 }
 
 @end

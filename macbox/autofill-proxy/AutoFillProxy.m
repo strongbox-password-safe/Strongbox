@@ -23,7 +23,7 @@ static const int MAX_PATH = 103;
 
 NSString* _Nullable getSocketPath(BOOL hardcodeSandboxTestingPath) {
     NSURL* url = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:@"group.strongbox.mac.mcguill"];
-    NSLog(@"App Group Path = [%@]", url.path);
+
 
 #ifdef DEBUG
     if ( hardcodeSandboxTestingPath ) {
@@ -35,7 +35,7 @@ NSString* _Nullable getSocketPath(BOOL hardcodeSandboxTestingPath) {
     
     NSString* path = [url.path stringByAppendingPathComponent:@"F"];
     
-    NSLog(@"Trying to connect to socket at [%@] - %ld characters", path, path.length);
+
     
     if ( path.length > MAX_PATH ) {
         NSLog(@"🔴 Could not create socket, socket path > %d chars [%@] = %ld chars", MAX_PATH, path, path.length);

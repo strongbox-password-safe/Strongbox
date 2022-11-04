@@ -637,7 +637,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
 
     __weak Model* weakSelf = self;
-    self.auditor = [[DatabaseAuditor alloc] initWithPro:self.applicationPreferences.isProOrFreeTrial
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:self.applicationPreferences.isPro
                                          strengthConfig:self.applicationPreferences.passwordStrengthConfig
                                              isExcluded:^BOOL(Node * _Nonnull item) {
         return [weakSelf isExcludedFromAuditHelper:set uuid:item.uuid];
@@ -1347,19 +1347,36 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         field = kBrowseSortFieldTitle;
     }
     
-    if(field != kBrowseSortFieldNone) {
-        return [items sortedArrayWithOptions:NSSortStable
-                             usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-                                 Node* n1 = (Node*)obj1;
-                                 Node* n2 = (Node*)obj2;
-                                 
-                                 return [self compareNodesForSort:n1
-                                                            node2:n2
-                                                            field:field
-                                                       descending:descending
-                                                foldersSeparately:foldersSeparately
-                                                 tieBreakUseTitle:YES];
-                             }];
+    if ( field != kBrowseSortFieldNone ) {
+        NSArray<Node*> *ret = [items sortedArrayWithOptions:NSSortStable
+                                            usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            return [self compareNodesForSort:(Node*)obj1 node2:(Node*)obj2 field:field descending:descending foldersSeparately:foldersSeparately];
+        }];
+        
+        
+
+        if ( self.database.recycleBinEnabled && self.database.recycleBinNode ) {
+            NSUInteger idx = [ret indexOfObject:self.database.recycleBinNode];
+            
+            if ( idx != NSNotFound ) {
+                NSMutableArray* mut = ret.mutableCopy;
+                [mut removeObjectAtIndex:idx];
+                
+                if ( foldersSeparately ) {
+                    NSUInteger folderCount = [mut filter:^BOOL(Node * _Nonnull obj) {
+                        return obj.isGroup;
+                    }].count;
+                    [mut insertObject:self.database.recycleBinNode atIndex:folderCount];
+                }
+                else {
+                    [mut addObject:self.database.recycleBinNode];
+                }
+                
+                return mut;
+            }
+        }
+        
+        return ret;
     }
     else { 
         if ( foldersSeparately ) { 
@@ -1382,49 +1399,48 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     }
 }
 
-- (NSComparisonResult)compareNodesForSort:(Node*)node1
-                                    node2:(Node*)node2
-                                    field:(BrowseSortField)field
-                               descending:(BOOL)descending
-                        foldersSeparately:(BOOL)foldersSeparately
-                         tieBreakUseTitle:(BOOL)tieBreakUseTitle {
-    if(foldersSeparately) {
-        if(node1.isGroup && !node2.isGroup) {
-            return NSOrderedAscending;
-        }
-        else if(!node1.isGroup && node2.isGroup) {
-            return NSOrderedDescending;
-        }
-    }
-    
-    
-    
-    if(node2.isGroup && node1.isGroup && field != kBrowseSortFieldTitle) {
-        return finderStringCompare(node1.title, node2.title);
-    }
-    
-    Node* n1 = descending ? node2 : node1;
-    Node* n2 = descending ? node1 : node2;
-    
+- (NSComparisonResult)compareGroupsForSort:(BrowseSortField)field n1:(Node *)n1 n2:(Node *)n2 {
     NSComparisonResult result = NSOrderedSame;
+
+    if ( field == kBrowseSortFieldCreated ) {
+        result = [n1.fields.created compare:n2.fields.created];
+    }
+    else if ( field == kBrowseSortFieldModified ) {
+        result = [n1.fields.modified compare:n2.fields.modified];
+    }
+    else {
+        return finderStringCompare(n1.title, n2.title);
+    }
     
-    if(field == kBrowseSortFieldTitle) {
+    
+    
+    if( result == NSOrderedSame ) {
         result = finderStringCompare(n1.title, n2.title);
     }
+    
+    return result;
+}
+
+- (NSComparisonResult)compareEntryOrGroupsForSort:(BrowseSortField)field n1:(Node *)n1 n2:(Node *)n2 {
+    NSComparisonResult result = NSOrderedSame;
+
+    if (field == kBrowseSortFieldTitle) {
+        return finderStringCompare([self dereference:n1.title node:n1], [self dereference:n2.title node:n2]);
+    }
     else if(field == kBrowseSortFieldUsername) {
-        result = finderStringCompare(n1.fields.username, n2.fields.username);
+        result = finderStringCompare([self dereference:n1.fields.username node:n1], [self dereference:n2.fields.username node:n2]);
     }
     else if(field == kBrowseSortFieldPassword) {
-        result = finderStringCompare(n1.fields.password, n2.fields.password);
+        result = finderStringCompare([self dereference:n1.fields.password node:n1], [self dereference:n2.fields.password node:n2]);
     }
     else if(field == kBrowseSortFieldUrl) {
-        result = finderStringCompare(n1.fields.url, n2.fields.url);
+        result = finderStringCompare([self dereference:n1.fields.url node:n1], [self dereference:n2.fields.url node:n2]);
     }
     else if(field == kBrowseSortFieldEmail) {
-        result = finderStringCompare(n1.fields.email, n2.fields.email);
+        result = finderStringCompare([self dereference:n1.fields.email node:n1], [self dereference:n2.fields.email node:n2]);
     }
     else if(field == kBrowseSortFieldNotes) {
-        result = finderStringCompare(n1.fields.notes, n2.fields.notes);
+        result = finderStringCompare([self dereference:n1.fields.notes node:n1], [self dereference:n2.fields.notes node:n2]);
     }
     else if(field == kBrowseSortFieldCreated) {
         result = [n1.fields.created compare:n2.fields.created];
@@ -1435,11 +1451,38 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     
     
-    if( result == NSOrderedSame && field != kBrowseSortFieldTitle && tieBreakUseTitle ) {
-        result = finderStringCompare(n1.title, n2.title);
+    if( result == NSOrderedSame ) {
+        result = finderStringCompare([self dereference:n1.title node:n1], [self dereference:n2.title node:n2]);
     }
     
     return result;
+}
+
+- (NSComparisonResult)compareNodesForSort:(Node*)node1
+                                    node2:(Node*)node2
+                                    field:(BrowseSortField)field
+                               descending:(BOOL)descending
+                        foldersSeparately:(BOOL)foldersSeparately {
+    if ( foldersSeparately ) {
+        if ( node1.isGroup && !node2.isGroup ) {
+            return NSOrderedAscending;
+        }
+        else if ( !node1.isGroup && node2.isGroup ) {
+            return NSOrderedDescending;
+        }
+    }
+    
+    Node* n1 = descending ? node2 : node1;
+    Node* n2 = descending ? node1 : node2;
+
+    
+    
+    if ( n1.isGroup && n2.isGroup ) {
+        return [self compareGroupsForSort:field n1:n1 n2:n2];
+    }
+    else {
+        return [self compareEntryOrGroupsForSort:field n1:n1 n2:n2];
+    }
 }
 
 - (BOOL)formatSupportsCustomIcons {

@@ -30,7 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)onCopyTotp:(id)sender;
 
 - (IBAction)onDelete:(id _Nullable)sender;
+
 - (IBAction)onGeneralDatabaseSettings:(id)sender;
+- (IBAction)onConvenienceUnlockProperties:(id)sender;
+- (IBAction)onDatabaseAutoFillSettings:(id)sender;
+- (IBAction)onDatabaseEncryptionSettings:(id)sender;
+- (IBAction)onChangeMasterPassword:(id)sender;
 
 - (Node*_Nullable)getSingleSelectedItem; 
 

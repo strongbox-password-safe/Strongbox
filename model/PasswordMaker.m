@@ -370,10 +370,44 @@ const static NSArray<NSString*> *kEmailDomains;
     
     
     if (config.saltConfig != kPasswordGenerationSaltConfigNone) {
-        return [self addSalt:passphrase config:config];
+        passphrase = [self addSalt:passphrase config:config];
     }
     
+    
+
+    if (config.dicewareAddLower ) {
+        passphrase = [self dicewareSprinkleRandomFromPool:kPasswordGenerationCharacterPoolLower passphrase:passphrase];
+    }
+    if (config.dicewareAddUpper ) {
+        passphrase = [self dicewareSprinkleRandomFromPool:kPasswordGenerationCharacterPoolUpper passphrase:passphrase];
+    }
+    if (config.dicewareAddNumber ) {
+        passphrase = [self dicewareSprinkleRandomFromPool:kPasswordGenerationCharacterPoolNumeric passphrase:passphrase];
+    }
+    if (config.dicewareAddSymbols ) {
+        passphrase = [self dicewareSprinkleRandomFromPool:kPasswordGenerationCharacterPoolSymbols passphrase:passphrase];
+    }
+    if (config.dicewareAddLatin1Supplement ) {
+        passphrase = [self dicewareSprinkleRandomFromPool:kPasswordGenerationCharacterPoolLatin1Supplement passphrase:passphrase];
+    }
+
     return passphrase;
+}
+
+- (NSString*)getRandomCharacterFromPool:(PasswordGenerationCharacterPool)pool {
+    NSString* chars = [self getCharacterPool:pool];
+    
+    NSInteger index = arc4random_uniform((u_int32_t)chars.length);
+    
+    return [chars substringWithRange:NSMakeRange(index, 1)];
+}
+
+- (NSString*)dicewareSprinkleRandomFromPool:(PasswordGenerationCharacterPool)pool passphrase:(NSString*)passphrase {
+    NSString* character = [self getRandomCharacterFromPool:pool];
+    
+    int index = arc4random_uniform((uint32_t)passphrase.length);
+    
+    return [passphrase stringByReplacingCharactersInRange:NSMakeRange(index, 0) withString:character];
 }
 
 - (NSString*)addSalt:(NSString*)passphrase config:(PasswordGenerationConfig*)config {
@@ -524,6 +558,11 @@ const static NSArray<NSString*> *kEmailDomains;
         allCharacters = [[allCharacters componentsSeparatedByCharactersInSet:trim] componentsJoinedByString:@""];
     }
 
+    if ( config.basicExcludedCharacters.length ) {
+        NSCharacterSet *trim = [NSCharacterSet characterSetWithCharactersInString:config.basicExcludedCharacters];
+        allCharacters = [[allCharacters componentsSeparatedByCharactersInSet:trim] componentsJoinedByString:@""];
+    }
+    
     
     
     if(![allCharacters length]) {

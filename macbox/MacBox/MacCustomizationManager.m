@@ -18,7 +18,7 @@
 + (void)applyCustomizations {
     if ( [self isAProBundle] ) {
         NSLog(@"Pro Bundle... customizing...");
-        [Settings.sharedInstance setFullVersion:YES];
+        [Settings.sharedInstance setPro:YES];
     }
 }
 

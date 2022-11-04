@@ -106,6 +106,10 @@ NSColor* NSColorFromRGB(NSUInteger rgbValue);
 
 #if TARGET_OS_IPHONE
 + (nullable NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error;
+
+@property (readonly, class) BOOL isiPadPro;
+@property (readonly, class) BOOL isiPad;
+
 #endif
 
 NSString* localizedYesOrNoFromBool(BOOL george);

@@ -1314,7 +1314,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         return text;
     }
     
-    NSError* error;
+    NSError* error = nil;
     
     BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
     

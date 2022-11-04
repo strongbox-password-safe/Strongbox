@@ -47,12 +47,6 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 @property (readonly) BOOL hasActiveMonthlySubscription;
 @property (readonly) BOOL isLegacyLifetimeIAPPro;
 
-
-
-@property (readonly, nullable) NSDate* freeTrialPurchaseDate;
-@property (readonly) BOOL hasPurchasedFreeTrial;
-
-
 @end
 
 NS_ASSUME_NONNULL_END

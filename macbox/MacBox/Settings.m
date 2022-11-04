@@ -27,7 +27,7 @@ NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
 
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
-static NSString* const kFullVersion = @"fullVersion";
+static NSString* const kPro = @"fullVersion";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* const kAutoLockTimeout = @"autoLockTimeout";
 
@@ -84,7 +84,7 @@ static NSString* const kLaunchCountKey = @"launchCountKey";
 static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
-static NSString* const kRunBrowserAutoFillProxyServer = @"runBrowserAutoFillProxyServer";
+static NSString* const kRunBrowserAutoFillProxyServer = @"runBrowserAutoFillProxyServer-Prod-22-Oct-2022";
 
 
 
@@ -145,8 +145,12 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+- (BOOL)expressUpdateSyncPerfImprovementEnabled {
+    return YES;
+}
+
 - (BOOL)runBrowserAutoFillProxyServer {
-    return [self getBool:kRunBrowserAutoFillProxyServer fallback:NO]; 
+    return [self getBool:kRunBrowserAutoFillProxyServer fallback:YES];
 }
 
 - (void)setRunBrowserAutoFillProxyServer:(BOOL)runBrowserAutoFillProxyServer {
@@ -277,40 +281,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (void)setHasPromptedThatAppHasBeenDowngradedToFreeEdition:(BOOL)hasPromptedThatAppHasBeenDowngradedToFreeEdition {
     [self setBool:kHasPromptedThatAppHasBeenDowngradedToFreeEdition value:hasPromptedThatAppHasBeenDowngradedToFreeEdition];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-- (void)setPro:(BOOL)value {
-    [self setFullVersion:value];
-}
-
-
-
-
-
-
-
-
 
 
 
@@ -602,61 +572,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     return _arr;
 }
 
-- (BOOL)fullVersion {
-    return [self getBool:kFullVersion];
+- (BOOL)isPro {
+    return [self getBool:kPro];
 }
 
-- (void)setFullVersion:(BOOL)value {
-    [self setBool:kFullVersion value:value];
+- (void)setPro:(BOOL)value {
+    [self setBool:kPro value:value];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
-}
-
-- (BOOL)isProOrFreeTrial {
-    return self.isPro || self.freeTrial;
-}
-
-- (BOOL)isPro {
-    return self.fullVersion;
-}
-
-- (BOOL)isFreeTrial {
-    return self.freeTrial;
-}
-
-- (BOOL)freeTrial {
-    NSDate* date = self.endFreeTrialDate;
-    
-    if ( date == nil ) {
-        return NO;
-    }
-    
-    BOOL ret = !([date timeIntervalSinceNow] < 0);
-
-    return ret;
-}
-
-- (NSInteger)freeTrialDaysRemaining {
-    NSDate* date = self.endFreeTrialDate;
-    
-    if(date == nil) {
-        return -1;
-    }
-    
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    
-    NSDateComponents *components = [gregorian components:NSCalendarUnitDay
-                                                fromDate:[NSDate date]
-                                                  toDate:date
-                                                 options:0];
-    
-    NSInteger days = [components day];
-    
-    return days;
-}
-
-- (NSDate*)endFreeTrialDate {
-    return [self.userDefaults objectForKey:kEndFreeTrialDate];
 }
 
 - (NSInteger)autoLockTimeoutSeconds {

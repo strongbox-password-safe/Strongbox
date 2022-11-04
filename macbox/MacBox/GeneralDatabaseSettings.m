@@ -67,7 +67,7 @@
     self.checkboxLockOnLockScreen.state = self.model.lockOnScreenLock ? NSControlStateValueOn : NSControlStateValueOff;
     self.checkboxAutoDownloadFavIcon.state = self.model.downloadFavIconOnChange ? NSControlStateValueOn : NSControlStateValueOff;
 
-    if ( !Settings.sharedInstance.fullVersion ) {
+    if ( !Settings.sharedInstance.isPro ) {
         self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
     }
     

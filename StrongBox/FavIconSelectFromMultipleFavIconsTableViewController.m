@@ -8,6 +8,9 @@
 
 #import "FavIconSelectFromMultipleFavIconsTableViewController.h"
 #import "Utils.h"
+#import "BrowseItemCell.h"
+
+static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 @interface FavIconSelectFromMultipleFavIconsTableViewController ()
 
@@ -19,6 +22,8 @@
     [super viewDidLoad];
     
     self.tableView.tableFooterView = UIView.new;
+    
+    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -26,18 +31,24 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"favicon-downloaded-candidate" forIndexPath:indexPath];
-    
-    cell.textLabel.text = self.node.title;
-    
+    BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
+
     UIImage* image = self.images[indexPath.row];
-    
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"%dx%d", (int)image.size.width, (int)image.size.height];
-    
-    if(image.size.height != 32 || image.size.width != 32) {
-        image = scaleImage(image, CGSizeMake(32, 32));
+    if( image.size.height != image.size.width && MIN(image.size.width, image.size.height) > 512 ) {
+        NSLog(@"🔴 Down scaling icon...");
+        image = scaleImage(image, CGSizeMake(192, 192));
     }
-    cell.imageView.image = image;
+
+    [cell setRecord:self.node.title
+           subtitle:[NSString stringWithFormat:@"%dx%d", (int)image.size.width, (int)image.size.height]
+               icon:image
+      groupLocation:@""
+              flags:@[]
+     flagTintColors:@{}
+            expired:NO
+           otpToken:nil
+           hideIcon:NO
+              audit:@""];
 
     cell.accessoryType = indexPath.row == self.selectedIndex ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     

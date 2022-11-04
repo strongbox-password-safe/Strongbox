@@ -77,13 +77,36 @@
            flags:(NSArray<UIImage *> *)flags
   flagTintColors:(NSDictionary<NSNumber *,UIColor *> * _Nullable)flagTintColors
         hideIcon:(BOOL)hideIcon {
+    return [self setGroup:title
+                     icon:icon
+               childCount:childCount
+                   italic:italic
+            groupLocation:groupLocation
+                tintColor:nil
+                    flags:flags
+           flagTintColors:flagTintColors
+                 hideIcon:hideIcon
+                textColor:nil];
+}
+
+- (void)setGroup:(NSString *)title
+            icon:(UIImage *)icon
+      childCount:(NSString *)childCount
+          italic:(BOOL)italic
+   groupLocation:(NSString *)groupLocation
+       tintColor:(UIColor *)tintColor
+           flags:(NSArray<UIImage *> *)flags
+  flagTintColors:(NSDictionary<NSNumber *,UIColor *> *)flagTintColors
+        hideIcon:(BOOL)hideIcon
+       textColor:(UIColor *)textColor {
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
+    self.titleLabel.textColor = textColor;
     
     self.iconImageView.image = hideIcon ? nil : icon;
     self.iconImageView.tintColor = tintColor;
     self.iconImageView.hidden = hideIcon;
-    
+        
     self.usernameLabel.text = @"";
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     

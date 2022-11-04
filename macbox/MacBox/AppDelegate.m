@@ -109,6 +109,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)startAutoFillProxyServer {
     if ( Settings.sharedInstance.runBrowserAutoFillProxyServer ) {
+        [NativeMessagingManifestInstallHelper installNativeMessagingHostsFiles];
+        
         if ( ![AutoFillProxyServer.sharedInstance start] ) {
             NSLog(@"🔴 Failed to start AutoFillProxyServer.");
         }
@@ -384,6 +386,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             self.statusItem.highlightMode = YES;
             self.statusItem.button.enabled = YES;
 
+        
+            
 
 
 
@@ -1172,7 +1176,7 @@ static NSInteger clipboardChangeCount;
 
         if( index != NSNotFound) {
             NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
-            NSString* fmt = (Settings.sharedInstance.fullVersion && !MacCustomizationManager.isUnifiedBundle) ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+            NSString* fmt = (Settings.sharedInstance.isPro && !MacCustomizationManager.isUnifiedBundle) ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
             menuItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
         }
         
@@ -1182,7 +1186,7 @@ static NSInteger clipboardChangeCount;
 
         if( index != NSNotFound) {
             NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
-            NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"upgrade_vc_change_my_license", @"Change My License...") : NSLocalizedString(@"mac_upgrade_button_title", @"Upgrade");
+            NSString* fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"upgrade_vc_change_my_license", @"Change My License...") : NSLocalizedString(@"mac_upgrade_button_title", @"Upgrade");
             menuItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
         }
     }

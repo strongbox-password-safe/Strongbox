@@ -1131,6 +1131,10 @@
                 unsigned long long value = *(unsigned long long*)((uintptr_t)safe + offset);
                 strValue = [NSString stringWithFormat:@"%lld", value];
             }
+            else if (strncmp(type, "B", 1) == 0) {
+                BOOL value = *(BOOL*)((uintptr_t)safe + offset);
+                strValue = [NSString stringWithFormat:@"%hhd", value];
+            }
             else if (strncmp(type, "@", 1) == 0) {
                 id value = object_getIvar(safe, ivar);
                 strValue = [NSString stringWithFormat:@"%@", value];
@@ -1142,7 +1146,7 @@
                 debugLines[key] = strValue;
             }
             else {
-                NSLog(@"WARNWARN Unknown iVar Type: %s", type);
+                NSLog(@"WARNWARN Unknown iVar Type: %s - %s", type, name);
             }
         }
         free(ivars);

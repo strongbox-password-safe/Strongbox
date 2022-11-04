@@ -203,7 +203,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         return nil;
     }
     
-    NSLog(@"desiredField = [%@], searchByField = [%@], searchTarget = [%@]", desiredField, searchByField, searchTarget);
+
     
     Node* target = [self findReferencedNode:searchByField searchTarget:searchTarget database:database error:error];
     

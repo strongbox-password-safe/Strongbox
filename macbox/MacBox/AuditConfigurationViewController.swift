@@ -154,7 +154,7 @@ class AuditConfigurationViewController: NSViewController {
         chckboxCommon.isEnabled = config.auditInBackground
         checkboxTwoFactor.isEnabled = config.auditInBackground
 
-        let hibpPossible = config.auditInBackground && Settings.sharedInstance().isProOrFreeTrial
+        let hibpPossible = config.auditInBackground && Settings.sharedInstance().isPro
         checkboxHibp.isEnabled = hibpPossible
         if !hibpPossible {
 
@@ -172,7 +172,7 @@ class AuditConfigurationViewController: NSViewController {
         sliderLength.isEnabled = config.auditInBackground && config.checkForMinimumLength
         labelLength.textColor = (config.auditInBackground && config.checkForMinimumLength) ? .controlTextColor : .disabledControlTextColor
 
-        let similarPossible = config.auditInBackground && Settings.sharedInstance().isProOrFreeTrial
+        let similarPossible = config.auditInBackground && Settings.sharedInstance().isPro
         checkboxSimilar.isEnabled = similarPossible
 
         if !similarPossible {

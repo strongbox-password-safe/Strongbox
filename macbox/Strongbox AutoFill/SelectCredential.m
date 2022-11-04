@@ -11,9 +11,15 @@
 #import "NodeIconHelper.h"
 #import "AutoFillCredentialCell.h"
 #import "NSString+Extensions.h"
-#import "regdom.h"
 #import "CustomBackgroundTableView.h"
 #import "OTPToken+Generation.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_AutoFill-Swift.h"
+#endif
+
 
 static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 
@@ -173,17 +179,17 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 
                     }
                     
-                    NSString* domain = getDomain(url.host);
+                    NSString* domain = getPublicDomain(url.host);
                     [self smartInitializeSearchFromDomain:domain];
                 }
                 else {
-                    NSString* domain = getDomain(url.absoluteString);
+                    NSString* domain = getPublicDomain(url.absoluteString);
                     [self smartInitializeSearchFromDomain:domain];
                 }
             }
             else {
 
-                NSString* domain = getDomain(serviceId.identifier);
+                NSString* domain = getPublicDomain(serviceId.identifier);
                 [self smartInitializeSearchFromDomain:domain];
             }
         }
@@ -213,31 +219,33 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     }
 }
 
-NSString *getDomain(NSString* host) {
-    if(host == nil) {
+NSString *getPublicDomain(NSString* url) {
+    if(url == nil) {
         return @"";
     }
     
-    if(!host.length) {
+    if(!url.length) {
         return @"";
     }
-    
-    const char *cStringUrl = [host UTF8String];
-    if(!cStringUrl || strlen(cStringUrl) == 0) {
-        return @"";
-    }
-    
-    void *tree = loadTldTree();
-    const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
-    
-    if(result == NULL) {
-        return @"";
-    }
-    
-    NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
-    
-    NSLog(@"Calculated Domain: %@", domain);
-    
+
+    NSString *domain = [BrowserAutoFillManager extractDomainFromUrlWithUrl:url];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return domain;
 }
 

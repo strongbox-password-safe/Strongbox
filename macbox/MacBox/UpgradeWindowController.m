@@ -51,7 +51,7 @@ static UpgradeWindowController *sharedInstance = nil;
     [[SKPaymentQueue defaultQueue] removeTransactionObserver:self];
     
     if(ret) {
-        Settings.sharedInstance.fullVersion = YES;
+        [Settings.sharedInstance setPro:YES];
     }
     
     [self.window close];

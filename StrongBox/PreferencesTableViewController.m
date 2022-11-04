@@ -301,13 +301,6 @@
                 self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
             }
         }
-        else if ( AppPreferences.sharedInstance.isFreeTrial ) {
-            self.labelProStatus.text = [NSString stringWithFormat:NSLocalizedString(@"pro_status_free_trial_days_left_fmt", @"Free Trial (%@ days left)"), @(AppPreferences.sharedInstance.freeTrialDaysLeft)];
-        }
-        else if ( AppPreferences.sharedInstance.hasOptedInToFreeTrial || AppPreferences.sharedInstance.daysInstalled > 60 ) {
-            self.labelProStatus.text = NSLocalizedString(@"pro_status_unlicensed_please_upgrade", @"Unlicensed (Please Upgrade)");
-            self.labelProStatus.textColor = UIColor.systemRedColor;
-        }
         else {
             self.labelProStatus.text = NSLocalizedString(@"pro_status_unlicensed", @"Unlicensed");
         }

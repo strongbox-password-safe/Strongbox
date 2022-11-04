@@ -98,9 +98,8 @@
 }
 
 - (void)setupConveniencePinAndOpen {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
-    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
-    pinEntryVc.isDatabasePIN = YES;
+    PinEntryController* pinEntryVc = PinEntryController.newControllerForDatabaseUnlock;
+    
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if( response == kPinEntryResponseOk ) {
             if(!(self.model.metadata.duressPin != nil && [pin isEqualToString:self.model.metadata.duressPin])) {

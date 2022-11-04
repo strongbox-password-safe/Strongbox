@@ -164,8 +164,17 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         popupLocation.menu?.removeAllItems()
 
         for group in sortedGroups {
-            let title = database.getGroupPathDisplayString(group, rootGroupNameInsteadOfSlash: false)
+            var title = database.getGroupPathDisplayString(group, rootGroupNameInsteadOfSlash: false)
 
+            
+            
+            
+            let clipLength = 72;
+            if title.count > clipLength {
+                let tail = title.suffix(clipLength - 3)
+                title = String(format: "...%@", String(tail))
+            }
+            
             let item = NSMenuItem(title: title, action: #selector(onChangeLocation(sender:)), keyEquivalent: "")
 
             var icon = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
@@ -656,7 +665,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 
 
                 let formatGood = database.format == .keePass || database.format == .keePass4
-                let featureAvailable = Settings.sharedInstance().isProOrFreeTrial
+                let featureAvailable = Settings.sharedInstance().isPro
 
                 if featureAvailable, formatGood, model.url.count > 0, let _ = model.url.urlExtendedParse {
                     if !database.promptedForAutoFetchFavIcon {

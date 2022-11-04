@@ -32,6 +32,18 @@ NS_ASSUME_NONNULL_BEGIN
   flagTintColors:(NSDictionary<NSNumber*, UIColor*> *_Nullable)flagTintColors
         hideIcon:(BOOL)hideIcon;
 
+- (void)setGroup:(NSString *)title
+            icon:(UIImage*)icon
+      childCount:(NSString*)childCount
+          italic:(BOOL)italic
+   groupLocation:(NSString*)groupLocation
+       tintColor:(UIColor* _Nullable )tintColor
+           flags:(NSArray<UIImage*>*)flags
+  flagTintColors:(NSDictionary<NSNumber*, UIColor*> *_Nullable)flagTintColors
+        hideIcon:(BOOL)hideIcon
+       textColor:(UIColor* _Nullable)textColor;
+
+
 - (void)setRecord:(NSString*)title
          subtitle:(NSString*)subtitle
              icon:(UIImage*)icon

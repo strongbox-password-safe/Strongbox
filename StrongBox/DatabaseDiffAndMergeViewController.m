@@ -75,7 +75,7 @@
     
     
     
-    return self.isCompareForMerge && AppPreferences.sharedInstance.isProOrFreeTrial;
+    return self.isCompareForMerge && AppPreferences.sharedInstance.isPro;
 }
 
 - (DiffSummary*)diff {
@@ -133,12 +133,12 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return AppPreferences.sharedInstance.isProOrFreeTrial ? 6 : 1;
+    return AppPreferences.sharedInstance.isPro ? 6 : 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section == 0) {
-        return self.diffSummary.databasePropertiesDifferent && AppPreferences.sharedInstance.isProOrFreeTrial ? 2 : 1;
+        return self.diffSummary.databasePropertiesDifferent && AppPreferences.sharedInstance.isPro ? 2 : 1;
     }
     else if (section == 1) {
         return self.willBeChangedOrEdited.count;
@@ -171,7 +171,7 @@
                 cell.accessoryType = UITableViewCellAccessoryNone;
             }
             else {
-                if ( !AppPreferences.sharedInstance.isProOrFreeTrial ) {
+                if ( !AppPreferences.sharedInstance.isPro ) {
                     cell.textLabel.text = NSLocalizedString(@"generic_pro_feature_only_please_upgrade", @"Pro feature only. Please Upgrade.");
                     cell.imageView.image = [UIImage imageNamed:@"rocket"];
                     cell.imageView.tintColor = nil;

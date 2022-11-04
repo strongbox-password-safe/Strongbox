@@ -63,25 +63,7 @@ static NSString* getFreeTrialSuffix() {
         return @"";
     }
     
-    if ( MacCustomizationManager.isUnifiedFreemiumBundle ) {
-        return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
-    }
-    else {
-        if (![Settings sharedInstance].freeTrial) {
-            return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
-        }
-        else {
-            long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
-            
-            if(daysLeft < 1 || daysLeft > 88) {
-                return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
-            }
-            else {
-                NSString* loc = NSLocalizedString(@"mac_pro_days_left_window_title_suffix_fmt", @" - [%ld Pro Days Left]");
-                return [NSString stringWithFormat:loc, daysLeft];
-            }
-        }
-    }
+    return NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
 }
 
 - (NSArray *)getStatusSuffixii {
@@ -295,12 +277,23 @@ static NSString* getFreeTrialSuffix() {
     }
     
     if ( doc && !doc.isModelLocked ) {
-        [self maybeOnboardDatabase];
-
-        [self listenToEventsOfInterest];
-
         if ( Settings.sharedInstance.nextGenUI ) {
             self.window.titlebarAppearsTransparent = NO;
+        }
+        
+        BOOL hide = NO; 
+        
+        self.window.isVisible = !hide;
+        
+        if ( hide ) {
+            
+            
+            
+        }
+        else {
+            [self maybeOnboardDatabase];
+            
+            [self listenToEventsOfInterest];
         }
     }
     else {
@@ -2140,7 +2133,7 @@ static NSString* getFreeTrialSuffix() {
 - (void)maybeOnboardDatabase {
     MacDatabasePreferences* databaseMetadata = self.databaseMetadata;
             
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isPro;
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
     BOOL convenienceAvailable = watchAvailable || touchAvailable;

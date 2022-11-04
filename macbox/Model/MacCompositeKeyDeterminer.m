@@ -357,7 +357,7 @@
     BOOL watchEnabled = (database.isWatchUnlockEnabled && watchAvailable);
     BOOL methodEnabled = touchEnabled || watchEnabled;
     BOOL passwordAvailable = database.conveniencePasswordHasBeenStored;
-    BOOL featureAvailable = Settings.sharedInstance.isProOrFreeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isPro;
     [database triggerPasswordExpiry];
     BOOL expired = database.conveniencePasswordHasExpired;
     BOOL possible = methodEnabled && featureAvailable && passwordAvailable && !expired;

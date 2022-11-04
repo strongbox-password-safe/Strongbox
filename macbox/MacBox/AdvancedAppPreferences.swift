@@ -29,6 +29,7 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var useIsolatedDropbox: NSButton!
     @IBOutlet var newEntryUsesParentGroupIcon: NSButton!
     @IBOutlet weak var stripUnusedIcons: NSButton!
+    @IBOutlet weak var enableThirdParty: NSButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,7 +50,7 @@ class AdvancedAppPreferences: NSViewController {
 
     func bindUI() {
         let settings = Settings.sharedInstance()
-
+        
         quickReveal.state = settings.quickRevealWithOptionKey ? .on : .off
         autoSave.state = settings.autoSave ? .on : .off
         rememberKeyFile.state = (!settings.doNotRememberKeyFile) ? .on : .off
@@ -81,6 +82,9 @@ class AdvancedAppPreferences: NSViewController {
         newEntryUsesParentGroupIcon.state = settings.useParentGroupIconOnCreate ? .on : .off;
         
         stripUnusedIcons.state = Settings.sharedInstance().stripUnusedIconsOnSave ? .on : .off
+            
+        enableThirdParty.isEnabled = settings.isPro;
+        enableThirdParty.state = settings.isPro && settings.runBrowserAutoFillProxyServer ? .on : .off;
     }
      
     @IBAction func onUseDropboxIsolated(_ sender: Any) {
@@ -123,5 +127,19 @@ class AdvancedAppPreferences: NSViewController {
 
     func notifyChanged() {
         NotificationCenter.default.post(name: .preferencesChanged, object: nil)
+    }
+    
+    @IBAction func onEnableThirdParty(_ sender: Any) {
+        let settings = Settings.sharedInstance();
+
+        settings.runBrowserAutoFillProxyServer = enableThirdParty.state == .on
+    
+        if ( settings.runBrowserAutoFillProxyServer ) {
+            NativeMessagingManifestInstallHelper.installNativeMessagingHostsFiles();
+            AutoFillProxyServer.sharedInstance().start();
+        }
+        else {
+            AutoFillProxyServer.sharedInstance().stop();
+        }
     }
 }

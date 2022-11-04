@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AutoFillNewRecordSettingsController : UITableViewController
 
+@property (class, readonly) AutoFillNewRecordSettingsController* fromStoryboard;
 @property (nonatomic, copy) void (^onDone)(void);
 
 @property (weak, nonatomic) IBOutlet UILabel *labelTitle;

@@ -181,6 +181,19 @@ NSComparator finderStringComparator = ^(id obj1, id obj2)
     return finderStringCompare(string1, string2);
 }
 
+#if TARGET_OS_IPHONE
++ (BOOL)isiPadPro {
+    
+
+    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) && MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) > 1024;
+}
+
++ (BOOL)isiPad {
+    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
+}
+
+#endif
+
 NSComparisonResult finderStringCompare(NSString* string1, NSString* string2) {
     
     

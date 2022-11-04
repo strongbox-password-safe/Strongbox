@@ -29,6 +29,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowPasscode;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPreferences;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDeleteAllEnabled;
+@property (weak, nonatomic) IBOutlet UISwitch *switchCoalesceBiometrics;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellCoalesceBiometrics;
 
 @end
 
@@ -159,6 +161,10 @@
     
     
     
+    self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
+
+    
+    
     [self cell:self.cellAppLockDelay setHidden:effectiveMode == kNoLock];
     [self cell:self.cellAllowPasscode setHidden:effectiveMode == kNoLock || effectiveMode == kPinCode];
     [self cell:self.cellPreferences setHidden:effectiveMode == kNoLock];
@@ -166,6 +172,8 @@
     [self cell:self.cellDeleteAllEnabled setHidden:!deleteEnabled];
     [self cell:self.cellDeleteDataAttempts setHidden:!deleteOnOff];
         
+    [self cell:self.cellCoalesceBiometrics setHidden:effectiveMode != kBiometric];
+    
     [self reloadDataAnimated:YES];
 }
 
@@ -175,19 +183,19 @@
     AppPreferences.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
     AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
     
+    AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics = self.switchCoalesceBiometrics.on;
+    
     [self bindAppLock];
 }
 
 - (void)requestAppLockPinCodeAndConfirm {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
-    PinEntryController* vc1 = (PinEntryController*)[storyboard instantiateInitialViewController];
-    vc1.isDatabasePIN = NO;
+    PinEntryController* vc1 = PinEntryController.newControllerForAppLock;
     
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kPinEntryResponseOk ) {
-            PinEntryController* vc2 = (PinEntryController*)[storyboard instantiateInitialViewController];
+            PinEntryController* vc2 = PinEntryController.newControllerForAppLock;
+            
             vc2.info = NSLocalizedString(@"prefs_vc_confirm_pin", @"Confirm PIN");
-            vc2.isDatabasePIN = NO;
             vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
                 if(response2 == kPinEntryResponseOk ) {
                     if ([pin isEqualToString:confirmPin]) {

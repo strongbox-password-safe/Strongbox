@@ -660,7 +660,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 - (void)expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:(Node*)node {
     NSURL* url = node.fields.url.urlExtendedParse;
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isPro;
     if( url && featureAvailable ) {
         if ( !self.viewModel.promptedForAutoFetchFavIcon ) {
             NSViewController* appropriate = self.detailsViewControllers[node.uuid];

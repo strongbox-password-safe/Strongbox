@@ -89,6 +89,7 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
     ret.algorithm = kPasswordGenerationAlgorithmBasic;
     
     ret.basicLength = 16;
+    ret.basicExcludedCharacters = @"";
     ret.useCharacterGroups = @[@(kPasswordGenerationCharacterPoolLower),
                                @(kPasswordGenerationCharacterPoolUpper),
                                @(kPasswordGenerationCharacterPoolNumeric),
@@ -103,7 +104,7 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
     ret.wordSeparator = @"-";
     ret.wordCasing = kPasswordGenerationWordCasingTitle;
     ret.hackerify = kPasswordGenerationHackerifyLevelNone;
-
+    
     return ret;
 }
 
@@ -117,6 +118,7 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
     if (self) {
         self.dicewareLists = [NSSet set];
         self.characterPools = [NSSet set];
+        self.basicExcludedCharacters = @"";
     }
     
     return self;
@@ -135,6 +137,14 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
     [encoder encodeInteger:self.wordCasing forKey:@"wordCasing"];
     [encoder encodeInteger:self.hackerify forKey:@"hackerifyLevel"];
     [encoder encodeInteger:self.saltConfig forKey:@"saltConfig"];
+    
+    [encoder encodeInteger:self.dicewareAddNumber forKey:@"dicewareAddNumber"];
+    [encoder encodeInteger:self.dicewareAddUpper forKey:@"dicewareAddUpper"];
+    [encoder encodeInteger:self.dicewareAddLower forKey:@"dicewareAddLower"];
+    [encoder encodeInteger:self.dicewareAddSymbols forKey:@"dicewareAddSymbols"];
+    [encoder encodeInteger:self.dicewareAddLatin1Supplement forKey:@"dicewareAddLatin1Supplement"];
+    [encoder encodeObject:self.basicExcludedCharacters forKey:@"basicExcludedCharacters"];
+
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -157,6 +167,33 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
         }
         if([decoder containsValueForKey:@"saltConfig"]) {
             self.saltConfig = [decoder decodeIntegerForKey:@"saltConfig"];
+        }
+        
+        if ( [decoder containsValueForKey:@"dicewareAddNumber" ]) {
+            self.dicewareAddNumber = [decoder decodeIntegerForKey:@"dicewareAddNumber"];
+        }
+
+        if ( [decoder containsValueForKey:@"dicewareAddUpper" ]) {
+            self.dicewareAddUpper = [decoder decodeIntegerForKey:@"dicewareAddUpper"];
+        }
+
+        if ( [decoder containsValueForKey:@"dicewareAddLower" ]) {
+            self.dicewareAddLower = [decoder decodeIntegerForKey:@"dicewareAddLower"];
+        }
+
+        if ( [decoder containsValueForKey:@"dicewareAddSymbols" ]) {
+            self.dicewareAddSymbols = [decoder decodeIntegerForKey:@"dicewareAddSymbols"];
+        }
+
+        if ( [decoder containsValueForKey:@"dicewareAddLatin1Supplement" ]) {
+            self.dicewareAddLatin1Supplement = [decoder decodeIntegerForKey:@"dicewareAddLatin1Supplement"];
+        }
+
+        if ( [decoder containsValueForKey:@"basicExcludedCharacters" ]) {
+            self.basicExcludedCharacters = [decoder decodeObjectForKey:@"basicExcludedCharacters"];
+        }
+        else {
+            self.basicExcludedCharacters = @"";
         }
     }
     

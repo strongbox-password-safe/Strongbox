@@ -74,7 +74,7 @@
 - (void)bindUi {
     NSString *biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
 
-    if (![AppPreferences.sharedInstance isProOrFreeTrial]) {
+    if (![AppPreferences.sharedInstance isPro]) {
         self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt_pro_only", @"%@ Unlock"), biometricIdName];
     }
     else {
@@ -171,7 +171,7 @@
 }
 
 - (BOOL)canToggleTouchId {
-    return BiometricsManager.isBiometricIdAvailable && [AppPreferences.sharedInstance isProOrFreeTrial];
+    return BiometricsManager.isBiometricIdAvailable && [AppPreferences.sharedInstance isPro];
 }
 
 - (void)promptForInteger:(NSString*)title

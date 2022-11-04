@@ -136,11 +136,9 @@
 }
 
 - (void)requestPin:(BOOL)afterSuccessfulBiometricAuthentication {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
-    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
-    
+    PinEntryController* pinEntryVc = PinEntryController.newControllerForAppLock;
+
     pinEntryVc.pinLength = AppPreferences.sharedInstance.appLockPin.length;
-    pinEntryVc.isDatabasePIN = NO;
     
     if(AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0 && AppPreferences.sharedInstance.failedUnlockAttempts > 0) {
         NSInteger remaining = AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount - AppPreferences.sharedInstance.failedUnlockAttempts;

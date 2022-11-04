@@ -148,7 +148,7 @@
             return NSOrderedAscending;
         }
         
-        static const int kIdealFavIconDimension = 48;
+        static const int kIdealFavIconDimension = 192;
         
         int distanceA = imageA.size.width - kIdealFavIconDimension;
         int distanceB = imageB.size.width - kIdealFavIconDimension;

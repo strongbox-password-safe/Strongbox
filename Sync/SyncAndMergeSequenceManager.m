@@ -271,7 +271,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     database.lastSyncAttempt = NSDate.date;
     
-    BOOL syncPullEvenIfModifiedDateSame = parameters.syncPullEvenIfModifiedDateSame;
+    BOOL forcePull = parameters.syncPullEvenIfModifiedDateSame;
     NSDate* localModDate;
     [self getExistingLocalCopy:databaseUuid modified:&localModDate];
 
@@ -283,14 +283,29 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     
     
-    opts.onlyIfModifiedDifferentFrom = syncPullEvenIfModifiedDateSame || (database.outstandingUpdateId != nil) ? nil : localModDate;
+    
+        
+    BOOL expressUpdateSyncMode = self.applicationPreferences.expressUpdateSyncPerfImprovementEnabled;
+    
+    if ( database.outstandingUpdateId != nil ) {
+        if ( expressUpdateSyncMode && database.lastSyncRemoteModDate != nil ) {
+            opts.onlyIfModifiedDifferentFrom = database.lastSyncRemoteModDate; 
+        }
+        else {
+            opts.onlyIfModifiedDifferentFrom = nil; 
+        }
+    }
+    else {
+        opts.onlyIfModifiedDifferentFrom = forcePull ? nil : localModDate;
+    }
     
     NSString* providerDisplayName = [SafeStorageProviderFactory getStorageDisplayName:database];
 
-    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, provider=%@, localMod=%@, lastRemoteSyncMod=%@]",
+    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, expressUpdateSyncMode=%d, provider=%@, localMod=%@, lastRemoteSyncMod=%@]",
                             (parameters.interactiveVC ? @"YES" : @"NO"),
                             (database.outstandingUpdateId != nil ? @"YES" : @"NO"),
-                            syncPullEvenIfModifiedDateSame,
+                            forcePull,
+                            expressUpdateSyncMode,
                             providerDisplayName,
                             localModDate.friendlyDateTimeStringBothPrecise,
                             database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise];
@@ -311,9 +326,15 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             completion(kSyncAndMergeResultUserInteractionRequired, NO, (NSError*)error);
         }
         else if (result == kReadResultModifiedIsSameAsLocal) {
-            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Modified same as Local"]];
-            [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:error];
-            completion(kSyncAndMergeSuccess, NO, nil);
+            if ( database.outstandingUpdateId != nil ) {
+                [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Modified same as Local - Outstanding Update Express Scenario..."]];
+                [self handleOutstandingUpdate:databaseUuid syncId:syncId expressUpdateMode:YES remoteData:nil remoteModified:localModDate parameters:parameters completion:completion];
+            }
+            else {
+                [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Modified same as Local"]];
+                [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:error];
+                completion(kSyncAndMergeSuccess, NO, nil);
+            }
         }
         else if (result == kReadResultSuccess) {
             [self onPulledRemoteDatabase:databaseUuid syncId:syncId localModDate:localModDate remoteData:data remoteModified:dateModified parameters:parameters completion:completion];
@@ -345,12 +366,13 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         [self setLocalAndComplete:remoteData dateModified:remoteModified database:databaseUuid syncId:syncId localWasChanged:YES takeABackup:YES completion:completion];
     }
     else {
-        [self handleOutstandingUpdate:databaseUuid syncId:syncId remoteData:remoteData remoteModified:remoteModified parameters:parameters completion:completion];
+        [self handleOutstandingUpdate:databaseUuid syncId:syncId expressUpdateMode:NO remoteData:remoteData remoteModified:remoteModified parameters:parameters completion:completion];
     }
 }
 
 - (void)handleOutstandingUpdate:(NSString*)databaseUuid
                          syncId:(NSUUID*)syncId
+              expressUpdateMode:(BOOL)expressUpdateMode
                      remoteData:(NSData*)remoteData
                  remoteModified:(NSDate*)remoteModified
                      parameters:(SyncParameters*)parameters
@@ -382,8 +404,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
         BOOL noRemoteChange = (database.lastSyncRemoteModDate && [database.lastSyncRemoteModDate isEqualToDateWithinEpsilon:remoteModified]);
         
-        if (forcePush || noRemoteChange) { 
-            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Update to Push - [Simple Push because Force=%@, Source Changed=%@]", forcePush ? @"YES" : @"NO", noRemoteChange ? @"NO" : @"YES"]];
+        if ( forcePush || noRemoteChange || expressUpdateMode ) { 
+            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Update to Push - [Simple Push because Force=%@, Source Changed=%@, Express Update Mode = %@]", forcePush ? @"YES" : @"NO", noRemoteChange ? @"NO" : @"YES", expressUpdateMode ? @"YES" : @"NO"]];
             [self setRemoteAndComplete:localData database:databaseUuid syncId:syncId localWasChanged:NO interactiveVC:parameters.interactiveVC completion:completion];
         }
         else {

@@ -415,11 +415,14 @@
             return NO;
         }
         
-        if ( !AppPreferences.sharedInstance.isFreeTrial ) {
-            return NO;
-        }
         
-        return !AppPreferences.sharedInstance.hasPromptedThatFreeTrialWillEndSoon && AppPreferences.sharedInstance.freeTrialDaysLeft <= 7;
+
+        return NO;
+
+
+
+
+
     };
 
     module.image = [UIImage imageNamed:@"timer"];
@@ -463,15 +466,13 @@
 
 - (id<OnboardingModule>)getHasBeenDowngradedModule {
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:nil];
+    
     module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
         if ( AppPreferences.sharedInstance.isPro ) {
             return NO;
         }
         
-        BOOL freeTrialHasRunOut = AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired;
-        BOOL subscriptionHasExpired = AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition;
-        
-        return ( freeTrialHasRunOut || subscriptionHasExpired ) &&  !AppPreferences.sharedInstance.hasPromptedThatAppHasBeenDowngradedToFreeEdition;
+        return AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition && !AppPreferences.sharedInstance.hasPromptedThatAppHasBeenDowngradedToFreeEdition;
     };
 
     module.image = [UIImage imageNamed:@"cry-emoji"];
@@ -653,7 +654,7 @@
             return NO;
         }
         
-        BOOL convenienceUnlockIsPossible = model.metadata.conveniencePasswordHasBeenStored && AppPreferences.sharedInstance.isProOrFreeTrial && model.metadata.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
+        BOOL convenienceUnlockIsPossible = model.metadata.conveniencePasswordHasBeenStored && AppPreferences.sharedInstance.isPro && model.metadata.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
         BOOL isDbBioOnlyUnlockOn = convenienceUnlockIsPossible && model.metadata.conveniencePin == nil; 
 
         return isDbBioOnlyUnlockOn;

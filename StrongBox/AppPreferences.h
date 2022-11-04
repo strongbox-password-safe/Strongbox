@@ -38,18 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
-
-@property (readonly) NSInteger freeTrialDaysLeft;
-@property (readonly) BOOL isFreeTrial;
-@property (readonly) BOOL hasOptedInToFreeTrial;
-@property NSDate *freeTrialEnd;
-
-@property (readonly) BOOL freeTrialHasBeenOptedInAndExpired; 
-@property (readonly) BOOL isProOrFreeTrial;
-
-
-
 @property (readonly) BOOL isPro;
 - (void)setPro:(BOOL)value;
 
@@ -190,6 +178,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL stripUnusedIconsOnSave;
 @property BOOL pinCodeHapticFeedback;
+@property (readonly) BOOL expressUpdateSyncPerfImprovementEnabled;
 
 @end
 

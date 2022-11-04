@@ -67,38 +67,11 @@
 	<dict>
 		<key>CFBundleAlternateIcons</key>
 		<dict>
-			<key>binary</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>binary</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>biohazard</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>biohazard</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>black</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>black</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>blue-invader</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>blue-invader</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -112,56 +85,11 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>calendar-1</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>calendar-1</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>calendar-2</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>calendar-2</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>code</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>code</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>iridescent</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>iridescent</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>jolly-roger</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>jolly-roger</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>landscape</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>landscape</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -175,74 +103,11 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>light-blue-calculator</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>light-blue-calculator</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>midnight-fire</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>midnight-fire</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>modern-calculator</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>modern-calculator</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>mountains2</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>mountains2</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>multi-colour-jr</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>multi-colour-jr</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>notepad</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>notepad</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>nuclear-power3</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>nuclear-power3</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>old-school-calculator</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>old-school-calculator</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -283,56 +148,11 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>ski</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ski</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>ski-lift</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ski-lift</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>space-invader</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>space-invader</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>todo-checklist</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>todo-checklist</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>water</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>water</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>weather</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>weather</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -352,42 +172,12 @@
 	<dict>
 		<key>CFBundleAlternateIcons</key>
 		<dict>
-			<key>binary</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>binary-ipad</string>
-					<string>binary-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>biohazard</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>biohazard-ipad</string>
-					<string>biohazard-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>black</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>black-ipad</string>
 					<string>black-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>blue-invader</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>blue-invader-ipad</string>
-					<string>blue-invader-ipad-pro</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -402,62 +192,12 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>calendar-1</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>calendar-1-ipad</string>
-					<string>calendar-1-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>calendar-2</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>calendar-2-ipad</string>
-					<string>calendar-2-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>code</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>code-ipad</string>
-					<string>code-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>iridescent</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>iridescent-ipad</string>
 					<string>iridescent-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>jolly-roger</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>jolly-roger-ipad</string>
-					<string>jolly-roger-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>landscape</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>landscape-ipad</string>
-					<string>landscape-ipad-pro</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -472,82 +212,12 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>light-blue-calculator</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>light-blue-calculator-ipad</string>
-					<string>light-blue-calculator-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>midnight-fire</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>midnight-fire-ipad</string>
 					<string>midnight-fire-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>modern-calculator</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>modern-calculator-ipad</string>
-					<string>modern-calculator-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>mountains2</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>mountains2-ipad</string>
-					<string>mountains2-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>multi-colour-jr</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>multi-colour-jr-ipad</string>
-					<string>multi-colour-jr-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>notepad</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>notepad-ipad</string>
-					<string>notepad-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>nuclear-power3</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>nuclear-power3-ipad</string>
-					<string>nuclear-power3-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>old-school-calculator</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>old-school-calculator-ipad</string>
-					<string>old-school-calculator-ipad-pro</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -592,62 +262,12 @@
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>ski</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ski-ipad</string>
-					<string>ski-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>ski-lift</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>ski-lift-ipad</string>
-					<string>ski-lift-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>space-invader</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>space-invader-ipad</string>
-					<string>space-invader-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>todo-checklist</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>todo-checklist-ipad</string>
-					<string>todo-checklist-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>water</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
 					<string>water-ipad</string>
 					<string>water-ipad-pro</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>weather</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>weather-ipad</string>
-					<string>weather-ipad-pro</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -673,7 +293,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.56.5</string>
+	<string>1.56.6</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -733,7 +353,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>4262</string>
+	<string>4272</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<true/>
 	<key>ITSEncryptionExportComplianceCode</key>

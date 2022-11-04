@@ -30,7 +30,7 @@
     [super viewDidLoad];
     
     self.buttonSyncLater.hidden = YES;
-    self.buttonCompareFirst.hidden = !Settings.sharedInstance.isProOrFreeTrial;
+    self.buttonCompareFirst.hidden = !Settings.sharedInstance.isPro;
 }
 
 - (IBAction)onCancel:(id)sender {

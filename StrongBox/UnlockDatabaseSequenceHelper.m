@@ -159,7 +159,7 @@
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
     BOOL userLikelyOffline = [self userIsLikelyOffline];
     
-    BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
+    BOOL isPro = AppPreferences.sharedInstance.isPro;
 
     BOOL userOfflineLineAndConfiguredForImmediateOffline = userLikelyOffline && self.database.offlineDetectedBehaviour == kOfflineDetectedBehaviourImmediateOffline;
     if( self.isAutoFillOpen || self.offlineExplicitlyRequested || userOfflineLineAndConfiguredForImmediateOffline ) {
@@ -292,7 +292,7 @@
 }
 
 - (void)openOffline:(CompositeKeyFactors*)factors {
-    BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
+    BOOL isPro = AppPreferences.sharedInstance.isPro;
     [self unlockLocalCopy:factors forceReadOnly:!isPro offline:YES];
 }
 
@@ -317,7 +317,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
     
     NSString* relocateDatabase = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db", @"Locate Database...");
 
-    BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
+    BOOL isPro = AppPreferences.sharedInstance.isPro;
 
     NSString* openOfflineText = isPro ? NSLocalizedString(@"open_sequence_use_local_copy_option", @"Open Offline") : NSLocalizedString(@"open_sequence_use_local_copy_option_ro", @"Open Offline (Read-Only)");
     

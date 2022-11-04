@@ -15,6 +15,7 @@
 #import "SafeStorageProviderFactory.h"
 #import "WorkingCopyManager.h"
 #import "ProUpgradeIAPManager.h"
+#import "Strongbox-Swift.h"
 
 #if TARGET_OS_IPHONE
 
@@ -22,6 +23,7 @@
 #import "AppPreferences.h"
 #import "git-version.h"
 #import "SyncManager.h"
+#import "CustomizationManager.h"
 
 #else
 
@@ -82,39 +84,48 @@ static NSString *ModelIdentifier()
 
 #endif
 
++ (NSString*)getProStatusDisplayString {
+    BOOL isAProBundle;
+    BOOL isPro;
+    
+#if !TARGET_OS_IPHONE
+    isAProBundle =  MacCustomizationManager.isAProBundle;
+    isPro =Settings.sharedInstance.isPro;
+#else
+    isAProBundle =  CustomizationManager.isAProBundle;
+    isPro = AppPreferences.sharedInstance.isPro;
+#endif
+    
+    NSString* proStatus;
+    if ( isAProBundle ) {
+        proStatus = @"Lifetime Pro (App SKU is Pro)";
+    }
+    else {
+        if ( isPro ) {
+            if ( ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro ) { 
+                proStatus = @"Lifetime Pro (via In-App Purchase)";
+            }
+            else if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription ){
+                proStatus = @"Pro (Yearly subscription)";
+            }
+            else if ( ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription ) {
+                proStatus = @"Pro (Monthly subscription)";
+            }
+            else {
+                proStatus = @"Pro (Unknown Entitlement)"; 
+            }
+        }
+        else {
+            proStatus = @"Not Pro (No Entitlement)";
+        }
+    }
+    
+    return proStatus;
+}
+
 + (NSArray<NSString*>*)getDebugLines {
     NSMutableArray<NSString*>* debugLines = [NSMutableArray array];
     
-    [debugLines addObject:[NSString stringWithFormat:@"Strongbox %@ Debug Information at %@", [Utils getAppVersion], NSDate.date.friendlyDateTimeStringBothPrecise]];
-    [debugLines addObject:@"--------------------"];
-    
-    
-
-#if TARGET_OS_IPHONE
-    NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
-    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION, pro]];
-    [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", AppPreferences.sharedInstance.numberOfEntitlementCheckFails]];
-    [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", AppPreferences.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
-#else
-    NSString* pro = Settings.sharedInstance.isPro ? @"P" : @"";
-    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], pro]];
-    [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", Settings.sharedInstance.numberOfEntitlementCheckFails]];
-    [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", Settings.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
-#endif
-
-    [debugLines addObject:[NSString stringWithFormat:@"LLIAPP: %hhd", ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro]];
-    [debugLines addObject:[NSString stringWithFormat:@"AMS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription]];
-    [debugLines addObject:[NSString stringWithFormat:@"AYS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription]];
-    [debugLines addObject:[NSString stringWithFormat:@"FTA: %hhd", ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable]];
-    [debugLines addObject:[NSString stringWithFormat:@"PFT: %hhd", ProUpgradeIAPManager.sharedInstance.hasPurchasedFreeTrial]];
-    [debugLines addObject:[NSString stringWithFormat:@"FTPD: %@", ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate.friendlyDateTimeStringBothPrecise]];
-        
-    
-
-    [debugLines addObject:@"--------------------"];
-    [debugLines addObject:@"Device"];
-    [debugLines addObject:@"--------------------"];
-
 #if TARGET_OS_IPHONE
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
@@ -124,6 +135,94 @@ static NSString *ModelIdentifier()
     NSString* systemName = @"MacOS";
     NSString* systemVersion = [DebugHelper systemVersion];
 #endif
+
+    
+
+    NSString* proStatus = [DebugHelper getProStatusDisplayString];
+        
+#if TARGET_OS_IPHONE
+    NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
+    [debugLines addObject:@"-------------------- App Summary -----------------------"];
+
+    [debugLines addObject:[NSString stringWithFormat:@"App SKU: %@%@", StrongboxProductBundle.displayName, StrongboxProductBundle.isTestFlightBuild ? @" (TestFlight)" : @""]];
+    [debugLines addObject:[NSString stringWithFormat:@"Pro Status: %@", proStatus]];
+    [debugLines addObject:[NSString stringWithFormat:@"Platform: %@ %@", systemName, systemVersion]];
+    [debugLines addObject:@"\n-------------------- Databases Summary -----------------------"];
+
+    int i = 0;
+    for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
+        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+        
+        NSDate* mod;
+        unsigned long long fileSize;
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid modified:&mod fileSize:&fileSize];
+        
+        NSString* syncState;
+        if (url) {
+            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => %@ (%@)", safe.nickName, spName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
+        }
+        else {
+            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => Unknown", safe.nickName, spName];
+        }
+                
+        [debugLines addObject:[NSString stringWithFormat:@"%d. %@", ++i, syncState]];
+    }
+    
+    [debugLines addObject:@"--------------------------------------------------------------\n"];
+    [debugLines addObject:[NSString stringWithFormat:@"Strongbox %@ Debug Information at %@", [Utils getAppVersion], NSDate.date.friendlyDateTimeStringBothPrecise]];
+    [debugLines addObject:@"--------------------"];
+
+
+    [debugLines addObject:[NSString stringWithFormat:@"Version Info: %@ [%@ (%@)@%@-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION, pro]];
+    [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", AppPreferences.sharedInstance.numberOfEntitlementCheckFails]];
+    [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", AppPreferences.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
+#else
+    NSString* pro = Settings.sharedInstance.isPro ? @"P" : @"";
+    [debugLines addObject:@"-------------------- App Summary -----------------------"];
+
+    [debugLines addObject:[NSString stringWithFormat:@"App SKU: %@%@", StrongboxProductBundle.displayName, StrongboxProductBundle.isTestFlightBuild ? @" (TestFlight)" : @""]];
+    [debugLines addObject:[NSString stringWithFormat:@"Pro Status: %@", proStatus]];
+    [debugLines addObject:[NSString stringWithFormat:@"Platform: %@ %@", systemName, systemVersion]];
+    [debugLines addObject:@"\n-------------------- Databases Summary -----------------------"];
+
+    int i = 0;
+    for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
+        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+        NSDate* mod;
+        unsigned long long fileSize;
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid modified:&mod fileSize:&fileSize];
+        
+        NSString* syncState;
+        if (url) {
+            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => %@ (%@)", safe.nickName, spName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
+        }
+        else {
+            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => Unknown", safe.nickName, spName];
+        }
+        
+        [debugLines addObject:[NSString stringWithFormat:@"%d. %@", ++i, syncState]];
+    }
+
+    [debugLines addObject:@"--------------------------------------------------------------\n"];
+    [debugLines addObject:[NSString stringWithFormat:@"Strongbox %@ Debug Information at %@", [Utils getAppVersion], NSDate.date.friendlyDateTimeStringBothPrecise]];
+    [debugLines addObject:@"--------------------"];
+
+    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], pro]];
+    [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", Settings.sharedInstance.numberOfEntitlementCheckFails]];
+    [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", Settings.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
+#endif
+
+    [debugLines addObject:[NSString stringWithFormat:@"LLIAPP: %hhd", ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro]];
+    [debugLines addObject:[NSString stringWithFormat:@"AMS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription]];
+    [debugLines addObject:[NSString stringWithFormat:@"AYS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription]];
+    [debugLines addObject:[NSString stringWithFormat:@"FTA: %hhd", ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable]];
+        
+    
+
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Device"];
+    [debugLines addObject:@"--------------------"];
+
     const NXArchInfo *info = NXGetLocalArchInfo();
     NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
 
@@ -160,10 +259,9 @@ static NSString *ModelIdentifier()
     }
 
 #if TARGET_OS_IPHONE
-    NSString* isFreeTrial = [[AppPreferences sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)AppPreferences.sharedInstance.installDate.timeIntervalSince1970;
     [debugLines addObject:[NSString stringWithFormat:@"Ep: %ld", epoch]];
-    [debugLines addObject:[NSString stringWithFormat:@"Flags: %@%@%@", pro, isFreeTrial, [AppPreferences.sharedInstance getFlagsStringForDiagnostics]]];
+    [debugLines addObject:[NSString stringWithFormat:@"Flags: %@%@", pro, [AppPreferences.sharedInstance getFlagsStringForDiagnostics]]];
 
     
     

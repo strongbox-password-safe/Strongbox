@@ -31,7 +31,6 @@
 @property (weak) IBOutlet NSButton *switchCopyTotp;
 @property (weak) IBOutlet NSStackView *stackViewProOnlyMessage;
 @property (weak) IBOutlet NSButton* autoLaunchSingleDatabase;
-@property (weak) IBOutlet NSButton *enableThirdParty;
 @property (weak) IBOutlet NSTextField *labelConvenienceAutoUnlock;
 @property (weak) IBOutlet NSButton *advancedQuickTypeSettings;
 @property (weak) IBOutlet NSButton *advancedSettings;
@@ -79,7 +78,7 @@
 }
 
 - (void)bindUI {
-    BOOL pro = Settings.sharedInstance.isProOrFreeTrial;
+    BOOL pro = Settings.sharedInstance.isPro;
     MacDatabasePreferences* meta = self.model.databaseMetadata;
 
     
@@ -145,13 +144,6 @@
     if (index != NSNotFound) {
         [self.popupAutoUnlock selectItemAtIndex:index];
     }
-
-    
-    
-    
-
-    self.enableThirdParty.enabled = pro;
-    self.enableThirdParty.state = pro && Settings.sharedInstance.runBrowserAutoFillProxyServer ? NSControlStateValueOn : NSControlStateValueOff;    
 }
 
 - (IBAction)onAutoLaunchSingleDatabase:(id)sender {
@@ -181,7 +173,6 @@
     BOOL autoFillCopyTotp = self.switchCopyTotp.state == NSControlStateValueOn;
     BOOL quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
     BOOL quickWormholeFillEnabled = self.useWormholeIfUnlocked.state == NSControlStateValueOn;
-
 
     self.model.databaseMetadata.autoFillEnabled = autoFillEnabled;
     self.model.databaseMetadata.autoFillCopyTotp = autoFillCopyTotp;
@@ -222,18 +213,6 @@
 
 - (IBAction)onClose:(id)sender {
     [self.view.window cancelOperation:nil];
-}
-
-- (IBAction)onEnableThirdParty:(id)sender {
-    Settings.sharedInstance.runBrowserAutoFillProxyServer = self.enableThirdParty.state == NSControlStateValueOn;
-    
-    if ( Settings.sharedInstance.runBrowserAutoFillProxyServer ) {
-        [NativeMessagingManifestInstallHelper installNativeMessagingHostsFiles];
-        [AutoFillProxyServer.sharedInstance start];
-    }
-    else {
-        [AutoFillProxyServer.sharedInstance stop];
-    }
 }
 
 - (void)startRefreshTimer {

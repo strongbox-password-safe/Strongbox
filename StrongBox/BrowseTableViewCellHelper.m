@@ -112,19 +112,25 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         NSArray* flags = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];
         
         if(node.isGroup) {
-            BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
+            BOOL isRecycleBin = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
 
             NSString* childCount = self.viewModel.metadata.showChildCountOnFolderInBrowse && showGroupChildCount ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
-                        
+                
+            UIColor *textColor = nil;
+
+
+
+            
             [cell setGroup:title
                       icon:icon
                 childCount:childCount
-                    italic:italic
+                    italic:isRecycleBin
              groupLocation:groupLocation
-                 tintColor:nil
+                 tintColor:isRecycleBin ? ColorFromRGB(0x25be35) : nil 
                      flags:flags
             flagTintColors:flagTintColors
-                  hideIcon:self.viewModel.metadata.hideIconInBrowse];
+                  hideIcon:self.viewModel.metadata.hideIconInBrowse
+                 textColor:textColor];
         }
         else {
             NSString* subtitle = [self getBrowseItemSubtitle:node subtitleOverride:subtitleOverride];

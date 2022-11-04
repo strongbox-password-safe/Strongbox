@@ -16,6 +16,13 @@
 
 @implementation AutoFillNewRecordSettingsController
 
++ (AutoFillNewRecordSettingsController *)fromStoryboard {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Preferences" bundle:nil];
+    UIViewController* vc = [storyboard instantiateViewControllerWithIdentifier:@"NewEntryDefaults"];
+    
+    return (AutoFillNewRecordSettingsController*)vc;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     

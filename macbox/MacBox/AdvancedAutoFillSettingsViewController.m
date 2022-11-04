@@ -42,12 +42,14 @@
     self.model.databaseMetadata.autoFillScanCustomFields = autoFillScanCustomFields;
     self.model.databaseMetadata.autoFillScanNotes = autoFillScanNotes;
 
-    [self refreshQuickType];
+    [self updateAutoFillDatabases];
     
     [self bindUI];
 }
 
-- (void)refreshQuickType {
+- (void)updateAutoFillDatabases {
+    [self.model rebuildAutoFillDomainNodeMap];
+    
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
@@ -62,7 +64,6 @@
                                        concealedCustomFieldsAsCreds:meta.autoFillConcealedFieldsAsCreds
                                      unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds
                                                            nickName:meta.nickName];
-    
 }
 
 @end

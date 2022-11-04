@@ -187,6 +187,10 @@ static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
 
 
 
+- (BOOL)expressUpdateSyncPerfImprovementEnabled {
+    return NO; 
+}
+
 - (BOOL)pinCodeHapticFeedback {
     return [self getBool:kPinCodeHapticFeedback fallback:YES];
 }
@@ -708,81 +712,9 @@ static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
     [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
 }
 
-- (BOOL)isProOrFreeTrial {
-    return self.isPro || self.isFreeTrial;
-}
-
 - (BOOL)isPro {
     NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
     return [userDefaults boolForKey:kIsProKey];
-}
-
-- (BOOL)hasOptedInToFreeTrial {
-    return self.freeTrialEnd != nil;
-}
-
-- (BOOL)isFreeTrial {
-    NSDate* date = self.freeTrialEnd;
-    
-    if(date == nil) {
-        
-        return NO;
-    }
-    
-    BOOL freeTrial = !([date timeIntervalSinceNow] < 0);
-    
-    NSLog(@"Free trial: %d Date: %@ - days remaining = [%ld]", freeTrial, date, (long)self.freeTrialDaysLeft);
-    
-    return freeTrial;
-}
-
-- (BOOL)freeTrialHasBeenOptedInAndExpired {
-    return !self.isFreeTrial && self.freeTrialEnd;
-}
-
-- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from {
-    NSCalendar *cal = [NSCalendar currentCalendar];
-
-    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:90 toDate:from options:0];
-    
-    return date;
-}
-
-- (NSInteger)freeTrialDaysLeft {
-    NSDate* date = self.freeTrialEnd;
-    
-    if(date == nil) {
-        return -1;
-    }
-    
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
-    
-    NSDateComponents *components = [gregorian components:NSCalendarUnitDay
-                                                fromDate:[NSDate date]
-                                                  toDate:date
-                                                 options:0];
-    
-    NSInteger days = [components day];
-    
-    return days + 1;
-}
-
-- (NSDate *)freeTrialEnd {
-    NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
-    
-    
-    
-    return [userDefaults objectForKey:kEndFreeTrialDate];
-}
-
-- (void)setFreeTrialEnd:(NSDate *)freeTrialEnd {
-    NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
-    
-    [userDefaults setObject:freeTrialEnd forKey:kEndFreeTrialDate];
-
-    NSLog(@"Set Free trial end date to %@", freeTrialEnd);
-
-    [userDefaults synchronize];
 }
 
 
@@ -1156,12 +1088,8 @@ static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
 
 
 - (NSString*)getFlagsStringForDiagnostics {
-    return [NSString stringWithFormat:@"[%d[%ld]%d%d%d[%ld]%d%d%d%d]",
-            AppPreferences.sharedInstance.hasOptedInToFreeTrial,
-            (long)AppPreferences.sharedInstance.freeTrialDaysLeft,
-            AppPreferences.sharedInstance.isProOrFreeTrial,
+    return [NSString stringWithFormat:@"[%d[%ld]%d%d%d%d]",
             AppPreferences.sharedInstance.isPro,
-            AppPreferences.sharedInstance.isFreeTrial,
             (long)self.launchCount,
             AppPreferences.sharedInstance.iCloudOn,
             self.iCloudWasOn,

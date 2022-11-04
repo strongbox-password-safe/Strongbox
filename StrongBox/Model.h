@@ -228,8 +228,7 @@ extern NSString* const kAsyncUpdateStarting;
                                     node2:(Node*)node2
                                     field:(BrowseSortField)field
                                descending:(BOOL)descending
-                        foldersSeparately:(BOOL)foldersSeparately
-                         tieBreakUseTitle:(BOOL)tieBreakUseTitle;
+                        foldersSeparately:(BOOL)foldersSeparately;
 
 @end
 

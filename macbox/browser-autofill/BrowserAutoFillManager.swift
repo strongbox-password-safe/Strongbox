@@ -4,12 +4,11 @@
 //
 //  Created by Strongbox on 29/08/2022.
 //  Copyright © 2022 Mark McGuill. All rights reserved.
-//
 
-import Cocoa
+import Foundation
 
 @objc
-class BrowserAutoFillManager: NSObject {
+public class BrowserAutoFillManager: NSObject {
     private static let domainParser : DomainParser! = getParser();
     
     class func getParser () -> DomainParser? {
@@ -22,21 +21,23 @@ class BrowserAutoFillManager: NSObject {
         }
     }
 
-    class func extractDomainFromUrl(url: String) -> String {
-        guard let urlProcessed = url.urlExtendedParse,
-              let components = URLComponents(url: urlProcessed, resolvingAgainstBaseURL: false),
-              let host = components.host else {
-            return url
+    @objc public class func extractDomainFromUrl(url: String) -> String {
+        guard let urlProcessed = url.urlExtendedParse else {
+            return url.lowercased()
         }
-        
-        let parsed = domainParser.parse(host: host)
-        
-        return parsed?.domain?.lowercased() ?? url.lowercased()
+
+        if let components = URLComponents(url: urlProcessed, resolvingAgainstBaseURL: false),
+           let host = components.host {
+            let parsed = domainParser.parse(host: host)
+            return parsed?.domain?.lowercased() ?? host.lowercased()
+        }
+        else {
+            let parsed = domainParser.parse(host: url)
+            return parsed?.domain?.lowercased() ?? url.lowercased()
+        }
     }
 
     @objc class func getMatchingNodes(url: String, domainNodeMap : [String: Set<UUID>]) -> Set<UUID> {
-        
-        
         let startTime = CFAbsoluteTimeGetCurrent()
         
         let domain = extractDomainFromUrl(url: url)
@@ -49,7 +50,7 @@ class BrowserAutoFillManager: NSObject {
         else {
             
         
-            for equivalentDomain in ApplePasswordManagerQuirks.shared.getEquivalentDomains(domain) { 
+            for equivalentDomain in ApplePasswordManagerQuirks.shared.getEquivalentDomains(domain) {
                 
             
                 if let found = domainNodeMap[equivalentDomain] {
@@ -63,10 +64,10 @@ class BrowserAutoFillManager: NSObject {
         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
         if ( !ret.isEmpty ) {
-            
+            NSLog("✅ Found \(ret.count) domain matches for [\(domain)] in \(timeElapsed) s.")
         }
         else {
-            print("⏱ getMatchingNodesForUrlOrDomain: 0 matches found in \(timeElapsed) s.")
+
         }
 
         return ret

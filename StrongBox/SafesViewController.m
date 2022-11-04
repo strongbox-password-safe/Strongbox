@@ -121,17 +121,6 @@
 
 @implementation SafesViewController
 
-- (void)setFreeTrialEndDateBasedOnIapPurchase {
-    
-
-    NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
-    if ( freeTrialPurchaseDate ) {
-        NSLog(@"setFreeTrialEndDateBasedOnIapPurchase: [%@]", freeTrialPurchaseDate);
-        NSDate* endDate = [AppPreferences.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
-        AppPreferences.sharedInstance.freeTrialEnd = endDate;
-    }
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -143,8 +132,6 @@
 
     [self customizeUI];
             
-    [self setFreeTrialEndDateBasedOnIapPurchase]; 
-
     [self checkForBrokenVirtualHardwareKeys];
     
     
@@ -1104,7 +1091,7 @@
 
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
-    BOOL conveniencePossible = safe.isConvenienceUnlockEnabled && safe.conveniencePasswordHasBeenStored && AppPreferences.sharedInstance.isProOrFreeTrial;
+    BOOL conveniencePossible = safe.isConvenienceUnlockEnabled && safe.conveniencePasswordHasBeenStored && AppPreferences.sharedInstance.isPro;
     if (conveniencePossible) [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
 
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
@@ -1879,7 +1866,7 @@
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
         if (@available(iOS 13.0, *)) {
-            if (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || AppPreferences.sharedInstance.daysInstalled > 90) {
+            if ( AppPreferences.sharedInstance.daysInstalled > 90 )  {
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.modalInPresentation = YES;
             }
@@ -2259,26 +2246,7 @@
         [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
         [self.buttonUpgrade setEnabled:YES];
 
-        if ( AppPreferences.sharedInstance.hasOptedInToFreeTrial ) {
-            if( AppPreferences.sharedInstance.isFreeTrial ) {
-                NSInteger daysLeft = AppPreferences.sharedInstance.freeTrialDaysLeft;
-                
-                if(daysLeft > 30) {
-                    upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title", @"Upgrade Button Title - Upgrade Info")];
-                    [self.buttonUpgrade setTintColor:nil];
-                }
-                else {
-                    upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title_days_remaining", @"Upgrade Button Title with Days remaining of pro trial version"),
-                                      (long)daysLeft];
-                    [self.buttonUpgrade setTintColor:nil];
-                }
-                
-                if(daysLeft < 10) {
-                    [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
-                }
-            }
-        }
-        else if ( ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
+        if ( ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
             upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Upgrade Button Title - Upgrade Info");
             if (AppPreferences.sharedInstance.daysInstalled > 60) {
                 [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
@@ -2334,11 +2302,9 @@
 }
 
 - (void)requestPin {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
-    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
-        
+    PinEntryController* pinEntryVc = PinEntryController.newControllerForAppLock;
+    
     pinEntryVc.pinLength = AppPreferences.sharedInstance.appLockPin.length;
-    pinEntryVc.isDatabasePIN = NO;
     
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if( response == kPinEntryResponseOk ) {

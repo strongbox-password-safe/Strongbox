@@ -81,7 +81,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
             do {
                 try FileManager.default.createDirectory(atPath: dir, withIntermediateDirectories: true)
                 try jsonString.write(toFile: fullPath.path, atomically: true, encoding: .utf8)
-                NSLog("✅ Wrote Native Messaging Manifest at [%@]", fullPath.path);
+
             }
             catch {
                 NSLog("🔴 Couldn't write Native Manifest... [%@]", String.init(describing: error));

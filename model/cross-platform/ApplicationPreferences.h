@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSData* duressDummyData;
 @property BOOL databasesAreAlwaysReadOnly;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
-@property (readonly) BOOL isProOrFreeTrial;
 @property PasswordStrengthConfig* passwordStrengthConfig;
 @property BOOL checkPinYin;
 
@@ -31,15 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL isPro;
 - (void)setPro:(BOOL)value;
 
-#if TARGET_OS_IPHONE 
-@property BOOL hasPromptedThatFreeTrialWillEndSoon;
-@property (readonly) BOOL hasOptedInToFreeTrial;
-@property NSDate *freeTrialEnd;
-- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
-#endif
-
 @property BOOL stripUnusedIconsOnSave;
 @property BOOL useIsolatedDropbox;
+@property (readonly) BOOL expressUpdateSyncPerfImprovementEnabled;
 
 @end
 

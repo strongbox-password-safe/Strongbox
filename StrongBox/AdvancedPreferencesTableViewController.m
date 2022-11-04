@@ -53,7 +53,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
-@property (weak, nonatomic) IBOutlet UISwitch *switchCoalesceBiometrics;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAddLegacyTotp;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAddOtpAuthUrl;
@@ -78,6 +77,7 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStripUnusedIcons;
 @property (weak, nonatomic) IBOutlet UISwitch *pinCodeHapticFeedback;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
 
 @end
 
@@ -113,7 +113,9 @@
     }
     
     [self cell:self.cellNativeKeePassEmail setHidden:YES];
-        
+    
+    [self cell:self.cellNewEntryDefaults setHidden:YES];
+    
     [self bindPreferences];
     [self bindCloudSessions];
     [self bindGeneral];
@@ -238,7 +240,7 @@
     }
 #endif
     
-    AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics = self.switchCoalesceBiometrics.on;
+
     AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields = self.switchAddLegacyTotp.on;
     AppPreferences.sharedInstance.addOtpAuthUrl = self.switchAddOtpAuthUrl.on;
 
@@ -301,7 +303,6 @@
     
     self.switchShowMetadataOnDetailsScreen.on = AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
 
-    self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
     self.switchAddLegacyTotp.on = AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields;
     self.switchAddOtpAuthUrl.on = AppPreferences.sharedInstance.addOtpAuthUrl;
     self.switchPinYinSearch.on = AppPreferences.sharedInstance.pinYinSearchEnabled;

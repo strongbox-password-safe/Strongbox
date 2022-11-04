@@ -50,6 +50,20 @@
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAlgorithm;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAlgorithm;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDiceAddANumber;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDiceAddUpper;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDiceAddLower;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDiceAddSymbol;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDiceAddLatin1;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellBasicExcluded;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellUpper;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellLower;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellNumeric;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSymbols;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellLatin1;
+
+
 @end
 
 @implementation PasswordGenerationViewController
@@ -70,7 +84,7 @@
     
     longPressRecognizer.minimumPressDuration = 1;
     longPressRecognizer.cancelsTouchesInView = YES;
-
+    
     return longPressRecognizer;
 }
 
@@ -78,15 +92,15 @@
     [super viewDidLoad];
     
     self.config = AppPreferences.sharedInstance.passwordGenerationConfig;
-
+    
     UILongPressGestureRecognizer* gr1 = [self makeLongPressGestureRecognizer];
     [self.sample1 addGestureRecognizer:gr1];
-
+    
     self.sample1.textLabel.font = FontManager.sharedInstance.easyReadFont;
     
     [self.segmentAlgorithm setTitle:NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic") forSegmentAtIndex:0];
-    [self.segmentAlgorithm setTitle: NSLocalizedString(@"password_gen_vc_mode_diceware_xkcd_title", @"Diceware (XKCD)") forSegmentAtIndex:1];
-
+    [self.segmentAlgorithm setTitle:NSLocalizedString(@"password_gen_vc_mode_diceware_xkcd_title", @"Diceware (XKCD)") forSegmentAtIndex:1];
+    
     [self bindUi];
     
     [self refreshGenerated];
@@ -97,7 +111,7 @@
     if (gr.state != UIGestureRecognizerStateBegan) {
         return;
     }
-
+    
     NSLog(@"onSampleLongPress");
     UITableViewCell* cell = (UITableViewCell*)gr.view;
     [self copyToClipboard:cell.textLabel.text message:NSLocalizedString(@"password_gen_vc_sample_password_copied", @"Sample Password Copied")];
@@ -141,7 +155,7 @@
     UISlider* slider = (UISlider*)sender;
     self.config.basicLength = (NSInteger)slider.value;
     AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
-
+    
     [self bindBasicLengthSlider];
     
     [self refreshGenerated];
@@ -161,7 +175,7 @@
     BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
     
     self.sample1.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
-   
+    
     [self bindStrength];
 }
 
@@ -177,6 +191,7 @@
         return [PasswordGenerationConfig characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];
     }];
     NSString* useGroups = [characterGroups componentsJoinedByString:@", "];
+    
     self.cellUseCharacterGroups.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"password_gen_vc_using_character_groups_fmt", @"Using: %@"), useGroups];
     
     self.cellEasyReadCharactersOnly.accessoryType = self.config.easyReadCharactersOnly ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
@@ -208,6 +223,28 @@
     
     self.cellAddSalt.detailTextLabel.text = [PasswordGenerationConfig getSaltLevel:self.config.saltConfig];
     
+    
+    
+    self.cellDiceAddANumber.accessoryType = self.config.dicewareAddNumber ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellDiceAddUpper.accessoryType = self.config.dicewareAddUpper ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellDiceAddLower.accessoryType = self.config.dicewareAddLower ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellDiceAddSymbol.accessoryType = self.config.dicewareAddSymbols ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellDiceAddLatin1.accessoryType = self.config.dicewareAddLatin1Supplement ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    
+    
+    
+    self.cellBasicExcluded.detailTextLabel.text = self.config.basicExcludedCharacters.length ? self.config.basicExcludedCharacters : NSLocalizedString(@"generic_none", @"None");
+    
+    
+    
+    self.cellUpper.accessoryType = [self.config.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolUpper)] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellLower.accessoryType = [self.config.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolLower)] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellNumeric.accessoryType = [self.config.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolNumeric)] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellSymbols.accessoryType = [self.config.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolSymbols)] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    self.cellLatin1.accessoryType = [self.config.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolLatin1Supplement)] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    
+    
+    
     [self bindBasicLengthSlider];
     [self bindWordCountSlider];
     
@@ -218,13 +255,20 @@
     
     
     [self cell:self.cellBasicLength setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
-    [self cell:self.cellUseCharacterGroups setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellUseCharacterGroups setHidden:YES]; 
     [self cell:self.cellEasyReadCharactersOnly setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellNoneAmbiguousOnly setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellPickFromEveryGroup setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
-    
-    
+    [self cell:self.cellBasicExcluded setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
 
+    [self cell:self.cellUpper setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellLower setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellNumeric setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellSymbols setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellLatin1 setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
+
+    
+    
     [self cell:self.cellWordCount setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellWordLists setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellWordSeparator setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
@@ -232,20 +276,25 @@
     [self cell:self.cellHackerify setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellAddSalt setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
     
+    [self cell:self.cellDiceAddANumber setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellDiceAddUpper setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellDiceAddLower setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellDiceAddSymbol setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
+    [self cell:self.cellDiceAddLatin1 setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
     
 #ifdef IS_APP_EXTENSION
     
     [self cell:self.cellInfoXkcd setHidden:YES];
     [self cell:self.cellInfoDiceware setHidden:YES];
 #endif
-
+    
     [self reloadDataAnimated:YES];
 }
 
 - (IBAction)onChangeAlgorithm:(id)sender {    
     self.config.algorithm = self.segmentAlgorithm.selectedSegmentIndex == 0 ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
     AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
-
+    
     [self bindUi];
     [self refreshGenerated];
 }
@@ -261,21 +310,21 @@
     else if(cell == self.cellEasyReadCharactersOnly) {
         self.config.easyReadCharactersOnly = !self.config.easyReadCharactersOnly;
         AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
-
+        
         [self bindUi];
         [self refreshGenerated];
     }
     else if(cell == self.cellNoneAmbiguousOnly) {
         self.config.nonAmbiguousOnly = !self.config.nonAmbiguousOnly;
         AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
-
+        
         [self bindUi];
         [self refreshGenerated];
     }
     else if(cell == self.cellPickFromEveryGroup) {
         self.config.pickFromEveryGroup = !self.config.pickFromEveryGroup;
         AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
-
+        
         [self bindUi];
         [self refreshGenerated];
     }
@@ -309,9 +358,95 @@
     else if ( cell == self.cellAlgorithm ) {
         
     }
+    else if ( cell == self.cellBasicExcluded ) {
+        [self promptForExcludedCharacters];
+    }
+    else if ( cell == self.cellDiceAddANumber ) {
+        self.config.dicewareAddNumber = !self.config.dicewareAddNumber;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellDiceAddUpper ) {
+        self.config.dicewareAddUpper = !self.config.dicewareAddUpper;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellDiceAddLower ) {
+        self.config.dicewareAddLower = !self.config.dicewareAddLower;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellDiceAddSymbol ) {
+        self.config.dicewareAddSymbols = !self.config.dicewareAddSymbols;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellDiceAddLatin1 ) {
+        self.config.dicewareAddLatin1Supplement = !self.config.dicewareAddLatin1Supplement;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellUpper ) {
+        [self toggleCharacterGroup:kPasswordGenerationCharacterPoolUpper];
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellLower ) {
+        [self toggleCharacterGroup:kPasswordGenerationCharacterPoolLower];
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellNumeric ) {
+        [self toggleCharacterGroup:kPasswordGenerationCharacterPoolNumeric];
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellSymbols ) {
+        [self toggleCharacterGroup:kPasswordGenerationCharacterPoolSymbols];
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
+    else if ( cell == self.cellLatin1 ) {
+        [self toggleCharacterGroup:kPasswordGenerationCharacterPoolLatin1Supplement];
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    }
     else { 
         [self refreshGenerated];
     }
+}
+
+- (void)toggleCharacterGroup:(PasswordGenerationCharacterPool)pool {
+    if ( [self.config.useCharacterGroups containsObject:@(pool)] ) {
+        if ( self.config.useCharacterGroups.count > 1 ) { 
+            [self removeCharacterGroup:pool];
+        }
+    }
+    else {
+        [self addCharacterGroup:pool];
+    }
+}
+
+- (void)removeCharacterGroup:(PasswordGenerationCharacterPool)pool {
+    NSMutableArray* mut = self.config.useCharacterGroups.mutableCopy;
+    [mut removeObject:@(pool)];
+    self.config.useCharacterGroups = mut.copy;
+}
+
+- (void)addCharacterGroup:(PasswordGenerationCharacterPool)pool {
+    NSMutableArray* mut = self.config.useCharacterGroups.mutableCopy;
+    [mut addObject:@(pool)];
+    self.config.useCharacterGroups = mut.copy;
 }
 
 - (void)promptForSaltLevel {
@@ -507,6 +642,21 @@
                   [self bindUi];
                   [self refreshGenerated];
               }];
+}
+
+- (void)promptForExcludedCharacters {
+    [Alerts OkCancelWithTextField:self
+                    textFieldText:self.config.basicExcludedCharacters
+                            title:NSLocalizedString(@"password_gen_vc_prompt_excluded_characters", @"Excluded Characters")
+                          message:@""
+                       completion:^(NSString *text, BOOL response) {
+        if(response) {
+            self.config.basicExcludedCharacters = text;
+            AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+            [self bindUi];
+            [self refreshGenerated];
+        }
+    }];
 }
 
 - (void)promptForNewWordSeparator {

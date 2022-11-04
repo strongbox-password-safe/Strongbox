@@ -28,7 +28,9 @@ class PasswordGenerationPreferences: NSViewController {
     @IBOutlet var nonAmbiguousOnly: NSButton!
     @IBOutlet var easyReadOnly: NSButton!
     @IBOutlet var buttonGenerate: NSButton!
-
+    @IBOutlet weak var excludedCharactersLabel: NSTextField!
+    @IBOutlet weak var dicewareAdditionalCharacterGroups: NSSegmentedControl!
+    
     class func fromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("PasswordGenerationPreferences"), bundle: nil)
         return storyboard.instantiateInitialController() as! Self
@@ -126,6 +128,8 @@ class PasswordGenerationPreferences: NSViewController {
         nonAmbiguousOnly.state = config.nonAmbiguousOnly ? .on : .off
         pickCharactersForAll.state = config.pickFromEveryGroup ? .on : .off
 
+        excludedCharactersLabel.stringValue = config.basicExcludedCharacters.count > 0 ? config.basicExcludedCharacters : NSLocalizedString("generic_none", comment: "None")
+        
         
 
         wordCountSlider.integerValue = config.wordCount
@@ -140,6 +144,12 @@ class PasswordGenerationPreferences: NSViewController {
         wordListsLabel.stringValue = config.wordLists.map { key in
             wordlists[key]?.name ?? "Unknown"
         }.sorted().joined(separator: ", ")
+        
+        dicewareAdditionalCharacterGroups.setSelected(config.dicewareAddUpper, forSegment: 0)
+        dicewareAdditionalCharacterGroups.setSelected(config.dicewareAddLower, forSegment: 1)
+        dicewareAdditionalCharacterGroups.setSelected(config.dicewareAddNumber, forSegment: 2)
+        dicewareAdditionalCharacterGroups.setSelected(config.dicewareAddSymbols, forSegment: 3)
+        dicewareAdditionalCharacterGroups.setSelected(config.dicewareAddLatin1Supplement, forSegment: 4)
     }
 
     @IBAction func onRefresh(_: Any) {
@@ -220,6 +230,22 @@ class PasswordGenerationPreferences: NSViewController {
         refreshSample()
     }
 
+    @IBAction func onEditExcludedCharacters(_: Any) {
+        let config = Settings.sharedInstance().passwordGenerationConfig
+        
+        guard let ret = MacAlerts().input(NSLocalizedString("password_gen_vc_prompt_excluded_characters", comment: "Excluded Characters"), defaultValue: config.basicExcludedCharacters, allowEmpty: true) else {
+            return
+        }
+        
+        config.basicExcludedCharacters = ret
+        
+        Settings.sharedInstance().passwordGenerationConfig = config
+        
+        bindUI()
+        
+        refreshSample()
+    }
+    
     override func prepare(for segue: NSStoryboardSegue, sender _: Any?) {
         if segue.identifier == "segueToWordLists" {
             let vc = segue.destinationController as! WordListsController
@@ -233,6 +259,22 @@ class PasswordGenerationPreferences: NSViewController {
         }
     }
 
+    @IBAction func onAddCharacterToDiceware(_ sender: Any) {
+        let config = Settings.sharedInstance().passwordGenerationConfig
+
+        config.dicewareAddUpper = dicewareAdditionalCharacterGroups.isSelected(forSegment: 0)
+        config.dicewareAddLower = dicewareAdditionalCharacterGroups.isSelected(forSegment: 1)
+        config.dicewareAddNumber = dicewareAdditionalCharacterGroups.isSelected(forSegment: 2)
+        config.dicewareAddSymbols = dicewareAdditionalCharacterGroups.isSelected(forSegment: 3)
+        config.dicewareAddLatin1Supplement = dicewareAdditionalCharacterGroups.isSelected(forSegment: 4)
+
+        Settings.sharedInstance().passwordGenerationConfig = config
+        
+        bindUI()
+        
+        refreshSample()
+    }
+    
     @IBAction func onCharacterGroups(_: Any) {
         let upper = characterGroups.isSelected(forSegment: 0)
         let lower = characterGroups.isSelected(forSegment: 1)

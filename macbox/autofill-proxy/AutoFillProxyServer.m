@@ -38,13 +38,13 @@
 }
 
 - (void)stop {
-    NSLog(@"AutoFillProxyServer::STOP ENTER");
+
 
     if ( !self.running ) {
         return;
     }
     
-    NSLog(@"Shutting down Proxy Server socket...");
+
     
     if ( self.server_sock != -1 ) {
         shutdown(self.server_sock, SHUT_RDWR);
@@ -54,13 +54,13 @@
     
     NSLog(@"Proxy Server shutdown done...");
     
-    NSLog(@"AutoFillProxyServer::STOP EXIT");
+
     
     self.running = NO;
 }
 
 - (BOOL)start {
-    NSLog(@"AutoFillProxyServer::start ENTER");
+
 
     [self stop];
     
@@ -122,7 +122,7 @@
         [self acceptNewConnections];
     }];
 
-    NSLog(@"AutoFillProxyServer::start EXIT ✅");
+
 
     self.running = YES;
     return YES; 
@@ -135,7 +135,7 @@
         int socket = accept (self.server_sock, NULL, NULL);  
 
         if ( socket == -1 ) {
-            NSLog(@"AutoFillProxyServer failed to accept new connection (possibly due to shutdown...");
+            NSLog(@"⚠️ AutoFillProxyServer failed to accept new connection (possibly due to shutdown...)");
             break;
         }
         
@@ -146,7 +146,7 @@
         });
     }
     
-    NSLog(@"acceptNewConnections Exited");
+
 }
 
 - (void)handleNewConnection:(int)socket {

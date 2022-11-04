@@ -379,16 +379,16 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet() {
             return nil;
         }
         
-        IMAGE_TYPE_PTR image;
-        if(img.size.height != 48 || img.size.width != 48) {
-            image = scaleImage(img, CGSizeMake(48, 48));
+        IMAGE_TYPE_PTR image;    
+        if( image.size.height != image.size.width && MIN(image.size.width, image.size.height) > 512 ) {
+            NSLog(@"🔴 Down Sampling icon...");
+            image = scaleImage(image, CGSizeMake(192, 192));
         }
         
         image = image ? image : img;
         
         if ( image ) {
             icon.cachedImage = image;
-    
         }
         else {
             NSLog(@"WARNWARN: Couldn't Load Image!");

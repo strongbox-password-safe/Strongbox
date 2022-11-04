@@ -11,7 +11,6 @@
 #import "NSArray+Extensions.h"
 #import "Alerts.h"
 #import "Utils.h"
-#import "regdom.h"
 #import "ItemDetailsViewController.h"
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
@@ -23,6 +22,12 @@
 #import "PreviewItemViewController.h"
 #import "ContextMenuHelper.h"
 #import "LargeTextViewController.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 static NSString* const kGroupTitleMatches = @"title";
 static NSString* const kGroupUrlMatches = @"url";
@@ -210,17 +215,17 @@ static NSString* const kGroupAllItems = @"all-items";
 
                     }
                     
-                    NSString* domain = getDomain(url.host);
+                    NSString* domain = getPublicDomain(url.host);
                     [self smartInitializeSearchFromDomain:domain];
                 }
                 else {
-                    NSString* domain = getDomain(url.absoluteString);
+                    NSString* domain = getPublicDomain(url.absoluteString);
                     [self smartInitializeSearchFromDomain:domain];
                 }
             }
             else {
 
-                NSString* domain = getDomain(serviceId.identifier);
+                NSString* domain = getPublicDomain(serviceId.identifier);
                 [self smartInitializeSearchFromDomain:domain];
             }
         }
@@ -270,30 +275,60 @@ static NSString* const kGroupAllItems = @"all-items";
 
 }
 
-NSString *getDomain(NSString* host) {
-    if(host == nil) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+NSString *getPublicDomain(NSString* url) {
+    if(url == nil) {
         return @"";
     }
     
-    if(!host.length) {
+    if(!url.length) {
         return @"";
     }
     
-    const char *cStringUrl = [host UTF8String];
-    if(!cStringUrl || strlen(cStringUrl) == 0) {
-        return @"";
-    }
+    NSString *domain = [BrowserAutoFillManager extractDomainFromUrlWithUrl:url];
     
-    void *tree = loadTldTree();
-    const char *result = getRegisteredDomainDrop(cStringUrl, tree, 1);
     
-    if(result == NULL) {
-        return @"";
-    }
     
-    NSString *domain = [NSString stringWithCString:result encoding:NSUTF8StringEncoding];
     
-    NSLog(@"Calculated Domain: %@", domain);
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     return domain;
 }
@@ -785,7 +820,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = serviceId.identifier.urlExtendedParse;
             if(url && url.host.length) {
-                NSString* bar = getDomain(url.host);
+                NSString* bar = getPublicDomain(url.host);
                 NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
                 suggestedTitle = foo.length ? [foo capitalizedString] : foo;
                 
@@ -798,7 +833,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             }
         }
         else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
-            NSString* bar = getDomain(serviceId.identifier);
+            NSString* bar = getPublicDomain(serviceId.identifier);
             NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
             suggestedTitle = foo.length ? [foo capitalizedString] : foo;
             suggestedUrl = serviceId.identifier;
