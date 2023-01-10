@@ -287,10 +287,12 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
 #if TARGET_OS_IPHONE
-    return [DatabasePreferences templateDummyWithNickName:nickName
+    DatabasePreferences *ret = [DatabasePreferences templateDummyWithNickName:nickName
                                   storageProvider:self.storageId
                                          fileName:[foo.filePath lastPathComponent]
                                    fileIdentifier:json];
+    
+    ret.lazySyncMode = YES; 
 #else
     NSURLComponents* components = [[NSURLComponents alloc] init];
     components.scheme = kStrongboxSFTPUrlScheme;
@@ -309,9 +311,9 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     components.queryItems = @[[NSURLQueryItem queryItemWithName:@"uuid" value:ret.uuid]];
     
     ret.fileUrl = components.URL;
+#endif
     
     return ret;
-#endif
 }
 
 - (void)pullDatabase:(METADATA_PTR)safeMetaData

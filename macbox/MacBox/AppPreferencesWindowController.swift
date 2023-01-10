@@ -13,9 +13,9 @@ public class AppPreferencesWindowController: NSWindowController {
     @objc
     public enum AppPreferencesTab: Int {
         case general
+        case appearance
+        case securityAndPrivacy
         case passwordGeneration
-        case favIcon
-        case newEntryDefaults
         case advanced
     }
 
@@ -27,7 +27,7 @@ public class AppPreferencesWindowController: NSWindowController {
         let wc = storyboard.instantiateInitialController() as! AppPreferencesWindowController
         return wc
     }
-
+    
     @objc
     public func show(tab: AppPreferencesTab = .general) {
         let vc = contentViewController as! NSTabViewController

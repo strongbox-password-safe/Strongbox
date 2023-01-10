@@ -187,8 +187,8 @@
     
     NSUInteger len = msg.length;
     
-    if ( len > 5 * 1024 ) {
-        NSLog(@"Writing JSON Response of length [%lu]", len);
+    if ( len > 50 * 1024 ) {
+        NSLog(@"⚠️ Writing Large JSON Response of length [%lu]", len);
     }
     
     [outputStream write:msg.bytes maxLength:len];

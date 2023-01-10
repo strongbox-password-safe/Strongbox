@@ -25,10 +25,11 @@ static PleaseConnectHardwareKey* instance;
     return self;
 }
 
-+ (void)show:(NSWindow *)parentHint completion:(void (^)(BOOL))completion {
++ (void)show:(MacHardwareKeyManagerOnDemandUIProviderBlock)parentHint completion:(void (^)(BOOL))completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         instance = [[PleaseConnectHardwareKey alloc] init];
-        [instance showAsSheet:parentHint completion:completion];
+        NSWindow* window = parentHint();
+        [instance showAsSheet:window completion:completion];
     });
 }
 
@@ -41,20 +42,8 @@ static PleaseConnectHardwareKey* instance;
 
 - (void)showAsSheet:(NSWindow*)parent completion:(void (^)(BOOL))completion {
     self.window.delegate = self;
-
-    if (!parent) {
-        
-        
-        parent = NSApplication.sharedApplication.mainWindow ? NSApplication.sharedApplication.mainWindow : NSApplication.sharedApplication.keyWindow;
-
-        if (!parent) {
-            
-
-            parent = NSApplication.sharedApplication.windows.firstObject;
-        }
-    }
     self.completion = completion;
-    
+                    
     [parent beginCriticalSheet:instance.window completionHandler:nil];
 }
 

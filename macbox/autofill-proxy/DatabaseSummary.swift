@@ -10,14 +10,14 @@ import Foundation
 
 @objc
 class DatabaseSummary : NSObject, Codable {
-    var databaseId : String
+    var uuid : String
     var nickName : String
     var autoFillEnabled : Bool
     var locked : Bool
     
     @objc
-    init( databaseId : String, nickName : String, autoFillEnabled : Bool = false, locked : Bool = true ) {
-        self.databaseId = databaseId;
+    init( uuid : String, nickName : String, autoFillEnabled : Bool = false, locked : Bool = true ) {
+        self.uuid = uuid;
         self.nickName = nickName;
         self.autoFillEnabled = autoFillEnabled;
         self.locked = locked;

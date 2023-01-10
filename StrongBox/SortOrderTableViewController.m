@@ -57,10 +57,6 @@
 
     self.cellFolders.accessoryType = self.foldersSeparately ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
 
-    
-    
-    [self cell:self.cellEmail setHidden:NO];
-    
     [self cell:self.cellCustom setHidden:self.format == kPasswordSafe];
     
     [self cell:self.cellAscending setHidden:self.field == kBrowseSortFieldNone];

@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property DatabaseModel* snapshot;
 @property (nonatomic, copy, nullable) AsyncUpdateCompletion completion;
+@property BOOL serializeOnlyNoSync; 
 
 @end
 

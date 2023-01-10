@@ -591,10 +591,12 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
 #if TARGET_OS_IPHONE
-    return [DatabasePreferences templateDummyWithNickName:nickName
-                                          storageProvider:self.storageId
-                                                 fileName:[[foo.href lastPathComponent] stringByRemovingPercentEncoding]
-                                           fileIdentifier:json];
+    DatabasePreferences *ret = [DatabasePreferences templateDummyWithNickName:nickName
+                                                              storageProvider:self.storageId
+                                                                     fileName:[[foo.href lastPathComponent] stringByRemovingPercentEncoding]
+                                                               fileIdentifier:json];
+    
+    ret.lazySyncMode = YES; 
 #else
     NSURLComponents* components = [NSURLComponents componentsWithString:foo.href];
     
@@ -616,9 +618,9 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     newComponents.queryItems = @[[NSURLQueryItem queryItemWithName:@"uuid" value:ret.uuid]];
     
     ret.fileUrl = newComponents.URL;
+#endif
     
     return ret;
-#endif
 }
 
 

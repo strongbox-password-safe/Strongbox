@@ -59,9 +59,14 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         }
     }
 
+    @IBAction func onClose(_ sender: Any) {
+        dismiss(nil)
+    }
+    
     @IBAction func onLooksGood(_: Any) {
         if let totp = scanResult?.totpString {
             onSetTotp?(totp)
+            dismiss(nil)
         }
     }
 
@@ -123,7 +128,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         }
     }
 
-    var dontDismissOnNextDismissal: Bool = false
+
     @IBAction func onLaunchPreferences(_: Any) {
 
 
@@ -131,23 +136,23 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
 
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
             NSWorkspace.shared.open(url)
-            dontDismissOnNextDismissal = true 
+
         }
 
     }
 
-    func popoverShouldClose(_: NSPopover) -> Bool {
-        if dontDismissOnNextDismissal {
-            dontDismissOnNextDismissal = false
-            return false
-        }
 
-        return true
-    }
 
-    func popoverDidClose(_: Notification) {
-        stopTotpRefreshTimer()
-    }
+
+
+
+
+
+
+
+
+
+
 
     func startScanning() {
         isScanning = true
@@ -197,6 +202,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         for dict in infoList {
             guard let maybeOwner = dict[kCGWindowOwnerName as String] as? String?,
                   let ownerWindow = maybeOwner,
+                  ownerWindow != "Strongbox",
                   let windowIDNum = dict[kCGWindowNumber as String] as? NSNumber,
                   let windowImage: CGImage = CGWindowListCreateImage(.null, .optionIncludingWindow, windowIDNum.uint32Value as CGWindowID, [.boundsIgnoreFraming, .nominalResolution])
             else {

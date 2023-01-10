@@ -34,7 +34,7 @@
     CustomFieldViewModel *c3 = [CustomFieldViewModel customFieldWithKey:@"Longish Key" value:@"Well this is a very very long thing that is going on here and there and must wrap" protected:YES];
 
     NSInputStream* dataStream = [NSInputStream inputStreamWithData:NSData.data];
-    DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] initWithStream:dataStream protectedInMemory:YES compressed:YES];
+    DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] initWithStream:dataStream length:0 protectedInMemory:YES compressed:YES];
      
     NSDictionary<NSString*, DatabaseAttachment*>* attachments = @{
         @"filename.jpg" : dbAttachment,
@@ -331,20 +331,32 @@
 }
 
 - (NSUInteger)addCustomField:(CustomFieldViewModel *)field {
-    if ( self.sortCustomFields ) {
-        NSUInteger idx = [self.mutableCustomFields indexOfObject:field
-                                                   inSortedRange:NSMakeRange(0, self.mutableCustomFields.count)
-                                                         options:NSBinarySearchingInsertionIndex
-                                                 usingComparator:customFieldKeyComparator];
+    return [self addCustomField:field atIndex:-1];
+}
+
+- (NSUInteger)addCustomField:(CustomFieldViewModel *)field atIndex:(NSUInteger)atIndex {
+    NSUInteger idx;
+    
+    if ( self.sortCustomFields ) { 
+        if ( atIndex != -1 ) {
+            NSLog(@"🔴 WARN: Attempt to add custom field at a specific index when in sort custom fields mode. Ignoring and inserting in sorted position.");
+        }
         
-        [self.mutableCustomFields insertObject:field atIndex:idx];
-        
-        return idx;
+        idx = [self.mutableCustomFields indexOfObject:field
+                                        inSortedRange:NSMakeRange(0, self.mutableCustomFields.count)
+                                              options:NSBinarySearchingInsertionIndex
+                                      usingComparator:customFieldKeyComparator];
+    }
+    else if ( atIndex < 0  || atIndex > self.mutableCustomFields.count ){
+        idx = self.mutableCustomFields.count;
     }
     else {
-        [self.mutableCustomFields addObject:field];
-        return self.mutableCustomFields.count - 1;
+        idx = atIndex;
     }
+    
+    [self.mutableCustomFields insertObject:field atIndex:idx];
+    
+    return idx;
 }
 
 - (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx {
@@ -370,11 +382,17 @@
 
 - (void)resetTags:(NSSet<NSString*>*)tags {
     [self.mutableTags removeAllObjects];
-    [self.mutableTags addObjectsFromArray:tags.allObjects];
+    
+    NSArray<NSString*>* splitByDelimiter = [tags.allObjects flatMap:^NSArray * _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        return [Utils getTagsFromTagString:obj];
+    }];
+    
+    [self.mutableTags addObjectsFromArray:splitByDelimiter];
 }
 
 - (void)addTag:(NSString*)tag {
-    [self.mutableTags addObject:tag];
+    NSArray<NSString*>* tags = [Utils getTagsFromTagString:tag]; 
+    [self.mutableTags addObjectsFromArray:tags];
 }
 
 - (void)removeTag:(NSString*)tag {

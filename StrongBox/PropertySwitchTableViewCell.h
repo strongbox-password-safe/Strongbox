@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const kPropertySwitchTableViewCellId;
+
 typedef void (^OnToggledSwitchBlock)(BOOL currentState);
 
 @interface PropertySwitchTableViewCell : UITableViewCell

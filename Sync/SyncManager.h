@@ -16,10 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SyncManager : NSObject<SyncManagement>
 
-+ (instancetype _Nullable)sharedInstance;
++ (instancetype)sharedInstance;
 
 - (SyncStatus*)getSyncStatus:(DatabasePreferences*)database;
 
+- (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 - (void)backgroundSyncAll;
 - (void)backgroundSyncOutstandingUpdates;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;

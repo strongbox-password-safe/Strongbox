@@ -164,6 +164,12 @@ static const BOOL kLogVerbose = NO;
     return transformKey;
 }
 
+- (void)rotateHardwareKeyChallenge {
+
+    
+    _salt = getRandomData(kDefaultSaltLength);
+}
+
 - (KdfParameters *)kdfParameters {
     NSData* uuidData = self.argon2id ? argon2idCipherUuidData() : argon2dCipherUuidData();
     VariantObject *uuid = [[VariantObject alloc] initWithType:kVariantTypeByteArray theObject:uuidData];

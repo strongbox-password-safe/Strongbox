@@ -11,9 +11,11 @@
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "YubiKeyConfiguration.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CreateFormatAndSetCredentialsWizard : NSWindowController
 
-// Initial Properties
+
 
 @property (nonatomic) NSString* titleText;
 @property BOOL createSafeWizardMode;
@@ -30,6 +32,8 @@
 @property (nonatomic, readonly) NSString* selectedKeyFileBookmark;
 @property (nonatomic, readonly) YubiKeyConfiguration* selectedYubiKeyConfiguration;
 
-- (CompositeKeyFactors *)generateCkfFromSelected:(NSWindow *)yubiKeyPressWindowHint error:(NSError**)error;
+- (CompositeKeyFactors *)generateCkfFromSelectedFactors:(NSViewController*)yubiKeyInteractionVc error:(NSError**)error;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -237,7 +237,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [self launchableUrlForUrlString:urlString];
 }
 
-- (NSURL *)launchableUrlForUrlString:(NSString*)urlString {
+- (NSURL *)launchableUrlForUrlString:(NSString*)urlString { 
     if (!urlString.length) {
         return nil;
     }
@@ -1455,7 +1455,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     .entry-field-value { font-family: Menlo; padding: 2px; max-width: 700px; word-wrap: break-word; } \
     </style></head>";
     
-    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h6>Printed: %@</h6>    ", stylesheet, [self htmlStringFromString:databaseName], NSDate.date.iso8601DateString];
+    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h4>Printed: %@</h6>    ", stylesheet, [self htmlStringFromString:databaseName], NSDate.date.iso8601DateString];
     
     NSArray<Node*>* sortedGroups = [self.effectiveRootGroup.allChildGroups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         NSString* path1 = [self getPathDisplayString:obj1];
@@ -1465,8 +1465,15 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     NSMutableArray* allGroups = sortedGroups.mutableCopy;
     [allGroups addObject:self.effectiveRootGroup];
+    if ( self.recycleBinNode ) {
+        [allGroups removeObject:self.recycleBinNode];
+    }
     
     for(Node* group in allGroups) {
+        if ( group.childRecords.count == 0 ) {
+            continue;
+        }
+        
         [ret appendFormat:@"    <div class=\"group-title\">%@</div>\n", [self htmlStringFromString:[self getPathDisplayString:group]]];
         
         NSMutableArray* nodeStrings = @[].mutableCopy;
@@ -1491,18 +1498,18 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSString*)getHtmlStringForNode:(Node*)entry {
     NSMutableString* str = [NSMutableString string];
     
-    [str appendFormat:@"        <table class=\"entry-table\"><tr class=\"entry-title\"><td colspan=\"100\">%@</td></tr>\n", entry.title];
+    [str appendFormat:@"        <table class=\"entry-table\"><tr class=\"entry-title\"><td colspan=\"100\">%@</td></tr>\n", [self dereference:entry.title node:entry]];
     
     if(entry.fields.username.length) {
-        [str appendString:[self getHtmlEntryFieldRow:@"Username" value:entry.fields.username]];
+        [str appendString:[self getHtmlEntryFieldRow:@"Username" value: [self dereference:entry.fields.username node:entry]]];
         [str appendString:@"\n"];
     }
     
-    [str appendString:[self getHtmlEntryFieldRow:@"Password" value:entry.fields.password]];
+    [str appendString:[self getHtmlEntryFieldRow:@"Password" value:[self dereference:entry.fields.password node:entry]]];
     [str appendString:@"\n"];
 
     if(entry.fields.url.length) {
-        [str appendString:[self getHtmlEntryFieldRow:@"URL" value:entry.fields.url]];
+        [str appendString:[self getHtmlEntryFieldRow:@"URL" value:[self dereference:entry.fields.url node:entry]]];
         [str appendString:@"\n"];
     }
     
@@ -1512,7 +1519,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }
     
     if (entry.fields.notes.length) {
-        [str appendString:[self getHtmlEntryFieldRow:@"Notes" value:entry.fields.notes]];
+        [str appendString:[self getHtmlEntryFieldRow:@"Notes" value:[self dereference:entry.fields.notes node:entry]]];
         [str appendString:@"\n"];
     }
     

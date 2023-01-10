@@ -126,17 +126,9 @@ const static NSSet<NSString*> *wellKnownKeys;
     else if([withXmlElementName isEqualToString:kTagsElementName]) {
         NSString* tagsString = [SimpleXmlValueExtractor getStringFromText:completedObject];
         
-        NSArray<NSString*>* tags = [tagsString componentsSeparatedByString:@";"]; 
-        
-        NSArray<NSString*>* trimmed = [tags map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-            return [Utils trim:obj];
-        }];
-        
-        NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
-            return obj.length > 0;
-        }];
-        
-        [self.tags addObjectsFromArray:filtered];
+        NSArray<NSString*>* tags = [Utils getTagsFromTagString:tagsString];
+
+        [self.tags addObjectsFromArray:tags];
         
         return YES;
     }

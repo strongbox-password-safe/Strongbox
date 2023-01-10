@@ -22,7 +22,6 @@ class PasswordGenerationPreferences: NSViewController {
     @IBOutlet var hackerifyPopup: NSPopUpButton!
     @IBOutlet var wordListsLabel: NSTextField!
     @IBOutlet var characterCountSlider: NSSlider!
-    @IBOutlet var characterCountLabel: NSTextField!
     @IBOutlet var characterGroups: NSSegmentedControl!
     @IBOutlet var pickCharactersForAll: NSButton!
     @IBOutlet var nonAmbiguousOnly: NSButton!
@@ -30,6 +29,8 @@ class PasswordGenerationPreferences: NSViewController {
     @IBOutlet var buttonGenerate: NSButton!
     @IBOutlet weak var excludedCharactersLabel: NSTextField!
     @IBOutlet weak var dicewareAdditionalCharacterGroups: NSSegmentedControl!
+    
+    @IBOutlet weak var characterCountTextField: NSTextField!
     
     class func fromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("PasswordGenerationPreferences"), bundle: nil)
@@ -102,8 +103,8 @@ class PasswordGenerationPreferences: NSViewController {
         
 
         characterCountSlider.integerValue = config.basicLength
-        characterCountLabel.stringValue = String(config.basicLength)
-
+        characterCountTextField.stringValue = String(config.basicLength)
+        
         characterGroups.setSelected(false, forSegment: 0)
         characterGroups.setSelected(false, forSegment: 1)
         characterGroups.setSelected(false, forSegment: 2)
@@ -273,6 +274,22 @@ class PasswordGenerationPreferences: NSViewController {
         bindUI()
         
         refreshSample()
+    }
+    
+    @IBAction func onCharacterCountTextFieldChanged(_ sender: Any) {
+
+        
+        characterCountSlider.integerValue = characterCountTextField.integerValue
+        
+
+        
+        let config = Settings.sharedInstance().passwordGenerationConfig
+
+        config.basicLength = characterCountSlider.integerValue
+
+        Settings.sharedInstance().passwordGenerationConfig = config
+
+        bindUI()
     }
     
     @IBAction func onCharacterGroups(_: Any) {

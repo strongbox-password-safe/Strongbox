@@ -14,6 +14,7 @@
 #import "RMAppReceipt.h"
 #import "Model.h"
 #import "CrossPlatform.h"
+#import "NSDate+Extensions.h"
 
 #if TARGET_OS_IPHONE
 #import "CustomizationManager.h"
@@ -68,7 +69,7 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
         RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
         if ([verificator verifyAppReceipt]) {
             NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-            [self checkVerifiedReceiptIsEntitledToPro];
+            [self checkVerifiedReceiptIsEntitledToPro:NO];
         }
         else {
             
@@ -76,6 +77,21 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
         }
     });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)performScheduledProEntitlementsCheckIfAppropriate {
     if ( self.preferences.lastEntitlementCheckAttempt != nil ) {
@@ -94,10 +110,10 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
             NSLog(@"Already checked entitlements today... not rechecking...");
             return;
         }
-                
-        if ( self.preferences.numberOfEntitlementCheckFails == 0 && days < 4 ) {
+        
+        if ( self.preferences.numberOfEntitlementCheckFails == 0 && days < 6 ) {
             
-
+            
             NSLog(@"We had a successful check recently, not rechecking...");
             return;
         }
@@ -105,36 +121,38 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
             NSLog(@"Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)self.preferences.numberOfEntitlementCheckFails, (long)days);
         }
     }
-
+    
     NSLog(@"Performing Scheduled Check of Entitlements...");
-    
-    
-    
-    if ( self.preferences.numberOfEntitlementCheckFails < 4 ) {
+     
+    if ( self.preferences.numberOfEntitlementCheckFails < 5 ) {
         [self checkReceiptForTrialAndProEntitlements];
     }
     else {
         self.preferences.appHasBeenDowngradedToFreeEdition = YES;
         self.preferences.hasPromptedThatAppHasBeenDowngradedToFreeEdition = NO;
+        self.preferences.numberOfEntitlementCheckFails = 0; 
         [self.preferences setPro:NO];
     }
 }
 
-- (void)expressRefreshReceipt {
-    [[RMStore defaultStore] refreshReceiptOnSuccess:^{
-        NSLog(@"Receipt Refreshed OK");
-    } failure:^(NSError *error) {
-        NSLog(@"Erro Refreshing Receipt: [%@]", error);
-    }];
+- (void)checkReceiptForTrialAndProEntitlements {
+    [self checkReceiptForTrialAndProEntitlements:NO completion:nil];
 }
 
-- (void)checkReceiptForTrialAndProEntitlements { 
-    self.preferences.lastEntitlementCheckAttempt = [NSDate date];
+- (void)refreshReceiptAndCheckForProEntitlements:(void(^)(void))completion {
+    [self checkReceiptForTrialAndProEntitlements:YES completion:completion];
+}
+
+- (void)checkReceiptForTrialAndProEntitlements:(BOOL)userInitiated completion:(void(^_Nullable)(void))completion { 
+    if ( !userInitiated ) {
+        self.preferences.lastEntitlementCheckAttempt = [NSDate date];
+    }
     
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
     if ( [verificator verifyAppReceipt] ) {
         NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-        [self checkVerifiedReceiptIsEntitledToPro];
+        [self checkVerifiedReceiptIsEntitledToPro:userInitiated];
+        if (completion) completion();
     }
     else {
         NSLog(@"Receipt Not Good... Refreshing...");
@@ -142,21 +160,30 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
         [[RMStore defaultStore] refreshReceiptOnSuccess:^{
             if ([verificator verifyAppReceipt]) {
                 NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-                [self checkVerifiedReceiptIsEntitledToPro];
+                [self checkVerifiedReceiptIsEntitledToPro:userInitiated];
+                if (completion) completion();
             }
             else {
                 NSLog(@"Receipt not good even after refresh");
-                self.preferences.numberOfEntitlementCheckFails++;
+                if ( !userInitiated ) {
+                    self.preferences.numberOfEntitlementCheckFails++;
+                }
+                if (completion) completion();
             }
         } failure:^(NSError *error) {
             NSLog(@"Refresh Receipt - Error [%@]", error);
-            self.preferences.numberOfEntitlementCheckFails++;
+            if ( !userInitiated ) {
+                self.preferences.numberOfEntitlementCheckFails++;
+            }
+            if (completion) completion();
         }];
     }
 }
 
-- (void)checkVerifiedReceiptIsEntitledToPro {
-    self.preferences.numberOfEntitlementCheckFails = 0;
+- (void)checkVerifiedReceiptIsEntitledToPro:(BOOL)userInitiated { 
+    if ( !userInitiated ) {
+        self.preferences.numberOfEntitlementCheckFails = 0;
+    }
     
 #if TARGET_OS_IPHONE
     if ( CustomizationManager.isAProBundle ) {
@@ -175,11 +202,15 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
     else {
         if ( self.preferences.isPro ) {
 
+                                  
+            if ( !userInitiated ) {
+                NSLog(@"PRO Entitlement NOT found in valid Receipt, incrementing fail count to allow for grace period but very likely app not entitled to Pro...");
+                self.preferences.numberOfEntitlementCheckFails++;
+            }
+            else {
+                NSLog(@"PRO Entitlement NOT found in valid Receipt");
+            }
             
-            NSLog(@"PRO Entitlement NOT found in Receipt, incrementing fail count to allow for grace period but very likely app not entitled to Pro...");
-                      
-            self.preferences.numberOfEntitlementCheckFails++;
-
             
 
 

@@ -39,6 +39,9 @@
 
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
+NSString* const kDatabasesCollectionLockStateChangedNotification = @"DatabasesCollectionLockStateChangedNotification";
+NSString* const kUpdateNotificationDatabasePreferenceChanged = @"UpdateNotificationDatabasePreferenceChanged";
+
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
 static NSString* const kDragAndDropId = @"com.markmcguill.strongbox.mac.databases.list";
@@ -54,6 +57,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 @property BOOL hasLoaded;
 @property (weak) IBOutlet ClickableTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonProperties;
+@property (strong) IBOutlet NSMenu *dummyStrongReferenceToMenuToPreventCrash;
 
 @end
 
@@ -64,7 +68,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)killRefreshTimer {
-    NSLog(@"Kill Refresh Timer");
+
 
     if ( self.timerRefresh ) {
         [self.timerRefresh invalidate];
@@ -75,7 +79,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)startRefreshTimer {
     [self killRefreshTimer];
     
-    NSLog(@"Start Refresh Timer");
+
 
     self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refreshVisibleRows) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
@@ -115,12 +119,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     [self.tableView registerForDraggedTypes:@[kDragAndDropId]];
     self.tableView.emptyString = NSLocalizedString(@"mac_no_databases_initial_message", @"No Databases Here Yet.\n\nClick 'Add Database...' below to get started...");
-    
-    [self.tableView setColumnAutoresizingStyle:NSTableViewUniformColumnAutoresizingStyle];
-    NSTableColumn *col = [self.tableView.tableColumns objectAtIndex:0];
-    [col setResizingMask:NSTableColumnAutoresizingMask];
-    self.tableView.headerView = nil;
 
+    self.tableView.headerView = nil;
+    [self.tableView sizeLastColumnToFit];
+    
     [self loadDatabases];
     [self.tableView reloadData];
 
@@ -130,15 +132,20 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     }
 
+    [self listenToEvents];
+    
+    [self bindVersionSubtitle];
+    
+    [self startRefreshTimer];
+}
+
+- (void)listenToEvents {
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotificationKey object:nil];
-    
-    [self bindVersionSubtitle];
-    
-    [self startRefreshTimer];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesCollectionLockStateChangedNotification object:nil];
 }
 
 - (void)bindVersionSubtitle {
@@ -182,10 +189,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     
 
-    DocumentController* dc = DocumentController.sharedDocumentController;
-
     BOOL atLeastOneUnlocked = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
-        return [dc databaseIsUnlockedInDocumentWindow:obj];
+        return [DatabasesCollection.shared isUnlockedWithUuid:obj.uuid];
     }];
 
     if ( atLeastOneUnlocked ) {
@@ -208,10 +213,12 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
        completion:^(BOOL yesNo) {
         if (yesNo) {
             for (MacDatabasePreferences* database in selected) {
-                BOOL isOpen = [dc databaseIsDocumentWindow:database];
-                if (isOpen) {
-                    [dc closeDocumentWindowForDatabase:database];
+                if ( [DatabasesCollection.shared isUnlockedWithUuid:database.uuid] ) {
+                    continue;
                 }
+                
+                [DatabasesCollection.shared closeAnyDocumentWindowsWithUuid:database.uuid];
+                
                 [self removeDatabase:database];
             }
             
@@ -272,6 +279,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
+    
+    
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
 
     NSString* databaseId = [self.databaseIds objectAtIndex:row];
@@ -331,19 +340,14 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)openDatabase:(MacDatabasePreferences*)database offline:(BOOL)offline {
     DocumentController* dc = DocumentController.sharedDocumentController;
 
-    
-
 
     
-    if ( offline != database.offlineMode ) {
-        if ( [dc databaseIsDocumentWindow:database] ) {
-            [MacAlerts info:NSLocalizedString(@"database_already_open_please_close", @"This database is already open. Please close it first if you would like to open it in a different mode.")
-                     window:self.view.window];
-            return;
-        }
-        else {
-            database.offlineMode = offline;
-        }
+    Model* existing = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
+    if ( !existing ) {
+        database.userRequestOfflineOpenEphemeralFlagForDocument = offline;
+    }
+    else if ( existing.isInOfflineMode != offline ) {
+        NSLog(@"⚠️ Ignoring request to open in different Offline Mode as database is already unlocked...");
     }
     
     [self showProgressModal:NSLocalizedString(@"generic_loading", "Loading...")];
@@ -542,7 +546,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     SEL theAction = [anItem action];
 
 
-    MacDatabasePreferences* database;
+    MacDatabasePreferences* database = nil;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         database = [MacDatabasePreferences fromUuid:databaseId];
@@ -570,32 +574,30 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     else if (theAction == @selector(onOpenInOfflineMode:)) {
         if( database != nil ) {
-            DocumentController* dc = DocumentController.sharedDocumentController;
-            BOOL isOpen = [dc databaseIsDocumentWindow:database];
-            return !isOpen && !database.isLocalDeviceDatabase;
+            BOOL isOpen = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+            return !isOpen;
         }
     }
     else if (theAction == @selector(onToggleAlwaysOpenOffline:)) {
         if(self.tableView.selectedRow != -1) {
             NSMenuItem* item = (NSMenuItem*)anItem;
             [item setState:database.alwaysOpenOffline ? NSControlStateValueOn : NSControlStateValueOff];
-
-            return !database.isLocalDeviceDatabase;
+            return YES;
         }
     }
     else if (theAction == @selector(onToggleReadOnly:)) {
         if( database != nil ) {
-            DocumentController* dc = DocumentController.sharedDocumentController;
-            BOOL isOpen = [dc databaseIsDocumentWindow:database];
+            Model* model = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
+            BOOL isReadOnly = model ? model.isReadOnly : database.readOnly;
 
             NSMenuItem* item = (NSMenuItem*)anItem;
-            [item setState:database.readOnly ? NSControlStateValueOn : NSControlStateValueOff];
-            return !isOpen;
+            [item setState:isReadOnly ? NSControlStateValueOn : NSControlStateValueOff];
+            return YES;
         }
     }
     else if (theAction == @selector(onSync:)) {
         if(self.tableView.selectedRow != -1) {
-            return !database.isLocalDeviceDatabase;
+            return YES;
         }
     }
     else if ( theAction == @selector(onAddSFTPDatabase:)) {
@@ -631,6 +633,9 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     else if (theAction == @selector(onRemove:)) {
         return self.tableView.selectedRowIndexes.count;
     }
+    else if ( theAction == @selector(onLock:)) {
+        return self.tableView.selectedRowIndexes.count == 1 && database && [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+    }
     else if (theAction == @selector(onToggleLaunchAtStartup:)) {
         if(self.tableView.selectedRow != -1) {
             NSMenuItem* item = (NSMenuItem*)anItem;
@@ -657,25 +662,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
-        Document* doc = [DocumentController.sharedDocumentController documentForURL:database.fileUrl];
-        if ( doc && !doc.isModelLocked ) {
-            NSLog(@"Document is already open ");
-            [doc checkForRemoteChanges];
+        Model* unlocked = [DatabasesCollection.shared getUnlockedWithUuid:databaseId];
+        BOOL isInOfflineMode = unlocked ? unlocked.isInOfflineMode : (database.alwaysOpenOffline || database.userRequestOfflineOpenEphemeralFlagForDocument);
+        
+        if ( isInOfflineMode ) {
+            [MacAlerts info:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")
+            informativeText:NSLocalizedString(@"database_is_in_offline_mode_cannot_be_synced", @"This database is in Offline Mode and cannot be synced.")
+                     window:self.view.window
+                 completion:nil];
         }
         else {
             
-            [MacSyncManager.sharedInstance backgroundSyncDatabase:database
-                                                       completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-                if ( error ) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [MacAlerts error:error window:self.view.window];
-                    });
-                }
-                else if ( localWasChanged ) {
-                    NSLog(@"ManagerVC - Background Sync - localWasChanged");
-                }
-            }];
+
+            [DatabasesCollection.shared syncWithUuid:databaseId allowInteractive:YES suppressErrorAlerts:NO ckfsForConflict:nil completion:nil];
         }
     }
 }
@@ -686,6 +685,15 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
         [self performSegueWithIdentifier:@"segueToBackups" sender:database.uuid];
+    }
+}
+
+- (IBAction)onLock:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
+       
+        [DatabasesCollection.shared initiateLockRequestWithUuid:database.uuid];
     }
 }
 
@@ -813,6 +821,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
         database.alwaysOpenOffline = !database.alwaysOpenOffline;
+        
+        [self publishDatabasePreferencesChangedNotification:databaseId];
     }
 }
 
@@ -820,8 +830,23 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
+        
+        Model* model = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
+        BOOL isReadOnly = model ? model.isReadOnly : database.readOnly;
+
+        if ( !isReadOnly ) {
+            if ( [DatabasesCollection.shared documentIsOpenWithPendingChangesWithUuid:databaseId] ) {
+                [MacAlerts info:NSLocalizedString(@"read_only_unavailable_title", @"Read Only Unavailable")
+                informativeText:NSLocalizedString(@"read_only_unavailable_pending_changes_message", @"You currently have changes pending and so you cannot switch to Read Only mode. You must save or discard your current changes first.")
+                         window:self.view.window
+                     completion:nil];
+                return;
+            }
+        }
 
         database.readOnly = !database.readOnly;
+        
+        [self publishDatabasePreferencesChangedNotification:databaseId];
     }
 }
 
@@ -831,6 +856,17 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         
         [view onChangeNickname];
     }
+}
+
+    
+- (void)publishDatabasePreferencesChangedNotification:(NSString*)databaseUuid {
+    
+    
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kUpdateNotificationDatabasePreferenceChanged object:databaseUuid userInfo:@{ }];
+    });
 }
 
 @end

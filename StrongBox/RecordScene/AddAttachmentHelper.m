@@ -321,7 +321,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
                                   else {
                                       if(self.onAdd) {
                                           NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
-                                          DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:inputStream protectedInMemory:YES compressed:YES];
+                                          DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:inputStream length:data.length protectedInMemory:YES compressed:YES];
                                           
                                           NSLog(@"Adding Attachment: [%@]-[%@]", text, dbAttachment.digestHash);
                                           

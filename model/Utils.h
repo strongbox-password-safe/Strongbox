@@ -114,6 +114,8 @@ NSColor* NSColorFromRGB(NSUInteger rgbValue);
 
 NSString* localizedYesOrNoFromBool(BOOL george);
 
++ (NSArray<NSString*>*)getTagsFromTagString:(NSString*)string;
+
 NS_ASSUME_NONNULL_END
 
 @end

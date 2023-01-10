@@ -84,6 +84,7 @@
     [self.rightButtonTap setNumberOfTapsRequired:1];
     [self.rightButtonTap setNumberOfTouchesRequired:1];
     [self.rightButtonSplashLabel addGestureRecognizer:self.rightButtonTap];
+    self.rightButtonSplashLabel.text = @" "; 
     
     self.labelAudit.userInteractionEnabled = YES;
     UITapGestureRecognizer *tapGesture =

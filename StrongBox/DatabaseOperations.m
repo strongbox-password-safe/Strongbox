@@ -9,7 +9,6 @@
 #import "DatabaseOperations.h"
 #import "IOsUtils.h"
 #import "Alerts.h"
-#import "ISMessages.h"
 #import "Utils.h"
 #import "KeyFileParser.h"
 #import "PinsConfigurationController.h"

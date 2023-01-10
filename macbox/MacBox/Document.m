@@ -16,7 +16,6 @@
 #import "NSArray+Extensions.h"
 #import "NodeDetailsViewController.h"
 #import "BiometricIdHelper.h"
-#import "DatabasesManagerVC.h"
 #import "AutoFillManager.h"
 #import "SampleItemsGenerator.h"
 #import "DatabaseModelConfig.h"
@@ -27,42 +26,38 @@
 #import "NSDate+Extensions.h"
 #import "DatabaseUnlocker.h"
 #import "MBProgressHUD.h"
-#import "MMWormhole.h"
-#import "AutoFillWormhole.h"
-#import "QuickTypeRecordIdentifier.h"
-#import "OTPToken+Generation.h"
-
-#ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
-#else
-#import "Strongbox_Auto_Fill-Swift.h"
-#endif
+#import "ViewController.h"
+#import "DatabasesManagerVC.h"
 
 NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationFullReload"; 
 
 @interface Document ()
 
 @property WindowController* windowController;
-@property NSTimer* managedDatabasePollForChangesTimer;
-@property BOOL pollingInProgress;
 @property BOOL isPromptingAboutUnderlyingFileChange;
-@property MMWormhole* wormhole;
 
 @end
 
 @implementation Document
 
 - (void)dealloc {
-    NSLog(@"=====================================================================");
     NSLog(@"😎 Document DEALLOC...");
-    NSLog(@"=====================================================================");
+}
+
+- (instancetype)init {
+    self = [super init];
+    
+    if (self) {
+        NSLog(@"✅ Document::init");
+        
+
+    }
+    
+    return self;
 }
 
 
-
-+ (BOOL)autosavesInPlace {
-    return Settings.sharedInstance.autoSave;
-}
 
 - (MacDatabasePreferences *)databaseMetadata {
     if ( self.viewModel ) {
@@ -76,7 +71,7 @@ NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationF
             ret = [MacDatabasePreferences addOrGet:self.fileURL]; 
         }
         else {
-            NSLog(@"✅ Got metadata for database URL: [%@]", self.fileURL);
+            
         }
         
         return ret;
@@ -87,8 +82,8 @@ NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationF
     }
 }
 
-- (BOOL)isModelLocked {
-    return self.viewModel ? self.viewModel.locked : YES;
++ (BOOL)autosavesInPlace {
+    return Settings.sharedInstance.autoSave;
 }
 
 - (BOOL)canAsynchronouslyWriteToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation {
@@ -111,20 +106,89 @@ NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationF
         self.windowController = [[NSStoryboard storyboardWithName:@"NextGen" bundle:nil] instantiateInitialController];
     }
     
+    [self addWindowController:self.windowController];
+    
     [self.windowController changeContentView]; 
     
-    [self addWindowController:self.windowController];
+    [self listenForNotifications];
+}
+
+- (void)listenForNotifications {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseReloaded:)
+                                               name:kDatabaseReloadedNotificationKey
+                                             object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onLockStateChanged:)
+                                               name:kDatabasesCollectionLockStateChangedNotification
+                                             object:nil];
+}
+
+- (void)onLockStateChanged:(id)notification {
+    NSString* databaseUuid = ((NSNotification*)notification).object;
+    
+    if ( ![databaseUuid isEqualToString:self.databaseMetadata.uuid] ) {
+        return;
+    }
+    
+    NSLog(@"✅ Document::onLockStateChanged");
+    
+    [self bindToLockState];
+}
+
+- (void)bindToLockState {
+    NSLog(@"✅ Document::bindToLockState");
+
+    Model* model = [DatabasesCollection.shared getUnlockedWithUuid:self.databaseMetadata.uuid];
+    
+    if ( !self.viewModel || self.viewModel.locked ) {
+        if ( model ) {
+            NSLog(@"✅ Document::bindToLockState => Newly Unlocked");
+
+            _viewModel = [[ViewModel alloc] initUnlocked:self databaseUuid:self.databaseMetadata.uuid model:model];
+            [self bindWindowControllerAfterLockStatusChange];
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+                if ( !self.viewModel.locked ) {
+                    [self.viewModel restartBackgroundAudit];
+                }
+            });
+        }
+    }
+    else {
+        if ( !model ) {
+            NSLog(@"✅ Document::bindToLockState => Newly Locked");
+
+            _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
+            [self bindWindowControllerAfterLockStatusChange];
+        }
+    }
+}
+
+- (void)onDatabaseReloaded:(id)notification {
+    NSString* databaseUuid = ((NSNotification*)notification).object;
+    
+    if ( [databaseUuid isEqualToString:self.databaseMetadata.uuid] ) {
+        NSLog(@"Document::onDatabaseReloaded => Notifying views to fully reload");
+        
+        [self notifyFullModelReload];
+    }
 }
 
 
 
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing  _Nullable *)outError {
-    NSLog(@"Sync Manager Mode: readFromURL - Loading Locked Model... [%@]", url);
-            
-    [NSFileCoordinator addFilePresenter:self]; 
+    NSLog(@"Document::readFromURL [%@] at [%@]", self.databaseMetadata.nickName, url);
 
-    return [self loadLockedModel];
+    if ( !self.viewModel ) { 
+        _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
+    }
+    
+    [self bindToLockState];
+    
+    return YES;
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
@@ -177,219 +241,30 @@ NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationF
  forSaveOperation:(NSSaveOperationType)saveOperation
 completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     NSLog(@"✅ saveToURL: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, url);
-
-    [self asyncBackgroundUpdate];
-
-    if (saveOperation != NSSaveToOperation) {
-        [self updateChangeCount:NSChangeCleared];
-    }
     
-    completionHandler(nil);
-}
-
-- (void)asyncBackgroundUpdate {
-    NSUUID* updateId = NSUUID.UUID;
-    NSLog(@"Document::asyncBackgroundUpdate start [%@]", updateId);
-    self.viewModel.asyncUpdateId = updateId;
-    [self.viewModel asyncUpdateAndSync:^(AsyncUpdateResult * _Nonnull result) {
-        [self onAsyncBackgroundUpdateDone:result updateId:updateId]; 
-    }];
-}
-
-- (void)onAsyncBackgroundUpdateDone:(AsyncUpdateResult*)result updateId:(NSUUID*)updateId {
-    NSLog(@"onAsyncBackgroundUpdateDone: [%@] - %@", result, updateId);
-
-    if ( [self.viewModel.asyncUpdateId isEqual:updateId] ) {
-        self.viewModel.asyncUpdateId = nil;
-        
-        
-        
-        [self onSyncOrUpdateDone:result.userCancelled userInteractionRequired:result.userInteractionRequired localWasChanged:result.localWasChanged update:YES error:result.error];
+    BOOL updateQueued = [DatabasesCollection.shared updateAndQueueSyncWithUuid:self.databaseMetadata.uuid allowInteractiveSync:YES];
+    
+    if ( !updateQueued ) {
+        NSLog(@"🔴 Could not queue a save for this database. Is it read-only or locked?!");
+        completionHandler([Utils createNSError:@"🔴 Could not queue a save for this database. Is it read-only or locked?!" errorCode:-1]);
     }
     else {
-        NSLog(@"Not clearing asyncUpdateID as another has been queued... [%@]", self.viewModel.asyncUpdateId);
-    }
-    
-    [self notifyUpdatesDatabasesList];
-}
-
-- (void)synchronousForegroundUpdate {
-    [self.viewModel update:self.windowController.contentViewController handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        [self onSyncOrUpdateDone:userCancelled userInteractionRequired:NO localWasChanged:localWasChanged update:YES error:error];
-    }];
-}
-
-
-
-- (void)synchronousForegroundSync {
-    NSLog(@"synchronousForegroundSync");
-
-    if ( self.viewModel.offlineMode ) {
-        NSLog(@"WARNWARN: performFullInteractiveSync called in Offline Mode!!");
-        return;
-    }
-
-    [MacSyncManager.sharedInstance sync:self.databaseMetadata
-                          interactiveVC:self.windowController.contentViewController
-                                    key:self.viewModel.compositeKeyFactors
-                                   join:NO
-                             completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        BOOL userInteractionRequired = result == kSyncAndMergeResultUserInteractionRequired;
-        BOOL userCancelled = result == kSyncAndMergeResultUserCancelled;
-         
-        [self onSyncOrUpdateDone:userCancelled userInteractionRequired:userInteractionRequired localWasChanged:localWasChanged update:NO error:error]; 
-    }];
-}
-
-
-
-
-- (void)close {
-    [super close];
-
-    [self unListenForSleepWakeEvents];
-    
-    [self stopMonitoringManagedFile];
-    
-    [self cleanupWormhole];
-    
-    
-        
-    if (NSDocumentController.sharedDocumentController.documents.count == 0 &&
-        Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows &&
-        !Settings.sharedInstance.runningAsATrayApp ) {
-        [DBManagerPanel.sharedInstance show];
+        if (saveOperation != NSSaveToOperation) {
+            [self updateChangeCount:NSChangeCleared];
+        }
+                
+        completionHandler(nil);
     }
 }
+
+
+
 
 
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *) coder {
 
     [coder encodeObject:self.fileURL forKey:@"StrongboxNonFileRestorationStateURL"];
-}
-
-
-
-
-- (void)listenForSleepWakeEvents {
-    [self unListenForSleepWakeEvents];
-    
-    NSLog(@"listenForSleepWakeEvents");
-    
-    
-    
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-                                                           selector:@selector(onSleep)
-                                                               name:NSWorkspaceWillSleepNotification object:nil];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-                                                           selector:@selector(onSleep)
-                                                               name:NSWorkspaceScreensDidSleepNotification object:nil];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-                                                           selector:@selector(onSleep)
-                                                               name:NSWorkspaceSessionDidResignActiveNotification object:nil];
-
-    NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
-    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onSleep) name:notificationName object:nil];
-
-    
-    
-    
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-                                                           selector:@selector(onWake)
-                                                               name:NSWorkspaceDidWakeNotification object:nil];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-                                                           selector:@selector(onWake)
-                                                               name:NSWorkspaceScreensDidWakeNotification object:nil];
-    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
-                                                           selector:@selector(onWake)
-                                                               name:NSWorkspaceSessionDidBecomeActiveNotification object:nil];
-
-    NSString* notificationName2 = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsUnlocked"];
-    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onWake) name:notificationName2 object:nil];
-}
-
-- (void)unListenForSleepWakeEvents {
-    NSLog(@"unListenForSleepWakeEvents");
-    
-    [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
-    [NSWorkspace.sharedWorkspace.notificationCenter removeObserver:self];
-}
-
-- (void)onSleep {
-    NSLog(@"XXX - onSleep");
-    [self stopMonitoringManagedFile];
-}
-
-- (void)onWake {
-    [self startMonitoringManagedFile];
-}
-
-- (void)startMonitoringManagedFile {
-    if ( !self.databaseMetadata ||
-        self.viewModel.locked ||
-        self.viewModel.offlineMode ||
-        !self.databaseMetadata.monitorForExternalChanges ) {
-        [self stopMonitoringManagedFile];
-        return;
-    }
-        
-    if(self.managedDatabasePollForChangesTimer == nil) {
-        NSLog(@"startMonitoringManagedFile - OK");
-        
-        [self listenForSleepWakeEvents];
-        
-        self.managedDatabasePollForChangesTimer = [NSTimer timerWithTimeInterval:self.databaseMetadata.monitorForExternalChangesInterval
-                                                                          target:self
-                                                                        selector:@selector(pollForDatabaseChanges)
-                                                                        userInfo:nil
-                                                                         repeats:YES];
-        
-        [[NSRunLoop mainRunLoop] addTimer:self.managedDatabasePollForChangesTimer forMode:NSRunLoopCommonModes];
-    }
-}
-
-- (void)stopMonitoringManagedFile {
-    NSLog(@"stopMonitoringManagedFile");
-    
-    if ( self.managedDatabasePollForChangesTimer ) {
-        [self.managedDatabasePollForChangesTimer invalidate];
-        self.managedDatabasePollForChangesTimer = nil;
-    }
-}
-
-- (void)pollForDatabaseChanges {
-    if ( self.pollingInProgress ) {
-        NSLog(@"pollingInProgress - Will not queue up another Poll.");
-        return;
-    }
-    
-    if ( !self.databaseMetadata.monitorForExternalChanges || self.viewModel.offlineMode) {
-        [self stopMonitoringManagedFile];
-        return;
-    }
-
-    if ( self.viewModel.offlineMode ) {
-        NSLog(@"WARNWARN: pollForDatabaseChanges called in Offline Mode!!");
-        return;
-    }
-    
-    [self checkForRemoteChanges];
-}
-
-- (void)checkForRemoteChanges {
-
-
-    self.pollingInProgress = YES;
-    [MacSyncManager.sharedInstance pollForChanges:self.databaseMetadata
-                                       completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        self.pollingInProgress = NO;
-        
-        if ( localWasChanged ) {
-            NSLog(@"checkForRemoteChanges - Change Found");
-            [self onFileChangedByOtherApplication];
-        }
-    }];
 }
 
 - (NSURL *)presentedItemURL {
@@ -403,32 +278,6 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         
         
         return foo;
-    }
-}
-
-- (void)presentedItemDidChange {
-    NSLog(@"presentedItemDidChange - [%@]", self.fileModificationDate.friendlyDateTimeStringBothPrecise);
-
-    
-    
-    if( !self.databaseMetadata.monitorForExternalChanges ) {
-        return;
-    }
-
-    if ( [self.fileURL.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-        [self checkForRemoteChanges];
-    }
-    else {
-        if( !self.fileModificationDate ) {
-            NSLog(@"presentedItemDidChange but NO self.fileModificationDate?");
-            return;
-        }
-        
-
-
-
-
-
     }
 }
 
@@ -451,20 +300,140 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 
 
-
-- (BOOL)loadLockedModel {
-    _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
-
-    WindowController* wc = self.windowController; 
+- (BOOL)isNextGenEditsInProgress {
+    if ( Settings.sharedInstance.nextGenUI ) {
+        if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
+            NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
+            return vc.editsInProgress;
+        }
+    }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [wc changeContentView];
-    });
-    
-    return YES;
+    return NO;
 }
 
-- (void)lock:(NSString*)selectedItem {
+
+
+
+- (void)close {
+    
+    
+    
+    [self closeAllWindows];
+    
+    if ( Settings.sharedInstance.lockDatabaseOnWindowClose ) {
+        [DatabasesCollection.shared forceLockWithUuid:self.databaseMetadata.uuid];
+    }
+    
+    self.databaseMetadata.userRequestOfflineOpenEphemeralFlagForDocument = NO; 
+    
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+    
+    [super close];
+}
+
+- (void)initiateLockSequence {
+    NSLog(@"✅ Document::initiateLockSequence called...");
+
+    if( !self.viewModel && self.viewModel.locked ) {
+        return;
+    }
+    
+    BOOL isEditing = [self isNextGenEditsInProgress];
+
+    NSLog(@"Document::initiateLockSequence called... isEditing = %hhd", isEditing);
+
+    if ( isEditing ) {
+        if (!Settings.sharedInstance.lockEvenIfEditing ) {
+            NSLog(@"⚠️ NOT Locking because there is an edit in progress.");
+            return;
+        }
+        else {
+            NSLog(@"⚠️ Locking even though there is an edit in progress to to configuration.");
+        }
+    }
+    
+    if ( self.isDocumentEdited ) {
+        NSLog(@"✅ Document::initiateLockSequence isDocumentEdited = [YES]");
+
+        NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
+        
+        [macOSSpinnerUI.sharedInstance show:loc viewController:self.windowController.contentViewController];
+        
+        [self saveDocumentWithDelegate:self didSaveSelector:@selector(onSaveBeforeLockingCompletion:) contextInfo:nil];
+    }
+    else {
+        
+        
+        [self onSaveBeforeLockingCompletion:nil];
+    }
+}
+
+- (void)closeAllWindows {
+    NSLog(@"✅ Document::closeAllWindows");
+    
+    if ( !self.viewModel.locked ) {
+        if ( Settings.sharedInstance.nextGenUI ) {
+            if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
+                
+                
+                
+                NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
+                
+                [vc onLockDoneKillAllWindows];
+            }
+        }
+        else {
+            ViewController* vc = (ViewController*)self.windowController.contentViewController;
+            
+            [vc closeAllDetailsWindows:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [vc stopObservingModelAndCleanup];
+                });
+            }];
+        }
+    }
+}
+
+- (IBAction)onSaveBeforeLockingCompletion:(id)sender {
+    NSLog(@"Document::onSaveBeforeLockingCompletion called...");
+
+    [macOSSpinnerUI.sharedInstance dismiss];
+    
+    if ( Settings.sharedInstance.nextGenUI ) {
+        
+        if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
+            
+            NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
+            
+            
+            [vc onLockDoneKillAllWindows];
+        }
+        
+        [self forceLock];
+    }
+    else {
+        ViewController* vc = (ViewController*)self.windowController.contentViewController;
+        
+        __weak Document* weakSelf = self;
+        [vc closeAllDetailsWindows:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf forceLock];
+                [vc stopObservingModelAndCleanup];
+            });
+        }];
+    }
+    
+    
+    
+    if ( Settings.sharedInstance.clearClipboardEnabled ) {
+        AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
+        [appDelegate clearClipboardWhereAppropriate];
+    }
+}
+
+- (void)forceLock {
+    NSLog(@"✅ Document::forceLock called");
+    
     if( self.isDocumentEdited ) {
         NSLog(@"⚠️ Cannot lock document with edits!");
         return;
@@ -476,333 +445,63 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     
     self.wasJustLocked = YES;
     
-    [self loadLockedModel];
-
-    [self cleanupWormhole];
+    [DatabasesCollection.shared forceLockWithUuid:self.databaseMetadata.uuid];
     
-    self.selectedItem = selectedItem; 
+    _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
+    [self bindWindowControllerAfterLockStatusChange];
 }
 
-- (void)unlock:(CompositeKeyFactors *)compositeKeyFactors
-viewController:(NSViewController *)viewController
-alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
-fromConvenience:(BOOL)fromConvenience
-    completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
-    NSLog(@"Document::unlock: [%@]", self.fileURL);
-
-    if ( !self.databaseMetadata.offlineMode ) {
-        NSLog(@"ONLINE MODE: syncWorkingCopyAndUnlock");
-        
-        [self syncWorkingCopyAndUnlock:viewController
-                   alertOnJustPwdWrong:alertOnJustPwdWrong
-                       fromConvenience:fromConvenience
-                                   key:compositeKeyFactors
-                          selectedItem:self.selectedItem
-                            completion:completion];
+- (void)bindWindowControllerAfterLockStatusChange {
+    WindowController* wc = self.windowController;
+    
+    
+    
+    if ( NSThread.isMainThread ) {
+        [wc changeContentView];
     }
     else {
-        NSLog(@"OFFLINE MODE: loadWorkingCopyAndUnlock");
-
-        [self loadWorkingCopyAndUnlock:compositeKeyFactors
-                        viewController:viewController
-                   alertOnJustPwdWrong:alertOnJustPwdWrong
-                       fromConvenience:fromConvenience
-                          selectedItem:self.selectedItem
-                            completion:completion];
-    }
-}
-
-- (void)syncWorkingCopyAndUnlock:(NSViewController*)viewController
-             alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
-                 fromConvenience:(BOOL)fromConvenience
-                             key:(CompositeKeyFactors*)key
-                    selectedItem:(NSString *)selectedItem
-                      completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
-    NSLog(@"syncWorkingCopyAndUnlock ENTER");
-        
-    [MacSyncManager.sharedInstance sync:self.databaseMetadata
-                          interactiveVC:viewController
-                                    key:key
-                                   join:NO
-                             completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        if ( result == kSyncAndMergeSuccess ) {
-            [self loadWorkingCopyAndUnlock:key
-                            viewController:viewController
-                       alertOnJustPwdWrong:alertOnJustPwdWrong
-                           fromConvenience:fromConvenience
-                              selectedItem:selectedItem
-                                completion:completion];
-        }
-        else if (result == kSyncAndMergeError ) {
-            if(completion) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(NO, NO, NO, error);
-                });
-            }
-        }
-        else if (result == kSyncAndMergeResultUserCancelled ) {
-            if(completion) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(NO, YES, NO, nil);
-                });
-            }
-        }
-        else {
-            NSLog(@"🔴 WARNWARN: Unhandled Sync Result [%lu] - error = [%@]", (unsigned long)result, error);
-            if(completion) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(NO, NO, NO, error);
-                });
-            }
-        }
-    }];
-}
-
-- (void)loadWorkingCopyAndUnlock:(CompositeKeyFactors*)key
-                  viewController:(NSViewController*)viewController
-             alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
-                 fromConvenience:(BOOL)fromConvenience
-                    selectedItem:(NSString *)selectedItem
-                      completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
-    BOOL openOffline = self.databaseMetadata.offlineMode || self.databaseMetadata.alwaysOpenOffline; 
-
-    if ( openOffline != self.databaseMetadata.offlineMode ) {
-        self.databaseMetadata.offlineMode = openOffline;
-    }
-
-    DatabaseUnlocker *unlocker = [DatabaseUnlocker unlockerForDatabase:self.databaseMetadata
-                                                        viewController:viewController
-                                                         forceReadOnly:NO
-                                                        isAutoFillOpen:NO
-                                                           offlineMode:openOffline];
-    
-    unlocker.alertOnJustPwdWrong = alertOnJustPwdWrong;
-    
-    [unlocker unlockLocalWithKey:key
-              keyFromConvenience:fromConvenience
-                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
-        if ( result == kUnlockDatabaseResultSuccess ) {
-            [self onUnlockDatabaseSuccessful:model];
-        }
-        else if ( result == kUnlockDatabaseResultError ) {
-            [self onUnlockDatabaseError];
-        }
-        else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
-            [self onUnlockDatabaseError];
-        }
-        else {
-            
-        }
-        
-        if(completion) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                NSError* caolError = error ? error : innerStreamError;
-                completion(result == kUnlockDatabaseResultSuccess,
-                           result == kUnlockDatabaseResultUserCancelled,
-                           result == kUnlockDatabaseResultIncorrectCredentials,
-                           caolError);
-            });
-        }
-    }];
-}
-
-- (void)onUnlockDatabaseError {
-    if ( self.viewModel && !self.viewModel.locked ) {
-        _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
-
-        WindowController* wc = self.windowController;
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [wc changeContentView];
-        });
-
-        [self notifyFullModelReload];
-    }
-    else {
-        
-    }
-}
-
-- (void)onUnlockDatabaseSuccessful:(Model*)model {
-    BOOL wasLocked = self.viewModel && self.viewModel.locked;
-    
-    _viewModel = [[ViewModel alloc] initUnlocked:self databaseUuid:self.databaseMetadata.uuid model:model];
-    
-    if ( wasLocked ) { 
-        WindowController* wc = self.windowController;
-
         dispatch_async(dispatch_get_main_queue(), ^{
             [wc changeContentView];
         });
     }
-    else {
-        [self notifyFullModelReload]; 
-    }
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
-        [self.viewModel restartBackgroundAudit];
-    });
-    
-    
-    [NSFileCoordinator addFilePresenter:self];
-
-    [self startMonitoringManagedFile];
-    
-    [self listenToAutoFillWormhole];
 }
 
 
-
-
-- (void)onSyncOrUpdateDone:(BOOL)userCancelled
-   userInteractionRequired:(BOOL)userInteractionRequired
-           localWasChanged:(BOOL)localWasChanged
-                    update:(BOOL)update
-                     error:(NSError*)error {
-    __weak Document* weakSelf = self;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ( update ) {
-            [weakSelf onUpdateFinished:userInteractionRequired userCancelled:userCancelled localWasChanged:localWasChanged error:error];
-        }
-        else {
-            [weakSelf onSyncFinished:userInteractionRequired userCancelled:userCancelled localWasChanged:localWasChanged error:error];
-        }
-    });
-}
-
-
-
-- (void)onUpdateFinished:(BOOL)userInteractionRequired
-           userCancelled:(BOOL)userCancelled
-         localWasChanged:(BOOL)localWasChanged
-                   error:(NSError*_Nullable)error {
-    __weak Document* weakSelf = self;
-    
-    if ( error || userCancelled ) {
-        
-        
-        
-        
-        
-        
-        [MacAlerts error:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
-                   error:error
-                  window:self.windowController.window
-              completion:^{
-            [MacAlerts twoOptions:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
-                  informativeText:NSLocalizedString(@"sync_status_error_updating_try_again_prompt", @"There was an error updating your database. Would you like to try updating again, or would you prefer to revert to the latest successful update?")
-                option1AndDefault:NSLocalizedString(@"sync_status_error_updating_try_again_action", @"Try Again")
-                          option2:NSLocalizedString(@"generic_cancel", @"Cancel")
-                           window:self.windowController.window
-                       completion:^(NSUInteger option) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if ( option == 1 ) {
-                        [weakSelf synchronousForegroundUpdate];
-                    }
-                    else {
-                        [weakSelf refreshUnlockedFromWorkingCopy];
-                    }
-                });
-            }];
-        }];
-    }
-    else if ( userInteractionRequired ) {
-        NSLog(@"Background sync failed, will now try an interactive sync...");
-        
-        [MacAlerts yesNo:NSLocalizedString(@"sync_status_user_interaction_required_prompt_title", @"Assistance Required")
-         informativeText:NSLocalizedString(@"sync_status_user_interaction_required_prompt_yes_or_no", @"There was a problem updating your database and your assistance is required to resolve. Would you like to resolve this problem now?")
-                  window:self.windowController.window
-              completion:^(BOOL yesNo) {
-            if ( yesNo ) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self synchronousForegroundUpdate];
-                });
-            }
-        }];
-    }
-    else {
-        [self showToastNotification:NSLocalizedString(@"notification_sync_successful", @"Sync Successful") error:NO];
-        
-        if ( localWasChanged ) {
-            NSLog(@"Update successful and local was changed, reloading...");
-            [self refreshUnlockedFromWorkingCopy];
-        }
-    }
-}
-
-- (void)onSyncFinished:(BOOL)userInteractionRequired userCancelled:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*_Nullable)error {
-    if ( userInteractionRequired ) {
-        NSLog(@"Background sync failed, will now try an interactive sync...");
-        [self synchronousForegroundSync];
-    }
-    else if ( userCancelled ) {
-        
-    }
-    else if ( error ) {
-        NSString* message = [NSString stringWithFormat:@"%@: %@",
-                             NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error"),
-                             error.localizedDescription];
-        [self showToastNotification:message error:YES];
-    }
-    else {
-        [self showToastNotification:NSLocalizedString(@"notification_sync_successful", @"Sync Successful") error:NO];
-        
-        if ( localWasChanged ) {
-            NSLog(@"Sync successful and local was changed, reloading...");
-            [self refreshUnlockedFromWorkingCopy];
-        }
-    }
-}
-
-- (void)refreshUnlockedFromWorkingCopy {
-    NSLog(@"Document::refreshUnlockedFromWorkingCopy...");
-    
-    [self.viewModel reloadDatabaseFromLocalWorkingCopy:self.windowController.contentViewController
-                                            completion:^(BOOL success) {
-        if ( success ) {
-            [self notifyFullModelReload]; 
-        }
-        else {
-            [self onUnlockDatabaseError];
-        }
-    }];
-}
-
-
-
-- (void)onFileChangedByOtherApplication {
-    NSLog(@"XXXX - [%@] - onFileChangedByOtherApplication", self);
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self onDatabaseChangedByExternalOther];
-    });
-}
 
 - (void)onDatabaseChangedByExternalOther {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self _onDatabaseChangedByExternalOther];
+    });
+}
+
+- (void)_onDatabaseChangedByExternalOther {
     if(self.isPromptingAboutUnderlyingFileChange) {
         NSLog(@"Already in Use...");
         return;
     }
     
     self.isPromptingAboutUnderlyingFileChange = YES;
+    
     if (self.viewModel && !self.viewModel.locked) {
         NSLog(@"ViewController::onDatabaseChangedByExternalOther - Reloading...");
         
-        if(!self.viewModel.document.isDocumentEdited) {
+        if(!self.viewModel.document.isDocumentEdited) { 
             if( !self.databaseMetadata.autoReloadAfterExternalChanges ) {
                 NSString* loc = NSLocalizedString(@"mac_db_changed_externally_reload_yes_or_no", @"The database has been changed by another application, would you like to reload this latest version and automatically unlock?");
 
                 [MacAlerts yesNo:loc
-                       window:self.windowController.window
-                   completion:^(BOOL yesNo) {
+                          window:self.windowController.window
+                      completion:^(BOOL yesNo) {
                     if(yesNo) {
                         NSString* loc = NSLocalizedString(@"mac_db_reloading_after_external_changes_popup_notification", @"Reloading after external changes...");
 
                         [self showPopupChangeToastNotification:loc];
                         
-                        self.selectedItem = [self selectedItemSerializationId];
-                        
-                        [self syncAndReloadAfterExternalFileChange];
+                        [DatabasesCollection.shared syncWithUuid:self.databaseMetadata.uuid
+                                                allowInteractive:YES
+                                             suppressErrorAlerts:NO
+                                                 ckfsForConflict:nil 
+                                                      completion:nil];
                     }
                     
                     self.isPromptingAboutUnderlyingFileChange = NO;
@@ -814,10 +513,12 @@ fromConvenience:(BOOL)fromConvenience
 
                 [self showPopupChangeToastNotification:loc];
 
-                self.selectedItem = [self selectedItemSerializationId];
-                
-                [self syncAndReloadAfterExternalFileChange];
-            
+                [DatabasesCollection.shared syncWithUuid:self.databaseMetadata.uuid
+                                        allowInteractive:YES
+                                     suppressErrorAlerts:NO
+                                         ckfsForConflict:nil 
+                                              completion:nil];
+
                 self.isPromptingAboutUnderlyingFileChange = NO;
 
                 return;
@@ -832,37 +533,6 @@ fromConvenience:(BOOL)fromConvenience
     }
     
     self.isPromptingAboutUnderlyingFileChange = NO;
-}
-
-- (void)syncAndReloadAfterExternalFileChange {
-    NSLog(@"Document::reloadAfterExternalFileChange ENTER");
-    
-    if ( self.viewModel ) {
-        
-        [self synchronousForegroundSync];
-    }
-    else { 
-        [MacAlerts info:@"Model is not set. Could not unlock. Please close and reopen your database"
-                 window:self.windowController.window];
-    }
-}
-
-
-
-- (NSString*)selectedItemSerializationId {
-    if ( Settings.sharedInstance.nextGenUI ) {
-        return nil; 
-    }
-    else {
-        Node* item = [self.windowController getSingleSelectedItem];
-        
-        if ( item ) {
-            return [self.viewModel.database getCrossSerializationFriendlyIdId:item.uuid];
-        }
-        else {
-            return nil;
-        }
-    }
 }
 
 
@@ -903,188 +573,6 @@ fromConvenience:(BOOL)fromConvenience
             [hud hide:YES];
         });
     });
-}
-
-
-
-- (void)cleanupWormhole {
-    NSLog(@"✅ cleanupWormhole");
-
-    if ( self.wormhole ) {
-
-        [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeQuickTypeRequestId];
-
-        NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, self.databaseMetadata.uuid];
-        [self.wormhole stopListeningForMessageWithIdentifier:requestId];
-        
-        NSString* convRequestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, self.databaseMetadata.uuid];
-        [self.wormhole stopListeningForMessageWithIdentifier:convRequestId];
-
-        [self.wormhole clearAllMessageContents];
-        self.wormhole = nil;
-    }
-}
-
-- (void)listenToAutoFillWormhole {
-    NSLog(@"✅ listenToAutoFillWormhole");
-    
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
-                                                         optionalDirectory:kAutoFillWormholeName];
-
-    
-    
-    __weak Document* weakSelf = self;
-    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeQuickTypeRequestId
-                                         listener:^(id messageObject) {
-        NSDictionary *dict = (NSDictionary*)messageObject;
-        NSString* userSession = dict[@"user-session-id"];
-        
-        if ([userSession isEqualToString:NSUserName()]) { 
-            NSString* json = dict ? dict[@"id"] : nil;
-            [weakSelf onQuickTypeAutoFillWormholeRequest:json];
-        }
-    }];
-    
-    
-    
-    NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, self.databaseMetadata.uuid];
-
-    [self.wormhole listenForMessageWithIdentifier:requestId
-                                         listener:^(id messageObject) {
-        NSDictionary *dict = (NSDictionary*)messageObject;
-        NSString* userSession = dict[@"user-session-id"];
-        
-        if ( [userSession isEqualToString:NSUserName()] ) { 
-            NSString* databaseId = dict[@"database-id"];
-            [weakSelf onAutoFillDatabaseUnlockedStatusWormholeRequest:databaseId];
-        }
-    }];
-    
-    
-
-    NSString* convRequestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, self.databaseMetadata.uuid];
-
-    [self.wormhole listenForMessageWithIdentifier:convRequestId
-                                         listener:^(id messageObject) {
-        NSDictionary *dict = (NSDictionary*)messageObject;
-        NSString* userSession = dict[@"user-session-id"];
-        
-        if ( [userSession isEqualToString:NSUserName()] ) { 
-            NSString* databaseId = dict[@"database-id"];
-            [weakSelf onAutoFillWormholeMasterCredentialsRequest:databaseId];
-        }
-    }];
-}
-
-- (void)onAutoFillWormholeMasterCredentialsRequest:(NSString*)databaseId {
-    NSLog(@"✅ onAutoFillWormholeMasterCredentialsRequest: [%@]", databaseId );
-    
-    if ( self.viewModel && !self.viewModel.locked && databaseId) {
-        if (!self.databaseMetadata.quickWormholeFillEnabled ) {
-            return;
-        }
-
-        if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
-            NSLog(@"Responding to Conv Unlock Req for Database - [%@]-%@", self, databaseId);
-
-            NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockResponseId, databaseId];
-            NSString* secretStoreId = NSUUID.UUID.UUIDString;
-            NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
-            [SecretStore.sharedInstance setSecureObject:self.viewModel.compositeKeyFactors.password
-                                          forIdentifier:secretStoreId
-                                              expiresAt:expiry];
-
-            [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(),
-                                                 @"secret-store-id" : secretStoreId }
-                                  identifier:responseId];
-        }
-    }
-}
-
-- (void)onAutoFillDatabaseUnlockedStatusWormholeRequest:(NSString*)databaseId {
-    NSLog(@"✅ onAutoFillDatabaseUnlockedStatusWormholeRequest");
-
-    if ( self.viewModel && !self.viewModel.locked && databaseId) {
-        if (!self.databaseMetadata.quickWormholeFillEnabled ) {
-            return;
-        }
-        
-        if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
-
-
-            NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, databaseId];
-
-            [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(), @"unlocked" : databaseId }
-                                  identifier:responseId];
-        }
-    }
-}
-
-- (void)onQuickTypeAutoFillWormholeRequest:(NSString*)json {
-    NSLog(@"✅ onQuickTypeAutoFillWormholeRequest");
-
-    if ( self.viewModel && !self.viewModel.locked && json) {
-        QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
-        
-        if( identifier && self.databaseMetadata && [self.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
-            if (!self.databaseMetadata.quickWormholeFillEnabled || !self.databaseMetadata.quickTypeEnabled ) {
-                return;
-            }
-            
-            
-            
-            DatabaseModel* model = self.viewModel.database;
-            Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
-                return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
-            }];
-
-            NSString* secretStoreId = NSUUID.UUID.UUIDString;
-
-            if(node) {
-                NSString* password = @"";
-
-                if ( identifier.fieldKey ) {
-                    StringValue* sv = node.fields.customFields[identifier.fieldKey];
-                    if ( sv ) {
-                        password = sv.value;
-                    }
-                }
-                else {
-                    password = [model dereference:node.fields.password node:node];
-                }
-                
-                NSString* user = [model dereference:node.fields.username node:node];
-                NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
-                
-                password = password ? password : @"";
-                
-
-                
-                NSDictionary* securePayload = @{
-                    @"user" : user,
-                    @"password" : password,
-                    @"totp" : totp,
-                };
-                
-                NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
-                [SecretStore.sharedInstance setSecureObject:securePayload forIdentifier:secretStoreId expiresAt:expiry];
-            }
-            else {
-
-            }
-            
-            [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(),
-                                                @"success" : @(node != nil),
-                                                @"secret-store-id" : secretStoreId }
-                                  identifier:kAutoFillWormholeQuickTypeResponseId];
-        }
-    }
-}
-
-
-
-- (NSArray<Node*>*)autoFillUrlCredentialMatchesForUrl:(NSString *)urlString {
-    return [self.viewModel getAutoFillMatchingNodesForUrl:urlString];
 }
 
 @end

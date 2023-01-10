@@ -17,7 +17,6 @@
 @property (weak) IBOutlet NSTextField *textboxMonitorInterval;
 @property (weak) IBOutlet NSStepper *stepperMonitorInterval;
 @property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
-@property (weak) IBOutlet NSButton *checkboxLockOnLockScreen;
 @property (weak) IBOutlet NSButton *checkboxAutoDownloadFavIcon;
 @property (weak) IBOutlet NSButton *closeButton;
 @property (weak) IBOutlet NSPopUpButton *popupIconSet;
@@ -64,7 +63,6 @@
     self.textboxMonitorInterval.enabled = self.model.monitorForExternalChanges;
     self.checkboxReloadForeignChanges.enabled = self.model.monitorForExternalChanges;
     
-    self.checkboxLockOnLockScreen.state = self.model.lockOnScreenLock ? NSControlStateValueOn : NSControlStateValueOff;
     self.checkboxAutoDownloadFavIcon.state = self.model.downloadFavIconOnChange ? NSControlStateValueOn : NSControlStateValueOff;
 
     if ( !Settings.sharedInstance.isPro ) {
@@ -79,7 +77,6 @@
     self.model.monitorForExternalChangesInterval = self.stepperMonitorInterval.integerValue;
     self.model.autoReloadAfterExternalChanges = self.checkboxReloadForeignChanges.state == NSControlStateValueOn;
     
-    self.model.lockOnScreenLock = self.checkboxLockOnLockScreen.state == NSControlStateValueOn;
     self.model.downloadFavIconOnChange = self.checkboxAutoDownloadFavIcon.state == NSControlStateValueOn;
 
     [self bindUI];

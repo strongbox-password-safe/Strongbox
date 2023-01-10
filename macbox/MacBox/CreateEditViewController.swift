@@ -178,7 +178,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             let item = NSMenuItem(title: title, action: #selector(onChangeLocation(sender:)), keyEquivalent: "")
 
             var icon = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
-            if let gi = group.icon, gi.isCustom {
+            
+            let isCustom = group.icon?.isCustom ?? false
+            
+            if isCustom || database.iconSet != .sfSymbols {
                 icon = scaleImage(icon, CGSize(width: 16, height: 16))
             }
             item.image = icon
@@ -201,10 +204,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             
 
             var icon = database.rootGroup.isUsingKeePassDefaultIcon ? Icon.house.image() : NodeIconHelper.getIconFor(database.rootGroup, predefinedIconSet: database.iconSet, format: database.format)
-
-            if let gi = database.rootGroup.icon, gi.isCustom {
+            
+            let isCustom = database.rootGroup.icon?.isCustom ?? false
+            
+            if isCustom || database.iconSet != .sfSymbols {
                 icon = scaleImage(icon, CGSize(width: 16, height: 16))
             }
+
             item.image = icon
 
             popupLocation.menu?.insertItem(item, at: 0)
@@ -304,6 +310,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func setupNotes() {
         textViewNotes.delegate = self
+        
+        textViewNotes.enabledTextCheckingTypes = 0
+        textViewNotes.isAutomaticQuoteSubstitutionEnabled = false
+        textViewNotes.isAutomaticTextReplacementEnabled = false
+        textViewNotes.isAutomaticDashSubstitutionEnabled = false
+        textViewNotes.isAutomaticLinkDetectionEnabled = false
+        
         popupButtonNotesSuggestions.menu?.delegate = self
 
         borderScrollNotes.wantsLayer = true
@@ -1471,7 +1484,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func onTagsFieldEdited() {
-
+        NSLog("onTagsFieldEdited: [%@]", String(describing: tagsField.objectValue))
 
         guard let existingTags = tagsField.objectValue as? [String] else {
             return
@@ -1496,8 +1509,14 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         guard let existingTags = tagsField.objectValue as? [String] else {
             return
         }
+        
+        let splitByDelimter = existingTags.flatMap { t in
+            return Utils.getTagsFromTagString(t)
+        }
 
-        let fieldTags = Set(existingTags)
+
+
+        let fieldTags = Set(splitByDelimter)
 
         model.resetTags(fieldTags)
         onModelEdited()
@@ -1787,7 +1806,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             let field = CustomFieldViewModel.customField(withKey: key, value: value, protected: protected)
 
             self.model.removeCustomField(at: UInt(idx))
-            self.model.addCustomField(field)
+            
+            if ( self.model.sortCustomFields ) {
+                self.model.addCustomField(field)
+            }
+            else {
+                self.model.addCustomField(field, at: UInt(idx))
+            }
 
             self.refreshCustomFields()
             self.onModelEdited()

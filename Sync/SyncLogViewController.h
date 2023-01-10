@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SyncLogViewController : UITableViewController
 
++ (UINavigationController*)createWithDatabase:(DatabasePreferences*)database;
 @property DatabasePreferences* database;
 
 @end

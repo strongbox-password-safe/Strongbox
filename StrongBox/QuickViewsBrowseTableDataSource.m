@@ -41,20 +41,21 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (void)refresh {
-    UIImage* globeImage;
-    if (@available(iOS 13.0, *)) {
-        globeImage = [UIImage systemImageNamed:@"globe"];
-    }
-    else {
-        globeImage = [UIImage imageNamed:@"globe"];
-    }
-    
-    NSString *loc1 = NSLocalizedString(@"quick_view_title_all_entries_title", @"All Entries");
-    NSString *loc2 = NSLocalizedString(@"quick_view_title_all_entries_subtitle", @"View every entry in a flat list...");
-    QuickViewConfig *allItems = [QuickViewConfig title:loc1 subtitle:loc2 image:globeImage searchTerm:kSpecialSearchTermAllEntries];
 
-    NSMutableArray<QuickViewConfig*>* ret = @[allItems].mutableCopy;
+
+
+
+
+
+
+
+
+
+
+
     
+    NSMutableArray<QuickViewConfig*>* ret = @[].mutableCopy;
+
     NSUInteger auditCount = self.viewModel.auditIssueNodeCount;
     
     if ( auditCount ) {
@@ -75,22 +76,22 @@ static NSUInteger const kTagSectionIdx = 1;
         [ret addObject:auditEntries];
     }
 
-    if ( self.viewModel.database.totpEntries.count ) {
-        NSString *loc5 = NSLocalizedString(@"quick_view_title_totp_entries_title", @"TOTP Entries");
-        NSString *loc6 = NSLocalizedString(@"quick_view_title_totp_entries_subtitle", @"View all entries with a TOTP token");
 
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"timer"];
-        }
-        else {
-            image = [UIImage imageNamed:@"timer"];
-        }
-        
-        QuickViewConfig *totpEntries = [QuickViewConfig title:loc5 subtitle:loc6 image:image searchTerm:kSpecialSearchTermTotpEntries];
-        
-        [ret addObject:totpEntries];
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     NSUInteger expiredCount = self.viewModel.database.expiredEntries.count;
     if ( expiredCount > 0 ) {
@@ -139,8 +140,8 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (NSUInteger)sections {
-    BOOL hasTags = self.viewModel.database.tagSet.anyObject != nil;
-    return hasTags ? 2 : 1;
+
+    return 1; 
 }
 
 - (nonnull UITableViewCell *)cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -189,7 +190,7 @@ static NSUInteger const kTagSectionIdx = 1;
     return section == kQuickViewSectionIdx ? NSLocalizedString(@"quick_view_section_title_quick_views", @"Quick Views") : NSLocalizedString(@"browse_vc_search_scope_tags", @"Tags");
 }
 
-- (Node *)getNodeFromIndexPath:(nonnull NSIndexPath *)indexPath {
+- (Node *)getParamFromIndexPath:(nonnull NSIndexPath *)indexPath {
     return nil;
 }
 
@@ -220,6 +221,14 @@ static NSUInteger const kTagSectionIdx = 1;
 
 - (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
+}
+
+- (NSArray<NSString *> *)sectionIndexTitles {
+    return @[];
+}
+
+- (NSInteger)sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
+    return index;
 }
 
 @end

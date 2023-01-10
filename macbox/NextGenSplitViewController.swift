@@ -95,6 +95,8 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         if database != nil, database.nextGenSearchText.count > 0 || database.startWithSearch {
             onFind(nil)
         }
+        
+        bindSyncButtonToSyncStatus()
     }
     
     func listenToModelUpdateNotifications() {
@@ -109,8 +111,193 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
                 self.onModelNotificationReceived(notification)
             }
         }
+
+        NotificationCenter.default.addObserver(forName: NSNotification.Name (kAsyncUpdateStarting), object: nil, queue: nil) { [weak self] notification in
+            self?.onAsyncUpdateStarting(notification: notification)
+        }
+
+        NotificationCenter.default.addObserver(forName: NSNotification.Name (kAsyncUpdateDone), object: nil, queue: nil) { [weak self] notification in
+            self?.onAsyncUpdateDone(notification: notification)
+        }
+        
+        NotificationCenter.default.addObserver(forName: NSNotification.Name (kSyncManagerDatabaseSyncStatusChanged), object: nil, queue: nil) { [weak self] notification in
+            self?.onSyncStatusChanged(notification: notification)
+        }
     }
     
+    func onAsyncUpdateStarting ( notification : Notification ) {
+        guard let databaseUuid = notification.object as? String,
+              databaseUuid == database.databaseUuid else {
+            return
+        }
+        
+        updateSyncButton(color: NSColor.systemBlue, animate: true)
+    }
+    
+    func onAsyncUpdateDone ( notification : Notification ) {
+        guard let asyncResult = notification.object as? AsyncUpdateResult,
+                asyncResult.databaseUuid == database.databaseUuid else {
+            return
+        }
+        
+        updateSyncButton()
+        
+        if asyncResult.success {
+            if !database.isInOfflineMode {
+                
+                NSLog("✅ NextGenSplitViewController::onAsyncUpdateDone Received Indication of Successful Save/Update")
+            }
+            else {
+                NSLog("✅ Async Update Done and in offline mode so displaying a toast to indicate success");
+                
+                showToastNotification(message: NSLocalizedString("generic_save_was_successful", comment: "Save Successful"))
+            }
+        }
+        else {
+            
+        }
+    }
+
+    func onSyncStatusChanged ( notification : Notification ) {
+        guard let databaseUuid = notification.object as? String,
+              databaseUuid == database.databaseUuid else {
+            return
+        }
+        
+        let status = MacSyncManager.sharedInstance().getSyncStatus(database.databaseMetadata)
+        
+
+        
+        if status.state == .error {
+            showToastNotification(message: NSLocalizedString("open_sequence_storage_provider_error_title", comment: "Sync Error"), error: true)
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+        else if status.state == .backgroundButUserInteractionRequired {
+        }
+        else if status.state == .inProgress {
+        }
+        else {
+            showToastNotification(message: NSLocalizedString("notification_sync_successful", comment: "Sync Successful"))
+        }
+        
+        bindSyncButtonToSyncStatus()
+    }
+
+    func bindSyncButtonToSyncStatus () {
+        let status = MacSyncManager.sharedInstance().getSyncStatus(database.databaseMetadata)
+        
+        
+        
+        if status.state == .error {
+            updateSyncButton(color: NSColor.systemRed, animate: false)
+        }
+        else if status.state == .backgroundButUserInteractionRequired {
+            updateSyncButton(color: NSColor.systemYellow, animate: false)
+        }
+        else if status.state == .inProgress {
+            updateSyncButton(color: NSColor.systemBlue, animate: true)
+        }
+        else {
+            updateSyncButton(color: nil, animate: false)
+        }
+    }
+    
+    func showToastNotification( message : String, error : Bool = false) {
+        if view.window?.isMiniaturized ?? true {
+            NSLog("Not Showing Popup Change notification because window is miniaturized");
+            return;
+        }
+        
+        showToastNotification(message: message, error: error,  yOffset: 150)
+    }
+
+    func showToastNotification( message : String, error : Bool = false, yOffset : Float = 0.0 ) {
+
+
+
+                
+        DispatchQueue.main.async { [weak self] in
+            let defaultColor = NSColor(deviceRed: 0.23, green: 0.5, blue: 0.82, alpha: 0.6)
+            let errorColor = NSColor(deviceRed: 1, green: 0.55, blue: 0.05, alpha: 0.9)
+            
+            guard let hud = MBProgressHUD.showAdded(to: self?.view, animated: true) else {
+
+                NSLog("🔴 Couldn't create Toast!")
+                return
+            }
+            
+            hud.labelText = message;
+            hud.color = ( error ? errorColor : defaultColor )
+            hud.mode = MBProgressHUDModeText
+            hud.margin = 10
+            hud.yOffset = yOffset
+            hud.removeFromSuperViewOnHide = true
+            hud.dismissible = true
+            
+            let delay = error ? 3.0 : 0.5
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay ) {
+                hud.hide(true)
+            }
+        }
+    }
+    
+    func updateSyncButton ( color : NSColor? = nil, animate : Bool = false ) {
+        guard let syncToolbarItem = view.window?.toolbar?.visibleItems?.first(where: { item in
+            item.itemIdentifier == ToolbarItemIdentifiers.syncButton
+        }), let button = syncToolbarItem.view as? NSButton else {
+            NSLog("🔴 Couldn't find Sync Toolbar Item")
+            return
+        }
+        
+        button.contentTintColor = color
+        
+        runSpinAnimationOnView(view: button, spin: animate)
+    }
+    
+    func runSpinAnimationOnView (view : NSView, spin : Bool ) {
+        guard let layer = view.layer else {
+            NSLog("COuldn't get layer!")
+            return
+        }
+        
+        layer.removeAllAnimations()
+
+        if ( spin ) {
+            layer.position = NSMakePoint(NSMidX(layer.frame), NSMidY(layer.frame)); 
+            layer.anchorPoint = NSMakePoint(0.5, 0.5); 
+
+            let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
+            
+            rotationAnimation.duration = 1.25;
+            rotationAnimation.isCumulative = true;
+            rotationAnimation.toValue = NSNumber(floatLiteral: .pi * -2.0)
+            rotationAnimation.repeatCount = Float.infinity
+            rotationAnimation.isRemovedOnCompletion = false 
+            
+            layer.add(rotationAnimation, forKey: "rotationAnimation")
+        }
+    }
+
     func onModelNotificationReceived(_ notification: Notification) {
         guard let notifyModel = notification.object as? ViewModel else {
             return
@@ -184,6 +371,29 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         createOrEdit(false)
     }
     
+    @objc func onSync(_: Any?) {
+
+
+
+
+
+
+            guard let doc = view.window?.windowController?.document as? Document else {
+                NSLog("🔴 NextGenSplitViewController::load Document not set!")
+                return
+            }
+            
+            if doc.hasUnautosavedChanges || doc.isDocumentEdited {
+                NSLog("NextGenSplitViewController::onSync: Sync called but there are unsaved changes. Saving then syncing...")
+                NSApplication.shared.sendAction(#selector(NSDocument.save(_:)), to: nil, from: self)
+            }
+            else {
+                NSLog("NextGenSplitViewController::onSync: Sync called and NO unsaved changes. Syncing...")
+                DatabasesCollection.shared.sync(uuid: database.databaseUuid, allowInteractive: true)
+            }
+
+    }
+    
     func createOrEdit(_ createNew: Bool = true) {
         if database.locked || database.isEffectivelyReadOnly {
             NSLog("🔴 Cannot edit locked or read-only database")
@@ -255,7 +465,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
     
     @objc func showChangeMasterCredentials() {
-        NSApplication.shared.sendAction(#selector(WindowController.onChangeMasterPassword(_:)), to: nil, from: self) 
+        NSApplication.shared.sendAction(#selector(WindowController.onChangeMasterPassword(_:)), to: nil, from: self)
     }
     
     @IBAction func onFind(_: Any?) {
@@ -448,14 +658,15 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         static let databasePreferences = NSToolbarItem.Identifier("databasePreferencesToolbarItem")
         static let lockDatabase = NSToolbarItem.Identifier("lockDatabaseToolbarItem")
         static let popoutDetails = NSToolbarItem.Identifier("popoutDetailsToolbarItem")
+        static let syncButton = NSToolbarItem.Identifier("syncToolbarItem")
     }
     
     func setupToolbar() {
-        let toolbar = NSToolbar(identifier: "nextgen-toolbar-identifier-version-8.0")
+        let toolbar = NSToolbar(identifier: "nextgen-toolbar-identifier-version-9.0")
         
         toolbar.autosavesConfiguration = true
         toolbar.delegate = self
-        toolbar.allowsUserCustomization = false 
+        toolbar.allowsUserCustomization = true 
         toolbar.displayMode = .iconOnly
         
         guard let window = view.window else {
@@ -473,6 +684,8 @@ extension NextGenSplitViewController: NSToolbarDelegate {
                     NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.databasePreferences,
                     ToolbarItemIdentifiers.masterTracking,
+                    ToolbarItemIdentifiers.syncButton,
+                    NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.createGroup,
                     ToolbarItemIdentifiers.addEntry,
                     ToolbarItemIdentifiers.searchField,
@@ -494,6 +707,8 @@ extension NextGenSplitViewController: NSToolbarDelegate {
                     NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.databasePreferences,
                     ToolbarItemIdentifiers.masterTracking,
+                    ToolbarItemIdentifiers.syncButton,
+                    NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.createGroup,
                     ToolbarItemIdentifiers.addEntry,
                     ToolbarItemIdentifiers.searchField,
@@ -608,6 +823,32 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         return toolbarItem
     }
     
+    func getSyncToolbarItem() -> NSToolbarItem {
+        let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.syncButton)
+
+        let image : NSImage
+        if #available(macOS 11.0, *) {
+            image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)!
+        } else {
+            image = NSImage(named: NSImage.folderName)! 
+        }
+
+        let button = NSButton(image: image, target: self, action: #selector(onSync))
+        button.isBordered = false
+        toolbarItem.view = button
+        
+        let loc = NSLocalizedString("generic_action_sync", comment: "Sync")
+
+        toolbarItem.label = loc
+        toolbarItem.paletteLabel = loc
+        toolbarItem.toolTip = loc
+        toolbarItem.isEnabled = true
+
+        toolbarItem.action = #selector(onSync)
+        
+        return toolbarItem
+    }
+    
     func getCreateEntryToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.addEntry)
         
@@ -672,7 +913,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
     }
     
     func getDatabasePreferencesToolbarItem() -> NSToolbarItem {
-        let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.toggleSideBar)
+        let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.databasePreferences)
         
         let menu = NSMenu(title: "")
         
@@ -726,6 +967,9 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         }
         else if itemIdentifier == ToolbarItemIdentifiers.editEntry {
             return getEditEntryToolbarItem()
+        }
+        else if itemIdentifier == ToolbarItemIdentifiers.syncButton {
+            return getSyncToolbarItem()
         }
         else if itemIdentifier == ToolbarItemIdentifiers.addEntry {
             return getCreateEntryToolbarItem()
@@ -827,7 +1071,10 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onEditEntry) {
             return !database.locked && database.nextGenSelectedItems.count == 1 && !database.isEffectivelyReadOnly
-        } else if action == #selector(onFind) {
+        } else if action == #selector(onSync) {
+            return !database.locked && !database.isEffectivelyReadOnly && !database.isInOfflineMode
+        }
+        else if action == #selector(onFind) {
             return !database.locked
         } else if action == #selector(onShowHideQuickView(_:)) {
             return !database.locked

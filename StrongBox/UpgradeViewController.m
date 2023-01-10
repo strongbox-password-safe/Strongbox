@@ -379,18 +379,30 @@
             }
             else {
                 if( !AppPreferences.sharedInstance.isPro ) {
-                    [Alerts info:self
-                           title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
-                         message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
-                      completion:nil];
+                    [self tryRefreshReceiptAfterRestorePurchases];
                 }
                 else {
-                    dispatch_async(dispatch_get_main_queue(), ^(void) {
-                        [self dismiss];
-                    });
+                    [self dismiss];
                 }
             }
         });
+    }];
+}
+
+- (void)tryRefreshReceiptAfterRestorePurchases {
+    [ProUpgradeIAPManager.sharedInstance refreshReceiptAndCheckForProEntitlements:^{
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            if( !AppPreferences.sharedInstance.isPro ) {
+                [Alerts info:self
+                       title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
+                     message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
+                  completion:nil];
+            }
+            else {
+                [self dismiss];
+            }
+        });
+
     }];
 }
 

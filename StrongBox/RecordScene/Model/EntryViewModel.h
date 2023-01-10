@@ -66,7 +66,10 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 @property BOOL sortCustomFields;
 
 - (void)removeCustomFieldAtIndex:(NSUInteger)index;
+
 - (NSUInteger)addCustomField:(CustomFieldViewModel*)field;
+- (NSUInteger)addCustomField:(CustomFieldViewModel*)field atIndex:(NSUInteger)atIndex;
+
 - (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx;
 
 @end

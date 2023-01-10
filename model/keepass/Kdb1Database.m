@@ -364,7 +364,11 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     
     if(entry.binaryFileName.length) {
         NSInputStream* str = [NSInputStream inputStreamWithData:entry.binaryData];
-        DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:str protectedInMemory:NO compressed:NO];
+        
+        DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:str
+                                                                               length:entry.binaryData.length
+                                                                    protectedInMemory:NO
+                                                                           compressed:NO];
         [attachments addObject:dbAttachment];
         fields.attachments[entry.binaryFileName] = dbAttachment;
     }

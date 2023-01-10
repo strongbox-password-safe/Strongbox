@@ -58,7 +58,12 @@
 }
 
 - (void)refresh {
-    self.items = [self.viewModel sortItemsForBrowse:self.currentGroup.childGroups browseSortField:self.viewModel.metadata.browseSortField descending:self.viewModel.metadata.browseSortOrderDescending foldersSeparately:YES];
+    BrowseSortConfiguration* sortConfig = [self.viewModel getDefaultSortConfiguration];
+    
+    self.items = [self.viewModel sortItemsForBrowse:self.currentGroup.childGroups
+                                    browseSortField:sortConfig.field
+                                         descending:sortConfig.descending
+                                  foldersSeparately:sortConfig.foldersOnTop];
         
     self.buttonSelectThisDestination.enabled = [self isValidDestination:self.currentGroup validIfContainsAValidDestination:NO];
     

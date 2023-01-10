@@ -212,11 +212,7 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     
 
     NSString * searchTerm = getCompanyOrOrganisationNameFromDomain(domain);
-    items = [self getMatchingItems:searchTerm scope:kSearchScopeAll];
-    if(items.count) {
-        self.searchField.stringValue = domain;
-        return;
-    }
+    self.searchField.stringValue = searchTerm;
 }
 
 NSString *getPublicDomain(NSString* url) {
@@ -228,25 +224,7 @@ NSString *getPublicDomain(NSString* url) {
         return @"";
     }
 
-    NSString *domain = [BrowserAutoFillManager extractDomainFromUrlWithUrl:url];
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    return domain;
+    return [BrowserAutoFillManager extractPSLDomainFromUrlWithUrl:url];
 }
 
 NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
@@ -256,9 +234,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     
     NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
     
-    NSLog(@"%@", parts);
-    
-    NSString *searchTerm =  parts.count ? parts[0] : domain;
+    NSString *searchTerm = parts.count ? parts[0] : domain;
     return searchTerm;
 }
 

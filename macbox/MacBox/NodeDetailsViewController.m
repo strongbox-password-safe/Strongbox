@@ -116,6 +116,7 @@
 
 @property (readonly) BOOL isEffectivelyReadOnly;
 @property BOOL quickRevealButtonDown;
+@property (weak) IBOutlet NSButton *buttonNewEntryDefaults;
 
 @end
 
@@ -586,6 +587,8 @@ static NSString* trimField(NSTextField* textField) {
     self.imageViewIcon.image = [self getIconForNode];
     self.imageViewIcon.onClick = ^{ [weakSelf onEditNodeIcon]; };
     self.imageViewIcon.showClickableBorder = YES;
+    
+    self.buttonNewEntryDefaults.hidden = !self.newEntry;
     
     self.labelID.stringValue = self.model.format == kPasswordSafe ? self.node.uuid.UUIDString : keePassStringIdFromUuid(self.node.uuid);
     self.labelCreated.stringValue = self.node.fields.created ? self.node.fields.created.friendlyDateTimeString : @"";
@@ -1439,8 +1442,16 @@ static NSString* trimField(NSTextField* textField) {
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
             for (NSURL* url in openPanel.URLs) {
-                NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:url.path];
-                DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithStream:stream protectedInMemory:YES compressed:YES];
+                NSError* error;
+                NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
+
+                if ( !data || error ) {
+                    NSLog(@"Error reading attahment! - [%@]", error);
+                    return;
+                }
+                
+                DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:YES];
+                
                 NSString* filename = url.lastPathComponent;
                 [self.model addItemAttachment:self.node filename:filename attachment:dbA];
             }

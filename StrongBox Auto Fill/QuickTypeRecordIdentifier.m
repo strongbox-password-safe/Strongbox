@@ -25,6 +25,10 @@ static NSString* const kFieldKeyKey = @"fieldKey";
 }
 
 + (instancetype)fromJson:(NSString *)json {
+    if ( !json ) {
+        return nil;
+    }
+    
     NSError* error;
     NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     

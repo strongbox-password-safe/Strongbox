@@ -155,7 +155,7 @@ static UpgradeWindowController *sharedInstance = nil;
     self.buttonNoThanks.enabled = NO;
     [self showProgressIndicator];
 
-    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];
+    [[SKPaymentQueue defaultQueue] restoreCompletedTransactions];    
 }
 
 #pragma mark StoreKit Delegate

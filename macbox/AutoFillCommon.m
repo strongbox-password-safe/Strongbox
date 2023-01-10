@@ -19,14 +19,13 @@ static NSString* const kMailToScheme = @"mailto";
                           alternativeUrls:(BOOL)alternativeUrls
                              customFields:(BOOL)customFields
                                     notes:(BOOL)notes {
-    NSMutableSet<NSString*> *uniqueUrls = [NSMutableSet set];
-    NSMutableArray<NSString*> *explicitUrls = [NSMutableArray array];
+    NSMutableArray<NSString*> *collectedUrls = [NSMutableArray array];
     
     
     
     NSString* urlField = [database dereference:node.fields.url node:node];
     if(urlField.length) {
-        [explicitUrls addObject:urlField];
+        [collectedUrls addObject:urlField];
     }
     
     
@@ -35,32 +34,11 @@ static NSString* const kMailToScheme = @"mailto";
         for ( NSString* altUrl in node.fields.alternativeUrls) {
             if(altUrl.length) {
                 NSString* derefed = [database dereference:altUrl node:node];
-                [explicitUrls addObject:derefed];
+                [collectedUrls addObject:derefed];
             }
         }
     }
-    
-    
-
-    for ( NSString* expUrl in explicitUrls ) {
-        NSURL* parsed = expUrl.urlExtendedParse;
-
-        if ( parsed ) {
-            NSURLComponents* components = [NSURLComponents componentsWithURL:parsed resolvingAgainstBaseURL:NO];
-            
-            if ( !components.scheme.length ) { 
-                NSString* urlString = [NSString stringWithFormat:@"https:
-                [uniqueUrls addObject:urlString];
-            }
-            else {
-                [uniqueUrls addObject:expUrl];
-            }
-        }
-        else {
-            [uniqueUrls addObject:expUrl];
-        }
-    }
-    
+        
     
     
     if ( customFields ) {
@@ -68,7 +46,7 @@ static NSString* const kMailToScheme = @"mailto";
             if ( ![NodeFields isAlternativeURLCustomFieldKey:key] ) { 
                 StringValue* strValue = node.fields.customFields[key];
                 NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
-                [uniqueUrls addObjectsFromArray:foo];
+                [collectedUrls addObjectsFromArray:foo];
             }
         }
     }
@@ -80,11 +58,22 @@ static NSString* const kMailToScheme = @"mailto";
 
         if(notesField.length) {
             NSArray<NSString*> *foo = [AutoFillCommon findUrlsInString:notesField];
-            [uniqueUrls addObjectsFromArray:foo];
+            [collectedUrls addObjectsFromArray:foo];
         }
     }
-                                       
-   return uniqueUrls;
+    
+    
+    
+    
+    NSMutableSet<NSString*> *uniqueUrls = [NSMutableSet set];
+    for ( NSString* expUrl in collectedUrls ) {
+        NSURL* parsed = expUrl.urlExtendedParseAddingDefaultScheme;
+        if ( parsed && parsed.absoluteString ) {
+            [uniqueUrls addObject:parsed.absoluteString];
+        }
+    }
+                                   
+    return uniqueUrls;
 }
 
 + (NSArray<NSString*>*)findUrlsInString:(NSString*)target {

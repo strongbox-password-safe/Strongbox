@@ -71,7 +71,7 @@ class DetailViewController: NSViewController {
     }
 
     @objc func refresh() {
-        NSLog("✅ DetailViewController::refresh")
+
         cached = nil
         tableView.reloadData()
     }
@@ -107,13 +107,13 @@ class DetailViewController: NSViewController {
         let selectedNode: Node
 
         guard let dbModel = database.commonModel else {
-            NSLog("✅ DetailViewController::load - empty")
+
             return []
         }
 
         if let fixedItemUuid = fixedItemUuid {
             guard let node = database.getItemBy(fixedItemUuid) else {
-                NSLog("✅ DetailViewController::load - empty")
+                NSLog("✅ DetailViewController::load - fixedItemUuid empty")
                 return []
             }
 
@@ -124,14 +124,14 @@ class DetailViewController: NSViewController {
                   let uuid = database.nextGenSelectedItems.first,
                   let node = database.getItemBy(uuid)
             else {
-                NSLog("✅ DetailViewController::load - empty")
+                NSLog("✅ DetailViewController::load - database.nextGenSelectedItems could not find")
                 return []
             }
 
             selectedNode = node
         }
 
-        NSLog("✅ DetailViewController::load - Not Empty [%@]", String(describing: database.nextGenSelectedItems))
+
 
         let model = EntryViewModel.fromNode(selectedNode, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
 
@@ -252,9 +252,9 @@ class DetailViewController: NSViewController {
                                 object: DetailsViewField.FieldType.url)
     }
 
-    func getUrlField(_ model: EntryViewModel, _: Node, _ dereferencedPassword: String) -> DetailsViewField {
+    func getUrlField(_ model: EntryViewModel, _ node : Node, _ dereferencedPassword: String) -> DetailsViewField {
         return DetailsViewField(name: NSLocalizedString("generic_fieldname_url", comment: "URL"),
-                                value: model.url,
+                                value: dereference(model.url, node: node),
                                 fieldType: .url,
                                 object: dereferencedPassword)
     }
@@ -671,6 +671,23 @@ class DetailViewController: NSViewController {
                     NSLog("🔴 Could not find Notes Field!")
                 }
             }
+            else if field.object as? DetailsViewField.FieldType == .some(.customField) {
+                let itemAscending = NSMenuItem(title: NSLocalizedString("generic_sort_order_ascending", comment: "Ascending"), action: #selector(onToggleCustomFieldsSortOrder(sender:)), keyEquivalent: "")
+                
+                itemAscending.representedObject = NSNumber(booleanLiteral: false)
+                itemAscending.target = self
+                itemAscending.state = database.customSortOrderForFields ? .off : .on
+                
+                let itemCustom = NSMenuItem(title: NSLocalizedString("generic_sort_order_custom", comment: "Custom"), action: #selector(onToggleCustomFieldsSortOrder(sender:)), keyEquivalent: "")
+                itemCustom.representedObject = NSNumber(booleanLiteral: true)
+                itemCustom.target = self
+                itemCustom.state = database.customSortOrderForFields ? .on : .off
+
+                menu.addItem(itemAscending)
+                menu.addItem(itemCustom)
+                
+                return
+            }
         }
 
         
@@ -746,6 +763,18 @@ class DetailViewController: NSViewController {
         }
 
         launchUrl(field)
+    }
+
+    @objc
+    func onToggleCustomFieldsSortOrder(sender: Any?) {
+        guard let menuItem = sender as? NSMenuItem, let sort = menuItem.representedObject as? NSNumber else {
+            return
+        }
+        
+        NSLog("onToggleCustomFieldsSortOrder: %hhd", sort.boolValue)
+        
+        database.customSortOrderForFields = sort.boolValue
+        refresh()
     }
 
     @objc
@@ -1118,7 +1147,7 @@ extension DetailViewController: DocumentViewController {
         tableView.register(NSNib(nibNamed: AuditIssueTableCellView.nibName, bundle: nil), forIdentifier: AuditIssueTableCellView.reuseIdentifier)
 
         tableView.selectionHighlightStyle = .regular
-        tableView.overrideValidateProposedFirstResponderForRow = overrideValidateProposedFirstResponderForRow(row:)
+        tableView.overrideValidateProposedFirstResponderForRow = { [weak self] row in self?.overrideValidateProposedFirstResponderForRow(row: row) }
 
         if #available(macOS 10.13, *) {
             tableView.registerForDraggedTypes([.fileURL])
@@ -1185,7 +1214,7 @@ extension DetailViewController: DocumentViewController {
             return
         }
 
-        NSLog("✅ DetailViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
+
 
         refresh()
     }
@@ -1229,8 +1258,8 @@ extension DetailViewController: NSTableViewDelegate {
             }
 
             cell.setContent(field,
-                            popupMenuUpdater: onPopupMenuNeedsUpdate,
-                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? onCopyField : nil)
+                            popupMenuUpdater:  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) },
+                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil)
 
             cell.onLaunch = { [weak self] in
                 self?.launchUrl(field)
@@ -1254,7 +1283,7 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.setContent(field, popupMenuUpdater: onPopupMenuNeedsUpdate)
+            cell.setContent(field, popupMenuUpdater:  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) })
 
             return cell
         case .customField:
@@ -1263,8 +1292,8 @@ extension DetailViewController: NSTableViewDelegate {
             }
 
             cell.setContent(field,
-                            popupMenuUpdater: onPopupMenuNeedsUpdate,
-                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? onCopyField : nil,
+                            popupMenuUpdater:  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) },
+                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil,
                             containingWindow: view.window)
 
             return cell
@@ -1284,10 +1313,19 @@ extension DetailViewController: NSTableViewDelegate {
 
             let subtype = field.object as? DetailsViewField.FieldType
 
+            var sortImage : NSImage? = nil
+            if #available(macOS 11.0, *) {
+                sortImage = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: nil)
+            }
+            
+            let sortTitle = String(format: NSLocalizedString("sort_status_fmt", comment: "Sort: %@"), database.customSortOrderForFields ? NSLocalizedString("generic_sort_order_custom", comment: "Custom") : NSLocalizedString("generic_sort_order_ascending", comment: "Ascending"));
+            
             cell.setContent(field,
-                            popupMenuUpdater: subtype == .some(.notes) ? onPopupMenuNeedsUpdate(_:_:) : nil,
+                            popupMenuUpdater: (subtype == .some(.notes) || subtype == .some(.customField)) ?  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) } : nil,
                             showCopyButton: subtype == .some(.notes),
-                            onCopyClicked: subtype == .some(.notes) ? onCopyEntiresNotes : nil)
+                            onCopyClicked: subtype == .some(.notes) ? { [weak self] in self?.onCopyEntiresNotes() } : nil,
+                            popupMenuImage: (subtype == .some(.customField) ? sortImage : nil),
+                            popupMenuText: (subtype == .some(.customField) ? sortTitle : ""))
 
             return cell
         case .metadata:
@@ -1312,7 +1350,7 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.setContent(field, popupMenuUpdater: onPopupMenuNeedsUpdate)
+            cell.setContent(field, popupMenuUpdater:  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) })
             return cell
         case .totp:
             guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("TotpTableCellView"), owner: nil) as? TotpTableCellView else {
@@ -1320,8 +1358,8 @@ extension DetailViewController: NSTableViewDelegate {
             }
 
             cell.setContent(field,
-                            popupMenuUpdater: onPopupMenuNeedsUpdate,
-                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? onCopyField : nil)
+                            popupMenuUpdater: { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) } ,
+                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil)
 
             return cell
         case .auditIssue:

@@ -45,7 +45,6 @@
 #ifndef IS_APP_EXTENSION
 
 #import "OfflineDetector.h"
-#import "ISMessages/ISMessages.h"
 
 #endif
 
@@ -123,11 +122,11 @@
     self.completion = completion;
     
     IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self.viewController
-                                                                                     database:self.database
-                                                                               isAutoFillOpen:self.isAutoFillOpen
-                                                                      isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
-                                                                          biometricPreCleared:biometricPreCleared
-                                                                          noConvenienceUnlock:noConvenienceUnlock];
+                                                                                           database:self.database
+                                                                                     isAutoFillOpen:self.isAutoFillOpen
+                                                                            isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
+                                                                                biometricPreCleared:biometricPreCleared
+                                                                                noConvenienceUnlock:noConvenienceUnlock];
     
     [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
@@ -138,10 +137,10 @@
             [DuressActionHelper performDuressAction:self.viewController database:self.database isAutoFillOpen:self.isAutoFillOpen completion:self.completion];
         }
         else if (result == kGetCompositeKeyResultError) {
-            self.completion(kUnlockDatabaseResultError, nil, nil, error);
+            self.completion(kUnlockDatabaseResultError, nil, error);
         }
         else {
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
     }];
 }
@@ -157,17 +156,62 @@
 
 - (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors {
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
-    BOOL userLikelyOffline = [self userIsLikelyOffline];
-    
-    BOOL isPro = AppPreferences.sharedInstance.isPro;
-
-    BOOL userOfflineLineAndConfiguredForImmediateOffline = userLikelyOffline && self.database.offlineDetectedBehaviour == kOfflineDetectedBehaviourImmediateOffline;
-    if( self.isAutoFillOpen || self.offlineExplicitlyRequested || userOfflineLineAndConfiguredForImmediateOffline ) {
+  
+    if( self.isAutoFillOpen || self.offlineExplicitlyRequested ) {
+        NSLog(@"✅ beginUnlockWithCredentials - AutoFill or Explicit Offline Request Mode... Unlocking Local if available.");
+        
         if(localCopyUrl == nil) {
             [Alerts warn:self.viewController
                    title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Offline")
                  message:NSLocalizedString(@"open_sequence_couldnt_open_local_message", @"Could not open Strongbox's local copy of this database. A online sync is required.")];
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+            return;
+        }
+
+        BOOL forceReadOnly = !self.isAutoFillOpen && !AppPreferences.sharedInstance.isPro;
+        [self unlockLocalCopy:factors forceReadOnly:forceReadOnly offline:YES];
+    }
+    else {
+        SyncStatus *status = [SyncManager.sharedInstance getSyncStatus:self.database];
+        BOOL syncStateGood = status.state == kSyncOperationStateInitial || status.state == kSyncOperationStateDone;
+        
+        syncStateGood = syncStateGood | self.database.persistLazyEvenLastSyncErrors; 
+        
+        if ( syncStateGood && localCopyUrl && self.database.storageProvider != kLocalDevice && self.database.lazySyncMode ) {
+            
+            
+            
+            [self beginLazySyncModeWithCredentials:factors];
+        }
+        else {
+            [self beginEagerSyncModeWithCredentials:factors];
+        }
+    }
+}
+
+- (void)beginLazySyncModeWithCredentials:(CompositeKeyFactors*)factors {
+    NSLog(@"✅ beginLazySyncModeWithCredentials");
+
+    [self unlockLocalCopy:factors forceReadOnly:NO offline:self.database.forceOpenOffline];
+}
+
+- (void)beginEagerSyncModeWithCredentials:(CompositeKeyFactors*)factors {
+    NSLog(@"✅ beginEagerSyncModeWithCredentials");
+    
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
+
+    BOOL userLikelyOffline = [self userIsLikelyOffline];
+    
+    BOOL isPro = AppPreferences.sharedInstance.isPro;
+
+    BOOL userOfflineAndConfiguredForImmediateOffline = userLikelyOffline && self.database.offlineDetectedBehaviour == kOfflineDetectedBehaviourImmediateOffline;
+    
+    if( userOfflineAndConfiguredForImmediateOffline ) {
+        if(localCopyUrl == nil) {
+            [Alerts warn:self.viewController
+                   title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Offline")
+                 message:NSLocalizedString(@"open_sequence_couldnt_open_local_message", @"Could not open Strongbox's local copy of this database. A online sync is required.")];
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             return;
         }
         
@@ -201,7 +245,7 @@
                 [self syncAndUnlock:factors];
             }
             else {
-                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
         }];
     }
@@ -233,7 +277,7 @@
             }
             else if (result == kSyncAndMergeResultUserCancelled) {
                 
-                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
             else if (result == kSyncAndMergeError) {
                 [self handleSyncAndMergeError:factors error:error];
@@ -244,7 +288,7 @@
             }
             else {
                 NSLog(@"WARNWARN: Unknown response from Sync: %lu", (unsigned long)result);
-                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
         });
     }];
@@ -256,7 +300,7 @@
         [self askAboutRelocatingDatabase:factors];
     }
     else if ( error.code == kStorageProviderSFTPorWebDAVSecretMissingErrorCode ) {
-        self.completion(kUnlockDatabaseResultError, nil, nil, error);
+        self.completion(kUnlockDatabaseResultError, nil, error);
     }
     else {
         if ( self.database.couldNotConnectBehaviour == kCouldNotConnectBehaviourOpenOffline ) {
@@ -281,10 +325,10 @@
                     [self openOffline:factors];
                 }
                 else if ( response == 2) { 
-                    self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil, nil);
+                    self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil);
                 }
                 else {
-                    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+                    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
                 }
             }];
         }
@@ -297,7 +341,14 @@
 }
 
 - (void)unlockLocalCopy:(CompositeKeyFactors*)factors forceReadOnly:(BOOL)forceReadOnly offline:(BOOL)offline {
-    DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.database viewController:self.viewController forceReadOnly:forceReadOnly isAutoFillOpen:self.isAutoFillOpen offlineMode:offline];
+    NSLog(@"✅ unlockLocalCopy");
+    
+    DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.database
+                                                        viewController:self.viewController
+                                                         forceReadOnly:forceReadOnly
+                                      isNativeAutoFillAppExtensionOpen:self.isAutoFillOpen
+                                                           offlineMode:offline];
+    
     [unlocker unlockLocalWithKey:factors keyFromConvenience:self.unlockedWithConvenienceFactors completion:self.completion];
 }
 
@@ -334,7 +385,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
             [self unlockLocalCopy:factors forceReadOnly:!isPro offline:YES];
         }
         else {
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
     }];
 }
@@ -354,7 +405,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
     sharedInstance = nil;
-    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
@@ -398,7 +449,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
         [Alerts warn:self.viewController
                title:@"Error Opening This Database"
              message:@"Could not access this file."];
-        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
     }
     else {
         NSError* error;
@@ -407,7 +458,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
             [Alerts error:self.viewController
                     title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                     error:error];
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             return;
         }
         
@@ -435,7 +486,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
         [Alerts error:self.viewController
                 title:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
                 error:error];
-        self.completion(kUnlockDatabaseResultError, nil, nil, nil);
+        self.completion(kUnlockDatabaseResultError, nil, nil);
     }
     else {
         NSString* identifier = [FilesAppUrlBookmarkProvider.sharedInstance getJsonFileIdentifier:bookMark];

@@ -44,11 +44,12 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
-@interface WindowController ()
+@interface WindowController () <NSWindowDelegate>
 
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController; 
 @property (readonly, nullable) ViewModel* viewModel;
+@property (readonly) BOOL databaseIsLocked;
 
 @end
 
@@ -70,11 +71,15 @@ static NSString* getFreeTrialSuffix() {
     Document* doc = (Document*)self.document;
     
     NSMutableArray* statusii = NSMutableArray.array;
-    if ( doc.viewModel.offlineMode || doc.viewModel.alwaysOpenOffline ) {
-        [statusii addObject:NSLocalizedString(@"database_offline_mode_window_suffix", @"Offline")];
-    }
+    
     if ( doc.viewModel.isEffectivelyReadOnly ) {
         [statusii addObject:NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read-Only")];
+    }
+    
+    BOOL offlineMode = doc.viewModel.isInOfflineMode || doc.viewModel.alwaysOpenOffline || doc.viewModel.databaseMetadata.userRequestOfflineOpenEphemeralFlagForDocument;
+    
+    if ( offlineMode ) {
+        [statusii addObject:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")];
     }
     
     return statusii;
@@ -238,9 +243,7 @@ static NSString* getFreeTrialSuffix() {
 }
 
 - (void)changeContentView {
-    Document* doc = self.document;
-
-    NSLog(@"WindowController::updateContentView - doc=[%@], doc.isLocked = [%hhd]", doc, doc.isLocked);
+    NSLog(@"WindowController::changeContentView - isLocked = [%hhd]", self.databaseIsLocked);
     
     [self bindFloatWindowOnTop];
     
@@ -249,7 +252,7 @@ static NSString* getFreeTrialSuffix() {
     CGRect oldFrame = self.contentViewController.view.frame;
     NSViewController* vc;
     
-    if ( !doc || doc.isModelLocked ) {
+    if ( self.databaseIsLocked ) {
         NSStoryboard* storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
         vc = [storyboard instantiateControllerWithIdentifier:@"LockScreen"];
     }
@@ -267,34 +270,19 @@ static NSString* getFreeTrialSuffix() {
     
     
     [vc.view setFrame:oldFrame];
-
     self.contentViewController = vc;
-
-    if ( doc ) { 
-        if ( [self.contentViewController respondsToSelector:@selector(onDocumentLoaded)]) {
-            [self.contentViewController performSelector:@selector(onDocumentLoaded)];
-        }
+    if ( [self.contentViewController respondsToSelector:@selector(onDocumentLoaded)]) {
+        [self.contentViewController performSelector:@selector(onDocumentLoaded)];
     }
     
-    if ( doc && !doc.isModelLocked ) {
+    
+    
+    if ( !self.databaseIsLocked ) {
         if ( Settings.sharedInstance.nextGenUI ) {
             self.window.titlebarAppearsTransparent = NO;
         }
         
-        BOOL hide = NO; 
-        
-        self.window.isVisible = !hide;
-        
-        if ( hide ) {
-            
-            
-            
-        }
-        else {
-            [self maybeOnboardDatabase];
-            
-            [self listenToEventsOfInterest];
-        }
+        [self maybeOnboardDatabase];
     }
     else {
         if ( Settings.sharedInstance.nextGenUI ) {
@@ -305,12 +293,19 @@ static NSString* getFreeTrialSuffix() {
             }
         }
     }
+    
+    [self listenToEventsOfInterest];
+}
+
+- (BOOL)databaseIsLocked {
+    return self.viewModel.locked;
 }
 
 - (ViewModel *)viewModel {
     Document* doc = self.document;
-
-    return doc ? doc.viewModel : nil;
+    ViewModel* viewModel = doc ? doc.viewModel : nil;
+    
+    return viewModel;
 }
 
 - (MacDatabasePreferences*)databaseMetadata {
@@ -787,11 +782,12 @@ static NSString* getFreeTrialSuffix() {
     
     
     
-    if ( theAction == @selector(onVCToggleOfflineMode:)) {
-        menuItem.state = self.databaseMetadata.offlineMode ? NSControlStateValueOn : NSControlStateValueOff;
-        return !self.databaseMetadata.isLocalDeviceDatabase;
-    }
-    else if ( theAction == @selector(onVCToggleShowEntryCountInSidebar:)) {
+
+
+
+
+
+    if ( theAction == @selector(onVCToggleShowEntryCountInSidebar:)) {
         menuItem.state = self.viewModel.showChildCountOnFolderInSidebar ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
@@ -813,7 +809,7 @@ static NSString* getFreeTrialSuffix() {
     }
     else if ( theAction == @selector(onVCToggleReadOnly:)) {
         menuItem.state = self.viewModel.isEffectivelyReadOnly ? NSControlStateValueOn : NSControlStateValueOff;
-        return !self.viewModel.offlineMode; 
+        return YES;
     }
     else if ( theAction == @selector(onVCToggleLaunchAtStartup:)) {
         menuItem.state = self.databaseMetadata.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff;
@@ -1081,28 +1077,31 @@ static NSString* getFreeTrialSuffix() {
 
 
 
+- (void)unsubscribeFromNotifications {
+    NSLog(@"✅ WindowController::unsubscribeFromNotifications");
+    
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+    [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
+}
+
 - (void)listenToEventsOfInterest {
     NSLog(@"✅ WindowController::listenToEventsOfInterest");
     
-    
-    
-    
-    
-
     [self unsubscribeFromNotifications]; 
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onDatabasePreferencesChanged:) name:kModelUpdateNotificationDatabasePreferenceChanged object:nil];
-
-    NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
-    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onScreenLocked) name:notificationName object:nil];
+    if ( !self.databaseIsLocked ) { 
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(onDatabaseModelPreferencesChanged:) name:kModelUpdateNotificationDatabasePreferenceChanged object:nil];
+    }
     
-    NSString* notificationName2 = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"sessionDidMoveOffConsole"]; 
-    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onSessionDidMoveOffConsole) name:notificationName2 object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onDatabasePreferencesChanged:) name:kUpdateNotificationDatabasePreferenceChanged object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onDatabasePreferencesChanged:) name:kDatabasesCollectionLockStateChangedNotification object:nil];
 }
 
 - (void)onPreferencesChanged:(NSNotification*)notification {
@@ -1119,120 +1118,31 @@ static NSString* getFreeTrialSuffix() {
 }
 
 - (void)onDatabasePreferencesChanged:(NSNotification*)notification {
+    if ( ![notification.object isEqualToString:self.viewModel.databaseUuid] ) {
+        return;
+    }
+    
+    [self onGenericDatabasePreferencesChanged];
+}
+
+- (void)onDatabaseModelPreferencesChanged:(NSNotification*)notification {
     if ( notification.object != self.viewModel ) {
         return;
     }
 
+    [self onGenericDatabasePreferencesChanged];
+}
+
+- (void)onGenericDatabasePreferencesChanged {
     NSLog(@"WindowController::onDatabasePreferencesChanged");
     
-    [self synchronizeWindowTitleWithDocumentName]; 
-}
-
-- (void)unsubscribeFromNotifications {
-    NSLog(@"✅ WindowController::unsubscribeFromNotifications");
-    
-    [NSNotificationCenter.defaultCenter removeObserver:self];
-    [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
-}
-
-- (void)onAutoLock:(NSNotification*)notification {
-    if( self.viewModel && !self.viewModel.locked ) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self onLock:nil];
-        });
-    }
-}
-
-- (void)onSessionDidMoveOffConsole {
-    if ( self.viewModel && !self.viewModel.locked && self.viewModel.lockOnScreenLock ) {
-        NSLog(@"onSessionDidMoveOffConsole: Locking Database");
-        [self onLock:nil];
-    }
-}
-
-- (void)onScreenLocked {
-    if ( self.viewModel && !self.viewModel.locked && self.viewModel.lockOnScreenLock ) {
-        NSLog(@"onScreenLocked: Locking Database");
-        [self onLock:nil];
-    }
-}
-
-- (BOOL)isNextGenEditsInProgress {
-    if ( Settings.sharedInstance.nextGenUI ) {
-        NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
-        
-        return vc.editsInProgress;
-    }
-    
-    return NO;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self synchronizeWindowTitleWithDocumentName]; 
+    });
 }
 
 - (void)onLock:(id)sender {
-    if(self.viewModel && !self.viewModel.locked) {
-        BOOL isEditing = [self isNextGenEditsInProgress];
-        
-        if ( isEditing && !Settings.sharedInstance.lockEvenIfEditing ) {
-            NSLog(@"⚠️ NOT Locking because there is an edit in progress.");
-            return;
-        }
-        
-        if ( self.viewModel.document.isDocumentEdited ) {
-
-
-
-                    NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
-                    
-                    [macOSSpinnerUI.sharedInstance show:loc viewController:self.contentViewController];
-                    
-                    [self.viewModel.document saveDocumentWithDelegate:self didSaveSelector:@selector(onSaveDoneLockCompletion:) contextInfo:nil];
-
-
-
-
-
-        }
-        else {
-            
-            
-            [self onSaveDoneLockCompletion:nil];
-        }
-    }
-}
-
-- (IBAction)onSaveDoneLockCompletion:(id)sender {
-    [macOSSpinnerUI.sharedInstance dismiss];
-
-    Document* doc = self.document;
-
-    if ( Settings.sharedInstance.nextGenUI ) {
-        
-        
-        NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
-
-                
-        [vc onLockDoneKillAllWindows];
-        
-        [doc lock:nil];
-    }
-    else {
-        Node* item = [self getSingleSelectedItem];
-        NSString* sid = [self.viewModel.database getCrossSerializationFriendlyIdId:item.uuid];
-        ViewController* vc = (ViewController*)self.contentViewController;
-        
-        [vc closeAllDetailsWindows:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [doc lock:sid];
-                [vc onLockDone];
-            });
-        }];
-    }
-    
-    
-
-    if ( Settings.sharedInstance.clearClipboardEnabled ) {
-        AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-        [appDelegate clearClipboardWhereAppropriate];
-    }
+    [self.viewModel.document initiateLockSequence];
 }
 
 
@@ -1297,10 +1207,10 @@ static NSString* getFreeTrialSuffix() {
 }
 
 - (IBAction)onPrintDatabase:(id)sender {
-    NSString* loc = NSLocalizedString(@"mac_database_print_emergency_sheet_fmt", @"%@ Emergency Sheet");
-    
-    NSString* databaseName = [NSString stringWithFormat:loc, self.databaseMetadata.nickName];
-    NSString* htmlString = [self.viewModel getHtmlPrintString:databaseName];
+
+
+
+    NSString* htmlString = [self.viewModel getHtmlPrintString:self.databaseMetadata.nickName];
 
     
     
@@ -1324,22 +1234,6 @@ static NSString* getFreeTrialSuffix() {
     });
 }
 
-- (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
-    [self.viewModel setCompositeKeyFactors:ckf];
-
-    MacDatabasePreferences* md = self.databaseMetadata;
-    md.conveniencePassword = ckf.password;
-
-    if ( self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile ) {
-        md.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
-    }
-    else {
-        md.keyFileBookmark = nil;
-    }
-    
-    md.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
-}
-
 - (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
     if(self.viewModel && !self.viewModel.locked) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1355,10 +1249,10 @@ static NSString* getFreeTrialSuffix() {
             self.changeMasterPassword.initialKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
             
             [self.window beginSheet:self.changeMasterPassword.window
-                       completionHandler:^(NSModalResponse returnCode) {
+                  completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
                     NSError* error;
-                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelected:nil error:&error];
+                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelectedFactors:self.contentViewController error:&error];
                     
                     if ( ckf ) {
                         [self changeMasterCredentials:ckf];
@@ -1377,6 +1271,26 @@ static NSString* getFreeTrialSuffix() {
     }
 }
 
+- (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
+    [self.viewModel setCompositeKeyFactors:ckf];
+    
+    MacDatabasePreferences* md = self.databaseMetadata;
+    
+    if ( md.isConvenienceUnlockEnabled ) {
+        md.conveniencePassword = ckf.password;
+        md.conveniencePasswordHasBeenStored = YES;
+    }
+    
+    if ( self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile ) {
+        md.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
+    }
+    else {
+        md.keyFileBookmark = nil;
+    }
+    
+    md.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
+}
+
 - (IBAction)onChangeMasterPassword:(id)sender {
     [self promptForMasterPassword:NO
                        completion:^(BOOL okCancel) {
@@ -1389,9 +1303,8 @@ static NSString* getFreeTrialSuffix() {
 }
 
 - (void)onMasterCredentialsChangedAndSaved:(id)param {
-    NSString* loc = NSLocalizedString(@"mac_master_credentials_changed_and_saved", @"Master Credentials Changed and Database Saved");
-    
-    [MacAlerts info:loc window:self.window];
+
+
 }
 
 
@@ -1416,15 +1329,9 @@ static NSString* getFreeTrialSuffix() {
     self.viewModel.showTotp = !self.viewModel.showTotp;
 }
 
-- (IBAction)onVCToggleOfflineMode:(id)sender {
-    self.viewModel.offlineMode = !self.viewModel.offlineMode;
-}
-
 - (IBAction)onVCToggleReadOnly:(id)sender {
     if ( !self.viewModel.readOnly ) {
-        Document* doc = self.document;
-    
-        if ( doc.hasUnautosavedChanges || doc.isDocumentEdited ) {
+        if ( [DatabasesCollection.shared documentIsOpenWithPendingChangesWithUuid:self.viewModel.databaseUuid] ) {
             [MacAlerts info:NSLocalizedString(@"read_only_unavailable_title", @"Read Only Unavailable")
             informativeText:NSLocalizedString(@"read_only_unavailable_pending_changes_message", @"You currently have changes pending and so you cannot switch to Read Only mode. You must save or discard your current changes first.")
                      window:self.window
@@ -1917,6 +1824,10 @@ static NSString* getFreeTrialSuffix() {
     
     return data;
 }
+
+
+
+
 
 - (IBAction)onCopyTitle:(id)sender {
     [self copyTitle:[self getSingleSelectedItem]];
@@ -2420,10 +2331,43 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
          completion:nil];
 }
 
+- (BOOL)windowShouldClose:(NSWindow *)sender {
+    NSLog(@"✅ WindowController::windowShouldClose");
+
+    if ( !Settings.sharedInstance.hasAskedAboutDatabaseOpenInBackground && self.viewModel && !self.viewModel.locked && Settings.sharedInstance.nextGenUI ) {
+        [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"mac_on_window_close_action_title", @"Lock Database?")
+                        informativeText:NSLocalizedString(@"mac_on_window_close_action_message", @"Strongbox can keep your databases open in the background or it can lock them immediately when you close the window.\n\nWhat would you like Strongbox to do when you close a Database window?")
+                      option1AndDefault:NSLocalizedString(@"mac_on_window_close_action_option_keep_unlocked", @"Keep Database Unlocked")
+                                option2:NSLocalizedString(@"mac_on_window_close_action_lock_immediately", @"Lock Database Immediately")
+                                 window:self.window
+                             completion:^(int response) {
+            if ( response == 0 ) { 
+                Settings.sharedInstance.hasAskedAboutDatabaseOpenInBackground = YES;
+                Settings.sharedInstance.lockDatabaseOnWindowClose = NO;
+            }
+            else if ( response == 1 ) { 
+                Settings.sharedInstance.hasAskedAboutDatabaseOpenInBackground = YES;
+                Settings.sharedInstance.lockDatabaseOnWindowClose = YES;
+            }
+            
+            [self close];
+        }];
+        
+        return NO;
+    }
+    else {
+        return YES;
+    }
+}
+
 - (void)close {
     [super close];
     
     NSLog(@"✅ Closing WindowController!");
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)notification {
+    [self synchronizeWindowTitleWithDocumentName];
 }
 
 @end

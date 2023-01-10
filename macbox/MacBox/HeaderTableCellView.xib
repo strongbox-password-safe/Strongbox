@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -31,7 +31,7 @@
                             </connections>
                         </button>
                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h2E-2d-O1Y">
-                            <rect key="frame" x="15" y="3" width="161" height="16"/>
+                            <rect key="frame" x="15" y="3" width="134" height="16"/>
                             <textFieldCell key="cell" lineBreakMode="clipping" title="Header" usesSingleLineMode="YES" id="QaS-3j-MrU">
                                 <font key="font" textStyle="headline" name=".SFNS-Bold"/>
                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -39,7 +39,7 @@
                             </textFieldCell>
                         </textField>
                         <button toolTip="Copy" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XB7-Mf-2IJ" userLabel="Copy Button">
-                            <rect key="frame" x="178" y="-5" width="20" height="33"/>
+                            <rect key="frame" x="151" y="-5" width="20" height="33"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="20" id="6IZ-LM-Doj"/>
                                 <constraint firstAttribute="height" constant="18" id="vkf-yY-KqP"/>
@@ -54,13 +54,13 @@
                             </connections>
                         </button>
                         <popUpButton horizontalHuggingPriority="760" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ThG-Sy-AIM">
-                            <rect key="frame" x="202" y="1" width="42" height="19"/>
-                            <popUpButtonCell key="cell" type="recessed" bezelStyle="recessed" imagePosition="only" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="Reo-ci-nf2" id="O5b-RG-Rcs">
+                            <rect key="frame" x="175" y="1" width="69" height="19"/>
+                            <popUpButtonCell key="cell" type="recessed" title="Foo" bezelStyle="recessed" imagePosition="leading" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" pullsDown="YES" autoenablesItems="NO" selectedItem="Reo-ci-nf2" id="O5b-RG-Rcs">
                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                                 <font key="font" textStyle="body" name=".SFNS-Regular"/>
                                 <menu key="menu" autoenablesItems="NO" id="nV8-mP-lt8">
                                     <items>
-                                        <menuItem state="on" hidden="YES" id="Reo-ci-nf2">
+                                        <menuItem title="Foo" state="on" hidden="YES" id="Reo-ci-nf2">
                                             <imageReference key="image" image="ellipsis.circle" catalog="system" symbolScale="large"/>
                                         </menuItem>
                                         <menuItem title="Item 2" id="1D6-D2-7Pi"/>

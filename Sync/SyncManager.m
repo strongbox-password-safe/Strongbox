@@ -72,6 +72,10 @@
 }
 
 - (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join {
+    [self backgroundSyncDatabase:database join:join completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError *  error) { }];
+}
+
+- (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
@@ -84,6 +88,7 @@
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
+        completion(result, localWasChanged, error);
     }];
 }
 

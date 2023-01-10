@@ -48,14 +48,14 @@ static const BOOL kLogVerbose = NO;
 @implementation Kdbx4Serialization
 
 + (NSData *)getYubiKeyChallenge:(KdfParameters *)kdfParameters error:(NSError * _Nullable __autoreleasing *)error {
-
-
     id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters, error);
     
     if(!kdf) {
         NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", kdfParameters);
         return nil;
     }
+    
+
     
     return kdf.transformSeed;
 }
@@ -742,7 +742,7 @@ static BOOL checkHeaderHmac(NSData* headerData, NSData* hmacKey, NSInputStream* 
     return YES;
 }
 
-static id<KeyDerivationCipher> getKeyDerivationCipher(KdfParameters *kdfParameters, NSError** error) {
+id<KeyDerivationCipher> getKeyDerivationCipher(KdfParameters *kdfParameters, NSError** error) {
     if([kdfParameters.uuid isEqual:argon2dCipherUuid()]) {
         id<KeyDerivationCipher> ret = [[Argon2dKdfCipher alloc] initWithParametersDictionary:kdfParameters];
         if(ret == nil) {

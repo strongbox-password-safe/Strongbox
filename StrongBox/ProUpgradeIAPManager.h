@@ -32,7 +32,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 - (void)initialize;
 - (void)restorePrevious:(RestoreCompletionBlock)completion;
-- (void)expressRefreshReceipt;
+- (void)refreshReceiptAndCheckForProEntitlements:(void(^)(void))completion;
 
 @property (readonly, nullable) SKProduct* monthlyProduct;
 @property (readonly, nullable) SKProduct* yearlyProduct;
@@ -46,6 +46,8 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 @property (readonly) BOOL hasActiveYearlySubscription;
 @property (readonly) BOOL hasActiveMonthlySubscription;
 @property (readonly) BOOL isLegacyLifetimeIAPPro;
+
+
 
 @end
 

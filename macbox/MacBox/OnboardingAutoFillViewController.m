@@ -103,7 +103,7 @@
 }
 
 - (void)updateAutoFillDatabases {
-    [self.viewModel rebuildAutoFillDomainNodeMap];
+    [self.viewModel rebuildFastMaps];
     
     [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.commonModel
                                                        databaseUuid:self.database.uuid

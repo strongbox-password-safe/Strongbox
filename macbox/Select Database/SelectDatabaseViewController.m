@@ -11,7 +11,6 @@
 #import "DatabaseCellView.h"
 #import "NSArray+Extensions.h"
 #import "Settings.h"
-#import "MMWormhole.h"
 #import "AutoFillWormhole.h"
 
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
@@ -47,13 +46,13 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         
         [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kDatabaseCellView bundle:nil]
                       forIdentifier:kDatabaseCellView];
-
+        
         self.tableView.emptyString = NSLocalizedString(@"mac_no_autofill_enabled_databases_initial_message", @"No AutoFill Enabled Databases");
         
-        self.tableView.doubleAction = @selector(onSelect:);
+        self.tableView.doubleAction = @selector(onDoubleClick:);
         
         self.unlockedDatabases = NSSet.set;
-
+        
         [self refresh];
         
         if ( self.autoFillMode ) {
@@ -64,18 +63,18 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
 - (void)viewDidAppear {
     [super viewDidAppear];
-        
+    
     if ( !self.firstAppearanceDone ) {
         self.firstAppearanceDone = YES;
         self.view.window.frameAutosaveName = @"SelectAutoFillDatabase-AutoSave";
-    
+        
         NSUInteger count = [self.databases filter:^BOOL(MacDatabasePreferences * _Nonnull obj) {
             return obj.autoFillEnabled;
         }].count;
         
         if ( self.autoFillMode && count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
             NSLog(@"Single Database Launching...");
-        
+            
             MacDatabasePreferences* database = self.databases.firstObject;
             
             __weak SelectDatabaseViewController* weakSelf = self;
@@ -91,29 +90,31 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 - (void)checkWormholeForUnlockedDatabases {
     [self.wormhole clearAllMessageContents];
     
+    NSLog(@"✅ checkWormholeForUnlockedDatabases");
+    
     __block BOOL gotResponse = NO;
     __block NSMutableSet<NSString*> *unlocked = NSMutableSet.set;
-        
+    
     for (MacDatabasePreferences* database in self.databases) {
-        NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, database.uuid];
-
+        NSLog(@"Sending status request for %@", database.uuid);
+        
         [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(), @"database-id" : database.uuid }
-                              identifier:requestId];
-
+                              identifier:kAutoFillWormholeDatabaseStatusRequestId];
+        
         NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, database.uuid];
-
+        
         [self.wormhole listenForMessageWithIdentifier:responseId
                                              listener:^(id messageObject) {
-
+            
             
             NSDictionary* dict = messageObject;
             NSString* userSession = dict[@"user-session-id"];
-
+            
             if ( [userSession isEqualToString:NSUserName()] ) { 
                 NSString* databaseId = dict[@"unlocked"];
-
+                
                 NSLog(@"AutoFill-Wormhole: Got Database Status Response Message [%@] is unlocked", databaseId);
-
+                
                 gotResponse = YES;
                 [unlocked addObject:databaseId];
                 
@@ -142,13 +143,13 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
 - (void)refresh {
     self.databases = MacDatabasePreferences.allDatabases;
-        
+    
     [self.tableView reloadData];
-
+    
     NSUInteger idx = [self.databases indexOfFirstMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         return obj.autoFillEnabled;
     }];
-
+    
     if ( idx != NSNotFound ) {
         [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
     }
@@ -162,9 +163,15 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     self.onDone(YES, nil);
 }
 
+- (void)onDoubleClick:(id)sender {
+    [self openDatabaseAtRow:self.tableView.clickedRow];
+}
+
 - (IBAction)onSelect:(id)sender {
-    NSUInteger row = self.tableView.selectedRowIndexes.firstIndex;
-    
+    [self openDatabaseAtRow:self.tableView.selectedRow];
+}
+
+- (void)openDatabaseAtRow:(NSUInteger)row {
     if (row != NSNotFound) {
         MacDatabasePreferences* database = self.databases[row];
         

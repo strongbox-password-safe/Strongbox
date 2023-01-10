@@ -31,6 +31,10 @@
         }
     }
     
+    if ( Settings.sharedInstance.concealClipboardFromMonitors ) {
+        [NSPasteboard.generalPasteboard setString:@"" forType:@"org.nspasteboard.ConcealedType"];
+    }
+    
     [NSPasteboard.generalPasteboard setString:(string ? string : @"") forType:NSPasteboardTypeString];
 }
 

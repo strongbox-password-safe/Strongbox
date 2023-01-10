@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_Nullable model, NSError*_Nullable innerStreamError, NSError*_Nullable error);
+typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_Nullable model, NSError*_Nullable error);
 
 @interface Serializator : NSObject
 

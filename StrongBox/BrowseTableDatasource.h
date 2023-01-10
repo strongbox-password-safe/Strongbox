@@ -20,8 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSUInteger)rowsForSection:(NSUInteger)section;
 - (NSString*_Nullable)titleForSection:(NSUInteger)section;
 - (UITableViewCell*)cellForRowAtIndexPath:(NSIndexPath*)indexPath;
-- (Node*_Nullable)getNodeFromIndexPath:(NSIndexPath*)indexPath;
+- (id _Nullable)getParamFromIndexPath:(NSIndexPath*)indexPath;
 - (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath;
+
+- (NSArray<NSString *> *)sectionIndexTitles;
+- (NSInteger)sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index;
 
 @end
 

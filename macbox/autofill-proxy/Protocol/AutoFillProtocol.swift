@@ -15,6 +15,8 @@ enum AutoFillMessageType : NSInteger, Codable {
     case search
     case getCredentialsForUrl
     case copyField
+    case lock
+    case unlock
 }
 
 @objc

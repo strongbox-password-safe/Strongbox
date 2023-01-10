@@ -66,7 +66,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         NSError* error;
     
         _regex = [NSRegularExpression regularExpressionWithPattern:kSprCompilerRegex
-                                                           options:kNilOptions
+                                                           options:NSRegularExpressionCaseInsensitive
                                                              error:&error];
         if(error) {
             NSLog(@"Error compiling Regex: %@", error);
@@ -149,19 +149,19 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         return nil;
     }
     
-    if([operation isEqualToString:kTitleOperation]) {
+    if([operation caseInsensitiveCompare:kTitleOperation] == NSOrderedSame ) {
         return node.title;
     }
-    else if([operation isEqualToString:kUsernameOperation]) {
+    else if( [operation caseInsensitiveCompare:kUsernameOperation] == NSOrderedSame ) {
         return node.fields.username;
     }
-    else if([operation isEqualToString:kPasswordOperation]) {
+    else if([operation caseInsensitiveCompare:kPasswordOperation] == NSOrderedSame) {
         return node.fields.password;
     }
-    else if([operation isEqualToString:kNotesOperation]) {
+    else if([operation caseInsensitiveCompare:kNotesOperation] == NSOrderedSame) {
         return node.fields.notes;
     }
-    else if([operation isEqualToString:kKPXC_TOTP_Operation] || [operation isEqualToString:kWinKP_TOTP_Operation]) {
+    else if([operation caseInsensitiveCompare:kKPXC_TOTP_Operation]  == NSOrderedSame || [operation caseInsensitiveCompare:kWinKP_TOTP_Operation] == NSOrderedSame) {
         return node.fields.otpToken.password;
     }
     else if([operation hasPrefix:kCustomFieldOperation]) {

@@ -50,7 +50,12 @@ static NSString* const kColumnLog = @"log";
 }
 
 - (void)cancel:(id)sender { 
-    [self.view.window orderOut:self];
+    if ( self.view.window.sheetParent ) {
+        [self.view.window.sheetParent endSheet:self.view.window returnCode:NSModalResponseCancel];
+    }
+    else {
+        [self.view.window orderOut:self];
+    }
 }
 
 - (IBAction)onClose:(id)sender {

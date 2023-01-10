@@ -10,6 +10,14 @@
 
 @implementation ContextMenuHelper
 
++ (UIAction *)getItem:(NSString *)title handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0)) {
+    return [ContextMenuHelper getItem:title systemImage:nil handler:handler];
+}
+
++ (UIAction *)getItem:(NSString *)title checked:(BOOL)checked handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0)) {
+    return [ContextMenuHelper getItem:title systemImage:nil enabled:YES checked:checked handler:handler];
+}
+
 + (UIAction*)getItem:(NSString*)title systemImage:(NSString*)systemImage handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0))  {
     return [ContextMenuHelper getItem:title systemImage:systemImage enabled:YES handler:handler];
 }
@@ -29,7 +37,7 @@
 + (UIAction*)getItem:(NSString*)title systemImage:(NSString*)systemImage destructive:(BOOL)destructive enabled:(BOOL)enabled checked:(BOOL)checked handler:(UIActionHandler)handler
   API_AVAILABLE(ios(13.0)) {
     return [ContextMenuHelper getItem:title
-                                 image:[UIImage systemImageNamed:systemImage]
+                                image:systemImage ? [UIImage systemImageNamed:systemImage] : nil
                            destructive:destructive
                                enabled:enabled
                                checked:checked

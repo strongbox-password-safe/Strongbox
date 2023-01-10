@@ -124,6 +124,7 @@
     else if([segue.identifier isEqualToString:@"segueToViewPreferences"]) {
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)segue.destinationViewController;
         vc.format = self.viewModel.database.originalFormat;
+        vc.model = self.viewModel;
         vc.databaseMetaData = self.viewModel.metadata;
     }
     else if ([segue.identifier isEqualToString:@"segueToAudit"]) {

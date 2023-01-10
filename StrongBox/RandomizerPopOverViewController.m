@@ -12,7 +12,7 @@
 #import "ColoredStringHelper.h"
 #import "FontManager.h"
 #import "ClipboardManager.h"
-#import "ISMessages/ISMessages.h"
+#import "Strongbox-Swift.h"
 
 @interface RandomizerPopOverViewController ()
 
@@ -118,25 +118,16 @@
     
 }
 
-- (IBAction)onButton1:(id)sender {
+- (IBAction)onCopyText:(id)sender {
     UIButton* button = sender;
     NSString* text= button.titleLabel.text;
-    
-    NSLog(@"%@", text);
     
     [ClipboardManager.sharedInstance copyStringWithNoExpiration:text];
     
     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
     [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
 
-    [ISMessages showCardAlertWithTitle:NSLocalizedString(@"generic_copied", @"Copied")
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [StrongboxToastMessages showToastWithTitle:NSLocalizedString(@"generic_copied", @"Copied") body:@"" category:ToastMessageCategoryInfo icon:ToastIconInfo];
 }
 
 

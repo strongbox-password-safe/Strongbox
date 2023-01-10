@@ -14,6 +14,7 @@
 #import "Settings.h"
 #import "ClipboardManager.h"
 #import "MBProgressHUD.h"
+#import "AppDelegate.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -374,8 +375,8 @@
     }
 }
 
-- (IBAction)onQuit:(id)sender {
-    [NSApplication.sharedApplication terminate:nil];
+- (IBAction)onQuit:(id)sender {    
+    [NSApplication.sharedApplication sendAction:@selector(onSystemTrayQuitStrongbox:) to:nil from:nil];
 }
 
 - (IBAction)onShowPasswordGenerator:(id)sender {

@@ -20,14 +20,31 @@ const NSUInteger kMinimumDatabasePrefixLengthForValidation = 192;
 const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; 
 const size_t kMaxAttachmentTableviewIconImageSize = 4 * 1024 * 1024;
 
+
 NSString* const kCanonicalEmailFieldName = @"Email";
 NSString* const kCanonicalFavouriteTag = @"Favorite";
 
-+(void)initialize {
++ (void)initialize {
     if(self == [Constants class]) {
         kUserInteractionRequiredError = [Utils createNSError:kStorageProviderUserInteractionRequiredErrorMessage errorCode:kStorageProviderUserInteractionRequiredErrorCode];
+
+#if TARGET_OS_IPHONE
+        kRecycleBinTintColor = ColorFromRGB(0x008f54); 
+#endif
+        
     }
 }
+
+
+#if TARGET_OS_IPHONE
+
+static UIColor* kRecycleBinTintColor;
+
++ (UIColor *)recycleBinTintColor {
+    return kRecycleBinTintColor;
+}
+
+#endif
 
 NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";
 NSString* const kDragAndDropSideBarHeaderMoveInternalUti = @"com.markmcguill.strongbox.drag.and.drop.sidebar.header.move.internal.uti";

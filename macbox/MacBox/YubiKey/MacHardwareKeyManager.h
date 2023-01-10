@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^GetAvailableKeyCompletion)(HardwareKeyData*_Nullable yubiKeyData);
 typedef void (^ChallengeResponseCompletion)(NSData* response, NSError* error);
+typedef NSWindow* _Nonnull (^MacHardwareKeyManagerOnDemandUIProviderBlock)(void); 
 
 @interface MacHardwareKeyManager : NSObject
 
@@ -27,6 +28,11 @@ typedef void (^ChallengeResponseCompletion)(NSData* response, NSError* error);
                   windowHint:(NSWindow*_Nullable)windowHint
                         slot:(NSInteger)slot
                   completion:(YubiKeyCRResponseBlock)completion;
+
+- (void)compositeKeyFactorCr:(NSData*)challenge
+                        slot:(NSInteger)slot
+                  completion:(YubiKeyCRResponseBlock)completion
+      onDemandWindowProvider:(MacHardwareKeyManagerOnDemandUIProviderBlock)onDemandWindowProvider;
 
 @end
 

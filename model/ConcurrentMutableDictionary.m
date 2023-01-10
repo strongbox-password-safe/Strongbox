@@ -42,6 +42,16 @@
     });
 }
 
+- (NSArray *)allKeys {
+    __block NSArray* result;
+    
+    dispatch_sync(self.dataQueue, ^{  
+        result = self.data.allKeys;
+    });
+    
+    return result;
+}
+
 - (id)objectForKey:(id)key {
     __block id result;
 

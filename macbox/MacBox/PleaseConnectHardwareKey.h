@@ -8,12 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
+#import "MacHardwareKeyManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PleaseConnectHardwareKey : NSWindowController
 
-+ (void)show:(NSWindow*_Nullable)parentHint completion:(void (^)(BOOL cancelled))completion;
++ (void)show:(MacHardwareKeyManagerOnDemandUIProviderBlock)parentHint completion:(void (^)(BOOL cancelled))completion;
 + (void)hide;
 
 @end

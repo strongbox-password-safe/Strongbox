@@ -352,7 +352,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 }
 
 - (void)showDatabases {
-    NSLog(@"showDatabases - [%@]", self.selectDbVc);
+    NSLog(@"✅ showDatabases - [%@]", self.selectDbVc);
 
     if(!self.selectDbVc) {
         [self exitWithErrorOccurred:[Utils createNSError:@"There was an error loading the Safes List View" errorCode:-1]];
@@ -400,11 +400,9 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     
     [self.wormhole clearAllMessageContents];
     
-    NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, self.database.uuid];
-
     [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(),
                                         @"database-id" : self.database.uuid }
-                          identifier:requestId];
+                          identifier:kAutoFillWormholeConvUnlockRequestId];
     
     __block NSString* ret = nil;
     dispatch_group_t group = dispatch_group_create();
@@ -479,7 +477,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
     MacCompositeKeyDeterminer* det = [MacCompositeKeyDeterminer determinerWithViewController:self
                                                                                     database:self.database
-                                                                              isAutoFillOpen:YES
+                                                            isNativeAutoFillAppExtensionOpen:YES
                                                                      isAutoFillQuickTypeOpen:self.quickTypeMode];
 
     [det getCkfsManually:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
@@ -492,7 +490,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
     MacCompositeKeyDeterminer* det = [MacCompositeKeyDeterminer determinerWithViewController:self
                                                                                     database:self.database
-                                                                              isAutoFillOpen:YES
+                                                            isNativeAutoFillAppExtensionOpen:YES
                                                                      isAutoFillQuickTypeOpen:self.quickTypeMode];
 
     [det getCkfs:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
@@ -505,7 +503,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
     MacCompositeKeyDeterminer* det = [MacCompositeKeyDeterminer determinerWithViewController:self
                                                                                     database:self.database
-                                                                              isAutoFillOpen:YES
+                                                            isNativeAutoFillAppExtensionOpen:YES
                                                                      isAutoFillQuickTypeOpen:self.quickTypeMode];
 
     [det getCkfsWithExplicitPassword:password
@@ -545,12 +543,12 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     DatabaseUnlocker *unlocker = [DatabaseUnlocker unlockerForDatabase:self.database
                                                         viewController:self
                                                          forceReadOnly:NO
-                                                        isAutoFillOpen:YES
-                                                           offlineMode:self.database.offlineMode];
+                                      isNativeAutoFillAppExtensionOpen:YES
+                                                           offlineMode:NO];
     
     [unlocker unlockLocalWithKey:ckf
               keyFromConvenience:isConvenienceUnlock
-                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         NSLog(@"unlockLocalWithKey => [%lu](%@) - error = [%@]", result, result == kUnlockDatabaseResultSuccess ? @"Success" : @"Not Successful", error);
         
         if ( result == kUnlockDatabaseResultSuccess ) {

@@ -461,7 +461,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         
         outlineView.reloadData()
 
-        expandStructure()
+        expandStructure() 
 
         bindSelectionToModelNavigationContext()
         
@@ -585,7 +585,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
         let navContext = navigationContext
 
-        NSLog("✅ SideBarViewController::bindSelectionToModelNavigationContext: [%@]", String(describing: navContext))
+
 
         if let viewNode = findViewNode(for: navigationContext) {
             expandParentsOfItem(item: viewNode, expandCollapsedHeaderItem: false)
@@ -763,7 +763,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
     }
 
     func outlineViewSelectionDidChange(_: Notification) {
-        NSLog("outlineViewSelectionDidChange: selected = %d", outlineView.selectedRow)
+
 
         guard let selected = outlineView.item(atRow: outlineView.selectedRow) as? SideBarViewNode else {
             NSLog("🔴 outlineViewSelectionDidChange::Could not get selected.")

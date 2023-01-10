@@ -504,12 +504,13 @@
     }
 }
 
-- (CompositeKeyFactors *)generateCkfFromSelected:(NSWindow *)yubiKeyPressWindowHint error:(NSError**)error {
+- (CompositeKeyFactors *)generateCkfFromSelectedFactors:(NSViewController *)yubiKeyInteractionVc
+                                                  error:(NSError *__autoreleasing  _Nullable *)error {
     NSError* err;
     CompositeKeyFactors *ret = [MacCompositeKeyDeterminer getCkfsWithConfigs:self.selectedPassword
                                                              keyFileBookmark:self.selectedKeyFileBookmark
                                                         yubiKeyConfiguration:self.selectedYubiKeyConfiguration
-                                            hardwareKeyInteractionWindowHint:yubiKeyPressWindowHint
+                                        hardwareKeyInteractionViewController:yubiKeyInteractionVc
                                                            formatKeyFileHint:self.selectedDatabaseFormat
                                                                        error:&err];
 

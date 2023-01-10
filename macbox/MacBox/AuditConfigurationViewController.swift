@@ -277,7 +277,7 @@ class AuditConfigurationViewController: NSViewController {
     }
 
     @IBAction func onSimpleChanged(_: Any?) {
-        NSLog("✅ onSimpleChanged")
+
 
         let config = database.auditConfig
 

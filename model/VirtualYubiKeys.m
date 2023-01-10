@@ -47,7 +47,9 @@ NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeys
     }];
     
     if (!json || error || readError) {
-        NSLog(@"Error reading file for Virtual Hardware Keys: [%@] - [%@]", error, readError);
+        if ( readError && readError.code == NSFileReadNoSuchFileError ) return ret;
+        
+        NSLog(@"🔴 Error reading file for Virtual Hardware Keys: [%@] - [%@]", error, readError);
         return ret;
     }
 

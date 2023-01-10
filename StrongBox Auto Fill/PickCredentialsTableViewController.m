@@ -146,7 +146,7 @@ static NSString* const kGroupAllItems = @"all-items";
     if (!self.doneFirstAppearanceTasks) {
         self.doneFirstAppearanceTasks = YES;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.45  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.40  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
             [self smartInitializeSearch];
 
             [self.searchController.searchBar becomeFirstResponder];
@@ -275,34 +275,6 @@ static NSString* const kGroupAllItems = @"all-items";
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 NSString *getPublicDomain(NSString* url) {
     if(url == nil) {
         return @"";
@@ -312,76 +284,56 @@ NSString *getPublicDomain(NSString* url) {
         return @"";
     }
     
-    NSString *domain = [BrowserAutoFillManager extractDomainFromUrlWithUrl:url];
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    return domain;
+    return [BrowserAutoFillManager extractPSLDomainFromUrlWithUrl:url];
 }
 
 NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if(!domain.length) {
         return domain;
     }
-
-    if ( [domain hasPrefix:@"www."] ) {
-        domain = [domain substringFromIndex:4];
-    }
     
     NSArray<NSString*> *parts = [domain componentsSeparatedByString:@"."];
-    
-    NSLog(@"%@", parts);
     
     NSString *searchTerm = parts.count ? parts[0] : domain;
     return searchTerm;
 }
 
 - (NSArray<Node*>*)loadAllItems {
-    BrowseSortField sortField = self.model.metadata.browseSortField;
-    BOOL descending = self.model.metadata.browseSortOrderDescending;
-    BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
-    
+    BrowseSortConfiguration* sortConfig = [self.model getDefaultSortConfiguration];
+
+
+
+
+
     return [self.model filterAndSortForBrowse:self.model.allEntries.mutableCopy
                         includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
                             includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
                                includeExpired:self.model.metadata.showExpiredInSearch
                                 includeGroups:NO
-                              browseSortField:sortField
-                                   descending:descending
-                            foldersSeparately:foldersSeparately];
+                              browseSortField:sortConfig.field
+                                   descending:sortConfig.descending
+                            foldersSeparately:sortConfig.foldersOnTop];
 }
 
 - (NSArray<Node*>*)loadPinnedItems {
-    if( !self.model.favourites.count || !AppPreferences.sharedInstance.autoFillShowPinned ) {
+    if( !self.model.favourites.count || !AppPreferences.sharedInstance.autoFillShowFavourites ) {
         return @[];
     }
     
-    BrowseSortField sortField = self.model.metadata.browseSortField;
-    BOOL descending = self.model.metadata.browseSortOrderDescending;
-    BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
+    BrowseSortConfiguration* sortConfig = [self.model getDefaultSortConfiguration];
+
+
+
+
     
     return [self.model filterAndSortForBrowse:self.model.favourites.mutableCopy
                         includeKeePass1Backup:NO
                             includeRecycleBin:NO
                                includeExpired:YES
                                 includeGroups:NO
-                              browseSortField:sortField
-                                   descending:descending
-                            foldersSeparately:foldersSeparately];
+                              browseSortField:sortConfig.field
+                                   descending:sortConfig.descending
+                            foldersSeparately:sortConfig.foldersOnTop];
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
@@ -427,9 +379,11 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
-    BrowseSortField sortField = self.model.metadata.browseSortField;
-    BOOL descending = self.model.metadata.browseSortOrderDescending;
-    BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
+    BrowseSortConfiguration* sortConfig = [self.model getDefaultSortConfiguration];
+
+
+
+
     
     return [self.model search:searchText
                         scope:scope
@@ -438,9 +392,9 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
                includeExpired:self.model.metadata.showExpiredInSearch
                 includeGroups:NO
-              browseSortField:sortField
-                   descending:descending
-            foldersSeparately:foldersSeparately];
+              browseSortField:sortConfig.field
+                   descending:sortConfig.descending
+            foldersSeparately:sortConfig.foldersOnTop];
 }
 
 

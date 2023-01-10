@@ -24,6 +24,7 @@ Big thank you to all the localization contributors
 - Dutch - Wishes to remain anonymous
 - French - Charles-Ivan Chesneau
 - German - @Slummi
+- Greek - John Spiropoulos
 - Italian - Marco Ermini
 - Japanese - Anonymous
 - Norwegian - Ole Aldric
@@ -64,10 +65,8 @@ The code is provided here for reasons of security, transparency and openness. An
 
 If instead of examining the code, you simply want to use the app, please download from the App Store, the free version is more than functional. Lastly, if you are attempting to bypass built-in Pro/Free limitations for your own app usage, I would ask you to keep that app to yourself and not distribute it. Also, please consider your actions, and consider supporting further development by contributing via the official application (In-App Purchase upgrade). It will be very much appreciated. Finally, if you really need all the Pro features and cannot afford the upgrade, just drop me a mail and I'll help you out.
 
-# Contributions or Pull Requests
-I cannot accept outside pull requests from the community for licensing reasons. To release to Apple's App Store I have to manage Strongbox under a dual licence. The code here is under the GPL which Apple will not allow in the App Store. As mentioned above the code is provided here for transparency and openness, something I consider a prerequisite for a Password Manager. I need to maintain full ownership of the code so that I can licence to Apple separately, and also any outside/other licencing that might come along, commercial or otherwise. Accepting contributions (no matter how awesome) would involve the contributer signing their life and probably first born child away... There is probably a way to do this but I believe it will involve legally binding documents and other bureaucracies so to keep things simple I'm just going to manage the development myself. Other people's code sucks anyway, right? 
-
-Sorry... :(
+# No Pull Requests - Open Source not Open Contribution
+At the moment, we are not accepting pull requests and do not want to manage contributions from others. The code here is under the GPL which Apple will not allow in the App Store. As mentioned above the code is provided here for transparency and openness. We licence the code to Apple separately under a different license which is compatible with the App Store. Other people's code sucks anyway, right?  
 
 # Acknowledgements
 The crypto is mostly from TomCrypt and libsodium. PasswordSafe & KeePass DB parsing/navigation/UI/Cloud interaction is my own work. 

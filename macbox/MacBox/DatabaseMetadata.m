@@ -30,6 +30,8 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 - (instancetype)init {
     self = [super init];
     if (self) {
+        _uuid = [[NSUUID UUID] UUIDString];
+
         self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
         self.autoFillConvenienceAutoUnlockTimeout = -1; 
@@ -42,8 +44,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.outlineViewTitleIsReadonly = NO;
         self.outlineViewEditableFieldsAreReadonly = YES;
         self.concealEmptyProtectedFields = YES;
-        self.startWithSearch = NO;
-        self.lockOnScreenLock = YES;
+        self.startWithSearch = YES; 
         self.visibleColumns = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
         self.autoFillScanAltUrls = YES;
         self.autoFillScanCustomFields = NO;
@@ -56,6 +57,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.headerNodes = HeaderNodeState.defaults;
         self.autoFillCopyTotp = YES;
         self.searchScope = kSearchScopeAll;
+        self.autoPromptForConvenienceUnlockOnActivate = NO;
     }
     
     return self;
@@ -67,12 +69,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
                      storageInfo:(NSString*)storageInfo {
     if(self = [self init]) {
         _nickName = nickName ? nickName : @"<Unknown>";
-        _uuid = [[NSUUID UUID] UUIDString];
         self.storageProvider = storageProvider;
         self.monitorForExternalChangesInterval = storageProvider == kMacFile ? 5 : 30; 
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
-        self.autoPromptForConvenienceUnlockOnActivate = NO;
     }
     
     return self;
@@ -241,7 +241,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
     [encoder encodeInteger:self.maxBackupKeepCount forKey:@"maxBackupKeepCount"];
     [encoder encodeBool:self.makeBackups forKey:@"makeBackups"];
-    [encoder encodeBool:self.offlineMode forKey:@"offlineMode"];
+    [encoder encodeBool:self.userRequestOfflineOpenEphemeralFlagForDocument forKey:@"offlineMode"];
     [encoder encodeBool:self.readOnly forKey:@"readOnly"];
     [encoder encodeBool:self.alwaysOpenOffline forKey:@"alwaysOpenOffline"];
     
@@ -260,7 +260,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.concealEmptyProtectedFields forKey:@"concealEmptyProtectedFields"];
     [encoder encodeBool:self.startWithSearch forKey:@"startWithSearch"];
     [encoder encodeBool:self.showAdvancedUnlockOptions forKey:@"showAdvancedUnlockOptions"];
-    [encoder encodeBool:self.lockOnScreenLock forKey:@"lockOnScreenLock"];
     [encoder encodeBool:self.expressDownloadFavIconOnNewOrUrlChanged forKey:@"expressDownloadFavIconOnNewOrUrlChanged"];
     [encoder encodeBool:self.doNotShowRecycleBinInBrowse forKey:@"doNotShowRecycleBinInBrowse"];
     [encoder encodeBool:self.showRecycleBinInSearchResults forKey:@"showRecycleBinInSearchResults"];
@@ -430,7 +429,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.makeBackups = [decoder decodeBoolForKey:@"makeBackups"];
         }
         if ( [decoder containsValueForKey:@"offlineMode"] ) {
-            self.offlineMode = [decoder decodeBoolForKey:@"offlineMode"];
+            self.userRequestOfflineOpenEphemeralFlagForDocument = [decoder decodeBoolForKey:@"offlineMode"];
         }
         if ( [decoder containsValueForKey:@"readOnly"] ) {
             self.readOnly = [decoder decodeBoolForKey:@"readOnly"];
@@ -488,10 +487,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         if ( [decoder containsValueForKey:@"showAdvancedUnlockOptions"] ) {
             self.showAdvancedUnlockOptions = [decoder decodeBoolForKey:@"showAdvancedUnlockOptions"];
-        }
-
-        if ( [decoder containsValueForKey:@"lockOnScreenLock"] ) {
-            self.lockOnScreenLock = [decoder decodeBoolForKey:@"lockOnScreenLock"];
         }
 
         if ( [decoder containsValueForKey:@"expressDownloadFavIconOnNewOrUrlChanged"] ) {

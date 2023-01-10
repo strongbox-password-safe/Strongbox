@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)removeAllObjects;
 
+@property (readonly) NSArray<KeyType>* allKeys;
+
 @end
 
 NS_ASSUME_NONNULL_END

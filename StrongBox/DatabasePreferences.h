@@ -21,6 +21,7 @@
 #import "QuickTypeAutoFillDisplayFormat.h"
 #import "OfflineDetectedBehaviour.h"
 #import "CouldNotConnectBehaviour.h"
+#import "BrowseSortConfiguration.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -96,9 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BrowseTapAction doubleTapAction;
 @property BrowseTapAction tripleTapAction;
 @property BrowseTapAction longPressTapAction;
-@property BrowseSortField browseSortField;
-@property BOOL browseSortOrderDescending;
-@property BOOL browseSortFoldersSeparately;
+
 @property BrowseItemSubtitleField browseItemSubtitleField;
 @property BOOL immediateSearchOnBrowse;
 @property BOOL hideTotpInBrowse;
@@ -187,6 +186,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
 @property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
+
+@property BOOL lazySyncMode;
+@property BOOL persistLazyEvenLastSyncErrors;
+
+@property (nullable) NSUUID* asyncUpdateId; 
+@property (nullable) NSUUID* lastViewedEntry;
+@property BOOL showLastViewedEntryOnUnlock;
+
+@property NSArray<NSNumber*>* visibleTabs;
+@property BOOL hideTabBarIfOnlySingleTab;
+
+
+@property NSDictionary<NSString*, BrowseSortConfiguration*>* sortConfigurations;
+
+
+
+
+@property BrowseSortField browseSortField;
+@property BOOL browseSortOrderDescending;
+@property BOOL browseSortFoldersSeparately;
+
+
 
 @end
 

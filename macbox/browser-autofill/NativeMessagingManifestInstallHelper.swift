@@ -47,6 +47,50 @@ class NativeMessagingManifestInstallHelper: NSObject {
         installForChromiumBasedBrowser("Library/Application Support/Vivaldi/NativeMessagingHosts/")
     }
     
+    @objc
+    class func removeNativeMessagingHostsFiles () {
+        removeForFirefox()
+        
+        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome/NativeMessagingHosts")
+        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome Beta/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome Dev/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome Canary/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Chromium/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Beta/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Dev/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Canary/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Vivaldi/NativeMessagingHosts/")
+    }
+    
+    class func removeForFirefox () {
+        removeManifest( "Library/Application Support/Mozilla/NativeMessagingHosts" )
+    }
+ 
+    class func removeForChromiumBasedBrowser ( _ browserHomePath : String ) {
+        removeManifest( browserHomePath )
+    }
+    
+    class func removeManifest ( _ path : String ) {
+        let filename = "com.markmcguill.strongbox.json"
+        let browserPathUrl = Utils.userHomeDirectoryEvenInSandbox().appendingPathComponent(path)
+        let fullPath = browserPathUrl.appendingPathComponent(filename)
+
+        do {
+            try FileManager.default.removeItem(at: fullPath)
+            
+            NSLog("✅ Removed Native Manifest... [%@]", path);
+        }
+        catch {
+            if (error as NSError).code == NSFileNoSuchFileError {
+                return
+            }
+            else {
+                NSLog("🔴 Couldn't delete Native Manifest... [%@]", String.init(describing: error));
+            }
+        }
+    }
+    
     class func installForFirefox () {
         let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/afproxy").path
         let manifest = FirefoxNativeMessagingManifest(path: path)

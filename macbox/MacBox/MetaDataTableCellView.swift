@@ -11,4 +11,13 @@ import Cocoa
 class MetaDataTableCellView: NSTableCellView {
     @IBOutlet var valueLabel: NSTextField!
     @IBOutlet var nameLabel: NSTextField!
+    
+//    override func awakeFromNib() {
+//        super.awakeFromNib()
+
+
+
+
+
+
 }

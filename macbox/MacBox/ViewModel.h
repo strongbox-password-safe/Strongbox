@@ -226,7 +226,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property BOOL showAutoCompleteSuggestions;
 @property BOOL showChangeNotifications;
 @property BOOL concealEmptyProtectedFields;
-@property BOOL lockOnScreenLock;
 @property BOOL showAdvancedUnlockOptions;
 @property BOOL showQuickView;
 @property BOOL showAlternatingRows;
@@ -251,14 +250,16 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property BOOL autoPromptForConvenienceUnlockOnActivate;
 
 @property BOOL launchAtStartup;
+
 @property BOOL alwaysOpenOffline;
+@property (readonly) BOOL isInOfflineMode;
+
 @property BOOL readOnly;
-@property BOOL offlineMode;
 @property (readonly) BOOL isEffectivelyReadOnly; 
 
 
 
-- (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion _Nullable)completion;
+
 @property (nullable) NSUUID* asyncUpdateId;
 
 - (void)update:(NSViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
@@ -359,17 +360,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property ConflictResolutionStrategy conflictResolutionStrategy;
 
-
-
-- (NSArray<Node*>*)getAutoFillMatchingNodesForUrl:(NSString *)urlString;
-
-- (void)rebuildAutoFillDomainNodeMap; 
-
-
-
-- (void)copyUsername:(NSUUID*)itemId;
-- (void)copyPassword:(NSUUID*)itemId;
-- (void)copyTotp:(NSUUID*)itemId;
+- (void)rebuildFastMaps;
 
 @end
 

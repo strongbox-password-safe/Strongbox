@@ -25,6 +25,7 @@
 #import "SyncManager.h"
 #import "CustomizationManager.h"
 
+
 #else
 
 #import <objc/message.h>
@@ -36,6 +37,7 @@
 #import "MacSyncManager.h"
 #import "FileManager.h"
 #import "MacDatabasePreferences.h"
+
 
 #endif
 
@@ -66,6 +68,21 @@ static NSString *ModelIdentifier()
     return result;
 }
 
+#define OPProcessValueUnknown UINT_MAX
+
+
+
+int OPParentIDForProcessID(int pid)
+{
+    struct kinfo_proc info;
+    size_t length = sizeof(struct kinfo_proc);
+    int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, pid };
+    if (sysctl(mib, 4, &info, &length, NULL, 0) < 0)
+        return OPProcessValueUnknown;
+    if (length == 0)
+        return OPProcessValueUnknown;
+    return info.kp_eproc.e_ppid;
+}
 
 + (NSString *)systemVersion {
     static NSString *systemVersion = nil;
@@ -135,20 +152,21 @@ static NSString *ModelIdentifier()
     NSString* systemName = @"MacOS";
     NSString* systemVersion = [DebugHelper systemVersion];
 #endif
-
     
-
+    
+    
     NSString* proStatus = [DebugHelper getProStatusDisplayString];
-        
+    
 #if TARGET_OS_IPHONE
     NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
     [debugLines addObject:@"-------------------- App Summary -----------------------"];
-
+    
     [debugLines addObject:[NSString stringWithFormat:@"App SKU: %@%@", StrongboxProductBundle.displayName, StrongboxProductBundle.isTestFlightBuild ? @" (TestFlight)" : @""]];
     [debugLines addObject:[NSString stringWithFormat:@"Pro Status: %@", proStatus]];
     [debugLines addObject:[NSString stringWithFormat:@"Platform: %@ %@", systemName, systemVersion]];
+        
     [debugLines addObject:@"\n-------------------- Databases Summary -----------------------"];
-
+    
     int i = 0;
     for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
         NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
@@ -164,27 +182,34 @@ static NSString *ModelIdentifier()
         else {
             syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => Unknown", safe.nickName, spName];
         }
-                
+        
         [debugLines addObject:[NSString stringWithFormat:@"%d. %@", ++i, syncState]];
     }
     
     [debugLines addObject:@"--------------------------------------------------------------\n"];
     [debugLines addObject:[NSString stringWithFormat:@"Strongbox %@ Debug Information at %@", [Utils getAppVersion], NSDate.date.friendlyDateTimeStringBothPrecise]];
     [debugLines addObject:@"--------------------"];
-
-
+    
+    
     [debugLines addObject:[NSString stringWithFormat:@"Version Info: %@ [%@ (%@)@%@-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION, pro]];
     [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", AppPreferences.sharedInstance.numberOfEntitlementCheckFails]];
     [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", AppPreferences.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
 #else
+    
+    
+    
+    
     NSString* pro = Settings.sharedInstance.isPro ? @"P" : @"";
     [debugLines addObject:@"-------------------- App Summary -----------------------"];
-
+    
     [debugLines addObject:[NSString stringWithFormat:@"App SKU: %@%@", StrongboxProductBundle.displayName, StrongboxProductBundle.isTestFlightBuild ? @" (TestFlight)" : @""]];
     [debugLines addObject:[NSString stringWithFormat:@"Pro Status: %@", proStatus]];
     [debugLines addObject:[NSString stringWithFormat:@"Platform: %@ %@", systemName, systemVersion]];
     [debugLines addObject:@"\n-------------------- Databases Summary -----------------------"];
-
+    
+    
+    
+    
     int i = 0;
     for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
         NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
@@ -206,6 +231,8 @@ static NSString *ModelIdentifier()
     [debugLines addObject:@"--------------------------------------------------------------\n"];
     [debugLines addObject:[NSString stringWithFormat:@"Strongbox %@ Debug Information at %@", [Utils getAppVersion], NSDate.date.friendlyDateTimeStringBothPrecise]];
     [debugLines addObject:@"--------------------"];
+    AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
+    [debugLines addObject:[NSString stringWithFormat:@"Launched as Login Item: %@", localizedYesOrNoFromBool(appDelegate.isWasLaunchedAsLoginItem)]];
 
     [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], pro]];
     [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", Settings.sharedInstance.numberOfEntitlementCheckFails]];

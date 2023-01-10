@@ -34,7 +34,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 
 @property (weak) IBOutlet NSButton *buttonIncludeItemsWithCustomIcons;
 @property (weak) IBOutlet NSTextField *statusLabel;
-@property (weak) IBOutlet NSButton *buttonPreferences;
+
 @property (weak) IBOutlet NSButton *buttonViewResults;
 @property (weak) IBOutlet NSButton *buttonRetry;
 @property (weak) IBOutlet NSTextField *labelSuccesses;
@@ -136,17 +136,10 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     self.validUniqueUrls = addedArray.copy;
 }
 
-- (IBAction)onPreferences:(id)sender {
-    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabFavIcon];
-}
-
 - (void)bindUi {
     self.statusLabel.stringValue = [self getStatusString];
 
     self.buttonIncludeItemsWithCustomIcons.enabled =
-    self.buttonPreferences.enabled =(
-        self.status != kFavIconBulkStatusInProgress &&
-        self.status != kFavIconBulkStatusPausing);
 
     self.buttonViewResults.hidden = self.buttonRetry.hidden =
         self.results.count == 0 ||

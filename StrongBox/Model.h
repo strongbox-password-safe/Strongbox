@@ -10,6 +10,8 @@
 #import "OnboardingDatabaseChangeRequests.h"
 #import "SearchScope.h"
 #import "BrowseSortField.h"
+#import "BrowseSortConfiguration.h"
+#import "BrowseViewType.h"
 
 #if TARGET_OS_IPHONE
 
@@ -50,6 +52,7 @@ extern NSString* const kMasterDetailViewCloseNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 extern NSString* const kWormholeAutoFillUpdateMessageId;
 extern NSString* const kDatabaseReloadedNotificationKey;
+extern NSString* const kTabsMayHaveChangedDueToModelEdit;
 extern NSString* const kAsyncUpdateDone;
 extern NSString* const kAsyncUpdateStarting;
 
@@ -66,6 +69,8 @@ extern NSString* const kAsyncUpdateStarting;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allItems;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allEntries;
+
+@property (nonatomic, nonnull) CompositeKeyFactors *ckfs;
 
 
 
@@ -84,7 +89,7 @@ extern NSString* const kAsyncUpdateStarting;
 
 #if TARGET_OS_IPHONE
 
-- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
+- (instancetype)initAsDuressDummy:(BOOL)isNativeAutoFillAppExtensionOpen
                  templateMetaData:(METADATA_PTR)templateMetaData;
 
 #endif
@@ -167,8 +172,9 @@ extern NSString* const kAsyncUpdateStarting;
 @property (nullable) AsyncUpdateResult* lastAsyncUpdateResult;
 @property (readonly) BOOL isRunningAsyncUpdate;
 
-- (BOOL)asyncUpdateAndSync;
-- (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion _Nullable)completion;
+- (BOOL)asyncUpdateAndSync; 
+- (BOOL)asyncUpdate:(AsyncUpdateCompletion _Nullable)completion;
+
 - (void)clearAsyncUpdateState;
 
 
@@ -229,6 +235,23 @@ extern NSString* const kAsyncUpdateStarting;
                                     field:(BrowseSortField)field
                                descending:(BOOL)descending
                         foldersSeparately:(BOOL)foldersSeparately;
+
+- (void)rebuildFastMaps; 
+
+#ifndef IS_APP_EXTENSION 
+
+- (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString;
+- (void)rebuildAutoFillDomainNodeMap;
+
+#endif
+
+#if TARGET_OS_IPHONE
+
+- (BrowseSortConfiguration*)getDefaultSortConfiguration;
+- (BrowseSortConfiguration*)getSortConfigurationForViewType:(BrowseViewType)viewType;
+- (void)setSortConfigurationForViewType:(BrowseViewType)viewType configuration:(BrowseSortConfiguration*)configuration;
+
+#endif
 
 @end
 

@@ -133,6 +133,10 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 }
 
 - (DatabaseSyncOperationalData*)getOperationData:(NSString*)databaseUuid {
+    if ( databaseUuid == nil ) {
+        NSLog(@"🔴 getOperationData called with NIL!");
+        return [[DatabaseSyncOperationalData alloc] initWithDatabaseId:databaseUuid];
+    }
     DatabaseSyncOperationalData *ret = [self.operationalStateForDatabase objectForKey:databaseUuid];
     
     if (!ret) {
@@ -284,11 +288,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     
     
-        
-    BOOL expressUpdateSyncMode = self.applicationPreferences.expressUpdateSyncPerfImprovementEnabled;
-    
+            
     if ( database.outstandingUpdateId != nil ) {
-        if ( expressUpdateSyncMode && database.lastSyncRemoteModDate != nil ) {
+        if ( database.lastSyncRemoteModDate != nil ) {
             opts.onlyIfModifiedDifferentFrom = database.lastSyncRemoteModDate; 
         }
         else {
@@ -301,11 +303,10 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     NSString* providerDisplayName = [SafeStorageProviderFactory getStorageDisplayName:database];
 
-    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, expressUpdateSyncMode=%d, provider=%@, localMod=%@, lastRemoteSyncMod=%@]",
+    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, provider=%@, localMod=%@, lastRemoteSyncMod=%@]",
                             (parameters.interactiveVC ? @"YES" : @"NO"),
                             (database.outstandingUpdateId != nil ? @"YES" : @"NO"),
                             forcePull,
-                            expressUpdateSyncMode,
                             providerDisplayName,
                             localModDate.friendlyDateTimeStringBothPrecise,
                             database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise];
@@ -662,7 +663,10 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Source DB has also changed. Conflict. Auto Merging..."];
 
     if ( !parameters.key ) {
-        NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_cannot_merge_in_background", @"Cannot merge without Master Credentials.") errorCode:-1];
+        
+        
+        
+        NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_cannot_merge_in_background", @"Cannot merge without credentials or in Background Sync mode. You must now do an Online Sync to resolve this conflict.") errorCode:-1];
         [self logAndPublishStatusChange:databaseUuid
                                  syncId:syncId
                                   state:kSyncOperationStateError
@@ -709,7 +713,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         completion(result, factors, error);
     }];
 #else
-    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithViewController:vc database:database isAutoFillOpen:NO];
+    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithViewController:vc database:database isNativeAutoFillAppExtensionOpen:NO];
     
     [determiner getCkfsManually:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         completion(result, factors, error);
@@ -728,7 +732,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:database
                                                         viewController:parameters.interactiveVC
                                                          forceReadOnly:NO
-                                                        isAutoFillOpen:NO
+                                      isNativeAutoFillAppExtensionOpen:NO
                                                            offlineMode:NO];
 
     [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
@@ -737,7 +741,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     [unlocker unlockAtUrl:localUrl
                       key:parameters.key
        keyFromConvenience:NO
-               completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+               completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.spinnerUi dismiss];
 
@@ -755,7 +759,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             }
             else if ( result == kUnlockDatabaseResultError ) {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not unlock working copy."]];
-                [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error ? error : innerStreamError];
+                [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
                 completion(kSyncAndMergeError, NO, error);
             }
             else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
@@ -766,7 +770,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                               completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, NSError * _Nullable error) {
                     if ( result == kGetCompositeKeyResultError ) {
                         [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not get credentials for working copy."]];
-                        [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error ? error : innerStreamError];
+                        [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
                         completion(kSyncAndMergeError, NO, error);
                     }
                     else if ( result == kGetCompositeKeyResultSuccess ) {
@@ -809,7 +813,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:database
                                                         viewController:parameters.interactiveVC
                                                          forceReadOnly:NO
-                                                        isAutoFillOpen:NO
+                                      isNativeAutoFillAppExtensionOpen:NO
                                                            offlineMode:NO];
     
     [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
@@ -818,7 +822,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     [unlocker unlockAtUrl:remoteUrl
                       key:parameters.key
        keyFromConvenience:NO
-               completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+               completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.spinnerUi dismiss];
             
@@ -828,7 +832,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             }
             else if ( result == kUnlockDatabaseResultError ) {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not unlock Source copy."]];
-                [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error ? error : innerStreamError];
+                [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
                 completion(kSyncAndMergeError, NO, error);
             }
             else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
@@ -839,7 +843,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                               completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, NSError * _Nullable error) {
                     if ( result == kGetCompositeKeyResultError ) {
                         [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not get credentials for source copy."]];
-                        [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error ? error : innerStreamError];
+                        [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
                         completion(kSyncAndMergeError, NO, error);
                     }
                     else if ( result == kGetCompositeKeyResultSuccess ) {
@@ -1188,7 +1192,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                  error:(NSError**)error {
     if ( takeABackup ) {
         NSURL* localWorkingCache = [self getExistingLocalCopy:databaseUuid modified:nil];
-        if (localWorkingCache) {
+        
+        if (localWorkingCache) { 
             METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
 
             if( ![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database] ) {
@@ -1199,10 +1204,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 }
                 return nil;
             }
-        }
-        else {
-            
-            NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
         }
     }
     

@@ -20,6 +20,12 @@
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_AutoFill-Swift.h"
+#endif
+
 @interface DatabaseCellView () <NSTextFieldDelegate>
 
 @property (weak) IBOutlet NSTextField *textFieldName;
@@ -42,6 +48,9 @@
 @property NSString* originalNickName;
 
 @property (weak) IBOutlet NSImageView *imageViewProvider;
+@property (weak) IBOutlet NSBox *boxUnlockedBarIndicator;
+@property (weak) IBOutlet NSStackView *masterStack;
+@property (weak) IBOutlet NSTextField *labelStatus;
 
 @end
 
@@ -55,10 +64,12 @@
     self.gestureRecognizerClick = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onNicknameClick)];
     [self.textFieldName addGestureRecognizer:self.gestureRecognizerClick];
     
-    if (@available(macOS 11.0, *)) {
-        self.imageViewUnlocked.image = [NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil];
-        self.imageViewUnlocked.contentTintColor = NSColor.systemGreenColor;
-    }
+
+
+
+
+    
+    [self.masterStack setCustomSpacing:8.0f afterView:self.boxUnlockedBarIndicator];
 }
 
 - (void)prepareForReuse {
@@ -89,7 +100,6 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     [self resetUi:metadata];
     
     self.gestureRecognizerClick.enabled = nickNameEditClickEnabled;
-    self.imageViewUnlocked.hidden = !wormholeUnlocked;
     
     @try {
         self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:metadata.storageProvider];
@@ -98,7 +108,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     
         [self bindEnableDisabled:metadata disabled:disabled indicateAutoFillDisabled:indicateAutoFillDisabled];
 
-        [self bindIndicators:metadata];
+        [self bindIndicatorsAndStatus:metadata wormholeUnlocked:wormholeUnlocked];
         
         [self bindSyncState:metadata showSyncState:showSyncState];
     }
@@ -120,12 +130,74 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     self.imageViewSyncing.hidden = YES;
     self.syncProgressIndicator.hidden = YES;
     [self.syncProgressIndicator stopAnimation:nil];
+    self.boxUnlockedBarIndicator.fillColor = NSColor.darkGrayColor;
+    self.labelStatus.stringValue = @"";
 }
 
-- (void)bindIndicators:(MacDatabasePreferences*)metadata {
+- (void)bindIndicatorsAndStatus:(MacDatabasePreferences*)metadata wormholeUnlocked:(BOOL)wormholeUnlocked {
     self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
     self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
     self.imageViewReadOnly.hidden = !metadata.readOnly;
+    
+    BOOL unlocked = (wormholeUnlocked || [self isDatabaseUnlocked:metadata.uuid]);
+    
+    self.imageViewUnlocked.hidden = !unlocked;
+    self.boxUnlockedBarIndicator.fillColor = unlocked ? NSColor.systemGreenColor : NSColor.darkGrayColor;
+    
+    self.labelStatus.stringValue = [self getStatusText:metadata unlocked:unlocked];
+    self.labelStatus.textColor = unlocked ? NSColor.systemGreenColor : NSColor.secondaryLabelColor;
+}
+
+- (BOOL)isDatabaseUnlocked:(NSString*)uuid {
+#ifndef IS_APP_EXTENSION
+    return [DatabasesCollection.shared isUnlockedWithUuid:uuid]; 
+#else
+    return NO;
+#endif
+}
+
+- (NSString*)getStatusText:(MacDatabasePreferences*)metadata unlocked:(BOOL)unlocked {
+    NSMutableArray* s = NSMutableArray.array;
+        
+#ifndef IS_APP_EXTENSION
+    Model* model = [DatabasesCollection.shared getUnlockedWithUuid:metadata.uuid];
+    
+    if ( model ) {
+        [s addObject:NSLocalizedString(@"database_unlocked_status", @"Unlocked")]; 
+
+        if ( model.isReadOnly  ) {
+            [s addObject:NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read-Only")];
+        }
+        if ( model.isInOfflineMode ) {
+            [s addObject:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")];
+        }
+    }
+    else {
+        if ( unlocked ) {
+            [s addObject:NSLocalizedString(@"database_unlocked_status", @"Unlocked")];
+        }
+        if ( metadata.readOnly ) {
+            [s addObject:NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read-Only")];
+        }
+        if ( metadata.alwaysOpenOffline || metadata.userRequestOfflineOpenEphemeralFlagForDocument ) {
+            [s addObject:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")];
+        }
+    }
+#else
+    if ( unlocked ) {
+        [s addObject:NSLocalizedString(@"database_unlocked_status", @"Unlocked")];
+    }
+    if ( metadata.readOnly ) {
+        [s addObject:NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read-Only")];
+    }
+    if ( metadata.alwaysOpenOffline ) {
+        [s addObject:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")];
+    }
+#endif
+    NSString* csv = [s componentsJoinedByString:@", "];
+    
+
+    return csv.length ? [NSString stringWithFormat:@"(%@)", csv] : @"";
 }
 
 - (void)bindEnableDisabled:(MacDatabasePreferences*)metadata disabled:(BOOL)disabled indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled {

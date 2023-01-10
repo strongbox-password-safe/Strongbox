@@ -40,7 +40,7 @@
 }
 
 - (nonnull UITableViewCell *)cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    Node* node = [self getNodeFromIndexPath:indexPath];
+    Node* node = [self getParamFromIndexPath:indexPath];
     
     return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:NO showGroupLocation:YES];
 }
@@ -53,7 +53,7 @@
     return nil;
 }
 
-- (Node*)getNodeFromIndexPath:(NSIndexPath*)indexPath {
+- (id)getParamFromIndexPath:(NSIndexPath *)indexPath {
     NSArray<Node*>* dataSource = self.searchResults;
     
     if(!dataSource || indexPath.row >= dataSource.count) {
@@ -65,9 +65,11 @@
 }
 
 - (void)updateSearchResults:(UISearchController*)searchController {
-    BrowseSortField sortField = self.viewModel.metadata.browseSortField;
-    BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
-    BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
+    BrowseSortConfiguration* sortConfig = [self.viewModel getDefaultSortConfiguration];
+    
+    BrowseSortField sortField = sortConfig.field;
+    BOOL descending = sortConfig.descending;
+    BOOL foldersSeparately = sortConfig.foldersOnTop;
 
     self.searchResults = [self.viewModel search:searchController.searchBar.text
                                           scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
@@ -84,6 +86,14 @@
 
 - (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
+}
+
+- (NSArray<NSString *> *)sectionIndexTitles {
+    return @[];
+}
+
+- (NSInteger)sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
+    return index;
 }
 
 @end

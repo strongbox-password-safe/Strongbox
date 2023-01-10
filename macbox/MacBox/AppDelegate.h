@@ -8,8 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-#define kAutoLockTime @"autoLockTime"
-
 extern const NSInteger kTopLevelMenuItemTagStrongbox;
 extern const NSInteger kTopLevelMenuItemTagFile;
 extern const NSInteger kTopLevelMenuItemTagView;
@@ -20,10 +18,16 @@ extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 
 - (IBAction)onUpgradeToFullVersion:(id)sender;
 
+- (IBAction)onSystemTrayQuitStrongbox:(id)sender;
+
 
 
 - (void)clearClipboardWhereAppropriate;
 - (void)onStrongboxDidChangeClipboard; 
+
+@property BOOL isRequestingAutoFillManualCredentialsEntry; 
+
+@property (readonly) BOOL isWasLaunchedAsLoginItem;
 
 @end
 

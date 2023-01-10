@@ -32,8 +32,6 @@
     return sharedInstance;
 }
 
-
-
 - (void)updateAutoFillQuickTypeDatabase:(Model*)database
                             databaseUuid:(NSString *)databaseUuid
                             displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat

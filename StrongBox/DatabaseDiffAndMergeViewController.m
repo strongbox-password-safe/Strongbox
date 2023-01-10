@@ -81,13 +81,15 @@
 - (DiffSummary*)diff {
     DiffSummary* summary = [DatabaseDiffer diff:self.firstDatabase.database second:self.secondDatabase.database];
     
+    BrowseSortConfiguration* sortConfig = [self.firstDatabase getDefaultSortConfiguration];
+    
     
     
     NSArray<Node*>* created = [summary.onlyInSecond map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [self.secondDatabase.database getItemById:obj];
     }];
     
-    self.willBeAddedOrOnlyInSecond = [self.firstDatabase sortItemsForBrowse:created browseSortField:self.firstDatabase.metadata.browseSortField descending:self.firstDatabase.metadata.browseSortOrderDescending foldersSeparately:YES];
+    self.willBeAddedOrOnlyInSecond = [self.firstDatabase sortItemsForBrowse:created browseSortField:sortConfig.field descending:sortConfig.descending foldersSeparately:sortConfig.foldersOnTop];
         
     
     
@@ -95,7 +97,7 @@
         return [self.firstDatabase.database getItemById:obj];
     }];
 
-    self.willBeDeletedOrOnlyInFirst = [self.firstDatabase sortItemsForBrowse:deleted browseSortField:self.firstDatabase.metadata.browseSortField descending:self.firstDatabase.metadata.browseSortOrderDescending foldersSeparately:YES];
+    self.willBeDeletedOrOnlyInFirst = [self.firstDatabase sortItemsForBrowse:deleted browseSortField:sortConfig.field descending:sortConfig.descending foldersSeparately:sortConfig.foldersOnTop];
     
     
     
@@ -103,7 +105,7 @@
         return [self.firstDatabase.database getItemById:obj];
     }];
     
-    self.willChangeHistoryOrHasDifferentHistory = [self.firstDatabase sortItemsForBrowse:history browseSortField:self.firstDatabase.metadata.browseSortField descending:self.firstDatabase.metadata.browseSortOrderDescending foldersSeparately:YES];
+    self.willChangeHistoryOrHasDifferentHistory = [self.firstDatabase sortItemsForBrowse:history browseSortField:sortConfig.field descending:sortConfig.descending foldersSeparately:sortConfig.foldersOnTop];
     
     
     

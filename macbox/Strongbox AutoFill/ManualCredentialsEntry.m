@@ -183,12 +183,24 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self dismissViewController:self];
+    if ( self.presentingViewController ) {
+        [self.presentingViewController dismissViewController:self];
+    }
+    else {
+        [self.view.window close];
+    }
+    
     self.onDone(YES, nil, nil, nil);
 }
 
 - (IBAction)onUnlock:(id)sender {
-    [self dismissViewController:self];
+    if ( self.presentingViewController ) {
+        [self.presentingViewController dismissViewController:self];
+    }
+    else {
+        [self.view.window close];
+    }
+
     self.onDone(NO, self.textFieldPassword.stringValue, self.selectedKeyFileBookmark, self.selectedYubiKeyConfiguration);
 }
 
@@ -546,11 +558,11 @@
 }
 
 - (NSString*)contextAwareKeyFileBookmark {
-    return self.isAutoFillOpen ? self.database.autoFillKeyFileBookmark : self.database.keyFileBookmark;
+    return self.isNativeAutoFillAppExtensionOpen ? self.database.autoFillKeyFileBookmark : self.database.keyFileBookmark;
 }
 
 - (void)setContextAwareKeyFileBookmark:(NSString *)contextAwareKeyFileBookmark {
-    if ( self.isAutoFillOpen ) {
+    if ( self.isNativeAutoFillAppExtensionOpen ) {
         self.database.autoFillKeyFileBookmark = contextAwareKeyFileBookmark;
     }
     else {

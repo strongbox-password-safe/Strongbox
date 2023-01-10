@@ -109,7 +109,7 @@ public class StrongboxProductBundle : NSObject {
         let bundleId = Utils.getAppBundleId()
         
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
-            NSLog("✅ Recognized Product Bundle: [%@] - [%hhd]", String(describing: bundle), bundle.isPro)
+
             return bundle.isPro
         }
         else {
@@ -119,14 +119,14 @@ public class StrongboxProductBundle : NSObject {
     }
     
     @objc class var isTestFlightBuild : Bool {
-        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt" 
     }
     
     @objc class var displayName : String {
         let bundleId = Utils.getAppBundleId()
         
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
-            NSLog("✅ Recognized Product Bundle: [%@] - [%hhd]", String(describing: bundle), bundle.isPro)
+
             return bundle.displayName
         }
         else {

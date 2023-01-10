@@ -47,16 +47,16 @@
 }
 
 - (void)requestPlugIn:(NSData*)challenge
-           windowHint:(NSWindow*)windowHint
+onDemandWindowProvider:(MacHardwareKeyManagerOnDemandUIProviderBlock)onDemandWindowProvider
                  slot:(NSInteger)slot
            completion:(YubiKeyCRResponseBlock)completion   {
     __weak MacHardwareKeyManager* weakSelf = self;
-    [PleaseConnectHardwareKey show:windowHint completion:^(BOOL cancelled) {
+    [PleaseConnectHardwareKey show:onDemandWindowProvider completion:^(BOOL cancelled) {
         if ( cancelled ) {
             completion(YES, nil, nil);
         }
         else {
-            [weakSelf compositeKeyFactorCr:challenge windowHint:windowHint slot:slot completion:completion];
+            [weakSelf compositeKeyFactorCr:challenge slot:slot completion:completion onDemandWindowProvider:onDemandWindowProvider];
         }
     }];
 }
@@ -65,24 +65,33 @@
                   windowHint:(NSWindow*)windowHint
                         slot:(NSInteger)slot
                   completion:(YubiKeyCRResponseBlock)completion {
+    [self compositeKeyFactorCr:challenge slot:slot completion:completion onDemandWindowProvider:^NSWindow * _Nonnull{
+        return windowHint;
+    }];
+}
+
+- (void)compositeKeyFactorCr:(NSData *)challenge
+                        slot:(NSInteger)slot
+                  completion:(YubiKeyCRResponseBlock)completion
+      onDemandWindowProvider:(MacHardwareKeyManagerOnDemandUIProviderBlock)onDemandWindowProvider {
     dispatch_async(self.queue, ^{
         HardwareKeySlotCrStatus status = [self fastGetStatus:(int)slot];
-
+        
         if ( status == kHardwareKeySlotCrStatusUnknown || status == kHardwareKeySlotCrStatusNotSupported ) {
-            [self requestPlugIn:challenge windowHint:windowHint slot:slot completion:completion];
+            [self requestPlugIn:challenge onDemandWindowProvider:onDemandWindowProvider slot:slot completion:completion];
         }
         else {
             if ( status == kHardwareKeySlotCrStatusSupportedBlocking ) {
-                [PressHardwareKeyWindow show:windowHint];
+                [PressHardwareKeyWindow show:onDemandWindowProvider];
             }
-
+            
             NSError *error;
             NSData* response = [self cr:challenge slot:slot error:&error];
-
+            
             if ( status == kHardwareKeySlotCrStatusSupportedBlocking ) {
                 [PressHardwareKeyWindow hide];
             }
-                
+            
             completion(NO, response, error);
         }
     });

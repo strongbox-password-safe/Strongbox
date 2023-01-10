@@ -62,6 +62,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNumeric;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSymbols;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellLatin1;
+@property (weak, nonatomic) IBOutlet UILabel *labelTapToSetLength;
 
 
 @end
@@ -97,6 +98,10 @@
     [self.sample1 addGestureRecognizer:gr1];
     
     self.sample1.textLabel.font = FontManager.sharedInstance.easyReadFont;
+    
+    UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTappedSetLength)];
+    tap.cancelsTouchesInView = YES;
+    [self.labelTapToSetLength addGestureRecognizer:tap];
     
     [self.segmentAlgorithm setTitle:NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic") forSegmentAtIndex:0];
     [self.segmentAlgorithm setTitle:NSLocalizedString(@"password_gen_vc_mode_diceware_xkcd_title", @"Diceware (XKCD)") forSegmentAtIndex:1];
@@ -149,6 +154,22 @@
 - (void)bindWordCountSlider {
     self.wordCountSlider.value = self.config.wordCount;
     self.wordCountLabel.text = @(self.config.wordCount).stringValue;
+}
+
+- (void)onTappedSetLength {
+    [Alerts OkCancelWithTextField:self
+                    textFieldText:@(self.config.basicLength).stringValue
+                            title:NSLocalizedString(@"alert_enter_password_basic_length", @"Enter Length")
+                          message:@""
+                       completion:^(NSString *text, BOOL response) {
+        if ( response && text.intValue ) {
+            self.basicLengthSlider.value = text.intValue;
+            self.config.basicLength = (NSInteger)self.basicLengthSlider.value;
+            AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+            [self bindBasicLengthSlider];
+            [self refreshGenerated];
+        }
+    }];
 }
 
 - (IBAction)onBasicLengthChanged:(id)sender {

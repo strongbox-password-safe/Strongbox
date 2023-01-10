@@ -286,16 +286,37 @@ class UnifiedUpgrade: NSViewController {
             }
             else {
                 if !Settings.sharedInstance().isPro {
-                    DispatchQueue.main.async { [weak self] in
-                        MacAlerts.info(NSLocalizedString("upgrade_vc_restore_unsuccessful_title", comment: "Restoration Unsuccessful"),
-                                       informativeText: NSLocalizedString("upgrade_vc_restore_unsuccessful_message", comment: "Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?"),
-                                       window: self?.view.window,
-                                       completion: nil)
-                    }
+                    self?.tryRefreshReceiptRestore()
                 }
                 else {
                     self?.dismissAndComplete()
                 }
+            }
+        }
+    }
+    
+    func tryRefreshReceiptRestore () {
+        NSLog("Restore purchases didn't work... try to refresh receipt...")
+        
+        macOSSpinnerUI.sharedInstance().show(NSLocalizedString("upgrade_vc_progress_restoring", comment: "Restoring..."), viewController: self)
+        self.enableButtons(false)
+        
+        ProUpgradeIAPManager.sharedInstance().refreshReceiptAndCheck {
+            self.enableButtons(true)
+            macOSSpinnerUI.sharedInstance().dismiss()
+            
+            if !Settings.sharedInstance().isPro {
+                NSLog("Refresh didn't work either...")
+                
+                DispatchQueue.main.async { [weak self] in
+                    MacAlerts.info(NSLocalizedString("upgrade_vc_restore_unsuccessful_title", comment: "Restoration Unsuccessful"),
+                                   informativeText: NSLocalizedString("upgrade_vc_restore_unsuccessful_message", comment: "Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?"),
+                                   window: self?.view.window,
+                                   completion: nil)
+                }
+            }
+            else {
+                self.dismissAndComplete()
             }
         }
     }

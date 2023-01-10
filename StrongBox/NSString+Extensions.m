@@ -11,6 +11,7 @@
 #import "MMcG_MF_Base32Additions.h"
 
 static NSString* const kDefaultScheme = @"https";
+static NSString* const kDefaultSchemeWithSlashes = @"https://";
 
 static NSString* const kLowerCaseTrue = @"true";
 static NSString* const kLowerCaseFalse = @"false";
@@ -113,6 +114,17 @@ static NSString* const kLowerCaseNull = @"null";
      return [self componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
 }
 
+- (NSURL *)urlExtendedParseAddingDefaultScheme {
+    NSURL* url = self.urlExtendedParse;
+    
+    if ( url && url.scheme.length == 0 ) {
+        NSString* foo = [kDefaultSchemeWithSlashes stringByAppendingString:url.absoluteString];
+        return foo.urlExtendedParse;
+    }
+    
+    return url;
+}
+
 - (NSURL*)urlExtendedParse {
     NSURL *simple = [NSURL URLWithString:self];
     if (simple) {
@@ -159,6 +171,9 @@ static NSString* const kLowerCaseNull = @"null";
     }
     
     NSString* processedHost =  [hostResult rangeAtIndex:5].location != NSNotFound ? [host substringWithRange:[hostResult rangeAtIndex:5]] : host;
+    
+    processedHost = [host stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLHostAllowedCharacterSet]; 
+    
     NSString* username =  [hostResult rangeAtIndex:2].location != NSNotFound ? [host substringWithRange:[hostResult rangeAtIndex:2]] : nil;
     NSString* password =  [hostResult rangeAtIndex:4].location != NSNotFound ? [host substringWithRange:[hostResult rangeAtIndex:4]] : nil;
     NSString* port =  [hostResult rangeAtIndex:7].location != NSNotFound ? [host substringWithRange:[hostResult rangeAtIndex:7]] : nil;

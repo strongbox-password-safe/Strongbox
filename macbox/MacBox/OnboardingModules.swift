@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import ServiceManagement
 
 class OnboardingModules {
     class func getFirstRunWelcomeModule() -> OnboardingModule {
@@ -18,11 +19,20 @@ class OnboardingModules {
                                        button1Title: NSLocalizedString("generic_lets_go", comment: "Let's Go"),
                                        hideDismiss: true,
                                        shouldDisplay: {
-                                           return !Settings.sharedInstance().hasShownFirstRunWelcome && MacDatabasePreferences.allDatabases.count == 0
-                                       }, onButton1: { _, completion in
-                                           Settings.sharedInstance().hasShownFirstRunWelcome = true
-                                           completion()
-                                       })
+            return !Settings.sharedInstance().hasShownFirstRunWelcome && MacDatabasePreferences.allDatabases.count == 0
+       }, onButton1: { _, completion in
+           Settings.sharedInstance().hasShownFirstRunWelcome = true
+                   completion()
+           
+           if #available(macOS 13.0, *) {
+               do {
+                   try SMAppService.mainApp.register()
+               }
+               catch {
+                   NSLog("🔴 Error registering startup item: [%@]", String(describing: error))
+               }
+           }
+       })
     }
 
     class func getHasBeenDowngradedModule() -> OnboardingModule {

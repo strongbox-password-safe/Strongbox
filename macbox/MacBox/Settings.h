@@ -65,7 +65,7 @@ extern NSString* const kCustomFieldsColumn;
 @property NSInteger clearClipboardAfterSeconds;
 @property (nonatomic) BOOL revealPasswordsImmediately;
 
-@property (nonatomic) NSInteger autoLockTimeoutSeconds; 
+@property (nonatomic) NSInteger autoLockTimeoutSeconds;
 
 @property BOOL closeManagerOnLaunch;
 @property BOOL makeLocalRollingBackups;
@@ -88,7 +88,7 @@ extern NSString* const kCustomFieldsColumn;
 
 
 
-@property (readonly) BOOL runningAsATrayApp;
+@property (readonly) BOOL configuredAsAMenuBarApp;
 
 @property BOOL checkPinYin;
 
@@ -128,7 +128,14 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL stripUnusedIconsOnSave;
 
 @property BOOL runBrowserAutoFillProxyServer;
-@property (readonly) BOOL expressUpdateSyncPerfImprovementEnabled;
+
+@property BOOL quitTerminatesProcessEvenInSystemTrayMode;
+@property BOOL lockDatabaseOnWindowClose; 
+@property BOOL lockDatabasesOnScreenLock;
+@property BOOL showDatabasesManagerOnAppLaunch;
+
+@property BOOL hasAskedAboutDatabaseOpenInBackground;
+@property BOOL concealClipboardFromMonitors;
 
 @end
 

@@ -31,6 +31,7 @@
 #import "DatabasePreferences.h"
 #import "EncryptionSettingsViewModel.h"
 #import "BackupsManager.h"
+#import "ProUpgradeIAPManager.h"
 
 @interface OnboardingManager ()
 
@@ -414,6 +415,7 @@
         if ( AppPreferences.sharedInstance.isPro ) {
             return NO;
         }
+        
         
         
 

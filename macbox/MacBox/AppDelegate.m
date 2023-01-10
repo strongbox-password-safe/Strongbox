@@ -12,7 +12,6 @@
 #import "MacAlerts.h"
 #import "Utils.h"
 #import "Strongbox.h"
-#import "DatabasesManagerVC.h"
 #import "BiometricIdHelper.h"
 #import "ViewController.h"
 #import "SafeStorageProviderFactory.h"
@@ -46,7 +45,6 @@
 #import "GoogleDriveStorageProvider.h"
 #import "DropboxV2StorageProvider.h"
 #import "AutoFillProxyServer.h"
-
 #import "Strongbox-Swift.h"
 
 NSString* const kUpdateNotificationQuickRevealStateChanged = @"kUpdateNotificationQuickRevealStateChanged";
@@ -62,13 +60,16 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 @property (strong) IBOutlet NSMenu *systemTraymenu;
 @property NSStatusItem* statusItem;
 
-@property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 @property NSTimer* clipboardChangeWatcher;
 @property NSInteger currentClipboardVersion;
 @property NSPopover* systemTrayPopover;
 @property NSDate* systemTrayPopoverClosedAt;
 @property NSTimer* timerRefreshOtp;
 @property NSDate* appLaunchTime;
+
+@property BOOL explicitQuitRequest;
+@property BOOL firstActivationDone;
+@property BOOL wasLaunchedAsLoginItem;
 
 @end
 
@@ -87,12 +88,40 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     return self;
 }
 
+- (BOOL)isWasLaunchedAsLoginItem {
+    return self.wasLaunchedAsLoginItem;
+}
+
+- (void)determineIfLaunchedAsLoginItem {
+    
+    
+    
+
+    NSAppleEventDescriptor* event = NSAppleEventManager.sharedAppleEventManager.currentAppleEvent;
+    if ( event.eventID == kAEOpenApplication &&
+        [[event paramDescriptorForKeyword:keyAEPropData] enumCodeValue] == keyAELaunchedAsLogInItem) {
+        NSLog(@"Strongbox was launched as a login item!");
+        self.wasLaunchedAsLoginItem = YES;
+    }
+    else {
+        NSLog(@"Strongbox was NOT launched as a login item - just a regular launch");
+    }
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     
     
     
     
     
+    
+
+    [self determineIfLaunchedAsLoginItem];
+
+
+
+
+
 
     [self initializeInstallSettingsAndLaunchCount];
     
@@ -100,10 +129,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [self listenToEvents];
             
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self doAppOnboarding];
-        
-        [self startAutoFillProxyServer];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self doDeferredAppLaunchTasks]; 
     });
 }
 
@@ -114,6 +141,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         if ( ![AutoFillProxyServer.sharedInstance start] ) {
             NSLog(@"🔴 Failed to start AutoFillProxyServer.");
         }
+    }
+    else {
+        [NativeMessagingManifestInstallHelper removeNativeMessagingHostsFiles];
     }
 }
 
@@ -147,7 +177,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self installGlobalHotKeys];
             
-    [self clearAsyncUpdateIds]; 
+    [self clearAsyncUpdateIdsAndEphemeralOfflineFlags]; 
     
     [self startRefreshOtpTimer];
 
@@ -160,20 +190,18 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [DropboxV2StorageProvider.sharedInstance initialize:Settings.sharedInstance.useIsolatedDropbox];
 }
 
-- (void)doAppOnboarding {
+- (void)doDeferredAppLaunchTasks {
     [MacOnboardingManager beginAppOnboardingWithCompletion:^{
         NSLog(@"✅ Onboarding Completed...");
 
-        
-
-        DocumentController* dc = NSDocumentController.sharedDocumentController;
-        
-        [dc onAppStartup];
-        
-        [self maybeHideDockIconIfAllMiniaturized:nil];
-        
-        [self monitorForQuickRevealKey];
+        [self checkForAllWindowsClosedScenario:nil appIsLaunching:YES];
     }];
+
+    [self monitorForQuickRevealKey];
+
+    [self startAutoFillProxyServer];
+    
+    [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 }
 
 - (void)setupSystemTrayPopover {
@@ -246,6 +274,18 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
                                                      andSelector:@selector(handleGetURLEvent:withReplyEvent:)
                                                    forEventClass:kInternetEventClass
                                                       andEventID:kAEGetURL];
+    
+    
+    
+    [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self
+                                                       selector:@selector(onLogoutRestartOrShutdown:)
+                                                           name:NSWorkspaceWillPowerOffNotification
+                                                         object:nil];
+}
+
+- (void)cleanupWorkingDirectories {
+    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+    [FileManager.sharedInstance deleteAllTmpWorkingFiles];
 }
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
@@ -277,7 +317,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         return;
     }
 
-    [self maybeHideDockIconIfAllMiniaturized:notification.object];
+    [self checkForAllWindowsClosedScenario:notification.object appIsLaunching:NO];
 }
 
 - (void)onWindowDidMiniaturize:(NSNotification*)notification {
@@ -304,10 +344,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
     
-    [self maybeHideDockIconIfAllMiniaturized:nil];
+    [self checkForAllWindowsClosedScenario:nil appIsLaunching:NO];
 }
 
-- (void)maybeHideDockIconIfAllMiniaturized:(NSWindow*)windowAboutToBeClosed {
+- (void)checkForAllWindowsClosedScenario:(NSWindow*)windowAboutToBeClosed appIsLaunching:(BOOL)appIsLaunching {
+    NSLog(@"✅ AppDelegate::checkForAllWindowsClosedScenario");
+    
     NSArray* docs = DocumentController.sharedDocumentController.documents;
     NSMutableArray* mainWindows = [docs map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
         Document* doc = obj;
@@ -329,54 +371,113 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }];
     
     if ( allMiniaturizedOrClosed ) {
+        [self onAllWindowsClosed:windowAboutToBeClosed appIsLaunching:appIsLaunching];
+    }
+    else {
 
-        
-        if ( Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.hideDockIconOnAllMinimized ) {
+
+
+
+
+
+
+    }
+}
+
+- (void)onAllWindowsClosed:(NSWindow*)windowAboutToBeClosed appIsLaunching:(BOOL)appIsLaunching {
+    if ( appIsLaunching ) {
+        if ( Settings.sharedInstance.showDatabasesManagerOnAppLaunch ) {
+            if ( self.isWasLaunchedAsLoginItem && Settings.sharedInstance.showSystemTrayIcon ) {
+                NSLog(@"AppDelegate::onAllWindowsClosed -> App Launching and no windows visible but was launched as a login item so NOP - Silent Launch - Hiding Dock Icon");
+                
+                [self showHideDockIcon:NO];
+            }
+            else {
+                NSLog(@"AppDelegate::onAllWindowsClosed -> App Launching and no windows visible - Showing Databases Manager because so configured");
+                
+                [DBManagerPanel.sharedInstance show];
+            }
+        }
+        else if ( Settings.sharedInstance.configuredAsAMenuBarApp ) {
+            
+            NSLog(@"AppDelegate::onAllWindowsClosed -> App Launching and no windows visible - Running as a tray app so NOT showing Databases Manager");
+            
             [self showHideDockIcon:NO];
         }
     }
     else {
+        BOOL currentlyClosingDatabasesManager = [windowAboutToBeClosed isMemberOfClass:DatabasesManagerWindow.class];
+        
+        if ( Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows && !currentlyClosingDatabasesManager ) {
+            NSLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... launching Databases Manager");
+            
+            [DBManagerPanel.sharedInstance show];
+        }
+        else {
+            if ( Settings.sharedInstance.configuredAsAMenuBarApp ) {
+                NSLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... running as a tray app - hiding dock icon.");
+                
+                [self showHideDockIcon:NO];
+            }
+            else {
+                NSLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... but configured to do nothing special.");
+            }
+        }
+    }
+}
 
+- (void)showHideDockIcon:(BOOL)show {
+    NSLog(@"🚀 AppDelegate::showHideDockIcon: [%@] - [%@]", (long)show ? @"SHOW" : @"HIDE", NSThread.currentThread);
 
-
-
-
-
-
+    if ( show ) {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        BOOL ret = [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
+        NSLog(@"🚀 AppDelegate::NSApplicationActivationPolicyProhibited: %@", localizedYesOrNoFromBool(ret));
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            BOOL ret = [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+            NSLog(@"🚀 AppDelegate::NSApplicationActivationPolicyRegular: %@", localizedYesOrNoFromBool(ret));
+            
+            
+            
+            [NSApp activateIgnoringOtherApps:YES];
+            [NSApp arrangeInFront:nil];
+            
+            NSLog(@"🚀 AppDelegate::showHideDockIcon: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
+            
+            [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
+        });
+    }
+    else {
+        
+        
+        
+        
+        BOOL ret = [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
+        NSLog(@"🚀 AppDelegate::NSApplicationActivationPolicyAccessory: %@", localizedYesOrNoFromBool(ret));
     }
 }
 
 - (BOOL)isHiddenToTray {
-    return NSApp.activationPolicy != NSApplicationActivationPolicyRegular;
-}
-
-- (void)showHideDockIcon:(BOOL)show {
-    NSLog(@"AppDelegate::showHideDockIcon: %ld", (long)show);
-
-    if ( show ) {
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-        
-        
-
-        [NSApp activateIgnoringOtherApps:YES];
-        [NSApp arrangeInFront:nil];
-        
-        NSLog(@"showHideDockIcon: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
-        
-        [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
-    }
-    else {
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
-
-    }
-}
-
-- (void)cleanupWorkingDirectories {
-    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
-    [FileManager.sharedInstance deleteAllTmpWorkingFiles];
+    BOOL ret = NSApp.activationPolicy != NSApplicationActivationPolicyRegular;
+    
+    NSLog(@"isHiddenToTray: %@", localizedYesOrNoFromBool(ret));
+    
+    return ret;
 }
 
 - (void)showHideSystemStatusBarIcon {
+    NSLog(@"AppDelegate::showHideSystemStatusBarIcon");
+    
     if (Settings.sharedInstance.showSystemTrayIcon) {
         if (!self.statusItem) {
             NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
@@ -448,10 +549,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-- (IBAction)onSystemTrayQuitStrongbox:(id)sender {
-    [NSApplication.sharedApplication terminate:nil];
-}
-
 - (IBAction)onSystemTrayShow:(id)sender {
     [self showAndActivateStrongbox:sender];
 }
@@ -466,14 +563,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             [win deminiaturize:self];
         }
     }
-
-    [NSApp arrangeInFront:nil];
-    
-
-    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
-    
-    [NSApp activateIgnoringOtherApps:YES];
-    
+        
     DocumentController* dc = NSDocumentController.sharedDocumentController;
     
     if ( databaseUuid ) {
@@ -483,9 +573,21 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         }
     }
     else {
-        [dc performEmptyLaunchTasksIfNecessary];
+        [dc launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable];
     }
+
+    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
+    [NSApp arrangeInFront:nil];
     
+    [NSApp activateIgnoringOtherApps:YES];
+
+    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
+    [NSApp arrangeInFront:nil];
+
+    [NSApp activateIgnoringOtherApps:YES];
+
+    
+
     NSLog(@"🚀 showAndActivateStrongbox: [%@] - END", databaseUuid);
 }
 
@@ -500,39 +602,89 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-    NSLog(@"✅ applicationDidBecomeActive - START");
+    NSLog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
 
     [self performedScheduledEntitlementsCheck];
     
-    if(self.autoLockWorkBlock) {
-        dispatch_block_cancel(self.autoLockWorkBlock);
-        self.autoLockWorkBlock = nil;
-    }
+    if ( !self.firstActivationDone ) {
+        self.firstActivationDone = YES;
         
-    if ( [self isHiddenToTray] ) {
-        
-        
-        
-        
-        
+        NSLog(@"✅ applicationDidBecomeActive - First Activation");
 
-        [self showAndActivateStrongbox:nil];
+        DocumentController* dc = NSDocumentController.sharedDocumentController;
+
+        [dc onAppStartup];
+    }
+    else if ( !self.isRequestingAutoFillManualCredentialsEntry ) {
+        if ( [self isHiddenToTray] ) {
+            NSLog(@"✅ applicationDidBecomeActive - isHiddenToTray - showing dock icon and and activating");
+            
+            
+            
+            
+            
+            
+            
+            
+            [self showAndActivateStrongbox:nil];
+        }
+        else {
+
+
+
+
+
+
+
+            
+            
+            
+            
+            
+        }
+    }
+    else {
+        NSLog(@"✅ applicationDidBecomeActive - Activated due to AutoFill Manual Credentials Entry request - NOP");
     }
 }
 
-- (void)applicationDidResignActive:(NSNotification *)notification {
-    NSInteger timeout = [[Settings sharedInstance] autoLockTimeoutSeconds];
-    
-    if(timeout != 0) {
-        self.autoLockWorkBlock = dispatch_block_create(0, ^{
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)hasVisibleWindows {
+    NSLog(@"✅ AppDelegate::applicationShouldHandleReopen: hasVisibleWindows = [%@]", localizedYesOrNoFromBool(hasVisibleWindows));
 
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:kAutoLockTime object:nil];
-            self.autoLockWorkBlock = nil;
-        });
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), self.autoLockWorkBlock);
+    
+    
+    
+    if ( !hasVisibleWindows ) {
+        DocumentController* dc = NSDocumentController.sharedDocumentController;
+        [dc launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable];
     }
+    
+    return YES;
+}
+
+- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
+    NSLog(@"✅ AppDelegate::applicationShouldOpenUntitledFile");
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    return NO;
+}
+
+- (void)applicationDidResignActive:(NSNotification *)notification {
+
 }
 
 - (void)randomlyShowUpgradeMessage {
@@ -641,7 +793,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         [topLevelMenuItem removeItemAtIndex:index];
     }
     else {
-        NSLog(@"WARN: Menu Item %@ not found to remove.", NSStringFromSelector(action));
+
     }
 }
 
@@ -662,25 +814,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     else {
         NSLog(@"WARN: Menu Item %@ not found to remove.", NSStringFromSelector(action));
     }
-}
-
-- (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    return NO;
 }
 
 - (IBAction)onViewDatabases:(id)sender {
@@ -713,7 +846,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 - (void)onPreferencesChanged:(NSNotification*)notification {
-    NSLog(@"Preferences Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
+    NSLog(@"AppDelegate::Preferences Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
 
     [self initializeClipboardWatchingTask];
     [self showHideSystemStatusBarIcon];
@@ -852,8 +985,10 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)importFromCsvFile {
-    [DBManagerPanel.sharedInstance show]; 
     
+    
+    [DBManagerPanel.sharedInstance show]; 
+
     NSOpenPanel* panel = [NSOpenPanel openPanel];
     NSString* loc = NSLocalizedString(@"mac_choose_csv_file_import", @"Choose CSV file to Import");
     [panel setTitle:loc];
@@ -876,13 +1011,15 @@ static NSInteger clipboardChangeCount;
             else {
                 [MacAlerts error:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
                            error:error
-                          window:NSApplication.sharedApplication.mainWindow];
+                          window:DBManagerPanel.sharedInstance.window];
             }
         }
     }
 }
 
 - (IBAction)import1Password1Pif:(id)sender {
+    
+    
     [DBManagerPanel.sharedInstance show]; 
 
     NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
@@ -890,7 +1027,7 @@ static NSInteger clipboardChangeCount;
     
     [MacAlerts info:title
     informativeText:msg
-             window:NSApplication.sharedApplication.mainWindow
+             window:DBManagerPanel.sharedInstance.window
          completion:^{
         NSOpenPanel* panel = NSOpenPanel.openPanel;
         
@@ -911,7 +1048,7 @@ static NSInteger clipboardChangeCount;
                 Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
                 
                 if ( error ) {
-                    [MacAlerts error:error window:NSApplication.sharedApplication.mainWindow];
+                    [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
                 }
                 else {
                     [self addImportedDatabase:root];
@@ -920,7 +1057,7 @@ static NSInteger clipboardChangeCount;
             else {
                 [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
                 informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
-                         window:NSApplication.sharedApplication.mainWindow
+                         window:DBManagerPanel.sharedInstance.window
                      completion:nil];
             }
         }
@@ -931,20 +1068,20 @@ static NSInteger clipboardChangeCount;
     if ( !root ) {
         [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
         informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
-                 window:NSApplication.sharedApplication.mainWindow
+                 window:DBManagerPanel.sharedInstance.window
              completion:nil];
         return;
     }
     
     [MacAlerts info:NSLocalizedString(@"import_successful_title", @"✅ Import Successful")
     informativeText:NSLocalizedString(@"import_successful_message", @"Your import was successful! Now, let's set a strong master password and save your new Strongbox database.")
-             window:NSApplication.sharedApplication.mainWindow
+             window:DBManagerPanel.sharedInstance.window
          completion:^{
-        [self setANewMasterPassword:root];
+        [self setANewCkfsForImportedDatabase:root];
     }];
 }
 
-- (void)setANewMasterPassword:(Node*)root {
+- (void)setANewCkfsForImportedDatabase:(Node*)root {
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
     NSString* loc = NSLocalizedString(@"mac_please_enter_master_credentials_for_this_database", @"Please Enter the Master Credentials for this Database");
@@ -952,13 +1089,19 @@ static NSInteger clipboardChangeCount;
     wizard.initialDatabaseFormat = kKeePass4;
     wizard.createSafeWizardMode = NO;
         
-    NSModalResponse returnCode = [NSApp runModalForWindow:wizard.window];
-    if (returnCode != NSModalResponseOK) {
-        return;
-    }
+    [DBManagerPanel.sharedInstance.window beginSheet:wizard.window
+                                   completionHandler:^(NSModalResponse returnCode) {
+        if (returnCode == NSModalResponseOK) {
+            [self onWizardDoneWithNewCkfs:wizard root:root];
+        }
+    }];
+}
 
+- (void)onWizardDoneWithNewCkfs:(CreateFormatAndSetCredentialsWizard*)wizard root:(Node*)root {
     NSError* error;
-    CompositeKeyFactors* ckf = [wizard generateCkfFromSelected:nil error:&error];
+    
+    CompositeKeyFactors* ckf = [wizard generateCkfFromSelectedFactors:DBManagerPanel.sharedInstance.contentViewController
+                                                                error:&error];
     
     if ( ckf ) {
         DatabaseFormat format = kKeePass4;
@@ -968,14 +1111,16 @@ static NSInteger clipboardChangeCount;
                                                                    root:root];
         
         DocumentController* dc = DocumentController.sharedDocumentController;
-        [dc serializeAndAddDatabase:database format:format];
+        [dc serializeAndAddDatabase:database format:format
+                    keyFileBookmark:wizard.selectedKeyFileBookmark
+                      yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
     }
     else {
-        [MacAlerts error:error window:NSApplication.sharedApplication.mainWindow];
+        [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
     }
 }
 
-- (BOOL)shouldWaitForUpdatesToFinish {
+- (BOOL)shouldWaitForUpdatesOrSyncsToFinish {
     BOOL asyncUpdatesInProgress = [MacDatabasePreferences.allDatabases anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         return obj.asyncUpdateId != nil;
     }];
@@ -983,27 +1128,78 @@ static NSInteger clipboardChangeCount;
     return asyncUpdatesInProgress || MacSyncManager.sharedInstance.syncInProgress;
 }
 
+- (void)closeAllDatabases {
+    NSArray* docs = DocumentController.sharedDocumentController.documents;
+    NSMutableArray* mainWindows = [docs map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
+        Document* doc = obj;
+        NSWindowController* wc = (NSWindowController*)doc.windowControllers.firstObject;
+        return wc.window;
+    }].mutableCopy;
+
+    for ( NSWindow* window in mainWindows ) {
+        [window close];
+    }
+}
+
+- (IBAction)onSystemTrayQuitStrongbox:(id)sender {
+    self.explicitQuitRequest = YES;
+    [NSApplication.sharedApplication terminate:nil];
+}
+
+- (void)onLogoutRestartOrShutdown:(NSNotification *)notification {
+    NSLog(@"✅ onLogoutRestartOrShutdown...");
+    
+    
+    
+    
+    
+    
+    self.explicitQuitRequest = YES;
+}
+
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
+    BOOL explicit = self.explicitQuitRequest;
+    self.explicitQuitRequest = NO; 
+
+    if ( Settings.sharedInstance.configuredAsAMenuBarApp && !Settings.sharedInstance.quitTerminatesProcessEvenInSystemTrayMode ) {
+        if ( !explicit ) {
+            NSLog(@"✅ applicationShouldTerminate => No - Closing all windows instead");
+
+            [self closeAllDatabases];
+            
+            [DBManagerPanel.sharedInstance close];
+            
+            return NSTerminateCancel;
+        }
+    }
+        
     [self stopRefreshOtpTimer];
     
-    if ( [self shouldWaitForUpdatesToFinish] ) {
+    if ( [self shouldWaitForUpdatesOrSyncsToFinish] ) {
+        
+        
         [DBManagerPanel.sharedInstance show];
         
-        [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"macos_quitting_finishing_sync", @"Quitting - Finishing Sync...") viewController:nil];
+        [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"macos_quitting_finishing_sync", @"Quitting - Finishing Sync...")
+                             viewController:DBManagerPanel.sharedInstance.contentViewController];
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self waitForAllSyncToFinishThenTerminate];
         });
     
+        NSLog(@"✅ applicationShouldTerminate? => Yes, but later finish sync first");
+
         return NSTerminateLater;
     }
     else {
+        NSLog(@"✅ applicationShouldTerminate? => Yes, immediately");
+
         return NSTerminateNow;
     }
 }
 
 - (void)waitForAllSyncToFinishThenTerminate {
-    if ( [self shouldWaitForUpdatesToFinish] ) {
+    if ( [self shouldWaitForUpdatesOrSyncsToFinish] ) {
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1. * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self waitForAllSyncToFinishThenTerminate];
@@ -1038,11 +1234,10 @@ static NSInteger clipboardChangeCount;
     [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabGeneral];
 }
 
-- (void)clearAsyncUpdateIds {
+- (void)clearAsyncUpdateIdsAndEphemeralOfflineFlags {
     for (MacDatabasePreferences* preferences in MacDatabasePreferences.allDatabases) {
-        if ( preferences.asyncUpdateId != nil ) {
-            preferences.asyncUpdateId = nil;
-        }
+        preferences.asyncUpdateId = nil;
+        preferences.userRequestOfflineOpenEphemeralFlagForDocument = NO;
     }
 }
 

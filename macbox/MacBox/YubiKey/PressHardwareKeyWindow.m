@@ -18,10 +18,11 @@ static PressHardwareKeyWindow* instance;
     return self;
 }
 
-+ (void)show:(NSWindow*)parentHint {
++ (void)show:(MacHardwareKeyManagerOnDemandUIProviderBlock)parentHint {
     dispatch_async(dispatch_get_main_queue(), ^{
         instance = [[PressHardwareKeyWindow alloc] init];
-        [instance showAsSheet:parentHint];
+        NSWindow* window = parentHint();
+        [instance showAsSheet:window];
     });
 }
 
@@ -33,18 +34,6 @@ static PressHardwareKeyWindow* instance;
 }
 
 - (void)showAsSheet:(NSWindow*)parent {
-    if (!parent) {
-        
-        
-        parent = NSApplication.sharedApplication.mainWindow ? NSApplication.sharedApplication.mainWindow : NSApplication.sharedApplication.keyWindow;
-
-        if (!parent) {
-            
-
-            parent = NSApplication.sharedApplication.windows.firstObject;
-        }
-    }
-    
     [parent beginCriticalSheet:instance.window completionHandler:nil];
 }
 

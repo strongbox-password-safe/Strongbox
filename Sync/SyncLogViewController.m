@@ -24,6 +24,15 @@ static NSString* const kSyncLogCellCellId = @"SyncLogCell";
 
 @implementation SyncLogViewController
 
++ (UINavigationController*)createWithDatabase:(DatabasePreferences*)database {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"SyncLog" bundle:nil];
+    UINavigationController* nav = [sb instantiateInitialViewController];
+    SyncLogViewController* vc = (SyncLogViewController*) nav.childViewControllers.firstObject;
+    vc.database = database;
+    
+    return nav;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 

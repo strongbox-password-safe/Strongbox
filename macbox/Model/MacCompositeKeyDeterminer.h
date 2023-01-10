@@ -12,17 +12,23 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NSViewController* _Nonnull (^MacCompositeKeyDeterminerOnDemandUIProviderBlock)(void); // Allows lazy creation of UI only when required, so we can run very silently / in background
+
 @interface MacCompositeKeyDeterminer : NSObject
 
-+ (instancetype)determinerWithViewController:(NSViewController*)viewController
++ (instancetype)determinerWithViewController:(NSViewController*_Nullable)viewController
                                     database:(METADATA_PTR)database
-                              isAutoFillOpen:(BOOL)isAutoFillOpen;
+            isNativeAutoFillAppExtensionOpen:(BOOL)isNativeAutoFillAppExtensionOpen;
 
-
-+ (instancetype)determinerWithViewController:(NSViewController*)viewController
++ (instancetype)determinerWithViewController:(NSViewController*_Nullable)viewController
                                     database:(METADATA_PTR)database
-                              isAutoFillOpen:(BOOL)isAutoFillOpen
+            isNativeAutoFillAppExtensionOpen:(BOOL)isNativeAutoFillAppExtensionOpen
                      isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen;
+
++ (instancetype)determinerWithDatabase:(METADATA_PTR)database
+      isNativeAutoFillAppExtensionOpen:(BOOL)isNativeAutoFillAppExtensionOpen
+               isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
+                    onDemandUiProvider:(MacCompositeKeyDeterminerOnDemandUIProviderBlock)onDemandUiProvider;
 
 - (void)getCkfs:(CompositeKeyDeterminedBlock)completion;
 
@@ -38,17 +44,18 @@ NS_ASSUME_NONNULL_BEGIN
                          completion:(CompositeKeyDeterminedBlock)completion;
 
 @property (readonly) BOOL bioOrWatchUnlockIsPossible;
+@property BOOL createWindowForManualCredentialsEntry;
 
 + (BOOL)bioOrWatchUnlockIsPossible:(MacDatabasePreferences*)database;
 
 
 
 + (CompositeKeyFactors* _Nullable)getCkfsWithConfigs:(NSString*_Nullable)password
-                           keyFileBookmark:(NSString*_Nullable)keyFileBookmark
-                      yubiKeyConfiguration:(YubiKeyConfiguration*_Nullable)yubiKeyConfiguration
-          hardwareKeyInteractionWindowHint:(NSWindow*)hardwareKeyInteractionWindowHint
-                         formatKeyFileHint:(DatabaseFormat)formatKeyFileHint
-                                     error:(NSError**)outError;
+                                     keyFileBookmark:(NSString*_Nullable)keyFileBookmark
+                                yubiKeyConfiguration:(YubiKeyConfiguration*_Nullable)yubiKeyConfiguration
+                hardwareKeyInteractionViewController:(NSViewController*)hardwareKeyInteractionViewController
+                                   formatKeyFileHint:(DatabaseFormat)formatKeyFileHint
+                                               error:(NSError**)outError;
 @end
 
 NS_ASSUME_NONNULL_END

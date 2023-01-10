@@ -12,8 +12,11 @@
 #import "DatabasePreferences.h"
 #import "Model.h"
 #import "AppPreferences.h"
+#import "Strongbox-Swift.h"
 
-@interface BrowsePreferencesTableViewController () <UIAdaptivePresentationControllerDelegate> // Detect iOS13 swipe down dismiss
+@interface BrowsePreferencesTableViewController () <UIAdaptivePresentationControllerDelegate> 
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellConfigureTabs;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStartWithSearch;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpBrowseView;
@@ -30,8 +33,6 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowBackupFolder;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowRecycleBin;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowRecycleBinInSearch;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAs;
-@property (weak, nonatomic) IBOutlet UILabel *labelViewAs;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSingleTapAction;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDoubleTapAction;
@@ -63,6 +64,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellFetchFavIcon;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchSortCustomFields;
+@property (weak, nonatomic) IBOutlet UISwitch *switchStartWithLastViewedEntry;
 
 
 @end
@@ -108,6 +110,8 @@
     self.databaseMetaData.showFlagsInBrowse = self.showFlagsInBrowse.on;
     self.databaseMetaData.immediateSearchOnBrowse = self.switchStartWithSearch.on;
     
+    self.databaseMetaData.showLastViewedEntryOnUnlock = self.switchStartWithLastViewedEntry.on;
+    
     self.databaseMetaData.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
     self.databaseMetaData.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
 
@@ -146,8 +150,10 @@
     self.switchShowIcons.on = !self.databaseMetaData.hideIconInBrowse;
     self.showChildCountOnFolder.on = self.databaseMetaData.showChildCountOnFolderInBrowse;
     self.showFlagsInBrowse.on = self.databaseMetaData.showFlagsInBrowse;
+    
     self.switchStartWithSearch.on = self.databaseMetaData.immediateSearchOnBrowse;
-        
+    self.switchStartWithLastViewedEntry.on = self.databaseMetaData.showLastViewedEntryOnUnlock;
+    
     self.switchShowKeePass1BackupFolder.on = self.databaseMetaData.showKeePass1BackupGroup;
     self.switchShowRecycleBinInSearch.on = self.databaseMetaData.showRecycleBinInSearchResults;
     
@@ -157,8 +163,6 @@
     
     self.switchShowTotpBrowseView.on = !self.databaseMetaData.hideTotpInBrowse;
     self.switchShowRecycleBinInBrowse.on = !self.databaseMetaData.doNotShowRecycleBinInBrowse;
-
-    self.labelViewAs.text = [BrowsePreferencesTableViewController getBrowseViewTypeName:self.databaseMetaData.browseViewType];
     
     
     
@@ -236,16 +240,16 @@
     if (cell == self.cellBrowseItemSubtitle) {
         [self onChangeBrowseItemSubtitle];
     }
-    else if (cell == self.cellViewAs) {
-        [self onChangeViewType];
-    }
     else if (cell == self.cellSingleTapAction || cell == self.cellDoubleTapAction || cell == self.cellTripleTapAction || cell == self.cellLongPressAction) {
         [self onChangeTapAction:cell];
     }
     else if (cell == self.cellIconSet) {
         [self onChangeIconSet];
     }
-    
+    else if (cell == self.cellConfigureTabs ) {
+        [self onConfigureTabs];
+    }
+
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
@@ -339,51 +343,6 @@
                    [self bindPreferences];
                    [self notifyDatabaseViewPreferencesChanged];
                }];
-}
-
-- (void)onChangeViewType {
-    NSArray<NSNumber*>* options = @[@(kBrowseViewTypeHierarchy),
-                                    @(kBrowseViewTypeList),
-                                    @(kBrowseViewTypeTotpList)];
-    
-    NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return [BrowsePreferencesTableViewController getBrowseViewTypeName:(BrowseViewType)obj.integerValue];
-    }];
-    
-    BrowseViewType current = self.databaseMetaData.browseViewType;
-    
-    NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        return obj.integerValue == current;
-    }];
-    
-    [self promptForString:NSLocalizedString(@"browse_prefs_view_as", @"View As")
-                  options:optionStrings
-             currentIndex:currentIndex
-               completion:^(BOOL success, NSInteger selectedIdx) {
-                   if (success) {
-                       self.databaseMetaData.browseViewType = (BrowseViewType)options[selectedIdx].integerValue;
-                   }
-                   
-                   [self bindPreferences];
-                   [self notifyDatabaseViewPreferencesChanged];
-               }];
-}
-
-+ (NSString*)getBrowseViewTypeName:(BrowseViewType)field {
-    switch (field) {
-        case kBrowseViewTypeHierarchy:
-            return NSLocalizedString(@"browse_prefs_view_as_folders", @"Folder Hierarchy");
-            break;
-        case kBrowseViewTypeList:
-            return NSLocalizedString(@"browse_prefs_view_as_flat_list", @"Flat List");
-            break;
-        case kBrowseViewTypeTotpList:
-            return NSLocalizedString(@"browse_prefs_view_as_totp_list", @"TOTP List");
-            break;
-        default:
-            return @"None";
-            break;
-    }
 }
 
 - (void)onChangeBrowseItemSubtitle {
@@ -490,6 +449,12 @@
     if (self.onDone) {
         self.onDone();
     }
+}
+
+- (void)onConfigureTabs {
+    UINavigationController* nav = [ConfigureTabsViewController fromStoryboardWithModel:self.model];
+    
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 - (IBAction)onDone:(id)sender {

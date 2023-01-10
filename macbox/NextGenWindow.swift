@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class NextGenWindow: NSWindow {
+class NextGenWindow: NSWindow {    
     override func doCommand(by selector: Selector) {
 //        NSLog("NextGenWindow::doCommand: [%@]", NSStringFromSelector(selector))
 

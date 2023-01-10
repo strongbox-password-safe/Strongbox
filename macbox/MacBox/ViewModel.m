@@ -61,7 +61,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 @property (nullable) Model* innerModel;
 @property (nullable) NSUUID* internalSelectedItem; 
-@property (readonly) NSDictionary<NSString*, NSSet<NSUUID*>*> *domainNodeMap; 
 
 @end
 
@@ -78,7 +77,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     if (self = [super init]) {
         _document = document;
         _databaseUuid = databaseUuid;
-        _domainNodeMap = @{};
         
         self.innerModel = nil;
     }
@@ -91,8 +89,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                        model:(Model *)model {
     if ( self = [self initLocked:document databaseUuid:databaseUuid] ) {
         self.innerModel = model;
-        
-        [self rebuildAutoFillDomainNodeMap];
     }
     
     return self;
@@ -111,8 +107,12 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 
 
+- (BOOL)isInOfflineMode {
+    return self.innerModel ? self.innerModel.isInOfflineMode : (self.alwaysOpenOffline || self.databaseMetadata.userRequestOfflineOpenEphemeralFlagForDocument);
+}
+
 - (BOOL)isEffectivelyReadOnly {
-    return self.readOnly || (self.offlineMode || self.alwaysOpenOffline) || (self.innerModel && self.innerModel.isReadOnly);
+    return self.innerModel ? self.innerModel.isReadOnly :  self.readOnly;
 }
 
 - (Model *)commonModel {
@@ -304,24 +304,13 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     return NO;
 }
 
-- (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion)completion {
-    if (self.locked) {
-        NSLog(@"🔴 Attempt to get update while locked?");
-        return NO;
-    }
-    
-    [self rebuildAutoFillDomainNodeMap];
-    
-    return [self.innerModel asyncUpdateAndSync:completion];
-}
-
 - (void)update:(NSViewController *)viewController handler:(void (^)(BOOL, BOOL, NSError * _Nullable))handler {
     if (self.locked) {
         NSLog(@"🔴 Attempt to get update while locked?");
         return;
     }
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
     
     [self.innerModel update:viewController handler:handler];
 }
@@ -333,8 +322,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
     
     [self.innerModel reloadDatabaseFromLocalWorkingCopy:viewController completion:^(BOOL success) {
-        [self rebuildAutoFillDomainNodeMap];
-
         completion(success);
     }];
 }
@@ -1826,7 +1813,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                                 kNotificationUserInfoKeyBoolParam : @(openEntryDetailsWindowWhenDone)
                                                              }];
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
     
     return YES;
 }
@@ -1857,7 +1844,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = children.count > 1 ? NSLocalizedString(@"mac_undo_action_add_items", @"Add Items") : NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
     
     [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
                                                       object:self
@@ -1891,7 +1878,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                       object:self
                                                     userInfo:@{ kNotificationUserInfoKeyNode : items }];
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
 }
 
 - (void)unDeleteItems:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
@@ -1916,7 +1903,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
     
     [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsUnDeleted
                                                       object:self
@@ -1949,7 +1936,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                         userInfo:@{ kNotificationUserInfoKeyNode : items }];
     }
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
     
     return ret;
 }
@@ -1980,7 +1967,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                       object:self
                                                     userInfo:nil];
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
 }
 
 
@@ -2015,7 +2002,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                         userInfo:@{ kNotificationUserInfoKeyNode : items }];
     }
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
     
     return ret;
 }
@@ -2046,7 +2033,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                       object:self
                                                     userInfo:nil];
     
-    [self rebuildAutoFillDomainNodeMap];
+    [self rebuildFastMaps];
 }
 
 - (BOOL)moveItemsIntoNewGroup:(const NSArray<Node *> *)items parentGroup:(Node *)parentGroup title:(NSString *)title group:(Node **)group {
@@ -2388,14 +2375,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     self.databaseMetadata.concealEmptyProtectedFields = concealEmptyProtectedFields;
 }
 
-- (BOOL)lockOnScreenLock {
-    return self.databaseMetadata.lockOnScreenLock;
-}
-
-- (void)setLockOnScreenLock:(BOOL)lockOnScreenLock {
-    self.databaseMetadata.lockOnScreenLock = lockOnScreenLock;
-}
-
 - (BOOL)autoPromptForConvenienceUnlockOnActivate {
     return self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate;
 }
@@ -2575,16 +2554,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 - (void)setReadOnly:(BOOL)readOnly {
     self.databaseMetadata.readOnly = readOnly;
-    
-    [self publishDatabasePreferencesChangedNotification];
-}
-
-- (BOOL)offlineMode {
-    return self.databaseMetadata.offlineMode;
-}
-
-- (void)setOfflineMode:(BOOL)offlineMode {
-    self.databaseMetadata.offlineMode = offlineMode;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -2815,7 +2784,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (void)publishNextGenSelectedItemsChanged {
-    NSLog(@"✅ publishNextGenSelectedItemsChanged");
+
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNextGenSelectedItemsChanged object:self userInfo:nil];
@@ -2900,92 +2869,8 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 
 
-- (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
-    if ( !self.locked ) {
-        if ( self.databaseMetadata.autoFillEnabled ) {
-            NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString domainNodeMap:self.domainNodeMap];
-            
-            return [self.innerModel getItemsById:matches.allObjects];
-        }
-        else {
-            return @[];
-        }
-    }
-    else {
-        NSLog(@"🔴 autoFillUrlCredentialMatchesForUrl - Model Locked cannot get item.");
-        return @[];
-    }
-}
-
 - (void)rebuildFastMaps {
-    [self.database rebuildFastMaps];
-    
-    [self rebuildAutoFillDomainNodeMap];
-}
-
-- (void)rebuildAutoFillDomainNodeMap {
-    NSLog(@"ViewModel::rebuildAutoFillDomainNodeMap");
-    
-    if ( !self.locked ) {
-        if ( self.databaseMetadata.autoFillEnabled ) {
-            _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self.database
-                                                       alternativeUrls:self.databaseMetadata.autoFillScanAltUrls
-                                                          customFields:self.databaseMetadata.autoFillScanCustomFields
-                                                                 notes:self.databaseMetadata.autoFillScanNotes];
-        }
-        else {
-            _domainNodeMap = @{};
-        }
-    }
-    else {
-        NSLog(@"🔴 rebuildDomainNodeMap - Model Locked");
-        _domainNodeMap = @{};
-    }
-}
-
-
-
-- (void)copyUsername:(NSUUID *)itemId {
-    Node* item = [self getItemById:itemId];
-    
-    if ( item ) {
-        [self dereferenceAndCopy:item.fields.username item:item];
-    }
-}
-
-- (void)copyPassword:(NSUUID *)itemId {
-    Node* item = [self getItemById:itemId];
-    
-    if ( item ) {
-        [self dereferenceAndCopy:item.fields.password item:item];
-    }
-}
-
-- (void)copyTotp:(NSUUID *)itemId {
-    Node* item = [self getItemById:itemId];
-    
-    if ( item ) {
-        if ( item.fields.otpToken ) {
-            NSString *password = item.fields.otpToken.password;
-            [ClipboardManager.sharedInstance copyConcealedString:password];
-            [self scheduleClipboardClearingTask];
-        }
-    }
-}
-
-- (void)dereferenceAndCopy:(NSString*)text item:(Node*)item {
-    NSString* deref = [self dereference:text node:item];
-    [ClipboardManager.sharedInstance copyConcealedString:deref];
-    [self scheduleClipboardClearingTask];
-}
-
-- (void)scheduleClipboardClearingTask {
-    if ( Settings.sharedInstance.clearClipboardEnabled ) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-            [appDelegate onStrongboxDidChangeClipboard];
-        });
-    }
+    [self.innerModel rebuildFastMaps];
 }
 
 @end

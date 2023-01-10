@@ -414,6 +414,16 @@
 		C8015EA727D9196F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EA527D9196F00F9F3B1 /* FastMaps.m */; };
 		C8015EA827D9196F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EA527D9196F00F9F3B1 /* FastMaps.m */; };
 		C8015EA927D9196F00F9F3B1 /* FastMaps.m in Sources */ = {isa = PBXBuildFile; fileRef = C8015EA527D9196F00F9F3B1 /* FastMaps.m */; };
+		C801BA75295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA76295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA77295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA78295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA79295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA7A295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA7B295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA7C295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA7D295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
+		C801BA7E295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */; };
 		C80232BE285881790066BFC9 /* ProUpgradeIAPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C80232BD285881790066BFC9 /* ProUpgradeIAPManager.m */; };
 		C80232BF285881790066BFC9 /* ProUpgradeIAPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C80232BD285881790066BFC9 /* ProUpgradeIAPManager.m */; };
 		C80232C0285881790066BFC9 /* ProUpgradeIAPManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C80232BD285881790066BFC9 /* ProUpgradeIAPManager.m */; };
@@ -503,6 +513,11 @@
 		C810337C2749632600869513 /* AppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C810337E2749632600869513 /* AppPreferences.storyboard */; };
 		C81033A0274963AE00869513 /* FavIconsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C810339E274963AE00869513 /* FavIconsPreferences.swift */; };
 		C81033A1274963AE00869513 /* FavIconsPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C810339E274963AE00869513 /* FavIconsPreferences.swift */; };
+		C81277DF291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81277DE291806E500567AF7 /* UnlockDatabaseRequestResponse.swift */; };
+		C81277E0291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81277DE291806E500567AF7 /* UnlockDatabaseRequestResponse.swift */; };
+		C81277E1291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81277DE291806E500567AF7 /* UnlockDatabaseRequestResponse.swift */; };
+		C81277E2291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81277DE291806E500567AF7 /* UnlockDatabaseRequestResponse.swift */; };
+		C81277E3291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81277DE291806E500567AF7 /* UnlockDatabaseRequestResponse.swift */; };
 		C8127D0E2905771800F48390 /* Import1PasswordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86846B2271F21CA00D4565B /* Import1PasswordTests.swift */; };
 		C8127D0F2905771D00F48390 /* MB1Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29663721AD7318009B7936 /* MB1Tests.m */; };
 		C8127D102905772700F48390 /* Parse2FactorAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */; };
@@ -575,6 +590,16 @@
 		C812E72D286066A10068AD5F /* FreeTrialOrUpgradeOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C812E72B286066A10068AD5F /* FreeTrialOrUpgradeOnboardingViewController.swift */; };
 		C812E72E286066A10068AD5F /* FreeTrialOrUpgradeOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C812E72B286066A10068AD5F /* FreeTrialOrUpgradeOnboardingViewController.swift */; };
 		C812E72F286066A10068AD5F /* FreeTrialOrUpgradeOnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C812E72B286066A10068AD5F /* FreeTrialOrUpgradeOnboardingViewController.swift */; };
+		C816D1032916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1092916AEB3003F19B2 /* SecurityPrivacySettings.storyboard */; };
+		C816D1042916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1092916AEB3003F19B2 /* SecurityPrivacySettings.storyboard */; };
+		C816D1052916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1092916AEB3003F19B2 /* SecurityPrivacySettings.storyboard */; };
+		C816D1062916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1092916AEB3003F19B2 /* SecurityPrivacySettings.storyboard */; };
+		C816D1072916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1092916AEB3003F19B2 /* SecurityPrivacySettings.storyboard */; };
+		C816D1402916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1462916BAA8003F19B2 /* AppearanceSettings.storyboard */; };
+		C816D1412916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1462916BAA8003F19B2 /* AppearanceSettings.storyboard */; };
+		C816D1422916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1462916BAA8003F19B2 /* AppearanceSettings.storyboard */; };
+		C816D1432916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1462916BAA8003F19B2 /* AppearanceSettings.storyboard */; };
+		C816D1442916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C816D1462916BAA8003F19B2 /* AppearanceSettings.storyboard */; };
 		C81756722735220900431A36 /* PleaseConnectHardwareKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C81756712735220900431A36 /* PleaseConnectHardwareKey.m */; };
 		C81756732735220900431A36 /* PleaseConnectHardwareKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C81756712735220900431A36 /* PleaseConnectHardwareKey.m */; };
 		C81756742735220900431A36 /* PleaseConnectHardwareKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C81756712735220900431A36 /* PleaseConnectHardwareKey.m */; };
@@ -2617,6 +2642,15 @@
 		C85179342826D0C900A09797 /* SelectDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectDatabaseViewController.m */; };
 		C852B316284660C900597CE7 /* EncryptionSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C852B319284660C900597CE7 /* EncryptionSettings.storyboard */; };
 		C852B317284660C900597CE7 /* EncryptionSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C852B319284660C900597CE7 /* EncryptionSettings.storyboard */; };
+		C852EF63295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF64295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF65295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF66295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF67295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF68295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF69295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF6A295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
+		C852EF6B295B44DE006EF9A1 /* NoClippingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C852EF62295B44DE006EF9A1 /* NoClippingView.swift */; };
 		C8579C5427AEECD900653664 /* Parse2FactorAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */; };
 		C8594240277F2AE60040F03D /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
 		C8594241277F2AE60040F03D /* TitleAndIconCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C859423F277F2AE60040F03D /* TitleAndIconCell.swift */; };
@@ -2704,6 +2738,11 @@
 		C85F27C92705DD1000A216C6 /* SBColorCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C85F27C72705DD1000A216C6 /* SBColorCollection.swift */; };
 		C860C93F2744255B00A28341 /* PasswordGenerationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C860C93E2744255B00A28341 /* PasswordGenerationPreferences.swift */; };
 		C860C9402744255B00A28341 /* PasswordGenerationPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C860C93E2744255B00A28341 /* PasswordGenerationPreferences.swift */; };
+		C8613C95291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8613C94291FE4A90006567C /* WhatIsMarkdownViewController.swift */; };
+		C8613C96291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8613C94291FE4A90006567C /* WhatIsMarkdownViewController.swift */; };
+		C8613C97291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8613C94291FE4A90006567C /* WhatIsMarkdownViewController.swift */; };
+		C8613C98291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8613C94291FE4A90006567C /* WhatIsMarkdownViewController.swift */; };
+		C8613C99291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8613C94291FE4A90006567C /* WhatIsMarkdownViewController.swift */; };
 		C8629F97260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */; };
 		C8629F98260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */; };
 		C8629FDC260B998600DEDB8E /* EditCustomFieldController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629FDB260B998600DEDB8E /* EditCustomFieldController.m */; };
@@ -2828,6 +2867,138 @@
 		C873EA6326F2408A00A71F2A /* MemoryProtection.m in Sources */ = {isa = PBXBuildFile; fileRef = C873EA6126F2408A00A71F2A /* MemoryProtection.m */; };
 		C873EA6426F2408A00A71F2A /* MemoryProtection.m in Sources */ = {isa = PBXBuildFile; fileRef = C873EA6126F2408A00A71F2A /* MemoryProtection.m */; };
 		C873EA6526F2408A00A71F2A /* MemoryProtection.m in Sources */ = {isa = PBXBuildFile; fileRef = C873EA6126F2408A00A71F2A /* MemoryProtection.m */; };
+		C875E0C8294F5B68003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C875E0C9294F5B68003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C875E0CA294F5B68003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		C875E0CB294F5B68003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		C875E0CC294F5B68003C82F2 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		C875E0CD294F5B68003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		C875E0CE294F5B68003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		C875E0CF294F5B68003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
+		C875E0D0294F5B68003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C875E0D1294F5B68003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
+		C875E0D2294F5B68003C82F2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
+		C875E0D3294F5B68003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		C875E0D4294F5B68003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		C875E0D5294F5B68003C82F2 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
+		C875E0D6294F5B68003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		C875E0D7294F5B68003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		C875E0D8294F5B68003C82F2 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		C875E0D9294F5B68003C82F2 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		C875E0DA294F5B68003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		C875E0DB294F5B68003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		C875E0DC294F5B68003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		C875E0DD294F5B68003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
+		C875E0DE294F5B69003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C875E0DF294F5B69003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C875E0E0294F5B69003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		C875E0E1294F5B69003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		C875E0E2294F5B69003C82F2 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		C875E0E3294F5B69003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		C875E0E4294F5B69003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		C875E0E5294F5B69003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
+		C875E0E6294F5B69003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C875E0E7294F5B69003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
+		C875E0E8294F5B69003C82F2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
+		C875E0E9294F5B69003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		C875E0EA294F5B69003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		C875E0EB294F5B69003C82F2 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
+		C875E0EC294F5B69003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		C875E0ED294F5B69003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		C875E0EE294F5B69003C82F2 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		C875E0EF294F5B69003C82F2 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		C875E0F0294F5B69003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		C875E0F1294F5B69003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		C875E0F2294F5B69003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		C875E0F3294F5B69003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
+		C875E0F4294F5B6A003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C875E0F5294F5B6A003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C875E0F6294F5B6A003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		C875E0F7294F5B6A003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		C875E0F8294F5B6A003C82F2 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		C875E0F9294F5B6A003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		C875E0FA294F5B6A003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		C875E0FB294F5B6A003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
+		C875E0FC294F5B6A003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C875E0FD294F5B6A003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
+		C875E0FE294F5B6A003C82F2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
+		C875E0FF294F5B6A003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		C875E100294F5B6A003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		C875E101294F5B6A003C82F2 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
+		C875E102294F5B6A003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		C875E103294F5B6A003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		C875E104294F5B6A003C82F2 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		C875E105294F5B6A003C82F2 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		C875E106294F5B6A003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		C875E107294F5B6A003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		C875E108294F5B6A003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		C875E109294F5B6A003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
+		C875E10A294F5B6B003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C875E10B294F5B6B003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C875E10C294F5B6B003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		C875E10D294F5B6B003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		C875E10E294F5B6B003C82F2 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		C875E10F294F5B6B003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		C875E110294F5B6B003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		C875E111294F5B6B003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
+		C875E112294F5B6B003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C875E113294F5B6B003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
+		C875E114294F5B6B003C82F2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
+		C875E115294F5B6B003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		C875E116294F5B6B003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		C875E117294F5B6B003C82F2 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
+		C875E118294F5B6B003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		C875E119294F5B6B003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		C875E11A294F5B6B003C82F2 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		C875E11B294F5B6B003C82F2 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		C875E11C294F5B6B003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		C875E11D294F5B6B003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		C875E11E294F5B6B003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		C875E11F294F5B6B003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
+		C875E120294F5B6C003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C875E121294F5B6C003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C875E122294F5B6C003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		C875E123294F5B6C003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		C875E124294F5B6C003C82F2 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		C875E125294F5B6C003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		C875E126294F5B6C003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		C875E127294F5B6C003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
+		C875E128294F5B6C003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C875E129294F5B6C003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
+		C875E12A294F5B6C003C82F2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
+		C875E12B294F5B6C003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		C875E12C294F5B6C003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		C875E12D294F5B6C003C82F2 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
+		C875E12E294F5B6C003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		C875E12F294F5B6C003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		C875E130294F5B6C003C82F2 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		C875E131294F5B6C003C82F2 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		C875E132294F5B6C003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		C875E133294F5B6C003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		C875E134294F5B6C003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		C875E136294F5B6C003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
+		C875E137294F5B6D003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C875E138294F5B6D003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C875E139294F5B6D003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		C875E13A294F5B6D003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		C875E13B294F5B6D003C82F2 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		C875E13C294F5B6D003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		C875E13D294F5B6D003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		C875E13E294F5B6D003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
+		C875E13F294F5B6D003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C875E140294F5B6D003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
+		C875E141294F5B6D003C82F2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
+		C875E142294F5B6D003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		C875E143294F5B6D003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		C875E144294F5B6D003C82F2 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
+		C875E145294F5B6D003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		C875E146294F5B6D003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		C875E147294F5B6D003C82F2 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		C875E148294F5B6D003C82F2 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		C875E149294F5B6D003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		C875E14A294F5B6D003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		C875E14B294F5B6D003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		C875E14C294F5B6D003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
 		C875F83C279AB72000955D14 /* NotificationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = C875F83B279AB72000955D14 /* NotificationConstants.m */; };
 		C875F83D279AB72000955D14 /* NotificationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = C875F83B279AB72000955D14 /* NotificationConstants.m */; };
 		C875F83E279AB72000955D14 /* NotificationConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = C875F83B279AB72000955D14 /* NotificationConstants.m */; };
@@ -3412,25 +3583,16 @@
 		C89963F628A144130069FA51 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DB3DD2D257E7A4000DC6560 /* CloudKit.framework */; };
 		C89963F728A144130069FA51 /* libssh2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8F78FCA26CFF016002B0924 /* libssh2.a */; };
 		C89963FA28A144130069FA51 /* PasswordGenerationPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F9AA6C27495BFB00C2D9E8 /* PasswordGenerationPreferences.storyboard */; };
-		C89963FB28A144130069FA51 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
-		C89963FC28A144130069FA51 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
 		C89963FD28A144130069FA51 /* CheckboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805D423A1176E001E742E /* CheckboxCell.xib */; };
-		C89963FE28A144130069FA51 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
-		C89963FF28A144130069FA51 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
 		C899640028A144130069FA51 /* CreateEditViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8CB830C279081B700F85A2C /* CreateEditViewController.storyboard */; };
 		C899640128A144130069FA51 /* MacKeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */; };
 		C899640228A144130069FA51 /* SFTPConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */; };
 		C899640328A144130069FA51 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C887733C261DD64900C01406 /* Backups.storyboard */; };
 		C899640428A144130069FA51 /* GenericOnboardingViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8221F14285F2B3200FD58E8 /* GenericOnboardingViewController.storyboard */; };
-		C899640528A144130069FA51 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
 		C899640628A144130069FA51 /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */; };
 		C899640728A144130069FA51 /* ConnectHardwareKey.xib in Resources */ = {isa = PBXBuildFile; fileRef = C817567B2735259100431A36 /* ConnectHardwareKey.xib */; };
 		C899640828A144130069FA51 /* MacConflictResolutionWizard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8E5C33B275E76D0006C15FE /* MacConflictResolutionWizard.storyboard */; };
-		C899640928A144130069FA51 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
 		C899640A28A144130069FA51 /* SelectPredefinedIconController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805B523A1170E001E742E /* SelectPredefinedIconController.xib */; };
-		C899640B28A144130069FA51 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
-		C899640C28A144130069FA51 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
-		C899640D28A144130069FA51 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
 		C899640E28A144130069FA51 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */; };
 		C899640F28A144130069FA51 /* EditCustomField.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */; };
 		C899641028A144130069FA51 /* DatabaseOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8AA213B256BD0E400E9FF8D /* DatabaseOnboarding.storyboard */; };
@@ -3438,12 +3600,9 @@
 		C899641228A144130069FA51 /* AdvancedAppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B14BC0274AA9D90055EB05 /* AdvancedAppPreferences.storyboard */; };
 		C899641328A144130069FA51 /* NewEntryDefaultsPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B14B9A274AA3D70055EB05 /* NewEntryDefaultsPreferences.storyboard */; };
 		C899641428A144130069FA51 /* FreeTrialOrUpgradeOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C881FAA22861C85D00A10A3A /* FreeTrialOrUpgradeOnboarding.storyboard */; };
-		C899641528A144130069FA51 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
 		C899641628A144130069FA51 /* AttachmentItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8B946862573D59400932C46 /* AttachmentItem.xib */; };
 		C899641728A144130069FA51 /* AuditConfigurationViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DD027B426FA00862C17 /* AuditConfigurationViewController.storyboard */; };
 		C899641828A144130069FA51 /* PredefinedKeePassIcon.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805C123A11749001E742E /* PredefinedKeePassIcon.xib */; };
-		C899641928A144130069FA51 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
-		C899641A28A144130069FA51 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
 		C899641B28A144130069FA51 /* CompareAndMergeWizard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BBBE0A2824113D00334D2B /* CompareAndMergeWizard.storyboard */; };
 		C899641C28A144130069FA51 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DA3DF227B4277700862C17 /* AuditDrillDown.storyboard */; };
 		C899641D28A144130069FA51 /* PopOutDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8E8163A284900A400E99062 /* PopOutDetails.storyboard */; };
@@ -3452,7 +3611,6 @@
 		C899642128A144130069FA51 /* QRCodePresenter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF522B723C8BACE00CD948E /* QRCodePresenter.storyboard */; };
 		C899642228A144130069FA51 /* TagsTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C875F846279B031500955D14 /* TagsTableCellView.xib */; };
 		C899642328A144130069FA51 /* PillView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C89C944127B17ECE00F78928 /* PillView.xib */; };
-		C899642428A144130069FA51 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
 		C899642528A144130069FA51 /* GeneralAppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F9AA8E27495C3200C2D9E8 /* GeneralAppPreferences.storyboard */; };
 		C899642628A144130069FA51 /* DownloadFavIcons.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */; };
 		C899642728A144130069FA51 /* apple.cer in Resources */ = {isa = PBXBuildFile; fileRef = C8F9A4AB2858A46F0000BCC4 /* apple.cer */; };
@@ -3462,13 +3620,10 @@
 		C899642B28A144130069FA51 /* AddDatabaseSelectStorageProvider.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F8CE6525D57F1C00C93840 /* AddDatabaseSelectStorageProvider.storyboard */; };
 		C899642C28A144130069FA51 /* SingleLinePillTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8039E6127B1767700DCC981 /* SingleLinePillTableCellView.xib */; };
 		C899642D28A144130069FA51 /* LargeTextIndexedCharacter.xib in Resources */ = {isa = PBXBuildFile; fileRef = C84412BC279EFFA8006F4B8B /* LargeTextIndexedCharacter.xib */; };
-		C899642E28A144130069FA51 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
 		C899642F28A144130069FA51 /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
 		C899643028A144130069FA51 /* NextGen-Sidebar.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8A5EF0927A568E800C5232D /* NextGen-Sidebar.storyboard */; };
 		C899643128A144130069FA51 /* SFTPConfigurationVC.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F8CE3D25D57EC300C93840 /* SFTPConfigurationVC.storyboard */; };
-		C899643228A144130069FA51 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
 		C899643328A144130069FA51 /* DrillDownDiff.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C812B05B2825576400E47941 /* DrillDownDiff.storyboard */; };
-		C899643428A144130069FA51 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
 		C899643528A144130069FA51 /* EditTagsPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */; };
 		C899643628A144130069FA51 /* NotesTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C85A841A27988B42004BCF22 /* NotesTableCellView.xib */; };
 		C899643728A144130069FA51 /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C5DF9A28328A0300A1EEFE /* FavIconResultTableCell.xib */; };
@@ -3479,7 +3634,6 @@
 		C899643C28A144130069FA51 /* EncryptionSettings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C852B319284660C900597CE7 /* EncryptionSettings.storyboard */; };
 		C899643D28A144130069FA51 /* TitleAndIconCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8594242277F2AFA0040F03D /* TitleAndIconCell.xib */; };
 		C899643E28A144130069FA51 /* FavIconPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B14B74274A98E20055EB05 /* FavIconPreferences.storyboard */; };
-		C899643F28A144130069FA51 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
 		C899644028A144130069FA51 /* WebDAVConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80043C426BD900B0090C90D /* WebDAVConnectionsManager.storyboard */; };
 		C899644128A144130069FA51 /* HeaderTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81B8D0E2799C331006387D0 /* HeaderTableCellView.xib */; };
 		C899644228A144130069FA51 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A923A116E9001E742E /* ChangeMasterPasswordWindowController.xib */; };
@@ -3491,22 +3645,17 @@
 		C899644828A144130069FA51 /* QrCodeWindowScanner.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8CB82EA2790817A00F85A2C /* QrCodeWindowScanner.storyboard */; };
 		C899644928A144130069FA51 /* TotpTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81B8D152799DFC0006387D0 /* TotpTableCellView.xib */; };
 		C899644A28A144130069FA51 /* AppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C810337E2749632600869513 /* AppPreferences.storyboard */; };
-		C899644B28A144130069FA51 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
 		C899644C28A144130069FA51 /* NextGen-Detail.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C83F590626D97CCD00CA1D85 /* NextGen-Detail.storyboard */; };
 		C899644D28A144130069FA51 /* CustomFieldTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8B946A32573D63400932C46 /* CustomFieldTableCellView.xib */; };
 		C899644E28A144130069FA51 /* UrlTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C84412AD279D772D006F4B8B /* UrlTableCellView.xib */; };
 		C899644F28A144130069FA51 /* DatabasesManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F8CE1325D57BC500C93840 /* DatabasesManager.storyboard */; };
 		C899645028A144130069FA51 /* WebDAVConfigVC.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F39F3B25DD90A80045CAAB /* WebDAVConfigVC.storyboard */; };
 		C899645128A144130069FA51 /* AutoFillAppLevelPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8630E40274BE390002718DE /* AutoFillAppLevelPreferences.storyboard */; };
-		C899645228A144130069FA51 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
-		C899645328A144130069FA51 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
-		C899645428A144130069FA51 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
 		C899645528A144130069FA51 /* NextGen-Master.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C823F04127A31CC6009FF675 /* NextGen-Master.storyboard */; };
 		C899645628A144130069FA51 /* GenericDetailFieldTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C84F18182763C0050055C101 /* GenericDetailFieldTableCellView.xib */; };
 		C899645728A144130069FA51 /* NextGen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F1B40226D67F3D00B21A29 /* NextGen.storyboard */; };
 		C899645828A144130069FA51 /* MetaDataTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C85A84132798781A004BCF22 /* MetaDataTableCellView.xib */; };
 		C899645928A144130069FA51 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F621F30DB7A00D68BFE /* Main.storyboard */; };
-		C899645A28A144130069FA51 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
 		C899645B28A144130069FA51 /* LargeTextViewAndQrCode.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84412B4279EED05006F4B8B /* LargeTextViewAndQrCode.storyboard */; };
 		C899645C28A144130069FA51 /* AboutViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C88773D7261E02E600C01406 /* AboutViewController.storyboard */; };
 		C899645D28A144130069FA51 /* twofactorauth.json in Resources */ = {isa = PBXBuildFile; fileRef = C8039E5627AFDB7F00DCC981 /* twofactorauth.json */; };
@@ -3957,6 +4106,16 @@
 		C8B14BBE274AA9D90055EB05 /* AdvancedAppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B14BC0274AA9D90055EB05 /* AdvancedAppPreferences.storyboard */; };
 		C8B14BE0274AAB8F0055EB05 /* AutoFillAppLevelPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B14BDF274AAB8F0055EB05 /* AutoFillAppLevelPreferences.swift */; };
 		C8B14BE1274AAB8F0055EB05 /* AutoFillAppLevelPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8B14BDF274AAB8F0055EB05 /* AutoFillAppLevelPreferences.swift */; };
+		C8B413602961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413612961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413622961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413632961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413642961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413652961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413662961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413672961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413682961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
+		C8B413692961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */; };
 		C8B45C8C24ACC97700318562 /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B45C8A24ACC97700318562 /* StreamUtils.m */; };
 		C8B45C8D24ACC97700318562 /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B45C8A24ACC97700318562 /* StreamUtils.m */; };
 		C8B501EA26ECB5B1003DE6A2 /* ChaCha20OutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B501E726ECB5B0003DE6A2 /* ChaCha20OutputStream.m */; };
@@ -4211,6 +4370,16 @@
 		C8C8969426CECB9300F1BC4D /* HardwareKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8968026CECB9300F1BC4D /* HardwareKeyData.m */; };
 		C8C8969526CECB9300F1BC4D /* HardwareKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8968026CECB9300F1BC4D /* HardwareKeyData.m */; };
 		C8C8969626CECB9300F1BC4D /* HardwareKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C8968026CECB9300F1BC4D /* HardwareKeyData.m */; };
+		C8C93F30290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F2F290FFCD4005BAE54 /* SecurityPrivacySettings.swift */; };
+		C8C93F31290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F2F290FFCD4005BAE54 /* SecurityPrivacySettings.swift */; };
+		C8C93F32290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F2F290FFCD4005BAE54 /* SecurityPrivacySettings.swift */; };
+		C8C93F33290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F2F290FFCD4005BAE54 /* SecurityPrivacySettings.swift */; };
+		C8C93F34290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F2F290FFCD4005BAE54 /* SecurityPrivacySettings.swift */; };
+		C8C93F3D29100BC1005BAE54 /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F3C29100BC1005BAE54 /* AppearanceSettings.swift */; };
+		C8C93F3E29100BC1005BAE54 /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F3C29100BC1005BAE54 /* AppearanceSettings.swift */; };
+		C8C93F3F29100BC1005BAE54 /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F3C29100BC1005BAE54 /* AppearanceSettings.swift */; };
+		C8C93F4029100BC1005BAE54 /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F3C29100BC1005BAE54 /* AppearanceSettings.swift */; };
+		C8C93F4129100BC1005BAE54 /* AppearanceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8C93F3C29100BC1005BAE54 /* AppearanceSettings.swift */; };
 		C8CB82C52790812900F85A2C /* PastedImagePreviewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8CB82C82790812900F85A2C /* PastedImagePreviewer.storyboard */; };
 		C8CB82C62790812900F85A2C /* PastedImagePreviewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8CB82C82790812900F85A2C /* PastedImagePreviewer.storyboard */; };
 		C8CB82E72790817A00F85A2C /* QrCodeWindowScanner.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8CB82EA2790817A00F85A2C /* QrCodeWindowScanner.storyboard */; };
@@ -4391,6 +4560,21 @@
 		C8F39F6F25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F39F7225DD91270045CAAB /* SyncLogViewController.storyboard */; };
 		C8F3FD6D27D6193600AD56B7 /* TwoDriveStorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */; };
 		C8F3FD6E27D6193600AD56B7 /* TwoDriveStorageProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */; };
+		C8F44E0F295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E10295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E11295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E12295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E13295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E14295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E15295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E16295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E17295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F44E18295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */; };
+		C8F5560C2912DA9A002A5517 /* DatabasesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F5560B2912DA9A002A5517 /* DatabasesCollection.swift */; };
+		C8F5560D2912DA9A002A5517 /* DatabasesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F5560B2912DA9A002A5517 /* DatabasesCollection.swift */; };
+		C8F5560E2912DA9A002A5517 /* DatabasesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F5560B2912DA9A002A5517 /* DatabasesCollection.swift */; };
+		C8F5560F2912DA9A002A5517 /* DatabasesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F5560B2912DA9A002A5517 /* DatabasesCollection.swift */; };
+		C8F556142912DA9A002A5517 /* DatabasesCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F5560B2912DA9A002A5517 /* DatabasesCollection.swift */; };
 		C8F78FCB26CFF016002B0924 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8F78FC826CFF015002B0924 /* libssl.a */; };
 		C8F78FCC26CFF016002B0924 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8F78FC826CFF015002B0924 /* libssl.a */; };
 		C8F78FCD26CFF016002B0924 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C8F78FC826CFF015002B0924 /* libssl.a */; };
@@ -4420,6 +4604,13 @@
 		C8F9AA6A27495BFB00C2D9E8 /* PasswordGenerationPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F9AA6C27495BFB00C2D9E8 /* PasswordGenerationPreferences.storyboard */; };
 		C8F9AA8B27495C3200C2D9E8 /* GeneralAppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F9AA8E27495C3200C2D9E8 /* GeneralAppPreferences.storyboard */; };
 		C8F9AA8C27495C3200C2D9E8 /* GeneralAppPreferences.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8F9AA8E27495C3200C2D9E8 /* GeneralAppPreferences.storyboard */; };
+		C8FC11D029190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FC11CF29190E7D00EEBCA1 /* SafariAutoFillWormhole.m */; };
+		C8FC11D129190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FC11CF29190E7D00EEBCA1 /* SafariAutoFillWormhole.m */; };
+		C8FC11D229190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FC11CF29190E7D00EEBCA1 /* SafariAutoFillWormhole.m */; };
+		C8FC11D329190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FC11CF29190E7D00EEBCA1 /* SafariAutoFillWormhole.m */; };
+		C8FC11D429190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FC11CF29190E7D00EEBCA1 /* SafariAutoFillWormhole.m */; };
+		C8FC11D529196D7A00EEBCA1 /* AutoFillLoadingVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C82DB42D2753C6EB006B7573 /* AutoFillLoadingVC.m */; };
+		C8FC11D629196D7F00EEBCA1 /* AutoFillLoading.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C82DB4362753C911006B7573 /* AutoFillLoading.storyboard */; };
 		C8FD557325DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
 		C8FD557525DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
 		C8FDF2E0261CD38300F17CBE /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DC261CD38300F17CBE /* BackupItem.m */; };
@@ -5165,6 +5356,7 @@
 		C80148C228AA9DB800E49CA6 /* AutoFillProxyClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoFillProxyClient.m; sourceTree = "<group>"; };
 		C8015EA427D9196F00F9F3B1 /* FastMaps.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FastMaps.h; path = ../model/FastMaps.h; sourceTree = "<group>"; };
 		C8015EA527D9196F00F9F3B1 /* FastMaps.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FastMaps.m; path = ../model/FastMaps.m; sourceTree = "<group>"; };
+		C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TOTPGenerator.swift; path = ../StrongBox/TOTPGenerator.swift; sourceTree = "<group>"; };
 		C80232BC285881790066BFC9 /* ProUpgradeIAPManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ProUpgradeIAPManager.h; path = ../StrongBox/ProUpgradeIAPManager.h; sourceTree = "<group>"; };
 		C80232BD285881790066BFC9 /* ProUpgradeIAPManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ProUpgradeIAPManager.m; path = ../StrongBox/ProUpgradeIAPManager.m; sourceTree = "<group>"; };
 		C80232C4285881F20066BFC9 /* RMStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RMStore.h; path = ../lib/RMStore/RMStore/RMStore.h; sourceTree = "<group>"; };
@@ -5241,10 +5433,57 @@
 		C81033982749634200869513 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AppPreferences.strings"; sourceTree = "<group>"; };
 		C810339A2749634400869513 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AppPreferences.strings"; sourceTree = "<group>"; };
 		C810339E274963AE00869513 /* FavIconsPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FavIconsPreferences.swift; path = MacBox/FavIconsPreferences.swift; sourceTree = "<group>"; };
+		C81277DE291806E500567AF7 /* UnlockDatabaseRequestResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UnlockDatabaseRequestResponse.swift; path = Protocol/UnlockDatabaseRequestResponse.swift; sourceTree = "<group>"; };
+		C81277E429182F6700567AF7 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SecurityPrivacySettings.strings"; sourceTree = "<group>"; };
+		C81277E729182F8400567AF7 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/AppearanceSettings.strings"; sourceTree = "<group>"; };
 		C812B05B2825576400E47941 /* DrillDownDiff.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = DrillDownDiff.storyboard; sourceTree = "<group>"; };
 		C812B05E28255A4300E47941 /* DiffDrillDownDetailer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DiffDrillDownDetailer.h; path = ../model/DiffDrillDownDetailer.h; sourceTree = "<group>"; };
 		C812B05F28255A4300E47941 /* DiffDrillDownDetailer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DiffDrillDownDetailer.m; path = ../model/DiffDrillDownDetailer.m; sourceTree = "<group>"; };
 		C812E72B286066A10068AD5F /* FreeTrialOrUpgradeOnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FreeTrialOrUpgradeOnboardingViewController.swift; path = MacBox/FreeTrialOrUpgradeOnboardingViewController.swift; sourceTree = "<group>"; };
+		C816D1082916AEB3003F19B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SecurityPrivacySettings.storyboard; sourceTree = "<group>"; };
+		C816D10D2916AEC3003F19B2 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1112916AED2003F19B2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SecurityPrivacySettings.strings"; sourceTree = "<group>"; };
+		C816D1132916AED3003F19B2 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/SecurityPrivacySettings.strings"; sourceTree = "<group>"; };
+		C816D1152916AED5003F19B2 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1172916AED7003F19B2 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1192916AED7003F19B2 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D11B2916AEDB003F19B2 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D11D2916AEDC003F19B2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D11F2916AEDE003F19B2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1232916AEE6003F19B2 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1252916AEE8003F19B2 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1272916AEEA003F19B2 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1292916AEEB003F19B2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D12B2916AEED003F19B2 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D12D2916AEF0003F19B2 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D12F2916AEF1003F19B2 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1312916AEF3003F19B2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1332916AEF5003F19B2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1352916AEF7003F19B2 /* sk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sk; path = sk.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1372916AEF9003F19B2 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1392916AEFA003F19B2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D13B2916AEFD003F19B2 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D13D2916AEFE003F19B2 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C816D1452916BAA8003F19B2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/AppearanceSettings.storyboard; sourceTree = "<group>"; };
+		C816D14C2916BAC2003F19B2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AppearanceSettings.strings"; sourceTree = "<group>"; };
+		C816D14E2916BAC3003F19B2 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AppearanceSettings.strings"; sourceTree = "<group>"; };
+		C816D1502916BAC5003F19B2 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1522916BAC6003F19B2 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1542916BAC7003F19B2 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1562916BAC8003F19B2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1582916BAC9003F19B2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D15C2916BAD1003F19B2 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D15E2916BAD2003F19B2 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1602916BAD4003F19B2 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1622916BAD6003F19B2 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1642916BADF003F19B2 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1662916BAE0003F19B2 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1682916BAE2003F19B2 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D16A2916BAE4003F19B2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D16C2916BAE9003F19B2 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D16E2916BAEB003F19B2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1702916BAEC003F19B2 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C816D1722916BAED003F19B2 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
 		C81756702735220900431A36 /* PleaseConnectHardwareKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PleaseConnectHardwareKey.h; path = MacBox/PleaseConnectHardwareKey.h; sourceTree = "<group>"; };
 		C81756712735220900431A36 /* PleaseConnectHardwareKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PleaseConnectHardwareKey.m; path = MacBox/PleaseConnectHardwareKey.m; sourceTree = "<group>"; };
 		C817567A2735259100431A36 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/ConnectHardwareKey.xib; sourceTree = "<group>"; };
@@ -5585,9 +5824,6 @@
 		C8441CA025CB01AB0070C7FE /* NMSSHChannelDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMSSHChannelDelegate.h; sourceTree = "<group>"; };
 		C8441CA125CB01AB0070C7FE /* NMSSHSessionDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMSSHSessionDelegate.h; sourceTree = "<group>"; };
 		C8441CA225CB01AB0070C7FE /* NMSSHHostConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NMSSHHostConfig.m; sourceTree = "<group>"; };
-		C8441CCB25CB02080070C7FE /* libssh2_sftp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libssh2_sftp.h; sourceTree = "<group>"; };
-		C8441CCC25CB02080070C7FE /* libssh2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libssh2.h; sourceTree = "<group>"; };
-		C8441CCD25CB02080070C7FE /* libssh2_publickey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libssh2_publickey.h; sourceTree = "<group>"; };
 		C8441CD025CB02080070C7FE /* NMSSH.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NMSSH.h; sourceTree = "<group>"; };
 		C8445C1C256FB3AD00AF1110 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/DatabaseOnboarding.strings; sourceTree = "<group>"; };
 		C8445C1E256FB3AD00AF1110 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Main.strings; sourceTree = "<group>"; };
@@ -5671,6 +5907,7 @@
 		C852B333284660E200597CE7 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/EncryptionSettings.strings; sourceTree = "<group>"; };
 		C852B335284660E400597CE7 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/EncryptionSettings.strings"; sourceTree = "<group>"; };
 		C852B337284660E500597CE7 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/EncryptionSettings.strings"; sourceTree = "<group>"; };
+		C852EF62295B44DE006EF9A1 /* NoClippingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NoClippingView.swift; path = MacBox/NoClippingView.swift; sourceTree = "<group>"; };
 		C8579C5327AEECD900653664 /* Parse2FactorAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parse2FactorAuth.swift; sourceTree = "<group>"; };
 		C8584C7C27A84B7B00686A08 /* NextNavigationConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NextNavigationConstants.h; path = MacBox/NextNavigationConstants.h; sourceTree = "<group>"; };
 		C859423F277F2AE60040F03D /* TitleAndIconCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TitleAndIconCell.swift; path = MacBox/TitleAndIconCell.swift; sourceTree = "<group>"; };
@@ -5705,6 +5942,7 @@
 		C85F27C72705DD1000A216C6 /* SBColorCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SBColorCollection.swift; path = ../lib/SBColorCollection.swift; sourceTree = "<group>"; };
 		C860C93E2744255B00A28341 /* PasswordGenerationPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PasswordGenerationPreferences.swift; path = MacBox/PasswordGenerationPreferences.swift; sourceTree = "<group>"; };
 		C860FEB228A046D500DE19CE /* version.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = version.txt; path = ../build/version.txt; sourceTree = "<group>"; };
+		C8613C94291FE4A90006567C /* WhatIsMarkdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = WhatIsMarkdownViewController.swift; path = MacBox/WhatIsMarkdownViewController.swift; sourceTree = "<group>"; };
 		C8629F95260B45C000DEDB8E /* GeneralDatabaseSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GeneralDatabaseSettings.h; path = MacBox/GeneralDatabaseSettings.h; sourceTree = "<group>"; };
 		C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneralDatabaseSettings.m; path = MacBox/GeneralDatabaseSettings.m; sourceTree = "<group>"; };
 		C8629FDA260B998600DEDB8E /* EditCustomFieldController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EditCustomFieldController.h; path = MacBox/EditCustomFieldController.h; sourceTree = "<group>"; };
@@ -6004,6 +6242,62 @@
 		C8A5EF2327A5690F00C5232D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/NextGen-Sidebar.strings"; sourceTree = "<group>"; };
 		C8A5EF2527A5691000C5232D /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = "sv.lproj/NextGen-Sidebar.strings"; sourceTree = "<group>"; };
 		C8A5EF2727A5691200C5232D /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = "uk.lproj/NextGen-Sidebar.strings"; sourceTree = "<group>"; };
+		C8A85154295C5316000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/DatabasesManager.strings; sourceTree = "<group>"; };
+		C8A85155295C5316000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8A85156295C5316000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Main.strings; sourceTree = "<group>"; };
+		C8A85157295C5316000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C8A85158295C5317000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		C8A85159295C5317000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/NextGen.strings; sourceTree = "<group>"; };
+		C8A8515A295C5317000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = "el.lproj/NextGen-Sidebar.strings"; sourceTree = "<group>"; };
+		C8A8515B295C5317000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = "el.lproj/NextGen-Master.strings"; sourceTree = "<group>"; };
+		C8A8515C295C5317000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/CreateEditViewController.strings; sourceTree = "<group>"; };
+		C8A8515D295C5317000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/QrCodeWindowScanner.strings; sourceTree = "<group>"; };
+		C8A8515E295C5317000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/PastedImagePreviewer.strings; sourceTree = "<group>"; };
+		C8A8515F295C5318000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/TipJar.strings; sourceTree = "<group>"; };
+		C8A85160295C5318000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/DatabaseOnboarding.strings; sourceTree = "<group>"; };
+		C8A85161295C5318000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/FreeTrialOrUpgradeOnboarding.strings; sourceTree = "<group>"; };
+		C8A85162295C5318000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/MacConflictResolutionWizard.strings; sourceTree = "<group>"; };
+		C8A85163295C5318000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/CompareDatabases.strings; sourceTree = "<group>"; };
+		C8A85164295C5318000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/CompareAndMergeWizard.strings; sourceTree = "<group>"; };
+		C8A85165295C5318000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C8A85166295C5319000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AuditConfigurationViewController.strings; sourceTree = "<group>"; };
+		C8A85167295C5319000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8A85168295C5319000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/ConnectHardwareKey.strings; sourceTree = "<group>"; };
+		C8A85169295C5319000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SystemTrayViewController.strings; sourceTree = "<group>"; };
+		C8A8516A295C5319000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8A8516B295C5319000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C8A8516C295C531A000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AppPreferences.strings; sourceTree = "<group>"; };
+		C8A8516D295C531A000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/GeneralAppPreferences.strings; sourceTree = "<group>"; };
+		C8A8516E295C531A000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AppearanceSettings.strings; sourceTree = "<group>"; };
+		C8A8516F295C531A000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SecurityPrivacySettings.strings; sourceTree = "<group>"; };
+		C8A85170295C531A000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AutoFillAppLevelPreferences.strings; sourceTree = "<group>"; };
+		C8A85171295C531A000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AdvancedAppPreferences.strings; sourceTree = "<group>"; };
+		C8A85172295C531A000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/NewEntryDefaultsPreferences.strings; sourceTree = "<group>"; };
+		C8A85173295C531B000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/FavIconPreferences.strings; sourceTree = "<group>"; };
+		C8A85174295C531B000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
+		C8A85175295C531B000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/EncryptionSettings.strings; sourceTree = "<group>"; };
+		C8A85176295C531B000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		C8A85177295C531B000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
+		C8A85178295C531B000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = MacBox/el.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
+		C8A85179295C531B000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/UnifiedUpgrade.strings; sourceTree = "<group>"; };
+		C8A8517A295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
+		C8A8517B295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		C8A8517C295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		C8A8517D295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/FavIconResultTableCell.strings; sourceTree = "<group>"; };
+		C8A8517E295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SyncLogViewController.strings; sourceTree = "<group>"; };
+		C8A8517F295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		C8A85180295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
+		C8A85181295C531C000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C8A85182295C531D000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SFTPConfigurationVC.strings; sourceTree = "<group>"; };
+		C8A85183295C531D000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/WebDAVConfigVC.strings; sourceTree = "<group>"; };
+		C8A85184295C531D000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C8A85185295C531D000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AddDatabaseSelectStorageProvider.strings; sourceTree = "<group>"; };
+		C8A85186295C5322000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SelectAutoFillDatabaseViewController.strings; sourceTree = "<group>"; };
+		C8A85187295C5322000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/CredentialProviderViewController.strings; sourceTree = "<group>"; };
+		C8A85188295C5322000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/ManualCredentialsEntry.strings; sourceTree = "<group>"; };
+		C8A85189295C5322000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/SelectCredential.strings; sourceTree = "<group>"; };
+		C8A8518A295C5322000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AutoFillLoading.strings; sourceTree = "<group>"; };
+		C8A8518B295C5322000D27B8 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = "el.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
 		C8AA213A256BD0E400E9FF8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DatabaseOnboarding.storyboard; sourceTree = "<group>"; };
 		C8AA2143256BD10000E9FF8D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DatabaseOnboarding.strings"; sourceTree = "<group>"; };
 		C8AA2145256BD10200E9FF8D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DatabaseOnboarding.strings; sourceTree = "<group>"; };
@@ -6100,6 +6394,7 @@
 		C8B14BDA274AA9F40055EB05 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/AdvancedAppPreferences.strings"; sourceTree = "<group>"; };
 		C8B14BDC274AA9F70055EB05 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AdvancedAppPreferences.strings"; sourceTree = "<group>"; };
 		C8B14BDF274AAB8F0055EB05 /* AutoFillAppLevelPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AutoFillAppLevelPreferences.swift; path = MacBox/AutoFillAppLevelPreferences.swift; sourceTree = "<group>"; };
+		C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "ptbr-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/ptbr-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8B45C8A24ACC97700318562 /* StreamUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StreamUtils.m; path = ../model/StreamUtils.m; sourceTree = "<group>"; };
 		C8B45C8B24ACC97700318562 /* StreamUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StreamUtils.h; path = ../model/StreamUtils.h; sourceTree = "<group>"; };
 		C8B501E626ECB5B0003DE6A2 /* ChaCha20OutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ChaCha20OutputStream.h; path = ../model/ChaCha20OutputStream.h; sourceTree = "<group>"; };
@@ -6227,6 +6522,8 @@
 		C8C8967E26CECB9300F1BC4D /* PressHardwareKeyWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PressHardwareKeyWindow.h; path = MacBox/YubiKey/PressHardwareKeyWindow.h; sourceTree = "<group>"; };
 		C8C8967F26CECB9300F1BC4D /* MacHardwareKeyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MacHardwareKeyManager.m; path = MacBox/YubiKey/MacHardwareKeyManager.m; sourceTree = "<group>"; };
 		C8C8968026CECB9300F1BC4D /* HardwareKeyData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HardwareKeyData.m; path = MacBox/YubiKey/HardwareKeyData.m; sourceTree = "<group>"; };
+		C8C93F2F290FFCD4005BAE54 /* SecurityPrivacySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SecurityPrivacySettings.swift; path = MacBox/SecurityPrivacySettings.swift; sourceTree = "<group>"; };
+		C8C93F3C29100BC1005BAE54 /* AppearanceSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppearanceSettings.swift; path = MacBox/AppearanceSettings.swift; sourceTree = "<group>"; };
 		C8CB82C72790812900F85A2C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/PastedImagePreviewer.storyboard; sourceTree = "<group>"; };
 		C8CB82CC2790812E00F85A2C /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PastedImagePreviewer.strings"; sourceTree = "<group>"; };
 		C8CB82CE2790812F00F85A2C /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/PastedImagePreviewer.strings"; sourceTree = "<group>"; };
@@ -6479,6 +6776,9 @@
 		C8F39F9125DD91490045CAAB /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SyncLogViewController.strings; sourceTree = "<group>"; };
 		C8F39F9325DD914A0045CAAB /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SyncLogViewController.strings; sourceTree = "<group>"; };
 		C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TwoDriveStorageProvider.swift; path = ../model/TwoDriveStorageProvider.swift; sourceTree = "<group>"; };
+		C8F44E0D295F06B50008E5BD /* BrowseSortConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BrowseSortConfiguration.h; path = ../StrongBox/BrowseSortConfiguration.h; sourceTree = "<group>"; };
+		C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BrowseSortConfiguration.m; path = ../StrongBox/BrowseSortConfiguration.m; sourceTree = "<group>"; };
+		C8F5560B2912DA9A002A5517 /* DatabasesCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DatabasesCollection.swift; path = MacBox/DatabasesCollection.swift; sourceTree = "<group>"; };
 		C8F78FC826CFF015002B0924 /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = "../../../openssl-ssh/macOS/libssl.a"; sourceTree = "<group>"; };
 		C8F78FC926CFF016002B0924 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = "../../../openssl-ssh/macOS/libcrypto.a"; sourceTree = "<group>"; };
 		C8F78FCA26CFF016002B0924 /* libssh2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssh2.a; path = "../../../openssl-ssh/macOS/libssh2.a"; sourceTree = "<group>"; };
@@ -6569,6 +6869,8 @@
 		C8FB343825B9F566003C0F24 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SelectCredential.strings; sourceTree = "<group>"; };
 		C8FB343925B9F566003C0F24 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
 		C8FB343A25B9F566003C0F24 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = ../StrongBox/nl.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C8FC11CE29190E7D00EEBCA1 /* SafariAutoFillWormhole.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SafariAutoFillWormhole.h; path = MacBox/SafariAutoFillWormhole.h; sourceTree = "<group>"; };
+		C8FC11CF29190E7D00EEBCA1 /* SafariAutoFillWormhole.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SafariAutoFillWormhole.m; path = MacBox/SafariAutoFillWormhole.m; sourceTree = "<group>"; };
 		C8FD557125DD3E1A009B8705 /* NonFileDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NonFileDocument.h; path = Model/NonFileDocument.h; sourceTree = "<group>"; };
 		C8FD557225DD3E1A009B8705 /* NonFileDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NonFileDocument.m; path = Model/NonFileDocument.m; sourceTree = "<group>"; };
 		C8FD559525DD3F9A009B8705 /* Mac-Outright-Pro-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Mac-Outright-Pro-Info.plist"; sourceTree = "<group>"; };
@@ -6819,6 +7121,7 @@
 		4D216F5B22CBCDBF000954D0 /* Word Lists */ = {
 			isa = PBXGroup;
 			children = (
+				C8B4135F2961D69800682940 /* ptbr-diceware.wordlist.utf8.txt */,
 				C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */,
 				C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */,
 				C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */,
@@ -7077,23 +7380,22 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				C8006BB526DA747C0020AF23 /* Main */,
-				C8F1B3F926D67EE000B21A29 /* NextGen */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
+				4D88E6D123A924D100A75D1F /* Databases Manager */,
+				C8006BB526DA747C0020AF23 /* Main */,
+				C8F1B3F926D67EE000B21A29 /* NextGen */,
 				C8970BAB2891287300BF61DE /* Tip Jar */,
 				C8EF9F10285B687B0081E934 /* Onboarding */,
 				C8BBBDD12823F1CF00334D2B /* Compare & Merge */,
 				C85179302826CEDD00A09797 /* Select Database */,
 				C8DA3DC027B3EBA300862C17 /* Audit */,
-				4D14A13B224D211400C71ABF /* Node Details */,
 				C817566A27351F3F00431A36 /* Hardware Key */,
 				4DE79B86255D987C00F59B10 /* Strongbox AutoFill */,
 				C834321A270CAC8D009DFFF4 /* Markdown */,
 				C8F1B42526D68ADE00B21A29 /* System Tray */,
 				C8877459261E16BB00C01406 /* Edit Tags */,
 				C8877392261DE80100C01406 /* About */,
-				4D88E6D123A924D100A75D1F /* Databases Manager */,
 				4D88E6D023A9249E00A75D1F /* App Preferences */,
 				4D6EB45923DF23750045C8D5 /* Database Settings */,
 				C85B9D6E2465426A00EEBFC9 /* UI Components */,
@@ -7115,6 +7417,7 @@
 				C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */,
 				C89C944727B180DC00F78928 /* NibLoadable.swift */,
 				C803826527B666E300AB075A /* ProLabelBadge.swift */,
+				C852EF62295B44DE006EF9A1 /* NoClippingView.swift */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -7178,11 +7481,14 @@
 		4D88E6D023A9249E00A75D1F /* App Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				C810337E2749632600869513 /* AppPreferences.storyboard */,
+				C8F9AA6527495AC900C2D9E8 /* General */,
+				C8C93F3529100B99005BAE54 /* Appearance */,
+				C8C93F28290FFC9A005BAE54 /* Security & Privacy */,
 				C8B14BE2274AABAB0055EB05 /* AutoFill */,
 				C8B14BBC274AA48F0055EB05 /* Advanced */,
 				C8B14B96274A9A400055EB05 /* New Entry Defaults */,
 				C810339D2749638400869513 /* FavIcons */,
-				C8F9AA6527495AC900C2D9E8 /* General */,
 				C89F69D8274808ED0051BC50 /* Password Generation */,
 				C89F69D62747F3540051BC50 /* Window Controller & Window */,
 			);
@@ -7438,6 +7744,7 @@
 		4DE2CA3E23C38B5E00F76255 /* Original */ = {
 			isa = PBXGroup;
 			children = (
+				4D14A13B224D211400C71ABF /* Node Details */,
 				4DF59F5A1F30DB7A00D68BFE /* ViewController.h */,
 				4DF59F5B1F30DB7A00D68BFE /* ViewController.m */,
 				C80C2BC1259A1DD300085E7F /* OutlineView.h */,
@@ -7508,8 +7815,12 @@
 		4DF347EF2074FA5A00148741 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
-				C85B04EF28BE733D00323009 /* Apple Password Manager Quirks */,
+				C8F44E0D295F06B50008E5BD /* BrowseSortConfiguration.h */,
+				C8F44E0E295F06B50008E5BD /* BrowseSortConfiguration.m */,
+				C801BA74295CB2AC00DDDA4C /* TOTPGenerator.swift */,
+				C8F5560A2912D9EA002A5517 /* Databases Collection */,
 				C8864C182746B28500D55C1C /* AutoFIll */,
+				C85B04EF28BE733D00323009 /* Apple Password Manager Quirks */,
 				C8970B97289122EB00BF61DE /* TipJarLogic.swift */,
 				C80232C2285881B40066BFC9 /* In App Purchases */,
 				C85B9D71246543BA00EEBFC9 /* Database */,
@@ -7568,10 +7879,11 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
-				4DF347EF2074FA5A00148741 /* Logic */,
+				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
-				C8B9D494247E9F3800F6B9F5 /* Build */,
 				4D524D2B219B503F00C22CB4 /* View */,
+				4DF347EF2074FA5A00148741 /* Logic */,
+				C8B9D494247E9F3800F6B9F5 /* Build */,
 				C8E615FB28BD1069006A6E56 /* Libs */,
 				C820284B28A7F8AF00EBEE2F /* autofill-proxy */,
 				C83CE61128AAA7D000E482E6 /* afproxy */,
@@ -7620,7 +7932,6 @@
 			children = (
 				4DF347F02074FA6B00148741 /* Strongbox.h */,
 				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
-				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DCA65B01F4B4A000078B962 /* Credits.rtf */,
 				4DF59F581F30DB7A00D68BFE /* main.m */,
 			);
@@ -7679,8 +7990,8 @@
 		C8006BB526DA747C0020AF23 /* Main */ = {
 			isa = PBXGroup;
 			children = (
-				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
 				C8EEDB0427A1949D00FBFA43 /* Lock Screen */,
+				4DF59F621F30DB7A00D68BFE /* Main.storyboard */,
 				4DE2CA3E23C38B5E00F76255 /* Original */,
 				C875F83A279AB72000955D14 /* NotificationConstants.h */,
 				C875F83B279AB72000955D14 /* NotificationConstants.m */,
@@ -8228,19 +8539,8 @@
 				C8F78FC926CFF016002B0924 /* libcrypto.a */,
 				C8F78FCA26CFF016002B0924 /* libssh2.a */,
 				C8F78FC826CFF015002B0924 /* libssl.a */,
-				C8441CCA25CB02080070C7FE /* include */,
 			);
 			path = Libraries;
-			sourceTree = "<group>";
-		};
-		C8441CCA25CB02080070C7FE /* include */ = {
-			isa = PBXGroup;
-			children = (
-				C8441CCB25CB02080070C7FE /* libssh2_sftp.h */,
-				C8441CCC25CB02080070C7FE /* libssh2.h */,
-				C8441CCD25CB02080070C7FE /* libssh2_publickey.h */,
-			);
-			path = include;
 			sourceTree = "<group>";
 		};
 		C84622B6276A49CC00322FD5 /* Cells */ = {
@@ -8804,7 +9104,6 @@
 		C89F69D62747F3540051BC50 /* Window Controller & Window */ = {
 			isa = PBXGroup;
 			children = (
-				C810337E2749632600869513 /* AppPreferences.storyboard */,
 				C89F69D02747ECA20051BC50 /* AppPreferencesWindowController.swift */,
 				C89F69D32747EDE30051BC50 /* AppPreferencesWindow.swift */,
 			);
@@ -8839,6 +9138,7 @@
 				C86ED4D928DC8EAF003A1C75 /* CopyFieldRequest.swift */,
 				C86ED4DE28DC8EC8003A1C75 /* CopyFieldResponse.swift */,
 				C8C5B69528DF3B2100FA6F96 /* DatabaseSummary.swift */,
+				C81277DE291806E500567AF7 /* UnlockDatabaseRequestResponse.swift */,
 			);
 			name = Protocol;
 			sourceTree = "<group>";
@@ -9008,6 +9308,25 @@
 				C8AFD595256AC48000290960 /* OnboardingAutoFillViewController.m */,
 			);
 			name = "Database Onboarding";
+			sourceTree = "<group>";
+		};
+		C8C93F28290FFC9A005BAE54 /* Security & Privacy */ = {
+			isa = PBXGroup;
+			children = (
+				C816D1092916AEB3003F19B2 /* SecurityPrivacySettings.storyboard */,
+				C8C93F2F290FFCD4005BAE54 /* SecurityPrivacySettings.swift */,
+			);
+			name = "Security & Privacy";
+			sourceTree = "<group>";
+		};
+		C8C93F3529100B99005BAE54 /* Appearance */ = {
+			isa = PBXGroup;
+			children = (
+				C816D1462916BAA8003F19B2 /* AppearanceSettings.storyboard */,
+				C8C93F3C29100BC1005BAE54 /* AppearanceSettings.swift */,
+				C8613C94291FE4A90006567C /* WhatIsMarkdownViewController.swift */,
+			);
+			name = Appearance;
 			sourceTree = "<group>";
 		};
 		C8DA3DB927B3E39B00862C17 /* Audit Issue */ = {
@@ -9308,6 +9627,16 @@
 				C8F3FD6C27D6193600AD56B7 /* TwoDriveStorageProvider.swift */,
 			);
 			name = OneDrive;
+			sourceTree = "<group>";
+		};
+		C8F5560A2912D9EA002A5517 /* Databases Collection */ = {
+			isa = PBXGroup;
+			children = (
+				C8F5560B2912DA9A002A5517 /* DatabasesCollection.swift */,
+				C8FC11CE29190E7D00EEBCA1 /* SafariAutoFillWormhole.h */,
+				C8FC11CF29190E7D00EEBCA1 /* SafariAutoFillWormhole.m */,
+			);
+			name = "Databases Collection";
 			sourceTree = "<group>";
 		};
 		C8F9AA6527495AC900C2D9E8 /* General */ = {
@@ -9712,7 +10041,6 @@
 				pl,
 				he,
 				ar,
-				el,
 				es_MX,
 				zh_CN,
 				pt_BR,
@@ -9735,6 +10063,7 @@
 				hr,
 				hi,
 				ca,
+				el,
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
 			productRefGroup = 4DF59F521F30DB7A00D68BFE /* Products */;
@@ -9832,11 +10161,14 @@
 				C867342B2673A09B0063237B /* MAS-Localizable.strings in Resources */,
 				C8970BAD289132BD00BF61DE /* TipJar.storyboard in Resources */,
 				C85A66B628C24A4200695EBC /* Assets.xcassets in Resources */,
+				C816D1412916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */,
 				C852B317284660C900597CE7 /* EncryptionSettings.storyboard in Resources */,
 				C8594244277F2AFA0040F03D /* TitleAndIconCell.xib in Resources */,
 				C8B14B72274A98E20055EB05 /* FavIconPreferences.storyboard in Resources */,
 				4D1FFB352403030100B75EA2 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				C80043C226BD900B0090C90D /* WebDAVConnectionsManager.storyboard in Resources */,
+				C816D1042916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */,
+				C8B413612961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C81B8D102799C331006387D0 /* HeaderTableCellView.xib in Resources */,
 				4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				C8594247277F2DDB0040F03D /* GenericAutoLayoutTableViewCell.xib in Resources */,
@@ -9894,22 +10226,45 @@
 			buildActionMask = 2147483647;
 			files = (
 				C81ABE4B25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
+				C875E0D6294F5B68003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C88773D1261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				C8E78ACE25714A3900251153 /* SelectCredential.xib in Resources */,
 				C8877336261DD64900C01406 /* Backups.storyboard in Resources */,
+				C875E0D3294F5B68003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4DE79B8C255D987C00F59B10 /* CredentialProviderViewController.xib in Resources */,
+				C875E0D1294F5B68003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C851791E2826A35B00A09797 /* CompareDatabases.storyboard in Resources */,
 				C8127D3A29057FDE00F48390 /* public_suffix_list.dat in Resources */,
+				C875E0D5294F5B68003C82F2 /* beale.wordlist.utf8.txt in Resources */,
+				C875E0C8294F5B68003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
+				C875E0C9294F5B68003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
+				C875E0CE294F5B68003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C8E5C337275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */,
+				C875E0DB294F5B68003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C8C1F75925702E7B009991D4 /* AutoFillCredentialCell.xib in Resources */,
+				C875E0CA294F5B68003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				C875E0D8294F5B68003C82F2 /* securedrop.wordlist.utf8.txt in Resources */,
 				C851791A2826A35200A09797 /* DrillDownDiff.storyboard in Resources */,
+				C875E0CC294F5B68003C82F2 /* diceware.wordlist.utf8.txt in Resources */,
+				C875E0DC294F5B68003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				C875E0D0294F5B68003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */,
+				C875E0DD294F5B68003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				C86FED1925C326A800386DD9 /* PressYubiKeyWindow.xib in Resources */,
+				C875E0CF294F5B68003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				C875E0DA294F5B68003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				C875E0CB294F5B68003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C82DB4332753C911006B7573 /* AutoFillLoading.storyboard in Resources */,
+				C875E0CD294F5B68003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C89B8F682562C27800B590C0 /* Localizable.strings in Resources */,
+				C875E0D7294F5B68003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				C875E0D9294F5B68003C82F2 /* eff_large_wordlist.utf8.txt in Resources */,
 				C8AA2170256BD15900E9FF8D /* ManualCredentialsEntry.xib in Resources */,
 				C85B04DF28BE72EE00323009 /* websites-with-shared-credential-backends.json in Resources */,
 				C8F8CE3925D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
+				C875E0D2294F5B68003C82F2 /* starwars_8k_2018.utf8.txt in Resources */,
 				C81756772735259100431A36 /* ConnectHardwareKey.xib in Resources */,
+				C875E0D4294F5B68003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				C8B413642961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C85A66BD28C24A8000695EBC /* Assets.xcassets in Resources */,
 				C8E78AC725714A2A00251153 /* SelectAutoFillDatabaseViewController.xib in Resources */,
 			);
@@ -9928,10 +10283,12 @@
 				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				C8CB8309279081B700F85A2C /* CreateEditViewController.storyboard in Resources */,
 				4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */,
+				C8B413602961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C819D6BE26BD921300886363 /* SFTPConnectionsManager.storyboard in Resources */,
 				C8877335261DD64900C01406 /* Backups.storyboard in Resources */,
 				C8E6161128BD107B006A6E56 /* public_suffix_list.dat in Resources */,
 				C8221F15285F2B3200FD58E8 /* GenericOnboardingViewController.storyboard in Resources */,
+				C816D1032916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
 				4D68255823E498D7002DC4FB /* DatabaseProperties.storyboard in Resources */,
 				C81756762735259100431A36 /* ConnectHardwareKey.xib in Resources */,
@@ -9955,6 +10312,7 @@
 				C8DA3DCD27B426FA00862C17 /* AuditConfigurationViewController.storyboard in Resources */,
 				4DC805BF23A11749001E742E /* PredefinedKeePassIcon.xib in Resources */,
 				4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				C816D1402916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */,
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C8BBBE072824113D00334D2B /* CompareAndMergeWizard.storyboard in Resources */,
 				C8DA3DEF27B4277700862C17 /* AuditDrillDown.storyboard in Resources */,
@@ -10062,6 +10420,7 @@
 				C84936BA2857631D0079D1E8 /* SFTPConnectionsManager.storyboard in Resources */,
 				C84936BB2857631D0079D1E8 /* Backups.storyboard in Resources */,
 				C84936BD2857631D0079D1E8 /* diceware.wordlist.utf8.txt in Resources */,
+				C8B413622961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C84936BE2857631D0079D1E8 /* DatabaseProperties.storyboard in Resources */,
 				C84936BF2857631D0079D1E8 /* ConnectHardwareKey.xib in Resources */,
 				C84936C02857631D0079D1E8 /* MacConflictResolutionWizard.storyboard in Resources */,
@@ -10110,6 +10469,7 @@
 				C84936EA2857631D0079D1E8 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C84936EB2857631D0079D1E8 /* EditTagsPopover.storyboard in Resources */,
 				C84936EC2857631D0079D1E8 /* NotesTableCellView.xib in Resources */,
+				C816D1052916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */,
 				C84936ED2857631D0079D1E8 /* FavIconResultTableCell.xib in Resources */,
 				C84936EE2857631D0079D1E8 /* formatV3.txt in Resources */,
 				C84936EF2857631D0079D1E8 /* TagItem.xib in Resources */,
@@ -10128,6 +10488,7 @@
 				C84936FB2857631D0079D1E8 /* SyncLogViewController.storyboard in Resources */,
 				C84936FC2857631D0079D1E8 /* formatV4.txt in Resources */,
 				C84936FD2857631D0079D1E8 /* QrCodeWindowScanner.storyboard in Resources */,
+				C816D1422916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */,
 				C84936FE2857631D0079D1E8 /* TotpTableCellView.xib in Resources */,
 				C84936FF2857631D0079D1E8 /* AppPreferences.storyboard in Resources */,
 				C84937002857631D0079D1E8 /* securedrop.wordlist.utf8.txt in Resources */,
@@ -10170,22 +10531,45 @@
 			buildActionMask = 2147483647;
 			files = (
 				C849382D285763230079D1E8 /* DatabaseCellView.xib in Resources */,
+				C875E102294F5B6A003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C849382E285763230079D1E8 /* AboutViewController.storyboard in Resources */,
 				C849382F285763230079D1E8 /* SelectCredential.xib in Resources */,
 				C8493830285763230079D1E8 /* Backups.storyboard in Resources */,
+				C875E0FF294F5B6A003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C8493831285763230079D1E8 /* CredentialProviderViewController.xib in Resources */,
+				C875E0FD294F5B6A003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C8493832285763230079D1E8 /* CompareDatabases.storyboard in Resources */,
 				C8127D3C29057FDF00F48390 /* public_suffix_list.dat in Resources */,
+				C875E101294F5B6A003C82F2 /* beale.wordlist.utf8.txt in Resources */,
+				C875E0F4294F5B6A003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
+				C875E0F5294F5B6A003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
+				C875E0FA294F5B6A003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C8493833285763230079D1E8 /* MacConflictResolutionWizard.storyboard in Resources */,
+				C875E107294F5B6A003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C8493834285763230079D1E8 /* AutoFillCredentialCell.xib in Resources */,
+				C875E0F6294F5B6A003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				C875E104294F5B6A003C82F2 /* securedrop.wordlist.utf8.txt in Resources */,
 				C8493835285763230079D1E8 /* DrillDownDiff.storyboard in Resources */,
+				C875E0F8294F5B6A003C82F2 /* diceware.wordlist.utf8.txt in Resources */,
+				C875E108294F5B6A003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				C875E0FC294F5B6A003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */,
+				C875E109294F5B6A003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				C8493836285763230079D1E8 /* PressYubiKeyWindow.xib in Resources */,
+				C875E0FB294F5B6A003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				C875E106294F5B6A003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				C875E0F7294F5B6A003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C8493837285763230079D1E8 /* AutoFillLoading.storyboard in Resources */,
+				C875E0F9294F5B6A003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C8493838285763230079D1E8 /* Localizable.strings in Resources */,
+				C875E103294F5B6A003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				C875E105294F5B6A003C82F2 /* eff_large_wordlist.utf8.txt in Resources */,
 				C849383A285763230079D1E8 /* ManualCredentialsEntry.xib in Resources */,
 				C85B04E128BE72EE00323009 /* websites-with-shared-credential-backends.json in Resources */,
 				C849383B285763230079D1E8 /* SFTPConfigurationVC.storyboard in Resources */,
+				C875E0FE294F5B6A003C82F2 /* starwars_8k_2018.utf8.txt in Resources */,
 				C849383C285763230079D1E8 /* ConnectHardwareKey.xib in Resources */,
+				C875E100294F5B6A003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				C8B413662961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C85A66BE28C24A8000695EBC /* Assets.xcassets in Resources */,
 				C849383D285763230079D1E8 /* SelectAutoFillDatabaseViewController.xib in Resources */,
 			);
@@ -10204,8 +10588,10 @@
 				C8493A1528577D4D0079D1E8 /* CreateEditViewController.storyboard in Resources */,
 				C8E6161428BD107B006A6E56 /* public_suffix_list.dat in Resources */,
 				C8493A1628577D4D0079D1E8 /* MacKeePassHistory.storyboard in Resources */,
+				C8FC11D629196D7F00EEBCA1 /* AutoFillLoading.storyboard in Resources */,
 				C8493A1728577D4D0079D1E8 /* SFTPConnectionsManager.storyboard in Resources */,
 				C8493A1828577D4D0079D1E8 /* Backups.storyboard in Resources */,
+				C8B413632961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C8221F18285F2B3200FD58E8 /* GenericOnboardingViewController.storyboard in Resources */,
 				C8493A1A28577D4D0079D1E8 /* diceware.wordlist.utf8.txt in Resources */,
 				C8493A1B28577D4D0079D1E8 /* DatabaseProperties.storyboard in Resources */,
@@ -10263,11 +10649,13 @@
 				C8493A4D28577D4D0079D1E8 /* MAS-Localizable.strings in Resources */,
 				C8970BAF289132BD00BF61DE /* TipJar.storyboard in Resources */,
 				C85A66BC28C24A7F00695EBC /* Assets.xcassets in Resources */,
+				C816D1432916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */,
 				C8493A4E28577D4D0079D1E8 /* EncryptionSettings.storyboard in Resources */,
 				C8493A4F28577D4D0079D1E8 /* TitleAndIconCell.xib in Resources */,
 				C8493A5028577D4D0079D1E8 /* FavIconPreferences.storyboard in Resources */,
 				C8493A5128577D4D0079D1E8 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				C8493A5228577D4D0079D1E8 /* WebDAVConnectionsManager.storyboard in Resources */,
+				C816D1062916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */,
 				C8493A5328577D4D0079D1E8 /* HeaderTableCellView.xib in Resources */,
 				C8493A5428577D4D0079D1E8 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				C8493A5528577D4D0079D1E8 /* GenericAutoLayoutTableViewCell.xib in Resources */,
@@ -10314,22 +10702,45 @@
 			buildActionMask = 2147483647;
 			files = (
 				C8493B8A28577D530079D1E8 /* DatabaseCellView.xib in Resources */,
+				C875E118294F5B6B003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C8493B8B28577D530079D1E8 /* AboutViewController.storyboard in Resources */,
 				C8493B8C28577D530079D1E8 /* SelectCredential.xib in Resources */,
 				C8493B8D28577D530079D1E8 /* Backups.storyboard in Resources */,
+				C875E115294F5B6B003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C8493B8E28577D530079D1E8 /* CredentialProviderViewController.xib in Resources */,
+				C875E113294F5B6B003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C8493B8F28577D530079D1E8 /* CompareDatabases.storyboard in Resources */,
 				C8127D3D29057FE000F48390 /* public_suffix_list.dat in Resources */,
+				C875E117294F5B6B003C82F2 /* beale.wordlist.utf8.txt in Resources */,
+				C875E10A294F5B6B003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
+				C875E10B294F5B6B003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
+				C875E110294F5B6B003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C8493B9028577D530079D1E8 /* MacConflictResolutionWizard.storyboard in Resources */,
+				C875E11D294F5B6B003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C8493B9128577D530079D1E8 /* AutoFillCredentialCell.xib in Resources */,
+				C875E10C294F5B6B003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				C875E11A294F5B6B003C82F2 /* securedrop.wordlist.utf8.txt in Resources */,
 				C8493B9228577D530079D1E8 /* DrillDownDiff.storyboard in Resources */,
+				C875E10E294F5B6B003C82F2 /* diceware.wordlist.utf8.txt in Resources */,
+				C875E11E294F5B6B003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				C875E112294F5B6B003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */,
+				C875E11F294F5B6B003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				C8493B9328577D530079D1E8 /* PressYubiKeyWindow.xib in Resources */,
+				C875E111294F5B6B003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				C875E11C294F5B6B003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				C875E10D294F5B6B003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C8493B9428577D530079D1E8 /* AutoFillLoading.storyboard in Resources */,
+				C875E10F294F5B6B003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C8493B9528577D530079D1E8 /* Localizable.strings in Resources */,
+				C875E119294F5B6B003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				C875E11B294F5B6B003C82F2 /* eff_large_wordlist.utf8.txt in Resources */,
 				C8493B9728577D530079D1E8 /* ManualCredentialsEntry.xib in Resources */,
 				C85B04E228BE72EE00323009 /* websites-with-shared-credential-backends.json in Resources */,
 				C8493B9828577D530079D1E8 /* SFTPConfigurationVC.storyboard in Resources */,
+				C875E114294F5B6B003C82F2 /* starwars_8k_2018.utf8.txt in Resources */,
 				C8493B9928577D530079D1E8 /* ConnectHardwareKey.xib in Resources */,
+				C875E116294F5B6B003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				C8B413672961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C85A66BF28C24A8100695EBC /* Assets.xcassets in Resources */,
 				C8493B9A28577D530079D1E8 /* SelectAutoFillDatabaseViewController.xib in Resources */,
 			);
@@ -10340,26 +10751,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				C89963FA28A144130069FA51 /* PasswordGenerationPreferences.storyboard in Resources */,
-				C89963FB28A144130069FA51 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
-				C89963FC28A144130069FA51 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				C89963FD28A144130069FA51 /* CheckboxCell.xib in Resources */,
-				C89963FE28A144130069FA51 /* harrypotter_8k_2018.utf8.txt in Resources */,
-				C89963FF28A144130069FA51 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				C8127D3E29057FE000F48390 /* public_suffix_list.dat in Resources */,
 				C899640028A144130069FA51 /* CreateEditViewController.storyboard in Resources */,
+				C875E133294F5B6C003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C899640128A144130069FA51 /* MacKeePassHistory.storyboard in Resources */,
 				C899640228A144130069FA51 /* SFTPConnectionsManager.storyboard in Resources */,
+				C875E120294F5B6C003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				C899640328A144130069FA51 /* Backups.storyboard in Resources */,
 				C899640428A144130069FA51 /* GenericOnboardingViewController.storyboard in Resources */,
-				C899640528A144130069FA51 /* diceware.wordlist.utf8.txt in Resources */,
 				C899640628A144130069FA51 /* DatabaseProperties.storyboard in Resources */,
+				C875E136294F5B6C003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				C899640728A144130069FA51 /* ConnectHardwareKey.xib in Resources */,
 				C899640828A144130069FA51 /* MacConflictResolutionWizard.storyboard in Resources */,
-				C899640928A144130069FA51 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C899640A28A144130069FA51 /* SelectPredefinedIconController.xib in Resources */,
-				C899640B28A144130069FA51 /* star_trek_8k_2018.utf8.txt in Resources */,
-				C899640C28A144130069FA51 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
-				C899640D28A144130069FA51 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				C899640E28A144130069FA51 /* first.names.us.txt in Resources */,
 				C899640F28A144130069FA51 /* EditCustomField.storyboard in Resources */,
 				C899641028A144130069FA51 /* DatabaseOnboarding.storyboard in Resources */,
@@ -10367,22 +10772,21 @@
 				C85A66B828C24A4D00695EBC /* Assets.xcassets in Resources */,
 				C899641228A144130069FA51 /* AdvancedAppPreferences.storyboard in Resources */,
 				C899641328A144130069FA51 /* NewEntryDefaultsPreferences.storyboard in Resources */,
+				C875E12C294F5B6C003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				C899641428A144130069FA51 /* FreeTrialOrUpgradeOnboarding.storyboard in Resources */,
-				C899641528A144130069FA51 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C899641628A144130069FA51 /* AttachmentItem.xib in Resources */,
 				C899641728A144130069FA51 /* AuditConfigurationViewController.storyboard in Resources */,
 				C899641828A144130069FA51 /* PredefinedKeePassIcon.xib in Resources */,
-				C899641928A144130069FA51 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
-				C899641A28A144130069FA51 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C899641B28A144130069FA51 /* CompareAndMergeWizard.storyboard in Resources */,
 				C899641C28A144130069FA51 /* AuditDrillDown.storyboard in Resources */,
 				C899641D28A144130069FA51 /* PopOutDetails.storyboard in Resources */,
 				C899641E28A144130069FA51 /* surnames.us.txt in Resources */,
 				C899641F28A144130069FA51 /* SystemTrayViewController.storyboard in Resources */,
+				C875E122294F5B6C003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				C899642128A144130069FA51 /* QRCodePresenter.storyboard in Resources */,
 				C899642228A144130069FA51 /* TagsTableCellView.xib in Resources */,
+				C875E121294F5B6C003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
 				C899642328A144130069FA51 /* PillView.xib in Resources */,
-				C899642428A144130069FA51 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C899642528A144130069FA51 /* GeneralAppPreferences.storyboard in Resources */,
 				C899642628A144130069FA51 /* DownloadFavIcons.storyboard in Resources */,
 				C899642728A144130069FA51 /* apple.cer in Resources */,
@@ -10392,64 +10796,74 @@
 				C899642B28A144130069FA51 /* AddDatabaseSelectStorageProvider.storyboard in Resources */,
 				C899642C28A144130069FA51 /* SingleLinePillTableCellView.xib in Resources */,
 				C899642D28A144130069FA51 /* LargeTextIndexedCharacter.xib in Resources */,
-				C899642E28A144130069FA51 /* starwars_8k_2018.utf8.txt in Resources */,
 				C899642F28A144130069FA51 /* DatabaseCellView.xib in Resources */,
 				C899643028A144130069FA51 /* NextGen-Sidebar.storyboard in Resources */,
 				C899643128A144130069FA51 /* SFTPConfigurationVC.storyboard in Resources */,
-				C899643228A144130069FA51 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C899643328A144130069FA51 /* DrillDownDiff.storyboard in Resources */,
-				C899643428A144130069FA51 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C899643528A144130069FA51 /* EditTagsPopover.storyboard in Resources */,
+				C875E130294F5B6C003C82F2 /* securedrop.wordlist.utf8.txt in Resources */,
 				C899643628A144130069FA51 /* NotesTableCellView.xib in Resources */,
+				C875E12D294F5B6C003C82F2 /* beale.wordlist.utf8.txt in Resources */,
+				C875E129294F5B6C003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C899643728A144130069FA51 /* FavIconResultTableCell.xib in Resources */,
 				C899643828A144130069FA51 /* formatV3.txt in Resources */,
+				C875E128294F5B6C003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				C899643928A144130069FA51 /* TagItem.xib in Resources */,
 				C899643A28A144130069FA51 /* MAS-Localizable.strings in Resources */,
 				C899643B28A144130069FA51 /* TipJar.storyboard in Resources */,
 				C899643C28A144130069FA51 /* EncryptionSettings.storyboard in Resources */,
+				C816D1442916BAA8003F19B2 /* AppearanceSettings.storyboard in Resources */,
 				C899643D28A144130069FA51 /* TitleAndIconCell.xib in Resources */,
+				C875E12B294F5B6C003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C899643E28A144130069FA51 /* FavIconPreferences.storyboard in Resources */,
-				C899643F28A144130069FA51 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				C899644028A144130069FA51 /* WebDAVConnectionsManager.storyboard in Resources */,
 				C899644128A144130069FA51 /* HeaderTableCellView.xib in Resources */,
+				C816D1072916AEB3003F19B2 /* SecurityPrivacySettings.storyboard in Resources */,
 				C899644228A144130069FA51 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				C899644328A144130069FA51 /* GenericAutoLayoutTableViewCell.xib in Resources */,
 				C85B04E328BE72EE00323009 /* websites-with-shared-credential-backends.json in Resources */,
+				C875E123294F5B6C003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C899644428A144130069FA51 /* SelectAutoFillDatabaseViewController.xib in Resources */,
+				C875E125294F5B6C003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */,
+				C8B413682961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C899644528A144130069FA51 /* ConnectionCellView.xib in Resources */,
 				C899644628A144130069FA51 /* SyncLogViewController.storyboard in Resources */,
 				C899644728A144130069FA51 /* formatV4.txt in Resources */,
 				C899644828A144130069FA51 /* QrCodeWindowScanner.storyboard in Resources */,
+				C875E12A294F5B6C003C82F2 /* starwars_8k_2018.utf8.txt in Resources */,
 				C899644928A144130069FA51 /* TotpTableCellView.xib in Resources */,
+				C875E127294F5B6C003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				C875E124294F5B6C003C82F2 /* diceware.wordlist.utf8.txt in Resources */,
 				C899644A28A144130069FA51 /* AppPreferences.storyboard in Resources */,
-				C899644B28A144130069FA51 /* securedrop.wordlist.utf8.txt in Resources */,
+				C875E12E294F5B6C003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C899644C28A144130069FA51 /* NextGen-Detail.storyboard in Resources */,
 				C899644D28A144130069FA51 /* CustomFieldTableCellView.xib in Resources */,
 				C899644E28A144130069FA51 /* UrlTableCellView.xib in Resources */,
+				C875E132294F5B6C003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				C899644F28A144130069FA51 /* DatabasesManager.storyboard in Resources */,
 				C899645028A144130069FA51 /* WebDAVConfigVC.storyboard in Resources */,
+				C875E131294F5B6C003C82F2 /* eff_large_wordlist.utf8.txt in Resources */,
 				C899645128A144130069FA51 /* AutoFillAppLevelPreferences.storyboard in Resources */,
-				C899645228A144130069FA51 /* beale.wordlist.utf8.txt in Resources */,
-				C899645328A144130069FA51 /* dutch-diceware.wordlist.utf8.txt in Resources */,
-				C899645428A144130069FA51 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C899645528A144130069FA51 /* NextGen-Master.storyboard in Resources */,
 				C899645628A144130069FA51 /* GenericDetailFieldTableCellView.xib in Resources */,
 				C899645728A144130069FA51 /* NextGen.storyboard in Resources */,
+				C875E126294F5B6C003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C899645828A144130069FA51 /* MetaDataTableCellView.xib in Resources */,
 				C899645928A144130069FA51 /* Main.storyboard in Resources */,
-				C899645A28A144130069FA51 /* eff_large_wordlist.utf8.txt in Resources */,
 				C899645B28A144130069FA51 /* LargeTextViewAndQrCode.storyboard in Resources */,
 				C899645C28A144130069FA51 /* AboutViewController.storyboard in Resources */,
 				C899645D28A144130069FA51 /* twofactorauth.json in Resources */,
 				C899645E28A144130069FA51 /* NodeDetails.storyboard in Resources */,
 				C899645F28A144130069FA51 /* ManualCredentialsEntry.xib in Resources */,
 				C899646028A144130069FA51 /* TitleCellView.xib in Resources */,
+				C875E12F294F5B6C003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				C899646128A144130069FA51 /* GroupPropertiesViewController.storyboard in Resources */,
 				C899646228A144130069FA51 /* 10-million-password-list-top-10000.txt in Resources */,
 				C899646328A144130069FA51 /* PressYubiKeyWindow.xib in Resources */,
 				C899646428A144130069FA51 /* Credits.rtf in Resources */,
 				C899646528A144130069FA51 /* AuditIssueTableCellView.xib in Resources */,
 				C899646628A144130069FA51 /* CompareDatabases.storyboard in Resources */,
+				C875E134294F5B6C003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -10458,22 +10872,45 @@
 			buildActionMask = 2147483647;
 			files = (
 				C899657628A1441B0069FA51 /* DatabaseCellView.xib in Resources */,
+				C875E145294F5B6D003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C899657728A1441B0069FA51 /* AboutViewController.storyboard in Resources */,
 				C899657828A1441B0069FA51 /* SelectCredential.xib in Resources */,
 				C899657928A1441B0069FA51 /* Backups.storyboard in Resources */,
+				C875E142294F5B6D003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C899657A28A1441B0069FA51 /* CredentialProviderViewController.xib in Resources */,
+				C875E140294F5B6D003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C899657B28A1441B0069FA51 /* CompareDatabases.storyboard in Resources */,
 				C8127D3F29057FE100F48390 /* public_suffix_list.dat in Resources */,
+				C875E144294F5B6D003C82F2 /* beale.wordlist.utf8.txt in Resources */,
+				C875E137294F5B6D003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
+				C875E138294F5B6D003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
+				C875E13D294F5B6D003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C899657C28A1441B0069FA51 /* MacConflictResolutionWizard.storyboard in Resources */,
+				C875E14A294F5B6D003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C899657D28A1441B0069FA51 /* AutoFillCredentialCell.xib in Resources */,
+				C875E139294F5B6D003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				C875E147294F5B6D003C82F2 /* securedrop.wordlist.utf8.txt in Resources */,
 				C899657E28A1441B0069FA51 /* DrillDownDiff.storyboard in Resources */,
+				C875E13B294F5B6D003C82F2 /* diceware.wordlist.utf8.txt in Resources */,
+				C875E14B294F5B6D003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				C875E13F294F5B6D003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */,
+				C875E14C294F5B6D003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				C899657F28A1441B0069FA51 /* PressYubiKeyWindow.xib in Resources */,
+				C875E13E294F5B6D003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				C875E149294F5B6D003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				C875E13A294F5B6D003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C899658028A1441B0069FA51 /* AutoFillLoading.storyboard in Resources */,
+				C875E13C294F5B6D003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C899658128A1441B0069FA51 /* Localizable.strings in Resources */,
+				C875E146294F5B6D003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				C875E148294F5B6D003C82F2 /* eff_large_wordlist.utf8.txt in Resources */,
 				C899658328A1441B0069FA51 /* ManualCredentialsEntry.xib in Resources */,
 				C85B04E428BE72EE00323009 /* websites-with-shared-credential-backends.json in Resources */,
 				C899658428A1441B0069FA51 /* SFTPConfigurationVC.storyboard in Resources */,
+				C875E141294F5B6D003C82F2 /* starwars_8k_2018.utf8.txt in Resources */,
 				C899658528A1441B0069FA51 /* ConnectHardwareKey.xib in Resources */,
+				C875E143294F5B6D003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				C8B413692961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C85A66B928C24A4D00695EBC /* Assets.xcassets in Resources */,
 				C899658628A1441B0069FA51 /* SelectAutoFillDatabaseViewController.xib in Resources */,
 			);
@@ -10484,22 +10921,45 @@
 			buildActionMask = 2147483647;
 			files = (
 				C81ABE4D25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
+				C875E0EC294F5B69003C82F2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C88773D3261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				C8B946162573D01A00932C46 /* SelectCredential.xib in Resources */,
 				C8877338261DD64900C01406 /* Backups.storyboard in Resources */,
+				C875E0E9294F5B69003C82F2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				C8B946172573D01A00932C46 /* CredentialProviderViewController.xib in Resources */,
+				C875E0E7294F5B69003C82F2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C851791F2826A35C00A09797 /* CompareDatabases.storyboard in Resources */,
 				C8127D3B29057FDE00F48390 /* public_suffix_list.dat in Resources */,
+				C875E0EB294F5B69003C82F2 /* beale.wordlist.utf8.txt in Resources */,
+				C875E0DE294F5B69003C82F2 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
+				C875E0DF294F5B69003C82F2 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
+				C875E0E4294F5B69003C82F2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				C8E5C339275E76D0006C15FE /* MacConflictResolutionWizard.storyboard in Resources */,
+				C875E0F1294F5B69003C82F2 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				C8B946192573D01A00932C46 /* AutoFillCredentialCell.xib in Resources */,
+				C875E0E0294F5B69003C82F2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				C875E0EE294F5B69003C82F2 /* securedrop.wordlist.utf8.txt in Resources */,
 				C851791B2826A35300A09797 /* DrillDownDiff.storyboard in Resources */,
+				C875E0E2294F5B69003C82F2 /* diceware.wordlist.utf8.txt in Resources */,
+				C875E0F2294F5B69003C82F2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				C875E0E6294F5B69003C82F2 /* finnish-diceware.wordlist.utf8.txt in Resources */,
+				C875E0F3294F5B69003C82F2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				C86FED1F25C326A900386DD9 /* PressYubiKeyWindow.xib in Resources */,
+				C875E0E5294F5B69003C82F2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				C875E0F0294F5B69003C82F2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				C875E0E1294F5B69003C82F2 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C82DB4342753C911006B7573 /* AutoFillLoading.storyboard in Resources */,
+				C875E0E3294F5B69003C82F2 /* german-diceware.wordlist.utf8.txt in Resources */,
 				C8B9461C2573D01A00932C46 /* Localizable.strings in Resources */,
+				C875E0ED294F5B69003C82F2 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				C875E0EF294F5B69003C82F2 /* eff_large_wordlist.utf8.txt in Resources */,
 				C8B9461E2573D01A00932C46 /* ManualCredentialsEntry.xib in Resources */,
 				C85B04E028BE72EE00323009 /* websites-with-shared-credential-backends.json in Resources */,
 				C8F8CE3B25D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
+				C875E0E8294F5B69003C82F2 /* starwars_8k_2018.utf8.txt in Resources */,
 				C81756792735259100431A36 /* ConnectHardwareKey.xib in Resources */,
+				C875E0EA294F5B69003C82F2 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				C8B413652961D69800682940 /* ptbr-diceware.wordlist.utf8.txt in Resources */,
 				C85A66B728C24A4300695EBC /* Assets.xcassets in Resources */,
 				C8B9461F2573D01A00932C46 /* SelectAutoFillDatabaseViewController.xib in Resources */,
 			);
@@ -10941,6 +11401,7 @@
 				4D1FFA732403030100B75EA2 /* DatabaseConvenienceUnlockPreferences.m in Sources */,
 				C8441C3925CB009B0070C7FE /* SFTPSessionConfiguration.m in Sources */,
 				4D1FFA742403030100B75EA2 /* DatabaseAttachment.m in Sources */,
+				C8F44E10295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				4D1FFA752403030100B75EA2 /* AesKdfCipher.m in Sources */,
 				4D1FFA762403030100B75EA2 /* crypt_argchk.c in Sources */,
 				4D1FFA782403030100B75EA2 /* MMcGACTextField.m in Sources */,
@@ -11037,12 +11498,14 @@
 				C832A4AD2730272E00768319 /* ManualCredentialsEntry.m in Sources */,
 				C8DE8DAF258FD71300B4D9EA /* SampleItemsGenerator.m in Sources */,
 				C831366C24A9200A00D475D9 /* Sha256PassThroughOutputStream.m in Sources */,
+				C8613C96291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */,
 				4D1FFA9B2403030100B75EA2 /* KdbSerializationData.m in Sources */,
 				4D1FFA9C2403030100B75EA2 /* V3BinariesList.m in Sources */,
 				C837417D25D2F13000EDE4F3 /* ConcurrentMutableQueue.m in Sources */,
 				C859FEE32770EC6B00BA2752 /* GrowingTextField.swift in Sources */,
 				C806E6F92721A4E4007A1F28 /* KeePassIconNames.swift in Sources */,
 				4D1FFA9D2403030100B75EA2 /* DatabaseMetadata.m in Sources */,
+				C8F5560D2912DA9A002A5517 /* DatabasesCollection.swift in Sources */,
 				C8E6161E28BD107B006A6E56 /* RulesParser.swift in Sources */,
 				4D1FFA9E2403030100B75EA2 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D1FFA9F2403030100B75EA2 /* argon2.c in Sources */,
@@ -11099,6 +11562,7 @@
 				4D1FFAB22403030100B75EA2 /* CustomIcon.m in Sources */,
 				C83741BB25D30E8B00EDE4F3 /* WorkingCopyManager.m in Sources */,
 				C81033A1274963AE00869513 /* FavIconsPreferences.swift in Sources */,
+				C8C93F31290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */,
 				C81B8D032799B8D2006387D0 /* AttachmentTableCellView.swift in Sources */,
 				C8B501FB26ECB653003DE6A2 /* GZIPCompressOutputStream.m in Sources */,
 				C8DC76322497A79000C9C443 /* ChaCha20ReadStream.m in Sources */,
@@ -11143,6 +11607,7 @@
 				4D1FFAC22403030100B75EA2 /* PredefinedKeePassIcon.m in Sources */,
 				4D1FFAC32403030100B75EA2 /* KdbxSerialization.m in Sources */,
 				C81F1DD5260214D900251A2F /* DatabaseMerger.m in Sources */,
+				C801BA76295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				4D1FFAC42403030100B75EA2 /* DAVCredentials.m in Sources */,
 				C8441CC125CB01AB0070C7FE /* NMSSHHostConfig.m in Sources */,
 				4D1FFAC52403030100B75EA2 /* KeePassGroup.m in Sources */,
@@ -11227,6 +11692,8 @@
 				4D1FFADC2403030100B75EA2 /* thread.c in Sources */,
 				C8E6160A28BD107B006A6E56 /* Constant.swift in Sources */,
 				C8441CB125CB01AB0070C7FE /* NMSFTP.m in Sources */,
+				C852EF64295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
+				C8C93F3E29100BC1005BAE54 /* AppearanceSettings.swift in Sources */,
 				C8E6D504246D71E800AFFE13 /* DeletedObject.m in Sources */,
 				C80232E6285881F30066BFC9 /* RMStore.m in Sources */,
 				C8441BEA25CAFBB10070C7FE /* DAVRequest.m in Sources */,
@@ -11270,6 +11737,7 @@
 				4D1FFAEC2403030100B75EA2 /* AttachmentCollectionView.m in Sources */,
 				C837416725D2DE7200EDE4F3 /* MacUrlSchemes.m in Sources */,
 				C8BE5928278B226200C9B1B8 /* QRCodeScanner.swift in Sources */,
+				C81277E0291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */,
 				C8E1FECA274D583200918205 /* DBManagerPanel.swift in Sources */,
 				C843567C2722EA7500CBB0A1 /* OpenContents.swift in Sources */,
 				C89F69D22747ECA20051BC50 /* AppPreferencesWindowController.swift in Sources */,
@@ -11345,6 +11813,7 @@
 				C8441C2325CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C8B679D126271DB200E295A3 /* zxcvbn.c in Sources */,
 				C867341426739F860063237B /* MASShortcutValidator.m in Sources */,
+				C8FC11D129190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */,
 				C80A59AF2726EAC30042EA78 /* RecordType.swift in Sources */,
 				C867ACE427BA969100FF1E6E /* PaddedRowView.swift in Sources */,
 				4D1FFB022403030100B75EA2 /* Kdbx4Serialization.m in Sources */,
@@ -11633,6 +12102,7 @@
 				C89B8F722562D22C00B590C0 /* DatabaseModel.m in Sources */,
 				4DE79B89255D987C00F59B10 /* CredentialProviderViewController.m in Sources */,
 				C89B8FB52562D2FE00B590C0 /* TwoFishCipher.m in Sources */,
+				C852EF67295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
 				C832A482272ECC6E00768319 /* MacOSAlertingUI.m in Sources */,
 				C8441B8625CAEB930070C7FE /* WebDAVProviderData.m in Sources */,
 				C81F1DF22602152C00251A2F /* MergeDryRunReport.m in Sources */,
@@ -11653,11 +12123,13 @@
 				C86E60932562D649001953AD /* core.c in Sources */,
 				C8441B9C25CAEC300070C7FE /* StorageProviderReadOptions.m in Sources */,
 				C86E60372562D52D001953AD /* PwSafeSerialization.m in Sources */,
+				C8F44E13295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C86E60582562D58B001953AD /* PasswordGenerationConfig.m in Sources */,
 				C8FDF2E7261CD38300F17CBE /* BackupsManager.m in Sources */,
 				C8E78B5025715C8700251153 /* MMWormholeFileTransiting.m in Sources */,
 				C85B04E928BE72EE00323009 /* ApplePasswordManagerQuirks.swift in Sources */,
 				C86E603F2562D540001953AD /* CustomData.m in Sources */,
+				C801BA79295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C8441BDD25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
 				C8E0B1EE275BD49000A871F6 /* MacDatabasePreferences.m in Sources */,
 				C85179142826A29500A09797 /* Collection+Extensions.swift in Sources */,
@@ -11704,6 +12176,7 @@
 				4D6EB45E23DF26910045C8D5 /* DatabaseConvenienceUnlockPreferences.m in Sources */,
 				4D524CAB219B45F700C22CB4 /* DatabaseAttachment.m in Sources */,
 				4DEA5898224BFA7300013808 /* AesKdfCipher.m in Sources */,
+				C8F44E0F295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C8441BF825CAFBB10070C7FE /* DAVListingParser.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
 				4DBFD38B225D12A300290488 /* MMcGACTextField.m in Sources */,
@@ -11800,12 +12273,14 @@
 				C832A4AE2730272F00768319 /* ManualCredentialsEntry.m in Sources */,
 				C8B6799C26271D4500E295A3 /* PasswordStrength.m in Sources */,
 				4D524CC1219B479900C22CB4 /* KdbSerializationData.m in Sources */,
+				C8613C95291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */,
 				4D524D07219B48D300C22CB4 /* V3BinariesList.m in Sources */,
 				C837417B25D2F13000EDE4F3 /* ConcurrentMutableQueue.m in Sources */,
 				4D559FA520750D1D009856E3 /* DatabaseMetadata.m in Sources */,
 				C859FEE22770EC6B00BA2752 /* GrowingTextField.swift in Sources */,
 				C806E6F82721A4E4007A1F28 /* KeePassIconNames.swift in Sources */,
 				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
+				C8F5560C2912DA9A002A5517 /* DatabasesCollection.swift in Sources */,
 				C8E6161D28BD107B006A6E56 /* RulesParser.swift in Sources */,
 				4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */,
 				C87A9947255968EA0002BEF8 /* Utils.swift in Sources */,
@@ -11862,6 +12337,7 @@
 				4D524D05219B48D300C22CB4 /* CustomIcon.m in Sources */,
 				C83741B925D30E8B00EDE4F3 /* WorkingCopyManager.m in Sources */,
 				C81033A0274963AE00869513 /* FavIconsPreferences.swift in Sources */,
+				C8C93F30290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */,
 				C81B8D022799B8D2006387D0 /* AttachmentTableCellView.swift in Sources */,
 				C8DC76312497A79000C9C443 /* ChaCha20ReadStream.m in Sources */,
 				4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
@@ -11906,6 +12382,7 @@
 				4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */,
 				4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */,
 				C81F1DD3260214D900251A2F /* DatabaseMerger.m in Sources */,
+				C801BA75295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C8441CBF25CB01AB0070C7FE /* NMSSHHostConfig.m in Sources */,
 				C81F165326BC432A00CDAEAF /* SFTPConnectionsManager.m in Sources */,
 				C81F164626BC2F2800CDAEAF /* SFTPConnections.m in Sources */,
@@ -11990,6 +12467,8 @@
 				C8441CAF25CB01AB0070C7FE /* NMSFTP.m in Sources */,
 				C8E6160928BD107B006A6E56 /* Constant.swift in Sources */,
 				4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */,
+				C852EF63295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
+				C8C93F3D29100BC1005BAE54 /* AppearanceSettings.swift in Sources */,
 				C80232E5285881F30066BFC9 /* RMStore.m in Sources */,
 				C8441BE825CAFBB10070C7FE /* DAVRequest.m in Sources */,
 				C831366324A91FDB00D475D9 /* GzipDecompressOutputStream.m in Sources */,
@@ -12033,6 +12512,7 @@
 				C837416525D2DE7200EDE4F3 /* MacUrlSchemes.m in Sources */,
 				C8397ADC25939858000F5158 /* NodeIcon.m in Sources */,
 				C8BE5927278B226200C9B1B8 /* QRCodeScanner.swift in Sources */,
+				C81277DF291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */,
 				C8E1FEC9274D583200918205 /* DBManagerPanel.swift in Sources */,
 				C843567B2722EA7500CBB0A1 /* OpenContents.swift in Sources */,
 				C89F69D12747ECA20051BC50 /* AppPreferencesWindowController.swift in Sources */,
@@ -12108,6 +12588,7 @@
 				C8441C2125CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C8B679D026271DB200E295A3 /* zxcvbn.c in Sources */,
 				C867341326739F860063237B /* MASShortcutValidator.m in Sources */,
+				C8FC11D029190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */,
 				C80A59AE2726EAC30042EA78 /* RecordType.swift in Sources */,
 				C867ACE327BA969100FF1E6E /* PaddedRowView.swift in Sources */,
 				4D524CD4219B47DB00C22CB4 /* Kdbx4Serialization.m in Sources */,
@@ -12210,6 +12691,7 @@
 				C84935172857631D0079D1E8 /* DatabaseConvenienceUnlockPreferences.m in Sources */,
 				C84935182857631D0079D1E8 /* SFTPSessionConfiguration.m in Sources */,
 				C84935192857631D0079D1E8 /* DatabaseAttachment.m in Sources */,
+				C8F44E11295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C849351A2857631D0079D1E8 /* AesKdfCipher.m in Sources */,
 				C849351B2857631D0079D1E8 /* crypt_argchk.c in Sources */,
 				C849351C2857631D0079D1E8 /* MMcGACTextField.m in Sources */,
@@ -12306,12 +12788,14 @@
 				C84935722857631D0079D1E8 /* SampleItemsGenerator.m in Sources */,
 				C84935732857631D0079D1E8 /* Sha256PassThroughOutputStream.m in Sources */,
 				C84935742857631D0079D1E8 /* KdbSerializationData.m in Sources */,
+				C8613C97291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */,
 				C84935752857631D0079D1E8 /* V3BinariesList.m in Sources */,
 				C84935762857631D0079D1E8 /* ConcurrentMutableQueue.m in Sources */,
 				C84935772857631D0079D1E8 /* GrowingTextField.swift in Sources */,
 				C84935782857631D0079D1E8 /* KeePassIconNames.swift in Sources */,
 				C84935792857631D0079D1E8 /* DatabaseMetadata.m in Sources */,
 				C849357A2857631D0079D1E8 /* BaseXmlDomainObjectHandler.m in Sources */,
+				C8F5560E2912DA9A002A5517 /* DatabasesCollection.swift in Sources */,
 				C8E6161F28BD107B006A6E56 /* RulesParser.swift in Sources */,
 				C849357B2857631D0079D1E8 /* argon2.c in Sources */,
 				C849357C2857631D0079D1E8 /* Utils.swift in Sources */,
@@ -12368,6 +12852,7 @@
 				C84935AC2857631D0079D1E8 /* WorkingCopyManager.m in Sources */,
 				C84935AD2857631D0079D1E8 /* FavIconsPreferences.swift in Sources */,
 				C84935AE2857631D0079D1E8 /* AttachmentTableCellView.swift in Sources */,
+				C8C93F32290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */,
 				C84935AF2857631D0079D1E8 /* GZIPCompressOutputStream.m in Sources */,
 				C84935B02857631D0079D1E8 /* ChaCha20ReadStream.m in Sources */,
 				C84935B12857631D0079D1E8 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
@@ -12412,6 +12897,7 @@
 				C84935D32857631D0079D1E8 /* PredefinedKeePassIcon.m in Sources */,
 				C84935D42857631D0079D1E8 /* KdbxSerialization.m in Sources */,
 				C84935D52857631D0079D1E8 /* DatabaseMerger.m in Sources */,
+				C801BA77295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C84935D62857631D0079D1E8 /* DAVCredentials.m in Sources */,
 				C84935D72857631D0079D1E8 /* NMSSHHostConfig.m in Sources */,
 				C84935D82857631D0079D1E8 /* KeePassGroup.m in Sources */,
@@ -12496,6 +12982,8 @@
 				C84936192857631D0079D1E8 /* DeletedObject.m in Sources */,
 				C8E6160B28BD107B006A6E56 /* Constant.swift in Sources */,
 				C80232E7285881F30066BFC9 /* RMStore.m in Sources */,
+				C852EF65295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
+				C8C93F3F29100BC1005BAE54 /* AppearanceSettings.swift in Sources */,
 				C849361A2857631D0079D1E8 /* DAVRequest.m in Sources */,
 				C849361B2857631D0079D1E8 /* VariantObject.m in Sources */,
 				C849361C2857631D0079D1E8 /* Date+Extensions.swift in Sources */,
@@ -12539,6 +13027,7 @@
 				C849363E2857631D0079D1E8 /* AttachmentCollectionView.m in Sources */,
 				C849363F2857631D0079D1E8 /* MacUrlSchemes.m in Sources */,
 				C84936402857631D0079D1E8 /* QRCodeScanner.swift in Sources */,
+				C81277E1291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */,
 				C84936412857631D0079D1E8 /* DBManagerPanel.swift in Sources */,
 				C84936422857631D0079D1E8 /* OpenContents.swift in Sources */,
 				C84936432857631D0079D1E8 /* AppPreferencesWindowController.swift in Sources */,
@@ -12614,6 +13103,7 @@
 				C84936822857631D0079D1E8 /* DatabasesManager.m in Sources */,
 				C84936832857631D0079D1E8 /* Group.m in Sources */,
 				C84936842857631D0079D1E8 /* StorageBrowserItem.m in Sources */,
+				C8FC11D229190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */,
 				C84936852857631D0079D1E8 /* zxcvbn.c in Sources */,
 				C84936862857631D0079D1E8 /* MASShortcutValidator.m in Sources */,
 				C84936872857631D0079D1E8 /* RecordType.swift in Sources */,
@@ -12891,6 +13381,7 @@
 				C8493801285763230079D1E8 /* DatabaseModel.m in Sources */,
 				C8493802285763230079D1E8 /* CredentialProviderViewController.m in Sources */,
 				C8493803285763230079D1E8 /* TwoFishCipher.m in Sources */,
+				C852EF69295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
 				C8493804285763230079D1E8 /* MacOSAlertingUI.m in Sources */,
 				C8493805285763230079D1E8 /* WebDAVProviderData.m in Sources */,
 				C8493806285763230079D1E8 /* MergeDryRunReport.m in Sources */,
@@ -12911,11 +13402,13 @@
 				C8493815285763230079D1E8 /* core.c in Sources */,
 				C8493816285763230079D1E8 /* StorageProviderReadOptions.m in Sources */,
 				C8493817285763230079D1E8 /* PwSafeSerialization.m in Sources */,
+				C8F44E15295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C8493818285763230079D1E8 /* PasswordGenerationConfig.m in Sources */,
 				C8493819285763230079D1E8 /* BackupsManager.m in Sources */,
 				C849381A285763230079D1E8 /* MMWormholeFileTransiting.m in Sources */,
 				C85B04EB28BE72EE00323009 /* ApplePasswordManagerQuirks.swift in Sources */,
 				C849381B285763230079D1E8 /* CustomData.m in Sources */,
+				C801BA7B295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C849381C285763230079D1E8 /* DAVRequestGroup.m in Sources */,
 				C849381D285763230079D1E8 /* MacDatabasePreferences.m in Sources */,
 				C849381F285763230079D1E8 /* Collection+Extensions.swift in Sources */,
@@ -13048,6 +13541,7 @@
 				C84938C328577D4D0079D1E8 /* KdbxSerializationCommon.m in Sources */,
 				C84938C428577D4D0079D1E8 /* NSDictionary+Extensions.m in Sources */,
 				C84938C528577D4D0079D1E8 /* MASLocalization.m in Sources */,
+				C801BA78295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C84938C628577D4D0079D1E8 /* OEXTokenField.m in Sources */,
 				C8E6162C28BD107B006A6E56 /* ParsedHost.swift in Sources */,
 				C84938C728577D4D0079D1E8 /* LargeTextIndexedCharacter.swift in Sources */,
@@ -13064,6 +13558,7 @@
 				C84938D228577D4D0079D1E8 /* GrowingTextField.swift in Sources */,
 				C84938D328577D4D0079D1E8 /* KeePassIconNames.swift in Sources */,
 				C84938D428577D4D0079D1E8 /* DatabaseMetadata.m in Sources */,
+				C8F5560F2912DA9A002A5517 /* DatabasesCollection.swift in Sources */,
 				C8E6162028BD107B006A6E56 /* RulesParser.swift in Sources */,
 				C84938D528577D4D0079D1E8 /* BaseXmlDomainObjectHandler.m in Sources */,
 				C84938D628577D4D0079D1E8 /* argon2.c in Sources */,
@@ -13120,6 +13615,7 @@
 				C849390628577D4D0079D1E8 /* CustomIcon.m in Sources */,
 				C849390728577D4D0079D1E8 /* WorkingCopyManager.m in Sources */,
 				C849390828577D4D0079D1E8 /* FavIconsPreferences.swift in Sources */,
+				C8C93F33290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */,
 				C849390928577D4D0079D1E8 /* AttachmentTableCellView.swift in Sources */,
 				C849390A28577D4D0079D1E8 /* GZIPCompressOutputStream.m in Sources */,
 				C849390B28577D4D0079D1E8 /* ChaCha20ReadStream.m in Sources */,
@@ -13138,6 +13634,7 @@
 				C89282C328B90EB80070FFB4 /* CredentialsForUrlRequestResponse.swift in Sources */,
 				C849391628577D4D0079D1E8 /* CustomBackgroundTableView.m in Sources */,
 				C849391728577D4D0079D1E8 /* AttachmentItem.m in Sources */,
+				C852EF66295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
 				C849391828577D4D0079D1E8 /* AuditDrillDown.swift in Sources */,
 				C849391928577D4D0079D1E8 /* TotpTableCellView.swift in Sources */,
 				C849391A28577D4D0079D1E8 /* SyncAndMergeSequenceManager.m in Sources */,
@@ -13165,6 +13662,7 @@
 				C849392F28577D4D0079D1E8 /* KdbxSerialization.m in Sources */,
 				C849393028577D4D0079D1E8 /* DatabaseMerger.m in Sources */,
 				C849393128577D4D0079D1E8 /* DAVCredentials.m in Sources */,
+				C8F44E12295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C849393228577D4D0079D1E8 /* NMSSHHostConfig.m in Sources */,
 				C849393328577D4D0079D1E8 /* KeePassGroup.m in Sources */,
 				C849393428577D4D0079D1E8 /* PasswordGenerationPreferences.swift in Sources */,
@@ -13248,6 +13746,8 @@
 				C849397428577D4D0079D1E8 /* NMSFTP.m in Sources */,
 				C8E6160C28BD107B006A6E56 /* Constant.swift in Sources */,
 				C849397528577D4D0079D1E8 /* DeletedObject.m in Sources */,
+				C8FC11D529196D7A00EEBCA1 /* AutoFillLoadingVC.m in Sources */,
+				C8C93F4029100BC1005BAE54 /* AppearanceSettings.swift in Sources */,
 				C80232E8285881F30066BFC9 /* RMStore.m in Sources */,
 				C849397628577D4D0079D1E8 /* DAVRequest.m in Sources */,
 				C849397728577D4D0079D1E8 /* VariantObject.m in Sources */,
@@ -13291,6 +13791,7 @@
 				C849399A28577D4D0079D1E8 /* AttachmentCollectionView.m in Sources */,
 				C849399B28577D4D0079D1E8 /* MacUrlSchemes.m in Sources */,
 				C849399C28577D4D0079D1E8 /* QRCodeScanner.swift in Sources */,
+				C81277E2291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */,
 				C849399D28577D4D0079D1E8 /* DBManagerPanel.swift in Sources */,
 				C849399E28577D4D0079D1E8 /* OpenContents.swift in Sources */,
 				C849399F28577D4D0079D1E8 /* AppPreferencesWindowController.swift in Sources */,
@@ -13350,6 +13851,7 @@
 				C820508A28E08BB800FFBDED /* AdvancedAutoFillSettingsViewController.m in Sources */,
 				C84939D128577D4D0079D1E8 /* PasswordStrengthConfig.m in Sources */,
 				C84939D228577D4D0079D1E8 /* DatabaseUnlocker.m in Sources */,
+				C8613C98291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */,
 				C84939D328577D4D0079D1E8 /* HTMLDocument.m in Sources */,
 				C820507828E06DFE00FFBDED /* NativeMessagingManifestInstallHelper.swift in Sources */,
 				C84939D428577D4D0079D1E8 /* SyncLogViewController.m in Sources */,
@@ -13366,6 +13868,7 @@
 				C84939DF28577D4D0079D1E8 /* DatabasesManager.m in Sources */,
 				C84939E028577D4D0079D1E8 /* Group.m in Sources */,
 				C84939E128577D4D0079D1E8 /* StorageBrowserItem.m in Sources */,
+				C8FC11D329190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */,
 				C84939E228577D4D0079D1E8 /* zxcvbn.c in Sources */,
 				C84939E328577D4D0079D1E8 /* MASShortcutValidator.m in Sources */,
 				C84939E428577D4D0079D1E8 /* RecordType.swift in Sources */,
@@ -13643,6 +14146,7 @@
 				C8493B5E28577D530079D1E8 /* DatabaseModel.m in Sources */,
 				C8493B5F28577D530079D1E8 /* CredentialProviderViewController.m in Sources */,
 				C8493B6028577D530079D1E8 /* TwoFishCipher.m in Sources */,
+				C852EF6A295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
 				C8493B6128577D530079D1E8 /* MacOSAlertingUI.m in Sources */,
 				C8493B6228577D530079D1E8 /* WebDAVProviderData.m in Sources */,
 				C8493B6328577D530079D1E8 /* MergeDryRunReport.m in Sources */,
@@ -13663,11 +14167,13 @@
 				C8493B7228577D530079D1E8 /* core.c in Sources */,
 				C8493B7328577D530079D1E8 /* StorageProviderReadOptions.m in Sources */,
 				C8493B7428577D530079D1E8 /* PwSafeSerialization.m in Sources */,
+				C8F44E16295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C8493B7528577D530079D1E8 /* PasswordGenerationConfig.m in Sources */,
 				C8493B7628577D530079D1E8 /* BackupsManager.m in Sources */,
 				C8493B7728577D530079D1E8 /* MMWormholeFileTransiting.m in Sources */,
 				C85B04EC28BE72EE00323009 /* ApplePasswordManagerQuirks.swift in Sources */,
 				C8493B7828577D530079D1E8 /* CustomData.m in Sources */,
+				C801BA7C295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C8493B7928577D530079D1E8 /* DAVRequestGroup.m in Sources */,
 				C8493B7A28577D530079D1E8 /* MacDatabasePreferences.m in Sources */,
 				C8493B7C28577D530079D1E8 /* Collection+Extensions.swift in Sources */,
@@ -13696,6 +14202,7 @@
 				C899623B28A144130069FA51 /* MASShortcutView.m in Sources */,
 				C899623C28A144130069FA51 /* HmacBlockOutputStream.m in Sources */,
 				C899623D28A144130069FA51 /* DAVRequests.m in Sources */,
+				C801BA7D295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C899623E28A144130069FA51 /* InnerRandomStreamFactory.m in Sources */,
 				C899623F28A144130069FA51 /* MASShortcutView+Bindings.m in Sources */,
 				C899624028A144130069FA51 /* RMStoreAppReceiptVerifier.m in Sources */,
@@ -13782,6 +14289,7 @@
 				C899628F28A144130069FA51 /* DecryptionParameters.m in Sources */,
 				C899629028A144130069FA51 /* KeePassFile.m in Sources */,
 				C899629128A144130069FA51 /* MutableOrderedDictionary.m in Sources */,
+				C8C93F4129100BC1005BAE54 /* AppearanceSettings.swift in Sources */,
 				C899629228A144130069FA51 /* CompareAndMergeWizard.swift in Sources */,
 				C899629328A144130069FA51 /* NSString+Levenshtein.m in Sources */,
 				C899629428A144130069FA51 /* Field.swift in Sources */,
@@ -13869,6 +14377,7 @@
 				C89962E328A144130069FA51 /* WorkingCopyManager.m in Sources */,
 				C89962E428A144130069FA51 /* FavIconsPreferences.swift in Sources */,
 				C89962E528A144130069FA51 /* AttachmentTableCellView.swift in Sources */,
+				C8F556142912DA9A002A5517 /* DatabasesCollection.swift in Sources */,
 				C89962E628A144130069FA51 /* GZIPCompressOutputStream.m in Sources */,
 				C89962E728A144130069FA51 /* ChaCha20ReadStream.m in Sources */,
 				C89962E828A144130069FA51 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
@@ -13896,6 +14405,7 @@
 				C89962FD28A144130069FA51 /* ColoredStringHelper.m in Sources */,
 				C89962FE28A144130069FA51 /* MMWormhole.m in Sources */,
 				C89962FF28A144130069FA51 /* CompareDatabasesViewController.swift in Sources */,
+				C8C93F34290FFCD4005BAE54 /* SecurityPrivacySettings.swift in Sources */,
 				C899630028A144130069FA51 /* NodeFields.m in Sources */,
 				C899630128A144130069FA51 /* Utils.m in Sources */,
 				C899630228A144130069FA51 /* LargeTextViewAndQrCode.swift in Sources */,
@@ -13903,6 +14413,7 @@
 				C899630428A144130069FA51 /* FastMaps.m in Sources */,
 				C899630528A144130069FA51 /* ykcore_osx.c in Sources */,
 				C899630628A144130069FA51 /* ClipboardManager.m in Sources */,
+				C81277E3291806E500567AF7 /* UnlockDatabaseRequestResponse.swift in Sources */,
 				C899630728A144130069FA51 /* FontManager.swift in Sources */,
 				C899630828A144130069FA51 /* FreeTrialOrUpgradeOnboardingViewController.swift in Sources */,
 				C899630928A144130069FA51 /* OutlineView.m in Sources */,
@@ -14022,6 +14533,7 @@
 				C899637828A144130069FA51 /* OnboardingDatabaseChangeRequests.m in Sources */,
 				C899637928A144130069FA51 /* SideBarSettings.swift in Sources */,
 				C899637A28A144130069FA51 /* Argon2dKdfCipher.m in Sources */,
+				C8FC11D429190E7D00EEBCA1 /* SafariAutoFillWormhole.m in Sources */,
 				C899637B28A144130069FA51 /* CustomDataItem.m in Sources */,
 				C899637C28A144130069FA51 /* AutoLayoutResizingTokenField.swift in Sources */,
 				C899637D28A144130069FA51 /* AutoResizingTokenField.swift in Sources */,
@@ -14066,6 +14578,7 @@
 				C89963A228A144130069FA51 /* DAVRequestGroup.m in Sources */,
 				C89963A328A144130069FA51 /* MacHardwareKeyManager.m in Sources */,
 				C89963A428A144130069FA51 /* MASShortcut.m in Sources */,
+				C8613C99291FE4A90006567C /* WhatIsMarkdownViewController.swift in Sources */,
 				C89963A528A144130069FA51 /* CustomRowView.swift in Sources */,
 				C89963A628A144130069FA51 /* ItemCategory.swift in Sources */,
 				C89963A728A144130069FA51 /* NSString+Extensions.m in Sources */,
@@ -14123,6 +14636,7 @@
 				C89963DA28A144130069FA51 /* RMStoreKeychainPersistence.m in Sources */,
 				C89963DB28A144130069FA51 /* EditTagsViewController.m in Sources */,
 				C89963DC28A144130069FA51 /* PwSafeDatabase.m in Sources */,
+				C8F44E17295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C89963DD28A144130069FA51 /* MacConflictResolutionWizard.m in Sources */,
 				C89963DE28A144130069FA51 /* cencode.c in Sources */,
 				C89963DF28A144130069FA51 /* Model.m in Sources */,
@@ -14135,6 +14649,7 @@
 				C89963E628A144130069FA51 /* QuickTypeAutoFillDisplayFormat.m in Sources */,
 				C89963E728A144130069FA51 /* Settings.m in Sources */,
 				C89963E828A144130069FA51 /* AesOutputStream.m in Sources */,
+				C852EF6B295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
 				C89963E928A144130069FA51 /* OTPTokenType.m in Sources */,
 				C89963EA28A144130069FA51 /* OnboardingAutoFillViewController.m in Sources */,
 				C89963EB28A144130069FA51 /* KeePassXmlAutoTypeAssociation.m in Sources */,
@@ -14178,6 +14693,7 @@
 				C899648B28A1441B0069FA51 /* ykcrc.c in Sources */,
 				C899648C28A1441B0069FA51 /* QuickTypeAutoFillDisplayFormat.m in Sources */,
 				C899648D28A1441B0069FA51 /* AsyncUpdateResult.m in Sources */,
+				C801BA7E295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C899648E28A1441B0069FA51 /* ValueWithModDate.m in Sources */,
 				C899648F28A1441B0069FA51 /* NSUUID+Zero.m in Sources */,
 				C899649028A1441B0069FA51 /* Binary.m in Sources */,
@@ -14376,6 +14892,7 @@
 				C899654828A1441B0069FA51 /* SelectCredential.m in Sources */,
 				C899654928A1441B0069FA51 /* KdbGroup.m in Sources */,
 				C899654A28A1441B0069FA51 /* DatabaseModel.m in Sources */,
+				C8F44E18295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C899654B28A1441B0069FA51 /* CredentialProviderViewController.m in Sources */,
 				C899654C28A1441B0069FA51 /* TwoFishCipher.m in Sources */,
 				C899654D28A1441B0069FA51 /* MacOSAlertingUI.m in Sources */,
@@ -14649,6 +15166,7 @@
 				C8B945F32573D01A00932C46 /* DatabaseModel.m in Sources */,
 				C8B945F52573D01A00932C46 /* CredentialProviderViewController.m in Sources */,
 				C8B945F62573D01A00932C46 /* TwoFishCipher.m in Sources */,
+				C852EF68295B44DE006EF9A1 /* NoClippingView.swift in Sources */,
 				C832A484272ECC6E00768319 /* MacOSAlertingUI.m in Sources */,
 				C8441B8825CAEB930070C7FE /* WebDAVProviderData.m in Sources */,
 				C81F1DF42602152C00251A2F /* MergeDryRunReport.m in Sources */,
@@ -14669,11 +15187,13 @@
 				C8B946002573D01A00932C46 /* core.c in Sources */,
 				C8441B9E25CAEC300070C7FE /* StorageProviderReadOptions.m in Sources */,
 				C8B946022573D01A00932C46 /* PwSafeSerialization.m in Sources */,
+				C8F44E14295F06B50008E5BD /* BrowseSortConfiguration.m in Sources */,
 				C8B946032573D01A00932C46 /* PasswordGenerationConfig.m in Sources */,
 				C8FDF2E9261CD38300F17CBE /* BackupsManager.m in Sources */,
 				C8B946052573D01A00932C46 /* MMWormholeFileTransiting.m in Sources */,
 				C85B04EA28BE72EE00323009 /* ApplePasswordManagerQuirks.swift in Sources */,
 				C8B946072573D01A00932C46 /* CustomData.m in Sources */,
+				C801BA7A295CB2AC00DDDA4C /* TOTPGenerator.swift in Sources */,
 				C8441BDF25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
 				C8E0B1F0275BD49000A871F6 /* MacDatabasePreferences.m in Sources */,
 				C85179152826A29600A09797 /* Collection+Extensions.swift in Sources */,
@@ -14777,6 +15297,7 @@
 				C86BB46B25F91C3300425405 /* pt-BR */,
 				C8242D8026FB70F100D586A4 /* zh-Hant */,
 				C818E00F2833C0B4003EE3B3 /* pl */,
+				C8A8517C295C531C000D27B8 /* el */,
 			);
 			name = DownloadFavIcons.storyboard;
 			path = MacBox;
@@ -14801,6 +15322,7 @@
 				C86BB46D25F91C3400425405 /* pt-BR */,
 				C8242D8326FB717E00D586A4 /* zh-Hant */,
 				C818E0122833C0B5003EE3B3 /* pl */,
+				C8A8517F295C531C000D27B8 /* el */,
 			);
 			name = MacKeePassHistory.storyboard;
 			path = MacBox;
@@ -14825,6 +15347,7 @@
 				C86BB46725F91C3100425405 /* pt-BR */,
 				C8242D8526FB71E000D586A4 /* zh-Hant */,
 				C818DFFA2833C0AC003EE3B3 /* pl */,
+				C8A85158295C5317000D27B8 /* el */,
 			);
 			name = NodeDetails.storyboard;
 			path = MacBox;
@@ -14872,6 +15395,7 @@
 				C86BB46625F91C3000425405 /* pt-BR */,
 				C8242D7E26FB70CE00D586A4 /* zh-Hant */,
 				C818E0092833C0B2003EE3B3 /* pl */,
+				C8A85176295C531B000D27B8 /* el */,
 			);
 			name = DatabaseProperties.storyboard;
 			path = MacBox;
@@ -14897,6 +15421,7 @@
 				C8242D7C26FB709F00D586A4 /* zh-Hant */,
 				C81756A52735366C00431A36 /* en */,
 				C818E00E2833C0B3003EE3B3 /* pl */,
+				C8A8517B295C531C000D27B8 /* el */,
 			);
 			name = ChangeMasterPasswordWindowController.xib;
 			path = MacBox;
@@ -14921,6 +15446,7 @@
 				C86BB46825F91C3100425405 /* pt-BR */,
 				C8242D8926FB726900D586A4 /* zh-Hant */,
 				C818E00D2833C0B3003EE3B3 /* pl */,
+				C8A8517A295C531C000D27B8 /* el */,
 			);
 			name = SelectPredefinedIconController.xib;
 			path = MacBox;
@@ -14945,6 +15471,7 @@
 				C86BB46E25F91C3500425405 /* pt-BR */,
 				C8242D8626FB720E00D586A4 /* zh-Hant */,
 				C818E0132833C0B5003EE3B3 /* pl */,
+				C8A85180295C531C000D27B8 /* el */,
 			);
 			name = PredefinedKeePassIcon.xib;
 			path = MacBox;
@@ -14962,6 +15489,7 @@
 				C8FB342525B9F563003C0F24 /* nl */,
 				C86BB46425F91C2F00425405 /* pt-BR */,
 				C818E00B2833C0B2003EE3B3 /* pl */,
+				C8A85177295C531B000D27B8 /* el */,
 			);
 			name = CheckboxCell.xib;
 			path = MacBox;
@@ -14986,6 +15514,7 @@
 				C86BB47225F91C3700425405 /* pt-BR */,
 				C844B425273992D90023AD74 /* zh-Hant */,
 				C818E01A2833C0BC003EE3B3 /* pl */,
+				C8A85187295C5322000D27B8 /* el */,
 			);
 			name = CredentialProviderViewController.xib;
 			sourceTree = "<group>";
@@ -15009,6 +15538,7 @@
 				C86BB46325F91C2E00425405 /* pt-BR */,
 				C8242D8426FB71C800D586A4 /* zh-Hant */,
 				C818DFF62833C0AB003EE3B3 /* pl */,
+				C8A85156295C5316000D27B8 /* el */,
 			);
 			name = Main.storyboard;
 			path = MacBox;
@@ -15033,6 +15563,7 @@
 				C80043E626BD90290090C90D /* cs */,
 				C80043E826BD902C0090C90D /* zh-Hant */,
 				C818E0172833C0B7003EE3B3 /* pl */,
+				C8A85184295C531D000D27B8 /* el */,
 			);
 			name = WebDAVConnectionsManager.storyboard;
 			path = MacBox;
@@ -15057,8 +15588,73 @@
 				C81033982749634200869513 /* zh-Hant */,
 				C810339A2749634400869513 /* zh-Hans */,
 				C818E0082833C0B2003EE3B3 /* pl */,
+				C8A8516C295C531A000D27B8 /* el */,
 			);
 			name = AppPreferences.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C816D1092916AEB3003F19B2 /* SecurityPrivacySettings.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C816D1082916AEB3003F19B2 /* Base */,
+				C816D10D2916AEC3003F19B2 /* ar */,
+				C816D1112916AED2003F19B2 /* zh-Hans */,
+				C816D1132916AED3003F19B2 /* zh-Hant */,
+				C816D1152916AED5003F19B2 /* cs */,
+				C816D1172916AED7003F19B2 /* da */,
+				C816D1192916AED7003F19B2 /* nl */,
+				C816D11B2916AEDB003F19B2 /* fi */,
+				C816D11D2916AEDC003F19B2 /* fr */,
+				C816D11F2916AEDE003F19B2 /* de */,
+				C816D1232916AEE6003F19B2 /* hi */,
+				C816D1252916AEE8003F19B2 /* hu */,
+				C816D1272916AEEA003F19B2 /* it */,
+				C816D1292916AEEB003F19B2 /* ja */,
+				C816D12B2916AEED003F19B2 /* ko */,
+				C816D12D2916AEF0003F19B2 /* nb */,
+				C816D12F2916AEF1003F19B2 /* pl */,
+				C816D1312916AEF3003F19B2 /* pt */,
+				C816D1332916AEF5003F19B2 /* ru */,
+				C816D1352916AEF7003F19B2 /* sk */,
+				C816D1372916AEF9003F19B2 /* es */,
+				C816D1392916AEFA003F19B2 /* sv */,
+				C816D13B2916AEFD003F19B2 /* tr */,
+				C816D13D2916AEFE003F19B2 /* uk */,
+				C81277E429182F6700567AF7 /* pt-BR */,
+				C8A8516F295C531A000D27B8 /* el */,
+			);
+			name = SecurityPrivacySettings.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C816D1462916BAA8003F19B2 /* AppearanceSettings.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C816D1452916BAA8003F19B2 /* Base */,
+				C816D14C2916BAC2003F19B2 /* zh-Hans */,
+				C816D14E2916BAC3003F19B2 /* zh-Hant */,
+				C816D1502916BAC5003F19B2 /* cs */,
+				C816D1522916BAC6003F19B2 /* nl */,
+				C816D1542916BAC7003F19B2 /* fi */,
+				C816D1562916BAC8003F19B2 /* fr */,
+				C816D1582916BAC9003F19B2 /* de */,
+				C816D15C2916BAD1003F19B2 /* hi */,
+				C816D15E2916BAD2003F19B2 /* hu */,
+				C816D1602916BAD4003F19B2 /* it */,
+				C816D1622916BAD6003F19B2 /* ja */,
+				C816D1642916BADF003F19B2 /* nb */,
+				C816D1662916BAE0003F19B2 /* pl */,
+				C816D1682916BAE2003F19B2 /* pt */,
+				C816D16A2916BAE4003F19B2 /* ru */,
+				C816D16C2916BAE9003F19B2 /* es */,
+				C816D16E2916BAEB003F19B2 /* sv */,
+				C816D1702916BAEC003F19B2 /* tr */,
+				C816D1722916BAED003F19B2 /* uk */,
+				C81277E729182F8400567AF7 /* pt-BR */,
+				C8A8516E295C531A000D27B8 /* el */,
+			);
+			name = AppearanceSettings.storyboard;
 			path = MacBox;
 			sourceTree = "<group>";
 		};
@@ -15081,6 +15677,7 @@
 				C8175697273525AA00431A36 /* sv */,
 				C8175699273525AB00431A36 /* uk */,
 				C818DFFC2833C0AD003EE3B3 /* pl */,
+				C8A85168295C5319000D27B8 /* el */,
 			);
 			name = ConnectHardwareKey.xib;
 			path = MacBox;
@@ -15105,6 +15702,7 @@
 				C819D6DF26BD923500886363 /* sv */,
 				C819D6E126BD923600886363 /* es */,
 				C818E0142833C0B5003EE3B3 /* pl */,
+				C8A85181295C531C000D27B8 /* el */,
 			);
 			name = SFTPConnectionsManager.storyboard;
 			path = MacBox;
@@ -15129,6 +15727,7 @@
 				C823F05B27A31CDC009FF675 /* zh-Hant */,
 				C823F05D27A31CDE009FF675 /* zh-Hans */,
 				C818DFF22833C0A9003EE3B3 /* pl */,
+				C8A8515B295C5317000D27B8 /* el */,
 			);
 			name = "NextGen-Master.storyboard";
 			path = MacBox;
@@ -15153,6 +15752,7 @@
 				C82DB4502753C95F006B7573 /* zh-Hant */,
 				C82DB4522753C960006B7573 /* zh-Hans */,
 				C818E01D2833C0BE003EE3B3 /* pl */,
+				C8A8518A295C5322000D27B8 /* el */,
 			);
 			name = AutoFillLoading.storyboard;
 			sourceTree = "<group>";
@@ -15176,6 +15776,7 @@
 				C845951426D3E6C700D5DF6B /* sv */,
 				C845951626D3E6C900D5DF6B /* uk */,
 				C818DFFD2833C0AE003EE3B3 /* pl */,
+				C8A85169295C5319000D27B8 /* el */,
 			);
 			name = SystemTrayViewController.storyboard;
 			path = MacBox;
@@ -15200,6 +15801,7 @@
 				C852B333284660E200597CE7 /* cs */,
 				C852B335284660E400597CE7 /* zh-Hant */,
 				C852B337284660E500597CE7 /* zh-Hans */,
+				C8A85175295C531B000D27B8 /* el */,
 			);
 			name = EncryptionSettings.storyboard;
 			path = MacBox;
@@ -15224,6 +15826,7 @@
 				C862A029260B9D9B00DEDB8E /* de */,
 				C8242D8126FB710100D586A4 /* zh-Hant */,
 				C818DFF92833C0AC003EE3B3 /* pl */,
+				C8A85157295C5316000D27B8 /* el */,
 			);
 			name = EditCustomField.storyboard;
 			path = MacBox;
@@ -15248,6 +15851,7 @@
 				C8630E5A274BE3A5002718DE /* zh-Hant */,
 				C8630E5C274BE3A6002718DE /* zh-Hans */,
 				C818E0022833C0B0003EE3B3 /* pl */,
+				C8A85170295C531A000D27B8 /* el */,
 			);
 			name = AutoFillAppLevelPreferences.storyboard;
 			path = MacBox;
@@ -15268,6 +15872,7 @@
 				C86734262673A09B0063237B /* ru */,
 				C86734272673A09B0063237B /* fr */,
 				C86734282673A09B0063237B /* nl */,
+				C8A8518B295C5322000D27B8 /* el */,
 			);
 			name = "MAS-Localizable.strings";
 			sourceTree = "<group>";
@@ -15291,6 +15896,7 @@
 				C871F131285A4AEC00F4A731 /* cs */,
 				C871F133285A4AEE00F4A731 /* zh-Hant */,
 				C871F135285A4AF000F4A731 /* zh-Hans */,
+				C8A85179295C531B000D27B8 /* el */,
 			);
 			name = UnifiedUpgrade.storyboard;
 			path = MacBox;
@@ -15315,6 +15921,7 @@
 				C881FABC2861C87100A10A3A /* cs */,
 				C881FABE2861C87300A10A3A /* zh-Hant */,
 				C881FAC02861C87500A10A3A /* zh-Hans */,
+				C8A85161295C5318000D27B8 /* el */,
 			);
 			name = FreeTrialOrUpgradeOnboarding.storyboard;
 			path = MacBox;
@@ -15339,6 +15946,7 @@
 				C8877366261DD65D00C01406 /* uk */,
 				C8242D7B26FB706D00D586A4 /* zh-Hant */,
 				C818E0012833C0AF003EE3B3 /* pl */,
+				C8A85155295C5316000D27B8 /* el */,
 			);
 			name = Backups.storyboard;
 			path = MacBox;
@@ -15363,6 +15971,7 @@
 				C8877416261E02FB00C01406 /* uk */,
 				C8242D7926FB704200D586A4 /* zh-Hant */,
 				C818DFFF2833C0AE003EE3B3 /* pl */,
+				C8A8516B295C5319000D27B8 /* el */,
 			);
 			name = AboutViewController.storyboard;
 			path = MacBox;
@@ -15387,6 +15996,7 @@
 				C8970BCF289132FE00BF61DE /* uk */,
 				C8970BD12891332600BF61DE /* nb */,
 				C80973B928A0E29E0092FBEB /* cs */,
+				C8A8515F295C5318000D27B8 /* el */,
 			);
 			name = TipJar.storyboard;
 			path = MacBox;
@@ -15411,6 +16021,7 @@
 				C8A5EF2527A5691000C5232D /* sv */,
 				C8A5EF2727A5691200C5232D /* uk */,
 				C818DFF12833C0A9003EE3B3 /* pl */,
+				C8A8515A295C5317000D27B8 /* el */,
 			);
 			name = "NextGen-Sidebar.storyboard";
 			path = MacBox;
@@ -15435,6 +16046,7 @@
 				C86BB46125F91C2D00425405 /* pt-BR */,
 				C8242D7D26FB70BD00D586A4 /* zh-Hant */,
 				C818E00A2833C0B2003EE3B3 /* pl */,
+				C8A85160295C5318000D27B8 /* el */,
 			);
 			name = DatabaseOnboarding.storyboard;
 			path = MacBox;
@@ -15459,6 +16071,7 @@
 				C86BB47325F91C3800425405 /* pt-BR */,
 				C832A4AA2730272500768319 /* zh-Hant */,
 				C818E01B2833C0BD003EE3B3 /* pl */,
+				C8A85188295C5322000D27B8 /* el */,
 			);
 			name = ManualCredentialsEntry.xib;
 			sourceTree = "<group>";
@@ -15467,6 +16080,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				C8B12121287EC68900F0C6BD /* Base */,
+				C8A85178295C531B000D27B8 /* el */,
 			);
 			name = UpgradeWindowController.xib;
 			sourceTree = "<group>";
@@ -15490,6 +16104,7 @@
 				C8B14B8E274A991B0055EB05 /* zh-Hant */,
 				C8B14B90274A991C0055EB05 /* zh-Hans */,
 				C818E0052833C0B0003EE3B3 /* pl */,
+				C8A85173295C531B000D27B8 /* el */,
 			);
 			name = FavIconPreferences.storyboard;
 			path = MacBox;
@@ -15514,6 +16129,7 @@
 				C8B14BB4274AA3F30055EB05 /* zh-Hant */,
 				C8B14BB6274AA3F60055EB05 /* zh-Hans */,
 				C818E0042833C0B0003EE3B3 /* pl */,
+				C8A85172295C531A000D27B8 /* el */,
 			);
 			name = NewEntryDefaultsPreferences.storyboard;
 			path = MacBox;
@@ -15538,6 +16154,7 @@
 				C8B14BDA274AA9F40055EB05 /* zh-Hant */,
 				C8B14BDC274AA9F70055EB05 /* zh-Hans */,
 				C818E0032833C0B0003EE3B3 /* pl */,
+				C8A85171295C531A000D27B8 /* el */,
 			);
 			name = AdvancedAppPreferences.storyboard;
 			path = MacBox;
@@ -15562,6 +16179,7 @@
 				C8BB755E261E241A00D6FCB1 /* uk */,
 				C8242D8226FB711100D586A4 /* zh-Hant */,
 				C818DFFE2833C0AE003EE3B3 /* pl */,
+				C8A8516A295C5319000D27B8 /* el */,
 			);
 			name = EditTagsPopover.storyboard;
 			path = MacBox;
@@ -15586,6 +16204,7 @@
 				C8BBBDF22823F21700334D2B /* zh-Hant */,
 				C8BBBDF42823F21800334D2B /* zh-Hans */,
 				C818DFEE2833C0A8003EE3B3 /* pl */,
+				C8A85163295C5318000D27B8 /* el */,
 			);
 			name = CompareDatabases.storyboard;
 			path = MacBox;
@@ -15610,6 +16229,7 @@
 				C8BBBE242824115300334D2B /* zh-Hant */,
 				C8BBBE262824115500334D2B /* zh-Hans */,
 				C818DFEF2833C0A8003EE3B3 /* pl */,
+				C8A85164295C5318000D27B8 /* el */,
 			);
 			name = CompareAndMergeWizard.storyboard;
 			path = MacBox;
@@ -15634,6 +16254,7 @@
 				C8C5DFA728328A2B00A1EEFE /* zh-Hant */,
 				C8C5DFA828328A2E00A1EEFE /* zh-Hans */,
 				C818E0102833C0B4003EE3B3 /* pl */,
+				C8A8517D295C531C000D27B8 /* el */,
 			);
 			name = FavIconResultTableCell.xib;
 			path = MacBox;
@@ -15658,6 +16279,7 @@
 				C8CB82E42790817100F85A2C /* sv */,
 				C8CB82E62790817200F85A2C /* uk */,
 				C818DFF52833C0AB003EE3B3 /* pl */,
+				C8A8515E295C5317000D27B8 /* el */,
 			);
 			name = PastedImagePreviewer.storyboard;
 			path = MacBox;
@@ -15682,6 +16304,7 @@
 				C8CB8306279081AA00F85A2C /* ja */,
 				C8CB8308279081AB00F85A2C /* nb */,
 				C818DFF42833C0AA003EE3B3 /* pl */,
+				C8A8515D295C5317000D27B8 /* el */,
 			);
 			name = QrCodeWindowScanner.storyboard;
 			path = MacBox;
@@ -15706,6 +16329,7 @@
 				C8CB8326279081E400F85A2C /* zh-Hant */,
 				C8CB8328279081E500F85A2C /* zh-Hans */,
 				C818DFF32833C0AA003EE3B3 /* pl */,
+				C8A8515C295C5317000D27B8 /* el */,
 			);
 			name = CreateEditViewController.storyboard;
 			path = MacBox;
@@ -15730,6 +16354,7 @@
 				C8DA3DEA27B4270F00862C17 /* zh-Hant */,
 				C8DA3DEC27B4271000862C17 /* zh-Hans */,
 				C818DFF82833C0AC003EE3B3 /* pl */,
+				C8A85166295C5319000D27B8 /* el */,
 			);
 			name = AuditConfigurationViewController.storyboard;
 			path = MacBox;
@@ -15754,6 +16379,7 @@
 				C8DA3E0E27B4278D00862C17 /* sv */,
 				C8DA3E1027B4278E00862C17 /* uk */,
 				C818DFF72833C0AB003EE3B3 /* pl */,
+				C8A85165295C5318000D27B8 /* el */,
 			);
 			name = AuditDrillDown.storyboard;
 			path = MacBox;
@@ -15778,6 +16404,7 @@
 				C8E5C355275E76E5006C15FE /* zh-Hant */,
 				C8E5C357275E76EA006C15FE /* zh-Hans */,
 				C818DFED2833C0A7003EE3B3 /* pl */,
+				C8A85162295C5318000D27B8 /* el */,
 			);
 			name = MacConflictResolutionWizard.storyboard;
 			path = MacBox;
@@ -15802,6 +16429,7 @@
 				C86BB47425F91C3800425405 /* pt-BR */,
 				C844B426273992E60023AD74 /* zh-Hant */,
 				C818E0192833C0BC003EE3B3 /* pl */,
+				C8A85186295C5322000D27B8 /* el */,
 			);
 			name = SelectAutoFillDatabaseViewController.xib;
 			sourceTree = "<group>";
@@ -15825,6 +16453,7 @@
 				C86BB47525F91C3900425405 /* pt-BR */,
 				C844B427273992ED0023AD74 /* zh-Hant */,
 				C818E01C2833C0BD003EE3B3 /* pl */,
+				C8A85189295C5322000D27B8 /* el */,
 			);
 			name = SelectCredential.xib;
 			sourceTree = "<group>";
@@ -15848,6 +16477,7 @@
 				C86BB45F25F91C2C00425405 /* pt-BR */,
 				C8242D8726FB722400D586A4 /* zh-Hant */,
 				C818DFFB2833C0AD003EE3B3 /* pl */,
+				C8A85167295C5319000D27B8 /* el */,
 			);
 			name = PressYubiKeyWindow.xib;
 			path = MacBox;
@@ -15872,6 +16502,7 @@
 				C8F1B42226D67F5900B21A29 /* sv */,
 				C8F1B42426D67F5B00B21A29 /* uk */,
 				C818DFF02833C0A8003EE3B3 /* pl */,
+				C8A85159295C5317000D27B8 /* el */,
 			);
 			name = NextGen.storyboard;
 			path = MacBox;
@@ -15896,6 +16527,7 @@
 				C86BB47025F91C3600425405 /* pt-BR */,
 				C800441426BD90730090C90D /* zh-Hant */,
 				C818E0162833C0B6003EE3B3 /* pl */,
+				C8A85183295C531D000D27B8 /* el */,
 			);
 			name = WebDAVConfigVC.storyboard;
 			path = MacBox;
@@ -15920,6 +16552,7 @@
 				C86BB46C25F91C3400425405 /* pt-BR */,
 				C8242D8A26FB728400D586A4 /* zh-Hant */,
 				C818E0112833C0B5003EE3B3 /* pl */,
+				C8A8517E295C531C000D27B8 /* el */,
 			);
 			name = SyncLogViewController.storyboard;
 			path = MacBox;
@@ -15944,6 +16577,7 @@
 				C86BB46225F91C2E00425405 /* pt-BR */,
 				C8242D7F26FB70DD00D586A4 /* zh-Hant */,
 				C818E0002833C0AF003EE3B3 /* pl */,
+				C8A85154295C5316000D27B8 /* el */,
 			);
 			name = DatabasesManager.storyboard;
 			path = MacBox;
@@ -15968,6 +16602,7 @@
 				C86BB46F25F91C3600425405 /* pt-BR */,
 				C800441826BD907F0090C90D /* zh-Hant */,
 				C818E0152833C0B6003EE3B3 /* pl */,
+				C8A85182295C531D000D27B8 /* el */,
 			);
 			name = SFTPConfigurationVC.storyboard;
 			path = MacBox;
@@ -15992,6 +16627,7 @@
 				C86BB47125F91C3700425405 /* pt-BR */,
 				C8242D7A26FB705C00D586A4 /* zh-Hant */,
 				C818E0182833C0B7003EE3B3 /* pl */,
+				C8A85185295C531D000D27B8 /* el */,
 			);
 			name = AddDatabaseSelectStorageProvider.storyboard;
 			path = MacBox;
@@ -16016,6 +16652,7 @@
 				C8F9AA8627495C2600C2D9E8 /* zh-Hant */,
 				C8F9AA8827495C2700C2D9E8 /* zh-Hans */,
 				C818E0072833C0B1003EE3B3 /* pl */,
+				C8A85174295C531B000D27B8 /* el */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = MacBox;
@@ -16040,6 +16677,7 @@
 				C8F9AAA827495C4800C2D9E8 /* zh-Hant */,
 				C8F9AAAA27495C4A00C2D9E8 /* zh-Hans */,
 				C818E0062833C0B1003EE3B3 /* pl */,
+				C8A8516D295C531A000D27B8 /* el */,
 			);
 			name = GeneralAppPreferences.storyboard;
 			path = MacBox;
@@ -16061,7 +16699,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -16097,7 +16735,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -16189,7 +16827,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16234,7 +16872,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16384,7 +17022,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -16417,7 +17055,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -16447,7 +17085,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -16481,7 +17119,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -16573,7 +17211,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Freemium-Info.plist";
@@ -16608,7 +17246,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Freemium-Info.plist";
@@ -16642,7 +17280,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16687,7 +17325,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16727,7 +17365,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Pro-Info.plist";
@@ -16762,7 +17400,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Unified-Pro-Info.plist";
@@ -16796,7 +17434,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16841,7 +17479,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16880,7 +17518,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Graphene-Info.plist";
@@ -16914,7 +17552,7 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Graphene-Info.plist";
@@ -16948,7 +17586,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -16993,7 +17631,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -17034,7 +17672,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -17079,7 +17717,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 5048;
+				CURRENT_PROJECT_VERSION = 5091;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

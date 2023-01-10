@@ -56,8 +56,8 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.tryDownloadFavIconForNewRecord = YES;
         self.showExpiredInBrowse = YES;
         self.showExpiredInSearch = YES;
-        self.autoLockTimeoutSeconds = @60;
-        self.showQuickViewFavourites = YES;
+        self.autoLockTimeoutSeconds = @180;
+        self.showQuickViewFavourites = NO;
         self.showQuickViewNearlyExpired = YES;
 
         
@@ -94,6 +94,16 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.autoFillScanAltUrls = YES;
         self.autoFillScanCustomFields = NO;
         self.autoFillScanNotes = NO;
+        self.lazySyncMode = NO; 
+        self.showLastViewedEntryOnUnlock = YES;
+        
+        self.visibleTabs = @[@(kBrowseViewTypeFavourites),
+                             @(kBrowseViewTypeHierarchy),
+                             @(kBrowseViewTypeList),
+                             @(kBrowseViewTypeTags),
+                             @(kBrowseViewTypeTotpList)];
+    
+        self.sortConfigurations = @{}; 
     }
     
     return self;
@@ -169,7 +179,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( jsonDictionary[@"showPasswordByDefaultOnEditScreen"] != nil ) ret.showPasswordByDefaultOnEditScreen = ((NSNumber*)jsonDictionary[@"showPasswordByDefaultOnEditScreen"]).boolValue;
     if ( jsonDictionary[@"showExpiredInBrowse"] != nil ) ret.showExpiredInBrowse = ((NSNumber*)jsonDictionary[@"showExpiredInBrowse"]).boolValue;
     if ( jsonDictionary[@"showExpiredInSearch"] != nil ) ret.showExpiredInSearch = ((NSNumber*)jsonDictionary[@"showExpiredInSearch"]).boolValue;
-    if ( jsonDictionary[@"showQuickViewFavourites"] != nil ) ret.showQuickViewFavourites = ((NSNumber*)jsonDictionary[@"showQuickViewFavourites"]).boolValue;
+    if ( jsonDictionary[@"showQuickViewFavourites2"] != nil ) ret.showQuickViewFavourites = ((NSNumber*)jsonDictionary[@"showQuickViewFavourites2"]).boolValue;
     if ( jsonDictionary[@"showQuickViewNearlyExpired"] != nil ) ret.showQuickViewNearlyExpired = ((NSNumber*)jsonDictionary[@"showQuickViewNearlyExpired"]).boolValue;
     if ( jsonDictionary[@"makeBackups"] != nil ) ret.makeBackups = ((NSNumber*)jsonDictionary[@"makeBackups"]).boolValue;
     if ( jsonDictionary[@"hideTotpCustomFieldsInViewMode"] != nil ) ret.hideTotpCustomFieldsInViewMode = ((NSNumber*)jsonDictionary[@"hideTotpCustomFieldsInViewMode"]).boolValue;
@@ -443,6 +453,80 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     
     [ret setKeyFile:kfb keyFileFileName:kffn];
 
+    
+    
+    if ( jsonDictionary[@"lazySyncMode"] != nil ) {
+        ret.lazySyncMode = ((NSNumber*)jsonDictionary[@"lazySyncMode"]).boolValue;
+    }
+    else {
+        ret.lazySyncMode = NO;
+    }
+
+    if ( jsonDictionary[@"persistLazyEvenLastSyncErrors"] != nil ) {
+        ret.persistLazyEvenLastSyncErrors = ((NSNumber*)jsonDictionary[@"persistLazyEvenLastSyncErrors"]).boolValue;
+    }
+    else {
+        ret.persistLazyEvenLastSyncErrors = NO;
+    }
+
+    
+    
+    if ( jsonDictionary[@"asyncUpdateId"] != nil) {
+        ret.asyncUpdateId = [[NSUUID alloc] initWithUUIDString:jsonDictionary[@"asyncUpdateId"]];
+    }
+    
+    if ( jsonDictionary[@"lastViewedEntry"] != nil) {
+        ret.lastViewedEntry = [[NSUUID alloc] initWithUUIDString:jsonDictionary[@"lastViewedEntry"]];
+    }
+    
+    
+    
+    if ( jsonDictionary[@"showLastViewedEntryOnUnlock"] != nil ) {
+        ret.showLastViewedEntryOnUnlock = ((NSNumber*)jsonDictionary[@"showLastViewedEntryOnUnlock"]).boolValue;
+    }
+    else {
+        ret.showLastViewedEntryOnUnlock = YES;
+    }
+
+    
+    
+    if ( jsonDictionary[@"visibleTabs"] != nil ) {
+        ret.visibleTabs = jsonDictionary[@"visibleTabs"];
+    }
+    else {
+        ret.visibleTabs = @[@(kBrowseViewTypeFavourites),
+                            @(kBrowseViewTypeHierarchy),
+                            @(kBrowseViewTypeList),
+                            @(kBrowseViewTypeTags),
+                            @(kBrowseViewTypeTotpList)];
+    }
+
+    if ( jsonDictionary[@"hideTabBarIfOnlySingleTab"] != nil ) {
+        ret.hideTabBarIfOnlySingleTab = ((NSNumber*)jsonDictionary[@"hideTabBarIfOnlySingleTab"]).boolValue;
+    }
+    else {
+        ret.hideTabBarIfOnlySingleTab = NO;
+    }
+    
+    
+    
+    if ( jsonDictionary[@"sortConfigurations"] != nil ) {
+        NSDictionary* dicts = jsonDictionary[@"sortConfigurations"];
+        
+        NSMutableDictionary<NSString*, BrowseSortConfiguration*>* configs = NSMutableDictionary.dictionary;
+        
+        for ( NSString* num in dicts.allKeys ) {
+            NSDictionary* dict = dicts[num];
+            BrowseSortConfiguration* config = [BrowseSortConfiguration fromJsonSerializationDictionary:dict];
+            configs[num] = config;
+        }
+        
+        ret.sortConfigurations = configs.copy;
+    }
+    else {
+        ret.sortConfigurations = @{};
+    }
+    
     return ret;
 }
 
@@ -478,7 +562,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"showPasswordByDefaultOnEditScreen" : @(self.showPasswordByDefaultOnEditScreen),
         @"showExpiredInBrowse" : @(self.showExpiredInBrowse),
         @"showExpiredInSearch" : @(self.showExpiredInSearch),
-        @"showQuickViewFavourites" : @(self.showQuickViewFavourites),
+        @"showQuickViewFavourites2" : @(self.showQuickViewFavourites),
         @"showQuickViewNearlyExpired" : @(self.showQuickViewNearlyExpired),
         @"makeBackups" : @(self.makeBackups),
         @"maxBackupKeepCount" : @(self.maxBackupKeepCount),
@@ -534,6 +618,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"argon2MemReductionDontAskAgain" : @(self.argon2MemReductionDontAskAgain),
         @"kdbx4UpgradeDontAskAgain" : @(self.kdbx4UpgradeDontAskAgain),
         @"customSortOrderForFields" : @(self.customSortOrderForFields),
+        @"lazySyncMode" : @(self.lazySyncMode),
+        @"persistLazyEvenLastSyncErrors" : @(self.persistLazyEvenLastSyncErrors),
+        @"showLastViewedEntryOnUnlock" : @(self.showLastViewedEntryOnUnlock),
+        @"hideTabBarIfOnlySingleTab" : @(self.hideTabBarIfOnlySingleTab),
     }];
     
     if (self.nickName != nil) {
@@ -559,7 +647,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if (self.detailsViewCollapsedSections != nil) {
         ret[@"detailsViewCollapsedSections"] = self.detailsViewCollapsedSections;
     }
-    
+
     if (self.yubiKeyConfig != nil) {
         ret[@"yubiKeyConfig"] = [self.yubiKeyConfig getJsonSerializationDictionary];
     }
@@ -575,7 +663,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if (self.outstandingUpdateId != nil) {
         ret[@"outstandingUpdateId"] = self.outstandingUpdateId.UUIDString;
     }
-    
+
     if (self.lastSyncRemoteModDate != nil) {
         ret[@"lastSyncRemoteModDate"] = @(self.lastSyncRemoteModDate.timeIntervalSinceReferenceDate);
     }
@@ -599,15 +687,38 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if (self.databaseCreated != nil) {
         ret[@"databaseCreated"] = @(self.databaseCreated.timeIntervalSinceReferenceDate);
     }
-
-    
-    
     
     if ( self.lastAskedAboutArgon2MemReduction != nil ) {
         ret[@"lastAskedAboutArgon2MemReduction"] = @(self.lastAskedAboutArgon2MemReduction.timeIntervalSinceReferenceDate);
     }
     if ( self.lastAskedAboutKdbx4Upgrade != nil ) {
         ret[@"lastAskedAboutKdbx4Upgrade"] = @(self.lastAskedAboutKdbx4Upgrade.timeIntervalSinceReferenceDate);
+    }
+
+    if (self.asyncUpdateId != nil) {
+        ret[@"asyncUpdateId"] = self.asyncUpdateId.UUIDString;
+    }
+    
+    if ( self.lastViewedEntry != nil ) {
+        ret[@"lastViewedEntry"] = self.lastViewedEntry.UUIDString;
+    }
+    
+    if (self.visibleTabs != nil) {
+        ret[@"visibleTabs"] = self.visibleTabs;
+    }
+    
+    if ( self.sortConfigurations ) {
+        NSMutableDictionary<NSString*, NSDictionary*> *dicts = NSMutableDictionary.dictionary;
+        
+        for ( NSString* num in self.sortConfigurations.allKeys ) {
+            BrowseSortConfiguration* config = self.sortConfigurations[num];
+            
+            NSDictionary* dict = [config getJsonSerializationDictionary];
+            
+            dicts[num] = dict;
+        }
+        
+        ret[@"sortConfigurations"] = dicts;
     }
 
     return ret;

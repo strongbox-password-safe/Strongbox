@@ -43,7 +43,6 @@
 #import "NSData+Extensions.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
-#import "AsyncUpdateResultViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "MarkdownCell.h"
 
@@ -52,11 +51,18 @@
 #import "ISMessages/ISMessages.h"
 #import "SetNodeIconUiHelper.h"
 #import "QRCodeScannerViewController.h"
+#import "Strongbox-Swift.h"
+#import "NavBarSyncButtonHelper.h"
+
+#else
+
+#import "Strongbox_Auto_Fill-Swift.h"
 
 #endif
 
 #import "DatabasePreferences.h"
 #import "AutoFillNewRecordSettingsController.h"
+#import "SyncManager.h"
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
@@ -94,7 +100,6 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
 
 
-
 @interface ItemDetailsViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate, UIPopoverPresentationControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @property EntryViewModel* model;
@@ -113,12 +118,17 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 #ifndef IS_APP_EXTENSION
 
 @property SetNodeIconUiHelper* sni;
+@property (readonly) MainSplitViewController* parentSplitViewController; 
 
 #endif
 
+
 @property BOOL hideMetadataSection;
+
+#ifndef IS_APP_EXTENSION
 @property UIBarButtonItem* syncBarButton;
 @property UIButton* syncButton;
+#endif
 
 @property (readonly) BOOL isEffectivelyReadOnly;
 @property (readonly) DatabaseFormat databaseFormat;
@@ -130,12 +140,12 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 @implementation ItemDetailsViewController
 
 + (NSArray<NSNumber*>*)defaultCollapsedSections {
-   return @[@(0), @(0), @(0), @(0), @(1), @(1)];
+    return @[@(0), @(0), @(0), @(0), @(1), @(1)];
 }
 
 - (void)dealloc {
     NSLog(@"ItemDetailsViewController::DEALLOC [%@]", self);
-
+    
     [self unListenToNotifications];
 }
 
@@ -147,10 +157,10 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     if (!self.inCellHeightsChangedProcess) {
         self.inCellHeightsChangedProcess = YES;
         
-
+        
         [self.tableView beginUpdates];
         [self.tableView endUpdates];
-
+        
         
         self.inCellHeightsChangedProcess = NO;
     }
@@ -162,25 +172,25 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-
+    
     [UIView setAnimationsEnabled:NO];
-
+    
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
-
-
+    
+    
     
     self.navigationController.navigationBarHidden = NO;
     self.navigationController.navigationBar.prefersLargeTitles = NO;
-
+    
     [self listenToNotifications];
-
+    
     [self.tableView reloadData];
-
+    
     
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
-
+    
     [UIView setAnimationsEnabled:YES];
     
     [self updateSyncBarButtonItemState];
@@ -188,7 +198,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
+        
     [self unListenToNotifications];
 }
 
@@ -209,24 +219,24 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     [super viewDidLoad];
     
     self.hideMetadataSection = !AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
-
+    
 #ifndef IS_APP_EXTENSION
     self.isAutoFillContext = NO;
 #else
     self.isAutoFillContext = YES;
 #endif
-
+    
     [self customizeRightBarButtons];
     
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
     
     [self setupTableview];
-
+    
     self.passwordConcealedInUi = !self.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
     
     self.model = [self refreshViewModel];
     [self bindNavBar];
-
+    
     if(self.createNewItem || self.editImmediately) {
         [self setEditing:YES animated:YES];
     }
@@ -239,8 +249,8 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 - (void)listenToNotifications {
     [self unListenToNotifications];
     
-
-
+    
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onCellHeightChangedNotification)
                                                  name:CellHeightsChangedNotification
@@ -255,62 +265,49 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
                                            selector:@selector(onAuditChanged:)
                                                name:kAuditNodesChangedNotificationKey
                                              object:nil];
-
+    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onAuditChanged:)
                                                name:kAuditCompletedNotificationKey
                                              object:nil];
     
+    
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(onAsyncUpdateStart:)
+                                           selector:@selector(onSyncOrUpdateStatusChanged:)
                                                name:kAsyncUpdateStarting
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(onAsyncUpdateDone:)
+                                           selector:@selector(onSyncOrUpdateStatusChanged:)
                                                name:kAsyncUpdateDone
                                              object:nil];
-
+    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseReloaded:)
                                                name:kDatabaseReloadedNotificationKey
                                              object:nil];
+    
+#ifndef IS_APP_EXTENSION
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onSyncOrUpdateStatusChanged:)
+                                               name:kSyncManagerDatabaseSyncStatusChanged
+                                             object:nil];
+#endif
 }
 
 - (void)unListenToNotifications {
-
-
-    [NSNotificationCenter.defaultCenter removeObserver:self name:CellHeightsChangedNotification object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseViewPreferencesChangedNotificationKey object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditNodesChangedNotificationKey object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditCompletedNotificationKey object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kAsyncUpdateDone object:nil];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseReloadedNotificationKey object:nil];
+    
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)onSyncButtonClicked:(id)sender {
-    if ( self.databaseModel.isRunningAsyncUpdate ) {
+    SyncStatus* syncStatus = [SyncManager.sharedInstance getSyncStatus:self.databaseModel.metadata];
+    
+    if ( self.databaseModel.isRunningAsyncUpdate || syncStatus.state == kSyncOperationStateInProgress ) {
         return;
     }
     
-    if ( !self.databaseModel.lastAsyncUpdateResult ) {
-        [self updateSyncBarButtonItemState];
-        return;
-    }
-    
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"AsyncUpdateResultViewer" bundle:nil];
-    AsyncUpdateResultViewController* vc = (AsyncUpdateResultViewController*)[storyboard instantiateInitialViewController];
-    vc.modalPresentationStyle = UIModalPresentationPopover;
-    vc.presentationController.delegate = self;
-    vc.popoverPresentationController.barButtonItem = self.syncBarButton;
-    vc.result = self.databaseModel.lastAsyncUpdateResult;
-    
-    __weak ItemDetailsViewController* weakSelf = self;
-    vc.onRetryClicked = ^{
-        [weakSelf onRetryUpdateSynchronouslyClicked];
-    };
-    
-    [self presentViewController:vc animated:YES completion:nil];
+    [self updateAndSync];
 }
 
 - (UIModalPresentationStyle)adaptivePresentationStyleForPresentationController:(UIPresentationController *)controller traitCollection:(UITraitCollection *)traitCollection {
@@ -320,22 +317,6 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 }
 
 - (void)customizeRightBarButtons {
-    self.syncButton = [[UIButton alloc] init];
-    [self.syncButton addTarget:self action:@selector(onSyncButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
-    
-    if (@available(iOS 14.0, *)) {
-        [self.syncButton setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
-    }
-    else {
-        [self.syncButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
-        self.syncButton.contentMode = UIViewContentModeCenter;
-        self.syncButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [self.syncButton setTintColor:UIColor.systemBlueColor];
-        self.syncButton.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
-    }
-    
-    self.syncBarButton = [[UIBarButtonItem alloc] initWithCustomView:self.syncButton];
-    
     NSMutableArray* rightBarButtons = @[].mutableCopy;
     
     if ( self.navigationItem.rightBarButtonItems ) {
@@ -344,59 +325,45 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     else if ( self.navigationItem.rightBarButtonItem ) {
         rightBarButtons = @[self.navigationItem.rightBarButtonItem].mutableCopy;
     }
-
+    
     [rightBarButtons insertObject:self.editButtonItem atIndex:0];
+
+#ifndef IS_APP_EXTENSION
+    self.syncButton = [NavBarSyncButtonHelper createSyncButton:self action:@selector(onSyncButtonClicked:)];
+    self.syncBarButton = [[UIBarButtonItem alloc] initWithCustomView:self.syncButton];
     [rightBarButtons addObject:self.syncBarButton];
+#endif
     
     self.navigationItem.rightBarButtonItems = rightBarButtons;
 }
 
-- (void)runSpinAnimationOnView:(UIView*)view spin:(BOOL)spin {
-
-
-    [view.layer removeAllAnimations];
-    
-    if ( spin ) {
-        CABasicAnimation* rotationAnimation;
-        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-        rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0];
-        rotationAnimation.duration = 1.25f;
-        rotationAnimation.cumulative = YES;
-        rotationAnimation.repeatCount = HUGE_VALF;
-        [rotationAnimation setRemovedOnCompletion:NO]; 
-        
-        [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
-    }
+- (void)onSyncOrUpdateStatusChanged:(id)object {
+    [self updateSyncBarButtonItemState];
 }
 
 - (void)updateSyncBarButtonItemState {
-    [self runSpinAnimationOnView:self.syncButton spin:NO];
-    [self.syncButton setTintColor:UIColor.clearColor];
-    self.syncButton.enabled = NO;
-
-    if ( self.databaseModel.isRunningAsyncUpdate ) {
-        [self runSpinAnimationOnView:self.syncButton spin:YES];
-        [self.syncButton setTintColor:UIColor.systemBlueColor];
-        self.syncButton.enabled = YES;
-    }
-    else if ( self.databaseModel.lastAsyncUpdateResult ) {
-        if ( !self.databaseModel.lastAsyncUpdateResult.success ) {
-            if ( self.databaseModel.lastAsyncUpdateResult.error ) {
-                [self runSpinAnimationOnView:self.syncButton spin:NO];
-                [self.syncButton setTintColor:UIColor.systemRedColor];
-                self.syncButton.enabled = YES;
-            }
-            else {
-                [self runSpinAnimationOnView:self.syncButton spin:NO];
-                [self.syncButton setTintColor:UIColor.systemOrangeColor];
-                self.syncButton.enabled = YES;
-            }
+#ifndef IS_APP_EXTENSION
+    NSMutableArray *copy = self.navigationItem.rightBarButtonItems.mutableCopy;
+    
+    
+     
+    
+    
+    BOOL showSyncButton = [NavBarSyncButtonHelper bindSyncToobarButton:self.databaseModel button:self.syncButton];
+    
+    if ( !showSyncButton ) {
+        if ( [copy containsObject:self.syncBarButton] ) {
+            [copy removeObject:self.syncBarButton];
         }
     }
-}
-
-- (void)onRetryUpdateSynchronouslyClicked {
-    [self updateAndSync:NO];
+    else {
+        if ( ![copy containsObject:self.syncBarButton] ) { 
+            [copy addObject:self.syncBarButton];
+        }
+    }
+    
+    self.navigationItem.rightBarButtonItems = copy;
+#endif
 }
 
 - (void)onAuditChanged:(id)param {
@@ -427,7 +394,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     [self.tableView registerNib:[UINib nibWithNibName:kEditDateCell bundle:nil] forCellReuseIdentifier:kEditDateCell];
     [self.tableView registerNib:[UINib nibWithNibName:kTagsViewCellId bundle:nil] forCellReuseIdentifier:kTagsViewCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kMarkdownNotesCellId bundle:nil] forCellReuseIdentifier:kMarkdownNotesCellId];
-
+    
     if (@available(iOS 15.0, *)) {
         [self.tableView setSectionHeaderTopPadding:4.0f];
     }
@@ -445,8 +412,29 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     [self.tableView addGestureRecognizer:self.longPressRecognizer];
 }
 
+- (void)onCancelConfirmed {
+    if ( self.createNewItem ) {
+        [DatabasePreferences setEditing:self.databaseModel.metadata editing:NO];
+        
+        if ( self.splitViewController ) {
+            if (self.splitViewController.isCollapsed ) { 
+                [self.navigationController popViewControllerAnimated:YES];
+            }
+            else {
+                [self performSegueWithIdentifier:@"segueToEmptyDetails" sender:nil];
+            }
+        }
+        else {
+            [self.navigationController popViewControllerAnimated:YES];
+        }
+    }
+    else {
+        [self setEditing:NO];
+    }
+}
+
 - (void)onCancel:(id)sender {
-    if(self.editing) {
+    if ( self.editing ) {
         if([self.model isDifferentFrom:self.preEditModelClone]) {
             [Alerts yesNo:self
                     title:NSLocalizedString(@"item_details_vc_discard_changes", @"Discard Changes?")
@@ -455,46 +443,12 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
                 if(response) {
                     self.model = self.preEditModelClone;
                     
-                    if(self.createNewItem) {
-                        [DatabasePreferences setEditing:self.databaseModel.metadata editing:NO];
-
-                        if(self.splitViewController) {
-                            if(self.splitViewController.isCollapsed) { 
-                                [self.navigationController.navigationController popViewControllerAnimated:YES];
-                            }
-                            else {
-                                [self performSegueWithIdentifier:@"segueToEmptyDetails" sender:nil];
-                            }
-                        }
-                        else {
-                            [self.navigationController popViewControllerAnimated:YES];
-                        }
-                    }
-                    else {
-                        [self setEditing:NO];
-                    }
+                    [self onCancelConfirmed];
                 }
             }];
         }
         else {
-            if(self.createNewItem) {
-                [DatabasePreferences setEditing:self.databaseModel.metadata editing:NO];
-
-                if(self.splitViewController) {
-                    if(self.splitViewController.isCollapsed) { 
-                        [self.navigationController.navigationController popViewControllerAnimated:YES];
-                    }
-                    else {
-                        [self performSegueWithIdentifier:@"segueToEmptyDetails" sender:nil];
-                    }
-                }
-                else {
-                    [self.navigationController popViewControllerAnimated:YES];
-                }
-            }
-            else {
-                [self setEditing:NO];
-            }
+            [self onCancelConfirmed];
         }
     }
 }
@@ -516,14 +470,14 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         self.editButtonItem.enabled = saveable;
         self.navigationItem.leftBarButtonItem = self.cancelOrDiscardBarButton;
         
-
-
-
-
-
-
         
-
+        
+        
+        
+        
+        
+        
+        
     }
     else {
         self.navigationItem.leftItemsSupplementBackButton = YES;
@@ -535,19 +489,33 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 }
 
 - (void)bindTitle {
-    self.navigationItem.title = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title],
-                                 self.isEffectivelyReadOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
+    NSString* fullTitle = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title],
+                                    self.isEffectivelyReadOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
+
+    UIImage* image = [NodeIconHelper getNodeIcon:self.model.icon
+              predefinedIconSet:self.databaseModel.metadata.keePassIconSet
+                         format:self.databaseModel.database.originalFormat];
+
+    UIView* view = [MMcGSwiftUtils navTitleWithImageAndTextWithTitleText:fullTitle
+                                                                   image:image
+                                                                    tint:nil];
+    
+    self.navigationItem.titleView = view;
+
+    
+
+
 }
 
 - (void)prepareTableViewForEditing {
     BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4);
     NSUInteger addCustomFieldIdx = self.model.customFields.count + kSimpleRowCount;
-
+    
     if(self.editing) {
         if (showAddCustomFieldRow) {
             NSUInteger addCustomFieldIdx = self.model.customFields.count + kSimpleRowCount;
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx inSection:kSimpleFieldsSectionIdx]]
-            withRowAnimation:UITableViewRowAnimationAutomatic];
+                                  withRowAnimation:UITableViewRowAnimationAutomatic];
         }
         
         [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kAttachmentsSectionIdx]]
@@ -634,7 +602,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 #pragma mark - Table view data source
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
+    
     
     if (indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowTitleAndIcon) {
@@ -682,7 +650,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     }
     
     UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
-
+    
     return cell;
 }
 
@@ -741,7 +709,10 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     BOOL shouldHideEmpty = !self.databaseModel.metadata.showEmptyFieldsInDetailsView && !self.editing;
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
-        if(indexPath.row == kRowUsername && shouldHideEmpty && !self.model.username.length) {
+        if ( indexPath.row == kRowTitleAndIcon && !self.editing ) {
+            return CGFLOAT_MIN;
+        }
+        else if(indexPath.row == kRowUsername && shouldHideEmpty && !self.model.username.length) {
             return CGFLOAT_MIN;
         }
         else if(indexPath.row == kRowPassword && shouldHideEmpty && !self.model.password.length) {
@@ -783,17 +754,12 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
                 if (!f.protected && !f.value.length && shouldHideEmpty) { 
                     return CGFLOAT_MIN;
                 }
-            
+                
                 BOOL shouldHideTotpFields = self.databaseModel.metadata.hideTotpCustomFieldsInViewMode && !self.editing;
                 if (shouldHideTotpFields && [NodeFields isTotpCustomFieldKey:f.key]) {
                     return CGFLOAT_MIN;
                 }
             }
-#ifdef IS_APP_EXTENSION
-            else {
-                return CGFLOAT_MIN; 
-            }
-#endif
         }
     }
     else if (indexPath.section == kNotesSectionIdx) {
@@ -850,7 +816,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         return CGFLOAT_MIN;
     }
 #endif
-
+    
     return UITableViewAutomaticDimension;
 }
 
@@ -889,7 +855,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     if(indexPath.section == kOtherSectionIdx || indexPath.section == kMetadataSectionIdx) {
         return NO;
     }
-
+    
     return self.editing;
 }
 
@@ -901,7 +867,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
             return YES;
         }
     }
-
+    
     return NO;
 }
 
@@ -913,7 +879,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
             return proposedDestinationIndexPath;
         }
     }
-
+    
     return sourceIndexPath;
 }
 
@@ -921,7 +887,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     if ( sourceIndexPath.section == kSimpleFieldsSectionIdx && destinationIndexPath.section == kSimpleFieldsSectionIdx && self.model.customFields.count > 1 ) {
         NSInteger sourceIdx = sourceIndexPath.row - kSimpleRowCount;
         NSInteger destIdx = destinationIndexPath.row - kSimpleRowCount;
-
+        
         if ( sourceIdx >= 0 && sourceIdx < self.model.customFields.count && destIdx >= 0 && destIdx < self.model.customFields.count && sourceIdx != destIdx ) {
             NSLog(@"Move: [%ld] -> [%ld]", (long)sourceIdx, destIdx);
             [self.model moveCustomFieldAtIndex:sourceIdx to:destIdx];
@@ -1017,7 +983,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     
     NSInputStream* attStream = [attachment getPlainTextInputStream];
     [StreamUtils pipeFromStream:attStream to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
-
+    
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -1029,7 +995,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     if([segue.identifier isEqualToString:@"segueToCustomFieldEditor"]) {
         UINavigationController *nav = segue.destinationViewController;
         CustomFieldEditorViewController* vc = (CustomFieldEditorViewController*)[nav topViewController];
-
+        
         vc.colorizeValue = self.databaseModel.metadata.colorizePasswords;
         vc.customFieldsKeySet = [NSSet setWithArray:[self.model.customFields map:^id _Nonnull(CustomFieldViewModel * _Nonnull obj, NSUInteger idx) {
             return obj.key;
@@ -1055,16 +1021,16 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     }
     else if ([segue.identifier isEqualToString:@"toKeePassHistory"] && (self.itemId != nil)) {
         KeePassHistoryController *vc = (KeePassHistoryController *)segue.destinationViewController;
-
+        
         Node* item = [self.databaseModel.database getItemById:self.itemId];
         
         vc.historicalItems = item.fields.keePassHistory;
         vc.viewModel = self.databaseModel;
-
+        
         vc.restoreToHistoryItem = ^(Node * historicalNode) {
             [self onRestoreFromHistoryNode:historicalNode];
         };
-
+        
         vc.deleteHistoryItem = ^(Node * historicalNode) {
             [self onDeleteHistoryItem:historicalNode];
         };
@@ -1091,7 +1057,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
         vc.model = self.databaseModel;
         vc.itemId = self.itemId;
         vc.hideShowAllAuditIssues = YES;
-        vc.onDone = ^(BOOL showAllAuditIssues, UIViewController * _Nonnull viewControllerToDismiss) { 
+        vc.onDone = ^(BOOL showAllAuditIssues, UIViewController * _Nonnull viewControllerToDismiss) {
             [viewControllerToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         };
         
@@ -1104,16 +1070,16 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
 - (void)onCustomFieldEditedOrAdded:(CustomFieldViewModel * _Nonnull)field fieldToEdit:(CustomFieldViewModel*)fieldToEdit {
     NSLog(@"Received new Custom Field View Model: [%@]", field);
-
+    
     NSUInteger oldIdx = -1;
     if (fieldToEdit) { 
         oldIdx = [self.model.customFields indexOfObject:fieldToEdit];
-
         
         
         
         
-
+        
+        
         if (oldIdx != NSNotFound) {
             [self.model removeCustomFieldAtIndex:oldIdx];
         }
@@ -1124,11 +1090,11 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     
     NSUInteger idx = [self.model addCustomField:field];
     [self.tableView performBatchUpdates:^{
-       if(oldIdx != -1) {
+        if(oldIdx != -1) {
             [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIdx + kSimpleRowCount
                                                                         inSection:kSimpleFieldsSectionIdx]]
                                   withRowAnimation:UITableViewRowAnimationAutomatic];
-       }
+        }
         
         [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + kSimpleRowCount
                                                                     inSection:kSimpleFieldsSectionIdx]]
@@ -1142,7 +1108,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
     if(self.databaseModel.database.originalFormat == kPasswordSafe) {
         return nil;
     }
-        
+    
     return [NodeIconHelper getNodeIcon:self.model.icon predefinedIconSet:self.databaseModel.metadata.keePassIconSet format:self.databaseModel.database.originalFormat];
 }
 
@@ -1155,7 +1121,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
 - (void)onClearTotp {
     self.model.totp = nil;
-
+    
     [self updateTotpRow];
     
     [self onModelEdited];
@@ -1164,13 +1130,13 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 - (void)onSetTotp {
 #ifndef IS_APP_EXTENSION
     [Alerts fourOptionsWithCancel:self
-                             title:NSLocalizedString(@"item_details_setup_totp_how_title", @"How would you like to setup TOTP?")
-                           message:NSLocalizedString(@"item_details_setup_totp_how_message", @"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL")
-                 defaultButtonText:NSLocalizedString(@"scan_qr_code_from_camera", @"Scan QR Code with Camera")
-                  secondButtonText:NSLocalizedString(@"key_files_vc_one_time_key_file_source_option_photos", @"Photo Library...")
-                   thirdButtonText:NSLocalizedString(@"item_details_setup_totp_manual_rfc", @"Manual (Standard/RFC 6238)...")
-                  fourthButtonText:NSLocalizedString(@"item_details_setup_totp_manual_steam", @"Manual (Steam Token)...")
-                            action:^(int response) {
+                            title:NSLocalizedString(@"item_details_setup_totp_how_title", @"How would you like to setup TOTP?")
+                          message:NSLocalizedString(@"item_details_setup_totp_how_message", @"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL")
+                defaultButtonText:NSLocalizedString(@"scan_qr_code_from_camera", @"Scan QR Code with Camera")
+                 secondButtonText:NSLocalizedString(@"key_files_vc_one_time_key_file_source_option_photos", @"Photo Library...")
+                  thirdButtonText:NSLocalizedString(@"item_details_setup_totp_manual_rfc", @"Manual (Standard/RFC 6238)...")
+                 fourthButtonText:NSLocalizedString(@"item_details_setup_totp_manual_steam", @"Manual (Steam Token)...")
+                           action:^(int response) {
         if(response == 0){
 #ifndef IS_READ_ONLY_BUILD
             
@@ -1234,14 +1200,14 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
              message:NSLocalizedString(@"add_attachment_vc_error_source_unavailable_photos", @"Strongbox could not access photos. Does it have permission?")];
         return;
     }
-
+    
     UIImagePickerController *vc = [[UIImagePickerController alloc] init];
     vc.delegate = self;
     vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
     vc.modalPresentationStyle = UIModalPresentationFormSheet;
     vc.mediaTypes = @[(NSString*)kUTTypeMovie, (NSString*)kUTTypeImage];
     vc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
-
+    
     [self presentViewController:vc animated:YES completion:nil];
 }
 
@@ -1255,7 +1221,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
              message:NSLocalizedString(@"add_attachment_vc_error_reading_message", @"Could not read the data for this item.")];
         return;
     }
-
+    
     [picker dismissViewControllerAnimated:YES completion:^{
         NSString *qrCodeString = [self detectQRCode:image];
         
@@ -1264,7 +1230,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         }
         else {
             NSLog(@"Couldn't find QR Code!");
-
+            
             [Alerts warn:self
                    title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
                  message:NSLocalizedString(@"could_not_find_qr_code", @"Strongbox could not find a QR Code in this image.")];
@@ -1275,7 +1241,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 - (NSString*)detectQRCode:(UIImage *)image {
     @autoreleasepool {
         CIImage* ciImage = image.CIImage ? image.CIImage : [CIImage imageWithCGImage:image.CGImage];
- 
+        
         if ( !ciImage ) {
             NSLog(@"WARNWARN: Could not get CIImage for QR Code");
             return nil;
@@ -1289,7 +1255,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         
         NSArray<CIFeature*>* features = [qrDetector featuresInImage:ciImage
                                                             options:@{ CIDetectorImageOrientation : orientation ? orientation : @1}];
-
+        
         if ( features.firstObject && [features.firstObject isKindOfClass:CIQRCodeFeature.class] ) {
             CIQRCodeFeature* feature = (CIQRCodeFeature*)features.firstObject;
             return feature.messageString;
@@ -1307,7 +1273,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     }
     
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
-
+    
 #ifndef IS_APP_EXTENSION
     [ISMessages showCardAlertWithTitle:message
                                message:nil
@@ -1333,7 +1299,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     NSString* pw = [self dereference:self.model.password];
     [self copyToClipboard:pw
                   message:NSLocalizedString(@"item_details_password_copied_and_launching", @"Password Copied. Launching URL...")];
-        
+    
     [self.databaseModel launchUrlString:urlString];
 }
 
@@ -1352,47 +1318,47 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
 - (Node*)createNewEntryNode {
     AutoFillNewRecordSettings* settings = AppPreferences.sharedInstance.autoFillNewRecordSettings;
-
+    
     NSString *title = settings.titleAutoFillMode == kDefault ?
-        NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
-        settings.titleCustomAutoFill;
-
+    NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
+    settings.titleCustomAutoFill;
+    
 #ifdef IS_APP_EXTENSION
     if(self.autoFillSuggestedTitle.length) {
         title = self.autoFillSuggestedTitle;
     }
 #endif
-
+    
     NSString* username = settings.usernameAutoFillMode == kNone ? @"" :
     settings.usernameAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularUsername : settings.usernameCustomAutoFill;
-
+    
     NSString *password =
     settings.passwordAutoFillMode == kNone ? @"" :
     settings.passwordAutoFillMode == kGenerated ? [self.databaseModel generatePassword] : settings.passwordCustomAutoFill;
-
+    
     NSString* email =
     settings.emailAutoFillMode == kNone ? @"" :
     settings.emailAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularEmail : settings.emailCustomAutoFill;
-
+    
     NSString* url = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
-
+    
 #ifdef IS_APP_EXTENSION
     if(self.autoFillSuggestedUrl.length) {
         url = self.autoFillSuggestedUrl;
     }
 #endif
-
+    
     NSString* notes = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
-
+    
 #ifdef IS_APP_EXTENSION
     if(self.autoFillSuggestedNotes.length) {
         notes = self.autoFillSuggestedNotes;
     }
 #endif
-
+    
     NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
-
-    Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
+    
+    Node* parentGroup = [self getParentGroupForNewNode];
     Node* node = [[Node alloc] initAsRecord:title parent:parentGroup fields:fields uuid:nil];
     
     if ( parentGroup && !parentGroup.isUsingKeePassDefaultIcon && AppPreferences.sharedInstance.useParentGroupIconOnCreate ) {
@@ -1402,12 +1368,30 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     return node;
 }
 
+- (Node*)getParentGroupForNewNode {
+    Node* parentGroup = nil;
+    
+    if ( self.parentGroupId ) {
+        parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
+    }
+    
+    if ( parentGroup == nil ) {
+        parentGroup = self.databaseModel.database.effectiveRootGroup;
+    }
+    
+    if ( !parentGroup.childRecordsAllowed ) { 
+        parentGroup = parentGroup.childGroups.firstObject;
+    }
+    
+    return parentGroup ? parentGroup : self.databaseModel.database.effectiveRootGroup; 
+}
+
 - (void)applyModelChangesToDatabaseNode:(void (^)(Node* item))completion {
     Node* ret;
     
     if ( self.createNewItem ) {
         ret = [self createNewEntryNode];
-        Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
+        Node* parentGroup = [self getParentGroupForNewNode];
         
         BOOL added = [self.databaseModel addChildren:@[ret] destination:parentGroup];
         
@@ -1421,7 +1405,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         Node* originalNodeForHistory = [ret cloneForHistory];
         [self addHistoricalNode:ret originalNodeForHistory:originalNodeForHistory];
     }
-
+    
     if ( ![self.model applyToNode:ret
                    databaseFormat:self.databaseFormat
           legacySupplementaryTotp:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
@@ -1453,7 +1437,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             BOOL featureAvailable = AppPreferences.sharedInstance.isPro && !AppPreferences.sharedInstance.disableFavIconFeature;
             
             BOOL favIconFetchPossible = (featureAvailable && formatGood && isValidUrl(self.model.url));
-
+            
             if (favIconFetchPossible) {
                 if (!self.databaseModel.metadata.promptedForAutoFetchFavIcon) {
                     [Alerts yesNo:self
@@ -1462,7 +1446,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
                            action:^(BOOL response) {
                         self.databaseModel.metadata.promptedForAutoFetchFavIcon = YES;
                         self.databaseModel.metadata.tryDownloadFavIconForNewRecord = response;
-
+                        
                         if (self.databaseModel.metadata.tryDownloadFavIconForNewRecord ) {
                             [self fetchFavIcon:item completion:completion];
                             return;
@@ -1494,13 +1478,13 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     
     [self.sni expressDownloadBestFavIcon:self.model.url
                               completion:^(UIImage * _Nullable favIcon) {
-                          if( favIcon ) {
-                              NSData *data = UIImagePNGRepresentation(favIcon);
-                              item.icon = [NodeIcon withCustom:data];
-                          }
-
-                          completion();
-                      }];
+        if( favIcon ) {
+            NSData *data = UIImagePNGRepresentation(favIcon);
+            item.icon = [NodeIcon withCustom:data];
+        }
+        
+        completion();
+    }];
 }
 
 - (void)onChangeIcon {
@@ -1573,11 +1557,11 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         NSMutableArray* mutable = [weakSelf.databaseModel.metadata.detailsViewCollapsedSections mutableCopy];
         mutable[section] = @(toggled);
         weakSelf.databaseModel.metadata.detailsViewCollapsedSections = mutable;
-                
+        
         [weakHeader setCollapsed:toggled];
         [weakSelf.tableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
     };
-
+    
     return header;
 }
 
@@ -1593,7 +1577,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         }
         else if (indexPath.section == kSimpleFieldsSectionIdx) {
             NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
-
+            
             if(indexPath.row == kRowTotp) {
                 if(!self.model.totp) {
                     [self onSetTotp];
@@ -1654,13 +1638,13 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             [self performSegueWithIdentifier:self.databaseModel.database.originalFormat == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
         }
     }
-        
+    
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (UITableViewCell*)getUsernameCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
-
+    
     __weak ItemDetailsViewController* weakSelf = self;
     
     UIImage* refresh = [UIImage imageNamed:@"syncronize"];
@@ -1668,32 +1652,32 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     if (@available(iOS 14.0, *)) { 
         refresh = [UIImage systemImageNamed:@"arrow.triangle.2.circlepath"];
     }
-
+    
     UIImage* image = self.editing ? refresh : nil;
-
+    
     [cell setKey:NSLocalizedString(@"item_details_username_field_title", @"Username")
            value:[self maybeDereference:self.model.username]
          editing:self.editing
  useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
 rightButtonImage:image
 suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
-            NSArray* matches = [[[weakSelf.databaseModel.database.usernameSet allObjects] filter:^BOOL(NSString * obj) {
-                return [obj hasPrefix:text];
-            }] sortedArrayUsingComparator:finderStringComparator];
-              return matches.firstObject;
-        }];
-
+        NSArray* matches = [[[weakSelf.databaseModel.database.usernameSet allObjects] filter:^BOOL(NSString * obj) {
+            return [obj hasPrefix:text];
+        }] sortedArrayUsingComparator:finderStringComparator];
+        return matches.firstObject;
+    }];
+    
     cell.onEdited = ^(NSString * _Nonnull text) {
-      weakSelf.model.username = trim(text);
-      [weakSelf onModelEdited];
+        weakSelf.model.username = trim(text);
+        [weakSelf onModelEdited];
     };
     
     if (self.editing) {
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
             [PasswordMaker.sharedInstance promptWithUsernameSuggestions:weakSelf
-                                                             config:AppPreferences.sharedInstance.passwordGenerationConfig
-                                                             action:^(NSString * _Nonnull response) {
+                                                                 config:AppPreferences.sharedInstance.passwordGenerationConfig
+                                                                 action:^(NSString * _Nonnull response) {
                 [weakCell pokeValue:response];
             }];
         };
@@ -1707,36 +1691,36 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
 
 - (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
     TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
-
+    
     __weak ItemDetailsViewController* weakSelf = self;
     
     [cell setModel:!self.editing
               tags:self.model.tags
    useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
              onAdd:^(NSString * _Nonnull tag) {
-                [weakSelf.model addTag:trim(tag)];
-                [weakSelf onModelEdited];
-            }
+        [weakSelf.model addTag:trim(tag)];
+        [weakSelf onModelEdited];
+    }
           onRemove:^(NSString * _Nonnull tag) {
-                [weakSelf.model removeTag:trim(tag)];
-                [weakSelf onModelEdited];
-            }];
-
+        [weakSelf.model removeTag:trim(tag)];
+        [weakSelf onModelEdited];
+    }];
     
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
     return cell;
 }
 
 - (UITableViewCell*)getPasswordCell:(NSIndexPath*)indexPath {
     __weak ItemDetailsViewController* weakSelf = self;
-
+    
     if(self.editing) {
         EditPasswordTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditPasswordCellId forIndexPath:indexPath];
         
@@ -1751,14 +1735,11 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
             [weakSelf onModelEdited];
         };
         
-#ifndef IS_APP_EXTENSION 
         cell.onPasswordSettings = ^(void) {
             [weakSelf performSegueWithIdentifier:@"segueToPasswordGenerationSettings" sender:nil];
         };
         cell.showGenerationSettings = YES;
-#else
-        cell.showGenerationSettings = NO;
-#endif
+
         return cell;
     }
     else {
@@ -1767,10 +1748,10 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         NSString* audit = [self.databaseModel getQuickAuditSummaryForNode:self.itemId];
         
         [cell setConcealableKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
-                           value:[self maybeDereference:self.model.password]
-                       concealed:self.passwordConcealedInUi
-                        colorize:self.databaseModel.metadata.colorizePasswords
-                           audit:audit
+                          value:[self maybeDereference:self.model.password]
+                      concealed:self.passwordConcealedInUi
+                       colorize:self.databaseModel.metadata.colorizePasswords
+                          audit:audit
                    showStrength:YES];
         
         __weak GenericKeyValueTableViewCell* weakCell = cell;
@@ -1782,7 +1763,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         cell.onAuditTap = ^{
             [weakSelf performSegueWithIdentifier:@"segueToAuditDrillDown" sender:nil];
         };
-                
+        
         return cell;
     }
 }
@@ -1809,7 +1790,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
     
     __weak ItemDetailsViewController* weakSelf = self;
-
+    
     if (self.editing) {
         [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
                value:[self maybeDereference:self.model.url]
@@ -1817,16 +1798,16 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
      useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
          formatAsUrl:isValidUrl(self.model.url) && !self.editing
     rightButtonImage:nil
-        suggestionProvider:^NSString*(NSString *text) {
-          NSArray* matches = [[[weakSelf.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
+  suggestionProvider:^NSString*(NSString *text) {
+            NSArray* matches = [[[weakSelf.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
                 return [obj hasPrefix:text];
-          }] sortedArrayUsingComparator:finderStringComparator];
-          return matches.firstObject;
+            }] sortedArrayUsingComparator:finderStringComparator];
+            return matches.firstObject;
         }];
-
+        
         cell.onEdited = ^(NSString * _Nonnull text) {
-          weakSelf.model.url = trim(text);
-          [weakSelf onModelEdited];
+            weakSelf.model.url = trim(text);
+            [weakSelf onModelEdited];
         };
     }
     else {
@@ -1850,13 +1831,13 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
             }
         };
     }
-
+    
     return cell;
 }
 
 - (UITableViewCell*)getEmailCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
-        
+    
     __weak ItemDetailsViewController* weakSelf = self;
     
     [cell setKey:NSLocalizedString(@"item_details_email_field_title", @"Email")
@@ -1865,15 +1846,15 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
  useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
 rightButtonImage:nil
 suggestionProvider:^NSString*(NSString *text) {
-      NSArray* matches = [[[weakSelf.databaseModel.database.emailSet allObjects] filter:^BOOL(NSString * obj) {
+        NSArray* matches = [[[weakSelf.databaseModel.database.emailSet allObjects] filter:^BOOL(NSString * obj) {
             return [obj hasPrefix:text];
-      }] sortedArrayUsingComparator:finderStringComparator];
-      return matches.firstObject;
+        }] sortedArrayUsingComparator:finderStringComparator];
+        return matches.firstObject;
     }];
-
+    
     cell.onEdited = ^(NSString * _Nonnull text) {
-      weakSelf.model.email = trim(text);
-      [weakSelf onModelEdited];
+        weakSelf.model.email = trim(text);
+        [weakSelf onModelEdited];
     };
     
     return cell;
@@ -1881,7 +1862,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (UITableViewCell*)getExpiresCell:(NSIndexPath*)indexPath {
     __weak ItemDetailsViewController* weakSelf = self;
-
+    
     if(self.isEditing) {
         EditDateCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditDateCell forIndexPath:indexPath];
         cell.keyLabel.text = NSLocalizedString(@"item_details_expires_field_title", @"Expires");
@@ -1913,7 +1894,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (UITableViewCell*)getNotesCell:(NSIndexPath*)indexPath {
     __weak ItemDetailsViewController* weakSelf = self;
-
+    
     if ( self.editing || self.databaseModel.metadata.easyReadFontForAll || !AppPreferences.sharedInstance.markdownNotes ) {
         NotesTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kNotesCellId forIndexPath:indexPath];
         
@@ -1930,19 +1911,19 @@ suggestionProvider:^NSString*(NSString *text) {
             [weakSelf copyToClipboard:weakSelf.model.notes
                               message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
         };
-
+        
         return cell;
     }
-    else {        
+    else {
         MarkdownCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kMarkdownNotesCellId forIndexPath:indexPath];
-
+        
         [cell setNotes:[self maybeDereference:self.model.notes]];
-
+        
         cell.onNotesDoubleTap = ^{
             [weakSelf copyToClipboard:weakSelf.model.notes
                               message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
         };
-
+        
         return cell;
     }
 }
@@ -1951,7 +1932,7 @@ suggestionProvider:^NSString*(NSString *text) {
     NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
     
     __weak ItemDetailsViewController* weakSelf = self;
-
+    
     if(self.editing && virtualRow == self.model.customFields.count) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         
@@ -1978,7 +1959,7 @@ suggestionProvider:^NSString*(NSString *text) {
                            colorize:self.databaseModel.metadata.colorizeProtectedCustomFields
                               audit:nil
                        showStrength:NO];
-
+            
             __weak GenericKeyValueTableViewCell* weakCell = cell;
             cell.onRightButton = ^{
                 cf.concealedInUI = !cf.concealedInUI;
@@ -1987,7 +1968,7 @@ suggestionProvider:^NSString*(NSString *text) {
         }
         else {
             NSString* value = [self maybeDereference:cf.value];
-
+            
             if (self.editing) {
                 [cell setKey:cf.key
                        value:value
@@ -2020,7 +2001,7 @@ suggestionProvider:^NSString*(NSString *text) {
     if(self.editing && indexPath.row == 0) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         cell.labelText.text = NSLocalizedString(@"item_details_add_attachment_button", @"Add Attachment...");
-    
+        
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.editingAccessoryType = UITableViewCellAccessoryNone;
         
@@ -2035,7 +2016,7 @@ suggestionProvider:^NSString*(NSString *text) {
             EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];
             cell.textField.text = filename;
             cell.image.image = [UIImage imageNamed:@"document"];
-
+            
             if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
                 NSData* data = attachment.nonPerformantFullData; 
                 UIImage* img = [UIImage imageWithData:data];
@@ -2058,22 +2039,22 @@ suggestionProvider:^NSString*(NSString *text) {
             UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kViewAttachmentCellId forIndexPath:indexPath];
             cell.textLabel.text = filename;
             cell.imageView.image = [UIImage imageNamed:@"document"];
-
+            
             NSUInteger filesize = attachment.length;
             cell.detailTextLabel.text = friendlyFileSizeString(filesize);
-           
+            
             if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
                 NSData* data = attachment.nonPerformantFullData; 
                 UIImage* img = [UIImage imageWithData:data];
-
+                
                 if(img) { 
                     @autoreleasepool { 
                         UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
-
+                        
                         CGRect imageRect = CGRectMake(0, 0, 48, 48);
                         [img drawInRect:imageRect];
                         cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-
+                        
                         UIGraphicsEndImageContext();
                     }
                 }
@@ -2094,7 +2075,7 @@ suggestionProvider:^NSString*(NSString *text) {
  useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
     
     cell.selectionStyle = entry.copyable ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
-        
+    
     return cell;
 }
 
@@ -2110,40 +2091,40 @@ suggestionProvider:^NSString*(NSString *text) {
     
     return cell;
 }
-    
+
 - (UITableViewCell*)getIconAndTitleCell:(NSIndexPath*)indexPath {
     IconTableCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kIconTableCell forIndexPath:indexPath];
-
+    
     __weak ItemDetailsViewController* weakSelf = self;
-
+    
     [cell setModel:[self maybeDereference:self.model.title]
               icon:[self getIconImageFromModel]
            editing:self.editing
           newEntry:self.createNewItem
    selectAllOnEdit:self.createNewItem
    useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
-
+    
 #ifndef IS_APP_EXTENSION
-        if(self.isEditing) {
-            cell.onIconTapped = ^{
-                [weakSelf onChangeIcon];
-            };
-            cell.onConfigureDefaultsTapped = ^{
-                [weakSelf onConfigureDefaults];
-            };
-        }
-        else {
+    if(self.isEditing) {
+        cell.onIconTapped = ^{
+            [weakSelf onChangeIcon];
+        };
+        cell.onConfigureDefaultsTapped = ^{
+            [weakSelf onConfigureDefaults];
+        };
+    }
+    else {
 #endif
-            cell.onIconTapped = nil;
+        cell.onIconTapped = nil;
 #ifndef IS_APP_EXTENSION
-        }
+    }
 #endif
-
+    
     cell.onTitleEdited = ^(NSString * _Nonnull text) {
         weakSelf.model.title = trim(text);
         [weakSelf onModelEdited];
     };
-        
+    
     return cell;
 }
 
@@ -2159,8 +2140,8 @@ suggestionProvider:^NSString*(NSString *text) {
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    NSLog(@"Long Press at %@", indexPath);
 
+    
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowUsername) {
             [self showLargeText:self.model.username colorize:NO];
@@ -2194,14 +2175,10 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (void)showLargeText:(NSString*)text colorize:(BOOL)colorize {
-#ifndef IS_APP_EXTENSION     
     if (text) {
         [self performSegueWithIdentifier:@"segueToLargeView" sender:@{ @"text" : text, @"colorize" : @(colorize) }];
     }
-#endif
 }
-
-
 
 
 
@@ -2211,10 +2188,10 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (EntryViewModel*)refreshViewModel {
     DatabaseFormat format = self.databaseModel.database.originalFormat;
-
+    
     Node* item;
     
-    if ( self.createNewItem ) { 
+    if ( self.createNewItem ) {
         item = [self createNewEntryNode];
     }
     else {
@@ -2227,7 +2204,7 @@ suggestionProvider:^NSString*(NSString *text) {
             }
         }
     }
-
+    
     return [EntryViewModel fromNode:item
                              format:format
                               model:self.databaseModel
@@ -2244,7 +2221,7 @@ suggestionProvider:^NSString*(NSString *text) {
 - (void)refreshPublishAndSyncAfterModelEdit {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self performFullReload];
-
+        
         [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
         
         [self updateAndSync];
@@ -2264,7 +2241,7 @@ suggestionProvider:^NSString*(NSString *text) {
     Node* item = [self.databaseModel.database getItemById:self.itemId];
     
     Node* clonedOriginalNodeForHistory = [item cloneForHistory];
-
+    
     [self addHistoricalNode:item originalNodeForHistory:clonedOriginalNodeForHistory];
     
     [item touch:YES touchParents:NO];
@@ -2279,7 +2256,7 @@ suggestionProvider:^NSString*(NSString *text) {
     
     item.fields.passwordHistory = changed;
     [item touch:YES touchParents:NO];
-        
+    
     [self.databaseModel.database rebuildFastMaps];
     
     [self refreshPublishAndSyncAfterModelEdit];
@@ -2287,10 +2264,10 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (void)onDone {
     [self disableUi];
-
+    
     [self applyModelChangesToDatabaseNode:^(Node *item) { 
         [self enableUi];
-
+        
         if ( !item ) {
             [Alerts info:self
                    title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
@@ -2305,137 +2282,48 @@ suggestionProvider:^NSString*(NSString *text) {
                 [self prepareTableViewForEditing];
             } completion:^(BOOL finished) {
                 [self bindNavBar];
-        
+                
                 [self refreshPublishAndSyncAfterModelEdit];
             }];
         }
     }];
 }
 
+#ifdef IS_APP_EXTENSION
 - (void)updateAndSync {
-    [self updateAndSync:!self.isAutoFillContext]; 
-}
-
-- (void)performSynchronousUpdate {
-    [self updateAndSync:NO];
-}
-
-- (void)updateAndSync:(BOOL)allowAsync {
-    [self updateAndSync:allowAsync synchronousCompletion:nil];
-}
-
-- (void)updateAndSync:(BOOL)allowAsync synchronousCompletion:(void (^)(BOOL synchronousUpdateCompleted))synchronousCompletion {
-    if ( allowAsync) {
-        [self.databaseModel asyncUpdateAndSync];
-
-        [self updateSyncBarButtonItemState]; 
-    }
-    else {
-        [self.databaseModel clearAsyncUpdateState];
+    [self disableUi];
+    
+    AppPreferences.sharedInstance.autoFillWroteCleanly = NO;
+    
+    [self.databaseModel update:self.navigationController.visibleViewController
+                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+        AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
         
-        [self updateSyncBarButtonItemState];
-
-        [self disableUi];
-
-#ifdef IS_APP_EXTENSION
-        AppPreferences.sharedInstance.autoFillWroteCleanly = NO;
-#endif
-
-        [self.databaseModel update:self.navigationController.visibleViewController
-                           handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-#ifdef IS_APP_EXTENSION
-            AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
-#endif
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self enableUi];
-                [self onSynchronousUpdateDone:userCancelled localWasChanged:localWasChanged error:error synchronousCompletion:synchronousCompletion];
-            });
-        }];
-    }
-}
-
-- (void)onAsyncUpdateStart:(id)object { 
-    [self updateSyncBarButtonItemState];
-}
-
-- (void)onAsyncUpdateDone:(id)object { 
-    [self updateSyncBarButtonItemState];
-}
-
-- (void)onSynchronousUpdateDone:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*)error synchronousCompletion:(void (^)(BOOL synchronousUpdateCompleted))synchronousCompletion {
-    BOOL success = !userCancelled && !error;
-    
-    [self onUpdateDoneCommonCompletion:success localWasChanged:localWasChanged userCancelled:userCancelled userInteractionRequired:NO error:error];
-    
-    if ( synchronousCompletion ) {
-        synchronousCompletion( success );
-    }
-}
-
-- (void)onUpdateDoneCommonCompletion:(BOOL)success localWasChanged:(BOOL)localWasChanged userCancelled:(BOOL)userCancelled userInteractionRequired:(BOOL)userInteractionRequired error:(NSError*)error {
-    NSLog(@"ItemDetailsViewController::onUpdateDoneCommonCompletion ENTER");
-
-    if ( success ) {
-        if ( localWasChanged ) {
-            NSLog(@"ItemDetailsViewController::onAsyncUpdateDone - Database was changed by external actor... reloading");
-            [self.databaseModel reloadDatabaseFromLocalWorkingCopy:self completion:nil];
-        }
-                
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateSyncBarButtonItemState];
+            [self enableUi];
+            
+            if ( !userCancelled && !error ) {
+                if (self.onAutoFillNewItemAdded) {
+                    self.onAutoFillNewItemAdded(self.model.username, self.model.password);
+                }
+            }
+            else if (error) {
+                [Alerts error:self.navigationController.visibleViewController error:error];
+            }
         });
-        
-        
-#ifdef IS_APP_EXTENSION
-        if (self.onAutoFillNewItemAdded) {
-            self.onAutoFillNewItemAdded(self.model.username, self.model.password);
-        }
-#endif
-    }
-    else {
-        if ( userInteractionRequired ) { 
-            NSLog(@"ItemDetailsViewController::onAsyncUpdateDone - User Interaction is Required");
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts yesNo:self.navigationController.visibleViewController 
-                        title:NSLocalizedString(@"sync_status_user_interaction_required_prompt_title", @"Assistance Required")
-                      message:NSLocalizedString(@"sync_status_user_interaction_required_prompt_yes_or_no", @"There was a problem updating your database and your assistance is required to resolve. Would you like to resolve this problem now?")
-                       action:^(BOOL response) {
-                    if ( response ) {
-                        [self updateAndSync:NO];
-                    }
-                }];
-            });
-        }
-        else if ( error || userCancelled ) {
-            
-            
-            
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts error:self.navigationController.visibleViewController
-                        title:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
-                        error:error
-                   completion:^{
-                    [Alerts twoOptions:self.navigationController.visibleViewController
-                                 title:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
-                               message:NSLocalizedString(@"sync_status_error_updating_try_again_prompt", @"There was an error updating your database. Would you like to try updating again, or would you prefer to revert to the latest successful update?")
-                     defaultButtonText:NSLocalizedString(@"sync_status_error_updating_try_again_action", @"Try Again")
-                      secondButtonText:NSLocalizedString(@"sync_status_error_updating_revert_action", @"Revert to Latest")
-                                action:^(BOOL response) {
-                        if ( response ) {
-                            [self updateAndSync:NO];
-                        }
-                        else {
-                            [self.databaseModel reloadDatabaseFromLocalWorkingCopy:self completion:nil];
-                        }
-                    }];
-                }];
-            });
-        }
-    }
+    }];
 }
+#else
+- (void)updateAndSync {
+
+
+    [self.parentSplitViewController updateAndQueueSyncWithCompletion:^(BOOL savedWorkingCopy) {
+
+
+
+    }];
+}
+#endif
 
 - (void)onConfigureDefaults {
 #ifndef IS_APP_EXTENSION
@@ -2454,5 +2342,11 @@ suggestionProvider:^NSString*(NSString *text) {
     [self presentViewController:nav animated:YES completion:nil];
 #endif
 }
+
+#ifndef IS_APP_EXTENSION
+- (MainSplitViewController *)parentSplitViewController {
+    return (MainSplitViewController*)self.splitViewController;
+}
+#endif
 
 @end

@@ -76,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL autoFillAutoLaunchSingleDatabase;
 @property (nullable) NSString* autoFillQuickLaunchUuid;
 @property BOOL migratedQuickLaunchToAutoFill;
-@property BOOL autoFillShowPinned;
+@property BOOL autoFillShowFavourites;
 @property BOOL coalesceAppLockAndQuickLaunchBiometrics;
 
 @property AppPrivacyShieldMode appPrivacyShieldMode;
@@ -178,7 +178,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL stripUnusedIconsOnSave;
 @property BOOL pinCodeHapticFeedback;
-@property (readonly) BOOL expressUpdateSyncPerfImprovementEnabled;
+
+@property BOOL hasMigratedToLazySync;
 
 @end
 

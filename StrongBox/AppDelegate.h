@@ -14,4 +14,6 @@
 @property (readonly) BOOL isAppLocked;
 @property NSDate* appLaunchTime;
 
+- (UIViewController*_Nullable)getVisibleViewController;
+
 @end

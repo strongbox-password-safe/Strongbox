@@ -20,22 +20,12 @@ extern NSString* const kModelUpdateNotificationFullReload;
 
 @property (readonly) ViewModel* viewModel;
 @property (readonly, nullable) MacDatabasePreferences* databaseMetadata;
-@property (nullable) NSString* selectedItem; 
 @property BOOL wasJustLocked; 
-@property (readonly) BOOL isModelLocked;
 
-- (NSArray<Node*>*)autoFillUrlCredentialMatchesForUrl:(NSString*)urlString;
+- (void)initiateLockSequence;
+ 
+- (void)onDatabaseChangedByExternalOther;
 
-- (void)lock:(NSString* _Nullable)selectedItem;
-
-- (void)unlock:(CompositeKeyFactors *)compositeKeyFactors
-viewController:(NSViewController *)viewController
-alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
-fromConvenience:(BOOL)fromConvenience
-    completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion;
-
-- (void)checkForRemoteChanges;
-     
 @end
 
 NS_ASSUME_NONNULL_END

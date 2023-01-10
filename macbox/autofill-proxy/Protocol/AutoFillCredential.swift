@@ -9,9 +9,6 @@
 import Cocoa
 
 class AutoFillCredential : Codable {
-    // TODO: Indicate if entry is a favourite - might be good to indicate in UI
-    // TODO: Tags?
-    
     var uuid : UUID
     var databaseId : String
     var title : String
@@ -21,9 +18,11 @@ class AutoFillCredential : Codable {
     var url : String
     var totp : String
     var customFields : [String:String] 
+    var databaseName : String
+    var tags : [String]
+    var favourite : Bool
     
-    
-    init(uuid : UUID, databaseId : String, title : String, username : String, password : String, url : String, totp: String, icon : String, customFields : [String : String] = [:]) {
+    init(uuid : UUID, databaseId : String, title : String, username : String, password : String, url : String, totp: String, icon : String, customFields : [String : String] = [:], databaseName : String, tags : [String], favourite : Bool ) {
         self.uuid = uuid
         self.title = title
         self.username = username
@@ -33,5 +32,8 @@ class AutoFillCredential : Codable {
         self.icon = icon
         self.customFields = customFields
         self.databaseId = databaseId
+        self.databaseName = databaseName
+        self.tags = tags
+        self.favourite = favourite;
     }
 }

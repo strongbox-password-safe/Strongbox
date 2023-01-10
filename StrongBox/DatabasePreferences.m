@@ -9,6 +9,7 @@
 #import "DatabasePreferences.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
+#import "BrowseSortConfiguration.h"
 
 @interface DatabasePreferences ()
 
@@ -1422,6 +1423,86 @@
 - (void)setCustomSortOrderForFields:(BOOL)customSortOrderForFields {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.customSortOrderForFields = customSortOrderForFields;
+    }];
+}
+
+- (BOOL)lazySyncMode {
+     return self.metadata.lazySyncMode;
+}
+
+- (void)setLazySyncMode:(BOOL)lazySyncMode {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.lazySyncMode = lazySyncMode;
+    }];
+}
+
+- (NSUUID *)asyncUpdateId {
+    return self.metadata.asyncUpdateId;
+}
+
+- (void)setAsyncUpdateId:(NSUUID *)asyncUpdateId {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.asyncUpdateId = asyncUpdateId;
+    }];
+}
+
+- (NSUUID *)lastViewedEntry {
+    return self.metadata.lastViewedEntry;
+}
+
+- (void)setLastViewedEntry:(NSUUID *)lastViewedEntry {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.lastViewedEntry = lastViewedEntry;
+    }];
+}
+
+- (BOOL)showLastViewedEntryOnUnlock {
+    return self.metadata.showLastViewedEntryOnUnlock;
+}
+
+- (void)setShowLastViewedEntryOnUnlock:(BOOL)showLastViewedEntryOnUnlock {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.showLastViewedEntryOnUnlock = showLastViewedEntryOnUnlock;
+    }];
+}
+
+- (BOOL)persistLazyEvenLastSyncErrors {
+    return self.metadata.persistLazyEvenLastSyncErrors;
+}
+
+- (void)setPersistLazyEvenLastSyncErrors:(BOOL)persistLazyEvenLastSyncErrors {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.persistLazyEvenLastSyncErrors = persistLazyEvenLastSyncErrors;
+    }];
+}
+
+- (NSArray<NSNumber *> *)visibleTabs {
+    return self.metadata.visibleTabs;
+}
+
+- (void)setVisibleTabs:(NSArray<NSNumber *> *)visibleTabs {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.visibleTabs = visibleTabs;
+    }];
+}
+
+- (BOOL)hideTabBarIfOnlySingleTab {
+    return self.metadata.hideTabBarIfOnlySingleTab;
+}
+
+- (void)setHideTabBarIfOnlySingleTab:(BOOL)hideTabBarIfOnlySingleTab {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.hideTabBarIfOnlySingleTab = hideTabBarIfOnlySingleTab;
+    }];
+}
+
+- (NSDictionary<NSString *,BrowseSortConfiguration *> *)sortConfigurations {
+    return self.metadata.sortConfigurations;
+}
+
+- (void)setSortConfigurations:(NSDictionary<NSString *,BrowseSortConfiguration *> *)sortConfigurations {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.sortConfigurations = sortConfigurations;
     }];
 }
 

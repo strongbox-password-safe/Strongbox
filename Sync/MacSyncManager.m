@@ -29,7 +29,7 @@
     NSLog(@"backgroundSyncOutstandingUpdates START");
     
     for (MacDatabasePreferences* database in MacDatabasePreferences.allDatabases) {
-        if ( database.outstandingUpdateId && !database.offlineMode ) {
+        if ( database.outstandingUpdateId ) {
             [self backgroundSyncDatabase:database];
         }
     }
@@ -51,7 +51,7 @@
                     completion:(SyncAndMergeCompletionBlock _Nullable)completion {
     NSLog(@"backgroundSyncDatabase enter [%@]", database);
         
-    if ( database.offlineMode ) {
+    if ( database.alwaysOpenOffline ) {
         NSLog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
         if (completion) {
             completion(kSyncAndMergeError, NO, nil);
@@ -78,11 +78,15 @@
     }];
 }
 
-- (void)sync:(MacDatabasePreferences *)database interactiveVC:(NSViewController *)interactiveVC key:(CompositeKeyFactors *)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
+- (void)sync:(MacDatabasePreferences *)database
+interactiveVC:(NSViewController *)interactiveVC
+         key:(CompositeKeyFactors *)key
+        join:(BOOL)join
+  completion:(SyncAndMergeCompletionBlock)completion {
     NSLog(@"Sync ENTER - [%@]", database.nickName);
     
 
-    if ( database.offlineMode ) {
+    if ( database.alwaysOpenOffline ) {
         NSLog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
         if (completion) {
             completion(kSyncAndMergeError, NO, nil);
@@ -115,9 +119,11 @@
     return [self updateLocalCopyMarkAsRequiringSync:database data:data file:nil error:error];
 }
 
-- (BOOL)updateLocalCopyMarkAsRequiringSync:(nonnull METADATA_PTR)database data:(NSData *)data file:(NSString *)file error:(NSError**)error {
-    if ( database.readOnly ) { 
-        
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(nonnull METADATA_PTR)database
+                                      data:(NSData *)data
+                                      file:(NSString *)file
+                                     error:(NSError**)error {
+    if ( database.readOnly ) {
         if ( error ) {
             *error = [Utils createNSError:NSLocalizedString(@"warn_database_is_ro_no_update", @"Your database is in Read Only mode and cannot be updated.") errorCode:-1];
         }
@@ -131,7 +137,7 @@
     if ( localWorkingCache && Settings.sharedInstance.makeLocalRollingBackups ) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
-            NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
+            NSLog(@"⚠️ WARNWARN: Could not write backup: [%@]", localWorkingCache);
             NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
             
             if(error) {

@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+#if TARGET_OS_IPHONE
+
+#import <UIKit/UIKit.h>
+
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Constants : NSObject
@@ -27,6 +33,12 @@ extern NSString* const kStrongboxPasteboardName;
 extern NSString* const kDragAndDropInternalUti;
 extern NSString* const kDragAndDropExternalUti;
 extern NSString* const kDragAndDropSideBarHeaderMoveInternalUti;
+
+#if TARGET_OS_IPHONE
+
+@property (class, readonly) UIColor* recycleBinTintColor;
+
+#endif
 
 @end
 

@@ -71,7 +71,7 @@ static NSString* const kScreenCaptureBlocked = @"screenCaptureBlocked";
 
 
 static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
-static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
+static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails-reset-all-27-dec-2022";
 static NSString* const kAppHasBeenDowngradedToFreeEdition = @"appHasBeenDowngradedToFreeEdition";
 static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"hasPromptedThatAppHasBeenDowngradedToFreeEdition";
 static NSString* const kHasPromptedThatFreeTrialWillEndSoon = @"hasPromptedThatFreeTrialWillEndSoon";
@@ -85,6 +85,12 @@ static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 static NSString* const kRunBrowserAutoFillProxyServer = @"runBrowserAutoFillProxyServer-Prod-22-Oct-2022";
+static NSString* const kQuitTerminatesProcessEvenInSystemTrayMode = @"quitTerminatesProcessEvenInSystemTrayMode";
+static NSString* const kLockDatabaseOnWindowClose = @"lockDatabaseOnWindowClose";
+static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock";
+static NSString* const KShowDatabasesManagerOnAppLaunch = @"showDatabasesManagerOnAppLaunch";
+static NSString* const kHasAskedAboutDatabaseOpenInBackground = @"hasAskedAboutDatabaseOpenInBackground";
+static NSString* const kConcealClipboardFromMonitors = @"concealClipboardFromMonitors-DefaultON-27-Dec-2022";
 
 
 
@@ -145,8 +151,52 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
-- (BOOL)expressUpdateSyncPerfImprovementEnabled {
-    return YES;
+- (BOOL)concealClipboardFromMonitors {
+    return [self getBool:kConcealClipboardFromMonitors fallback:YES];
+}
+
+- (void)setConcealClipboardFromMonitors:(BOOL)concealClipboardFromMonitors {
+    [self setBool:kConcealClipboardFromMonitors value:concealClipboardFromMonitors];
+}
+
+- (BOOL)hasAskedAboutDatabaseOpenInBackground {
+    return [self getBool:kHasAskedAboutDatabaseOpenInBackground];
+}
+
+- (void)setHasAskedAboutDatabaseOpenInBackground:(BOOL)hasAskedAboutDatabaseOpenInBackground {
+    [self setBool:kHasAskedAboutDatabaseOpenInBackground value:hasAskedAboutDatabaseOpenInBackground];
+}
+
+- (BOOL)showDatabasesManagerOnAppLaunch {
+    return [self getBool:KShowDatabasesManagerOnAppLaunch fallback:YES];
+}
+
+- (void)setShowDatabasesManagerOnAppLaunch:(BOOL)showDatabasesManagerOnAppLaunch {
+    [self setBool:KShowDatabasesManagerOnAppLaunch value:showDatabasesManagerOnAppLaunch];
+}
+
+- (BOOL)lockDatabasesOnScreenLock {
+    return [self getBool:kLockDatabasesOnScreenLock fallback:YES];
+}
+
+- (void)setLockDatabasesOnScreenLock:(BOOL)lockDatabasesOnScreenLock {
+    [self setBool:kLockDatabasesOnScreenLock value:lockDatabasesOnScreenLock];
+}
+
+- (BOOL)lockDatabaseOnWindowClose {
+    return [self getBool:kLockDatabaseOnWindowClose fallback:YES];
+}
+
+- (void)setLockDatabaseOnWindowClose:(BOOL)lockDatabaseOnWindowClose {
+    [self setBool:kLockDatabaseOnWindowClose value:lockDatabaseOnWindowClose];
+}
+
+- (BOOL)quitTerminatesProcessEvenInSystemTrayMode {
+    return [self getBool:kQuitTerminatesProcessEvenInSystemTrayMode fallback:NO];
+}
+
+- (void)setQuitTerminatesProcessEvenInSystemTrayMode:(BOOL)quitTerminatesProcessEvenInSystemTrayMode {
+    [self setBool:kQuitTerminatesProcessEvenInSystemTrayMode value:quitTerminatesProcessEvenInSystemTrayMode];
 }
 
 - (BOOL)runBrowserAutoFillProxyServer {
@@ -285,7 +335,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 - (BOOL)screenCaptureBlocked {
-    return [self getBool:kScreenCaptureBlocked fallback:YES];
+    return [self getBool:kScreenCaptureBlocked];
 }
 
 - (void)setScreenCaptureBlocked:(BOOL)screenCaptureBlocked {
@@ -340,7 +390,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     
 }
 
-- (BOOL)runningAsATrayApp {
+- (BOOL)configuredAsAMenuBarApp {
     return Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.hideDockIconOnAllMinimized;
 }
 
@@ -587,8 +637,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (void)setAutoLockTimeoutSeconds:(NSInteger)autoLockTimeoutSeconds {
-    
-    
     [self.userDefaults setInteger:autoLockTimeoutSeconds forKey:kAutoLockTimeout];
     
     [self.userDefaults synchronize];

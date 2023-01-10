@@ -110,7 +110,7 @@
     
         NSFont* font = self.protected ? [NSFont fontWithName:Settings.sharedInstance.easyReadFontName size:13.0f] : [NSFont systemFontOfSize:13.0f];
         
-        if (self.protected && Settings.sharedInstance.colorizePasswords) {
+        if ( self.protected && Settings.sharedInstance.colorizePasswords ) {
             NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
             BOOL dark = ([osxMode isEqualToString:@"Dark"]);
             BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;

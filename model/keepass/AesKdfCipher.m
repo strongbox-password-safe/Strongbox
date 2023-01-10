@@ -94,6 +94,11 @@ static const uint32_t kDefaultSeedLength = 32;
                                                         kParameterRounds : voRound }];
 }
 
+- (void)rotateHardwareKeyChallenge {
+
+    _seed = getRandomData(kDefaultSeedLength);
+}
+
 - (NSData *)transformSeed {
     return self.seed;
 }

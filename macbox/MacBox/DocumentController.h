@@ -18,16 +18,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)originalOpenDocument:(id _Nullable)sender;
 - (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^_Nullable)(NSError* error))completion;
 
-- (Document*_Nullable)documentForDatabase:(MacDatabasePreferences*)database;
-- (BOOL)databaseIsDocumentWindow:(MacDatabasePreferences*)database;
-- (BOOL)databaseIsUnlockedInDocumentWindow:(MacDatabasePreferences*)database;
-- (void)closeDocumentWindowForDatabase:(MacDatabasePreferences *)database;
+- (Document*_Nullable)documentForDatabase:(NSString*)uuid;
 
 - (void)onAppStartup;
-- (void)performEmptyLaunchTasksIfNecessary;
+- (void)launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable;
 
-- (void)serializeAndAddDatabase:(DatabaseModel*)database
-                         format:(DatabaseFormat)format;
+- (void)serializeAndAddDatabase:(DatabaseModel*)db
+                         format:(DatabaseFormat)format
+                keyFileBookmark:(NSString*)keyFileBookmark
+                  yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig;
 
 @end
 

@@ -49,6 +49,10 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 }
 
 - (void)newDocument:(id)sender {
+    
+
+    [DBManagerPanel.sharedInstance show];
+    
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
     NSString* loc = NSLocalizedString(@"mac_please_enter_master_credentials_for_this_database", @"Please Enter the Master Credentials for this Database");
@@ -56,21 +60,25 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     wizard.initialDatabaseFormat = kKeePass4;
     wizard.createSafeWizardMode = YES;
     
-    NSModalResponse returnCode = [NSApp runModalForWindow:wizard.window];
-
-    if(returnCode != NSModalResponseOK) {
-        return;
-    }
-
-    NSError* error;
-    CompositeKeyFactors* ckf = [wizard generateCkfFromSelected:nil error:&error];
-    
-    if ( ckf ) {
-        [self createNewDatabase:ckf format:wizard.selectedDatabaseFormat keyFileBookmark:wizard.selectedKeyFileBookmark yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
-    }
-    else {
-        [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
-    }
+    [DBManagerPanel.sharedInstance.window beginSheet:wizard.window
+                                   completionHandler:^(NSModalResponse returnCode) {
+        if(returnCode != NSModalResponseOK) {
+            return;
+        }
+        
+        NSError* error;
+        
+        CompositeKeyFactors* ckf = [wizard generateCkfFromSelectedFactors:DBManagerPanel.sharedInstance.contentViewController error:&error];
+        
+        if ( ckf ) {
+            [self createNewDatabase:ckf format:wizard.selectedDatabaseFormat
+                    keyFileBookmark:wizard.selectedKeyFileBookmark
+                      yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
+        }
+        else {
+            [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
+        }
+    }];
 }
 
 - (void)createNewDatabase:(CompositeKeyFactors*)ckf
@@ -80,13 +88,8 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     DatabaseModel* db = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:ckf];
     
     [SampleItemsGenerator addSampleGroupAndRecordToRoot:db passwordConfig:Settings.sharedInstance.passwordGenerationConfig];
-
+    
     [self serializeAndAddDatabase:db format:format keyFileBookmark:keyFileBookmark yubiKeyConfig:yubiKeyConfig];
-}
-
-- (void)serializeAndAddDatabase:(DatabaseModel*)database
-                         format:(DatabaseFormat)format {
-    [self serializeAndAddDatabase:database format:format keyFileBookmark:nil yubiKeyConfig:nil];
 }
 
 - (void)serializeAndAddDatabase:(DatabaseModel*)db
@@ -95,7 +98,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
                   yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
     NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory];
     [outputStream open];
-            
+    
     [Serializator getAsData:db
                      format:db.originalFormat
                outputStream:outputStream completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
@@ -109,7 +112,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
             }
             else if (! userCancelled ) {
                 NSLog(@"Error Saving New Database: [%@]", error);
-
+                
                 if (NSApplication.sharedApplication.keyWindow) {
                     [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
                 }
@@ -135,18 +138,18 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     panel.nameFieldStringValue = [NSString stringWithFormat:loc5, ext ];
     
     NSInteger modalCode = [panel runModal];
-
+    
     if (modalCode != NSModalResponseOK) {
         return;
     }
     
     NSURL *URL = [panel URL];
-
+    
     NSError* error;
     BOOL success = [data writeToURL:URL options:kNilOptions error:&error];
     if ( !success ) {
         NSLog(@"Error Saving New Database: [%@]", error);
-
+        
         if (NSApplication.sharedApplication.keyWindow) {
             [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
         }
@@ -166,14 +169,14 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     dbm.showAdvancedUnlockOptions = keyFileBookmark != nil || yubiKeyConfig != nil;
     
     BOOL rememberKeyFile = !Settings.sharedInstance.doNotRememberKeyFile;
-        
+    
     if ( rememberKeyFile ) {
         dbm.keyFileBookmark = keyFileBookmark;
     }
     
     dbm.yubiKeyConfiguration = yubiKeyConfig;
     dbm.showAdvancedUnlockOptions = keyFileBookmark != nil || yubiKeyConfig != nil;
-
+    
     [self openDatabase:dbm completion:^(NSError * _Nonnull error) {
         if ( error ) {
             if (NSApplication.sharedApplication.keyWindow) {
@@ -190,10 +193,10 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     if ( ![Serializator isValidDatabase:url error:&error] ) {
         if (NSApplication.sharedApplication.keyWindow) {
             [MacAlerts info:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-             informativeText:NSLocalizedString(@"safesvc_import_manual_url_invalid", @"Invalid Database")
-                      window:NSApplication.sharedApplication.keyWindow
-                  completion:^{
-                    completionHandler(nil, NO, nil);
+            informativeText:NSLocalizedString(@"safesvc_import_manual_url_invalid", @"Invalid Database")
+                     window:NSApplication.sharedApplication.keyWindow
+                 completion:^{
+                completionHandler(nil, NO, nil);
             }];
         }
     }
@@ -206,11 +209,11 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
                                           display:(BOOL)displayDocument
                                 completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
     MacDatabasePreferences* database = [MacDatabasePreferences fromUrl:url];
-
+    
     NSLog(@"openDocumentWithContentsOfURL: [%@] => Metadata = [%@]", url, database);
-
+    
     NSURL* maybeManaged = database ? url : managedUrlFromFileUrl(url);
-
+    
     [super openDocumentWithContentsOfURL:maybeManaged
                                  display:displayDocument
                        completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
@@ -224,7 +227,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     }];
 }
 
-- (void)originalOpenDocument:(id)sender {
+- (IBAction)originalOpenDocument:(id)sender {
     return [super openDocument:sender];
 }
 
@@ -236,9 +239,9 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 
 - (void)openDatabaseWorker:(MacDatabasePreferences*)database completion:(void (^)(NSError* error))completion {
     NSURL* url = database.fileUrl;
-
+    
     NSLog(@"Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
-
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( url ) {
             [self openDocumentWithContentsOfURLContinuation:url
@@ -266,7 +269,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     if ( ![url.scheme isEqualToString:kStrongboxFileUrlScheme]) {
         return kStrongboxPasswordDatabaseManagedSyncDocumentType;
     }
-
+    
     return [super typeForContentsOfURL:url error:outError];
 }
 
@@ -283,36 +286,56 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     
     
     
-    NSLog(@"openDocument: document count = [%ld]", self.documents.count);
     
-    if ( self.hasDoneAppStartupTasks ) {
-        NSWindow* keyWindow = NSApplication.sharedApplication.keyWindow;
-        
-        NSLog(@"openDocument - regular call - Once off startup tasks are done. - Key Window = [%@]", keyWindow);
-        
-        
-        
-         
-        if( 
-            
-            NSApplication.sharedApplication.keyWindow == nil ) {
-            NSLog(@"No open docs and no key window => Do empty launch tasks");
-            [self performEmptyLaunchTasksIfNecessary];
-        }
-        else {
-            [self originalOpenDocument:sender];
-        }
-    }
-    else {
-        NSLog(@"openDocument - startup call - Doing once off startup tasks are done.");
 
-        [self doAppStartupTasksOnceOnly];
-    }
+    
+    
+    
+    
+    
+    /*************************************************************************************************************/
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    /*************************************************************************************************************/
+    
+    
+    
+    
+    
 }
 
 - (void)onAppStartup {
-    NSLog(@"applicationDidFinishLaunching => onAppStartup: document count = [%ld]", self.documents.count);
-
+    NSLog(@"✅ DocumentController::onAppStartup: document count = [%ld]", self.documents.count);
+    
     [self doAppStartupTasksOnceOnly];
 }
 
@@ -330,34 +353,38 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     
     NSLog(@"doAppStartupTasksOnceOnly - Doing tasks as they have not yet been done");
     
-    if( self.startupDatabases.count ) {
-        [self launchStartupDatabases];
+    AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
+    if ( appDelegate.isWasLaunchedAsLoginItem && Settings.sharedInstance.showSystemTrayIcon ) {
+        NSLog(@"DocumentController::doAppStartupTasksOnceOnly2 -> Strongbox was launched as a Login Item && running as menu bar app - Silent Mode not launching databases or any UI...");
     }
-    else if ( self.documents.count == 0 ) {
-        if ( !Settings.sharedInstance.runningAsATrayApp ) {
-            NSLog(@"Empty Startup - Showing Manager...");
-            
-            [DBManagerPanel.sharedInstance show];
+    else {
+        if( self.startupDatabases.count ) {
+            [self launchStartupDatabases];
         }
-        else {
-            NSLog(@"Empty Startup - Running as a Tray App - Not Showing DB Manager...");
+        else if ( self.documents.count == 0 ) {
+            if ( Settings.sharedInstance.showDatabasesManagerOnAppLaunch ) {
+                NSLog(@"DocumentController::doAppStartupTasksOnceOnly2 -> Empty Startup - Showing Databases Manager because so configured");
+                
+                [DBManagerPanel.sharedInstance show];
+            }
+            else {
+                NSLog(@"DocumentController::doAppStartupTasksOnceOnly2 -> Empty Startup - Not Showing DB Manager because so configured...");
+            }
         }
     }
-    
-    [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 }
 
-- (void)performEmptyLaunchTasksIfNecessary {
-    NSLog(@"performEmptyLaunchTasks...");
-    
+- (void)launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable {
+    NSLog(@"✅ DocumentController::launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable...");
+
     if( self.documents.count == 0 ) { 
-        NSLog(@"performEmptyLaunchTasks: document count = [%ld]", self.documents.count);
+        NSLog(@"launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable: document count = [%ld]", self.documents.count);
         
         if( self.startupDatabases.count ) {
             [self launchStartupDatabases];
         }
         else {
-            NSLog(@"Empty Startup - No Startup DBs - Showing Manager...");
+            NSLog(@"launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable - No Startup DBs - Showing Manager...");
             
             [DBManagerPanel.sharedInstance show];
         }
@@ -368,7 +395,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     NSArray<MacDatabasePreferences*> *startupDatabases = [MacDatabasePreferences filteredDatabases:^BOOL(MacDatabasePreferences * _Nonnull database) {
         return database.launchAtStartup;
     }];
-
+    
     return startupDatabases;
 }
 
@@ -387,23 +414,23 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 + (void)restoreWindowWithIdentifier:(NSUserInterfaceItemIdentifier)identifier
                               state:(NSCoder *)state
                   completionHandler:(void (^)(NSWindow * _Nullable, NSError * _Nullable))completionHandler {
-
+    
     
     if ([state containsValueForKey:@"StrongboxNonFileRestorationStateURL"] ) {
         NSURL *nonFileRestorationStateURL = [state decodeObjectForKey:@"StrongboxNonFileRestorationStateURL"];
         
         if ( nonFileRestorationStateURL ) {
-
-
+            
+            
             [[self sharedDocumentController] reopenDocumentForURL:nonFileRestorationStateURL
                                                 withContentsOfURL:nonFileRestorationStateURL
                                                           display:NO
                                                 completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
                 NSWindow *resultWindow = nil;
-                 
+                
                 if (!documentWasAlreadyOpen) {
                     if ( !document.windowControllers.count ) {
-                         [document makeWindowControllers];
+                        [document makeWindowControllers];
                     }
                     
                     if ( 1 == document.windowControllers.count ) {
@@ -425,39 +452,17 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
         
         return;
     }
-
+    
     [super restoreWindowWithIdentifier:identifier state:state completionHandler:completionHandler];
 }
 
-- (Document*)documentForDatabase:(MacDatabasePreferences*)database {
+- (Document*)documentForDatabase:(NSString*)uuid {
     NSArray<Document*> *docs = self.documents;
-
+    
     return [docs firstOrDefault:^BOOL(Document * _Nonnull obj) {
         MacDatabasePreferences* metadata = obj.databaseMetadata;
-        return (metadata != nil) && [metadata.uuid isEqualToString:database.uuid];
+        return (metadata != nil) && [metadata.uuid isEqualToString:uuid];
     }];
-}
-
-- (BOOL)databaseIsDocumentWindow:(MacDatabasePreferences *)database {
-    return [self documentForDatabase:database] != nil;
-}
-
-- (BOOL)databaseIsUnlockedInDocumentWindow:(MacDatabasePreferences *)database {
-    Document* doc = [self documentForDatabase:database];
-    
-    if ( doc && doc.viewModel ) {
-        return !doc.viewModel.locked;
-    }
-    
-    return NO;
-}
-
-- (void)closeDocumentWindowForDatabase:(MacDatabasePreferences *)database {
-    Document* doc = [self documentForDatabase:database];
-    
-    if ( doc ) {
-        [doc close];
-    }
 }
 
 - (BOOL)allowsAutomaticShareMenu { 
@@ -466,13 +471,14 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 
 - (BOOL)respondsToSelector:(SEL)aSelector{
     
-
+    
     if ( @available(macOS 10.12, *) ){
         if ( aSelector == @selector(newWindowForTab:) ) {
             return NO;
         }
     }
-
+    
     return [super respondsToSelector:aSelector];
 }
+
 @end

@@ -53,8 +53,8 @@ class CompareAndMergeWizard: NSViewController {
                                   ckfs: CompositeKeyFactors,
                                   completion: @escaping (_ model: DatabaseModel?, _ error: Error?) -> Void)
     {
-        Serializator.fromUrl(url, ckf: ckfs) { userCancelled, model, innerStreamError, error in
-            if error != nil || innerStreamError != nil {
+        Serializator.fromUrl(url, ckf: ckfs) { userCancelled, model, error in
+            if error != nil {
                 completion(nil, error)
             }
             else if !userCancelled, let model = model {
@@ -83,7 +83,7 @@ class CompareAndMergeWizard: NSViewController {
             return
         }
         
-        let keyDeterminer = MacCompositeKeyDeterminer(viewController: self, database: database, isAutoFillOpen: false)
+        let keyDeterminer = MacCompositeKeyDeterminer(viewController: self, database: database, isNativeAutoFillAppExtensionOpen: false)
         keyDeterminer.getCkfs { [weak self] result, ckfs, fromConvenience, error in
             switch result {
             case .success:
@@ -102,8 +102,8 @@ class CompareAndMergeWizard: NSViewController {
     }
     
     func onSuccessfulSecondDatabaseGotKeys ( _ database : MacDatabasePreferences, _ ckfs : CompositeKeyFactors, _ fromConvenience : Bool ) {
-        let unlocker = DatabaseUnlocker(forDatabase: database, viewController: self, forceReadOnly: true, isAutoFillOpen: false, offlineMode: true)
-        unlocker.unlockLocal(withKey: ckfs, keyFromConvenience: fromConvenience) { [weak self] unlockResult, model, innerError, error in
+        let unlocker = DatabaseUnlocker(forDatabase: database, viewController: self, forceReadOnly: true, isNativeAutoFillAppExtensionOpen: false, offlineMode: true)
+        unlocker.unlockLocal(withKey: ckfs, keyFromConvenience: fromConvenience) { [weak self] unlockResult, model, error in
             switch unlockResult {
             case .success:
                 if let model = model {

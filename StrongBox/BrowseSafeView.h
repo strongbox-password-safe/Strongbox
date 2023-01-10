@@ -13,10 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BrowseSafeView : UITableViewController
 
-@property (nonatomic, strong, nonnull) Model *viewModel;
-@property (nonatomic, strong, nonnull) NSUUID *currentGroupId;
++ (instancetype)fromStoryboard:(BrowseViewType)viewType model:(Model*)model;
 
-- (void)performSynchronousUpdate;
+@property (strong, nonnull) Model *viewModel;
+@property (nullable) NSUUID *currentGroupId; 
+@property (nullable) NSString* currentTag; 
+@property BrowseViewType viewType;
 
 @end
 

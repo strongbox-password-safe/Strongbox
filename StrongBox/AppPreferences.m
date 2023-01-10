@@ -61,7 +61,7 @@ static NSString* const kHasOnboardedForAutoFillConvenienceAutoUnlock = @"hasOnbo
 static NSString* const kAutoFillAutoLaunchSingleDatabase = @"autoFillAutoLaunchSingleDatabase";
 static NSString* const kAutoFillQuickLaunchUuid = @"autoFillQuickLaunchUuid";
 static NSString* const kMigratedQuickLaunchToAutoFill = @"migratedQuickLaunchToAutoFill";
-static NSString* const kAutoFillShowPinned = @"autoFillShowPinned";
+static NSString* const kAutoFillShowFavourites = @"autoFillShowPinned";
 static NSString* const kCoalesceAppLockAndQuickLaunchBiometrics = @"coalesceAppLockAndQuickLaunchBiometrics";
 static NSString* const kAppPrivacyShieldMode = @"appPrivacyShieldMode";
 static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDetectedBehaviour";
@@ -145,6 +145,8 @@ static NSString* const kHideTipJar = @"hideTipJar";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
+static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync";
+static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
 
 @implementation AppPreferences
 
@@ -187,8 +189,30 @@ static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
 
 
 
-- (BOOL)expressUpdateSyncPerfImprovementEnabled {
-    return NO; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (BOOL)hasMigratedToLazySync {
+    return [self getBool:kHasMigratedToLazySync];
+}
+
+- (void)setHasMigratedToLazySync:(BOOL)hasMigratedToLazySync {
+    [self setBool:kHasMigratedToLazySync value:hasMigratedToLazySync];
 }
 
 - (BOOL)pinCodeHapticFeedback {
@@ -531,12 +555,12 @@ static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
     [self setBool:kCoalesceAppLockAndQuickLaunchBiometrics value:coalesceAppLockAndQuickLaunchBiometrics];
 }
 
-- (BOOL)autoFillShowPinned {
-    return [self getBool:kAutoFillShowPinned fallback:YES];
+- (BOOL)autoFillShowFavourites {
+    return [self getBool:kAutoFillShowFavourites fallback:YES];
 }
 
-- (void)setAutoFillShowPinned:(BOOL)autoFillShowPinned {
-    [self setBool:kAutoFillShowPinned value:autoFillShowPinned];
+- (void)setAutoFillShowFavourites:(BOOL)autoFillShowPinned {
+    [self setBool:kAutoFillShowFavourites value:autoFillShowPinned];
 }
 
 

@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSData*)deriveKey:(NSData*)data;
 
+- (void)rotateHardwareKeyChallenge;
+
 @property (readonly, nonatomic) KdfParameters* kdfParameters;
 @property (readonly, nonatomic) NSData* transformSeed; 
 

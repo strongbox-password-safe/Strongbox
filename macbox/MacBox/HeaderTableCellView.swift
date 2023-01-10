@@ -22,7 +22,12 @@ class HeaderTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMe
     var onCopyClickedCallback : (() -> Void)?
     var field: DetailsViewField?
 
-    func setContent(_ field: DetailsViewField, popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil, showCopyButton : Bool = false, onCopyClicked: (() -> Void)? = nil) {
+    func setContent(_ field: DetailsViewField,
+                    popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
+                    showCopyButton : Bool = false,
+                    onCopyClicked: (() -> Void)? = nil,
+                    popupMenuImage : NSImage? = nil,
+                    popupMenuText : String? = nil) {
         self.field = field
         self.popupMenuUpdater = popupMenuUpdater
         self.copyButton.isHidden = !showCopyButton
@@ -32,6 +37,26 @@ class HeaderTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMe
 
         popupButton.menu?.delegate = self
         popupButton.isHidden = popupMenuUpdater == nil
+        
+        if let popupMenuImage {
+            popupButton.menu?.items.first?.image = popupMenuImage
+            if #available(macOS 11, *) {
+                popupButton.symbolConfiguration = NSImage.SymbolConfiguration(scale: .medium)
+            }
+        }
+        else {
+            if #available(macOS 11.0, *) {
+                popupButton.menu?.items.first?.image = NSImage(systemSymbolName: "ellipsis.circle", accessibilityDescription: nil )
+                popupButton.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
+            }
+        }
+        
+        if let popupMenuText {
+            popupButton.title = popupMenuText
+        }
+        else {
+            popupButton.title = ""
+        }
     }
 
     var onDisclosureClicked: ((_: Bool) -> Void)?

@@ -21,8 +21,8 @@ public class BrowserAutoFillManager: NSObject {
         }
     }
 
-    @objc public class func extractDomainFromUrl(url: String) -> String {
-        guard let urlProcessed = url.urlExtendedParse else {
+    @objc public class func extractPSLDomainFromUrl(url: String) -> String {
+        guard let urlProcessed = url.urlExtendedParseAddingDefaultScheme else {
             return url.lowercased()
         }
 
@@ -38,9 +38,9 @@ public class BrowserAutoFillManager: NSObject {
     }
 
     @objc class func getMatchingNodes(url: String, domainNodeMap : [String: Set<UUID>]) -> Set<UUID> {
-        let startTime = CFAbsoluteTimeGetCurrent()
+
         
-        let domain = extractDomainFromUrl(url: url)
+        let domain = extractPSLDomainFromUrl(url: url)
         
         var ret : Set<UUID> = Set()
         
@@ -61,10 +61,10 @@ public class BrowserAutoFillManager: NSObject {
             }
         }
 
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+
 
         if ( !ret.isEmpty ) {
-            NSLog("✅ Found \(ret.count) domain matches for [\(domain)] in \(timeElapsed) s.")
+
         }
         else {
 
@@ -83,7 +83,7 @@ public class BrowserAutoFillManager: NSObject {
         for node in all {
             let uniqueUrls = AutoFillCommon.getUniqueUrls(forNode: database, node: node, alternativeUrls: alternativeUrls, customFields: customFields, notes: notes)
 
-            let domains = Set(uniqueUrls.map { extractDomainFromUrl(url: $0) })
+            let domains = Set(uniqueUrls.map { extractPSLDomainFromUrl(url: $0) })
 
             for domain in domains {
                 mutableRet[domain, default: Set<UUID>()].insert(node.uuid)
@@ -95,5 +95,55 @@ public class BrowserAutoFillManager: NSObject {
         NSLog("⏱ loadDomainNodeMap: Loaded \(mutableRet.count) domains from \(all.count) entries in \(timeElapsed) s.")
 
         return mutableRet
+    }
+    
+    @objc public class func compareMatches(node1 : Node, node2 : Node, url : String, isFavourite : ((Node) -> Bool) ) -> ComparisonResult {
+        
+        
+        if ( isFavourite(node1) ) {
+
+            
+            return isFavourite(node2) ? .orderedSame : .orderedAscending
+        }
+        if ( isFavourite(node2) ) {
+            
+            
+            return isFavourite(node1) ? .orderedSame : .orderedDescending
+        }
+
+        
+        
+        if ( node1.fields.url != node2.fields.url ) {
+            
+            
+            if ( node1.fields.url == url ) {
+
+                return .orderedAscending
+            }
+            
+            if ( node2.fields.url == url ) {
+
+                return .orderedDescending
+            }
+            
+
+            
+            
+            
+            let distance1 = node1.fields.url.levenshteinDistance(url)
+            let distance2 = node2.fields.url.levenshteinDistance(url)
+
+
+
+            if ( distance1 != distance2 ) {
+                return (distance1 < distance2) ? .orderedAscending : .orderedDescending
+            }
+        }
+        else {
+
+        }
+        
+        
+        return node1.title.compare(node2.title)
     }
 }

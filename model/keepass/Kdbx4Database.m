@@ -153,7 +153,30 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     rootXmlDocument.keePassFile.meta.headerHash = nil; 
         
     id<InnerRandomStream> innerStream = [InnerRandomStreamFactory getStream:database.meta.innerRandomStreamId key:nil];
+
+    
+    
+    
+    
+    
+    BOOL rotateHardwareKeyChallenge = YES; 
+    
+    if ( rotateHardwareKeyChallenge ) {
+        id<KeyDerivationCipher> kdf = getKeyDerivationCipher(database.meta.kdfParameters, &error);
         
+        if(!kdf) {
+            NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", database.meta.kdfParameters);
+            completion(NO, nil, error);
+            return;
+        }
+
+        NSLog(@"✅ Rotating KDBX4 Hardware Key Challenge");
+        
+        [kdf rotateHardwareKeyChallenge];
+        
+        database.meta.kdfParameters = kdf.kdfParameters;
+    }
+    
     
 
     NSDictionary* unknownHeaders = tag ? tag.unknownHeaders : @{ };

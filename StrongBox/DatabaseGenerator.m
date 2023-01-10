@@ -49,6 +49,39 @@
     return db;
 }
 
++ (DatabaseModel*)generateWithSingleEntry:(NSString*)password {
+    DatabaseModel* db = [[DatabaseModel alloc] init];
+    
+    int groupCount = 1;
+    int subGroupCount = 1;
+    int entryCount = 1;
+    
+    for(int i=0;i<groupCount;i++) {
+        for(int k=0;k<subGroupCount;k++) {
+            NSString* title;
+            Node* existing;
+            do {
+                title = [PasswordMaker.sharedInstance generateRandomWord];
+                existing = [db.effectiveRootGroup firstOrDefault:NO predicate:^BOOL(Node * _Nonnull node) {
+                    return [node.title isEqualToString:title];
+                }];
+            } while (existing);
+            
+            Node* childGroup = [[Node alloc] initAsGroup:title parent:db.effectiveRootGroup keePassGroupTitleRules:NO uuid:nil];
+            
+            [db addChildren:@[childGroup] destination:db.effectiveRootGroup];
+            
+            for (int j = 0; j < entryCount; j++) {
+                Node* childEntry = [self createSampleEntry:j parentGroup:childGroup];
+                [db addChildren:@[childEntry] destination:childGroup];
+            }
+        }
+    }
+    
+    return db;
+}
+
+
 + (Node *)generateSampleNode:(Node *)parentGroup {
     return [DatabaseGenerator createSampleEntry:arc4random_uniform(100) parentGroup:parentGroup];
 }

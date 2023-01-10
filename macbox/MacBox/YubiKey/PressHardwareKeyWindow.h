@@ -7,12 +7,13 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "MacHardwareKeyManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface PressHardwareKeyWindow : NSWindowController
 
-+ (void)show:(NSWindow*_Nullable)parentHint;
++ (void)show:(MacHardwareKeyManagerOnDemandUIProviderBlock)parentHint;
 + (void)hide;
 
 @end

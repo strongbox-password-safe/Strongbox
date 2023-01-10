@@ -8,6 +8,8 @@
 
 #import "PropertySwitchTableViewCell.h"
 
+NSString* const kPropertySwitchTableViewCellId = @"PropertySwitchTableViewCell";
+
 @implementation PropertySwitchTableViewCell
 
 - (void)prepareForReuse {

@@ -7,7 +7,6 @@
 //
 
 #import "SafesViewController.h"
-#import "BrowseSafeView.h"
 #import "DatabasePreferences.h"
 #import "Alerts.h"
 #import "SelectStorageProviderController.h"
@@ -42,7 +41,6 @@
 #import "BookmarksHelper.h"
 #import "YubiManager.h"
 #import "FreeTrialOnboardingViewController.h"
-#import "MasterDetailViewController.h"
 #import "AppPreferences.h"
 #import "SyncManager.h"
 #import "SyncStatus.h"
@@ -92,6 +90,7 @@
 #import "NSString+Extensions.h"
 #import "SafesList.h"
 #import "VirtualYubiKeys.h"
+#import "Strongbox-Swift.h"
 
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate>
 
@@ -121,6 +120,19 @@
 
 @implementation SafesViewController
 
+- (void)migrateToLazySync { 
+    if ( !AppPreferences.sharedInstance.hasMigratedToLazySync ) {
+        AppPreferences.sharedInstance.hasMigratedToLazySync = YES;
+        
+        for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
+            if ( database.storageProvider == kSFTP || database.storageProvider == kWebDAV ) {
+                NSLog(@"Migrating SFTP/WebDAV Database [%@] to lazy sync", database.nickName);
+                database.lazySyncMode = YES;
+            }
+        }
+    }
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -130,6 +142,10 @@
 
     self.tableView.hidden = YES;
 
+    
+    [self migrateToLazySync];
+    
+    
     [self customizeUI];
             
     [self checkForBrokenVirtualHardwareKeys];
@@ -521,25 +537,25 @@
     [self onDeviceLocked];
 }
 
-- (void)onMasterDetailViewControllerClosed:(id)param {
+- (void)onMainSplitViewControllerClosed:(id)param {
     NSNotification* notification = param;
     NSString* databaseId = notification.object;
 
-    NSLog(@"onMasterDetailViewControllerClosed [%@]", databaseId);
+    NSLog(@"onMainSplitViewControllerClosed [%@]", databaseId);
 
     if ( self.unlockedDatabase ) {
-        NSLog(@"onMasterDetailViewControllerClosed - Matching unlock db - clearing unlocked state.");
+        NSLog(@"onMainSplitViewControllerClosed - Matching unlock db - clearing unlocked state.");
 
         if ( [self.unlockedDatabase.uuid isEqualToString:databaseId] ) {
             self.unlockedDatabase = nil;
             self.unlockedDatabaseWentIntoBackgroundAt = nil;
         }
         else {
-            NSLog(@"WARNWARN: Received MasterDetail closed but Unlocked Database ID doesn't match!");
+            NSLog(@"WARNWARN: Received closed but Unlocked Database ID doesn't match!");
         }
     }
     else {
-        NSLog(@"WARNWARN: Received MasterDetail closed but no Unlocked Database state available!");
+        NSLog(@"WARNWARN: Received closed but no Unlocked Database state available!");
     }
 }
 
@@ -681,7 +697,7 @@
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(onMasterDetailViewControllerClosed:)
+                                           selector:@selector(onMainSplitViewControllerClosed:)
                                                name:kMasterDetailViewCloseNotification
                                              object:nil];
 }
@@ -978,21 +994,11 @@
         [helper beginUnlockSequence:NO
                 biometricPreCleared:biometricPreCleared
                 noConvenienceUnlock:noConvenienceUnlock
-                         completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+                         completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
             self.openingDatabaseInProgress = NO;
             
             if (result == kUnlockDatabaseResultSuccess) {
-                if ( innerStreamError ) {
-                    [Alerts info:self
-                           title:NSLocalizedString(@"safesvc_inner_stream_error_title", @"Inner Stream Decryption Error")
-                         message:NSLocalizedString(@"safesvc_inner_stream_error_message", @"Strongbox has had a problem decrypting some protected fields in this database. This is likely due to a previous corrupt save by another App. The database will now open in Read-Only mode to prevent further corruption. We recommend restoring from an older backup, or trying to re-save to restore or undo corruption.")
-                      completion:^{
-                        [self onboardOrShowUnlockedDatabase:model];
-                    }];
-                }
-                else {
-                    [self onboardOrShowUnlockedDatabase:model];
-                }
+                [self onboardOrShowUnlockedDatabase:model];
             }
             else if (result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
                 [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
@@ -1022,6 +1028,8 @@
 }
 
 - (void)showUnlockedDatabase:(Model*)model {
+    self.unlockedDatabase = model.metadata;
+    
     [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
 }
 
@@ -1714,17 +1722,10 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ( [segue.identifier isEqualToString:@"segueToMasterDetail"] ) {
-        MasterDetailViewController *svc = segue.destinationViewController;
-        svc.viewModel = (Model*)sender;
-        
-        UINavigationController *nav = [svc.viewControllers firstObject];
-        BrowseSafeView *vc = (BrowseSafeView*)nav.topViewController;
-    
-        vc.viewModel = (Model *)sender;
-        vc.currentGroupId = vc.viewModel.database.effectiveRootGroup.uuid;
-        self.unlockedDatabase = vc.viewModel.metadata;
+        MainSplitViewController *svc = segue.destinationViewController;
+        svc.model = (Model*)sender;
     }
-    else if ([segue.identifier isEqualToString:@"segueToStorageType"])
+    else if ( [segue.identifier isEqualToString:@"segueToStorageType"] )
     {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         SelectStorageProviderController *vc = (SelectStorageProviderController*)nav.topViewController;

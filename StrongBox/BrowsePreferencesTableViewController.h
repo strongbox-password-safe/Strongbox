@@ -10,6 +10,7 @@
 #import "StaticDataTableViewController.h"
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "DatabasePreferences.h"
+#import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property DatabaseFormat format;
 @property DatabasePreferences* databaseMetaData;
+@property Model* model;
 @property (nonatomic, copy) void (^onDone)(void);
 
 @end

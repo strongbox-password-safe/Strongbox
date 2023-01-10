@@ -18,17 +18,24 @@ typedef NS_ENUM(NSUInteger, UnlockDatabaseResult) {
     kUnlockDatabaseResultIncorrectCredentials,
 };
 
-typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, NSError*_Nullable innerStreamError, NSError*_Nullable error);
-
 NS_ASSUME_NONNULL_BEGIN
+
+typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, NSError*_Nullable error);
+typedef VIEW_CONTROLLER_PTR _Nonnull (^UnlockDatabaseOnDemandUIProviderBlock)(void); 
 
 @interface DatabaseUnlocker : NSObject
 
 + (instancetype)unlockerForDatabase:(METADATA_PTR)database
                      viewController:(VIEW_CONTROLLER_PTR)viewController
                       forceReadOnly:(BOOL)forcedReadOnly
-                     isAutoFillOpen:(BOOL)isAutoFillOpen
+   isNativeAutoFillAppExtensionOpen:(BOOL)isNativeAutoFillAppExtensionOpen
                         offlineMode:(BOOL)offlineMode;
+
++ (instancetype)unlockerForDatabase:(METADATA_PTR)database
+                      forceReadOnly:(BOOL)forcedReadOnly
+   isNativeAutoFillAppExtensionOpen:(BOOL)isNativeAutoFillAppExtensionOpen
+                        offlineMode:(BOOL)offlineMode
+                 onDemandUiProvider:(UnlockDatabaseOnDemandUIProviderBlock)onDemandUiProvider;
 
 - (void)unlockLocalWithKey:(CompositeKeyFactors*)key
         keyFromConvenience:(BOOL)keyFromConvenience
@@ -42,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (Model*_Nullable)expressTryUnlockWithKey:(METADATA_PTR)database key:(CompositeKeyFactors*)key;
 
 @property BOOL alertOnJustPwdWrong;
+@property BOOL noProgressSpinner;
 
 @end
 

@@ -26,7 +26,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelConvenienceAutoUnlockTimeout;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCopyTOTP;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoLaunchSingle;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowPinned;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowFavourites;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSystemLevelEnabled;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSystemLevelDisabled;
@@ -178,7 +178,7 @@
     self.autoProceed.on = AppPreferences.sharedInstance.autoProceedOnSingleMatch;
     self.switchCopyTOTP.on = self.viewModel.metadata.autoFillCopyTotp;
     self.switchAutoLaunchSingle.on = AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase;
-    self.switchShowPinned.on = AppPreferences.sharedInstance.autoFillShowPinned;
+    self.switchShowFavourites.on = AppPreferences.sharedInstance.autoFillShowFavourites;
     self.switchLongTapPreview.on = AppPreferences.sharedInstance.autoFillLongTapPreview;
     
     
@@ -222,7 +222,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     AppPreferences.sharedInstance.storeAutoFillServiceIdentifiersInNotes = self.addServiceIds.on;
     AppPreferences.sharedInstance.useFullUrlAsURLSuggestion = !self.useHostOnlyUrl.on;
     AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase = self.switchAutoLaunchSingle.on;
-    AppPreferences.sharedInstance.autoFillShowPinned = self.switchShowPinned.on;
+    AppPreferences.sharedInstance.autoFillShowFavourites = self.switchShowFavourites.on;
     AppPreferences.sharedInstance.autoFillLongTapPreview = self.switchLongTapPreview.on;
     
     [self bind];

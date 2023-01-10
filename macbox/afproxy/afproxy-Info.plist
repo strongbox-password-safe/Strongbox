@@ -7,9 +7,9 @@
 	<key>CFBundleName</key>
 	<string>Strongbox AutoFill Proxy</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.56.6</string>
+	<string>1.58.0</string>
 	<key>CFBundleVersion</key>
-	<string>5048</string>
+	<string>5091</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>

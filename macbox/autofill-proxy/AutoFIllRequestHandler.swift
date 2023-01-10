@@ -8,7 +8,6 @@
 
 import Foundation
 
-
 @objc class AutoFillRequestHandler: NSObject {
     var keyPair: BoxKeyPair = CryptoBoxHelper.createKeyPair()
   
@@ -28,12 +27,7 @@ import Foundation
             NSLog("🔴 Can't decode CopyFieldRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode CopyFieldRequest from message JSON")
         }
-        
-        guard let dc = NSDocumentController.shared as? DocumentController else {
-            NSLog("🔴 Can't get Document Controller")
-            return AutoFillEncryptedResponse.error(message: "Can't get Document Controller")
-        }
-        
+                
         guard let theDatabase = MacDatabasePreferences.allDatabases.first ( where: { database in
             database.uuid == copyRequest.databaseId
         }) else {
@@ -46,39 +40,33 @@ import Foundation
             return AutoFillEncryptedResponse.error(message: "This database is not AutoFill enabled")
         }
         
-        guard dc.databaseIsUnlocked(inDocumentWindow: theDatabase),
-              let document = dc.document(forDatabase: theDatabase) else {
-            NSLog("🔴 This database is not unlocked or error getting document")
+        guard let model = DatabasesCollection.shared .getUnlocked(uuid: theDatabase.uuid) else {
+            NSLog("🔴 This database is not unlocked.")
             return AutoFillEncryptedResponse.error(message: "This database is not unlocked or error getting document")
         }
         
         switch ( copyRequest.field ) {
         case .totp:
-            document.viewModel.copyTotp(copyRequest.nodeId)
+            copyTotp(model: model, itemId: copyRequest.nodeId, explicitRequest: copyRequest.explicitTotp)
         case .username:
-            document.viewModel.copyUsername(copyRequest.nodeId)
+            copyUsername(model: model, itemId: copyRequest.nodeId)
         case .password:
-            document.viewModel.copyPassword(copyRequest.nodeId)
+            copyPassword(model: model, itemId: copyRequest.nodeId)
         }
-                
+
         let response = CopyFieldResponse(success: true)
                 
         let json = AutoFillJsonHelper.toJson(object: response)
         
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
     }
-    
-    func handleGetStatusRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
-        guard let dc = NSDocumentController.shared as? DocumentController else {
-            NSLog("🔴 Can't get Document Controller")
-            return AutoFillEncryptedResponse.error(message: "Can't get Document Controller")
-        }
 
+    func handleGetStatusRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
         let response = GetStatusResponse()
         
         response.serverVersionInfo = Utils.getAppVersion()
         response.databases = MacDatabasePreferences.allDatabases.map { obj in
-            DatabaseSummary(databaseId: obj.uuid, nickName: obj.nickName, autoFillEnabled: obj.autoFillEnabled, locked: !dc.databaseIsUnlocked(inDocumentWindow: obj))
+            DatabaseSummary(uuid: obj.uuid, nickName: obj.nickName, autoFillEnabled: obj.autoFillEnabled, locked: !DatabasesCollection.shared.isUnlocked(uuid: obj.uuid))
         }
         
         let json = AutoFillJsonHelper.toJson(object: response)
@@ -99,13 +87,75 @@ import Foundation
         
         NSLog("Got Search Request - Query = [%@]", searchRequest.query)
                  
-        let result = AutoFillCredential(uuid: UUID(), databaseId: UUID().uuidString, title: "Test Entry", username: "mark", password: "abc123", url: "https:
-        
-        let response = SearchResponse(results: [result])
+        let response = SearchResponse(results: [])
         
         let json = AutoFillJsonHelper.toJson(object: response)
         
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
+    }
+
+    func handleLockDatabaseRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+        
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(LockDatabaseRequest.self, from: data) else
+        {
+            NSLog("🔴 Can't decode LockDatabaseRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode LockDatabaseRequest from message JSON")
+        }
+        
+        NSLog("Got LockDatabaseRequest - Database ID = [%@]", request.databaseId)
+        
+        guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled else {
+            NSLog("🔴 Can't find AutoFillEnabled database to Lock")
+            return AutoFillEncryptedResponse.error(message: "🔴 Can't find AutoFillEnabled database to Lock")
+        }
+        
+        if DatabasesCollection.shared.isUnlocked(uuid: request.databaseId) {
+            DatabasesCollection.shared.initiateLockRequest(uuid: request.databaseId)
+        }
+        else {
+            
+        }
+        
+        let response = LockDatabaseResponse(success: true)
+        
+        let json = AutoFillJsonHelper.toJson(object: response)
+        
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
+    }
+
+    func handleUnlockDatabaseRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+        
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(UnlockDatabaseRequest.self, from: data) else
+        {
+            NSLog("🔴 Can't decode UnlockDatabaseRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode UnlockDatabaseRequest from message JSON")
+        }
+        
+        NSLog("Got UnlockDatabaseRequest - Database ID = [%@]", request.databaseId)
+
+        guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled else {
+            NSLog("🔴 Can't find AutoFillEnabled database to Unlock")
+            return AutoFillEncryptedResponse.error(message: "Can't find AutoFillEnabled database to Unlock")
+        }
+        
+        if !DatabasesCollection.shared.isUnlocked(uuid: request.databaseId) {
+            DatabasesCollection.shared.autoFillRequestCkfsAndUnlock(uuid: request.databaseId)
+        }
+        else {
+            
+        }
+                
+        let response = UnlockDatabaseResponse(success: true)
+        
+        let json = AutoFillJsonHelper.toJson(object: response)
+        
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
     }
 
     func handleGetCredentialsForUrlRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
@@ -121,29 +171,24 @@ import Foundation
         
 
                  
-        guard let dc = NSDocumentController.shared as? DocumentController else {
-            NSLog("🔴 Can't decode CredentialsForUrlRequest from message JSON")
-            return AutoFillEncryptedResponse.error(message: "Can't decode CredentialsForUrlRequest from message JSON")
-        }
-
         let unlockedDatabases = MacDatabasePreferences.allDatabases.filter { database in
-            database.autoFillEnabled && dc.databaseIsUnlocked(inDocumentWindow: database)
+            database.autoFillEnabled && DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
         }
         
 
         
         var credentials: [AutoFillCredential] = []
         for database in unlockedDatabases {
-            guard let document = dc.document(forDatabase: database) else {
+            guard let model = DatabasesCollection.shared.getUnlocked(uuid: database.uuid) else {
                 continue
             }
             
-            let nodes = document.autoFillUrlCredentialMatches(forUrl: searchRequest.url)
+            let nodes = model.getAutoFillMatchingNodes(forUrl: searchRequest.url)
             
 
             
             let urlCredentialMatches = nodes.map { node in
-                convertNodeToAutoFillCredential(database, document, node)
+                convertNodeToAutoFillCredential(database, model, node)
             }
             
             credentials += urlCredentialMatches
@@ -170,10 +215,14 @@ import Foundation
             return handleGetCredentialsForUrlRequest(request)
         case .copyField:
             return handleCopyFieldRequest(request)
+        case .lock:
+            return handleLockDatabaseRequest(request)
+        case .unlock:
+            return handleUnlockDatabaseRequest(request)
         }
     }
     
-    func convertNodeToAutoFillCredential(_ database : MacDatabasePreferences, _ document : Document, _ node: Node) -> AutoFillCredential {
+    func convertNodeToAutoFillCredential(_ database : MacDatabasePreferences, _ model : Model, _ node: Node) -> AutoFillCredential {
         var iconBase64Encoded = ""
         
         if let b64 = getNodeIconPngData(node) {
@@ -184,13 +233,16 @@ import Foundation
         
         let credential = AutoFillCredential(uuid: node.uuid,
                                             databaseId: database.uuid,
-                                            title: document.viewModel.dereference(node.title, node: node),
-                                            username: document.viewModel.dereference(node.fields.username, node: node),
-                                            password: document.viewModel.dereference(node.fields.password, node: node),
-                                            url: document.viewModel.dereference(node.fields.url, node: node),
+                                            title: model.dereference(node.title, node: node),
+                                            username: model.dereference(node.fields.username, node: node),
+                                            password: model.dereference(node.fields.password, node: node),
+                                            url: model.dereference(node.fields.url, node: node),
                                             totp: node.fields.otpToken?.url(true).absoluteString ?? "",
                                             icon: iconBase64Encoded,
-                                            customFields: [:])         
+                                            customFields: [:], 
+                                            databaseName: database.nickName,
+                                            tags: [],
+                                            favourite: model.isFavourite(node.uuid))
         
         return credential
     }
@@ -214,5 +266,53 @@ import Foundation
         }
         
         return pngData.base64EncodedString()
+    }
+    
+    func copyUsername ( model : Model, itemId : UUID ) {
+        guard let item = model.getItemBy(itemId) else {
+            NSLog("🔴 Could not find item to copy!")
+            return
+        }
+        
+        dereferenceAndCopy(model: model, text: item.fields.username , item: item)
+    }
+    
+    func copyPassword ( model : Model, itemId : UUID ) {
+        guard let item = model.getItemBy(itemId) else {
+            NSLog("🔴 Could not find item to copy!")
+            return
+        }
+        
+        dereferenceAndCopy(model: model, text: item.fields.password , item: item)
+    }
+    
+    func copyTotp ( model : Model, itemId : UUID, explicitRequest : Bool ) {
+        guard explicitRequest || model.metadata.autoFillCopyTotp else {
+            NSLog("🔴 Not copying TOTP as not configured or not an explicit request")
+            return
+        }
+
+        guard let item = model.getItemBy(itemId), let token = item.fields.otpToken else {
+            NSLog("🔴 Could not find item to copy!")
+            return
+        }
+        
+        ClipboardManager.sharedInstance().copyConcealedString(token.password)
+        scheduleClipboardClearingTask()
+    }
+    
+    func dereferenceAndCopy ( model : Model, text : String, item : Node ) {
+        let deref = model.dereference(text, node: item)
+        ClipboardManager.sharedInstance().copyConcealedString(deref)
+        scheduleClipboardClearingTask()
+    }
+    
+    func scheduleClipboardClearingTask() {
+        if ( Settings.sharedInstance().clearClipboardEnabled ) {
+            DispatchQueue.main.async {
+                let delegate = NSApplication.shared.delegate as! AppDelegate
+                delegate.onStrongboxDidChangeClipboard()
+            }
+        }
     }
 }

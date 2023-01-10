@@ -82,7 +82,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property (readonly) BOOL isLocalDeviceDatabase;
 
-@property BOOL offlineMode; 
+@property BOOL userRequestOfflineOpenEphemeralFlagForDocument; 
 @property BOOL alwaysOpenOffline;
 @property BOOL readOnly;
 
@@ -101,7 +101,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL concealEmptyProtectedFields;
 @property BOOL startWithSearch;
 @property BOOL showAdvancedUnlockOptions;
-@property BOOL lockOnScreenLock;
 @property BOOL expressDownloadFavIconOnNewOrUrlChanged;
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;

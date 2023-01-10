@@ -7,20 +7,17 @@
 //
 
 import Cocoa
+import ServiceManagement
 
 class GeneralPreferencesViewController: NSViewController {
-    @IBOutlet var autoLockDatabase: NSButton!
-    @IBOutlet var miniaturizeOnCopy: NSButton!
-    @IBOutlet var autoClearClipboard: NSButton!
-    @IBOutlet var shortcutView: MASShortcutView!
-    @IBOutlet var autoClearClipboardTimeout: NSTextField!
-    @IBOutlet var autoLockTimeoutTextField: NSTextField!
-    @IBOutlet var stepperAutoClearClipboard: NSStepper!
-    @IBOutlet var autoLockStepper: NSStepper!
-    @IBOutlet var hideDockIcon: NSButton!
+    @IBOutlet var stackStartAtLogin: NSStackView!
+    @IBOutlet var stackLegacyRegularAppOptions: NSStackView!
+    @IBOutlet var buttonStartAtLogin: NSButton!
     @IBOutlet var showInSystemTray: NSButton!
+    @IBOutlet var shortcutView: MASShortcutView!
     @IBOutlet var quitWhenAllClosed: NSButton!
-    @IBOutlet weak var lockEvenIfEditing: NSButton!
+    @IBOutlet var checkboxAlwaysShowDockIcon: NSButton!
+    @IBOutlet var stackAlwaysShowDockIcon: NSStackView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,98 +28,59 @@ class GeneralPreferencesViewController: NSViewController {
     }
 
     private func bindUI() {
-        bindAutoLock()
-        bindClipboard()
+        let settings = Settings.sharedInstance()
+        
+        if #available(macOS 13.0, *) {
+            stackStartAtLogin.isHidden = false
+            buttonStartAtLogin.state = SMAppService.mainApp.status == .enabled ? .on : .off
+        }
+        else {
+            stackStartAtLogin.isHidden = true
+        }
+        
+        stackLegacyRegularAppOptions.isHidden = settings.showSystemTrayIcon
 
-        showInSystemTray.state = Settings.sharedInstance().showSystemTrayIcon ? .on : .off
-        hideDockIcon.isEnabled = Settings.sharedInstance().showSystemTrayIcon
-        hideDockIcon.state = Settings.sharedInstance().hideDockIconOnAllMinimized ? .on : .off
-        quitWhenAllClosed.isEnabled = !Settings.sharedInstance().showSystemTrayIcon
-        quitWhenAllClosed.state = Settings.sharedInstance().quitStrongboxOnAllWindowsClosed ? .on : .off
-
-        miniaturizeOnCopy.state = Settings.sharedInstance().miniaturizeOnCopy ? .on : .off
-        lockEvenIfEditing.state = Settings.sharedInstance().lockEvenIfEditing ? .on : .off
+        showInSystemTray.state = settings.showSystemTrayIcon ? .on : .off
+        quitWhenAllClosed.state = settings.quitStrongboxOnAllWindowsClosed ? .on : .off
+                
+        stackAlwaysShowDockIcon.isHidden = !settings.showSystemTrayIcon
+        checkboxAlwaysShowDockIcon.state = settings.hideDockIconOnAllMinimized ? .off : .on
     }
 
-    func bindAutoLock() {
-        let alt = Settings.sharedInstance().autoLockTimeoutSeconds
-
-        autoLockDatabase.state = alt != 0 ? .on : .off
-        autoLockTimeoutTextField.isEnabled = alt != 0
-        autoLockStepper.isEnabled = alt != 0
-        autoLockStepper.integerValue = alt
-        autoLockTimeoutTextField.stringValue = alt != 0 ? autoLockStepper.stringValue : "120"
-    }
-
-    func bindClipboard() {
-        autoClearClipboard.state = Settings.sharedInstance().clearClipboardEnabled ? .on : .off
-        autoClearClipboardTimeout.isEnabled = Settings.sharedInstance().clearClipboardEnabled
-        stepperAutoClearClipboard.isEnabled = Settings.sharedInstance().clearClipboardEnabled
-        stepperAutoClearClipboard.integerValue = Settings.sharedInstance().clearClipboardAfterSeconds
-        autoClearClipboardTimeout.stringValue = stepperAutoClearClipboard.stringValue
-    }
-
-    @IBAction func onClearClipboardTextFieldEdited(_: Any) {
-        stepperAutoClearClipboard.integerValue = autoClearClipboardTimeout.integerValue
-
-        Settings.sharedInstance().clearClipboardAfterSeconds = stepperAutoClearClipboard.integerValue
-
+    @IBAction func onStartAtLogin(_ sender: Any) {
+        let start = buttonStartAtLogin.state == .on
+        
+        if #available(macOS 13.0, *) {
+            if ( start ) {
+                do {
+                    try SMAppService.mainApp.register()
+                }
+                catch {
+                    MacAlerts.error(error, window: self.view.window)
+                    NSLog("🔴 Error registering startup item: [%@]", String(describing: error))
+                }
+            }
+            else {
+                do {
+                    try SMAppService.mainApp.unregister()
+                }
+                catch {
+                    MacAlerts.error(error, window: self.view.window)
+                    NSLog("🔴 Error unregistering startup item: [%@]", String(describing: error))
+                }
+            }
+        }
+        
         bindUI()
-
+        
         notifyChanged()
     }
-
-    @IBAction func onClearClipboardStepper(_: Any) {
-        Settings.sharedInstance().clearClipboardAfterSeconds = stepperAutoClearClipboard.integerValue
-
-        bindUI()
-
-        notifyChanged()
-    }
-
-    @IBAction func onClearClipboardCheckbox(_: Any) {
-        Settings.sharedInstance().clearClipboardEnabled = autoClearClipboard.state == .on
-
-        bindUI()
-
-        notifyChanged()
-    }
-
-    @IBAction func onAutoLockTextFieldEdited(_: Any) {
-        autoLockStepper.integerValue = autoLockTimeoutTextField.integerValue
-
-        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockStepper.integerValue
-
-        bindUI()
-
-        notifyChanged()
-    }
-
-    @IBAction func onAutoLockStepperChanged(_: Any) {
-        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockStepper.integerValue
-
-        bindUI()
-
-        notifyChanged()
-    }
-
-    @IBAction func onAutoLockTimeoutChanged(_: Any) {
-        Settings.sharedInstance().autoLockTimeoutSeconds = autoLockDatabase.state == .on ? 120 : 0
-
-        bindUI()
-
-        notifyChanged()
-    }
-
+    
     @IBAction func onChanged(_: Any) {
         Settings.sharedInstance().showSystemTrayIcon = showInSystemTray.state == .on
-        Settings.sharedInstance().hideDockIconOnAllMinimized = hideDockIcon.state == .on
-        Settings.sharedInstance().miniaturizeOnCopy = miniaturizeOnCopy.state == .on
-        Settings.sharedInstance().quitStrongboxOnAllWindowsClosed = quitWhenAllClosed.state == .on
-        Settings.sharedInstance().lockEvenIfEditing = lockEvenIfEditing.state == .on
-        
-        
-        
+        Settings.sharedInstance().quitStrongboxOnAllWindowsClosed = quitWhenAllClosed.state == .on        
+        Settings.sharedInstance().hideDockIconOnAllMinimized = checkboxAlwaysShowDockIcon.state == .off
+
         bindUI()
 
         notifyChanged()

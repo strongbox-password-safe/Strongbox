@@ -66,7 +66,8 @@ static BOOL kLogVerbose = NO;
     return self;
 }
 
-- (void)stage1Serialize:(CompositeKeyFactors *)compositeKeyFactors completion:(SerializeCompletionBlock)completion {
+- (void)stage1Serialize:(CompositeKeyFactors *)compositeKeyFactors
+             completion:(SerializeCompletionBlock)completion {
     KeepassFileHeader header = getNewFileHeader(self.serializationData.fileVersion);
     [self.headerData appendBytes:&header length:SIZE_OF_KEEPASS_HEADER];
     
@@ -75,10 +76,13 @@ static BOOL kLogVerbose = NO;
     NSData* compositeKey = getCompositeKey(compositeKeyFactors);
     NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);
     NSData* transformKey = getAesTransformKey(compositeKey, transformSeed, self.serializationData.transformRounds);
-    NSData* masterSeed = getRandomData(kMasterSeedLength);
+    NSData* masterSeed = getRandomData(kMasterSeedLength); 
     
     if(compositeKeyFactors.yubiKeyCR) {
         NSData* challenge = masterSeed;
+        
+
+        
         compositeKeyFactors.yubiKeyCR(challenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {
             if(userCancelled || error) {
                 completion(userCancelled, nil, error);

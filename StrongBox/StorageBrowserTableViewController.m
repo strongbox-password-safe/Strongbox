@@ -186,7 +186,7 @@
     }
 
     cell.accessoryType = file.folder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
-
+    
     return cell;
 }
 

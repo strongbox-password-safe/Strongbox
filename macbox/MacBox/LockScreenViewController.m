@@ -17,14 +17,13 @@
 #import "ClickableImageView.h"
 #import "KSPasswordField.h"
 #import "MacHardwareKeyManager.h"
-#import "DatabasesManagerVC.h"
 #import "BookmarksHelper.h"
 #import "StrongboxErrorCodes.h"
 #import "KeyFileParser.h"
 #import "MBProgressHUD.h"
 #import "MacCompositeKeyDeterminer.h"
 #import "NSDate+Extensions.h"
-
+#import "macOSSpinnerUI.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -78,7 +77,7 @@
 @implementation LockScreenViewController
 
 - (void)dealloc {
-    NSLog(@"DEALLOC [%@]", self);
+    NSLog(@"😎 LockScreenViewController::DEALLOC [%@]", self);
 }
 
 - (ViewModel *)viewModel {
@@ -141,8 +140,10 @@
     NSColor *colour = ColorFromRGB(0x2C2C2E);
     self.quickTrialStartContainer.layer.backgroundColor = colour.CGColor;
     self.quickTrialStartContainer.layer.cornerRadius = 10;
+    
+    __weak LockScreenViewController* weakSelf = self;
     self.labelLearnMore.onClick = ^{
-        [self onLearnMoreUpgradeScreen];
+        [weakSelf onLearnMoreUpgradeScreen];
     };
 
     [self bindProOrFreeTrial];
@@ -887,15 +888,44 @@
     return self.textFieldMasterPassword.stringValue.length || (formatAllowsEmptyOrNone && Settings.sharedInstance.allowEmptyOrNoPasswordEntry);
 }
 
++ (NSViewController*)getAppropriateOnDemandViewController:(NSString*)databaseUuid {
+    DocumentController* dc = DocumentController.sharedDocumentController;
+    Document* doc = [dc documentForDatabase:databaseUuid];
+    
+    if ( doc && doc.windowControllers.firstObject.contentViewController ) {
+        NSLog(@"✅ onDemand Provider returning from document: [%@]", doc.windowControllers.firstObject.contentViewController);
+
+        return doc.windowControllers.firstObject.contentViewController;
+    }
+    else {
+        [NSApp activateIgnoringOtherApps:YES];
+        [NSApp arrangeInFront:nil];
+        
+        [DBManagerPanel.sharedInstance show];
+        
+        
+        
+        NSLog(@"✅ onDemand Provider returning DBManagerPanel: [%@]", DBManagerPanel.sharedInstance.contentViewController);
+
+        return DBManagerPanel.sharedInstance.contentViewController;
+    }
+}
+
 - (IBAction)onUnlock:(id)sender {
     if(![self manualCredentialsAreValid]) {
         return;
     }
 
-    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithViewController:self
-                                                                                           database:self.databaseMetadata
-                                                                                     isAutoFillOpen:NO];
-
+    NSString* uuid = self.databaseMetadata.uuid;
+    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
+                                                             isNativeAutoFillAppExtensionOpen:NO
+                                                                      isAutoFillQuickTypeOpen:NO
+                                                                            onDemandUiProvider:^NSViewController * {
+        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
+    }];
+    
+    
+    
     NSString* password = self.textFieldMasterPassword.stringValue;
     NSString* keyFileBookmark = self.selectedKeyFileBookmark;
     YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
@@ -909,9 +939,14 @@
 }
 
 - (IBAction)onUnlockWithConvenience:(id)sender {
-    MacCompositeKeyDeterminer* determiner = [MacCompositeKeyDeterminer determinerWithViewController:self
-                                                                                           database:self.databaseMetadata
-                                                                                     isAutoFillOpen:NO];
+    NSString* uuid = self.databaseMetadata.uuid;
+
+    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
+                                                             isNativeAutoFillAppExtensionOpen:NO
+                                                                      isAutoFillQuickTypeOpen:NO
+                                                                           onDemandUiProvider:^NSViewController * {
+        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
+    }];
 
     if ( !determiner.bioOrWatchUnlockIsPossible ) {
         NSLog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
@@ -969,11 +1004,11 @@
     [self enableMasterCredentialsEntry:NO];
             
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.document unlock:compositeKeyFactors
-                         viewController:self
-                    alertOnJustPwdWrong:NO
-                        fromConvenience:fromConvenience
-                             completion:^(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError * _Nonnull error) {
+        [self unlock:compositeKeyFactors
+      viewController:self
+ alertOnJustPwdWrong:NO
+     fromConvenience:fromConvenience
+          completion:^(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError * _Nonnull error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self handleUnlockResult:success
                     incorrectCredentials:incorrectCredentials
@@ -985,6 +1020,181 @@
     });
 }
 
+
+
+- (void)unlock:(CompositeKeyFactors *)compositeKeyFactors
+viewController:(NSViewController *)viewController
+alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+fromConvenience:(BOOL)fromConvenience
+    completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
+    NSLog(@"LockScreenViewController::unlock: [%@]", self.document.fileURL );
+    
+    if ( !self.databaseMetadata.userRequestOfflineOpenEphemeralFlagForDocument && !self.databaseMetadata.alwaysOpenOffline ) {
+        NSLog(@"ONLINE MODE: syncWorkingCopyAndUnlock");
+        
+        [self syncWorkingCopyAndUnlock:viewController
+                   alertOnJustPwdWrong:alertOnJustPwdWrong
+                       fromConvenience:fromConvenience
+                                   key:compositeKeyFactors
+                            completion:completion];
+    }
+    else {
+        NSLog(@"OFFLINE MODE: loadWorkingCopyAndUnlock");
+        
+        [self loadWorkingCopyAndUnlock:compositeKeyFactors
+                        viewController:viewController
+                   alertOnJustPwdWrong:alertOnJustPwdWrong
+                       fromConvenience:fromConvenience
+                         forceReadOnly:NO
+                            completion:completion];
+    }
+}
+
+- (void)syncWorkingCopyAndUnlock:(NSViewController*)viewController
+             alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+                 fromConvenience:(BOOL)fromConvenience
+                             key:(CompositeKeyFactors*)key
+                      completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
+    NSLog(@"syncWorkingCopyAndUnlock ENTER");
+    
+    [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
+                         viewController:self];
+    
+    [DatabasesCollection.shared syncWithUuid:self.databaseMetadata.uuid
+                            allowInteractive:YES
+                         suppressErrorAlerts:YES
+                             ckfsForConflict:key
+                                  completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        [macOSSpinnerUI.sharedInstance dismiss];
+        
+        if ( result == kSyncAndMergeSuccess ) {
+            [self loadWorkingCopyAndUnlock:key
+                            viewController:viewController
+                       alertOnJustPwdWrong:alertOnJustPwdWrong
+                           fromConvenience:fromConvenience
+                             forceReadOnly:NO
+                                completion:completion];
+        }
+        else if (result == kSyncAndMergeError ) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self onSyncError:viewController
+              alertOnJustPwdWrong:alertOnJustPwdWrong
+                  fromConvenience:fromConvenience
+                              key:key
+                            error:error
+                       completion:completion];
+            });
+        }
+        else if (result == kSyncAndMergeResultUserCancelled ) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(NO, YES, NO, nil);
+            });
+        }
+        else {
+            NSLog(@"🔴 WARNWARN: Unhandled Sync Result [%lu] - error = [%@]", (unsigned long)result, error);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(NO, NO, NO, error);
+            });
+        }
+    }];
+}
+
+- (void)onSyncError:(NSViewController*)viewController
+alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+   fromConvenience:(BOOL)fromConvenience
+               key:(CompositeKeyFactors*)key
+             error:(NSError*)error
+        completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
+    if ( self.databaseMetadata.storageProvider == kMacFile && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
+        completion(NO, NO, NO, error);
+    }
+    else {
+        if ( [WorkingCopyManager.sharedInstance getLocalWorkingCacheUrlForDatabase:self.databaseMetadata.uuid] == nil ) {
+            completion(NO, NO, NO, error);
+        }
+        else {
+            NSString* message = NSLocalizedString(@"open_sequence_storage_provider_error_open_local_ro_instead", @"If this happens repeatedly you should try re-adding your database. See the Debug Sync Log for more...\n\nWould you like to open in offline mode instead?");
+            
+            NSString* viewSyncError = NSLocalizedString(@"safes_vc_action_view_sync_status", @"View Sync Log");
+
+            [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error")
+                            informativeText:message
+                          option1AndDefault:NSLocalizedString(@"open_sequence_yes_use_local_copy_option", @"Yes, Open Offline")
+                                    option2:viewSyncError
+                                     window:self.view.window completion:^(int response) {
+                if ( response == 0 ) {
+                    [self loadWorkingCopyAndUnlock:key
+                                    viewController:viewController
+                               alertOnJustPwdWrong:alertOnJustPwdWrong
+                                   fromConvenience:fromConvenience
+                                     forceReadOnly:YES 
+                                        completion:completion];
+                }
+                else if (response == 1) {
+                    [self showSyncLog];
+                    completion(NO, YES, NO, nil);
+                }
+                else {
+                    completion(NO, YES, NO, nil);
+                }
+            }];
+        }
+    }
+}
+
+- (void)showSyncLog {
+    NSViewController* vc = [SyncLogViewController showForDatabase:self.viewModel.databaseMetadata];
+    [self presentViewControllerAsSheet:vc];
+}
+
+- (void)loadWorkingCopyAndUnlock:(CompositeKeyFactors*)key
+                  viewController:(NSViewController*)viewController
+             alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+                 fromConvenience:(BOOL)fromConvenience
+                   forceReadOnly:(BOOL)forceReadOnly
+                      completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
+    [DatabasesCollection.shared unlockModelFromLocalWorkingCopyWithDatabase:self.databaseMetadata
+                                                                       ckfs:key
+                                                            fromConvenience:fromConvenience
+                                                        alertOnJustPwdWrong:alertOnJustPwdWrong
+                                                     offlineUnlockRequested:self.databaseMetadata.userRequestOfflineOpenEphemeralFlagForDocument
+                                                        showProgressSpinner:YES
+                                                                    eagerVc:viewController
+                                                     suppressErrorMessaging:YES
+                                                              forceReadOnly:forceReadOnly
+                                                                 completion:^(UnlockDatabaseResult result, Model *model, NSError* error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(result == kUnlockDatabaseResultSuccess,
+                       result == kUnlockDatabaseResultUserCancelled,
+                       result == kUnlockDatabaseResultIncorrectCredentials,
+                       error);
+        });
+    }];
+}
+
+- (void)onUnsuccessfulUnlock:(CompositeKeyFactors *)ckfs error:(NSError *)error fromConvenience:(BOOL)fromConvenience incorrectCredentials:(BOOL)incorrectCredentials {
+    [self enableMasterCredentialsEntry:YES];
+    
+    [self bindUI];
+    
+    [self setInitialFocus];
+    
+    
+    if ( incorrectCredentials && !fromConvenience && ( ckfs.keyFileDigest == nil && ckfs.yubiKeyCR == nil ) ) {
+        [self showIncorrectPasswordToast];
+    }
+    else if (error) {
+        if ( self.databaseMetadata.storageProvider == kMacFile && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
+            [self askAboutRelocatingDatabase:ckfs fromConvenience:fromConvenience];
+        }
+        else {
+            [MacAlerts error:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") error:error window:self.view.window];
+        }
+    }
+}
+
+
+
 - (void)handleUnlockResult:(BOOL)success
       incorrectCredentials:(BOOL)incorrectCredentials
                       ckfs:(CompositeKeyFactors*)ckfs
@@ -992,28 +1202,14 @@
                      error:(NSError*)error {
     NSLog(@"LockScreenViewController -> handleUnlockResult [%@] - error = [%@]", success ? @"Succeeded" : @"Failed", error);
 
-    [self enableMasterCredentialsEntry:YES];
-    
-    if(success) {
+    if ( success ) {
+        [self enableMasterCredentialsEntry:YES];
+
         self.textFieldMasterPassword.stringValue = @"";
         [self stopObservingModelChanges];
     }
     else {
-        [self bindUI];
-        
-        [self setInitialFocus];
-        
-        if ( incorrectCredentials && !fromConvenience && ( ckfs.keyFileDigest == nil && ckfs.yubiKeyCR == nil ) ) {
-            [self showIncorrectPasswordToast];
-        }
-        else if (error) {
-            if ( self.databaseMetadata.storageProvider == kMacFile && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
-                [self askAboutRelocatingDatabase:ckfs fromConvenience:fromConvenience];
-            }
-            else {
-                [MacAlerts error:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") error:error window:self.view.window];
-            }
-        }
+        [self onUnsuccessfulUnlock:ckfs error:error fromConvenience:fromConvenience incorrectCredentials:incorrectCredentials];
     }
 }
 

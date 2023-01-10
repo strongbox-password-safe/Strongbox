@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)fromUuid:(NSString*)uuid;
 + (instancetype)fromUrl:(NSURL*)url;
++ (instancetype _Nullable)getById:(NSString *)databaseId;
 
 + (NSArray<MacDatabasePreferences*>*)filteredDatabases:(BOOL (^)(MacDatabasePreferences* database))block;
 
@@ -92,7 +93,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSUInteger maxBackupKeepCount;
 @property BOOL makeBackups;
 @property (readonly) BOOL isLocalDeviceDatabase;
-@property BOOL offlineMode; 
+@property BOOL userRequestOfflineOpenEphemeralFlagForDocument; 
 @property BOOL alwaysOpenOffline;
 @property BOOL readOnly;
 @property BOOL showQuickView;
@@ -107,7 +108,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL concealEmptyProtectedFields;
 @property BOOL startWithSearch;
 @property BOOL showAdvancedUnlockOptions;
-@property BOOL lockOnScreenLock;
 @property BOOL expressDownloadFavIconOnNewOrUrlChanged;
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;

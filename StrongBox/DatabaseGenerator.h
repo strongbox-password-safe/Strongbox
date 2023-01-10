@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (DatabaseModel*)generateEmpty:(NSString*)password;
 + (DatabaseModel*)generate:(NSString*)password;
++ (DatabaseModel*)generateWithSingleEntry:(NSString*)password;
 
 + (Node*)generateSampleNode:(Node*)parentGroup;
 

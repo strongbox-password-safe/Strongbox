@@ -16,18 +16,18 @@
 #import "NSArray+Extensions.h"
 #import "OfflineDetectedBehaviour.h"
 
-static NSString* const kPropertySwitchTableViewCellId = @"PropertySwitchTableViewCell";
-
 static NSUInteger const kReadOnlyRow = 0;
 static NSUInteger const kQuickLaunchRow = 1;
-static NSUInteger const kConflictResolutionStrategyRow = 2;
-static NSUInteger const kAlwaysOpenOffline = 3;
+static NSUInteger const kLazySyncRow = 2;
+static NSUInteger const kLazySyncPersistRow = 3;
 static NSUInteger const kOfflineDetectedBehaviour = 4;
 static NSUInteger const kCouldNotConnectBehaviour = 5;
-static NSUInteger const kBackupsRow = 6;
-static NSUInteger const kViewSyncLogRow = 7;
+static NSUInteger const kAlwaysOpenOffline = 6;
+static NSUInteger const kConflictResolutionStrategyRow = 7;
+static NSUInteger const kBackupsRow = 8;
+static NSUInteger const kViewSyncLogRow = 9;
 
-static NSUInteger const kRowCount = 8;
+static NSUInteger const kRowCount = 10;
 
 @interface DatabasePropertiesVC ()
 
@@ -99,6 +99,36 @@ static NSUInteger const kRowCount = 8;
 
         cell.onToggledSwitch = ^(BOOL currentState) {
             weakSelf.database.conflictResolutionStrategy = currentState ? kConflictResolutionStrategyAutoMerge : kConflictResolutionStrategyAsk;
+        };
+        
+        return cell;
+    }
+    else if ( indexPath.row == kLazySyncRow ) {
+        PropertySwitchTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kPropertySwitchTableViewCellId forIndexPath:indexPath];
+        
+        cell.titleLabel.text = NSLocalizedString(@"lazy_sync_option_title", @"Lazy Sync Mode");
+        cell.subtitleLabel.text = NSLocalizedString(@"lazy_sync_option_detail", @"Unlock database first, then attempt to sync.");
+        
+        cell.switchBool.on = self.database.lazySyncMode;
+        
+        cell.onToggledSwitch = ^(BOOL currentState) {
+            weakSelf.database.lazySyncMode = currentState;
+            [weakSelf.tableView reloadData];
+        };
+        
+        return cell;
+    }
+    else if ( indexPath.row == kLazySyncPersistRow ) {
+        PropertySwitchTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kPropertySwitchTableViewCellId forIndexPath:indexPath];
+        
+        cell.titleLabel.text = NSLocalizedString(@"lazy_sync_persist_option_title", @"Persistently Lazy (Igonre Errors)");
+        cell.subtitleLabel.text = NSLocalizedString(@"lazy_sync_persist_option_detail", @"Keep in Lazy Sync Mode even if an error in sync occurs.");
+        
+        cell.switchBool.on = self.database.persistLazyEvenLastSyncErrors;
+        
+        cell.onToggledSwitch = ^(BOOL currentState) {
+            weakSelf.database.persistLazyEvenLastSyncErrors = currentState;
+            [weakSelf.tableView reloadData];
         };
         
         return cell;
@@ -280,14 +310,28 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
          indexPath.row == kOfflineDetectedBehaviour ||
          indexPath.row == kCouldNotConnectBehaviour ||
          indexPath.row == kViewSyncLogRow ||
+         indexPath.row == kLazySyncRow ||
+         indexPath.row == kLazySyncPersistRow ||
          indexPath.row == kConflictResolutionStrategyRow ) {
         if ( self.database.storageProvider == kLocalDevice || AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
             return 0.0f;
         }
     }
-    
+        
     if ( indexPath.row == kReadOnlyRow ) {
         if ( AppPreferences.sharedInstance.disableReadOnlyToggles ) {
+            return 0.0f;
+        }
+    }
+
+    if ( indexPath.row == kLazySyncPersistRow && !self.database.lazySyncMode ) {
+        return 0.0f;
+    }
+    
+    if (
+        indexPath.row == kOfflineDetectedBehaviour ||
+        indexPath.row == kCouldNotConnectBehaviour ) {
+        if ( self.database.lazySyncMode ) {
             return 0.0f;
         }
     }

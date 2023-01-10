@@ -12,9 +12,11 @@
 #import "BrowseItemTotpCell.h"
 #import "NSDate+Extensions.h"
 #import "Utils.h"
+#import "Constants.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
+static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
 
 @interface BrowseTableViewCellHelper ()
 
@@ -33,8 +35,35 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         
         [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
         [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemTotpCell bundle:nil] forCellReuseIdentifier:kBrowseItemTotpCell];
+        [self.tableView registerNib:[UINib nibWithNibName:kBrowseQuickViewItemCell bundle:nil] forCellReuseIdentifier:kBrowseQuickViewItemCell];
     }
     return self;
+}
+
+- (UITableViewCell*)getTagCell:(NSIndexPath*)indexPath tag:(NSString*)tag {
+    UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseQuickViewItemCell forIndexPath:indexPath];
+    
+    cell.textLabel.text = tag;
+    
+    NSArray<Node*>* items = [self.viewModel entriesWithTag:tag];
+    
+    if ( items.count == 1 ) {
+        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"generic_single_item_singular_fmt", @"%@ Item"), @(items.count).stringValue];
+    }
+    else {
+        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"generic_number_of_items_plural_fmt", @"%@ Items"), @(items.count).stringValue];
+    }
+    
+    if (@available(iOS 13.0, *)) {
+        cell.imageView.image = [UIImage systemImageNamed:@"tag.fill"];
+    }
+    else {
+        cell.imageView.image = [UIImage imageNamed:@"price_tag"];
+    }
+    cell.imageView.tintColor = nil;
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    
+    return cell;
 }
 
 - (UITableViewCell *)getBrowseCellForNode:(Node*)node
@@ -126,7 +155,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                 childCount:childCount
                     italic:isRecycleBin
              groupLocation:groupLocation
-                 tintColor:isRecycleBin ? ColorFromRGB(0x25be35) : nil 
+                 tintColor:isRecycleBin ? Constants.recycleBinTintColor : nil
                      flags:flags
             flagTintColors:flagTintColors
                   hideIcon:self.viewModel.metadata.hideIconInBrowse

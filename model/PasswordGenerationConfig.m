@@ -36,6 +36,8 @@ static NSString* const kWordListNorwegian = @"norwegian-diceware.wordlist.utf8";
 static NSString* const kWordListFinnish = @"finnish-diceware.wordlist.utf8";
 static NSString* const kWordListIcelandic = @"icelandic-diceware.wordlist.utf8";
 
+static NSString* const kWordListPtBr = @"ptbr-diceware.wordlist.utf8";
+
 static NSString* const kWordListFandomGameOfThrones = @"gameofthrones_8k_2018.utf8";
 static NSString* const kWordListFandomHarryPotter = @"harrypotter_8k_2018.utf8";
 static NSString* const kWordListFandomStarTrek = @"star_trek_8k_2018.utf8";
@@ -70,6 +72,7 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
                 [WordList named:NSLocalizedString(@"pwgen_wordlist_harrypotter", @"Harry Potter (EFF Fandom)") withKey:kWordListFandomHarryPotter withCategory:kWordListCategoryFandom],
                 [WordList named:NSLocalizedString(@"pwgen_wordlist_star_trek", @"Star Trek (EFF Fandom)") withKey:kWordListFandomStarTrek withCategory:kWordListCategoryFandom],
                 [WordList named:NSLocalizedString(@"pwgen_wordlist_starwars", @"Star Wars (EFF Fandom)") withKey:kWordListFandomStarWars withCategory:kWordListCategoryFandom],
+                [WordList named:NSLocalizedString(@"pwgen_wordlist_pt_br", @"Portuguese (Brazilian)") withKey:kWordListPtBr withCategory:kWordListCategoryLanguages],
             ];
             
             NSMutableDictionary<NSString*, WordList*>* wld = NSMutableDictionary.dictionary;

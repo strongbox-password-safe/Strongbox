@@ -10,6 +10,8 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
+#import "NSArray+Extensions.h"
+
 #include <pwd.h>
 
 #import <CoreImage/CoreImage.h>
@@ -84,6 +86,21 @@ BOOL isValidUrl(NSString* urlString) {
     
     return fn;
 }
+
++ (NSArray<NSString*>*)getTagsFromTagString:(NSString*)string {
+    NSArray<NSString*>* tags = [string componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@";:,"]]; 
+    
+    NSArray<NSString*>* trimmed = [tags map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        return [Utils trim:obj];
+    }];
+    
+    NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+        return obj.length > 0;
+    }];
+
+    return filtered;
+}
+
 
 + (NSString *)hostname {
 #if TARGET_OS_IPHONE

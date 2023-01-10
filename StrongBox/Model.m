@@ -24,6 +24,24 @@
 #import "WorkingCopyManager.h"
 #import "Constants.h"
 
+#if TARGET_OS_IPHONE
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
+#else
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_AutoFill-Swift.h"
+#endif
+
+#endif
+
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
 NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
@@ -35,6 +53,8 @@ NSString* const kAppStoreSaleNotificationKey = @"appStoreSaleNotification";
 NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-id";
 
 NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificationKey";
+NSString* const kTabsMayHaveChangedDueToModelEdit = @"kTabsMayHaveChangedDueToModelEdit-iOS";
+
 NSString* const kAsyncUpdateDone = @"kAsyncUpdateDone";
 NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
@@ -48,7 +68,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 @property NSSet<NSString*> *cachedLegacyFavourites;
 @property DatabaseAuditor* auditor;
-@property BOOL isAutoFillOpen;
+@property BOOL isNativeAutoFillAppExtensionOpen;
 @property BOOL forcedReadOnly;
 @property BOOL isDuressDummyMode;
 @property DatabaseModel* theDatabase;
@@ -61,6 +81,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 @property (readonly) id<SyncManagement> syncManagement;
 @property (readonly) id<SpinnerUI> spinnerUi;
 @property (readonly) NSArray<Node*>* legacyFavourites;
+
+@property (readonly) NSDictionary<NSString*, NSSet<NSUUID*>*> *domainNodeMap; 
 
 @end
 
@@ -104,7 +126,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 #if TARGET_OS_IPHONE
 
-- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
+- (instancetype)initAsDuressDummy:(BOOL)isNativeAutoFillAppExtensionOpen
                  templateMetaData:(METADATA_PTR)templateMetaData {
     METADATA_PTR meta = [DatabasePreferences templateDummyWithNickName:templateMetaData.nickName
                                                        storageProvider:templateMetaData.storageProvider
@@ -115,7 +137,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     NSData* data = [self getDuressDummyData];
     if (!data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
-
+        
         DatabaseModel* model = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:cpf];
         
         [SampleItemsGenerator addSampleGroupAndRecordToRoot:model passwordConfig:self.applicationPreferences.passwordGenerationConfig];
@@ -124,13 +146,13 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         
         [self setDuressDummyData:data];
     }
-
+    
     DatabaseModel* model = [Serializator expressFromData:data password:@"1234"];
     
     return [self initWithDatabase:model
                          metaData:meta
                    forcedReadOnly:NO
-                       isAutoFill:isAutoFillOpen
+                       isAutoFill:isNativeAutoFillAppExtensionOpen
                       offlineMode:NO
                 isDuressDummyMode:YES];
 }
@@ -172,13 +194,14 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
             return nil;
         }
         
+        _domainNodeMap = @{};
         _metadata = metaData;
         self.theDatabase = passwordDatabase;
         self.asyncUpdateEncryptionQueue = dispatch_queue_create("Model-AsyncUpdateEncryptionQueue", DISPATCH_QUEUE_SERIAL);
         self.asyncUpdatesStack = ConcurrentMutableStack.mutableStack;
         
         _cachedLegacyFavourites = [NSSet setWithArray:self.metadata.favourites];
-                
+        
         if ( self.applicationPreferences.databasesAreAlwaysReadOnly ) {
             self.forcedReadOnly = YES;
         }
@@ -186,9 +209,11 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
             self.forcedReadOnly = forcedReadOnly;
         }
         
-        self.isAutoFillOpen = isAutoFill;
+        self.isNativeAutoFillAppExtensionOpen = isAutoFill;
         self.isDuressDummyMode = isDuressDummyMode;
         self.offlineMode = offlineMode;
+        
+        [self rebuildAutoFillDomainNodeMap];
         
         [self createNewAuditor];
         
@@ -232,27 +257,30 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         });
         return;
     }
-
+    
     NSLog(@"reloadDatabaseFromLocalWorkingCopy....");
-
+    
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata
                                                         viewController:viewController
                                                          forceReadOnly:self.forcedReadOnly
-                                                        isAutoFillOpen:self.isAutoFillOpen
+                                      isNativeAutoFillAppExtensionOpen:self.isNativeAutoFillAppExtensionOpen
                                                            offlineMode:self.offlineMode];
-    [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+    
+    [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         if ( result == kUnlockDatabaseResultSuccess) {
             NSLog(@"reloadDatabaseFromLocalWorkingCopy... Success ");
-
+            
             self.theDatabase = model.database;
             if (completion) {
                 completion(YES);
             }
             
+            [self rebuildFastMaps];
+            
             [self restartBackgroundAudit];
-
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:nil];
+                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:self.databaseUuid];
             });
         }
         else {
@@ -261,7 +289,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
             
             
             
-
+            
             
             if (completion) {
                 completion(NO); 
@@ -272,11 +300,19 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
+- (CompositeKeyFactors *)ckfs {
+    return self.database.ckfs;
+}
+
+- (void)setCkfs:(CompositeKeyFactors *)ckfs {
+    self.database.ckfs = ckfs;
+}
+
 - (void)replaceEntireUnderlyingDatabaseWith:(DatabaseModel*)newDatabase {
     self.theDatabase = newDatabase;
     
     [self restartBackgroundAudit];
-
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:nil];
     });
@@ -292,6 +328,14 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 }
 
 - (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion)completion {
+    return [self asyncUpdateAndSync:NO completion:completion];
+}
+
+- (BOOL)asyncUpdate:(AsyncUpdateCompletion)completion {
+    return [self asyncUpdateAndSync:YES completion:completion];
+}
+
+- (BOOL)asyncUpdateAndSync:(BOOL)serializeOnlyNoSync completion:(AsyncUpdateCompletion _Nullable)completion {
     NSLog(@"asyncUpdateAndSync ENTER");
 
     if(self.isReadOnly) {
@@ -301,6 +345,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     AsyncUpdateJob* job = [[AsyncUpdateJob alloc] init];
     job.snapshot = [self.database clone];
+    job.serializeOnlyNoSync = serializeOnlyNoSync;
     job.completion = completion;
     
     [self.asyncUpdatesStack push:job];
@@ -325,38 +370,12 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     }
 }
 
-- (NSString*)getUniqueStreamingFilename {
-    NSString* ret;
-    
-    do {
-#if TARGET_OS_IPHONE
-        ret = [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
-#else
-        
-        
-        NSURL* localWorkingCacheUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCacheUrlForDatabase:self.databaseUuid];
-        NSError* error;
-        NSURL* url = [NSFileManager.defaultManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:localWorkingCacheUrl create:YES error:&error];
-
-        if ( !url ) {
-            NSLog(@"getUniqueStreamingFilename: ERROR = [%@]", error);
-            return [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
-        }
-
-        ret = [url URLByAppendingPathComponent:NSUUID.UUID.UUIDString].path;
-        NSLog(@"MacOS - getUniqueStreamingFilename [FINAL] = [%@]", ret);
-#endif
-    } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
-    
-    return ret;
-}
-
 - (void)queueAsyncUpdateWithDatabaseClone:(NSUUID*)updateId job:(AsyncUpdateJob*)job {
     NSLog(@"queueAsyncUpdateWithDatabaseClone ENTER - [%@]", NSThread.currentThread.name);
     
     _isRunningAsyncUpdate = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateStarting object:nil];
+        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateStarting object:self.databaseUuid];
     });
     
     dispatch_group_t mutex = dispatch_group_create();
@@ -380,12 +399,44 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
 }
 
+- (void)updateAutoFillQuickTypeDatabase {
+#ifndef IS_APP_EXTENSION 
+    if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
+                                                           databaseUuid:self.metadata.uuid
+                                                          displayFormat:self.metadata.quickTypeDisplayFormat
+                                                        alternativeUrls:self.metadata.autoFillScanAltUrls
+                                                           customFields:self.metadata.autoFillScanCustomFields
+                                                                  notes:self.metadata.autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds
+                                                               nickName:self.metadata.nickName];
+    }
+#endif
+}
+
+- (void)postSerializationRefreshCaches {
+    [self rebuildFastMaps];
+    
+    
+    
+    if (self.metadata.auditConfig.auditInBackground) {
+        [self restartAudit];
+    }
+    
+    
+    
+    [self updateAutoFillQuickTypeDatabase];
+}
+
 - (void)onAsyncUpdateSerializeDone:(NSUUID*)updateId
                      userCancelled:(BOOL)userCancelled
                      streamingFile:(NSString*)streamingFile
                        updateMutex:(dispatch_group_t)updateMutex
                                job:(AsyncUpdateJob*)job
                              error:(NSError * _Nullable)error {
+    [self postSerializationRefreshCaches];
+    
     if (userCancelled || error) {
         
         [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
@@ -409,37 +460,23 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:localUpdateError];
         return;
     }
-
-    
-
-    if (self.metadata.auditConfig.auditInBackground) {
-        [self restartAudit];
-    }
-
     
     
-    if ( self.offlineMode ) { 
+    
+    if ( self.offlineMode || job.serializeOnlyNoSync ) {
+        NSLog(@"ℹ️ Offline or Update ONLY mode - AsyncUpdateAndSync DONE");
+        
         [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
+        
         return;
     }
 
     [self.syncManagement sync:self.metadata
-                       interactiveVC:nil
-                                 key:self.database.ckfs
-                                join:NO
-                          completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+                interactiveVC:nil
+                          key:self.database.ckfs
+                         join:NO
+                   completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         if ( result == kSyncAndMergeSuccess ) {
-            if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
-                                                                   databaseUuid:self.metadata.uuid
-                                                                  displayFormat:self.metadata.quickTypeDisplayFormat
-                                                                alternativeUrls:self.metadata.autoFillScanAltUrls
-                                                                   customFields:self.metadata.autoFillScanCustomFields
-                                                                          notes:self.metadata.autoFillScanNotes
-                                                   concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
-                                                 unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds      nickName:self.metadata.nickName];
-            }
-
             [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
         }
         else if (result == kSyncAndMergeError) {
@@ -465,9 +502,9 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                     error:(NSError*)error {
     NSLog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localUpdated=%hhd, error=%@", updateId, success, userInteractionRequired, localUpdated, error);
 
-    AsyncUpdateResult* result;
-
-    result = [[AsyncUpdateResult alloc] init];
+    AsyncUpdateResult* result = [[AsyncUpdateResult alloc] init];
+    
+    result.databaseUuid = self.databaseUuid;
     result.success = success;
     result.error = error;
     result.userCancelled = userCancelled;
@@ -478,7 +515,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     _isRunningAsyncUpdate = NO;
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:nil];
+        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:result];
         
         if ( job.completion ) {
             job.completion(result);
@@ -506,6 +543,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         [self onEncryptionDone:viewController streamingFile:file completion:handler];
     }];
 }
+
+
 
 - (void)encrypt:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL userCancelled, NSString* file, NSString*_Nullable debugXml, NSError* error))completion {
     [self.spinnerUi show:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:viewController];
@@ -552,6 +591,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         return;
     }
     
+    [self updateAutoFillQuickTypeDatabase];
+    
     
     
     if (self.metadata.auditConfig.auditInBackground) {
@@ -568,17 +609,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                              join:NO
                        completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
             if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
-                if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
-                                                                       databaseUuid:self.metadata.uuid
-                                                                      displayFormat:self.metadata.quickTypeDisplayFormat
-                                                                    alternativeUrls:self.metadata.autoFillScanAltUrls
-                                                                       customFields:self.metadata.autoFillScanCustomFields
-                                                                              notes:self.metadata.autoFillScanNotes
-                                                       concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
-                                                     unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds nickName:self.metadata.nickName];
-                }
-
                 completion(NO, localWasChanged, nil);
             }
             else if (result == kSyncAndMergeError) {
@@ -598,6 +628,33 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     }
 }
 
+- (NSString*)getUniqueStreamingFilename {
+    NSString* ret;
+    
+    do {
+#if TARGET_OS_IPHONE
+        ret = [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+#else
+        
+        
+        NSURL* localWorkingCacheUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCacheUrlForDatabase:self.databaseUuid];
+        NSError* error;
+        NSURL* url = [NSFileManager.defaultManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:localWorkingCacheUrl create:YES error:&error];
+        
+        if ( !url ) {
+            NSLog(@"getUniqueStreamingFilename: ERROR = [%@]", error);
+            return [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+        }
+        
+        ret = [url URLByAppendingPathComponent:NSUUID.UUID.UUIDString].path;
+        NSLog(@"MacOS - getUniqueStreamingFilename [FINAL] = [%@]", ret);
+#endif
+    } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
+    
+    return ret;
+}
+
+
 
 
 - (AuditState)auditState {
@@ -605,7 +662,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 }
 
 - (void)restartBackgroundAudit {
-    if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
+    if (!self.isNativeAutoFillAppExtensionOpen && self.metadata.auditConfig.auditInBackground) {
          [self restartAudit];
     }
     else {
@@ -923,7 +980,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (BOOL)launchUrlString:(NSString*)urlString {
     NSURL* launchableUrl = [self.database launchableUrlForUrlString:urlString];
-        
+         
     if ( !launchableUrl ) {
         NSLog(@"Could not get launchable URL for string.");
         return NO;
@@ -1492,5 +1549,105 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 - (BOOL)formatSupportsTags {
     return self.originalFormat == kKeePass || self.originalFormat == kKeePass4;
 }
+
+
+
+- (void)rebuildFastMaps {
+    [self.database rebuildFastMaps];
+    
+    [self rebuildAutoFillDomainNodeMap];
+    
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kTabsMayHaveChangedDueToModelEdit object:nil];
+    });
+}
+
+- (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
+#ifndef IS_APP_EXTENSION 
+    if ( self.metadata.autoFillEnabled ) {
+        NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString domainNodeMap:self.domainNodeMap];
+        
+        NSArray<Node*> *ret = [self getItemsById:matches.allObjects];
+        
+        return [ret sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            return [BrowserAutoFillManager compareMatchesWithNode1:obj1
+                                                             node2:obj2
+                                                               url:urlString
+                                                       isFavourite:^BOOL(Node * _Nonnull node) {
+                return [self isFavourite:node.uuid];
+            }];
+        }];
+    }
+    else {
+        return @[];
+    }
+#else
+    NSLog(@"🔴 getAutoFillMatchingNodesForUrl called in AutoFill mode?!");
+    return @[];
+#endif
+}
+
+- (void)rebuildAutoFillDomainNodeMap {
+    NSLog(@"Model::rebuildAutoFillDomainNodeMap");
+
+#ifndef IS_APP_EXTENSION 
+    if ( self.metadata.autoFillEnabled ) {
+        _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self.database
+                                                   alternativeUrls:self.metadata.autoFillScanAltUrls
+                                                      customFields:self.metadata.autoFillScanCustomFields
+                                                             notes:self.metadata.autoFillScanNotes];
+    }
+    else {
+        _domainNodeMap = @{};
+    }
+#else
+    _domainNodeMap = @{};
+#endif
+}
+
+#if TARGET_OS_IPHONE
+
+- (BrowseSortConfiguration*)getDefaultSortConfiguration {
+    BrowseSortConfiguration* ret = [[BrowseSortConfiguration alloc] init];
+    
+    
+    
+    ret.field = kBrowseSortFieldTitle;
+    ret.descending = NO;
+    ret.foldersOnTop = YES;
+    ret.showAlphaIndex = NO;
+    
+    return ret;
+}
+
+- (BrowseSortConfiguration*)getSortConfigurationForViewType:(BrowseViewType)viewType {
+    BrowseSortConfiguration* config = self.metadata.sortConfigurations[@(viewType).stringValue];
+
+    if ( config == nil ) { 
+        BrowseSortConfiguration* legacyConfig = [[BrowseSortConfiguration alloc] init];
+        
+        legacyConfig.field = self.metadata.browseSortField;
+        legacyConfig.descending = self.metadata.browseSortOrderDescending;
+        legacyConfig.foldersOnTop = self.metadata.browseSortFoldersSeparately;
+        legacyConfig.showAlphaIndex = viewType == kBrowseViewTypeList || viewType == kBrowseViewTypeTotpList;
+        
+        return legacyConfig;
+    }
+    
+    return config;
+}
+
+- (void)setSortConfigurationForViewType:(BrowseViewType)viewType
+                          configuration:(BrowseSortConfiguration *)configuration {
+    NSMutableDictionary* mut = self.metadata.sortConfigurations.mutableCopy;
+
+    mut[@(viewType).stringValue] = configuration;
+    
+    self.metadata.sortConfigurations = mut;
+}
+
+#endif
 
 @end

@@ -15,9 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ConfiguredBrowseTableDatasource : NSObject <BrowseTableDatasource>
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithModel:(Model*)model isDisplayingRootGroup:(BOOL)isDisplayingRootGroup tableView:(UITableView*)tableView NS_DESIGNATED_INITIALIZER;
 
-- (void)refreshItems:(NSUUID*)currentGroup;
+- (instancetype)initWithModel:(Model*)model
+        isDisplayingRootGroup:(BOOL)isDisplayingRootGroup
+                    tableView:(UITableView*)tableView
+                     viewType:(BrowseViewType)viewType
+               currentGroupId:(NSUUID*_Nullable)currentGroupId
+                   currentTag:(NSString*_Nullable)currentTag NS_DESIGNATED_INITIALIZER;
+
+- (void)refresh;
 
 @end
 

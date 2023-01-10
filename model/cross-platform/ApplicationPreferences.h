@@ -32,7 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL stripUnusedIconsOnSave;
 @property BOOL useIsolatedDropbox;
-@property (readonly) BOOL expressUpdateSyncPerfImprovementEnabled;
 
 @end
 

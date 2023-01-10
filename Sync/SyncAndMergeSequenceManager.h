@@ -18,7 +18,7 @@ typedef NS_ENUM (NSUInteger, SyncAndMergeResult) {
     kSyncAndMergeResultUserCancelled,
     kSyncAndMergeResultUserInteractionRequired,
     kSyncAndMergeError,
-    kSyncAndMergeUserPostponedSync,
+    kSyncAndMergeUserPostponedSync, 
     kSyncAndMergeSuccess,
 };
 

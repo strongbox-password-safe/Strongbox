@@ -56,3 +56,4 @@
 #import "macOSSpinnerUI.h"
 #import "DiffDrillDownDetailer.h"
 #import "AutoFillCommon.h"
+#import "NSString+Levenshtein.h"

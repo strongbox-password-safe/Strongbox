@@ -16,7 +16,7 @@ import Cocoa
 
 class BrowseViewController: NSViewController {
     deinit {
-        NSLog("😎 DEINIT [MasterViewController]")
+        NSLog("😎 DEINIT [BrowseViewController]")
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -298,7 +298,7 @@ class BrowseViewController: NSViewController {
         }
         
         if !isSearching, case .auditIssues = navigationContext {
-            NSLog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+
 
             refresh()
         }
@@ -310,7 +310,7 @@ class BrowseViewController: NSViewController {
         }
 
         if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenSelectedItemsChanged) {
-            NSLog("BrowseViewController::-Notify: Selected Items Changed")
+
             bindSelectionToModel(selectFirstItemIfSelectionNotFound: false)
         } else if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenNavigationChanged) ||
             notification.name == NSNotification.Name(kModelUpdateNotificationNextGenSearchContextChanged) ||
@@ -335,7 +335,7 @@ class BrowseViewController: NSViewController {
     }
 
     func refresh(maintainSelectionIfPossible: Bool = true, selectFirstItemIfSelectionNotFound: Bool = false) {
-        NSLog("✅ BrowseViewController::refresh() - [%@]", database.nextGenSelectedItems)
+
 
         adjustHeightConstraintsWithAnimation() 
 
@@ -363,18 +363,18 @@ class BrowseViewController: NSViewController {
         let selected = database.nextGenSelectedItems
         let selectedIndices = getRowIndicesForItemIds(itemIds: selected)
 
-        NSLog("✅ BrowseViewController::bindSelectionToModel() - [%@], selectedRowIndices = [%@]", database.nextGenSelectedItems, String(describing: selectedIndices))
+
 
         if selectedIndices.isEmpty {
             if items.count == 0 {
-                NSLog("✅ BrowseViewController::bindSelectionToModel - current selection not found, empty group/view - Selecting None")
+
                 database.nextGenSelectedItems = [] 
             } else if selectFirstItemIfSelectionNotFound {
-                NSLog("✅ BrowseViewController::bindSelectionToModel - current selection not found - Selecting First Item")
+
                 outlineView.selectRowIndexes(IndexSet(integer: 0), byExtendingSelection: false) 
             }
         } else {
-            NSLog("✅ BrowseViewController::bindSelectionToModel - Maintaining Selection OK = [%@]",  String(describing: selectedIndices.first))
+
             outlineView.selectRowIndexes(selectedIndices, byExtendingSelection: false)
         }
     }
@@ -676,7 +676,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
             item.uuid
         }
 
-        NSLog("✅ BrowseViewController::outlineViewSelectionDidChange: [%@]", selectedUuids)
+
 
         database.nextGenSelectedItems = selectedUuids
     }

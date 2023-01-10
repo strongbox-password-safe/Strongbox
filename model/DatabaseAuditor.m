@@ -17,6 +17,8 @@
 #import "SecretStore.h"
 #import "Utils.h"
 #import "PasswordStrengthTester.h"
+#import "NSString+Extensions.h"
+#import "Strongbox-Swift.h"
 
 static const int kHttpStatusOk = 200;
 static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwnedSetCacheKey";
@@ -567,41 +569,15 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         if ( obj.fields.otpToken ) {
             return NO;
         }
-        
-        NSString* urlStr = obj.fields.url;
-        if ( urlStr.length == 0 ) {
+
+        NSString* domain = [BrowserAutoFillManager extractPSLDomainFromUrlWithUrl:obj.fields.url];
+
+        if ( domain ) {
+            return [kTwoFactorDomains containsObject:domain];
+        }
+        else {
             return NO;
         }
-        NSURL* url = urlStr.urlExtendedParse;
-        if( url == nil || url.host.length == 0 ) {
-            return NO;
-        }
-        
-        NSString* host = url.host; 
-        NSArray<NSString*>* comp = [host componentsSeparatedByString:@"."];
-        
-        
-        
-        if ( comp.count > 2 ) {
-            unsigned long lastIdx = comp.count - 1;
-            NSString* reconstructed = [NSString stringWithFormat:@"%@.%@.%@", comp[lastIdx-2], comp[lastIdx-1], comp[lastIdx]].lowercaseString;
-
-            
-            if ( [kTwoFactorDomains containsObject:reconstructed] ) {
-                return YES;
-            }
-        }
-        
-        if ( comp.count > 1 ) {
-            unsigned long lastIdx = comp.count - 1;
-            NSString* reconstructed = [NSString stringWithFormat:@"%@.%@", comp[lastIdx-1], comp[lastIdx]].lowercaseString;
-
-            if ( [kTwoFactorDomains containsObject:reconstructed] ) {
-                return YES;
-            }
-        }
-
-        return NO;
     }];
     
     return [results map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {

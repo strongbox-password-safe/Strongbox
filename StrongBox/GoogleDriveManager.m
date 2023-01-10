@@ -102,38 +102,35 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 - (void)authenticate:(VIEW_CONTROLLER_PTR)viewController
           completion:(Authenticationcompletion)completion {
     if (!viewController) { 
+        NSLog(@"✅ Google Drive Sign In - Background Mode - Thread [%@] - completion = [%@]", NSThread.currentThread, completion);
 
-
-
+        NSLog(@"✅ GoogleDriveManager::authenticate - Attempting to restore previous sign in...");
         
-        [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user,
-                                                                        NSError * _Nullable error) {
+        [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
+            NSLog(@"✅ GoogleDriveManager::authenticate - restore previous sign in done with error = [%@] and user = [%@]", error, user);
 
-
-            [self onDidSignInForUser:user
-                          completion:completion
-                      backgroundSync:YES
-                           withError:error];
+            [self onDidSignInForUser:user completion:completion backgroundSync:YES withError:error];
         }];
 
     }
     else {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
-
-
-            if ( GIDSignIn.sharedInstance.hasPreviousSignIn ) {
-                [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user,
-                                                                                NSError * _Nullable error) {
-
-
-                    [self onDidSignInForUser:user completion:completion backgroundSync:NO withError:error];
-                }];
-            }
-            else {
+        NSLog(@"✅ Google Drive Sign In - Foreground Interactive Mode - Thread [%@]", NSThread.currentThread);
+        
+        if ( GIDSignIn.sharedInstance.hasPreviousSignIn ) {
+            [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
+                NSLog(@"✅ GoogleDriveManager::authenticate - restore previous sign in done with error = [%@] and user = [%@]", error, user);
+                
+                [self onDidSignInForUser:user completion:completion backgroundSync:NO withError:error];
+            }];
+        }
+        else {
 #if TARGET_OS_IPHONE
-                AppPreferences.sharedInstance.suppressAppBackgroundTriggers = YES;
+            AppPreferences.sharedInstance.suppressAppBackgroundTriggers = YES;
 #endif
-
+            
+            
+                
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [GIDSignIn.sharedInstance signInWithConfiguration:[[GIDConfiguration alloc] initWithClientID:GOOGLE_CLIENT_ID]
 #if TARGET_OS_IPHONE
                                          presentingViewController:viewController
@@ -144,11 +141,11 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
                                                  additionalScopes:@[kGTLRAuthScopeDrive]
                                                          callback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
                     NSLog(@"✅ GoogleDriveManager::authenticate - signInWithConfiguration in done with error = [%@] and user = [%@]", error, user);
-
+                    
                     [self onDidSignInForUser:user completion:completion backgroundSync:NO withError:error];
                 }];
-            }
-        });
+            });
+        }
     }
 }
 

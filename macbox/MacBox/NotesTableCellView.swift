@@ -29,11 +29,21 @@ class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
 
         textViewMarkdown.refuseFirstResponder = true
         textViewMarkdown.delegate = self
+        
+        textViewMarkdown.enabledTextCheckingTypes = 0
+        textViewMarkdown.isAutomaticQuoteSubstitutionEnabled = false
+        textViewMarkdown.isAutomaticTextReplacementEnabled = false
+        textViewMarkdown.isAutomaticDashSubstitutionEnabled = false
     }
 
     override func prepareForReuse() {
         textViewMarkdown.markdownEnabled = false
         textViewMarkdown.string = "<Not Set>"
+                
+        textViewMarkdown.enabledTextCheckingTypes = 0
+        textViewMarkdown.isAutomaticQuoteSubstitutionEnabled = false
+        textViewMarkdown.isAutomaticTextReplacementEnabled = false
+        textViewMarkdown.isAutomaticDashSubstitutionEnabled = false
     }
 
     var isSomeTextSelected : Bool {

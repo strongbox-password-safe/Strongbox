@@ -31,6 +31,12 @@
     }];
 }
 
++ (instancetype)getById:(NSString *)databaseId {
+    return [MacDatabasePreferences.allDatabases firstOrDefault:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+        return [obj.uuid isEqual:databaseId];
+    }];
+}
+
 + (NSArray<MacDatabasePreferences *> *)allDatabases {
     return [DatabasesManager.sharedInstance.snapshot map:^id _Nonnull(DatabaseMetadata * _Nonnull obj, NSUInteger idx) {
         return [MacDatabasePreferences fromUuid:obj.uuid];
@@ -486,13 +492,13 @@
 
 
 
-- (BOOL)offlineMode {
-    return self.metadata.offlineMode;
+- (BOOL)userRequestOfflineOpenEphemeralFlagForDocument {
+    return self.metadata.userRequestOfflineOpenEphemeralFlagForDocument;
 }
 
-- (void)setOfflineMode:(BOOL)offlineMode {
+- (void)setUserRequestOfflineOpenEphemeralFlagForDocument:(BOOL)userRequestOfflineOpenEphemeralFlagForDocument {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.offlineMode = offlineMode;
+        metadata.userRequestOfflineOpenEphemeralFlagForDocument = userRequestOfflineOpenEphemeralFlagForDocument;
     }];
 
 }
@@ -675,19 +681,6 @@
 - (void)setShowAdvancedUnlockOptions:(BOOL)showAdvancedUnlockOptions {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.showAdvancedUnlockOptions = showAdvancedUnlockOptions;
-    }];
-
-}
-
-
-
-- (BOOL)lockOnScreenLock {
-    return self.metadata.lockOnScreenLock;
-}
-
-- (void)setLockOnScreenLock:(BOOL)lockOnScreenLock {
-    [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.lockOnScreenLock = lockOnScreenLock;
     }];
 
 }
@@ -1096,6 +1089,81 @@
 
 
 - (NSDictionary<NSString*, NSString *> *)debugInfoLines {
+    NSMutableDictionary<NSString*, NSString*>* debugLines = NSMutableDictionary.dictionary;
+    
+    debugLines[@"nickName"] = self.nickName; 
+    debugLines[@"fileUrl"] = [NSString stringWithFormat:@"%@", self.fileUrl]; 
+    debugLines[@"keyFileBookmark"] = [NSString stringWithFormat:@"%@", self.keyFileBookmark ? @"YES" : @"NO" ];
+    debugLines[@"autoFillEnabled"] = [NSString stringWithFormat:@"%hhd", self.autoFillEnabled]; 
+    debugLines[@"quickTypeEnabled"] = [NSString stringWithFormat:@"%hhd", self.quickTypeEnabled]; 
+    debugLines[@"quickTypeDisplayFormat"] = [NSString stringWithFormat:@"%ld", (long)self.quickTypeDisplayFormat]; 
+    debugLines[@"quickWormholeFillEnabled"] = [NSString stringWithFormat:@"%hhd", self.quickWormholeFillEnabled]; 
+    debugLines[@"hasPromptedForAutoFillEnrol"] = [NSString stringWithFormat:@"%hhd", self.hasPromptedForAutoFillEnrol]; 
+    debugLines[@"outstandingUpdateId"] = [NSString stringWithFormat:@"%@", self.outstandingUpdateId]; 
+    debugLines[@"lastSyncRemoteModDate"] = [NSString stringWithFormat:@"%@", self.lastSyncRemoteModDate.iso8601DateString]; 
+    debugLines[@"lastSyncAttempt"] = [NSString stringWithFormat:@"%@", self.lastSyncAttempt.iso8601DateString]; 
+    debugLines[@"launchAtStartup"] = [NSString stringWithFormat:@"%hhd", self.launchAtStartup]; 
+    debugLines[@"autoPromptForConvenienceUnlockOnActivate"] = [NSString stringWithFormat:@"%hhd", self.autoPromptForConvenienceUnlockOnActivate]; 
+    debugLines[@"autoFillConvenienceAutoUnlockTimeout"] = [NSString stringWithFormat:@"%ld", self.autoFillConvenienceAutoUnlockTimeout]; 
+    debugLines[@"autoFillLastUnlockedAt"] = [NSString stringWithFormat:@"%@", self.autoFillLastUnlockedAt.iso8601DateString]; 
+    debugLines[@"conflictResolutionStrategy"] = [NSString stringWithFormat:@"%ld", self.conflictResolutionStrategy]; 
+    debugLines[@"monitorForExternalChanges"] = [NSString stringWithFormat:@"%hhd", self.monitorForExternalChanges]; 
+    debugLines[@"monitorForExternalChangesInterval"] = [NSString stringWithFormat:@"%ld", self.monitorForExternalChangesInterval]; 
+    debugLines[@"autoReloadAfterExternalChanges"] = [NSString stringWithFormat:@"%hhd", self.autoReloadAfterExternalChanges]; 
+    debugLines[@"maxBackupKeepCount"] = [NSString stringWithFormat:@"%ld", self.maxBackupKeepCount]; 
+    debugLines[@"makeBackups"] = [NSString stringWithFormat:@"%hhd", self.makeBackups]; 
+    debugLines[@"userRequestOfflineOpenEphemeralFlagForDocument"] = [NSString stringWithFormat:@"%hhd", self.userRequestOfflineOpenEphemeralFlagForDocument]; 
+    debugLines[@"alwaysOpenOffline"] = [NSString stringWithFormat:@"%hhd", self.alwaysOpenOffline]; 
+    debugLines[@"readOnly"] = [NSString stringWithFormat:@"%hhd", self.readOnly]; 
+    debugLines[@"showQuickView"] = [NSString stringWithFormat:@"%hhd", self.showQuickView]; 
+    debugLines[@"doNotShowTotp"] = [NSString stringWithFormat:@"%hhd", self.doNotShowTotp]; 
+    debugLines[@"noAlternatingRows"] = [NSString stringWithFormat:@"%hhd", self.noAlternatingRows]; 
+    debugLines[@"showHorizontalGrid"] = [NSString stringWithFormat:@"%hhd", self.showHorizontalGrid]; 
+    debugLines[@"showVerticalGrid"] = [NSString stringWithFormat:@"%hhd", self.showVerticalGrid]; 
+    debugLines[@"doNotShowAutoCompleteSuggestions"] = [NSString stringWithFormat:@"%hhd", self.doNotShowAutoCompleteSuggestions]; 
+    debugLines[@"doNotShowChangeNotifications"] = [NSString stringWithFormat:@"%hhd", self.doNotShowChangeNotifications]; 
+    debugLines[@"outlineViewTitleIsReadonly"] = [NSString stringWithFormat:@"%hhd", self.outlineViewTitleIsReadonly]; 
+    debugLines[@"outlineViewEditableFieldsAreReadonly"] = [NSString stringWithFormat:@"%hhd", self.outlineViewEditableFieldsAreReadonly]; 
+    debugLines[@"concealEmptyProtectedFields"] = [NSString stringWithFormat:@"%hhd", self.concealEmptyProtectedFields]; 
+    debugLines[@"startWithSearch"] = [NSString stringWithFormat:@"%hhd", self.startWithSearch]; 
+    debugLines[@"showAdvancedUnlockOptions"] = [NSString stringWithFormat:@"%hhd", self.showAdvancedUnlockOptions]; 
+    debugLines[@"expressDownloadFavIconOnNewOrUrlChanged"] = [NSString stringWithFormat:@"%hhd", self.expressDownloadFavIconOnNewOrUrlChanged]; 
+    debugLines[@"doNotShowRecycleBinInBrowse"] = [NSString stringWithFormat:@"%hhd", self.doNotShowRecycleBinInBrowse]; 
+    debugLines[@"showRecycleBinInSearchResults"] = [NSString stringWithFormat:@"%hhd", self.showRecycleBinInSearchResults]; 
+    debugLines[@"uiDoNotSortKeePassNodesInBrowseView"] = [NSString stringWithFormat:@"%hhd", self.uiDoNotSortKeePassNodesInBrowseView]; 
+    debugLines[@"hasSetInitialWindowPosition"] = [NSString stringWithFormat:@"%hhd", self.hasSetInitialWindowPosition]; 
+    debugLines[@"autoFillScanAltUrls"] = [NSString stringWithFormat:@"%hhd", self.autoFillScanAltUrls]; 
+    debugLines[@"autoFillScanCustomFields"] = [NSString stringWithFormat:@"%hhd", self.autoFillScanCustomFields]; 
+    debugLines[@"autoFillScanNotes"] = [NSString stringWithFormat:@"%hhd", self.autoFillScanNotes]; 
+    debugLines[@"unlockCount"] = [NSString stringWithFormat:@"%ld", self.unlockCount]; 
+    debugLines[@"likelyFormat"] = [NSString stringWithFormat:@"%ld", self.likelyFormat]; 
+    debugLines[@"emptyOrNilPwPreferNilCheckFirst"] = [NSString stringWithFormat:@"%hhd", self.emptyOrNilPwPreferNilCheckFirst]; 
+    debugLines[@"isTouchIdEnabled"] = [NSString stringWithFormat:@"%hhd", self.isTouchIdEnabled]; 
+    debugLines[@"isWatchUnlockEnabled"] = [NSString stringWithFormat:@"%hhd", self.isWatchUnlockEnabled]; 
+    debugLines[@"hasPromptedForTouchIdEnrol"] = [NSString stringWithFormat:@"%hhd", self.hasPromptedForTouchIdEnrol]; 
+    debugLines[@"touchIdPasswordExpiryPeriodHours"] = [NSString stringWithFormat:@"%ld", self.touchIdPasswordExpiryPeriodHours]; 
+    debugLines[@"isConvenienceUnlockEnabled"] = [NSString stringWithFormat:@"%hhd", self.isConvenienceUnlockEnabled]; 
+    debugLines[@"conveniencePasswordHasExpired"] = [NSString stringWithFormat:@"%hhd", self.conveniencePasswordHasExpired]; 
+    debugLines[@"hasBeenPromptedForConvenience"] = [NSString stringWithFormat:@"%hhd", self.hasBeenPromptedForConvenience]; 
+    debugLines[@"convenienceExpiryPeriod"] = [NSString stringWithFormat:@"%ld", self.convenienceExpiryPeriod]; 
+    debugLines[@"conveniencePasswordHasBeenStored"] = [NSString stringWithFormat:@"%hhd", self.conveniencePasswordHasBeenStored]; 
+    debugLines[@"autoFillConcealedFieldsAsCreds"] = [NSString stringWithFormat:@"%hhd", self.autoFillConcealedFieldsAsCreds]; 
+    debugLines[@"autoFillUnConcealedFieldsAsCreds"] = [NSString stringWithFormat:@"%hhd", self.autoFillUnConcealedFieldsAsCreds]; 
+    debugLines[@"asyncUpdateId"] = [NSString stringWithFormat:@"%@", self.asyncUpdateId]; 
+    debugLines[@"promptedForAutoFetchFavIcon"] = [NSString stringWithFormat:@"%hhd", self.promptedForAutoFetchFavIcon]; 
+    debugLines[@"iconSet"] = [NSString stringWithFormat:@"%ld", self.iconSet]; 
+    debugLines[@"sideBarNavigationContext"] = [NSString stringWithFormat:@"%ld", self.sideBarNavigationContext]; 
+    debugLines[@"sideBarSelectedSpecial"] = [NSString stringWithFormat:@"%ld", self.sideBarSelectedSpecial]; 
+    debugLines[@"sideBarSelectedAuditCategory"] = [NSString stringWithFormat:@"%ld", self.sideBarSelectedAuditCategory]; 
+    debugLines[@"searchScope"] = [NSString stringWithFormat:@"%ld", self.searchScope]; 
+    debugLines[@"showChildCountOnFolderInSidebar"] = [NSString stringWithFormat:@"%hhd", self.showChildCountOnFolderInSidebar]; 
+    debugLines[@"customSortOrderForFields"] = [NSString stringWithFormat:@"%hhd", self.customSortOrderForFields]; 
+    debugLines[@"autoFillCopyTotp"] = [NSString stringWithFormat:@"%hhd", self.autoFillCopyTotp]; 
+    
+    return debugLines;
+}
+
+- (NSDictionary<NSString*, NSString *> *)debugInfoLines_old {
     NSMutableDictionary<NSString*, NSString*>* debugLines = NSMutableDictionary.dictionary;
     
     @autoreleasepool {

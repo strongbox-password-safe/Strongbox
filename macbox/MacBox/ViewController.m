@@ -37,7 +37,6 @@
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "NSDate+Extensions.h"
-#import "DatabasesManagerVC.h"
 #import "AutoFillManager.h"
 
 #import "SecretStore.h"
@@ -264,7 +263,6 @@ static NSString* const kNewEntryKey = @"newEntry";
     
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-
         dispatch_group_t group = dispatch_group_create();
 
         for (NodeDetailsViewController *vc in vcs) {
@@ -769,8 +767,7 @@ static NSString* const kNewEntryKey = @"newEntry";
     
     [self.outlineView reloadData];
     
-    Node* selectedItem = [self.viewModel getItemFromSerializationId:self.document.selectedItem];
-    [self selectItem:selectedItem];
+    [self selectItem:nil];
     
     self.buttonCreateGroup.enabled = !self.viewModel.isEffectivelyReadOnly;
     self.buttonCreateRecord.enabled = !self.viewModel.isEffectivelyReadOnly;
@@ -1494,8 +1491,8 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 
 
-- (void)onLockDone {
-    NSLog(@"ViewController::onLockDone");
+- (void)stopObservingModelAndCleanup {
+    NSLog(@"ViewController::stopObservingModelAndCleanup");
         
     [self stopObservingModelChanges];
     

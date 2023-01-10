@@ -175,13 +175,13 @@
 - (NSURL*)cleanupUrl:(NSURL*)url trimToDomainOnly:(BOOL)trimToDomainOnly {
     
 
-    if(url.scheme.length == 0) {
+    if ( url && url.scheme.length == 0 ) {
         NSString* foo = [@"https:
         url = foo.urlExtendedParse;
 
     }
     
-    if(trimToDomainOnly) {
+    if(url && trimToDomainOnly) {
         NSURLComponents* components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
     
         if(components) {
