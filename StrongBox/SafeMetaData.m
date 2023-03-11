@@ -8,7 +8,7 @@
 
 #import "SafeMetaData.h"
 #import "SecretStore.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "ItemDetailsViewController.h"
 #import "NSDate+Extensions.h"
 
@@ -70,11 +70,6 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         
         self.tapAction = kBrowseTapActionOpenDetails;
 
-        
-        self.doubleTapAction = kBrowseTapActionCopyPassword;
-        self.tripleTapAction = kBrowseTapActionCopyTotp;
-        self.longPressTapAction = kBrowseTapActionCopyUsername;
-
         self.colorizePasswords = YES;
         self.keePassIconSet = kKeePassIconSetSfSymbols;
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
@@ -104,6 +99,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
                              @(kBrowseViewTypeTotpList)];
     
         self.sortConfigurations = @{}; 
+        self.customSortOrderForFields = YES; 
     }
     
     return self;
@@ -205,10 +201,9 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( jsonDictionary[@"browseViewType"] != nil ) ret.browseViewType = ((NSNumber*)jsonDictionary[@"browseViewType"]).unsignedIntegerValue;
     if ( jsonDictionary[@"browseSortField"] != nil ) ret.browseSortField = ((NSNumber*)jsonDictionary[@"browseSortField"]).unsignedIntegerValue;
     if ( jsonDictionary[@"maxBackupKeepCount"] != nil ) ret.maxBackupKeepCount = ((NSNumber*)jsonDictionary[@"maxBackupKeepCount"]).unsignedIntegerValue;
+
     if ( jsonDictionary[@"tapAction"] != nil ) ret.tapAction = ((NSNumber*)jsonDictionary[@"tapAction"]).unsignedIntegerValue;
-    if ( jsonDictionary[@"doubleTapAction"] != nil ) ret.doubleTapAction = ((NSNumber*)jsonDictionary[@"doubleTapAction"]).unsignedIntegerValue;
-    if ( jsonDictionary[@"tripleTapAction"] != nil ) ret.tripleTapAction = ((NSNumber*)jsonDictionary[@"tripleTapAction"]).unsignedIntegerValue;
-    if ( jsonDictionary[@"longPressTapAction"] != nil ) ret.longPressTapAction = ((NSNumber*)jsonDictionary[@"longPressTapAction"]).unsignedIntegerValue;
+
     if ( jsonDictionary[@"storageProvider"] != nil ) ret.storageProvider = ((NSNumber*)jsonDictionary[@"storageProvider"]).unsignedIntegerValue;
     if ( jsonDictionary[@"duressAction"] != nil ) ret.duressAction = ((NSNumber*)jsonDictionary[@"duressAction"]).unsignedIntegerValue;
     if ( jsonDictionary[@"failedPinAttempts"] != nil ) ret.failedPinAttempts = ((NSNumber*)jsonDictionary[@"failedPinAttempts"]).intValue;
@@ -443,7 +438,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.customSortOrderForFields = ((NSNumber*)jsonDictionary[@"customSortOrderForFields"]).boolValue;
     }
     else {
-        ret.customSortOrderForFields = NO;
+        ret.customSortOrderForFields = YES;
     }
     
     
@@ -569,9 +564,6 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"hideTotpCustomFieldsInViewMode" : @(self.hideTotpCustomFieldsInViewMode),
         @"hideIconInBrowse" : @(self.hideIconInBrowse),
         @"tapAction" : @(self.tapAction),
-        @"doubleTapAction" : @(self.doubleTapAction),
-        @"tripleTapAction" : @(self.tripleTapAction),
-        @"longPressTapAction" : @(self.longPressTapAction),
         @"colorizePasswords" : @(self.colorizePasswords),
         @"keePassIconSet" : @(self.keePassIconSet),
         @"isTouchIdEnabled" : @(self.isTouchIdEnabled),
@@ -905,9 +897,9 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 }
 
 - (NSURL *)backupsDirectory {
-    NSURL* url = [FileManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
+    NSURL* url = [StrongboxFilesManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
     
-    [FileManager.sharedInstance createIfNecessary:url];
+    [StrongboxFilesManager.sharedInstance createIfNecessary:url];
     
     return url;
 }

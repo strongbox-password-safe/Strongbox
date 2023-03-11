@@ -149,7 +149,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 - (BOOL)isKeePass2Format {
-    return self.format == kKeePass || self.format == kKeePass4;
+    return self.innerModel.isKeePass2Format;
 }
 
 - (NSSet<NodeIcon*>*)customIcons {
@@ -313,17 +313,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     [self rebuildFastMaps];
     
     [self.innerModel update:viewController handler:handler];
-}
-
-- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL))completion {
-    if (self.locked) {
-        NSLog(@"🔴 Attempt to get update while locked?");
-        return;
-    }
-    
-    [self.innerModel reloadDatabaseFromLocalWorkingCopy:viewController completion:^(BOOL success) {
-        completion(success);
-    }];
 }
 
 
@@ -580,22 +569,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 }
 
 
-
-- (NSUUID *)selectedItem {
-    return self.internalSelectedItem;
-}
-
-- (void)setSelectedItem:(NSUUID *)selectedItem {
-    if(self.locked) {
-        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
-    }
-    
-    self.internalSelectedItem = selectedItem;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationSelectedItemChanged object:self userInfo:@{ }];
-    });
-}
 
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title {
     return [self setItemTitle:item title:title modified:nil];
@@ -891,6 +864,23 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationExpiryChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
+}
+
+- (void)setSearchableState:(Node *)item searchable:(NSNumber*)searchable {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    if ( self.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 setSearchableState - Model is RO!");
+        return;
+    }
+    
+    
+    
+    item.fields.enableSearching = searchable;
+    [self touchAndModify:item modDate:NSDate.date];
+    [self.document updateChangeCount:NSChangeDone];
 }
 
 - (void)setGroupExpandedState:(Node *)item expanded:(BOOL)expanded {
@@ -1970,6 +1960,10 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     [self rebuildFastMaps];
 }
 
+- (BOOL)isInRecycled:(NSUUID *)itemId {
+    return [self.innerModel isInRecycled:itemId];
+}
+
 
 
 
@@ -2277,9 +2271,9 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     return self.database.usernameSet;
 }
 
-- (NSSet<NSString*> *)passwordSet {
-    return self.database.passwordSet;
-}
+
+
+
 
 - (NSString *)mostPopularUsername {
     return self.database.mostPopularUsername;

@@ -101,10 +101,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (void)bindUi {
-    UIColor* secondary = UIColor.darkGrayColor;
-    if (@available(iOS 13.0, *)) {
-        secondary = UIColor.secondaryLabelColor;
-    }
+    UIColor* secondary = UIColor.secondaryLabelColor;
 
     self.switchShowPopups.on = self.model.metadata.auditConfig.showAuditPopupNotifications;
     self.switchAuditInBackground.on = self.model.metadata.auditConfig.auditInBackground;

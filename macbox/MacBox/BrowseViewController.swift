@@ -67,6 +67,8 @@ class BrowseViewController: NSViewController {
         outlineView.register(NSNib(nibNamed: NSNib.Name(TitleAndIconCell.NibIdentifier.rawValue), bundle: nil), forIdentifier: TitleAndIconCell.NibIdentifier)
         outlineView.register(NSNib(nibNamed: NSNib.Name("CustomFieldTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("CustomFieldValueCellIdentifier"))
         outlineView.register(NSNib(nibNamed: NSNib.Name(SingleLinePillTableCellView.NibIdentifier.rawValue), bundle: nil), forIdentifier: SingleLinePillTableCellView.NibIdentifier)
+        
+        outlineView.register(NSNib(nibNamed: NSNib.Name("UrlCell"), bundle: nil), forIdentifier: UrlCell.NibIdentifier)
     }
 
     @objc func onRulesRowsDidChange(_: NSMenuItem) {
@@ -134,8 +136,8 @@ class BrowseViewController: NSViewController {
 
             tableColumn.headerCell.title = column.title
             tableColumn.identifier = column.identifier
-            tableColumn.minWidth = 100
-            tableColumn.width = 100
+            tableColumn.minWidth = 65
+            tableColumn.width = column == .title ? 200 : 150
             tableColumn.isHidden = !column.visibleByDefault
             tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: column.rawValue, ascending: true)
 
@@ -229,6 +231,11 @@ class BrowseViewController: NSViewController {
             self?.onDocumentUpdateNotificationReceived(notification)
         }
 
+        NotificationCenter.default.addObserver(forName: .genericRefreshAllDatabaseViews, object: nil, queue: nil)
+        { [weak self] notification in
+            self?.onGenericRefreshNotificationReceived(notification)
+        }
+        
         
 
         let auditNotificationsOfInterest: [String] = [
@@ -272,6 +279,16 @@ class BrowseViewController: NSViewController {
 
         NotificationCenter.default.addObserver(forName: .totpUpdate, object: nil, queue: nil) { [weak self] _ in
             self?.refreshOtpCodes()
+        }
+    }
+
+    func onGenericRefreshNotificationReceived(_ notification: Notification) {
+        if notification.object as? String != database.databaseUuid {
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.refresh()
         }
     }
 
@@ -320,7 +337,7 @@ class BrowseViewController: NSViewController {
             refresh(maintainSelectionIfPossible: true, selectFirstItemIfSelectionNotFound: true)
         } else {
             NSLog("BrowseViewController::-Notify: Model Update notification received - refreshing...")
-            refresh(maintainSelectionIfPossible: true, selectFirstItemIfSelectionNotFound: false)
+            refresh()
         }
     }
 
@@ -544,6 +561,19 @@ class BrowseViewController: NSViewController {
         return getGenericCell(text, node: node, concealable: concealable, dereference: true)
     }
 
+    func getUrlCell ( _ text: String, node: Node ) -> NSTableCellView {
+        let cell = outlineView.makeView(withIdentifier: UrlCell.NibIdentifier, owner: nil) as! UrlCell
+        
+        let deref = self.dereference(text: text, node: node)
+        
+        cell.urlHyperLinkField.href = deref
+        cell.urlHyperLinkField.onClicked = { [weak self] in
+            self?.database.launchUrlString(deref)
+        }
+        
+        return cell
+    }
+    
     func getGenericCell(_ text: String, node: Node? = nil, concealable: Bool = false, dereference: Bool = false, plainTextColor: NSColor? = nil) -> NSTableCellView {
         let cell = outlineView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("CustomFieldValueCellIdentifier"), owner: nil) as! CustomFieldTableCellView
 
@@ -705,7 +735,8 @@ extension BrowseViewController: NSOutlineViewDelegate {
         case .password:
             cell = getDereferencedGenericCell(item.fields.password, node: item, concealable: true)
         case .url:
-            cell = getDereferencedGenericCell(item.fields.url, node: item)
+
+            cell = getUrlCell(item.fields.url, node: item)
         case .email:
             cell = getDereferencedGenericCell(item.fields.email, node: item)
         case .notes:
@@ -796,14 +827,33 @@ extension BrowseViewController: NSOutlineViewDelegate {
                 return []
             }
         } else {
-
+            NSLog("validateDrop: External Source -%d", index)
 
             guard let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)) else { return [] }
 
+            if case .regularHierarchy( _ ) = navigationContext {
+                
+            }
+            else {
+                return []
+            }
+            
             if index == NSOutlineViewDropOnItemIndex { 
                 return []
             } else {
-                return [.copy]
+                switch navigationContext {
+                case .regularHierarchy(_):
+                    return [.copy]
+                case let .special(theSpecial):
+                    switch theSpecial {
+                    case .allEntries:
+                        return [.copy]
+                    default:
+                        return []
+                    }
+                default:
+                    return [] 
+                }
             }
         }
     }
@@ -837,14 +887,23 @@ extension BrowseViewController: NSOutlineViewDelegate {
         }
         else {
             let destinationItemId: NodeIdentifier
-
+            
             switch navigationContext {
             case let .regularHierarchy(group):
                 destinationItemId = group
+            case let .special(theSpecial):
+                switch theSpecial {
+                case .allEntries:
+                    destinationItemId = database.rootGroup.uuid
+                default:
+                    NSLog("🔴 Invalid Drop Destination - Navigation Context")
+                    return false
+                }
             default:
-                return false 
+                NSLog("🔴 Invalid Drop Destination - Navigation Context")
+                return false
             }
-
+            
             guard let destinationItem = database.getItemBy(destinationItemId) else {
                 return false
             }

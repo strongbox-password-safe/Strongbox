@@ -556,21 +556,9 @@
     UIImage *concealed;
     UIImage *revealed;
     
-    if (@available(iOS 13.0, *)) {
-        concealed = [UIImage systemImageNamed:@"eye"];
-        revealed = [UIImage systemImageNamed:@"eye.slash"];
-    }
-    else {
-        concealed = [UIImage imageNamed:@"visible"];
-        revealed = [UIImage imageNamed:@"invisible"];
+    concealed = [UIImage systemImageNamed:@"eye"];
+    revealed = [UIImage systemImageNamed:@"eye.slash"];
 
-        [checkbox setAdjustsImageWhenHighlighted:TRUE];
-        checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); 
-                                                                  
-                                                                  
-
-    }
-    
     [checkbox setImage:concealed forState:UIControlStateNormal];
     [checkbox setImage:revealed forState:UIControlStateSelected];
     [checkbox setImage:revealed forState:UIControlStateHighlighted];

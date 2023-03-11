@@ -23,8 +23,6 @@
 #import "CustomFieldTableCellView.h"
 #import "SearchScope.h"
 
-#import "FavIconDownloader.h"
-#import "FavIconManager.h"
 #import "NodeDetailsViewController.h"
 #import "DocumentController.h"
 #import "ClipboardManager.h"
@@ -33,7 +31,7 @@
 #import "MacHardwareKeyManager.h"
 #import "ColoredStringHelper.h"
 #import "NSString+Extensions.h"
-#import "FileManager.h"
+#import "StrongboxMacFilesManager.h"
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "NSDate+Extensions.h"
@@ -50,6 +48,11 @@
 #import "PasswordStrengthUIHelper.h"
 #import "Constants.h"
 #import "NSArray+Extensions.h"
+
+#ifndef NO_FAVICON_LIBRARY
+    #import "FavIconDownloader.h"
+    #import "FavIconManager.h"
+#endif
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -658,7 +661,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 - (void)expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:(Node*)node {
     NSURL* url = node.fields.url.urlExtendedParse;
-    BOOL featureAvailable = Settings.sharedInstance.isPro;
+    BOOL featureAvailable = Settings.sharedInstance.isPro && StrongboxProductBundle.supportsFavIconDownloader;
     if( url && featureAvailable ) {
         if ( !self.viewModel.promptedForAutoFetchFavIcon ) {
             NSViewController* appropriate = self.detailsViewControllers[node.uuid];
@@ -679,7 +682,8 @@ static NSString* const kNewEntryKey = @"newEntry";
     }
 }
 
-- (void)downloadFavIconForNewOrUpdatedNode:(Node*)node {
+- (void)downloadFavIconForNewOrUpdatedNode:(Node*)node { 
+#ifndef NO_FAVICON_LIBRARY
     if( self.viewModel.downloadFavIconOnChange && node.fields.url.length ) {
         NSURL* url = node.fields.url.urlExtendedParse;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
@@ -695,6 +699,7 @@ static NSString* const kNewEntryKey = @"newEntry";
             }];
         });
     }
+#endif
 }
 
 - (void)onItemNotesChanged:(NSNotification*)notification {
@@ -1870,8 +1875,8 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     [ret addKey:NSLocalizedString(@"mac_database_summary_unique_usernames", @"Unique Usernames")
        andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.usernameSet.count]];
-    [ret addKey:NSLocalizedString(@"mac_database_summary_unique_passwords", @"Unique Passwords")
-       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.passwordSet.count]];
+
+
     [ret addKey:NSLocalizedString(@"mac_database_summary_most_popular_username", @"Most Popular Username")
        andValue:model.mostPopularUsername ? model.mostPopularUsername : @"<None>"];
     [ret addKey:NSLocalizedString(@"mac_database_summary_number_of_entries", @"Number of Entries")
@@ -2017,7 +2022,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     DatabaseAttachment* dbAttachment = self.attachments[filename];
     
-    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
+    NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
     
     NSURL* url = [NSURL fileURLWithPath:f];
@@ -2035,7 +2040,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
-    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+    [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
 - (IBAction)onPreviewQuickViewAttachment:(id)sender {
@@ -2377,11 +2382,8 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 
 - (void)copyConcealedAndMaybeMinimize:(NSString*)string {
-    [ClipboardManager.sharedInstance copyConcealedString:string];
-    
-    if ( Settings.sharedInstance.miniaturizeOnCopy ) {
-        [self.view.window miniaturize:nil];
-    }
+    WindowController* wc = self.view.window.windowController;
+    [wc copyConcealedAndMaybeMinimize:string];
 }
 
 - (void)onFullModelReloadNotification:(NSNotification*)notification {

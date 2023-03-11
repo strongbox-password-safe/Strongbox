@@ -81,11 +81,7 @@
         self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock"), biometricIdName];
     }
     
-    if (@available(iOS 13.0, *)) {
-        self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.labelColor : UIColor.secondaryLabelColor;
-    } else {
-        self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.blackColor : UIColor.lightGrayColor;
-    }
+    self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.labelColor : UIColor.secondaryLabelColor;
     
     self.switchAllowBiometric.enabled = [self canToggleTouchId];
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;

@@ -14,20 +14,4 @@
     return TARGET_OS_SIMULATOR != 0;
 }
 
-+ (BOOL)iOS13Available {
-    if ( @available(iOS 13.0, *) ) { 
-        return YES;
-    }
-    
-    return NO;
-}
-
-+ (BOOL)iOS14Available {
-    if ( @available(iOS 14.0, *) ) { 
-        return YES;
-    }
-    
-    return NO;
-}
-
 @end

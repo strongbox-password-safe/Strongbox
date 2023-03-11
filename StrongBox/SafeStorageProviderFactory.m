@@ -34,8 +34,11 @@
     
     #ifndef IS_APP_EXTENSION
         #import "Strongbox-Swift.h"
-        #import "GoogleDriveStorageProvider.h"
-        #import "DropboxV2StorageProvider.h"
+
+        #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+            #import "GoogleDriveStorageProvider.h"
+            #import "DropboxV2StorageProvider.h"
+        #endif
     #endif
 #endif
 
@@ -54,6 +57,11 @@
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
     }
+#else
+    if (providerId == kMacFile) {
+        return MacFileBasedBookmarkStorageProvider.sharedInstance;
+    }
+#endif
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if (providerId == kGoogleDrive) {
         return [GoogleDriveStorageProvider sharedInstance];
@@ -64,20 +72,6 @@
     }
     else if ( providerId == kTwoDrive ) {
         return TwoDriveStorageProvider.sharedInstance;
-    }
-#endif
-#else
-    if (providerId == kMacFile) {
-        return MacFileBasedBookmarkStorageProvider.sharedInstance;
-    }
-    else if ( providerId == kTwoDrive ) {
-        return TwoDriveStorageProvider.sharedInstance;
-    }
-    else if (providerId == kGoogleDrive) {
-        return [GoogleDriveStorageProvider sharedInstance];
-    }
-    else if (providerId == kDropbox) {
-        return DropboxV2StorageProvider.sharedInstance;
     }
 #endif
 #ifndef NO_SFTP_WEBDAV_SP
@@ -183,11 +177,8 @@
     else if(provider == kWebDAV) {
 #if TARGET_OS_IPHONE
         _displayName = NSLocalizedString(@"storage_provider_name_webdav", @"WebDAV");
-        if([_displayName isEqualToString:@"storage_provider_name_webdav"]) {
-            _displayName = @"WebDAV";
-        }
 #else
-            _displayName = @"DAV"; 
+        _displayName = @"DAV";
 #endif
     }
     else {

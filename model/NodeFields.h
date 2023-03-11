@@ -16,6 +16,8 @@
 #import "SyncComparisonParams.h"
 #import "ValueWithModDate.h"
 
+extern NSString* _Nonnull const kOtpAuthScheme;
+
 @class Node;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -69,6 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isTotpCustomFieldKey:(NSString*)key;
 + (BOOL)isAlternativeURLCustomFieldKey:(NSString*)key;
+- (void)addSecondaryUrl:(NSString*)url optionalCustomFieldSuffixLabel:(NSString*_Nullable)optionalCustomFieldSuffixLabel;
 
 + (NodeFields *)deserialize:(NSDictionary *)dict;
 - (NSDictionary*)serialize:(SerializationPackage*)serialization;

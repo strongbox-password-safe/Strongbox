@@ -7,7 +7,13 @@
 //
 
 #import "BackupsManager.h"
-#import "FileManager.h"
+
+#if TARGET_OS_IPHONE
+#import "StrongboxiOSFilesManager.h"
+#else
+#import "StrongboxMacFilesManager.h"
+#endif
+
 #import "Utils.h"
 #import "NSDate+Extensions.h"
 
@@ -103,12 +109,12 @@
 
 - (NSArray<BackupItem*> *)getAllEmergencyRecoveryFilesAsBackups {
 #if TARGET_OS_IPHONE
-    NSArray<BackupItem*>* appSupport = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.appSupportDirectory];
-    NSArray<BackupItem*>* documents = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.documentsDirectory];
+    NSArray<BackupItem*>* appSupport = [self getAllAvailableFilesAsBackupsAtDir:StrongboxFilesManager.sharedInstance.appSupportDirectory];
+    NSArray<BackupItem*>* documents = [self getAllAvailableFilesAsBackupsAtDir:StrongboxFilesManager.sharedInstance.documentsDirectory];
 #endif
     
-    NSArray<BackupItem*>* sharedAppGroup = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.sharedAppGroupDirectory recursive:NO];
-    NSArray<BackupItem*>* syncManager = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.syncManagerLocalWorkingCachesDirectory recursive:YES];
+    NSArray<BackupItem*>* sharedAppGroup = [self getAllAvailableFilesAsBackupsAtDir:StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory recursive:NO];
+    NSArray<BackupItem*>* syncManager = [self getAllAvailableFilesAsBackupsAtDir:StrongboxFilesManager.sharedInstance.syncManagerLocalWorkingCachesDirectory recursive:YES];
 
     NSMutableArray<BackupItem*>* ret = [NSMutableArray arrayWithArray:sharedAppGroup];
     [ret addObjectsFromArray:syncManager];
@@ -125,7 +131,7 @@
 
 
 - (NSArray<BackupItem*> *)getAllAvailableBackups {
-    NSURL* dir = FileManager.sharedInstance.backupFilesDirectory;
+    NSURL* dir = StrongboxFilesManager.sharedInstance.backupFilesDirectory;
 
     return [self getAllAvailableFilesAsBackupsAtDir:dir];
 }

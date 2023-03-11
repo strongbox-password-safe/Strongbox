@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL showGenerationSettings;
 @property BOOL colorize;
 @property (weak) UIViewController* parentVc;
+@property (nullable) UIMenu* historyMenu;
 
 @end
 

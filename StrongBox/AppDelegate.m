@@ -17,7 +17,7 @@
 #import "real-secrets.h"
 #import "NSArray+Extensions.h"
 #import "ProUpgradeIAPManager.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "SyncManager.h"
 #import "ClipboardManager.h"
 #import "iCloudSafesCoordinator.h"
@@ -98,8 +98,8 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
         
 #ifdef DEBUG
-    NSLog(@"STARTUP - Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
-    NSLog(@"STARTUP - Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
+    NSLog(@"STARTUP - Documents Directory: [%@]", StrongboxFilesManager.sharedInstance.documentsDirectory);
+    NSLog(@"STARTUP - Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
 #endif
     
     return YES;
@@ -121,7 +121,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 }
 
 - (void)markDirectoriesForBackupInclusion {
-    [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
+    [StrongboxFilesManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
                                                importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
 }
 
@@ -141,10 +141,10 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         
         
         
-        [FileManager.sharedInstance deleteAllInboxItems];
+        [StrongboxFilesManager.sharedInstance deleteAllInboxItems];
          
-        [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
-        [FileManager.sharedInstance deleteAllTmpWorkingFiles];
+        [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+        [StrongboxFilesManager.sharedInstance deleteAllTmpWorkingFiles];
     }
 }
 
@@ -298,7 +298,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonDict options:NSJSONWritingPrettyPrinted error:nil];
     if (json) {
-        [json writeToURL:FileManager.sharedInstance.crashFile options:kNilOptions error:nil];
+        [json writeToURL:StrongboxFilesManager.sharedInstance.crashFile options:kNilOptions error:nil];
     }
 }
 
@@ -330,15 +330,13 @@ void uncaughtExceptionHandler(NSException *exception) {
     }
 
     UIImage* cover = nil;
-    if (@available(iOS 13.0, *)) {
-        if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlur ) {
-            UIImage* screenshot = [self screenShot];
-            cover = [self blur:screenshot];
-        }
-        else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModePixellate ) {
-            UIImage* screenshot = [self screenShot];
-            cover = [self pixellate:screenshot];
-        }
+    if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlur ) {
+        UIImage* screenshot = [self screenShot];
+        cover = [self blur:screenshot];
+    }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModePixellate ) {
+        UIImage* screenshot = [self screenShot];
+        cover = [self pixellate:screenshot];
     }
 
     UIImageView* tmp = [[UIImageView alloc] init];
@@ -357,10 +355,8 @@ void uncaughtExceptionHandler(NSException *exception) {
 
         [self.window addSubview:self.privacyScreen];
 
-        if (@available(iOS 13.0, *)) {
-            if ( cover ) {
-                self.privacyScreen.image = cover;
-            }
+        if ( cover ) {
+            self.privacyScreen.image = cover;
         }
     }
     else {
@@ -410,7 +406,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     return image;
 }
 
-- (UIImage*)pixellate:(UIImage*)image API_AVAILABLE(ios(13.0)) {
+- (UIImage*)pixellate:(UIImage*)image {
     CIImage* ciImage = [[CIImage alloc] initWithImage:image];
     
     CIFilter *clampFilter = [CIFilter filterWithName:@"CIAffineClamp"];
@@ -435,7 +431,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     return cover;
 }
 
-- (UIImage*)blur:(UIImage*)image API_AVAILABLE(ios(13.0)) {
+- (UIImage*)blur:(UIImage*)image {
     CIImage* ciImage = [[CIImage alloc] initWithImage:image];
     
     CIFilter *clampFilter = [CIFilter filterWithName:@"CIAffineClamp"];

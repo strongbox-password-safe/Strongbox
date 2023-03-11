@@ -39,11 +39,9 @@
 - (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Upgrade" bundle:nil];
     UpgradeViewController* vc = [storyboard instantiateInitialViewController];
-
-    if (@available(iOS 13.0, *)) {
-        vc.modalPresentationStyle = UIModalPresentationFullScreen;
-        vc.modalInPresentation = YES;
-    }
+    
+    vc.modalPresentationStyle = UIModalPresentationFullScreen;
+    vc.modalInPresentation = YES;
 
     vc.onDone = ^{
         onDone(NO, NO);

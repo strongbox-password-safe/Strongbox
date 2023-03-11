@@ -20,7 +20,8 @@
 #import "NSString+Extensions.h"
 #import "Constants.h"
 
-static NSString* const kOtpAuthScheme = @"otpauth";
+NSString* const kOtpAuthScheme = @"otpauth";
+
 static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
 static NSString* const kKeePassXcTotpSettingsKey = @"TOTP Settings";
 static NSString* const kKeeOtpPluginKey = @"otp";
@@ -741,7 +742,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
         
         
-        if(token.algorithm != OTPAlgorithmSteam) {
+        if ( token.algorithm != OTPAlgorithmSteam && token.algorithm != OTPAlgorithmYandex ) {
             self.mutablCustomFields[kOriginalWindowsSecretBase32Key] = [StringValue valueWithString:base32Secret protected:YES];
 
             if(token.period != OTPToken.defaultPeriod) {
@@ -1062,8 +1063,8 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     return nil;
 }
 
-+ (NSURL*)findOtpUrlInString:(NSString*)notes {
-    if(!notes.length) {
++ (NSURL*)findOtpUrlInString:(NSString*)urlString {
+    if(!urlString.length) {
         return nil;
     }
     
@@ -1071,9 +1072,9 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:&error];
     
     if(detector) {
-        NSArray *matches = [detector matchesInString:notes
+        NSArray *matches = [detector matchesInString:urlString
                                              options:0
-                                               range:NSMakeRange(0, [notes length])];
+                                               range:NSMakeRange(0, [urlString length])];
         for (NSTextCheckingResult *match in matches) {
             if ([match resultType] == NSTextCheckingTypeLink) {
                 NSURL *url = [match URL];
@@ -1135,6 +1136,41 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     }];
     
     return [values sortedArrayUsingComparator:finderStringComparator];
+}
+
+- (void)addSecondaryUrl:(NSString*)url optionalCustomFieldSuffixLabel:(NSString*_Nullable)optionalCustomFieldSuffixLabel {
+    if ( url.length == 0 ) {
+        NSLog(@"🔴 Nil or empty URL sent to addSecondaryURL");
+        return;
+    }
+    
+    NSString* customFieldDesiredName = @"URL-2";
+    if ( optionalCustomFieldSuffixLabel.length ) {
+        customFieldDesiredName = [NSString stringWithFormat:@"URL-%@", optionalCustomFieldSuffixLabel];
+    }
+    
+    if ( self.mutablCustomFields[customFieldDesiredName] == nil ) {
+        self.mutablCustomFields[customFieldDesiredName] = [StringValue valueWithString:url];
+        return;
+    }
+    
+    
+    
+    customFieldDesiredName = @"URL-";
+    if ( optionalCustomFieldSuffixLabel.length ) {
+        customFieldDesiredName = [NSString stringWithFormat:@"URL-%@-", optionalCustomFieldSuffixLabel];
+    }
+
+    NSString* suffixed;
+    for ( int i = 2;i < INT_MAX;i++) {
+        suffixed = [NSString stringWithFormat:@"%@%d", customFieldDesiredName, i];
+        
+        if ( self.mutablCustomFields[suffixed] == nil ) {
+            self.mutablCustomFields[suffixed] = [StringValue valueWithString:url];
+            return;
+        }
+        
+    }
 }
 
 

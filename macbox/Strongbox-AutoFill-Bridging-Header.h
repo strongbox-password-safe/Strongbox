@@ -38,7 +38,7 @@
 #import "PasswordStrengthUIHelper.h"
 #import "MMcGSecureTextField.h"
 #import "MMcGACTextViewEditor.h"
-#import "FileManager.h"
+#import "StrongboxMacFilesManager.h"
 #import "StreamUtils.h"
 #import "CustomFieldTableCellView.h"
 #import "EditCustomFieldController.h"

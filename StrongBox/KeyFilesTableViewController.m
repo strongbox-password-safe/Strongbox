@@ -13,10 +13,11 @@
 #import "IOsUtils.h"
 #import "DatabasePreferences.h"
 #import "NSArray+Extensions.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "AppPreferences.h"
 #import "BookmarksHelper.h"
 #import "UITableView+EmptyDataSet.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 @interface KeyFilesTableViewController () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
@@ -64,7 +65,7 @@
     NSMutableArray* otherFiles = [NSMutableArray array];
     
     NSFileManager *fm = [NSFileManager defaultManager];
-    NSURL *directoryURL = FileManager.sharedInstance.documentsDirectory;
+    NSURL *directoryURL = StrongboxFilesManager.sharedInstance.documentsDirectory;
     
     NSArray *keys = [NSArray arrayWithObject:NSURLIsDirectoryKey];
     
@@ -94,7 +95,7 @@
 - (void)loadKeyFiles {
     NSMutableArray* files = [NSMutableArray array];
     NSFileManager *fm = [NSFileManager defaultManager];
-    NSURL *directoryURL =  FileManager.sharedInstance.keyFilesDirectory;
+    NSURL *directoryURL =  StrongboxFilesManager.sharedInstance.keyFilesDirectory;
     
     NSDirectoryEnumerator *enumerator = [fm
                                          enumeratorAtURL:directoryURL
@@ -136,8 +137,11 @@
 }
 
 - (IBAction)onAddKeyFile:(id)sender {
-    self.importDocPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
+    UTType* type = [UTType typeWithIdentifier:(NSString*)kUTTypeItem];
+    self.importDocPicker = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[type]];
+
     self.importDocPicker.delegate = self;
+    
     [self presentViewController:self.importDocPicker animated:YES completion:nil];
 }
 
@@ -150,7 +154,10 @@
          thirdButtonText:NSLocalizedString(@"generic_cancel", @"Cancel")
                   action:^(int response) {
                       if(response == 0) {
-                          UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
+                          UTType* type = [UTType typeWithIdentifier:(NSString*)kUTTypeItem];
+                          UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[type]];
+                          
+
                           vc.delegate = self;
                           
                           [self presentViewController:vc animated:YES completion:nil];
@@ -207,25 +214,13 @@
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
-    [self documentPicker:controller didPickDocumentAtURL:url];
-    
-    #pragma GCC diagnostic pop
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
-    NSLog(@"didPickDocumentAtURL: %@", url);
-
     NSError* error;
     
     
     
-    [url startAccessingSecurityScopedResource];
+    if (! [url startAccessingSecurityScopedResource] ) {
+        NSLog(@"🔴 Could not securely access URL!");
+    }
     
     __block NSData *data;
     __block NSError *err;
@@ -277,10 +272,8 @@
     }
 }
 
-#pragma GCC diagnostic pop
-
 - (NSURL*)importToLocal:(NSURL*)url data:(NSData*)data error:(NSError**)error {
-    NSURL* destination = [FileManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:url.lastPathComponent];
+    NSURL* destination = [StrongboxFilesManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:url.lastPathComponent];
     
     NSLog(@"Source: %@", url);
     NSLog(@"Destination: %@", destination);
@@ -435,7 +428,7 @@
 
 - (void)importLocalFile:(NSIndexPath*)indexPath {
     NSURL* url = self.otherFiles[indexPath.row];
-    NSURL *destination = [FileManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:url.lastPathComponent];
+    NSURL *destination = [StrongboxFilesManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:url.lastPathComponent];
     
     NSLog(@"Importing Local Key File: [%@] => [%@]", url, destination);
     

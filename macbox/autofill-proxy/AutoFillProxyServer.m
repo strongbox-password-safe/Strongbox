@@ -38,7 +38,7 @@
 }
 
 - (void)stop {
-
+    NSLog(@"AutoFillProxyServer::STOP ENTER");
 
     if ( !self.running ) {
         return;
@@ -54,13 +54,13 @@
     
     NSLog(@"Proxy Server shutdown done...");
     
-
+    NSLog(@"AutoFillProxyServer::STOP EXIT");
     
     self.running = NO;
 }
 
 - (BOOL)start {
-
+    NSLog(@"AutoFillProxyServer::start ENTER");
 
     [self stop];
     
@@ -122,7 +122,7 @@
         [self acceptNewConnections];
     }];
 
-
+    NSLog(@"AutoFillProxyServer::start EXIT ✅");
 
     self.running = YES;
     return YES; 

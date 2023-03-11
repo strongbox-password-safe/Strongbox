@@ -10,31 +10,31 @@ import Cocoa
 import ServiceManagement
 
 class OnboardingModules {
-    class func getFirstRunWelcomeModule() -> OnboardingModule {
-        let image = NSImage(imageLiteralResourceName: "welcome-business")
+    class func getTurnOnThirdPartyAutoFill() -> OnboardingModule {
+        let image = NSImage(imageLiteralResourceName: "browser")
 
         return GenericOnboardingModule(image: image,
-                                       title: NSLocalizedString("onboarding_welcome_to_strongbox_first_run_title", comment: "Welcome Aboard"),
-                                       body: NSLocalizedString("onboarding_welcome_to_strongbox_first_run_message_macos", comment: "Hi there 😎\n\nWe're excited you've decided to try us out and we just wanted to say thanks! So, without further ado, let's get started...\n\n❤️ The Strongbox Team ❤️"),
-                                       button1Title: NSLocalizedString("generic_lets_go", comment: "Let's Go"),
-                                       hideDismiss: true,
-                                       shouldDisplay: {
-            return !Settings.sharedInstance().hasShownFirstRunWelcome && MacDatabasePreferences.allDatabases.count == 0
-       }, onButton1: { _, completion in
-           Settings.sharedInstance().hasShownFirstRunWelcome = true
-                   completion()
-           
-           if #available(macOS 13.0, *) {
-               do {
-                   try SMAppService.mainApp.register()
-               }
-               catch {
-                   NSLog("🔴 Error registering startup item: [%@]", String(describing: error))
-               }
-           }
-       })
+                                       title: NSLocalizedString("onboarding_autofill_title_turn_on", comment: "Turn On Browser AutoFill?"),
+                                       body: NSLocalizedString("onboarding_autofill_msg_available_turn_on_question", comment: "Browser AutoFill is available but currently not turned on. Would you like to enable Browser AutoFill so that you can conveniently and securely login from within your browser?"),
+                                       button1Title: NSLocalizedString("onboarding_autofill_option_turn_on_autofill", comment: "Turn On AutoFill"),
+                                       button2Title: NSLocalizedString("generic_no_thanks", comment: "No Thanks"),
+           hideDismiss: true,
+           shouldDisplay: {
+            let settings = Settings.sharedInstance()
+            return settings.isPro && !settings.runBrowserAutoFillProxyServer && !settings.hasPromptedForThirdPartyAutoFill
+           },
+           onButton1: { viewController, completion in
+            Settings.sharedInstance().hasPromptedForThirdPartyAutoFill = true
+            Settings.sharedInstance().runBrowserAutoFillProxyServer = true
+            completion()
+        },
+           onButton2: { viewController, completion in
+            Settings.sharedInstance().hasPromptedForThirdPartyAutoFill = true
+            Settings.sharedInstance().runBrowserAutoFillProxyServer = false
+            completion()
+        })
     }
-
+    
     class func getHasBeenDowngradedModule() -> OnboardingModule {
         let image = NSImage(imageLiteralResourceName: "cry-emoji")
 

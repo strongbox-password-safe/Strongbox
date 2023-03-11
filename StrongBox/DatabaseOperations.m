@@ -47,28 +47,20 @@
     self.cellBulkUpdateFavIcons.imageView.image = [UIImage imageNamed:@"picture"];
     self.cellStats.imageView.image = [UIImage imageNamed:@"statistics"];
 
-    if (@available(iOS 13.0, *)) {
-        self.cellExport.imageView.image = [UIImage systemImageNamed:@"square.and.arrow.up"];
-        [self.cellExport.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+    self.cellExport.imageView.image = [UIImage systemImageNamed:@"square.and.arrow.up"];
+    [self.cellExport.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
 
-        self.cellPrint.imageView.image = [UIImage systemImageNamed:@"printer"];
-        [self.cellPrint.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+    self.cellPrint.imageView.image = [UIImage systemImageNamed:@"printer"];
+    [self.cellPrint.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
 
-        self.cellViewAttachments.imageView.image = [UIImage systemImageNamed:@"paperclip"];
-        [self.cellViewAttachments.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+    self.cellViewAttachments.imageView.image = [UIImage systemImageNamed:@"paperclip"];
+    [self.cellViewAttachments.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
 
-        self.cellBulkUpdateFavIcons.imageView.image = [UIImage systemImageNamed:@"photo"];
-        [self.cellBulkUpdateFavIcons.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
-        
-        self.cellStats.imageView.image = [UIImage systemImageNamed:@"number.circle"];
-        [self.cellStats.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
-
-        
-        
-        if (@available(iOS 14.0, *)) {
-
-        }
-    }
+    self.cellBulkUpdateFavIcons.imageView.image = [UIImage systemImageNamed:@"photo"];
+    [self.cellBulkUpdateFavIcons.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+    
+    self.cellStats.imageView.image = [UIImage systemImageNamed:@"number.circle"];
+    [self.cellStats.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
     
     [self setupTableView];
 }

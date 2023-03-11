@@ -166,6 +166,7 @@
         }
         
         if(error) {
+            NSLog(@"Error in Google Drive Push call... Signing Out...");
             [[GoogleDriveManager sharedInstance] signout];
         }
 

@@ -8,7 +8,7 @@
 
 #import "CustomFieldEditorViewController.h"
 #import "Utils.h"
-#import "Entry.h"
+#import "Constants.h"
 #import "NSArray+Extensions.h"
 #import "PasswordMaker.h"
 #import "Alerts.h"
@@ -34,7 +34,7 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 + (void)initialize {
     if(self == [CustomFieldEditorViewController class]) {
-        keePassReservedNames = [NSSet setWithArray:[[[Entry reservedCustomFieldKeys] allObjects] map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        keePassReservedNames = [NSSet setWithArray:[[[Constants reservedCustomFieldKeys] allObjects] map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
             return obj.lowercaseString;
         }]];
     }
@@ -56,14 +56,7 @@ const static NSSet<NSString*> *keePassReservedNames;
                           action:@selector(textFieldDidChange:)
                 forControlEvents:UIControlEventEditingChanged];
     
-
-    
-    if (@available(iOS 13.0, *)) {
-        self.textView.layer.borderColor = UIColor.labelColor.CGColor;
-    } else {
-        UIColor *borderColor = [UIColor colorWithRed:204.0/255.0 green:204.0/255.0 blue:204.0/255.0 alpha:1.0];
-        self.textView.layer.borderColor = borderColor.CGColor;
-    }
+    self.textView.layer.borderColor = UIColor.labelColor.CGColor;
     self.textView.layer.borderWidth = 0.5f;
     self.textView.layer.cornerRadius = 5.0f;
 
@@ -79,12 +72,10 @@ const static NSSet<NSString*> *keePassReservedNames;
 
     
     
-    if (@available(iOS 14.0, *)) { 
-        [self.buttonGenerate setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
+    [self.buttonGenerate setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
 
-        [self.buttonGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
-                                                       forImageInState:UIControlStateNormal];
-    }
+    [self.buttonGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                   forImageInState:UIControlStateNormal];
     
     [self.keyTextField becomeFirstResponder];
     
@@ -148,14 +139,9 @@ const static NSSet<NSString*> *keePassReservedNames;
         self.labelError.hidden = NO;
     }
     else {
-        if (@available(iOS 13.0, *)) {
-            self.keyTextField.layer.borderColor = UIColor.labelColor.CGColor;
-            self.keyTextField.layer.borderWidth = 0.5;
-        } else {
-            self.keyTextField.layer.borderColor = UIColor.systemRedColor.CGColor;
-            self.keyTextField.layer.borderWidth = 0.0;
-        }
-        
+        self.keyTextField.layer.borderColor = UIColor.labelColor.CGColor;
+        self.keyTextField.layer.borderWidth = 0.5;
+    
         self.keyTextField.layer.cornerRadius = 5.0f;
         self.buttonDone.enabled = YES;
         self.labelError.text = @"";

@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseCellView : NSTableCellView
 
 - (void)setWithDatabase:(MacDatabasePreferences*)metadata;
-
+- (void)setWithDatabase:(MacDatabasePreferences*)metadata disabled:(BOOL)disabled;
 - (void)setWithDatabase:(MacDatabasePreferences*)metadata
 nickNameEditClickEnabled:(BOOL)nickNameEditClickEnabled
           showSyncState:(BOOL)showSyncState

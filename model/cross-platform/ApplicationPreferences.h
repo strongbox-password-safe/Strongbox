@@ -33,6 +33,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL stripUnusedIconsOnSave;
 @property BOOL useIsolatedDropbox;
 
+@property BOOL addLegacySupplementaryTotpCustomFields;
+@property BOOL addOtpAuthUrl;
+
 @end
 
 NS_ASSUME_NONNULL_END

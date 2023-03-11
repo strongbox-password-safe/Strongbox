@@ -13,19 +13,23 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ContextMenuHelper : NSObject
 
-+ (UIAction*)getItem:(NSString*)title handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
++ (UIAction*)getItem:(NSString*)title handler:(UIActionHandler)handler ;
 
-+ (UIAction *)getItem:(NSString *)title checked:(BOOL)checked handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
++ (UIAction *)getItem:(NSString *)title checked:(BOOL)checked handler:(UIActionHandler)handler ;
 
-+ (UIAction*)getItem:(NSString*)title image:(UIImage*_Nullable)image handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
++ (UIAction*)getItem:(NSString*)title image:(UIImage*_Nullable)image handler:(UIActionHandler)handler ;
 
-+ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
++ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage handler:(UIActionHandler)handler ;
 
-+ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage enabled:(BOOL)enabled handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
++ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage colour:(UIColor*)colour handler:(UIActionHandler)handler;
 
-+ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage enabled:(BOOL)enabled checked:(BOOL)checked handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
++ (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage colour:(UIColor *)colour large:(BOOL)large handler:(UIActionHandler)handler;
 
-+ (UIAction*)getDestructiveItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0));
++ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage enabled:(BOOL)enabled handler:(UIActionHandler)handler ;
+
++ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage enabled:(BOOL)enabled checked:(BOOL)checked handler:(UIActionHandler)handler ;
+
++ (UIAction*)getDestructiveItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage handler:(UIActionHandler)handler ;
 
 
 

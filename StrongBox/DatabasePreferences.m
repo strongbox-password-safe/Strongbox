@@ -369,42 +369,6 @@
 
 
 
-- (BrowseTapAction)doubleTapAction {
-    return self.metadata.doubleTapAction;
-}
-
-- (void)setDoubleTapAction:(BrowseTapAction)doubleTapAction {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.doubleTapAction = doubleTapAction;
-    }];
-}
-
-
-
-- (BrowseTapAction)tripleTapAction {
-    return self.metadata.tripleTapAction;
-}
-
-- (void)setTripleTapAction:(BrowseTapAction)tripleTapAction {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.tripleTapAction = tripleTapAction;
-    }];
-}
-
-
-
-- (BrowseTapAction)longPressTapAction {
-    return self.metadata.longPressTapAction;
-}
-
-- (void)setLongPressTapAction:(BrowseTapAction)longPressTapAction {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.longPressTapAction = longPressTapAction;
-    }];
-}
-
-
-
 - (BrowseSortField)browseSortField {
     return self.metadata.browseSortField;
 }

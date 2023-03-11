@@ -7,13 +7,14 @@
 //
 
 #import "OutlineView.h"
+#import "Strongbox-Swift.h"
 
 @implementation OutlineView
 
 - (void)keyDown:(NSEvent *)theEvent {
 //    BOOL cmd = ((theEvent.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand);
     unichar key = [[theEvent charactersIgnoringModifiers] characterAtIndex:0];
-//    NSLog(@"%hu - %d", key, theEvent.keyCode);
+
     
     if (key == NSDeleteCharacter || key == NSBackspaceCharacter || key == 63272) {
         if (self.onDeleteKey) {
@@ -59,6 +60,14 @@
     }
     
     return [super menuForEvent:event];
+}
+
+- (BOOL)validateProposedFirstResponder:(NSResponder *)responder forEvent:(NSEvent *)event {
+    if ( [responder isKindOfClass:HyperlinkTextField.class] ) { 
+        return YES;
+    }
+    
+    return [super validateProposedFirstResponder:responder forEvent:event];
 }
 
 

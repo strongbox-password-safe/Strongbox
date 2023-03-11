@@ -61,7 +61,7 @@ class TipJarLogic: NSObject {
             return tip.rawValue
         }
 #else
-        if MacCustomizationManager.isUnifiedBundle { 
+        if MacCustomizationManager.supportsTipJar { 
             if MacCustomizationManager.isAProBundle { 
                 return String(format: "pro.%@", tip.rawValue)
             } else {
@@ -76,6 +76,12 @@ class TipJarLogic: NSObject {
     }
 
     private func loadTips() {
+        guard StrongboxProductBundle.supportsTipJar else {
+            NSLog("🔴 Tips not available in this bundle! Don't call this from this bundle!")
+            self.errorLoading = true
+            return
+        }
+        
         let productIds = Tip.allCases.map { tip in
             getProductId(tip)
         }

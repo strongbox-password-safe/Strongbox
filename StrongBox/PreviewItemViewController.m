@@ -27,7 +27,7 @@
     return [[PreviewItemViewController alloc] initForItem:item andModel:model];
 }
 
-- (instancetype)initForItem:(Node *)item andModel:(Model *)model API_AVAILABLE(ios(13.0)) {
+- (instancetype)initForItem:(Node *)item andModel:(Model *)model  {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         UIImage* icon = [NodeIconHelper getIconForNode:item predefinedIconSet:model.metadata.keePassIconSet format:model.database.originalFormat];
@@ -132,7 +132,7 @@
     return self;
 }
 
-- (UILabel*)createFieldLabel:(NSString*)value API_AVAILABLE(ios(13.0)) {
+- (UILabel*)createFieldLabel:(NSString*)value  {
     UILabel *ret = [[UILabel alloc] init];
     
     ret.font = FontManager.sharedInstance.regularFont;
@@ -144,7 +144,7 @@
     return ret;
 }
 
-- (UILabel*)createHeaderLabel:(NSString*)heading API_AVAILABLE(ios(13.0)) {
+- (UILabel*)createHeaderLabel:(NSString*)heading  {
     UILabel *ret = [[UILabel alloc] init];
     
     ret.font = FontManager.sharedInstance.caption2Font;
@@ -156,7 +156,7 @@
     return ret;
 }
 
-- (void)createTotpLabel API_AVAILABLE(ios(13.0)) {
+- (void)createTotpLabel  {
     self.totpLabel = [[UILabel alloc] init];
     
     self.totpLabel.font = FontManager.sharedInstance.easyReadFontForTotp;

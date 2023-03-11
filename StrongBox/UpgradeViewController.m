@@ -109,10 +109,7 @@
                                                                 body:NSLocalizedString(@"upgrade_vc_feature_subtitle_compare_and_merge", @"View & Combine Revisions")
                                                                 tint:UIColor.whiteColor];
 
-    UIImage* image = [UIImage imageNamed:@"upgrade_carousel_offline"];
-    if (@available(iOS 13.0, *)) {
-        image = [UIImage systemImageNamed:@"bolt.circle.fill"];
-    }
+    UIImage* image = [UIImage systemImageNamed:@"bolt.circle.fill"];
     
     ZKCarouselSlide* offline = [[ZKCarouselSlide alloc] initWithImage:image
                                                                 title:NSLocalizedString(@"upgrade_vc_feature_offline_editing", @"Offline Editing")
@@ -129,10 +126,7 @@
                                                                            body:NSLocalizedString(@"upgrade_vc_feature_subtitle_favicon_downloader", @"Make your entries stand out")
                                                                            tint:UIColor.whiteColor];
 
-    UIImage* image2 = [UIImage imageNamed:@"upgrade_carousel_heart"];
-    if (@available(iOS 13.0, *)) {
-        image2 = [UIImage systemImageNamed:@"heart.circle"];
-    }
+    UIImage* image2 = [UIImage systemImageNamed:@"heart.circle"];
 
     ZKCarouselSlide* indieDev = [[ZKCarouselSlide alloc] initWithImage:image2
                                                                  title:NSLocalizedString(@"upgrade_vc_feature_support_indie", @"Support Indie Development")
@@ -184,13 +178,11 @@
     
     self.buttonViewMonthly.layer.cornerRadius = kRadius;
     
-    if (@available(iOS 13.0, *)) {
-        if ( self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ) {
-            self.buttonViewMonthly.backgroundColor = UIColor.systemGray5Color;
-        }
-        else {
-            self.buttonViewMonthly.backgroundColor = UIColor.systemGray5Color;
-        }
+    if ( self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark ) {
+        self.buttonViewMonthly.backgroundColor = UIColor.systemGray5Color;
+    }
+    else {
+        self.buttonViewMonthly.backgroundColor = UIColor.systemGray5Color;
     }
     
     self.buttonViewYearly.layer.cornerRadius = kRadius;
@@ -476,15 +468,13 @@
 }
 
 - (NSDecimalNumber*)getEffectivePrice:(SKProduct*)product {
-    if (@available(iOS 11.2, *)) {
-        if(product.introductoryPrice) {
-            if ( [product.introductoryPrice.price isEqual:NSDecimalNumber.zero] ) {
-
-                return product.price;
-            }
-            else {
-                return product.introductoryPrice.price;
-            }
+    if(product.introductoryPrice) {
+        if ( [product.introductoryPrice.price isEqual:NSDecimalNumber.zero] ) {
+            
+            return product.price;
+        }
+        else {
+            return product.introductoryPrice.price;
         }
     }
 

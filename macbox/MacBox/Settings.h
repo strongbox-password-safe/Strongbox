@@ -30,6 +30,10 @@ extern NSString* const kCustomFieldsColumn;
 
 + (instancetype)sharedInstance;
 
+#ifndef IS_APP_EXTENSION
+- (void)factoryReset;
+#endif
+
 @property (readonly) NSString* appGroupName;
 @property (readonly) NSUserDefaults* sharedAppGroupDefaults;
 
@@ -66,6 +70,7 @@ extern NSString* const kCustomFieldsColumn;
 @property (nonatomic) BOOL revealPasswordsImmediately;
 
 @property (nonatomic) NSInteger autoLockTimeoutSeconds;
+@property (nonatomic) NSInteger autoLockIfInBackgroundTimeoutSeconds;
 
 @property BOOL closeManagerOnLaunch;
 @property BOOL makeLocalRollingBackups;
@@ -74,9 +79,12 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL nextGenUI;
 @property BOOL miniaturizeOnCopy;
+@property BOOL hideOnCopy;
 @property BOOL quickRevealWithOptionKey;
 @property BOOL markdownNotes;
 @property BOOL showPasswordGenInTray;
+
+@property BOOL hasPromptedForThirdPartyAutoFill;
 
 
 
@@ -136,6 +144,8 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL hasAskedAboutDatabaseOpenInBackground;
 @property BOOL concealClipboardFromMonitors;
+
+@property BOOL autoCommitScannedTotp;
 
 @end
 

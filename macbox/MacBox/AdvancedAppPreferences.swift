@@ -27,6 +27,8 @@ class AdvancedAppPreferences: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad() 
 
+        useIsolatedDropbox.isHidden = !StrongboxProductBundle.supports3rdPartyStorageProviders
+        
         bindUI()
         
         NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
@@ -91,7 +93,109 @@ class AdvancedAppPreferences: NSViewController {
         NotificationCenter.default.post(name: .preferencesChanged, object: nil)
     }
     
+    @IBAction func onFactoryReset(_ sender: Any) {
+        MacAlerts.areYouSure("WARNING: This will completely remove all settings, databases, directories, caches and connections belonging to Strongbox.\n\nIt will NOT delete the database files themselves whether on cloud or locally stored.\n\nAre you sure you want to Factory Reset Strongbox?",
+                             window: view.window) { [weak self] response in
+            if response {
+                self?.startFactoryReset()
+            }
+        }
+    }
+    
+    func startFactoryReset() {
+        let allLocked = DatabasesCollection.shared.unlockedCollection.allKeys.isEmpty
+
+        if !allLocked {
+            DatabasesCollection.shared.tryToLockAll()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in 
+                self?.continueFactoryResetAfterLockAllAttempt()
+            }
+        }
+        else {
+            continueFactoryResetAfterLockAllAttempt()
+        }
+    }
+    
+    func continueFactoryResetAfterLockAllAttempt() {
+        let allLocked = DatabasesCollection.shared.unlockedCollection.allKeys.isEmpty
+        
+        NSLog("Factory Reset: All Locked: %hhd", allLocked)
+        
+        if allLocked {
+            let allDocsClosed = DocumentController.shared.documents.isEmpty
+            
+            if !allDocsClosed {
+                DocumentController.shared.closeAllDocuments(withDelegate: nil, didCloseAllSelector:nil, contextInfo: nil)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in 
+                    self?.continueFactoryResetAfterAllDocsClosed()
+                }
+            }
+            else {
+                continueFactoryResetAfterAllDocsClosed()
+            }
+        }
+        else {
+            MacAlerts.info("Strongbox could not lock, close and sync all databases before resetting. Please make sure all syncs are done, lock any open databases and close any open Strongbox windows. Then try Factory Reset again.",
+                           window: view.window)
+        }
+    }
+    
+    func continueFactoryResetAfterAllDocsClosed() {
+
+        
+        let allDocsClosed = DocumentController.shared.documents.isEmpty
+        
+        if !allDocsClosed {
+            MacAlerts.info("Strongbox could not lock, close and sync all databases before resetting. Please make sure all syncs are done, lock any open databases and close any open Strongbox windows. Then try Factory Reset again.",
+                           window: view.window)
+            return
+        }
+        
+        let asyncUpdatesInProgress = MacDatabasePreferences.allDatabases.first { obj in
+            return obj.asyncUpdateId != nil;
+        }
+        
+        let syncInProgress = asyncUpdatesInProgress != nil || MacSyncManager.sharedInstance().syncInProgress;
+        
+        if syncInProgress {
+            MacAlerts.info("Strongbox could not lock, close and sync all databases before resetting. Please make sure all syncs are done, lock any open databases and close any open Strongbox windows. Then try Factory Reset again.",
+                           window: view.window)
+            return
+        }
+        
+
+        
+        
+        
+        DBManagerPanel.sharedInstance.hide()
+        
+        
+        
+        AutoFillProxyServer.sharedInstance().stop()
+        
+        
+        
+        Settings.sharedInstance().factoryReset()
+        
+        
+        
+        restartStrongbox()
+    }
+
+    func restartStrongbox(afterDelay seconds: TimeInterval = 1.0){
+        let task = Process()
+        task.launchPath = "/bin/sh"
+        task.arguments = ["-c", "sleep \(seconds); open \"\(Bundle.main.bundlePath)\""]
+        task.launch()
+        
+        NSApp.terminate(self)
+        exit(0)
+    }
+    
     @IBAction func onUseDropboxIsolated(_ sender: Any) {
+#if !NO_3RD_PARTY_STORAGE_PROVIDERS
         onChanged(sender)
         
         DropboxV2StorageProvider.sharedInstance().signOut()
@@ -100,6 +204,7 @@ class AdvancedAppPreferences: NSViewController {
                        informativeText: NSLocalizedString("generic_restart_required_for_changes_to_take_effect", comment: "You must restart Strongbox for these changes to take effect."),
                        window: view.window,
                        completion: nil)
+#endif
     }
     
     @IBAction func onEnableThirdParty(_ sender: Any) {

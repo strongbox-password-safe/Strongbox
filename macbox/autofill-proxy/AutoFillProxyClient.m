@@ -28,8 +28,8 @@ NSString* jsonErrorMessage(NSString* message);
 NSString* jsonMessage(BOOL success, NSString* message);
 NSString* jsonResponseOK(void);
 
-BOOL isLaunchStrongboxMessage(NSString* str);
-BOOL launchStrongbox(NSError** error);
+BOOL isLaunchStrongboxMessage(NSString* str, NSString** initiateUnlockDatabaseUuid);
+BOOL launchStrongbox(NSString* _Nullable initiateUnlockDatabaseUuid, NSError** error);
 void sigHandler(int sig) {
     exit(1);
 }
@@ -94,8 +94,9 @@ void onGotBrowserExtensionMessage(NSData* data) {
     NSString *message = sendMessageOverSocket(str, NO, &error);
 
     if ( message == nil ) {
-        if ( isLaunchStrongboxMessage(str) ) {
-            if ( launchStrongbox(&error) ) {
+        NSString* initiateUnlockDatabaseUuid = nil;
+        if ( isLaunchStrongboxMessage(str, &initiateUnlockDatabaseUuid) ) {
+            if ( launchStrongbox( initiateUnlockDatabaseUuid, &error ) ) {
                 message = jsonResponseOK();
             }
             else {
@@ -132,7 +133,7 @@ void onGotBrowserExtensionMessage(NSData* data) {
     [NSFileHandle.fileHandleWithStandardOutput writeData:messageData];
 }
 
-BOOL isLaunchStrongboxMessage(NSString* str) {
+BOOL isLaunchStrongboxMessage(NSString* str, NSString** initiateUnlockDatabaseUuid) {
     NSError* error;
     id object = [NSJSONSerialization JSONObjectWithData:str.utf8Data options:kNilOptions error:&error];
 
@@ -140,6 +141,7 @@ BOOL isLaunchStrongboxMessage(NSString* str) {
         NSDictionary* dict = (NSDictionary*)object;
         
         if ( dict[@"launch"] != nil ) {
+            *initiateUnlockDatabaseUuid = dict[@"initiateUnlockDatabaseUuid"];
             return YES;
         }
     }
@@ -147,18 +149,47 @@ BOOL isLaunchStrongboxMessage(NSString* str) {
     return NO;
 }
 
-BOOL launchStrongbox(NSError** error) {
-    NSString* exes = NSBundle.mainBundle.executablePath.stringByDeletingLastPathComponent;
-    NSString* pathToStrongbox = [exes stringByAppendingPathComponent:@"Strongbox"];
+BOOL launchStrongbox(NSString* _Nullable initiateUnlockDatabaseUuid, NSError** error) {
+    
+    NSString* pathToStrongbox =  NSBundle.mainBundle.bundlePath  ; 
 
     NSLog(@"✅ Launch Strongbox at: [%@]", pathToStrongbox);
+
     
     if ( pathToStrongbox.length ) {
-        NSRunningApplication *app = [NSWorkspace.sharedWorkspace launchApplicationAtURL:[NSURL fileURLWithPath:pathToStrongbox]
-                                                                                options:0
-                                                                          configuration:@{}
-                                                                                  error:error];
-        return app != nil;
+        NSWorkspaceOpenConfiguration* config = [NSWorkspaceOpenConfiguration configuration];
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        config.hides = YES; 
+        NSURL* url = [NSURL fileURLWithPath:pathToStrongbox];
+        
+        __block BOOL ret;
+        dispatch_group_t g = dispatch_group_create();
+        dispatch_group_enter(g);
+
+        [NSWorkspace.sharedWorkspace openApplicationAtURL:url
+                                            configuration:config
+                                        completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+
+            ret = error == nil;
+            dispatch_group_leave(g);
+        }];
+        
+        dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+        
+        NSLog(@"✅ Launch Done! ret = [%hhd]", ret);
+        
+        return ret;
     }
     
     return NO;

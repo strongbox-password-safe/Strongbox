@@ -19,6 +19,10 @@ class AppearanceSettings: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad() 
         
+        
+
+        showManagerOnAllClosed.isHidden = true 
+        
         bindUI()
     }
 

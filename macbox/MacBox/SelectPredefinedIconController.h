@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hideFavIconButton;
 @property KeePassIconSet iconSet;
 
-@property NSArray<NodeIcon*>* customIcons;
+@property NSArray<NodeIcon*>* iconPool;
 
 @end
 

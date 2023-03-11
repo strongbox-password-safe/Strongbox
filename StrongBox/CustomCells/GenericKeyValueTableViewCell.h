@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL showUiValidationOnEmpty;
 @property BOOL isConcealed;
+@property (nullable) UIMenu* historyMenu;
 
 @end
 

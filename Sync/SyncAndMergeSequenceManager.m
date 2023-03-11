@@ -15,7 +15,13 @@
 #import "ConcurrentMutableQueue.h"
 #import "DatabaseSyncOperationalData.h"
 #import "NSDate+Extensions.h"
-#import "FileManager.h"
+
+#if TARGET_OS_IPHONE
+#import "StrongboxiOSFilesManager.h"
+#else
+#import "StrongboxMacFilesManager.h"
+#endif
+
 #import "DatabaseModel.h"
 #import "DatabaseMerger.h"
 #import "Serializator.h"
@@ -677,7 +683,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }
     
     NSUUID* syncMergeId = NSUUID.UUID;
-    NSString* dirPath = FileManager.sharedInstance.syncManagerMergeWorkingDirectory.path;
+    NSString* dirPath = StrongboxFilesManager.sharedInstance.syncManagerMergeWorkingDirectory.path;
     NSString* local = [dirPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.local", syncMergeId.UUIDString]];
     NSString* remote = [dirPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.remote", syncMergeId.UUIDString]];
         

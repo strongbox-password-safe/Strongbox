@@ -29,8 +29,6 @@
 #import "OutlineView.h"
 #import "ClickableImageView.h"
 #import "SelectPredefinedIconController.h"
-#import "FavIconDownloader.h"
-#import "FavIconManager.h"
 #import "NSString+Extensions.h"
 #import "macOSSpinnerUI.h"
 #import "MMcGACTextField.h"
@@ -39,7 +37,7 @@
 #import "PasswordStrengthUIHelper.h"
 #import "MMcGSecureTextField.h"
 #import "MMcGACTextViewEditor.h"
-#import "FileManager.h"
+#import "StrongboxMacFilesManager.h"
 #import "StreamUtils.h"
 #import "CustomFieldTableCellView.h"
 #import "EditCustomFieldController.h"
@@ -65,12 +63,12 @@
 #import "MacCustomizationManager.h"
 #import "UpgradeWindowController.h"
 #import "MacUrlSchemes.h"
-#import "DropboxV2StorageProvider.h" 
 #import "RMStore.h"
 #import "AutoFillProxy.h"
 #import "CryptoBoxHelper.h"
 #import "DocumentController.h"
 #import "ConcurrentMutableDictionary.h"
+#import "ConcurrentMutableSet.h"
 #import "AutoFillCommon.h"
 #import "AutoFillProxyServer.h"
 #import "ObjCExceptionCatcherForSwift.h"
@@ -81,3 +79,17 @@
 #import "AutoFillLoadingVC.h"
 #import "NSString+Levenshtein.h"
 #import "SyncLogViewController.h"
+#import "CHCSVParser.h"
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+
+#import "DropboxV2StorageProvider.h" 
+
+#endif
+
+#ifndef NO_FAVICON_LIBRARY
+
+#import "FavIconDownloader.h"
+#import "FavIconManager.h"
+
+#endif

@@ -17,8 +17,9 @@ class MainSplitViewController : UISplitViewController, UISplitViewControllerDele
     
     var cancelOtpTimer : Bool = false
     var nextGenSyncInProgress : Bool = false
-    @objc public var model : Model!
-
+    @objc var model : Model!
+    @objc var hasAlreadyDoneStartWithSearch = false
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -407,7 +408,9 @@ class MainSplitViewController : UISplitViewController, UISplitViewControllerDele
         if localWasChanged {
             let vc = getMostAppropriateViewControllerForInteraction() 
                         
-            model.reloadDatabase(fromLocalWorkingCopy: vc) { [weak self] success in
+            model.reloadDatabase(fromLocalWorkingCopy: {
+                return vc
+            }, noProgressSpinner: false) { [weak self] success in
                 if success {
                     
                     NSLog("✅ Successfully reloaded database after Sync found changes")

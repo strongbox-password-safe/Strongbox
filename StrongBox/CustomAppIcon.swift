@@ -156,16 +156,14 @@ enum CustomAppIconCategory: CaseIterable {
 public class CustomAppIconObjCHelper: NSObject {
     @objc
     public static func downgradeProIconIfInUse() {
-        if #available(iOS 10.3, *) {
             guard !AppPreferences.sharedInstance().isPro,
                   let iconName = UIApplication.shared.alternateIconName,
                   let icon = CustomAppIcon.allCases.first(where: { $0.plistKey == iconName }) else { return }
 
-            if icon.isPro {
-                UIApplication.shared.setAlternateIconName(nil) { error in
-                    if let error = error {
-                        NSLog("🔴 Error = [%@]", String(describing: error))
-                    }
+        if icon.isPro {
+            UIApplication.shared.setAlternateIconName(nil) { error in
+                if let error = error {
+                    NSLog("🔴 Error = [%@]", String(describing: error))
                 }
             }
         }

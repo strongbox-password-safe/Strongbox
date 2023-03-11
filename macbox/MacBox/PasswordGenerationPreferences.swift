@@ -175,9 +175,10 @@ class PasswordGenerationPreferences: NSViewController {
 
         paragraphStyle.lineBreakMode = .byTruncatingTail 
         paragraphStyle.alignment = .center
-
+        
         mut.addAttribute(.paragraphStyle, value: paragraphStyle, range: NSMakeRange(0, sample.count))
-
+        mut.addAttribute(.baselineOffset, value: -8.0, range: NSMakeRange(0, sample.count)) 
+        
         samplePassword.attributedStringValue = mut
 
         bindPasswordStrength()

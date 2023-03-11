@@ -22,8 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Entry : BaseXmlDomainObjectHandler <KeePassGroupOrEntry>
 
-+ (const NSSet<NSString*>*)reservedCustomFieldKeys;
-
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
 @property (nonatomic) NSUUID* uuid;

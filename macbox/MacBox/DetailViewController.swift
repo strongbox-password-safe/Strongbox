@@ -103,20 +103,20 @@ class DetailViewController: NSViewController {
         return true
     }
     
-    func loadFields() -> [DetailsViewField] {
-        let selectedNode: Node
-
-        guard let dbModel = database.commonModel else {
-
-            return []
+    func getNode() -> Node? {
+        guard let _ = database.commonModel else {
+            
+            return nil
         }
 
+        let selectedNode: Node
+        
         if let fixedItemUuid = fixedItemUuid {
             guard let node = database.getItemBy(fixedItemUuid) else {
                 NSLog("✅ DetailViewController::load - fixedItemUuid empty")
-                return []
+                return nil
             }
-
+            
             selectedNode = node
         }
         else {
@@ -125,14 +125,27 @@ class DetailViewController: NSViewController {
                   let node = database.getItemBy(uuid)
             else {
                 NSLog("✅ DetailViewController::load - database.nextGenSelectedItems could not find")
-                return []
+                return nil
             }
-
+            
             selectedNode = node
+        }
+        
+        return selectedNode
+    }
+    
+    func loadFields() -> [DetailsViewField] {
+        guard let selectedNode = getNode() else {
+            NSLog("Could not get node from Model Selected or Fixed UUID")
+            return []
         }
 
 
-
+        guard let dbModel = database.commonModel else {
+            
+            return []
+        }
+        
         let model = EntryViewModel.fromNode(selectedNode, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
 
         var ret: [DetailsViewField] = []
@@ -181,12 +194,16 @@ class DetailViewController: NSViewController {
         if model.password.count > 0 {
             let dereferencedPassword = dereference(model.password, node: node)
 
-            return [DetailsViewField(name: NSLocalizedString("generic_fieldname_password", comment: "Password"),
+            let ret = DetailsViewField(name: NSLocalizedString("generic_fieldname_password", comment: "Password"),
                                      value: dereferencedPassword,
                                      fieldType: .customField,
                                      concealed: !Settings.sharedInstance().revealPasswordsImmediately && !quickRevealButtonDown,
                                      concealable: true,
-                                     showStrength: true)]
+                                     showStrength: true)
+            
+            ret.showHistory = true
+            
+            return [ret];
         } else {
             return []
         }
@@ -1094,6 +1111,11 @@ extension DetailViewController: DocumentViewController {
             }
         }
 
+        NotificationCenter.default.addObserver(forName: .genericRefreshAllDatabaseViews, object: nil, queue: nil)
+        { [weak self] notification in
+            self?.onGenericRefreshNotificationReceived(notification)
+        }
+        
         NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self = self else { return }
 
@@ -1101,6 +1123,16 @@ extension DetailViewController: DocumentViewController {
         }
     }
 
+    func onGenericRefreshNotificationReceived(_ notification: Notification) {
+        if notification.object as? String != database.databaseUuid {
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.refresh()
+        }
+    }
+    
     func overrideValidateProposedFirstResponderForRow(row: Int) -> Bool? {
         guard let field = fields[safe: row] else {
             return false
@@ -1218,6 +1250,15 @@ extension DetailViewController: DocumentViewController {
 
         refresh()
     }
+
+    func getPasswordHistoryMenu( ) -> NSMenu? {
+        guard (database.format == .keePass4 || database.format == .keePass),
+              let item = getNode() else {
+            return nil
+        }
+        
+        return PasswordHistoryHelper.getPasswordHistoryMenu( item: item )
+    }
 }
 
 extension DetailViewController: NSMenuDelegate {
@@ -1296,6 +1337,13 @@ extension DetailViewController: NSTableViewDelegate {
                             onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil,
                             containingWindow: view.window)
 
+            if field.showHistory {
+                cell.history = getPasswordHistoryMenu()
+            }
+            else {
+                cell.history = nil
+            }
+            
             return cell
         case .title:
             guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("TitleCellView"), owner: nil) as? TitleCellView else {
@@ -1382,7 +1430,7 @@ extension DetailViewController: NSTableViewDelegate {
     func onCopyEntiresNotes() {
         NSApplication.shared.sendAction(#selector(WindowController.onCopyNotes(_:)), to: nil, from: self)
     }
-
+    
     func showAuditDrillDown(_ uuid: UUID, view: NSView) {
         let vc = AuditDrillDown.fromStoryboard()
 
@@ -1514,7 +1562,7 @@ extension DetailViewController: QLPreviewPanelDelegate, QLPreviewPanelDataSource
 
         guard let field = attachmentFields[safe: index], let attachment = field.object as? DatabaseAttachment else { return nil }
 
-        let path = FileManager.sharedInstance().tmpAttachmentPreviewPath as NSString
+        let path = StrongboxFilesManager.sharedInstance().tmpAttachmentPreviewPath as NSString
         let tmp = path.appendingPathComponent(field.name as String)
 
         let inputStream = attachment.getPlainTextInputStream()!
@@ -1536,6 +1584,6 @@ extension DetailViewController: QLPreviewPanelDelegate, QLPreviewPanelDataSource
     }
 
     override func endPreviewPanelControl(_: QLPreviewPanel!) {
-        FileManager.sharedInstance().deleteAllTmpAttachmentPreviewFiles()
+        StrongboxFilesManager.sharedInstance().deleteAllTmpAttachmentPreviewFiles()
     }
 }

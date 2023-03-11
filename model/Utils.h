@@ -113,6 +113,7 @@ NSColor* NSColorFromRGB(NSUInteger rgbValue);
 #endif
 
 NSString* localizedYesOrNoFromBool(BOOL george);
+NSString* localizedOnOrOffFromBool(BOOL george);
 
 + (NSArray<NSString*>*)getTagsFromTagString:(NSString*)string;
 

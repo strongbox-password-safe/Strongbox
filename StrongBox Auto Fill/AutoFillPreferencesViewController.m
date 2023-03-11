@@ -90,15 +90,10 @@
     
     UIImage* check;
     UIImage* notCheck;
-
-    if (@available(iOS 13.0, *)) {
-        check = [UIImage systemImageNamed:@"checkmark.circle"];
-        notCheck = [UIImage systemImageNamed:@"exclamationmark.triangle"];
-    } else {
-        check = [UIImage imageNamed:@"ok"];
-        notCheck = [UIImage imageNamed:@"error"];
-    }
     
+    check = [UIImage systemImageNamed:@"checkmark.circle"];
+    notCheck = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+
     self.cellSystemLevelEnabled.imageView.image = check;
     self.cellSystemLevelEnabled.imageView.tintColor = UIColor.systemGreenColor;
 
@@ -153,12 +148,8 @@
     
     self.cellQuickTypeFormat.userInteractionEnabled = self.switchQuickTypeAutoFill.on;
     self.labelQuickTypeFormat.text = quickTypeFormatString(self.viewModel.metadata.quickTypeDisplayFormat);
-    if (@available(iOS 13.0, *)) {
-        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.labelColor : UIColor.secondaryLabelColor;
-    }
-    else {
-        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.blackColor : UIColor.lightGrayColor;
-    }
+    
+    self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.labelColor : UIColor.secondaryLabelColor;
     
     
     
@@ -186,12 +177,8 @@
     self.cellConvenienceAutoUnlock.userInteractionEnabled = self.viewModel.metadata.autoFillEnabled;
     self.labelConvenienceAutoUnlockTimeout.text = stringForConvenienceAutoUnlock(self.viewModel.metadata.autoFillConvenienceAutoUnlockTimeout);
 
-    if (@available(iOS 13.0, *)) {
-        self.labelConvenienceAutoUnlockTimeout.textColor = self.viewModel.metadata.autoFillEnabled ? UIColor.labelColor : UIColor.secondaryLabelColor;
-    }
-    else {
-        self.labelConvenienceAutoUnlockTimeout.textColor = self.viewModel.metadata.autoFillEnabled ? UIColor.blackColor : UIColor.lightGrayColor;
-    }
+    
+    self.labelConvenienceAutoUnlockTimeout.textColor = self.viewModel.metadata.autoFillEnabled ? UIColor.labelColor : UIColor.secondaryLabelColor;
     
     
     

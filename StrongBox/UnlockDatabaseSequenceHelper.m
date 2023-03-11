@@ -16,7 +16,7 @@
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
 #import "AddNewSafeHelper.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "StrongboxUIDocument.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "BiometricsManager.h"
@@ -413,15 +413,6 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    [self documentPicker:controller didPickDocumentAtURL:url];
-    #pragma GCC diagnostic pop
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     if (!document) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -442,7 +433,6 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
     
     sharedInstance = nil;
 }
-#pragma GCC diagnostic pop
 
 - (void)readReselectedFilesDatabase:(BOOL)success data:(NSData*)data url:(NSURL*)url {
     if(!success || !data) {

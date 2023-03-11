@@ -10,10 +10,6 @@
 #import "MTBBarcodeScanner.h"
 #import "Alerts.h"
 
-@interface QRCodeScannerViewController ()
-
-@end
-
 @implementation QRCodeScannerViewController
 
 - (void)viewDidAppear:(BOOL)animated {

@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseModel : NSObject
 
 @property (nonatomic, readonly) Node* rootNode;
+@property (readonly) BOOL isKeePass2Format;
 
 @property (nonatomic, readonly) DatabaseFormat originalFormat;
 @property (nonatomic, readonly) Node* effectiveRootGroup;
@@ -55,6 +56,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)rebuildFastMaps; 
+
+- (BOOL)isInRecycled:(NSUUID *)itemId;
+- (void)emptyRecycleBin;
 
 
 
@@ -164,14 +168,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull usernameSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull urlSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull passwordSet;
+
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull customFieldKeySet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull tagSet;
 
-@property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
+@property (nonatomic, readonly, nullable) NSString* mostPopularUsername;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularUsernames;
 
-@property (nonatomic, readonly) NSString* _Nonnull mostPopularEmail;
+@property (nonatomic, readonly, nullable) NSString* mostPopularEmail;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularEmails;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularTags;
 

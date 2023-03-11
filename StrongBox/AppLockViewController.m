@@ -11,7 +11,7 @@
 #import "Alerts.h"
 #import "DatabasePreferences.h"
 #import "AutoFillManager.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "BiometricsManager.h"
 #import "AppPreferences.h"
@@ -185,7 +185,7 @@
 - (void)deleteAllData {
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
-    [FileManager.sharedInstance deleteAllLocalAndAppGroupFiles]; 
+    [StrongboxFilesManager.sharedInstance deleteAllLocalAndAppGroupFiles]; 
 
     [DatabasePreferences deleteAll]; 
 }

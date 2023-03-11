@@ -13,6 +13,7 @@
 #import "NSArray+Extensions.h"
 #import "Utils.h"
 #import "MutableOrderedDictionary.h"
+#import "Constants.h"
 
 @interface Entry ()
 
@@ -23,26 +24,9 @@
 
 @implementation Entry
 
-static NSString* const kTitleStringKey = @"Title";
-static NSString* const kUserNameStringKey = @"UserName";
-static NSString* const kPasswordStringKey = @"Password";
-static NSString* const kUrlStringKey = @"URL";
-static NSString* const kNotesStringKey = @"Notes";
-
-const static NSSet<NSString*> *wellKnownKeys;
-
 + (void)initialize {
     if(self == [Entry class]) {
-        wellKnownKeys = [NSSet setWithArray:@[  kTitleStringKey,
-                                                kUserNameStringKey,
-                                                kPasswordStringKey,
-                                                kUrlStringKey,
-                                                kNotesStringKey]];
     }
-}
-
-+ (const NSSet<NSString*>*)reservedCustomFieldKeys {
-    return wellKnownKeys;
 }
 
 - (BOOL)isGroup {
@@ -184,7 +168,7 @@ const static NSSet<NSString*> *wellKnownKeys;
             
             
 
-            if(value.protected == NO && value.value.length == 0 && [wellKnownKeys containsObject:key]) {
+            if(value.protected == NO && value.value.length == 0 && [Constants.reservedCustomFieldKeys containsObject:key]) {
                 continue;
             }
 
@@ -362,7 +346,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     MutableOrderedDictionary<NSString*, StringValue*> *ret = [[MutableOrderedDictionary alloc] init];
     
     for (NSString* key in self.strings.allKeys) {
-        if([wellKnownKeys containsObject:key]) {
+        if([Constants.reservedCustomFieldKeys containsObject:key]) {
             StringValue* string = self.strings[key];
             ret[key] = string;
         }
@@ -375,7 +359,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     MutableOrderedDictionary<NSString*, StringValue*> *ret = [[MutableOrderedDictionary alloc] init];
     
     for (NSString* key in self.strings.allKeys) {
-        if(![wellKnownKeys containsObject:key]) {
+        if(![Constants.reservedCustomFieldKeys containsObject:key]) {
             StringValue* string = self.strings[key];
             ret[key] = string;
         }

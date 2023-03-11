@@ -29,6 +29,7 @@
 
 @property (nonnull, readonly) NSViewController* viewController;
 @property MacCompositeKeyDeterminerOnDemandUIProviderBlock onDemandUiProvider;
+@property NSWindowController* fooWc;
 
 @end
 
@@ -152,6 +153,7 @@
         
         
         
+        
         AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
         appDelegate.isRequestingAutoFillManualCredentialsEntry = YES; 
         
@@ -159,9 +161,9 @@
 
         NSWindow* window = [NSWindow windowWithContentViewController:mce];
         [window setLevel:NSFloatingWindowLevel];
-
-        NSWindowController* wc = [[NSWindowController alloc] initWithWindow:window];
-        [wc showWindow:nil];
+        
+        self.fooWc = [[NSWindowController alloc] initWithWindow:window]; 
+        [self.fooWc showWindow:nil];
         [window center];
         
         [NSApp activateIgnoringOtherApps:YES];

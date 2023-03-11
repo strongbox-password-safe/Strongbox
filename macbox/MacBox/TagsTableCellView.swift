@@ -19,16 +19,21 @@ class TagsTableCellView: NSTableCellView, NSCollectionViewDataSource, NSCollecti
 
         flowLayout.minimumInteritemSpacing = 4
         flowLayout.minimumLineSpacing = 8
-        flowLayout.itemSize = NSSize(width: 120, height: 24) 
+        flowLayout.itemSize = NSSize(width: 140, height: 24) 
 
-        wantsLayer = true
+
 
         collectionView.collectionViewLayout = flowLayout
-        collectionView.wantsLayer = true
+
         collectionView.register(TagItem.self, forItemWithIdentifier: TagItem.reuseIdentifier)
         collectionView.delegate = self
         collectionView.dataSource = self
 
+        collectionView.backgroundColors = [.clear]
+        let scrollView = collectionView.enclosingScrollView!
+        scrollView.drawsBackground = false
+        scrollView.contentView.drawsBackground = false
+                                                
         updateHeightConstraint()
     }
 

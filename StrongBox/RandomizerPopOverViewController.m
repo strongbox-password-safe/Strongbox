@@ -30,15 +30,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    if (@available(iOS 13.0, *)) { 
-        [self.barButtonConfig setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
-        [self.barButtonRefresh setImage:[UIImage systemImageNamed:@"arrow.clockwise"] forState:UIControlStateNormal];
-    }
-    
-    if (@available(iOS 14.0, *)) { 
-        [self.barButtonRefresh setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
-    }
+
+    [self.barButtonConfig setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
+    [self.barButtonRefresh setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
 
     [self makeButtonLabelAdjustForLength:self.button1];
     [self makeButtonLabelAdjustForLength:self.button2];
@@ -104,10 +98,7 @@
 }
 
 - (NSAttributedString*)getAttributedString:(NSString*)str {
-    BOOL dark = NO;
-    if (@available(iOS 12.0, *)) {
-        dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-    }
+    BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
     BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
 
     return [ColoredStringHelper getColorizedAttributedString:str

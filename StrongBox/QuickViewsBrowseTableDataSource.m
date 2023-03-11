@@ -14,7 +14,6 @@
 static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
 
 static NSUInteger const kQuickViewSectionIdx = 0;
-static NSUInteger const kTagSectionIdx = 1;
 
 @interface QuickViewsBrowseTableDataSource ()
 
@@ -41,19 +40,6 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (void)refresh {
-
-
-
-
-
-
-
-
-
-
-
-
-    
     NSMutableArray<QuickViewConfig*>* ret = @[].mutableCopy;
 
     NSUInteger auditCount = self.viewModel.auditIssueNodeCount;
@@ -63,35 +49,12 @@ static NSUInteger const kTagSectionIdx = 1;
         NSString* title = [NSString stringWithFormat:loc3, auditCount];
         NSString *loc4 = NSLocalizedString(@"quick_view_title_audit_issues_subtitle", @"View all entries with audit issues");
         
-        UIImage* auditImage;
-        if (@available(iOS 13.0, *)) {
-            auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
-        }
-        else {
-            auditImage = [UIImage imageNamed:@"security_checked"];
-        }
+        UIImage* auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
 
         QuickViewConfig *auditEntries = [QuickViewConfig title:title subtitle:loc4 image:auditImage searchTerm:kSpecialSearchTermAuditEntries imageTint:UIColor.systemOrangeColor];
         
         [ret addObject:auditEntries];
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     
     NSUInteger expiredCount = self.viewModel.database.expiredEntries.count;
     if ( expiredCount > 0 ) {
@@ -99,13 +62,7 @@ static NSUInteger const kTagSectionIdx = 1;
         NSString* title = [NSString stringWithFormat:loc5, @(expiredCount)];
         NSString *loc6 = NSLocalizedString(@"quick_view_title_expired_entries_subtitle", @"View all expired entries");
 
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"timelapse"];
-        }
-        else {
-            image = [UIImage imageNamed:@"timer"];
-        }
+        UIImage* image = [UIImage systemImageNamed:@"timelapse"];
         
         QuickViewConfig *entries = [QuickViewConfig title:title subtitle:loc6 image:image searchTerm:kSpecialSearchTermExpiredEntries];
         
@@ -140,8 +97,7 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (NSUInteger)sections {
-
-    return 1; 
+    return 1;
 }
 
 - (nonnull UITableViewCell *)cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -152,9 +108,8 @@ static NSUInteger const kTagSectionIdx = 1;
         
         cell.textLabel.text = config.title;
         cell.detailTextLabel.text = config.subtitle;
-        if (@available(iOS 13.0, *)) {
-            cell.detailTextLabel.textColor = UIColor.secondaryLabelColor;
-        }
+        cell.detailTextLabel.textColor = UIColor.secondaryLabelColor;
+
         cell.imageView.image = config.image;
         cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
         cell.imageView.tintColor = config.imageTint;
@@ -165,12 +120,9 @@ static NSUInteger const kTagSectionIdx = 1;
 
         cell.textLabel.text = tag;
         cell.detailTextLabel.text = @"";
-        if (@available(iOS 13.0, *)) {
-            cell.imageView.image = [UIImage systemImageNamed:@"tag"];
-        }
-        else {
-            cell.imageView.image = [UIImage imageNamed:@"price_tag"];
-        }
+
+        cell.imageView.image = [UIImage systemImageNamed:@"tag"];
+        
         cell.imageView.tintColor = nil;
     }
 
@@ -178,16 +130,11 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (NSUInteger)rowsForSection:(NSUInteger)section {
-    if (section == kTagSectionIdx) {
-        NSArray<NSString*>* tags = [self.viewModel.database.tagSet.allObjects sortedArrayUsingComparator:finderStringComparator];
-        return tags.count;
-    }
-    
     return self.quickViews.count;
 }
 
 - (NSString*)titleForSection:(NSUInteger)section {
-    return section == kQuickViewSectionIdx ? NSLocalizedString(@"quick_view_section_title_quick_views", @"Quick Views") : NSLocalizedString(@"browse_vc_search_scope_tags", @"Tags");
+    return self.quickViews.count == 0 ? nil : NSLocalizedString(@"quick_view_section_title_quick_views", @"Quick Views");
 }
 
 - (Node *)getParamFromIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -195,27 +142,13 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (void)performTapAction:(NSIndexPath *)indexPath searchController:(UISearchController *)searchController {
-    if (indexPath.section == kQuickViewSectionIdx) {
-        if ( indexPath.row < self.quickViews.count ) {
-            QuickViewConfig *config = self.quickViews[indexPath.row];
+    if ( indexPath.row < self.quickViews.count ) {
+        QuickViewConfig *config = self.quickViews[indexPath.row];
 
-            searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
-            searchController.searchBar.text = config.searchTerm;
-            
-            [searchController.searchBar endEditing:YES]; 
-        }
-    }
-    else if (indexPath.section == kTagSectionIdx) {
-        NSArray<NSString*>* tags = [self.viewModel.database.tagSet.allObjects sortedArrayUsingComparator:finderStringComparator];
+        searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
+        searchController.searchBar.text = config.searchTerm;
         
-        if ( indexPath.row < tags.count ) {
-            NSString* tag = tags[indexPath.row];
-
-            searchController.searchBar.selectedScopeButtonIndex = kSearchScopeTags;
-            searchController.searchBar.text = tag;
-
-            [searchController.searchBar endEditing:YES]; 
-        }
+        [searchController.searchBar endEditing:YES]; 
     }
 }
 

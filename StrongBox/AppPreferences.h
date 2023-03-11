@@ -181,6 +181,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL hasMigratedToLazySync;
 
+@property (nullable) NSString* businessOrganisationName;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -10,7 +10,7 @@
 #import "Utils.h"
 #import "NSArray+Extensions.h"
 #import <QuickLook/QuickLook.h>
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "Constants.h"
@@ -132,7 +132,7 @@
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
-    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+    [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
@@ -144,7 +144,7 @@
 
     NSString* filename = [self getAttachmentLikelyName:attachment forDisplay:NO];
 
-    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
+    NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
 
     NSInputStream* attStream = [attachment getPlainTextInputStream];
     [StreamUtils pipeFromStream:attStream to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];

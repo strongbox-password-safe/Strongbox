@@ -56,7 +56,7 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
     self.statistics[NSLocalizedString(@"mac_database_summary_number_of_folders", @"Number of Groups")] = [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfGroups];
     self.statistics[NSLocalizedString(@"mac_database_summary_number_of_entries", @"Number of Entries")] = [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.numberOfRecords];
     self.statistics[NSLocalizedString(@"mac_database_summary_unique_usernames", @"Unique Usernames")] = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.usernameSet count]];
-    self.statistics[NSLocalizedString(@"mac_database_summary_unique_passwords", @"Unique Passwords")] = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.passwordSet count]];
+
     
     if ( self.viewModel.database.mostPopularUsername ) {
         self.statistics[NSLocalizedString(@"mac_database_summary_most_popular_username", @"Most Popular Username")] = self.viewModel.database.mostPopularUsername;

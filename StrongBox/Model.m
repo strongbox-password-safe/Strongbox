@@ -17,7 +17,13 @@
 #import "SampleItemsGenerator.h"
 #import "DatabaseUnlocker.h"
 #import "ConcurrentMutableStack.h"
-#import "FileManager.h"
+
+#if TARGET_OS_IPHONE
+#import "StrongboxiOSFilesManager.h"
+#else
+#import "StrongboxMacFilesManager.h"
+#endif
+
 #import "CrossPlatform.h"
 #import "AsyncUpdateJob.h"
 #import "NSMutableArray+Extensions.h"
@@ -242,7 +248,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     return [self.database getItemsById:ids];
 }
 
-- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
+- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR(^)(void))onDemandViewController 
+                         noProgressSpinner:(BOOL)noProgressSpinner
                                 completion:(void(^)(BOOL success))completion {
     if (self.isDuressDummyMode) {
         
@@ -261,10 +268,12 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     NSLog(@"reloadDatabaseFromLocalWorkingCopy....");
     
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata
-                                                        viewController:viewController
                                                          forceReadOnly:self.forcedReadOnly
                                       isNativeAutoFillAppExtensionOpen:self.isNativeAutoFillAppExtensionOpen
-                                                           offlineMode:self.offlineMode];
+                                                           offlineMode:self.offlineMode
+                                                    onDemandUiProvider:onDemandViewController];
+    
+    unlocker.noProgressSpinner = noProgressSpinner;
     
     [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         if ( result == kUnlockDatabaseResultSuccess) {
@@ -633,7 +642,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     do {
 #if TARGET_OS_IPHONE
-        ret = [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+        ret = [StrongboxFilesManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
 #else
         
         
@@ -643,7 +652,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         
         if ( !url ) {
             NSLog(@"getUniqueStreamingFilename: ERROR = [%@]", error);
-            return [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+            return [StrongboxFilesManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
         }
         
         ret = [url URLByAppendingPathComponent:NSUUID.UUID.UUIDString].path;
@@ -953,6 +962,10 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
+- (BOOL)isInRecycled:(NSUUID *)itemId {
+    return [self.database isInRecycled:itemId];
+}
+
 - (BOOL)canRecycle:(NSUUID *)itemId {
     return [self.database canRecycle:itemId];
 }
@@ -963,6 +976,10 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (BOOL)recycleItems:(const NSArray<Node *> *)items {
     return [self.database recycleItems:items];
+}
+
+- (void)emptyRecycleBin {
+    [self.database emptyRecycleBin];
 }
 
 - (BOOL)launchUrl:(Node *)item {
@@ -1007,17 +1024,13 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         return;
     }
     
-    if (@available(macOS 10.15, *)) {
-        [[NSWorkspace sharedWorkspace] openURL:launchableUrl
-                                 configuration:NSWorkspaceOpenConfiguration.configuration
-                             completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
-            if ( error ) {
-                NSLog(@"Launch URL done. Error = [%@]", error);
-            }
-        }];
-    } else {
-        [[NSWorkspace sharedWorkspace] openURL:launchableUrl];
-    }
+    [[NSWorkspace sharedWorkspace] openURL:launchableUrl
+                             configuration:NSWorkspaceOpenConfiguration.configuration
+                         completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+        if ( error ) {
+            NSLog(@"Launch URL done. Error = [%@]", error);
+        }
+    }];
 #endif
 }
 
@@ -1649,5 +1662,9 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 }
 
 #endif
+
+- (BOOL)isKeePass2Format {
+    return self.database.isKeePass2Format;
+}
 
 @end

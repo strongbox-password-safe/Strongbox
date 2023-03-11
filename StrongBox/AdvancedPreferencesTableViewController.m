@@ -14,7 +14,7 @@
 #import "NSArray+Extensions.h"
 #import "OfflineDetector.h"
 #import "BiometricsManager.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "WebDAVConnectionsViewController.h"
 #import "SFTPConnectionsViewController.h"
 #import "SelectItemTableViewController.h"
@@ -209,7 +209,7 @@
     AppPreferences.sharedInstance.backupFiles = self.switchBackupFiles.on;
     AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = self.switchBackupImportedKeyFiles.on;
     
-    [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
+    [StrongboxFilesManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
                                                importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
     
     [self bindPreferences];

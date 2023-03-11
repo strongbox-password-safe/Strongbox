@@ -25,25 +25,25 @@
 }
 
 - (BOOL)isEqual:(id)object {
-    if (object == self) {
-        return YES;
-    }
-    else if (![super isEqual:object]) {
+    if (object == nil) {
         return NO;
     }
-    else {
-        if (![object isKindOfClass:[ValueWithModDate class]]) {
-            return NO;
-        }
-        
-        ValueWithModDate* other = (ValueWithModDate*)object;
-     
-        BOOL valuesDifferent = ((self.value == nil && other.value != nil) || (self.value != nil && ![self.value isEqualToString:other.value]));
-        BOOL modsDifferent = ((self.modified == nil && other.modified != nil) || (self.modified != nil && ![self.modified isEqual:other.modified]));
     
-        if ( valuesDifferent || modsDifferent ) {
-            return NO;
-        }
+    if (self == object) {
+        return YES;
+    }
+    
+    if (![object isKindOfClass:[ValueWithModDate class]]) {
+        return NO;
+    }
+    
+    ValueWithModDate* other = (ValueWithModDate*)object;
+ 
+    BOOL valuesDifferent = ((self.value == nil && other.value != nil) || (self.value != nil && ![self.value isEqualToString:other.value]));
+    BOOL modsDifferent = ((self.modified == nil && other.modified != nil) || (self.modified != nil && ![self.modified isEqual:other.modified]));
+
+    if ( valuesDifferent || modsDifferent ) {
+        return NO;
     }
     
     return YES;

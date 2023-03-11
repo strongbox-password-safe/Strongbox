@@ -146,7 +146,7 @@ static NSString* const kGroupAllItems = @"all-items";
     if (!self.doneFirstAppearanceTasks) {
         self.doneFirstAppearanceTasks = YES;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.40  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
             [self smartInitializeSearch];
 
             [self.searchController.searchBar becomeFirstResponder];
@@ -458,22 +458,16 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         
         if ( indexPath.row == 0 ) {
             cell.textLabel.text = NSLocalizedString(@"pick_creds_vc_create_new_button_title", @"Create New Entry...");
-            if (@available(iOS 13.0, *)) {
-                cell.imageView.image = [UIImage systemImageNamed:@"plus"];
-                cell.imageView.tintColor = [self canCreateNewCredential] ? nil : UIColor.secondaryLabelColor;
-                
-                cell.textLabel.textColor = [self canCreateNewCredential] ? UIColor.systemBlueColor : UIColor.secondaryLabelColor;
-            }
-            else {
-                cell.textLabel.textColor = [self canCreateNewCredential] ? UIColor.systemBlueColor : UIColor.darkTextColor;
-            }
+            cell.imageView.image = [UIImage systemImageNamed:@"plus"];
+            cell.imageView.tintColor = [self canCreateNewCredential] ? nil : UIColor.secondaryLabelColor;
+            
+            cell.textLabel.textColor = [self canCreateNewCredential] ? UIColor.systemBlueColor : UIColor.secondaryLabelColor;
+
             cell.userInteractionEnabled = [self canCreateNewCredential];
         }
         else {
             cell.textLabel.text = NSLocalizedString(@"generic_preferences", @"Preferences");
-            if (@available(iOS 13.0, *)) {
-                cell.imageView.image = [UIImage systemImageNamed:@"gear"];
-            }
+            cell.imageView.image = [UIImage systemImageNamed:@"gear"];
             
             cell.textLabel.textColor = UIColor.systemBlueColor;
             cell.userInteractionEnabled = YES;
@@ -486,12 +480,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         
         cell.textLabel.text = NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Records");
         cell.imageView.image = [UIImage imageNamed:@"search"];
-        if (@available(iOS 13.0, *)) {
-            cell.textLabel.textColor = UIColor.labelColor;
-        }
-        else {
-            cell.textLabel.textColor = UIColor.darkTextColor;
-        }
+        cell.textLabel.textColor = UIColor.labelColor;
         
         return cell;
     }
@@ -839,7 +828,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 
 
-- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point API_AVAILABLE(ios(13.0)){
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
     if ( !AppPreferences.sharedInstance.autoFillLongTapPreview ) {
         return nil;
     }
@@ -872,7 +861,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }];
 }
 
-- (UIMenu*)getContextualMenuCopyToClipboard:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+- (UIMenu*)getContextualMenuCopyToClipboard:(NSIndexPath*)indexPath item:(Node*)item {
     NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
     
     
@@ -894,7 +883,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                         children:ma];
 }
 
-- (UIAction*)getContextualMenuCopyUsernameAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuCopyUsernameAction:(NSIndexPath*)indexPath item:(Node*)item  {
     __weak PickCredentialsTableViewController* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_username", @"Copy Username")
@@ -904,7 +893,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }];
 }
 
-- (UIAction*)getContextualMenuCopyPasswordAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuCopyPasswordAction:(NSIndexPath*)indexPath item:(Node*)item  {
     __weak PickCredentialsTableViewController* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_password", @"Copy Password")
@@ -914,7 +903,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }];
 }
 
-- (UIAction*)getContextualMenuCopyTotpAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuCopyTotpAction:(NSIndexPath*)indexPath item:(Node*)item  {
     __weak PickCredentialsTableViewController* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_totp", @"Copy TOTP")
@@ -924,7 +913,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }];
 }
 
-- (UIMenu*)getContextualMenuNonMutators:(NSIndexPath*)indexPath item:(Node*)item  API_AVAILABLE(ios(13.0)){
+- (UIMenu*)getContextualMenuNonMutators:(NSIndexPath*)indexPath item:(Node*)item  {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
         
     if (item.fields.password.length) [ma addObject:[self getContextualMenuShowLargePasswordAction:indexPath item:item]];
@@ -935,7 +924,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                         children:ma];
 }
 
-- (UIAction*)getContextualMenuShowLargePasswordAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuShowLargePasswordAction:(NSIndexPath*)indexPath item:(Node*)item {
     __weak PickCredentialsTableViewController* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_show_password", @"Show Password")
@@ -954,7 +943,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     [self presentViewController:vc animated:YES completion:nil];
 }
 
-- (UIMenu*)getContextualMenuCopyFieldToClipboard:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+- (UIMenu*)getContextualMenuCopyFieldToClipboard:(NSIndexPath*)indexPath item:(Node*)item {
     NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
     
     if ( !item.isGroup ) [ma addObject:[self getContextualMenuCopyToClipboardSubmenu:indexPath item:item]];
@@ -966,7 +955,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                         children:ma];
 }
 
-- (UIMenuElement*)getContextualMenuCopyToClipboardSubmenu:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+- (UIMenuElement*)getContextualMenuCopyToClipboardSubmenu:(NSIndexPath*)indexPath item:(Node*)item {
     NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
     __weak PickCredentialsTableViewController* weakSelf = self;
     
@@ -1077,14 +1066,9 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 
-- (UIAction*)getContextualMenuGenericCopy:(NSString*)locKey item:(Node*)item handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuGenericCopy:(NSString*)locKey item:(Node*)item handler:(UIActionHandler)handler  {
     return [ContextMenuHelper getItem:NSLocalizedString(locKey, nil) systemImage:@"doc.on.doc" handler:handler];
 }
-
-
-
-
-
 
 
 

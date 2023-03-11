@@ -9,7 +9,7 @@
 #import "DatabaseMetadata.h"
 #import "SecretStore.h"
 #import "BookmarksHelper.h"
-#import "FileManager.h"
+#import "StrongboxMacFilesManager.h"
 #import "Settings.h"
 
 const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
@@ -58,6 +58,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.autoFillCopyTotp = YES;
         self.searchScope = kSearchScopeAll;
         self.autoPromptForConvenienceUnlockOnActivate = NO;
+        self.customSortOrderForFields = YES; 
     }
     
     return self;
@@ -652,6 +653,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         if ( [decoder containsValueForKey:@"customSortOrderForFields"] ) {
             self.customSortOrderForFields = [decoder decodeBoolForKey:@"customSortOrderForFields"];
         }
+        else {
+            self.customSortOrderForFields = YES;
+        }
         
         if ( [decoder containsValueForKey:@"autoFillCopyTotp"] ) {
             self.autoFillCopyTotp = [decoder decodeBoolForKey:@"autoFillCopyTotp"];
@@ -674,9 +678,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
 
 - (NSURL *)backupsDirectory {
-    NSURL* url = [FileManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
+    NSURL* url = [StrongboxFilesManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
     
-    [FileManager.sharedInstance createIfNecessary:url];
+    [StrongboxFilesManager.sharedInstance createIfNecessary:url];
     
     return url;
 }

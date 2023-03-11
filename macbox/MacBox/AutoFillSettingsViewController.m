@@ -207,6 +207,8 @@
                                          unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds
                                                                nickName:meta.nickName];
     }
+    
+    [self.model rebuildFastMaps]; 
 
     [self bindUI];
 }

@@ -8,7 +8,6 @@
 
 #import "DebugHelper.h"
 #import "Utils.h"
-#import "FileManager.h"
 #import <mach-o/arch.h>
 #import "NSDate+Extensions.h"
 #import "NSArray+Extensions.h"
@@ -25,6 +24,7 @@
 #import "SyncManager.h"
 #import "CustomizationManager.h"
 
+#import "StrongboxiOSFilesManager.h"
 
 #else
 
@@ -35,9 +35,9 @@
 #include <sys/sysctl.h>
 #import "Settings.h"
 #import "MacSyncManager.h"
-#import "FileManager.h"
 #import "MacDatabasePreferences.h"
 
+#import "StrongboxMacFilesManager.h"
 
 #endif
 
@@ -297,8 +297,8 @@ int OPParentIDForProcessID(int pid)
     [debugLines addObject:@"Last Crash"];
     [debugLines addObject:@"--------------------"];
 
-    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
-        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
+    if ([NSFileManager.defaultManager fileExistsAtPath:StrongboxFilesManager.sharedInstance.archivedCrashFile.path]) {
+        NSData* crashFileData = [NSData dataWithContentsOfURL:StrongboxFilesManager.sharedInstance.archivedCrashFile];
         NSString* jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
         [debugLines addObject:[NSString stringWithFormat:@"JSON Crash:%@", jsonCrash]];
     }
@@ -369,13 +369,13 @@ int OPParentIDForProcessID(int pid)
     
 
 #if TARGET_OS_IPHONE
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.appSupportDirectory]];
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.documentsDirectory]];
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.appSupportDirectory]];
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.documentsDirectory]];
 
 
 #endif
         
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.sharedAppGroupDirectory]];
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory]];
 
     
 

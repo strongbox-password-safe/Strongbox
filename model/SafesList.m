@@ -9,7 +9,7 @@
 #import "SafesList.h"
 #import "IOsUtils.h"
 #import "AppPreferences.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "NSArray+Extensions.h"
 #import "WorkingCopyManager.h"
 #import "ConcurrentMutableSet.h"
@@ -96,7 +96,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 }
 
 - (NSMutableArray<SafeMetaData*>*)deserialize {
-    NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
+    NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
     
     NSError* error;
     __block NSError* readError;
@@ -154,7 +154,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         return;
     }
 
-    NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
+    NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
 
     NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
     __block NSError *writeError = nil;

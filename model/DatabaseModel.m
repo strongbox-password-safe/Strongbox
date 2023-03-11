@@ -820,8 +820,19 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }];
 }
 
-- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+- (BOOL)isUrlMatches:(NSString*)searchText
+                node:(Node*)node
+         dereference:(BOOL)dereference
+         checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
+
+    if ( [foo.lowercaseString hasPrefix:kOtpAuthScheme] ) {
+        
+        
+
+        return NO;
+    }
+
     if ( [foo containsSearchString:searchText checkPinYin:checkPinYin] ) {
         return YES;
     }
@@ -837,22 +848,34 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
-    BOOL simple =   [self isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
-                    [self isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
-                    [self isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
-                    [self isEmailMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
-                    [self isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
-                    [self isNotesMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
-                    [self isTagsMatches:searchText node:node checkPinYin:checkPinYin];
-        
-    if(simple) {
+    if ( [self isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
         return YES;
     }
-    else {
-        if (self.format == kKeePass4 || self.format == kKeePass) {
+    if ( [self isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
+        return YES;
+    }
+    if ( [self isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
+        return YES;
+    }
+    if ( [self isEmailMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
+        return YES;
+    }
+    if ( [self isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
+        return YES;
+    }
+    if ( [self isNotesMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
+        return YES;
+    }
+    if ( [self isTagsMatches:searchText node:node checkPinYin:checkPinYin] ) {
+        return YES;
+    }
+        
+    if (self.format == kKeePass4 || self.format == kKeePass) {
+        
+        
+        for (NSString* key in node.fields.customFields.allKeys) {
             
-            
-            for (NSString* key in node.fields.customFields.allKeys) {
+            if ( ![NodeFields isAlternativeURLCustomFieldKey:key] && ![NodeFields isTotpCustomFieldKey:key]) {
                 NSString* value = node.fields.customFields[key].value;
                 NSString* derefed = [self maybeDeref:value node:node maybe:dereference];
                 
@@ -861,19 +884,20 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                 }
             }
         }
-                
-        if (self.format != kPasswordSafe) {
-            BOOL attachmentMatch = [node.fields.attachments.allKeys anyMatch:^BOOL(NSString * _Nonnull obj) {
-                return [obj containsSearchString:searchText checkPinYin:checkPinYin];
-            }];
-            
-            if (attachmentMatch) {
-                return YES;
-            }
-        }
-        
-        
     }
+            
+    if (self.format != kPasswordSafe) {
+        BOOL attachmentMatch = [node.fields.attachments.allKeys anyMatch:^BOOL(NSString * _Nonnull obj) {
+            return [obj containsSearchString:searchText checkPinYin:checkPinYin];
+        }];
+        
+        if (attachmentMatch) {
+            return YES;
+        }
+    }
+    
+    
+
     
     return NO;
 }
@@ -888,6 +912,10 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [unique.allObjects sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         return [@(((NSString*)obj2).length) compare:@(((NSString*)obj1).length)];
     }];
+}
+
+- (BOOL)isKeePass2Format {
+    return self.format == kKeePass || self.format == kKeePass4;
 }
 
 
@@ -1406,6 +1434,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return self.metadata.recycleBinChanged;
 }
 
+- (void)emptyRecycleBin {
+    if ( self.isKeePass2Format && self.recycleBinNode && self.recycleBinEnabled ) {
+        [self deleteItems:self.recycleBinNode.children];
+    }
+}
+
 - (Node*)keePass1BackupNode {
     return [self.effectiveRootGroup firstOrDefault:NO predicate:^BOOL(Node * _Nonnull node) {
         return [node.title isEqualToString:kKeePass1BackupGroupName];
@@ -1414,6 +1448,18 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
     return self.mutableDeletedObjects.copy;
+}
+
+- (BOOL)isInRecycled:(NSUUID *)itemId {
+    Node* item = [self getItemById:itemId];
+    
+    if ( item && self.recycleBinNode ) {
+        if([self.recycleBinNode contains:item] || [self.recycleBinNode.uuid isEqual:itemId]) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 - (BOOL)canRecycle:(NSUUID *)itemId {

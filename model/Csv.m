@@ -8,6 +8,7 @@
 
 #import "Csv.h"
 #import "CHCSVParser.h"
+#import "OTPToken+Serialization.h"
 
 @implementation Csv
 
@@ -19,10 +20,16 @@
     NSOutputStream *output = [NSOutputStream outputStreamToMemory];
     CHCSVWriter *writer = [[CHCSVWriter alloc] initWithOutputStream:output encoding:NSUTF8StringEncoding delimiter:','];
     
-    [writer writeLineOfFields:@[kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderNotes]];
+    [writer writeLineOfFields:@[kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderTotp, kCSVHeaderNotes]];
     
     for(Node* node in nodes) {
-        [writer writeLineOfFields:@[node.title, node.fields.username, node.fields.email, node.fields.password, node.fields.url, node.fields.notes]];
+        NSString *otp = @"";
+        
+        if ( node.fields.otpToken != nil ) {
+            otp = [node.fields.otpToken url:YES].absoluteString;
+        }
+        
+        [writer writeLineOfFields:@[node.title, node.fields.username, node.fields.email, node.fields.password, node.fields.url, otp, node.fields.notes]];
     }
     
     [writer closeStream];

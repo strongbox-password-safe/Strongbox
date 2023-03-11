@@ -39,46 +39,24 @@ class BrowseTabViewController: UITabBarController {
     }
     
     func getTabImage ( tab : BrowseViewType, large : Bool = false ) -> UIImage {
-        if #available(iOS 13.0, *) {
-            var imageName : String
-            
-            switch tab {
-            case .tags:
-                imageName = "tag.fill"
-            case .hierarchy:
-                imageName = "folder.fill"
-            case .list:
-                imageName = "list.bullet"
-            case .totpList:
-                imageName = "timer"
-            case .favourites:
-                imageName = "star.fill"
-            @unknown default:
-                imageName = "questionmark.circle.fill"
-            }
-            
-            return UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(scale: large ? .default : .small))!
+        var imageName : String
+        
+        switch tab {
+        case .tags:
+            imageName = "tag.fill"
+        case .hierarchy:
+            imageName = "folder.fill"
+        case .list:
+            imageName = "list.bullet"
+        case .totpList:
+            imageName = "timer"
+        case .favourites:
+            imageName = "star.fill"
+        @unknown default:
+            imageName = "questionmark.circle.fill"
         }
-        else {
-            var imageName : String
-            
-            switch tab {
-            case .tags:
-                imageName = "price_tag"
-            case .hierarchy:
-                imageName = "list"
-            case .list:
-                imageName = "list"
-            case .totpList:
-                imageName = "timer"
-            case .favourites:
-                imageName = "list"
-            @unknown default:
-                imageName = "list"
-            }
-            
-            return UIImage(imageLiteralResourceName: imageName)
-        }
+        
+        return UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(scale: large ? .default : .small))!
     }
 
     var currentVisibleTabs : [BrowseViewType] = []
@@ -90,15 +68,13 @@ class BrowseTabViewController: UITabBarController {
     }
 
     fileprivate func customizeUI() {
-        if #available(iOS 13.0, *) {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            
-            tabBar.standardAppearance = appearance
-            
-            if #available(iOS 15.0, *) {
-                tabBar.scrollEdgeAppearance = appearance
-            }
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        
+        tabBar.standardAppearance = appearance
+        
+        if #available(iOS 15.0, *) {
+            tabBar.scrollEdgeAppearance = appearance
         }
     }
     

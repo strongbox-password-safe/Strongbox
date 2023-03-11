@@ -14,7 +14,7 @@
 #define SIZE_OF_PASSWORD_SAFE_3_HEADER_SALT 32
 #define TWOFISH_BLOCK_SIZE                  16
 #define EOF_MARKER                          @"PWS3-EOFPWS3-EOF"
-#define DEFAULT_KEYSTRETCH_ITERATIONS       2048
+#define DEFAULT_KEYSTRETCH_ITERATIONS       8192
 #define TWOFISH_KEYSIZE_BYTES               32
 #define FIELD_HEADER_LENGTH                 5
 

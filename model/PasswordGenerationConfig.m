@@ -91,7 +91,7 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
     
     ret.algorithm = kPasswordGenerationAlgorithmBasic;
     
-    ret.basicLength = 16;
+    ret.basicLength = 22;
     ret.basicExcludedCharacters = @"";
     ret.useCharacterGroups = @[@(kPasswordGenerationCharacterPoolLower),
                                @(kPasswordGenerationCharacterPoolUpper),
@@ -102,7 +102,7 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
     ret.nonAmbiguousOnly = YES;
     ret.pickFromEveryGroup = YES;
     
-    ret.wordCount = 5;
+    ret.wordCount = 6;
     ret.wordLists = @[kWordListEffLarge];
     ret.wordSeparator = @"-";
     ret.wordCasing = kPasswordGenerationWordCasingTitle;

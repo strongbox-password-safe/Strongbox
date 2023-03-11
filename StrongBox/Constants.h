@@ -18,6 +18,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Constants : NSObject
 
++ (const NSSet<NSString*>*)reservedCustomFieldKeys;
+extern NSString* const kTitleStringKey;
+extern NSString* const kUserNameStringKey;
+extern NSString* const kPasswordStringKey;
+extern NSString* const kUrlStringKey;
+extern NSString* const kNotesStringKey;
+
 extern const NSInteger kStorageProviderSFTPorWebDAVSecretMissingErrorCode;
 extern const NSInteger kStorageProviderUserInteractionRequiredErrorCode;
 extern NSString* const kStorageProviderUserInteractionRequiredErrorMessage;

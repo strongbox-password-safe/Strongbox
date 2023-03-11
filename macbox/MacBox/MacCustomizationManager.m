@@ -38,4 +38,8 @@
     return StrongboxProductBundle.isUnifiedFreemiumBundle;
 }
 
++ (BOOL)supportsTipJar {
+    return StrongboxProductBundle.supportsTipJar;
+}
+
 @end

@@ -38,19 +38,13 @@
     self.upgradeOptions.hidden = CustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro; 
     
     self.debugTextView.layer.cornerRadius = 2.0f;
-    if (@available(iOS 13.0, *)) {
-        self.debugTextView.layer.borderColor = [UIColor.secondaryLabelColor CGColor];
-    } else {
-        self.debugTextView.layer.borderColor = [UIColor.darkGrayColor CGColor];
-    }
+    self.debugTextView.layer.borderColor = [UIColor.secondaryLabelColor CGColor];
+
     self.debugTextView.layer.borderWidth = 0.5f;
 
     self.aboutTextView.layer.cornerRadius = 2.0f;
-    if (@available(iOS 13.0, *)) {
-        self.aboutTextView.layer.borderColor = [UIColor.secondaryLabelColor CGColor];
-    } else {
-        self.debugTextView.layer.borderColor = [UIColor.darkGrayColor CGColor];
-    }
+    self.aboutTextView.layer.borderColor = [UIColor.secondaryLabelColor CGColor];
+
     self.aboutTextView.layer.borderWidth = 0.5f;
 
     self.debugTextView.text = [DebugHelper getAboutDebugString];
@@ -63,12 +57,9 @@
                                                                                                     options:@{ NSDocumentTypeDocumentOption :  NSRTFTextDocumentType }
                                                                                          documentAttributes:nil
                                                                                                       error:&error];
-        UIColor *color;
-        if (@available(iOS 13.0, *)) {
-            color = UIColor.labelColor;
-            NSDictionary *attrs = @{ NSForegroundColorAttributeName : color };
-            [attributedStringWithRtf addAttributes:attrs range:NSMakeRange(0, attributedStringWithRtf.length)];
-        }
+        UIColor *color = UIColor.labelColor;
+        NSDictionary *attrs = @{ NSForegroundColorAttributeName : color };
+        [attributedStringWithRtf addAttributes:attrs range:NSMakeRange(0, attributedStringWithRtf.length)];
         
         self.aboutTextView.attributedText = error ? [[NSAttributedString alloc] initWithString:error.description] : attributedStringWithRtf;
     }

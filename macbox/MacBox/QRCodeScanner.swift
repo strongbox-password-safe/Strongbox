@@ -22,7 +22,9 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
     @IBOutlet var labelFoundInWindow: NSTextField!
     @IBOutlet var labelNoneFoundHeader: NSTextField!
     @IBOutlet var labelPermissionsHeader: NSTextField!
-
+    @IBOutlet var stackViewPreviewTotp: NSStackView!
+    @IBOutlet weak var checkboxAutoCommit: NSButton!
+    
     struct ScanResult {
         var totpString: String
         var ownerWindow: String
@@ -40,14 +42,17 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
 
         stackViewNoneFound.setCustomSpacing(8, after: labelNoneFoundHeader)
         stackViewResultConfirm.setCustomSpacing(8, after: labelFoundInWindow)
+        stackViewResultConfirm.setCustomSpacing(12, after: checkboxAutoCommit)
 
+        stackViewPreviewTotp.isHidden = true 
+        
         bindUI()
 
         if hasPermissions {
             startScanning()
         }
     }
-
+    
     var hasPermissions: Bool {
         if #available(macOS 11.0, *) {
             
@@ -76,12 +81,29 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         bindUI()
     }
 
+    @IBAction func onChangedAutoCommit(_ sender: Any) {
+        if checkboxAutoCommit.state == .off {
+            MacAlerts.areYouSure(NSLocalizedString("are_you_sure_auto_commit_totp_msg", comment: "Disabling Auto-Commit could mean you lose this TOTP if you forget to commit later. Are you sure?"),
+                                 window: view.window) { [weak self] response in
+                if response {
+                    Settings.sharedInstance().autoCommitScannedTotp = false
+                }
+                self?.bindUI()
+            }
+        }
+        else {
+            Settings.sharedInstance().autoCommitScannedTotp = true
+            bindUI()
+        }
+    }
+
     func bindUI() {
         stackViewPermissions.isHidden = hasPermissions
         stackViewSearching.isHidden = !hasPermissions || !isScanning
         stackViewResultConfirm.isHidden = scanResult == nil
         stackViewNoneFound.isHidden = scanResult != nil || isScanning || !hasPermissions
-
+        checkboxAutoCommit.state = Settings.sharedInstance().autoCommitScannedTotp ? .on : .off
+        
         if let result = scanResult {
             imageView.image = result.image
             labelTotpUrl.stringValue = result.totpString
@@ -210,7 +232,6 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
             }
 
             let ciImage = CIImage(cgImage: windowImage)
-
             let features = qrDetector.features(in: ciImage)
 
             if let qrc = features.first as? CIQRCodeFeature, let string = qrc.messageString {
@@ -218,9 +239,19 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
 
 
 
-                if let url = URL(string: string), let _ = OTPToken(url: url) {
-                    completionHandler(ScanResult(totpString: string, ownerWindow: ownerWindow, image: image))
-                    return
+                
+                
+                
+                if let url = (string as NSString).urlExtendedParse {
+
+                    
+                    if let _ = OTPToken(url: url) {
+
+
+                        
+                        completionHandler(ScanResult(totpString: url.absoluteString, ownerWindow: ownerWindow, image: image))
+                        return
+                    }
                 }
             }
         }

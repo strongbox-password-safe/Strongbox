@@ -18,9 +18,10 @@ class MacOnboardingManager: NSObject {
 
     @objc class func beginAppOnboarding ( completion : @escaping () -> Void ) {
         let modules : [OnboardingModule] = [ 
-            OnboardingModules.getFirstRunWelcomeModule(),
+            WelcomeAppOnboardingModule(),
             FreeTrialOrUpgradeOnboardingModule (),
-            OnboardingModules.getHasBeenDowngradedModule() 
+            OnboardingModules.getHasBeenDowngradedModule(),
+            OnboardingModules.getTurnOnThirdPartyAutoFill(),
         ]
         
         if let window = window {

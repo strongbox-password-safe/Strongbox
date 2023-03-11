@@ -12,13 +12,16 @@
 #import "NSDate+Extensions.h"
 #import "MacUrlSchemes.h"
 #import "WorkingCopyManager.h"
-#import "FileManager.h"
+#import "StrongboxMacFilesManager.h"
 #import "Settings.h"
 #import "MacSyncManager.h"
 #import <QuartzCore/QuartzCore.h>
 #import "SafeStorageProviderFactory.h"
+
+#ifndef NO_SFTP_WEBDAV_SP
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
+#endif
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -89,6 +92,15 @@
  indicateAutoFillDisabled:NO
          wormholeUnlocked:NO
                  disabled:NO];
+}
+
+- (void)setWithDatabase:(MacDatabasePreferences*)metadata disabled:(BOOL)disabled {
+    [self setWithDatabase:metadata
+ nickNameEditClickEnabled:YES
+            showSyncState:YES
+ indicateAutoFillDisabled:NO
+         wormholeUnlocked:NO
+                 disabled:disabled];
 }
 
 - (void)setWithDatabase:(MacDatabasePreferences *)metadata
@@ -244,6 +256,10 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     }
     
     if ( url ) {
+
+
+
+        
         if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
             path = getFriendlyICloudPath(url.path);
             self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:kiCloud];
@@ -276,6 +292,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     NSString* fileMod = @"";
     NSString* title = metadata.nickName ? metadata.nickName : @"";
 
+#ifndef NO_SFTP_WEBDAV_SP
     if ( metadata.storageProvider == kSFTP ) {
         SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
         
@@ -287,8 +304,11 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
         path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
     }
     else {
+#endif
         path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
+#ifndef NO_SFTP_WEBDAV_SP
     }
+#endif
     
     NSDate* modDate;
     unsigned long long size;

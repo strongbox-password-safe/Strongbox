@@ -14,18 +14,8 @@
 + (UIButton*)createSyncButton:(id)target action:(SEL)action {
     UIButton* ret = [[UIButton alloc] init];
     [ret addTarget:target action:action forControlEvents:UIControlEventTouchUpInside];
-    
-    if (@available(iOS 14.0, *)) {
-        [ret setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
-    }
-    else {
-        [ret setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
-        ret.contentMode = UIViewContentModeCenter;
-        ret.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [ret setTintColor:UIColor.systemBlueColor];
-        ret.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
-    }
-    
+    [ret setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
+   
     return ret;
 }
 

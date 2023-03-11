@@ -145,8 +145,9 @@ static NSString* const kHideTipJar = @"hideTipJar";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
-static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync";
+static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync-Iteration-4-RB-OneDrive";
 static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
+static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
 
 @implementation AppPreferences
 
@@ -189,22 +190,14 @@ static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
 
 
 
+- (NSString *)businessOrganisationName {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kBusinessOrganisationName];
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- (void)setBusinessOrganisationName:(NSString *)businessOrganisationName {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setObject:businessOrganisationName forKey:kBusinessOrganisationName];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
 
 
 - (BOOL)hasMigratedToLazySync {

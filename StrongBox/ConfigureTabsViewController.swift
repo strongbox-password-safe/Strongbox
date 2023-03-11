@@ -194,22 +194,15 @@ class ConfigureTabsViewController : UITableViewController, UIAdaptivePresentatio
             if let viewType {
                 cell.textLabel?.text = titleForViewType(viewType: viewType)
                 cell.imageView?.image = imageForViewType(viewType: viewType)
-                
-                if #available(iOS 13.0, *) {
-                    cell.imageView?.preferredSymbolConfiguration = UIImage.SymbolConfiguration(scale: .large)
-                }
-                
+                cell.imageView?.preferredSymbolConfiguration = UIImage.SymbolConfiguration(scale: .large)
                 cell.imageView?.tintColor = imageTintForViewType(viewType: viewType)
             }
             else {
                 cell.textLabel?.text = NSLocalizedString("configure_tabs_drag_tabs_to_hide", comment: "Drag tabs here to hide them")
-                if #available(iOS 13.0, *) {
-                    cell.textLabel?.textColor = .secondaryLabel
-                    
-                    cell.tintColor = .secondaryLabel
-                } else {
-                    cell.textLabel?.textColor = .darkGray
-                }
+                
+                cell.textLabel?.textColor = .secondaryLabel
+                
+                cell.tintColor = .secondaryLabel
             }
             
             return cell
@@ -217,12 +210,7 @@ class ConfigureTabsViewController : UITableViewController, UIAdaptivePresentatio
         else {
             cell.textLabel?.text = NSLocalizedString("configure_tabs_option_hide_tab_bar_completely", comment: "Hide Tab Bar Completely")
 
-            if #available(iOS 13.0, *) {
-                cell.textLabel?.textColor = .label
-            } else {
-                cell.textLabel?.textColor = .black
-            }
-
+            cell.textLabel?.textColor = .label
             cell.imageView?.image = nil
             cell.accessoryType = model.metadata.hideTabBarIfOnlySingleTab ? .checkmark : .none
             cell.editingAccessoryType = model.metadata.hideTabBarIfOnlySingleTab ? .checkmark : .none
@@ -268,46 +256,24 @@ class ConfigureTabsViewController : UITableViewController, UIAdaptivePresentatio
     }
     
     func imageForViewType ( viewType : BrowseViewType ) -> UIImage {
-        if #available(iOS 13.0, *) {
-            var imageName : String
-            
-            switch viewType {
-            case .tags:
-                imageName = "tag.fill"
-            case .hierarchy:
-                imageName = "folder.fill"
-            case .list:
-                imageName = "list.bullet"
-            case .totpList:
-                imageName = "timer"
-            case .favourites:
-                imageName = "star.fill"
-            @unknown default:
-                imageName = "questionmark.circle.fill"
-            }
-            
-            return UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(scale: .small))!
+        var imageName : String
+        
+        switch viewType {
+        case .tags:
+            imageName = "tag.fill"
+        case .hierarchy:
+            imageName = "folder.fill"
+        case .list:
+            imageName = "list.bullet"
+        case .totpList:
+            imageName = "timer"
+        case .favourites:
+            imageName = "star.fill"
+        @unknown default:
+            imageName = "questionmark.circle.fill"
         }
-        else {
-            var imageName : String
-            
-            switch viewType {
-            case .tags:
-                imageName = "price_tag"
-            case .hierarchy:
-                imageName = "list"
-            case .list:
-                imageName = "list"
-            case .totpList:
-                imageName = "timer"
-            case .favourites:
-                imageName = "list"
-            @unknown default:
-                imageName = "list"
-            }
-            
-            return UIImage(imageLiteralResourceName: imageName)
-        }
+        
+        return UIImage(systemName: imageName, withConfiguration: UIImage.SymbolConfiguration(scale: .small))!
     }
     
     @IBAction func onDone(_: Any?) {

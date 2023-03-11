@@ -15,6 +15,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kModelUpdateNotificationFullReload;
+extern NSString* const kGenericRefreshAllDatabaseViewsNotification;
 
 @interface Document : NSDocument
 

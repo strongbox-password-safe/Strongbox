@@ -31,7 +31,8 @@ class DetailsViewField {
     var fieldType: FieldType = .customField
     var object: Any?
     var showStrength: Bool = false
-
+    var showHistory : Bool = false
+    
     init(name: String, value: String,
          fieldType: FieldType,
          concealed: Bool = false,

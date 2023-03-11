@@ -10,4 +10,6 @@
 
 class Section: Decodable {
     var fields: [SectionField]? = nil
+    var title: String? = nil
+    var name: String? = nil
 }

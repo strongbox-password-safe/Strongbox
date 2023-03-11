@@ -35,13 +35,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowRecycleBinInSearch;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSingleTapAction;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellDoubleTapAction;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellTripleTapAction;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellLongPressAction;
 @property (weak, nonatomic) IBOutlet UILabel *labelSingleTapAction;
-@property (weak, nonatomic) IBOutlet UILabel *labelDoubleTapAction;
-@property (weak, nonatomic) IBOutlet UILabel *labelTripleTapAction;
-@property (weak, nonatomic) IBOutlet UILabel *labelLongPressAction;
 
 @property (weak, nonatomic) IBOutlet UISwitch *swtichShowExpiredInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowExpiredInSearch;
@@ -86,15 +80,7 @@
     [self cell:self.cellShowRecycleBin setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellShowRecycleBinInSearch setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellIconSet setHidden:self.format == kPasswordSafe];
-    
-    if (@available(iOS 13, *)) {
         
-
-        [self cell:self.cellDoubleTapAction setHidden:YES];
-        [self cell:self.cellTripleTapAction setHidden:YES];
-        [self cell:self.cellLongPressAction setHidden:YES];
-    }
-    
     if ( AppPreferences.sharedInstance.disableFavIconFeature ) {
         [self cell:self.cellFetchFavIcon setHidden:YES];
     }
@@ -172,9 +158,6 @@
     
     
     self.labelSingleTapAction.text = [self getTapActionString:(self.databaseMetaData.tapAction)];
-    self.labelDoubleTapAction.text = [self getTapActionString:(self.databaseMetaData.doubleTapAction)];
-    self.labelTripleTapAction.text = [self getTapActionString:(self.databaseMetaData.tripleTapAction)];
-    self.labelLongPressAction.text = [self getTapActionString:(self.databaseMetaData.longPressTapAction)];
     
     
     
@@ -240,7 +223,7 @@
     if (cell == self.cellBrowseItemSubtitle) {
         [self onChangeBrowseItemSubtitle];
     }
-    else if (cell == self.cellSingleTapAction || cell == self.cellDoubleTapAction || cell == self.cellTripleTapAction || cell == self.cellLongPressAction) {
+    else if (cell == self.cellSingleTapAction ) {
         [self onChangeTapAction:cell];
     }
     else if (cell == self.cellIconSet) {
@@ -304,18 +287,6 @@
         current = self.databaseMetaData.tapAction;
         title = NSLocalizedString(@"browse_prefs_single_tap_action", @"Single Tap Action");
     }
-    else if(cell == self.cellDoubleTapAction) {
-        current = self.databaseMetaData.doubleTapAction;
-        title = NSLocalizedString(@"browse_prefs_double_tap_action", @"Double Tap Action");
-    }
-    else if(cell == self.cellTripleTapAction) {
-        current = self.databaseMetaData.tripleTapAction;
-        title = NSLocalizedString(@"browse_prefs_triple_tap_action", @"Triple Tap Action");
-    }
-    else {
-        current = self.databaseMetaData.longPressTapAction;
-        title = NSLocalizedString(@"browse_prefs_long_press_action", @"Long Press Action");
-    }
     
     NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return obj.integerValue == current;
@@ -328,15 +299,6 @@
                    if (success) {
                        if(cell == self.cellSingleTapAction) {
                            self.databaseMetaData.tapAction = (BrowseTapAction)options[selectedIdx].integerValue;
-                       }
-                       else if(cell == self.cellDoubleTapAction) {
-                           self.databaseMetaData.doubleTapAction = (BrowseTapAction)options[selectedIdx].integerValue;
-                       }
-                       else if(cell == self.cellTripleTapAction) {
-                           self.databaseMetaData.tripleTapAction = (BrowseTapAction)options[selectedIdx].integerValue;
-                       }
-                       else {
-                           self.databaseMetaData.longPressTapAction = (BrowseTapAction)options[selectedIdx].integerValue;
                        }
                    }
                    

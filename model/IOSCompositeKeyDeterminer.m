@@ -18,7 +18,7 @@
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
 #import "BookmarksHelper.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "Serializator.h"
 #import "KeyFileParser.h"
 #import "YubiManager.h"
@@ -411,7 +411,7 @@ static const int kMaxFailedPinAttempts = 3;
 }
 
 - (NSString*)getAutoDetectedKeyFileUrl {
-    NSURL *directory = FileManager.sharedInstance.documentsDirectory;
+    NSURL *directory = StrongboxFilesManager.sharedInstance.documentsDirectory;
 
     NSError* error;
     NSFileManager *fm = [NSFileManager defaultManager];

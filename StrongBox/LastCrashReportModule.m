@@ -8,7 +8,7 @@
 
 #import "LastCrashReportModule.h"
 #import "GenericOnboardingViewController.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "DebugHelper.h"
 #import "ClipboardManager.h"
 
@@ -27,10 +27,18 @@
     
     
 
-    if ( [NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.crashFile.path] ) {
-        [NSFileManager.defaultManager removeItemAtURL:FileManager.sharedInstance.archivedCrashFile error:nil];
-        [NSFileManager.defaultManager moveItemAtURL:FileManager.sharedInstance.crashFile toURL:FileManager.sharedInstance.archivedCrashFile error:nil];
+    if ( [NSFileManager.defaultManager fileExistsAtPath:StrongboxFilesManager.sharedInstance.crashFile.path] ) {
+        [NSFileManager.defaultManager removeItemAtURL:StrongboxFilesManager.sharedInstance.archivedCrashFile error:nil];
+        [NSFileManager.defaultManager moveItemAtURL:StrongboxFilesManager.sharedInstance.crashFile toURL:StrongboxFilesManager.sharedInstance.archivedCrashFile error:nil];
 
+        NSData* data = [NSData dataWithContentsOfURL:StrongboxFilesManager.sharedInstance.archivedCrashFile];
+        NSString* crashStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        
+        if ( [crashStr containsString:@"MSLargeFileUploadTask uploadNextSegmentWithCompletion"]) {
+            NSLog(@"⚠️ Ignoring well known Microsoft OneDrive crash until we find a fix.");
+            return NO;
+        }
+        
         return YES;
     }
     

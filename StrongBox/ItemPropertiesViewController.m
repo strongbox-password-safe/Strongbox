@@ -16,6 +16,7 @@
 #import "ClipboardManager.h"
 #import "NSUUID+Zero.h"
 #import "TagsViewTableViewCell.h"
+#import "SelectItemTableViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -26,14 +27,15 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 static NSString* const kGenericBasicCellId = @"GenericBasicCell";
 static NSString* const kTagsViewCellId = @"TagsViewCell";
 
-const static NSUInteger kSectionPropertiesIdx = 0;
-const static NSUInteger kSectionTagsIdx = 1; 
-const static NSUInteger kSectionNotesIdx = 2; 
-const static NSUInteger kSectionDatesIdx = 3;
-const static NSUInteger kSectionCustomDataIdx = 4;
+const static NSUInteger kSectionSearchableIdx = 0;
+const static NSUInteger kSectionPropertiesIdx = 1;
+const static NSUInteger kSectionTagsIdx = 2; 
+const static NSUInteger kSectionNotesIdx = 3; 
+const static NSUInteger kSectionDatesIdx = 4;
+const static NSUInteger kSectionCustomDataIdx = 5;
 
-const static NSUInteger kSectionCount = 5;
-const static NSUInteger kSectionUuidIdx = 5; 
+const static NSUInteger kSectionCount = 6;
+const static NSUInteger kSectionUuidIdx = 6; 
 
 @interface ItemPropertiesViewController ()
 
@@ -61,6 +63,10 @@ const static NSUInteger kSectionUuidIdx = 5;
     [self.tableView registerNib:[UINib nibWithNibName:kGenericBasicCellId bundle:nil] forCellReuseIdentifier:kGenericBasicCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kTagsViewCellId bundle:nil] forCellReuseIdentifier:kTagsViewCellId];
     
+    [self refresh];
+}
+
+- (void)refresh {
     self.customData = [[MutableOrderedDictionary alloc] init];
     NSArray* sortedKeys = [self.item.fields.customData.allKeys sortedArrayUsingComparator:finderStringComparator];
     for (NSString* key in sortedKeys) {
@@ -72,6 +78,8 @@ const static NSUInteger kSectionUuidIdx = 5;
     
     [self loadDates];
     [self loadProperties];
+
+    [self.tableView reloadData];
 }
 
 - (void)loadProperties {
@@ -79,25 +87,22 @@ const static NSUInteger kSectionUuidIdx = 5;
         
     NSString* value = keePassStringIdFromUuid(self.item.uuid);
     self.properties[@"ID"] = value;
-
-    self.properties[NSLocalizedString(@"item_properties_search_visible_state", @"Visible in Search")] = localizedYesOrNoFromBool (self.item.isSearchable);
     
     if ( self.item.fields.previousParentGroup ) {
         self.properties[NSLocalizedString(@"item_properties_previous_parent_group", @"Previous Parent Group")] = keePassStringIdFromUuid(self.item.fields.previousParentGroup);
     }
     
     if (self.item.isGroup) {
-        self.properties[NSLocalizedString(@"item_properties_allow_search", @"Allow Search")] = [self optionalBoolString:self.item.fields.enableSearching];
         self.properties[NSLocalizedString(@"item_properties_allow_autotype", @"Allow AutoType")] = [self optionalBoolString:self.item.fields.enableAutoType];
-        self.properties[NSLocalizedString(@"item_properties_is_expanded", @"Is Expanded")] = localizedYesOrNoFromBool(self.item.fields.isExpanded);
+
         
         if (self.item.fields.defaultAutoTypeSequence.length) {
             self.properties[NSLocalizedString(@"item_properties_default_autotype_sequence", @"Default Auto Type Sequence")] = self.item.fields.defaultAutoTypeSequence;
         }
         
-        if (self.item.fields.lastTopVisibleEntry && ![self.item.fields.lastTopVisibleEntry isEqual:NSUUID.zero]) {
-            self.properties[NSLocalizedString(@"item_properties_last_top_visible_entry", @"Last Top Visible Entry")] = keePassStringIdFromUuid(self.item.fields.lastTopVisibleEntry);
-        }
+
+
+
     }
     else {
         if ( !self.item.fields.qualityCheck ) {
@@ -179,6 +184,9 @@ const static NSUInteger kSectionUuidIdx = 5;
     else if ( section == kSectionDatesIdx ) {
         return self.dates.count;
     }
+    else if ( section == kSectionSearchableIdx ) {
+        return 1;
+    }
 
     return [super tableView:tableView numberOfRowsInSection:section];
 }
@@ -197,6 +205,8 @@ const static NSUInteger kSectionUuidIdx = 5;
     else if ( indexPath.section == kSectionNotesIdx ) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         cell.labelText.text = [self maybeDereference:self.notes];
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        
         return cell;
     }
     else if ( indexPath.section == kSectionCustomDataIdx ) {
@@ -232,6 +242,26 @@ const static NSUInteger kSectionUuidIdx = 5;
     else if ( indexPath.section == kSectionTagsIdx ) {
         return [self getTagsCell:indexPath];
     }
+    else if ( indexPath.section == kSectionSearchableIdx ) {
+
+        
+        
+        NSString* effectiveSearchableState = localizedYesOrNoFromBool (self.item.isSearchable);
+        
+        NSString* inheritedStr = [NSString stringWithFormat:NSLocalizedString(@"item_properties_inherited_yes_no_fmt", @"Inherited (%@)"), effectiveSearchableState];
+        NSString* searchableStr = self.item.fields.enableSearching == nil ? inheritedStr : effectiveSearchableState;
+
+
+
+
+
+
+        GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
+        cell.labelText.text = searchableStr;
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        
+        return cell;
+    }
     
     return [super tableView:tableView cellForRowAtIndexPath:indexPath];
 }
@@ -249,6 +279,9 @@ const static NSUInteger kSectionUuidIdx = 5;
     else if ( section == kSectionDatesIdx ) {
         return NSLocalizedString(@"properties_vc_header_dates", @"Dates");
     }
+    else if ( section == kSectionSearchableIdx && self.item.isGroup && self.model.isKeePass2Format) {
+        return NSLocalizedString(@"group_properties_searchable", @"Searchable");
+    }
     
     return [super tableView:tableView titleForHeaderInSection:section];
 }
@@ -263,6 +296,9 @@ const static NSUInteger kSectionUuidIdx = 5;
     }
     else if ( section == kSectionCustomDataIdx && self.customData.count ) {
         return NSLocalizedString(@"properties_vc_footer_custom_data", @"Custom Data used by plugins and various other applications.");
+    }
+    else if ( section == kSectionSearchableIdx && self.item.isGroup && self.model.isKeePass2Format ) {
+        return NSLocalizedString(@"group_properties_searchable_footer_info", @"The Searchable setting affects whether this group and its contents are visible in search results, AutoFill suggestions and most views. This is useful if you'd like to archive/ignore some items, but not permanently delete them.");
     }
 
     return [super tableView:tableView titleForFooterInSection:section];
@@ -279,6 +315,9 @@ const static NSUInteger kSectionUuidIdx = 5;
         return CGFLOAT_MIN;
     }
     else if ( section == kSectionTagsIdx && (!self.item.isGroup || self.item.fields.tags.count == 0 ) ) {
+        return CGFLOAT_MIN;
+    }
+    else if ( section == kSectionSearchableIdx && !(self.item.isGroup && self.model.isKeePass2Format) ) {
         return CGFLOAT_MIN;
     }
 
@@ -298,7 +337,10 @@ const static NSUInteger kSectionUuidIdx = 5;
     else if ( section == kSectionTagsIdx && (!self.item.isGroup || self.item.fields.tags.count == 0 ) ) {
         return CGFLOAT_MIN;
     }
-
+    else if ( section == kSectionSearchableIdx && !(self.item.isGroup && self.model.isKeePass2Format) ) {
+        return CGFLOAT_MIN;
+    }
+    
     return UITableViewAutomaticDimension;
 }
 
@@ -315,7 +357,10 @@ const static NSUInteger kSectionUuidIdx = 5;
     else if ( indexPath.section == kSectionTagsIdx && ( !self.item.isGroup || self.item.fields.tags.count == 0 ) ) {
         return CGFLOAT_MIN;
     }
-
+    else if ( indexPath.section == kSectionSearchableIdx && !(self.item.isGroup && self.model.isKeePass2Format) ) {
+        return CGFLOAT_MIN;
+    }
+    
     return [super tableView:tableView heightForRowAtIndexPath:indexPath];
 }
 
@@ -345,6 +390,9 @@ const static NSUInteger kSectionUuidIdx = 5;
         NSString* key = self.dates.allKeys[indexPath.row];
         NSString* value = self.dates[key];
         [self copyToClipboard:value message:[NSString stringWithFormat:fmt, key]];
+    }
+    else if ( indexPath.section == kSectionSearchableIdx ) {
+        [self promptForSearchableSetting];
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -387,6 +435,56 @@ const static NSUInteger kSectionUuidIdx = 5;
           onRemove:nil];
 
     return cell;
+}
+
+- (void)promptForSearchableSetting {
+    NSInteger idx = self.item.fields.enableSearching == nil ? 1 : self.item.isSearchable ? 2 : 0;
+    
+    [self promptForString:NSLocalizedString(@"group_properties_searchable", @"Searchable")
+                  options:@[NSLocalizedString(@"alerts_no", @"No"),
+                            NSLocalizedString(@"generic_setting_is_inherited_from_parent", @"Inherited From Parent"),
+                            NSLocalizedString(@"alerts_yes", @"Yes")]
+             currentIndex:idx
+               completion:^(BOOL success, NSInteger selectedIdx) {
+        if ( success ) {
+            NSLog(@"set Searchable = %ld", (long)selectedIdx);
+            
+            if ( selectedIdx == 0 ) {
+                self.item.fields.enableSearching = @(NO);
+            }
+            else if ( selectedIdx == 1) {
+                self.item.fields.enableSearching = nil;
+            }
+            else if ( selectedIdx == 2) {
+                self.item.fields.enableSearching = @(YES);
+            }
+            
+            self.updateDatabase();
+            
+            [self refresh];
+        }
+    }];
+}
+
+- (void)promptForString:(NSString*)title
+                options:(NSArray<NSString*>*)options
+           currentIndex:(NSInteger)currentIndex
+             completion:(void(^)(BOOL success, NSInteger selectedIdx))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+    
+    vc.groupItems = @[options];
+    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentIndex]];
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        [self.navigationController popViewControllerAnimated:YES];
+        
+        NSIndexSet* set = selectedIndices.firstObject;
+        completion(YES, set.firstIndex);
+    };
+    vc.title = title;
+    
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 @end

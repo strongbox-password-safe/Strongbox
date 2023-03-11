@@ -46,6 +46,14 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     return sharedInstance;
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        GIDSignIn.sharedInstance.configuration = [[GIDConfiguration alloc] initWithClientID:GOOGLE_CLIENT_ID];
+    }
+    return self;
+}
+
 - (GTLRDriveService *)driveService {
     static GTLRDriveService *service = nil;
 
@@ -89,7 +97,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 - (void)signout {
     [GIDSignIn.sharedInstance signOut];
     
-    [GIDSignIn.sharedInstance disconnectWithCallback:^(NSError * _Nullable error) {
+    [GIDSignIn.sharedInstance disconnectWithCompletion:^(NSError * _Nullable error) {
         NSLog(@"✅ GIDSignIn.sharedInstance disconnectWithCallback finished with [%@]", error);
     }];
 }
@@ -106,7 +114,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
         NSLog(@"✅ GoogleDriveManager::authenticate - Attempting to restore previous sign in...");
         
-        [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
+        [GIDSignIn.sharedInstance restorePreviousSignInWithCompletion:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
             NSLog(@"✅ GoogleDriveManager::authenticate - restore previous sign in done with error = [%@] and user = [%@]", error, user);
 
             [self onDidSignInForUser:user completion:completion backgroundSync:YES withError:error];
@@ -117,7 +125,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         NSLog(@"✅ Google Drive Sign In - Foreground Interactive Mode - Thread [%@]", NSThread.currentThread);
         
         if ( GIDSignIn.sharedInstance.hasPreviousSignIn ) {
-            [GIDSignIn.sharedInstance restorePreviousSignInWithCallback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
+            [GIDSignIn.sharedInstance restorePreviousSignInWithCompletion:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
                 NSLog(@"✅ GoogleDriveManager::authenticate - restore previous sign in done with error = [%@] and user = [%@]", error, user);
                 
                 [self onDidSignInForUser:user completion:completion backgroundSync:NO withError:error];
@@ -128,21 +136,19 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
             AppPreferences.sharedInstance.suppressAppBackgroundTriggers = YES;
 #endif
             
-            
                 
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [GIDSignIn.sharedInstance signInWithConfiguration:[[GIDConfiguration alloc] initWithClientID:GOOGLE_CLIENT_ID]
 #if TARGET_OS_IPHONE
-                                         presentingViewController:viewController
+                [GIDSignIn.sharedInstance signInWithPresentingViewController:viewController
 #else
-                                                 presentingWindow:viewController.view.window
+                [GIDSignIn.sharedInstance signInWithPresentingWindow:viewController.view.window
 #endif
-                                                             hint:nil
-                                                 additionalScopes:@[kGTLRAuthScopeDrive]
-                                                         callback:^(GIDGoogleUser * _Nullable user, NSError * _Nullable error) {
-                    NSLog(@"✅ GoogleDriveManager::authenticate - signInWithConfiguration in done with error = [%@] and user = [%@]", error, user);
-                    
-                    [self onDidSignInForUser:user completion:completion backgroundSync:NO withError:error];
+                                                                        hint:nil
+                                                            additionalScopes:@[kGTLRAuthScopeDrive]
+                                                                  completion:^(GIDSignInResult * _Nullable signInResult, NSError * _Nullable error) {
+                    NSLog(@"✅ GoogleDriveManager::authenticate - signInWithConfiguration in done with error = [%@] and user = [%@]", error, signInResult.user);
+
+                    [self onDidSignInForUser:signInResult.user completion:completion backgroundSync:NO withError:error];
                 }];
             });
         }
@@ -159,7 +165,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     }
     else {
 
-        self.driveService.authorizer = user.authentication.fetcherAuthorizer;
+        self.driveService.authorizer = user.fetcherAuthorizer;
     }
     
 #if TARGET_OS_IPHONE
@@ -391,6 +397,8 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     [self findSafeFile:parentOrJson
               fileName:fileName
             completion:^(GTLRDrive_File *file, NSError *error) {
+        
+        
         if (viewController) {
             [self dismissProgressSpinner];
         }
@@ -402,16 +410,30 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         else {
             GTLRUploadParameters *uploadParameters = [GTLRUploadParameters uploadParametersWithData:data MIMEType:kMimeType];
             GTLRDriveQuery_FilesUpdate *query = [GTLRDriveQuery_FilesUpdate queryWithObject:[GTLRDrive_File object] fileId:file.identifier uploadParameters:uploadParameters];
+                        
             query.fields = @"modifiedTime";
-
+            
             if (viewController) {
                 [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:viewController];
             }
+        
+
             
             [self.driveService executeQuery:query completionHandler:^(GTLRServiceTicket *callbackTicket, GTLRDrive_File *uploadedFile, NSError *callbackError) {
                 if (viewController) {
                     [self dismissProgressSpinner];
                 }
+
+
+
+
+
+
+
+
+
+
+
 
                 handler(callbackError ? kUpdateResultError : kUpdateResultSuccess, uploadedFile.modifiedTime.date, callbackError);
             }];

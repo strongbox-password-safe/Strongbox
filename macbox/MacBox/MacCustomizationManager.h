@@ -15,10 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)applyCustomizations;
 
 @property (readonly, class) BOOL isAProBundle;
-@property (readonly, class) BOOL isUnifiedFreemiumBundle;
-@property (readonly, class) BOOL isUnifiedBundle;
-@property (readonly, class) BOOL isUnifiedProBundle;
 
+@property (readonly, class) BOOL isUnifiedFreemiumBundle;
+
+@property (readonly, class) BOOL supportsTipJar;
 @end
 
 NS_ASSUME_NONNULL_END

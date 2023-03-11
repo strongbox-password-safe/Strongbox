@@ -13,6 +13,7 @@
 #import "AppPreferences.h"
 #import "PasswordStrengthTester.h"
 #import "PasswordStrengthUIHelper.h"
+#import "ContextMenuHelper.h"
 
 @interface GenericKeyValueTableViewCell ()
 
@@ -42,6 +43,8 @@
 @property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
 @property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 
+@property (weak, nonatomic) IBOutlet UIButton *buttonHistory;
+
 @end
 
 @implementation GenericKeyValueTableViewCell
@@ -49,12 +52,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
 
-    if (@available(iOS 13.0, *)) {
-        self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
-    }
-    else {
-        self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
-    }
+    self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
     self.keyLabel.font = FontManager.sharedInstance.caption1Font;
@@ -85,6 +83,14 @@
     [self.rightButtonTap setNumberOfTouchesRequired:1];
     [self.rightButtonSplashLabel addGestureRecognizer:self.rightButtonTap];
     self.rightButtonSplashLabel.text = @" "; 
+
+    
+    
+    self.buttonHistory.showsMenuAsPrimaryAction = YES;
+    self.buttonHistory.hidden = YES;
+    self.contentView.userInteractionEnabled = YES;
+    
+    
     
     self.labelAudit.userInteractionEnabled = YES;
     UITapGestureRecognizer *tapGesture =
@@ -92,13 +98,7 @@
                                                   action:@selector(onAuditLabelTap)];
     [self.labelAudit addGestureRecognizer:tapGesture];
 
-    UIImage* auditImage;
-    if (@available(iOS 13.0, *)) {
-        auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
-    }
-    else {
-        auditImage = [UIImage imageNamed:@"security_checked"];
-    }
+    UIImage* auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
     
     self.imageAuditError.image = auditImage;
     self.imageAuditError.userInteractionEnabled = YES;
@@ -125,11 +125,7 @@
     self.valueLabel.hidden = YES;
     self.valueText.hidden = NO;
     
-    if (@available(iOS 13.0, *)) {
-        self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
-    } else {
-        self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
-    }
+    self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
 
     self.onEdited = nil;
     self.showUiValidationOnEmpty = NO;
@@ -147,10 +143,10 @@
     self.auditStack.hidden = YES;
     self.stackStrength.hidden = YES;
     
-    if (@available(iOS 13.0, *)) {
-        [self.buttonRightButton setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+    [self.buttonRightButton setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
                                                 forImageInState:UIControlStateNormal];
-    }
+    
+    self.historyMenu = nil;
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
@@ -207,14 +203,8 @@ rightButtonImage:rightButtonImage
               showStrength:(BOOL)showStrength {
     
         
-    UIImage *image;
-    if (@available(iOS 13.0, *)) {
-        image = [UIImage systemImageNamed:concealed ? @"eye" : @"eye.slash"];
-    }
-    else {
-        image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
-    }
-
+    UIImage *image = [UIImage systemImageNamed:concealed ? @"eye" : @"eye.slash"];
+  
     [self setKey:key
            value:value
          editing:NO
@@ -304,12 +294,7 @@ rightButtonImage:(UIImage*)rightButtonImage
 
 - (void)bindKey:(NSString*)key {
     self.keyLabel.text = key;
-    if (@available(iOS 13.0, *)) {
-        self.keyLabel.textColor = UIColor.secondaryLabelColor;
-    }
-    else {
-        self.keyLabel.textColor = nil;
-    }
+    self.keyLabel.textColor = UIColor.secondaryLabelColor;
     self.keyLabel.accessibilityLabel = key;
 }
 
@@ -326,13 +311,8 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     [self bindValueText];
 
     if(formatAsUrl) {
-        if (@available(iOS 13.0, *)) {
-            self.valueText.textColor = UIColor.linkColor;
-            self.valueLabel.textColor = UIColor.linkColor;
-        } else {
-            self.valueText.textColor = UIColor.blueColor;
-            self.valueLabel.textColor = UIColor.blueColor;
-        }
+        self.valueText.textColor = UIColor.linkColor;
+        self.valueLabel.textColor = UIColor.linkColor;
     }
 }
 
@@ -342,14 +322,8 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
         self.valueText.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
         self.valueLabel.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
 
-        if (@available(iOS 13.0, *)) {
-            self.valueText.textColor = UIColor.secondaryLabelColor;
-            self.valueLabel.textColor = UIColor.secondaryLabelColor;
-        }
-        else {
-            self.valueText.textColor = UIColor.darkGrayColor;
-            self.valueLabel.textColor = UIColor.darkGrayColor;
-        }
+        self.valueText.textColor = UIColor.secondaryLabelColor;
+        self.valueLabel.textColor = UIColor.secondaryLabelColor;
 
         self.valueText.font = FontManager.sharedInstance.caption1Font;
         self.valueLabel.font = FontManager.sharedInstance.caption1Font;
@@ -359,10 +333,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
         self.valueLabel.accessibilityLabel = nil;
         
         if (self.colorizeValue) {
-            BOOL dark = NO;
-            if (@available(iOS 12.0, *)) {
-                dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-            }
+            BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
             BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
             
             self.valueText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.value
@@ -382,15 +353,8 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
             self.valueLabel.text = self.value;
             self.valueText.font = self.configuredValueFont;
             self.valueLabel.font = self.configuredValueFont;
-            
-            if (@available(iOS 13.0, *)) {
-                self.valueText.textColor = UIColor.labelColor;
-                self.valueLabel.textColor = UIColor.labelColor;
-            }
-            else {
-                self.valueText.textColor = UIColor.darkTextColor;
-                self.valueLabel.textColor = UIColor.darkTextColor;
-            }
+            self.valueText.textColor = UIColor.labelColor;
+            self.valueLabel.textColor = UIColor.labelColor;
         }
     }
 }
@@ -420,12 +384,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
             self.valueText.placeholder = [NSString stringWithFormat:NSLocalizedString(@"generic_kv_cell_value_empty_value_validation_fmt", @"%@ (Required)"), self.keyLabel.text];
         }
         else {
-            if (@available(iOS 13.0, *)) {
-                self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
-            }
-            else {
-                self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
-            }
+            self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
         }
     }
 }
@@ -441,13 +400,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 - (void)setIsConcealed:(BOOL)isConcealed {
     self.concealed = isConcealed;
     
-    UIImage *image;
-    if (@available(iOS 13.0, *)) {
-        image = [UIImage systemImageNamed:self.concealed ? @"eye" : @"eye.slash"];
-    }
-    else {
-        image = [UIImage imageNamed:self.concealed ? @"visible" : @"invisible"];
-    }
+    UIImage *image = [UIImage systemImageNamed:self.concealed ? @"eye" : @"eye.slash"];
     self.rightButtonImage = image;
 
     [self bindRightButton];
@@ -498,7 +451,6 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     }
 }
 
-
 - (void)bindStrength:(BOOL)showStrength {
     if ( showStrength && self.value.length ) {
         [PasswordStrengthUIHelper bindStrengthUI:self.value
@@ -512,6 +464,15 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     else {
         self.stackStrength.hidden = YES;
     }
+}
+
+- (UIMenu *)historyMenu {
+    return self.buttonHistory.menu;
+}
+
+- (void)setHistoryMenu:(UIMenu *)historyMenu {
+    self.buttonHistory.menu = historyMenu;
+    self.buttonHistory.hidden = historyMenu == nil;
 }
 
 @end

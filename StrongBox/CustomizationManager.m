@@ -39,17 +39,15 @@
         AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
         AppPreferences.sharedInstance.backupFiles = NO;
         AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
-        AppPreferences.sharedInstance.hideTipJar = YES;
     }
     else if ( self.isGrapheneEdition ) {
         NSLog(@"Graphene Edition... customizing...");
-
+        
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
         AppPreferences.sharedInstance.disableReadOnlyToggles = NO;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
-        AppPreferences.sharedInstance.hideTipJar = YES; 
     }
     else {
         AppPreferences.sharedInstance.disableFavIconFeature = NO;
@@ -57,8 +55,9 @@
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = NO;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = NO;
-        AppPreferences.sharedInstance.hideTipJar = NO;
     }
+    
+    AppPreferences.sharedInstance.hideTipJar = !StrongboxProductBundle.supportsTipJar;
 }
 
 + (BOOL)isAProBundle {

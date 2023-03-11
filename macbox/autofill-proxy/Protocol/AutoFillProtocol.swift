@@ -17,6 +17,10 @@ enum AutoFillMessageType : NSInteger, Codable {
     case copyField
     case lock
     case unlock
+    case createEntry
+    case getGroups
+    case getNewEntryDefaults
+    case generatePassword
 }
 
 @objc

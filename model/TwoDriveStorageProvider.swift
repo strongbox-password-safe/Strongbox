@@ -88,7 +88,11 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         }
         
 #if os(iOS)
-        return DatabasePreferences.templateDummy(withNickName: nickName, storageProvider: storageId, fileName: dItem.name!, fileIdentifier: json)
+        let ret = DatabasePreferences.templateDummy(withNickName: nickName, storageProvider: storageId, fileName: dItem.name!, fileIdentifier: json)
+        
+        ret.lazySyncMode = true
+        
+        return ret
 #else
         guard let filename = (dItem.name! as NSString).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
               let url = URL(string: String(format: "%@:

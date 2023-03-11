@@ -119,24 +119,6 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     });
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 - (void)atomicUpdate:(NSString *)uuid touch:(void (^)(DatabaseMetadata * _Nonnull))touch {
     dispatch_barrier_async(self.dataQueue, ^{  
         NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];

@@ -25,12 +25,8 @@
     
     self.image.image = nil;
     self.textField.enabled = NO;
-    if (@available(iOS 13.0, *)) {
-        self.textField.textColor = UIColor.labelColor;
-    }
-    else {
-        self.textField.textColor = UIColor.darkTextColor;
-    }
+    self.textField.textColor = UIColor.labelColor;
+
     self.textField.tag = 0;
     self.horizontalLine.hidden = YES;
     self.editingAccessoryType = UITableViewCellAccessoryNone;

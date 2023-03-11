@@ -11,7 +11,7 @@
 #import "Utils.h"
 #import "BookmarksHelper.h"
 #import "DatabasePreferences.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "iCloudSafesCoordinator.h"
 #import "NSDate+Extensions.h"
 
@@ -84,20 +84,10 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    [self documentPicker:controller didPickDocumentAtURL:url];
-    #pragma GCC diagnostic pop
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     [self onCreateDestinationSelected:url];
     
     [NSFileManager.defaultManager removeItemAtURL:self.createTemporaryDatabaseUrl error:nil];
 }
-#pragma GCC diagnostic pop
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
     [NSFileManager.defaultManager removeItemAtURL:self.createTemporaryDatabaseUrl error:nil];
@@ -106,7 +96,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
 - (void)onCreateDestinationSelected:(NSURL*)dest {
     [dest startAccessingSecurityScopedResource];
 
-    NSURL *strongboxLocalDocumentsDirectory = FileManager.sharedInstance.documentsDirectory;
+    NSURL *strongboxLocalDocumentsDirectory = StrongboxFilesManager.sharedInstance.documentsDirectory;
     NSString *strongboxLocalDocumentsPath = strongboxLocalDocumentsDirectory.URLByStandardizingPath.URLByResolvingSymlinksInPath.path;
 
     NSURL* strongboxICloudDocumentsDirectory = iCloudSafesCoordinator.sharedInstance.iCloudDocumentsFolder;

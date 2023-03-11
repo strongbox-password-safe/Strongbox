@@ -13,6 +13,7 @@
 #import "SVProgressHUD.h"
 #import "UIImage+FixOrientation.h"
 #import "NSDate+Extensions.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 const int kMaxRecommendedAttachmentSize = 512 * 1024; 
 
@@ -78,7 +79,10 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
 
 - (void)onAddAttachmentLocationResponse:(int)response {
     if(response == 3) {
-        UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
+        UTType* type = [UTType typeWithIdentifier:(NSString*)kUTTypeItem];
+        UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[type]];
+
+
         vc.delegate = self;
         vc.modalPresentationStyle = UIModalPresentationFormSheet;
         
@@ -115,20 +119,21 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
-    [self documentPicker:controller didPickDocumentAtURL:url];
     
-    #pragma GCC diagnostic pop
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
+    
+    if (! [url startAccessingSecurityScopedResource] ) {
+        NSLog(@"🔴 Could not securely access URL!");
+    }
+    
     NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
+    __block NSData *data;
+    __block NSError *err;
+    NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] init];
+    [coordinator coordinateReadingItemAtURL:url options:0 error:&error byAccessor:^(NSURL *newURL) {
+        data = [NSData dataWithContentsOfURL:newURL options:NSDataReadingUncached error:&err];
+    }];
+    
+    [url stopAccessingSecurityScopedResource];
     
     if(!data) {
         NSLog(@"Error: %@", error);
@@ -141,8 +146,6 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
     NSString *filename = [url.absoluteString.lastPathComponent stringByRemovingPercentEncoding];
     [self addAttachment:filename data:data];
 }
-
-#pragma GCC diagnostic pop
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
     NSLog(@"Image Pick did finish: [%@]", info);

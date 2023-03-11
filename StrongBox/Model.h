@@ -58,6 +58,7 @@ extern NSString* const kAsyncUpdateStarting;
 
 @interface Model : NSObject
 
+@property (readonly) BOOL isKeePass2Format;
 @property (nonatomic, readonly) NSString *databaseUuid;
 @property (nonatomic, readonly, nonnull) METADATA_PTR metadata;
 @property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
@@ -94,8 +95,12 @@ extern NSString* const kAsyncUpdateStarting;
 
 #endif
 
-- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
-                                completion:(void(^_Nullable)(BOOL success))completion;
+- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR(^)(void))onDemandViewController 
+                         noProgressSpinner:(BOOL)noProgressSpinner
+                                completion:(void(^)(BOOL success))completion;
+
+
+
 
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
@@ -143,7 +148,9 @@ extern NSString* const kAsyncUpdateStarting;
 
 - (void)deleteItems:(const NSArray<Node *> *)items;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items;
+- (void)emptyRecycleBin;
 
+- (BOOL)isInRecycled:(NSUUID *)itemId; 
 - (BOOL)canRecycle:(NSUUID*_Nonnull)itemId;
 
 - (BOOL)isFavourite:(NSUUID*)itemId;

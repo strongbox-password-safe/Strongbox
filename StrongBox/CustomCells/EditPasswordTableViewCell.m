@@ -24,7 +24,7 @@
 @property BOOL internalShowGenerationSettings;
 @property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 @property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
-@property (weak, nonatomic) IBOutlet UIButton *barButtonAlternativeGenerate;
+@property (weak, nonatomic) IBOutlet UIButton *buttonHistory;
 @property (weak, nonatomic) IBOutlet UIButton *buttonGenerate;
 
 @property BOOL isInShouldChangeMethod;
@@ -48,7 +48,7 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-  
+    
     self.concealPassword = YES;
     
     self.valueTextView.delegate = self;
@@ -57,7 +57,7 @@
     self.valueTextView.adjustsFontForContentSizeCategory = YES;
     
     self.valueTextView.accessibilityLabel = NSLocalizedString(@"edit_password_cell_value_textfield_accessibility_label", @"Password Text Field");
-
+    
     [self customizeIcons];
     
     [self refreshGeneratedMenu];
@@ -69,80 +69,42 @@
     [self.buttonGenerate addGestureRecognizer:self.touchDownGenerateButtonGestureRecognizer];
     
     
-
+    
     self.buttonGenerationSettings.hidden = !self.showGenerationSettings;
-
-    if (@available(iOS 14.0, *)) { 
-        if ( AppPreferences.sharedInstance.hideTips ) {
-            self.tipView.hidden = YES;
-            self.tipBottomConstraint.constant = 8.0f;
-        }
-        else {
-            self.tipView.layer.cornerRadius = 3.0f;
-        }
-        
-        self.barButtonAlternativeGenerate.hidden = YES;
-    }
-    else { 
+    
+    if ( AppPreferences.sharedInstance.hideTips ) {
         self.tipView.hidden = YES;
         self.tipBottomConstraint.constant = 8.0f;
     }
+    else {
+        self.tipView.layer.cornerRadius = 3.0f;
+    }
+    
+    
+    
+    self.buttonHistory.showsMenuAsPrimaryAction = YES;
+    self.buttonHistory.hidden = YES;
+    
+    
 }
 
 - (void)customizeIcons {
-    if (@available(iOS 13.0, *)) { 
-        [self.buttonClearPassword setImage:[UIImage systemImageNamed:@"xmark.circle"] forState:UIControlStateNormal];
-        [self.buttonClearPassword setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+    [self.buttonClearPassword setImage:[UIImage systemImageNamed:@"xmark.circle"] forState:UIControlStateNormal];
+    [self.buttonClearPassword setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                   forImageInState:UIControlStateNormal];
+
+    [self.buttonGenerationSettings setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
+
+    [self.buttonGenerationSettings setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                   forImageInState:UIControlStateNormal];
+    
+    [self.buttonGenerate setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
+
+    [self.buttonGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
                                                        forImageInState:UIControlStateNormal];
-
-        [self.buttonGenerationSettings setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
-
-        [self.buttonGenerationSettings setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
-                                                       forImageInState:UIControlStateNormal];
-
-    }
-    
-    if (@available(iOS 14.0, *)) { 
-        [self.barButtonAlternativeGenerate setImage:[UIImage systemImageNamed:@"die.face.6"] forState:UIControlStateNormal];
-        
-        [self.barButtonAlternativeGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
-                                                           forImageInState:UIControlStateNormal];
-        
-        [self.buttonGenerate setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
-
-        [self.buttonGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
-                                                       forImageInState:UIControlStateNormal];
-    }
-}
-
-- (void)onCloseTip:(UIGestureRecognizer*)gesture {
-    NSLog(@"onCloseTip");
-    
-
-
-
-
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 - (void)onButtonGenerateTouchedDown:(UIGestureRecognizer*)gesture {
-
     [self refreshGeneratedMenu];
 }
 
@@ -161,24 +123,14 @@
     
     self.concealPassword = YES;
     
-    if (@available(iOS 14.0, *)) { 
-        self.barButtonAlternativeGenerate.hidden = YES;
-    }
-    
     self.buttonGenerationSettings.hidden = !self.showGenerationSettings;
+    
+    self.historyMenu = nil;
 }
 
 - (IBAction)onGenerate:(id)sender {
     PasswordGenerationConfig* config = AppPreferences.sharedInstance.passwordGenerationConfig;
     [self setPassword:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
-}
-
-- (IBAction)onAlternativeGenerate:(id)sender {
-    [PasswordMaker.sharedInstance promptWithSuggestions:self.parentVc
-                                                 config:AppPreferences.sharedInstance.passwordGenerationConfig
-                                                 action:^(NSString * _Nonnull response) {
-        [self setPassword:response];
-    }];
 }
 
 - (IBAction)onSettings:(id)sender {
@@ -202,10 +154,7 @@
 - (void)bindUI {
 
 
-    BOOL dark = NO;
-    if (@available(iOS 12.0, *)) {
-        dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-    }
+    BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
     BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
     
     if ( self.concealPassword ) {
@@ -225,13 +174,7 @@
     }
     
     
-    UIImage *image;
-    if (@available(iOS 13.0, *)) {
-        image = [UIImage systemImageNamed:self.concealPassword ? @"eye" : @"eye.slash"];
-    }
-    else {
-        image = [UIImage imageNamed:self.concealPassword ? @"visible" : @"invisible"];
-    }
+    UIImage *image = [UIImage systemImageNamed:self.concealPassword ? @"eye" : @"eye.slash"];
 
     [self.self.buttonToggleConceal setImage:image
                                    forState:UIControlStateNormal];
@@ -339,107 +282,105 @@
 
 
 - (void)refreshGeneratedMenu {
-    if (@available(iOS 14.0, *)) {
-        PasswordGenerationConfig* config = AppPreferences.sharedInstance.passwordGenerationConfig;
-        config.algorithm = config.algorithm == kPasswordGenerationAlgorithmBasic ? kPasswordGenerationAlgorithmDiceware : kPasswordGenerationAlgorithmBasic; 
-        
-        NSMutableArray* suggestions = [NSMutableArray arrayWithCapacity:3];
-        
-        [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:AppPreferences.sharedInstance.passwordGenerationConfig]];
-        [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:AppPreferences.sharedInstance.passwordGenerationConfig]];
-        [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
-        [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
-                    
-        NSMutableArray<UIMenuElement*>* ma0 = [NSMutableArray array];
-        
-        __weak EditPasswordTableViewCell* weakSelf = self;
-        
-        for ( NSString* suggestion in suggestions ) {
-            [ma0 addObject:[self getContextualMenuItem:suggestion
-                                           systemImage:nil
-                                           destructive:NO
-                                               enabled:YES
-                                               checked:NO
-                                               handler:^(__kindof UIAction * _Nonnull action) {
-                [weakSelf setPassword:action.title];
-            }]];
-        }
-                
-        UIMenu* menu0 = [UIMenu menuWithTitle:@""
-                                       image:nil
-                                  identifier:nil
-                                     options:UIMenuOptionsDisplayInline
-                                    children:ma0];
-
-        
-        
-        NSMutableArray* altSuggestions = [NSMutableArray arrayWithCapacity:3];
-        
-        [altSuggestions addObject:[PasswordMaker.sharedInstance generateUsername].lowercaseString];
-        [altSuggestions addObject:@(arc4random()).stringValue];
-        [altSuggestions addObject:[PasswordMaker.sharedInstance generateEmail]];
-        [altSuggestions addObject:[PasswordMaker.sharedInstance generateRandomWord]];
-        
-        NSMutableArray<UIMenuElement*>* ma05 = [NSMutableArray array];
-        for ( NSString* suggestion in altSuggestions ) {
-            [ma05 addObject:[self getContextualMenuItem:suggestion
-                                           systemImage:nil
-                                           destructive:NO
-                                               enabled:YES
-                                               checked:NO
-                                               handler:^(__kindof UIAction * _Nonnull action) {
-                [weakSelf setPassword:action.title];
-            }]];
-        }
-                
-        UIMenu* menu05 = [UIMenu menuWithTitle:@""
-                                       image:nil
-                                  identifier:nil
-                                     options:UIMenuOptionsDisplayInline
-                                    children:ma05];
-
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    PasswordGenerationConfig* config = AppPreferences.sharedInstance.passwordGenerationConfig;
+    config.algorithm = config.algorithm == kPasswordGenerationAlgorithmBasic ? kPasswordGenerationAlgorithmDiceware : kPasswordGenerationAlgorithmBasic; 
     
-        UIMenu* menu = [UIMenu menuWithTitle:@""
-                                       image:nil
-                                  identifier:nil
-                                     options:kNilOptions
-                                    children:@[menu0, menu05]]; 
-
-        self.buttonGenerate.menu = menu;
+    NSMutableArray* suggestions = [NSMutableArray arrayWithCapacity:3];
+    
+    [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:AppPreferences.sharedInstance.passwordGenerationConfig]];
+    [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:AppPreferences.sharedInstance.passwordGenerationConfig]];
+    [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
+    [suggestions addObject:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
+    
+    NSMutableArray<UIMenuElement*>* ma0 = [NSMutableArray array];
+    
+    __weak EditPasswordTableViewCell* weakSelf = self;
+    
+    for ( NSString* suggestion in suggestions ) {
+        [ma0 addObject:[self getContextualMenuItem:suggestion
+                                       systemImage:nil
+                                       destructive:NO
+                                           enabled:YES
+                                           checked:NO
+                                           handler:^(__kindof UIAction * _Nonnull action) {
+            [weakSelf setPassword:action.title];
+        }]];
     }
+    
+    UIMenu* menu0 = [UIMenu menuWithTitle:@""
+                                    image:nil
+                               identifier:nil
+                                  options:UIMenuOptionsDisplayInline
+                                 children:ma0];
+    
+    
+    
+    NSMutableArray* altSuggestions = [NSMutableArray arrayWithCapacity:3];
+    
+    [altSuggestions addObject:[PasswordMaker.sharedInstance generateUsername].lowercaseString];
+    [altSuggestions addObject:@(arc4random()).stringValue];
+    [altSuggestions addObject:[PasswordMaker.sharedInstance generateEmail]];
+    [altSuggestions addObject:[PasswordMaker.sharedInstance generateRandomWord]];
+    
+    NSMutableArray<UIMenuElement*>* ma05 = [NSMutableArray array];
+    for ( NSString* suggestion in altSuggestions ) {
+        [ma05 addObject:[self getContextualMenuItem:suggestion
+                                        systemImage:nil
+                                        destructive:NO
+                                            enabled:YES
+                                            checked:NO
+                                            handler:^(__kindof UIAction * _Nonnull action) {
+            [weakSelf setPassword:action.title];
+        }]];
+    }
+    
+    UIMenu* menu05 = [UIMenu menuWithTitle:@""
+                                     image:nil
+                                identifier:nil
+                                   options:UIMenuOptionsDisplayInline
+                                  children:ma05];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    UIMenu* menu = [UIMenu menuWithTitle:@""
+                                   image:nil
+                              identifier:nil
+                                 options:kNilOptions
+                                children:@[menu0, menu05]]; 
+    
+    self.buttonGenerate.menu = menu;
 }
 
-- (UIAction*)getContextualMenuItem:(NSString*)title systemImage:(NSString*)systemImage handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0))  {
+- (UIAction*)getContextualMenuItem:(NSString*)title systemImage:(NSString*)systemImage handler:(UIActionHandler)handler   {
     return [self getContextualMenuItem:title systemImage:systemImage destructive:NO handler:handler];
 }
 
-- (UIAction*)getContextualMenuItem:(NSString*)title systemImage:(NSString*)systemImage destructive:(BOOL)destructive handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0))  {
+- (UIAction*)getContextualMenuItem:(NSString*)title systemImage:(NSString*)systemImage destructive:(BOOL)destructive handler:(UIActionHandler)handler   {
     return [self getContextualMenuItem:title systemImage:systemImage destructive:destructive enabled:YES checked:NO handler:handler];
 }
 
 - (UIAction*)getContextualMenuItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage destructive:(BOOL)destructive enabled:(BOOL)enabled checked:(BOOL)checked handler:(UIActionHandler)handler
-  API_AVAILABLE(ios(13.0)) {
+   {
     return [self getContextualMenuItem:title
                                  image:systemImage ? [UIImage systemImageNamed:systemImage] : nil
                            destructive:destructive
@@ -448,12 +389,12 @@
                                handler:handler];
 }
 
-- (UIAction*)getContextualMenuItem:(NSString*)title image:(UIImage*)image destructive:(BOOL)destructive handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuItem:(NSString*)title image:(UIImage*)image destructive:(BOOL)destructive handler:(UIActionHandler)handler  {
     return [self getContextualMenuItem:title image:image destructive:destructive enabled:YES checked:NO handler:handler];
 }
 
 - (UIAction*)getContextualMenuItem:(NSString*)title image:(UIImage*_Nullable)image destructive:(BOOL)destructive enabled:(BOOL)enabled checked:(BOOL)checked handler:(UIActionHandler)handler
-  API_AVAILABLE(ios(13.0)) {
+   {
     UIAction *ret = [UIAction actionWithTitle:title
                                         image:image
                                    identifier:nil
@@ -472,6 +413,15 @@
     }
     
     return ret;
+}
+
+- (UIMenu *)historyMenu {
+    return self.buttonHistory.menu;
+}
+
+- (void)setHistoryMenu:(UIMenu *)historyMenu {
+    self.buttonHistory.menu = historyMenu;
+    self.buttonHistory.hidden = historyMenu == nil;
 }
 
 @end

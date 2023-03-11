@@ -7,34 +7,6 @@
 //
 
 #import "UITableView+EmptyDataSet.h"
-#import <objc/runtime.h>
-
-@interface ClosureSleeve ()
-
-@property (copy) dispatch_block_t action;
-
-@end
-
-@implementation ClosureSleeve
-    
-- (instancetype)initWithAction:(dispatch_block_t)action {
-    self = [super init];
-    if (self) {
-        self.action = action;
-    }
-    return self;
-}
-
-- (void)act {
-    if (self.action) {
-        self.action();
-    }
-    else {
-        NSLog(@"WARNWARN: No action set on Closure Sleeve!");
-    }
-}
-
-@end
 
 @implementation UITableView (EmptyDataSet)
 
@@ -92,18 +64,9 @@
             
             [button setAttributedTitle:buttonTitle forState:UIControlStateNormal];
             
-            if (@available(iOS 14.0, *)) {
-                [button addAction:[UIAction actionWithHandler:^(__kindof UIAction * _Nonnull action) {
-                    buttonAction();
-                }] forControlEvents:UIControlEventTouchUpInside];
-            }
-            else {
-                ClosureSleeve* sleeve = [[ClosureSleeve alloc] initWithAction:buttonAction];
-                [button addTarget:sleeve action:@selector(act) forControlEvents:UIControlEventTouchUpInside];
-                
-                
-                objc_setAssociatedObject (button, [NSUUID.UUID.UUIDString cStringUsingEncoding:NSUTF8StringEncoding], sleeve, OBJC_ASSOCIATION_RETAIN);
-            }
+            [button addAction:[UIAction actionWithHandler:^(__kindof UIAction * _Nonnull action) {
+                buttonAction();
+            }] forControlEvents:UIControlEventTouchUpInside];
             
             [stackView addArrangedSubview:button];
 

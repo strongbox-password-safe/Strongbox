@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property Model* model;
 @property Node* item;
+@property (nonatomic, copy) void (^updateDatabase)(void);
 
 @end
 

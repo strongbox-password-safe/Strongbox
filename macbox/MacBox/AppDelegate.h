@@ -29,5 +29,10 @@ extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 
 @property (readonly) BOOL isWasLaunchedAsLoginItem;
 
+
+
+- (void)cancelAutoLockInBackgroundTimer;
+- (void)startAutoLockForAppInBackgroundTimer;
+
 @end
 

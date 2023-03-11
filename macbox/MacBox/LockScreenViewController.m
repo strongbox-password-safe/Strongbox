@@ -308,6 +308,12 @@
 }
 
 - (void)bindProOrFreeTrial {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self bindProOrFreeTrialMain];
+    });
+}
+
+- (void)bindProOrFreeTrialMain {
     self.quickTrialStartContainer.hidden = YES; 
 
     if ( !Settings.sharedInstance.isPro ) {
@@ -924,8 +930,6 @@
         return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
     }];
     
-    
-    
     NSString* password = self.textFieldMasterPassword.stringValue;
     NSString* keyFileBookmark = self.selectedKeyFileBookmark;
     YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
@@ -1022,10 +1026,9 @@
 
 
 
-- (void)unlock:(CompositeKeyFactors *)compositeKeyFactors
-viewController:(NSViewController *)viewController
-alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
-fromConvenience:(BOOL)fromConvenience
+- (void)unlock:(CompositeKeyFactors *)compositeKeyFactors viewController:(NSViewController *)viewController
+    alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+    fromConvenience:(BOOL)fromConvenience
     completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
     NSLog(@"LockScreenViewController::unlock: [%@]", self.document.fileURL );
     
@@ -1172,15 +1175,19 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     }];
 }
 
-- (void)onUnsuccessfulUnlock:(CompositeKeyFactors *)ckfs error:(NSError *)error fromConvenience:(BOOL)fromConvenience incorrectCredentials:(BOOL)incorrectCredentials {
+- (void)onUnsuccessfulUnlock:(CompositeKeyFactors *)ckfs
+                       error:(NSError *)error
+             fromConvenience:(BOOL)fromConvenience
+        incorrectCredentials:(BOOL)incorrectCredentials {
     [self enableMasterCredentialsEntry:YES];
     
     [self bindUI];
     
     [self setInitialFocus];
     
-    
-    if ( incorrectCredentials && !fromConvenience && ( ckfs.keyFileDigest == nil && ckfs.yubiKeyCR == nil ) ) {
+    if ( incorrectCredentials && !fromConvenience
+        
+        ) {
         [self showIncorrectPasswordToast];
     }
     else if (error) {

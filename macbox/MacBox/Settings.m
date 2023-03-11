@@ -12,6 +12,13 @@
 #import "Constants.h"
 #import "Model.h"
 
+#ifndef IS_APP_EXTENSION
+#import "GoogleDriveManager.h"
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_AutoFill-Swift.h"
+#endif
+
 NSString* const kTitleColumn = @"TitleColumn";
 NSString* const kUsernameColumn = @"UsernameColumn";
 NSString* const kPasswordColumn = @"PasswordColumn";
@@ -30,6 +37,7 @@ static const NSInteger kDefaultClearClipboardTimeout = 60;
 static NSString* const kPro = @"fullVersion";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* const kAutoLockTimeout = @"autoLockTimeout";
+static NSString* const kAutoLockIfInBackgroundTimeoutSeconds = @"autoLockIfInBackgroundTimeoutSeconds";
 
 static NSString* const kAlwaysShowPassword = @"alwaysShowPassword";
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
@@ -91,6 +99,9 @@ static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock"
 static NSString* const KShowDatabasesManagerOnAppLaunch = @"showDatabasesManagerOnAppLaunch";
 static NSString* const kHasAskedAboutDatabaseOpenInBackground = @"hasAskedAboutDatabaseOpenInBackground";
 static NSString* const kConcealClipboardFromMonitors = @"concealClipboardFromMonitors-DefaultON-27-Dec-2022";
+static NSString* const kAutoCommitScannedTotp = @"autoCommitScannedTotp";
+static NSString* const kHideOnCopy = @"hideOnCopy";
+static NSString* const kHasPromptedForThirdPartyAutoFill = @"hasPromptedForThirdPartyAutoFill";
 
 
 
@@ -143,6 +154,55 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self.userDefaults synchronize];
 }
 
+#ifndef IS_APP_EXTENSION
+- (void)factoryReset {    
+    for (NSString* key in self.sharedAppGroupDefaults.dictionaryRepresentation.allKeys) {
+        NSLog(@"✅ Deleting from Shared App Group: [%@]", key);
+        [self.sharedAppGroupDefaults removeObjectForKey:key];
+    }
+    
+    [self.sharedAppGroupDefaults synchronize];
+    
+    for ( NSString* key in NSUserDefaults.standardUserDefaults.dictionaryRepresentation.allKeys ) {
+        NSLog(@"✅ Deleting from Standard: [%@]", key);
+        [NSUserDefaults.standardUserDefaults removeObjectForKey:key];
+        [self.sharedAppGroupDefaults removeObjectForKey:key];
+    }
+    
+    [NSUserDefaults.standardUserDefaults synchronize];
+    
+    
+    
+    NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:@"sftp-connections.json"];
+    
+    NSError *error;
+    [NSFileManager.defaultManager removeItemAtURL:fileUrl error:&error];
+    if ( error ) {
+        NSLog(@"🔴 Error Deleting SFTP Connections File [%@]", error);
+    }
+    
+    fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:@"webdav-connections.json"];
+    [NSFileManager.defaultManager removeItemAtURL:fileUrl error:&error];
+    if ( error ) {
+        NSLog(@"🔴 Error Deleting WebDAV Connections File [%@]", error);
+    }
+
+    
+    
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    [GoogleDriveManager.sharedInstance signout];
+    [TwoDriveStorageProvider.sharedInstance signOutAll];
+    [DropboxV2StorageProvider.sharedInstance signOut];
+#endif
+    
+    
+    
+    [StrongboxFilesManager.sharedInstance deleteAllNukeFromOrbit];
+    
+    
+    
+    [NativeMessagingManifestInstallHelper removeNativeMessagingHostsFiles];
+}
 
 
 
@@ -150,6 +210,91 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif
+
+
+
+- (BOOL)hasPromptedForThirdPartyAutoFill {
+    return [self getBool:kHasPromptedForThirdPartyAutoFill fallback:NO];
+}
+
+- (void)setHasPromptedForThirdPartyAutoFill:(BOOL)hasPromptedForThirdPartyAutoFill {
+    [self setBool:kHasPromptedForThirdPartyAutoFill value:hasPromptedForThirdPartyAutoFill];
+}
+
+- (BOOL)hideOnCopy {
+    return [self getBool:kHideOnCopy fallback:NO];
+}
+
+- (void)setHideOnCopy:(BOOL)hideOnCopy {
+    [self setBool:kHideOnCopy value:hideOnCopy];
+}
+
+- (BOOL)autoCommitScannedTotp {
+    return [self getBool:kAutoCommitScannedTotp fallback:YES];
+}
+
+- (void)setAutoCommitScannedTotp:(BOOL)autoCommitScannedTotp {
+    [self setBool:kAutoCommitScannedTotp value:autoCommitScannedTotp];
+}
 
 - (BOOL)concealClipboardFromMonitors {
     return [self getBool:kConcealClipboardFromMonitors fallback:YES];
@@ -630,6 +775,16 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kPro value:value];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
+}
+
+- (NSInteger)autoLockIfInBackgroundTimeoutSeconds {
+    return [self.userDefaults integerForKey:kAutoLockIfInBackgroundTimeoutSeconds];
+}
+
+- (void)setAutoLockIfInBackgroundTimeoutSeconds:(NSInteger)autoLockIfInBackgroundTimeoutSeconds {
+    [self.userDefaults setInteger:autoLockIfInBackgroundTimeoutSeconds forKey:kAutoLockIfInBackgroundTimeoutSeconds];
+    
+    [self.userDefaults synchronize];
 }
 
 - (NSInteger)autoLockTimeoutSeconds {

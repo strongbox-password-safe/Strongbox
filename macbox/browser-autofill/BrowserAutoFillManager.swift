@@ -21,6 +21,20 @@ public class BrowserAutoFillManager: NSObject {
         }
     }
 
+    @objc public class func extractFullDomainFromUrl(url: String) -> String {
+        guard let urlProcessed = url.urlExtendedParseAddingDefaultScheme else {
+            return url.lowercased()
+        }
+        
+        if let components = URLComponents(url: urlProcessed, resolvingAgainstBaseURL: false),
+           let host = components.host {
+            return host.lowercased()
+        }
+        else {
+            return url.lowercased()
+        }
+    }
+
     @objc public class func extractPSLDomainFromUrl(url: String) -> String {
         guard let urlProcessed = url.urlExtendedParseAddingDefaultScheme else {
             return url.lowercased()
@@ -128,6 +142,46 @@ public class BrowserAutoFillManager: NSObject {
             
 
             
+            
+
+            let targetDomain = extractFullDomainFromUrl(url: url)
+            let fullDomain1 = extractFullDomainFromUrl(url: node1.fields.url)
+            let fullDomain2 = extractFullDomainFromUrl(url: node2.fields.url)
+
+            if ( fullDomain1 != fullDomain2 ) { 
+                if ( fullDomain1 == targetDomain ) {
+                    
+                    return .orderedAscending
+                }
+                
+                if ( fullDomain2 == targetDomain ) {
+                    
+                    return .orderedDescending
+                }
+                
+                
+                
+                let targetPslDomain = extractPSLDomainFromUrl(url: url)
+                let pslDomain1 = extractPSLDomainFromUrl(url: node1.fields.url)
+                let pslDomain2 = extractPSLDomainFromUrl(url: node2.fields.url)
+                
+                if ( pslDomain1 == pslDomain2 && (pslDomain1 == targetPslDomain)) {
+                    
+                    
+                    return fullDomain1.count < fullDomain2.count ? .orderedAscending : .orderedDescending
+                }
+                else {
+                    if ( pslDomain1 == targetPslDomain ) {
+                        return .orderedAscending
+                    }
+                    
+                    if ( pslDomain2 == targetPslDomain ) {
+                        
+                        return .orderedDescending
+                    }
+                }
+            }
+
             
             
             let distance1 = node1.fields.url.levenshteinDistance(url)

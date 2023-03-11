@@ -9,12 +9,10 @@
 import CryptoKit
 import Foundation
 
-@available(iOS 13.0, *)
 @objc
 class SwiftTOTPGenerator : NSObject {
-    @available(iOS 13.0, *)
     @objc class func cryptoKitOTP(secret: Data, digits: Int = 6, period : Int = 30, algorithm: OTPAlgorithm = .SHA1) -> UInt32 {
-        
+        // HMAC message data from counter as big endian
         var counter = UInt64(Date().timeIntervalSince1970 / TimeInterval (period )).bigEndian
 
         let counterMessage = withUnsafeBytes(of: &counter) { Array($0) }

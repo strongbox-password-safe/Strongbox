@@ -40,14 +40,12 @@
                             notes:(BOOL)notes
                             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
                             unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
-                            nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macos(11.0)) {
+                            nickName:(NSString *)nickName API_AVAILABLE(macos(11.0)) {
     if (! self.isPossible || database == nil) {
         return;
     }
 
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
+#if !TARGET_OS_IPHONE
     if (@available(macOS 11.0, *)) {
 #endif
         [self _updateAutoFillQuickTypeDatabase:database
@@ -59,7 +57,9 @@
                   concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
                 unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds
                                       nickName:nickName];
+#if !TARGET_OS_IPHONE
     }
+#endif
 }
 
 - (void)_updateAutoFillQuickTypeDatabase:(Model*)database
@@ -70,7 +70,7 @@
                                    notes:(BOOL)notes
             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
           unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
-                            nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macosx(11.0)) {
+                            nickName:(NSString *)nickName API_AVAILABLE(macosx(11.0)) {
     [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
         if(state.enabled) {
             [self onGotAutoFillStoreOK:database
@@ -124,7 +124,7 @@
                        notes:(BOOL)notes
 concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
 unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
-                    nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macosx(11.0)) {
+                    nickName:(NSString *)nickName API_AVAILABLE(macosx(11.0)) {
     NSLog(@"Updating Quick Type AutoFill Database...");
     
     NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
@@ -173,7 +173,7 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                                                     notes:(BOOL)notes
                                             concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
                                           unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
-                                nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macos(11.0)) {
+                                nickName:(NSString *)nickName API_AVAILABLE(macos(11.0)) {
     NSSet<NSString*>* uniqueUrls = [AutoFillCommon getUniqueUrlsForNode:database.database
                                                                    node:node
                                                         alternativeUrls:alternativeUrls
@@ -257,7 +257,7 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                                 displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                                     fieldKey:(NSString*)fieldKey
                                   fieldValue:(NSString*)fieldValue
-                            nickName:(NSString *)nickName API_AVAILABLE(ios(12.0), macos(11.0)) {
+                            nickName:(NSString *)nickName API_AVAILABLE(macos(11.0)) {
     QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString fieldKey:fieldKey];
     ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
     
@@ -316,24 +316,22 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
 }
 
 - (BOOL)isPossible {
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
+#if !TARGET_OS_IPHONE
     if (@available(macOS 11.0, *)) {
 #endif
         return YES;
+#if !TARGET_OS_IPHONE
     }
     else {
         return NO;
     }
+#endif
 }
 
 - (BOOL)isOnForStrongbox {
     __block BOOL ret = NO;
     
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
+#if !TARGET_OS_IPHONE
     if (@available(macOS 11.0, *)) {
 #endif
         dispatch_group_t g = dispatch_group_create();
@@ -346,15 +344,14 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
         }];
 
         dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+#if !TARGET_OS_IPHONE
     }
-
+#endif
     return ret;
 }
 
-- (void)clearAutoFillQuickTypeDatabase API_AVAILABLE(ios(12.0), macos(11.0)) {
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
+- (void)clearAutoFillQuickTypeDatabase API_AVAILABLE(macos(11.0)) {
+#if !TARGET_OS_IPHONE
     if (@available(macOS 11.0, *)) {
 #endif
         NSLog(@"Clearing Quick Type AutoFill Database...");
@@ -368,8 +365,9 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
                 NSLog(@"AutoFill QuickType store not enabled. Not Clearing Quick Type AutoFill Database...");
             }
         }];
+#if !TARGET_OS_IPHONE
     }
+#endif
 }
 
-    
 @end

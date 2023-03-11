@@ -8,11 +8,7 @@
 
 #import "VirtualYubiKeys.h"
 #import "NSArray+Extensions.h"
-#import "FileManager.h"
-
-@interface VirtualYubiKeys ()
-
-@end
+#import "StrongboxiOSFilesManager.h"
 
 static NSString* const kConfigFilename = @"virtual-yubikeys.json";
 NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeysChangedNotification";
@@ -32,7 +28,7 @@ NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeys
 - (NSMutableArray<VirtualYubiKey*>*)deserialize {
     NSMutableArray<VirtualYubiKey*> *ret = NSMutableArray.array;
     
-    NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kConfigFilename];
+    NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kConfigFilename];
     
     NSError* error;
     __block NSError* readError;
@@ -87,7 +83,7 @@ NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeys
         return;
     }
 
-    NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kConfigFilename];
+    NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kConfigFilename];
 
     NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
     __block NSError *writeError = nil;

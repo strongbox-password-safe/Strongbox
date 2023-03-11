@@ -54,12 +54,7 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
         cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"generic_number_of_items_plural_fmt", @"%@ Items"), @(items.count).stringValue];
     }
     
-    if (@available(iOS 13.0, *)) {
-        cell.imageView.image = [UIImage systemImageNamed:@"tag.fill"];
-    }
-    else {
-        cell.imageView.image = [UIImage imageNamed:@"price_tag"];
-    }
+    cell.imageView.image = [UIImage systemImageNamed:@"tag.fill"];
     cell.imageView.tintColor = nil;
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
@@ -147,8 +142,6 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
                 
             UIColor *textColor = nil;
 
-
-
             
             [cell setGroup:title
                       icon:icon
@@ -194,37 +187,19 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
     NSMutableDictionary<NSNumber*, UIColor*> *tintsMap = NSMutableDictionary.dictionary;
     
     if([self.viewModel isFavourite:node.uuid]) {
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-           image = [UIImage systemImageNamed:@"star.fill"];
-        }
-        else {
-           image = [UIImage imageNamed:@"pin"];
-        }
+        UIImage* image = [UIImage systemImageNamed:@"star.fill"];
 
         tintsMap[@(flags.count)] = UIColor.systemYellowColor;
         [flags addObject:image];
     }
 
     if(!node.isGroup && node.fields.attachments.count) {
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"paperclip"];
-        }
-        else {
-            image = [UIImage imageNamed:@"attach"];
-        }
+        UIImage* image = [UIImage systemImageNamed:@"paperclip"];
         [flags addObject:image];
     }
     
     if(!node.isGroup && isFlaggedByAudit) {
-        UIImage* auditImage;
-        if (@available(iOS 13.0, *)) {
-            auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
-        }
-        else {
-            auditImage = [UIImage imageNamed:@"security_checked"];
-        }
+        UIImage* auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
         
         if(tintColors) {
             tintsMap[@(flags.count)] = UIColor.systemOrangeColor;

@@ -35,10 +35,8 @@
     
     
     
-    if (@available(iOS 13.4, *)) {
-        self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
-        self.timePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
-    }
+    self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
+    self.timePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
         
     
     
@@ -110,12 +108,10 @@
     self.timeTextField.accessibilityLabel = NSLocalizedString(@"edit_date_cell_time_field_accessibility_label", @"Time Text Field");
     self.timeTextField.inputAccessoryView = toolbarTime;
     
-    if (@available(iOS 13.0, *)) { 
-        [self.buttonClear setImage:[UIImage systemImageNamed:@"xmark.circle"] forState:UIControlStateNormal];
-        [self.buttonClear setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+    [self.buttonClear setImage:[UIImage systemImageNamed:@"xmark.circle"] forState:UIControlStateNormal];
+    [self.buttonClear setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
                                           forImageInState:UIControlStateNormal];
 
-    }
     self.buttonClear.tintColor = UIColor.systemOrangeColor;
 }
 

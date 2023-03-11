@@ -146,19 +146,17 @@
     else if (error.code == LAErrorUserCancel) {
         NSLog(@"BIOMETRIC: User Cancelled %@", error);
     }
-    else if (@available(iOS 11.0, *)) {
-        if (error.code == LAErrorBiometryNotAvailable) {
-            NSLog(@"BIOMETRIC: LAErrorBiometryNotAvailable %@", error);
-        }
-        else if (error.code == LAErrorSystemCancel) {
-            NSLog(@"BIOMETRIC: LAErrorSystemCancel %@", error);
-        }
-        else if (error.code == LAErrorBiometryNotEnrolled) {
-            NSLog(@"BIOMETRIC: LAErrorBiometryNotEnrolled %@", error);
-        }
-        else if (error.code == LAErrorBiometryLockout) {
-            NSLog(@"BIOMETRIC: LAErrorBiometryLockout %@", error);
-        }
+    else if (error.code == LAErrorBiometryNotAvailable) {
+        NSLog(@"BIOMETRIC: LAErrorBiometryNotAvailable %@", error);
+    }
+    else if (error.code == LAErrorSystemCancel) {
+        NSLog(@"BIOMETRIC: LAErrorSystemCancel %@", error);
+    }
+    else if (error.code == LAErrorBiometryNotEnrolled) {
+        NSLog(@"BIOMETRIC: LAErrorBiometryNotEnrolled %@", error);
+    }
+    else if (error.code == LAErrorBiometryLockout) {
+        NSLog(@"BIOMETRIC: LAErrorBiometryLockout %@", error);
     }
     else {
         NSLog(@"BIOMETRIC: Unknown Error: [%@]", error);

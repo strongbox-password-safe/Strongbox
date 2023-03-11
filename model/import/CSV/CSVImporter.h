@@ -9,12 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "CHCSVParser.h"
 #import "Node.h"
+#import "Strongbox-Swift.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CSVImporter : NSObject
+@interface CSVImporter : NSObject<Importer>
 
-+ (Node*_Nullable)importFromUrl:(NSURL*)url error:(NSError**)error;
+
 
 @end
 

@@ -125,9 +125,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    if (@available(iOS 13.0, *)) {
-        [self.navigationController setModalInPresentation:YES]; 
-    }
+    [self.navigationController setModalInPresentation:YES]; 
     
     UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onStartStop)];
     singleTap.numberOfTapsRequired = 1;

@@ -16,9 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseOnboardingTabViewController : NSTabViewController
 
 + (instancetype)fromStoryboard;
-
-@property BOOL convenienceUnlock;
-@property BOOL autoFill;
++ (BOOL)shouldShowOnboarding:(MacDatabasePreferences*)databaseMetadata;
 
 @property NSString* databaseUuid;
 @property CompositeKeyFactors *ckfs;

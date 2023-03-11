@@ -200,32 +200,36 @@ class AuditConfigurationViewController: NSViewController {
         let config = database.auditConfig
 
         config.hibpCheckForNewBreachesIntervalSeconds = kHibpAlwaysCheck
-
-        saveAndRestartAuditor(config)
+        database.auditConfig = config
+        restartAuditor()
     }
 
     @objc func onSetHibpIntervalOnceADay() {
         let config = database.auditConfig
 
         config.hibpCheckForNewBreachesIntervalSeconds = kHibpOnceADay
-
-        saveAndRestartAuditor(config)
+        database.auditConfig = config
+        restartAuditor()
     }
 
     @objc func onSetHibpIntervalOnceAWeek() {
         let config = database.auditConfig
 
         config.hibpCheckForNewBreachesIntervalSeconds = kHibpOnceAWeek
-
-        saveAndRestartAuditor(config)
+        database.auditConfig = config
+        
+        restartAuditor()
     }
 
     @objc func onSetHibpIntervalOnceAMonth() {
         let config = database.auditConfig
-
         config.hibpCheckForNewBreachesIntervalSeconds = kHibpOnceEvery30Days
+        
+        database.auditConfig = config
+        
+        bindUI()
 
-        saveAndRestartAuditor(config)
+        restartAuditor()
     }
 
     func bindHibpInterval(_ config: DatabaseAuditorConfiguration) {
@@ -306,7 +310,7 @@ class AuditConfigurationViewController: NSViewController {
 
         bindUI()
 
-        saveAndRestartAuditor(config)
+        restartAuditor()
     }
 
     @IBAction func onSliderLengthChanged(_: Any) {
@@ -345,7 +349,7 @@ class AuditConfigurationViewController: NSViewController {
         labelSimilar.stringValue = String(format: "%0.1f%%", sliderSimilar.doubleValue)
     }
 
-    func saveAndRestartAuditor(_: DatabaseAuditorConfiguration) {
+    func restartAuditor() {
         if refreshTimer != nil {
             refreshTimer?.invalidate()
             refreshTimer = nil

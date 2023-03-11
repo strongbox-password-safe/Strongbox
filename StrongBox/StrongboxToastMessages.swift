@@ -24,17 +24,9 @@ import SwiftMessages
     class func getImage ( icon : ToastIcon = .info ) -> UIImage {
         switch icon {
         case .info:
-            if #available(iOS 13.0, *) {
-                return UIImage(systemName: "info.circle")!
-            } else {
-                return UIImage(named: "info")!
-            }
+            return UIImage(systemName: "info.circle")!
         case .sync:
-            if #available(iOS 13.0, *) {
-                return UIImage(systemName: "arrow.triangle.2.circlepath")!
-            } else {
-                return UIImage(named: "syncronize")!
-            }
+            return UIImage(systemName: "arrow.triangle.2.circlepath")!
         }
     }
     

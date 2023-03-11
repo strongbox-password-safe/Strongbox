@@ -103,11 +103,8 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
             cell.userInteractionEnabled = NO;
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.accessoryType = UITableViewCellAccessoryNone;
-            if (@available(iOS 13.0, *)) {
-                cell.textLabel.textColor = UIColor.secondaryLabelColor;
-            } else {
-                cell.textLabel.textColor = UIColor.lightTextColor;
-            }
+            
+            cell.textLabel.textColor = UIColor.secondaryLabelColor;
 #endif
         }
         else {
@@ -127,12 +124,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
             
 #ifndef IS_APP_EXTENSION
             if (key.autoFillOnly) {
-                if (@available(iOS 13.0, *)) {
-                    cell.textLabel.textColor = UIColor.secondaryLabelColor;
-                } else {
-                    cell.textLabel.textColor = UIColor.lightTextColor;
-                }
-                
+                cell.textLabel.textColor = UIColor.secondaryLabelColor;
                 cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"yubikeys_virtual_autofill_only", @"%@ (AutoFill Only)"), key.name];
                 cell.userInteractionEnabled = NO;
                 cell.selectionStyle = UITableViewCellSelectionStyleNone;

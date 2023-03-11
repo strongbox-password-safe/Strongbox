@@ -102,99 +102,47 @@
     
     
     
-    if (@available(iOS 13.0, *)) {
-        if (@available(iOS 15.0, *)) {
-            self.imageViewAbout.image = [UIImage systemImageNamed:@"lock.shield"];
-        }
-        else {
-            self.imageViewAbout.image = [UIImage systemImageNamed:@"lock.shield"];
-        }
-    } else {
-        self.imageViewAbout.hidden = YES;
+    self.imageViewAbout.image = [UIImage systemImageNamed:@"lock.shield"];
+    self.imageViewTipJar.image = [UIImage systemImageNamed:@"gift"];
+    self.imageViewTipJar.tintColor = UIColor.systemYellowColor;
+    
+    
+    self.imageViewHelp.image = [UIImage systemImageNamed:@"questionmark.circle"];
+    self.imageViewHelp.tintColor = UIColor.systemPurpleColor;
+    self.imageViewAppIcon.image = [UIImage systemImageNamed:@"photo"];
+    self.imageViewShowTips.image = [UIImage systemImageNamed:@"text.bubble"];
+
+    if (@available(iOS 15.0, *)) {
+        self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"checkerboard.shield"];
+    }
+    else {
+        self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"shield"];
     }
 
-    if (@available(iOS 13.0, *)) {
-        self.imageViewTipJar.image = [UIImage systemImageNamed:@"gift"];
-        self.imageViewTipJar.tintColor = UIColor.systemYellowColor;
-    } else {
-        self.imageViewTipJar.hidden = YES;
+    self.imageViewAppLock.image = [UIImage systemImageNamed:@"lock.circle"];
+
+    if (@available(iOS 15.0, *)) {
+        self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear.circle"];
+    }
+    else {
+        self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear"];
+    }
+
+    BOOL licensed = AppPreferences.sharedInstance.isPro;
+    NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
+    
+    self.imageViewLicense.image =  [UIImage systemImageNamed:license];
+    self.imageViewLicense.tintColor = licensed ? nil : UIColor.systemOrangeColor;
+
+    if ( AppPreferences.sharedInstance.isPro ) {
+        self.imageViewContactSupport.image =  [UIImage systemImageNamed:@"bubble.left"];
+        self.imageViewContactSupport.tintColor = UIColor.systemPurpleColor;
+    }
+    else {
+        [self cell:self.cellContactSupport setHidden:YES];
     }
     
-    if (@available(iOS 13.0, *)) {
-        self.imageViewHelp.image = [UIImage systemImageNamed:@"questionmark.circle"];
-
-            self.imageViewHelp.tintColor = UIColor.systemPurpleColor;
-
-    } else {
-        self.imageViewHelp.hidden = YES;
-    }
-    
-    if (@available(iOS 13.0, *)) {
-        self.imageViewAppIcon.image = [UIImage systemImageNamed:@"photo"];
-    } else {
-        self.imageViewAppIcon.hidden = YES;
-    }
-    if (@available(iOS 13.0, *)) {
-        self.imageViewShowTips.image = [UIImage systemImageNamed:@"text.bubble"];
-    } else {
-        self.imageViewShowTips.hidden = YES;
-    }
-    if (@available(iOS 13.0, *)) {
-        if (@available(iOS 15.0, *)) {
-            self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"checkerboard.shield"];
-        }
-        else {
-            self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"shield"];
-        }
-    } else {
-        self.imageViewPrivacyShield.hidden = YES;
-    }
-    
-    if (@available(iOS 13.0, *)) {
-        self.imageViewAppLock.image = [UIImage systemImageNamed:@"lock.circle"];
-    } else {
-        self.imageViewAppLock.hidden = YES;
-    }
-
-    if (@available(iOS 13.0, *)) {
-        if (@available(iOS 15.0, *)) {
-            self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear.circle"];
-        }
-        else {
-            self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear"];
-        }
-    } else {
-        self.imageViewAdvanced.hidden = YES;
-    }
-
-    if (@available(iOS 14.0, *)) {
-        BOOL licensed = AppPreferences.sharedInstance.isPro;
-        NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
-        
-        self.imageViewLicense.image =  [UIImage systemImageNamed:license];
-        self.imageViewLicense.tintColor = licensed ? nil : UIColor.systemOrangeColor;
-    } else {
-        self.imageViewLicense.hidden = YES;
-    }
-
-    if (@available(iOS 13.0, *)) {
-        if ( AppPreferences.sharedInstance.isPro ) {
-            self.imageViewContactSupport.image =  [UIImage systemImageNamed:@"bubble.left"];
-            self.imageViewContactSupport.tintColor = UIColor.systemPurpleColor;
-        }
-        else {
-            [self cell:self.cellContactSupport setHidden:YES];
-        }
-
-    } else {
-        self.imageViewContactSupport.hidden = YES;
-    }
-    
-    if (@available(iOS 13.0, *)) {
-        self.imageViewClipboard.image =  [UIImage systemImageNamed:@"doc.on.doc"];
-    } else {
-        self.imageViewClipboard.hidden = YES;
-    }
+    self.imageViewClipboard.image =  [UIImage systemImageNamed:@"doc.on.doc"];
     
     [self reloadDataAnimated:YES];
 }
@@ -271,11 +219,10 @@
         
     self.labelVersion.text = aboutString;
         
-    if (@available(iOS 13.0, *)) {
-        self.labelProStatus.textColor = UIColor.labelColor;
-        self.cellProStatus.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleDefault;
-    }
+    
+    self.labelProStatus.textColor = UIColor.labelColor;
+    self.cellProStatus.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleDefault;
     
     if ( CustomizationManager.isAProBundle ) {
         self.labelProStatus.text = NSLocalizedString(@"pro_status_lifetime_pro", @"Lifetime Pro");
@@ -308,12 +255,10 @@
     
     
     
-    if (@available(iOS 14.0, *)) {
-        BOOL licensed = AppPreferences.sharedInstance.isPro;
-        NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
-        self.imageViewLicense.image =  [UIImage systemImageNamed:license];
-        self.imageViewLicense.tintColor = licensed ? nil : UIColor.systemOrangeColor;
-    }
+    BOOL licensed = AppPreferences.sharedInstance.isPro;
+    NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
+    self.imageViewLicense.image =  [UIImage systemImageNamed:license];
+    self.imageViewLicense.tintColor = licensed ? nil : UIColor.systemOrangeColor;
     
     [self cell:self.cellContactSupport setHidden:!AppPreferences.sharedInstance.isPro];
 }

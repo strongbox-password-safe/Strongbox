@@ -30,9 +30,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    if (@available(iOS 13.0, *)) {
-        [self.buttonShowQrCode setTitleColor:UIColor.labelColor forState:UIControlStateNormal];
-    }
+    [self.buttonShowQrCode setTitleColor:UIColor.labelColor forState:UIControlStateNormal];
        
     UIImage* img = [Utils getQrCode:self.string pointSize:self.qrCodeImageView.frame.size.width];
     self.qrCodeImageView.image = img;
@@ -50,10 +48,7 @@
         self.labelLargeText.text = self.string;
     }
     else {
-        BOOL dark = NO;
-        if (@available(iOS 12.0, *)) {
-            dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-        }
+        BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
         BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
     
         self.labelLargeText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.string

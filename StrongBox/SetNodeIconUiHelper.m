@@ -18,6 +18,7 @@
 #import "FavIconBulkViewController.h"
 #import "AppPreferences.h"
 #import "NSString+Extensions.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIDocumentPickerDelegate>
 
@@ -395,7 +396,10 @@ static const int kMaxRecommendedCustomIconDimension = 256;
 }
 
 - (void)presentFiles {
-    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeImage] inMode:UIDocumentPickerModeImport];
+    UTType* type = [UTType typeWithIdentifier:(NSString*)kUTTypeItem];
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[type]];
+    
+
     vc.delegate = self;
     vc.modalPresentationStyle = UIModalPresentationFormSheet;
     
@@ -407,18 +411,22 @@ static const int kMaxRecommendedCustomIconDimension = 256;
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    [self documentPicker:controller didPickDocumentAtURL:url];
-    #pragma GCC diagnostic pop
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
-    NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
     
+
+    if (! [url startAccessingSecurityScopedResource] ) {
+        NSLog(@"🔴 Could not securely access URL!");
+    }
+    
+    NSError* error;
+    __block NSData *data;
+    __block NSError *err;
+    NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] init];
+    [coordinator coordinateReadingItemAtURL:url options:0 error:&error byAccessor:^(NSURL *newURL) {
+        data = [NSData dataWithContentsOfURL:newURL options:NSDataReadingUncached error:&err];
+    }];
+    
+    [url stopAccessingSecurityScopedResource];
+        
     if(!data) {
         NSLog(@"Error: %@", error);
         

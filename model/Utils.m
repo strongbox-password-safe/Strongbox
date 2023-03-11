@@ -480,21 +480,8 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
     NSURL *url;
     NSData* data;
     
-    if(isImage) {
-        if (@available(iOS 11.0, *)) {
-            url =  [info objectForKey:UIImagePickerControllerImageURL];
-        } else {
-            UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
-            
-            if(!image) {
-                if(error) {
-                    *error = [Utils createNSError:@"Could not read the data for this item" errorCode:-1];
-                }
-                return nil;
-            }
-            
-            data = UIImagePNGRepresentation(image);
-        }
+    if ( isImage ) {
+        url =  [info objectForKey:UIImagePickerControllerImageURL];
     }
     else {
         url =  [info objectForKey:UIImagePickerControllerMediaURL];
@@ -565,6 +552,12 @@ NSString* localizedYesOrNoFromBool(BOOL george) {
     return george ?
     NSLocalizedString(@"alerts_yes", @"Yes") :
     NSLocalizedString(@"alerts_no", @"No");
+}
+
+NSString* localizedOnOrOffFromBool(BOOL george) {
+    return george ?
+    NSLocalizedString(@"generic_state_on", @"On") :
+    NSLocalizedString(@"generic_state_off", @"Off");
 }
 
 #if TARGET_OS_IPHONE

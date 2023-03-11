@@ -34,6 +34,7 @@
     NSStoryboard* sb = [NSStoryboard storyboardWithName:@"EditCustomField" bundle:nil];
     return [sb instantiateInitialController];
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -117,12 +118,12 @@
     const NSSet<NSString*> *keePassReserved;
 
     if ( Settings.sharedInstance.nextGenUI ) {
-        NSMutableSet* set = [Entry reservedCustomFieldKeys].mutableCopy;
+        NSMutableSet* set = Constants.reservedCustomFieldKeys.mutableCopy;
         [set addObject:kCanonicalEmailFieldName];
         keePassReserved = [set copy];
     }
     else {
-        keePassReserved = [Entry reservedCustomFieldKeys];
+        keePassReserved = Constants.reservedCustomFieldKeys;
     }
     
     if ( self.field ) { 
@@ -219,7 +220,6 @@
         BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
         
         for ( NSString* suggestion in altSuggestions ) {
-        
             NSAttributedString* colored = [ColoredStringHelper getColorizedAttributedString:suggestion
                                                                                    colorize:colorize
                                                                                    darkMode:dark

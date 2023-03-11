@@ -34,11 +34,7 @@
     [self.iconImage addGestureRecognizer:singleTap];
     
 
-    if (@available(iOS 13.0, *)) {
-        self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
-    } else {
-        self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
-    }
+    self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
     
@@ -64,12 +60,7 @@
     self.titleLabel.placeholder = @"";
     self.titleLabel.font = self.configuredValueFont;
     
-    if (@available(iOS 13.0, *)) {
-        self.horizontalLine.backgroundColor = UIColor.labelColor;
-    } else {
-        self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
-    }
-
+    self.horizontalLine.backgroundColor = UIColor.labelColor;
     self.onTitleEdited = nil;
     
     self.accessoryType = UITableViewCellAccessoryNone;
@@ -90,12 +81,7 @@
     NSString* key = NSLocalizedString(@"generic_fieldname_title", @"Title");
     self.titleLabel.accessibilityLabel = [key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
 
-    if (@available(iOS 13.0, *)) {
-        self.titleLabel.textColor = UIColor.labelColor;
-    } else {
-        self.titleLabel.textColor = UIColor.darkTextColor;
-    }
-    
+    self.titleLabel.textColor = UIColor.labelColor;
     self.selectAllOnEdit = selectAllOnEdit;
     
     self.horizontalLine.hidden = !editing;
@@ -120,12 +106,7 @@
     
 #ifndef IS_APP_EXTENSION
     if(editing) {
-        if (@available(iOS 13.0, *)) {
-            self.iconImage.layer.borderColor = UIColor.labelColor.CGColor;
-        }
-        else {
-            self.iconImage.layer.borderColor = UIColor.blueColor.CGColor;
-        }
+        self.iconImage.layer.borderColor = UIColor.labelColor.CGColor;
         self.iconImage.layer.borderWidth = 0.5;
         self.iconImage.layer.cornerRadius = 5;
     }

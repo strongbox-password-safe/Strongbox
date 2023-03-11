@@ -89,6 +89,15 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBOutlet var progressTotp: NSProgressIndicator!
     @IBOutlet var popupLocation: NSPopUpButton!
 
+    @IBOutlet var buttonHistory: NSPopUpButton!
+    
+
+
+
+
+
+
+
     
     
 
@@ -153,6 +162,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
     
     var sortedGroups: [Node]!
+    
     func setupLocationUI() {
         let groups = database.allActiveGroups
 
@@ -706,7 +716,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func maybeDownloadFavIconAndExit(_ node: Node, dismissAfterSave: Bool) {
-        if database.downloadFavIconOnChange {
+#if NO_FAVICON_LIBRARY 
+        onSaveDone(node, dismissAfterSave: dismissAfterSave)
+#else
+        if database.downloadFavIconOnChange { 
             let url = node.fields.url.urlExtendedParse
             if url == nil {
                 onSaveDone(node, dismissAfterSave: dismissAfterSave)
@@ -733,11 +746,17 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         } else {
             onSaveDone(node, dismissAfterSave: dismissAfterSave)
         }
+#endif
     }
 
     func onSaveDone(_ node: Node, dismissAfterSave: Bool) {
         NSLog("✅ onSaveDone")
 
+        
+        
+        
+        database.document?.save(nil)
+                
         if dismissAfterSave {
             database.nextGenSelectedItems = [node.uuid]
             dismiss(nil)
@@ -822,9 +841,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             return
         }
 
-        selectPredefinedIconController.customIcons = Array(database.customIcons)
+        selectPredefinedIconController.iconPool = Array(database.customIcons)
         selectPredefinedIconController.hideSelectFile = !database.formatSupportsCustomIcons
-        selectPredefinedIconController.hideFavIconButton = !database.formatSupportsCustomIcons
+        selectPredefinedIconController.hideFavIconButton = !database.formatSupportsCustomIcons || !StrongboxProductBundle.supportsFavIconDownloader
+        
         selectPredefinedIconController.onSelectedItem = { [weak self] (icon: NodeIcon?, showFindFavIcons: Bool) in
             guard let self = self else { return }
             self.onIconSelected(icon: icon, showFindFavIcons: showFindFavIcons)
@@ -843,6 +863,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func showFavIconDownloader() {
+        #if !NO_FAVICON_LIBRARY
         let vc = FavIconDownloader.newVC()
 
         
@@ -879,6 +900,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         presentAsSheet(vc)
+        #endif
     }
 
     func explicitSetIconAndUpdateUI(_ icon: NodeIcon?) {
@@ -921,6 +943,20 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func bindPasswordUI() {
         PasswordStrengthUIHelper.bindPasswordStrength(model.password, labelStrength: labelStrength, progress: progressStrength)
+        
+        let history = getPasswordHistoryMenu()
+        buttonHistory.menu = history
+        buttonHistory.isHidden = history == nil
+    }
+    
+    func getPasswordHistoryMenu( ) -> NSMenu? {
+        guard (database.format == .keePass4 || database.format == .keePass),
+              let initialNodeId,
+              let item = database.getItemBy(initialNodeId) else {
+            return nil
+        }
+        
+        return PasswordHistoryHelper.getPasswordHistoryMenu( item: item )
     }
 
     @IBAction func onGenerationSettings(_: Any) {
@@ -1308,7 +1344,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
     }
 
-
     @IBAction func onAddTOTP(_: Any) {
         let alert = MacAlerts()
 
@@ -1328,6 +1363,14 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                  allowEmpty: false)
         {
             setTotpWithString(string: str, steam: true)
+        }
+    }
+    
+    func setTotpFromQrCodeScanner ( _ totpString : String ) {
+        setTotpWithString(string: totpString, steam: false)
+        
+        if Settings.sharedInstance().autoCommitScannedTotp {
+            save(dismissAfterSave: false)
         }
     }
 
@@ -1354,12 +1397,12 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         if segue.identifier == "segueToQrCodeScanner" {
             if let vc = segue.destinationController as? QRCodeScanner {
                 vc.onSetTotp = { [weak self] totpString in
-                    self?.setTotpWithString(string: totpString, steam: false)
+                    self?.setTotpFromQrCodeScanner(totpString)
                 }
             }
         }
     }
-
+    
     func scanPhotoLibraryImageForQRCode() {}
 
     @IBAction func onRemoveTOTP(_: Any) {
@@ -2079,7 +2122,7 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
 
 
 
-            let path = FileManager.sharedInstance().tmpAttachmentPreviewPath as NSString
+            let path = StrongboxFilesManager.sharedInstance().tmpAttachmentPreviewPath as NSString
             let tmp = path.appendingPathComponent(key as String)
 
             let inputStream = attachment.getPlainTextInputStream()!
@@ -2105,7 +2148,7 @@ extension CreateEditViewController: QLPreviewPanelDelegate {
     }
 
     override func endPreviewPanelControl(_: QLPreviewPanel!) {
-        FileManager.sharedInstance().deleteAllTmpAttachmentPreviewFiles()
+        StrongboxFilesManager.sharedInstance().deleteAllTmpAttachmentPreviewFiles()
     }
 }
 

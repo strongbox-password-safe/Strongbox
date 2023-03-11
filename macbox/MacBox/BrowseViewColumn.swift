@@ -56,13 +56,13 @@ enum BrowseViewColumn: String, CaseIterable {
         case .expires:
             return false
         case .totp:
-            return false
+            return true
         case .attachmentCount:
             return false
         case .customFieldCount:
             return false
         case .tags:
-            return false
+            return true
         case .path:
             return false
         case .historicalItemCount:
@@ -72,7 +72,7 @@ enum BrowseViewColumn: String, CaseIterable {
         case .uuid:
             return false
         case .auditIssues:
-            return false
+            return false 
         }
     }
 

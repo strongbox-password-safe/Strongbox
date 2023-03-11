@@ -61,9 +61,7 @@
     PinEntryController* vc1 = (PinEntryController*)[storyboard instantiateInitialViewController];
     
     vc1.isDatabasePIN = databasePIN;
-    if (@available(iOS 13.0, *)) {
-        vc1.modalInPresentation = !Utils.isiPad;
-    }
+    vc1.modalInPresentation = !Utils.isiPad;
     
     vc1.modalPresentationStyle = Utils.isiPad ? UIModalPresentationFormSheet : UIModalPresentationFullScreen;
     
@@ -180,32 +178,18 @@
 }
 
 - (UIColor*)labelColor {
-    if (@available(iOS 13.0, *)) {
-        return UIColor.labelColor;
-    }
-    else {
-        return UIColor.blackColor;
-    }
+    return UIColor.labelColor;
 }
 
 - (UIColor*)borderColor {
-    if (@available(iOS 13.0, *)) {
-        return UIColor.systemGrayColor;
-    }
-    else {
-        return UIColor.darkGrayColor;
-    }
+    return UIColor.systemGrayColor;
 }
 
 - (void)styleKeyPadButton:(UIButton*)button {
     const CGFloat buttonWidth = button.frame.size.width;
     
     UIColor* backgroundColor = UIColor.clearColor;
-    UIColor* insideCircleColor = UIColor.lightGrayColor;
-    
-    if (@available(iOS 13.0, *)) {
-        insideCircleColor = UIColor.quaternaryLabelColor;
-    }
+    UIColor* insideCircleColor = UIColor.quaternaryLabelColor;
 
     
     
@@ -315,24 +299,13 @@
         NSString *masked = [@"" stringByPaddingToLength:self.enteredText.length withString:@"●" startingAtIndex:0];
         
         self.labelEnteredText.text = masked;
-
-        if (@available(iOS 13.0, *)) {
-            self.labelEnteredText.textColor = UIColor.labelColor;
-        }
-        else {
-            self.labelEnteredText.textColor = nil;
-        }
+        self.labelEnteredText.textColor = UIColor.labelColor;
     }
     else {
         NSString* placeholderText = self.isDatabasePIN ? NSLocalizedString(@"pin_entry_database_default_text", @"Database PIN") : NSLocalizedString(@"pin_entry_app_default_text", @"App PIN");
         
         self.labelEnteredText.text = self.info.length ? self.info : placeholderText;
-        if (@available(iOS 13.0, *)) {
-            self.labelEnteredText.textColor = UIColor.systemGrayColor;
-        }
-        else {
-            self.labelEnteredText.textColor = UIColor.lightGrayColor;
-        }
+        self.labelEnteredText.textColor = UIColor.systemGrayColor;
     }
 }
 

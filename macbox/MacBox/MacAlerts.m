@@ -112,7 +112,9 @@ disableEscapeKey:(BOOL)disableEscapeKey
 }
 
 + (void)error:(const NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion {
-    NSString* loc = NSLocalizedString(@"alerts_unknown_error", @"Unknown Error");
+    NSString* loc2 = NSLocalizedString(@"alerts_unknown_error", @"Unknown Error");
+    NSString* loc = error.domain.description.length ? error.domain.description : loc2;
+    
     [self error:loc error:error window:window completion:completion];
 }
 

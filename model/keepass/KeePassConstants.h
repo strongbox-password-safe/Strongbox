@@ -129,7 +129,7 @@ static const uint64_t kDefaultBlockifySize = 1 << 20;
 
 static NSString* const kKdfParametersKeyUuid = @"$UUID";
 
-static const uint32_t kDefaultTransformRounds = 600000;
+static const uint32_t kDefaultTransformRounds = 1000000;
 
 static const int kFlagsSha2 = 1;
 static const int kFlagsAes = 2;

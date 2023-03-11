@@ -8,9 +8,11 @@
 
 import Cocoa
 
+
 extension Notification.Name {
     enum DatabasesCollection {
         static let lockStateChanged = Notification.Name("DatabasesCollectionLockStateChangedNotification")
+        static let autoLockAppInBackgroundTimeout = Notification.Name("autoLockAppInBackgroundTimeout")
     }
 }
 
@@ -18,6 +20,10 @@ class DatabasesCollection: NSObject {
     @objc static let shared = DatabasesCollection()
     
     var unlockedCollection : ConcurrentMutableDictionary<NSString, Model> = ConcurrentMutableDictionary<NSString, Model>()
+    var pollingInProgressSetC : ConcurrentMutableSet<NSString> = ConcurrentMutableSet()
+    var pollingTimersC : ConcurrentMutableDictionary<NSString, Timer> = ConcurrentMutableDictionary<NSString, Timer>() 
+    
+    var idleTimer : Timer? = nil
     
     private override init() {
         super.init()
@@ -41,9 +47,13 @@ class DatabasesCollection: NSObject {
             
             self.onPreferencesChanged()
         }
+        
+        NotificationCenter.default.addObserver(forName: .DatabasesCollection.autoLockAppInBackgroundTimeout, object: nil, queue: nil) { [weak self] _ in
+            NSLog("🐞 DEBUG - DatabasesCollection - Received AutoLockInBackgroundTimeout notification - Attempting Lock")
+            self?.onAutoLockTimeout( background: true )
+        }
     }
     
-    var idleTimer : Timer? = nil
     private func watchForIdle () {
         idleTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true, block: { [weak self] timer in
             let interval = self?.getSystemIdleInterval()
@@ -88,8 +98,8 @@ class DatabasesCollection: NSObject {
         DistributedNotificationCenter.default().addObserver(self, selector: #selector(onWake(_:)), name: NSNotification.Name(rawValue: notificationName3), object: nil)
     }
     
-    func onAutoLockTimeout() {
-        NSLog("onAutoLockTimeout (%d seconds): Maybe Locking Databases...", Settings.sharedInstance().autoLockTimeoutSeconds);
+    func onAutoLockTimeout( background : Bool = false ) {
+        NSLog("🐞 onAutoLockTimeout: Maybe Locking Databases... [Background = %hhd]", background );
         
         tryToLockAll()
     }
@@ -194,7 +204,11 @@ class DatabasesCollection: NSObject {
         
         
         
-        return DBManagerPanel.sharedInstance.contentViewController!
+        let ret = DBManagerPanel.sharedInstance.contentViewController!
+        
+        NSLog("🐞 XXXX DEBUG: getDbManagerPanelVc => returning %@", ret);
+        
+        return ret
     }
     
     @objc public func autoFillRequestCkfsAndUnlock ( uuid : String ) {
@@ -209,15 +223,33 @@ class DatabasesCollection: NSObject {
         }
         
         DispatchQueue.main.async { [weak self] in
-            let determiner = MacCompositeKeyDeterminer(database: prefs, isNativeAutoFillAppExtensionOpen: false, isAutoFillQuickTypeOpen: false, onDemandUiProvider: DatabasesCollection.getDbManagerPanelVc)
+            let determiner = MacCompositeKeyDeterminer(database: prefs,
+                                                       isNativeAutoFillAppExtensionOpen: false,
+                                                       isAutoFillQuickTypeOpen: false,
+                                                       onDemandUiProvider: DatabasesCollection.getDbManagerPanelVc)
             
-            determiner.createWindowForManualCredentialsEntry = true;
+
             
+            determiner.createWindowForManualCredentialsEntry = false; 
+
+            
+            
+            
+            let appDelegate = NSApplication.shared.delegate as! AppDelegate
+            appDelegate.cancelAutoLockInBackgroundTimer()
+
             determiner.getCkfs { [weak self] result, ckfs, fromConvenience, error in
                 if let ckfs, result == .success {
                     
                     
                     self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience)
+                    
+                    if !NSApplication.shared.isActive {
+                        
+                        
+
+                        appDelegate.startAutoLockForAppInBackgroundTimer()
+                    }
                 }
                 else if result == .error, let error {
                     self?.displayUnlockingErrorMessage(error: error, eagerVc: nil)
@@ -242,7 +274,7 @@ class DatabasesCollection: NSObject {
         }
     }
     
-    private func tryToLockAll () {
+    @objc public func tryToLockAll () {
         let keys = unlockedCollection.allKeys
         
         for uuid in keys {
@@ -286,15 +318,16 @@ class DatabasesCollection: NSObject {
     
     
     
-    var pollingTimers : [String : Timer] = [:]
-    
     func stopAllPollingTimers ( ) {
         NSLog("Stop all Polling Timers...")
         
-        pollingTimers.values.forEach { timer in
-            timer.invalidate()
+        let keys = pollingTimersC.allKeys
+        keys.forEach { key in
+            if let timer = pollingTimersC.object(forKey: key) {
+                timer.invalidate()
+            }
+            pollingTimersC.removeObject(forKey: key)
         }
-        pollingTimers.removeAll()
     }
     
     func restartPollingTimers () {
@@ -315,15 +348,17 @@ class DatabasesCollection: NSObject {
             return
         }
         
-        if pollingTimers[uuid] != nil {
+        if pollingTimersC.object(forKey: uuid as NSString) != nil {
             NSLog("🔴 Already a timer in place");
             return
         }
         
         if let model = getUnlocked(uuid: uuid), model.metadata.monitorForExternalChanges, !model.isInOfflineMode {
-            pollingTimers[uuid] = Timer.scheduledTimer(withTimeInterval:TimeInterval( prefs.monitorForExternalChangesInterval) , repeats: true) { [weak self] timer in
+            let nTimer = Timer.scheduledTimer(withTimeInterval:TimeInterval( prefs.monitorForExternalChangesInterval) , repeats: true) { [weak self] timer in
                 self?.pollForDatabaseRemoteChanges( uuid : uuid )
             }
+            
+            pollingTimersC.setObject(nTimer, forKey: uuid as NSString)
         }
         else {
             NSLog("Not monitoring database external changes because OfflineMode or configured Off.")
@@ -333,13 +368,12 @@ class DatabasesCollection: NSObject {
     private func stopPollForRemoteChangesTimer ( uuid : String ) {
         NSLog("stopPollForRemoteChangesTimer")
         
-        if let timer = pollingTimers [uuid] {
+        if let timer = pollingTimersC.object(forKey: uuid as NSString) {
             timer.invalidate()
-            pollingTimers[uuid] = nil
+            pollingTimersC.removeObject(forKey: uuid as NSString)
         }
     }
     
-    var pollingInProgressSet : Set<String> = Set()
     private func pollForDatabaseRemoteChanges ( uuid : String ) {
 
         
@@ -348,14 +382,14 @@ class DatabasesCollection: NSObject {
             return
         }
         
-        if pollingInProgressSet.contains(uuid) {
+        if pollingInProgressSetC.contains(uuid as NSString) {
             NSLog("pollForDatabaseRemoteChanges - pollingInProgress - Will not queue up another Poll.");
             return
         }
         
-        pollingInProgressSet.insert(uuid)
+        pollingInProgressSetC.add(uuid as NSString)
         MacSyncManager.sharedInstance().poll(forChanges: prefs) { [weak self] result, changesPresent, error in
-            self?.pollingInProgressSet.remove(uuid)
+            self?.pollingInProgressSetC.remove(uuid as NSString)
             
             if let error {
                 NSLog("🔴 error polling: [%@]", String(describing: error))
@@ -577,7 +611,7 @@ class DatabasesCollection: NSObject {
 
     func onSyncCompleted ( result : SyncAndMergeResult, metadata : MacDatabasePreferences, localWasChanged : Bool, error : Error?, allowInteractive : Bool, wasInteractive : Bool, suppressErrorAlerts : Bool, ckfsForConflict : CompositeKeyFactors?, completion : SyncAndMergeCompletionBlock? ) {
         if result == .success {
-            onSyncSuccess(uuid: metadata.uuid, localWasChanged: localWasChanged, completion: completion)
+            onSyncSuccess(uuid: metadata.uuid, localWasChanged: localWasChanged, allowInteractive: allowInteractive, completion: completion)
         }
         else if result == .error {
             onSyncError(metadata: metadata, error: error, allowInteractive: allowInteractive, wasInteractive: wasInteractive, suppressErrorAlerts: suppressErrorAlerts, completion: completion )
@@ -702,18 +736,19 @@ class DatabasesCollection: NSObject {
         interactiveVc.presentAsSheet(vc)
     }
     
-    func onSyncSuccess ( uuid : String, localWasChanged : Bool, completion : SyncAndMergeCompletionBlock? ) {
+    func onSyncSuccess ( uuid : String, localWasChanged : Bool, allowInteractive : Bool, completion : SyncAndMergeCompletionBlock? ) {
         NSLog("✅ DatabasesCollection::onSyncSuccess => Sync Successfully Completed [localWasChanged = %@]", localizedYesOrNoFromBool(localWasChanged))
         
         if localWasChanged, let existing = getUnlocked(uuid: uuid ) {
             NSLog("DatabasesCollection::onSyncSuccess - database is unlocked - refreshing our unlocked model...");
-                
-            let vc = getMostAppropriateViewControllerForInteraction(uuid: uuid)
+                   
             
             
-            
-            
-            existing.reloadDatabase(fromLocalWorkingCopy: vc) { [weak self] success in
+        
+            existing.reloadDatabase(fromLocalWorkingCopy: {
+                let vc = self.getMostAppropriateViewControllerForInteraction(uuid: uuid)
+                return vc
+            }, noProgressSpinner: !allowInteractive) { [weak self] success in
                 if success {
                     
                     
@@ -737,6 +772,12 @@ class DatabasesCollection: NSObject {
     func notifyUpdatesDatabasesList() {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .databasesListViewForceRefresh, object: nil)
+        }
+    }
+
+    func notifyViewsToRefresh( uuid : String ) {
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .genericRefreshAllDatabaseViews, object: uuid)
         }
     }
 }

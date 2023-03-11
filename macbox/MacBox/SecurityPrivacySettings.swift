@@ -13,6 +13,7 @@ class SecurityPrivacySettings: NSViewController {
     @IBOutlet var quickReveal: NSButton!
     @IBOutlet var revealImmediately: NSButton!
 
+    @IBOutlet var hideOnCopy: NSButton!
     @IBOutlet var miniaturizeOnCopy: NSButton!
     @IBOutlet var autoClearClipboard: NSButton!
     @IBOutlet var autoClearClipboardTimeout: NSTextField!
@@ -21,9 +22,15 @@ class SecurityPrivacySettings: NSViewController {
     
     @IBOutlet var lockOnScreenLock: NSButton!
     @IBOutlet var lockEvenIfEditing: NSButton!
+    
     @IBOutlet var autoLockDatabase: NSButton!
     @IBOutlet var autoLockTimeoutTextField: NSTextField!
     @IBOutlet var autoLockStepper: NSStepper!
+
+    @IBOutlet var autoLockAppInBackground: NSButton!
+    @IBOutlet var autoLockAppInBackgroundTimeoutTextField: NSTextField!
+    @IBOutlet var autoLockAppInBackgroundStepper: NSStepper!
+
     @IBOutlet var lockDatabaseOnWindowClose: NSButton!
 
     override func viewDidLoad() {
@@ -54,19 +61,37 @@ class SecurityPrivacySettings: NSViewController {
         autoClearClipboardTimeout.stringValue = stepperAutoClearClipboard.stringValue
         allowClipboardHandoff.state = Settings.sharedInstance().clipboardHandoff ? .on : .off
         miniaturizeOnCopy.state = Settings.sharedInstance().miniaturizeOnCopy ? .on : .off
+        hideOnCopy.state = Settings.sharedInstance().hideOnCopy ? .on : .off
     }
     
-    func bindLocking() {
+    func bindAutoLockingIdle() {
         let alts = Settings.sharedInstance().autoLockTimeoutSeconds
         let mins = alts / 60
         
         autoLockDatabase.state = mins != 0 ? .on : .off
         autoLockTimeoutTextField.isEnabled = mins != 0
         autoLockStepper.isEnabled = mins != 0
-        
         autoLockStepper.integerValue = mins
         autoLockTimeoutTextField.stringValue = mins != 0 ? autoLockStepper.stringValue : ""
+    }
+    
+    func bindAutoLockingBackground () {
+        let autoLockIfInBackgroundTimeoutSeconds = Settings.sharedInstance().autoLockIfInBackgroundTimeoutSeconds
+        let autoLockIfInBackgroundTimeoutMinutes = autoLockIfInBackgroundTimeoutSeconds / 60
+        
+        autoLockAppInBackground.state = autoLockIfInBackgroundTimeoutMinutes != 0 ? .on : .off
+        autoLockAppInBackgroundTimeoutTextField.isEnabled = autoLockIfInBackgroundTimeoutMinutes != 0
+        autoLockAppInBackgroundStepper.isEnabled = autoLockIfInBackgroundTimeoutMinutes != 0
+        autoLockAppInBackgroundStepper.integerValue = autoLockIfInBackgroundTimeoutMinutes
+        autoLockAppInBackgroundTimeoutTextField.stringValue = autoLockIfInBackgroundTimeoutMinutes != 0 ? autoLockAppInBackgroundStepper.stringValue : ""
 
+    }
+    
+    func bindLocking() {
+        bindAutoLockingIdle()
+        
+        bindAutoLockingBackground()
+        
         lockDatabaseOnWindowClose.state = Settings.sharedInstance().lockDatabaseOnWindowClose ? .on : .off
         lockOnScreenLock.state = Settings.sharedInstance().lockDatabasesOnScreenLock ? .on : .off;
         lockEvenIfEditing.state = Settings.sharedInstance().lockEvenIfEditing ? .on : .off
@@ -79,6 +104,7 @@ class SecurityPrivacySettings: NSViewController {
         
         Settings.sharedInstance().clipboardHandoff = allowClipboardHandoff.state == .on
         Settings.sharedInstance().miniaturizeOnCopy = miniaturizeOnCopy.state == .on
+        Settings.sharedInstance().hideOnCopy = hideOnCopy.state == .on
         
         Settings.sharedInstance().lockDatabaseOnWindowClose = lockDatabaseOnWindowClose.state == .on
         Settings.sharedInstance().lockDatabasesOnScreenLock = lockOnScreenLock.state == .on
@@ -143,6 +169,34 @@ class SecurityPrivacySettings: NSViewController {
         notifyChanged()
     }
 
+    
+    
+    @IBAction func onAutoLockAppInBackgroundTextFieldEdited(_: Any) {
+        autoLockAppInBackgroundStepper.integerValue = autoLockAppInBackgroundTimeoutTextField.integerValue
+        
+        Settings.sharedInstance().autoLockIfInBackgroundTimeoutSeconds = autoLockAppInBackgroundStepper.integerValue * 60
+        
+        bindUI()
+        
+        notifyChanged()
+    }
+    
+    @IBAction func onAutoLockAppInBackgroundStepperChanged(_: Any) {
+        Settings.sharedInstance().autoLockIfInBackgroundTimeoutSeconds = autoLockAppInBackgroundStepper.integerValue * 60
+        
+        bindUI()
+        
+        notifyChanged()
+    }
+    
+    @IBAction func onAutoLockAppInBackgroundTimeoutChanged(_: Any) {
+        Settings.sharedInstance().autoLockIfInBackgroundTimeoutSeconds = autoLockAppInBackground.state == .on ? 600 : 0
+        
+        bindUI()
+        
+        notifyChanged()
+    }
+    
     
     
     func notifyChanged() {

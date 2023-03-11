@@ -104,18 +104,16 @@
 }
 
 - (NSDecimalNumber*)getEffectivePrice:(SKProduct*)product {
-    if (@available(iOS 11.2, *)) {
-        if(product.introductoryPrice) {
-            if ( [product.introductoryPrice.price isEqual:NSDecimalNumber.zero] ) {
-
-                return product.price;
-            }
-            else {
-                return product.introductoryPrice.price;
-            }
+    if(product.introductoryPrice) {
+        if ( [product.introductoryPrice.price isEqual:NSDecimalNumber.zero] ) {
+            
+            return product.price;
+        }
+        else {
+            return product.introductoryPrice.price;
         }
     }
-
+    
     return product.price;
 }
 

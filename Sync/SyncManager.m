@@ -14,7 +14,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "AppleICloudProvider.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "LocalDatabaseIdentifier.h"
 #import "DatabaseModel.h"
 #import "Constants.h"
@@ -180,8 +180,9 @@
 
 
 
+
 - (void)startMonitoringDocumentsDirectory {
-    NSString * homeDirectory = FileManager.sharedInstance.documentsDirectory.path;
+    NSString * homeDirectory = StrongboxFilesManager.sharedInstance.documentsDirectory.path;
     
     int filedes = open([homeDirectory cStringUsingEncoding:NSASCIIStringEncoding], O_EVTONLY);
     
@@ -229,7 +230,7 @@
     if(items) {
         for (StorageBrowserItem *item in items) {
             if(!item.folder && ![existing containsObject:item.name]) {
-                NSURL *url = [FileManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
+                NSURL *url = [StrongboxFilesManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
 
                 if([Serializator isValidDatabase:url error:&error]) {
                     NSLog(@"New File: [%@] is a valid database", item.name);
@@ -250,7 +251,7 @@
 
 - (NSArray<StorageBrowserItem*>*)getDocumentFiles:(NSError**)ppError {
     NSError *error;
-    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:FileManager.sharedInstance.documentsDirectory.path
+    NSArray *directoryContent = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:StrongboxFilesManager.sharedInstance.documentsDirectory.path
                                                                                     error:&error];
     
     if (error) {
@@ -263,7 +264,7 @@
     NSMutableArray<StorageBrowserItem*>* items = [NSMutableArray array];
     for (NSString* file in directoryContent) {
         BOOL isDirectory;
-        NSString *fullPath = [FileManager.sharedInstance.documentsDirectory.path stringByAppendingPathComponent:file];
+        NSString *fullPath = [StrongboxFilesManager.sharedInstance.documentsDirectory.path stringByAppendingPathComponent:file];
         
         BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDirectory];
         
@@ -289,7 +290,7 @@
         DatabasePreferences *safe = [LocalDeviceStorageProvider.sharedInstance getDatabasePreferences:name
                                                                                          providerData:item.providerData];
         
-        NSURL *url = [FileManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
+        NSURL *url = [StrongboxFilesManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
         NSData* snapshot = [NSData dataWithContentsOfURL:url];
         
         NSError* error;
@@ -365,7 +366,7 @@
 }
 
 - (NSURL*)getLegacyLocalDatabaseDirectory:(BOOL)shared {
-    return shared ? FileManager.sharedInstance.sharedAppGroupDirectory : FileManager.sharedInstance.documentsDirectory;
+    return shared ? StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory : StrongboxFilesManager.sharedInstance.documentsDirectory;
 }
 
 - (NSURL*)getLegacyLocalDatabaseFileUrl:(DatabasePreferences*)safeMetaData {

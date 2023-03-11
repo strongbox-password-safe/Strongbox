@@ -68,12 +68,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         NSLog("🚀 Initial Navigation Context = [%@], browse selected items = [%@]", String(describing: navigationContext), database.nextGenSelectedItems)
         
         if case NavigationContext.none = navigationContext {
-            if database.format == .keePass1, let root = database.rootGroup.childGroups.first {
-                setModelNavigationContextWithViewNode(database, .regularHierarchy(root.uuid))
-            }
-            else {
-                setModelNavigationContextWithViewNode(database, .regularHierarchy(database.rootGroup.uuid))
-            }
+            setModelNavigationContextWithViewNode(database, .special(.allEntries))
         }
         
         loadChildSplitViews()
@@ -89,10 +84,12 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         NSLog("========================================================================")
     }
     
+    var firstAppearance = true
     override func viewDidAppear() {
         super.viewDidAppear()
         
-        if database != nil, database.nextGenSearchText.count > 0 || database.startWithSearch {
+        if database != nil, database.nextGenSearchText.count > 0 || database.startWithSearch, firstAppearance {
+            firstAppearance = false
             onFind(nil)
         }
         
@@ -403,7 +400,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         let vc = CreateEditViewController.instantiateFromStoryboard()
         
         if createNew {
-            if case let .regularHierarchy(selectedGroup) = navigationContext {
+            if case let .regularHierarchy(selectedGroup) = navigationContext, !database.is(inRecycled: selectedGroup) {
                 vc.initialParentNodeId = selectedGroup
             } else {
                 vc.initialParentNodeId = database.rootGroup.uuid
@@ -555,25 +552,27 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         return selected
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     
     

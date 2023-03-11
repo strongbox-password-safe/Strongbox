@@ -33,6 +33,7 @@ Big thank you to all the localization contributors
 - Russian - Wishes to remain anonymous
 - Spanish - Wishes to remain anonymous
 - Swedish - Jari Häkkinen
+- Turkish - evreka
 - Ukrainian - Artem Polivanchuk
 
 # License Notes

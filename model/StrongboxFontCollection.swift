@@ -39,7 +39,6 @@ extension DownFont {
 
 
 @available(macOS 11.0, *)
-@available(iOS 11.0, *)
 
 
 

@@ -20,7 +20,8 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     @IBOutlet var stackViewStrength: NSStackView!
     @IBOutlet var stackViewParent: NSStackView!
     @IBOutlet var copyButton: NSButton!
-
+    @IBOutlet var buttonHistory: NSPopUpButton!
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
@@ -33,6 +34,8 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
             imageViewIcon.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
         }
 
+        buttonHistory.isHidden = true
+        
         monitorForQuickRevealKey()
     }
 
@@ -51,6 +54,9 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     override func prepareForReuse() {
         super.prepareForReuse()
 
+        buttonHistory.menu = nil
+        buttonHistory.isHidden = true
+
         setContent(nil)
     }
 
@@ -66,6 +72,13 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     var concealable: Bool = false
     var textColorOverride: NSColor?
 
+    var history : NSMenu? = nil {
+        didSet {
+            buttonHistory.menu = history
+            buttonHistory.isHidden = history == nil
+        }
+    }
+    
     var concealed: Bool = false {
         didSet {
             if concealed {

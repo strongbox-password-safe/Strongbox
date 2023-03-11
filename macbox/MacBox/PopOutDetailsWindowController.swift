@@ -9,6 +9,9 @@
 import Cocoa
 
 class PopOutDetailsWindowController: NSWindowController {
+    var database: ViewModel!
+    var uuid: UUID!
+    
     class func fromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("PopOutDetails"), bundle: nil)
         return storyboard.instantiateInitialController() as! Self
@@ -31,9 +34,6 @@ class PopOutDetailsWindowController: NSWindowController {
     var viewController: DetailViewController {
         return contentViewController as! DetailViewController
     }
-
-    var database: ViewModel!
-    var uuid: UUID!
 
     func load(model: ViewModel, uuid: UUID) {
         database = model
@@ -61,12 +61,7 @@ class PopOutDetailsWindowController: NSWindowController {
 
         let vc = CreateEditViewController.instantiateFromStoryboard()
 
-        guard let selectedItem = database.nextGenSelectedItems.first, database.nextGenSelectedItems.count == 1 else {
-            NSLog("🔴 Selected Item not set for Editing!")
-            return
-        }
-
-        vc.initialNodeId = selectedItem
+        vc.initialNodeId = uuid
         vc.database = database
 
         viewController.presentAsSheet(vc)

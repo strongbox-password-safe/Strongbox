@@ -34,6 +34,9 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 
 @property BOOL viewWillAppearFirstTimeDone;
 @property BOOL doneFirstAppearanceTasks;
+@property (weak) IBOutlet NSTextField *cautionImpreciseWarning;
+
+@property BOOL doneSmartInit;
 
 @end
 
@@ -65,6 +68,7 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
             NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
         
         self.tableView.emptyString = text;
+        self.cautionImpreciseWarning.hidden = YES;
     }
 }
 
@@ -95,6 +99,10 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     }
     
     [self bindSelectButton];
+    
+    if ( self.doneSmartInit ) {
+        self.cautionImpreciseWarning.hidden = YES;
+    }
 }
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
@@ -212,7 +220,13 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     
 
     NSString * searchTerm = getCompanyOrOrganisationNameFromDomain(domain);
+    
     self.searchField.stringValue = searchTerm;
+    self.cautionImpreciseWarning.hidden = NO;
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.doneSmartInit = YES;
+    });
 }
 
 NSString *getPublicDomain(NSString* url) {

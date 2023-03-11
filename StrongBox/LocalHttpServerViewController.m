@@ -8,7 +8,9 @@
 
 #import "LocalHttpServerViewController.h"
 #import "GCDWebUploader.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
+
+#import "Strongbox-Swift.h"
 
 @interface LocalHttpServerViewController ()
 
@@ -25,17 +27,35 @@
     [super viewWillAppear:animated];
     
     if(!self.webUploader.isRunning) {
-        [self.webUploader startWithPort:80 bonjourName:nil];
+        [self.webUploader startWithPort:80 bonjourName:@"Strongbox_Salut"];
 
         NSLog(@"Visit %@ in your web browser", self.webUploader.serverURL);
-
-        if(self.webUploader.serverURL) {
+        
+        if ( self.webUploader.serverURL ) {
             self.helpfulInfo.hidden = NO;
             self.serverUrl.text = self.webUploader.serverURL.absoluteString;
         }
         else {
-            self.helpfulInfo.hidden = YES;
-            self.serverUrl.text = NSLocalizedString(@"transfer_local_network_network_unavailable_message", @"Message to display when device is offline and has no IP address in Local HTTP Transfer - Select Storage -> Transfer over Local Network");
+            NSString* str = [WifiAddressHelper getWifiAddress];
+            
+
+
+            
+            
+            
+            
+            
+            
+            
+            if ( str.length ) {
+                NSString* host = [str containsString:@":"] ? [NSString stringWithFormat:@"[%@]", str] : str;
+                self.helpfulInfo.hidden = NO;
+                self.serverUrl.text = [NSString stringWithFormat:@"http:
+            }
+            else {
+                self.helpfulInfo.hidden = YES;
+                self.serverUrl.text = NSLocalizedString(@"transfer_local_network_network_unavailable_message", @"Message to display when device is offline and has no IP address in Local HTTP Transfer - Select Storage -> Transfer over Local Network");
+            }
         }
     }
 }

@@ -77,9 +77,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BrowseViewType browseViewType;
 
 @property BrowseTapAction tapAction;
-@property BrowseTapAction doubleTapAction;
-@property BrowseTapAction tripleTapAction;
-@property BrowseTapAction longPressTapAction;
 
 
 

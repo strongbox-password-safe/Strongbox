@@ -11,7 +11,7 @@
 #import "Utils.h"
 #import "DatabasePreferences.h"
 #import "DatabaseModel.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "LocalDatabaseIdentifier.h"
 #import "NSDate+Extensions.h"
 
@@ -248,7 +248,7 @@ suggestedFilename:(NSString *)suggestedFilename
 }
 
 - (NSURL*)getDirectory:(BOOL)shared {
-    return shared ? FileManager.sharedInstance.sharedAppGroupDirectory : FileManager.sharedInstance.documentsDirectory;
+    return shared ? StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory : StrongboxFilesManager.sharedInstance.documentsDirectory;
 }
 
 - (NSURL*)getFileUrl:(DatabasePreferences*)safeMetaData {

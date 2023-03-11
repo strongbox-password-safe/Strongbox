@@ -11,7 +11,7 @@
 
 #import "AppPreferences.h"
 #import "iCloudSafesCoordinator.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "FirstUnlockWelcomeModule.h"
 #import "ConvenienceUnlockOnboardingModule.h"
 #import "QuickLaunchOnboardingModule.h"
@@ -32,6 +32,8 @@
 #import "EncryptionSettingsViewModel.h"
 #import "BackupsManager.h"
 #import "ProUpgradeIAPManager.h"
+#import "BusinessActivationOnboardingModule.h"
+#import "Strongbox-Swift.h"
 
 @interface OnboardingManager ()
 
@@ -66,6 +68,7 @@
 
     self.appOnboardingInProcess = YES;
 
+    id<OnboardingModule> businessActivation = [self getBusinessActivationModule];
     id<OnboardingModule> welcomeToStrongbox = [self getFirstRunWelcomeToStrongboxModule];
     id<OnboardingModule> freeTrial = [self getFreeTrialOnboardingModule];
     id<OnboardingModule> iCloud = [self getICloudOnboardingModule];
@@ -78,7 +81,8 @@
     id<OnboardingModule> upgradeToPro = [self getUpgradeToProModule];
     id<OnboardingModule> finalAllSetWelcomeToStrongbox = [self getFirstRunFinalWelcomeToStrongboxModule];
     
-    NSArray<id<OnboardingModule>> *onboardingItems = @[welcomeToStrongbox,
+    NSArray<id<OnboardingModule>> *onboardingItems = @[businessActivation,
+                                                       welcomeToStrongbox,
                                                        iCloud,
                                                        iCloudMigration,
                                                        autoFill,
@@ -100,10 +104,7 @@
     
     
     nav.modalPresentationStyle = UIModalPresentationFormSheet;
-
-    if (@available(iOS 13.0, *)) {
-        nav.modalInPresentation = YES; 
-    }
+    nav.modalInPresentation = YES; 
     
     OnboardingManager *weakSelf = self;
     [self showNextOnboardingModule:presentingViewController model:nil onboardingItems:onboardingItems index:0 stopOnboarding:NO nav:nav completion:^{
@@ -164,9 +165,7 @@
     
     nav.navigationBarHidden = YES;
     nav.modalPresentationStyle = UIModalPresentationFormSheet;
-    if (@available(iOS 13.0, *)) {
-        nav.modalInPresentation = YES; 
-    }
+    nav.modalInPresentation = YES; 
     
     [self showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:0 stopOnboarding:NO nav:nav completion:completion];
 }
@@ -226,10 +225,14 @@
 
 
 
+- (id<OnboardingModule>)getBusinessActivationModule {
+    return [[BusinessActivationOnboardingModule alloc] initWithModel:nil];
+}
+
 - (id<OnboardingModule>)getFirstRunWelcomeToStrongboxModule {
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:nil];
     module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
-        return !AppPreferences.sharedInstance.hasShownFirstRunWelcome;
+        return !AppPreferences.sharedInstance.hasShownFirstRunWelcome && !StrongboxProductBundle.isBusinessBundle;
     };
 
     module.image = [UIImage imageNamed:@"welcome-business"];
@@ -330,7 +333,7 @@
     module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
         BOOL userHasAnyBackupFiles = [BackupsManager.sharedInstance getAvailableBackups:nil all:NO].count;
         BOOL userHasLocalDatabases = [self getLocalDeviceSafes].firstObject != nil;
-        BOOL hasImportedKeyFiles = FileManager.sharedInstance.importedKeyFiles.firstObject != nil;
+        BOOL hasImportedKeyFiles = StrongboxFilesManager.sharedInstance.importedKeyFiles.firstObject != nil;
     
         return !AppPreferences.sharedInstance.haveAskedAboutBackupSettings && (userHasLocalDatabases || hasImportedKeyFiles || userHasAnyBackupFiles);
     };
@@ -363,7 +366,7 @@
         }
 
         if ( buttonIdCancelIsZero != 0 ) {
-            [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
+            [StrongboxFilesManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
                                                        importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
 
             AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
@@ -735,10 +738,7 @@
         return YES;
     };
 
-    module.image = [UIImage imageNamed:@"unlock"];
-    if (@available(iOS 13.0, *)) {
-        module.image = [UIImage systemImageNamed:@"function"];
-    }
+    module.image = [UIImage systemImageNamed:@"function"];
     module.imageSize = 64;
     
     module.header = NSLocalizedString(@"autofill_argon2_onboarding_issue_title", @"AutoFill Issue");
@@ -811,10 +811,7 @@
         return YES;
     };
 
-    module.image = [UIImage imageNamed:@"unlock"];
-    if (@available(iOS 13.0, *)) {
-        module.image = [UIImage systemImageNamed:@"wand.and.stars"];
-    }
+    module.image = [UIImage systemImageNamed:@"wand.and.stars"];
     module.imageSize = 64;
     
     module.header = NSLocalizedString(@"kdbx4_upgrade_onboarding_issue_title", @"Database Upgrade");

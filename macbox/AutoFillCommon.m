@@ -9,7 +9,6 @@
 #import "AutoFillCommon.h"
 #import "NSString+Extensions.h"
 
-static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kMailToScheme = @"mailto";
 
 @implementation AutoFillCommon

@@ -43,94 +43,89 @@ static NSArray<IMAGE_TYPE_PTR> *kKeePassXCIconSet;
 }
 
 static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet() {
-    if (@available(iOS 13.0, *)) {
-        NSArray<NSString*>* names = @[@"lock",
-                                      @"globe",
-                                      @"exclamationmark.triangle",
-                                      @"hifispeaker",
-                                      @"pin.circle",
-                                      @"message.circle",
-                                      @"cube.box",
-                                      @"square.and.pencil",
-                                      @"exclamationmark.bubble",
-                                      @"creditcard",
-                                      @"person.crop.square",
-                                      @"camera",
-                                      @"antenna.radiowaves.left.and.right",
-                                      @"square.stack.3d.up",
-                                      @"power",
-                                      @"doc.text.viewfinder",
-                                      @"star.circle",
-                                      @"smallcircle.circle",
-                                      @"tv",
-                                      @"envelope.open",
-                                      @"gear",
-                                      @"doc.on.clipboard",
-                                      @"doc.plaintext",
-                                      @"doc.richtext",
-                                      @"bolt.circle",
-                                      @"envelope.badge",
-                                      @"desktopcomputer",
-                                      @"phone.circle",
-                                      @"at",
-                                      @"terminal.fill", 
-                                      @"terminal",      
-                                      @"printer",
-                                      @"perspective",
-                                      @"square",
-                                      @"wrench",
-                                      @"slider.horizontal.below.rectangle",
-                                      @"selection.pin.in.out",
-                                      @"percent",
-                                      @"uiwindow.split.2x1",
-                                      @"clock",
-                                      @"magnifyingglass.circle",
-                                      @"hexagon",
-                                      @"memories",
-                                      @"trash",
-                                      @"mappin.circle",
-                                      @"clear",
-                                      @"questionmark.circle",
-                                      @"archivebox",
-                                      @"folder",
-                                      @"folder.badge.person.crop",
-                                      @"folder.circle",
-                                      @"lock.open",
-                                      @"lock",
-                                      @"checkmark.circle",
-                                      @"pencil",
-                                      @"book.circle",
-                                      @"airplane",
-                                      @"text.justify",
-                                      @"person.badge.plus",
-                                      @"hammer",
-                                      @"house",
-                                      @"star",
-                                      @"tortoise",
-                                      @"flame",
-                                      @"burn",
-                                      @"w.square",
-                                      @"dollarsign.circle",
-                                      @"signature",
-                                      @"equal.square"];
-        
-        return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+    NSArray<NSString*>* names = @[@"lock",
+                                  @"globe",
+                                  @"exclamationmark.triangle",
+                                  @"hifispeaker",
+                                  @"pin.circle",
+                                  @"message.circle",
+                                  @"cube.box",
+                                  @"square.and.pencil",
+                                  @"exclamationmark.bubble",
+                                  @"creditcard",
+                                  @"person.crop.square",
+                                  @"camera",
+                                  @"antenna.radiowaves.left.and.right",
+                                  @"square.stack.3d.up",
+                                  @"power",
+                                  @"doc.text.viewfinder",
+                                  @"star.circle",
+                                  @"smallcircle.circle",
+                                  @"tv",
+                                  @"envelope.open",
+                                  @"gear",
+                                  @"doc.on.clipboard",
+                                  @"doc.plaintext",
+                                  @"doc.richtext",
+                                  @"bolt.circle",
+                                  @"envelope.badge",
+                                  @"desktopcomputer",
+                                  @"phone.circle",
+                                  @"at",
+                                  @"terminal.fill", 
+                                  @"terminal",      
+                                  @"printer",
+                                  @"perspective",
+                                  @"square",
+                                  @"wrench",
+                                  @"slider.horizontal.below.rectangle",
+                                  @"selection.pin.in.out",
+                                  @"percent",
+                                  @"uiwindow.split.2x1",
+                                  @"clock",
+                                  @"magnifyingglass.circle",
+                                  @"hexagon",
+                                  @"memories",
+                                  @"trash",
+                                  @"mappin.circle",
+                                  @"clear",
+                                  @"questionmark.circle",
+                                  @"archivebox",
+                                  @"folder",
+                                  @"folder.badge.person.crop",
+                                  @"folder.circle",
+                                  @"lock.open",
+                                  @"lock",
+                                  @"checkmark.circle",
+                                  @"pencil",
+                                  @"book.circle",
+                                  @"airplane",
+                                  @"text.justify",
+                                  @"person.badge.plus",
+                                  @"hammer",
+                                  @"house",
+                                  @"star",
+                                  @"tortoise",
+                                  @"flame",
+                                  @"burn",
+                                  @"w.square",
+                                  @"dollarsign.circle",
+                                  @"signature",
+                                  @"equal.square"];
+    
+    return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
 #if TARGET_OS_IPHONE
-            IMAGE_TYPE_PTR img = [UIImage systemImageNamed:obj];
-            return img ? img : [UIImage systemImageNamed:@"lock"];
+        IMAGE_TYPE_PTR img = [UIImage systemImageNamed:obj];
+        return img ? img : [UIImage systemImageNamed:@"lock"];
 #else
-            if (@available(macOS 11.0, *)) {
-                IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
-                return img ? img : kSmallLockImage;
-            } else {
-                return kSmallLockImage; 
-            };
+        if (@available(macOS 11.0, *)) {
+            IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
+            return img ? img : kSmallLockImage;
+        } else {
+            return kSmallLockImage; 
+        };
 #endif
-        }];
-    }
-    else {
-        return loadKeePassIconSet();
-    }
+    }];
 }
 
 static NSArray<IMAGE_TYPE_PTR>* loadKeePassXCIconSet() {
@@ -295,7 +290,6 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet() {
 
 + (IMAGE_TYPE_PTR)getIconForNode:(Node*)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format {
     return [self getIconForNode:vm predefinedIconSet:predefinedIconSet format:format large:NO];
-    
 }
 
 + (IMAGE_TYPE_PTR)getIconForNode:(Node*)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format large:(BOOL)large {

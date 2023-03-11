@@ -55,6 +55,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
         outlineView.delegate = self
         outlineView.dataSource = self
 
+        outlineView.menu?.delegate = self
+
+
+            
         refresh()
 
         listenToModelUpdateNotifications()
@@ -67,6 +71,11 @@ class SideBarViewController: NSViewController, DocumentViewController {
             self.refresh()
         }
 
+        NotificationCenter.default.addObserver(forName: .genericRefreshAllDatabaseViews, object: nil, queue: nil)
+        { [weak self] notification in
+            self?.onGenericRefreshNotificationReceived(notification)
+        }
+        
         
 
         let auditNotificationsOfInterest: [String] = [
@@ -129,6 +138,16 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
                 self.onNotificationReceived(notification)
             }
+        }
+    }
+    
+    func onGenericRefreshNotificationReceived(_ notification: Notification) {
+        if notification.object as? String != database.databaseUuid {
+            return
+        }
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.refresh()
         }
     }
 
@@ -654,13 +673,78 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 }
 
+extension SideBarViewController: NSMenuDelegate {
+    func menuNeedsUpdate(_ menu: NSMenu) {
 
 
+        for item in menu.items {
+            item.isHidden = false
+        }
+        
+        
+        
+        if let recyleBinNode = database.recycleBinNode, navigationContext == .regularHierarchy(recyleBinNode.uuid) {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarFindFavIcons(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarCreateGroup(_:)))
+        }
+        else {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onEmptyRecycleBin(_:)))
+        }
+        
+        
 
+        if case .favourites = navigationContext {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarFindFavIcons(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarItemProperties(_:)))
+        }
+        else {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onToggleFavouriteItemInSideBar(_:)))
+        }
 
+        
 
-
-
+        if case .regularHierarchy(let nodeUuid) = navigationContext {
+            if nodeUuid == database.rootGroup.uuid {
+                hideMenuItemWithTarget(menu, #selector(WindowController.onDeleteSideBarItem(_:)))
+            }
+        }
+        else {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarCreateGroup(_:)))
+        }
+        
+        if case .tags = navigationContext {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSetSideBarItemIcon(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarFindFavIcons(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarItemProperties(_:)))
+        }
+        
+        if case .special = navigationContext {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSetSideBarItemIcon(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarFindFavIcons(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarItemProperties(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onDeleteSideBarItem(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onRenameSideBarItem(_:)))
+        }
+        
+        if case .auditIssues = navigationContext {
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSetSideBarItemIcon(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarFindFavIcons(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarItemProperties(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onDeleteSideBarItem(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onRenameSideBarItem(_:)))
+        }
+    }
+    
+    fileprivate func hideMenuItemWithTarget(_ menu: NSMenu, _ selector : Selector ) {
+        let idx = menu.items.firstIndex { menuItem in
+            menuItem.action == selector
+        }
+        
+        if let idx {
+            menu.item(at: idx)?.isHidden = true
+        }
+    }
+}
 
 extension SideBarViewController: NSOutlineViewDataSource {
     func outlineView(_: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {

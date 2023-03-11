@@ -12,7 +12,12 @@
 #import "NSString+Extensions.h"
 #import "BookmarksHelper.h"
 #import "Utils.h"
-#import "FileManager.h"
+
+#if TARGET_OS_IPHONE
+#import "StrongboxiOSFilesManager.h"
+#else
+#import "StrongboxMacFilesManager.h"
+#endif
 
 #import "Sha256PassThroughOutputStream.h"
 #import "StreamUtils.h"
@@ -366,7 +371,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
     
 #if TARGET_OS_IPHONE 
     if ( keyFileFileName ) {
-        NSURL* localGroupFile = [FileManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:keyFileFileName];
+        NSURL* localGroupFile = [StrongboxFilesManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:keyFileFileName];
         return getByUrl(error, format, localGroupFile);
     }
 #endif

@@ -24,14 +24,13 @@
 #import "ViewController.h"
 #import "AttachmentItem.h"
 #import "CustomFieldTableCellView.h"
-#import "FavIconDownloader.h"
 #import "ClipboardManager.h"
 #import "QRCodePresenterPopover.h"
 #import "OTPToken+Serialization.h"
 #import "ColoredStringHelper.h"
 #import "ClickableSecureTextField.h"
 #import "NSString+Extensions.h"
-#import "FileManager.h"
+#import "StrongboxMacFilesManager.h"
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "NSDate+Extensions.h"
@@ -40,6 +39,12 @@
 #import "PasswordStrengthTester.h"
 #import "PasswordStrengthUIHelper.h"
 #import "NSArray+Extensions.h"
+
+#ifndef NO_FAVICON_LIBRARY
+
+#import "FavIconDownloader.h"
+
+#endif
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -1013,9 +1018,10 @@ static NSString* trimField(NSTextField* textField) {
     
     __weak NodeDetailsViewController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
-    self.selectPredefinedIconController.customIcons = self.model.customIcons.allObjects;
+    self.selectPredefinedIconController.iconPool = self.model.customIcons.allObjects;
     self.selectPredefinedIconController.hideSelectFile = !self.model.formatSupportsCustomIcons;
-    self.selectPredefinedIconController.hideFavIconButton = !self.model.formatSupportsCustomIcons;
+    
+    self.selectPredefinedIconController.hideFavIconButton = !self.model.formatSupportsCustomIcons || !StrongboxProductBundle.supportsFavIconDownloader;
     
     self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
         if(showFindFavIcons) {
@@ -1030,6 +1036,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)showFavIconDownloader {
+#ifndef NO_FAVICON_LIBRARY
     FavIconDownloader *vc = [FavIconDownloader newVC];
     vc.nodes = @[self.node];
     vc.viewModel = self.model;
@@ -1042,6 +1049,7 @@ static NSString* trimField(NSTextField* textField) {
     };
     
     [self presentViewControllerAsSheet:vc];
+#endif
 }
 
 - (void)validateTitleAndIndicateValidityInUI {
@@ -1223,7 +1231,7 @@ static NSString* trimField(NSTextField* textField) {
     NSString* filename = self.sortedAttachmentFileNames[idx];
     DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
     
-    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
+    NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
     
     NSURL* url = [NSURL fileURLWithPath:f];
@@ -1241,7 +1249,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
-    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+    [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
 
@@ -1580,7 +1588,7 @@ static NSString* trimField(NSTextField* textField) {
     }];
     
     NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
-    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+    const NSSet<NSString*> *keePassReserved = Constants.reservedCustomFieldKeys;
     
     if( [existingKeySet containsObject:field.key] ) {
         NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_that_key_already_exists", @"You cannot use that Key here as it already exists in custom fields.");
@@ -1598,7 +1606,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)editExistingCustomField:(CustomField*)field fieldToEdit:(CustomField*)fieldToEdit {
-    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+    const NSSet<NSString*> *keePassReserved = Constants.reservedCustomFieldKeys;
         
     if([keePassReserved containsObject:field.key]) {
         NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_key_reserved", @"You cannot use that Key here as it is reserved for standard KeePass fields.");

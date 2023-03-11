@@ -16,18 +16,12 @@
 #import "ViewController.h"
 #import "SafeStorageProviderFactory.h"
 #import "AboutViewController.h"
-#import "FileManager.h"
 #import "ClipboardManager.h"
 #import "DebugHelper.h"
 #import "MacUrlSchemes.h"
 #import "Shortcut.h"
 #import "NodeDetailsViewController.h"
 #import "Document.h"
-#import "WebDAVStorageProvider.h"
-#import "SFTPStorageProvider.h"
-#import "WebDAVConnections.h"
-#import "SFTPConnections.h"
-#import "SFTPConnectionsManager.h"
 #import "SystemTrayViewController.h"
 #import "MainWindow.h"
 #import "LockScreenViewController.h"
@@ -42,12 +36,24 @@
 #import "MacCustomizationManager.h"
 #import "ProUpgradeIAPManager.h"
 #import "UpgradeWindowController.h"
-#import "GoogleDriveStorageProvider.h"
-#import "DropboxV2StorageProvider.h"
 #import "AutoFillProxyServer.h"
 #import "Strongbox-Swift.h"
 
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS 
+    #import "GoogleDriveStorageProvider.h"
+    #import "DropboxV2StorageProvider.h"
+#endif
+
+#ifndef NO_SFTP_WEBDAV_SP
+    #import "WebDAVStorageProvider.h"
+    #import "SFTPStorageProvider.h"
+    #import "WebDAVConnections.h"
+    #import "SFTPConnections.h"
+    #import "SFTPConnectionsManager.h"
+#endif
+
 NSString* const kUpdateNotificationQuickRevealStateChanged = @"kUpdateNotificationQuickRevealStateChanged";
+static NSString* const kAutoLockIfInBackgroundNotification = @"autoLockAppInBackgroundTimeout";
 
 const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 const NSInteger kTopLevelMenuItemTagFile = 1111;
@@ -70,6 +76,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 @property BOOL explicitQuitRequest;
 @property BOOL firstActivationDone;
 @property BOOL wasLaunchedAsLoginItem;
+
+@property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 
 @end
 
@@ -114,28 +122,27 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     
     
-    
 
     [self determineIfLaunchedAsLoginItem];
-
-
-
-
-
-
+    
+    
+    
+    
     [self initializeInstallSettingsAndLaunchCount];
     
     [self doInitialSetup];
 
     [self listenToEvents];
-            
+    
+    [self startAutoFillProxyServer];
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self doDeferredAppLaunchTasks]; 
     });
 }
 
 - (void)startAutoFillProxyServer {
-    if ( Settings.sharedInstance.runBrowserAutoFillProxyServer ) {
+    if ( Settings.sharedInstance.runBrowserAutoFillProxyServer && Settings.sharedInstance.isPro ) {
         [NativeMessagingManifestInstallHelper installNativeMessagingHostsFiles];
         
         if ( ![AutoFillProxyServer.sharedInstance start] ) {
@@ -187,7 +194,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         [ProUpgradeIAPManager.sharedInstance initialize]; 
     }
     
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [DropboxV2StorageProvider.sharedInstance initialize:Settings.sharedInstance.useIsolatedDropbox];
+#endif
 }
 
 - (void)doDeferredAppLaunchTasks {
@@ -198,8 +207,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }];
 
     [self monitorForQuickRevealKey];
-
-    [self startAutoFillProxyServer];
     
     [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 }
@@ -284,8 +291,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)cleanupWorkingDirectories {
-    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
-    [FileManager.sharedInstance deleteAllTmpWorkingFiles];
+    [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+    [StrongboxFilesManager.sharedInstance deleteAllTmpWorkingFiles];
 }
 
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
@@ -295,12 +302,16 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     
     if ( [url.absoluteString hasPrefix:@"com.googleusercontent.apps"] ) {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
         [GoogleDriveManager.sharedInstance handleUrl:url];
+#endif
     }
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if ([url.absoluteString hasPrefix:@"db"]) {
         [DropboxV2StorageProvider.sharedInstance handleAuthRedirectUrl:url];
         [NSRunningApplication.currentApplication activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
     }
+#endif
 }
 
 - (BOOL)isWindowOfInterest:(NSNotification*)notification {
@@ -348,7 +359,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)checkForAllWindowsClosedScenario:(NSWindow*)windowAboutToBeClosed appIsLaunching:(BOOL)appIsLaunching {
-    NSLog(@"✅ AppDelegate::checkForAllWindowsClosedScenario");
+    NSLog(@"✅ AppDelegate::checkForAllWindowsClosedScenario - currentEvent = [%@]", NSApp.currentEvent);
     
     NSArray* docs = DocumentController.sharedDocumentController.documents;
     NSMutableArray* mainWindows = [docs map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
@@ -406,14 +417,16 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         }
     }
     else {
-        BOOL currentlyClosingDatabasesManager = [windowAboutToBeClosed isMemberOfClass:DatabasesManagerWindow.class];
         
-        if ( Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows && !currentlyClosingDatabasesManager ) {
-            NSLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... launching Databases Manager");
-            
-            [DBManagerPanel.sharedInstance show];
-        }
-        else {
+        
+
+
+
+
+
+
+
+
             if ( Settings.sharedInstance.configuredAsAMenuBarApp ) {
                 NSLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... running as a tray app - hiding dock icon.");
                 
@@ -422,7 +435,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             else {
                 NSLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... but configured to do nothing special.");
             }
-        }
+
     }
 }
 
@@ -430,6 +443,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     NSLog(@"🚀 AppDelegate::showHideDockIcon: [%@] - [%@]", (long)show ? @"SHOW" : @"HIDE", NSThread.currentThread);
 
     if ( show ) {
+        if ( NSApp.activationPolicy != NSApplicationActivationPolicyAccessory ) {
+            NSLog(@"Dock Icon already visible - NOP"); 
+            return;
+        }
+        
         
         
         
@@ -578,12 +596,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     [NSApp arrangeInFront:nil];
-    
-    [NSApp activateIgnoringOtherApps:YES];
-
-    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
-    [NSApp arrangeInFront:nil];
-
     [NSApp activateIgnoringOtherApps:YES];
 
     
@@ -604,6 +616,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     NSLog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
 
+    [self cancelAutoLockInBackgroundTimer];
+    
     [self performedScheduledEntitlementsCheck];
     
     if ( !self.firstActivationDone ) {
@@ -684,7 +698,36 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
+        NSLog(@"🐞 DEBUG - [applicationDidResignActive]");
+    
+    [self startAutoLockForAppInBackgroundTimer];
+}
 
+- (void)cancelAutoLockInBackgroundTimer {
+    if(self.autoLockWorkBlock) {
+        NSLog(@"🐞 DEBUG - Cancelling Background Auto-Lock work block");
+        dispatch_block_cancel(self.autoLockWorkBlock);
+        self.autoLockWorkBlock = nil;
+    }
+}
+
+- (void)startAutoLockForAppInBackgroundTimer {
+    NSInteger timeout = Settings.sharedInstance.autoLockIfInBackgroundTimeoutSeconds;
+    
+    if(timeout != 0) {
+        [self cancelAutoLockInBackgroundTimer];
+        
+        NSLog(@"🐞 DEBUG - [startAutoLockForAppInBackgroundTimer] Creating Background Auto-Lock work block... [timeout = %ld secs]", timeout);
+
+        self.autoLockWorkBlock = dispatch_block_create(0, ^{
+            NSLog(@"🐞 DEBUG - App in Background timeout exceeded -> Sending Notification...");
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:kAutoLockIfInBackgroundNotification object:nil];
+            self.autoLockWorkBlock = nil;
+        });
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), self.autoLockWorkBlock);
+    }
 }
 
 - (void)randomlyShowUpgradeMessage {
@@ -720,15 +763,21 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (IBAction)signOutOfGoogleDrive:(id)sender {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [GoogleDriveManager.sharedInstance signout];
+#endif
 }
 
 - (IBAction)signOutOfOneDrive:(id)sender {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [TwoDriveStorageProvider.sharedInstance signOutAll];
+#endif
 }
 
 - (IBAction)signOutOfDropbox:(id)sender {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [DropboxV2StorageProvider.sharedInstance signOut];
+#endif
 }
 
 
@@ -752,12 +801,19 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(duplicateDocument:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(saveDocumentAs:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(renameDocument:)];
-    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(revertDocumentToSaved:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(moveDocument:)];
+    
+    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
+        NSMenu* fileMenu = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagFile].submenu;
+        
+        
+        
+        NSInteger idx = [fileMenu indexOfItemWithTag:24121980];
+        [fileMenu removeItemAtIndex:idx];
+    }
     
 #ifndef DEBUG
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(onDumpXml:)];
-    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(onFactoryReset:)];
 #endif
     
     
@@ -765,7 +821,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     
     NSMenu* fileMenu = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagFile].submenu;
-    NSInteger openDocumentMenuItemIndex = [fileMenu indexOfItemWithTarget:nil andAction:@selector(openDocument:)];
+    NSInteger openDocumentMenuItemIndex = [fileMenu indexOfItemWithTarget:nil andAction:@selector(originalOpenDocument:)];
 
     if (openDocumentMenuItemIndex>=0 &&
         [[fileMenu itemAtIndex:openDocumentMenuItemIndex+1] hasSubmenu])
@@ -970,9 +1026,11 @@ static NSInteger clipboardChangeCount;
 
 
 - (IBAction)onImportFromCsvFile:(id)sender {
-    NSString* loc = NSLocalizedString(@"mac_csv_file_must_contain_header_and_fields", @"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.");
+    [DBManagerPanel.sharedInstance show]; 
 
-    NSString* message = [NSString stringWithFormat:loc, kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderNotes];
+    NSString* loc = NSLocalizedString(@"mac_csv_file_must_contain_header_and_fields", @"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.");
+
+    NSString* message = [NSString stringWithFormat:loc, kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderTotp, kCSVHeaderNotes];
    
     loc = NSLocalizedString(@"mac_csv_format_info_title", @"CSV Format");
     
@@ -980,46 +1038,21 @@ static NSInteger clipboardChangeCount;
     informativeText:message
              window:NSApplication.sharedApplication.mainWindow
          completion:^{
-        dispatch_async(dispatch_get_main_queue(), ^{[self importFromCsvFile];});
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self requestImportFile:[[CSVImporter alloc] init]];
+        });
     }];
 }
 
-- (void)importFromCsvFile {
-    
-    
-    [DBManagerPanel.sharedInstance show]; 
-
-    NSOpenPanel* panel = [NSOpenPanel openPanel];
-    NSString* loc = NSLocalizedString(@"mac_choose_csv_file_import", @"Choose CSV file to Import");
-    [panel setTitle:loc];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setCanChooseDirectories:NO];
-    [panel setCanChooseFiles:YES];
-    [panel setFloatingPanel:NO];
-     panel.allowedFileTypes = @[@"csv"];
-
-    NSInteger result = [panel runModal];
-    if(result == NSModalResponseOK) {
-        NSURL* url = panel.URLs.firstObject;
-        if ( url ) {
-            NSError* error;
-            Node* root = [CSVImporter importFromUrl:url error:&error];
-            
-            if ( root ) {
-                [self addImportedDatabase:root];
-            }
-            else {
-                [MacAlerts error:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
-                           error:error
-                          window:DBManagerPanel.sharedInstance.window];
-            }
-        }
-    }
+- (IBAction)onImportFromiCloudCsvFile:(id)sender {
+    [self requestImportFile:[[iCloudImporter alloc] init]];
 }
 
-- (IBAction)import1Password1Pif:(id)sender {
-    
-    
+- (IBAction)onImportFromLastPassCsvFile:(id)sender {
+    [self requestImportFile:[[LastPassImporter alloc] init]];
+}
+
+- (IBAction)onImport1Password1Pif:(id)sender {
     [DBManagerPanel.sharedInstance show]; 
 
     NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
@@ -1029,59 +1062,81 @@ static NSInteger clipboardChangeCount;
     informativeText:msg
              window:DBManagerPanel.sharedInstance.window
          completion:^{
-        NSOpenPanel* panel = NSOpenPanel.openPanel;
-        
-        NSString* loc = NSLocalizedString(@"mac_choose_file_import", @"Choose file to Import");
-        [panel setTitle:loc];
-        [panel setAllowsMultipleSelection:NO];
-        [panel setCanChooseDirectories:NO];
-        [panel setCanChooseFiles:YES];
-        [panel setFloatingPanel:NO];
-        panel.allowedFileTypes = @[@"1pif"];
-
-        NSInteger result = [panel runModal];
-        if(result == NSModalResponseOK) {
-            NSURL* url = panel.URLs.firstObject;
-            
-            if ( url ) {
-                NSError* error;
-                Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
-                
-                if ( error ) {
-                    [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
-                }
-                else {
-                    [self addImportedDatabase:root];
-                }
-            }
-            else {
-                [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
-                informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
-                         window:DBManagerPanel.sharedInstance.window
-                     completion:nil];
-            }
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self requestImportFile:[[OnePasswordImporter alloc] init]];
+        });
     }];
 }
 
-- (void)addImportedDatabase:(Node*)root {
-    if ( !root ) {
-        [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
-        informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
-                 window:DBManagerPanel.sharedInstance.window
-             completion:nil];
-        return;
-    }
+- (IBAction)onImport1Password1Pux:(id)sender {
+
+
+
+
+
+
+
+
+
+
+    [self requestImportFile:[[OnePassword1PuxImporter alloc] init]];
+
+
+}
+
+- (void)requestImportFile:(id<Importer>)importer {
+    [DBManagerPanel.sharedInstance show]; 
     
+    NSOpenPanel* panel = [NSOpenPanel openPanel];
+    NSString* loc = NSLocalizedString(@"mac_choose_file_import", @"Choose file to Import");
+    [panel setTitle:loc];
+    [panel setAllowsMultipleSelection:NO];
+    [panel setCanChooseDirectories:NO];
+    [panel setCanChooseFiles:YES];
+    [panel setFloatingPanel:NO];
+    panel.allowedFileTypes = importer.allowedFileTypes;
+    
+    NSInteger result = [panel runModal];
+    if(result == NSModalResponseOK) {
+        NSURL* url = panel.URLs.firstObject;
+        if ( url ) {
+            [self continueImportWithUrl:url importer:importer];
+        }
+    }
+}
+
+- (void)continueImportWithUrl:(NSURL*)url importer:(id<Importer>)importer {
+    NSError* error;
+    DatabaseModel* database = [importer convertWithUrl:url error:&error];
+    
+    if ( error ) {
+        NSLog(@"🔴 %@", error.localizedDescription);
+        [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
+    }
+    else {
+        if ( !database ) {
+            [MacAlerts info:NSLocalizedString(@"import_failed_title", @"🔴 Import Failed")
+            informativeText:NSLocalizedString(@"import_failed_message", @"Strongbox could not import this file. Please check it is in the correct format.")
+                     window:DBManagerPanel.sharedInstance.window
+                 completion:nil];
+            return;
+        }
+        else {
+            [self addImportedDatabase:database];
+        }
+    }
+}
+
+- (void)addImportedDatabase:(DatabaseModel*)database {
     [MacAlerts info:NSLocalizedString(@"import_successful_title", @"✅ Import Successful")
     informativeText:NSLocalizedString(@"import_successful_message", @"Your import was successful! Now, let's set a strong master password and save your new Strongbox database.")
              window:DBManagerPanel.sharedInstance.window
          completion:^{
-        [self setANewCkfsForImportedDatabase:root];
+        [self setNewCkfsForImportedDatabase:database];
     }];
 }
 
-- (void)setANewCkfsForImportedDatabase:(Node*)root {
+- (void)setNewCkfsForImportedDatabase:(DatabaseModel*)database {
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
     NSString* loc = NSLocalizedString(@"mac_please_enter_master_credentials_for_this_database", @"Please Enter the Master Credentials for this Database");
@@ -1092,26 +1147,23 @@ static NSInteger clipboardChangeCount;
     [DBManagerPanel.sharedInstance.window beginSheet:wizard.window
                                    completionHandler:^(NSModalResponse returnCode) {
         if (returnCode == NSModalResponseOK) {
-            [self onWizardDoneWithNewCkfs:wizard root:root];
+            [self onWizardDoneWithNewCkfs:wizard database:database];
         }
     }];
 }
 
-- (void)onWizardDoneWithNewCkfs:(CreateFormatAndSetCredentialsWizard*)wizard root:(Node*)root {
+- (void)onWizardDoneWithNewCkfs:(CreateFormatAndSetCredentialsWizard*)wizard database:(DatabaseModel*)database {
     NSError* error;
     
     CompositeKeyFactors* ckf = [wizard generateCkfFromSelectedFactors:DBManagerPanel.sharedInstance.contentViewController
                                                                 error:&error];
     
     if ( ckf ) {
-        DatabaseFormat format = kKeePass4;
-        DatabaseModel* database = [[DatabaseModel alloc] initWithFormat:format
-                                                    compositeKeyFactors:ckf
-                                                               metadata:[UnifiedDatabaseMetadata withDefaultsForFormat:format]
-                                                                   root:root];
+        database.ckfs = ckf;
         
         DocumentController* dc = DocumentController.sharedDocumentController;
-        [dc serializeAndAddDatabase:database format:format
+        [dc serializeAndAddDatabase:database
+                             format:database.originalFormat
                     keyFileBookmark:wizard.selectedKeyFileBookmark
                       yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
     }
@@ -1281,71 +1333,6 @@ static NSInteger clipboardChangeCount;
     }
 }
 
-- (IBAction)onFactoryReset:(id)sender {
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
 - (void)onProStatusChanged:(id)param {
     NSLog(@"✅ AppDelegate: Pro Status Changed!");
 
@@ -1359,7 +1346,7 @@ static NSInteger clipboardChangeCount;
         [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onUpgradeToFullVersion:)];
     }
     
-    if ( !MacCustomizationManager.isUnifiedBundle ) {
+    if ( !MacCustomizationManager.supportsTipJar ) {
         [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onShowTipJar:)];
     }
     
@@ -1371,7 +1358,7 @@ static NSInteger clipboardChangeCount;
 
         if( index != NSNotFound) {
             NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
-            NSString* fmt = (Settings.sharedInstance.isPro && !MacCustomizationManager.isUnifiedBundle) ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+            NSString* fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
             menuItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
         }
         

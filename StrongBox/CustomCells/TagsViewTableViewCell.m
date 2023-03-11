@@ -70,10 +70,8 @@
            onAdd:(void(^)(NSString* tag))onAdd
            onRemove:(void(^)(NSString* tag))onRemove {
     self.tagsField.readOnly = readOnly;
-    self.tagsField.font = useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;
-    if (@available(iOS 13.0, *)) {
-        self.tagsField.fieldTextColor = UIColor.labelColor;
-    }
+    self.tagsField.font = useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;    
+    self.tagsField.fieldTextColor = UIColor.labelColor;
     
     [self.tagsField addTags:tags];
 

@@ -19,7 +19,7 @@
 #endif
 
 #import <MobileCoreServices/MobileCoreServices.h>
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "AppPreferences.h"
 #import "NSString+Extensions.h"
@@ -260,18 +260,8 @@
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    [self documentPicker:controller didPickDocumentAtURL:url];
-    #pragma GCC diagnostic pop
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     self.onDone([SelectedStorageParameters parametersForFilesApp:url withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
 }
-#pragma GCC diagnostic pop
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSError* error;

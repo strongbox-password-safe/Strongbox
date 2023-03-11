@@ -24,6 +24,14 @@ const size_t kMaxAttachmentTableviewIconImageSize = 4 * 1024 * 1024;
 NSString* const kCanonicalEmailFieldName = @"Email";
 NSString* const kCanonicalFavouriteTag = @"Favorite";
 
+NSString* const kTitleStringKey = @"Title";
+NSString* const kUserNameStringKey = @"UserName";
+NSString* const kPasswordStringKey = @"Password";
+NSString* const kUrlStringKey = @"URL";
+NSString* const kNotesStringKey = @"Notes";
+
+const static NSSet<NSString*> *wellKnownKeys;
+
 + (void)initialize {
     if(self == [Constants class]) {
         kUserInteractionRequiredError = [Utils createNSError:kStorageProviderUserInteractionRequiredErrorMessage errorCode:kStorageProviderUserInteractionRequiredErrorCode];
@@ -32,9 +40,17 @@ NSString* const kCanonicalFavouriteTag = @"Favorite";
         kRecycleBinTintColor = ColorFromRGB(0x008f54); 
 #endif
         
+        wellKnownKeys = [NSSet setWithArray:@[  kTitleStringKey,
+                                                kUserNameStringKey,
+                                                kPasswordStringKey,
+                                                kUrlStringKey,
+                                                kNotesStringKey]];
     }
 }
 
++ (const NSSet<NSString*>*)reservedCustomFieldKeys {
+    return wellKnownKeys;
+}
 
 #if TARGET_OS_IPHONE
 

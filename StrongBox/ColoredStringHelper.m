@@ -57,14 +57,8 @@ static COLOR_PTR defaultNonColorizedColor;
         dark.symbolColor = UIColor.systemYellowColor;
         dark.upperLetterColor = UIColor.systemGreenColor;
         
-        if (@available(iOS 13.0, *)) {
-            dark.lowerLetterColor = UIColor.labelColor;
-            light.lowerLetterColor = UIColor.labelColor;
-        }
-        else {
-            dark.lowerLetterColor = UIColor.darkTextColor;
-            light.lowerLetterColor = UIColor.darkTextColor;
-        }
+        dark.lowerLetterColor = UIColor.labelColor;
+        light.lowerLetterColor = UIColor.labelColor;
 #else
         dark.numberColor = NSColor.systemBlueColor;
         dark.symbolColor = NSColor.systemYellowColor;
@@ -79,12 +73,7 @@ static COLOR_PTR defaultNonColorizedColor;
         
 
 #if TARGET_OS_IPHONE
-        if (@available(iOS 13.0, *)) {
-            defaultNonColorizedColor = UIColor.labelColor;
-        }
-        else {
-            defaultNonColorizedColor = UIColor.darkTextColor;
-        }
+        defaultNonColorizedColor = UIColor.labelColor;
 #else
         defaultNonColorizedColor = NSColor.labelColor;
 #endif

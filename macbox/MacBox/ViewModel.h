@@ -78,8 +78,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property (nonatomic, nullable) CompositeKeyFactors* compositeKeyFactors;
 
-@property (nullable) NSUUID* selectedItem;
-
 @property (nullable, readonly) Model* commonModel;
 @property (readonly, nonatomic) DatabaseModel* database;
 
@@ -101,6 +99,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (void)setItemExpires:(Node*)item expiry:(NSDate*_Nullable)expiry;
 
 - (void)setGroupExpandedState:(Node*)item expanded:(BOOL)expanded;
+- (void)setSearchableState:(Node *)item searchable:(NSNumber*_Nullable)searchable;
 
 - (void)setItemIcon:(Node *)item image:(NSImage*)image;
 - (void)setItemIcon:(Node *)item icon:(NodeIcon*_Nullable)icon;
@@ -149,6 +148,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (void)deleteItems:(const NSArray<Node *>*)items;
 - (BOOL)recycleItems:(const NSArray<Node *>*)items;
 - (BOOL)canRecycle:(Node*_Nonnull)item;
+- (BOOL)isInRecycled:(NSUUID *)itemId;
 
 
 
@@ -206,7 +206,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * customFieldKeySet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * tagSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*> * passwordSet;
+
 
 @property (nonatomic, readonly) NSString * mostPopularUsername;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularUsernames;
@@ -263,9 +263,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (nullable) NSUUID* asyncUpdateId;
 
 - (void)update:(NSViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
-
-- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
-                                completion:(void(^_Nullable)(BOOL success))completion;
 
 
 

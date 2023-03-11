@@ -101,10 +101,8 @@
     [self cell:self.cellUpgradeToV4 setHidden:!self.currentSettings.shouldUpgradeToV4];
     [self cell:self.cellReduceArgon2 setHidden:!self.currentSettings.shouldReduceArgon2Memory];
 
-    if (@available(iOS 13.0, *)) {
-        self.cellUpgradeToV4.imageView.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
-        self.cellReduceArgon2.imageView.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
-    }
+    self.cellUpgradeToV4.imageView.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+    self.cellReduceArgon2.imageView.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
     
     [self cell:self.cellCalibrate setHidden:YES]; 
     

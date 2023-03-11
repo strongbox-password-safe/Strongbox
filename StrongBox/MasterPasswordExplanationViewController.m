@@ -20,9 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    if (@available(iOS 13.0, *)) {
-        self.imageView.image = [UIImage systemImageNamed:@"lock.shield"];
-    }
+    self.imageView.image = [UIImage systemImageNamed:@"lock.shield"];
 }
 
 - (IBAction)onGotIt:(id)sender {

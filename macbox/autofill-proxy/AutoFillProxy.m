@@ -18,6 +18,7 @@
 #include <errno.h>
 
 #import "Utils.h"
+#import "NSData+Extensions.h"
 
 static const int MAX_PATH = 103;
 
@@ -82,6 +83,11 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
 
             break;
         }
+        else {
+
+
+        }
+        
         if ( read == 0 ) {
             NSLog(@"🔴 Read entire message but couldn't get object!");
             break;
@@ -114,6 +120,15 @@ NSString* sendMessageOverSocket (NSString* request, BOOL hardcodeSandboxTestingP
 
     int s = socket (AF_UNIX, SOCK_STREAM, 0);
 
+    
+    const int kBufferSize = 2 * 1024 * 1024;
+    if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, &kBufferSize, sizeof(int)) == -1) {
+        NSLog(@"🔴 Error setting socket SO_RCVBUF opts: %s\n", strerror(errno));
+    }
+    if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, &kBufferSize, sizeof(int)) == -1) {
+        NSLog(@"🔴 Error setting socket SO_SNDBUF opts: %s\n", strerror(errno));
+    }
+    
     int connectReturn = connect (s, (struct sockaddr *)&sun, sun.sun_len);
     if ( connectReturn < 0 ) {
         NSString* errMsg = [NSString stringWithFormat:@"connect failed! [%s]", strerror(errno)];

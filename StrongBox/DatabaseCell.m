@@ -216,12 +216,7 @@ rotateLastImage:(BOOL)rotateLastImage
         }
         
         if(database.readOnly) {
-            if (@available(iOS 13.0, *)) {
-                [ret addObject:[UIImage systemImageNamed:@"eyeglasses"]];
-            } else {
-                [ret addObject:[UIImage imageNamed:@"glasses"]];
-            }
-
+            [ret addObject:[UIImage systemImageNamed:@"eyeglasses"]];
             [tnts addObject:UIColor.systemGrayColor];
         }
     }
@@ -236,13 +231,7 @@ rotateLastImage:(BOOL)rotateLastImage
         syncState == kSyncOperationStateBackgroundButUserInteractionRequired ||
         syncState == kSyncOperationStateUserCancelled) {
         
-        UIImage* syncImage;
-        if (@available(iOS 14.0, *)) { 
-            syncImage = [UIImage systemImageNamed:@"arrow.triangle.2.circlepath"];
-        }
-        else {
-            syncImage = [UIImage imageNamed:@"syncronize"];
-        }
+        UIImage* syncImage = [UIImage systemImageNamed:@"arrow.triangle.2.circlepath"];
         
         [ret addObject:syncImage];
         [tnts addObject:syncState == kSyncOperationStateError ? UIColor.redColor : (syncState == kSyncOperationStateInProgress ? NSNull.null : UIColor.orangeColor)];

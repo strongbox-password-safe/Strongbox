@@ -45,6 +45,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
         installForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Dev/NativeMessagingHosts/")
         installForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Canary/NativeMessagingHosts/")
         installForChromiumBasedBrowser("Library/Application Support/Vivaldi/NativeMessagingHosts/")
+        installForChromiumBasedBrowser("Library/Application Support/Arc/User Data/NativeMessagingHosts")
     }
     
     @objc
@@ -61,6 +62,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
         removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Dev/NativeMessagingHosts/")
         removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Canary/NativeMessagingHosts/")
         removeForChromiumBasedBrowser("Library/Application Support/Vivaldi/NativeMessagingHosts/")
+        removeForChromiumBasedBrowser("Library/Application Support/Arc/User Data/NativeMessagingHosts")
     }
     
     class func removeForFirefox () {

@@ -20,20 +20,30 @@ class HyperlinkTextField: NSTextField {
         return str.urlExtendedParse
     }
 
+    var linkColor : NSColor = .linkColor {
+        didSet {
+            refresh()
+        }
+    }
+    
     var href: String = "" {
         didSet {
-            if let _ = parsedUrl {
-                let attributes: [NSAttributedString.Key: Any] = [
-                    NSAttributedString.Key.foregroundColor: NSColor.linkColor,
-                    NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue as AnyObject,
-                ]
-                attributedStringValue = NSAttributedString(string: href, attributes: attributes)
-            } else {
-                attributedStringValue = NSAttributedString(string: href)
-            }
+            refresh()
         }
     }
 
+    func refresh( ) {
+        if let _ = parsedUrl {
+            let attributes: [NSAttributedString.Key: Any] = [
+                NSAttributedString.Key.foregroundColor: linkColor,
+                NSAttributedString.Key.underlineStyle: NSUnderlineStyle.single.rawValue as AnyObject,
+            ]
+            attributedStringValue = NSAttributedString(string: href, attributes: attributes)
+        } else {
+            attributedStringValue = NSAttributedString(string: href)
+        }
+    }
+    
     override func resetCursorRects() {
         discardCursorRects()
 
@@ -48,4 +58,23 @@ class HyperlinkTextField: NSTextField {
             onClicked?()
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

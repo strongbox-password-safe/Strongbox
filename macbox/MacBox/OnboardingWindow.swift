@@ -24,6 +24,8 @@ class OnboardingWindow : NSWindow {
         
         win.makeKeyAndOrderFront(self)
         
+        win.level = .floating 
+        
         return win
     }
     

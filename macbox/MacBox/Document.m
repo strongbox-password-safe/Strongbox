@@ -31,6 +31,7 @@
 #import "DatabasesManagerVC.h"
 
 NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationFullReload"; 
+NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAllDatabaseViews";
 
 @interface Document ()
 

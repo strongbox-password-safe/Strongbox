@@ -264,14 +264,8 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
 }
 
 - (void)checkForSaleAndNotify {
-#if TARGET_OS_IPHONE
-    if (@available(iOS 11.2, *)) {
-#else
-    if (@available(macOS 10.13.2, *)) {
-#endif
-      if(self.yearlyProduct.introductoryPrice) {
-            [NSNotificationCenter.defaultCenter postNotificationName:kAppStoreSaleNotificationKey object:nil];
-        }
+  if(self.yearlyProduct.introductoryPrice) {
+        [NSNotificationCenter.defaultCenter postNotificationName:kAppStoreSaleNotificationKey object:nil];
     }
 }
 
@@ -360,20 +354,12 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
 }
 
 - (BOOL)isFreeTrialAvailable {
-#if TARGET_OS_IPHONE
-    if (@available(iOS 11.2, *)) {
-#else
-    if (@available(macOS 10.13.2, *)) {
-#endif
-        SKProduct* product = self.yearlyProduct;        
-        SKProductDiscount* introPrice = product ? product.introductoryPrice : nil;
-        
-        BOOL ret = (introPrice != nil) && [introPrice.price isEqual:NSDecimalNumber.zero];
-        
-        return ret;
-    }
+    SKProduct* product = self.yearlyProduct;
+    SKProductDiscount* introPrice = product ? product.introductoryPrice : nil;
     
-    return NO;
+    BOOL ret = (introPrice != nil) && [introPrice.price isEqual:NSDecimalNumber.zero];
+    
+    return ret;
 }
     
 @end

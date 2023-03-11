@@ -94,9 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL readOnly;
 @property BrowseViewType browseViewType;
 @property BrowseTapAction tapAction;
-@property BrowseTapAction doubleTapAction;
-@property BrowseTapAction tripleTapAction;
-@property BrowseTapAction longPressTapAction;
 
 @property BrowseItemSubtitleField browseItemSubtitleField;
 @property BOOL immediateSearchOnBrowse;

@@ -8,7 +8,12 @@
 
 #import "WorkingCopyManager.h"
 #import "Utils.h"
-#import "FileManager.h"
+
+#if TARGET_OS_IPHONE
+#import "StrongboxiOSFilesManager.h"
+#else
+#import "StrongboxMacFilesManager.h"
+#endif
 
 @implementation WorkingCopyManager
 
@@ -111,7 +116,7 @@
         return nil;
     }
     
-    return [FileManager.sharedInstance.syncManagerLocalWorkingCachesDirectory URLByAppendingPathComponent:databaseUuid];
+    return [StrongboxFilesManager.sharedInstance.syncManagerLocalWorkingCachesDirectory URLByAppendingPathComponent:databaseUuid];
 }
 
 - (NSURL*)getLocalWorkingCache:(NSString*)databaseUuid {

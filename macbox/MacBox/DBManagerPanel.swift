@@ -25,4 +25,11 @@ class DBManagerPanel: NSWindowController {
         showWindow(nil)
     }
     
+    @objc
+    public func hide() {
+        
+        
+        window?.orderOut(nil)
+    }
+    
 }

@@ -70,20 +70,16 @@
     self.imageViewChangeCreds.image = [UIImage imageNamed:@"key"];
     self.imageViewAutoLock.image = [UIImage imageNamed:@"unlock"];
 
-    if (@available(iOS 13.0, *)) {
-        self.imageViewPreferences.image = [UIImage systemImageNamed:@"list.bullet"];
-        self.imageViewDatabaseOperations.image = [UIImage systemImageNamed:@"wrench"];
-        self.imageViewAudit.image = [UIImage systemImageNamed:@"checkmark.shield"];
-        self.imageViewAudit.preferredSymbolConfiguration = [UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightLight];
-        self.imageViewEncryptionSettings.image = [UIImage systemImageNamed:@"function"];
-        self.imageViewAutoLock.image = [UIImage systemImageNamed:@"lock.rotation.open"];
+    self.imageViewPreferences.image = [UIImage systemImageNamed:@"list.bullet"];
+    self.imageViewDatabaseOperations.image = [UIImage systemImageNamed:@"wrench"];
+    self.imageViewAudit.image = [UIImage systemImageNamed:@"checkmark.shield"];
+    self.imageViewAudit.preferredSymbolConfiguration = [UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightLight];
+    self.imageViewEncryptionSettings.image = [UIImage systemImageNamed:@"function"];
+    self.imageViewAutoLock.image = [UIImage systemImageNamed:@"lock.rotation.open"];
 
-        if (@available(iOS 14.0, *)) {
-            self.imageViewAutoFill.image = [UIImage systemImageNamed:@"rectangle.and.pencil.and.ellipsis"];
-            self.imageViewScheduledExport.image = [UIImage systemImageNamed:@"externaldrive.badge.timemachine"];
-            self.imageViewChangeCreds.image = [UIImage systemImageNamed:@"key"];
-        }
-    }
+    self.imageViewAutoFill.image = [UIImage systemImageNamed:@"rectangle.and.pencil.and.ellipsis"];
+    self.imageViewScheduledExport.image = [UIImage systemImageNamed:@"externaldrive.badge.timemachine"];
+    self.imageViewChangeCreds.image = [UIImage systemImageNamed:@"key"];
     
     NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"convenience_unlock_preferences_title_fmt", @"%@ & PIN Codes"), BiometricsManager.sharedInstance.biometricIdName];
     
@@ -94,11 +90,8 @@
     
     self.cellChangeCreds.userInteractionEnabled = [self canSetCredentials];
     
-    if (@available(iOS 13.0, *)) {
-        self.labelChangeCreds.textColor = [self canSetCredentials] ? nil : UIColor.secondaryLabelColor;
-    } else {
-        self.labelChangeCreds.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
-    }
+    
+    self.labelChangeCreds.textColor = [self canSetCredentials] ? nil : UIColor.secondaryLabelColor;
     
     self.labelChangeCreds.text = self.viewModel.database.originalFormat == kPasswordSafe ?
         NSLocalizedString(@"db_management_change_master_password", @"Change Master Password") :

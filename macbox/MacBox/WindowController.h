@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WindowController : NSWindowController <NSMenuItemValidation, NSMenuDelegate>
 
+- (void)copyConcealedAndMaybeMinimize:(NSString*)string;
 - (void)changeContentView;
 - (BOOL)placeItemsOnPasteboard:(NSPasteboard*)pasteboard items:(NSArray<Node*>*)items;
 - (NSUInteger)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
@@ -36,6 +37,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)onDatabaseAutoFillSettings:(id)sender;
 - (IBAction)onDatabaseEncryptionSettings:(id)sender;
 - (IBAction)onChangeMasterPassword:(id)sender;
+- (IBAction)onEmptyRecycleBin:(id)sender;
+- (IBAction)onToggleFavouriteItemInSideBar:(id)sender;
+- (IBAction)onSideBarCreateGroup:(id)sender;
+- (IBAction)onSideBarFindFavIcons:(id)sender;
+- (IBAction)onSideBarItemProperties:(id)sender;
+- (IBAction)onDeleteSideBarItem:(id)sender;
+- (IBAction)onSetSideBarItemIcon:(id)sender;
+- (IBAction)onRenameSideBarItem:(id)sender;
 
 - (Node*_Nullable)getSingleSelectedItem; 
 

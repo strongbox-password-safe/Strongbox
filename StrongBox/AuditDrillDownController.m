@@ -179,12 +179,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"auditDrillDownBasicCellId" forIndexPath:indexPath];
         cell.accessoryType = UITableViewCellAccessoryNone;
         
-        if (@available(iOS 13.0, *)) {
-            cell.imageView.image = [UIImage systemImageNamed:@"checkmark.shield"];
-        }
-        else {
-            cell.imageView.image = [UIImage imageNamed:@"security_checked"];
-        }
+        cell.imageView.image = [UIImage systemImageNamed:@"checkmark.shield"];
         
         if (self.flags.count == 0) {
             if ([self.model isExcludedFromAudit:self.itemId]) {

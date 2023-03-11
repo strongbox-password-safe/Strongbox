@@ -26,12 +26,10 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if #available(iOS 10.3, *) {
-            if UIApplication.shared.alternateIconName == nil {
-                buttonReset.isEnabled = false
-                buttonReset.tintColor = UIColor.clear
-                navigationController?.isToolbarHidden = true
-            }
+        if UIApplication.shared.alternateIconName == nil {
+            buttonReset.isEnabled = false
+            buttonReset.tintColor = UIColor.clear
+            navigationController?.isToolbarHidden = true
         }
     }
 
@@ -140,14 +138,12 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
     }
 
     func setTheIcon(_ icon: CustomAppIcon? = nil) {
-        if #available(iOS 10.3, *) {
-            UIApplication.shared.setAlternateIconName(icon?.plistKey) { [weak self] error in
-                if let error = error {
-                    NSLog("🔴 Error setting alternate app icon [%@]", String(describing: error))
-                    Alerts.error(self, error: error)
-                } else {
-                    self?.dismiss(animated: true, completion: nil)
-                }
+        UIApplication.shared.setAlternateIconName(icon?.plistKey) { [weak self] error in
+            if let error = error {
+                NSLog("🔴 Error setting alternate app icon [%@]", String(describing: error))
+                Alerts.error(self, error: error)
+            } else {
+                self?.dismiss(animated: true, completion: nil)
             }
         }
     }

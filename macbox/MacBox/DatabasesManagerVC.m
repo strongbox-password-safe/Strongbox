@@ -16,25 +16,32 @@
 #import "AutoFillManager.h"
 #import "SafeStorageProviderFactory.h"
 #import "AddDatabaseSelectStorageVC.h"
-#import "SFTPStorageProvider.h"
 #import "SyncLogViewController.h"
 #import "MacSyncManager.h"
 #import "Document.h"
-#import "WebDAVStorageProvider.h"
 #import "MacUrlSchemes.h"
 #import "BackupsViewController.h"
 #import "BackupsManager.h"
 #import "Utils.h"
 #import "WorkingCopyManager.h"
-#import "SFTPConnectionsManager.h"
-#import "WebDAVConnectionsManager.h"
 #import "NSDate+Extensions.h"
 #import "macOSSpinnerUI.h"
 #import "DatabasesManager.h"
-#import "GoogleDriveStorageProvider.h"
-#import "DropboxV2StorageProvider.h"
-#import "Strongbox-Swift.h"
 #import "AboutViewController.h"
+
+#ifndef NO_SFTP_WEBDAV_SP
+    #import "SFTPStorageProvider.h"
+    #import "SFTPConnectionsManager.h"
+    #import "WebDAVConnectionsManager.h"
+    #import "WebDAVStorageProvider.h"
+#endif
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    #import "GoogleDriveStorageProvider.h"
+    #import "DropboxV2StorageProvider.h"
+#endif
+
+#import "Strongbox-Swift.h"
 
 
 
@@ -58,6 +65,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 @property (weak) IBOutlet ClickableTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonProperties;
 @property (strong) IBOutlet NSMenu *dummyStrongReferenceToMenuToPreventCrash;
+@property (weak) IBOutlet NSPopUpButton *buttonAdd;
 
 @end
 
@@ -132,11 +140,30 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     }
 
+    
+    
+    [self customizeAddButtonMenu];
+    
+    
+    
     [self listenToEvents];
     
     [self bindVersionSubtitle];
     
     [self startRefreshTimer];
+}
+
+- (void)customizeAddButtonMenu {
+    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddGoogleDriveDatabase:)];
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddDropboxDatabase:)];
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddOneDriveDatabase:)];
+    }
+
+    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddSFTPDatabase:)];
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddWebDav:)];
+    }
 }
 
 - (void)listenToEvents {
@@ -278,6 +305,16 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     return self.databaseIds.count;
 }
 
+- (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
+    NSString* databaseId = [self.databaseIds objectAtIndex:row];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
+    
+    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV;
+    BOOL disabled = database.storageProvider != kMacFile && filesOnly;
+
+    return !disabled;
+}
+
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
     
     
@@ -286,7 +323,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     NSString* databaseId = [self.databaseIds objectAtIndex:row];
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 
-    [result setWithDatabase:database];
+    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV;
+    BOOL disabled = database.storageProvider != kMacFile && filesOnly;
+    
+    [result setWithDatabase:database disabled:disabled];
 
     __weak DatabasesManagerVC* weakSelf = self;
 
@@ -339,7 +379,14 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 - (void)openDatabase:(MacDatabasePreferences*)database offline:(BOOL)offline {
     DocumentController* dc = DocumentController.sharedDocumentController;
+    
+    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV;
+    BOOL disabled = database.storageProvider != kMacFile && filesOnly;
 
+    if ( disabled ) {
+        NSLog(@"🔴 Attempt to unlock unsupported Database Storage Provider");
+        return;
+    }
 
     
     Model* existing = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
@@ -390,24 +437,29 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (IBAction)onAddGoogleDriveDatabase:(id)sender {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     GoogleDriveStorageProvider* storageProvider = GoogleDriveStorageProvider.sharedInstance;
-    
     [self showStorageBrowserForProvider:storageProvider];
+#endif
 }
 
 - (IBAction)onAddDropboxDatabase:(id)sender {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     DropboxV2StorageProvider* storageProvider = DropboxV2StorageProvider.sharedInstance;
     
     [self showStorageBrowserForProvider:storageProvider];
+#endif
 }
 
 - (IBAction)onAddOneDriveDatabase:(id)sender {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     TwoDriveStorageProvider* storageProvider = TwoDriveStorageProvider.sharedInstance;
-    
     [self showStorageBrowserForProvider:storageProvider];
+#endif
 }
 
 - (void)onAddSFTPDatabase:(id)sender {
+#ifndef NO_SFTP_WEBDAV_SP
     SFTPConnectionsManager* vc = [SFTPConnectionsManager instantiateFromStoryboard];
 
     __weak DatabasesManagerVC* weakSelf = self;
@@ -420,9 +472,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     };
         
     [self presentViewControllerAsSheet:vc];
+#endif
 }
 
 - (IBAction)onAddWebDav:(id)sender {
+#ifndef NO_SFTP_WEBDAV_SP
     WebDAVConnectionsManager* vc = [WebDAVConnectionsManager instantiateFromStoryboard];
     
     __weak DatabasesManagerVC* weakSelf = self;
@@ -435,8 +489,12 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     };
         
     [self presentViewControllerAsSheet:vc];
+#endif
 }
 
+
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 - (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider {
     AddDatabaseSelectStorageVC* vc = [AddDatabaseSelectStorageVC newViewController];
     vc.provider = provider;
@@ -465,6 +523,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     [self presentViewControllerAsSheet:vc];
 }
+#endif
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
     [self bindUi];
@@ -867,6 +926,23 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kUpdateNotificationDatabasePreferenceChanged object:databaseUuid userInfo:@{ }];
     });
+}
+
+
+- (void)removeMenuItemFromAddButtonMenu:(SEL)action {
+    NSMenu* topLevelMenuItem = self.buttonAdd.menu;
+    
+    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.action == action;
+    }];
+    
+    if( topLevelMenuItem &&  index != NSNotFound) {
+        
+        [topLevelMenuItem removeItemAtIndex:index];
+    }
+    else {
+        
+    }
 }
 
 @end

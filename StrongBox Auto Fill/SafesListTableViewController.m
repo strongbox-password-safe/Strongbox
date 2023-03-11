@@ -87,9 +87,7 @@
     
     [SVProgressHUD setViewForExtension:self.view];
     
-    if (@available(iOS 13.0, *)) { 
-        [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
-    }
+    [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
 }
 
 - (void)refreshSafes {

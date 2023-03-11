@@ -27,7 +27,7 @@
 #import "WelcomeAddDatabaseViewController.h"
 #import "WelcomeCreateDoneViewController.h"
 #import "NSArray+Extensions.h"
-#import "FileManager.h"
+#import "StrongboxiOSFilesManager.h"
 #import "LocalDeviceStorageProvider.h"
 #import "Utils.h"
 #import "DatabasesViewPreferencesController.h"
@@ -83,6 +83,7 @@
 #import "WebDAVProviderData.h"
 #import "ContextMenuHelper.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 #import "Strongbox-Swift.h"
 #import "CSVImporter.h"
@@ -109,7 +110,6 @@
 @property DatabasePreferences* unlockedDatabase; 
 @property BOOL appLockSuppressedForBiometricAuth;
 
-@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonDice;
 @property BOOL openingDatabaseInProgress;
 @property NSString* importFormat;
@@ -120,14 +120,21 @@
 
 @implementation SafesViewController
 
-- (void)migrateToLazySync { 
+- (void)migrateToLazySync {
+    
+    
+    
+    
     if ( !AppPreferences.sharedInstance.hasMigratedToLazySync ) {
         AppPreferences.sharedInstance.hasMigratedToLazySync = YES;
         
         for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
-            if ( database.storageProvider == kSFTP || database.storageProvider == kWebDAV ) {
-                NSLog(@"Migrating SFTP/WebDAV Database [%@] to lazy sync", database.nickName);
-                database.lazySyncMode = YES;
+            if (
+                
+                
+                database.storageProvider == kTwoDrive ) { 
+                NSLog(@"Migrating OneDrive Database [%@] to non lazy sync", database.nickName);
+                database.lazySyncMode = NO;
             }
         }
     }
@@ -141,10 +148,8 @@
     NSLog(@"SafesViewController::viewDidLoad");
 
     self.tableView.hidden = YES;
-
     
     [self migrateToLazySync];
-    
     
     [self customizeUI];
             
@@ -226,7 +231,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    
+
     NSLog(@"SafesViewController::viewDidAppear");
 }
 
@@ -235,12 +240,7 @@
         self.navigationItem.prompt = nil;
     }
     else {
-        if (@available(iOS 13.0, *)) {
-            self.navigationItem.prompt = NSLocalizedString(@"hint_tap_and_hold_to_see_options", @"TIP: Tap and hold item to see options");
-        }
-        else {
-            self.navigationItem.prompt = NSLocalizedString(@"safes_vc_tip", @"Tip displayed at top of screen. Slide left on Database for options");
-        }
+        self.navigationItem.prompt = NSLocalizedString(@"hint_tap_and_hold_to_see_options", @"TIP: Tap and hold item to see options");
     } 
 }
 
@@ -271,17 +271,7 @@
         UIMutableApplicationShortcutItem *mutableShortcutItem = [[UIMutableApplicationShortcutItem alloc] initWithType:@"quick-launch"  localizedTitle:database.nickName];
 
         mutableShortcutItem.userInfo = @{ @"uuid" : database.uuid };
-        
-        if (@available(iOS 13.0, *)) {
-            if (@available(iOS 14.0, *)) {
-                mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithSystemImageName:@"cylinder.split.1x2"]; 
-            }
-            else {
-                mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithTemplateImageName:@"rocket"]; 
-            }
-        }
-        
-
+        mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithSystemImageName:@"cylinder.split.1x2"];
         
         [shortcuts addObject:mutableShortcutItem.copy];
     }
@@ -311,15 +301,10 @@
 }
 
 - (void)customizeUI {
-    if (@available(iOS 13.0, *)) { 
-        [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
-    }
-    
-    if (@available(iOS 14.0, *)) { 
-        [self.barButtonDice setImage:[UIImage systemImageNamed:@"die.face.6"]];
+    [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
+    [self.barButtonDice setImage:[UIImage systemImageNamed:@"die.face.6"]];
 
-        [self customizeAddDatabaseButton];
-    }
+    [self customizeAddDatabaseButton];
     
     [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_preferences", @"Preferences")];
     [self.buttonCustomizeView setAccessibilityLabel:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")];
@@ -330,7 +315,7 @@
     [self setupTableview];
 }
 
-- (void)customizeAddDatabaseButton API_AVAILABLE(ios(14.0)) {
+- (void)customizeAddDatabaseButton {
     __weak SafesViewController* weakSelf = self;
 
     UIMenuElement* quickStart = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_quick_start", @"Get Started Wizard")
@@ -364,16 +349,28 @@
         [weakSelf performSegueWithIdentifier:@"segueToLocalNetworkServer" sender:nil];
     }];
 
-    UIMenuElement* import1P = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_1password", @"Import 1Password")
-                                             systemImage:@"square.and.arrow.down"
+    UIMenuElement* import1P = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_1password_1pif", @"1Password (1Pif)")
                                                  handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImport1Password];
     }];
 
-    UIMenuElement* importCsv = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_csv", @"Import CSV")
-                                              systemImage:@"squareshape.split.3x3"
+    UIMenuElement* import1P1Pux = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_1password_1pux", @"1Password (1Pux)")
+                                                 handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImport1Password1Pux];
+    }];
+
+    UIMenuElement* importLastPass = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_lastpass", @"LastPass (CSV)")
+                                                     handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportLastPass];
+    }];
+    UIMenuElement* importiCloud = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_icloud", @"Apple/iCloud Keychain (CSV)")
+                                                     handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportiCloud];
+    }];
+
+    UIMenuElement* importCsv = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_csv", @"CSV...")
                                                   handler:^(__kindof UIAction * _Nonnull action) {
-        [weakSelf onImport1Csv];
+        [weakSelf onImportGenericCsv];
     }];
 
     UIMenu* menu1 = [UIMenu menuWithTitle:@""
@@ -394,17 +391,24 @@
                                  options:UIMenuOptionsDisplayInline
                                 children:@[wifiTransfer]];
 
-    UIMenu* advanced = [UIMenu menuWithTitle:NSLocalizedString(@"safesvc_more_submenu", @"More")
-                                         image:[UIImage systemImageNamed:@"ellipsis.circle"]
-                                    identifier:nil
-                                       options:kNilOptions
-                                      children:@[import1P, importCsv]];
+    UIMenu* import = [UIMenu menuWithTitle:NSLocalizedString(@"safesvc_import_submenu", @"Import")
+                                     image:[UIImage systemImageNamed:@"square.and.arrow.down"]
+                                identifier:nil
+                                   options:UIMenuOptionsDisplayInline
+                                  children:@[import1P1Pux, import1P, importLastPass, importiCloud, importCsv]];
+
+    
+    UIMenu* more = [UIMenu menuWithTitle:NSLocalizedString(@"safesvc_more_submenu", @"More")
+                                   image:[UIImage systemImageNamed:@"ellipsis.circle"]
+                              identifier:nil
+                                 options:kNilOptions
+                                children:@[import]];
 
     UIMenu* menu = [UIMenu menuWithTitle:@""
                                    image:nil
                               identifier:nil
                                  options:kNilOptions
-                                children:AppPreferences.sharedInstance.disableNetworkBasedFeatures ? @[menu1, menu2, advanced] : @[menu1, menu2, menuWifi, advanced]];
+                                children:AppPreferences.sharedInstance.disableNetworkBasedFeatures ? @[menu1, menu2, more] : @[menu1, menu2, menuWifi, more]];
 
     self.buttonAddSafe.action = nil;
     self.buttonAddSafe.menu = menu;
@@ -766,18 +770,6 @@
     
     self.tableView.tableFooterView = [UIView new];
     self.tableView.rowHeight = UITableViewAutomaticDimension;
-
-    if (@available(iOS 13.0, *)) { 
-        
-    }
-    else {
-        self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                                    initWithTarget:self
-                                    action:@selector(handleLongPress)];
-        self.longPressRecognizer.minimumPressDuration = 1;
-        self.longPressRecognizer.cancelsTouchesInView = YES;
-        [self.tableView addGestureRecognizer:self.longPressRecognizer];
-    }
     
     UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
     [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
@@ -792,15 +784,6 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.tableView.refreshControl endRefreshing];
     });
-}
-
-- (void)handleLongPress {
-    if (!self.tableView.editing) {
-        [self setEditing:YES animated:YES];
-        
-        UIImpactFeedbackGenerator* gen = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
-        [gen impactOccurred];
-    }
 }
 
 - (NSAttributedString*)getEmptyDatasetTitle {
@@ -1037,7 +1020,7 @@
 
 
 
-- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)){
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
     return [UIContextMenuConfiguration configurationWithIdentifier:nil
                                                    previewProvider:nil
                                                     actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
@@ -1068,7 +1051,7 @@
     }];
 }
 
-- (UIAction*)getContextualViewBackupsAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualViewBackupsAction:(NSIndexPath*)indexPath   {
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
@@ -1081,7 +1064,7 @@
     return ret;
 }
 
-- (UIAction*)getContextualViewSyncLogAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualViewSyncLogAction:(NSIndexPath*)indexPath  {
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
@@ -1094,7 +1077,7 @@
     return ret;
 }
 
-- (UIMenu*)getContextualMenuDatabaseNonMutatatingActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIMenu*)getContextualMenuDatabaseNonMutatatingActions:(NSIndexPath*)indexPath  {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
 
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
@@ -1132,7 +1115,7 @@
                         children:ma];
 }
 
-- (UIAction*)getContextualReOrderDatabasesAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualReOrderDatabasesAction:(NSIndexPath*)indexPath   {
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
                                     systemImage:@"arrow.up.arrow.down"
                                     
@@ -1143,7 +1126,7 @@
     return ret;
 }
 
-- (UIMenu*)getContextualMenuDatabaseStateActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIMenu*)getContextualMenuDatabaseStateActions:(NSIndexPath*)indexPath  {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
@@ -1169,7 +1152,7 @@
                         children:ma];
 }
 
-- (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
+- (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     DatabasePreferences *safe = self.collection[indexPath.row];
 
@@ -1193,7 +1176,7 @@
                         children:ma];
 }
 
-- (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath  {
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"generic_export", @"Export")
                                     systemImage:@"square.and.arrow.up"
                                     
@@ -1204,7 +1187,7 @@
     return ret;
 }
 
-- (UIAction*)getContextualMenuMakeVisibleAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuMakeVisibleAction:(NSIndexPath*)indexPath {
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
@@ -1222,7 +1205,7 @@
     return ret;
 }
 
-- (UIAction*)getContextualMenuQuickLaunchAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuQuickLaunchAction:(NSIndexPath*)indexPath {
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
     
@@ -1240,7 +1223,7 @@
     return ret;
 }
 
-- (UIAction*)getContextualMenuAutoFillQuickLaunchAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuAutoFillQuickLaunchAction:(NSIndexPath*)indexPath {
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:safe.uuid];
     
@@ -1258,7 +1241,7 @@
     return ret;
 }
 
-- (UIAction*)getContextualMenuPropertiesAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuPropertiesAction:(NSIndexPath*)indexPath  {
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     NSString* title = NSLocalizedString(@"browse_vc_action_properties", @"Properties");
@@ -1273,7 +1256,7 @@
     return ret;
 }
 
-- (UIAction*)getContextualMenuReadOnlyAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuReadOnlyAction:(NSIndexPath*)indexPath  {
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     NSString* title = NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read Only");
@@ -1290,7 +1273,7 @@
     return ret;
 }
 
-- (UIAction*)getContextualMenuUnlockManualAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuUnlockManualAction:(NSIndexPath*)indexPath  {
     return [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_unlock_manual_action", @"Open ths database manually bypassing any convenience unlock")
                            systemImage:@"lock.open"
                            
@@ -1299,7 +1282,7 @@
     }];
 }
 
-- (UIAction*)getContextualMenuOpenOfflineAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuOpenOfflineAction:(NSIndexPath*)indexPath  {
     return [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
                            systemImage:@"bolt.horizontal.circle"
                            
@@ -1308,7 +1291,7 @@
     }];
 }
 
-- (UIAction*)getContextualMenuOpenOnlineAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualMenuOpenOnlineAction:(NSIndexPath*)indexPath  {
     return [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_slide_left_open_online_action", @"Open this database online action")
                            systemImage:@"bolt.horizontal.circle"
                            
@@ -1317,7 +1300,7 @@
     }];
 }
 
-- (UIAction*)getContextualMenuRenameAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuRenameAction:(NSIndexPath*)indexPath  {
     return [ContextMenuHelper getItem:NSLocalizedString(@"generic_rename", @"Rename")
                            systemImage:@"pencil"
                            
@@ -1326,8 +1309,8 @@
     }];
 }
     
-- (UIAction*)getContextualMenuCreateLocalCopyAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
-    UIImage* img = Platform.iOS13Available ? [UIImage systemImageNamed:@"doc.on.doc"] : [UIImage imageNamed:@"copy"];
+- (UIAction*)getContextualMenuCreateLocalCopyAction:(NSIndexPath*)indexPath {
+    UIImage* img = [UIImage systemImageNamed:@"doc.on.doc"];
 
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
@@ -1347,8 +1330,8 @@
     return ret;
 }
 
-- (UIAction*)getContextualMenuMergeAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
-    UIImage* img = Platform.iOS14Available ? [UIImage systemImageNamed:@"arrow.triangle.merge"] : [UIImage imageNamed:@"paper_plane"];
+- (UIAction*)getContextualMenuMergeAction:(NSIndexPath*)indexPath  {
+    UIImage* img = [UIImage systemImageNamed:@"arrow.triangle.merge"];
 
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
@@ -1360,8 +1343,8 @@
     }];
 }
 
-- (UIAction*)getContextualMenuEditConnectionAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
-    UIImage* img = Platform.iOS14Available ? [UIImage systemImageNamed:@"externaldrive.connected.to.line.below"] : [UIImage imageNamed:@"link"];
+- (UIAction*)getContextualMenuEditConnectionAction:(NSIndexPath*)indexPath  {
+    UIImage* img = [UIImage systemImageNamed:@"externaldrive.connected.to.line.below"];
 
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
@@ -1374,7 +1357,7 @@
     }];
 }
 
-- (UIAction*)getContextualMenuEditFilePathAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuEditFilePathAction:(NSIndexPath*)indexPath  {
     UIImage* img = [UIImage systemImageNamed:@"location"];
 
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
@@ -1388,7 +1371,7 @@
     }];
 }
 
-- (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath  {
     return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"generic_remove", @"Remove")
                                      systemImage:@"trash"
                                          handler:^(__kindof UIAction * _Nonnull action) {
@@ -1866,11 +1849,10 @@
     }
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
-        if (@available(iOS 13.0, *)) {
-            if ( AppPreferences.sharedInstance.daysInstalled > 90 )  {
-                vc.modalPresentationStyle = UIModalPresentationFullScreen;
-                vc.modalInPresentation = YES;
-            }
+
+        if ( AppPreferences.sharedInstance.daysInstalled > 90 )  {
+            vc.modalPresentationStyle = UIModalPresentationFullScreen;
+            vc.modalInPresentation = YES;
         }
     }
     else if ( [segue.identifier isEqualToString:@"segueToMergeWizard"] ) {
@@ -2329,7 +2311,7 @@
 }
 
 - (void)openQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self internalOpenQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
     });
 }
@@ -2407,7 +2389,7 @@
                 
                 
                 
-                [FileManager.sharedInstance deleteAllInboxItems];
+                [StrongboxFilesManager.sharedInstance deleteAllInboxItems];
                         
                 [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
             }
@@ -2469,7 +2451,7 @@
 
 - (void)importKey:(NSData*)data url:(NSURL*)url {
     NSString* filename = url.lastPathComponent;
-    NSString* path = [FileManager.sharedInstance.keyFilesDirectory.path stringByAppendingPathComponent:filename];
+    NSString* path = [StrongboxFilesManager.sharedInstance.keyFilesDirectory.path stringByAppendingPathComponent:filename];
     
     NSError *error;
     [data writeToFile:path options:kNilOptions error:&error];
@@ -2901,36 +2883,52 @@
 
 
 
+- (void)onImportLastPass {
+    [self continueImportFileSelection:@"LastPass"];
+}
+
+- (void)onImportiCloud {
+    [self continueImportFileSelection:@"iCloud"];
+}
+
+- (void)onImport1Password1Pux {
+    [Alerts info:self
+           title:NSLocalizedString(@"safes_vc_import_1password", @"Import 1Password")
+         message:NSLocalizedString(@"safes_vc_import_1password_1pux_message", @"Strongbox can import 1Pux files from 1Password. Tap OK to select your exported 1Pux file.")
+      completion:^{
+        [self continueImportFileSelection:@"1Pux"];
+    } ];
+}
+
 - (void)onImport1Password {
     [Alerts info:self
            title:NSLocalizedString(@"safes_vc_import_1password", @"Import 1Password")
          message:NSLocalizedString(@"safes_vc_import_1password_message", @"Strongbox can import 1Pif files from 1Password. Tap OK to select your exported 1Pif file.")
       completion:^{
-        UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
-        vc.delegate = self;
-        vc.modalPresentationStyle = UIModalPresentationFormSheet;
-        
-        self.importFormat = @"1Password";
-        [self presentViewController:vc animated:YES completion:nil];
-    }];
+        [self continueImportFileSelection:@"1Password"];
+    } ];
 }
 
-- (void)onImport1Csv {
+- (void)onImportGenericCsv {
     NSString* loc = NSLocalizedString(@"mac_csv_file_must_contain_header_and_fields", @"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.");
 
-    NSString* message = [NSString stringWithFormat:loc, kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderNotes];
+    NSString* message = [NSString stringWithFormat:loc, kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderTotp, kCSVHeaderNotes];
    
     loc = NSLocalizedString(@"mac_csv_format_info_title", @"CSV Format");
 
-    
     [Alerts info:self title:loc message:message completion:^{
-        UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeImport];
-        vc.delegate = self;
-        vc.modalPresentationStyle = UIModalPresentationFormSheet;
-
-        self.importFormat = @"CSV";
-        [self presentViewController:vc animated:YES completion:nil];
+        [self continueImportFileSelection:@"CSV"];
     }];
+}
+
+- (void)continueImportFileSelection:(NSString*)importFormat {
+    UTType* type = [UTType typeWithIdentifier:(NSString*)kUTTypeItem];
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[type]];
+    vc.delegate = self;
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    self.importFormat = importFormat;
+    
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
@@ -2938,26 +2936,54 @@
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    [self documentPicker:controller didPickDocumentAtURL:url];
-    #pragma GCC diagnostic pop
-}
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
-    NSLog(@"documentPicker::didPickDocumentAtURL [%@]", url);
     
+    
+    if (! [url startAccessingSecurityScopedResource] ) {
+        NSLog(@"🔴 Could not securely access URL!");
+    }
+
+
+
+
+
+
+
+
+
+
+
     if ( [self.importFormat isEqualToString:@"1Password"] ) {
         [self import1Password:url];
+    }
+    else if ( [self.importFormat isEqualToString:@"1Pux"] ) {
+        [self import1Password1Pux:url];
+    }
+    else if ( [self.importFormat isEqualToString:@"LastPass"] ) {
+        [self importLastPass:url];
+    }
+    else if ( [self.importFormat isEqualToString:@"iCloud"] ) {
+        [self importiCloudCsv:url];
     }
     else if ( [self.importFormat isEqualToString:@"CSV"] ) {
         [self importCsv:url];
     }
+
 }
 
-#pragma GCC diagnostic pop
+- (void)import1Password1Pux:(NSURL*)url {
+    NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
+    NSString* msg = NSLocalizedString(@"1password_import_warning_msg", @"The import process isn't perfect and some features of 1Password such as named sections are not available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+    
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        id<Importer> importer = [[OnePassword1PuxImporter alloc] init];
+        DatabaseModel* database = [importer convertWithUrl:url error:&error];
+        [self addImportedDatabase:database error:error];
+    }];
+}
 
 - (void)import1Password:(NSURL*)url {
     NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
@@ -2968,19 +2994,35 @@
          message:msg
       completion:^{
         NSError* error;
-        Node* root = [OnePasswordImporter convertToStrongboxNodesWithUrl:url error:&error];
-        [self addImportedDatabaseWithRoot:root error:error];
+        id<Importer> importer = [[OnePasswordImporter alloc] init];
+        DatabaseModel* database = [importer convertWithUrl:url error:&error];
+        [self addImportedDatabase:database error:error];
     }];
+}
+
+- (void)importLastPass:(NSURL*)url {
+    NSError* error;
+    id<Importer> importer = [[LastPassImporter alloc] init];
+    DatabaseModel* database = [importer convertWithUrl:url error:&error];
+    [self addImportedDatabase:database error:error];
+}
+
+- (void)importiCloudCsv:(NSURL*)url {
+    NSError* error;
+    id<Importer> importer = [[iCloudImporter alloc] init];
+    DatabaseModel* database = [importer convertWithUrl:url error:&error];
+    [self addImportedDatabase:database error:error];
 }
 
 - (void)importCsv:(NSURL*)url {
     NSError* error;
-    Node* root = [CSVImporter importFromUrl:url error:&error];
-    [self addImportedDatabaseWithRoot:root error:error];
+    id<Importer> importer = [[CSVImporter alloc] init];
+    DatabaseModel* database = [importer convertWithUrl:url error:&error];
+    [self addImportedDatabase:database error:error];
 }
 
-- (void)addImportedDatabaseWithRoot:(Node*)root error:(NSError*)error {
-    if ( !root ) {
+- (void)addImportedDatabase:(DatabaseModel*)database error:(NSError*)error {
+    if ( !database ) {
         [self importFailedNotification:error];
     }
     else {
@@ -2988,12 +3030,12 @@
                title:NSLocalizedString(@"import_successful_title", @"✅ Import Successful")
              message:NSLocalizedString(@"import_successful_message", @"Your import was successful! Now, let's set a strong master password and save your new Strongbox database.")
           completion:^{
-            [self setNewMasterPasswordOnImportedDatabase:root];
+            [self setNewMasterPasswordOnImportedDatabase:database];
         }];
     }
 }
 
-- (void)setNewMasterPasswordOnImportedDatabase:(Node*)root {
+- (void)setNewMasterPasswordOnImportedDatabase:(DatabaseModel*)database {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"CreateDatabaseOrSetCredentials" bundle:nil];
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     CASGTableViewController *scVc = (CASGTableViewController*)nav.topViewController;
@@ -3004,13 +3046,7 @@
             if(success) {
                 CompositeKeyFactors *ckf = [[CompositeKeyFactors alloc] initWithPassword:creds.password];
                 if ( ckf ) {
-                    DatabaseFormat format = kKeePass4;
-                    DatabaseModel* database = [[DatabaseModel alloc] initWithFormat:format
-                                                                compositeKeyFactors:ckf
-                                                                           metadata:[UnifiedDatabaseMetadata withDefaultsForFormat:format]
-                                                                               root:root];
-            
-            
+                    database.ckfs = ckf;
                     [self addImportedDatabase:database name:creds.name];
                 }
                 else {

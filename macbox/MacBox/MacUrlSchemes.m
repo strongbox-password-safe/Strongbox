@@ -7,7 +7,7 @@
 //
 
 #import "MacUrlSchemes.h"
-#import "FileManager.h"
+#import "StrongboxMacFilesManager.h"
 
 NSString* const kStrongboxSFTPUrlScheme = @"sftp";
 NSString* const kStrongboxOneDriveUrlScheme = @"onedrive";
@@ -64,7 +64,7 @@ NSURL* managedUrlFromFileUrl(NSURL* fileUrl) {
 }
 
 NSString* getPathRelativeToUserHome(NSString* path) {
-    NSString* userHome = FileManager.sharedInstance.userHomePath;
+    NSString* userHome = StrongboxFilesManager.sharedInstance.userHomePath;
     
     if ( userHome && path.length > userHome.length ) {
         path = [path stringByReplacingOccurrencesOfString:userHome withString:@"~" options:kNilOptions range:NSMakeRange(0, userHome.length)];
@@ -74,8 +74,8 @@ NSString* getPathRelativeToUserHome(NSString* path) {
 }
 
 NSString* getFriendlyICloudPath(NSString* path) {
-    NSURL* iCloudRoot = FileManager.sharedInstance.iCloudRootURL;
-    NSURL* iCloudDriveRoot = FileManager.sharedInstance.iCloudDriveRootURL;
+    NSURL* iCloudRoot = StrongboxFilesManager.sharedInstance.iCloudRootURL;
+    NSURL* iCloudDriveRoot = StrongboxFilesManager.sharedInstance.iCloudDriveRootURL;
 
     
     

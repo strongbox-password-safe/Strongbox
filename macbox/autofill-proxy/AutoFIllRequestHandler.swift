@@ -17,6 +17,37 @@ import Foundation
         super.init()
     }
     
+    
+    
+    @objc func handleJsonRequest(json: String) -> AutoFillEncryptedResponse {
+        guard let request = AutoFillEncryptedRequest.from(json: json) else {
+            return AutoFillEncryptedResponse.error(message: "Could not convert request to JSON")
+        }
+        
+        switch request.messageType {
+        case .status:
+            return handleGetStatusRequest(request)
+        case .search:
+            return handleSearchRequest(request)
+        case .getCredentialsForUrl:
+            return handleGetCredentialsForUrlRequest(request)
+        case .copyField:
+            return handleCopyFieldRequest(request)
+        case .lock:
+            return handleLockDatabaseRequest(request)
+        case .unlock:
+            return handleUnlockDatabaseRequest(request)
+        case .createEntry:
+            return handleCreateEntryRequest(request)
+        case .getGroups:
+            return handleGetGroupsRequest(request)
+        case .getNewEntryDefaults:
+            return handleGetNewEntryDefaultsRequest(request)
+        case .generatePassword:
+            return handleGeneratePasswordRequest(request)
+        }
+    }
+    
     func handleCopyFieldRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
         let decoder = JSONDecoder()
         
@@ -63,6 +94,10 @@ import Foundation
 
     func handleGetStatusRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
         let response = GetStatusResponse()
+        
+        response.serverSettings = ServerSettings()
+        
+        response.serverSettings?.supportsCreateNew = true
         
         response.serverVersionInfo = Utils.getAppVersion()
         response.databases = MacDatabasePreferences.allDatabases.map { obj in
@@ -193,34 +228,99 @@ import Foundation
             
             credentials += urlCredentialMatches
         }
-                            
+         
+        
+        
+        credentials = Array( credentials.prefix(15) )
+        
         let response = CredentialsForUrlResponse(results: credentials,unlockedDatabaseCount: unlockedDatabases.count)
         
         let json = AutoFillJsonHelper.toJson(object: response)
         
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
     }
-    
-    @objc func handleJsonRequest(json: String) -> AutoFillEncryptedResponse {
-        guard let request = AutoFillEncryptedRequest.from(json: json) else {
-            return AutoFillEncryptedResponse.error(message: "Could not convert request to JSON")
+
+    func handleCreateEntryRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+        
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(CreateEntryRequest.self, from: data) else
+        {
+            NSLog("🔴 Can't decode CreateEntryRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode CreateEntryRequest from message JSON")
         }
         
-        switch request.messageType {
-        case .status:
-            return handleGetStatusRequest(request)
-        case .search:
-            return handleSearchRequest(request)
-        case .getCredentialsForUrl:
-            return handleGetCredentialsForUrlRequest(request)
-        case .copyField:
-            return handleCopyFieldRequest(request)
-        case .lock:
-            return handleLockDatabaseRequest(request)
-        case .unlock:
-            return handleUnlockDatabaseRequest(request)
-        }
+        NSLog("✅ Got CreateEntryRequest [databaseId = %@]", request.databaseId)
+        
+        let response = createEntry( request: request);
+        
+        let json = AutoFillJsonHelper.toJson(object: response)
+        
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
     }
+
+    func handleGetGroupsRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+        
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(GetGroupsRequest.self, from: data) else
+        {
+            NSLog("🔴 Can't decode CreateEntryRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode CreateEntryRequest from message JSON")
+        }
+        
+        NSLog("✅ Got CreateEntryRequest [databaseId = %@]", request.databaseId)
+        
+        let response = getGroups( request: request);
+        
+        let json = AutoFillJsonHelper.toJson(object: response)
+        
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
+    }
+
+    func handleGeneratePasswordRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+        
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(GeneratePasswordRequest.self, from: data) else
+        {
+            NSLog("🔴 Can't decode handleGeneratePasswordRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode handleGeneratePasswordRequest from message JSON")
+        }
+        
+        NSLog("✅ Got handleGeneratePasswordRequest")
+        
+        let response = generatePassword( request: request);
+        
+        let json = AutoFillJsonHelper.toJson(object: response)
+        
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
+    }
+    
+    func handleGetNewEntryDefaultsRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+        
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(GetNewEntryDefaultsRequest.self, from: data) else
+        {
+            NSLog("🔴 Can't decode GetNewEntryDefaultsRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode GetNewEntryDefaultsRequest from message JSON")
+        }
+        
+        NSLog("✅ Got GetNewEntryDefaultsRequest [databaseId = %@]", request.databaseId)
+        
+        let response = getNewEntryDefaults( request: request);
+        
+        let json = AutoFillJsonHelper.toJson(object: response)
+        
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
+    }
+    
+    
     
     func convertNodeToAutoFillCredential(_ database : MacDatabasePreferences, _ model : Model, _ node: Node) -> AutoFillCredential {
         var iconBase64Encoded = ""
@@ -314,5 +414,150 @@ import Foundation
                 delegate.onStrongboxDidChangeClipboard()
             }
         }
+    }
+    
+    
+    
+    func createEntry ( request : CreateEntryRequest ) -> CreateEntryResponse {
+        guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled,
+              let model = DatabasesCollection.shared.getUnlocked(uuid: prefs.uuid)
+        else {
+            let response = CreateEntryResponse()
+            response.error = "Can't find AutoFillEnabled database to Unlock"
+            return response
+        }
+
+        let parent : Node
+        if let groupId = request.groupId, let uuid = UUID(uuidString: groupId),
+           let parentGroup = model.getItemBy(uuid) {
+            parent = parentGroup
+        }
+        else {
+            parent = model.database.effectiveRootGroup
+        }
+
+        let autoFill = Settings.sharedInstance().autoFillNewRecordSettings
+    
+        let mostPopularEmail = model.database.mostPopularEmail ?? "";
+        let actualEmail = autoFill.emailAutoFillMode == .none ? "" : autoFill.emailAutoFillMode == .mostUsed ? mostPopularEmail : autoFill.emailCustomAutoFill;
+        let actualNotes = autoFill.notesAutoFillMode == .none ? "" : autoFill.notesAutoFillMode == .clipboard ? getClipboardText() : autoFill.notesCustomAutoFill
+        
+        let fields = NodeFields(username: request.username ?? "", url: request.url ?? "", password: request.password ?? "", notes: actualNotes, email: actualEmail)
+        
+        let newNode = Node(asRecord: request.title ?? "", parent: parent, fields: fields, uuid: nil)
+        
+        if let iconB64 = request.icon,
+           let data = Data(base64Encoded: iconB64) {
+            let icon = NodeIcon.withCustom(data)
+            newNode.icon = icon
+        }
+        else {
+            let useParentGroupIcon = Settings.sharedInstance().useParentGroupIconOnCreate
+            
+            if ( useParentGroupIcon && !parent.isUsingKeePassDefaultIcon ) {
+                newNode.icon = parent.icon;
+            }
+        }
+        
+        if !model.addChildren([newNode], destination: parent) {
+            let response = CreateEntryResponse()
+            response.error =  "Could not create new entry here."
+            return response
+        }
+        
+        if !DatabasesCollection.shared.updateAndQueueSync(uuid: prefs.uuid) {
+            let response = CreateEntryResponse()
+            response.error =  "Could not create new entry here."
+            return response
+        }
+        
+        notifyViewsRefresh(uuid: prefs.uuid)
+        
+        let response = CreateEntryResponse()
+        response.uuid = newNode.uuid.uuidString
+        
+        if let foundNode = model.getItemBy(newNode.uuid) {
+            response.credential = convertNodeToAutoFillCredential(prefs, model, foundNode)
+        }
+        
+        return response
+    }
+
+    func getGroups ( request : GetGroupsRequest ) -> GetGroupsResponse {
+        guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled,
+              let model = DatabasesCollection.shared.getUnlocked(uuid: prefs.uuid) else {
+            let response = GetGroupsResponse()
+            response.error =  "Can't find AutoFillEnabled database to Unlock"
+            return response
+        }
+        
+        let summaries = model.database.allActiveGroups.map { grp in
+            return GroupSummary( title: getGroupPathDisplayString(model, grp), uuid: grp.uuid.uuidString);
+        }
+
+        var sorted = summaries.sorted { n1, n2 in
+            return finderStringCompare(n1.title, n2.title ) == .orderedAscending
+        }
+        
+        if model.database.effectiveRootGroup.childRecordsAllowed {
+            let title = getGroupPathDisplayString(model, model.database.effectiveRootGroup, rootGroupNameInsteadOfSlash: true)
+            let root = GroupSummary( title: title, uuid: model.database.effectiveRootGroup.uuid.uuidString);
+            sorted.insert(root, at: 0)
+        }
+        
+        let response = GetGroupsResponse()
+            
+        response.groups = sorted;
+        
+        return response
+    }
+
+    func generatePassword ( request : GeneratePasswordRequest ) -> GeneratePasswordResponse {
+        let pw = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+
+        let pw1 = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+        let pw2 = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+        let pw3 = PasswordMaker.sharedInstance().generateAlternate(for: Settings.sharedInstance().passwordGenerationConfig)
+        let pw4 = PasswordMaker.sharedInstance().generateAlternate(for: Settings.sharedInstance().passwordGenerationConfig)
+        let pw5 = PasswordMaker.sharedInstance().generateAlternate(for: Settings.sharedInstance().passwordGenerationConfig)
+
+        let alternatives = [pw1, pw2, pw3, pw4, pw5]
+        
+        return GeneratePasswordResponse(password: pw, alternatives: alternatives)
+    }
+    
+    func getNewEntryDefaults ( request : GetNewEntryDefaultsRequest ) -> GetNewEntryDefaultsResponse {
+        guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled,
+              let model = DatabasesCollection.shared.getUnlocked(uuid: prefs.uuid) else {
+            let response = GetNewEntryDefaultsResponse( error: "Can't find AutoFillEnabled database to Unlock")
+            return response
+        }
+        
+        let defaultConfig = Settings.sharedInstance().autoFillNewRecordSettings;
+        
+        let mostPopularUsername = model.database.mostPopularUsername ?? "";
+        let username = defaultConfig.usernameAutoFillMode == .none ? "" : defaultConfig.usernameAutoFillMode == .mostUsed ? mostPopularUsername : defaultConfig.usernameCustomAutoFill;
+        
+        let generated = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+        
+        let password = defaultConfig.passwordAutoFillMode == .none ? "" : defaultConfig.passwordAutoFillMode == .generated ? generated : defaultConfig.passwordCustomAutoFill;
+        
+        let response = GetNewEntryDefaultsResponse(username: username, password: password, mostPopularUsernames: model.database.mostPopularUsernames)
+        
+        return response
+    }
+    
+    func getClipboardText() -> String {
+        return NSPasteboard.general.string(forType: .string) ?? ""
+    }
+    
+    
+    
+    func getGroupPathDisplayString( _ model : Model, _ node : Node, rootGroupNameInsteadOfSlash: Bool = false) -> String {
+        return model.database.getPathDisplayString(node, includeRootGroup: true, rootGroupNameInsteadOfSlash: rootGroupNameInsteadOfSlash, includeFolderEmoji: false, joinedBy: "/")
+    }
+    
+    func notifyViewsRefresh( uuid : String ) {
+        DatabasesCollection.shared.notifyViewsToRefresh(uuid: uuid);
     }
 }

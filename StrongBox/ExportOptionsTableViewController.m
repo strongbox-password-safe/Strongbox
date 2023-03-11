@@ -350,15 +350,10 @@
     
     NSURL* url = [urls objectAtIndex:0];
 
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    [self documentPicker:controller didPickDocumentAtURL:url];
-    #pragma GCC diagnostic pop
-}
+    if (! [url startAccessingSecurityScopedResource] ) {
+        NSLog(@"🔴 Could not securely access URL!");
+    }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     NSError* error;
     NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
     
@@ -387,7 +382,6 @@
     
     [document closeWithCompletionHandler:nil];
 }
-#pragma GCC diagnostic pop
 
 - (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
     [self onDismissed:NO];

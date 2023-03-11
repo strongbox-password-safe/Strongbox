@@ -19,6 +19,7 @@
 @property (weak) IBOutlet NSButton *buttonSelectFile;
 @property (weak) IBOutlet NSButton *buttonFindFavIcons;
 @property NSArray<NSImage*>* predefinedIcons;
+@property NSArray<NodeIcon*> *customIcons;
 
 @end
 
@@ -29,6 +30,19 @@
 
     self.predefinedIcons = [NodeIconHelper getIconSet:self.iconSet];
 
+    if ( self.iconPool ) {
+        self.customIcons = [self.iconPool sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            NodeIcon *n1 = obj1;
+            NodeIcon *n2 = obj2;
+            
+            return [@(n1.preferredOrder) compare:@(n2.preferredOrder)];
+        }];
+    }
+    else {
+        self.customIcons = @[];
+    }
+
+    
     self.buttonSelectFile.hidden = self.hideSelectFile;
     self.buttonFindFavIcons.hidden = self.hideFavIconButton;
         
@@ -107,6 +121,10 @@
             }
 
             [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+            
+            
+            
+            
             self.onSelectedItem([NodeIcon withCustom:data], NO);
         }
     }];
