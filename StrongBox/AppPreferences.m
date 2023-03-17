@@ -145,7 +145,7 @@ static NSString* const kHideTipJar = @"hideTipJar";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
-static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync-Iteration-4-RB-OneDrive";
+static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync-Iteration-5-RB-OneDrive";
 static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
 
