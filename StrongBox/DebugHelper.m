@@ -55,7 +55,7 @@
 
 #if !TARGET_OS_IPHONE
 
-static NSString *ModelIdentifier()
+static NSString *ModelIdentifier(void)
 {
     NSString *result=@"Unknown Mac";
     size_t len=0;

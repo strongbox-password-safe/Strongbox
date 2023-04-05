@@ -89,7 +89,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.autoFillScanAltUrls = YES;
         self.autoFillScanCustomFields = NO;
         self.autoFillScanNotes = NO;
-        self.lazySyncMode = NO; 
+        self.lazySyncMode = NO;
         self.showLastViewedEntryOnUnlock = YES;
         
         self.visibleTabs = @[@(kBrowseViewTypeFavourites),

@@ -307,7 +307,7 @@ class UnifiedRecord: Decodable {
             }
         case "URL":
             if !stringValue.isEmpty {
-                var label = title.count > 0 ? title : name
+                let label = title.count > 0 ? title : name
                 BaseImporter.addUrl(entry, stringValue, label)
             }
         case "file":

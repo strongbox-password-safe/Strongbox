@@ -13,8 +13,13 @@
 #import "Model.h"
 
 #ifndef IS_APP_EXTENSION
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 #import "GoogleDriveManager.h"
+#endif
+
 #import "Strongbox-Swift.h"
+
 #else
 #import "Strongbox_AutoFill-Swift.h"
 #endif

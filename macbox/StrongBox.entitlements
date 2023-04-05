@@ -53,6 +53,7 @@
 		<string>/Library/Application Support/Microsoft Edge Canary/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Vivaldi/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Arc/User Data/NativeMessagingHosts/</string>
+		<string>/Library/Application Support/Sidekick/NativeMessagingHosts/</string>
 	</array>
 </dict>
 </plist>

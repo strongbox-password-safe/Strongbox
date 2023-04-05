@@ -42,7 +42,7 @@ static NSArray<IMAGE_TYPE_PTR> *kKeePassXCIconSet;
     }
 }
 
-static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet() {
+static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
     NSArray<NSString*>* names = @[@"lock",
                                   @"globe",
                                   @"exclamationmark.triangle",
@@ -128,7 +128,7 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet() {
     }];
 }
 
-static NSArray<IMAGE_TYPE_PTR>* loadKeePassXCIconSet() {
+static NSArray<IMAGE_TYPE_PTR>* loadKeePassXCIconSet(void) {
     NSArray<NSString*>* names = @[@"KPXC_C00_Password",
                                   @"KPXC_C01_Package_Network",
                                   @"KPXC_C02_MessageBox_Warning",
@@ -208,7 +208,7 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassXCIconSet() {
     }];
 }
 
-static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet() {
+static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
     NSArray<NSString*>* names = @[@"C00_Password",
                                   @"C01_Package_Network",
                                   @"C02_MessageBox_Warning",

@@ -69,7 +69,7 @@
     NSLog(@"😎 DEALLOC [%@]", self);
 }
 
-static NSString* getFreeTrialSuffix() {
+static NSString* getFreeTrialSuffix(void) {
     if ( Settings.sharedInstance.isPro ) {
         return @"";
     }
@@ -430,6 +430,47 @@ static NSString* getFreeTrialSuffix() {
         else if (item.action == @selector(onRemoveTagFromItems:)) {
             [self populateRemoveTagFromItemsSubMenu:item.submenu];
         }
+        else if ([item.identifier isEqualToString:@"copy-field-submenu-identifier"]) {
+            [self populateCopyFieldSubMenu:item.submenu];
+        }
+    }
+}
+
+- (void)populateCopyFieldSubMenu:(NSMenu*)theMenu {
+    
+    
+    NSInteger idxInsertAfter = [theMenu indexOfItemWithTag:24121224];
+    NSInteger idxInsertBefore = [theMenu indexOfItemWithTag:24121225];
+    
+    for ( NSInteger idx = idxInsertAfter + 1; idx < idxInsertBefore; idx++ ) {
+        [theMenu removeItemAtIndex:idxInsertAfter + 1];
+    }
+    
+    
+    
+    Node* item = [self getSingleSelectedItem];
+    if ( !item ) { 
+        return;
+    }
+
+    NSArray<NSString*> *customFieldKeys = [item.fields.customFieldsNoEmail.allKeys filter:^BOOL(NSString * _Nonnull obj) {
+        return ![NodeFields isTotpCustomFieldKey:obj];
+    }];
+    
+    if ( customFieldKeys.count > 0 ) {
+        if ( !self.viewModel.customSortOrderForFields ) {
+            customFieldKeys = [customFieldKeys sortedArrayUsingComparator:finderStringComparator];
+        }
+        
+        NSInteger i = 1;
+        for ( NSString* customFieldKey in customFieldKeys ) {
+            NSMenuItem* item  = [[NSMenuItem alloc] initWithTitle:customFieldKey
+                                                           action:@selector(onCopyCustomField:)
+                                                    keyEquivalent:@""];
+            
+            [theMenu insertItem:item atIndex:idxInsertAfter + i];
+            i++;
+        }
     }
 }
 
@@ -507,7 +548,7 @@ static NSString* getFreeTrialSuffix() {
     
     if ( self.viewModel && !self.viewModel.locked ) {
         BOOL isKeePass2 = self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4;
-        Node* item = [self getSingleSelectedItem];
+        Node* singleSelectedItem = [self getSingleSelectedItem];
         NSArray<Node*>* items = [self getSelectedItems];
         
         if ( !self.viewModel.isEffectivelyReadOnly ) { 
@@ -536,8 +577,8 @@ static NSString* getFreeTrialSuffix() {
                 }
             }
             else if ( theAction == @selector(onToggleFavouriteItem:)) {
-                if ( item != nil  && !item.isGroup ) {
-                    BOOL favourite = [self.viewModel isFavourite:item.uuid];
+                if ( singleSelectedItem != nil  && !singleSelectedItem.isGroup ) {
+                    BOOL favourite = [self.viewModel isFavourite:singleSelectedItem.uuid];
                     
                     menuItem.title = favourite ? NSLocalizedString(@"browse_vc_action_unpin", @"Un-Favourite Item") : NSLocalizedString(@"browse_vc_action_pin", @"Favourite");
                     
@@ -555,11 +596,11 @@ static NSString* getFreeTrialSuffix() {
                 }
             }
             else if ( theAction == @selector(onToggleExclusionFromAudit:)) {
-                BOOL excluded = [self.viewModel isExcludedFromAudit:item.uuid];
+                BOOL excluded = [self.viewModel isExcludedFromAudit:singleSelectedItem.uuid];
                 
                 menuItem.title = excluded ? NSLocalizedString(@"action_include_in_audit", @"Include in Audit") : NSLocalizedString(@"action_exclude_from_audit", @"Exclude from Audit");
                 
-                return ( item != nil && ((!excluded && [self.viewModel isFlaggedByAudit:item.uuid] ) || excluded)) ;
+                return ( singleSelectedItem != nil && ((!excluded && [self.viewModel isFlaggedByAudit:singleSelectedItem.uuid] ) || excluded)) ;
             }
             else if ( theAction == @selector(onNewGroupWithItems:)) {
                 if ( items.count ) {
@@ -578,8 +619,8 @@ static NSString* getFreeTrialSuffix() {
             else if ( theAction == @selector(onRemoveTagFromItems:)) {
                 if ( items.count && isKeePass2 ) {
                     NSMutableSet* all = NSMutableSet.set;
-                    for ( item in items ) {
-                        [all addObjectsFromArray:item.fields.tags.allObjects];
+                    for ( singleSelectedItem in items ) {
+                        [all addObjectsFromArray:singleSelectedItem.fields.tags.allObjects];
                     }
                     
                     return all.count > 0;
@@ -735,7 +776,7 @@ static NSString* getFreeTrialSuffix() {
                 return YES;
             }
             else if (theAction == @selector(onDuplicateItem:)) {
-                return item != nil;
+                return singleSelectedItem != nil;
             }
             else if (theAction == @selector(paste:)) {
                 NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
@@ -764,9 +805,9 @@ static NSString* getFreeTrialSuffix() {
         }
         else if (theAction == @selector(onViewItemHistory:)) {
             return
-            item != nil &&
-            !item.isGroup &&
-            item.fields.keePassHistory.count > 0 &&
+            singleSelectedItem != nil &&
+            !singleSelectedItem.isGroup &&
+            singleSelectedItem.fields.keePassHistory.count > 0 &&
             (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
         }
         else if (theAction == @selector( onSideBarItemProperties: )) {
@@ -795,35 +836,38 @@ static NSString* getFreeTrialSuffix() {
         }
         else if(theAction == @selector(onLaunchUrl:) ||
                 theAction == @selector(onCopyUrl:)) {
-            return item && !item.isGroup && item.fields.url.length;
+            return singleSelectedItem && !singleSelectedItem.isGroup && singleSelectedItem.fields.url.length;
         }
         else if (theAction == @selector(onCopyTitle:)) {
-            return item && !item.isGroup;
+            return singleSelectedItem && !singleSelectedItem.isGroup;
+        }
+        else if (theAction == @selector(onCopyCustomField:)) {
+            return singleSelectedItem && !singleSelectedItem.isGroup;
         }
         else if (theAction == @selector(onCopyUsername:)) {
-            return item && !item.isGroup;
+            return singleSelectedItem && !singleSelectedItem.isGroup;
         }
         else if (theAction == @selector(onCopyEmail:)) {
-            BOOL emailAvailable = item.fields.email.length;
-            return item && !item.isGroup && emailAvailable;
+            BOOL emailAvailable = singleSelectedItem.fields.email.length;
+            return singleSelectedItem && !singleSelectedItem.isGroup && emailAvailable;
         }
         else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
-            return item && !item.isGroup && item.fields.password.length;
+            return singleSelectedItem && !singleSelectedItem.isGroup && singleSelectedItem.fields.password.length;
         }
         else if (theAction == @selector(onCopyPassword:)) {
-            return item && !item.isGroup && item.fields.password.length;
+            return singleSelectedItem && !singleSelectedItem.isGroup && singleSelectedItem.fields.password.length;
         }
         else if (theAction == @selector(onCopyTotp:)) {
-            return item && !item.isGroup && item.fields.otpToken;
+            return singleSelectedItem && !singleSelectedItem.isGroup && singleSelectedItem.fields.otpToken;
         }
         else if (theAction == @selector(onCopyNotes:)) {
-            return item && !item.isGroup && item.fields.notes.length;
+            return singleSelectedItem && !singleSelectedItem.isGroup && singleSelectedItem.fields.notes.length;
         }
         else if (theAction == @selector(onCopyUsernameAndPassword:)) {
-            return item && !item.isGroup;
+            return singleSelectedItem && !singleSelectedItem.isGroup;
         }
         else if (theAction == @selector(onCopyAllFields:)) {
-            return item && !item.isGroup;
+            return singleSelectedItem && !singleSelectedItem.isGroup;
         }
         else if (theAction == @selector(copy:)) {
             return items.count > 0;
@@ -1948,6 +1992,28 @@ static NSString* getFreeTrialSuffix() {
 
 - (IBAction)onCopyTotp:(id)sender {
     [self copyTotp:[self getSingleSelectedItem]];
+}
+
+- (IBAction)onCopyCustomField:(id)sender {
+    NSLog(@"onCopyCustomField: [%@]", sender);
+
+    Node* item = [self getSingleSelectedItem];
+    
+    if ( !item ) {
+        return;
+    }
+
+    NSMenuItem* menuItem = (NSMenuItem*)sender;
+    NSString* key = menuItem.title;
+        
+    StringValue* field = [item.fields.customFields objectForKey:key];
+    
+    if ( field ) {
+        [self dereferenceAndCopyToPasteboard:field.value item:item];
+        
+        NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
+        [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, key]];
+    }
 }
 
 - (void)copyTitle:(Node*)item {

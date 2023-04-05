@@ -1891,13 +1891,12 @@ extension CreateEditViewController: NSTableViewDataSource {
 
                 let cell = tableView.makeView(withIdentifier: identifier, owner: nil) as! TitleAndIconCell
 
-                cell.setContent(NSAttributedString(string: key as String))
-
-                cell.icon.image = AttachmentPreviewHelper.shared.getPreviewImage(key as String, attachment)
-                cell.title.stringValue = key as String
-                cell.title.isEditable = true
-                cell.title.action = #selector(onAttachmentNameEdited)
-
+                let image = AttachmentPreviewHelper.shared.getPreviewImage(key as String, attachment)
+                
+                cell.setContent(NSAttributedString(string: key as String), editable: true, iconImage: image) { [weak self] text in
+                    self?.onAttachmentNameEdited(cell.title)
+                }
+                
                 return cell
             } else {
                 let identifier = GenericAutoLayoutTableViewCell.NibIdentifier

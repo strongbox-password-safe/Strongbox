@@ -948,18 +948,6 @@
  biometricPreCleared:(BOOL)biometricPreCleared {
     NSLog(@"======================== OPEN DATABASE: %@ ============================", safe.nickName);
     
-    if ( safe.storageProvider == kOneDrive_Deprecated && !openOffline ) { 
-        [Alerts okCancel:self
-                   title:NSLocalizedString(@"pick_creds_vc_cannot_create_new_unsupported_storage_type_title", @"Unsupported Storage")
-                 message:NSLocalizedString(@"onedrive_readd_required", @"You need to re-add your OneDrive database due to a library update. Tap OK to get started...")
-                  action:^(BOOL response) {
-            if ( response ) {
-                [self onAddExistingSafe];
-            }
-        }];
-        return;
-    }
-    
     biometricPreCleared = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics && biometricPreCleared;
     
     if(safe.hasUnresolvedConflicts) { 

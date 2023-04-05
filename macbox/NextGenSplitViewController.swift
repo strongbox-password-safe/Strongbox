@@ -606,15 +606,17 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         }
     }
     
-    @objc func onLockDoneKillAllWindows() {
-        
-        
-        
-        if let presentedViewControllers = presentedViewControllers {
+    func closeAllPresentedRecursive( viewController: NSViewController ) {
+        if let presentedViewControllers = viewController.presentedViewControllers {
             for presented in presentedViewControllers {
+                closeAllPresentedRecursive(viewController: presented)
                 dismiss(presented)
             }
         }
+    }
+    
+    @objc func onLockDoneKillAllWindows() {
+        closeAllPresentedRecursive(viewController: self)
         
         for popout in popouts.values {
             popout.close()

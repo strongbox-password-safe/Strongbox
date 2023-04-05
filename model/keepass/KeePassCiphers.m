@@ -22,7 +22,7 @@ static NSString* const argon2dUuid = @"EF636DDF-8C29-444B-91F7-A9A403E30A0C";
 static NSString* const argon2idUuid = @"9E298B19-56DB-4773-B23D-FC3EC6F0A1E6";
 static NSString* const twoFishUuid = @"AD68F29F-576F-4BB9-A36A-D47AF965346C";
 
-NSUUID* const aesKdbx3KdfCipherUuid() {
+NSUUID* const aesKdbx3KdfCipherUuid(void) {
     static NSUUID* foo = nil;
     
     if (!foo) {
@@ -32,7 +32,7 @@ NSUUID* const aesKdbx3KdfCipherUuid() {
     return foo;
 }
 
-NSData* aesKdbx3KdfCipherUuidData() {
+NSData* aesKdbx3KdfCipherUuidData(void) {
     static NSData* foo = nil;
     
     if(!foo) {
@@ -44,7 +44,7 @@ NSData* aesKdbx3KdfCipherUuidData() {
     return foo;
 }
 
-NSUUID* const aesKdbx4KdfCipherUuid() {
+NSUUID* const aesKdbx4KdfCipherUuid(void) {
     static NSUUID* foo = nil;
     
     if (!foo) {
@@ -54,7 +54,7 @@ NSUUID* const aesKdbx4KdfCipherUuid() {
     return foo;
 }
 
-NSData* aesKdbx4KdfCipherUuidData() {
+NSData* aesKdbx4KdfCipherUuidData(void) {
     static NSData* foo = nil;
     
     if(!foo) {
@@ -66,7 +66,7 @@ NSData* aesKdbx4KdfCipherUuidData() {
     return foo;
 }
 
-NSUUID* const twoFishCipherUuid() {
+NSUUID* const twoFishCipherUuid(void) {
     static NSUUID* foo = nil;
     
     if (!foo) {
@@ -76,7 +76,7 @@ NSUUID* const twoFishCipherUuid() {
     return foo;
 }
 
-NSData* twoFishCipherUuidData() {
+NSData* twoFishCipherUuidData(void) {
     static NSData* foo = nil;
     
     if(!foo) {
@@ -88,7 +88,7 @@ NSData* twoFishCipherUuidData() {
     return foo;
 }
 
-NSUUID* const chaCha20CipherUuid() {
+NSUUID* const chaCha20CipherUuid(void) {
     static NSUUID* foo = nil;
     
     if (!foo) {
@@ -98,7 +98,7 @@ NSUUID* const chaCha20CipherUuid() {
     return foo;
 }
 
-NSData* chaCha20CipherUuidData() {
+NSData* chaCha20CipherUuidData(void) {
     static NSData* foo = nil;
     
     if(!foo) {
@@ -110,7 +110,7 @@ NSData* chaCha20CipherUuidData() {
     return foo;
 }
 
-NSUUID* const argon2dCipherUuid() {
+NSUUID* const argon2dCipherUuid(void) {
     static NSUUID* foo = nil;
     
     if (!foo) {
@@ -120,7 +120,7 @@ NSUUID* const argon2dCipherUuid() {
     return foo;
 }
 
-NSData* argon2dCipherUuidData() {
+NSData* argon2dCipherUuidData(void) {
     static NSData* foo = nil;
     
     if(!foo) {
@@ -132,7 +132,7 @@ NSData* argon2dCipherUuidData() {
     return foo;
 }
 
-NSUUID* const argon2idCipherUuid() {
+NSUUID* const argon2idCipherUuid(void) {
     static NSUUID* foo = nil;
     
     if (!foo) {
@@ -142,7 +142,7 @@ NSUUID* const argon2idCipherUuid() {
     return foo;
 }
 
-NSData* argon2idCipherUuidData() {
+NSData* argon2idCipherUuidData(void) {
     static NSData* foo = nil;
     
     if(!foo) {
@@ -154,7 +154,7 @@ NSData* argon2idCipherUuidData() {
     return foo;
 }
 
-NSUUID* const aesCipherUuid() {
+NSUUID* const aesCipherUuid(void) {
     static NSUUID* foo = nil;
     
     if (!foo) {
@@ -164,7 +164,7 @@ NSUUID* const aesCipherUuid() {
     return foo;
 }
 
-NSData* aesCipherUuidData() {
+NSData* aesCipherUuidData(void) {
     static NSData* foo = nil;
     
     if(!foo) {

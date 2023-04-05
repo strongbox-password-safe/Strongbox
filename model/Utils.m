@@ -356,7 +356,7 @@ NSData* hmacSha1(NSData* data, NSData* key) {
     return [[NSData alloc] initWithBytes:cHMAC length:CC_SHA1_DIGEST_LENGTH];
 }
 
-uint32_t getRandomUint32() {
+uint32_t getRandomUint32(void) {
     uint32_t ret;
     if(SecRandomCopyBytes(kSecRandomDefault, sizeof(uint32_t), &ret))
     {
