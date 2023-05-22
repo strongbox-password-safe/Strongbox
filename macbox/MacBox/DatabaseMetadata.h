@@ -18,6 +18,7 @@
 #import "NextNavigationConstants.h"
 #import "SearchScope.h"
 #import "HeaderNodeState.h"
+#import "SideBarChildCountFormat.h"
 
 @class HeaderNodeState;
 
@@ -183,12 +184,20 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property NSArray<NSUUID*> *browseSelectedItems;
 @property NSString* searchText;
 @property SearchScope searchScope;
-@property BOOL showChildCountOnFolderInSidebar;
+@property BOOL searchIncludeGroups;
+
 @property NSArray<HeaderNodeState*>* headerNodes;
 
 @property BOOL customSortOrderForFields;
 
 @property BOOL autoFillCopyTotp;
+
+@property BOOL showChildCountOnFolderInSidebar;
+@property SideBarChildCountFormat sideBarChildCountFormat;
+@property NSString* sideBarChildCountGroupPrefix;
+@property NSString* sideBarChildCountSeparator;
+@property BOOL sideBarChildCountShowZero;
+@property BOOL sideBarShowTotalCountOnHierarchy;
 
 @end
 

@@ -112,7 +112,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 
 - (void)removeItemAttachment:(Node*)item filename:(NSString*)filename;
-- (void)addItemAttachment:(Node*)item filename:(NSString*)filename attachment:(DatabaseAttachment*)attachment;
+- (void)addItemAttachment:(Node*)item filename:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment;
 
 
 - (void)addCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
@@ -214,8 +214,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularEmails;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularTags;
 
-@property (nonatomic, readonly) NSInteger numberOfRecords;
-@property (nonatomic, readonly) NSInteger numberOfGroups;
+@property (nonatomic, readonly) NSInteger fastEntryTotalCount;
+@property (nonatomic, readonly) NSInteger fastGroupTotalCount;
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
 
@@ -231,7 +231,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property BOOL showAlternatingRows;
 @property BOOL showVerticalGrid;
 @property BOOL showHorizontalGrid;
-@property BOOL showChildCountOnFolderInSidebar;
+
 @property NSArray<NSString*>* visibleColumns;
 @property BOOL downloadFavIconOnChange;
 @property BOOL promptedForAutoFetchFavIcon;
@@ -256,6 +256,13 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property BOOL readOnly;
 @property (readonly) BOOL isEffectivelyReadOnly; 
+
+@property BOOL showChildCountOnFolderInSidebar;
+@property SideBarChildCountFormat sideBarChildCountFormat;
+@property NSString* sideBarChildCountGroupPrefix;
+@property NSString* sideBarChildCountSeparator;
+@property BOOL sideBarChildCountShowZero;
+@property BOOL sideBarShowTotalCountOnHierarchy;
 
 
 
@@ -350,6 +357,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property NSString* nextGenSearchText;
 @property SearchScope nextGenSearchScope;
+@property BOOL nextGenSearchIncludeGroups;
 
 @property NSArray<HeaderNodeState*>* headerNodes;
 

@@ -12,7 +12,7 @@
 
 @implementation MinimalPoolHelper
 
-+ (NSArray<DatabaseAttachment*>*)getMinimalAttachmentPool:(Node*)rootNode {
++ (NSArray<KeePassAttachmentAbstractionLayer*>*)getMinimalAttachmentPool:(Node*)rootNode {
     NSArray<Node*>* currentNodesWithAttachments = [rootNode filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup && node.fields.attachments.count > 0;
     }];
@@ -32,14 +32,14 @@
     NSMutableArray<Node*>* allNodesWithAttachments = currentNodesWithAttachments.mutableCopy;
     [allNodesWithAttachments addObjectsFromArray:allHistoricalNodesWithAttachments];
 
-    NSArray<DatabaseAttachment*>* allAttachments = [allNodesWithAttachments flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+    NSArray<KeePassAttachmentAbstractionLayer*>* allAttachments = [allNodesWithAttachments flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.fields.attachments.allValues;
     }];
     
     
     
-    NSMutableDictionary<NSString*, DatabaseAttachment*>* attachmentsByHash = NSMutableDictionary.dictionary;
-    for (DatabaseAttachment* attachment in allAttachments) {
+    NSMutableDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* attachmentsByHash = NSMutableDictionary.dictionary;
+    for (KeePassAttachmentAbstractionLayer* attachment in allAttachments) {
         attachmentsByHash[attachment.digestHash] = attachment;
     }
 

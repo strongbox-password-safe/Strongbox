@@ -301,9 +301,6 @@
 }
 
 - (void)customizeUI {
-    [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
-    [self.barButtonDice setImage:[UIImage systemImageNamed:@"die.face.6"]];
-
     [self customizeAddDatabaseButton];
     
     [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_preferences", @"Preferences")];
@@ -901,53 +898,65 @@
         return;
     }
     
-    [self openAtIndexPath:indexPath openOffline:NO];
+    [self openAtIndexPath:indexPath
+          explicitOffline:NO
+     explicitManualUnlock:NO
+           explicitOnline:NO];
 }
 
 
 
-- (void)manualUnlock:(NSIndexPath*)indexPath {
-    [self openAtIndexPath:indexPath openOffline:NO manualUnlock:YES ignoreForceOpenOffline:NO];
+- (void)explicitRequestManualUnlock:(NSIndexPath*)indexPath {
+    [self openAtIndexPath:indexPath
+          explicitOffline:NO
+     explicitManualUnlock:YES
+           explicitOnline:NO];
 }
 
-- (void)openOffline:(NSIndexPath*)indexPath {
-    [self openAtIndexPath:indexPath openOffline:YES];
+- (void)explicitRequestOpenOffline:(NSIndexPath*)indexPath {
+    [self openAtIndexPath:indexPath
+          explicitOffline:YES
+     explicitManualUnlock:NO
+           explicitOnline:NO];
 }
 
-- (void)forceOpenOnline:(NSIndexPath*)indexPath {
-    [self openAtIndexPath:indexPath openOffline:NO manualUnlock:NO ignoreForceOpenOffline:YES];
+- (void)explicitRequestOpenOnline:(NSIndexPath*)indexPath {
+    [self openAtIndexPath:indexPath
+          explicitOffline:NO
+     explicitManualUnlock:NO
+           explicitOnline:YES];
 }
 
-- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline {
-    [self openAtIndexPath:indexPath openOffline:openOffline manualUnlock:NO ignoreForceOpenOffline:NO];
-}
-
-- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline manualUnlock:(BOOL)manualUnlock ignoreForceOpenOffline:(BOOL)ignoreForceOpenOffline {
+- (void)openAtIndexPath:(NSIndexPath*)indexPath
+        explicitOffline:(BOOL)explicitOffline
+   explicitManualUnlock:(BOOL)explicitManualUnlock
+         explicitOnline:(BOOL)explicitOnline {
     DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
-
-    if ( !ignoreForceOpenOffline ) {
-        openOffline |= database.forceOpenOffline;
-    }
     
-    [self openDatabase:database openOffline:openOffline noConvenienceUnlock:manualUnlock biometricPreCleared:NO];
+    [self openDatabase:database
+       explicitOffline:explicitOffline
+  explicitManualUnlock:explicitManualUnlock
+   biometricPreCleared:NO
+        explicitOnline:explicitOnline];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)openDatabase:(DatabasePreferences*)database {
-    [self openDatabase:database biometricPreCleared:NO];
-}
-
-- (void)openDatabase:(DatabasePreferences*)database biometricPreCleared:(BOOL)biometricPreCleared {
-    [self openDatabase:database openOffline:database.forceOpenOffline noConvenienceUnlock:NO biometricPreCleared:biometricPreCleared];
+    [self openDatabase:database
+       explicitOffline:NO
+  explicitManualUnlock:NO
+   biometricPreCleared:NO
+        explicitOnline:NO];
 }
 
 - (void)openDatabase:(DatabasePreferences*)safe
-         openOffline:(BOOL)openOffline
- noConvenienceUnlock:(BOOL)noConvenienceUnlock
- biometricPreCleared:(BOOL)biometricPreCleared {
-    NSLog(@"======================== OPEN DATABASE: %@ ============================", safe.nickName);
-    
+     explicitOffline:(BOOL)explicitOffline
+explicitManualUnlock:(BOOL)explicitManualUnlock
+ biometricPreCleared:(BOOL)biometricPreCleared
+      explicitOnline:(BOOL)explicitOnline {
+    NSLog(@"======================== OPEN DATABASE: %@ [EON: %hhd, EOFF: %hhd, MAN: %hhd, BPC: %hhd] ============================", safe.nickName, explicitOnline, explicitOffline, explicitManualUnlock, biometricPreCleared);
+        
     biometricPreCleared = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics && biometricPreCleared;
     
     if(safe.hasUnresolvedConflicts) { 
@@ -960,11 +969,15 @@
         }
         self.openingDatabaseInProgress = YES;
         
-        UnlockDatabaseSequenceHelper* helper = [UnlockDatabaseSequenceHelper helperWithViewController:self database:safe isAutoFillOpen:NO offlineExplicitlyRequested:openOffline];
+        UnlockDatabaseSequenceHelper* helper = [UnlockDatabaseSequenceHelper helperWithViewController:self
+                                                                                             database:safe
+                                                                                       isAutoFillOpen:NO
+                                                                                      explicitOffline:explicitOffline
+                                                                                       explicitOnline:explicitOnline];
 
         [helper beginUnlockSequence:NO
                 biometricPreCleared:biometricPreCleared
-                noConvenienceUnlock:noConvenienceUnlock
+               explicitManualUnlock:explicitManualUnlock
                          completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
             self.openingDatabaseInProgress = NO;
             
@@ -1266,7 +1279,7 @@
                            systemImage:@"lock.open"
                            
                                handler:^(__kindof UIAction * _Nonnull action) {
-        [self manualUnlock:indexPath];
+        [self explicitRequestManualUnlock:indexPath];
     }];
 }
 
@@ -1275,7 +1288,7 @@
                            systemImage:@"bolt.horizontal.circle"
                            
                                handler:^(__kindof UIAction * _Nonnull action) {
-        [self openOffline:indexPath];
+        [self explicitRequestOpenOffline:indexPath];
     }];
 }
 
@@ -1284,7 +1297,7 @@
                            systemImage:@"bolt.horizontal.circle"
                            
                                handler:^(__kindof UIAction * _Nonnull action) {
-        [self forceOpenOnline:indexPath];
+        [self explicitRequestOpenOnline:indexPath];
     }];
 }
 
@@ -1439,7 +1452,7 @@
             onOrOfflineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                    title:NSLocalizedString(@"safes_vc_slide_left_open_online_action", @"Open this database online action")
                                                                  handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-                [self forceOpenOnline:indexPath];
+                [self explicitRequestOpenOnline:indexPath];
             }];
             onOrOfflineAction.backgroundColor = [UIColor systemGreenColor];
         }
@@ -1450,7 +1463,7 @@
             onOrOfflineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                    title:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open this database offline table action")
                                                                  handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-                [self openOffline:indexPath];
+                [self explicitRequestOpenOffline:indexPath];
             }];
             onOrOfflineAction.backgroundColor = [UIColor darkGrayColor];
         }
@@ -2329,7 +2342,11 @@
         return;
     }
     
-    [self openDatabase:safe biometricPreCleared:userJustCompletedBiometricAuthentication];
+    [self openDatabase:safe
+       explicitOffline:NO
+  explicitManualUnlock:NO
+   biometricPreCleared:userJustCompletedBiometricAuthentication
+        explicitOnline:NO];
 }
 
 

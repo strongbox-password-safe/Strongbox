@@ -134,7 +134,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 
 @property NSArray<NSString*>* sortedAttachmentsFilenames;
-@property NSDictionary<NSString*, DatabaseAttachment*>* attachments;
+@property NSDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* attachments;
 
 @property NSArray* customFields;
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
@@ -1880,9 +1880,9 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     [ret addKey:NSLocalizedString(@"mac_database_summary_most_popular_username", @"Most Popular Username")
        andValue:model.mostPopularUsername ? model.mostPopularUsername : @"<None>"];
     [ret addKey:NSLocalizedString(@"mac_database_summary_number_of_entries", @"Number of Entries")
-       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfRecords]];
+       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.fastEntryTotalCount]];
     [ret addKey:NSLocalizedString(@"mac_database_summary_number_of_folders", @"Number of Folders")
-       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.numberOfGroups]];
+       andValue:[NSString stringWithFormat:@"%lu", (unsigned long)model.fastGroupTotalCount]];
     
     return ret;
 }
@@ -1921,7 +1921,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     }
     else if (tableView == self.attachmentsTable) {
         NSString* filename = self.sortedAttachmentsFilenames[row];
-        DatabaseAttachment* dbAttachment = self.attachments[filename];
+        KeePassAttachmentAbstractionLayer* dbAttachment = self.attachments[filename];
 
         BOOL isFileNameColumn = [tableColumn.identifier isEqualToString:@"filename"];
         NSString* cellId = isFileNameColumn ? @"AttachmentFileNameCellIdentifier" : @"AttachmentFileSizeCellIdentifier";
@@ -1977,7 +1977,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         for (int i=0;i<workingCopy.count;i++) {
-            DatabaseAttachment* dbAttachment = workingCopy[i];
+            KeePassAttachmentAbstractionLayer* dbAttachment = workingCopy[i];
             
             NSData* data = [NSData dataWithContentsOfStream:[dbAttachment getPlainTextInputStream]];
             NSImage* img = [[NSImage alloc] initWithData:data];
@@ -2020,7 +2020,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     }
     NSString* filename = self.sortedAttachmentsFilenames[idx];
     
-    DatabaseAttachment* dbAttachment = self.attachments[filename];
+    KeePassAttachmentAbstractionLayer* dbAttachment = self.attachments[filename];
     
     NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
@@ -2065,7 +2065,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
-            DatabaseAttachment* dbAttachment = self.attachments[filename];
+            KeePassAttachmentAbstractionLayer* dbAttachment = self.attachments[filename];
             NSInputStream* inStream = [dbAttachment getPlainTextInputStream];
             NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
 

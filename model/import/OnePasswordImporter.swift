@@ -119,7 +119,7 @@ class OnePasswordImporter: NSObject, Importer {
             
             if let uuid = record.uuid, let attachments = attachments[uuid] {
                 for attachment in attachments {
-                    let dbA = DatabaseAttachment(nonPerformantWith: attachment.value, compressed: true, protectedInMemory: true)
+                    let dbA = KeePassAttachmentAbstractionLayer(nonPerformantWith: attachment.value, compressed: true, protectedInMemory: true)
                     entry.fields.attachments[attachment.key] = dbA
                 }
             }

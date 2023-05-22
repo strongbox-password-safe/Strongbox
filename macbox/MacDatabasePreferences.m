@@ -1327,13 +1327,13 @@
     }];
 }
 
-- (BOOL)showChildCountOnFolderInSidebar {
-    return self.metadata.showChildCountOnFolderInSidebar;
+- (BOOL)searchIncludeGroups {
+    return self.metadata.searchIncludeGroups;
 }
 
-- (void)setShowChildCountOnFolderInSidebar:(BOOL)showChildCountOnFolderInSidebar {
+- (void)setSearchIncludeGroups:(BOOL)searchIncludeGroups {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.showChildCountOnFolderInSidebar = showChildCountOnFolderInSidebar;
+        metadata.searchIncludeGroups = searchIncludeGroups;
     }];
 }
 
@@ -1364,6 +1364,66 @@
 - (void)setAutoFillCopyTotp:(BOOL)autoFillCopyTotp {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.autoFillCopyTotp = autoFillCopyTotp;
+    }];
+}
+
+- (BOOL)showChildCountOnFolderInSidebar {
+    return self.metadata.showChildCountOnFolderInSidebar;
+}
+
+- (void)setShowChildCountOnFolderInSidebar:(BOOL)showChildCountOnFolderInSidebar {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showChildCountOnFolderInSidebar = showChildCountOnFolderInSidebar;
+    }];
+}
+
+- (SideBarChildCountFormat)sideBarChildCountFormat {
+    return self.metadata.sideBarChildCountFormat;
+}
+
+- (void)setSideBarChildCountFormat:(SideBarChildCountFormat)sideBarChildCountFormat {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.sideBarChildCountFormat = sideBarChildCountFormat;
+    }];
+}
+
+- (NSString *)sideBarChildCountGroupPrefix {
+    return self.metadata.sideBarChildCountGroupPrefix;
+}
+
+- (void)setSideBarChildCountGroupPrefix:(NSString *)sideBarChildCountGroupPrefix {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.sideBarChildCountGroupPrefix = sideBarChildCountGroupPrefix;
+    }];
+}
+
+- (NSString *)sideBarChildCountSeparator {
+    return self.metadata.sideBarChildCountSeparator;
+}
+
+- (void)setSideBarChildCountSeparator:(NSString *)sideBarChildCountSeparator {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.sideBarChildCountSeparator = sideBarChildCountSeparator;
+    }];
+}
+
+- (BOOL)sideBarChildCountShowZero {
+    return self.metadata.sideBarChildCountShowZero;
+}
+
+- (void)setSideBarChildCountShowZero:(BOOL)sideBarChildCountShowZero {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.sideBarChildCountShowZero = sideBarChildCountShowZero;
+    }];
+}
+
+- (BOOL)sideBarShowTotalCountOnHierarchy {
+    return self.metadata.sideBarShowTotalCountOnHierarchy;
+}
+
+- (void)setSideBarShowTotalCountOnHierarchy:(BOOL)sideBarShowTotalCountOnHierarchy {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.sideBarShowTotalCountOnHierarchy = sideBarShowTotalCountOnHierarchy;
     }];
 }
 

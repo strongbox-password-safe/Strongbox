@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
 
-@property (class, nullable, readonly) NSString* suggestedDatabaseNameUsingDeviceName;
+@property (class, nullable, readonly) NSString* suggestedNewDatabaseName;
 
 - (void)addWithDuplicateCheck:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
 - (void)add:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;

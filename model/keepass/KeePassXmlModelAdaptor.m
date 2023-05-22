@@ -19,7 +19,7 @@
 }
 
 + (Node *)toStrongboxModel:(RootXmlDomainObject *)xmlRoot
-               attachments:(NSArray<DatabaseAttachment *> *)attachments
+               attachments:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachments
             customIconPool:(NSDictionary<NSUUID *,NodeIcon *> *)customIconPool
                      error:(NSError *__autoreleasing  _Nullable *)error {
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
@@ -92,7 +92,7 @@
 - (RootXmlDomainObject*)toKeePassModel:(Node*)rootNode
                     databaseProperties:(KeePassDatabaseWideProperties*)databaseProperties
                                context:(XmlProcessingContext*)context
-                 minimalAttachmentPool:(NSArray<DatabaseAttachment*>**)minimalAttachmentPool
+                 minimalAttachmentPool:(NSArray<KeePassAttachmentAbstractionLayer*>**)minimalAttachmentPool
                               iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool
                                  error:(NSError **)error {
     RootXmlDomainObject *ret = [[RootXmlDomainObject alloc] initWithDefaultsAndInstantiatedChildren:context];
@@ -252,10 +252,10 @@
     return [NSMutableDictionary dictionary];
 }
 
-+ (NSArray<DatabaseAttachment*>*)getV3Attachments:(RootXmlDomainObject*)xmlDoc {
++ (NSArray<KeePassAttachmentAbstractionLayer*>*)getV3Attachments:(RootXmlDomainObject*)xmlDoc {
     NSArray<V3Binary*>* v3Binaries = safeGetBinaries(xmlDoc);
     
-    NSMutableArray<DatabaseAttachment*> *attachments = [NSMutableArray array];
+    NSMutableArray<KeePassAttachmentAbstractionLayer*> *attachments = [NSMutableArray array];
     
     NSArray *sortedById = [v3Binaries sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         return [@(((V3Binary*)obj1).id) compare:@(((V3Binary*)obj2).id)];

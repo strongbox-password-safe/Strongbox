@@ -41,6 +41,7 @@
 	</array>
 	<key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
 	<array>
+		<string>/Library/Application Support/librewolf/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Mozilla/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Google/Chrome/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Google/Chrome Beta/NativeMessagingHosts/</string>
@@ -54,6 +55,7 @@
 		<string>/Library/Application Support/Vivaldi/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Arc/User Data/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Sidekick/NativeMessagingHosts/</string>
+		<string>/Library/Application Support/Orion/NativeMessagingHosts/</string>
 	</array>
 </dict>
 </plist>

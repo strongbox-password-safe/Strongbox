@@ -77,7 +77,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
  
     
 
-    NSArray<DatabaseAttachment*>* attachments = [KeePassXmlModelAdaptor getV3Attachments:xmlRoot];
+    NSArray<KeePassAttachmentAbstractionLayer*>* attachments = [KeePassXmlModelAdaptor getV3Attachments:xmlRoot];
     NSDictionary<NSUUID*, NodeIcon*>* customIconPool = [KeePassXmlModelAdaptor getCustomIcons:meta];
 
     
@@ -137,7 +137,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
     databaseProperties.deletedObjects = database.deletedObjects;
     databaseProperties.metadata = database.meta;
     
-    NSArray<DatabaseAttachment*>* minimalAttachmentPool = @[];
+    NSArray<KeePassAttachmentAbstractionLayer*>* minimalAttachmentPool = @[];
     RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toKeePassModel:database.rootNode
                                                    databaseProperties:databaseProperties
                                                               context:[XmlProcessingContext standardV3Context]
@@ -163,7 +163,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
     [v3Binaries removeAllObjects];
     
     int i = 0;
-    for (DatabaseAttachment* binary in minimalAttachmentPool) {
+    for (KeePassAttachmentAbstractionLayer* binary in minimalAttachmentPool) {
         V3Binary* bin = [[V3Binary alloc] initWithContext:[XmlProcessingContext standardV3Context] dbAttachment:binary];
         bin.id = i++;
         [v3Binaries addObject:bin];

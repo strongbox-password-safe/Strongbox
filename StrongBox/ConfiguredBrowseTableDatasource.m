@@ -12,6 +12,7 @@
 #import "AppPreferences.h"
 #import "Utils.h"
 #import "NSString+Extensions.h"
+#import "Constants.h"
 
 const NSUInteger kSectionIdxFavourites = 0;
 const NSUInteger kSectionIdxNearlyExpired = 1;
@@ -228,7 +229,15 @@ const NSUInteger kSectionIdxLast = 3;
             ret = [self.viewModel entriesWithTag:tag];
         }
         else {
-            return [self.viewModel.database.tagSet.allObjects sortedArrayUsingComparator:finderStringComparator];
+            NSSet<NSString*>* tags = self.viewModel.database.tagSet;
+            
+            if ( AppPreferences.sharedInstance.shadeFavoriteTag && [tags containsObject:kCanonicalFavouriteTag] ) {
+                NSMutableSet<NSString*>* mut = self.viewModel.database.tagSet.mutableCopy;
+                [mut removeObject:kCanonicalFavouriteTag];
+                tags = [mut copy];
+            }
+            
+            return [tags.allObjects sortedArrayUsingComparator:finderStringComparator];
         }
     }
     else {

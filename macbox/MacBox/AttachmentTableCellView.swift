@@ -30,7 +30,7 @@ class AttachmentTableCellView: NSTableCellView, DetailTableCellViewPopupButton, 
         self.popupMenuUpdater = popupMenuUpdater
         popupButton.menu?.delegate = self
 
-        guard let attachment = field.object as? DatabaseAttachment else {
+        guard let attachment = field.object as? KeePassAttachmentAbstractionLayer else {
             NSLog("🔴 Couldn't get attachment from field")
             return
         }

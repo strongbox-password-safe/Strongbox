@@ -18,6 +18,7 @@
 #import "KeePassIconSet.h"
 #import "NextNavigationConstants.h"
 #import "SearchScope.h"
+#import "SideBarChildCountFormat.h"
 
 @class HeaderNodeState;
 
@@ -153,13 +154,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* searchText;
 @property SearchScope searchScope;
 
-@property BOOL showChildCountOnFolderInSidebar;
-
 @property NSArray<HeaderNodeState*>* headerNodes;
-
 @property BOOL customSortOrderForFields;
-
 @property BOOL autoFillCopyTotp;
+
+@property BOOL showChildCountOnFolderInSidebar;
+@property SideBarChildCountFormat sideBarChildCountFormat;
+@property NSString* sideBarChildCountGroupPrefix;
+@property NSString* sideBarChildCountSeparator;
+@property BOOL sideBarChildCountShowZero;
+@property BOOL sideBarShowTotalCountOnHierarchy;
+
+@property BOOL searchIncludeGroups;
 
 @end
 

@@ -35,6 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)containsSearchString:(NSString*)searchText checkPinYin:(BOOL)checkPinYin;
 
+- (NSString *)stringByTrimmingLeadingCharactersInSet:(NSCharacterSet *)characterSet;
+- (NSString *)stringByTrimmingTrailingCharactersInSet:(NSCharacterSet *)characterSet;
+
 @end
 
 NS_ASSUME_NONNULL_END

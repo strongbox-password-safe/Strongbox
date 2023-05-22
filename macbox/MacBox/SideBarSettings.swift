@@ -18,10 +18,24 @@ class SideBarSettings: NSViewController {
     @IBOutlet var checkboxAuditIssues: NSButton!
     @IBOutlet var checkboxQuickViews: NSButton!
 
+    @IBOutlet weak var checkboxShowChildCounts: NSButton!
+    @IBOutlet weak var checkboxShowDatabaeSummaryCount: NSButton!
+    @IBOutlet weak var checkboxShowZeroCounts: NSButton!
+    @IBOutlet weak var stackViewDisplayFormat: NSStackView!
+    @IBOutlet weak var stackViewSeparator: NSStackView!
+    @IBOutlet weak var stackViewGroupPrefix: NSStackView!
+    
+    @IBOutlet weak var popupDisplayFormat: NSPopUpButton!
+    @IBOutlet weak var textFieldSeparator: NSTextField!
+    @IBOutlet weak var textFieldGroupPrefix: NSTextField!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        populateChildCountFormatPopup()
+        
         bindUI()
+        bindChildCountUI()
     }
 
     func bindUI() {
@@ -108,5 +122,80 @@ class SideBarSettings: NSViewController {
 
     @IBAction func onClose(_: Any) {
         view.window?.cancelOperation(nil)
+    }
+    
+    
+    
+    func populateChildCountFormatPopup () {
+        popupDisplayFormat.menu?.removeAllItems()
+        
+        popupDisplayFormat.menu?.addItem(withTitle: NSLocalizedString("side_bar_child_count_format_entries", comment: "Entries"), action: nil, keyEquivalent: "")
+        popupDisplayFormat.menu?.addItem(withTitle: NSLocalizedString("side_bar_child_count_format_entries_rec", comment: "Entries (Recursive)"), action: nil, keyEquivalent: "")
+        popupDisplayFormat.menu?.addItem(withTitle: NSLocalizedString("side_bar_child_count_format_groups_and_entries", comment: "Groups and Entries"), action: nil, keyEquivalent: "")
+        popupDisplayFormat.menu?.addItem(withTitle: NSLocalizedString("side_bar_child_count_format_groups_and_entries_rec", comment: "Groups and Entries (Recursive)"), action: nil, keyEquivalent: "")
+        popupDisplayFormat.menu?.addItem(withTitle: NSLocalizedString("side_bar_child_count_format_items", comment: "Items"), action: nil, keyEquivalent: "")
+        popupDisplayFormat.menu?.addItem(withTitle: NSLocalizedString("side_bar_child_count_format_items_rec", comment: "Items (Recursive)"), action: nil, keyEquivalent: "")
+    }
+    
+    func bindChildCountUI() {
+        checkboxShowChildCounts.state = model.showChildCountOnFolderInSidebar ? .on : .off
+        checkboxShowDatabaeSummaryCount.state = model.sideBarShowTotalCountOnHierarchy ? .on : .off
+        checkboxShowZeroCounts.state = model.sideBarChildCountShowZero ? .on : .off
+        
+        textFieldSeparator.stringValue = model.sideBarChildCountSeparator
+        textFieldGroupPrefix.stringValue = model.sideBarChildCountGroupPrefix
+        
+        popupDisplayFormat.selectItem(at: model.sideBarChildCountFormat.rawValue)
+
+        checkboxShowZeroCounts.isHidden = !model.showChildCountOnFolderInSidebar
+        stackViewDisplayFormat.isHidden = !model.showChildCountOnFolderInSidebar
+
+        stackViewSeparator.isHidden = !model.showChildCountOnFolderInSidebar || !(model.sideBarChildCountFormat == .groupsAndEntries || model.sideBarChildCountFormat == .groupsAndEntriesRecursive)
+
+        stackViewGroupPrefix.isHidden = !model.showChildCountOnFolderInSidebar || !(model.sideBarChildCountFormat == .groupsAndEntries || model.sideBarChildCountFormat == .groupsAndEntriesRecursive)
+    }
+    
+    @IBAction func onChangeFormatPopup(_ sender: Any) {
+        model.sideBarChildCountFormat = SideBarChildCountFormat(rawValue: popupDisplayFormat.indexOfSelectedItem) ?? .entries
+
+        bindChildCountUI()
+    }
+    
+    @IBAction func onChildCountChanged(_ sender: Any) {
+        model.showChildCountOnFolderInSidebar = checkboxShowChildCounts.state == .on
+        
+        bindChildCountUI()
+    }
+    
+    @IBAction func onShowSummaryChanged(_ sender: Any) {
+        model.sideBarShowTotalCountOnHierarchy = checkboxShowDatabaeSummaryCount.state == .on
+        
+        bindChildCountUI()
+    }
+    
+    @IBAction func onShowZeroCountsChanged(_ sender: Any) {
+        model.sideBarChildCountShowZero = checkboxShowZeroCounts.state == .on
+        
+        bindChildCountUI()
+    }
+    
+    @IBAction func onEditSeparator(_ sender: Any) {
+        guard let ret = MacAlerts().input(NSLocalizedString("mac_password_gen_enter_new_separator", comment: "Please Enter a New Word Separator"), defaultValue: model.sideBarChildCountSeparator, allowEmpty: true) else {
+            return
+        }
+        
+        model.sideBarChildCountSeparator = ret
+        
+        bindChildCountUI()
+    }
+    
+    @IBAction func onEditGroupPrefix(_ sender: Any) {
+        guard let ret = MacAlerts().input(NSLocalizedString("mac_password_gen_enter_new_separator", comment: "Please Enter a New Word Separator"), defaultValue: model.sideBarChildCountGroupPrefix, allowEmpty: true) else {
+            return
+        }
+        
+        model.sideBarChildCountGroupPrefix = ret
+        
+        bindChildCountUI()
     }
 }

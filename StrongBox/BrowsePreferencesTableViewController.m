@@ -88,6 +88,29 @@
     [self reloadDataAnimated:NO];
 }
 
+- (IBAction)onEayReadFontOnAll:(id)sender {
+    NSLog(@"onEayReadFontOnAll: [%@]", sender);
+    
+    if ( self.easyReadFontForAll.on && AppPreferences.sharedInstance.markdownNotes ) {
+        [Alerts areYouSure:self
+                   message:NSLocalizedString(@"are_you_sure_message_easy_read_font_markdown_notes", @"Note: Enabling Easy-Read Font will have the effect of disabling the 'Markdown Notes' formatting feature. Is this OK?")
+                    action:^(BOOL response) {
+            if ( response ) {
+                self.databaseMetaData.easyReadFontForAll = self.easyReadFontForAll.on;
+                
+                [self notifyDatabaseViewPreferencesChanged];
+            }
+            
+            [self bindPreferences];
+        }];
+    }
+    else {
+        self.databaseMetaData.easyReadFontForAll = self.easyReadFontForAll.on;
+        [self bindPreferences];
+        [self notifyDatabaseViewPreferencesChanged];
+    }
+}
+
 - (IBAction)onGenericPreferencesChanged:(id)sender {
     NSLog(@"Generic Preference Changed: [%@]", sender);
     
@@ -117,7 +140,6 @@
     self.databaseMetaData.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
     self.databaseMetaData.hideTotp = !self.switchShowTotp.on;
     self.databaseMetaData.showEmptyFieldsInDetailsView = self.switchShowEmptyFields.on;
-    self.databaseMetaData.easyReadFontForAll = self.easyReadFontForAll.on;
     self.databaseMetaData.hideTotpCustomFieldsInViewMode = !self.switchShowTotpCustom.on;
     self.databaseMetaData.colorizePasswords = self.switchColorizePasswords.on;
     self.databaseMetaData.colorizeProtectedCustomFields = self.switchColorizeProtectedCustomFields.on;
@@ -224,7 +246,7 @@
         [self onChangeBrowseItemSubtitle];
     }
     else if (cell == self.cellSingleTapAction ) {
-        [self onChangeTapAction:cell];
+        [self onChangeSingleTapAction];
     }
     else if (cell == self.cellIconSet) {
         [self onChangeIconSet];
@@ -265,7 +287,7 @@
     }];
 }
 
-- (void)onChangeTapAction:(UITableViewCell*)cell {
+- (void)onChangeSingleTapAction {
     NSArray<NSNumber*>* options = @[@(kBrowseTapActionNone),
                                     @(kBrowseTapActionOpenDetails),
                                     @(kBrowseTapActionEdit),
@@ -281,12 +303,8 @@
         return [self getTapActionString:(BrowseTapAction)obj.integerValue];
     }];
     
-    BrowseTapAction current;
-    NSString* title;
-    if(cell == self.cellSingleTapAction) {
-        current = self.databaseMetaData.tapAction;
-        title = NSLocalizedString(@"browse_prefs_single_tap_action", @"Single Tap Action");
-    }
+    BrowseTapAction current = self.databaseMetaData.tapAction;
+    NSString* title = NSLocalizedString(@"browse_prefs_single_tap_action", @"Single Tap Action");
     
     NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return obj.integerValue == current;
@@ -297,9 +315,7 @@
              currentIndex:currentIndex
                completion:^(BOOL success, NSInteger selectedIdx) {
                    if (success) {
-                       if(cell == self.cellSingleTapAction) {
-                           self.databaseMetaData.tapAction = (BrowseTapAction)options[selectedIdx].integerValue;
-                       }
+                       self.databaseMetaData.tapAction = (BrowseTapAction)options[selectedIdx].integerValue;
                    }
                    
                    [self bindPreferences];

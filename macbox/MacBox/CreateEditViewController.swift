@@ -89,6 +89,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBOutlet var progressTotp: NSProgressIndicator!
     @IBOutlet var popupLocation: NSPopUpButton!
 
+    @IBOutlet weak var buttonNewEntryDefaults: NSButton!
     @IBOutlet var buttonHistory: NSPopUpButton!
     
 
@@ -139,9 +140,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         super.viewDidLoad()
 
         guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId),
-              let dbModel = database.commonModel else
-        {
-            NSLog("🔴 Could not load initial node!")
+              let dbModel = database.commonModel,
+              !node.isGroup else {
+            NSLog("🔴 Could not load initial node or node is a group!")
             return
         }
 
@@ -152,7 +153,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         bindUiToModel()
         
-        bindDoneButtonState()
+        bindActionButtonStatesAndTitles()
     }
 
     func bindScreenCaptureBlock() {
@@ -557,7 +558,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         return database.getDefaultNewEntryNode(parentGroup)
     }
 
-    @IBAction func onDiscard(_: Any) {
+    @IBAction func onDiscard(_: Any?) {
         let isDifferent = model.isDifferent(from: preEditModelClone)
 
         if isDifferent {
@@ -754,8 +755,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         
         
-        
-        database.document?.save(nil)
+        if ( Settings.sharedInstance().autoSave ) { 
+            database.document?.save(nil)
+        }
                 
         if dismissAfterSave {
             database.nextGenSelectedItems = [node.uuid]
@@ -775,12 +777,12 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             
             bindUiToModel()
 
-            bindDoneButtonState()
+            bindActionButtonStatesAndTitles()
         }
     }
 
     func onModelEdited() {
-        bindDoneButtonState()
+        bindActionButtonStatesAndTitles()
     }
 
     @objc
@@ -788,24 +790,43 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         return model.isDifferent(from: preEditModelClone)
     }
 
-    func bindDoneButtonState() {
+    func bindActionButtonStatesAndTitles() {
         let isDifferent = model.isDifferent(from: preEditModelClone)
         let isSaveable = isDifferent || initialNodeId == nil
 
         buttonDone.isEnabled = isSaveable || !isDifferent
         
-        buttonDone.title = isSaveable ?  NSLocalizedString("mac_create_or_edit_commit_changes_and_close", comment: "Commit & Close (⌘⏎)") :
-        NSLocalizedString("mac_create_or_edit_commit_close", comment: "Close (⌘⏎)");
-        
+        if ( isSaveable ) {
+            if ( Settings.sharedInstance().autoSave ) {
+                buttonDone.title = NSLocalizedString("mac_create_or_edit_save_changes_and_close", comment: "Save & Close (⌘⏎)");
+                buttonSave.title = NSLocalizedString("mac_create_or_edit_save_changes", comment: "Save (⌘S)");
+            }
+            else {
+                buttonDone.title = NSLocalizedString("mac_create_or_edit_commit_changes_and_close", comment: "Commit & Close (⌘⏎)");
+                buttonSave.title = NSLocalizedString("mac_create_or_edit_commit_changes", comment: "Commit (⌘S)");
+            }
+        }
+        else {
+            buttonDone.title = NSLocalizedString("mac_create_or_edit_commit_close", comment: "Close (⌘⏎)");
+        }
+
         buttonSave.isEnabled = isSaveable
+        buttonSave.isHidden = !isSaveable
         
         buttonCancel.title = isDifferent ? NSLocalizedString("discard_changes", comment: "Discard Changes") : NSLocalizedString("generic_cancel", comment: "Cancel")
 
+        buttonCancel.isHidden = !isSaveable
+        buttonNewEntryDefaults.isHidden = initialNodeId != nil
+        
         if #available(macOS 10.12.2, *) {
             buttonCancel.bezelColor = isDifferent ? .systemRed : nil
         }
     }
 
+    override func cancelOperation(_ sender: Any?) { 
+        onDiscard(nil)
+    }
+    
     func controlTextDidChange(_ obj: Notification) {
         guard let textField = obj.object as? NSTextField else { return }
 
@@ -1273,14 +1294,14 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             return
         }
 
-        let databaseAttachment = DatabaseAttachment(nonPerformantWith: pngData, compressed: true, protectedInMemory: true)
+        let databaseAttachment = KeePassAttachmentAbstractionLayer(nonPerformantWith: pngData, compressed: true, protectedInMemory: true)
 
         let filename = String(format: NSLocalizedString("pasted_image_attachment_at_time_filename_png_fmt", comment: "paste-at-%@.png"), NSDate().fileNameCompatibleDateTimePrecise)
 
         addAttachment(filename, databaseAttachment)
     }
 
-    func addAttachment(_ filename: String, _ databaseAttachment: DatabaseAttachment) {
+    func addAttachment(_ filename: String, _ databaseAttachment: KeePassAttachmentAbstractionLayer) {
         var uniqueFilename = filename
 
         if model.attachments.allKeys().contains(filename as NSString) {
@@ -1631,7 +1652,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         let filename = url.lastPathComponent
         do {
             let data = try Data(contentsOf: url)
-            let attachment = DatabaseAttachment(nonPerformantWith: data, compressed: true, protectedInMemory: true)
+            let attachment = KeePassAttachmentAbstractionLayer(nonPerformantWith: data, compressed: true, protectedInMemory: true)
             addAttachment(filename, attachment)
         } catch {
             MacAlerts.error(error, window: view.window)
@@ -1777,7 +1798,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             filename = String(format: "%@-%@.%@", url.deletingPathExtension().lastPathComponent, NSDate().fileNameCompatibleDateTimePrecise, url.pathExtension)
         }
 
-        let attachment = DatabaseAttachment(nonPerformantWith: data, compressed: true, protectedInMemory: true)
+        let attachment = KeePassAttachmentAbstractionLayer(nonPerformantWith: data, compressed: true, protectedInMemory: true)
 
         addAttachment(filename, attachment)
 

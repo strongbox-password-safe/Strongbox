@@ -17,7 +17,7 @@
 #import "CryptoParameters.h"
 #import "Kdbx4SerializationData.h"
 #import "KeePassConstants.h"
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 #import "PwSafeSerialization.h"
 #import "VariantDictionary.h"
 #import "Keys.h"
@@ -434,7 +434,7 @@ NSData* getHeadersData(NSDictionary<NSNumber*, NSData*>* headers) {
     return ret;
 }
 
-static NSInteger createInnerHeaders(NSArray<DatabaseAttachment*> *attachments, uint32_t innerStreamId, NSData *innerStreamKey, NSOutputStream *outputStream) {
+static NSInteger createInnerHeaders(NSArray<KeePassAttachmentAbstractionLayer*> *attachments, uint32_t innerStreamId, NSData *innerStreamKey, NSOutputStream *outputStream) {
     NSInteger wrote = appendInnerHeader(kInnerHeaderTypeInnerRandomStreamId, Uint32ToLittleEndianData(innerStreamId), outputStream);
     if ( wrote < 0 ) {
         return wrote;
@@ -445,7 +445,7 @@ static NSInteger createInnerHeaders(NSArray<DatabaseAttachment*> *attachments, u
         return wrote;
     }
     
-    for (DatabaseAttachment *attachment in attachments) {
+    for (KeePassAttachmentAbstractionLayer *attachment in attachments) {
         wrote = appendInnerBinaryHeaderFromStream( attachment, outputStream );
         if ( wrote < 0 ) {
             NSLog(@"Could not get attachment screen, cannot serialize.");
@@ -461,7 +461,7 @@ static NSInteger createInnerHeaders(NSArray<DatabaseAttachment*> *attachments, u
     return YES;
 }
 
-static NSInteger appendInnerBinaryHeaderFromStream(DatabaseAttachment *attachment, NSOutputStream *outputStream) {
+static NSInteger appendInnerBinaryHeaderFromStream(KeePassAttachmentAbstractionLayer *attachment, NSOutputStream *outputStream) {
     uint8_t typeBytes[] = { kInnerHeaderTypeBinary };
     NSInteger wrote = [outputStream write:typeBytes maxLength:1];
     if ( wrote < 0 ) {
@@ -600,7 +600,7 @@ static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
             BOOL protectedInMemory = block[0] == 1;
             
 
-            DatabaseAttachment *attachment = [[DatabaseAttachment alloc] initWithStream:stream length:headerLength - 1 protectedInMemory:protectedInMemory];
+            KeePassAttachmentAbstractionLayer *attachment = [[KeePassAttachmentAbstractionLayer alloc] initWithStream:stream length:headerLength - 1 protectedInMemory:protectedInMemory];
             
             if (attachment == nil) {
                 return nil;

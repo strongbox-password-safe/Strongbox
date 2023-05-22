@@ -944,6 +944,42 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }];
 }
 
+- (void)onRenameTag:(NSString*)tag
+         completion:(void (^)(BOOL actionPerformed))completion {
+    [Alerts OkCancelWithTextField:self
+                    textFieldText:tag
+                            title:NSLocalizedString(@"browse_vc_rename_item", @"Rename Item")
+                          message:NSLocalizedString(@"browse_vc_rename_item_enter_title", @"Please enter a new title for this item")
+                       completion:^(NSString *text, BOOL response) {
+        if ( response && text && [Utils trim:text].length ) {
+            NSString* trimmed = [Utils trim:text];
+            
+            [self.viewModel renameTag:tag to:trimmed];
+            
+            [self updateAndRefresh];
+        }
+        
+        if(completion) {
+            completion(response);
+        }
+    }];
+}
+
+- (void)onDeleteTag:(NSString*)tag
+         completion:(void (^)(BOOL actionPerformed))completion {
+    [Alerts areYouSure:self message:NSLocalizedString(@"are_you_sure_delete_tag_message", @"Are you sure you want to delete this tag?") action:^(BOOL response) {
+        if(response) {
+            [self.viewModel deleteTag:tag];
+            
+            [self updateAndRefresh];
+        }
+        
+        if(completion) {
+            completion(response);
+        }
+    }];
+}
+
 - (void)onEmptyRecycleBin:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
     [Alerts areYouSure:self message:NSLocalizedString(@"browse_vc_action_empty_recycle_bin_are_you_sure", @"This will permanently delete all items contained within the Recycle Bin.") action:^(BOOL response) {
         if ( response ) {
@@ -1182,25 +1218,28 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     if (![self getTableDataSource].supportsSlideActions) {
         return [UISwipeActionsConfiguration configurationWithActions:@[]];
     }
-        
-    UIContextualAction* copyPassword = [self getCopyPasswordSlideAction:indexPath];
-    UIContextualAction* copyUsername = [self getCopyUsernameSlideAction:indexPath];
-    
-    NSMutableArray* actions = @[copyPassword, copyUsername].mutableCopy;
-    
+            
     Node *item = [self getNodeFromIndexPath:indexPath];
 
     if ( item ) {
+        UIContextualAction* copyPassword = [self getCopyPasswordSlideAction:indexPath];
+        UIContextualAction* copyUsername = [self getCopyUsernameSlideAction:indexPath];
+        
+        NSMutableArray* actions = @[copyPassword, copyUsername].mutableCopy;
+
         if (item.fields.otpToken) {
             UIContextualAction* copyTotp = [self getCopyTotpSlideAction:indexPath];
             [actions addObject:copyTotp];
         }
+        
+        UISwipeActionsConfiguration* ret = (item && item.isGroup) ? [self getLeftSlideActionsForGroup:indexPath] : [UISwipeActionsConfiguration configurationWithActions:actions];
+        ret.performsFirstActionWithFullSwipe = YES;
+        
+        return ret;
     }
-    
-    UISwipeActionsConfiguration* ret = (item && item.isGroup) ? [self getLeftSlideActionsForGroup:indexPath] : [UISwipeActionsConfiguration configurationWithActions:actions];
-    ret.performsFirstActionWithFullSwipe = YES;
-    
-    return ret;
+    else {
+        return [UISwipeActionsConfiguration configurationWithActions:@[]];
+    }
 }
 
 - (UIContextualAction*)getCopyAndLaunchSlideAction:(NSIndexPath *)indexPath {
@@ -2393,17 +2432,34 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 
-- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
-    if (self.isEditing || [self isShowingQuickViews]) {
+- (UIContextMenuConfiguration *)getContextMenuForTagAt:(NSIndexPath *)indexPath {
+    __weak BrowseSafeView* weakSelf = self;
+    NSString* tag = [self getTagFromIndexPath:indexPath];
+    
+    if ( tag.length == 0 ) {
+        NSLog(@"⚠️ Nil empty Tag?!");
         return nil;
     }
+    
+    return [UIContextMenuConfiguration configurationWithIdentifier:indexPath
+                                                   previewProvider:nil
+                                                    actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
+        return [UIMenu menuWithTitle:@""
+                               image:nil
+                          identifier:nil
+                             options:kNilOptions
+                            children:@[
+            [weakSelf getContextualMenuForTag:indexPath tag:tag]]];
+    }];
+}
+
+- (UIContextMenuConfiguration *)getContextMenuForNodeAt:(NSIndexPath *)indexPath {
+    __weak BrowseSafeView* weakSelf = self;
     
     Node *item = [self getNodeFromIndexPath:indexPath];
     if (!item) {
         return nil;
     }
-
-    __weak BrowseSafeView* weakSelf = self;
     
     return [UIContextMenuConfiguration configurationWithIdentifier:indexPath
                                                    previewProvider:^UIViewController * _Nullable{ return item.isGroup ? nil : [PreviewItemViewController forItem:item andModel:self.viewModel];   }
@@ -2413,12 +2469,25 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                           identifier:nil
                              options:kNilOptions
                             children:@[
-                                [weakSelf getContextualMenuNonMutators:indexPath item:item],
-
-                                [weakSelf getContextualMenuCopyFieldToClipboard:indexPath item:item],
-                                [weakSelf getContextualMenuMutators:indexPath item:item],
-                            ]];
+            [weakSelf getContextualMenuNonMutators:indexPath item:item],
+            
+            [weakSelf getContextualMenuCopyFieldToClipboard:indexPath item:item],
+            [weakSelf getContextualMenuMutators:indexPath item:item],
+        ]];
     }];
+}
+
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
+    if (self.isEditing || [self isShowingQuickViews]) {
+        return nil;
+    }
+
+    if ( self.viewType == kBrowseViewTypeTags && self.currentTag == nil ) {
+        return [self getContextMenuForTagAt:indexPath];
+    }
+    else {
+        return [self getContextMenuForNodeAt:indexPath];
+    }
 }
 
 - (void)tableView:(UITableView *)tableView willPerformPreviewActionForMenuWithConfiguration:(UIContextMenuConfiguration *)configuration animator:(id<UIContextMenuInteractionCommitAnimating>)animator  {
@@ -2430,6 +2499,38 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else {
         [self openDetails:item];
     }
+}
+
+- (UIMenu*)getContextualMenuForTag:(NSIndexPath*)indexPath tag:(NSString*)tag {
+    NSMutableArray<UIAction*>* ma = [NSMutableArray array];
+    
+    [ma addObject:[self getContextualMenuRenameTagAction:indexPath tag:tag]];
+    [ma addObject:[self getContextualMenuDeleteTagAction:indexPath tag:tag]];
+    
+    return [UIMenu menuWithTitle:@""
+                           image:nil
+                      identifier:nil options:UIMenuOptionsDisplayInline
+                        children:ma];
+}
+
+- (UIAction*)getContextualMenuRenameTagAction:(NSIndexPath*)indexPath tag:(NSString*)tag {
+    __weak BrowseSafeView* weakSelf = self;
+    
+    return [ContextMenuHelper getItem:NSLocalizedString(@"browse_vc_action_rename", @"Rename")
+                          systemImage:@"pencil"
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onRenameTag:tag completion:nil];
+    }];
+}
+
+- (UIAction*)getContextualMenuDeleteTagAction:(NSIndexPath*)indexPath tag:(NSString*)tag {
+    __weak BrowseSafeView* weakSelf = self;
+    
+    return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"browse_vc_action_delete", @"Delete")
+                                     systemImage:@"trash"
+                                         handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onDeleteTag:tag completion:nil];
+    }];
 }
 
 - (UIMenu*)getContextualMenuNonMutators:(NSIndexPath*)indexPath item:(Node*)item  {

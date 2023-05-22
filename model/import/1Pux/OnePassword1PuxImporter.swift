@@ -200,6 +200,15 @@ class OnePassword1PuxImporter: NSObject, Importer {
                 try processSection(node: node, section: section, categoryId: categoryId, attachmentsDir: attachmentsDir )
             }
         }
+        
+        if let password = details.password {
+            if node.fields.password.isEmpty {
+                node.fields.password = password
+            }
+            else {
+                addCustomField(node: node, name: "password", value: password, protected: true)
+            }
+        }
     }
     
     func processLoginField ( node : Node, field : OnePuxLoginField ) {
@@ -468,7 +477,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
             uniqueFilename = String(format: "%@-%@", documentId, filename)
         }
         
-        node.fields.attachments[uniqueFilename] = DatabaseAttachment(nonPerformantWith: data, compressed: true, protectedInMemory: true)
+        node.fields.attachments[uniqueFilename] = KeePassAttachmentAbstractionLayer(nonPerformantWith: data, compressed: true, protectedInMemory: true)
     }
     
     

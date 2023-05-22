@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable RootXmlDomainObject*)toKeePassModel:(Node*)rootNode
                              databaseProperties:(KeePassDatabaseWideProperties*)databaseProperties
                                         context:(XmlProcessingContext*)context
-                          minimalAttachmentPool:(NSArray<DatabaseAttachment*>*_Nullable*_Nullable)minimalAttachmentPool
+                          minimalAttachmentPool:(NSArray<KeePassAttachmentAbstractionLayer*>*_Nullable*_Nullable)minimalAttachmentPool
                                        iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool
                                           error:(NSError **)error;
 
@@ -32,14 +32,14 @@ NS_ASSUME_NONNULL_BEGIN
                              error:(NSError**)error;
 
 + (Node*_Nullable)toStrongboxModel:(RootXmlDomainObject*)xmlRoot
-                       attachments:(NSArray<DatabaseAttachment *> *)attachments
+                       attachments:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachments
                     customIconPool:(NSDictionary<NSUUID *, NodeIcon*> *)customIconPool
                              error:(NSError**)error;
 
 + (UnifiedDatabaseMetadata*)getMetadata:(Meta*_Nullable)meta format:(DatabaseFormat)format;
 + (NSDictionary<NSUUID*, NSDate*>*)getDeletedObjects:(RootXmlDomainObject*)existingRootXmlDocument;
 + (NSDictionary<NSUUID*, NodeIcon*>*)getCustomIcons:(Meta*_Nullable)meta;
-+ (NSArray<DatabaseAttachment*>*)getV3Attachments:(RootXmlDomainObject*)xmlDoc;
++ (NSArray<KeePassAttachmentAbstractionLayer*>*)getV3Attachments:(RootXmlDomainObject*)xmlDoc;
 
 @end
 

@@ -957,7 +957,7 @@ static NSInteger const kSectionCount = 5;
     
     [AddAttachmentHelper.sharedInstance beginAddAttachmentUi:self
                                                usedFilenames:usedFilenames
-                                                       onAdd:^(NSString * _Nonnull filename, DatabaseAttachment * _Nonnull databaseAttachment) {
+                                                       onAdd:^(NSString * _Nonnull filename, KeePassAttachmentAbstractionLayer * _Nonnull databaseAttachment) {
         [self onAddAttachment:filename attachment:databaseAttachment];
     }];
 }
@@ -973,7 +973,7 @@ static NSInteger const kSectionCount = 5;
     [self presentViewController:v animated:YES completion:nil];
 }
 
-- (void)onAddAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment {
+- (void)onAddAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment {
     NSLog(@"Adding new Attachment: [%@]", attachment);
     
     NSUInteger idx = [self.model insertAttachment:filename attachment:attachment];
@@ -998,7 +998,7 @@ static NSInteger const kSectionCount = 5;
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
     NSString* filename = self.model.attachments.allKeys[index];
-    DatabaseAttachment* attachment = self.model.attachments[filename];
+    KeePassAttachmentAbstractionLayer* attachment = self.model.attachments[filename];
     
     NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     
@@ -2046,7 +2046,7 @@ suggestionProvider:^NSString*(NSString *text) {
     else {
         NSInteger idx = indexPath.row - (self.editing ? 1 : 0);
         NSString* filename = self.model.attachments.allKeys[idx];
-        DatabaseAttachment* attachment = self.model.attachments[filename];
+        KeePassAttachmentAbstractionLayer* attachment = self.model.attachments[filename];
         
         if(self.editing) {
             EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];

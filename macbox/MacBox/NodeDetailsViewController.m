@@ -1070,7 +1070,7 @@ static NSString* trimField(NSTextField* textField) {
     AttachmentItem *item = [self.attachmentsView makeItemWithIdentifier:@"AttachmentItem" forIndexPath:indexPath];
     
     NSString* filename = self.sortedAttachmentFileNames[indexPath.item];
-    DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
+    KeePassAttachmentAbstractionLayer* dbAttachment = self.node.fields.attachments[filename];
     
     item.textField.stringValue = filename;
     item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.length countStyle:NSByteCountFormatterCountStyleFile];
@@ -1097,7 +1097,7 @@ static NSString* trimField(NSTextField* textField) {
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         for (int i=0;i<workingCopy.count;i++) {
-            DatabaseAttachment* dbAttachment = workingCopy[i];
+            KeePassAttachmentAbstractionLayer* dbAttachment = workingCopy[i];
             
             NSData* data = [NSData dataWithContentsOfStream:[dbAttachment getPlainTextInputStream]];
             NSImage* img = [[NSImage alloc] initWithData:data];
@@ -1229,7 +1229,7 @@ static NSString* trimField(NSTextField* textField) {
         return nil;
     }
     NSString* filename = self.sortedAttachmentFileNames[idx];
-    DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
+    KeePassAttachmentAbstractionLayer* dbAttachment = self.node.fields.attachments[filename];
     
     NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
@@ -1409,7 +1409,7 @@ static NSString* trimField(NSTextField* textField) {
     
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
-            DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
+            KeePassAttachmentAbstractionLayer* dbAttachment = self.node.fields.attachments[filename];
             
             NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
             [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:outStream];
@@ -1458,7 +1458,7 @@ static NSString* trimField(NSTextField* textField) {
                     return;
                 }
                 
-                DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:YES];
+                KeePassAttachmentAbstractionLayer* dbA = [[KeePassAttachmentAbstractionLayer alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:YES];
                 
                 NSString* filename = url.lastPathComponent;
                 [self.model addItemAttachment:self.node filename:filename attachment:dbA];

@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DatabaseAttachment : NSObject
+@interface KeePassAttachmentAbstractionLayer : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 

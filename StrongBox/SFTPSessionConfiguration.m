@@ -39,7 +39,11 @@
     if(self.username) [ret setValue:self.username forKey:@"username"];
     if(self.keyChainUuid) [ret setValue:self.keyChainUuid forKey:@"keyChainUuid"];
     if(self.initialDirectory) [ret setValue:self.initialDirectory forKey:@"initialDirectory"];
-
+    
+    if ( self.sha256FingerPrint ) {
+        [ret setValue:self.sha256FingerPrint forKey:@"sha256FingerPrint"];
+    }
+    
     return ret;
 }
 
@@ -63,6 +67,10 @@
     
     ret.username = [dictionary objectForKey:@"username"];
     ret.initialDirectory = [dictionary objectForKey:@"initialDirectory"];
+    
+    if ( dictionary[@"sha256FingerPrint"] ) {
+        ret.sha256FingerPrint = [dictionary objectForKey:@"sha256FingerPrint"];
+    }
     
     return ret;
 }

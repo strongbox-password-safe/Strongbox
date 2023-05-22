@@ -193,7 +193,7 @@
                     incompatible.icon = nil;
                     NSString* firstAttachmentFilename = incompatible.fields.attachments.allKeys.firstObject;
                     if ( firstAttachmentFilename ) {
-                        DatabaseAttachment* dbA = incompatible.fields.attachments[firstAttachmentFilename];
+                        KeePassAttachmentAbstractionLayer* dbA = incompatible.fields.attachments[firstAttachmentFilename];
                         
                         [incompatible.fields.attachments removeAllObjects];
                         

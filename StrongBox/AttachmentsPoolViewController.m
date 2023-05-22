@@ -18,7 +18,7 @@
 
 @interface AttachmentsPoolViewController () <QLPreviewControllerDelegate, QLPreviewControllerDataSource>
 
-@property NSArray<DatabaseAttachment*>* attachments;
+@property NSArray<KeePassAttachmentAbstractionLayer*>* attachments;
 
 @end
 
@@ -39,7 +39,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"attachmentPoolCell" forIndexPath:indexPath];
 
-    DatabaseAttachment* attachment = self.attachments[indexPath.row];
+    KeePassAttachmentAbstractionLayer* attachment = self.attachments[indexPath.row];
 
     cell.textLabel.text = [self getAttachmentLikelyName:attachment forDisplay:YES];
 
@@ -67,9 +67,9 @@
     return cell;
 }
 
-- (NSString*)getAttachmentLikelyName:(DatabaseAttachment*)attachment forDisplay:(BOOL)forDisplay {
+- (NSString*)getAttachmentLikelyName:(KeePassAttachmentAbstractionLayer*)attachment forDisplay:(BOOL)forDisplay {
     Node* match = [self.viewModel.database.effectiveRootGroup firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
-        return [node.fields.attachments.allValues anyMatch:^BOOL(DatabaseAttachment * _Nonnull obj) {
+        return [node.fields.attachments.allValues anyMatch:^BOOL(KeePassAttachmentAbstractionLayer * _Nonnull obj) {
             return [obj.digestHash isEqualToString:attachment.digestHash];
         }];
     }];
@@ -78,14 +78,14 @@
     if (!match) {
         match = [self.viewModel.database.effectiveRootGroup firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
             return [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
-                return [obj.fields.attachments.allValues anyMatch:^BOOL(DatabaseAttachment * _Nonnull da) {
+                return [obj.fields.attachments.allValues anyMatch:^BOOL(KeePassAttachmentAbstractionLayer * _Nonnull da) {
                     return [da.digestHash isEqualToString:attachment.digestHash];
                 }];
             }];
         }];
         
         historicalMatch = [match.fields.keePassHistory firstOrDefault:^BOOL(Node * _Nonnull obj) {
-            return [obj.fields.attachments.allValues anyMatch:^BOOL(DatabaseAttachment * _Nonnull da) {
+            return [obj.fields.attachments.allValues anyMatch:^BOOL(KeePassAttachmentAbstractionLayer * _Nonnull da) {
                 return [da.digestHash isEqualToString:attachment.digestHash];
             }];
         }];
@@ -94,7 +94,7 @@
     if (match) {
         Node* containerNode = historicalMatch ? historicalMatch : match;
         for (NSString* filename in containerNode.fields.attachments.allKeys) {
-            DatabaseAttachment* att = containerNode.fields.attachments[filename];
+            KeePassAttachmentAbstractionLayer* att = containerNode.fields.attachments[filename];
             if ([att.digestHash isEqualToString:attachment.digestHash]) {
                 if (!historicalMatch) {
                     NSString* foo = filename;
@@ -140,7 +140,7 @@
 }
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    DatabaseAttachment* attachment = [self.attachments objectAtIndex:index];
+    KeePassAttachmentAbstractionLayer* attachment = [self.attachments objectAtIndex:index];
 
     NSString* filename = [self getAttachmentLikelyName:attachment forDisplay:NO];
 

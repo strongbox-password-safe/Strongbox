@@ -260,6 +260,16 @@ extern NSString* const kAsyncUpdateStarting;
 
 #endif
 
+
+
+- (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag;
+- (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag;
+- (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag;
+- (void)deleteTag:(NSString*)tag;
+- (void)renameTag:(NSString*)from to:(NSString*)to;
+- (void)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
+- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
+
 @end
 
 NS_ASSUME_NONNULL_END

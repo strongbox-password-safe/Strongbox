@@ -66,7 +66,8 @@
 @property (nonnull) NSString* databaseUuid;
 
 @property BOOL isAutoFillOpen;
-@property BOOL offlineExplicitlyRequested;
+@property BOOL explicitOffline;
+@property BOOL explicitOnline;
 @property (nonnull) UnlockDatabaseCompletionBlock completion;
 
 
@@ -79,29 +80,33 @@
 @implementation UnlockDatabaseSequenceHelper
 
 + (instancetype)helperWithViewController:(UIViewController *)viewController database:(DatabasePreferences *)database {
-    return [self helperWithViewController:viewController database:database isAutoFillOpen:NO offlineExplicitlyRequested:NO];
+    return [self helperWithViewController:viewController database:database isAutoFillOpen:NO explicitOffline:NO explicitOnline:NO];
 }
 
 + (instancetype)helperWithViewController:(UIViewController*)viewController
                                 database:(DatabasePreferences*)database
                           isAutoFillOpen:(BOOL)isAutoFillOpen
-              offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested {
+                         explicitOffline:(BOOL)explicitOffline
+                          explicitOnline:(BOOL)explicitOnline {
     return [[UnlockDatabaseSequenceHelper alloc] initWithViewController:viewController
                                                                    safe:database
                                                          isAutoFillOpen:isAutoFillOpen
-                                             offlineExplicitlyRequested:offlineExplicitlyRequested];
+                                                        explicitOffline:explicitOffline
+                                                         explicitOnline:explicitOnline];
 }
 
 - (instancetype)initWithViewController:(UIViewController*)viewController
                                   safe:(DatabasePreferences*)safe
                         isAutoFillOpen:(BOOL)isAutoFillOpen
-            offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested {
+                       explicitOffline:(BOOL)explicitOffline
+                        explicitOnline:(BOOL)explicitOnline {
     self = [super init];
     if (self) {
         self.viewController = viewController;
         self.databaseUuid = safe.uuid;
         self.isAutoFillOpen = isAutoFillOpen;
-        self.offlineExplicitlyRequested = offlineExplicitlyRequested;
+        self.explicitOffline = explicitOffline;
+        self.explicitOnline = explicitOnline;
     }
     
     return self;
@@ -112,12 +117,12 @@
 }
 
 - (void)beginUnlockSequence:(UnlockDatabaseCompletionBlock)completion {
-    return [self beginUnlockSequence:NO biometricPreCleared:NO noConvenienceUnlock:NO completion:completion];
+    return [self beginUnlockSequence:NO biometricPreCleared:NO explicitManualUnlock:NO completion:completion];
 }
 
 - (void)beginUnlockSequence:(BOOL)isAutoFillQuickTypeOpen
         biometricPreCleared:(BOOL)biometricPreCleared
-        noConvenienceUnlock:(BOOL)noConvenienceUnlock
+       explicitManualUnlock:(BOOL)explicitManualUnlock
                  completion:(UnlockDatabaseCompletionBlock)completion {
     self.completion = completion;
     
@@ -126,7 +131,7 @@
                                                                                      isAutoFillOpen:self.isAutoFillOpen
                                                                             isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
                                                                                 biometricPreCleared:biometricPreCleared
-                                                                                noConvenienceUnlock:noConvenienceUnlock];
+                                                                                noConvenienceUnlock:explicitManualUnlock];
     
     [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
@@ -157,7 +162,13 @@
 - (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors {
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
   
-    if( self.isAutoFillOpen || self.offlineExplicitlyRequested ) {
+    if ( self.explicitOnline && self.explicitOffline ) {
+        NSLog(@"🔴 WARNWARN - Something very wrong, explicit Online and Offline Request to Unlock!");
+    }
+    
+    BOOL offline = (self.explicitOffline || self.database.forceOpenOffline) && !self.explicitOnline;
+
+    if( self.isAutoFillOpen || offline ) {
         NSLog(@"✅ beginUnlockWithCredentials - AutoFill or Explicit Offline Request Mode... Unlocking Local if available.");
         
         if(localCopyUrl == nil) {
@@ -177,7 +188,7 @@
         
         syncStateGood = syncStateGood | self.database.persistLazyEvenLastSyncErrors; 
         
-        if ( syncStateGood && localCopyUrl && self.database.storageProvider != kLocalDevice && self.database.lazySyncMode ) {
+        if ( syncStateGood && localCopyUrl && self.database.storageProvider != kLocalDevice && self.database.lazySyncMode && !self.explicitOnline ) { 
             
             
             

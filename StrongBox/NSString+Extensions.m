@@ -341,4 +341,24 @@ static NSString* const kLowerCaseNull = @"null";
     return r.location == NSNotFound && self.length > 0;
 }
 
+- (NSString *)stringByTrimmingLeadingCharactersInSet:(NSCharacterSet *)characterSet {
+    NSRange rangeOfFirstWantedCharacter = [self rangeOfCharacterFromSet:[characterSet invertedSet]];
+    
+    if (rangeOfFirstWantedCharacter.location == NSNotFound) {
+        return @"";
+    }
+    
+    return [self substringFromIndex:rangeOfFirstWantedCharacter.location];
+}
+
+- (NSString *)stringByTrimmingTrailingCharactersInSet:(NSCharacterSet *)characterSet {
+    NSRange rangeOfLastWantedCharacter = [self rangeOfCharacterFromSet:[characterSet invertedSet]
+                                                               options:NSBackwardsSearch];
+    if (rangeOfLastWantedCharacter.location == NSNotFound) {
+        return @"";
+    }
+    
+    return [self substringToIndex:rangeOfLastWantedCharacter.location+1]; 
+}
+
 @end

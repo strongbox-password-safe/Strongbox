@@ -53,12 +53,20 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.iconSet = kKeePassIconSetSfSymbols;
         self.browseSelectedItems = @[];
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
-        self.showChildCountOnFolderInSidebar = YES;
         self.headerNodes = HeaderNodeState.defaults;
         self.autoFillCopyTotp = YES;
         self.searchScope = kSearchScopeAll;
         self.autoPromptForConvenienceUnlockOnActivate = NO;
         self.customSortOrderForFields = YES; 
+
+        
+        
+        self.showChildCountOnFolderInSidebar = YES;
+        self.sideBarChildCountFormat = kSideBarChildCountFormatEntries;
+        self.sideBarChildCountGroupPrefix = @"📁";
+        self.sideBarChildCountSeparator = @"/";
+        self.sideBarChildCountShowZero = YES;
+        self.sideBarShowTotalCountOnHierarchy = YES;
     }
     
     return self;
@@ -299,13 +307,22 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeInteger:self.sideBarSelectedAuditCategory forKey:@"sideBarSelectedAuditCategory"];
     
     [encoder encodeObject:self.sideBarSelectedFavouriteId forKey:@"sideBarSelectedFavouriteId"];
-    [encoder encodeBool:self.showChildCountOnFolderInSidebar forKey:@"showChildCountOnFolderInSidebar"];
     
     [encoder encodeObject:self.headerNodes forKey:@"headerNodes2"];
     
     [encoder encodeBool:self.customSortOrderForFields forKey:@"customSortOrderForFields"];
     [encoder encodeBool:self.autoFillCopyTotp forKey:@"autoFillCopyTotp"];
     [encoder encodeInteger:self.searchScope forKey:@"searchScope"];
+    [encoder encodeBool:self.searchIncludeGroups forKey:@"searchIncludeGroups"];
+    
+    
+    
+    [encoder encodeBool:self.showChildCountOnFolderInSidebar forKey:@"showChildCountOnFolderInSidebar"];
+    [encoder encodeInteger:self.sideBarChildCountFormat forKey:@"sideBarChildCountFormat"];
+    [encoder encodeObject:self.sideBarChildCountGroupPrefix forKey:@"sideBarChildCountGroupPrefix"];
+    [encoder encodeObject:self.sideBarChildCountSeparator forKey:@"sideBarChildCountSeparator"];
+    [encoder encodeBool:self.sideBarChildCountShowZero forKey:@"sideBarChildCountShowZero"];
+    [encoder encodeBool:self.sideBarShowTotalCountOnHierarchy forKey:@"sideBarShowTotalCountOnHierarchy"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -636,13 +653,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.sideBarSelectedFavouriteId = nil;
         }
         
-        if ( [decoder containsValueForKey:@"showChildCountOnFolderInSidebar"] ) {
-            self.showChildCountOnFolderInSidebar = [decoder decodeBoolForKey:@"showChildCountOnFolderInSidebar"];
-        }
-        else {
-            self.showChildCountOnFolderInSidebar = YES;
-        }
-        
         if ( [decoder containsValueForKey:@"headerNodes2"] ) {
             self.headerNodes = [decoder decodeObjectForKey:@"headerNodes2"];
         }
@@ -669,6 +679,58 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         }
         else {
             self.searchScope = kSearchScopeTitle;
+        }
+
+        if ( [decoder containsValueForKey:@"searchIncludeGroups"] ) {
+            self.searchIncludeGroups = [decoder decodeBoolForKey:@"searchIncludeGroups"];
+        }
+        else {
+            self.searchIncludeGroups = NO;
+        }
+
+        
+        
+        
+        if ( [decoder containsValueForKey:@"showChildCountOnFolderInSidebar"] ) {
+            self.showChildCountOnFolderInSidebar = [decoder decodeBoolForKey:@"showChildCountOnFolderInSidebar"];
+        }
+        else {
+            self.showChildCountOnFolderInSidebar = YES;
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarChildCountFormat"] ) {
+            self.sideBarChildCountFormat = [decoder decodeIntegerForKey:@"sideBarChildCountFormat"];
+        }
+        else {
+            self.sideBarChildCountFormat = kSideBarChildCountFormatEntries;
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarChildCountGroupPrefix"] ) {
+            self.sideBarChildCountGroupPrefix = [decoder decodeObjectForKey:@"sideBarChildCountGroupPrefix"];
+        }
+        else {
+            self.sideBarChildCountGroupPrefix = @"📁";
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarChildCountSeparator"] ) {
+            self.sideBarChildCountSeparator = [decoder decodeObjectForKey:@"sideBarChildCountSeparator"];
+        }
+        else {
+            self.sideBarChildCountSeparator = @"/";
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarChildCountShowZero"] ) {
+            self.sideBarChildCountShowZero = [decoder decodeBoolForKey:@"sideBarChildCountShowZero"];
+        }
+        else {
+            self.sideBarChildCountShowZero = YES;
+        }
+        
+        if ( [decoder containsValueForKey:@"sideBarShowTotalCountOnHierarchy"] ) {
+            self.sideBarShowTotalCountOnHierarchy = [decoder decodeBoolForKey:@"sideBarShowTotalCountOnHierarchy"];
+        }
+        else {
+            self.sideBarShowTotalCountOnHierarchy = YES;
         }
     }
     

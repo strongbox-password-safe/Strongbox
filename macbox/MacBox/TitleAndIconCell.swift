@@ -38,7 +38,7 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
                     showLeadingFavStar: Bool = false,
                     showTrailingFavStar: Bool = false,
                     contentTintColor: NSColor? = nil,
-                    count: Int? = nil,
+                    count: String? = nil,
                     onTitleEdited : (( _ text : String ) -> Void )? = nil)
     {
         favStarIcon.isHidden = !showLeadingFavStar
@@ -53,7 +53,7 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
 
         if let count = count {
             childCount.isHidden = false
-            childCount.stringValue = String(format: "(%ld)", count)
+            childCount.stringValue = count
         } else {
             childCount.isHidden = true
         }

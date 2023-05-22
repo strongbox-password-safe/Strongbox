@@ -114,9 +114,19 @@ class BrowseTabViewController: UITabBarController {
             if tab == .favourites && model.favourites.count == 0 {
                 continue
             }
-            if tab == .tags && model.database.tagSet.isEmpty {
-                continue
+            
+            if tab == .tags {
+                var tags = model.database.tagSet
+                
+                if AppPreferences.sharedInstance().shadeFavoriteTag {
+                    tags.remove(kCanonicalFavouriteTag)
+                }
+                
+                if tags.isEmpty {
+                    continue
+                }
             }
+            
             if tab == .totpList && model.database.totpEntries.isEmpty {
                 continue
             }

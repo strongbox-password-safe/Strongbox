@@ -107,6 +107,7 @@ static NSString* const kConcealClipboardFromMonitors = @"concealClipboardFromMon
 static NSString* const kAutoCommitScannedTotp = @"autoCommitScannedTotp";
 static NSString* const kHideOnCopy = @"hideOnCopy";
 static NSString* const kHasPromptedForThirdPartyAutoFill = @"hasPromptedForThirdPartyAutoFill";
+static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 
 
 
@@ -276,6 +277,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 #endif
 
 
+
+- (BOOL)shadeFavoriteTag {
+    return [self getBool:kShadeFavoriteTag fallback:YES];
+}
+
+- (void)setShadeFavoriteTag:(BOOL)shadeFavoriteTag {
+    [self setBool:kShadeFavoriteTag value:shadeFavoriteTag];
+}
 
 - (BOOL)hasPromptedForThirdPartyAutoFill {
     return [self getBool:kHasPromptedForThirdPartyAutoFill fallback:NO];

@@ -958,7 +958,7 @@ class DetailViewController: NSViewController {
     }
 
     func exportAttachment(_ field: DetailsViewField) {
-        guard let attachment = field.object as? DatabaseAttachment else {
+        guard let attachment = field.object as? KeePassAttachmentAbstractionLayer else {
             NSLog("🔴 Couldn't get attachment from field")
             return
         }
@@ -1528,7 +1528,7 @@ extension DetailViewController: NSFilePromiseProviderDelegate {
                let attachmentField = fields.first(where: { field in
                    field.fieldType == .attachment && field.name == filename
                }),
-               let attachment = attachmentField.object as? DatabaseAttachment
+               let attachment = attachmentField.object as? KeePassAttachmentAbstractionLayer
             {
                 try attachment.nonPerformantFullData.write(to: url)
             } else {
@@ -1560,7 +1560,7 @@ extension DetailViewController: QLPreviewPanelDelegate, QLPreviewPanelDataSource
             field.fieldType == .attachment
         }
 
-        guard let field = attachmentFields[safe: index], let attachment = field.object as? DatabaseAttachment else { return nil }
+        guard let field = attachmentFields[safe: index], let attachment = field.object as? KeePassAttachmentAbstractionLayer else { return nil }
 
         let path = StrongboxFilesManager.sharedInstance().tmpAttachmentPreviewPath as NSString
         let tmp = path.appendingPathComponent(field.name as String)

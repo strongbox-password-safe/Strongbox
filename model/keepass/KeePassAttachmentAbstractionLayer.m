@@ -6,11 +6,16 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
 #import <CommonCrypto/CommonCrypto.h>
-#import "FileManager.h"
+
+#if TARGET_OS_IPHONE
+#import "StrongboxiOSFilesManager.h"
+#else
+#import "StrongboxMacFilesManager.h"
+#endif
 
 #import "Utils.h"
 #import "Base64DecodeOutputStream.h"
@@ -24,23 +29,30 @@ static NSString* kEmptyDataDigest;
 
 static const BOOL kEncrypt = YES; 
 
-@interface DatabaseAttachment ()
+#if defined(TARGET_OS_IPHONE) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
+static const BOOL kMemoryPerfMeasuresEnabled = YES;
+#else
+static const BOOL kMemoryPerfMeasuresEnabled = NO;
+#endif
+
+@interface KeePassAttachmentAbstractionLayer ()
 
 @property NSString* encryptedSessionFilePath;
 @property NSData* encryptionKey;
 @property NSData* encryptionIV;
 @property NSString* sha256Hex;
 @property NSUInteger attachmentLength;
+@property NSOutputStream* memoryStream;
 
 @property NSOutputStream* incrementalWriteStream;
 @property Sha256PassThroughOutputStream* digested;
 
 @end
 
-@implementation DatabaseAttachment
+@implementation KeePassAttachmentAbstractionLayer
 
 + (void)initialize {
-    if(self == [DatabaseAttachment class]) {
+    if(self == [KeePassAttachmentAbstractionLayer class]) {
         kEmptyDataDigest = NSData.data.sha256.hexString; 
     }
 }
@@ -93,10 +105,15 @@ static const BOOL kEncrypt = YES;
     return self;
 }
     
-- (instancetype)initWithStream:(NSInputStream *)stream length:(NSUInteger)length protectedInMemory:(BOOL)protectedInMemory compressed:(BOOL)compressed {
+- (instancetype)initWithStream:(NSInputStream *)stream
+                        length:(NSUInteger)length
+             protectedInMemory:(BOOL)protectedInMemory
+                    compressed:(BOOL)compressed {
     if (self = [self initForStreamWriting:protectedInMemory compressed:compressed]) {
         _compressed = compressed;
         _protectedInMemory = protectedInMemory;
+        
+        [stream open];
         
         uint8_t block[kBlockSize];
         for (size_t readSoFar = 0; readSoFar < length; readSoFar += kBlockSize) {
@@ -144,15 +161,47 @@ static const BOOL kEncrypt = YES;
     
 }
 
+- (NSOutputStream*)getOutputStream {
+    if ( kMemoryPerfMeasuresEnabled ) {
+        return [NSOutputStream outputStreamToFileAtPath:self.encryptedSessionFilePath append:NO];
+    }
+    else {
+        self.memoryStream = [NSOutputStream outputStreamToMemory];
+        return self.memoryStream;
+    }
+}
+
+- (NSInputStream*)getInputStream {
+    if ( kMemoryPerfMeasuresEnabled ) {
+        NSError* error = nil;
+        [NSFileManager.defaultManager attributesOfItemAtPath:self.encryptedSessionFilePath error:&error];
+        if ( error ) {
+            NSLog(@"Could not find encrypted session file! Cannot return input stream [%@]", error);
+            return nil;
+        }
+        
+        return [NSInputStream inputStreamWithFileAtPath:self.encryptedSessionFilePath];
+    }
+    else {
+        if ( !self.memoryStream ) {
+            NSLog(@"🔴 Could not find memory stream! Cannot return input stream");
+            return nil;
+        }
+        
+        NSData* data = [self.memoryStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+        return [NSInputStream inputStreamWithData:data];
+    }
+}
+
 - (void)createOutputPipeline:(BOOL)base64Decode gzipDecompress:(BOOL)gzipDecompress {
-    NSOutputStream* outputFile = [NSOutputStream outputStreamToFileAtPath:self.encryptedSessionFilePath append:NO];
+    NSOutputStream* outputStream = [self getOutputStream];
 
     NSOutputStream* ciphered;
     if ( kEncrypt ) {
-        ciphered = [[AesOutputStream alloc] initToOutputStream:outputFile encrypt:YES key:self.encryptionKey iv:self.encryptionIV chainOpensAndCloses:YES];
+        ciphered = [[AesOutputStream alloc] initToOutputStream:outputStream encrypt:YES key:self.encryptionKey iv:self.encryptionIV chainOpensAndCloses:YES];
     }
     else {
-        ciphered = outputFile;
+        ciphered = outputStream;
     }
  
     
@@ -223,14 +272,7 @@ static const BOOL kEncrypt = YES;
         return [NSInputStream inputStreamWithData:NSData.data]; 
     }
  
-    NSError* error = nil;
-    [NSFileManager.defaultManager attributesOfItemAtPath:self.encryptedSessionFilePath error:&error];
-    if ( error ) {
-        NSLog(@"Could not find encrypted session file! Cannot return input stream;");
-        return nil;
-    }
-    
-    NSInputStream* inStream = [NSInputStream inputStreamWithFileAtPath:self.encryptedSessionFilePath];
+    NSInputStream* inStream = [self getInputStream];
     
     NSInputStream* aesDecrypt = kEncrypt ? [[AesInputStream alloc] initWithStream:inStream key:self.encryptionKey iv:self.encryptionIV] : inStream;
     
@@ -245,7 +287,7 @@ static const BOOL kEncrypt = YES;
     NSString* ret;
     
     do {
-        ret = [FileManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+        ret = [StrongboxFilesManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
     } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
     
     return ret;
@@ -270,11 +312,11 @@ static const BOOL kEncrypt = YES;
     if (self == object) {
         return YES;
     }
-    if (![object isKindOfClass:[DatabaseAttachment class]]) {
+    if (![object isKindOfClass:[KeePassAttachmentAbstractionLayer class]]) {
         return NO;
     }
     
-    DatabaseAttachment* other = (DatabaseAttachment*)object;
+    KeePassAttachmentAbstractionLayer* other = (KeePassAttachmentAbstractionLayer*)object;
     
 
 

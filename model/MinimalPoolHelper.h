@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MinimalPoolHelper : NSObject
 
-+ (NSArray<DatabaseAttachment*>*)getMinimalAttachmentPool:(Node*)rootNode;
++ (NSArray<KeePassAttachmentAbstractionLayer*>*)getMinimalAttachmentPool:(Node*)rootNode;
 
 @end
 

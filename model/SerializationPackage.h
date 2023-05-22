@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

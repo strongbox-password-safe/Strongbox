@@ -24,7 +24,7 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 - (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
 
 + (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
-- (NSString*_Nullable)getSuggestedDatabaseNameUsingDeviceName;
+- (NSString*_Nullable)getSuggestedNewDatabaseName;
 - (NSString*_Nullable)getUniqueNameFromSuggestedName:(NSString*)suggested;
 
 - (BOOL)isUnique:(NSString *)nickName;

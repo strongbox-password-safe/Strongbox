@@ -89,8 +89,8 @@
     return [SafesList trimDatabaseNickName:string];
 }
 
-+ (NSString *)suggestedDatabaseNameUsingDeviceName {
-    return [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
++ (NSString *)suggestedNewDatabaseName {
+    return [SafesList.sharedInstance getSuggestedNewDatabaseName];
 }
 
 - (void)add:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {

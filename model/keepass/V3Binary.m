@@ -23,7 +23,7 @@
     return [self initWithXmlElementName:kBinaryElementName context:context];
 }
 
-- (instancetype)initWithContext:(XmlProcessingContext *)context dbAttachment:(DatabaseAttachment *)dbAttachment {
+- (instancetype)initWithContext:(XmlProcessingContext *)context dbAttachment:(KeePassAttachmentAbstractionLayer *)dbAttachment {
     if( self = [super initWithXmlElementName:kBinaryElementName context:context] ) {
         self.dbAttachment = dbAttachment;
         self.compressed = dbAttachment.compressed;
@@ -34,7 +34,7 @@
 
 - (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(XmlProcessingContext *)context {
     if (self = [super initWithXmlElementName:xmlElementName context:context]) {
-        self.dbAttachment = [[DatabaseAttachment alloc] initForStreamWriting:YES compressed:YES];
+        self.dbAttachment = [[KeePassAttachmentAbstractionLayer alloc] initForStreamWriting:YES compressed:YES];
     }
     
     return self;
@@ -52,7 +52,7 @@
 
 - (void)onCompletedWithStrangeProtectedAttribute:(NSData*)data {
     self.completionDone = YES;
-    self.dbAttachment = [[DatabaseAttachment alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:NO];
+    self.dbAttachment = [[KeePassAttachmentAbstractionLayer alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:NO];
 }
 
 - (void)onCompleted {

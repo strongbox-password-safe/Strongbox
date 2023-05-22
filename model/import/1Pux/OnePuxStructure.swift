@@ -166,6 +166,7 @@ class OnePuxItemDetails: Decodable {
     let documentAttributes : OnePuxFileAttachment?
     let loginFields : [OnePuxLoginField]?
     let sections : [OnePuxSection]?
+    let password : String? 
 }
 
 class OnePuxItemOverview: Decodable {

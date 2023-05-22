@@ -1037,33 +1037,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
-- (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag {
-    return [self.database getItemIdsForTag:tag];
-}
-
-- (NSArray<Node *> *)itemsWithTag:(NSString *)tag {
-    return [[self.database getItemIdsForTag:tag] map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [self getItemById:obj];
-    }];
-}
-
-- (NSArray<Node *> *)entriesWithTag:(NSString *)tag {
-    return [[self itemsWithTag:tag] filter:^BOOL(Node * _Nonnull obj) {
-        return !obj.isGroup;
-    }];
-}
-
-- (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag {
-    return [self.database addTag:itemId tag:tag];
-}
-
-- (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag {
-    return [self.database removeTag:itemId tag:tag];
-}
-
-
-
-
 - (NSArray<Node *> *)legacyFavourites {
     return [self getNodesFromSerializationIds:self.cachedLegacyFavourites];
 }
@@ -1665,6 +1638,49 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (BOOL)isKeePass2Format {
     return self.database.isKeePass2Format;
+}
+
+
+
+
+- (NSArray<Node *> *)itemsWithTag:(NSString *)tag {
+    return [[self.database getItemIdsForTag:tag] map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [self getItemById:obj];
+    }];
+}
+
+- (NSArray<Node *> *)entriesWithTag:(NSString *)tag {
+    return [[self itemsWithTag:tag] filter:^BOOL(Node * _Nonnull obj) {
+        return !obj.isGroup;
+    }];
+}
+
+- (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag {
+    return [self.database getItemIdsForTag:tag];
+}
+
+- (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag {
+    return [self.database addTag:itemId tag:tag];
+}
+
+- (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag {
+    return [self.database removeTag:itemId tag:tag];
+}
+
+- (void)deleteTag:(NSString*)tag {
+    return [self.database deleteTag:tag];
+}
+
+- (void)renameTag:(NSString*)from to:(NSString*)to {
+    return [self.database renameTag:from to:to];
+}
+
+- (void)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+    return [self.database addTagToItems:ids tag:tag];
+}
+
+- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+    return [self.database removeTagFromItems:ids tag:tag];
 }
 
 @end

@@ -84,7 +84,7 @@
     
     self.switchReadOnly.on = self.initialReadOnly;
     
-    self.textFieldName.text = self.selectedName.length ? self.selectedName : DatabasePreferences.suggestedDatabaseNameUsingDeviceName;
+    self.textFieldName.text = self.selectedName.length ? self.selectedName : DatabasePreferences.suggestedNewDatabaseName;
   
     self.textFieldPassword.font = FontManager.sharedInstance.easyReadFont;
     self.textFieldConfirmPassword.font = FontManager.sharedInstance.easyReadFont;

@@ -78,6 +78,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchStripUnusedIcons;
 @property (weak, nonatomic) IBOutlet UISwitch *pinCodeHapticFeedback;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
+@property (weak, nonatomic) IBOutlet UISwitch *switchMaskKeePassFavoriteTag;
 
 @end
 
@@ -257,6 +258,8 @@
     
     AppPreferences.sharedInstance.stripUnusedIconsOnSave = self.switchStripUnusedIcons.on;
     
+    AppPreferences.sharedInstance.shadeFavoriteTag = self.switchMaskKeePassFavoriteTag.on;
+    
     [self bindPreferences];
 }
 
@@ -316,6 +319,8 @@
     self.switchMarkdownNotes.on = AppPreferences.sharedInstance.markdownNotes;
     self.switchNewEntryUsesParentGroupIcon.on = AppPreferences.sharedInstance.useParentGroupIconOnCreate;
     self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;
+    
+    self.switchMaskKeePassFavoriteTag.on = AppPreferences.sharedInstance.shadeFavoriteTag;
 }
 
 - (void)bindCloudSessions {

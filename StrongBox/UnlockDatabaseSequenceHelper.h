@@ -23,13 +23,14 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)helperWithViewController:(UIViewController*)viewController
                                 database:(DatabasePreferences*)database
                           isAutoFillOpen:(BOOL)isAutoFillOpen
-              offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested;
+                         explicitOffline:(BOOL)explicitOffline
+                          explicitOnline:(BOOL)explicitOnline;
 
 - (void)beginUnlockSequence:(UnlockDatabaseCompletionBlock)completion;
 
 - (void)beginUnlockSequence:(BOOL)isAutoFillQuickTypeOpen
         biometricPreCleared:(BOOL)biometricPreCleared
-        noConvenienceUnlock:(BOOL)noConvenienceUnlock
+       explicitManualUnlock:(BOOL)noConvenienceUnlock
                  completion:(UnlockDatabaseCompletionBlock)completion;
 
 @end

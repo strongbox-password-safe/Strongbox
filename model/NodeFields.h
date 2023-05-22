@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic, strong, nullable, readonly) NSNumber *usageCount;
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
 @property (nonatomic, strong, nullable) NSDate *expires;
-@property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, DatabaseAttachment*> *attachments;
+@property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, KeePassAttachmentAbstractionLayer*> *attachments;
 @property (nonatomic, strong, nonnull) NSMutableSet<NSString*> *tags;
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; 
 @property NSMutableArray<Node*> *keePassHistory;

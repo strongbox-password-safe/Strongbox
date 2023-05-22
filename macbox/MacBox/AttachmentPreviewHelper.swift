@@ -14,7 +14,7 @@ class AttachmentPreviewHelper {
     private init() {}
 
     var cache: [String: NSImage] = [:]
-    func getPreviewImage(_ filename: String, _ attachment: DatabaseAttachment) -> NSImage? {
+    func getPreviewImage(_ filename: String, _ attachment: KeePassAttachmentAbstractionLayer) -> NSImage? {
         if let cached = cache[attachment.digestHash] {
 
             return cached

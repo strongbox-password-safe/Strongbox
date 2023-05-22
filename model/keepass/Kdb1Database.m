@@ -54,7 +54,7 @@ static const BOOL kLogVerbose = NO;
         NSLog(@"KdbSerializationData = [%@]", serializationData);
     }
 
-    NSArray<DatabaseAttachment*>* attachments;
+    NSArray<KeePassAttachmentAbstractionLayer*>* attachments;
     Node* rootGroup = [Kdb1Database buildStrongboxModel:serializationData attachments:&attachments];
 
     if(kLogVerbose) {
@@ -253,7 +253,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
     
     if(record.fields.attachments.count) {
         NSString* filename = record.fields.attachments.allKeys.firstObject;
-        DatabaseAttachment *theAttachment = record.fields.attachments[filename];
+        KeePassAttachmentAbstractionLayer *theAttachment = record.fields.attachments[filename];
         
         ret.binaryFileName = filename;
         
@@ -298,9 +298,9 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     }
 }
 
-+ (Node*)buildStrongboxModel:(KdbSerializationData *)serializationData attachments:(NSArray<DatabaseAttachment*>**)attachments {
++ (Node*)buildStrongboxModel:(KdbSerializationData *)serializationData attachments:(NSArray<KeePassAttachmentAbstractionLayer*>**)attachments {
     Node* ret = [[Node alloc] initAsRoot:nil childRecordsAllowed:NO];
-    NSMutableArray<DatabaseAttachment*> *mutableAttachments = [NSMutableArray array];
+    NSMutableArray<KeePassAttachmentAbstractionLayer*> *mutableAttachments = [NSMutableArray array];
     
     normalizeLevels(serializationData.groups);
     
@@ -351,7 +351,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     return ret;
 }
 
-+ (Node*)kdbEntryToRecordNode:(KdbEntry*)entry parent:(Node*)parent attachments:(NSMutableArray<DatabaseAttachment*>*)attachments {
++ (Node*)kdbEntryToRecordNode:(KdbEntry*)entry parent:(Node*)parent attachments:(NSMutableArray<KeePassAttachmentAbstractionLayer*>*)attachments {
     NodeFields* fields = [[NodeFields alloc] initWithUsername:entry.username
                                                           url:entry.url
                                                      password:entry.password
@@ -365,7 +365,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     if(entry.binaryFileName.length) {
         NSInputStream* str = [NSInputStream inputStreamWithData:entry.binaryData];
         
-        DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:str
+        KeePassAttachmentAbstractionLayer *dbAttachment = [[KeePassAttachmentAbstractionLayer alloc] initWithStream:str
                                                                                length:entry.binaryData.length
                                                                     protectedInMemory:NO
                                                                            compressed:NO];

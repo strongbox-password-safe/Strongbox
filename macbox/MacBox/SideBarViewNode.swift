@@ -16,7 +16,7 @@ class SideBarViewNode {
     let headerNode : HeaderNode?
     let color: NSColor?
     let parent: SideBarViewNode?
-    let databaseNodeChildCount: Int?
+    let databaseNodeChildCount: String?
 
     init(context: NavigationContext,
          title: String,
@@ -25,7 +25,7 @@ class SideBarViewNode {
          children: [SideBarViewNode] = [],
          headerNode: HeaderNode? = nil,
          color: NSColor? = nil,
-         databaseNodeChildCount: Int? = nil)
+         databaseNodeChildCount: String? = nil)
     {
         self.context = context
         self.title = title

@@ -133,7 +133,7 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     
     NSError* error;
     
-    NSArray<DatabaseAttachment*>* minimalAttachmentPool = @[];
+    NSArray<KeePassAttachmentAbstractionLayer*>* minimalAttachmentPool = @[];
     RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toKeePassModel:database.rootNode
                                                    databaseProperties:databaseProperties
                                                               context:[XmlProcessingContext standardV4Context]

@@ -63,7 +63,7 @@
 
     self.nextButton.layer.cornerRadius = 5.0f;
 
-    self.textFieldName.text = DatabasePreferences.suggestedDatabaseNameUsingDeviceName;
+    self.textFieldName.text = DatabasePreferences.suggestedNewDatabaseName;
     
     [self.textFieldName addTarget:self
                            action:@selector(validateUi)

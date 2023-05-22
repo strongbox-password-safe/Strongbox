@@ -10,7 +10,7 @@
 #import "CustomFieldViewModel.h"
 #import "OTPToken.h"
 #import "ItemMetadataEntry.h"
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 #import "MutableOrderedDictionary.h"
 #import "Node.h"
 #import "DatabaseFormat.h"
@@ -38,7 +38,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 - (BOOL)isDifferentFrom:(EntryViewModel*)other;
 
 - (void)removeAttachment:(NSString*)filename; 
-- (NSUInteger)insertAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment;
+- (NSUInteger)insertAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment;
 
 @property (nullable) NodeIcon* icon;
 @property NSString* title;
@@ -51,7 +51,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 
 @property (nullable) OTPToken* totp;
 @property (readonly) NSArray<CustomFieldViewModel*> *customFields;
-@property (readonly) MutableOrderedDictionary<NSString*, DatabaseAttachment*>* attachments;
+@property (readonly) MutableOrderedDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* attachments;
 @property (readonly) NSArray<ItemMetadataEntry*> *metadata;
 
 - (void)addTag:(NSString*)tag;

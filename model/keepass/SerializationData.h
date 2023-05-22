@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DecryptionParameters.h"
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 #import "RootXmlDomainObject.h"
 
 NS_ASSUME_NONNULL_BEGIN

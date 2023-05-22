@@ -25,7 +25,10 @@ NS_ASSUME_NONNULL_BEGIN
                     usernameSet:(NSCountedSet<NSString*> *)usernameSet
                        emailSet:(NSCountedSet<NSString*> *)emailSet
                          urlSet:(NSCountedSet<NSString*> *)urlSet
-              customFieldKeySet:(NSCountedSet<NSString*> *)customFieldKeySet;
+              customFieldKeySet:(NSCountedSet<NSString*> *)customFieldKeySet
+                entryTotalCount:(NSInteger)entryTotalCount
+                groupTotalCount:(NSInteger)groupTotalCount;
+;
 
 @property (readonly) NSDictionary<NSUUID*, Node*>* uuidMap;
 @property (readonly) NSSet<NSUUID*> *withExpiryDates;
@@ -36,6 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSCountedSet<NSString*> *emailSet;
 @property (readonly) NSCountedSet<NSString*> *urlSet;
 @property (readonly) NSCountedSet<NSString*> *customFieldKeySet;
+
+@property (nonatomic, readonly) NSInteger entryTotalCount;
+@property (nonatomic, readonly) NSInteger groupTotalCount;
 
 @end
 

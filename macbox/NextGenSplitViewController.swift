@@ -1027,12 +1027,17 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
     }
     
     func validateAction(_ action: Selector) -> Bool {
+        var singleSelectedNode : Node? = nil
+
+        if !database.locked, database.nextGenSelectedItems.count == 1, let node = database.getItemBy(database.nextGenSelectedItems.first!) {
+            singleSelectedNode = node
+        }
+        
         if action == #selector(toggleLeadingSidebar) {
             return true
         } else if action == #selector(toggleDetailsView) {
             return true
         }
-        
         else if action == #selector(showDatabasePreferences) {
             return !database.locked
         }
@@ -1071,7 +1076,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
             
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onEditEntry) {
-            return !database.locked && database.nextGenSelectedItems.count == 1 && !database.isEffectivelyReadOnly
+            return !database.locked && singleSelectedNode != nil && !singleSelectedNode!.isGroup && !database.isEffectivelyReadOnly
         } else if action == #selector(onSync) {
             return !database.locked && !database.isEffectivelyReadOnly && !database.isInOfflineMode
         }

@@ -20,6 +20,9 @@ class BrowseViewController: NSViewController {
         NotificationCenter.default.removeObserver(self)
     }
 
+    @IBOutlet var checkboxIncludeGroupsInSearch: NSButton!
+    @IBOutlet var imageViewSearchSummary: NSImageView!
+    @IBOutlet var labelSearchSummary: NSTextField!
     @IBOutlet var scopeAllFields: NSSegmentedControl!
     @IBOutlet var scopeTitle: NSSegmentedControl!
     @IBOutlet var scopeUsername: NSSegmentedControl!
@@ -100,7 +103,7 @@ class BrowseViewController: NSViewController {
         predicateEditorHeightConstraint.animator().constant = predicateEditor.intrinsicContentSize.height
 
         if isSearching {
-            searchParametersViewHeightConstraint.constant = 60
+            searchParametersViewHeightConstraint.constant = 73
         } else {
             searchParametersViewHeightConstraint.constant = 0
         }
@@ -194,8 +197,16 @@ class BrowseViewController: NSViewController {
         @unknown default:
             NSLog("🔴 Unknown Scope!")
         }
+        
+        checkboxIncludeGroupsInSearch.state = database.nextGenSearchIncludeGroups ? .on : .off;
     }
 
+    @IBAction func onSearchIncludeGroupsChanged(_ sender: Any) {
+        database.nextGenSearchIncludeGroups = checkboxIncludeGroupsInSearch.state == .on;
+        
+        bindSearchParameters()
+    }
+    
     @IBAction func onSearchScopeChanged(_ sender: Any) {
         guard let segmentControl = sender as? NSSegmentedControl else {
             return
@@ -371,11 +382,47 @@ class BrowseViewController: NSViewController {
         loadAndSortItems()
         outlineView.reloadData()
 
+        refreshSearchResultsSummaryText()
+        
         if maintainSelectionIfPossible {
             bindSelectionToModel(selectFirstItemIfSelectionNotFound: selectFirstItemIfSelectionNotFound)
         }
     }
 
+    func refreshSearchResultsSummaryText() {
+        if #available(macOS 11.0, *) {
+            if let image = NSImage(systemSymbolName: "magnifyingglass.circle.fill", accessibilityDescription: nil) {
+                let largeConfig = NSImage.SymbolConfiguration(scale: .large)
+                if #available(macOS 12.0, *) {
+                    let colorConfig = NSImage.SymbolConfiguration(hierarchicalColor: items.count == 0 ? .secondaryLabelColor : .systemGreen)
+
+                    let config = largeConfig.applying(colorConfig)
+                    
+                    let imageLarge = image.withSymbolConfiguration(config)
+                    
+                    imageViewSearchSummary.image = imageLarge
+                } else {
+                    let imageLarge = image.withSymbolConfiguration(largeConfig)
+                    
+                    imageViewSearchSummary.image = imageLarge
+                }
+            }
+        }
+        
+        if items.count == 1 {
+            labelSearchSummary.stringValue = NSLocalizedString("search_results_summary_1_match_found", comment: "1 Match Found" )
+            imageViewSearchSummary.contentTintColor = .systemGreen
+        }
+        else if items.count > 1 {
+            labelSearchSummary.stringValue = String(format: NSLocalizedString("search_results_summary_n_match_found_fmt", comment: "%@ Matches Found"), String(items.count) )
+            imageViewSearchSummary.contentTintColor = .systemGreen
+        }
+        else {
+            labelSearchSummary.stringValue = NSLocalizedString("search_results_summary_no_matches_found", comment: "No Matches Found")
+            imageViewSearchSummary.contentTintColor = .secondaryLabelColor
+        }
+    }
+    
     func bindSelectionToModel(selectFirstItemIfSelectionNotFound: Bool = false) {
         let selected = database.nextGenSelectedItems
         let selectedIndices = getRowIndicesForItemIds(itemIds: selected)
@@ -624,8 +671,18 @@ class BrowseViewController: NSViewController {
         return false
     }
 
-    func editSelected() {
-        NSApplication.shared.sendAction(#selector(NextGenSplitViewController.onEditEntry(_:)), to: nil, from: self)
+    func editSelectedOrJumpToGroup() {
+        guard let uuid = database.nextGenSelectedItems.first, let node = database.getItemBy(uuid) else {
+            NSLog("⚠️ Could get selected item to edit")
+            return
+        }
+        
+        if node.isGroup {
+            setModelNavigationContextWithViewNode(database, .regularHierarchy(node.uuid))
+        }
+        else {
+            NSApplication.shared.sendAction(#selector(NextGenSplitViewController.onEditEntry(_:)), to: nil, from: self)
+        }
     }
 
     func deleteSelected() {
@@ -678,7 +735,7 @@ extension BrowseViewController: DocumentViewController {
         outlineView.doubleAction = #selector(onOutlineViewDoubleClicked)
         outlineView.onEnterKey = { [weak self] in
             guard let self = self else { return }
-            self.editSelected()
+            self.editSelectedOrJumpToGroup()
         }
         outlineView.onDeleteKey = { [weak self] in
             guard let self = self else { return }
@@ -914,29 +971,39 @@ extension BrowseViewController: NSOutlineViewDelegate {
 
     @objc func onOutlineViewDoubleClicked(_: Any) {
         guard outlineView.selectedRowIndexes.count == 1 else { return }
-
+        
         let colIdx = outlineView.clickedColumn
         let rowIdx = outlineView.clickedRow
 
         guard colIdx != -1, rowIdx != -1, let _ = outlineView.item(atRow: rowIdx) as? Node, let column = outlineView.tableColumns[safe: colIdx], let col = BrowseViewColumn(rawValue: column.identifier.rawValue) else {
             return
         }
-
-        switch col {
-        case .username:
-            NSApplication.shared.sendAction(#selector(WindowController.onCopyUsername(_:)), to: nil, from: self)
-        case .password:
-            NSApplication.shared.sendAction(#selector(WindowController.onCopyPassword(_:)), to: nil, from: self)
-        case .url:
-            NSApplication.shared.sendAction(#selector(WindowController.onCopyUrl(_:)), to: nil, from: self)
-        case .email:
-            NSApplication.shared.sendAction(#selector(WindowController.onCopyEmail(_:)), to: nil, from: self)
-        case .notes:
-            NSApplication.shared.sendAction(#selector(WindowController.onCopyNotes(_:)), to: nil, from: self)
-        case .totp:
-            NSApplication.shared.sendAction(#selector(WindowController.onCopyTotp(_:)), to: nil, from: self)
-        default:
-            editSelected()
+        
+        guard let uuid = database.nextGenSelectedItems.first, let node = database.getItemBy(uuid) else {
+            NSLog("⚠️ Could get selected item to edit")
+            return
+        }
+        
+        if node.isGroup {
+            editSelectedOrJumpToGroup()
+        }
+        else {
+            switch col {
+            case .username:
+                NSApplication.shared.sendAction(#selector(WindowController.onCopyUsername(_:)), to: nil, from: self)
+            case .password:
+                NSApplication.shared.sendAction(#selector(WindowController.onCopyPassword(_:)), to: nil, from: self)
+            case .url:
+                NSApplication.shared.sendAction(#selector(WindowController.onCopyUrl(_:)), to: nil, from: self)
+            case .email:
+                NSApplication.shared.sendAction(#selector(WindowController.onCopyEmail(_:)), to: nil, from: self)
+            case .notes:
+                NSApplication.shared.sendAction(#selector(WindowController.onCopyNotes(_:)), to: nil, from: self)
+            case .totp:
+                NSApplication.shared.sendAction(#selector(WindowController.onCopyTotp(_:)), to: nil, from: self)
+            default:
+                editSelectedOrJumpToGroup()
+            }
         }
     }
 }
@@ -965,7 +1032,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
     }
 
     func loadItems() {
-        NSLog("✅ BrowseViewController::loadAndSortItems - searching = [%hhd] - navContext = [%@]", isSearching, String(describing: navigationContext))
+
 
         if isSearching {
             unsorted = loadSearchItems()
@@ -1143,7 +1210,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
                                        includeKeePass1Backup: database.showRecycleBinInSearchResults,
                                        includeRecycleBin: database.showRecycleBinInSearchResults,
                                        includeExpired: true,
-                                       includeGroups: false,
+                                       includeGroups: database.nextGenSearchIncludeGroups,
                                        browseSortField: .none,
                                        descending: false,
                                        foldersSeparately: false)

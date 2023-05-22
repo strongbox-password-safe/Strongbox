@@ -33,6 +33,9 @@ extern NSString* const kDatabasesListChangedNotification;
 - (DatabaseMetadata*_Nullable)getDatabaseByFileUrl:(NSURL *)url;
 - (DatabaseMetadata*)addOrGet:(NSURL *)url;
 
+- (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested;
+- (NSString*)getSuggestedNewDatabaseName;
+
 @end
 
 NS_ASSUME_NONNULL_END

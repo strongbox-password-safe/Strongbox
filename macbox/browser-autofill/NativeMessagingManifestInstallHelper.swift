@@ -33,7 +33,8 @@ struct ChromeNativeMessagingManifest : Encodable {
 class NativeMessagingManifestInstallHelper: NSObject {
     @objc
     class func installNativeMessagingHostsFiles() {
-        installForFirefox()
+        installFirefoxLikeManifestAt( "Library/Application Support/Mozilla/NativeMessagingHosts" )
+        installFirefoxLikeManifestAt( "Library/Application Support/librewolf/NativeMessagingHosts" )
         
         installForChromiumBasedBrowser("Library/Application Support/Google/Chrome/NativeMessagingHosts")
         installForChromiumBasedBrowser("Library/Application Support/Google/Chrome Beta/NativeMessagingHosts/")
@@ -47,34 +48,33 @@ class NativeMessagingManifestInstallHelper: NSObject {
         installForChromiumBasedBrowser("Library/Application Support/Vivaldi/NativeMessagingHosts/")
         installForChromiumBasedBrowser("Library/Application Support/Arc/User Data/NativeMessagingHosts")
         installForChromiumBasedBrowser("Library/Application Support/Sidekick/NativeMessagingHosts")
+        
+        
+        
+        installForChromiumBasedBrowser("Library/Application Support/Orion/NativeMessagingHosts")
     }
     
     @objc
     class func removeNativeMessagingHostsFiles () {
-        removeForFirefox()
-        
-        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome/NativeMessagingHosts")
-        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome Beta/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome Dev/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Google/Chrome Canary/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Chromium/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Beta/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Dev/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Microsoft Edge Canary/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Vivaldi/NativeMessagingHosts/")
-        removeForChromiumBasedBrowser("Library/Application Support/Arc/User Data/NativeMessagingHosts")
-        removeForChromiumBasedBrowser("Library/Application Support/Sidekick/NativeMessagingHosts")
-    }
-    
-    class func removeForFirefox () {
         removeManifest( "Library/Application Support/Mozilla/NativeMessagingHosts" )
+        removeManifest( "Library/Application Support/librewolf/NativeMessagingHosts" )
+
+        removeManifest("Library/Application Support/Google/Chrome/NativeMessagingHosts")
+        removeManifest("Library/Application Support/Google/Chrome Beta/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Google/Chrome Dev/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Google/Chrome Canary/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Chromium/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Microsoft Edge/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Microsoft Edge Beta/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Microsoft Edge Dev/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Microsoft Edge Canary/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Vivaldi/NativeMessagingHosts/")
+        removeManifest("Library/Application Support/Arc/User Data/NativeMessagingHosts")
+        removeManifest("Library/Application Support/Sidekick/NativeMessagingHosts")
+        
+        removeManifest("Library/Application Support/Orion/NativeMessagingHosts")
     }
- 
-    class func removeForChromiumBasedBrowser ( _ browserHomePath : String ) {
-        removeManifest( browserHomePath )
-    }
-    
+         
     class func removeManifest ( _ path : String ) {
         let filename = "com.markmcguill.strongbox.json"
         let browserPathUrl = Utils.userHomeDirectoryEvenInSandbox().appendingPathComponent(path)
@@ -94,12 +94,12 @@ class NativeMessagingManifestInstallHelper: NSObject {
             }
         }
     }
-    
-    class func installForFirefox () {
+        
+    class func installFirefoxLikeManifestAt(_ browserHomePath : String) {
         let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/afproxy").path
         let manifest = FirefoxNativeMessagingManifest(path: path)
-        
-        writeNativeManifest( manifest, browserHomePath: "Library/Application Support/Mozilla/NativeMessagingHosts" )
+
+        writeNativeManifest( manifest, browserHomePath: browserHomePath )
     }
     
     class func installForChromiumBasedBrowser ( _ browserHomePath : String ) {

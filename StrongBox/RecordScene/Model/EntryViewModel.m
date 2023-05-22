@@ -19,7 +19,7 @@
 @interface EntryViewModel()
 
 @property NSMutableArray<CustomFieldViewModel*>* mutableCustomFields;
-@property MutableOrderedDictionary<NSString*, DatabaseAttachment*>* mutableAttachments;
+@property MutableOrderedDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* mutableAttachments;
 @property NSMutableSet<NSString*>* mutableTags;
 
 @end
@@ -34,9 +34,9 @@
     CustomFieldViewModel *c3 = [CustomFieldViewModel customFieldWithKey:@"Longish Key" value:@"Well this is a very very long thing that is going on here and there and must wrap" protected:YES];
 
     NSInputStream* dataStream = [NSInputStream inputStreamWithData:NSData.data];
-    DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] initWithStream:dataStream length:0 protectedInMemory:YES compressed:YES];
+    KeePassAttachmentAbstractionLayer* dbAttachment = [[KeePassAttachmentAbstractionLayer alloc] initWithStream:dataStream length:0 protectedInMemory:YES compressed:YES];
      
-    NSDictionary<NSString*, DatabaseAttachment*>* attachments = @{
+    NSDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* attachments = @{
         @"filename.jpg" : dbAttachment,
         @"document.txt" : dbAttachment,
         @"abc.pdf" : dbAttachment,
@@ -164,7 +164,7 @@
                          totp:(OTPToken *)totp
                          icon:(NodeIcon*)icon
                  customFields:(NSArray<CustomFieldViewModel *> *)customFields
-                  attachments:(nonnull NSDictionary<NSString *,DatabaseAttachment *> *)attachments
+                  attachments:(nonnull NSDictionary<NSString *,KeePassAttachmentAbstractionLayer *> *)attachments
                      metadata:(nonnull NSArray<ItemMetadataEntry *> *)metadata
                    hasHistory:(BOOL)hasHistory
               parentGroupUuid:(NSUUID*_Nullable)parentGroupUuid
@@ -294,8 +294,8 @@
     }
     
     for (NSString* filename in self.attachments.allKeys) {
-        DatabaseAttachment* b = other.attachments[filename];
-        DatabaseAttachment* a = self.attachments[filename];
+        KeePassAttachmentAbstractionLayer* b = other.attachments[filename];
+        KeePassAttachmentAbstractionLayer* a = self.attachments[filename];
         
         if (!b || ![b.digestHash isEqualToString:a.digestHash]) {
             return YES;
@@ -315,7 +315,7 @@
     [self.mutableAttachments remove:filename];
 }
 
-- (NSUInteger)insertAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment {
+- (NSUInteger)insertAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment {
     NSUInteger idx = [self.mutableAttachments.allKeys indexOfObject:filename
                                                       inSortedRange:NSMakeRange(0, self.mutableAttachments.count)
                                                             options:NSBinarySearchingInsertionIndex
@@ -403,7 +403,7 @@
     return [self.mutableTags.allObjects sortedArrayUsingComparator:finderStringComparator];
 }
 
-- (MutableOrderedDictionary<NSString *,DatabaseAttachment *> *)attachments {
+- (MutableOrderedDictionary<NSString *,KeePassAttachmentAbstractionLayer *> *)attachments {
     return self.mutableAttachments;
 }
 

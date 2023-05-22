@@ -550,6 +550,9 @@ static NSString* getFreeTrialSuffix(void) {
         BOOL isKeePass2 = self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4;
         Node* singleSelectedItem = [self getSingleSelectedItem];
         NSArray<Node*>* items = [self getSelectedItems];
+        BOOL itemsContainGroup = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+            return obj.isGroup; 
+        }];
         
         if ( !self.viewModel.isEffectivelyReadOnly ) { 
             if ( theAction == @selector(onSideBarCreateGroup:)) {
@@ -603,21 +606,21 @@ static NSString* getFreeTrialSuffix(void) {
                 return ( singleSelectedItem != nil && ((!excluded && [self.viewModel isFlaggedByAudit:singleSelectedItem.uuid] ) || excluded)) ;
             }
             else if ( theAction == @selector(onNewGroupWithItems:)) {
-                if ( items.count ) {
+                if ( items.count && !itemsContainGroup ) {
                     return YES;
                 }
                 
                 return NO;
             }
             else if ( theAction == @selector(onAddTagToItems:) || theAction == @selector(onAddNewTagToItems:)) {
-                if ( items.count && isKeePass2 ) {
+                if ( items.count && isKeePass2 && !itemsContainGroup) {
                     return YES;
                 }
                 
                 return NO;
             }
             else if ( theAction == @selector(onRemoveTagFromItems:)) {
-                if ( items.count && isKeePass2 ) {
+                if ( items.count && isKeePass2 && !itemsContainGroup ) {
                     NSMutableSet* all = NSMutableSet.set;
                     for ( singleSelectedItem in items ) {
                         [all addObjectsFromArray:singleSelectedItem.fields.tags.allObjects];
@@ -688,7 +691,7 @@ static NSString* getFreeTrialSuffix(void) {
                 return YES;
             }
             else if (theAction == @selector(onDownloadFavIcons:)) {
-                if ( !isKeePass2 || !StrongboxProductBundle.supportsFavIconDownloader ) {
+                if ( !isKeePass2 || !StrongboxProductBundle.supportsFavIconDownloader) {
                     return NO;
                 }
                 
@@ -819,6 +822,15 @@ static NSString* getFreeTrialSuffix(void) {
             
             return isKeePass2;
         }
+        else if (theAction == @selector( onSideBarDuplicateItem: )) {
+            Node* item = [self getSideBarSelectedItem];
+            
+            if( item == nil || !item.isGroup) {
+                return NO;
+            }
+            
+            return YES;
+        }
         else if (theAction == @selector(onGeneralDatabaseSettings:)) {
             return YES;
         }
@@ -882,11 +894,8 @@ static NSString* getFreeTrialSuffix(void) {
     
     
     
-    if ( theAction == @selector(onVCToggleShowEntryCountInSidebar:)) {
-        menuItem.state = self.viewModel.showChildCountOnFolderInSidebar ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
-    else if ( theAction == @selector(onVCToggleShowVerticalGridlines:)) {
+    
+    if ( theAction == @selector(onVCToggleShowVerticalGridlines:)) {
         menuItem.state = self.viewModel.showVerticalGrid ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
@@ -1043,6 +1052,33 @@ static NSString* getFreeTrialSuffix(void) {
     vc.viewModel = self.viewModel;
     
     [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (IBAction)onSideBarDuplicateItem:(id)sender {
+    NSLog(@"onSideBarDuplicateItem");
+    
+    Node* item = nil;
+    
+    if( self.viewModel && !self.viewModel.locked ) {
+        item = [self getSideBarSelectedItem];
+        if( item == nil || !item.isGroup) {
+            return;
+        }
+    }
+
+    if ( item ) {
+        Node* destinationItem = item.parent ? item.parent : self.viewModel.rootGroup;
+        
+        
+        
+        Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")] preserveTimestamps:NO];
+        
+        [item touch:NO touchParents:YES];
+        if ( [self.viewModel addChildren:@[dupe] parent:destinationItem] ) {
+            NSString* loc = NSLocalizedString(@"mac_item_duplicated", @"Item Duplicated");
+            [self showPopupChangeToastNotification:loc];
+        }
+    }
 }
 
 - (IBAction)onSideBarCreateGroup:(id)sender {
@@ -1427,10 +1463,6 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 
-
-- (IBAction)onVCToggleShowEntryCountInSidebar:(id)sender {
-    self.viewModel.showChildCountOnFolderInSidebar = !self.viewModel.showChildCountOnFolderInSidebar;
-}
 
 - (IBAction)onVCToggleShowVerticalGridlines:(id)sender {
     self.viewModel.showVerticalGrid = !self.viewModel.showVerticalGrid;

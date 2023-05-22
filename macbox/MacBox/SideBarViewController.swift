@@ -210,7 +210,17 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func loadHierarchyHeader() -> SideBarViewNode {
-        let hierarchyHeader = SideBarViewNode(context: .none, title: NSLocalizedString("side_bar_hierarchy_folder_structure", comment: "Hierarchy"), image: Icon.houseFill.image(), parent: nil, children: [], headerNode: kHeaderNodeRegularHierarchy)
+        let headerTitle : String
+        
+        if database.sideBarShowTotalCountOnHierarchy {
+            let fmt = NSLocalizedString("side_bar_hierarchy_folder_structure_summary_count_fmt", comment: "Hierarchy (%@ Groups, %@ Entries)")
+            headerTitle = String(format: fmt, String(database.fastGroupTotalCount), String( database.fastEntryTotalCount ))
+        }
+        else {
+            headerTitle = NSLocalizedString("side_bar_hierarchy_folder_structure", comment: "Hierarchy")
+        }
+        
+        let hierarchyHeader = SideBarViewNode(context: .none, title: headerTitle, image: Icon.houseFill.image(), parent: nil, children: [], headerNode: kHeaderNodeRegularHierarchy)
 
         let hierarchyRoot = getHierarchicalViewNodesFor(rootGroupForDisplay, hierarchyHeader)
         hierarchyHeader.children = [hierarchyRoot]
@@ -244,7 +254,13 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func loadTagsSideBarNodes() -> SideBarViewNode? {
-        let sortedTags = database.tagSet.sorted { a, b in
+        var tags = database.tagSet
+        
+        if Settings.sharedInstance().shadeFavoriteTag {
+            tags.remove(kCanonicalFavouriteTag)
+        }
+        
+        let sortedTags = tags.sorted { a, b in
             finderStringCompare(a, b) == .orderedAscending
         }
 
@@ -255,7 +271,13 @@ class SideBarViewController: NSViewController, DocumentViewController {
         let tagsHeader = SideBarViewNode(context: .none, title: NSLocalizedString("item_details_username_field_tags", comment: "Tags"), image: Icon.tagFill.image(), parent: nil, children: [], headerNode: kHeaderNodeTags)
 
         let tagNodes = sortedTags.map { tag in
-            SideBarViewNode(context: .tags(tag), title: tag, image: Icon.tag.image(), parent: tagsHeader)
+            let count = database.entries(withTag: tag).count
+            
+            return SideBarViewNode(context: .tags(tag),
+                                   title: tag,
+                                   image: Icon.tag.image(),
+                                   parent: tagsHeader,
+                                   databaseNodeChildCount: database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", count) : "")
         }
 
         tagsHeader.children = tagNodes
@@ -270,42 +292,50 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
         
 
+        let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.fastEntryTotalCount) : ""
         let allEntriesNode = SideBarViewNode(context: .special(.allEntries), title: NSLocalizedString("quick_view_title_all_entries_title", comment: "All Entries"),
-                                             image: Icon.listStar.image(), parent: specialsHeader)
+                                             image: Icon.listStar.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
         var specialNodes: [SideBarViewNode] = [allEntriesNode]
 
         
 
-        var expired = false
-        var nearlyExpired = false
-        var totp = false
-        var attachment = false
 
-        for obj in database.allSearchableEntries {
-            if !expired {
-                expired = obj.fields.expired
-            }
-            if !nearlyExpired {
-                nearlyExpired = obj.fields.nearlyExpired
-            }
-            if !totp {
-                totp = obj.fields.otpToken != nil
-            }
-            if !attachment {
-                attachment = obj.fields.attachments.count > 0
-            }
 
-            if expired, nearlyExpired, totp, attachment {
-                break
-            }
-        }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        let expired = !database.expiredEntries.isEmpty
+        let nearlyExpired = !database.nearlyExpiredEntries.isEmpty
+        let totp = !database.totpEntries.isEmpty
+        let attachment = !database.attachmentEntries.isEmpty
+        
         
 
         if expired {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.expiredEntries.count) : ""
+            
             let entry = SideBarViewNode(context: .special(.expiredEntries), title: NSLocalizedString("browse_vc_section_title_expired", comment: "Expired"),
-                                        image: Icon.expired.image(), parent: specialsHeader)
+                                        image: Icon.expired.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
             specialNodes.append(entry)
         }
@@ -313,8 +343,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
         
 
         if nearlyExpired {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.nearlyExpiredEntries.count) : ""
+
             let entry = SideBarViewNode(context: .special(.nearlyExpiredEntries), title: NSLocalizedString("browse_vc_section_title_nearly_expired", comment: "Nearly Expired"),
-                                        image: Icon.nearlyExpired.image(), parent: specialsHeader)
+                                        image: Icon.nearlyExpired.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
             specialNodes.append(entry)
         }
@@ -322,8 +354,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
         
 
         if totp {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.totpEntries.count) : ""
+
             let entry = SideBarViewNode(context: .special(.totpItems), title: NSLocalizedString("generic_fieldname_totp", comment: "TOTP"),
-                                        image: Icon.totp.image(), parent: specialsHeader)
+                                        image: Icon.totp.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
             specialNodes.append(entry)
         }
@@ -331,8 +365,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
         
 
         if attachment {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.attachmentEntries.count) : ""
+
             let entry = SideBarViewNode(context: .special(.itemsWithAttachments), title: NSLocalizedString("generic_fieldname_attachments", comment: "Attachments"),
-                                        image: Icon.attachment.image(), parent: specialsHeader)
+                                        image: Icon.attachment.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
             specialNodes.append(entry)
         }
@@ -360,91 +396,118 @@ class SideBarViewController: NSViewController, DocumentViewController {
         var auditNodes: [SideBarViewNode] = []
 
         if !report.entriesWithNoPasswords.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesWithNoPasswords.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.noPasswords),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_no_password_set", comment: "No Passwords"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.entriesWithDuplicatePasswords.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesWithDuplicatePasswords.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.duplicated),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_duplicated_password", comment: "Duplicated"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.entriesWithCommonPasswords.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesWithCommonPasswords.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.common),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_very_common_password", comment: "Common"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.entriesWithSimilarPasswords.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesWithSimilarPasswords.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.similar),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_password_is_similar_to_another", comment: "Similar"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.entriesTooShort.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesTooShort.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.tooShort),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_password_is_too_short", comment: "Short"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.entriesPwned.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesPwned.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.pwned),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_password_is_pwned", comment: "Pwned"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.entriesWithLowEntropyPasswords.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesWithLowEntropyPasswords.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.lowEntropy),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_low_entropy", comment: "Weak/Entropy"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.entriesWithTwoFactorAvailable.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.entriesWithTwoFactorAvailable.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.twoFactorAvailable),
                                                    title: NSLocalizedString("audit_quick_summary_very_brief_two_factor_available", comment: "2FA Available"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
 
         if !report.allEntries.isEmpty {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", report.allEntries.count) : ""
+
             let auditEntriesNode = SideBarViewNode(context: .auditIssues(.allEntries),
                                                    title: NSLocalizedString("audit_side_bar_nav_all_issues", comment: "All Issues"),
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
-                                                   color: .systemOrange)
+                                                   color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)
         }
@@ -525,6 +588,59 @@ class SideBarViewController: NSViewController, DocumentViewController {
         isPerformingProgrammaticExpandCollapse = false
     }
 
+    func getChildCountStringForGroupBothCountsHelper( _ groupCount : Int, _ entryCount : Int ) -> String {
+        if database.sideBarChildCountShowZero || ( groupCount > 0 && entryCount > 0 ) {
+            return String(format: "(%@%ld%@%ld)", database.sideBarChildCountGroupPrefix, groupCount, database.sideBarChildCountSeparator, entryCount)
+        }
+        else {
+            if groupCount == 0 && entryCount == 0 {
+                return ""
+            }
+            else if groupCount == 0 {
+                return String(format: "(%ld)", entryCount)
+            }
+            else if entryCount == 0 {
+                return String(format: "(%@%ld)", database.sideBarChildCountGroupPrefix, groupCount)
+            }
+        }
+
+        return ""
+    }
+    
+    func getChildCountStringForGroup( _ group : Node ) -> String {
+        guard database.showChildCountOnFolderInSidebar else {
+            return ""
+        }
+            
+        switch ( database.sideBarChildCountFormat ) {
+        case .entries:
+            let count = group.childRecords.count
+            
+            return count > 0 || database.sideBarChildCountShowZero ? String(format: "(%ld)", count) : ""
+        case .entriesRecursive:
+            let count = group.allChildRecords.count
+            return count > 0 || database.sideBarChildCountShowZero ? String(format: "(%ld)", count) : ""
+        case .groupsAndEntries:
+            let groupCount = group.childGroups.count
+            let entryCount = group.childRecords.count
+        
+            return getChildCountStringForGroupBothCountsHelper(groupCount, entryCount)
+        case .groupsAndEntriesRecursive:
+            let groupCount = group.allChildGroups.count
+            let entryCount = group.allChildRecords.count
+            
+            return getChildCountStringForGroupBothCountsHelper(groupCount, entryCount)
+        case .groupsAndEntriesCombined:
+            let count = group.children.count
+            return String(format: "(%ld)", count)
+        case .groupsAndEntriesCombinedRecursive:
+            let count = group.allChildren.count
+            return String(format: "(%ld)", count)
+        @unknown default:
+            return ""
+        }
+    }
+    
     private func getHierarchicalViewNodesFor(_ group: Node, _ parentNode: SideBarViewNode) -> SideBarViewNode {
         let image: NSImage
         if rootGroupForDisplay.uuid == group.uuid, group.isUsingKeePassDefaultIcon {
@@ -532,8 +648,12 @@ class SideBarViewController: NSViewController, DocumentViewController {
         } else {
             image = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
         }
-
-        let ret = SideBarViewNode(context: .regularHierarchy(group.uuid), title: group.title, image: image, parent: parentNode, children: [], databaseNodeChildCount: group.childRecords.count)
+        
+        
+        
+        let count = getChildCountStringForGroup( group )
+        
+        let ret = SideBarViewNode(context: .regularHierarchy(group.uuid), title: group.title, image: image, parent: parentNode, children: [], databaseNodeChildCount: count)
 
         if database.isKeePass2Format, !database.sortKeePassNodes {
             ret.children = group.childGroups.map { child in
@@ -686,6 +806,7 @@ extension SideBarViewController: NSMenuDelegate {
         if let recyleBinNode = database.recycleBinNode, navigationContext == .regularHierarchy(recyleBinNode.uuid) {
             hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarFindFavIcons(_:)))
             hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarCreateGroup(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarDuplicateItem(_:)))
         }
         else {
             hideMenuItemWithTarget(menu, #selector(WindowController.onEmptyRecycleBin(_:)))
@@ -710,6 +831,7 @@ extension SideBarViewController: NSMenuDelegate {
         }
         else {
             hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarCreateGroup(_:)))
+            hideMenuItemWithTarget(menu, #selector(WindowController.onSideBarDuplicateItem(_:)))
         }
         
         if case .tags = navigationContext {
@@ -784,11 +906,13 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
             let attr: NSAttributedString
             if database.isKeePass2Format, database.sortKeePassNodes, database.recycleBinEnabled, database.recycleBinNode != nil, node.context == .regularHierarchy(database.recycleBinNode!.uuid) {
+                
+                
                 let style = NSMutableParagraphStyle()
                 style.lineBreakMode = .byTruncatingTail
                 attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.italicBodyFont, .paragraphStyle: style])
 
-                cell.setContent(attr, iconImage: node.image, topSpacing: 16.0)
+                cell.setContent(attr, iconImage: node.image, topSpacing: 16.0, count: node.databaseNodeChildCount)
             } else {
                 let style = NSMutableParagraphStyle()
                 style.lineBreakMode = .byTruncatingTail
@@ -799,7 +923,12 @@ extension SideBarViewController: NSOutlineViewDelegate {
                     fav = true
                 }
 
-                cell.setContent(attr, iconImage: node.image, showLeadingFavStar: fav, count: database.showChildCountOnFolderInSidebar ? node.databaseNodeChildCount : nil)
+                
+                
+                cell.setContent(attr,
+                                iconImage: node.image,
+                                showLeadingFavStar: fav,
+                                count: node.databaseNodeChildCount)
             }
 
             return cell

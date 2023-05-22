@@ -20,7 +20,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
 @interface AddAttachmentHelper () <UIImagePickerControllerDelegate, UIDocumentPickerDelegate, UINavigationControllerDelegate>
 
 @property UIViewController* parentViewController;
-@property (nonatomic, copy) void (^onAdd)(NSString* filename, DatabaseAttachment* databaseAttachment);
+@property (nonatomic, copy) void (^onAdd)(NSString* filename, KeePassAttachmentAbstractionLayer* databaseAttachment);
 @property NSSet<NSString*>* usedFilenames;
 
 @end
@@ -40,7 +40,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
 
 - (void)beginAddAttachmentUi:(UIViewController *)vc
                usedFilenames:(NSArray<NSString *> *)usedFilenames
-                       onAdd:(void (^)(NSString* filename, DatabaseAttachment* databaseAttachment))onAdd {
+                       onAdd:(void (^)(NSString* filename, KeePassAttachmentAbstractionLayer* databaseAttachment))onAdd {
     self.parentViewController = vc;
     self.onAdd = onAdd;
     self.usedFilenames = [NSSet setWithArray:usedFilenames]; 
@@ -324,7 +324,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
                                   else {
                                       if(self.onAdd) {
                                           NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
-                                          DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:inputStream length:data.length protectedInMemory:YES compressed:YES];
+                                          KeePassAttachmentAbstractionLayer *dbAttachment = [[KeePassAttachmentAbstractionLayer alloc] initWithStream:inputStream length:data.length protectedInMemory:YES compressed:YES];
                                           
                                           NSLog(@"Adding Attachment: [%@]-[%@]", text, dbAttachment.digestHash);
                                           

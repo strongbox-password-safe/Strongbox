@@ -1229,7 +1229,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         return;
     }
     
-    DatabaseAttachment* oldDbAttachment = item.fields.attachments[filename];
+    KeePassAttachmentAbstractionLayer* oldDbAttachment = item.fields.attachments[filename];
     [item.fields.attachments removeObjectForKey:filename];
     
     NSDate* oldModified = item.fields.modified;
@@ -1258,11 +1258,11 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     });
 }
 
-- (void)addItemAttachment:(Node *)item filename:(NSString *)filename attachment:(DatabaseAttachment *)attachment {
+- (void)addItemAttachment:(Node *)item filename:(NSString *)filename attachment:(KeePassAttachmentAbstractionLayer *)attachment {
     [self addItemAttachment:item filename:filename attachment:attachment modified:nil];
 }
 
-- (void)addItemAttachment:(Node *)item filename:(NSString *)filename attachment:(DatabaseAttachment *)attachment modified:(NSDate*)modified {
+- (void)addItemAttachment:(Node *)item filename:(NSString *)filename attachment:(KeePassAttachmentAbstractionLayer *)attachment modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -2295,12 +2295,12 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     return self.database.mostPopularTags;
 }
 
-- (NSInteger)numberOfRecords {
-    return self.database.numberOfRecords;
+- (NSInteger)fastEntryTotalCount {
+    return self.database.fastEntryTotalCount;
 }
 
-- (NSInteger)numberOfGroups {
-    return self.database.numberOfGroups;
+- (NSInteger)fastGroupTotalCount {
+    return self.database.fastGroupTotalCount;
 }
 
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
@@ -2431,6 +2431,53 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     self.databaseMetadata.showChildCountOnFolderInSidebar = showChildCountOnFolderInSidebar;
     [self publishDatabasePreferencesChangedNotification];
 }
+
+
+- (SideBarChildCountFormat)sideBarChildCountFormat {
+    return self.databaseMetadata.sideBarChildCountFormat;
+}
+
+- (void)setSideBarChildCountFormat:(SideBarChildCountFormat)sideBarChildCountFormat {
+    self.databaseMetadata.sideBarChildCountFormat = sideBarChildCountFormat;
+    [self publishDatabasePreferencesChangedNotification];
+}
+
+- (NSString *)sideBarChildCountSeparator {
+    return self.databaseMetadata.sideBarChildCountSeparator;
+}
+
+- (void)setSideBarChildCountSeparator:(NSString *)sideBarChildCountSeparator {
+    self.databaseMetadata.sideBarChildCountSeparator = sideBarChildCountSeparator;
+    [self publishDatabasePreferencesChangedNotification];
+}
+
+- (BOOL)sideBarChildCountShowZero {
+    return self.databaseMetadata.sideBarChildCountShowZero;
+}
+
+- (void)setSideBarChildCountShowZero:(BOOL)sideBarChildCountShowZero {
+    self.databaseMetadata.sideBarChildCountShowZero = sideBarChildCountShowZero;
+    [self publishDatabasePreferencesChangedNotification];
+}
+
+- (NSString *)sideBarChildCountGroupPrefix {
+    return self.databaseMetadata.sideBarChildCountGroupPrefix;
+}
+
+- (void)setSideBarChildCountGroupPrefix:(NSString *)sideBarChildCountGroupPrefix {
+    self.databaseMetadata.sideBarChildCountGroupPrefix = sideBarChildCountGroupPrefix;
+    [self publishDatabasePreferencesChangedNotification];
+}
+
+- (BOOL)sideBarShowTotalCountOnHierarchy {
+    return self.databaseMetadata.sideBarShowTotalCountOnHierarchy;
+}
+
+- (void)setSideBarShowTotalCountOnHierarchy:(BOOL)sideBarShowTotalCountOnHierarchy {
+    self.databaseMetadata.sideBarShowTotalCountOnHierarchy = sideBarShowTotalCountOnHierarchy;
+    [self publishDatabasePreferencesChangedNotification];
+}
+
 
 - (NSArray *)visibleColumns {
     return self.databaseMetadata.visibleColumns;
@@ -2811,6 +2858,17 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 - (void)setNextGenSearchScope:(SearchScope)nextGenSearchScope {
     if ( self.nextGenSearchScope != nextGenSearchScope ) {
         self.databaseMetadata.searchScope = nextGenSearchScope;
+        [self publishNextGenSearchContextChanged];
+    }
+}
+
+- (BOOL)nextGenSearchIncludeGroups {
+    return self.databaseMetadata.searchIncludeGroups;
+}
+
+- (void)setNextGenSearchIncludeGroups:(BOOL)nextGenSearchIncludeGroups {
+    if ( self.nextGenSearchIncludeGroups != nextGenSearchIncludeGroups ) {
+        self.databaseMetadata.searchIncludeGroups = nextGenSearchIncludeGroups;
         [self publishNextGenSearchContextChanged];
     }
 }

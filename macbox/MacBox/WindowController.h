@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)onEmptyRecycleBin:(id)sender;
 - (IBAction)onToggleFavouriteItemInSideBar:(id)sender;
 - (IBAction)onSideBarCreateGroup:(id)sender;
+- (IBAction)onSideBarDuplicateItem:(id)sender;
 - (IBAction)onSideBarFindFavIcons:(id)sender;
 - (IBAction)onSideBarItemProperties:(id)sender;
 - (IBAction)onDeleteSideBarItem:(id)sender;

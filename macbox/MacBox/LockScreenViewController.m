@@ -1026,7 +1026,8 @@
 
 
 
-- (void)unlock:(CompositeKeyFactors *)compositeKeyFactors viewController:(NSViewController *)viewController
+- (void)unlock:(CompositeKeyFactors *)compositeKeyFactors
+viewController:(NSViewController *)viewController
     alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     fromConvenience:(BOOL)fromConvenience
     completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {

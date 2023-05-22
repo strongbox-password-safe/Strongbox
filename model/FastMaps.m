@@ -18,7 +18,9 @@
                     usernameSet:(NSCountedSet<NSString *> *)usernameSet
                        emailSet:(NSCountedSet<NSString *> *)emailSet
                          urlSet:(NSCountedSet<NSString *> *)urlSet
-              customFieldKeySet:(NSCountedSet<NSString *> *)customFieldKeySet {
+              customFieldKeySet:(NSCountedSet<NSString *> *)customFieldKeySet
+                entryTotalCount:(NSInteger)entryTotalCount
+                groupTotalCount:(NSInteger)groupTotalCount {
     if (self = [super init]) {
         _uuidMap = [uuidMap copy];
         _withExpiryDates = [withExpiryDates copy];
@@ -32,6 +34,8 @@
         _emailSet = emailSet;
         _urlSet = urlSet;
         _customFieldKeySet = customFieldKeySet;
+        _entryTotalCount = entryTotalCount;
+        _groupTotalCount = groupTotalCount;
     }
     
     return self;

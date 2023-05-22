@@ -10,7 +10,7 @@
 #import "Node.h"
 #import "SerializationData.h"
 #import "KeePassGroup.h"
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable KeePassGroup*)toKeePassModel:(Node*)rootNode
                                  context:(XmlProcessingContext*)context
-                   minimalAttachmentPool:(NSArray<DatabaseAttachment*>*_Nullable*_Nullable)minimalAttachmentPool
+                   minimalAttachmentPool:(NSArray<KeePassAttachmentAbstractionLayer*>*_Nullable*_Nullable)minimalAttachmentPool
                                 iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool
                                    error:(NSError**)error;
 
@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
                     error:(NSError**)error;
 
 - (nullable Node*)toStrongboxModel:(KeePassGroup*)existingXmlRoot
-                   attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
+                   attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool
                     customIconPool:(NSDictionary<NSUUID *, NodeIcon *> *)customIconPool
                              error:(NSError**)error;
 

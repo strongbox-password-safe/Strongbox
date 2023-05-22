@@ -506,6 +506,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 
                 NSString* suggestedName = [selectedItem.name stringByDeletingPathExtension];
                 
+                suggestedName = [DatabasesManager.sharedInstance getUniqueNameFromSuggestedName:suggestedName];
+                
                 MacDatabasePreferences *newDatabase = [provider getDatabasePreferences:suggestedName providerData:selectedItem.providerData];
                     
                 if (!newDatabase) {

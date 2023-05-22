@@ -71,7 +71,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (instancetype)initWithFormat:(DatabaseFormat)format
            compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                       metadata:(UnifiedDatabaseMetadata*)metadata
-            {
+{
     return [self initWithFormat:format
             compositeKeyFactors:compositeKeyFactors
                        metadata:metadata
@@ -89,7 +89,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                  deletedObjects:@{}
                        iconPool:@{}];
 }
-    
+
 - (instancetype)initWithFormat:(DatabaseFormat)format
            compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                       metadata:(UnifiedDatabaseMetadata*)metadata
@@ -103,7 +103,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         
         _rootNode = root ? root : [self initializeRoot];
         [self rebuildFastMaps];
- 
+        
         _mutableDeletedObjects = deletedObjects.mutableCopy;
         _backingIconPool = iconPool.mutableCopy;
     }
@@ -114,11 +114,11 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (Node*)initializeRoot {
     Node* rootGroup = [[Node alloc] initAsRoot:nil childRecordsAllowed:self.format != kKeePass1];
-
+    
     if (self.format != kPasswordSafe) {
         
         
-
+        
         NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
         if ([rootGroupName isEqualToString:@"generic_database"]) { 
             rootGroupName = kDefaultRootGroupName;
@@ -139,30 +139,30 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 
-- (NSArray<DatabaseAttachment *> *)attachmentPool {
+- (NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentPool {
     return [MinimalPoolHelper getMinimalAttachmentPool:self.rootNode];
 }
 
 - (NSDictionary<NSUUID *,NodeIcon *> *)iconPool {
     NSArray<Node*>* allNodes = [self getAllNodesReferencingCustomIcons:self.rootNode];
-
     
-
-
-            
+    
+    
+    
+    
     const BOOL stripUnusedIcons = self.preferences.stripUnusedIconsOnSave;
     
     NSMutableDictionary<NSUUID*, NodeIcon*>* newIconPool = stripUnusedIcons ? @{}.mutableCopy : self.backingIconPool.mutableCopy;
     
     for (Node* node in allNodes) {
         NodeIcon* icon = node.icon;
-
+        
         if ( newIconPool[icon.uuid] == nil ) {
-
+            
             newIconPool[icon.uuid] = icon;
         }
     }
-
+    
     NSLog(@"New Icon Pool count = %lu", (unsigned long)newIconPool.count);
     
     self.backingIconPool = newIconPool.copy;
@@ -189,7 +189,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     NSMutableArray *customIconNodes = [NSMutableArray arrayWithArray:currentCustomIconNodes];
     [customIconNodes addObjectsFromArray:allHistoricalNodesWithCustomIcons];
-
+    
     return customIconNodes;
 }
 
@@ -233,7 +233,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (NSURL *)launchableUrlForItem:(Node *)item {
     NSString *urlString = [self dereference:item.fields.url node:item];
-
+    
     return [self launchableUrlForUrlString:urlString];
 }
 
@@ -260,6 +260,11 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 
+- (void)addHistoricalNode:(Node *)item {
+    Node* cloneForHistory = [item cloneForHistory];
+    [self addHistoricalNode:item originalNodeForHistory:cloneForHistory];
+}
+
 - (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
     BOOL shouldAddHistory = YES; 
     
@@ -274,13 +279,13 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (BOOL)setItemTitle:(Node *)item title:(NSString *)title {
     Node* originalNodeForHistory = [item cloneForHistory];
-
+    
     BOOL ret = [item setTitle:title keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
-
+    
     if (ret) {
         [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
         [item touch:YES touchParents:NO];
-
+        
         [self rebuildFastMaps];
     }
     
@@ -313,6 +318,60 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }
     
     return NO;
+}
+
+- (void)deleteTag:(NSString*)tag {
+    NSArray<NSUUID*>* ids = [self getItemIdsForTag:tag];
+    
+    [self removeTagFromItems:ids tag:tag];
+}
+
+- (void)renameTag:(NSString*)from to:(NSString*)to {
+    NSArray<NSUUID*>* ids = [self getItemIdsForTag:from];
+    
+    [self removeTagFromItems:ids tag:from touchAndAddHistory:NO];
+    
+    [self addTagToItems:ids tag:to];
+}
+
+- (void)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+    NSArray<Node*>* items = [self getItemsById:ids];
+    
+    for (Node* item in items) {
+        if ( [item.fields.tags containsObject:tag] ) {
+            continue;
+        }
+        
+        [self addHistoricalNode:item];
+        [item touch:YES touchParents:NO];
+        
+        [item.fields.tags addObject:tag];
+    }
+    
+    [self rebuildFastMaps];
+}
+
+- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+    [self removeTagFromItems:ids tag:tag touchAndAddHistory:YES];
+}
+
+- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag touchAndAddHistory:(BOOL)touchAndAddHistory {
+    NSArray<Node*>* items = [self getItemsById:ids];
+    
+    for (Node* item in items) {
+        if ( ![item.fields.tags containsObject:tag] ) {
+            continue;
+        }
+        
+        if ( touchAndAddHistory ) {
+            [self addHistoricalNode:item];
+            [item touch:YES touchParents:NO];
+        }
+        
+        [item.fields.tags removeObject:tag];
+    }
+        
+    [self rebuildFastMaps];
 }
 
 
@@ -932,11 +991,14 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     NSCountedSet<NSString*> *urlSet = NSCountedSet.set;
     NSCountedSet<NSString*> *customFieldKeySet = NSCountedSet.set;
     
+    NSInteger entryTotalCount = 0;
+    NSInteger groupTotalCount = 0;
+
     if ( self.rootNode ) {
         uuidMap[self.rootNode.uuid] = self.rootNode;
 
         
-        
+                
         for (Node* node in self.rootNode.allChildren) { 
             Node* existing = uuidMap[node.uuid];
             
@@ -945,6 +1007,13 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             }
             else {
                 uuidMap[node.uuid] = node;
+            }
+            
+            if ( node.isGroup ) {
+                groupTotalCount++;
+            }
+            else {
+                entryTotalCount++;
             }
         }
         
@@ -956,7 +1025,9 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                                                   usernameSet:usernameSet
                                                      emailSet:emailSet
                                                        urlSet:urlSet
-                                            customFieldKeySet:customFieldKeySet];
+                                            customFieldKeySet:customFieldKeySet
+                                              entryTotalCount:entryTotalCount
+                                              groupTotalCount:groupTotalCount];
 
         _fastMaps = newMaps;
         
@@ -968,6 +1039,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         Node* recycler = kp2RecycleBin ? kp2RecycleBin : keePass1BackupNode;
 
         for (Node* node in self.rootNode.allChildren) { 
+                        
             if ( recycler != nil && (node == recycler || [recycler contains:node]) ) {
                 continue;
             }
@@ -1046,7 +1118,9 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                                               usernameSet:usernameSet
                                                  emailSet:emailSet
                                                    urlSet:urlSet
-                                        customFieldKeySet:customFieldKeySet];
+                                        customFieldKeySet:customFieldKeySet
+                                          entryTotalCount:entryTotalCount
+                                          groupTotalCount:groupTotalCount];
 
     _fastMaps = newMaps;
 }
@@ -1281,12 +1355,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [self filterItems:YES includeEntries:YES searchableOnly:NO];
 }
 
-- (NSInteger)numberOfRecords {
-    return self.effectiveRootGroup.allChildRecords.count;
+- (NSInteger)fastEntryTotalCount {
+    return self.fastMaps.entryTotalCount;
 }
 
-- (NSInteger)numberOfGroups {
-    return self.effectiveRootGroup.allChildGroups.count;
+- (NSInteger)fastGroupTotalCount {
+    return self.fastMaps.groupTotalCount - (self.rootNode == self.effectiveRootGroup ? 0 : 1); 
 }
 
 - (NSArray*)orderedByMostFrequentDescending:(NSCountedSet<NSString*>*)bag {
@@ -1685,7 +1759,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     NSUInteger binariesSize = 0;
     for (NSString* filename in node.fields.attachments.allKeys) {
-        DatabaseAttachment* dbA = node.fields.attachments[filename];
+        KeePassAttachmentAbstractionLayer* dbA = node.fields.attachments[filename];
         binariesSize += dbA == nil ? 0 : dbA.estimatedStorageBytes;
     }
     

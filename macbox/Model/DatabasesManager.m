@@ -191,7 +191,10 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     StorageProvider provider = storageProviderFromUrl(url);
      
     NSString* nickName = [url.lastPathComponent stringByDeletingPathExtension];
+    
     nickName = nickName ? nickName : NSLocalizedString(@"generic_unknown", @"Unknown");
+    
+    nickName = [self getUniqueNameFromSuggestedName:nickName];
     
     safe = [[DatabaseMetadata alloc] initWithNickName:nickName
                                       storageProvider:provider
@@ -234,6 +237,27 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
     
     return ![nicknamesLowerCase containsObject:nickName.lowercaseString];
+}
+
+- (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested {
+    suggested = [DatabasesManager trimDatabaseNickName:suggested];
+    
+    return [self getSuggestedNewDatabaseNameWithPrefix:suggested];
+}
+
+- (NSString*)getSuggestedNewDatabaseName {
+    return [self getSuggestedNewDatabaseNameWithPrefix:NSLocalizedString(@"casg_suggested_database_name_default", @"My Database")];
+}
+
+- (NSString*)getSuggestedNewDatabaseNameWithPrefix:(NSString*)prefix {
+    NSString *suggestion = prefix;
+    
+    int attempt = 2;
+    while(![self isUnique:suggestion] && attempt < 1000) {
+        suggestion = [NSString stringWithFormat:@"%@ %@", prefix, @(attempt++)];
+    }
+    
+    return [self isUnique:suggestion] ? suggestion : [NSUUID UUID].UUIDString;
 }
 
 @end

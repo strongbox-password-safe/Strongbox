@@ -182,6 +182,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hasMigratedToLazySync;
 
 @property (nullable) NSString* businessOrganisationName;
+@property BOOL shadeFavoriteTag;
 
 @end
 

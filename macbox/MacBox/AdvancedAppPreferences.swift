@@ -23,6 +23,7 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var useNextGenUI: NSButton!
     @IBOutlet var quitClosesAllWindowsNotTerminate: NSButton!
     @IBOutlet var concealedClipboard: NSButton!
+    @IBOutlet weak var maskKeePassFavoriteTag: NSButton!
     
     override func viewDidLoad() {
         super.viewDidLoad() 
@@ -53,6 +54,7 @@ class AdvancedAppPreferences: NSViewController {
         useNextGenUI.state = settings.nextGenUI ? .on : .off
         quitClosesAllWindowsNotTerminate.state = settings.quitTerminatesProcessEvenInSystemTrayMode ? .off : .on;
         concealedClipboard.state = settings.concealClipboardFromMonitors ? .on : .off
+        maskKeePassFavoriteTag.state = settings.shadeFavoriteTag ? .on : .off
         
         
         
@@ -85,6 +87,7 @@ class AdvancedAppPreferences: NSViewController {
         settings.quitTerminatesProcessEvenInSystemTrayMode = quitClosesAllWindowsNotTerminate.state == .off;
         settings.runBrowserAutoFillProxyServer = enableThirdParty.state == .on
         settings.concealClipboardFromMonitors = concealedClipboard.state == .on
+        settings.shadeFavoriteTag = maskKeePassFavoriteTag.state == .on
         
         notifyChanged()
     }

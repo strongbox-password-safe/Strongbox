@@ -146,6 +146,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL concealClipboardFromMonitors;
 
 @property BOOL autoCommitScannedTotp;
+@property BOOL shadeFavoriteTag;
 
 @end
 

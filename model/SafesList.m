@@ -327,25 +327,22 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 - (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested {
     suggested = [SafesList trimDatabaseNickName:suggested];
 
-    NSString *suggestion = suggested;
-    
-    int attempt = 2;
-    while(![self isUnique:suggestion] && attempt < 100) {
-        suggestion = [NSString stringWithFormat:@"%@ %d", suggested, attempt++];
-    }
-    
-    return [self isUnique:suggestion] ? suggestion : nil;
+    return [self getSuggestedNewDatabaseNameWithPrefix:suggested];
 }
 
-- (NSString*)getSuggestedDatabaseNameUsingDeviceName {
-    NSString *suggestion = NSLocalizedString(@"casg_suggested_database_name_default", @"My Database");
+- (NSString*)getSuggestedNewDatabaseName {
+    return [self getSuggestedNewDatabaseNameWithPrefix:NSLocalizedString(@"casg_suggested_database_name_default", @"My Database")];
+}
+
+- (NSString*)getSuggestedNewDatabaseNameWithPrefix:(NSString*)prefix {
+    NSString *suggestion = prefix;
    
     int attempt = 2;
-    while(![self isUnique:suggestion] && attempt < 100) {
-        suggestion = [NSString stringWithFormat:@"%@ %@", suggestion, @(attempt++)];
+    while(![self isUnique:suggestion] && attempt < 1000) {
+        suggestion = [NSString stringWithFormat:@"%@ %@", prefix, @(attempt++)];
     }
     
-    return [self isUnique:suggestion] ? suggestion : nil;
+    return [self isUnique:suggestion] ? suggestion : [NSUUID UUID].UUIDString;
 }
 
 - (NSArray<SafeMetaData*>*)getSafesOfProvider:(StorageProvider)storageProvider {

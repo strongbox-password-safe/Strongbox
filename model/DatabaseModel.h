@@ -3,7 +3,7 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 #import "DatabaseFormat.h"
 #import "UnifiedDatabaseMetadata.h"
 #import "NodeHierarchyReconstructionData.h"
@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSDictionary<NSUUID*, NSDate*> *deletedObjects;
 
-@property (readonly) NSArray<DatabaseAttachment*> *attachmentPool;
+@property (readonly) NSArray<KeePassAttachmentAbstractionLayer*> *attachmentPool;
 @property (readonly) NSDictionary<NSUUID*, NodeIcon*>* iconPool;
 
 - (instancetype)init;
@@ -179,8 +179,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularEmails;
 @property (nonatomic, readonly) NSArray<NSString*>* mostPopularTags;
 
-@property (nonatomic, readonly) NSInteger numberOfRecords;
-@property (nonatomic, readonly) NSInteger numberOfGroups;
+@property (nonatomic, readonly) NSInteger fastEntryTotalCount;
+@property (nonatomic, readonly) NSInteger fastGroupTotalCount;
 
 @property (readonly) BOOL isUsingKeePassGroupTitleRules;
 
@@ -191,10 +191,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
 - (NSArray<Node*>*)getItemsById:(NSArray<NSUUID*>*)ids;
-- (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag;
 
+- (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag;
 - (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag;
 - (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag;
+- (void)deleteTag:(NSString*)tag;
+- (void)renameTag:(NSString*)from to:(NSString*)to;
+- (void)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
+- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
 
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 

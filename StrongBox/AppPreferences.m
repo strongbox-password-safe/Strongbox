@@ -148,6 +148,7 @@ static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
 static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync-Iteration-5-RB-OneDrive";
 static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
+static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 
 @implementation AppPreferences
 
@@ -199,6 +200,13 @@ static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
     [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
+- (BOOL)shadeFavoriteTag {
+    return [self getBool:kShadeFavoriteTag fallback:YES];
+}
+
+- (void)setShadeFavoriteTag:(BOOL)shadeFavoriteTag {
+    [self setBool:kShadeFavoriteTag value:shadeFavoriteTag];
+}
 
 - (BOOL)hasMigratedToLazySync {
     return [self getBool:kHasMigratedToLazySync];

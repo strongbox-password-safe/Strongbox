@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,7 +20,7 @@ extern const int kMaxRecommendedAttachmentSize;
 
 - (void)beginAddAttachmentUi:(UIViewController*)vc
                usedFilenames:(NSArray<NSString*>*)usedFilenames
-                       onAdd:(void(^)(NSString* filename, DatabaseAttachment* databaseAttachment))onAdd;
+                       onAdd:(void(^)(NSString* filename, KeePassAttachmentAbstractionLayer* databaseAttachment))onAdd;
 
 @end
 

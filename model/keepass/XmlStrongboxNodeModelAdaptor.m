@@ -9,7 +9,7 @@
 #import "XmlStrongboxNodeModelAdaptor.h"
 #import "Utils.h"
 #import "KeePassConstants.h"
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 #import "NSArray+Extensions.h"
 #import "MinimalPoolHelper.h"
 #import "NSData+Extensions.h"
@@ -28,7 +28,7 @@
 
 - (KeePassGroup*)toKeePassModel:(Node*)rootNode
                         context:(XmlProcessingContext*)context
-          minimalAttachmentPool:(NSArray<DatabaseAttachment*>**)minimalAttachmentPool
+          minimalAttachmentPool:(NSArray<KeePassAttachmentAbstractionLayer*>**)minimalAttachmentPool
                        iconPool:(nonnull NSDictionary<NSUUID *,NodeIcon *> *)iconPool
                           error:(NSError *__autoreleasing  _Nullable * _Nullable)error {
     self.xmlParsingContext = context;
@@ -45,7 +45,7 @@
         return nil;
     }
 
-    NSArray<DatabaseAttachment*>* attachmentsPool = [MinimalPoolHelper getMinimalAttachmentPool:rootNode];
+    NSArray<KeePassAttachmentAbstractionLayer*>* attachmentsPool = [MinimalPoolHelper getMinimalAttachmentPool:rootNode];
     if (minimalAttachmentPool) {
         *minimalAttachmentPool = attachmentsPool;
     }
@@ -60,7 +60,7 @@
 }
 
 - (Node*)toStrongboxModel:(KeePassGroup*)existingXmlRoot
-          attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
+          attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool
            customIconPool:(NSDictionary<NSUUID *, NodeIcon *> *)customIconPool
                     error:(NSError**)error {
     Node* rootNode = [[Node alloc] initAsRoot:nil];
@@ -83,7 +83,7 @@
     return rootNode;
 }
 
-- (KeePassGroup*)buildXmlGroup:(Node*)group attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
+- (KeePassGroup*)buildXmlGroup:(Node*)group attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     KeePassGroup *ret = [[KeePassGroup alloc] initWithContext:self.xmlParsingContext];
     
     if ( group.linkedData && [ group.linkedData isKindOfClass:NSArray.class ] ) { 
@@ -149,7 +149,7 @@
     return ret;
 }
 
-- (Entry*)buildXmlEntry:(Node*)node stripHistory:(BOOL)stripHistory attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
+- (Entry*)buildXmlEntry:(Node*)node stripHistory:(BOOL)stripHistory attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
   
     if ( node.linkedData && [node.linkedData isKindOfClass:NSArray.class] ) { 
@@ -245,7 +245,7 @@
     [ret.binaries removeAllObjects];
     
     for (NSString* filename in node.fields.attachments) {
-        DatabaseAttachment* attachment = node.fields.attachments[filename];
+        KeePassAttachmentAbstractionLayer* attachment = node.fields.attachments[filename];
         NSInteger index = [self getIndexOfAttachmentInPool:attachmentsPool attachment:attachment];
         if (index == -1) {
             NSLog(@"WARNWARN: Attachment not found in pool!");
@@ -277,7 +277,7 @@
 
 - (BOOL)buildGroup:(KeePassGroup*)group
         parentNode:(Node*)parentNode
-   attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
+   attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool
     customIconPool:(NSDictionary<NSUUID *, NodeIcon *> *)customIconPool
            usedIds:(NSMutableSet<NSUUID*>*)usedIds {
     BOOL alreadyUsedId = [usedIds containsObject:group.uuid];
@@ -354,7 +354,7 @@
 
 - (Node*)nodeFromEntry:(Entry *)childEntry
              groupNode:(Node*)groupNode
-       attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
+       attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool
         customIconPool:(NSDictionary<NSUUID*, NodeIcon*>*)customIconPool
                usedIds:(NSMutableSet<NSUUID*>*)usedIds
             historical:(BOOL)historical {
@@ -379,7 +379,7 @@
             continue;
         }
             
-        DatabaseAttachment *dbAttachment = attachmentsPool[index];
+        KeePassAttachmentAbstractionLayer *dbAttachment = attachmentsPool[index];
         fields.attachments[binary.filename] = dbAttachment;
     }
     
@@ -464,10 +464,10 @@
     return entryNode;
 }
 
-- (NSInteger)getIndexOfAttachmentInPool:(NSArray<DatabaseAttachment*>*)attachments attachment:(DatabaseAttachment*)attachment {
+- (NSInteger)getIndexOfAttachmentInPool:(NSArray<KeePassAttachmentAbstractionLayer*>*)attachments attachment:(KeePassAttachmentAbstractionLayer*)attachment {
     int i = 0;
     
-    for (DatabaseAttachment* a in attachments) {
+    for (KeePassAttachmentAbstractionLayer* a in attachments) {
         if ([a.digestHash isEqualToString:attachment.digestHash]) {
             return i;
         }

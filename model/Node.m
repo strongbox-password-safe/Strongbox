@@ -816,7 +816,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
             if(child.fields.attachments.count == 1) {
                 NSString* filename = child.fields.attachments.allKeys.firstObject;
                 
-                DatabaseAttachment* a = child.fields.attachments[filename];
+                KeePassAttachmentAbstractionLayer* a = child.fields.attachments[filename];
 
                 attachmentString = [NSString stringWithFormat:@"(attachment: [%@] length: [%@] digestHash: %@)", filename, friendlyFileSizeString(a.length), a.digestHash];
             }
@@ -896,7 +896,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
         
         
         for (NSString* filename in self.fields.attachments.allKeys) {
-            DatabaseAttachment* dbA = self.fields.attachments[filename];
+            KeePassAttachmentAbstractionLayer* dbA = self.fields.attachments[filename];
             binariesSize += dbA == nil ? 0 : dbA.estimatedStorageBytes;
         }
         

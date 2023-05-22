@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "KdfParameters.h"
-#import "DatabaseAttachment.h"
+#import "KeePassAttachmentAbstractionLayer.h"
 #import "RootXmlDomainObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSDictionary<NSNumber*, NSObject*> *extraUnknownHeaders;
 @property KdfParameters *kdfParameters;
 @property NSUUID* cipherUuid;
-@property NSArray<DatabaseAttachment*>* attachments;
+@property NSArray<KeePassAttachmentAbstractionLayer*>* attachments;
 @property RootXmlDomainObject* rootXmlObject;
 
 @end

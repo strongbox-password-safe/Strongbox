@@ -217,7 +217,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     for (NSString* filename in attachments.allKeys) {
         NSString* base64 = attachments[filename];
         NSData* data = [[NSData alloc] initWithBase64EncodedString:base64 options:kNilOptions];
-        DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:YES];
+        KeePassAttachmentAbstractionLayer* dbAttachment = [[KeePassAttachmentAbstractionLayer alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:YES];
         ret.attachments[filename] = dbAttachment;
     }
     
@@ -296,7 +296,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     NSMutableDictionary<NSString*, NSString*> *attachments = NSMutableDictionary.dictionary;
     
     for (NSString* filename in self.attachments.allKeys) {
-        DatabaseAttachment* dbAttachment = self.attachments[filename];
+        KeePassAttachmentAbstractionLayer* dbAttachment = self.attachments[filename];
         NSData* data = dbAttachment.nonPerformantFullData;
         NSString* base64 = [data base64EncodedStringWithOptions:kNilOptions];
         attachments[filename] = base64;
