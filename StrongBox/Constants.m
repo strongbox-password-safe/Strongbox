@@ -30,6 +30,8 @@ NSString* const kPasswordStringKey = @"Password";
 NSString* const kUrlStringKey = @"URL";
 NSString* const kNotesStringKey = @"Notes";
 
+NSString* const kKeeAgentSettingsAttachmentName = @"KeeAgent.settings";
+
 const static NSSet<NSString*> *wellKnownKeys;
 
 + (void)initialize {

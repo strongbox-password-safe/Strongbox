@@ -57,3 +57,4 @@
 #import "DiffDrillDownDetailer.h"
 #import "AutoFillCommon.h"
 #import "NSString+Levenshtein.h"
+#import "XMLWriter.h"

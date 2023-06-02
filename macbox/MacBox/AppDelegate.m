@@ -38,6 +38,7 @@
 #import "UpgradeWindowController.h"
 #import "AutoFillProxyServer.h"
 #import "Strongbox-Swift.h"
+#import "SSHAgentServer.h"
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS 
     #import "GoogleDriveStorageProvider.h"
@@ -134,11 +135,18 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [self listenToEvents];
     
-    [self startAutoFillProxyServer];
-    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self doDeferredAppLaunchTasks]; 
     });
+}
+
+- (void)startSSHAgent {
+    if ( Settings.sharedInstance.runSshAgent && Settings.sharedInstance.isPro ) {
+        
+        if ( ![SSHAgentServer.sharedInstance start] ) {
+            NSLog(@"🔴 Failed to start SSH Agent.");
+        }
+    }
 }
 
 - (void)startAutoFillProxyServer {
@@ -200,6 +208,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)doDeferredAppLaunchTasks {
+    [self startAutoFillProxyServer];
+    
+    [self startSSHAgent];
+    
     [MacOnboardingManager beginAppOnboardingWithCompletion:^{
         NSLog(@"✅ Onboarding Completed...");
 
@@ -698,7 +710,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
-        NSLog(@"🐞 DEBUG - [applicationDidResignActive]");
+
     
     [self startAutoLockForAppInBackgroundTimer];
 }

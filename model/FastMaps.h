@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithUuidMap:(NSDictionary<NSUUID*, Node*>*)uuidMap
                 withExpiryDates:(NSSet<NSUUID*>*)withExpiryDates
                 withAttachments:(NSSet<NSUUID*>*)withAttachments
+            withKeeAgentSshKeys:(NSSet<NSUUID*>*)withKeeAgentSshKeys
                       withTotps:(NSSet<NSUUID*>*)withTotps
                          tagMap:(NSDictionary<NSString*, NSSet<NSUUID*>*>* )tagMap
                     usernameSet:(NSCountedSet<NSString*> *)usernameSet
@@ -33,6 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSDictionary<NSUUID*, Node*>* uuidMap;
 @property (readonly) NSSet<NSUUID*> *withExpiryDates;
 @property (readonly) NSSet<NSUUID*> *withAttachments;
+@property (readonly) NSSet<NSUUID*> *withKeeAgentSshKeys;
 @property (readonly) NSSet<NSUUID*> *withTotps;
 @property (readonly) NSDictionary<NSString*, NSSet<NSUUID*>*>* tagMap;
 @property (readonly) NSCountedSet<NSString*> *usernameSet;

@@ -48,7 +48,7 @@
                                     database:(METADATA_PTR)database
             isNativeAutoFillAppExtensionOpen:(BOOL)isNativeAutoFillAppExtensionOpen
                      isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen {
-
+    
     return [MacCompositeKeyDeterminer determinerWithDatabase:database
                             isNativeAutoFillAppExtensionOpen:isNativeAutoFillAppExtensionOpen
                                      isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
@@ -87,9 +87,14 @@
 }
 
 - (void)getCkfs:(CompositeKeyDeterminedBlock)completion {
+    return [self getCkfs:nil completion:completion];
+}
+
+- (void)getCkfs:(NSString*_Nullable)message completion:(CompositeKeyDeterminedBlock)completion {
     if ( self.bioOrWatchUnlockIsPossible ) {
         NSLog(@"MacCompositeKeyDeterminer::getCkfs. Convenience Possible...");
-        [self getCkfsWithBiometrics:self.contextAwareKeyFileBookmark
+        [self getCkfsWithBiometrics:message
+                    keyFileBookmark:self.contextAwareKeyFileBookmark
                yubiKeyConfiguration:self.database.yubiKeyConfiguration
                       allowFallback:YES
                          completion:completion];
@@ -111,17 +116,26 @@
 - (void)getCkfsWithBiometrics:(NSString *)keyFileBookmark
          yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                    completion:(CompositeKeyDeterminedBlock)completion {
-    [self getCkfsWithBiometrics:keyFileBookmark yubiKeyConfiguration:yubiKeyConfiguration allowFallback:NO completion:completion];
+    [self getCkfsWithBiometrics:nil
+                keyFileBookmark:keyFileBookmark
+           yubiKeyConfiguration:yubiKeyConfiguration
+                  allowFallback:NO
+                     completion:completion];
 }
 
-- (void)getCkfsWithBiometrics:(NSString *)keyFileBookmark
+- (void)getCkfsWithBiometrics:(NSString*_Nullable)message
+              keyFileBookmark:(NSString *)keyFileBookmark
          yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                 allowFallback:(BOOL)allowFallback
                    completion:(CompositeKeyDeterminedBlock)completion {
     NSLog(@"MacCompositeKeyDeterminer::getCkfsWithBiometrics...");
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self _getCkfsWithBiometrics:keyFileBookmark yubiKeyConfiguration:yubiKeyConfiguration allowFallback:allowFallback completion:completion];
+        [self _getCkfsWithBiometrics:message
+                     keyFileBookmark:keyFileBookmark
+                yubiKeyConfiguration:yubiKeyConfiguration
+                       allowFallback:allowFallback
+                          completion:completion];
     });
 }
 
@@ -173,7 +187,8 @@
     }
 }
 
-- (void)_getCkfsWithBiometrics:(NSString *)keyFileBookmark
+- (void)_getCkfsWithBiometrics:(NSString*_Nullable)message
+               keyFileBookmark:(NSString *)keyFileBookmark
           yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                  allowFallback:(BOOL)allowFallback
                     completion:(CompositeKeyDeterminedBlock)completion {
@@ -204,6 +219,7 @@
     }
     
     [BiometricIdHelper.sharedInstance authorize:localizedFallbackTitle
+                                         reason:message
                                        database:self.database
                                      completion:^(BOOL success, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{

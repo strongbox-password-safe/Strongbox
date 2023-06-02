@@ -9,13 +9,18 @@
 #import <Cocoa/Cocoa.h>
 #import "MacDatabasePreferences.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface BiometricIdHelper : NSObject
 
 + (instancetype)sharedInstance;
 
-
 - (void)authorize:(MacDatabasePreferences*)database completion:(void (^)(BOOL success, NSError *error))completion;
-- (void)authorize:(NSString *)fallbackTitle database:(MacDatabasePreferences*)database completion:(void (^)(BOOL, NSError *))completion;
+- (void)authorize:(NSString * _Nullable)fallbackTitle database:(MacDatabasePreferences*)database completion:(void (^)(BOOL, NSError *))completion;
+- (void)authorize:(NSString * _Nullable)fallbackTitle
+           reason:(NSString * _Nullable)reason
+         database:(MacDatabasePreferences *)database
+       completion:(void (^)(BOOL, NSError *))completion;
 
 @property (readonly) BOOL isTouchIdUnlockAvailable;
 @property (readonly) BOOL isWatchUnlockAvailable;
@@ -24,5 +29,6 @@
 @property BOOL dummyMode;
 @property BOOL biometricsInProgress;
 
-
 @end
+
+NS_ASSUME_NONNULL_END

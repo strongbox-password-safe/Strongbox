@@ -35,14 +35,28 @@
 
 - (void)OkCancelWithPasswordNonEmpty:(UIViewController *)viewController
                           completion:(void (^) (NSString *password, BOOL response))completion {
+    [self OkCancelWithPassword:viewController allowEmpty:NO completion:completion];
+}
+
+- (void)OkCancelWithPasswordAllowEmpty:(UIViewController *)viewController
+                            completion:(void (^) (NSString *password, BOOL response))completion {
+    [self OkCancelWithPassword:viewController allowEmpty:YES completion:completion];
+}
+
+- (void)OkCancelWithPassword:(UIViewController *)viewController
+                  allowEmpty:(BOOL)allowEmpty
+                  completion:(void (^) (NSString *password, BOOL response))completion {
     __weak typeof(self) weakSelf = self;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
             textField.secureTextEntry = YES;
-            [textField addTarget:weakSelf
-                          action:@selector(validateNoneEmpty:)
-                forControlEvents:UIControlEventEditingChanged];
+            
+            if ( !allowEmpty ) {
+                [textField addTarget:weakSelf
+                              action:@selector(validateNoneEmpty:)
+                    forControlEvents:UIControlEventEditingChanged];
+            }
         }];
         
         self.defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
@@ -52,7 +66,7 @@
                                                     }];
         
         
-        self.defaultAction.enabled = NO;
+        self.defaultAction.enabled = allowEmpty;
         
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
@@ -560,6 +574,10 @@
 
 - (void)validateNoneEmpty:(UITextField *)sender {
     self.defaultAction.enabled = sender.text.length;
+}
+
+- (void)validateNop:(UITextField *)sender {
+    self.defaultAction.enabled = YES;
 }
 
 + (void)OkCancelWithTextField:(UIViewController *)viewController

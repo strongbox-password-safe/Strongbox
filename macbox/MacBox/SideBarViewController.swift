@@ -298,36 +298,11 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
         var specialNodes: [SideBarViewNode] = [allEntriesNode]
 
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         let expired = !database.expiredEntries.isEmpty
         let nearlyExpired = !database.nearlyExpiredEntries.isEmpty
         let totp = !database.totpEntries.isEmpty
         let attachment = !database.attachmentEntries.isEmpty
+        let keeAgentSshKeys = !database.keeAgentSshKeyEntries.isEmpty
         
         
 
@@ -373,6 +348,20 @@ class SideBarViewController: NSViewController, DocumentViewController {
             specialNodes.append(entry)
         }
 
+        
+        
+        if keeAgentSshKeys {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.keeAgentSshKeyEntries.count) : ""
+            
+            let entry = SideBarViewNode(context: .special(.keeAgentSshKeyEntries),
+                                        title: NSLocalizedString("sidebar_quick_view_keeagent_ssh_keys_title", comment: "SSH Keys"),
+                                        image: Icon.sshKey.image(),
+                                        parent: specialsHeader,
+                                        databaseNodeChildCount: childCount)
+            
+            specialNodes.append(entry)
+        }
+        
         
 
         specialsHeader.children = specialNodes

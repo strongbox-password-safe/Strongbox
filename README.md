@@ -93,7 +93,7 @@ The ['Have I Been Pwned?'](https://haveibeenpwned.com/) service is provided by T
 You can read more about this library [here](https://dropbox.tech/security/zxcvbn-realistic-password-strength-estimation). Strongbox uses the C port by tsyrogit [here](https://github.com/tsyrogit/zxcvbn-c). The original CoffeeScript version by Dan Wheeler is available [here](https://github.com/dropbox/zxcvbn). 
 
 ** Diceware Wordlists **
-Major credit to Sam Schlinkert and his fantastic [Orchard Street Wordlists](https://github.com/sts10/orchard-street-wordlists) project. Sam has been super helpful in pointing out various issues and suggesting corrections to our wordlists. Thanks Sam! 
+Major credit to Sam Schlinkert and his fantastic [Orchard Street Wordlists](https://github.com/sts10/orchard-street-wordlists) project. Sam has been super helpful in pointing out various issues and suggesting corrections to our wordlists. Thanks Sam! Also, credit to Aaron Toponce for his "Fandom" wordlists which improve upon the EFF Fandom lists.
 
 ** Various Libraries **
 We use many different libraries in the app here are just a few:

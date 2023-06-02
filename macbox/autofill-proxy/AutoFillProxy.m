@@ -63,9 +63,8 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
     while ( 1 ) {
         read = [inputStream read:tmpBuffer.mutableBytes maxLength:BUFFER_LEN];
         if ( read < 0 ) {
-            
             NSLog(@"🔴 read error");
-            return nil; 
+            return nil;
         }
         
         if ( read > 0 ) {

@@ -89,6 +89,8 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                        model:(Model *)model {
     if ( self = [self initLocked:document databaseUuid:databaseUuid] ) {
         self.innerModel = model;
+        
+        [self cacheKeeAgentPublicKeysOffline]; 
     }
     
     return self;
@@ -210,6 +212,16 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
 }
 
+- (NSArray<Node *> *)keeAgentSshKeyEntries {
+    if ( !self.locked ) {
+        return self.database.keeAgentSSHKeyEntries;
+    }
+    else {
+        NSLog(@"🔴 keeAgentSSHKeyEntries - Model Locked cannot get item.");
+        return @[];
+    }
+}
+
 - (NSArray<Node *> *)allSearchable {
     if ( !self.locked ) {
         return self.database.allSearchable;
@@ -310,7 +322,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         return;
     }
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     [self.innerModel update:viewController handler:handler];
 }
@@ -628,7 +640,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         NSString* loc = NSLocalizedString(@"mac_undo_action_title_change", @"Title Change");
         [self.document.undoManager setActionName:loc];
         
-        [self rebuildFastMaps];
+        [self rebuildMapsAndCaches];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTitleChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -669,7 +681,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = NSLocalizedString(@"mac_undo_action_email_change", @"Email Change");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationEmailChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -713,7 +725,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = NSLocalizedString(@"mac_undo_action_username_change", @"Username Change");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationUsernameChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -748,7 +760,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = NSLocalizedString(@"mac_undo_action_url_change", @"URL Change");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationUrlChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -789,7 +801,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = NSLocalizedString(@"mac_undo_action_password_change", @"Password Change");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationPasswordChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -824,7 +836,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = NSLocalizedString(@"mac_undo_action_notes_change", @"Notes Change");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNotesChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -859,7 +871,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = NSLocalizedString(@"mac_undo_action_expiry_change", @"Expiry Date Change");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationExpiryChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -950,7 +962,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         }
     }
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     NSString* loc = NSLocalizedString(@"browse_prefs_tap_action_edit", @"Edit Item");
     
@@ -994,7 +1006,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         NSString* loc = NSLocalizedString(@"browse_prefs_tap_action_edit", @"Edit Item");
         [self.document.undoManager setActionName:loc];
         
-        [self rebuildFastMaps];
+        [self rebuildMapsAndCaches];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemEdited object:self userInfo:@{ kNotificationUserInfoKeyNode : destinationNode }];
@@ -1251,7 +1263,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     
     [self touchAndModify:item modDate:modified];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationAttachmentsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -1291,7 +1303,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         [self.document.undoManager setActionName:loc];
     }
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationAttachmentsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -1381,7 +1393,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
             [self.document.undoManager setActionName:loc];
         }
         
-        [self rebuildFastMaps];
+        [self rebuildMapsAndCaches];
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationCustomFieldsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -1425,7 +1437,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         [self.document.undoManager setActionName:loc];
     }
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTotpChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -1466,7 +1478,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
         [self.document.undoManager setActionName:loc];
     }
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTotpChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
@@ -1594,7 +1606,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
     [self.document.undoManager endUndoGrouping];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
@@ -1657,7 +1669,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
     [self.document.undoManager endUndoGrouping];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
@@ -1709,7 +1721,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
     [self.document.undoManager endUndoGrouping];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
@@ -1803,7 +1815,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                                 kNotificationUserInfoKeyBoolParam : @(openEntryDetailsWindowWhenDone)
                                                              }];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     return YES;
 }
@@ -1834,7 +1846,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = children.count > 1 ? NSLocalizedString(@"mac_undo_action_add_items", @"Add Items") : NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
                                                       object:self
@@ -1868,7 +1880,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                       object:self
                                                     userInfo:@{ kNotificationUserInfoKeyNode : items }];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
 }
 
 - (void)unDeleteItems:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
@@ -1893,7 +1905,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     
     [self.document.undoManager setActionName:loc];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsUnDeleted
                                                       object:self
@@ -1926,7 +1938,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                         userInfo:@{ kNotificationUserInfoKeyNode : items }];
     }
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     return ret;
 }
@@ -1957,7 +1969,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                       object:self
                                                     userInfo:nil];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
 }
 
 - (BOOL)isInRecycled:(NSUUID *)itemId {
@@ -1996,7 +2008,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                         userInfo:@{ kNotificationUserInfoKeyNode : items }];
     }
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
     
     return ret;
 }
@@ -2027,7 +2039,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
                                                       object:self
                                                     userInfo:nil];
     
-    [self rebuildFastMaps];
+    [self rebuildMapsAndCaches];
 }
 
 - (BOOL)moveItemsIntoNewGroup:(const NSArray<Node *> *)items parentGroup:(Node *)parentGroup title:(NSString *)title group:(Node **)group {
@@ -2921,8 +2933,32 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 
 
-- (void)rebuildFastMaps {
+- (void)rebuildMapsAndCaches { 
     [self.innerModel rebuildFastMaps];
+    
+    [self cacheKeeAgentPublicKeysOffline];
+}
+
+- (void)cacheKeeAgentPublicKeysOffline {
+    if ( !Settings.sharedInstance.runSshAgent ) {
+        
+        return;
+    }
+    
+    NSSet<NSData*>* pkBlobs = [self.keeAgentSshKeyEntries map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        NSData* pkData = obj.keeAgentEnabledSshPrivateKeyData;
+        if ( pkData ) {
+            OpenSSHPrivateKey* theKey = [OpenSSHPrivateKey fromData:pkData];
+            if ( theKey ) {
+                return theKey.publicKeySerializationBlob;
+            }
+        }
+        
+        return nil;
+    }].set;
+    
+    [SSHAgentRequestHandler.shared updateOffilnePublicKeysForDatabaseWithPublicKeyBlobs:pkBlobs.allObjects
+                                                                           databaseUuid:self.databaseUuid];
 }
 
 @end

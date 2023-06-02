@@ -82,6 +82,13 @@
 }
 
 - (void)authorize:(NSString *)fallbackTitle database:(MacDatabasePreferences *)database completion:(void (^)(BOOL, NSError *))completion {
+    return [self authorize:fallbackTitle reason:nil database:database completion:completion];
+}
+
+- (void)authorize:(NSString *)fallbackTitle
+           reason:(NSString * _Nullable)reason
+         database:(MacDatabasePreferences *)database
+       completion:(void (^)(BOOL, NSError *))completion {
     if(self.dummyMode) {
         completion(YES, nil);
         return;
@@ -107,7 +114,7 @@
             localAuthContext.localizedFallbackTitle = fallbackTitle;
         }
             
-        NSString* loc = NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Unlock Database");
+        NSString* loc = reason.length ? reason : NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Unlock Database");
         
         NSError *authError;
         NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];

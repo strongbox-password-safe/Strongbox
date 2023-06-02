@@ -26,7 +26,8 @@ enum Icon {
     case recycleBin
     case viewFinderCircleFill
     case favourite
-
+    case sshKey
+    
     func image() -> NSImage {
         switch self {
         case .favourite:
@@ -129,6 +130,16 @@ enum Icon {
             if #available(macOS 11.0, *) {
                 return NSImage(systemSymbolName: "viewfinder.circle.fill", accessibilityDescription: nil)!
             } else {
+                return NSImage(named: "house")!
+            }
+        case .sshKey:
+            if #available(macOS 12.0, *) {
+                return NSImage(systemSymbolName: "network.badge.shield.half.filled", accessibilityDescription: nil)!
+            }
+            else if #available(macOS 11.0, *) {
+                return NSImage(systemSymbolName: "key", accessibilityDescription: nil)!
+            }
+            else {
                 return NSImage(named: "house")!
             }
         }

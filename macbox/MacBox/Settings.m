@@ -108,6 +108,8 @@ static NSString* const kAutoCommitScannedTotp = @"autoCommitScannedTotp";
 static NSString* const kHideOnCopy = @"hideOnCopy";
 static NSString* const kHasPromptedForThirdPartyAutoFill = @"hasPromptedForThirdPartyAutoFill";
 static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
+static NSString* const kRunSshAgent = @"runSshAgent";
+static NSString* const kRequireApprovalSshAgent = @"requireApprovalSshAgent";
 
 
 
@@ -161,7 +163,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 #ifndef IS_APP_EXTENSION
-- (void)factoryReset {    
+
+- (void)factoryReset {
     for (NSString* key in self.sharedAppGroupDefaults.dictionaryRepresentation.allKeys) {
         NSLog(@"✅ Deleting from Shared App Group: [%@]", key);
         [self.sharedAppGroupDefaults removeObjectForKey:key];
@@ -210,73 +213,25 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [NativeMessagingManifestInstallHelper removeNativeMessagingHostsFiles];
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #endif
 
 
+
+- (BOOL)requireApprovalSshAgent {
+    return [self getBool:kRequireApprovalSshAgent fallback:YES];
+}
+
+- (void)setRequireApprovalSshAgent:(BOOL)requireApprovalSshAgent {
+    return [self setBool:kRequireApprovalSshAgent value:requireApprovalSshAgent];
+}
+
+- (BOOL)runSshAgent {
+    return [self getBool:kRunSshAgent];
+}
+
+- (void)setRunSshAgent:(BOOL)runSshAgent {
+    [self setBool:kRunSshAgent value:runSshAgent];
+}
 
 - (BOOL)shadeFavoriteTag {
     return [self getBool:kShadeFavoriteTag fallback:YES];
@@ -932,3 +887,67 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -60,6 +60,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
                     completion:(void (^)(BOOL go))completion;
 
 - (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty;
+- (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty secure:(BOOL)secure;
 
 - (void)inputKeyValue:(NSString*)prompt
               initKey:(NSString*)initKey

@@ -17,6 +17,7 @@ enum NavigationContext: Equatable {
         case itemsWithAttachments
         case expiredEntries
         case nearlyExpiredEntries
+        case keeAgentSshKeyEntries
     }
 
     enum AuditNavigationCategory: Equatable {
@@ -68,6 +69,8 @@ func convertSpecialToOGSpecial(_ special: NavigationContext.SpecialNavigationIte
         return OGNavigationSpecialTotpItems
     case .itemsWithAttachments:
         return OGNavigationSpecialAttachmentItems
+    case .keeAgentSshKeyEntries:
+        return OGNavigationSpecialKeeAgentSshKeyItems
     }
 }
 
@@ -160,6 +163,8 @@ func getNavContextFromModel(_ database: ViewModel) -> NavigationContext {
             navContext = .special(.totpItems)
         case OGNavigationSpecialAttachmentItems:
             navContext = .special(.itemsWithAttachments)
+        case OGNavigationSpecialKeeAgentSshKeyItems:
+            navContext = .special(.keeAgentSshKeyEntries)
         default:
             NSLog("🔴 Unknown OG Nav Context")
         }

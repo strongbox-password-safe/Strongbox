@@ -75,7 +75,8 @@ static NSInteger const kRowEmail = 4;
 static NSInteger const kRowTags = 5;
 static NSInteger const kRowExpires = 6;
 static NSInteger const kRowTotp = 7;
-static NSInteger const kSimpleRowCount = 8;
+static NSInteger const kRowSshKey = 8;
+static NSInteger const kSimpleRowCount = 9;
 
 static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 static NSString* const kEditPasswordCellId = @"EditPasswordCell";
@@ -88,6 +89,7 @@ static NSString* const kTotpCell = @"TotpCell";
 static NSString* const kEditDateCell = @"EditDateCell";
 static NSString* const kTagsViewCellId = @"TagsViewCell";
 static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
+static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 
 
 
@@ -410,6 +412,7 @@ static NSInteger const kSectionCount = 5;
     [self.tableView registerNib:[UINib nibWithNibName:kEditDateCell bundle:nil] forCellReuseIdentifier:kEditDateCell];
     [self.tableView registerNib:[UINib nibWithNibName:kTagsViewCellId bundle:nil] forCellReuseIdentifier:kTagsViewCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kMarkdownNotesCellId bundle:nil] forCellReuseIdentifier:kMarkdownNotesCellId];
+    [self.tableView registerNib:[UINib nibWithNibName:kSshKeyViewCellId bundle:nil] forCellReuseIdentifier:kSshKeyViewCellId];
     
     if (@available(iOS 15.0, *)) {
         [self.tableView setSectionHeaderTopPadding:4.0f];
@@ -650,6 +653,9 @@ static NSInteger const kSectionCount = 5;
         else if (indexPath.row == kRowTags) {
             return [self getTagsCell:indexPath];
         }
+        else if(indexPath.row == kRowSshKey) {
+            return [self getKeeAgentSshKeyCell:indexPath];
+        }
         else {
             
             return [self getCustomFieldCell:indexPath];
@@ -746,6 +752,11 @@ static NSInteger const kSectionCount = 5;
         }
         else if ( indexPath.row == kRowEmail ) {
             if ( shouldHideEmpty && !self.model.email.length ) {
+                return CGFLOAT_MIN;
+            }
+        }
+        else if ( indexPath.row == kRowSshKey ) {
+            if ( self.editing || !self.model.keeAgentSshKey ) {
                 return CGFLOAT_MIN;
             }
         }
@@ -846,7 +857,11 @@ static NSInteger const kSectionCount = 5;
         if (indexPath.row == kRowTotp) {
             return (self.model.totp ? UITableViewCellEditingStyleDelete : UITableViewCellEditingStyleInsert);
         }
-        
+
+        if (indexPath.row == kRowSshKey ) {
+            return (self.model.keeAgentSshKey ? UITableViewCellEditingStyleDelete : UITableViewCellEditingStyleInsert);
+        }
+
         if (indexPath.row >= kSimpleRowCount) { 
             return indexPath.row - kSimpleRowCount == self.model.customFields.count ? UITableViewCellEditingStyleInsert : UITableViewCellEditingStyleDelete;
         }
@@ -918,8 +933,6 @@ static NSInteger const kSectionCount = 5;
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"commitEditingStyle");
-    
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         if(indexPath.section == kAttachmentsSectionIdx && indexPath.row > 0) {
             NSString* filename = self.model.attachments.allKeys[indexPath.row - 1];
@@ -930,6 +943,10 @@ static NSInteger const kSectionCount = 5;
         else if(indexPath.section == kSimpleFieldsSectionIdx) {
             if (indexPath.row == kRowTotp) {
                 [self onClearTotp];
+            }
+            else if (indexPath.row == kRowSshKey) {
+                self.model.keeAgentSshKey = nil;
+                [self onModelEdited];
             }
             else if (indexPath.row >= kSimpleRowCount) {
                 NSUInteger idx = indexPath.row - kSimpleRowCount;
@@ -1803,7 +1820,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
     }
 }
 
-- (UITableViewCell*)getTotpCell:(NSIndexPath*)indexPath {   
+- (UITableViewCell*)getTotpCell:(NSIndexPath*)indexPath {
     if(self.editing && !self.model.totp) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         cell.labelText.text = NSLocalizedString(@"item_details_setup_totp", @"Setup TOTP...");
@@ -1817,6 +1834,33 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         
         [cell setItem:self.model.totp];
         
+        return cell;
+    }
+}
+
+- (UITableViewCell*)getKeeAgentSshKeyCell:(NSIndexPath*)indexPath {
+    if ( self.editing ) {
+        GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
+        cell.labelText.text = @"Remove SSH Key"; 
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.editingAccessoryType = UITableViewCellAccessoryNone;
+
+        return cell;
+    }
+    else {
+        SshKeyViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kSshKeyViewCellId forIndexPath:indexPath];
+        
+        OpenSSHPrivateKey* theKey = self.model.keeAgentSshKey.openSshKey;
+        
+        [cell setContent:self.model.keeAgentSshKey
+                password:self.model.password
+          viewController:self
+               onCopyPub:^{
+            [self copyToClipboard:theKey.publicKey message:NSLocalizedString(@"generic_copied", @"Copied")];
+        } onCopyFinger:^{
+            [self copyToClipboard:theKey.fingerprint message:NSLocalizedString(@"generic_copied", @"Copied")];
+        }];
+
         return cell;
     }
 }

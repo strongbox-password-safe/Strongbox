@@ -6,6 +6,7 @@
 
 #import "HTMLDocument.h"
 #import "XMLDocument.h"
+
 #import "Node.h"
 #import "OTPToken+Serialization.h"
 
@@ -39,3 +40,8 @@
 #import "CHCSVParser.h"
 
 #include <ifaddrs.h>
+
+#import "XMLWriter.h"
+#import "KissXML.h" 
+
+#import "KeeAgentSshKeyViewModel.h"

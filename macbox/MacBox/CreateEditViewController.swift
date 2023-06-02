@@ -92,7 +92,181 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBOutlet weak var buttonNewEntryDefaults: NSButton!
     @IBOutlet var buttonHistory: NSPopUpButton!
     
+    
+    
+    @IBOutlet weak var buttonAddOrGenerateSshKey: NSPopUpButton!
+    @IBOutlet weak var stackExistingSshKey: NSStackView!
+    @IBOutlet weak var stackSshKeeAgentMaster: NSStackView!
+    @IBOutlet weak var checkboxSshKeyAgentEnabled: NSButton!
+    @IBOutlet weak var labelSshKeyFingerprint: NSTextField!
+    @IBOutlet weak var labelSshKeyFilename: NSTextField!
+    
+    @IBAction func onAddKeeAgentSshKey(_ sender: Any) {
+        let op = NSOpenPanel()
+        
+        guard op.runModal() == .OK, let url = op.url else {
+            return
+        }
+        
+        let data : Data
+        do {
+            data = try Data(contentsOf: url)
+        }
+        catch {
+            MacAlerts.error(error, window: view.window)
+            return
+        }
+        
+        guard let key = OpenSSHPrivateKey.fromData(data) else {
+            MacAlerts.info(NSLocalizedString("ssh_agent_could_not_read_sshkey_file", comment: "Could not read this file. Are you sure it is a valid OpenSSH Private Key file?"),
+                           window: view.window)
+            return
+        }
+        
+        
+        
+        let filename = url.lastPathComponent
+        
+        if model.attachments.containsKey(filename as NSString) || filename == kKeeAgentSettingsAttachmentName {
+            MacAlerts.info("This filename already exists in Attachments. Cannot add duplicate attachment.", window: view.window)
+            return
+        }
+        
+        
+        
+        if !key.isPassphraseProtected || key.vaildatePassphrase(model.password) {
+            continueAddKeeAgentSshKey(key, filename)
+            return
+        }
+        
+        var incorrect = false
+        
+        while true {
+            let alert = MacAlerts()
+            
+            let incorrectStr = NSLocalizedString("ssh_agent_ssh_key_passphrase_incorrect_try_again", comment: "That passphrase was incorrect. Please try again.")
+            
+            let initialStr = NSLocalizedString("ssh_agent_sshkey_please_enter_passphrase_msg", comment: "This key is passphrase protected.\n\nPlease enter the passphrase to decrypt. Strongbox will then set the password of this entry to match.")
+            
+            guard let passphrase = alert.input(incorrect ? incorrectStr : initialStr,
+                                               defaultValue: "",
+                                               allowEmpty: false) else {
+                return
+            }
+            
+            if key.vaildatePassphrase(passphrase) {
+                return continueAddKeeAgentSshKeyWithPasswordCheck(key, filename, passphrase: passphrase )
+            }
+            else {
+                incorrect = true
+            }
+        }
+    }
+    
+    func continueAddKeeAgentSshKeyWithPasswordCheck ( _ key : OpenSSHPrivateKey, _ filename : String,  passphrase : String, _ enabled : Bool = true ) {
+        if model.password.count > 0 && model.password != passphrase {
+            MacAlerts.yesNo(NSLocalizedString("ssh_agent_overwrite_password", comment: "Overwrite Password?"),
+                            informativeText: NSLocalizedString("ssh_agent_passphrase_password_mismatch", comment: "The passphrase does not match the existing password. Strongbox needs the password to match the passphrase to use this SSH Key properly.\n\nContinue to overwrite the current password?"),
+                            window: view.window) { [weak self] response in
+                if response {
+                    self?.continueAddKeeAgentSshKey(key, filename, passphrase: passphrase)
+                }
+            }
+        }
+        else {
+            continueAddKeeAgentSshKey(key, filename, passphrase: passphrase)
+        }
+    }
+    
+    func continueAddKeeAgentSshKey ( _ key : OpenSSHPrivateKey, _ filename : String,  passphrase : String? = nil, _ enabled : Bool = true) {
+        if let passphrase {
+            model.password = passphrase;
+        }
+        
+        model.keeAgentSshKey = KeeAgentSshKeyViewModel.withKey(key, filename: filename, enabled: enabled)
+        onModelEdited()
+        
+        bindKeeAgentSshKey()
+        
+        passwordField.stringValue = model.password 
+        bindPasswordUI()
+    }
+    
+    @IBAction func onToggleSshKeyEnabled(_ sender: Any) {
+        model.setKeeAgentSshKeyEnabled(checkboxSshKeyAgentEnabled.state == .on)
+        
+        onModelEdited()
+        bindKeeAgentSshKey()
+    }
+    
+    @IBAction func onRemoveSshKey(_ sender: Any) {
+        MacAlerts.areYouSure(NSLocalizedString("ssh_agent_ays_remove_key", comment: "Are you sure you want to remove this SSH Key?"), window: view.window) { [weak self] resp in
+            if resp {
+                self?.model.keeAgentSshKey = nil
+                self?.onModelEdited()
+                self?.bindKeeAgentSshKey()
+            }
+        }
+    }
+    
+    @IBAction func onExportSshKey(_ sender: Any) {
+        guard let key = model.keeAgentSshKey else {
+            return
+        }
+        
+        let alert = MacAlerts()
+        
+        guard let passphrase = alert.input(NSLocalizedString("ssh_agent_enter_passphrase_for_export", comment: "Enter a passphrase to protect the exported key file"),
+                                           defaultValue: "", allowEmpty: true, secure: true) else {
+            return
+        }
+        
+        guard let data = key.openSshKey.exportFileBlob(model.password, exportPassphrase: passphrase) else {
+            MacAlerts.info(NSLocalizedString("export_vc_error_exporting", comment: "Error Exporting"),
+                           window: view.window)
+            return
+        }
 
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = key.filename
+        
+        if panel.runModal() == .OK {
+            guard let url = panel.url else {
+                return
+            }
+            
+            do {
+                try data.write(to: url) 
+            } catch {
+                MacAlerts.error(error, window: view.window)
+            }
+        }
+    }
+    
+    @IBAction func onNewRsaKey(_ sender: Any) {
+        guard let key = OpenSSHPrivateKey.newRsa() else {
+            return
+        }
+        
+        addNewKey(key, filename: "id_rsa")
+    }
+        
+    @IBAction func onNewEd25519(_ sender: Any) {
+        guard let key = OpenSSHPrivateKey.newEd25519() else {
+            return
+        }
+        
+        addNewKey(key, filename: "id_ed25519")
+    }
+    
+    func addNewKey ( _ key : OpenSSHPrivateKey, filename : String ) {
+        model.keeAgentSshKey = KeeAgentSshKeyViewModel.withKey(key, filename: filename, enabled: true)
+        
+        onModelEdited()
+        bindKeeAgentSshKey()
+    }
+
+    
 
 
 
@@ -461,6 +635,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         bindTags()
         bindLocation()
         bindPasswordUI()
+        bindKeeAgentSshKey()
     }
 
     
@@ -598,27 +773,81 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         save(dismissAfterSave: false)
     }
 
-    func save(dismissAfterSave: Bool) {
-        let value = model.password
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
-        if trim(value) != value {
-            MacAlerts.twoOptions(withCancel: NSLocalizedString("field_tidy_title_tidy_up_field", comment: "Tidy Up Field?"),
-                                 informativeText: NSLocalizedString("field_tidy_message_tidy_up_password", comment: "There are some blank characters (e.g. spaces, tabs) at the start or end of your password.\n\nShould Strongbox tidy up these extraneous characters?"),
-                                 option1AndDefault: NSLocalizedString("field_tidy_choice_tidy_up_field", comment: "Tidy Up"),
-                                 option2: NSLocalizedString("field_tidy_choice_dont_tidy", comment: "Don't Tidy"),
-                                 window: view.window) { [weak self] response in
-                if response == 0 {
-                    self?.model.password = trim(value)
-                    self?.postValidationSave(dismissAfterSave: dismissAfterSave)
-                } else if response == 1 {
-                    self?.postValidationSave(dismissAfterSave: dismissAfterSave)
-                }
+    func save(dismissAfterSave: Bool) {
+        validateAndFixPassword { [weak self] continueSave in
+            guard continueSave else {
+                return
             }
-        } else {
-            postValidationSave(dismissAfterSave: dismissAfterSave)
+            
+            self?.validateSshKeyPassphrase { continueSave in
+                guard continueSave else {
+                    return
+                }
+                
+                self?.postValidationSave(dismissAfterSave: dismissAfterSave)
+            }
         }
     }
 
+    func validateAndFixPassword( _ completion : @escaping ( (_ continueSave : Bool) -> Void ) ) {
+        let value = model.password
+        
+        if trim(value) == value {
+            completion(true)
+            return
+        }
+
+        MacAlerts.twoOptions(withCancel: NSLocalizedString("field_tidy_title_tidy_up_field", comment: "Tidy Up Field?"),
+                             informativeText: NSLocalizedString("field_tidy_message_tidy_up_password", comment: "There are some blank characters (e.g. spaces, tabs) at the start or end of your password.\n\nShould Strongbox tidy up these extraneous characters?"),
+                             option1AndDefault: NSLocalizedString("field_tidy_choice_tidy_up_field", comment: "Tidy Up"),
+                             option2: NSLocalizedString("field_tidy_choice_dont_tidy", comment: "Don't Tidy"),
+                             window: view.window) { [weak self] response in
+            if response == 0 {
+                self?.model.password = trim(value)
+                completion(true)
+            } else if response == 1 {
+                completion(true)
+            }
+            else {
+                completion(false)
+            }
+        }
+    }
+    
+    func validateSshKeyPassphrase (_ completion : @escaping ( (_ continueSave : Bool) -> Void ) ) {
+        guard let key = model.keeAgentSshKey, key.openSshKey.isPassphraseProtected, !key.openSshKey.vaildatePassphrase(model.password) else {
+            completion(true)
+            return
+        }
+        
+        MacAlerts.yesNo(NSLocalizedString("ssh_agent_incorrect_sshkey_passphrase", comment: "Inccorect SSH Key Passphrase"),
+                        informativeText: NSLocalizedString("ssh_agent_validation_passphrase_password_mismatch", comment: "The SSH Key is passphrase protected but the password for this entry is not the correct passphrase.\n\nDo you want to continue saving?"),
+                        window: view.window) { response in
+            completion(response)
+        }
+    }
+    
     func postValidationSave(dismissAfterSave: Bool) {
         let nodeId: UUID
 
@@ -941,7 +1170,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func onGeneratePassword(_ password: String) {
         model.password = trim(password)
-        passwordField.stringValue = model.password
+        passwordField.stringValue = model.password 
         onModelEdited()
         bindPasswordUI()
     }
@@ -968,6 +1197,22 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         let history = getPasswordHistoryMenu()
         buttonHistory.menu = history
         buttonHistory.isHidden = history == nil
+    }
+    
+    func bindKeeAgentSshKey() {
+        stackSshKeeAgentMaster.isHidden = !database.isKeePass2Format
+
+        if let key = model.keeAgentSshKey {
+            stackExistingSshKey.isHidden = false
+            buttonAddOrGenerateSshKey.isHidden = true
+            checkboxSshKeyAgentEnabled.state = key.enabled ? .on : .off
+            labelSshKeyFingerprint.stringValue = key.openSshKey.fingerprint
+            labelSshKeyFilename.stringValue = key.filename
+        }
+        else {
+            stackExistingSshKey.isHidden = true
+            buttonAddOrGenerateSshKey.isHidden = false
+        }
     }
     
     func getPasswordHistoryMenu( ) -> NSMenu? {
@@ -1257,7 +1502,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     var canAddAttachment: Bool {
         if database.format == .keePass1 {
-            return model.attachments.count == 0
+            return model.attachmentsNoKeeAgent.count == 0
         }
 
         return database.format != .passwordSafe
@@ -1318,13 +1563,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func deleteAttachment(_ filename: String) {
-        model.attachments.remove(filename as NSString)
+        model.attachmentsNoKeeAgent.remove(filename as NSString)
         refreshAttachments()
         onModelEdited()
     }
 
     func selectAttachmentWithName(_ name: String) {
-        guard let idx = model.attachments.allKeys().firstIndex(of: name as NSString) else {
+        guard let idx = model.attachmentsNoKeeAgent.allKeys().firstIndex(of: name as NSString) else {
             return
         }
 
@@ -1595,9 +1840,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         let selectedIdx = tableViewAttachments.selectedRow
-        if selectedIdx >= 0, selectedIdx < model.attachments.count {
-            let key = model.attachments.allKeys()[selectedIdx]
-            guard let attachment = model.attachments[key] else {
+        if selectedIdx >= 0, selectedIdx < model.attachmentsNoKeeAgent.count {
+            let key = model.attachmentsNoKeeAgent.allKeys()[selectedIdx]
+            guard let attachment = model.attachmentsNoKeeAgent[key] else {
                 return
             }
             let oldTitle = key as String
@@ -1669,9 +1914,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             return
         }
 
-        if idx >= 0, idx < model.attachments.count {
-            let key = model.attachments.allKeys()[idx]
-            guard let attachment = model.attachments[key] else {
+        if idx >= 0, idx < model.attachmentsNoKeeAgent.count {
+            let key = model.attachmentsNoKeeAgent.allKeys()[idx]
+            guard let attachment = model.attachmentsNoKeeAgent[key] else {
                 return
             }
 
@@ -1694,7 +1939,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     @IBAction func onDeleteAttachments(_: Any?) {
-        let keys = model.attachments.allKeys().enumerated().compactMap { index, b in
+        let keys = model.attachmentsNoKeeAgent.allKeys().enumerated().compactMap { index, b in
             tableViewAttachments.selectedRowIndexes.contains(index) ? b : nil
         }
 
@@ -1893,7 +2138,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 extension CreateEditViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
         if tableView == tableViewAttachments {
-            return Int(model.attachments.count)
+            return Int(model.attachmentsNoKeeAgent.count)
         } else if tableView == tableViewCustomFields {
             return Int(model.customFields.count)
         }
@@ -1903,9 +2148,9 @@ extension CreateEditViewController: NSTableViewDataSource {
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if tableView == tableViewAttachments {
-            let attachmentKey = model.attachments.allKeys()
+            let attachmentKey = model.attachmentsNoKeeAgent.allKeys()
             let key = attachmentKey[row]
-            guard let attachment = model.attachments[key] else { return nil }
+            guard let attachment = model.attachmentsNoKeeAgent[key] else { return nil }
 
             if tableColumn?.identifier.rawValue == "Name" {
                 let identifier = TitleAndIconCell.NibIdentifier
@@ -2074,7 +2319,7 @@ extension CreateEditViewController: NSTableViewDelegate {
 
     @available(macOS 10.13, *)
     func pasteboardWriterForRow(_: NSTableView, row: Int) -> NSPasteboardWriting? {
-        let attachmentKey = model.attachments.allKeys()
+        let attachmentKey = model.attachmentsNoKeeAgent.allKeys()
         let key = attachmentKey[row]
 
         let filename = key as String
@@ -2111,7 +2356,7 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
             return
         }
 
-        if idx >= 0 && idx < model.attachments.count {
+        if idx >= 0 && idx < model.attachmentsNoKeeAgent.count {
             QLPreviewPanel.shared().makeKeyAndOrderFront(self)
         }
     }
@@ -2126,9 +2371,9 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
             return nil
         }
 
-        if idx >= 0, idx < model.attachments.count {
-            let key = model.attachments.allKeys()[idx]
-            guard let attachment = model.attachments[key] else {
+        if idx >= 0, idx < model.attachmentsNoKeeAgent.count {
+            let key = model.attachmentsNoKeeAgent.allKeys()[idx]
+            guard let attachment = model.attachmentsNoKeeAgent[key] else {
                 return nil
             }
 
@@ -2193,7 +2438,7 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
         do {
             if let userInfo = filePromiseProvider.userInfo as? [String: Any],
                let filename = userInfo[FilePromiseProviderUserInfoKeys.filename] as? String,
-               let attachment = model.attachments[filename as NSString]
+               let attachment = model.attachmentsNoKeeAgent[filename as NSString]
             {
                 try attachment.nonPerformantFullData.write(to: url)
             } else {

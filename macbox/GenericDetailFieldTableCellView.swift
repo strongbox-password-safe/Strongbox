@@ -35,6 +35,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         }
 
         buttonHistory.isHidden = true
+        textFieldFieldValue.lineBreakMode = .byTruncatingTail
         
         monitorForQuickRevealKey()
     }
@@ -101,12 +102,20 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
                     textFieldFieldValue.attributedStringValue = colored
                 } else {
                     let attr: NSAttributedString
+                    let paragraphStyle = NSMutableParagraphStyle()
+                    
+                    if ( singleLineMode ) {
+                        paragraphStyle.lineBreakMode = .byTruncatingTail
+                    }
+                    
                     if let textColor = textColorOverride {
-                        attr = NSAttributedString(string: value, attributes: [.foregroundColor: textColor])
+                        attr = NSAttributedString(string: value, attributes: [.foregroundColor: textColor, .paragraphStyle: paragraphStyle])
                     } else {
-                        attr = NSAttributedString(string: value)
+                        attr = NSAttributedString(string: value, attributes: [.paragraphStyle: paragraphStyle])
                     }
 
+                    textFieldFieldValue.usesSingleLineMode = singleLineMode
+                    
                     textFieldFieldValue.attributedStringValue = attr
                 }
             }
@@ -114,11 +123,14 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     }
     weak var containingWindow : NSWindow? = nil
     
+    var singleLineMode : Bool = false
+    
     func setContent(_ field: DetailsViewField?,
                     popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
                     image: NSImage? = nil,
                     onCopyButton: ((DetailsViewField?) -> Void)? = nil,
-                    containingWindow : NSWindow? = nil ) {
+                    containingWindow : NSWindow? = nil,
+                    singleLineMode : Bool = false ) {
         self.field = field
         
         textColorOverride = nil
@@ -126,7 +138,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         var name = "<Not Set>"
         var value = "<Not Set>"
         var concealed = false
-
+        
         let showStrength = (field?.showStrength ?? false)
         stackViewStrength.isHidden = !showStrength
 
@@ -166,7 +178,8 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         imageViewIcon.image = image
         imageViewIcon.isHidden = (image == nil)
         buttonConcealReveal.isHidden = !concealable
-
+        
+        self.singleLineMode = singleLineMode
         self.popupMenuUpdater = popupMenuUpdater
         buttonPopup.menu?.delegate = self
 

@@ -159,6 +159,7 @@ class DetailViewController: NSViewController {
         ret.append(contentsOf: getExpiresFields(model))
         ret.append(contentsOf: loadUrlFields(model, selectedNode))
         ret.append(contentsOf: loadTagsFields(model))
+        ret.append(contentsOf: loadKeeAgentSshFields(model))
         ret.append(contentsOf: loadCustomFields(model, selectedNode))
         ret.append(contentsOf: loadAttachments(model))
         ret.append(contentsOf: loadNotes(model, selectedNode))
@@ -239,6 +240,55 @@ class DetailViewController: NSViewController {
         } else {
             return []
         }
+    }
+    
+    func loadKeeAgentSshFields(_ model: EntryViewModel) -> [DetailsViewField] {
+        guard let sshKey = model.keeAgentSshKey else {
+            return []
+        }
+        let key = sshKey.openSshKey
+        
+        var ret : [DetailsViewField] = []
+        
+
+        ret.append(DetailsViewField(name: NSLocalizedString("ssh_agent_ssh_key", comment: "SSH Key"),
+                                    value: NSLocalizedString("generic_export_ellipsis", comment: "Export..."),
+                                    fieldType: .headerWithTextButton,
+                                    object: model.keeAgentSshKey,
+                                    params: ["filename" : sshKey.filename, "password" : model.password ]))
+
+        let fingerprintImage : NSImage? = nil
+
+
+
+
+        ret.append(DetailsViewField(name: "",
+                                    value: model.password,
+                                    fieldType: .keeAgentKeySummary,
+                                    object: sshKey))
+
+        ret.append(DetailsViewField(name: NSLocalizedString("generic_public_key", comment: "Public Key"),
+                                    value: key.publicKey,
+                                    fieldType: .customField,
+                                    concealed: false,
+                                    concealable: false,
+                                    singleLineMode: true))
+        
+        ret.append(DetailsViewField(name: NSLocalizedString("generic_private_key", comment: "Private Key"),
+                                    value: key.privateKey,
+                                    fieldType: .customField,
+                                    concealed: true,
+                                    concealable: true))
+        
+        ret.append(DetailsViewField(name: NSLocalizedString("ssh_agent_key_fingerprint", comment: "Fingerprint"),
+                                    value: key.fingerprint,
+                                    fieldType: .customField,
+                                    concealed: false,
+                                    concealable: false,
+                                    singleLineMode: true,
+                                    leftImage: fingerprintImage))
+
+        return ret
     }
 
     func getEmailFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
@@ -345,13 +395,13 @@ class DetailViewController: NSViewController {
     fileprivate func loadAttachments(_ model: EntryViewModel) -> [DetailsViewField] {
         var ret: [DetailsViewField] = []
 
-        if model.attachments.count > 0 {
+        if model.attachmentsNoKeeAgent.count > 0 {
             ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_attachments", comment: "Attachments"),
                                         value: "",
                                         fieldType: .header,
                                         object: DetailsViewField.FieldType.attachment))
 
-            for key in model.attachments.allKeys() {
+            for key in model.attachmentsNoKeeAgent.allKeys() {
                 guard let attachment = model.attachments[key] else {
                     continue
                 }
@@ -454,7 +504,7 @@ class DetailViewController: NSViewController {
             previewAttachment(field)
         case .title, .customField, .url, .totp:
             copyFieldToClipboard(field)
-        case .header, .metadata, .expiry, .tags, .auditIssue, .notes:
+        case .header, .headerWithTextButton, .metadata, .expiry, .tags, .auditIssue, .notes, .keeAgentKeySummary:
             break
         }
     }
@@ -980,6 +1030,42 @@ class DetailViewController: NSViewController {
         }
     }
 
+    func onExportSshKey(_ field: DetailsViewField) {
+        guard let key = field.object as? KeeAgentSshKeyViewModel,
+            let password = field.params["password"] else {
+            NSLog("🔴 Couldn't get attachment from field")
+            return
+        }
+
+        let alert = MacAlerts()
+        
+        guard let passphrase = alert.input(NSLocalizedString("ssh_agent_enter_passphrase_for_export", comment: "Enter a passphrase to protect the exported key file"),
+                                           defaultValue: "", allowEmpty: true, secure: true) else {
+            return
+        }
+        
+        guard let data = key.openSshKey.exportFileBlob(password, exportPassphrase: passphrase) else {
+            MacAlerts.info(NSLocalizedString("export_vc_error_exporting", comment: "Error Exporting"), 
+                            window: view.window)
+            return
+        }
+        
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = field.params["filename"] ?? NSLocalizedString("generic_unknown", comment: "Unknown")
+
+        if panel.runModal() == .OK {
+            guard let url = panel.url else {
+                return
+            }
+
+            do {
+                try data.write(to: url)
+            } catch {
+                MacAlerts.error(error, window: view.window)
+            }
+        }
+    }
+    
     func toggleRevealConceal(_ field: DetailsViewField) {
         guard let cellView = cellViewForField(field) as? GenericDetailFieldTableCellView else { return }
 
@@ -1146,6 +1232,9 @@ extension DetailViewController: DocumentViewController {
         else if field.fieldType == .url {
             return true
         }
+        else if field.fieldType == .headerWithTextButton {
+            return true
+        }
         else if field.fieldType == .notes {
             
             
@@ -1173,9 +1262,11 @@ extension DetailViewController: DocumentViewController {
         tableView.register(NSNib(nibNamed: NSNib.Name("NotesTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("NotesTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("AttachmentTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("AttachmentTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("HeaderTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("HeaderTableCellView"))
+        tableView.register(NSNib(nibNamed: NSNib.Name("HeaderWithTextButton"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("HeaderWithTextButtonCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("TotpTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("TotpTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("TagsTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("TagsTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("UrlTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("UrlTableCellView"))
+        tableView.register(NSNib(nibNamed: NSNib.Name("KeeAgentSshCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("KeeAgentSshCellView"))
         tableView.register(NSNib(nibNamed: AuditIssueTableCellView.nibName, bundle: nil), forIdentifier: AuditIssueTableCellView.reuseIdentifier)
 
         tableView.selectionHighlightStyle = .regular
@@ -1309,6 +1400,14 @@ extension DetailViewController: NSTableViewDelegate {
                 self?.launchAndCopyPassword(field)
             }
             return cell
+        case .keeAgentKeySummary:
+            guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("KeeAgentSshCellView"), owner: nil) as? KeeAgentSshCellView else {
+                return nil
+            }
+            
+            cell.setContent(field)
+            
+            return cell
         case .tags:
             guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("TagsTableCellView"), owner: nil) as? TagsTableCellView else {
                 return nil
@@ -1334,8 +1433,9 @@ extension DetailViewController: NSTableViewDelegate {
 
             cell.setContent(field,
                             popupMenuUpdater:  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) },
+                            image: field.leftImage,
                             onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil,
-                            containingWindow: view.window)
+                            containingWindow: view.window, singleLineMode: field.singleLineMode)
 
             if field.showHistory {
                 cell.history = getPasswordHistoryMenu()
@@ -1353,6 +1453,16 @@ extension DetailViewController: NSTableViewDelegate {
             cell.titleLabel.stringValue = field.value
             cell.image.image = NodeIconHelper.getNodeIcon(field.icon, predefinedIconSet: database!.iconSet)
 
+            return cell
+        case .headerWithTextButton:
+            guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("HeaderWithTextButtonCellView"), owner: nil) as? HeaderWithTextButton else {
+                return nil
+            }
+
+            cell.setContent(field) { [weak self] in
+                self?.onExportSshKey(field)
+            }
+            
             return cell
         case .header:
             guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("HeaderTableCellView"), owner: nil) as? HeaderTableCellView else {
@@ -1450,7 +1560,7 @@ extension DetailViewController: NSTableViewDelegate {
             return false
         }
 
-        return field.fieldType == .header
+        return field.fieldType == .header || field.fieldType == .headerWithTextButton
     }
 
     func tableView(_: NSTableView, shouldSelectRow row: Int) -> Bool {
@@ -1459,7 +1569,7 @@ extension DetailViewController: NSTableViewDelegate {
             return false
         }
 
-        return field.fieldType != .header && field.fieldType != .metadata && field.fieldType != .auditIssue && field.fieldType != .title
+        return field.fieldType != .header && field.fieldType != .headerWithTextButton && field.fieldType != .metadata && field.fieldType != .auditIssue && field.fieldType != .title
     }
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {

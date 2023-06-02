@@ -178,15 +178,30 @@ import Foundation
             NSLog("🔴 Can't find AutoFillEnabled database to Unlock")
             return AutoFillEncryptedResponse.error(message: "Can't find AutoFillEnabled database to Unlock")
         }
-        
+
+        var go = false
         if !DatabasesCollection.shared.isUnlocked(uuid: request.databaseId) {
-            DatabasesCollection.shared.autoFillRequestCkfsAndUnlock(uuid: request.databaseId)
+            let g = DispatchGroup()
+            g.enter()
+            
+            DatabasesCollection.shared.initiateDatabaseUnlock(uuid: request.databaseId) { success in
+                go = success
+                g.leave()
+            }
+            
+            if g.wait(timeout: .now() + 5) == .timedOut {
+                NSLog("⚠️ Waiting for Database Unlock, timed out.")
+            }
+            else {
+                NSLog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
+            }
         }
         else {
             
+            go = true
         }
                 
-        let response = UnlockDatabaseResponse(success: true)
+        let response = UnlockDatabaseResponse(success: go)
         
         let json = AutoFillJsonHelper.toJson(object: response)
         

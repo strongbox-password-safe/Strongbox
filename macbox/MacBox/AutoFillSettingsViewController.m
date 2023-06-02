@@ -208,7 +208,7 @@
                                                                nickName:meta.nickName];
     }
     
-    [self.model rebuildFastMaps]; 
+    [self.model rebuildMapsAndCaches]; 
 
     [self bindUI];
 }

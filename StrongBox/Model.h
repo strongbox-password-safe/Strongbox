@@ -70,6 +70,7 @@ extern NSString* const kAsyncUpdateStarting;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allItems;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *keeAgentSSHKeyEntries;
 
 @property (nonatomic, nonnull) CompositeKeyFactors *ckfs;
 

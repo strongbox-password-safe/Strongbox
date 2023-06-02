@@ -48,7 +48,7 @@
 }
 
 - (void)updateAutoFillDatabases {
-    [self.model rebuildFastMaps];
+    [self.model rebuildMapsAndCaches];
     
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];

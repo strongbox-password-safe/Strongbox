@@ -41,6 +41,8 @@ extern NSString* const kDragAndDropInternalUti;
 extern NSString* const kDragAndDropExternalUti;
 extern NSString* const kDragAndDropSideBarHeaderMoveInternalUti;
 
+extern NSString* const kKeeAgentSettingsAttachmentName;
+
 #if TARGET_OS_IPHONE
 
 @property (class, readonly) UIColor* recycleBinTintColor;

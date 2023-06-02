@@ -15,6 +15,7 @@
 #import "NSDictionary+Extensions.h"
 #import "NSArray+Extensions.h"
 #import "NSDate+Extensions.h"
+#import "Node+KeeAgentSSH.h"
 
 @interface EntryViewModel()
 
@@ -69,7 +70,9 @@
                                                     attachments:attachments
                                                        metadata:metadata
                                                      hasHistory:YES
-                                                parentGroupUuid:nil sortCustomFields:YES];
+                                                parentGroupUuid:nil
+                                                 keeAgentSshKey:nil
+                                               sortCustomFields:YES];
     
     return ret;
 }
@@ -94,6 +97,8 @@
     }
     
     
+        
+    KeeAgentSshKeyViewModel* keeAgentSshKey = [EntryViewModel getKeeAgentSshKeyViewModelFromNode:item];
     
     EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
                                                        username:item.fields.username
@@ -110,9 +115,28 @@
                                                        metadata:metadata
                                                      hasHistory:historyAvailable
                                                 parentGroupUuid:item.parent.uuid
+                                                 keeAgentSshKey:keeAgentSshKey
                                                sortCustomFields:sortCustomFields];
     
     return ret;
+}
+
++ (KeeAgentSshKeyViewModel*)getKeeAgentSshKeyViewModelFromNode:(Node*)item {
+    KeeAgentSshKeyViewModel* keeAgentSshKey = nil;
+    
+    if ( item.hasKeeAgentSshPrivateKey ) {
+        OpenSSHPrivateKey* key = [OpenSSHPrivateKey fromData:item.keeAgentSshPrivateKeyData];
+        if ( key == nil ) {
+            NSLog(@"🔴 could not read KeeAgent SSH Key Data into OpenSSHPrivateKey!");
+        }
+        else {
+            keeAgentSshKey = [KeeAgentSshKeyViewModel withKey:key
+                                                     filename:item.keeAgentSshKeyAttachmentName
+                                                      enabled:item.hasEnabledKeeAgentSshPrivateKey];
+        }
+    }
+    
+    return keeAgentSshKey;
 }
 
 + (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item format:(DatabaseFormat)format model:(Model *)model {
@@ -168,6 +192,7 @@
                      metadata:(nonnull NSArray<ItemMetadataEntry *> *)metadata
                    hasHistory:(BOOL)hasHistory
               parentGroupUuid:(NSUUID*_Nullable)parentGroupUuid
+               keeAgentSshKey:(KeeAgentSshKeyViewModel*)keeAgentSshKey
              sortCustomFields:(BOOL)sortCustomFields {
     if (self = [super init]) {
         self.title = title;
@@ -199,6 +224,22 @@
         
         self.hasHistory = hasHistory;
         self.parentGroupUuid = parentGroupUuid;
+        self.keeAgentSshKey = keeAgentSshKey;
+        
+        
+        
+        
+        
+        
+
+
+
+
+
+
+
+
+
     }
     
     return self;
@@ -220,6 +261,7 @@
                                                          metadata:self.metadata
                                                        hasHistory:self.hasHistory
                                                   parentGroupUuid:self.parentGroupUuid
+                                                   keeAgentSshKey:self.keeAgentSshKey
                                                  sortCustomFields:self.sortCustomFields];
 
     return model;
@@ -308,7 +350,59 @@
         return YES;
     }
     
+    
+    
+    if ( !(self.keeAgentSshKey == nil && other.keeAgentSshKey == nil ) &&
+        (![self.keeAgentSshKey isEqualTo:other.keeAgentSshKey] )) {
+        return YES;
+    }
+            
     return NO;
+}
+
+
+
+- (void)resetTags:(NSSet<NSString*>*)tags {
+    [self.mutableTags removeAllObjects];
+    
+    NSArray<NSString*>* splitByDelimiter = [tags.allObjects flatMap:^NSArray * _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        return [Utils getTagsFromTagString:obj];
+    }];
+    
+    [self.mutableTags addObjectsFromArray:splitByDelimiter];
+}
+
+- (void)addTag:(NSString*)tag {
+    NSArray<NSString*>* tags = [Utils getTagsFromTagString:tag]; 
+    [self.mutableTags addObjectsFromArray:tags];
+}
+
+- (void)removeTag:(NSString*)tag {
+    [self.mutableTags removeObject:tag];
+}
+
+- (NSArray<NSString*>*)tags {
+    return [self.mutableTags.allObjects sortedArrayUsingComparator:finderStringComparator];
+}
+
+
+
+- (MutableOrderedDictionary<NSString *,KeePassAttachmentAbstractionLayer *> *)attachments {
+    return self.mutableAttachments;
+}
+
+- (MutableOrderedDictionary<NSString *,KeePassAttachmentAbstractionLayer *> *)attachmentsNoKeeAgent {
+    if ( self.keeAgentSshKey ) {
+        MutableOrderedDictionary* ret = [self.mutableAttachments mutableCopy];
+        
+        [ret removeObjectForKey:kKeeAgentSettingsAttachmentName];
+        [ret removeObjectForKey:self.keeAgentSshKey.filename];
+        
+        return ret;
+    }
+    else {
+        return self.attachments;
+    }
 }
 
 - (void)removeAttachment:(NSString*)filename {
@@ -325,6 +419,8 @@
     
     return idx;
 }
+
+
 
 - (void)removeCustomFieldAtIndex:(NSUInteger)index {
     [self.mutableCustomFields removeObjectAtIndex:index];
@@ -380,33 +476,6 @@
     }
 }
 
-- (void)resetTags:(NSSet<NSString*>*)tags {
-    [self.mutableTags removeAllObjects];
-    
-    NSArray<NSString*>* splitByDelimiter = [tags.allObjects flatMap:^NSArray * _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-        return [Utils getTagsFromTagString:obj];
-    }];
-    
-    [self.mutableTags addObjectsFromArray:splitByDelimiter];
-}
-
-- (void)addTag:(NSString*)tag {
-    NSArray<NSString*>* tags = [Utils getTagsFromTagString:tag]; 
-    [self.mutableTags addObjectsFromArray:tags];
-}
-
-- (void)removeTag:(NSString*)tag {
-    [self.mutableTags removeObject:tag];
-}
-
-- (NSArray<NSString*>*)tags {
-    return [self.mutableTags.allObjects sortedArrayUsingComparator:finderStringComparator];
-}
-
-- (MutableOrderedDictionary<NSString *,KeePassAttachmentAbstractionLayer *> *)attachments {
-    return self.mutableAttachments;
-}
-
 - (NSArray<CustomFieldViewModel *> *)customFields {
     return self.mutableCustomFields;
 }
@@ -417,6 +486,8 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     
     return finderStringCompare(a.key, b.key);
 };
+
+
 
 - (BOOL)applyToNode:(Node*)ret
      databaseFormat:(DatabaseFormat)databaseFormat
@@ -464,6 +535,30 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
     
     [ret.fields.tags removeAllObjects];
     [ret.fields.tags addObjectsFromArray:self.tags];
+    
+    
+    
+    if ( self.keeAgentSshKey ) {
+        KeeAgentSshKeyViewModel* originalKeeAgentSshKey = [EntryViewModel getKeeAgentSshKeyViewModelFromNode:ret];
+
+        if ( originalKeeAgentSshKey &&
+            [self.keeAgentSshKey.openSshKey isEqualTo:originalKeeAgentSshKey.openSshKey] && 
+            [self.keeAgentSshKey.filename isEqualToString:originalKeeAgentSshKey.filename] && 
+            self.keeAgentSshKey.enabled != originalKeeAgentSshKey.enabled ) {
+            
+            [ret setKeeAgentSshPrivateKeyEnabled:self.keeAgentSshKey.enabled];
+        }
+        else { 
+            [ret removeKeeAgentSshKey];
+            
+            [ret addKey:self.keeAgentSshKey.filename
+            keyFileBlob:self.keeAgentSshKey.openSshKey.data
+                enabled:self.keeAgentSshKey.enabled];
+        }
+    }
+    else {
+        [ret removeKeeAgentSshKey];
+    }
     
     
     
@@ -534,6 +629,23 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
     for (CustomFieldViewModel *field in self.customFields) {
         StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
         [ret.fields setCustomField:field.key value:value];
+    }
+}
+
+
+
+- (void)setKeeAgentSshKeyEnabled:(BOOL)enabled {
+    if ( self.keeAgentSshKey ) {
+        if ( self.keeAgentSshKey.enabled != enabled ) {
+            
+            
+            self.keeAgentSshKey = [KeeAgentSshKeyViewModel withKey:self.keeAgentSshKey.openSshKey
+                                                          filename:self.keeAgentSshKey.filename
+                                                           enabled:enabled];
+        }
+    }
+    else {
+        NSLog(@"🔴 setKeeAgentSshKeyEnabled when no key is set!");
     }
 }
 

@@ -14,8 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
+@property (readonly) BOOL isRunning;
+
 - (void)stop;
-- (BOOL)start; 
+- (BOOL)start;
 
 @end
 

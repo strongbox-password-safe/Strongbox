@@ -15,11 +15,17 @@
 + (instancetype)sharedInstance {
     static ClipboardManager *sharedInstance = nil;
     static dispatch_once_t onceToken;
-
+    
     dispatch_once(&onceToken, ^{
         sharedInstance = [[ClipboardManager alloc] init];
     });
     return sharedInstance;
+}
+
+- (void)copyNoneConcealedString:(NSString *)string {
+    [NSPasteboard.generalPasteboard clearContents]; 
+    
+    [NSPasteboard.generalPasteboard setString:(string ? string : @"") forType:NSPasteboardTypeString];
 }
 
 - (void)copyConcealedString:(NSString *)string {

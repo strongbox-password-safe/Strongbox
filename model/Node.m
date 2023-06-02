@@ -917,8 +917,6 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return ret;
 }
 
-
-
 - (NSString *)description {
     if(self.isGroup) {
         if(self.children.count) {

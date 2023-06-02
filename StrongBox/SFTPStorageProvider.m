@@ -533,7 +533,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     if ( ![fingerprint isEqualToString:sessionConfiguration.sha256FingerPrint] ) {
         if ( viewController ) {
             if ( sessionConfiguration.sha256FingerPrint == nil ) {
-                NSLog(@"🔴 shouldConnectToHostWithFingerprint NO EXISTING FINGERPRINT: [%@]", fingerprint);
+                NSLog(@"⚠️ shouldConnectToHostWithFingerprint NO EXISTING FINGERPRINT: [%@]", fingerprint);
 
                 [self promptUserOnFirstUseFingerPrint:sessionConfiguration
                                               session:session
@@ -559,8 +559,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
         }
     }
     else {
-        NSLog(@"✅ shouldConnectToHostWithFingerprint: YES - FingerPrint Matches: [%@]", fingerprint);
-        
+
         [self continueWithAuthenticationInBackground:sessionConfiguration session:session viewController:viewController completion:completion];
     }
 }

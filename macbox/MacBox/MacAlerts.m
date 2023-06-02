@@ -63,7 +63,7 @@ informativeText:(NSString*)informativeText
      informativeText:message
               window:window
           completion:completion];
-
+    
 }
 
 + (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText
@@ -125,7 +125,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
 + (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSAlert *alert = [[NSAlert alloc] init];
-
+        
         [alert setMessageText:message];
         
         if(error && error.localizedDescription) {
@@ -136,7 +136,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
         
         NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
         [alert addButtonWithTitle:loc];
-
+        
         [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
             if(completion) {
                 completion();
@@ -146,6 +146,10 @@ disableEscapeKey:(BOOL)disableEscapeKey
 }
 
 - (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty {
+    return [self input:prompt defaultValue:defaultValue allowEmpty:allowEmpty secure:NO];
+}
+
+- (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty secure:(BOOL)secure {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:prompt];
     
@@ -158,8 +162,9 @@ disableEscapeKey:(BOOL)disableEscapeKey
     NSString* loc2 = NSLocalizedString(@"generic_cancel", @"Cancel");
     [alert addButtonWithTitle:loc2];
     
-    self.simpleInputTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
+    self.simpleInputTextField = secure ? [[NSSecureTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)] : [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 200, 24)];
     [self.simpleInputTextField setStringValue:defaultValue];
+    
     self.simpleInputTextField.delegate=self;
     
     [alert setAccessoryView:self.simpleInputTextField];

@@ -24,6 +24,7 @@ typedef enum : NSUInteger {
     OGNavigationSpecialAttachmentItems,
     OGNavigationSpecialExpired,
     OGNavigationSpecialNearlyExpired,
+    OGNavigationSpecialKeeAgentSshKeyItems,
 } OGNavigationSpecial;
 
 typedef enum : NSUInteger {

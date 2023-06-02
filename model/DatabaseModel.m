@@ -12,6 +12,7 @@
 #import "NSString+Extensions.h"
 #import "FastMaps.h"
 #import "CrossPlatform.h"
+#import "Node+KeeAgentSSH.h"
 
 #if TARGET_OS_IPHONE
 #import "KissXML.h" 
@@ -982,15 +983,17 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (void)rebuildFastMaps {
     NSMutableDictionary<NSUUID*, Node*>* uuidMap = NSMutableDictionary.dictionary;
+        
     NSMutableSet<NSUUID*> *expirySet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *attachmentSet = NSMutableSet.set;
+    NSMutableSet<NSUUID*> *keeAgentSshKeysSet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *totpSet = NSMutableSet.set;
     NSMutableDictionary<NSString*, NSMutableSet<NSUUID*>*>* tagMap = NSMutableDictionary.dictionary;
     NSCountedSet<NSString*> *usernameSet = NSCountedSet.set;
     NSCountedSet<NSString*> *emailSet = NSCountedSet.set;
     NSCountedSet<NSString*> *urlSet = NSCountedSet.set;
     NSCountedSet<NSString*> *customFieldKeySet = NSCountedSet.set;
-    
+
     NSInteger entryTotalCount = 0;
     NSInteger groupTotalCount = 0;
 
@@ -1016,10 +1019,11 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                 entryTotalCount++;
             }
         }
-        
+
         FastMaps* newMaps = [[FastMaps alloc] initWithUuidMap:uuidMap
                                               withExpiryDates:expirySet
                                               withAttachments:attachmentSet
+                                          withKeeAgentSshKeys:keeAgentSshKeysSet
                                                     withTotps:totpSet
                                                        tagMap:tagMap
                                                   usernameSet:usernameSet
@@ -1039,7 +1043,6 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         Node* recycler = kp2RecycleBin ? kp2RecycleBin : keePass1BackupNode;
 
         for (Node* node in self.rootNode.allChildren) { 
-                        
             if ( recycler != nil && (node == recycler || [recycler contains:node]) ) {
                 continue;
             }
@@ -1060,6 +1063,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             
             if ( node.fields.attachments.count > 0 ) {
                 [attachmentSet addObject:node.uuid];
+            }
+            
+            
+            
+            if ( node.hasKeeAgentSshPrivateKey ) {
+                [keeAgentSshKeysSet addObject:node.uuid];
             }
             
             
@@ -1113,6 +1122,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     FastMaps* newMaps = [[FastMaps alloc] initWithUuidMap:uuidMap
                                           withExpiryDates:expirySet
                                           withAttachments:attachmentSet
+                                      withKeeAgentSshKeys:keeAgentSshKeysSet
                                                 withTotps:totpSet
                                                    tagMap:tagMap
                                               usernameSet:usernameSet
@@ -1307,6 +1317,14 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     __weak DatabaseModel* weakSelf = self;
     
     return [self.fastMaps.withAttachments.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [weakSelf getItemById:obj];
+    }];
+}
+
+- (NSArray<Node *> *)keeAgentSSHKeyEntries {
+    __weak DatabaseModel* weakSelf = self;
+    
+    return [self.fastMaps.withKeeAgentSshKeys.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [weakSelf getItemById:obj];
     }];
 }

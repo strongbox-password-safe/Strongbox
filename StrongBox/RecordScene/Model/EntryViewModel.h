@@ -15,6 +15,7 @@
 #import "Node.h"
 #import "DatabaseFormat.h"
 #import "Model.h"
+#import "KeeAgentSshKeyViewModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -71,6 +72,13 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 - (NSUInteger)addCustomField:(CustomFieldViewModel*)field atIndex:(NSUInteger)atIndex;
 
 - (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx;
+
+
+
+@property (readonly) MutableOrderedDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* attachmentsNoKeeAgent;
+
+@property (nullable) KeeAgentSshKeyViewModel* keeAgentSshKey;
+- (void)setKeeAgentSshKeyEnabled:(BOOL)enabled;
 
 @end
 

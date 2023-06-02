@@ -1162,6 +1162,10 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     return self.database.effectiveRootGroup.allChildRecords;
 }
 
+- (NSArray<Node *> *)keeAgentSSHKeyEntries {
+    return self.database.keeAgentSSHKeyEntries;
+}
+
 
 
 - (DatabaseFormat)originalFormat {

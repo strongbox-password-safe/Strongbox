@@ -19,7 +19,6 @@
 
 @interface AutoFillProxyServer ()
 
-@property BOOL running;
 @property int server_sock;
 
 @end
@@ -40,7 +39,7 @@
 - (void)stop {
     NSLog(@"AutoFillProxyServer::STOP ENTER");
 
-    if ( !self.running ) {
+    if ( !self.isRunning ) {
         return;
     }
     
@@ -56,7 +55,7 @@
     
     NSLog(@"AutoFillProxyServer::STOP EXIT");
     
-    self.running = NO;
+    _isRunning = NO;
 }
 
 - (BOOL)start {
@@ -64,10 +63,10 @@
 
     [self stop];
     
-    NSString* path = getSocketPath(NO); 
+    NSString* path = getSocketPath(NO);
     if ( !path ) {
         NSLog(@"🔴 Path too long for getSocketPath - Check users home dir");
-        return FALSE;
+        return NO;
     }
 
     struct sockaddr_un sun;
@@ -77,7 +76,7 @@
     
     if (unlink(sun.sun_path) == -1) {
         if ( errno != ENOENT ) {
-            printf("🔴 unlink: %s\n,%d", strerror(errno), errno);
+            NSLog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
         }
     }
 
@@ -102,7 +101,7 @@
     
     if (unlink(sun.sun_path) == -1) {
         if ( errno != ENOENT) {
-            printf("🔴 unlink: %s\n,%d", strerror(errno), errno);
+            NSLog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
         }
     }
 
@@ -124,7 +123,7 @@
 
     NSLog(@"AutoFillProxyServer::start EXIT ✅");
 
-    self.running = YES;
+    _isRunning = YES;
     return YES; 
 }
 
@@ -132,7 +131,7 @@
     while ( 1 ) {
 
 
-        int socket = accept (self.server_sock, NULL, NULL);  
+        int socket = accept (self.server_sock, NULL, NULL);
 
         if ( socket == -1 ) {
             NSLog(@"⚠️ AutoFillProxyServer failed to accept new connection (possibly due to shutdown...)");

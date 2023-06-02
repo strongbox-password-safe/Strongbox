@@ -1107,6 +1107,8 @@ extension BrowseViewController: NSOutlineViewDataSource {
             return loadTotps()
         case .itemsWithAttachments:
             return loadAttachmentEntries()
+        case .keeAgentSshKeyEntries:
+            return loadKeeAgentSshKeyEntries() 
         }
     }
 
@@ -1167,8 +1169,12 @@ extension BrowseViewController: NSOutlineViewDataSource {
         return database.totpEntries
     }
 
-    func loadAttachmentEntries() -> [Node] {
+    func loadAttachmentEntries() -> [Node] {        
         return database.attachmentEntries
+    }
+
+    func loadKeeAgentSshKeyEntries() -> [Node] {
+        return database.keeAgentSshKeyEntries
     }
 
     func loadTagChildEntries(_ tag: String) -> [Node] {

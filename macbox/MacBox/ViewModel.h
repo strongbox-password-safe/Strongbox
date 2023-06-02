@@ -190,6 +190,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *nearlyExpiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *attachmentEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *keeAgentSshKeyEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableNoneExpiredEntries;
@@ -365,7 +366,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property ConflictResolutionStrategy conflictResolutionStrategy;
 
-- (void)rebuildFastMaps;
+- (void)rebuildMapsAndCaches;
 
 @end
 

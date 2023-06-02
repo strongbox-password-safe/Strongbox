@@ -211,14 +211,20 @@ class DatabasesCollection: NSObject {
         return ret
     }
     
-    @objc public func autoFillRequestCkfsAndUnlock ( uuid : String ) {
+    public func initiateDatabaseUnlock ( uuid : String, message : String? = nil, completion : (( _ : Bool ) -> Void)? = nil ) {
         if ( isUnlocked(uuid: uuid )) {
             NSLog("🔴 This database was already unlocked! NOP");
+            DispatchQueue.global().async {
+                completion?(true)
+            }
             return
         }
         
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
             NSLog("🔴 No such database");
+            DispatchQueue.global().async {
+                completion?(false)
+            }
             return
         }
         
@@ -238,21 +244,33 @@ class DatabasesCollection: NSObject {
             let appDelegate = NSApplication.shared.delegate as! AppDelegate
             appDelegate.cancelAutoLockInBackgroundTimer()
 
-            determiner.getCkfs { [weak self] result, ckfs, fromConvenience, error in
+            determiner.getCkfs ( message ) { [weak self] result, ckfs, fromConvenience, error in
                 if let ckfs, result == .success {
-                    
-                    
-                    self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience)
-                    
                     if !NSApplication.shared.isActive {
                         
                         
-
+                        
                         appDelegate.startAutoLockForAppInBackgroundTimer()
                     }
+
+                    self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience) { result, model, error in
+                        DispatchQueue.global().async {
+                            completion?(result == .success)
+                        }
+                    }
+                    
+                    
                 }
                 else if result == .error, let error {
                     self?.displayUnlockingErrorMessage(error: error, eagerVc: nil)
+                    DispatchQueue.global().async {
+                        completion?(false)
+                    }
+                }
+                else {
+                    DispatchQueue.global().async {
+                        completion?(false)
+                    }
                 }
             }
         }

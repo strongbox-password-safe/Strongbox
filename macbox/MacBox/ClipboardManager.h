@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 - (void)copyConcealedString:(NSString *)string;
+- (void)copyNoneConcealedString:(NSString *)string;
 
 @end
 

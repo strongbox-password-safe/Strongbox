@@ -316,10 +316,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
-    
-    
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
 
+    
+    
     NSString* databaseId = [self.databaseIds objectAtIndex:row];
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
 

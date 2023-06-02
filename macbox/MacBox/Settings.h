@@ -146,7 +146,11 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL concealClipboardFromMonitors;
 
 @property BOOL autoCommitScannedTotp;
+
 @property BOOL shadeFavoriteTag;
+@property BOOL runSshAgent;
+
+@property BOOL requireApprovalSshAgent;
 
 @end
 

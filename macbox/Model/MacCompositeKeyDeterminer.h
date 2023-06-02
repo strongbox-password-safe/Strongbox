@@ -31,6 +31,7 @@ typedef NSViewController* _Nonnull (^MacCompositeKeyDeterminerOnDemandUIProvider
                     onDemandUiProvider:(MacCompositeKeyDeterminerOnDemandUIProviderBlock)onDemandUiProvider;
 
 - (void)getCkfs:(CompositeKeyDeterminedBlock)completion;
+- (void)getCkfs:(NSString*_Nullable)message completion:(CompositeKeyDeterminedBlock)completion;
 
 - (void)getCkfsManually:(CompositeKeyDeterminedBlock)completion;
 

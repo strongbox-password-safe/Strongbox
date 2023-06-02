@@ -93,3 +93,9 @@
 #import "FavIconManager.h"
 
 #endif
+
+#import "Node+KeeAgentSSH.h"
+#import "OpenSSHPrivateKey.h"
+#import "SSHAgentServer.h"
+#import "XMLWriter.h"
+
