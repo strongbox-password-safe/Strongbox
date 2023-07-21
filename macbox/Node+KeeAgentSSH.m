@@ -27,6 +27,16 @@
 
 #endif
 
+@interface Node ()
+
+@property (readonly) BOOL hasKeeAgentSshPrivateKey;
+@property (readonly) BOOL hasEnabledKeeAgentSshPrivateKey;
+
+@property (readonly, nullable) NSData* keeAgentSshPrivateKeyData;
+@property (readonly, nullable) NSString* keeAgentSshKeyAttachmentName;
+
+@end
+
 @implementation Node (KeeAgentSSH)
 
 - (BOOL)hasEnabledKeeAgentSshPrivateKey {
@@ -49,10 +59,6 @@
 
 - (NSData *)keeAgentSshPrivateKeyData {
     return [self getKeeAgentSshPrivateKeyData:NO];
-}
-
-- (NSData *)keeAgentEnabledSshPrivateKeyData {
-    return [self getKeeAgentSshPrivateKeyData:YES];
 }
 
 - (NSData *)getKeeAgentSshPrivateKeyData:(BOOL)onlyIfEnabled {
@@ -162,6 +168,69 @@
     NSData* xmlData = [settings toXmlData];
     
     self.fields.attachments[kKeeAgentSettingsAttachmentName] = [[KeePassAttachmentAbstractionLayer alloc] initNonPerformantWithData:xmlData compressed:YES protectedInMemory:YES];
+}
+
+
+
+- (void)setKeeAgentSshKeyEnabled:(BOOL)enabled {
+    if ( self.keeAgentSshKeyViewModel ) {
+        if ( self.keeAgentSshKeyViewModel.enabled != enabled ) {
+            
+
+            self.keeAgentSshKeyViewModel = [KeeAgentSshKeyViewModel withKey:self.keeAgentSshKeyViewModel.openSshKey
+                                                                   filename:self.keeAgentSshKeyViewModel.filename
+                                                                    enabled:enabled];
+        }
+    }
+    else {
+        NSLog(@"🔴 setKeeAgentSshKeyEnabled when no key is set!");
+    }
+}
+
+- (KeeAgentSshKeyViewModel *)keeAgentSshKeyViewModel {
+    return [Node getKeeAgentSshKeyViewModelFromNode:self];
+}
+
+- (void)setKeeAgentSshKeyViewModel:(KeeAgentSshKeyViewModel *)keeAgentSshKeyViewModel {
+    if ( keeAgentSshKeyViewModel ) {
+        KeeAgentSshKeyViewModel* originalKeeAgentSshKey = self.keeAgentSshKeyViewModel;
+        
+        if ( originalKeeAgentSshKey &&
+            [keeAgentSshKeyViewModel.openSshKey isEqualTo:originalKeeAgentSshKey.openSshKey] && 
+            [keeAgentSshKeyViewModel.filename isEqualToString:originalKeeAgentSshKey.filename] && 
+            keeAgentSshKeyViewModel.enabled != originalKeeAgentSshKey.enabled ) {
+            
+            [self setKeeAgentSshPrivateKeyEnabled:keeAgentSshKeyViewModel.enabled];
+        }
+        else { 
+            [self removeKeeAgentSshKey];
+            
+            [self addKey:keeAgentSshKeyViewModel.filename
+             keyFileBlob:keeAgentSshKeyViewModel.openSshKey.data
+                 enabled:keeAgentSshKeyViewModel.enabled];
+        }
+    }
+    else {
+        [self removeKeeAgentSshKey];
+    }
+}
+
++ (KeeAgentSshKeyViewModel*)getKeeAgentSshKeyViewModelFromNode:(Node*)item {
+    KeeAgentSshKeyViewModel* keeAgentSshKey = nil;
+    
+    if ( item.hasKeeAgentSshPrivateKey ) {
+        OpenSSHPrivateKey* key = [OpenSSHPrivateKey fromData:item.keeAgentSshPrivateKeyData];
+        if ( key == nil ) {
+            NSLog(@"🔴 could not read KeeAgent SSH Key Data into OpenSSHPrivateKey!");
+        }
+        else {
+            keeAgentSshKey = [KeeAgentSshKeyViewModel withKey:key
+                                                     filename:item.keeAgentSshKeyAttachmentName
+                                                      enabled:item.hasEnabledKeeAgentSshPrivateKey];
+        }
+    }
+    
+    return keeAgentSshKey;
 }
 
 @end

@@ -50,6 +50,16 @@
 
 @implementation UpgradeViewController
 
++ (instancetype)fromStoryboard {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Upgrade" bundle:nil];
+    UpgradeViewController* vc = [storyboard instantiateInitialViewController];
+    
+    vc.modalPresentationStyle = UIModalPresentationFullScreen;
+    vc.modalInPresentation = YES;
+    
+    return vc;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -253,7 +263,8 @@
     [self bindSale];
 }
 
-- (void)bindSale { 
+- (void)bindSale {
+    
     self.stackSale.hidden = YES; 
 
 

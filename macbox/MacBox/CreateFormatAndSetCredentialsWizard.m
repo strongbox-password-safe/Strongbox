@@ -17,6 +17,7 @@
 #import <CoreImage/CoreImage.h>
 #import "MacCompositeKeyDeterminer.h"
 #import "PasswordStrengthUIHelper.h"
+#import "KSPasswordField.h"
 
 @interface CreateFormatAndSetCredentialsWizard () <NSTabViewDelegate>
 
@@ -25,8 +26,8 @@
 
 @property (weak) IBOutlet NSTabView *tabView;
 
-@property (weak) IBOutlet NSSecureTextField *textFieldNew;
-@property (weak) IBOutlet NSSecureTextField *textFieldConfirm;
+@property (weak) IBOutlet KSPasswordField *textFieldNew;
+@property (weak) IBOutlet KSPasswordField *textFieldConfirm;
 @property (weak) IBOutlet NSButton *buttonOk;
 @property (weak) IBOutlet NSButton *buttonCancel;
 
@@ -53,9 +54,41 @@
 @property (weak) IBOutlet NSTextField *labelStrength;
 @property (weak) IBOutlet NSStackView *stackStrength;
 
+@property (weak) IBOutlet NSButton *buttonRevealConceal;
+@property BOOL concealed;
+@property (weak) IBOutlet NSButton *acceptEmptyPassword;
+
+@property (weak) IBOutlet NSStackView *stackHeader;
+@property (weak) IBOutlet NSStackView *stackOuterContainer;
+@property (weak) IBOutlet NSStackView *stackViewKeyFile;
+@property (weak) IBOutlet NSStackView *stackViewYubiKey;
+
+@property (weak) IBOutlet NSButton *checkboxShowAdvanced;
+@property BOOL showAdvanced;
+
 @end
 
 @implementation CreateFormatAndSetCredentialsWizard
+
+- (IBAction)onToggleShowAdvanced:(id)sender {
+    self.showAdvanced = !self.showAdvanced;
+    [self bindUi];
+}
+
+- (IBAction)onRevealConceal:(id)sender {
+    self.concealed = !self.concealed;
+    [self bindConcealed];
+}
+
+- (IBAction)toggleAcceptEmpty:(id)sender {
+    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = !Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    
+    [self bindUi];
+}
+
+- (void)bindAcceptEmpty {
+    [self.acceptEmptyPassword setState:Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSControlStateValueOn : NSControlStateValueOff];
+}
 
 - (void)windowDidLoad {
     [super windowDidLoad];
@@ -64,8 +97,12 @@
     _selectedKeyFileBookmark = self.initialKeyFileBookmark;
     _selectedYubiKeyConfiguration = self.initialYubiKeyConfiguration;
 
+    self.showAdvanced = self.initialKeyFileBookmark != nil || self.initialYubiKeyConfiguration != nil;
+    
     self.useAKeyFile = self.selectedKeyFileBookmark != nil;
     self.useAYubiKey = self.selectedYubiKeyConfiguration != nil;
+    
+    self.concealed = YES;
     
     [self setupUi];
     [self bindUi];
@@ -74,10 +111,6 @@
 }
 
 - (void)setupUi {
-    if(self.titleText) {
-        self.textFieldTitle.stringValue = self.titleText;
-    }
-    
     self.tabView.delegate = self;
     [self.tabView selectTabViewItem:self.tabView.tabViewItems[self.createSafeWizardMode ? 0 : 1]];
     
@@ -86,6 +119,9 @@
         NSLocalizedString(@"mac_enter_database_master_credentials", @"Enter Database Master Credentials");
     
     self.window.title = loc;
+    
+    [self.stackOuterContainer setCustomSpacing:8.f afterView:self.stackHeader];
+    
     [self setUIFromFormat];
 }
 
@@ -98,10 +134,6 @@
 
 - (IBAction)onNext:(id)sender {
     [self.tabView selectTabViewItem:self.tabView.tabViewItems[1]];
-}
-
-- (IBAction)onBack:(id)sender {
-    [self.tabView selectTabViewItem:self.tabView.tabViewItems[0]];
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -118,8 +150,10 @@
     }
 }
 
-- (IBAction)controlTextDidChange:(NSSecureTextField *)obj {
-    [self bindUi];
+- (void)controlTextDidChange:(NSNotification *)obj {
+    [self bindPasswordStrength];
+
+    [self validateUi];
 }
 
 - (IBAction)onBrowse:(id)sender {
@@ -157,13 +191,23 @@
 }
 
 - (void)setUIFromFormat {
-    if(self.selectedDatabaseFormat == kPasswordSafe) {
+    if(self.selectedDatabaseFormat == kPasswordSafe || self.selectedDatabaseFormat == kKeePass1 ) {
         self.checkboxUseAKeyFile.state = NSControlStateValueOff;
         self.checkboxUseAKeyFile.enabled = NO;
+        
         self.checkboxUseAPassword.state = NSControlStateValueOn;
         self.checkboxUseAPassword.enabled = NO;
+        
         self.checkboxUseYubiKey.state = NSControlStateValueOff;
         self.checkboxUseYubiKey.enabled = NO;
+
+        self.acceptEmptyPassword.state = NSControlStateValueOff;
+        self.acceptEmptyPassword.enabled = NO;
+        
+        self.stackViewKeyFile.hidden = YES;
+        self.stackViewYubiKey.hidden = YES;
+        self.checkboxUseAPassword.hidden = YES;
+        self.acceptEmptyPassword.hidden = YES;
     }
     else {
         self.checkboxUseAPassword.state = NSControlStateValueOn;
@@ -236,6 +280,11 @@
 
 
 - (void)bindUi {
+    self.checkboxShowAdvanced.state = self.showAdvanced ? NSControlStateValueOn : NSControlStateValueOff;
+    self.acceptEmptyPassword.hidden = !self.showAdvanced;
+    self.stackViewKeyFile.hidden = !self.showAdvanced;
+    self.stackViewYubiKey.hidden = !self.showAdvanced;
+    
     
     
     if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
@@ -246,6 +295,9 @@
         self.textFieldNew.enabled = NO;
         self.textFieldConfirm.enabled = NO;
     }
+    
+    [self bindConcealed];
+    [self bindAcceptEmpty];
     
     
     
@@ -258,8 +310,11 @@
     self.labelKeyFilePath.enabled = self.useAKeyFile;
     
     NSURL* url = self.selectedKeyFileBookmark ? [BookmarksHelper getExpressUrlFromBookmark:self.selectedKeyFileBookmark] : nil;
+    
     self.labelKeyFilePath.stringValue = self.useAKeyFile && url ? url.path : @"";
     self.labelKeyFilePath.placeholderString = !self.useAKeyFile ? @"" : NSLocalizedString(@"mac_click_browse_select_key_file", @"Click Browse to Select a Key File");
+    
+    self.labelKeyFilePath.hidden = self.labelKeyFilePath.stringValue.length == 0;
     
     
     
@@ -268,7 +323,15 @@
     
     
     
-    self.buttonOk.enabled = [self validateUi];
+    [self validateUi];
+}
+
+- (void)bindConcealed {
+    self.textFieldNew.showsText = !self.concealed;
+    
+    if (@available(macOS 11.0, *)) {
+        [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
+    }
 }
 
 - (void)updateYubiKeyUi {
@@ -391,18 +454,24 @@
     [self bindUi];
 }
 
-- (BOOL)validateUi {
-    self.labelPasswordsMatch.stringValue = @"";
+- (void)validateUi {
+    self.labelPasswordsMatch.stringValue = @" ";
     self.labelPasswordsMatch.textColor = [NSColor redColor];
     
     if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
+        if ( !Settings.sharedInstance.allowEmptyOrNoPasswordEntry && self.textFieldNew.stringValue.length == 0 ) {
+            self.buttonOk.enabled = NO;
+            return;
+        }
+        
         if(![self.textFieldNew.stringValue isEqualToString:self.textFieldConfirm.stringValue]) {
             if(self.textFieldConfirm.stringValue.length) {
                 NSString* loc = NSLocalizedString(@"mac_passwords_dont_match", @"Passwords don't match");
                 self.labelPasswordsMatch.stringValue = loc;
             }
             
-            return NO;
+            self.buttonOk.enabled = NO;
+            return;
         }
     }
 
@@ -413,7 +482,8 @@
             if(self.textFieldNew.stringValue.length == 0) {
                 NSString* loc = NSLocalizedString(@"mac_password_cannot_be_empty", @"Password cannot be Empty");
                 self.labelPasswordsMatch.stringValue = loc;
-                return NO;
+                self.buttonOk.enabled = NO;
+                return;
             }
         }
     }
@@ -423,14 +493,16 @@
     if(self.useAKeyFile) {
         if (self.selectedKeyFileBookmark == nil) {
             self.labelPasswordsMatch.stringValue = NSLocalizedString(@"mac_select_key_file", @"Select a Key File");
-            return NO;
+            self.buttonOk.enabled = NO;
+            return;
         }
         
         NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:self.selectedKeyFileBookmark];
         if(url == nil || ![NSFileManager.defaultManager fileExistsAtPath:url.path]) {
             NSString* loc = NSLocalizedString(@"mac_key_file_invalid", @"Key File Invalid");
             self.labelPasswordsMatch.stringValue = loc;
-            return NO;
+            self.buttonOk.enabled = NO;
+            return;
         }
     }
         
@@ -442,7 +514,8 @@
         NSString* loc = NSLocalizedString(@"mac_you_must_use_at_least_a_password_or_key_file", @"You must use at least one of either a password, a key file or a hardware key for your master credentials.");
         
         self.labelPasswordsMatch.stringValue = loc;
-        return NO;
+        self.buttonOk.enabled = NO;
+        return;
     }
     
     
@@ -460,7 +533,7 @@
         self.labelPasswordsMatch.textColor = [NSColor greenColor];
     }
     
-    return YES;
+    self.buttonOk.enabled = YES;
 }
 
 - (IBAction)onOk:(id)sender {

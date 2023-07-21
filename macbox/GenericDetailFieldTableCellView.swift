@@ -21,6 +21,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     @IBOutlet var stackViewParent: NSStackView!
     @IBOutlet var copyButton: NSButton!
     @IBOutlet var buttonHistory: NSPopUpButton!
+    @IBOutlet var shareButton: NSButton!
     
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -68,6 +69,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     var value: String = ""
     var popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)?
     var onCopyButton: ((DetailsViewField?) -> Void)?
+    var onShareButton: ((DetailsViewField?) -> Void)?
 
     var field: DetailsViewField?
     var concealable: Bool = false
@@ -129,6 +131,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
                     popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
                     image: NSImage? = nil,
                     onCopyButton: ((DetailsViewField?) -> Void)? = nil,
+                    onShareButton: ((DetailsViewField?) -> Void)? = nil,
                     containingWindow : NSWindow? = nil,
                     singleLineMode : Bool = false ) {
         self.field = field
@@ -149,7 +152,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
             value = field.value
 
             if showStrength {
-                PasswordStrengthUIHelper.bindPasswordStrength(field.value, labelStrength: labelStrength, progress: progressStrength, colorize: false) 
+                PasswordStrengthUIHelper.bindPasswordStrength(field.value, labelStrength: labelStrength, progress: progressStrength)
             }
 
             if field.fieldType == .expiry {
@@ -186,6 +189,9 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         self.onCopyButton = onCopyButton;
         self.copyButton.isHidden = onCopyButton == nil
         
+        self.onShareButton = onShareButton;
+        self.shareButton.isHidden = onShareButton == nil
+        
         self.value = value
         self.concealed = concealable && concealed
         self.containingWindow = containingWindow
@@ -209,6 +215,10 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         }
 
         popupMenuUpdater?(menu, field)
+    }
+    
+    @IBAction func onShare(_ sender: Any) {
+        self.onShareButton?(self.field)
     }
     
     @IBAction func onCopy(_ sender: Any) {

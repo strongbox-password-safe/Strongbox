@@ -84,8 +84,10 @@
     
     self.switchReadOnly.on = self.initialReadOnly;
     
-    self.textFieldName.text = self.selectedName.length ? self.selectedName : DatabasePreferences.suggestedNewDatabaseName;
-  
+    if ( self.mode != kCASGModeSetCredentials && self.mode != kCASGModeGetCredentials) {
+        self.textFieldName.text = self.selectedName.length ? self.selectedName : DatabasePreferences.suggestedNewDatabaseName;
+    }
+    
     self.textFieldPassword.font = FontManager.sharedInstance.easyReadFont;
     self.textFieldConfirmPassword.font = FontManager.sharedInstance.easyReadFont;
     
@@ -194,7 +196,10 @@
 }
 
 - (IBAction)onDone:(id)sender {
-    self.selectedName = [DatabasePreferences trimDatabaseNickName:self.textFieldName.text];
+    if ( self.mode != kCASGModeSetCredentials && self.mode != kCASGModeGetCredentials) {
+        self.selectedName = [DatabasePreferences trimDatabaseNickName:self.textFieldName.text];
+    }
+    
     self.selectedPassword = self.textFieldPassword.text;
     
     if(self.selectedPassword.length != 0 || self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {

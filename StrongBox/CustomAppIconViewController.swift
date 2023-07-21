@@ -54,7 +54,8 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
             .midnightFire,
             .red,
             .water,
-            .original
+            .original,
+            .white
         ]
         
         let grouped = Dictionary(grouping: allowedIcons, by: { $0.category })

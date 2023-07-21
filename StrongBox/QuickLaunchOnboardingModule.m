@@ -30,7 +30,7 @@
     return (!self.model.metadata.hasBeenPromptedForQuickLaunch && AppPreferences.sharedInstance.quickLaunchUuid == nil );
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"QuickLaunchOnboarding" bundle:nil];
     QuickLaunchOnboardingViewController* vc = [storyboard instantiateInitialViewController];
     

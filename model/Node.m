@@ -568,10 +568,18 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
 - (BOOL)validateChangeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     return
-        parent != self &&
+        parent != self && 
         self.parent != nil && 
-        self.parent != parent &&
-        ![parent isChildOf:self] && [parent validateAddChild:self keePassGroupTitleRules:keePassGroupTitleRules];
+    
+        
+        
+        
+        
+        
+
+        ![parent isChildOf:self] && 
+    
+        [parent validateAddChild:self keePassGroupTitleRules:keePassGroupTitleRules]; 
 }
 
 
@@ -583,7 +591,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if(![self validateChangeParent:parent keePassGroupTitleRules:keePassGroupTitleRules]) {
         return NO;
     }
-    
+        
     [self.parent removeChild:self];
     
     Node* rollbackParent = self.parent;

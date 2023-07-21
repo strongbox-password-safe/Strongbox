@@ -13,7 +13,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DatabaseOperations : StaticDataTableViewController
+@interface AdvancedDatabaseSettings : StaticDataTableViewController
+
++ (instancetype)fromStoryboard;
 
 @property (nonatomic) Model *viewModel;
 

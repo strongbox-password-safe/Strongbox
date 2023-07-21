@@ -65,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) AutoType* autoType;
 @property BOOL isExpanded;
 @property BOOL qualityCheck; 
+@property BOOL isAutoFillExcluded; 
 @property (nullable) NSUUID* previousParentGroup;
 
 

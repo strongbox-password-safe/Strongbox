@@ -88,7 +88,7 @@ class BrowseTabViewController: UITabBarController {
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
         tabBar.addGestureRecognizer(longPressRecognizer)
         
-        refreshVisibleTabs()
+        refreshVisibleTabs(true)
                 
         NotificationCenter.default.addObserver(forName: .ConfigureTabs.tabsChanged, object: nil, queue: nil) { [weak self] notification in
             self?.onTabsChanged(true)
@@ -138,10 +138,10 @@ class BrowseTabViewController: UITabBarController {
     }
     
     func onTabsChanged( _ isDirectConfigChange : Bool ) {
-        refreshVisibleTabs()
+        refreshVisibleTabs(isDirectConfigChange)
     }
     
-    func refreshVisibleTabs ( _ isDirectConfigChange : Bool = false ) {
+    func refreshVisibleTabs ( _ isDirectConfigChangeOrInitialLoad : Bool = false ) {
         
         
         
@@ -159,7 +159,7 @@ class BrowseTabViewController: UITabBarController {
 
         guard currentVisibleTabs != newEffectivelyVisible else {
             
-            if isDirectConfigChange {
+            if isDirectConfigChangeOrInitialLoad {
                 bindShowHideBar() 
             }
             return
@@ -222,7 +222,7 @@ class BrowseTabViewController: UITabBarController {
             model.metadata.browseViewType = currentVisibleTabs[selectedIndex]
         }
         
-        if isDirectConfigChange {
+        if isDirectConfigChangeOrInitialLoad {
             bindShowHideBar()
         }
     }

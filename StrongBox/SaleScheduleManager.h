@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL saleNowOn;
 @property BOOL userHasBeenPromptedAboutCurrentSale;
 @property (readonly, nullable) NSDate* currentSaleEndDate;
+@property (readonly, nullable) NSDate* saleAfterNextSaleStartDate;
 
 @end
 

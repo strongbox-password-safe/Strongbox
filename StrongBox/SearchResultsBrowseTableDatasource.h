@@ -16,7 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithModel:(Model*)model tableView:(UITableView*)tableView NS_DESIGNATED_INITIALIZER;
-- (void)updateSearchResults:(UISearchController*)searchController;
+
+- (void)updateSearchResults:(NSString*)searchText scope:(SearchScope)scope;
 
 @end
 

@@ -63,6 +63,7 @@
 #import "DatabasePreferences.h"
 #import "AutoFillNewRecordSettingsController.h"
 #import "SyncManager.h"
+#import "ContextMenuHelper.h"
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
@@ -77,6 +78,13 @@ static NSInteger const kRowExpires = 6;
 static NSInteger const kRowTotp = 7;
 static NSInteger const kRowSshKey = 8;
 static NSInteger const kSimpleRowCount = 9;
+
+static NSInteger const kSimpleFieldsSectionIdx = 0;
+static NSInteger const kNotesSectionIdx = 1;
+static NSInteger const kAttachmentsSectionIdx = 2;
+static NSInteger const kMetadataSectionIdx = 3;
+static NSInteger const kOtherSectionIdx = 4;
+static NSInteger const kSectionCount = 5;
 
 static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 static NSString* const kEditPasswordCellId = @"EditPasswordCell";
@@ -125,6 +133,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 
 @property (readonly) BOOL isEffectivelyReadOnly;
 @property (readonly) DatabaseFormat databaseFormat;
+@property UIBarButtonItem* preferencesBarButton;
 
 @end
 
@@ -134,21 +143,15 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 
 
 
-static NSInteger const kSimpleFieldsSectionIdx = 0;
-static NSInteger const kNotesSectionIdx = 1;
-static NSInteger const kAttachmentsSectionIdx = 2;
-static NSInteger const kMetadataSectionIdx = 3;
-static NSInteger const kOtherSectionIdx = 4;
-static NSInteger const kSectionCount = 5;
 
 + (NSArray<NSNumber*>*)defaultCollapsedSections {
     
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     return @[@(0),
              @(0),
              @(0),
@@ -211,7 +214,7 @@ static NSInteger const kSectionCount = 5;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-        
+    
     [self unListenToNotifications];
 }
 
@@ -239,9 +242,10 @@ static NSInteger const kSectionCount = 5;
     self.isAutoFillContext = YES;
 #endif
     
+    [self customizeLeftBarButtons];
     [self customizeRightBarButtons];
     
-
+    
     
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_verb_close", @"Close")
                                                                      style:UIBarButtonItemStylePlain
@@ -334,6 +338,19 @@ static NSInteger const kSectionCount = 5;
     return UIModalPresentationNone;
 }
 
+- (void)customizeLeftBarButtons {
+    self.navigationItem.leftItemsSupplementBackButton = YES;
+        
+    UIImage* image = [UIImage systemImageNamed:@"slider.horizontal.3"];
+    self.preferencesBarButton = [[UIBarButtonItem alloc] initWithImage:image menu:nil];
+    
+    [self.navigationItem.backBarButtonItem setTitle:@""];
+    
+    [self refreshPreferencesMenu];
+    
+    self.navigationItem.leftBarButtonItems = self.splitViewController ? @[self.splitViewController.displayModeButtonItem, self.preferencesBarButton] : @[self.preferencesBarButton];
+}
+
 - (void)customizeRightBarButtons {
     NSMutableArray* rightBarButtons = @[].mutableCopy;
     
@@ -345,7 +362,7 @@ static NSInteger const kSectionCount = 5;
     }
     
     [rightBarButtons insertObject:self.editButtonItem atIndex:0];
-
+    
 #ifndef IS_APP_EXTENSION
     self.syncButton = [NavBarSyncButtonHelper createSyncButton:self action:@selector(onSyncButtonClicked:)];
     self.syncBarButton = [[UIBarButtonItem alloc] initWithCustomView:self.syncButton];
@@ -353,6 +370,101 @@ static NSInteger const kSectionCount = 5;
 #endif
     
     self.navigationItem.rightBarButtonItems = rightBarButtons;
+}
+
+- (void)onToggleEasyReadFontOnAll {
+    if ( !self.databaseModel.metadata.easyReadFontForAll && AppPreferences.sharedInstance.markdownNotes ) {
+        [Alerts areYouSure:self
+                   message:NSLocalizedString(@"are_you_sure_message_easy_read_font_markdown_notes", @"Note: Enabling Easy-Read Font will have the effect of disabling the 'Markdown Notes' formatting feature. Is this OK?")
+                    action:^(BOOL response) {
+            if ( response ) {
+                self.databaseModel.metadata.easyReadFontForAll = !self.databaseModel.metadata.easyReadFontForAll;
+                [self notifyDatabaseViewPreferencesChanged];
+            }
+            
+            [self refreshPreferencesMenu];
+        }];
+    }
+    else {
+        self.databaseModel.metadata.easyReadFontForAll = !self.databaseModel.metadata.easyReadFontForAll;
+
+        [self refreshPreferencesMenu];
+        [self notifyDatabaseViewPreferencesChanged];
+    }
+}
+
+- (void)notifyDatabaseViewPreferencesChanged {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDatabaseViewPreferencesChangedNotificationKey object:nil];
+}
+
+
+- (void)refreshPreferencesMenu {
+    __weak ItemDetailsViewController* weakSelf = self;
+    
+    NSMutableArray<UIMenuElement*>* ma1 = [NSMutableArray array];
+    
+    [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_easy_read_all", @"Easy Read Font on All Fields")
+                                  systemImage:@"eyeglasses"
+                                      enabled:YES
+                                      checked:self.databaseModel.metadata.easyReadFontForAll
+                                      handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onToggleEasyReadFontOnAll];
+    }]];
+    
+    if ( !AppPreferences.sharedInstance.disableFavIconFeature ) {
+        [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_auto_fetch_favicon", @"Auto Fetch FavIcon")
+                                      systemImage:@"globe"
+                                          enabled:YES
+                                          checked:self.databaseModel.metadata.tryDownloadFavIconForNewRecord
+                                          handler:^(__kindof UIAction * _Nonnull action) {
+            weakSelf.databaseModel.metadata.tryDownloadFavIconForNewRecord = !weakSelf.databaseModel.metadata.tryDownloadFavIconForNewRecord;
+            [weakSelf notifyDatabaseViewPreferencesChanged];
+            [weakSelf refreshPreferencesMenu];
+        }]];
+    }
+    
+    [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_reveal_password_immediately", @"Reveal Password Immediately")
+                                  systemImage:@"eye"
+                                      enabled:YES
+                                      checked:self.databaseModel.metadata.showPasswordByDefaultOnEditScreen
+                                      handler:^(__kindof UIAction * _Nonnull action) {
+        weakSelf.databaseModel.metadata.showPasswordByDefaultOnEditScreen = !weakSelf.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
+        [weakSelf notifyDatabaseViewPreferencesChanged];
+        [weakSelf refreshPreferencesMenu];
+    }]];
+    [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_colorize_passwords", @"Colorize Passwords")
+                                  systemImage:@"paintbrush.pointed"
+                                      enabled:YES
+                                      checked:self.databaseModel.metadata.colorizePasswords
+                                      handler:^(__kindof UIAction * _Nonnull action) {
+        weakSelf.databaseModel.metadata.colorizePasswords = !weakSelf.databaseModel.metadata.colorizePasswords;
+        [weakSelf notifyDatabaseViewPreferencesChanged];
+        [weakSelf refreshPreferencesMenu];
+    }]];
+    
+    [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_sort_custom_fields", @"Sort Custom Fields")
+                                  systemImage:@"arrow.up.arrow.down"
+                                      enabled:YES
+                                      checked:!self.databaseModel.metadata.customSortOrderForFields
+                                      handler:^(__kindof UIAction * _Nonnull action) {
+        weakSelf.databaseModel.metadata.customSortOrderForFields = !weakSelf.databaseModel.metadata.customSortOrderForFields;
+        [weakSelf notifyDatabaseViewPreferencesChanged];
+        [weakSelf refreshPreferencesMenu];
+    }]];
+
+    UIMenu* menu1 = [UIMenu menuWithTitle:@""
+                                    image:nil
+                               identifier:nil
+                                  options:UIMenuOptionsDisplayInline
+                                 children:ma1];
+    
+    UIMenu* menu = [UIMenu menuWithTitle:NSLocalizedString(@"generic_settings", @"Settings")
+                                   image:nil
+                              identifier:nil
+                                 options:kNilOptions
+                                children:@[menu1]];
+    
+    self.preferencesBarButton.menu = menu;
 }
 
 - (void)onSyncOrUpdateStatusChanged:(id)object {
@@ -364,7 +476,7 @@ static NSInteger const kSectionCount = 5;
     NSMutableArray *copy = self.navigationItem.rightBarButtonItems.mutableCopy;
     
     
-     
+    
     
     
     BOOL showSyncButton = [NavBarSyncButtonHelper bindSyncToobarButton:self.databaseModel button:self.syncButton];
@@ -487,22 +599,16 @@ static NSInteger const kSectionCount = 5;
         BOOL isDifferent = [self.model isDifferentFrom:self.preEditModelClone];
         BOOL saveable = isDifferent || self.createNewItem;
         self.editButtonItem.enabled = saveable;
-        self.navigationItem.leftBarButtonItem = self.cancelOrDiscardBarButton;
+        
         [self.cancelOrDiscardBarButton setTitle:saveable ? NSLocalizedString(@"generic_verb_discard", @"Discard") :  NSLocalizedString(@"generic_verb_close", @"Close")];
         
-        
-        
-        
-        
-        
-        
-        
-        
+        self.navigationItem.leftBarButtonItems = @[self.cancelOrDiscardBarButton];
     }
     else {
         self.navigationItem.leftItemsSupplementBackButton = YES;
         self.editButtonItem.enabled = !self.isEffectivelyReadOnly;
-        self.navigationItem.leftBarButtonItem = self.splitViewController ? self.splitViewController.displayModeButtonItem : nil;
+        
+        self.navigationItem.leftBarButtonItems = self.splitViewController ? @[self.splitViewController.displayModeButtonItem, self.preferencesBarButton] : @[self.preferencesBarButton];
         
         [self bindTitle];
     }
@@ -510,30 +616,28 @@ static NSInteger const kSectionCount = 5;
 
 - (void)bindTitle {
     NSString* fullTitle = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title],
-                                    self.isEffectivelyReadOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
-
+                           self.isEffectivelyReadOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
+    
     UIImage* image = [NodeIconHelper getNodeIcon:self.model.icon
-              predefinedIconSet:self.databaseModel.metadata.keePassIconSet
-                         format:self.databaseModel.database.originalFormat];
-
+                               predefinedIconSet:self.databaseModel.metadata.keePassIconSet
+                                          format:self.databaseModel.database.originalFormat];
+    
     UIView* view = [MMcGSwiftUtils navTitleWithImageAndTextWithTitleText:fullTitle
                                                                    image:image
                                                                     tint:nil];
     
     self.navigationItem.titleView = view;
-
     
-
-
+    
+    
+    
 }
 
 - (void)prepareTableViewForEditing {
-    BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4);
-    NSUInteger addCustomFieldIdx = self.model.customFields.count + kSimpleRowCount;
-    
-    if(self.editing) {
-        if (showAddCustomFieldRow) {
-            NSUInteger addCustomFieldIdx = self.model.customFields.count + kSimpleRowCount;
+    if ( self.editing ) {
+        if (self.model.supportsCustomFields) {
+            NSUInteger addCustomFieldIdx = self.model.customFieldsFiltered.count + kSimpleRowCount;
+            
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx inSection:kSimpleFieldsSectionIdx]]
                                   withRowAnimation:UITableViewRowAnimationAutomatic];
         }
@@ -545,12 +649,6 @@ static NSInteger const kSectionCount = 5;
                       withRowAnimation:UITableViewRowAnimationAutomatic];
     }
     else {
-        if (showAddCustomFieldRow) {
-            [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx
-                                                                        inSection:kSimpleFieldsSectionIdx]]
-                                  withRowAnimation:UITableViewRowAnimationAutomatic];
-        }
-        
         [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kAttachmentsSectionIdx]]
                               withRowAnimation:UITableViewRowAnimationAutomatic];
         
@@ -596,7 +694,7 @@ static NSInteger const kSectionCount = 5;
 
 - (void)postValidationSetEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
-
+    
     
     
     
@@ -708,14 +806,14 @@ static NSInteger const kSectionCount = 5;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if(section == kSimpleFieldsSectionIdx) {
-        BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4);
-        return kSimpleRowCount + (self.model.customFields.count + (showAddCustomFieldRow ? 1 : 0));
+        BOOL showAddCustomFieldRow = self.editing && self.model.supportsCustomFields;
+        return kSimpleRowCount + (self.model.customFieldsFiltered.count + (showAddCustomFieldRow ? 1 : 0));
     }
     else if (section == kNotesSectionIdx) {
         return 1;
     }
     else if (section == kAttachmentsSectionIdx) {
-        return self.model.attachments.count + (self.editing ? 1 : 0);
+        return self.model.filteredAttachments.count + (self.editing ? 1 : 0);
     }
     else if (section == kMetadataSectionIdx) {
         return self.model.metadata.count;
@@ -756,9 +854,13 @@ static NSInteger const kSectionCount = 5;
             }
         }
         else if ( indexPath.row == kRowSshKey ) {
-            if ( self.editing || !self.model.keeAgentSshKey ) {
+#ifndef IS_APP_EXTENSION
+            if ( !self.editing && !self.model.keeAgentSshKey ) {
                 return CGFLOAT_MIN;
             }
+#else
+            return CGFLOAT_MIN;
+#endif
         }
         else if(indexPath.row == kRowTotp) {
 #ifndef IS_APP_EXTENSION
@@ -781,14 +883,9 @@ static NSInteger const kSectionCount = 5;
         }
         else if(indexPath.row >= kSimpleRowCount) { 
             NSUInteger idx = indexPath.row - kSimpleRowCount;
-            if(idx < self.model.customFields.count) {
-                CustomFieldViewModel* f = self.model.customFields[idx];
+            if ( idx < self.model.customFieldsFiltered.count ) {
+                CustomFieldViewModel* f = self.model.customFieldsFiltered[idx];
                 if (!f.protected && !f.value.length && shouldHideEmpty) { 
-                    return CGFLOAT_MIN;
-                }
-                
-                BOOL shouldHideTotpFields = self.databaseModel.metadata.hideTotpCustomFieldsInViewMode && !self.editing;
-                if (shouldHideTotpFields && [NodeFields isTotpCustomFieldKey:f.key]) {
                     return CGFLOAT_MIN;
                 }
             }
@@ -831,7 +928,7 @@ static NSInteger const kSectionCount = 5;
     }
 #ifndef IS_APP_EXTENSION
     else if(section == kAttachmentsSectionIdx) {
-        if(self.databaseModel.database.originalFormat == kPasswordSafe || (!self.editing && self.model.attachments.count == 0)) {
+        if(self.databaseModel.database.originalFormat == kPasswordSafe || (!self.editing && self.model.filteredAttachments.count == 0)) {
             return CGFLOAT_MIN;
         }
     }
@@ -857,13 +954,13 @@ static NSInteger const kSectionCount = 5;
         if (indexPath.row == kRowTotp) {
             return (self.model.totp ? UITableViewCellEditingStyleDelete : UITableViewCellEditingStyleInsert);
         }
-
+        
         if (indexPath.row == kRowSshKey ) {
             return (self.model.keeAgentSshKey ? UITableViewCellEditingStyleDelete : UITableViewCellEditingStyleInsert);
         }
-
+        
         if (indexPath.row >= kSimpleRowCount) { 
-            return indexPath.row - kSimpleRowCount == self.model.customFields.count ? UITableViewCellEditingStyleInsert : UITableViewCellEditingStyleDelete;
+            return indexPath.row - kSimpleRowCount == self.model.customFieldsFiltered.count ? UITableViewCellEditingStyleInsert : UITableViewCellEditingStyleDelete;
         }
         
         return UITableViewCellEditingStyleNone;
@@ -880,7 +977,10 @@ static NSInteger const kSectionCount = 5;
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (indexPath.section == kSimpleFieldsSectionIdx || indexPath.section == kNotesSectionIdx || indexPath.section == kMetadataSectionIdx || indexPath.section == kOtherSectionIdx) {
+    if (indexPath.section == kSimpleFieldsSectionIdx ||
+        indexPath.section == kNotesSectionIdx ||
+        indexPath.section == kMetadataSectionIdx ||
+        indexPath.section == kOtherSectionIdx) {
         return NO;
     }
     
@@ -896,10 +996,12 @@ static NSInteger const kSectionCount = 5;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ( !self.model.sortCustomFields && indexPath.section == kSimpleFieldsSectionIdx && self.model.customFields.count > 1 ) {
+    if ( !self.model.sortCustomFields &&
+        indexPath.section == kSimpleFieldsSectionIdx &&
+        self.model.customFieldsFiltered.count > 1 ) {
         NSInteger customFieldIdx = indexPath.row - kSimpleRowCount;
         
-        if ( customFieldIdx >= 0 && customFieldIdx < self.model.customFields.count ) { 
+        if ( customFieldIdx >= 0 && customFieldIdx < self.model.customFieldsFiltered.count ) { 
             return YES;
         }
     }
@@ -908,10 +1010,10 @@ static NSInteger const kSectionCount = 5;
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    if ( proposedDestinationIndexPath.section == kSimpleFieldsSectionIdx && self.model.customFields.count > 1 ) {
+    if ( proposedDestinationIndexPath.section == kSimpleFieldsSectionIdx && self.model.customFieldsFiltered.count > 1 ) {
         NSInteger customFieldIdx = proposedDestinationIndexPath.row - kSimpleRowCount;
         
-        if ( customFieldIdx >= 0 && customFieldIdx < self.model.customFields.count ) { 
+        if ( customFieldIdx >= 0 && customFieldIdx < self.model.customFieldsFiltered.count ) { 
             return proposedDestinationIndexPath;
         }
     }
@@ -920,11 +1022,11 @@ static NSInteger const kSectionCount = 5;
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    if ( sourceIndexPath.section == kSimpleFieldsSectionIdx && destinationIndexPath.section == kSimpleFieldsSectionIdx && self.model.customFields.count > 1 ) {
+    if ( sourceIndexPath.section == kSimpleFieldsSectionIdx && destinationIndexPath.section == kSimpleFieldsSectionIdx && self.model.customFieldsFiltered.count > 1 ) {
         NSInteger sourceIdx = sourceIndexPath.row - kSimpleRowCount;
         NSInteger destIdx = destinationIndexPath.row - kSimpleRowCount;
         
-        if ( sourceIdx >= 0 && sourceIdx < self.model.customFields.count && destIdx >= 0 && destIdx < self.model.customFields.count && sourceIdx != destIdx ) {
+        if ( sourceIdx >= 0 && sourceIdx < self.model.customFieldsFiltered.count && destIdx >= 0 && destIdx < self.model.customFieldsFiltered.count && sourceIdx != destIdx ) {
             NSLog(@"Move: [%ld] -> [%ld]", (long)sourceIdx, destIdx);
             [self.model moveCustomFieldAtIndex:sourceIdx to:destIdx];
             [self onModelEdited];
@@ -935,7 +1037,7 @@ static NSInteger const kSectionCount = 5;
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         if(indexPath.section == kAttachmentsSectionIdx && indexPath.row > 0) {
-            NSString* filename = self.model.attachments.allKeys[indexPath.row - 1];
+            NSString* filename = self.model.filteredAttachments.allKeys[indexPath.row - 1];
             [self.model removeAttachment:filename];
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
             [self onModelEdited];
@@ -946,7 +1048,14 @@ static NSInteger const kSectionCount = 5;
             }
             else if (indexPath.row == kRowSshKey) {
                 self.model.keeAgentSshKey = nil;
-                [self onModelEdited];
+                
+                [self.tableView performBatchUpdates:^{
+                    NSIndexPath* ip = [NSIndexPath indexPathForRow:kRowSshKey inSection:kSimpleFieldsSectionIdx];
+                    [self.tableView reloadRowsAtIndexPaths:@[ip]
+                                          withRowAnimation:UITableViewRowAnimationAutomatic];
+                } completion:^(BOOL finished) {
+                    [self onModelEdited];
+                }];
             }
             else if (indexPath.row >= kSimpleRowCount) {
                 NSUInteger idx = indexPath.row - kSimpleRowCount;
@@ -957,11 +1066,14 @@ static NSInteger const kSectionCount = 5;
         }
     }
     else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        if(indexPath.section == kSimpleFieldsSectionIdx && indexPath.row == self.model.customFields.count + kSimpleRowCount) {
+        if(indexPath.section == kSimpleFieldsSectionIdx && indexPath.row == self.model.customFieldsFiltered.count + kSimpleRowCount) {
             [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:nil];
         }
         else if(indexPath.section == kSimpleFieldsSectionIdx && indexPath.row == kRowTotp) {
             [self onSetTotp];
+        }
+        else if(indexPath.section == kSimpleFieldsSectionIdx && indexPath.row == kRowSshKey ) {
+            [self promptToAddSshKey];
         }
         else if(indexPath.section == kAttachmentsSectionIdx && indexPath.row == 0) {
             [self promptToAddAttachment];
@@ -970,12 +1082,53 @@ static NSInteger const kSectionCount = 5;
 }
 
 - (void)promptToAddAttachment {
-    NSArray* usedFilenames = self.model.attachments.allKeys;
-    
     [AddAttachmentHelper.sharedInstance beginAddAttachmentUi:self
-                                               usedFilenames:usedFilenames
+                                               usedFilenames:self.model.reservedAttachmentNames
                                                        onAdd:^(NSString * _Nonnull filename, KeePassAttachmentAbstractionLayer * _Nonnull databaseAttachment) {
         [self onAddAttachment:filename attachment:databaseAttachment];
+    }];
+}
+
+- (void)promptToAddSshKey {
+    [Alerts twoOptionsWithCancel:self
+                           title:NSLocalizedString(@"details_add_new_ssh_key", @"New SSH Key")
+                         message:NSLocalizedString(@"details_add_new_ssh_key_what_kind_prompt", @"What kind of SSH key would you like to add?\n\nWe recommend using the modern ED25519 key type.")
+               defaultButtonText:NSLocalizedString(@"details_add_new_ssh_key_ed25519", @"New ED25519 Key")
+                secondButtonText:NSLocalizedString(@"details_add_new_ssh_key_rsa", @"New RSA Key")
+                          action:^(int response) {
+        if ( response == 0 ) {
+            
+            [self addNewSshKey:YES];
+        }
+        else if ( response == 1 ) {
+            
+            [self addNewSshKey:NO];
+        }
+    }];
+}
+
+- (void)addNewSshKey:(BOOL)ed25519 {
+    if ( self.model.keeAgentSshKey ) {
+        NSLog(@"🔴 Already an existing Key!!");
+        return;
+    }
+    
+    OpenSSHPrivateKey* key = ed25519 ? [OpenSSHPrivateKey newEd25519] : [OpenSSHPrivateKey newRsa];
+    if ( key == nil ) {
+        NSLog(@"🔴 Could not create new key!");
+        return;
+    }
+    
+    NSString* filename = ed25519 ? @"id_ed25519" : @"id_rsa";
+    
+    self.model.keeAgentSshKey = [KeeAgentSshKeyViewModel withKey:key filename:filename enabled:YES];
+    
+    [self.tableView performBatchUpdates:^{
+        NSIndexPath* ip = [NSIndexPath indexPathForRow:kRowSshKey inSection:kSimpleFieldsSectionIdx];
+        [self.tableView reloadRowsAtIndexPaths:@[ip]
+                              withRowAnimation:UITableViewRowAnimationAutomatic];
+    } completion:^(BOOL finished) {
+        [self onModelEdited];
     }];
 }
 
@@ -993,11 +1146,15 @@ static NSInteger const kSectionCount = 5;
 - (void)onAddAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment {
     NSLog(@"Adding new Attachment: [%@]", attachment);
     
-    NSUInteger idx = [self.model insertAttachment:filename attachment:attachment];
+    
+    [self.model insertAttachment:filename attachment:attachment]; 
     
     [self.tableView performBatchUpdates:^{
-        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + 1 inSection:kAttachmentsSectionIdx]] 
-                              withRowAnimation:UITableViewRowAnimationAutomatic];
+        
+        
+        
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:kAttachmentsSectionIdx] withRowAnimation:UITableViewRowAnimationAutomatic];
+        
     } completion:^(BOOL finished) {
         [self onModelEdited];
     }];
@@ -1010,12 +1167,12 @@ static NSInteger const kSectionCount = 5;
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
-    return self.model.attachments.count;
+    return self.model.filteredAttachments.count;
 }
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    NSString* filename = self.model.attachments.allKeys[index];
-    KeePassAttachmentAbstractionLayer* attachment = self.model.attachments[filename];
+    NSString* filename = self.model.filteredAttachments.allKeys[index];
+    KeePassAttachmentAbstractionLayer* attachment = self.model.filteredAttachments[filename];
     
     NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     
@@ -1035,9 +1192,7 @@ static NSInteger const kSectionCount = 5;
         CustomFieldEditorViewController* vc = (CustomFieldEditorViewController*)[nav topViewController];
         
         vc.colorizeValue = self.databaseModel.metadata.colorizePasswords;
-        vc.customFieldsKeySet = [NSSet setWithArray:[self.model.customFields map:^id _Nonnull(CustomFieldViewModel * _Nonnull obj, NSUInteger idx) {
-            return obj.key;
-        }]];
+        vc.customFieldsKeySet = self.model.existingCustomFieldsKeySet;
         
         CustomFieldViewModel* fieldToEdit = (CustomFieldViewModel*)sender;
         
@@ -1086,6 +1241,7 @@ static NSInteger const kSectionCount = 5;
         
         NSDictionary* d = sender;
         vc.string = d[@"text"];
+        vc.subtext = d[@"subtext"];
         vc.colorize = ((NSNumber*)(d[@"colorize"])).boolValue;
     }
     else if ([segue.identifier isEqualToString:@"segueToAuditDrillDown"]) {
@@ -1106,20 +1262,19 @@ static NSInteger const kSectionCount = 5;
     }
 }
 
-- (void)onCustomFieldEditedOrAdded:(CustomFieldViewModel * _Nonnull)field fieldToEdit:(CustomFieldViewModel*)fieldToEdit {
+- (void)onCustomFieldEditedOrAdded:(CustomFieldViewModel * _Nonnull)field
+                       fieldToEdit:(CustomFieldViewModel*)fieldToEdit {
     NSLog(@"onCustomFieldEditedOrAdded: [%@] - fieldToEdit = [%@]", field, fieldToEdit);
     
     if ( fieldToEdit ) { 
-        NSUInteger oldIdx = [self.model.customFields indexOfObject:fieldToEdit];
-
+        NSUInteger oldIdx = [self.model.customFieldsFiltered indexOfObject:fieldToEdit];
+        
         if (oldIdx != NSNotFound) {
             [self.model removeCustomFieldAtIndex:oldIdx];
             [self.model addCustomField:field atIndex:oldIdx];
             
             [self.tableView performBatchUpdates:^{
-                NSIndexPath* ip = [NSIndexPath indexPathForRow:oldIdx + kSimpleRowCount inSection:kSimpleFieldsSectionIdx];
-                [self.tableView reloadRowsAtIndexPaths:@[ip]
-                                      withRowAnimation:UITableViewRowAnimationAutomatic];
+                [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:kSimpleFieldsSectionIdx] withRowAnimation:UITableViewRowAnimationAutomatic];
             } completion:^(BOOL finished) {
                 [self onModelEdited];
             }];
@@ -1131,17 +1286,15 @@ static NSInteger const kSectionCount = 5;
             
             
             
-
+            
             NSLog(@"⚠️ WARNWARN - Could not find custom field to edit!!");
             return;
         }
     }
     else {
-        NSUInteger idx = [self.model addCustomField:field];
+        [self.model addCustomField:field];
         [self.tableView performBatchUpdates:^{
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + kSimpleRowCount
-                                                                        inSection:kSimpleFieldsSectionIdx]]
-                                  withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:kSimpleFieldsSectionIdx] withRowAnimation:UITableViewRowAnimationAutomatic];
         } completion:^(BOOL finished) {
             [self onModelEdited];
         }];
@@ -1435,7 +1588,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         parentGroup = parentGroup.childGroups.firstObject;
     }
     
-    return parentGroup ? parentGroup : self.databaseModel.database.effectiveRootGroup; 
+    return parentGroup ? parentGroup : self.databaseModel.database.effectiveRootGroup;
 }
 
 - (void)applyModelChangesToDatabaseNode:(void (^)(Node* item))completion {
@@ -1618,7 +1771,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(self.editing) {
+    if ( self.editing ) {
         if(indexPath.section == kAttachmentsSectionIdx) {
             if(indexPath.row == 0) {
                 [self promptToAddAttachment];
@@ -1635,12 +1788,17 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
                     [self onSetTotp];
                 }
             }
-            else if(virtualRow == self.model.customFields.count  ) { 
+            else if ( indexPath.row == kRowSshKey ) {
+                if ( !self.model.keeAgentSshKey ) {
+                    [self promptToAddSshKey];
+                }
+            }
+            else if(virtualRow == self.model.customFieldsFiltered.count  ) { 
                 [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:nil];
             }
-            else if (virtualRow >= 0 && virtualRow < self.model.customFields.count) {
+            else if (virtualRow >= 0 && virtualRow < self.model.customFieldsFiltered.count) {
                 NSInteger idx = virtualRow;
-                CustomFieldViewModel* cf = self.model.customFields[idx];
+                CustomFieldViewModel* cf = self.model.customFieldsFiltered[idx];
                 [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:cf];
             }
         }
@@ -1670,9 +1828,9 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             else if (indexPath.row == kRowTotp && self.model.totp) {
                 [self copyToClipboard:self.model.totp.password message:NSLocalizedString(@"item_details_totp_copied", @"One Time Password Copied")];
             }
-            else if (virtualRow >= 0 && virtualRow < self.model.customFields.count) {
+            else if (virtualRow >= 0 && virtualRow < self.model.customFieldsFiltered.count) {
                 NSInteger idx = virtualRow;
-                CustomFieldViewModel* cf = self.model.customFields[idx];
+                CustomFieldViewModel* cf = self.model.customFieldsFiltered[idx];
                 NSString* value = [self maybeDereference:cf.value];
                 [self copyToClipboard:value message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), cf.key]];
             }
@@ -1787,7 +1945,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
             [weakSelf performSegueWithIdentifier:@"segueToPasswordGenerationSettings" sender:nil];
         };
         cell.showGenerationSettings = YES;
-
+        
         cell.historyMenu = [self getPasswordHistoryMenu];
         
         return cell;
@@ -1834,17 +1992,23 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         
         [cell setItem:self.model.totp];
         
+        __weak ItemDetailsViewController* weakSelf = self;
+        cell.onShowQrCode = ^{
+            [weakSelf showQrCodeForTotp];
+        };
+        
         return cell;
     }
 }
 
 - (UITableViewCell*)getKeeAgentSshKeyCell:(NSIndexPath*)indexPath {
-    if ( self.editing ) {
+    if ( self.editing && !self.model.keeAgentSshKey ) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
-        cell.labelText.text = @"Remove SSH Key"; 
+        
+        cell.labelText.text = NSLocalizedString(@"details_add_new_ssh_key_ellipsis", @"New SSH Key...");
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.editingAccessoryType = UITableViewCellAccessoryNone;
-
+        
         return cell;
     }
     else {
@@ -1855,12 +2019,17 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         [cell setContent:self.model.keeAgentSshKey
                 password:self.model.password
           viewController:self
+                editMode:self.editing
                onCopyPub:^{
             [self copyToClipboard:theKey.publicKey message:NSLocalizedString(@"generic_copied", @"Copied")];
-        } onCopyFinger:^{
+        }
+           onCopyPrivate:^{
+            [self copyToClipboard:theKey.privateKey message:NSLocalizedString(@"generic_copied", @"Copied")];
+        }
+            onCopyFinger:^{
             [self copyToClipboard:theKey.fingerprint message:NSLocalizedString(@"generic_copied", @"Copied")];
         }];
-
+        
         return cell;
     }
 }
@@ -1952,6 +2121,13 @@ suggestionProvider:^NSString*(NSString *text) {
             weakSelf.model.expires = date;
             [weakSelf onModelEdited];
         };
+
+
+
+
+
+
+        
         return cell;
     }
     else {
@@ -2012,7 +2188,7 @@ suggestionProvider:^NSString*(NSString *text) {
     
     __weak ItemDetailsViewController* weakSelf = self;
     
-    if(self.editing && virtualRow == self.model.customFields.count) {
+    if(self.editing && virtualRow == self.model.customFieldsFiltered.count) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         
         cell.labelText.text = NSLocalizedString(@"item_details_new_custom_field_button", @"New Custom Field...");
@@ -2025,11 +2201,11 @@ suggestionProvider:^NSString*(NSString *text) {
         
         
         NSInteger idx = virtualRow;
-        if (idx < 0 || idx >= self.model.customFields.count) {
+        if (idx < 0 || idx >= self.model.customFieldsFiltered.count) {
             return cell;
         }
         
-        CustomFieldViewModel* cf =  self.model.customFields[idx];
+        CustomFieldViewModel* cf =  self.model.customFieldsFiltered[idx];
         
         if(cf.protected && !self.editing) {
             [cell setConcealableKey:cf.key
@@ -2089,8 +2265,8 @@ suggestionProvider:^NSString*(NSString *text) {
     }
     else {
         NSInteger idx = indexPath.row - (self.editing ? 1 : 0);
-        NSString* filename = self.model.attachments.allKeys[idx];
-        KeePassAttachmentAbstractionLayer* attachment = self.model.attachments[filename];
+        NSString* filename = self.model.filteredAttachments.allKeys[idx];
+        KeePassAttachmentAbstractionLayer* attachment = self.model.filteredAttachments[filename];
         
         if(self.editing) {
             EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];
@@ -2220,7 +2396,7 @@ suggestionProvider:^NSString*(NSString *text) {
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-
+    
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowUsername) {
@@ -2236,16 +2412,11 @@ suggestionProvider:^NSString*(NSString *text) {
             [self showLargeText:self.model.email colorize:NO];
         }
         else if ( indexPath.row == kRowTotp ) {
-            if ( self.model.totp ) {
-                NSURL* url = [self.model.totp url:YES];
-                if ( url ) {
-                    [self showLargeText:url.absoluteString colorize:NO];
-                }
-            }
+            [self showQrCodeForTotp];
         }
         else if (indexPath.row >= kSimpleRowCount) { 
             NSUInteger idx = indexPath.row - kSimpleRowCount;
-            CustomFieldViewModel* field = self.model.customFields[idx];
+            CustomFieldViewModel* field = self.model.customFieldsFiltered[idx];
             [self showLargeText:field.value colorize:field.protected && self.databaseModel.metadata.colorizePasswords];
         }
     }
@@ -2254,9 +2425,27 @@ suggestionProvider:^NSString*(NSString *text) {
     }
 }
 
+- (void)showQrCodeForTotp {
+    if ( self.model.totp ) {
+        NSURL* url = [self.model.totp url:YES];
+        NSString* secret = self.model.totp.secretBase32;
+        
+        if ( url ) {
+            [self showLargeText:secret subtext:url.absoluteString colorize:YES];
+        }
+    }
+}
+
 - (void)showLargeText:(NSString*)text colorize:(BOOL)colorize {
+    [self showLargeText:text subtext:@"" colorize:colorize];
+}
+
+- (void)showLargeText:(NSString*)text subtext:(NSString*_Nullable)subtext colorize:(BOOL)colorize {
     if (text) {
-        [self performSegueWithIdentifier:@"segueToLargeView" sender:@{ @"text" : text, @"colorize" : @(colorize) }];
+        [self performSegueWithIdentifier:@"segueToLargeView"
+                                  sender:@{ @"text" : text,
+                                            @"colorize" : @(colorize),
+                                            @"subtext" : subtext ? subtext : @"" }];
     }
 }
 
@@ -2382,41 +2571,33 @@ suggestionProvider:^NSString*(NSString *text) {
     });
 }
 
-#ifdef IS_APP_EXTENSION
 - (void)updateAndSync {
+#ifdef IS_APP_EXTENSION
     [self disableUi];
     
     AppPreferences.sharedInstance.autoFillWroteCleanly = NO;
     
-    [self.databaseModel update:self.navigationController.visibleViewController
-                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+    [self.databaseModel asyncUpdate:^(AsyncJobResult * _Nonnull result) {
         AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [self enableUi];
             
-            if ( !userCancelled && !error ) {
+            if ( !result.userCancelled && !result.error ) {
                 if (self.onAutoFillNewItemAdded) {
                     self.onAutoFillNewItemAdded(self.model.username, self.model.password);
                 }
             }
-            else if (error) {
-                [Alerts error:self.navigationController.visibleViewController error:error];
+            else if (result.error) {
+                [Alerts error:self.navigationController.visibleViewController error:result.error];
             }
         });
+
     }];
-}
 #else
-- (void)updateAndSync {
-
-
-    [self.parentSplitViewController updateAndQueueSyncWithCompletion:^(BOOL savedWorkingCopy) {
-
-
-
-    }];
-}
+    [self.parentSplitViewController updateAndQueueSyncWithCompletion:nil];
 #endif
+}
 
 - (void)onConfigureDefaults {
 #ifndef IS_APP_EXTENSION

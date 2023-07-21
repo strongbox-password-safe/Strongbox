@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)backgroundSyncDatabase:(MacDatabasePreferences*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion;
 
 - (void)pollForChanges:(MacDatabasePreferences*)database completion:(SyncAndMergeCompletionBlock)completion;
+- (void)removeDatabaseAndLocalCopies:(MacDatabasePreferences*)database;
 
 @property (readonly) BOOL syncInProgress;
 

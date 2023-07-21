@@ -30,6 +30,8 @@ class AdvancedAppPreferences: NSViewController {
 
         useIsolatedDropbox.isHidden = !StrongboxProductBundle.supports3rdPartyStorageProviders
         
+        maskKeePassFavoriteTag.isHidden = true 
+        
         bindUI()
         
         NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in

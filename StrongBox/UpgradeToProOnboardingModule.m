@@ -36,7 +36,7 @@
     return (random < percentageChanceOfShowing);
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Upgrade" bundle:nil];
     UpgradeViewController* vc = [storyboard instantiateInitialViewController];
     

@@ -153,6 +153,12 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property (unsafe_unretained) IBOutlet SBDownTextView *textViewGroupNotes;
 @property (weak) IBOutlet NSScrollView *groupNotesScrollView;
 
+@property (weak) IBOutlet ClickableImageView *imageViewCloseDeprecation;
+@property (weak) IBOutlet ClickableTextField *textFieldSwitchNow;
+@property (weak) IBOutlet NSTextField *textFieldDeprecationBackground;
+@property (weak) IBOutlet NSStackView *stackViewDeprecationNotice;
+@property (weak) IBOutlet NSLayoutConstraint *topConstraintMainStackToSuper;
+
 @end
 
 @implementation ViewController
@@ -171,15 +177,51 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     NSLog(@"ViewController::viewDidLoad: doc=[%@] - vm=[%@]", self.view.window.windowController.document, self.view.window.windowController.document);
-
     
     
-
+    
+    
     self.detailsViewControllers = @{}.mutableCopy;
     
     [self enableDragDrop];
+    
+    [self setupDeprecationNotice];
+    [self bindDeprecationNotice];
+}
+
+- (void)bindDeprecationNotice {
+    if (@available(macOS 11.0, *)) { } else {
+        [self hideDeprecationNotice];
+    }
+}
+
+- (void)setupDeprecationNotice {
+    self.textFieldSwitchNow.onClick = ^{
+        [self switchToNextGen];
+    };
+    
+    self.imageViewCloseDeprecation.onClick = ^{
+        [self hideDeprecationNotice];
+    };
+    self.imageViewCloseDeprecation.clickable = YES;
+}
+
+- (void)switchToNextGen {
+    Settings.sharedInstance.nextGenUI = YES;
+    
+    [self hideDeprecationNotice];
+    
+    [MacAlerts info:NSLocalizedString(@"nextgen_ui_deprecation_switch_notice", @"You're all set! The next time you open this database you will see the new UI experience! We hope you'll love it!")
+             window:self.view.window];
+}
+
+- (void)hideDeprecationNotice {
+    self.imageViewCloseDeprecation.hidden = YES;
+    self.textFieldDeprecationBackground.hidden = YES;
+    self.stackViewDeprecationNotice.hidden = YES;
+    self.topConstraintMainStackToSuper.constant = 10;
 }
 
 - (void)onDocumentLoaded {
@@ -2106,7 +2148,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return;
     }
     
-    if( self.viewModel.showTotp && item.fields.otpToken ) {
+    if( item.fields.otpToken ) {
         self.totpRow.hidden = NO;
         
         

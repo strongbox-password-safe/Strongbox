@@ -99,3 +99,6 @@
 #import "SSHAgentServer.h"
 #import "XMLWriter.h"
 
+#import "ConcurrentCircularBuffer.h"
+
+#import "BrowseOutlineView.h"

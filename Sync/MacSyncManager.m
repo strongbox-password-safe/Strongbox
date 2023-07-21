@@ -199,4 +199,8 @@ interactiveVC:(NSViewController *)interactiveVC
     return NO;
 }
 
+- (void)removeDatabaseAndLocalCopies:(MacDatabasePreferences*)database {
+    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database.uuid];
+}
+
 @end

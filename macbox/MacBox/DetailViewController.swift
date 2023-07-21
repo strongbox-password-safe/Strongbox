@@ -235,7 +235,7 @@ class DetailViewController: NSViewController {
     }
 
     func getTotpFields(_ model: EntryViewModel) -> [DetailsViewField] {
-        if model.totp != nil, database.showTotp {
+        if model.totp != nil {
             return [DetailsViewField(name: NSLocalizedString("generic_fieldname_totp", comment: "TOTP"), value: "", fieldType: .totp, object: model.totp!)]
         } else {
             return []
@@ -253,9 +253,8 @@ class DetailViewController: NSViewController {
 
         ret.append(DetailsViewField(name: NSLocalizedString("ssh_agent_ssh_key", comment: "SSH Key"),
                                     value: NSLocalizedString("generic_export_ellipsis", comment: "Export..."),
-                                    fieldType: .headerWithTextButton,
-                                    object: model.keeAgentSshKey,
-                                    params: ["filename" : sshKey.filename, "password" : model.password ]))
+                                    fieldType: .header,
+                                    object: model.keeAgentSshKey ))
 
         let fingerprintImage : NSImage? = nil
 
@@ -269,16 +268,22 @@ class DetailViewController: NSViewController {
 
         ret.append(DetailsViewField(name: NSLocalizedString("generic_public_key", comment: "Public Key"),
                                     value: key.publicKey,
-                                    fieldType: .customField,
+                                    fieldType: .keeAgentKey,
                                     concealed: false,
                                     concealable: false,
-                                    singleLineMode: true))
+                                    object: sshKey,
+                                    showShare: true,
+                                    singleLineMode: true,
+                                    params: ["filename" : sshKey.filename, "password" : model.password ]))
         
         ret.append(DetailsViewField(name: NSLocalizedString("generic_private_key", comment: "Private Key"),
                                     value: key.privateKey,
-                                    fieldType: .customField,
+                                    fieldType: .keeAgentKey,
                                     concealed: true,
-                                    concealable: true))
+                                    concealable: true,
+                                    object: sshKey,
+                                    showShare: true,
+                                    params: ["filename" : sshKey.filename, "password" : model.password ]))
         
         ret.append(DetailsViewField(name: NSLocalizedString("ssh_agent_key_fingerprint", comment: "Fingerprint"),
                                     value: key.fingerprint,
@@ -329,7 +334,7 @@ class DetailViewController: NSViewController {
     fileprivate func loadUrlFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
         var fields: [DetailsViewField] = []
 
-        let alternativeUrls = model.customFields.filter { NodeFields.isAlternativeURLCustomFieldKey($0.key) }
+        let alternativeUrls = model.customFieldsFiltered.filter { NodeFields.isAlternativeURLCustomFieldKey($0.key) }
 
         if !alternativeUrls.isEmpty {
             fields.append(getUrlsHeaderField())
@@ -353,9 +358,17 @@ class DetailViewController: NSViewController {
     fileprivate func loadTagsFields(_ model: EntryViewModel) -> [DetailsViewField] {
         var ret: [DetailsViewField] = []
 
-        if model.tags.count > 0 {
+        var tags = model.tags
+        
+        if Settings.sharedInstance().shadeFavoriteTag {
+            if let idx = tags.firstIndex(of: kCanonicalFavouriteTag) {
+                tags.remove(at: idx)
+            }
+        }
+        
+        if tags.count > 0 {
             ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_tags", comment: "Tags"), value: "", fieldType: .header, object: DetailsViewField.FieldType.tags))
-            ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_tags", comment: "Tags"), value: "", fieldType: .tags, object: model.tags))
+            ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_tags", comment: "Tags"), value: "", fieldType: .tags, object: tags))
         }
 
         return ret
@@ -364,7 +377,8 @@ class DetailViewController: NSViewController {
     fileprivate func loadCustomFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
         var ret: [DetailsViewField] = []
 
-        let filtered = model.customFields.filter { field in 
+        let filtered = model.customFieldsFiltered.filter { field in
+            
             !NodeFields.isTotpCustomFieldKey(field.key) && !NodeFields.isAlternativeURLCustomFieldKey(field.key)
         }
 
@@ -395,14 +409,14 @@ class DetailViewController: NSViewController {
     fileprivate func loadAttachments(_ model: EntryViewModel) -> [DetailsViewField] {
         var ret: [DetailsViewField] = []
 
-        if model.attachmentsNoKeeAgent.count > 0 {
+        if model.filteredAttachments.count > 0 {
             ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_attachments", comment: "Attachments"),
                                         value: "",
                                         fieldType: .header,
                                         object: DetailsViewField.FieldType.attachment))
 
-            for key in model.attachmentsNoKeeAgent.allKeys() {
-                guard let attachment = model.attachments[key] else {
+            for key in model.filteredAttachments.allKeys() {
+                guard let attachment = model.filteredAttachments[key] else {
                     continue
                 }
 
@@ -502,7 +516,7 @@ class DetailViewController: NSViewController {
         switch field.fieldType {
         case .attachment:
             previewAttachment(field)
-        case .title, .customField, .url, .totp:
+        case .title, .customField, .url, .totp, .keeAgentKey:
             copyFieldToClipboard(field)
         case .header, .headerWithTextButton, .metadata, .expiry, .tags, .auditIssue, .notes, .keeAgentKeySummary:
             break
@@ -528,11 +542,19 @@ class DetailViewController: NSViewController {
 
     func copyFieldToClipboard(_ name: String, _ value: String, notificationView: NSView?) {
         ClipboardManager.sharedInstance().copyConcealedString(value)
-
+        
         let loc = NSLocalizedString("mac_field_copied_to_clipboard_no_item_title_fmt", comment: "%@ Copied")
         let message = String(format: loc, name)
-
+        
         showPopupToast(message, view: notificationView)
+        
+        if Settings.sharedInstance().miniaturizeOnCopy {
+            view.window?.miniaturize(nil)
+        }
+        
+        if Settings.sharedInstance().hideOnCopy {
+            NSApp.hide(nil)
+        }
     }
 
     func showPopupToast(_ message: String, view: NSView? = nil) {
@@ -926,6 +948,48 @@ class DetailViewController: NSViewController {
             copyFieldToClipboard(field.name, field.value, notificationView: rowViewForField(field))
         }
     }
+    
+    func shareField(_ field: DetailsViewField, _ button : NSButton ) {
+        if field.fieldType == .keeAgentKey {
+            guard let key = field.object as? KeeAgentSshKeyViewModel else {
+                NSLog("🔴 Couldn't get SSH key from field.")
+                return
+            }
+            
+            if field.concealable { 
+                onExportSshKey(field)
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                
+
+
+
+
+
+            }
+            else {
+                
+                onExportPublicKeyFromSshKey(field)
+            }
+        }
+        else {
+            NSLog("🔴 Unknown field type for sharing")
+        }
+    }
 
     func copyFieldNameToClipboard(_ field: DetailsViewField) {
         copyFieldToClipboard(NSLocalizedString("generic_field_name", comment: "Field Name"), field.name, notificationView: rowViewForField(field))
@@ -975,8 +1039,9 @@ class DetailViewController: NSViewController {
 
         if field.fieldType == .totp {
             guard let token = field.object as? OTPToken, let url = token.url(true) else { return }
-            vc.string = url.absoluteString
+            vc.string = token.secretBase32
             vc.largeText = false
+            vc.subtext = url.absoluteString
         } else {
             vc.string = field.value
         }
@@ -1045,7 +1110,7 @@ class DetailViewController: NSViewController {
         }
         
         guard let data = key.openSshKey.exportFileBlob(password, exportPassphrase: passphrase) else {
-            MacAlerts.info(NSLocalizedString("export_vc_error_exporting", comment: "Error Exporting"), 
+            MacAlerts.info(NSLocalizedString("export_vc_error_exporting", comment: "Error Exporting"),
                             window: view.window)
             return
         }
@@ -1065,6 +1130,38 @@ class DetailViewController: NSViewController {
             }
         }
     }
+    
+    func onExportPublicKeyFromSshKey(_ field: DetailsViewField) {
+        guard let key = field.object as? KeeAgentSshKeyViewModel else {
+            NSLog("🔴 Couldn't get attachment from field")
+            return
+        }
+
+        let alert = MacAlerts()
+                
+        guard let data = key.openSshKey.publicKey.data(using: .utf8) else {
+            MacAlerts.info(NSLocalizedString("export_vc_error_exporting", comment: "Error Exporting"), 
+                            window: view.window)
+            return
+        }
+        
+        let panel = NSSavePanel()
+        let filename = field.params["filename"] ?? NSLocalizedString("generic_unknown", comment: "Unknown")
+        panel.nameFieldStringValue = filename.appending(".pub")
+
+        if panel.runModal() == .OK {
+            guard let url = panel.url else {
+                return
+            }
+
+            do {
+                try data.write(to: url)
+            } catch {
+                MacAlerts.error(error, window: view.window)
+            }
+        }
+    }
+    
     
     func toggleRevealConceal(_ field: DetailsViewField) {
         guard let cellView = cellViewForField(field) as? GenericDetailFieldTableCellView else { return }
@@ -1376,6 +1473,12 @@ extension DetailViewController: NSTableViewDelegate {
             copyFieldToClipboard(field)
         }
     }
+    
+    func onShareField(field: DetailsViewField?, _ button : NSButton ) {
+        if let field = field {
+            shareField(field, button)
+        }
+    }
 
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         guard let field = fields[safe: row] else {
@@ -1426,7 +1529,7 @@ extension DetailViewController: NSTableViewDelegate {
             cell.setContent(field, popupMenuUpdater:  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) })
 
             return cell
-        case .customField:
+        case .customField, .keeAgentKey:
             guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("GenericDetailFieldTableCellView"), owner: nil) as? GenericDetailFieldTableCellView else {
                 return nil
             }
@@ -1435,6 +1538,8 @@ extension DetailViewController: NSTableViewDelegate {
                             popupMenuUpdater:  { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) },
                             image: field.leftImage,
                             onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil,
+                            onShareButton: field.showShare ? { [weak self] field in
+                self?.onShareField(field: field, cell.shareButton ) } : nil,
                             containingWindow: view.window, singleLineMode: field.singleLineMode)
 
             if field.showHistory {
@@ -1517,7 +1622,11 @@ extension DetailViewController: NSTableViewDelegate {
 
             cell.setContent(field,
                             popupMenuUpdater: { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) } ,
-                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil)
+                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field)} : nil) { [weak self] field in
+                if let field {
+                    self?.showLargeTextView(field)
+                }
+            }
 
             return cell
         case .auditIssue:

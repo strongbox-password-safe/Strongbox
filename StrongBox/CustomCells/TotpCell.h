@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TotpCell : UITableViewCell
 
 - (void)setItem:(OTPToken*)otpToken;
+@property (nonatomic, copy, nullable) void (^onShowQrCode)(void);
 
 @end
 

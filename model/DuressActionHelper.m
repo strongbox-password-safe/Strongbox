@@ -52,6 +52,9 @@
 
 + (void)removeOrDeleteSafe:(DatabasePreferences*)database {
     [SyncManager.sharedInstance removeDatabaseAndLocalCopies:database];
+    
+    [database clearKeychainItems];
+    
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
     [database removeFromDatabasesList];

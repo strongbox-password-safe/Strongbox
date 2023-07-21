@@ -17,7 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property (nonatomic) NSString* titleText;
 @property BOOL createSafeWizardMode;
 
 @property DatabaseFormat initialDatabaseFormat;

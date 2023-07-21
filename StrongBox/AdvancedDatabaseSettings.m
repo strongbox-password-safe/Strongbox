@@ -6,7 +6,7 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "DatabaseOperations.h"
+#import "AdvancedDatabaseSettings.h"
 #import "IOsUtils.h"
 #import "Alerts.h"
 #import "Utils.h"
@@ -22,18 +22,28 @@
 #import "BookmarksHelper.h"
 #import "AppPreferences.h"
 #import "StatisticsPropertiesViewController.h"
+#import "ScheduledExportConfigurationViewController.h"
 
-@interface DatabaseOperations ()
+@interface AdvancedDatabaseSettings ()
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBulkUpdateFavIcons;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStats;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellScheduledExport;
 
 @end
 
-@implementation DatabaseOperations
+@implementation AdvancedDatabaseSettings
+
++ (instancetype)fromStoryboard {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"DatabaseOperations" bundle:nil];
+    
+    AdvancedDatabaseSettings* vc = [sb instantiateViewControllerWithIdentifier:@"AdvancedSettings"];
+    
+    return vc;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -71,6 +81,9 @@
     
     [self cell:self.cellBulkUpdateFavIcons setHidden:formatUnsupported || featureDisabled];
     [self cell:self.cellViewAttachments setHidden:self.viewModel.database.attachmentPool.count == 0];
+    
+    
+    [self cell:self.cellPrint setHidden:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -99,6 +112,10 @@
         StatisticsPropertiesViewController* vc = (StatisticsPropertiesViewController*)segue.destinationViewController;
         vc.viewModel = self.viewModel;
     }
+    else if ([segue.identifier isEqualToString:@"segueToScheduledExport"]) {
+        ScheduledExportConfigurationViewController* vc = (ScheduledExportConfigurationViewController*)segue.destinationViewController;
+        vc.model = sender;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -115,6 +132,9 @@
     }
     else if (cell == self.cellBulkUpdateFavIcons) {
         [self onBulkUpdateFavIcons];
+    }
+    else if ( cell == self.cellScheduledExport ) {
+        [self performSegueWithIdentifier:@"segueToScheduledExport" sender:self.viewModel];
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

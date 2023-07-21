@@ -98,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL alwaysOpenOffline;
 @property BOOL readOnly;
 @property BOOL showQuickView;
-@property BOOL doNotShowTotp;
+
 @property BOOL noAlternatingRows;
 @property BOOL showHorizontalGrid;
 @property BOOL showVerticalGrid;
@@ -166,6 +166,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL sideBarShowTotalCountOnHierarchy;
 
 @property BOOL searchIncludeGroups;
+
+
+
+
+
+@property (nullable) NSArray<NSString*>* autoFillExcludedItems;
+
 
 @end
 

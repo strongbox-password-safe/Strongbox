@@ -136,7 +136,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
                     return
                 }
 
-                self.onNotificationReceived(notification)
+                self.onModelUpdateNotificationReceived(notification)
             }
         }
     }
@@ -167,7 +167,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         refresh()
     }
 
-    func onNotificationReceived(_ notification: Notification) {
+    func onModelUpdateNotificationReceived(_ notification: Notification) {
         guard let notifyModel = notification.object as? ViewModel else {
             return
         }
@@ -176,17 +176,17 @@ class SideBarViewController: NSViewController, DocumentViewController {
             return
         }
 
-        if notification.name == NSNotification.Name(kModelUpdateNotificationItemsAdded) {
-            NSLog("Master-Notify: Items Added")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationItemEdited) {
-            NSLog("Master-Notify: Items Edited")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationItemsDeleted) {
-            NSLog("Master-Notify: Items Deleted")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationItemsUnDeleted) {
-            NSLog("Master-Notify: Items Un-Deleted")
-        } else if notification.name == NSNotification.Name(kModelUpdateNotificationIconChanged) {
-            NSLog("Master-Notify: Icon Changed")
-        }
+
+
+
+
+
+
+
+
+
+
+
 
         refresh()
     }
@@ -914,10 +914,45 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
                 
                 
-                cell.setContent(attr,
-                                iconImage: node.image,
-                                showLeadingFavStar: fav,
-                                count: node.databaseNodeChildCount)
+                let nodeUuid : UUID?
+                if case let .regularHierarchy(uuid) = node.context {
+                    nodeUuid = uuid
+                }
+                else if case let .favourites(uuid) = node.context {
+                    nodeUuid = uuid
+                }
+                else {
+                    nodeUuid = nil
+                }
+                
+                if let uuid = nodeUuid, let childNode = database.getItemBy(uuid) {
+                    let possiblyDereferencedText = database.isDereferenceableText(childNode.title)
+                    
+                    let editable = !possiblyDereferencedText && !database.isEffectivelyReadOnly && !database.outlineViewTitleIsReadonly
+                    
+                    cell.setContent(attr,
+                                    editable: editable,
+                                    iconImage: node.image,
+                                    showTrailingFavStar: fav,
+                                    count: node.databaseNodeChildCount) { [weak self] text in
+                        self?.onNodeTitleEdited(text, node: childNode)
+                    }
+                }
+                else if case let .tags(tag) = node.context {
+                    cell.setContent(attr,
+                                    editable: true,
+                                    iconImage: node.image,
+                                    showTrailingFavStar: fav,
+                                    count: node.databaseNodeChildCount) { [weak self] text in
+                        self?.onTagTitleEdited(tag, text)
+                    }
+                }
+                else {
+                    cell.setContent(attr,
+                                    iconImage: node.image,
+                                    showLeadingFavStar: fav,
+                                    count: node.databaseNodeChildCount)
+                }
             }
 
             return cell
@@ -931,6 +966,20 @@ extension SideBarViewController: NSOutlineViewDelegate {
         return cell
     }
 
+    func onNodeTitleEdited ( _ text : String, node : Node) {
+        let trimmed = trim(text)
+        if trimmed != node.title {
+            database.setItemTitle(node, title: trimmed)
+        }
+    }
+
+    func onTagTitleEdited ( _ from : String, _ to : String) {
+        let trimmed = trim(to)
+        if trimmed != from {
+            database.renameTag(from, to: to)
+        }
+    }
+    
     func outlineView(_: NSOutlineView, isGroupItem item: Any) -> Bool {
         guard let item = item as? SideBarViewNode else {
             return false

@@ -47,19 +47,11 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellIconSet;
 @property (weak, nonatomic) IBOutlet UILabel *labelIconSet;
 
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowTotp;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFavIcon;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowPasswordOnDetails;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowEmptyFields;
-@property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpCustom;
-@property (weak, nonatomic) IBOutlet UISwitch *switchColorizePasswords;
-@property (weak, nonatomic) IBOutlet UISwitch *switchColorizeProtectedCustomFields;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellFetchFavIcon;
-
-@property (weak, nonatomic) IBOutlet UISwitch *switchSortCustomFields;
 @property (weak, nonatomic) IBOutlet UISwitch *switchStartWithLastViewedEntry;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellShowTotpInBrowse;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellShowFlags;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellStartWithSearch;
 
 @end
 
@@ -73,6 +65,13 @@
     [self bindPreferences];
     
     [self bindTableviewToFormat];
+    
+    
+    
+    [self cell:self.cellShowTotpInBrowse setHidden:YES];
+    [self cell:self.cellShowFlags setHidden:YES];
+    [self cell:self.cellConfigureTabs setHidden:YES];
+    [self cell:self.cellStartWithSearch setHidden:YES];
 }
 
 - (void)bindTableviewToFormat {
@@ -80,35 +79,8 @@
     [self cell:self.cellShowRecycleBin setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellShowRecycleBinInSearch setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellIconSet setHidden:self.format == kPasswordSafe];
-        
-    if ( AppPreferences.sharedInstance.disableFavIconFeature ) {
-        [self cell:self.cellFetchFavIcon setHidden:YES];
-    }
-    
-    [self reloadDataAnimated:NO];
-}
-
-- (IBAction)onEayReadFontOnAll:(id)sender {
-    NSLog(@"onEayReadFontOnAll: [%@]", sender);
-    
-    if ( self.easyReadFontForAll.on && AppPreferences.sharedInstance.markdownNotes ) {
-        [Alerts areYouSure:self
-                   message:NSLocalizedString(@"are_you_sure_message_easy_read_font_markdown_notes", @"Note: Enabling Easy-Read Font will have the effect of disabling the 'Markdown Notes' formatting feature. Is this OK?")
-                    action:^(BOOL response) {
-            if ( response ) {
-                self.databaseMetaData.easyReadFontForAll = self.easyReadFontForAll.on;
-                
-                [self notifyDatabaseViewPreferencesChanged];
-            }
             
-            [self bindPreferences];
-        }];
-    }
-    else {
-        self.databaseMetaData.easyReadFontForAll = self.easyReadFontForAll.on;
-        [self bindPreferences];
-        [self notifyDatabaseViewPreferencesChanged];
-    }
+    [self reloadDataAnimated:NO];
 }
 
 - (IBAction)onGenericPreferencesChanged:(id)sender {
@@ -116,7 +88,7 @@
     
     self.databaseMetaData.hideIconInBrowse = !self.switchShowIcons.on;
     self.databaseMetaData.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
-    self.databaseMetaData.showFlagsInBrowse = self.showFlagsInBrowse.on;
+    
     self.databaseMetaData.immediateSearchOnBrowse = self.switchStartWithSearch.on;
     
     self.databaseMetaData.showLastViewedEntryOnUnlock = self.switchStartWithLastViewedEntry.on;
@@ -124,7 +96,6 @@
     self.databaseMetaData.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
     self.databaseMetaData.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
 
-    self.databaseMetaData.hideTotpInBrowse = !self.switchShowTotpBrowseView.on;
     self.databaseMetaData.doNotShowRecycleBinInBrowse = !self.switchShowRecycleBinInBrowse.on;
     
     self.databaseMetaData.showExpiredInBrowse = self.swtichShowExpiredInBrowse.on;
@@ -136,15 +107,19 @@
     
     NSLog(@"Item Details Preferences Changed: [%@]", sender);
     
-    self.databaseMetaData.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
-    self.databaseMetaData.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
-    self.databaseMetaData.hideTotp = !self.switchShowTotp.on;
-    self.databaseMetaData.showEmptyFieldsInDetailsView = self.switchShowEmptyFields.on;
-    self.databaseMetaData.hideTotpCustomFieldsInViewMode = !self.switchShowTotpCustom.on;
-    self.databaseMetaData.colorizePasswords = self.switchColorizePasswords.on;
-    self.databaseMetaData.colorizeProtectedCustomFields = self.switchColorizeProtectedCustomFields.on;
-    self.databaseMetaData.customSortOrderForFields = !self.switchSortCustomFields.on;
 
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
     [self bindPreferences];
 
     [self notifyDatabaseViewPreferencesChanged];
@@ -188,17 +163,6 @@
     self.switchShowSpecialExpired.on = self.databaseMetaData.showQuickViewExpired;
     
     self.labelIconSet.text = getIconSetName(self.databaseMetaData.keePassIconSet);
-    
-    self.switchAutoFavIcon.on = self.databaseMetaData.tryDownloadFavIconForNewRecord;
-    self.switchShowPasswordOnDetails.on = self.databaseMetaData.showPasswordByDefaultOnEditScreen;
-    self.switchShowTotp.on = !self.databaseMetaData.hideTotp;
-    self.switchShowEmptyFields.on = self.databaseMetaData.showEmptyFieldsInDetailsView;
-    self.easyReadFontForAll.on = self.databaseMetaData.easyReadFontForAll;
-    self.switchShowTotpCustom.on = !self.databaseMetaData.hideTotpCustomFieldsInViewMode;
-    
-    self.switchColorizePasswords.on = self.databaseMetaData.colorizePasswords;
-    self.switchColorizeProtectedCustomFields.on = self.databaseMetaData.colorizeProtectedCustomFields;
-    self.switchSortCustomFields.on = !self.databaseMetaData.customSortOrderForFields;
 }
 
 - (NSString*)getTapActionString:(BrowseTapAction)action {

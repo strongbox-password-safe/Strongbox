@@ -31,8 +31,8 @@ extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 
 
 
-- (void)cancelAutoLockInBackgroundTimer;
-- (void)startAutoLockForAppInBackgroundTimer;
+- (void)cancelAutoLockTimer;
+- (void)startAutoLockTimer;
 
 @end
 

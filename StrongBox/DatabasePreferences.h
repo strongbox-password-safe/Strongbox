@@ -97,10 +97,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BrowseItemSubtitleField browseItemSubtitleField;
 @property BOOL immediateSearchOnBrowse;
-@property BOOL hideTotpInBrowse;
+
 @property BOOL showKeePass1BackupGroup;
 @property BOOL showChildCountOnFolderInBrowse;
-@property BOOL showFlagsInBrowse;
+
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;
 @property (readonly) BOOL viewDereferencedFields;
@@ -108,9 +108,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL showExpiredInSearch;
 @property BOOL showExpiredInBrowse;
 @property BOOL hideIconInBrowse;
-@property BOOL showEmptyFieldsInDetailsView;
+
+
 @property BOOL easyReadFontForAll;
-@property BOOL hideTotp;
+
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL showPasswordByDefaultOnEditScreen;
 @property NSNumber *autoLockTimeoutSeconds;
@@ -120,10 +121,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
 @property BOOL makeBackups;
-@property BOOL hideTotpCustomFieldsInViewMode;
+
 @property (readonly) BOOL mainAppAndAutoFillYubiKeyConfigsIncoherent;
 @property BOOL colorizePasswords;
-@property BOOL colorizeProtectedCustomFields;
+
 @property KeePassIconSet keePassIconSet;
 @property BOOL promptedForAutoFetchFavIcon;
 @property (nullable) NSUUID* outstandingUpdateId;
@@ -177,6 +178,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSArray<NSString*>* favourites;
 @property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
+@property (nullable) NSArray<NSString*>* autoFillExcludedItems;
+
 @property DatabaseAuditorConfiguration* auditConfig;
 
 @property BOOL customSortOrderForFields;
@@ -205,6 +208,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL browseSortFoldersSeparately;
 
 
+
+@property (readonly) BOOL hideTotpCustomFieldsInViewMode;
+@property (readonly) BOOL showEmptyFieldsInDetailsView;
+@property (readonly) BOOL hideTotp;
+@property (readonly) BOOL colorizeProtectedCustomFields;
+@property (readonly) BOOL hideTotpInBrowse;
+@property (readonly) BOOL showFlagsInBrowse;
+
+
+
+@property (readonly) NSString* exportFilename;
 
 @end
 

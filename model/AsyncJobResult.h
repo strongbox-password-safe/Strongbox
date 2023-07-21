@@ -10,13 +10,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AsyncUpdateResult : NSObject
+@interface AsyncJobResult : NSObject
 
 @property NSString* databaseUuid;
 @property BOOL success;
 @property BOOL userCancelled;
-@property BOOL userInteractionRequired; 
-@property BOOL localWasChanged; 
+@property BOOL userInteractionRequired;
+@property BOOL localWasChanged;
 @property (nullable) NSError* error;
 
 @end

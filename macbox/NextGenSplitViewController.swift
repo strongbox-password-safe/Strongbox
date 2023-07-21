@@ -16,6 +16,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     private var loadedDocument: Bool = false
     private var database: ViewModel!
     var searchField: NSSearchField?
+    var diceToolbarItem : NSToolbarItem?
     
     var windowController: WindowController {
         return view.window!.windowController as! WindowController
@@ -68,7 +69,16 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         NSLog("🚀 Initial Navigation Context = [%@], browse selected items = [%@]", String(describing: navigationContext), database.nextGenSelectedItems)
         
         if case NavigationContext.none = navigationContext {
-            setModelNavigationContextWithViewNode(database, .special(.allEntries))
+            let favourites = database.favourites.sorted { node1, node2 in
+                finderStyleNodeComparator(node1, node2) == .orderedAscending
+            }
+
+            if let favourite = favourites.first {
+                setModelNavigationContextWithViewNode(database, .favourites(favourite.uuid))
+            }
+            else {
+                setModelNavigationContextWithViewNode(database, .special(.allEntries))
+            }
         }
         
         loadChildSplitViews()
@@ -132,7 +142,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
     
     func onAsyncUpdateDone ( notification : Notification ) {
-        guard let asyncResult = notification.object as? AsyncUpdateResult,
+        guard let asyncResult = notification.object as? AsyncJobResult,
                 asyncResult.databaseUuid == database.databaseUuid else {
             return
         }
@@ -391,6 +401,14 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     }
     
+    @objc func onRollTheDice(_: Any?) {
+        let vc = PasswordGenerationPreferences.fromStoryboard()
+
+        if let diceToolbarItem, let view = diceToolbarItem.view {
+            present(vc, asPopoverRelativeTo: NSZeroRect, of: view, preferredEdge: .maxY, behavior: .transient)
+        }
+    }
+    
     func createOrEdit(_ createNew: Bool = true) {
         if database.locked || database.isEffectivelyReadOnly {
             NSLog("🔴 Cannot edit locked or read-only database")
@@ -489,19 +507,27 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     
     @objc
     func onSearchAction(param: Any?) {
-        
-        
         guard let searchField = param as? NSSearchField else {
             NSLog("🔴 searchField not good")
             return
         }
         
-        if database.nextGenSearchText != searchField.stringValue {
-            
-            database.nextGenSearchText = searchField.stringValue
-        }
+        
+        
+        NSObject.cancelPreviousPerformRequests(withTarget: self)
+        
+        perform(#selector(self.updateSearch), with: searchField, afterDelay: 0.275) 
     }
     
+    @objc public func updateSearch ( _ searchField : NSSearchField ) {
+        let text = searchField.stringValue
+        
+        if database.nextGenSearchText != searchField.stringValue {
+            NSLog("Search Text Changed... [%@]", String(describing: text))
+            database.nextGenSearchText = text
+        }
+    }
+
     func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         
         
@@ -660,6 +686,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         static let lockDatabase = NSToolbarItem.Identifier("lockDatabaseToolbarItem")
         static let popoutDetails = NSToolbarItem.Identifier("popoutDetailsToolbarItem")
         static let syncButton = NSToolbarItem.Identifier("syncToolbarItem")
+        static let diceButton = NSToolbarItem.Identifier("diceButtonToolbarItem")
     }
     
     func setupToolbar() {
@@ -687,6 +714,8 @@ extension NextGenSplitViewController: NSToolbarDelegate {
                     ToolbarItemIdentifiers.masterTracking,
                     ToolbarItemIdentifiers.syncButton,
                     NSToolbarItem.Identifier.flexibleSpace,
+                    ToolbarItemIdentifiers.diceButton,
+                    NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.createGroup,
                     ToolbarItemIdentifiers.addEntry,
                     ToolbarItemIdentifiers.searchField,
@@ -709,6 +738,8 @@ extension NextGenSplitViewController: NSToolbarDelegate {
                     ToolbarItemIdentifiers.databasePreferences,
                     ToolbarItemIdentifiers.masterTracking,
                     ToolbarItemIdentifiers.syncButton,
+                    NSToolbarItem.Identifier.flexibleSpace,
+                    ToolbarItemIdentifiers.diceButton,
                     NSToolbarItem.Identifier.flexibleSpace,
                     ToolbarItemIdentifiers.createGroup,
                     ToolbarItemIdentifiers.addEntry,
@@ -850,6 +881,44 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         return toolbarItem
     }
     
+    func getDiceToolbarItem() -> NSToolbarItem {
+        let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.diceButton)
+
+        let image : NSImage
+        
+        if #available(macOS 12.0, *) {
+            let smallimage = NSImage(systemSymbolName: "dice", accessibilityDescription: nil)!
+            let config = NSImage.SymbolConfiguration(scale: .large)
+            image = smallimage.withSymbolConfiguration(config) ?? smallimage
+        } else {
+            if #available(macOS 11.0, *) {
+                let smallimage = NSImage(systemSymbolName: "die.face.6", accessibilityDescription: nil)!
+                let config = NSImage.SymbolConfiguration(scale: .large)
+                image = smallimage.withSymbolConfiguration(config) ?? smallimage
+            } else {
+                image = NSImage(named: NSImage.folderName)! 
+            }
+        }
+        
+
+        let button = NSButton(image: image, target: self, action: #selector(onRollTheDice))
+        button.isBordered = false
+        toolbarItem.view = button
+        
+        let loc = NSLocalizedString("popout_password_generator", comment: "Password Generator")
+
+        toolbarItem.label = loc
+        toolbarItem.paletteLabel = loc
+        toolbarItem.toolTip = loc
+        toolbarItem.isEnabled = true
+
+        toolbarItem.action = #selector(onRollTheDice)
+        
+        diceToolbarItem = toolbarItem
+        
+        return toolbarItem
+    }
+    
     func getCreateEntryToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.addEntry)
         
@@ -971,6 +1040,9 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         }
         else if itemIdentifier == ToolbarItemIdentifiers.syncButton {
             return getSyncToolbarItem()
+        }
+        else if itemIdentifier == ToolbarItemIdentifiers.diceButton {
+            return getDiceToolbarItem()
         }
         else if itemIdentifier == ToolbarItemIdentifiers.addEntry {
             return getCreateEntryToolbarItem()

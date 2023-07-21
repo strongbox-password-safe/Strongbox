@@ -184,7 +184,8 @@ import Foundation
             let g = DispatchGroup()
             g.enter()
             
-            DatabasesCollection.shared.initiateDatabaseUnlock(uuid: request.databaseId) { success in
+            DatabasesCollection.shared.initiateDatabaseUnlock(uuid: request.databaseId,
+                                                              syncAfterUnlock: true) { success in
                 go = success
                 g.leave()
             }

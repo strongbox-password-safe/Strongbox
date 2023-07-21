@@ -23,6 +23,8 @@
 #import "AutoFillNewRecordSettingsController.h"
 #import "KeyFilesTableViewController.h"
 #import "PasswordGenerationViewController.h"
+#import "CustomizationManager.h"
+#import <StoreKit/StoreKit.h>
 
 @interface AdvancedPreferencesTableViewController ()
 
@@ -79,6 +81,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *pinCodeHapticFeedback;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
 @property (weak, nonatomic) IBOutlet UISwitch *switchMaskKeePassFavoriteTag;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellRedeemOfferCode;
 
 @end
 
@@ -114,8 +117,11 @@
     }
     
     [self cell:self.cellNativeKeePassEmail setHidden:YES];
-    
     [self cell:self.cellNewEntryDefaults setHidden:YES];
+
+    if ( CustomizationManager.isAProBundle ) {
+        [self cell:self.cellRedeemOfferCode setHidden:YES];
+    }
     
     [self bindPreferences];
     [self bindCloudSessions];
@@ -151,6 +157,10 @@
     }
     else if (cell == self.cellManageKeyFiles) {
         [self performSegueWithIdentifier:@"segueToManageKeyFiles" sender:nil];
+    }
+    else if ( cell == self.cellRedeemOfferCode ) {
+        SKPaymentQueue* queue = SKPaymentQueue.defaultQueue;
+        [queue presentCodeRedemptionSheet];
     }
     else if ( cell == self.cellPasswordStrength ) {
         NSArray<NSNumber*>* options = @[@(kPasswordStrengthAlgorithmBasic),

@@ -7,14 +7,13 @@
 //
 
 #import "GenericOnboardingViewController.h"
-#import "RoundedBlueButton.h"
 
 @interface GenericOnboardingViewController ()
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UILabel *labelTitle;
 @property (weak, nonatomic) IBOutlet UILabel *labelMessage;
-@property (weak, nonatomic) IBOutlet RoundedBlueButton *labelButton1;
+
 @property (weak, nonatomic) IBOutlet RoundedBlueButton *labelButton2;
 @property (weak, nonatomic) IBOutlet RoundedBlueButton *labelButton3;
 

@@ -55,8 +55,6 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
-    NSString* loc = NSLocalizedString(@"mac_please_enter_master_credentials_for_this_database", @"Please Enter the Master Credentials for this Database");
-    wizard.titleText = loc;
     wizard.initialDatabaseFormat = kKeePass4;
     wizard.createSafeWizardMode = YES;
     

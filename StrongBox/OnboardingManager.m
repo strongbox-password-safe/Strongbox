@@ -34,6 +34,8 @@
 #import "ProUpgradeIAPManager.h"
 #import "BusinessActivationOnboardingModule.h"
 #import "Strongbox-Swift.h"
+#import "SaleScheduleManager.h"
+#import "GenericOnboardingViewController.h"
 
 @interface OnboardingManager ()
 
@@ -79,6 +81,7 @@
     id<OnboardingModule> freeTrialEndingSoon = [self getFreeTrialEndingSoonModule];
     id<OnboardingModule> downgraded = [self getHasBeenDowngradedModule];
     id<OnboardingModule> upgradeToPro = [self getUpgradeToProModule];
+    id<OnboardingModule> saleNowOn = [self getSaleNowOnModule];
     id<OnboardingModule> finalAllSetWelcomeToStrongbox = [self getFirstRunFinalWelcomeToStrongboxModule];
     
     NSArray<id<OnboardingModule>> *onboardingItems = @[businessActivation,
@@ -92,6 +95,7 @@
                                                        freeTrialEndingSoon,
                                                        downgraded,
                                                        upgradeToPro,
+                                                       saleNowOn,
                                                        finalAllSetWelcomeToStrongbox];
 
 
@@ -252,6 +256,11 @@
     };
 
     return module;
+}
+
+- (id<OnboardingModule>)getSaleNowOnModule {
+    SaleNowOnOnboardingModule *module = [[SaleNowOnOnboardingModule alloc] initWithModel:nil];
+    return module;    
 }
 
 - (id<OnboardingModule>)getAutoFillOnboardingModule {
@@ -611,22 +620,7 @@
             onDone(NO, YES); 
         }
         else if ( buttonIdCancelIsZero == 1 ) { 
-            UIStoryboard* sb = [UIStoryboard storyboardWithName:@"Export" bundle:nil];
-            UINavigationController* nav = [sb instantiateInitialViewController];
-            ExportOptionsTableViewController* evc = (ExportOptionsTableViewController*)nav.topViewController;
-            
-            evc.hidePlaintextOptions = YES;
-            evc.viewModel = model;
-            evc.onDone = ^{
-                NSUInteger days = model.metadata.scheduleExportIntervalDays;
-                model.metadata.nextScheduledExport = [NSDate.date dateByAddingTimeInterval:days * 24 * 60 * 60];
-                
-                model.metadata.lastScheduledExportModDate = modDate;
-                
-                onDone(NO, NO);
-            };
-            
-            [viewController presentViewController:nav animated:YES completion:nil];
+            [self onShare:(GenericOnboardingViewController*)viewController database:model.metadata onDone:onDone];
         }
         else if ( buttonIdCancelIsZero == 2) { 
             NSUInteger days = model.metadata.scheduleExportIntervalDays;
@@ -860,17 +854,51 @@
     return [DatabasePreferences forAllDatabasesOfProvider:kiCloud];
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
+- (void)onShare:(GenericOnboardingViewController*)viewController database:(DatabasePreferences*)database onDone:(OnboardingModuleDoneBlock)onDone {
+    NSString* filename = database.exportFilename;
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
+    
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
+    if (!localCopyUrl) {
+        [Alerts error:viewController error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
+        return;
+    }
+    
+    NSError* err;
+    NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
+    if (err) {
+        [Alerts error:viewController error:err];
+        return;
+    }
+    
+    [data writeToFile:f options:kNilOptions error:&err];
+    if (err) {
+        [Alerts error:viewController error:err];
+        return;
+    }
+    
+    NSURL* url = [NSURL fileURLWithPath:f];
+    NSArray *activityItems = @[url];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+    
+    
+    
+    activityViewController.popoverPresentationController.sourceView = viewController.labelButton1;
+    activityViewController.popoverPresentationController.sourceRect = viewController.labelButton1.bounds;
+    activityViewController.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
+    
+    [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+        NSError *errorBlock;
+        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
+            NSLog(@"error deleting file %@", errorBlock);
+            return;
+        }
+        
+        onDone(NO, NO);
+    }];
+    
+    [viewController presentViewController:activityViewController animated:YES completion:nil];
+}
 
 @end

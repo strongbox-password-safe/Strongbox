@@ -10,12 +10,14 @@
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "QuickTypeRecordIdentifier.h"
 #import "NSArray+Extensions.h"
+#import "NSDate+Extensions.h"
 #import "SprCompilation.h"
 #import "NSString+Extensions.h"
 #import "CommonDatabasePreferences.h"
 #import "Utils.h"
 #import "ConcurrentMutableDictionary.h"
 #import "AutoFillCommon.h"
+#import "CrossPlatform.h"
 
 
 
@@ -73,7 +75,7 @@
                             nickName:(NSString *)nickName API_AVAILABLE(macosx(11.0)) {
     [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
         if(state.enabled) {
-            [self onGotAutoFillStoreOK:database
+            [self loadIdentitiesFromDb:database
                           databaseUuid:databaseUuid
                          displayFormat:displayFormat
                        alternativeUrls:alternativeUrls
@@ -88,8 +90,12 @@
     }];
 }
 
-- (NSArray<Node*>*)sortedNodesWithFavouritesFirst:(Model*)database {
-    NSArray<Node*>* allEntries = database.database.allSearchableNoneExpiredEntries;
+- (NSArray<Node*>*)getFilteredSortedNodes:(Model*)database {
+    NSArray<Node*>* allSearchable = database.database.allSearchableNoneExpiredEntries;
+    
+    NSArray<Node*>* allEntries = [allSearchable filter:^BOOL(Node * _Nonnull obj) {
+        return ![database isExcludedFromAutoFill:obj.uuid];
+    }];
     
     NSArray<Node*>* sortedEntries = [allEntries sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         Node* n1 = (Node*)obj1;
@@ -116,7 +122,7 @@
     return sortedEntries;
 }
 
-- (void)onGotAutoFillStoreOK:(Model*)database
+- (void)loadIdentitiesFromDb:(Model*)database
                 databaseUuid:(NSString*)databaseUuid
                displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
              alternativeUrls:(BOOL)alternativeUrls
@@ -128,8 +134,9 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
     NSLog(@"Updating Quick Type AutoFill Database...");
     
     NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
+    
     @try {
-        NSArray<Node*>* sortedNodes = [self sortedNodesWithFavouritesFirst:database];
+        NSArray<Node*>* sortedNodes = [self getFilteredSortedNodes:database];
         
         for ( Node* node in sortedNodes ) {
             NSArray<ASPasswordCredentialIdentity*>* nodeIdenitities = [self getPasswordCredentialIdentities:node
@@ -146,20 +153,36 @@ unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
         }
     }
     @finally { }
-                 
+    
+    [self setQuickTypeSuggestions:identities];
+}
+
+- (void)setQuickTypeSuggestions:(NSArray<ASPasswordCredentialIdentity*>*)identities API_AVAILABLE(macosx(11.0)) {
     
     NSUInteger databasesUsingQuickType = [self getDatabasesUsingQuickTypeCount];
 
     if(databasesUsingQuickType < 2) { 
         [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities
                                                                               completion:^(BOOL success, NSError * _Nullable error) {
-            NSLog(@"Replaced All Credential Identities... [%d] - [%@]", success, error);
+            NSLog(@"✅ Replaced All Credential Identities... [%d] - [%@]", success, error);
         }];
     }
     else {
+        NSDate* lastFullClear = CrossPlatformDependencies.defaults.applicationPreferences.lastQuickTypeMultiDbRegularClear;
+        
+        
+        
+        if ( lastFullClear == nil || [lastFullClear isMoreThanXDaysAgo:14] ) { 
+            NSLog(@"✅ Doing a full clear of the QuickType AutoFill database because the last clear was on [%@]", lastFullClear.friendlyDateString);
+            
+            [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:nil];
+            
+            CrossPlatformDependencies.defaults.applicationPreferences.lastQuickTypeMultiDbRegularClear = NSDate.date;
+        }
+
         [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities
                                                              completion:^(BOOL success, NSError * _Nullable error) {
-            NSLog(@"Saved Credential Identities (%lu items)... [%d] - [%@]", (unsigned long) identities.count, success, error);
+            NSLog(@"✅ Saved Credential Identities (%lu items)... [%d] - [%@]", (unsigned long) identities.count, success, error);
         }];
     }
 }

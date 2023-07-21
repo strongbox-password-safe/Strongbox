@@ -10,6 +10,9 @@ import Cocoa
 import CryptoKit
 
 class FreeTrialOrUpgradeOnboardingModule: OnboardingModule {
+    var window: NSWindow? = nil
+    var isAppModal: Bool = false
+    
     var shouldDisplay: Bool {
         if Settings.sharedInstance().isPro {
             return false
@@ -120,10 +123,12 @@ class FreeTrialOrUpgradeOnboardingViewController: NSViewController {
             ProUpgradeIAPManager.sharedInstance().purchaseAndCheckReceipts(product) { [weak self] error in
                 DispatchQueue.main.async {
                     macOSSpinnerUI.sharedInstance().dismiss()
-
-                    if let error = error {
-                        NSLog("⚠️ Purchase done with error = [%@]", String(describing: error))
-                        MacAlerts.error(error, window: self?.view.window)
+                    
+                    if let error {
+                        if (error as NSError).code != SKError.paymentCancelled.rawValue {
+                            NSLog("⚠️ Purchase done with error = [%@]", String(describing: error))
+                            MacAlerts.error(error, window: self?.view.window)
+                        }
                     }
                     else {
                         self?.dismissAndContinueOnboarding()

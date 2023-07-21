@@ -127,6 +127,7 @@ extern NSString* const kCustomFieldsColumn;
 
 @property (nonatomic) NSDate* installDate;
 @property (nonatomic, readonly) NSInteger daysInstalled;
+
 @property (readonly) NSUInteger launchCount;
 - (void)incrementLaunchCount;
 
@@ -147,10 +148,16 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL autoCommitScannedTotp;
 
-@property BOOL shadeFavoriteTag;
+@property BOOL shadeFavoriteTag; 
 @property BOOL runSshAgent;
 
-@property BOOL requireApprovalSshAgent;
+
+@property (nullable) NSString* businessOrganisationName;
+
+@property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
+
+
+@property (nonatomic) NSInteger sshAgentApprovalDefaultExpiryMinutes;
 
 @end
 

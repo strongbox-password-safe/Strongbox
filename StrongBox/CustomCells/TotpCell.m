@@ -16,6 +16,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *labelTotp;
 @property (weak, nonatomic) IBOutlet UIProgressView *progressView;
+@property (weak, nonatomic) IBOutlet UIButton *buttonShowQrCode;
 
 @property OTPToken* otpToken;
 
@@ -85,6 +86,12 @@
     else {
         self.labelTotp.text = NSLocalizedString(@"totp_cell_no_totp_has_been_setup", @"No TOTP Setup");
         self.labelTotp.textColor = nil;
+    }
+}
+
+- (IBAction)onShowQRCode:(id)sender {
+    if ( self.onShowQrCode ) {
+        self.onShowQrCode();
     }
 }
 

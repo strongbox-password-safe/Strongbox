@@ -36,6 +36,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
++ (UIAction*)getItem:(NSString*)title
+         systemImage:(NSString*)systemImage
+              colour:(UIColor*_Nullable)colour
+               large:(BOOL)large
+         destructive:(BOOL)destructive
+             enabled:(BOOL)enabled
+             checked:(BOOL)checked
+             handler:(UIActionHandler)handler;
+
 @end
 
 NS_ASSUME_NONNULL_END

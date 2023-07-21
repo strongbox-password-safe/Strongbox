@@ -24,6 +24,7 @@
 #import "MacCompositeKeyDeterminer.h"
 #import "NSDate+Extensions.h"
 #import "macOSSpinnerUI.h"
+#import "StrongboxMacFilesManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -130,7 +131,7 @@
     
     
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(bindProOrFreeTrial)
+                                           selector:@selector(bindProOrFreeTrialWrapper)
                                                name:kProStatusChangedNotificationKey
                                              object:nil];
 
@@ -307,13 +308,13 @@
     [self.buttonToggleRevealMasterPasswordTip setImage:img];
 }
 
-- (void)bindProOrFreeTrial {
+- (void)bindProOrFreeTrialWrapper {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self bindProOrFreeTrialMain];
+        [self bindProOrFreeTrial];
     });
 }
 
-- (void)bindProOrFreeTrialMain {
+- (void)bindProOrFreeTrial {
     self.quickTrialStartContainer.hidden = YES; 
 
     if ( !Settings.sharedInstance.isPro ) {
@@ -440,7 +441,7 @@
     BOOL convenienceEnabled = database.isConvenienceUnlockEnabled;
     
     if( !convenienceEnabled || !passwordAvailable) {
-        NSLog(@"Convenience Unlock disabled or password unavailable.");
+        
         self.buttonUnlockWithTouchId.hidden = YES;
         self.checkboxAutoPromptOnActivate.hidden = YES;
         return;
@@ -818,9 +819,16 @@
 
 - (void)onBrowseForKeyFile {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+    
+    
+    
+    
+    NSString* desktop = StrongboxFilesManager.sharedInstance.desktopPath;
+    openPanel.directoryURL = desktop ? [NSURL fileURLWithPath:desktop] : nil;
+    
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
-            NSLog(@"Open Key File: %@", openPanel.URL);
+            
             
             NSError* error;
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];
@@ -1049,7 +1057,7 @@ viewController:(NSViewController *)viewController
                         viewController:viewController
                    alertOnJustPwdWrong:alertOnJustPwdWrong
                        fromConvenience:fromConvenience
-                         forceReadOnly:NO
+                               offline:YES
                             completion:completion];
     }
 }
@@ -1076,7 +1084,7 @@ viewController:(NSViewController *)viewController
                             viewController:viewController
                        alertOnJustPwdWrong:alertOnJustPwdWrong
                            fromConvenience:fromConvenience
-                             forceReadOnly:NO
+                                   offline:NO
                                 completion:completion];
         }
         else if (result == kSyncAndMergeError ) {
@@ -1131,7 +1139,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
                                     viewController:viewController
                                alertOnJustPwdWrong:alertOnJustPwdWrong
                                    fromConvenience:fromConvenience
-                                     forceReadOnly:YES 
+                                           offline:YES
                                         completion:completion];
                 }
                 else if (response == 1) {
@@ -1155,17 +1163,17 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
                   viewController:(NSViewController*)viewController
              alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
                  fromConvenience:(BOOL)fromConvenience
-                   forceReadOnly:(BOOL)forceReadOnly
+                         offline:(BOOL)offline
                       completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
     [DatabasesCollection.shared unlockModelFromLocalWorkingCopyWithDatabase:self.databaseMetadata
                                                                        ckfs:key
                                                             fromConvenience:fromConvenience
                                                         alertOnJustPwdWrong:alertOnJustPwdWrong
-                                                     offlineUnlockRequested:self.databaseMetadata.userRequestOfflineOpenEphemeralFlagForDocument
+                                                     offlineUnlockRequested:offline
                                                         showProgressSpinner:YES
                                                                     eagerVc:viewController
                                                      suppressErrorMessaging:YES
-                                                              forceReadOnly:forceReadOnly
+                                                              forceReadOnly:NO
                                                                  completion:^(UnlockDatabaseResult result, Model *model, NSError* error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             completion(result == kUnlockDatabaseResultSuccess,

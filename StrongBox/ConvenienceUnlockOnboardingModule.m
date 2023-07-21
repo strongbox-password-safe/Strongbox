@@ -31,7 +31,7 @@
     return !self.model.metadata.hasBeenPromptedForConvenience && AppPreferences.sharedInstance.isPro;
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"ConvenienceUnlockOnboardingModule" bundle:nil];
     ConvenienceUnlockOnboardingViewController* vc = [storyboard instantiateInitialViewController];
     

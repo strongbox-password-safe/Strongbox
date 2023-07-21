@@ -304,7 +304,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     
     
     if ( jsonDictionary[@"showConvenienceExpiryMessage"] != nil ) {
-        ret.showConvenienceExpiryMessage = YES; 
+        ret.showConvenienceExpiryMessage = ((NSNumber*)jsonDictionary[@"showConvenienceExpiryMessage"]).boolValue;
     }
     else { 
         ret.showConvenienceExpiryMessage = YES;
@@ -718,6 +718,25 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 
 
+- (NSArray<NSString *> *)autoFillExcludedItems {
+    NSString *key = [NSString stringWithFormat:@"%@-autoFillExcludedItems", self.uuid];
+    
+    NSArray<NSString *>* ret = [SecretStore.sharedInstance getSecureObject:key];
+    
+    return ret ? ret : @[];
+}
+
+- (void)setAutoFillExcludedItems:(NSArray<NSString *> *)autoFillExcludedItems {
+    NSString *key = [NSString stringWithFormat:@"%@-autoFillExcludedItems", self.uuid];
+    
+    if( autoFillExcludedItems ) {
+        [SecretStore.sharedInstance setSecureObject:autoFillExcludedItems forIdentifier:key];
+    }
+    else {
+        [SecretStore.sharedInstance deleteSecureItem:key];
+    }
+}
+
 - (NSArray<NSString *> *)auditExcludedItems {
     NSString *key = [NSString stringWithFormat:@"%@-auditExcludedItems", self.uuid];
     
@@ -994,6 +1013,15 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     NSString *key = [NSString stringWithFormat:@"%@-pw-expires-at", self.uuid];
 
     [AppPreferences.sharedInstance.sharedAppGroupDefaults setObject:convenienceExpiresAt forKey:key];
+}
+
+- (NSString *)exportFilename {
+    NSString* baseFilename = self.fileName;
+    NSString* extension = baseFilename.pathExtension;
+    NSString* withoutExtension = [baseFilename.lastPathComponent stringByDeletingPathExtension];
+    NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
+    
+    return [newFileName stringByAppendingPathExtension:extension];
 }
 
 @end

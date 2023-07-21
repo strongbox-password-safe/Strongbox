@@ -11,12 +11,21 @@
 #import "ColoredStringHelper.h"
 #import "AppPreferences.h"
 #import "Utils.h"
+#import "ClipboardManager.h"
+
+#ifndef IS_APP_EXTENSION
+
+#import "ISMessages/ISMessages.h"
+
+#endif
 
 @interface LargeTextViewController ()
 
 @property (weak, nonatomic) IBOutlet UILabel *labelLargeText;
 @property (weak, nonatomic) IBOutlet UIImageView *qrCodeImageView;
 @property (weak, nonatomic) IBOutlet UIButton *buttonShowQrCode;
+@property (weak, nonatomic) IBOutlet UILabel *labelSubtext;
+@property (weak, nonatomic) IBOutlet UILabel *labelLargeTextCaption;
 
 @end
 
@@ -37,11 +46,15 @@
     self.qrCodeImageView.hidden = NO;
     
     UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(labelTapped)];
-    
     tapGestureRecognizer.numberOfTapsRequired = 1;
-    
     [self.labelLargeText addGestureRecognizer:tapGestureRecognizer];
     self.labelLargeText.userInteractionEnabled = YES;
+
+    
+    UITapGestureRecognizer *tapGestureRecognizerSubtext = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(subtextTapped)];
+    tapGestureRecognizerSubtext.numberOfTapsRequired = 1;
+    [self.labelSubtext addGestureRecognizer:tapGestureRecognizerSubtext];
+    self.labelSubtext.userInteractionEnabled = YES;
 
     if (!self.colorize) {
         self.labelLargeText.font = FontManager.sharedInstance.easyReadFontForTotp;
@@ -56,6 +69,11 @@
                                                                                       darkMode:dark
                                                                                     colorBlind:colorBlind font:FontManager.sharedInstance.easyReadFontForTotp];
     }
+    
+    self.labelSubtext.text = self.subtext;
+    self.labelSubtext.hidden = self.subtext.length == 0;
+    self.labelLargeTextCaption.hidden = self.subtext.length == 0;
+    self.labelLargeTextCaption.text = NSLocalizedString(@"generic_totp_secret", @"TOTP Secret");
 }
 
 - (IBAction)onDismiss:(id)sender {
@@ -63,10 +81,34 @@
 }
 
 - (void)labelTapped {
+    [self copyToClipboard:self.labelLargeText.text];
+}
+    
+- (void)subtextTapped {
+    [self copyToClipboard:self.labelSubtext.text];
 }
 
 - (IBAction)onShowQrCode:(id)sender {
     self.qrCodeImageView.hidden = !self.qrCodeImageView.hidden;
+}
+
+- (void)copyToClipboard:(NSString *)value {
+    if (value.length == 0) {
+        return;
+    }
+    
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
+    
+#ifndef IS_APP_EXTENSION
+    [ISMessages showCardAlertWithTitle:NSLocalizedString(@"generic_copied", @"Copied")
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
+#endif
 }
 
 @end

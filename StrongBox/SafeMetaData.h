@@ -121,7 +121,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable) NSArray<NSString*>* favourites;
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
-
+@property (nullable) NSArray<NSString*>* autoFillExcludedItems;
+ 
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
 @property BOOL makeBackups;
@@ -243,6 +244,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hideTabBarIfOnlySingleTab;
 
 @property NSDictionary<NSString*, BrowseSortConfiguration*>* sortConfigurations;
+
+@property (readonly) NSString* exportFilename;
 
 @end
 

@@ -184,6 +184,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* businessOrganisationName;
 @property BOOL shadeFavoriteTag;
 
+@property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
+
 @end
 
 NS_ASSUME_NONNULL_END

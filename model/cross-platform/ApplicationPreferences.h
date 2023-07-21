@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL addLegacySupplementaryTotpCustomFields;
 @property BOOL addOtpAuthUrl;
 
+@property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
+
 @end
 
 NS_ASSUME_NONNULL_END

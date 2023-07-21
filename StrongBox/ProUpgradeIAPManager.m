@@ -36,6 +36,8 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
 
 @property (readonly, nullable) SKProduct* lifeTimeProduct;
 
+@property (readonly) BOOL isVerifiedReceipt;
+
 @end
 
 @implementation ProUpgradeIAPManager
@@ -58,7 +60,17 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
     return self.readyState;
 }
 
-- (void)initialize {
+- (BOOL)isVerifiedReceipt {
+#ifdef DEBUG
+    NSLog(@"⚠️⚠️⚠️⚠️⚠️⚠️ DEBUG Faking Verified Receipt DEBUG 🔴🔴🔴🔴🔴🔴🔴");
+    return YES;
+#else
+    RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
+    return [verificator verifyAppReceipt];
+#endif
+}
+
+- (void)initialize {    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         NSLog(@"✅ ProUpgradeIAPManager::initialize - Loading Products and Checking Receipt for entitlements");
         
@@ -66,8 +78,7 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
         
         
         
-        RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
-        if ([verificator verifyAppReceipt]) {
+        if ( self.isVerifiedReceipt ) {
             NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
             [self checkVerifiedReceiptIsEntitledToPro:NO];
         }
@@ -75,23 +86,33 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
             
             NSLog(@"Startup receipt check failed...");
         }
+        
+        [self listenForPurchases];
     });
 }
 
+- (void)listenForPurchases {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onPurchaseNotification)
+                                               name:RMSKPaymentTransactionFinished
+                                             object:nil];
+}
 
+- (void)onPurchaseNotification {
+    NSLog(@"♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️ onPurchaseNotification ♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️♻️");
+    
+    [self checkReceiptForTrialAndProEntitlements];
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
+- (NSDate*)currentSubscriptionRenewalOrExpiry {
+    if ( self.hasActiveYearlySubscription ) {
+        return [RMAppReceipt.bundleReceipt expirationDateFor:kYearly];
+    }
+    else if ( self.hasActiveMonthlySubscription ) {
+        return [RMAppReceipt.bundleReceipt expirationDateFor:kMonthly];
+    }
+    return nil;
+}
 
 - (void)performScheduledProEntitlementsCheckIfAppropriate {
     if ( self.preferences.lastEntitlementCheckAttempt != nil ) {
@@ -111,7 +132,7 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
             return;
         }
         
-        if ( self.preferences.numberOfEntitlementCheckFails == 0 && days < 6 ) {
+        if ( self.preferences.numberOfEntitlementCheckFails == 0 && days < 5 ) {
             
             
             NSLog(@"We had a successful check recently, not rechecking...");
@@ -124,7 +145,7 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
     
     NSLog(@"Performing Scheduled Check of Entitlements...");
      
-    if ( self.preferences.numberOfEntitlementCheckFails < 5 ) {
+    if ( self.preferences.numberOfEntitlementCheckFails < 4 ) { 
         [self checkReceiptForTrialAndProEntitlements];
     }
     else {
@@ -144,21 +165,25 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
 }
 
 - (void)checkReceiptForTrialAndProEntitlements:(BOOL)userInitiated completion:(void(^_Nullable)(void))completion { 
+    
+    NSLog(@"🚀 checkReceiptForTrialAndProEntitlements... ");
+    
     if ( !userInitiated ) {
         self.preferences.lastEntitlementCheckAttempt = [NSDate date];
     }
-    
-    RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
-    if ( [verificator verifyAppReceipt] ) {
+
+    if ( self.isVerifiedReceipt ) {
         NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
         [self checkVerifiedReceiptIsEntitledToPro:userInitiated];
-        if (completion) completion();
+        if (completion) {
+            completion();
+        }
     }
     else {
         NSLog(@"Receipt Not Good... Refreshing...");
 
         [[RMStore defaultStore] refreshReceiptOnSuccess:^{
-            if ([verificator verifyAppReceipt]) {
+            if ( self.isVerifiedReceipt ) {
                 NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
                 [self checkVerifiedReceiptIsEntitledToPro:userInitiated];
                 if (completion) completion();
@@ -223,11 +248,18 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
 }
 
 - (BOOL)receiptHasProEntitlements {
-    BOOL lifetime = [[RMAppReceipt bundleReceipt] containsInAppPurchaseOfProductIdentifier:kIapProId]; 
+    RMAppReceipt* receipt = [RMAppReceipt bundleReceipt];
+    
+    if ( receipt == nil ) {
+        NSLog(@"🔴 NIL Bundle Receipt");
+        return NO;
+    }
+    
+    BOOL lifetime = [receipt containsInAppPurchaseOfProductIdentifier:kIapProId]; 
     
     NSDate* now = [NSDate date];
-    BOOL monthly = [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];
-    BOOL yearly = [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kYearly forDate:now];
+    BOOL monthly = [receipt containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];
+    BOOL yearly = [receipt containsActiveAutoRenewableSubscriptionOfProductIdentifier:kYearly forDate:now];
     
     NSLog(@"Found Lifetime=%d, Monthly=%d, Yearly=%d", lifetime, monthly, yearly);
     
@@ -261,12 +293,6 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
             self.productsAvailableNotify();
         }
     }];
-}
-
-- (void)checkForSaleAndNotify {
-  if(self.yearlyProduct.introductoryPrice) {
-        [NSNotificationCenter.defaultCenter postNotificationName:kAppStoreSaleNotificationKey object:nil];
-    }
 }
 
 - (NSDictionary<NSString *,SKProduct *> *)availableProducts {

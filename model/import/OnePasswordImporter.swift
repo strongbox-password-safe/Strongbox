@@ -12,6 +12,7 @@ import Foundation
 
 enum OnePasswordImporterError: Error {
     case CouldNotConvertStringToData
+    case CouldNotDecodeSshKey
     case UnknownRecordType(typeString: String)
 }
 

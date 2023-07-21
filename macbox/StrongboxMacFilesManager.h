@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSString* userHomePath;
 @property (readonly, nullable) NSURL* iCloudRootURL;
 @property (readonly, nullable) NSURL* iCloudDriveRootURL;
+@property (readonly, nullable) NSString* desktopPath;
 
 @property (readonly) NSString* tmpEncryptedAttachmentPath;
 @property (readonly) NSString* tmpAttachmentPreviewPath;

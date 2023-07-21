@@ -39,11 +39,13 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
 }
 
 - (void)beginAddAttachmentUi:(UIViewController *)vc
-               usedFilenames:(NSArray<NSString *> *)usedFilenames
+               usedFilenames:(NSSet<NSString *> *)usedFilenames
                        onAdd:(void (^)(NSString* filename, KeePassAttachmentAbstractionLayer* databaseAttachment))onAdd {
     self.parentViewController = vc;
     self.onAdd = onAdd;
-    self.usedFilenames = [NSSet setWithArray:usedFilenames]; 
+    
+    
+    self.usedFilenames = usedFilenames;
     
     UIAlertController *alertController =
     [UIAlertController alertControllerWithTitle:NSLocalizedString(@"add_attachment_vc_prompt_title", @"Attachment Location")

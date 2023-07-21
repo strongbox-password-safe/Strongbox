@@ -32,8 +32,16 @@ typedef NSViewController* _Nonnull (^MacCompositeKeyDeterminerOnDemandUIProvider
 
 - (void)getCkfs:(CompositeKeyDeterminedBlock)completion;
 - (void)getCkfs:(NSString*_Nullable)message completion:(CompositeKeyDeterminedBlock)completion;
+- (void)getCkfs:(NSString *_Nullable)message
+ manualHeadline:(NSString *_Nullable)manualHeadline
+  manualSubhead:(NSString *_Nullable)manualSubhead
+     completion:(CompositeKeyDeterminedBlock)completion;
 
 - (void)getCkfsManually:(CompositeKeyDeterminedBlock)completion;
+
+- (void)getCkfsManually:(NSString*_Nullable)headline
+            subheadline:(NSString*_Nullable)subheadline
+             completion:(CompositeKeyDeterminedBlock)completion;
 
 - (void)getCkfsWithBiometrics:(NSString*_Nullable)keyFileBookmark
          yubiKeyConfiguration:(YubiKeyConfiguration*_Nullable)yubiKeyConfiguration

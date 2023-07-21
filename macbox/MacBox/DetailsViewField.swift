@@ -23,6 +23,7 @@ class DetailsViewField {
         case url
         case auditIssue
         case keeAgentKeySummary
+        case keeAgentKey
     }
 
     var name: String = ""
@@ -34,6 +35,7 @@ class DetailsViewField {
     var object: Any?
     var showStrength: Bool = false
     var showHistory : Bool = false
+    var showShare : Bool = false
     var singleLineMode : Bool = false
     var params : [String:String]
     var leftImage: NSImage? = nil
@@ -45,6 +47,7 @@ class DetailsViewField {
          icon: NodeIcon? = nil,
          object: Any? = nil,
          showStrength: Bool = false,
+         showShare: Bool = false,
          singleLineMode : Bool = false,
          params : [String:String] = [:],
          leftImage : NSImage? = nil )
@@ -57,6 +60,7 @@ class DetailsViewField {
         self.icon = icon
         self.object = object
         self.showStrength = showStrength
+        self.showShare = showShare
         self.singleLineMode = singleLineMode
         self.params = params
         self.leftImage = leftImage

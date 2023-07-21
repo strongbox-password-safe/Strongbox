@@ -149,6 +149,7 @@ static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync-Iteratio
 static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
 static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
+static NSString* const kLastQuickTypeMultiDbRegularClear = @"lastQuickTypeMultiDbRegularClear";
 
 @implementation AppPreferences
 
@@ -191,6 +192,19 @@ static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 
 
 
+- (NSDate *)lastQuickTypeMultiDbRegularClear {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    return [userDefaults objectForKey:kLastQuickTypeMultiDbRegularClear];
+}
+
+- (void)setLastQuickTypeMultiDbRegularClear:(NSDate *)lastQuickTypeMultiDbRegularClear {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults setObject:lastQuickTypeMultiDbRegularClear forKey:kLastQuickTypeMultiDbRegularClear];
+    
+    [userDefaults synchronize];
+}
+
 - (NSString *)businessOrganisationName {
     return [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kBusinessOrganisationName];
 }
@@ -225,7 +239,7 @@ static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 }
 
 - (BOOL)stripUnusedIconsOnSave {
-    return [self getBool:kStripUnusedIconsOnSave];
+    return [self getBool:kStripUnusedIconsOnSave fallback:YES];
 }
 
 - (void)setStripUnusedIconsOnSave:(BOOL)stripUnusedIconsOnSave {

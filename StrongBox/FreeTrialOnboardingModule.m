@@ -51,7 +51,7 @@
     return nudgeDue;
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"FreemiumOnboarding" bundle:nil];
     FreeTrialOnboardingViewController* vc = [storyboard instantiateInitialViewController];
     

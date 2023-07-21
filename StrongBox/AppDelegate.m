@@ -98,8 +98,8 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
         
 #ifdef DEBUG
-    NSLog(@"STARTUP - Documents Directory: [%@]", StrongboxFilesManager.sharedInstance.documentsDirectory);
-    NSLog(@"STARTUP - Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
+    NSLog(@"🚀 Documents Directory: [%@]", StrongboxFilesManager.sharedInstance.documentsDirectory);
+    NSLog(@"🚀 Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
 #endif
     
     return YES;

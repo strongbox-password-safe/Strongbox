@@ -199,6 +199,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL sideBarChildCountShowZero;
 @property BOOL sideBarShowTotalCountOnHierarchy;
 
+@property (nullable) NSArray<NSString*>* autoFillExcludedItems;
+
 @end
 
 NS_ASSUME_NONNULL_END

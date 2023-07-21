@@ -242,8 +242,11 @@
     }];
 }
 
-- (void)readForValidationDone:(StorageProviderReadResult)result file:(StorageBrowserItem *)file data:(NSData *)data
-          initialDateModified:(NSDate*)initialDateModified error:(const NSError *)error {
+- (void)readForValidationDone:(StorageProviderReadResult)result
+                         file:(StorageBrowserItem *)file
+                         data:(NSData *)data
+          initialDateModified:(NSDate*)initialDateModified
+                        error:(const NSError *)error {
     if (result == kReadResultSuccess) {
         NSError* err;
         if ([Serializator isValidDatabaseWithPrefix:data error:&err]) {  

@@ -90,10 +90,20 @@
     return [self getCkfs:nil completion:completion];
 }
 
-- (void)getCkfs:(NSString*_Nullable)message completion:(CompositeKeyDeterminedBlock)completion {
+- (void)getCkfs:(NSString*_Nullable)message
+     completion:(CompositeKeyDeterminedBlock)completion {
+    return [self getCkfs:nil manualHeadline:nil manualSubhead:nil completion:completion];
+}
+
+- (void)getCkfs:(NSString *)message
+ manualHeadline:(NSString *)manualHeadline
+  manualSubhead:(NSString *)manualSubhead
+     completion:(CompositeKeyDeterminedBlock)completion {
     if ( self.bioOrWatchUnlockIsPossible ) {
         NSLog(@"MacCompositeKeyDeterminer::getCkfs. Convenience Possible...");
         [self getCkfsWithBiometrics:message
+             manualFallbackHeadline:manualHeadline
+          manualFallbackSubHeadline:manualSubhead
                     keyFileBookmark:self.contextAwareKeyFileBookmark
                yubiKeyConfiguration:self.database.yubiKeyConfiguration
                       allowFallback:YES
@@ -101,15 +111,21 @@
     }
     else {
         NSLog(@"MacCompositeKeyDeterminer::getCkfs. Convenience Possible...");
-        [self getCkfsManually:completion];
+        [self getCkfsManually:manualHeadline subheadline:manualSubhead completion:completion];
     }
 }
 
 - (void)getCkfsManually:(CompositeKeyDeterminedBlock)completion {
-    NSLog(@"MacCompositeKeyDeterminer::getCkfsManually...");
+    [self getCkfsManually:nil subheadline:nil completion:completion];
+}
 
+- (void)getCkfsManually:(NSString *)headline subheadline:(NSString *)subheadline completion:(CompositeKeyDeterminedBlock)completion {
+    NSLog(@"MacCompositeKeyDeterminer::getCkfsManually...");
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self _getCkfsWithManualUnlock:completion];
+        [self _getCkfsWithManualUnlock:headline
+                           subheadline:subheadline
+                            completion:completion];
     });
 }
 
@@ -117,6 +133,8 @@
          yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                    completion:(CompositeKeyDeterminedBlock)completion {
     [self getCkfsWithBiometrics:nil
+         manualFallbackHeadline:nil
+      manualFallbackSubHeadline:nil
                 keyFileBookmark:keyFileBookmark
            yubiKeyConfiguration:yubiKeyConfiguration
                   allowFallback:NO
@@ -124,6 +142,8 @@
 }
 
 - (void)getCkfsWithBiometrics:(NSString*_Nullable)message
+       manualFallbackHeadline:(NSString*_Nullable)manualFallbackHeadline
+    manualFallbackSubHeadline:(NSString*_Nullable)manualFallbackSubHeadline
               keyFileBookmark:(NSString *)keyFileBookmark
          yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                 allowFallback:(BOOL)allowFallback
@@ -132,6 +152,8 @@
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self _getCkfsWithBiometrics:message
+              manualFallbackHeadline:manualFallbackHeadline
+           manualFallbackSubHeadline:manualFallbackSubHeadline
                      keyFileBookmark:keyFileBookmark
                 yubiKeyConfiguration:yubiKeyConfiguration
                        allowFallback:allowFallback
@@ -139,10 +161,15 @@
     });
 }
 
-- (void)_getCkfsWithManualUnlock:(CompositeKeyDeterminedBlock)completion {
+- (void)_getCkfsWithManualUnlock:(NSString *)headline
+                     subheadline:(NSString *)subheadline
+                      completion:(CompositeKeyDeterminedBlock)completion {
     ManualCredentialsEntry* mce = [[ManualCredentialsEntry alloc] initWithNibName:@"ManualCredentialsEntry" bundle:nil];
     mce.databaseUuid = self.database.uuid;
     mce.isNativeAutoFillAppExtensionOpen = self.isNativeAutoFillAppExtensionOpen;
+    
+    mce.headline = headline;
+    mce.subheadline = subheadline;
     
     mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
         AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
@@ -161,6 +188,7 @@
     };
     
     if ( !self.createWindowForManualCredentialsEntry ) {
+        
         [self.viewController presentViewControllerAsSheet:mce];
     }
     else {
@@ -188,6 +216,8 @@
 }
 
 - (void)_getCkfsWithBiometrics:(NSString*_Nullable)message
+        manualFallbackHeadline:(NSString*_Nullable)manualFallbackHeadline
+     manualFallbackSubHeadline:(NSString*_Nullable)manualFallbackSubHeadline
                keyFileBookmark:(NSString *)keyFileBookmark
           yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                  allowFallback:(BOOL)allowFallback
@@ -197,7 +227,9 @@
         
         if ( allowFallback ) {
             NSLog(@"Falling back to manual unlock...");
-            [self getCkfsManually:completion];
+            [self getCkfsManually:manualFallbackHeadline
+                      subheadline:manualFallbackSubHeadline
+                       completion:completion];
         }
         return;
     }
@@ -240,7 +272,9 @@
             else {
                 if( allowFallback && error && error.code == LAErrorUserFallback ) {
                     NSLog(@"User requested fallback. Falling back to manual unlock...");
-                    [self getCkfsManually:completion];
+                    [self getCkfsManually:manualFallbackHeadline
+                              subheadline:manualFallbackSubHeadline
+                               completion:completion];
                 }
                 else {
                     BOOL cancelled = NO;

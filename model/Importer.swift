@@ -8,9 +8,36 @@
 
 import Foundation
 
+@objc public enum ImportMessageSeverity : Int {
+    case info
+    case warning
+    case error
+}
+
+@objc public class ImportMessage: NSObject, Identifiable {
+    var message : String
+    var severity : ImportMessageSeverity
+    
+    init(_ message: String, _ severity: ImportMessageSeverity) {
+        self.message = message
+        self.severity = severity
+    }
+}
+
+@objc public class ImportResult : NSObject {
+    @objc var database : DatabaseModel
+    @objc var messages : [ImportMessage]
+
+    init(database: DatabaseModel, messages: [ImportMessage]) {
+        self.database = database
+        self.messages = messages
+    }
+}
+
 @objc public protocol Importer {
     var allowedFileTypes : [String] { get }
-    func convert ( url : URL) throws -> DatabaseModel
+    func convert ( url : URL ) throws -> DatabaseModel
+    @objc optional func convertEx ( url : URL ) throws -> ImportResult
 }
 
 enum CsvGenericImporterError: Error {
@@ -41,8 +68,8 @@ class BaseImporter {
         }
     }
     
-    class func addCustomField ( node: Node, name : String?, value : String, protected : Bool = false ) {
-        if let url = value.urlExtendedParse, url.scheme != nil, url.absoluteString.count == value.count, !protected { 
+    class func addCustomField ( node: Node, name : String?, value : String, protected : Bool = false, detectUrl : Bool = true ) {
+        if detectUrl, let url = value.urlExtendedParse, url.scheme != nil, url.absoluteString.count == value.count, !protected { 
             addUrl(node, url.absoluteString, name)
             return
         }

@@ -13,6 +13,15 @@
 #import "MacHardwareKeyManager.h"
 #import "BookmarksHelper.h"
 #import "MacAlerts.h"
+#import "StrongboxMacFilesManager.h"
+#import "DatabasesManagerVC.h"
+#import "Constants.h"
+
+
+
+
+
+
 
 @interface ManualCredentialsEntry () <NSTextFieldDelegate>
 
@@ -47,6 +56,8 @@
 @property (nullable) NSString* contextAwareKeyFileBookmark;
 
 @property (weak) IBOutlet NSStackView *stackHardwareKey;
+@property (weak) IBOutlet NSTextField *textFIeldHeadline;
+@property (weak) IBOutlet NSTextField *textFieldSubheadline;
 
 @end
 
@@ -62,7 +73,6 @@
     self.textFieldPassword.delegate = self;
     [self fixStackViewSpacing];
 
-    
     if (@available(macOS 11.0, *)) {
         NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
         
@@ -75,8 +85,38 @@
     self.selectedKeyFileBookmark = [self contextAwareKeyFileBookmark];
     self.selectedYubiKeyConfiguration = self.database.yubiKeyConfiguration;
 
+    if ( self.headline ) {
+        self.textFIeldHeadline.stringValue = self.headline;
+    }
+    
+    if ( self.subheadline.length ) {
+        self.textFieldSubheadline.stringValue = self.subheadline;
+    }
+    else {
+        self.textFieldSubheadline.hidden = YES;
+    }
+    
     [self bindUi];
     [self validateUI];
+    
+    [self listenForDatabaseUnlock]; 
+}
+
+- (void)listenForDatabaseUnlock {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseLockStatusChanged:)
+                                               name:kDatabasesCollectionLockStateChangedNotification
+                                             object:nil];
+}
+
+- (void)onDatabaseLockStatusChanged:(NSNotification*)notification {
+    NSString* databaseUuid = notification.object;
+    
+    if ( [databaseUuid isEqualToString:self.databaseUuid] ) {
+        NSLog(@"✅ ManualCredentialsEntry::onDatabaseLockStatusChanged: [%@]", notification);
+        
+        [self onCancel:nil];
+    }
 }
 
 - (void)viewWillAppear {
@@ -293,6 +333,13 @@
 
 - (void)onBrowseForKeyFile {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+
+    
+    
+    
+    NSString* desktop = StrongboxFilesManager.sharedInstance.desktopPath;
+    openPanel.directoryURL = desktop ? [NSURL fileURLWithPath:desktop] : nil;
+
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
             NSLog(@"Open Key File: %@", openPanel.URL);

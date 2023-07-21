@@ -8,8 +8,7 @@
 
 import Cocoa
 
-
-extension Notification.Name {
+public extension Notification.Name {
     enum DatabasesCollection {
         static let lockStateChanged = Notification.Name("DatabasesCollectionLockStateChangedNotification")
         static let autoLockAppInBackgroundTimeout = Notification.Name("autoLockAppInBackgroundTimeout")
@@ -211,9 +210,9 @@ class DatabasesCollection: NSObject {
         return ret
     }
     
-    public func initiateDatabaseUnlock ( uuid : String, message : String? = nil, completion : (( _ : Bool ) -> Void)? = nil ) {
+    public func initiateDatabaseUnlock ( uuid : String, syncAfterUnlock : Bool, message : String? = nil, completion : (( _ : Bool ) -> Void)? = nil ) {
         if ( isUnlocked(uuid: uuid )) {
-            NSLog("🔴 This database was already unlocked! NOP");
+            NSLog("⚠️ This database was already unlocked! NOP");
             DispatchQueue.global().async {
                 completion?(true)
             }
@@ -229,48 +228,64 @@ class DatabasesCollection: NSObject {
         }
         
         DispatchQueue.main.async { [weak self] in
-            let determiner = MacCompositeKeyDeterminer(database: prefs,
-                                                       isNativeAutoFillAppExtensionOpen: false,
-                                                       isAutoFillQuickTypeOpen: false,
-                                                       onDemandUiProvider: DatabasesCollection.getDbManagerPanelVc)
+            self?.initiateDatabaseUnlockInternal (prefs: prefs, uuid: uuid, syncAfterUnlock: syncAfterUnlock, completion: completion)
+        }
+    }
+    
+    func initiateDatabaseUnlockInternal ( prefs : MacDatabasePreferences,
+                                          uuid : String,
+                                          syncAfterUnlock : Bool,
+                                          message : String? = nil,
+                                          completion : (( _ : Bool ) -> Void)? = nil) {
+        let determiner = MacCompositeKeyDeterminer(database: prefs,
+                                                   isNativeAutoFillAppExtensionOpen: false,
+                                                   isAutoFillQuickTypeOpen: false,
+                                                   onDemandUiProvider: DatabasesCollection.getDbManagerPanelVc)
+        
+        
+        
+        determiner.createWindowForManualCredentialsEntry = false; 
+        
+        
+        
+        
+        let appDelegate = NSApplication.shared.delegate as! AppDelegate
+        appDelegate.cancelAutoLockTimer()
+        
+        determiner.getCkfs ( message ) { [weak self] result, ckfs, fromConvenience, error in
+            if !NSApplication.shared.isActive {
+                
+                
+                
+                appDelegate.startAutoLockTimer()
+            }
             
-
-            
-            determiner.createWindowForManualCredentialsEntry = false; 
-
-            
-            
-            
-            let appDelegate = NSApplication.shared.delegate as! AppDelegate
-            appDelegate.cancelAutoLockInBackgroundTimer()
-
-            determiner.getCkfs ( message ) { [weak self] result, ckfs, fromConvenience, error in
-                if let ckfs, result == .success {
-                    if !NSApplication.shared.isActive {
-                        
-                        
-                        
-                        appDelegate.startAutoLockForAppInBackgroundTimer()
-                    }
-
-                    self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience) { result, model, error in
-                        DispatchQueue.global().async {
-                            completion?(result == .success)
+            if let ckfs, result == .success {
+                self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience) { result, model, error in
+                    DispatchQueue.global().async {
+                        if result == .success, syncAfterUnlock {
+                            self?.sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true, ckfsForConflict: ckfs)
                         }
-                    }
-                    
-                    
-                }
-                else if result == .error, let error {
-                    self?.displayUnlockingErrorMessage(error: error, eagerVc: nil)
-                    DispatchQueue.global().async {
-                        completion?(false)
+                        
+                        completion?(result == .success)
                     }
                 }
-                else {
-                    DispatchQueue.global().async {
-                        completion?(false)
+            }
+            else if result == .error, let error {
+                self?.displayUnlockingErrorMessage(error: error, eagerVc: nil)
+                DispatchQueue.global().async {
+                    completion?(false)
+                }
+            }
+            else {
+                DispatchQueue.global().async {
+                    let unlocked = self?.isUnlocked(uuid: uuid) ?? false
+                    
+                    if unlocked {
+                        NSLog("⚠️ MCE Cancelled - but database locked")
                     }
+                    
+                    completion?(unlocked) 
                 }
             }
         }
@@ -558,7 +573,7 @@ class DatabasesCollection: NSObject {
         }
     }
     
-    func onAsyncUpdateDone ( result : AsyncUpdateResult, updateId : UUID, model : Model, allowInteractiveSync : Bool ) {
+    func onAsyncUpdateDone ( result : AsyncJobResult, updateId : UUID, model : Model, allowInteractiveSync : Bool ) {
         NSLog("Async Update [%@] Done with [%@]", String(describing: updateId), String(describing: result.success));
                 
         if model.metadata.asyncUpdateId == updateId {
@@ -586,28 +601,28 @@ class DatabasesCollection: NSObject {
     
     
     @objc public func sync( uuid : String, allowInteractive : Bool = false, suppressErrorAlerts : Bool = false, ckfsForConflict : CompositeKeyFactors? = nil, completion : SyncAndMergeCompletionBlock? = nil ) {
-        NSLog("DatabasesCollection::sync")
-        
-        
-        
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
             NSLog("🔴 No such database to sync");
+            completion?(.error, false, Utils.createNSError("🔴 No such database to sync", errorCode: -1234))
             return
         }
 
         guard !prefs.alwaysOpenOffline else { 
             NSLog("🔴 Database is in Offline Mode - Cannot Sync!");
+            completion?(.error, false, Utils.createNSError("🔴 Database is in Offline Mode - Cannot Sync!", errorCode: -1234))
             return
         }
 
         if let model = getUnlocked(uuid: uuid) {
             if model.isInOfflineMode {
                 NSLog("🔴 Database is in Offline Mode - Cannot Sync!");
+                completion?(.error, false, Utils.createNSError("🔴 Database is in Offline Mode - Cannot Sync!", errorCode: -1234))
                 return
             }
             
             if let document = documentForDatabase(uuid: uuid), (document.hasUnautosavedChanges || document.isDocumentEdited) {
                 NSLog("🔴 Cannot Sync while Document Open with Changes/Edits");
+                completion?(.error, false, Utils.createNSError("🔴 Cannot Sync while Document Open with Changes/Edits", errorCode: -1234))
                 return
             }
         }

@@ -54,6 +54,12 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
 }
 
+- (NSString *)desktopPath {
+    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSUserDomainMask, YES );
+    
+    return paths.firstObject;
+}
+
 - (NSString*)userHomePath {
     const char *rawHome = getpwuid(getuid())->pw_dir;
     return rawHome ? [NSString stringWithCString:rawHome encoding:NSUTF8StringEncoding] : nil;

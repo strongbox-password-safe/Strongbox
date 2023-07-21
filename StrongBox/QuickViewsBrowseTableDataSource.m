@@ -115,15 +115,17 @@ static NSUInteger const kQuickViewSectionIdx = 0;
         cell.imageView.tintColor = config.imageTint;
     }
     else { 
-        NSArray<NSString*>* tags = [self.viewModel.database.tagSet.allObjects sortedArrayUsingComparator:finderStringComparator];
-        NSString* tag = tags[indexPath.row];
-
-        cell.textLabel.text = tag;
-        cell.detailTextLabel.text = @"";
-
-        cell.imageView.image = [UIImage systemImageNamed:@"tag"];
+        NSLog(@"🔴 QuickViewsBrowseTableDataSource::cellForRowAtIndexPath called but section not known [%@]", indexPath);
         
-        cell.imageView.tintColor = nil;
+
+
+
+
+
+
+
+
+
     }
 
     return cell;

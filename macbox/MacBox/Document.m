@@ -9,7 +9,6 @@
 #import "Document.h"
 #import "Utils.h"
 #import "MacAlerts.h"
-#import "CreateFormatAndSetCredentialsWizard.h"
 #import "WindowController.h"
 #import "Settings.h"
 #import "AppDelegate.h"
@@ -486,7 +485,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     if (self.viewModel && !self.viewModel.locked) {
         NSLog(@"ViewController::onDatabaseChangedByExternalOther - Reloading...");
         
-        if(!self.viewModel.document.isDocumentEdited) { 
+        if( !self.viewModel.document.isDocumentEdited ) { 
             if( !self.databaseMetadata.autoReloadAfterExternalChanges ) {
                 NSString* loc = NSLocalizedString(@"mac_db_changed_externally_reload_yes_or_no", @"The database has been changed by another application, would you like to reload this latest version and automatically unlock?");
 

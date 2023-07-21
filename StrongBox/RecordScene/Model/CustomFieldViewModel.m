@@ -11,14 +11,20 @@
 @implementation CustomFieldViewModel
 
 + (instancetype)customFieldWithKey:(NSString*)key value:(NSString*)value protected:(BOOL)protected {
-    CustomFieldViewModel* ret = [[CustomFieldViewModel alloc] init];
-    
-    ret.key = key;
-    ret.value = value;
-    ret.protected = protected;
-    ret.concealedInUI = protected;
-    
-    return ret;
+    return [[CustomFieldViewModel alloc] initWithKey:key value:value protected:protected];
+}
+
+- (instancetype)initWithKey:(NSString*)key value:(NSString*)value protected:(BOOL)protected
+{
+    self = [super init];
+    if (self) {
+        _key = key;
+        _value = value;
+        _protected = protected;
+        
+        self.concealedInUI = protected;
+    }
+    return self;
 }
 
 - (BOOL)isDifferentFrom:(CustomFieldViewModel *)other {

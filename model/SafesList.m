@@ -111,7 +111,10 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     }];
     
     if (!json || error || readError) {
-        NSLog(@"Error reading file for databases: [%@] - [%@]", error, readError);
+        if ( readError.code != NSFileReadNoSuchFileError ) {
+            NSLog(@"🔴 Error reading file for databases: [%@] - [%@]", error, readError);
+        }
+        
         return @[].mutableCopy;
     }
 

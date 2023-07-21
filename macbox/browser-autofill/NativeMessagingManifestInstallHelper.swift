@@ -48,6 +48,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
         installForChromiumBasedBrowser("Library/Application Support/Vivaldi/NativeMessagingHosts/")
         installForChromiumBasedBrowser("Library/Application Support/Arc/User Data/NativeMessagingHosts")
         installForChromiumBasedBrowser("Library/Application Support/Sidekick/NativeMessagingHosts")
+        installForChromiumBasedBrowser("Library/Application Support/Thorium/NativeMessagingHosts")
         
         
         
@@ -71,6 +72,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
         removeManifest("Library/Application Support/Vivaldi/NativeMessagingHosts/")
         removeManifest("Library/Application Support/Arc/User Data/NativeMessagingHosts")
         removeManifest("Library/Application Support/Sidekick/NativeMessagingHosts")
+        removeManifest("Library/Application Support/Thorium/NativeMessagingHosts")
         
         removeManifest("Library/Application Support/Orion/NativeMessagingHosts")
     }

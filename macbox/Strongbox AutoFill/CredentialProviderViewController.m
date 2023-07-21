@@ -20,7 +20,6 @@
 #import "BiometricIdHelper.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "KeyFileParser.h"
-#import "ManualCredentialsEntry.h"
 #import "SelectDatabaseViewController.h"
 #import "SelectCredential.h"
 #import "MMWormhole.h"

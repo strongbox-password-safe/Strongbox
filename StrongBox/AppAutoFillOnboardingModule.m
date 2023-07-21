@@ -36,7 +36,7 @@
     return AutoFillManager.sharedInstance.isPossible && !AutoFillManager.sharedInstance.isOnForStrongbox;
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Welcome" bundle:nil];
     TurnOnAutoFillViewController* vc = [storyboard instantiateViewControllerWithIdentifier:@"AutoFill"];
     

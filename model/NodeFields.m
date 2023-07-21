@@ -19,6 +19,7 @@
 #import "Node.h"
 #import "NSString+Extensions.h"
 #import "Constants.h"
+#import "KeePassConstants.h"
 
 NSString* const kOtpAuthScheme = @"otpauth";
 
@@ -1186,6 +1187,23 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     }
     else {
         [self removeCustomField:kCanonicalEmailFieldName];
+    }
+}
+
+
+
+- (BOOL)isAutoFillExcluded {
+    ValueWithModDate* vmd = self.customData[kIsExcludedFromAutoFillCustomDataKey];
+    
+    return vmd && vmd.value.isKeePassXmlBooleanStringTrue; 
+}
+
+- (void)setIsAutoFillExcluded:(BOOL)isAutoFillExcluded {
+    if ( isAutoFillExcluded ) {
+        self.customData[kIsExcludedFromAutoFillCustomDataKey] = [ValueWithModDate value:kAttributeValueTrue modified:NSDate.date];
+    }
+    else {
+        self.customData[kIsExcludedFromAutoFillCustomDataKey] = nil;
     }
 }
 

@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AutoFillPreferencesViewController : StaticDataTableViewController
 
++ (UINavigationController*)fromStoryboardWithModel:(Model*)model;
+
 @property Model* viewModel;
 
 @end

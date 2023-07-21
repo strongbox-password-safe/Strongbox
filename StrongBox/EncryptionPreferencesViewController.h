@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface EncryptionPreferencesViewController : StaticDataTableViewController
 
++ (UINavigationController*)fromStoryboard;
+
 @property Model* model;
 @property (nonatomic, copy) void (^onChangedDatabaseEncryptionSettings)(void);
 

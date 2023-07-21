@@ -17,6 +17,7 @@
 #import "Utils.h"
 #import "NSDate+Extensions.h"
 #import "Serializator.h"
+#import "WorkingCopyManager.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate, UIActivityItemSource>
 
@@ -50,13 +51,15 @@
     
     self.tableView.tableFooterView = [UIView new];
     
+    [self cell:self.cellFiles setHidden:YES];
+    [self cell:self.cellEmail setHidden:YES];
+    [self cell:self.cellXml setHidden:YES];
+    
     if (self.hidePlaintextOptions) {
         [self cell:self.cellEmailCsv setHidden:YES];
         [self cell:self.cellCopy setHidden:YES];
         [self cell:self.cellHtml setHidden:YES];
         [self cell:self.cellXml setHidden:YES];
-
-        [self reloadDataAnimated:YES];
     }
     else {
         if (!( self.viewModel.database.originalFormat == kKeePass || self.viewModel.database.originalFormat == kKeePass4 )) {
@@ -67,6 +70,8 @@
             [self cell:self.cellXml setHidden:YES];
         }
     }
+    
+    [self reloadDataAnimated:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -88,12 +93,12 @@
     if (cell == self.cellShare) {
         [self onShare];
     }
-    else if(cell == self.cellFiles) {
-        [self onFiles];
-    }
-    else if(cell == self.cellEmail) {
-        [self exportEncryptedSafeByEmail];
-    }
+
+
+
+
+
+
     else if(cell == self.cellEmailCsv) {
         [self exportCsvByEmail];
     }
@@ -103,26 +108,26 @@
     else if(cell == self.cellHtml) {
         [self exportHtmlByEmail];
     }
-    else if(cell == self.cellXml) {
-        [self copyXml];
-    }
+
+
+
 }
 
 - (void)onShare {
-    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled) {
-            
-        }
-        else if ( !file || error ) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
-                    error:error];
-        }
-        else {
-            NSData* data = [NSData dataWithContentsOfFile:file];
-            [self onShareWithData:data];
-        }
-    }];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseUuid];
+    if (!localCopyUrl) {
+        [Alerts error:self error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
+        return;
+    }
+    
+    NSError* err;
+    NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
+    if (err) {
+        [Alerts error:self error:err];
+        return;
+    }
+    
+    [self onShareWithData:data];
 }
 
 - (void)onShareWithData:(NSData*)data {
@@ -191,32 +196,32 @@
     [self informSuccessAndDismiss];
 }
 
-- (void)copyXml {
-    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled) {
-            return;
-        }
-        else if ( !file || error ) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
-                    error:error];
-            return;
-        }
-        
-        [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:debugXml];
-        
-        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"export_vc_message_xml_copied", @"Database KeePass XML Copied to Clipboard")
-                                   message:nil
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeSuccess
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
-        
-        [self informSuccessAndDismiss];
-    }];
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)exportCsvByEmail {
     NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database];
@@ -232,30 +237,30 @@
     [self composeEmail:attachmentName mimeType:@"text/html" data:[html dataUsingEncoding:NSUTF8StringEncoding] nickname:self.viewModel.metadata.nickName];
 }
 
-- (void)exportEncryptedSafeByEmail {
-    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled) {
-            return;
-        }
-        else if ( !file || error ) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
-                    error:error];
-            return;
-        }
-    
-        NSData* data = [NSData dataWithContentsOfFile:file];
-        
-        NSString* likelyExtension = [Serializator getDefaultFileExtensionForFormat:self.viewModel.database.originalFormat];
-        NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
-        NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.exportFileName, appendExtension];
-        
-        [self composeEmail:attachmentName
-                  mimeType:@"application/octet-stream"
-                      data:data
-                  nickname:self.viewModel.metadata.nickName];
-    }];
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)composeEmail:(NSString*)attachmentName mimeType:(NSString*)mimeType data:(NSData*)data nickname:(NSString*)nickname {
     if(![MFMailComposeViewController canSendMail]) {
@@ -306,82 +311,84 @@
     }];
 }
 
-- (void)onFiles {
-    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled) {
-            return;
-        }
-        else if ( !file || error ) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
-                    error:error];
-            return;
-        }
-    
-        NSData* data = [NSData dataWithContentsOfFile:file];
 
-        [self onFilesGotData:data metadata:self.viewModel.metadata];
-    }];
-}
 
-- (void)onFilesGotData:(NSData*)data metadata:(DatabasePreferences*)metadata {
-    self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:self.exportFileName];
-    
-    NSError* error;
-    [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
-    if(error) {
-        [Alerts error:self
-                title:NSLocalizedString(@"export_vc_error_writing", @"Error Writing Database")
-                error:error];
-        NSLog(@"error: %@", error);
-        return;
-    }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithURL:self.temporaryExportUrl inMode:UIDocumentPickerModeExportToService];
-        vc.delegate = self;
-        
-        [self presentViewController:vc animated:YES completion:nil];
-    });
-}
 
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
-    
-    NSURL* url = [urls objectAtIndex:0];
 
-    if (! [url startAccessingSecurityScopedResource] ) {
-        NSLog(@"🔴 Could not securely access URL!");
-    }
 
-    NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
-    
-    if(!data || error) {
-        [Alerts error:self
-                title:NSLocalizedString(@"export_vc_error_exporting", @"Error Exporting")
-                error:error];
-        NSLog(@"%@", error);
-        return;
-    }
-    
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
-    
-    [document saveToURL:url
-       forSaveOperation:UIDocumentSaveForCreating | UIDocumentSaveForOverwriting
-      completionHandler:^(BOOL success) {
-        if(!success) {
-            [Alerts warn:self
-                   title:NSLocalizedString(@"export_vc_error_exporting", @"Error Exporting")
-                 message:@""];
-        }
-        else {
-            [self informSuccessAndDismiss];
-        }
-    }];
-    
-    [document closeWithCompletionHandler:nil];
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
     [self onDismissed:NO];

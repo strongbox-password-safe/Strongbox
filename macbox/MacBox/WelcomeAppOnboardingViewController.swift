@@ -10,6 +10,9 @@ import Cocoa
 import ServiceManagement
 
 class WelcomeAppOnboardingModule: OnboardingModule {
+    var window: NSWindow? = nil
+    var isAppModal: Bool = false
+    
     var shouldDisplay: Bool {
         return !Settings.sharedInstance().hasShownFirstRunWelcome && MacDatabasePreferences.allDatabases.count == 0
     }
@@ -54,7 +57,9 @@ class WelcomeAppOnboardingViewController: NSViewController {
         
         checkboxStartAtLogin.state = .off
         checkboxKeepInMenuBar.state = .off
-        checkboxAutoFill.state = .on
+        
+        checkboxAutoFill.state = Settings.sharedInstance().isPro ? .on : .off
+        checkboxAutoFill.isEnabled = Settings.sharedInstance().isPro
     }
     
     @IBAction func onLetsGo(_ sender: Any) {

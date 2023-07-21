@@ -117,16 +117,18 @@
 
 - (void)setNotes:(NSString *)notes {
     self.downTextView.text = notes;
+
     
+
+    CGSize sizeThatFits = [self.downTextView sizeThatFits:CGSizeMake(self.downTextView.frame.size.width, CGFLOAT_MAX)];
+    UIEdgeInsets insets = self.downTextView.textContainerInset;
     
-
-    CGSize sizeThatFits = [self.downTextView sizeThatFits:self.frame.size];
-
-    float newHeight = sizeThatFits.height * 1.4; 
+    CGFloat height = sizeThatFits.height + insets.top + insets.bottom;
 
 
 
-    self.heightConstraint.constant = newHeight;
+
+    self.heightConstraint.constant = height;
 }
 
 @end

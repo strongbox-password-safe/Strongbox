@@ -117,6 +117,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (void)addCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
+
+
 - (void)editCustomField:(Node*)item
        existingFieldKey:(NSString*_Nullable)existingFieldKey
                     key:(NSString *_Nullable)key
@@ -219,11 +221,10 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (nonatomic, readonly) NSInteger fastGroupTotalCount;
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
+- (NSString*)getHtmlPrintStringForItems:(NSString*)databaseName items:(NSArray<Node*>*)items;
 
 
 
-
-@property BOOL showTotp;
 @property BOOL showAutoCompleteSuggestions;
 @property BOOL showChangeNotifications;
 @property BOOL concealEmptyProtectedFields;
@@ -267,12 +268,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 
 
-
 @property (nullable) NSUUID* asyncUpdateId;
-
-- (void)update:(NSViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
-
-
 
 - (NSArray<Node*>*)entriesWithTag:(NSString*)tag;
 
@@ -316,6 +312,12 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (void)restartBackgroundAudit;
 - (void)stopAndClearAuditor;
+
+
+
+- (void)toggleAutoFillExclusion:(NSUUID*)uuid;
+
+- (BOOL)isExcludedFromAutoFill:(NSUUID*)item;
 
 @property (readonly, nullable) NSNumber* auditIssueCount;
 - (BOOL)isFlaggedByAudit:(NSUUID*)item;
@@ -367,6 +369,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property ConflictResolutionStrategy conflictResolutionStrategy;
 
 - (void)rebuildMapsAndCaches;
+
+
 
 @end
 

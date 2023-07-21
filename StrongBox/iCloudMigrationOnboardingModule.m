@@ -89,7 +89,7 @@ typedef NS_ENUM (NSUInteger, iCloudOnboardingMode) {
     return self.mode != kModeNone;
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     if ( self.mode == kModeMigrateNoLongerAvailableAndHaveDatabases ) {
         return [self noLongerAvailable:onDone];
     }

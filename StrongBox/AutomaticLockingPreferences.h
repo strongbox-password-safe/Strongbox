@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AutomaticLockingPreferences : StaticDataTableViewController
 
++ (instancetype)fromStoryboardWithModel:(Model*)model;
+
 @property Model* viewModel;
 
 @end

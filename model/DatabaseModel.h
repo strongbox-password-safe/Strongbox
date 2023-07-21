@@ -144,6 +144,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
 - (NSString*)getHtmlPrintString:(NSString*)databaseName;
+- (NSString*)getHtmlPrintStringForItems:(NSString*)databaseName items:(NSArray<Node*>*)items;
 
 
 

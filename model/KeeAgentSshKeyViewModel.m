@@ -27,6 +27,10 @@
 }
 
 - (BOOL)isEqualTo:(id)object {
+    return [self isEqualToEx:object testEnabled:YES];
+}
+
+- (BOOL)isEqualToEx:(id)object testEnabled:(BOOL)testEnabled {
     if (object == nil) {
         return NO;
     }
@@ -38,10 +42,6 @@
     }
     
     KeeAgentSshKeyViewModel* other = (KeeAgentSshKeyViewModel*)object;
-
-    if ( self.enabled != other.enabled ) {
-        return NO;
-    }
     
     if ( ![self.filename isEqualToString:other.filename] ) {
         return NO;
@@ -49,6 +49,12 @@
     
     if ( ![self.openSshKey isEqualTo:other.openSshKey] ) {
         return NO;
+    }
+    
+    if ( testEnabled ) {
+        if ( self.enabled != other.enabled ) {
+            return NO;
+        }
     }
 
     return YES;

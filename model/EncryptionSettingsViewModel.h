@@ -37,10 +37,13 @@ typedef NS_ENUM (NSUInteger, InnerStreamAlgorithm) {
 @interface EncryptionSettingsViewModel : NSObject
 
 + (instancetype _Nullable)fromDatabaseModel:(DatabaseModel*)databaseModel;
++ (instancetype)defaultsForFormat:(DatabaseFormat)format;
+
 - (instancetype)clone;
 
+
 @property DatabaseFormat format;
-@property (nullable) NSString* subVersion;
+
 @property KdfAlgorithm kdfAlgorithm;
 @property uint64_t argonMemory;
 @property uint64_t iterations;
@@ -69,6 +72,8 @@ typedef NS_ENUM (NSUInteger, InnerStreamAlgorithm) {
 @property (readonly) CGFloat minKdfIterations;
 @property (readonly) CGFloat maxKdfIterations;
 
+@property (readonly) BOOL isStrongboxDefaultEncryptionSettings;
+
 + (NSString*)getAlternativeFormatString:(DatabaseFormat)format;
 + (NSString *)kdfStringForKdf:(KdfAlgorithm)algo;
 + (NSString *)encryptionStringForAlgo:(EncryptionAlgorithm)algo;
@@ -79,6 +84,7 @@ typedef NS_ENUM (NSUInteger, InnerStreamAlgorithm) {
 - (void)calibrateFor1Second;
 - (void)applyToDatabaseModel:(DatabaseModel*)model;
 - (BOOL)isDifferentFrom:(EncryptionSettingsViewModel*)other;
+- (BOOL)isEncryptionParamsDifferentFrom:(EncryptionSettingsViewModel*)other;
 
 @end
 

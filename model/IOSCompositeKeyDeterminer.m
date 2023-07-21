@@ -184,11 +184,17 @@ static const int kMaxFailedPinAttempts = 3;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( self.database.showConvenienceExpiryMessage ) {
-            [Alerts okCancel:self.viewController
-                       title:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Master Password Required")
-                     message:NSLocalizedString(@"composite_key_determiner_convenience_expired_message", @"It's time now to re-enter your Master Password manually. You can change this master password expiry interval in Database Settings.")
-                      action:^(BOOL response) {
-                if ( response ) { 
+            [Alerts twoOptionsWithCancel:self.viewController
+                                   title:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Master Password Required")
+                                 message:NSLocalizedString(@"composite_key_determiner_convenience_expired_message", @"It's time now to re-enter your Master Password manually. You can change this master password expiry interval in Database Settings.")
+                       defaultButtonText:NSLocalizedString(@"alerts_ok", @"OK")
+                        secondButtonText:NSLocalizedString(@"generic_ok_dont_remind_me_again", @"OK, Don't Remind Me Again")
+                                  action:^(int response) {
+                if ( response == 0 ) { 
+                    [self promptForManualCredentials];
+                }
+                else if ( response == 1 ) {
+                    self.database.showConvenienceExpiryMessage = NO;
                     [self promptForManualCredentials];
                 }
                 else {

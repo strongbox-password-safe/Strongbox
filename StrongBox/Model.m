@@ -85,7 +85,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 @property (readonly) id<ApplicationPreferences> applicationPreferences;
 @property (readonly) id<SyncManagement> syncManagement;
-@property (readonly) id<SpinnerUI> spinnerUi;
 @property (readonly) NSArray<Node*>* legacyFavourites;
 
 @property (readonly) NSDictionary<NSString*, NSSet<NSUUID*>*> *domainNodeMap; 
@@ -100,10 +99,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (id<SyncManagement>)syncManagement {
     return CrossPlatformDependencies.defaults.syncManagement;
-}
-
-- (id<SpinnerUI>)spinnerUi {
-    return CrossPlatformDependencies.defaults.spinnerUi;
 }
 
 
@@ -248,6 +243,57 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     return [self.database getItemsById:ids];
 }
 
+
+
+- (void)refreshCaches {
+    [self.database rebuildFastMaps];
+    
+    [self refreshAutoFillSuggestions];
+    
+    [self restartBackgroundAudit];
+    
+    
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kTabsMayHaveChangedDueToModelEdit object:nil];
+    });
+}
+
+- (void)refreshAutoFillSuggestions {
+    [self refreshAutoFillSuggestions:NO];
+}
+
+- (void)refreshAutoFillSuggestions:(BOOL)clearFirst {
+    [self rebuildAutoFillDomainNodeMap];
+    [self refreshAutoFillQuickTypeDatabase:clearFirst];
+}
+
+- (void)refreshAutoFillQuickTypeDatabase {
+    [self refreshAutoFillQuickTypeDatabase:NO];
+}
+
+- (void)refreshAutoFillQuickTypeDatabase:(BOOL)clearFirst {
+#ifndef IS_APP_EXTENSION 
+    if ( clearFirst ) {
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    }
+    
+    if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
+                                                           databaseUuid:self.metadata.uuid
+                                                          displayFormat:self.metadata.quickTypeDisplayFormat
+                                                        alternativeUrls:self.metadata.autoFillScanAltUrls
+                                                           customFields:self.metadata.autoFillScanCustomFields
+                                                                  notes:self.metadata.autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds
+                                                               nickName:self.metadata.nickName];
+    }
+#endif
+}
+
+
+
 - (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR(^)(void))onDemandViewController 
                          noProgressSpinner:(BOOL)noProgressSpinner
                                 completion:(void(^)(BOOL success))completion {
@@ -280,13 +326,12 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
             NSLog(@"reloadDatabaseFromLocalWorkingCopy... Success ");
             
             self.theDatabase = model.database;
+            
             if (completion) {
                 completion(YES);
             }
             
-            [self rebuildFastMaps];
-            
-            [self restartBackgroundAudit];
+            [self refreshCaches];
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:self.databaseUuid];
@@ -337,24 +382,37 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 }
 
 - (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion)completion {
-    return [self asyncUpdateAndSync:NO completion:completion];
+    return [self asyncJob:kAsyncJobTypeBoth completion:completion];
+}
+
+- (BOOL)asyncUpdate {
+    return [self asyncUpdate:nil];
 }
 
 - (BOOL)asyncUpdate:(AsyncUpdateCompletion)completion {
-    return [self asyncUpdateAndSync:YES completion:completion];
+    return [self asyncJob:kAsyncJobTypeSerializeOnly completion:completion];
 }
 
-- (BOOL)asyncUpdateAndSync:(BOOL)serializeOnlyNoSync completion:(AsyncUpdateCompletion _Nullable)completion {
+- (BOOL)asyncSync {
+    return [self asyncSync:nil];
+}
+
+- (BOOL)asyncSync:(AsyncUpdateCompletion)completion {
+    return [self asyncJob:kAsyncJobTypeSyncOnly completion:completion];
+}
+
+- (BOOL)asyncJob:(AsyncJobType)jobType
+      completion:(AsyncUpdateCompletion _Nullable)completion {
     NSLog(@"asyncUpdateAndSync ENTER");
 
-    if(self.isReadOnly) {
+    if ( self.isReadOnly && jobType != kAsyncJobTypeSyncOnly ) {
         NSLog(@"🔴 WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
         return NO;
     }
     
     AsyncUpdateJob* job = [[AsyncUpdateJob alloc] init];
     job.snapshot = [self.database clone];
-    job.serializeOnlyNoSync = serializeOnlyNoSync;
+    job.jobType = jobType;
     job.completion = completion;
     
     [self.asyncUpdatesStack push:job];
@@ -372,14 +430,14 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     AsyncUpdateJob* job = [self.asyncUpdatesStack popAndClear]; 
     
     if ( job ) {
-        [self queueAsyncUpdateWithDatabaseClone:NSUUID.UUID job:job];
+        [self beginJobWithDatabaseClone:NSUUID.UUID job:job];
     }
     else {
         NSLog(@"NOP - No outstanding async updates found. All Done.");
     }
 }
 
-- (void)queueAsyncUpdateWithDatabaseClone:(NSUUID*)updateId job:(AsyncUpdateJob*)job {
+- (void)beginJobWithDatabaseClone:(NSUUID*)updateId job:(AsyncUpdateJob*)job {
     NSLog(@"queueAsyncUpdateWithDatabaseClone ENTER - [%@]", NSThread.currentThread.name);
     
     _isRunningAsyncUpdate = YES;
@@ -390,6 +448,19 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     dispatch_group_t mutex = dispatch_group_create();
     dispatch_group_enter(mutex);
     
+    if ( job.jobType == kAsyncJobTypeBoth || job.jobType == kAsyncJobTypeSerializeOnly ) {
+        [self beginAsyncUpdate:NSUUID.UUID updateMutex:mutex job:job];
+    }
+    else if ( job.jobType == kAsyncJobTypeSyncOnly ) {
+        [self beginAsyncSync:NSUUID.UUID updateMutex:mutex job:job];
+    }
+
+    dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
+    
+    NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
+}
+
+- (void)beginAsyncUpdate:(NSUUID*)updateId updateMutex:(dispatch_group_t)mutex job:(AsyncUpdateJob*)job {
     NSString* streamingFile = [self getUniqueStreamingFilename];
     NSOutputStream* outputStream = [NSOutputStream outputStreamToFileAtPath:streamingFile append:NO];
     [outputStream open];
@@ -402,40 +473,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         
         [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled streamingFile:streamingFile updateMutex:mutex job:job error:error]; 
     }];
-
-    dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
-    
-    NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
-}
-
-- (void)updateAutoFillQuickTypeDatabase {
-#ifndef IS_APP_EXTENSION 
-    if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
-                                                           databaseUuid:self.metadata.uuid
-                                                          displayFormat:self.metadata.quickTypeDisplayFormat
-                                                        alternativeUrls:self.metadata.autoFillScanAltUrls
-                                                           customFields:self.metadata.autoFillScanCustomFields
-                                                                  notes:self.metadata.autoFillScanNotes
-                                           concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds
-                                                               nickName:self.metadata.nickName];
-    }
-#endif
-}
-
-- (void)postSerializationRefreshCaches {
-    [self rebuildFastMaps];
-    
-    
-    
-    if (self.metadata.auditConfig.auditInBackground) {
-        [self restartAudit];
-    }
-    
-    
-    
-    [self updateAutoFillQuickTypeDatabase];
 }
 
 - (void)onAsyncUpdateSerializeDone:(NSUUID*)updateId
@@ -444,11 +481,13 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                        updateMutex:(dispatch_group_t)updateMutex
                                job:(AsyncUpdateJob*)job
                              error:(NSError * _Nullable)error {
-    [self postSerializationRefreshCaches];
+    
+    
+    [self refreshCaches];
     
     if (userCancelled || error) {
         
-        [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+        [self onAsyncJobDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:error];
         return;
     }
     
@@ -457,69 +496,76 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
         
         [self setDuressDummyData:data];
-        [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
+        [self onAsyncJobDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:nil];
         return;
     }
-
+    
     NSError* localUpdateError;
     BOOL success = [self.syncManagement updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&localUpdateError];
     [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
-
+    
     if (!success) { 
-        [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:localUpdateError];
+        [self onAsyncJobDone:updateId job:job success:NO userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:localUpdateError];
         return;
     }
     
     
     
-    if ( self.offlineMode || job.serializeOnlyNoSync ) {
+    if ( self.offlineMode || job.jobType == kAsyncJobTypeSerializeOnly ) {
         NSLog(@"ℹ️ Offline or Update ONLY mode - AsyncUpdateAndSync DONE");
         
-        [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
+        [self onAsyncJobDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:nil];
         
         return;
     }
+    
+    [self beginAsyncSync:updateId updateMutex:updateMutex job:job];
+}
 
+- (void)beginAsyncSync:(NSUUID*)updateId
+           updateMutex:(dispatch_group_t)updateMutex
+                   job:(AsyncUpdateJob*)job {
     [self.syncManagement sync:self.metadata
                 interactiveVC:nil
                           key:self.database.ckfs
                          join:NO
                    completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         if ( result == kSyncAndMergeSuccess ) {
-            [self onAsyncUpdateDone:updateId job:job success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
+            [self onAsyncJobDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localWasChanged:localWasChanged updateMutex:updateMutex error:nil];
         }
         else if (result == kSyncAndMergeError) {
-            [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+            [self onAsyncJobDone:updateId job:job success:NO userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:error];
         }
         else if ( result == kSyncAndMergeResultUserInteractionRequired ) {
-            [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:YES localUpdated:NO updateMutex:updateMutex error:error];
+            [self onAsyncJobDone:updateId job:job success:NO userCancelled:NO userInteractionRequired:YES localWasChanged:NO updateMutex:updateMutex error:error];
         }
         else {
             error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from async update sync: [%@]", @(result)] errorCode:-1];
-            [self onAsyncUpdateDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+            BOOL userCancelled = result == kSyncAndMergeResultUserCancelled;
+            [self onAsyncJobDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:error];
         }
     }];
 }
 
-- (void)onAsyncUpdateDone:(NSUUID*)updateId
-                      job:(AsyncUpdateJob*)job
-                  success:(BOOL)success
-            userCancelled:(BOOL)userCancelled
-  userInteractionRequired:(BOOL)userInteractionRequired
-             localUpdated:(BOOL)localUpdated
-              updateMutex:(dispatch_group_t)updateMutex
-                    error:(NSError*)error {
-    NSLog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localUpdated=%hhd, error=%@", updateId, success, userInteractionRequired, localUpdated, error);
-
-    AsyncUpdateResult* result = [[AsyncUpdateResult alloc] init];
+- (void)onAsyncJobDone:(NSUUID*)updateId
+                   job:(AsyncUpdateJob*)job
+               success:(BOOL)success
+         userCancelled:(BOOL)userCancelled
+userInteractionRequired:(BOOL)userInteractionRequired
+          localWasChanged:(BOOL)localWasChanged
+           updateMutex:(dispatch_group_t)updateMutex
+                 error:(NSError*)error {
+    NSLog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localWasChanged=%hhd, error=%@", updateId, success, userInteractionRequired, localWasChanged, error);
+    
+    AsyncJobResult* result = [[AsyncJobResult alloc] init];
     
     result.databaseUuid = self.databaseUuid;
     result.success = success;
     result.error = error;
     result.userCancelled = userCancelled;
-    result.localWasChanged = localUpdated;
+    result.localWasChanged = localWasChanged;
     result.userInteractionRequired = userInteractionRequired;
-
+    
     self.lastAsyncUpdateResult = result;
     _isRunningAsyncUpdate = NO;
     
@@ -532,109 +578,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     });
     
     dispatch_group_leave(updateMutex);
-}
-
-
-
-- (void)update:(VIEW_CONTROLLER_PTR)viewController
-       handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
-    if(self.isReadOnly) {
-        handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
-        return;
-    }
-
-    [self encrypt:viewController completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled || error) {
-            handler(userCancelled, NO, error);
-            return;
-        }
-
-        [self onEncryptionDone:viewController streamingFile:file completion:handler];
-    }];
-}
-
-
-
-- (void)encrypt:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL userCancelled, NSString* file, NSString*_Nullable debugXml, NSError* error))completion {
-    [self.spinnerUi show:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:viewController];
-    
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        NSString* tmpFile = [self getUniqueStreamingFilename];
-        NSOutputStream* outputStream = [NSOutputStream outputStreamToFileAtPath:tmpFile append:NO];
-        [outputStream open];
-
-        [Serializator getAsData:self.database
-                         format:self.database.originalFormat
-                   outputStream:outputStream
-                     completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
-            [outputStream close];            
-
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                [self.spinnerUi dismiss];
-
-                completion(userCancelled, tmpFile, debugXml, error);
-            });
-        }];
-    });
-}
-
-- (void)onEncryptionDone:(VIEW_CONTROLLER_PTR)viewController
-           streamingFile:(NSString*)streamingFile
-              completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
-    if (self.isDuressDummyMode) {
-        NSData* data = [NSData dataWithContentsOfFile:streamingFile];
-        [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
-        [self setDuressDummyData:data];
-        completion(NO, NO, nil);
-        return;
-    }
-    
-    
-    
-    NSError* error;
-    BOOL success = [self.syncManagement updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&error];
-    [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
-
-    if (!success) {
-        completion(NO, NO, error);
-        return;
-    }
-    
-    [self updateAutoFillQuickTypeDatabase];
-    
-    
-    
-    if (self.metadata.auditConfig.auditInBackground) {
-        [self restartAudit];
-    }
-
-    if ( self.offlineMode ) { 
-        completion(NO, NO, nil);
-    }
-    else {
-        [self.syncManagement sync:self.metadata
-                    interactiveVC:viewController
-                              key:self.database.ckfs
-                             join:NO
-                       completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
-            if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
-                completion(NO, localWasChanged, nil);
-            }
-            else if (result == kSyncAndMergeError) {
-                completion(NO, NO, error);
-            }
-            else if (result == kSyncAndMergeResultUserCancelled) {
-                
-                NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
-                error = [Utils createNSError:message errorCode:-1];
-                completion(YES, NO, error);
-            }
-            else { 
-                error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
-                completion(NO, NO, error);
-            }
-        }];
-    }
 }
 
 - (NSString*)getUniqueStreamingFilename {
@@ -662,7 +605,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     return ret;
 }
-
 
 
 
@@ -906,6 +848,68 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     }
 }
 
+- (void)toggleAuditExclusion:(NSUUID *)uuid {
+    BOOL isExcluded = [self isExcludedFromAudit:uuid];
+    Node* node = [self getItemById:uuid];
+    
+    if ( node ) {
+        [self excludeFromAudit:node exclude:!isExcluded];
+    }
+    else {
+        NSLog(@"🔴 WARNWARN Attempt to exclude none existent node from Audit?!");
+    }
+}
+
+
+
+
+
+- (BOOL)isExcludedFromAutoFill:(NSUUID *)uuid {
+    if ( self.isKeePass2Format ) {
+        Node* node = [self.database getItemById:uuid];
+        return node.fields.isAutoFillExcluded;
+    }
+    else {
+        NSSet<NSString*> *set = self.metadata.autoFillExcludedItems.set;
+        
+        NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
+        
+        return [set containsObject:sid];
+    }
+}
+
+- (BOOL)toggleAutoFillExclusion:(NSUUID *)uuid {
+    BOOL isExcluded = [self isExcludedFromAutoFill:uuid];
+    return [self setExcludedFromAutoFill:uuid exclude:!isExcluded];
+}
+
+- (BOOL)setExcludedFromAutoFill:(NSUUID *)uuid exclude:(BOOL)exclude {
+    Node* node = [self getItemById:uuid];
+    
+    if ( self.isKeePass2Format ) {
+        node.fields.isAutoFillExcluded = exclude;
+    }
+    else {
+        NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
+        NSArray<NSString*> *excluded = self.metadata.autoFillExcludedItems;
+        
+        NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
+        
+        if ( exclude ) {
+            [mutable addObject:sid];
+        }
+        else {
+            [mutable removeObject:sid];
+        }
+        
+        self.metadata.autoFillExcludedItems = mutable.allObjects;
+    }
+    
+    [self refreshAutoFillSuggestions:YES];
+    
+    return self.isKeePass2Format;
+}
+
 
 
 - (BOOL)isInOfflineMode {
@@ -1073,7 +1077,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     else {
         return [self removeFavourite:itemId];
     }
-} 
+}
 
 - (BOOL)addFavourite:(NSUUID*)itemId {
     if ( self.formatSupportsTags ) {
@@ -1216,8 +1220,10 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
           browseSortField:(BrowseSortField)browseSortField
                descending:(BOOL)descending
         foldersSeparately:(BOOL)foldersSeparately {
+    NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
+        
     NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRootIncludingRecycled : self.database.allSearchableIncludingRecycled;
-
+    
     NSMutableArray* results = [nodes mutableCopy]; 
     
     NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
@@ -1229,14 +1235,29 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                 dereference:dereference];
     }
     
-    return [self filterAndSortForBrowse:results
-                  includeKeePass1Backup:includeKeePass1Backup
-                      includeRecycleBin:includeRecycleBin
-                         includeExpired:includeExpired
-                          includeGroups:includeGroups
-                        browseSortField:browseSortField
-                             descending:descending
-                      foldersSeparately:foldersSeparately];
+    NSTimeInterval searchTime = NSDate.timeIntervalSinceReferenceDate - startTime;
+
+    NSTimeInterval startBrowseFilterTime = NSDate.timeIntervalSinceReferenceDate;
+
+    NSArray<Node*>* ret = [self filterAndSortForBrowse:results
+                                 includeKeePass1Backup:includeKeePass1Backup
+                                     includeRecycleBin:includeRecycleBin
+                                        includeExpired:includeExpired
+                                         includeGroups:includeGroups
+                                       browseSortField:browseSortField
+                                            descending:descending
+                                     foldersSeparately:foldersSeparately];
+
+    
+#ifdef DEBUG
+    NSString* searchTerm = searchText;
+#else
+    NSString* searchTerm = @"<REDACTED>";
+#endif
+    
+    NSLog(@"✅ SEARCH for [%@] done in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
+
+    return ret;
 }
 
 - (NSArray<Node *> *)filterAndSortForBrowse:(NSMutableArray<Node *> *)nodes
@@ -1542,18 +1563,6 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
-- (void)rebuildFastMaps {
-    [self.database rebuildFastMaps];
-    
-    [self rebuildAutoFillDomainNodeMap];
-    
-    
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kTabsMayHaveChangedDueToModelEdit object:nil];
-    });
-}
-
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
 #ifndef IS_APP_EXTENSION 
     if ( self.metadata.autoFillEnabled ) {
@@ -1584,7 +1593,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 #ifndef IS_APP_EXTENSION 
     if ( self.metadata.autoFillEnabled ) {
-        _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self.database
+        _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self
                                                    alternativeUrls:self.metadata.autoFillScanAltUrls
                                                       customFields:self.metadata.autoFillScanCustomFields
                                                              notes:self.metadata.autoFillScanNotes];

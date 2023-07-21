@@ -813,6 +813,18 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [SecretStore.sharedInstance setSecureObject:auditExcludedItems forIdentifier:key];
 }
 
+- (NSArray<NSString *> *)autoFillExcludedItems {
+    NSString* key = [NSString stringWithFormat:@"autoFillExcludedItems-%@", self.uuid];
+    NSArray* ret = [SecretStore.sharedInstance getSecureObject:key];
+    return ret ? ret : @[];
+}
+
+- (void)setAutoFillExcludedItems:(NSArray<NSString *> *)autoFillExcludedItems {
+    NSString* key = [NSString stringWithFormat:@"autoFillExcludedItems-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureObject:autoFillExcludedItems forIdentifier:key];
+}
+
+
 
 
 - (BOOL)isConvenienceUnlockEnabled {

@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL isNativeAutoFillAppExtensionOpen;
 @property NSString* databaseUuid;
 
+@property NSString* headline;
+@property (nullable) NSString* subheadline;
+
 @property (nonatomic, copy) void (^onDone)(BOOL userCancelled, NSString*_Nullable password, NSString*_Nullable keyFileBookmark, YubiKeyConfiguration*_Nullable yubiKeyConfiguration);
 
 @end

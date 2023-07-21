@@ -87,15 +87,20 @@ public class BrowserAutoFillManager: NSObject {
         return ret
     }
 
-    @objc class func loadDomainNodeMap(_ database: DatabaseModel, alternativeUrls: Bool = true, customFields: Bool = false, notes: Bool = false) -> [String: Set<UUID>] {
+    @objc class func loadDomainNodeMap(_ model: Model, alternativeUrls: Bool = true, customFields: Bool = false, notes: Bool = false) -> [String: Set<UUID>] {
         let startTime = CFAbsoluteTimeGetCurrent()
         
-        let all = database.allSearchableNoneExpiredEntries
-
+        let allSearchable = model.database.allSearchableNoneExpiredEntries
+        let all = allSearchable.filter { return !model.isExcluded(fromAutoFill: $0.uuid )}
+        
         var mutableRet: [String: Set<UUID>] = [:]
 
         for node in all {
-            let uniqueUrls = AutoFillCommon.getUniqueUrls(forNode: database, node: node, alternativeUrls: alternativeUrls, customFields: customFields, notes: notes)
+            let uniqueUrls = AutoFillCommon.getUniqueUrls(forNode: model.database,
+                                                          node: node,
+                                                          alternativeUrls: alternativeUrls,
+                                                          customFields: customFields,
+                                                          notes: notes)
 
             let domains = Set(uniqueUrls.map { extractPSLDomainFromUrl(url: $0) })
 

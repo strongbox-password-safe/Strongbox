@@ -59,7 +59,6 @@
 #import "AppDelegate.h"
 #import "SaleScheduleManager.h"
 
-#import "ExportOptionsTableViewController.h"
 #import "StrongboxErrorCodes.h"
 #import "RandomizerPopOverViewController.h"
 #import "UpgradeViewController.h"
@@ -96,7 +95,6 @@
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonCustomizeView;
@@ -112,6 +110,7 @@
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonDice;
 @property BOOL openingDatabaseInProgress;
+
 @property NSString* importFormat;
 
 @property (nullable) NSString* overrideQuickLaunchWithAppShortcutQuickLaunchUuid;
@@ -226,7 +225,9 @@
     
     self.navigationController.navigationBar.prefersLargeTitles = NO;
     
-    [self bindProOrFreeTrialUi];
+    [self bindToolbar];
+    
+    [CustomAppIconObjCHelper downgradeProIconIfInUse];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -241,7 +242,7 @@
     }
     else {
         self.navigationItem.prompt = NSLocalizedString(@"hint_tap_and_hold_to_see_options", @"TIP: Tap and hold item to see options");
-    } 
+    }
 }
 
 - (void)refresh {
@@ -261,7 +262,9 @@
     
     [self updateDynamicAppIconShortcuts];
     
-    [self bindProOrFreeTrialUi];
+    [self bindToolbar];
+    
+    [CustomAppIconObjCHelper downgradeProIconIfInUse];
 }
 
 - (void)updateDynamicAppIconShortcuts {
@@ -306,6 +309,10 @@
     [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_preferences", @"Preferences")];
     [self.buttonCustomizeView setAccessibilityLabel:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")];
     [self.buttonAddSafe setAccessibilityLabel:NSLocalizedString(@"casg_add_action", @"Add")];
+    
+    if (@available(iOS 15.0, *)) {
+        self.barButtonDice.image = [UIImage systemImageNamed:@"dice"];
+    }
     
     self.collection = [NSArray array];
     
@@ -1180,7 +1187,6 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath  {
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"generic_export", @"Export")
                                     systemImage:@"square.and.arrow.up"
-                                    
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self onShare:indexPath];
     }];
@@ -1389,7 +1395,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         return;
     }
     
-    NSString* filename = database.fileName;
+    NSString* filename = database.exportFilename;
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];
@@ -1682,7 +1688,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }
 
     [SyncManager.sharedInstance removeDatabaseAndLocalCopies:safe];
-
+    [safe clearKeychainItems];
+    
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
     
@@ -1881,15 +1888,15 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     NSString* msg = NSLocalizedString(@"merge_view_are_you_sure", @"Are you sure you want to merge the second database into the first?");
     [Alerts areYouSure:self message:msg action:^(BOOL response) {
         if (response) {
-            DatabaseMerger* syncer= [DatabaseMerger mergerFor:first.database theirs:second.database];
-            BOOL success = [syncer merge];
+            DatabaseMerger* merger = [DatabaseMerger mergerFor:first.database theirs:second.database];
+            BOOL success = [merger merge];
 
             if (success) {
-                [first update:self handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-                    if (error) {
-                        [Alerts error:self error:error];
+                [first asyncUpdate:^(AsyncJobResult * _Nonnull result) {
+                    if (result.error) {
+                        [Alerts error:self error:result.error];
                     }
-                    else if (userCancelled) {
+                    else if (result.userCancelled) {
                         [Alerts error:self
                                 title:NSLocalizedString(@"merge_view_merge_title_error", @"There was an problem merging this database.")
                                 error:nil];
@@ -1898,6 +1905,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                         [Alerts info:self
                                title:NSLocalizedString(@"merge_view_merge_title_success", @"Merge Successful")
                              message:NSLocalizedString(@"merge_view_merge_message_success", @"The Merge was successful and your database is now up to date.")];
+                                                
+                        [first asyncSync]; 
                     }
                 }];
             }
@@ -2216,43 +2225,171 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (void)onProStatusChanged:(id)param {
     NSLog(@"Pro Status Changed!");
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self bindProOrFreeTrialUi];
+        [self bindToolbar];
+        
+        [CustomAppIconObjCHelper downgradeProIconIfInUse];
     });
 }
 
--(void)bindProOrFreeTrialUi {
-    self.navigationController.toolbarHidden =  [[AppPreferences sharedInstance] isPro];
-    self.navigationController.toolbar.hidden = [[AppPreferences sharedInstance] isPro];
-    
-    if( !AppPreferences.sharedInstance.isPro ) {
-        NSString *upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Upgrade Button Title asking to Please Upgrade");
-        
-        [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
-        [self.buttonUpgrade setEnabled:YES];
+- (void)showSaleScreen {
 
-        if ( ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable ) {
-            upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Upgrade Button Title - Upgrade Info");
-            if (AppPreferences.sharedInstance.daysInstalled > 60) {
-                [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
-            }
-            else {
-                [self.buttonUpgrade setTintColor:nil];
+
+
+    
+    BOOL existingSubscriber = ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription;
+    NSDate* saleEndDate = SaleScheduleManager.sharedInstance.currentSaleEndDate;
+    
+    if ( saleEndDate ) {
+        NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+        [dateComponents setDay:-1];
+        NSDate *inclusiveEndDate = [[NSCalendar currentCalendar] dateByAddingComponents:dateComponents toDate:saleEndDate options:0];
+
+        __weak SafesViewController* weakSelf = self;
+        UIViewController* vc = [SwiftUIViewFactory makeSaleOfferViewControllerWithSaleEndDate:inclusiveEndDate
+                                                                           existingSubscriber:existingSubscriber
+         redeemHandler:^{
+            [weakSelf dismissViewControllerAnimated:YES completion:^{
+                SKPaymentQueue* queue = SKPaymentQueue.defaultQueue;
+                [queue presentCodeRedemptionSheet];
+            }];
+        } onLifetimeHandler:^{
+            [weakSelf dismissViewControllerAnimated:YES completion:^{
+                [weakSelf showLifetimePurchaseScreen];
+            }];
+        } dismissHandler:^{
+            [weakSelf dismissViewControllerAnimated:YES completion:nil];
+        }];
+        vc.modalPresentationStyle = UIModalPresentationFormSheet;
+        
+        [self presentViewController:vc animated:YES completion:nil];
+    }
+}
+
+- (void)showLifetimePurchaseScreen {
+    SKStoreProductViewController *vc = [[SKStoreProductViewController alloc] init];
+    
+    [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(1481853033) }
+                  completionBlock:^(BOOL result, NSError * _Nullable error) {
+        if ( !result ) {
+            NSLog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
+        }
+    }];
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)showUpgradeScreen {
+    UpgradeViewController* vc = [UpgradeViewController fromStoryboard];
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)showToolbar:(NSString*)title
+              image:(NSString*)image
+      textTintColor:(UIColor*)textTintColor
+          tintColor:(UIColor*)tintColor
+  showDismissButton:(BOOL)showDismissButton
+             action:(SEL)action {
+
+    
+    UIBarButtonItem* bbi1 = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:image] menu:nil];
+    UIBarButtonItem* bbi2 = [[UIBarButtonItem alloc] initWithTitle:title menu:nil];
+    UIBarButtonItem* bbi3 = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:image] menu:nil];
+    
+
+
+
+
+
+    bbi1.tintColor = tintColor;
+    bbi2.tintColor = textTintColor;
+    bbi3.tintColor = tintColor;
+
+    
+    bbi1.action = action;
+    bbi1.target = self;
+    bbi2.action = action;
+    bbi2.target = self;
+    bbi3.action = action;
+    bbi3.target = self;
+    
+    NSMutableArray<UIBarButtonItem*>* buttons = @[UIBarButtonItem.flexibleSpaceItem,
+                                                  bbi1,
+                                                  bbi2,
+
+                                                  UIBarButtonItem.flexibleSpaceItem,
+                                                  ].mutableCopy;
+    
+
+
+
+    
+    self.navigationController.toolbar.items = buttons;
+    
+    self.navigationController.toolbar.hidden = NO;
+}
+
+- (void)hideToolbar {
+
+    self.navigationController.toolbar.hidden = YES;
+}
+
+- (BOOL)shouldShowUpgradeNotification {
+    return !CustomizationManager.isAProBundle && !AppPreferences.sharedInstance.isPro;
+}
+
+- (BOOL)shouldShowSaleNotification {
+    if ( SaleScheduleManager.sharedInstance.saleNowOn && !CustomizationManager.isAProBundle ) {
+        
+        if ( !AppPreferences.sharedInstance.isPro ) {
+            return YES;
+        }
+
+        if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription ) {
+            NSDate* expiry = ProUpgradeIAPManager.sharedInstance.currentSubscriptionRenewalOrExpiry;
+            
+            if ( expiry ) {
+                NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
+                [dateComponents setMonth:1];
+                                
+                NSDate* startNext = SaleScheduleManager.sharedInstance.saleAfterNextSaleStartDate;
+                
+                NSDate *expiryDeadline = [[NSCalendar currentCalendar] dateByAddingComponents:dateComponents
+                                                                                       toDate:startNext
+                                                                                      options:0];
+                
+                return [expiry isEarlierThan:expiryDeadline];
             }
         }
+    }
+    
+    return NO;
+}
+
+- (void)bindToolbar {
+    if ( [self shouldShowSaleNotification] ) {
+        [self showToolbar:NSLocalizedString(@"safesvc_sale_now_on", @"Strongbox Sale Now On")
+                    image:@"gift"
+            textTintColor:UIColor.systemBlueColor
+                tintColor:UIColor.greenColor
+        showDismissButton:NO
+                   action:@selector(showSaleScreen)];
+    }
+    else if ( [self shouldShowUpgradeNotification] ) {
+        BOOL freeTrialAvailable = ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable;
         
-
-
-
-
-
-            [self.buttonUpgrade setTitle:upgradeButtonTitle];
-
+        NSString *upgradeButtonTitle = freeTrialAvailable ?
+        NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Upgrade (Free 'Pro' Trial)...") :
+        NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Please Upgrade...");
         
-        [CustomAppIconObjCHelper downgradeProIconIfInUse];
+        [self showToolbar:upgradeButtonTitle
+                    image:@"star.circle.fill"
+            textTintColor:AppPreferences.sharedInstance.daysInstalled > 60 ? UIColor.systemOrangeColor : UIColor.linkColor
+                tintColor:AppPreferences.sharedInstance.daysInstalled > 60 ? UIColor.systemOrangeColor : UIColor.systemYellowColor
+        showDismissButton:NO
+                   action:@selector(showUpgradeScreen)];
     }
     else {
-        [self.buttonUpgrade setEnabled:NO];
-        [self.buttonUpgrade setTintColor: [UIColor clearColor]];
+        [self hideToolbar];
     }
 }
 
@@ -2508,7 +2645,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace modDate:(NSDate*)modDate {
     if(editInPlace == NO) {
         NSString* filename = url.lastPathComponent;
-        if ( [LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] ) { 
+        if ( [LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] ) {
             [Alerts twoOptionsWithCancel:self
                                    title:NSLocalizedString(@"safesvc_update_existing_database_title", @"Update Existing Database?")
                                  message:NSLocalizedString(@"safesvc_update_existing_question", @"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?")
@@ -2584,32 +2721,6 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
     
@@ -2805,67 +2916,64 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 - (void)editFilePath:(DatabasePreferences*)database {
 #ifndef NO_SFTP_WEBDAV_SP
+    if ( database.storageProvider != kWebDAV && database.storageProvider != kSFTP ) {
+        return;
+    }
+        
+    id<SafeStorageProvider> sp;
+    
     if ( database.storageProvider == kWebDAV ) {
-        StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
-        UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
-        
-        WebDAVStorageProvider* sp = [[WebDAVStorageProvider alloc] init];
-        sp.explicitConnection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:database];
-        sp.maintainSessionForListing = YES;
-        
-        vc.existing = YES;
-        vc.safeStorageProvider = sp;
-        vc.onDone = ^(SelectedStorageParameters *params) {
-            [nav.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                if ( params.method == kStorageMethodErrorOccurred ) {
-                    [Alerts error:self error:params.error];
-                }
-                else if ( params.method == kStorageMethodNativeStorageProvider ) {
-                    [Alerts areYouSure:self
-                               message:NSLocalizedString(@"are_you_sure_use_this_file_this_database", @"Are you want to use this file for this database?")
-                                action:^(BOOL response) {
-                        if ( response ) {
-                            NSLog(@"Done [%@]", params.file.providerData );
-                            [self changeWebDAVFilePath:database providerData:(WebDAVProviderData*)params.file.providerData];
-                        }
-                    }];
-                }
-            }];
-        };
-        
-        [self presentViewController:nav animated:YES completion:nil];
+        WebDAVStorageProvider *wsp = [[WebDAVStorageProvider alloc] init];
+        wsp.explicitConnection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:database];
+        wsp.maintainSessionForListing = YES;
+        sp = wsp;
     }
-    else if ( database.storageProvider == kSFTP ) {
-        StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
-        UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    else {
+        SFTPStorageProvider *ssp = [[SFTPStorageProvider alloc] init];
+        ssp.explicitConnection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:database];
+        ssp.maintainSessionForListing = YES;
+        sp = ssp;
+    }
+    
+    __weak SafesViewController* weakSelf = self;
+    
+    StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
+    UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
 
-        SFTPStorageProvider* sp = [[SFTPStorageProvider alloc] init];
-        sp.explicitConnection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:database];
-        sp.maintainSessionForListing = YES;
-        
-        vc.existing = YES;
-        vc.safeStorageProvider = sp;
-        vc.onDone = ^(SelectedStorageParameters *params) {
+    vc.existing = YES;
+    vc.safeStorageProvider = sp;
+    vc.onDone = ^(SelectedStorageParameters *params) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             [nav.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                if ( params.method == kStorageMethodErrorOccurred ) {
-                    [Alerts error:self error:params.error];
-                }
-                else if ( params.method == kStorageMethodNativeStorageProvider ) {
-                    [Alerts areYouSure:self
-                               message:NSLocalizedString(@"are_you_sure_use_this_file_this_database", @"Are you want to use this file for this database?")
-                                action:^(BOOL response) {
-                        if ( response ) {
-                            NSLog(@"Done [%@]", params.file.providerData );
-                            [self changeSFTPFilePath:database providerData:(SFTPProviderData*)params.file.providerData];
-                        }
-                    }];
-                }
+                [weakSelf onEditSftpOrWebDAVFilePathDone:params database:database];
             }];
-        };
-        
-        [self presentViewController:nav animated:YES completion:nil];
-    }
+        });
+    };
+    
+    [self presentViewController:nav animated:YES completion:nil];
 #endif
+}
+
+- (void)onEditSftpOrWebDAVFilePathDone:(SelectedStorageParameters *)params
+                              database:(DatabasePreferences*)database {
+    if ( params.method == kStorageMethodErrorOccurred ) {
+        [Alerts error:self error:params.error];
+    }
+    else if ( params.method == kStorageMethodNativeStorageProvider ) {
+        [Alerts areYouSure:self
+                   message:NSLocalizedString(@"are_you_sure_use_this_file_this_database", @"Are you want to use this file for this database?")
+                    action:^(BOOL response) {
+            if ( response ) {
+                NSLog(@"Done [%@]", params.file.providerData);
+                if ( database.storageProvider == kWebDAV ) {
+                    [self changeWebDAVFilePath:database providerData:(WebDAVProviderData*)params.file.providerData];
+                }
+                else {
+                    [self changeSFTPFilePath:database providerData:(SFTPProviderData*)params.file.providerData];
+                }
+            }
+        }];
+    }
 }
 
 - (void)changeSFTPFilePath:(DatabasePreferences*)database providerData:(SFTPProviderData*)providerData {
@@ -2985,8 +3093,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
       completion:^{
         NSError* error;
         id<Importer> importer = [[OnePassword1PuxImporter alloc] init];
-        DatabaseModel* database = [importer convertWithUrl:url error:&error];
-        [self addImportedDatabase:database error:error];
+        ImportResult* result = [importer convertExWithUrl:url error:&error];
+        [self addImportedDatabase:result.database messages:result.messages error:error];
     }];
 }
 
@@ -3027,16 +3135,38 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)addImportedDatabase:(DatabaseModel*)database error:(NSError*)error {
+    [self addImportedDatabase:database messages:nil error:error];
+}
+
+- (void)addImportedDatabase:(DatabaseModel*)database
+                   messages:(NSArray<ImportMessage*>* _Nullable)messages
+                      error:(NSError*)error {
     if ( !database ) {
         [self importFailedNotification:error];
     }
     else {
-        [Alerts info:self
-               title:NSLocalizedString(@"import_successful_title", @"✅ Import Successful")
-             message:NSLocalizedString(@"import_successful_message", @"Your import was successful! Now, let's set a strong master password and save your new Strongbox database.")
-          completion:^{
-            [self setNewMasterPasswordOnImportedDatabase:database];
+        messages = messages ? messages : @[];
+        
+        __weak SafesViewController* weakSelf = self;
+        
+        UIViewController* vc = [SwiftUIViewFactory makeImportResultViewControllerWithMessages:messages
+                                                                               dismissHandler:^(BOOL cancel) {
+            [weakSelf.presentedViewController dismissViewControllerAnimated:YES completion:^{
+                if ( !cancel ) {
+                    [weakSelf setNewMasterPasswordOnImportedDatabase:database];
+                }
+            }];
         }];
+        vc.modalPresentationStyle = UIModalPresentationFormSheet;
+        
+        [self presentViewController:vc animated:YES completion:nil];
+        
+
+
+
+
+
+
     }
 }
 
@@ -3158,3 +3288,73 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

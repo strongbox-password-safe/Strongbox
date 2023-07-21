@@ -47,7 +47,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 @property (readonly) BOOL hasActiveMonthlySubscription;
 @property (readonly) BOOL isLegacyLifetimeIAPPro;
 
-
+@property (readonly, nullable) NSDate* currentSubscriptionRenewalOrExpiry;
 
 @end
 

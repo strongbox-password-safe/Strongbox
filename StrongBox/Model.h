@@ -29,7 +29,7 @@ typedef NSViewController* VIEW_CONTROLLER_PTR;
 
 #import "DatabaseModel.h"
 #import "DatabaseAuditor.h"
-#import "AsyncUpdateResult.h"
+#import "AsyncJobResult.h"
 #import "CommonDatabasePreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -40,7 +40,7 @@ extern NSString* const kSpecialSearchTermTotpEntries;
 extern NSString* const kSpecialSearchTermExpiredEntries;
 extern NSString* const kSpecialSearchTermNearlyExpiredEntries;
 
-typedef void (^AsyncUpdateCompletion)(AsyncUpdateResult *result);
+typedef void (^AsyncUpdateCompletion)(AsyncJobResult *result);
 
 extern NSString* const kAuditNodesChangedNotificationKey;
 extern NSString* const kAuditProgressNotificationKey;
@@ -129,12 +129,19 @@ extern NSString* const kAsyncUpdateStarting;
 - (NSSet<Node*>*)getSimilarPasswordNodeSet:(NSUUID*)node;
 - (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(NSUUID*)node;
 
+- (void)toggleAuditExclusion:(NSUUID *)uuid;
 - (void)excludeFromAudit:(Node*)node exclude:(BOOL)exclude;
 - (BOOL)isExcludedFromAudit:(NSUUID*)item;
 - (NSArray<Node*>*)getExcludedAuditItems;
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;
 
 - (void)closeAndCleanup;
+
+
+
+- (BOOL)toggleAutoFillExclusion:(NSUUID*)uuid;
+- (BOOL)setExcludedFromAutoFill:(NSUUID*)uuid exclude:(BOOL)exclude;
+- (BOOL)isExcludedFromAutoFill:(NSUUID*)item;
 
 
 
@@ -156,13 +163,11 @@ extern NSString* const kAsyncUpdateStarting;
 
 - (BOOL)isFavourite:(NSUUID*)itemId;
 - (BOOL)toggleFavourite:(NSUUID*)itemId;
+
 @property (readonly) NSArray<Node*>* favourites;
 
 - (BOOL)launchUrl:(Node*)item;
 - (BOOL)launchUrlString:(NSString*)urlString;
-
-
--(void)encrypt:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL userCancelled, NSString*_Nullable file, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
 
 - (NSString *_Nonnull)generatePassword;
 
@@ -173,15 +178,15 @@ extern NSString* const kAsyncUpdateStarting;
 
 
 
-- (void)update:(VIEW_CONTROLLER_PTR)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
-
-
-
-@property (nullable) AsyncUpdateResult* lastAsyncUpdateResult;
+@property (nullable) AsyncJobResult* lastAsyncUpdateResult;
 @property (readonly) BOOL isRunningAsyncUpdate;
 
-- (BOOL)asyncUpdateAndSync; 
+- (BOOL)asyncUpdate;
 - (BOOL)asyncUpdate:(AsyncUpdateCompletion _Nullable)completion;
+- (BOOL)asyncSync;
+- (BOOL)asyncSync:(AsyncUpdateCompletion _Nullable)completion;
+- (BOOL)asyncUpdateAndSync;
+- (BOOL)asyncUpdateAndSync:(AsyncUpdateCompletion _Nullable)completion;
 
 - (void)clearAsyncUpdateState;
 
@@ -244,12 +249,11 @@ extern NSString* const kAsyncUpdateStarting;
                                descending:(BOOL)descending
                         foldersSeparately:(BOOL)foldersSeparately;
 
-- (void)rebuildFastMaps; 
+- (void)refreshCaches; 
 
 #ifndef IS_APP_EXTENSION 
 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString;
-- (void)rebuildAutoFillDomainNodeMap;
 
 #endif
 

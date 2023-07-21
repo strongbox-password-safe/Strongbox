@@ -62,13 +62,13 @@
     return [super menuForEvent:event];
 }
 
-- (BOOL)validateProposedFirstResponder:(NSResponder *)responder forEvent:(NSEvent *)event {
-    if ( [responder isKindOfClass:HyperlinkTextField.class] ) { 
-        return YES;
-    }
-    
-    return [super validateProposedFirstResponder:responder forEvent:event];
-}
+
+
+
+
+
+
+
 
 
 

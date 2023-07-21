@@ -20,17 +20,48 @@ class SshAgentSettings: NSViewController {
     @IBOutlet weak var stackErrorLaunching: NSStackView!
     
     @IBOutlet weak var onLearnMore: ClickableTextField!
-    @IBOutlet weak var checkboxRequireApproval: NSButton!
     
+    @IBOutlet weak var comboExpiry: NSPopUpButton!
     @IBOutlet weak var labelHeaderConfig: NSTextField!
     @IBOutlet weak var labelSymlnkBody: NSTextField!
     @IBOutlet weak var buttonCreateSymlink: NSButton!
     @IBOutlet weak var labelSnippetText: NSTextField!
     @IBOutlet weak var buttonCopySnippet: NSButton!
     
+    @IBOutlet weak var stackViewApprovals: NSStackView!
+    
+    @IBAction func onSetExpiry(_ sender: Any) {
+        let idx = comboExpiry.indexOfSelectedItem
+        
+        var hours : Int = -1
+        if idx == 0 {
+            hours = 4
+        }
+        else if idx == 1 {
+            hours = 12
+        }
+        else if idx == 2 {
+            hours = 24
+        }
+
+        Settings.sharedInstance().sshAgentApprovalDefaultExpiryMinutes = hours == -1 ? -1 : hours * 60
+        
+        bindUi()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        comboExpiry.menu?.removeAllItems()
+
+        let fmt = NSLocalizedString("generic_for_n_hours_suffix_fmt", comment: "for %@ hours")
+        
+        comboExpiry.menu?.addItem(withTitle: String(format: fmt, "4"), action: nil, keyEquivalent: "")
+        comboExpiry.menu?.addItem(withTitle: String(format: fmt, "12"), action: nil, keyEquivalent: "")
+        comboExpiry.menu?.addItem(withTitle: String(format: fmt, "24"), action: nil, keyEquivalent: "")
+        
+        comboExpiry.menu?.addItem(withTitle: NSLocalizedString("ssh_agent_remember_approval_until_strongbox_quits", comment: "until Strongbox quits"), action: nil, keyEquivalent: "")
+    
         guard let scrollView = textView.enclosingScrollView, let textContainer = textView.textContainer else {
             return
         }
@@ -85,14 +116,6 @@ class SshAgentSettings: NSViewController {
     @IBAction func onCopySnippet(_ sender: Any) {
         ClipboardManager.sharedInstance().copyNoneConcealedString(textView.string)
     }
-    
-    @IBAction func onRequireApproval(_ sender: Any) {
-        let settings = Settings.sharedInstance();
-        
-        settings.requireApprovalSshAgent = checkboxRequireApproval.state == .on
-        
-        bindUi()
-    }
 
     func bindUi() {
         if let socketPath = SSHAgentServer.sharedInstance().socketPathForSshConfig {
@@ -110,11 +133,31 @@ class SshAgentSettings: NSViewController {
         
         stackErrorLaunching.isHidden = !(settings.runSshAgent && settings.isPro && !SSHAgentServer.sharedInstance().isRunning)
         
-        checkboxRequireApproval.state = settings.requireApprovalSshAgent ? .on : .off
+        stackViewApprovals.isHidden = !(settings.runSshAgent && settings.isPro && SSHAgentServer.sharedInstance().isRunning)
         
         checkboxRunSshAgent.isEnabled = settings.isPro
-        checkboxRequireApproval.isEnabled = settings.runSshAgent && settings.isPro
         
+        let mins = settings.sshAgentApprovalDefaultExpiryMinutes
+        
+        if ( mins == -1 ) {
+            comboExpiry.selectItem(at: 3)
+        }
+        else {
+            var idx = 0
+            let hours = mins / 60
+            
+            if hours == 4 {
+                idx = 0
+            }
+            else if hours == 12 {
+                idx = 1
+            }
+            else {
+                idx = 2
+            }
+            
+            comboExpiry.selectItem(at: idx)
+        }
         
         labelHeaderConfig.textColor = (settings.runSshAgent && settings.isPro) ? .labelColor : .secondaryLabelColor
         labelSymlnkBody.textColor = (settings.runSshAgent && settings.isPro) ? .labelColor : .secondaryLabelColor
@@ -124,5 +167,9 @@ class SshAgentSettings: NSViewController {
         buttonCopySnippet.isEnabled = (settings.runSshAgent && settings.isPro)
         textView.textColor = (settings.runSshAgent && settings.isPro) ? .systemGreen : .secondaryLabelColor
         textView.isSelectable = settings.isPro
+        
+
+
+        
     }
 }

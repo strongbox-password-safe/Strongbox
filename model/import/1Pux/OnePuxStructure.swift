@@ -38,6 +38,8 @@ enum OnePuxCategory : String, Codable {
     case EmailAccount = "111"
     case API_Credential = "112"
     case MedicalRecord = "113"
+    case SshKey = "114"
+    case CryptoWallet = "115"
 
     var displayName : String {
         switch self {
@@ -81,6 +83,10 @@ enum OnePuxCategory : String, Codable {
             return "API Credentials"
         case .MedicalRecord:
             return "Medical Records"
+        case .SshKey:
+            return "SSH Keys"
+        case .CryptoWallet:
+            return "Crypto Wallet"
         }
     }
     
@@ -126,8 +132,24 @@ enum OnePuxCategory : String, Codable {
             return .TerminalEncrypted
         case .MedicalRecord:
             return .UserKey
+        case .SshKey:
+            return .TerminalEncrypted
+        case .CryptoWallet:
+            return .Money
         }
     }
+}
+
+class OnePuxSshKeyMetadata : Decodable {
+    let keyType : String?
+    let privateKey : String?
+    let fingerprint : String?
+    let publicKey : String?
+}
+
+class OnePuxSshKey : Decodable {
+    let metadata : OnePuxSshKeyMetadata?
+    let privateKey : String?
 }
 
 class OnePuxItemOverviewAdditionalUrl: Decodable {

@@ -87,7 +87,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
         NSLog(@"⚠️ Could not getSocketPath");
         return NO;
     }
-
+    
     if ( self.symlinkExists ) {
         NSError* error;
         BOOL success = [NSFileManager.defaultManager removeItemAtPath:self.symlinkFullPath error:&error];
@@ -109,7 +109,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
                                          withIntermediateDirectories:YES
                                                           attributes:nil
                                                                error:&error];
-
+    
     if ( !mkDir || error ) {
         NSLog(@"⚠️ Error creating .strongbox directory for SymLnk [%@]", error);
         return NO;
@@ -128,7 +128,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     BOOL success = [NSFileManager.defaultManager createSymbolicLinkAtPath:self.symlinkFullPath
                                                       withDestinationPath:str
                                                                     error:&error];
-
+    
     if ( !success || error ) {
         NSLog(@"⚠️ Error Creating SymLnk [%@]", error);
         return NO;
@@ -165,10 +165,10 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 
 - (NSString*)getSocketPath {
     static const int MAX_PATH = 103;
-
+    
     NSURL* url = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:@"group.strongbox.mac.mcguill"];
     
-        
+    
     NSString* path = [url.path stringByAppendingPathComponent:kSocketFileName];
     
     
@@ -190,7 +190,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 }
 
 - (void)stop {
-
+    
     
     if ( !self.isRunning ) {
         return;
@@ -206,13 +206,13 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     
     
-
+    
     
     _isRunning = NO;
 }
 
 - (BOOL)start {
-
+    
     
     [self stop];
     
@@ -282,7 +282,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 
 - (void)acceptNewConnections {
     while ( 1 ) {
-
+        
         
         int socket = accept (self.server_sock, NULL, NULL);
         
@@ -302,8 +302,8 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 }
 
 - (void)sendResponse:(NSOutputStream*)outputStream response:(NSData*)response {
-
-
+    
+    
     uint32_t messageLength = (uint32_t)response.length; 
     uint32_t bigEndianLength = CFSwapInt32HostToBig(messageLength);
     
@@ -316,12 +316,34 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 }
 
 - (void)sendUnsupportedRequestResponse:(NSOutputStream*)outputStream {
-
+    
     
     uint8_t resp[] = { SSH_AGENT_FAILURE };
     
     NSData* data = [NSData dataWithBytes:resp length:1];
     [self sendResponse:outputStream response:data];
+}
+
+- (pid_t)getSocketCallerPid:(int)socket {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    pid_t pid;
+    socklen_t pid_size = sizeof(pid);
+    if ( getsockopt(socket, SOL_LOCAL, LOCAL_PEERPID, &pid, &pid_size) == -1 ) { 
+        NSLog(@"🔴 Could not getsockopt LOCAL_PEERPID");
+        return -1;
+    }
+ 
+    return pid;
 }
 
 - (NSString* _Nullable)getSocketCallerId:(int)socket {
@@ -424,12 +446,12 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     switch ( requestId ) {
         case SSH2_AGENTC_REQUEST_IDENTITIES:
-            
+
             *response = [self getRequestIdentitiesResponse];
             return YES;
             break;
         case SSH2_AGENTC_SIGN_REQUEST:
-            
+
             *response = [self getSignRequestResponse:message socket:socket];
             return YES;
             break;
@@ -545,9 +567,12 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     NSData* publicKeyBlob = [NSData dataWithBytes:bloop length:bloopLen];
     free(bloop);
 
+    pid_t pid = [self getSocketCallerPid:socket];
+    
     NSData* signatureData = [SSHAgentRequestHandler.shared signChallenge:challengeData
                                                      requestedKeyBlobB64:publicKeyBlob.base64String
                                                              processName:[self getSocketCallerId:socket]
+                                                               processId:pid == -1 ? nil : @(pid).stringValue
                                                                    flags:flags];
     
     if ( signatureData == nil ) {
@@ -573,7 +598,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
         return nil;
     }
         
-    NSLog(@"✅ getSignRequestResponse Signing Done OK.");
+
 
     return retData;
 }

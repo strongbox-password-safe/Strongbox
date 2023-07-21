@@ -140,6 +140,22 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     });
 }
 
+- (void)doDeferredAppLaunchTasks {
+    [self startAutoFillProxyServer];
+    
+    [self startSSHAgent];
+    
+    [MacOnboardingManager beginAppOnboardingWithCompletion:^{
+        NSLog(@"✅ Onboarding Completed...");
+        
+        [self checkForAllWindowsClosedScenario:nil appIsLaunching:YES];
+    }];
+    
+    [self monitorForQuickRevealKey];
+    
+    [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
+}
+
 - (void)startSSHAgent {
     if ( Settings.sharedInstance.runSshAgent && Settings.sharedInstance.isPro ) {
         
@@ -205,22 +221,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [DropboxV2StorageProvider.sharedInstance initialize:Settings.sharedInstance.useIsolatedDropbox];
 #endif
-}
-
-- (void)doDeferredAppLaunchTasks {
-    [self startAutoFillProxyServer];
-    
-    [self startSSHAgent];
-    
-    [MacOnboardingManager beginAppOnboardingWithCompletion:^{
-        NSLog(@"✅ Onboarding Completed...");
-
-        [self checkForAllWindowsClosedScenario:nil appIsLaunching:YES];
-    }];
-
-    [self monitorForQuickRevealKey];
-    
-    [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 }
 
 - (void)setupSystemTrayPopover {
@@ -628,7 +628,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     NSLog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
 
-    [self cancelAutoLockInBackgroundTimer];
+    [self cancelAutoLockTimer];
     
     [self performedScheduledEntitlementsCheck];
     
@@ -712,10 +712,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)applicationDidResignActive:(NSNotification *)notification {
 
     
-    [self startAutoLockForAppInBackgroundTimer];
+    [self startAutoLockTimer];
 }
 
-- (void)cancelAutoLockInBackgroundTimer {
+- (void)cancelAutoLockTimer {
     if(self.autoLockWorkBlock) {
         NSLog(@"🐞 DEBUG - Cancelling Background Auto-Lock work block");
         dispatch_block_cancel(self.autoLockWorkBlock);
@@ -723,11 +723,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-- (void)startAutoLockForAppInBackgroundTimer {
+- (void)startAutoLockTimer {
     NSInteger timeout = Settings.sharedInstance.autoLockIfInBackgroundTimeoutSeconds;
     
     if(timeout != 0) {
-        [self cancelAutoLockInBackgroundTimer];
+        [self cancelAutoLockTimer];
         
         NSLog(@"🐞 DEBUG - [startAutoLockForAppInBackgroundTimer] Creating Background Auto-Lock work block... [timeout = %ld secs]", timeout);
 
@@ -988,11 +988,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 static NSInteger clipboardChangeCount;
 
 - (void)onStrongboxDidChangeClipboard {
-    NSLog(@"onApplicationDidChangeClipboard...");
+
     
     if ( Settings.sharedInstance.clearClipboardEnabled ) {
         clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
-        NSLog(@"Clipboard Changed and Clear Clipboard Enabled... Recording Change Count as [%ld]", (long)clipboardChangeCount);
+        
         [self scheduleClipboardClearTask];
     }
 }
@@ -1081,22 +1081,22 @@ static NSInteger clipboardChangeCount;
 }
 
 - (IBAction)onImport1Password1Pux:(id)sender {
+    [DBManagerPanel.sharedInstance show]; 
 
+    NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
+    NSString* msg = NSLocalizedString(@"1password_import_warning_msg", @"The import process isn't perfect and some features of 1Password such as named sections are not available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
 
-
-
-
-
-
-
-
-
-    [self requestImportFile:[[OnePassword1PuxImporter alloc] init]];
-
-
+    [MacAlerts info:title
+    informativeText:msg
+             window:DBManagerPanel.sharedInstance.window
+         completion:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self requestImportFile:[[OnePassword1PuxImporter alloc] init]];
+        });
+    }];
 }
 
-- (void)requestImportFile:(id<Importer>)importer {
+- (void)requestImportFile:(NSObject<Importer>*)importer {
     [DBManagerPanel.sharedInstance show]; 
     
     NSOpenPanel* panel = [NSOpenPanel openPanel];
@@ -1117,9 +1117,20 @@ static NSInteger clipboardChangeCount;
     }
 }
 
-- (void)continueImportWithUrl:(NSURL*)url importer:(id<Importer>)importer {
+- (void)continueImportWithUrl:(NSURL*)url importer:(NSObject<Importer>*)importer {
     NSError* error;
-    DatabaseModel* database = [importer convertWithUrl:url error:&error];
+    DatabaseModel* database;
+    NSArray<ImportMessage*>* messages;
+    
+    if ( [importer respondsToSelector:@selector(convertExWithUrl:error:)] ) {
+        ImportResult* result = [importer convertExWithUrl:url error:&error];
+        database = result.database;
+        messages = result.messages;
+    }
+    else {
+        database = [importer convertWithUrl:url error:&error];
+        messages = @[];
+    }
     
     if ( error ) {
         NSLog(@"🔴 %@", error.localizedDescription);
@@ -1134,25 +1145,29 @@ static NSInteger clipboardChangeCount;
             return;
         }
         else {
-            [self addImportedDatabase:database];
+            [self addImportedDatabase:database messages:messages];
         }
     }
 }
 
-- (void)addImportedDatabase:(DatabaseModel*)database {
-    [MacAlerts info:NSLocalizedString(@"import_successful_title", @"✅ Import Successful")
-    informativeText:NSLocalizedString(@"import_successful_message", @"Your import was successful! Now, let's set a strong master password and save your new Strongbox database.")
-             window:DBManagerPanel.sharedInstance.window
-         completion:^{
-        [self setNewCkfsForImportedDatabase:database];
+- (void)addImportedDatabase:(DatabaseModel*)database messages:(NSArray<ImportMessage*>*)messages {
+    NSViewController* presenter = DBManagerPanel.sharedInstance.contentViewController;
+    
+    NSViewController* vc = [SwiftUIViewFactory makeImportResultViewControllerWithMessages:messages
+                                                                           dismissHandler:^(BOOL cancel) {
+        [presenter dismissViewController:presenter.presentedViewControllers.firstObject];
+
+        if ( !cancel ) {
+            [self setNewCkfsForImportedDatabase:database];
+        }
     }];
+    
+    [DBManagerPanel.sharedInstance.contentViewController presentViewControllerAsSheet:vc];
 }
 
 - (void)setNewCkfsForImportedDatabase:(DatabaseModel*)database {
     CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-    
-    NSString* loc = NSLocalizedString(@"mac_please_enter_master_credentials_for_this_database", @"Please Enter the Master Credentials for this Database");
-    wizard.titleText = loc;
+
     wizard.initialDatabaseFormat = kKeePass4;
     wizard.createSafeWizardMode = NO;
         

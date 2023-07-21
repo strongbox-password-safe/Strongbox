@@ -24,6 +24,16 @@
 
 @implementation AutomaticLockingPreferences
 
++ (instancetype)fromStoryboardWithModel:(Model*)model {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"DatabaseOperations" bundle:nil];
+    
+    AutomaticLockingPreferences* vc = [sb instantiateViewControllerWithIdentifier:@"AutomaticLocking"];
+    
+    vc.viewModel = model;
+    
+    return vc;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -122,6 +132,10 @@
 - (IBAction)onSwitchLockEvenIfEditing:(id)sender {
     self.viewModel.metadata.lockEvenIfEditing = self.switchLockDuringEditing.on;
     [self bindUi];
+}
+
+- (IBAction)oDone:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

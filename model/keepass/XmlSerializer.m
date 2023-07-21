@@ -125,7 +125,7 @@
 }
 
 - (BOOL)writeElement:(NSString *)elementName boolean:(BOOL)boolean {
-    return [self writeElement:elementName text:boolean ? @"True" : @"False"];
+    return [self writeElement:elementName text:boolean ? kAttributeValueTrue : kAttributeValueFalse];
 }
 
 - (BOOL)writeElement:(NSString *)elementName uuid:(NSUUID *)uuid {

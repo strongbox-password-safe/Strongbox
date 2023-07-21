@@ -109,7 +109,10 @@ static NSString* const kHideOnCopy = @"hideOnCopy";
 static NSString* const kHasPromptedForThirdPartyAutoFill = @"hasPromptedForThirdPartyAutoFill";
 static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 static NSString* const kRunSshAgent = @"runSshAgent";
-static NSString* const kRequireApprovalSshAgent = @"requireApprovalSshAgent";
+
+static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
+static NSString* const kLastQuickTypeMultiDbRegularClear = @"lastQuickTypeMultiDbRegularClear";
+static NSString* const kSshAgentApprovalDefaultExpiryMinutes = @"sshAgentApprovalDefaultExpiryMinutes";
 
 
 
@@ -217,13 +220,47 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
-- (BOOL)requireApprovalSshAgent {
-    return [self getBool:kRequireApprovalSshAgent fallback:YES];
+- (NSInteger)sshAgentApprovalDefaultExpiryMinutes {
+    NSInteger ret = [self.sharedAppGroupDefaults integerForKey:kSshAgentApprovalDefaultExpiryMinutes];
+    
+    return ret == 0 ? -1 : ret;
 }
 
-- (void)setRequireApprovalSshAgent:(BOOL)requireApprovalSshAgent {
-    return [self setBool:kRequireApprovalSshAgent value:requireApprovalSshAgent];
+- (void)setSshAgentApprovalDefaultExpiryMinutes:(NSInteger)sshAgentApprovalDefaultExpiryMinutes {
+    [self.sharedAppGroupDefaults setInteger:sshAgentApprovalDefaultExpiryMinutes forKey:kSshAgentApprovalDefaultExpiryMinutes];
+    [self.sharedAppGroupDefaults synchronize];
+
 }
+
+- (NSDate *)lastQuickTypeMultiDbRegularClear {
+    NSUserDefaults *userDefaults = Settings.sharedInstance.sharedAppGroupDefaults;
+    return [userDefaults objectForKey:kLastQuickTypeMultiDbRegularClear];
+}
+
+- (void)setLastQuickTypeMultiDbRegularClear:(NSDate *)lastQuickTypeMultiDbRegularClear {
+    NSUserDefaults *userDefaults = Settings.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults setObject:lastQuickTypeMultiDbRegularClear forKey:kLastQuickTypeMultiDbRegularClear];
+    
+    [userDefaults synchronize];
+}
+
+- (NSString *)businessOrganisationName {
+    return [Settings.sharedInstance.sharedAppGroupDefaults objectForKey:kBusinessOrganisationName];
+}
+
+- (void)setBusinessOrganisationName:(NSString *)businessOrganisationName {
+    [Settings.sharedInstance.sharedAppGroupDefaults setObject:businessOrganisationName forKey:kBusinessOrganisationName];
+    [Settings.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+
+
+
+
+
+
+
 
 - (BOOL)runSshAgent {
     return [self getBool:kRunSshAgent];
@@ -234,11 +271,12 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)shadeFavoriteTag {
-    return [self getBool:kShadeFavoriteTag fallback:YES];
+    return YES;
+
 }
 
 - (void)setShadeFavoriteTag:(BOOL)shadeFavoriteTag {
-    [self setBool:kShadeFavoriteTag value:shadeFavoriteTag];
+
 }
 
 - (BOOL)hasPromptedForThirdPartyAutoFill {
@@ -322,7 +360,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)stripUnusedIconsOnSave {
-    return [self getBool:kStripUnusedIconsOnSave];
+    return [self getBool:kStripUnusedIconsOnSave fallback:YES]; 
 }
 
 - (void)setStripUnusedIconsOnSave:(BOOL)stripUnusedIconsOnSave {
@@ -517,7 +555,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)markdownNotes {
-    return [self getBool:kMarkdownNotes];
+    return [self getBool:kMarkdownNotes fallback:YES];
 }
 
 - (void)setMarkdownNotes:(BOOL)markdownNotes {

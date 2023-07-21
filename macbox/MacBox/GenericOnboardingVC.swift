@@ -9,6 +9,7 @@
 import Cocoa
 
 class GenericOnboardingModule: OnboardingModule {
+    var window: NSWindow? = nil
     var shouldDisplayFunc: (() -> Bool)?
     
     var image: NSImage?
@@ -31,6 +32,8 @@ class GenericOnboardingModule: OnboardingModule {
             return true
         }
     }
+    
+    var isAppModal: Bool = false
     
     init(image: NSImage, title: String, body: String,
          button1Title: String?,

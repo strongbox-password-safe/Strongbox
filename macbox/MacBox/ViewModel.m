@@ -316,17 +316,6 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     return NO;
 }
 
-- (void)update:(NSViewController *)viewController handler:(void (^)(BOOL, BOOL, NSError * _Nullable))handler {
-    if (self.locked) {
-        NSLog(@"🔴 Attempt to get update while locked?");
-        return;
-    }
-    
-    [self rebuildMapsAndCaches];
-    
-    [self.innerModel update:viewController handler:handler];
-}
-
 
 
 - (NSURL*)fileUrl {
@@ -489,7 +478,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemAuditExclusion:node exclude:!exclude modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
-        NSString* loc = NSLocalizedString(@"exclude_item_from_audit", @"Exclude Item from Audit");
+        NSString* loc = NSLocalizedString(@"item_settings_action_verb_toggle_suggest_in_audit", @"Toggle Audit this Item");
         [self.document.undoManager setActionName:loc];
     }
     
@@ -1223,6 +1212,8 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     NSString* loc = NSLocalizedString(@"mac_undo_action_restore_history_item", @"Restore History Item");
     [self.document.undoManager setActionName:loc];
     
+    [self rebuildMapsAndCaches];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationHistoryItemRestored object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
@@ -1545,6 +1536,58 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
     else {
         return self.innerModel.favourites;
+    }
+}
+
+
+
+- (void)toggleAutoFillExclusion:(NSUUID *)uuid {
+    [self toggleAutoFillExclusion:uuid modified:nil];
+}
+
+- (void)toggleAutoFillExclusion:(NSUUID *)uuid modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    if ( self.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 toggleAutoFillExclusion - Model is RO!");
+        return;
+    }
+    
+    Node* item = [self getItemById:uuid];
+    NSDate* oldModified = item.fields.modified;
+    
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+    
+    [self.innerModel toggleAutoFillExclusion:uuid];
+    
+    [self touchAndModify:item modDate:modified];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] toggleAutoFillExclusion:uuid modified:oldModified];
+    
+    if(!self.document.undoManager.isUndoing) {
+        NSString* loc = NSLocalizedString(@"item_settings_action_verb_toggle_suggest_in_autofill", @"Toggle Suggest in AutoFill");
+        [self.document.undoManager setActionName:loc];
+    }
+
+
+
+
+}
+
+- (BOOL)isExcludedFromAutoFill:(NSUUID *)item {
+    if ( !self.locked ) {
+        return [self.innerModel isExcludedFromAutoFill:item];
+    }
+    else {
+        NSLog(@"🔴 isExcludedFromAutoFill - Model Locked.");
+        return NO;
     }
 }
 
@@ -2343,17 +2386,21 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     return [self.database getHtmlPrintString:databaseName];
 }
 
-
-
-- (BOOL)showTotp {
-    return !self.databaseMetadata.doNotShowTotp;
+- (NSString *)getHtmlPrintStringForItems:(NSString *)databaseName items:(NSArray<Node *> *)items {
+    return [self.database getHtmlPrintStringForItems:databaseName items:items];
 }
 
-- (void)setShowTotp:(BOOL)showTotp {
-    self.databaseMetadata.doNotShowTotp = !showTotp;
-    
-    [self publishDatabasePreferencesChangedNotification];
-}
+
+
+
+
+
+
+
+
+
+
+
 
 - (BOOL)showAutoCompleteSuggestions {
     return !self.databaseMetadata.doNotShowAutoCompleteSuggestions;
@@ -2934,7 +2981,7 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
 
 
 - (void)rebuildMapsAndCaches { 
-    [self.innerModel rebuildFastMaps];
+    [self.innerModel refreshCaches];
     
     [self cacheKeeAgentPublicKeysOffline];
 }
@@ -2946,12 +2993,10 @@ NSString* const kNotificationUserInfoKeyBoolParam = @"boolean";
     }
     
     NSSet<NSData*>* pkBlobs = [self.keeAgentSshKeyEntries map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        NSData* pkData = obj.keeAgentEnabledSshPrivateKeyData;
-        if ( pkData ) {
-            OpenSSHPrivateKey* theKey = [OpenSSHPrivateKey fromData:pkData];
-            if ( theKey ) {
-                return theKey.publicKeySerializationBlob;
-            }
+        KeeAgentSshKeyViewModel* theKey = obj.keeAgentSshKeyViewModel;
+        
+        if ( theKey && theKey.enabled ) {
+            return theKey.openSshKey.publicKeySerializationBlob;
         }
         
         return nil;

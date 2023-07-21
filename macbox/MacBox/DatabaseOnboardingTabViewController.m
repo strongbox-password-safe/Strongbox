@@ -7,8 +7,6 @@
 //
 
 #import "DatabaseOnboardingTabViewController.h"
-#import "OnboardingAutoFillViewController.h"
-#import "OnboardingConvenienceViewController.h"
 #import "OnboardingWelcomeViewController.h"
 #import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
@@ -88,12 +86,10 @@
     shouldSetAutoFill:(BOOL)shouldSetAutoFill
        enableAutoFill:(BOOL)enableAutoFill {
     if ( shouldSetTouchID ) {
-        BOOL enable = enableTouchID;
-        
-        self.viewModel.databaseMetadata.isTouchIdEnabled = enableTouchID;
+        self.viewModel.databaseMetadata. isTouchIdEnabled = enableTouchID;
         self.viewModel.databaseMetadata.isWatchUnlockEnabled = enableTouchID;
         
-        if ( enable ) {
+        if ( enableTouchID ) {
             self.viewModel.databaseMetadata.conveniencePasswordHasBeenStored = YES;
             self.viewModel.databaseMetadata.conveniencePassword = self.ckfs.password;
         }
@@ -107,24 +103,24 @@
     
     if ( shouldSetAutoFill ) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-        
-        if ( enableAutoFill ) {
-            [self updateAutoFillDatabases];
-        }
-        
+
         self.viewModel.databaseMetadata.autoFillEnabled = enableAutoFill;
         self.viewModel.databaseMetadata.quickTypeEnabled = enableAutoFill;
         self.viewModel.databaseMetadata.quickWormholeFillEnabled = enableAutoFill;
+
+        if ( enableAutoFill ) {
+            [self updateQuickTypeAutoFillDatabases];
+        }
         
+        [self.viewModel rebuildMapsAndCaches];
+                
         self.viewModel.databaseMetadata.hasPromptedForAutoFillEnrol = YES;
     }
     
     [self.view.window close];
 }
 
-- (void)updateAutoFillDatabases {
-    [self.viewModel rebuildMapsAndCaches];
-    
+- (void)updateQuickTypeAutoFillDatabases {
     [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.commonModel
                                                        databaseUuid:self.viewModel.databaseMetadata.uuid
                                                       displayFormat:self.viewModel.databaseMetadata.quickTypeDisplayFormat

@@ -127,14 +127,14 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         
         let filename = url.lastPathComponent
         
-        if model.attachments.containsKey(filename as NSString) || filename == kKeeAgentSettingsAttachmentName {
+        if model.reservedAttachmentNames.contains(filename) || filename == kKeeAgentSettingsAttachmentName {
             MacAlerts.info("This filename already exists in Attachments. Cannot add duplicate attachment.", window: view.window)
             return
         }
         
         
         
-        if !key.isPassphraseProtected || key.vaildatePassphrase(model.password) {
+        if !key.isPassphraseProtected || key.validatePassphrase(model.password) {
             continueAddKeeAgentSshKey(key, filename)
             return
         }
@@ -154,7 +154,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 return
             }
             
-            if key.vaildatePassphrase(passphrase) {
+            if key.validatePassphrase(passphrase) {
                 return continueAddKeeAgentSshKeyWithPasswordCheck(key, filename, passphrase: passphrase )
             }
             else {
@@ -205,40 +205,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 self?.model.keeAgentSshKey = nil
                 self?.onModelEdited()
                 self?.bindKeeAgentSshKey()
-            }
-        }
-    }
-    
-    @IBAction func onExportSshKey(_ sender: Any) {
-        guard let key = model.keeAgentSshKey else {
-            return
-        }
-        
-        let alert = MacAlerts()
-        
-        guard let passphrase = alert.input(NSLocalizedString("ssh_agent_enter_passphrase_for_export", comment: "Enter a passphrase to protect the exported key file"),
-                                           defaultValue: "", allowEmpty: true, secure: true) else {
-            return
-        }
-        
-        guard let data = key.openSshKey.exportFileBlob(model.password, exportPassphrase: passphrase) else {
-            MacAlerts.info(NSLocalizedString("export_vc_error_exporting", comment: "Error Exporting"),
-                           window: view.window)
-            return
-        }
-
-        let panel = NSSavePanel()
-        panel.nameFieldStringValue = key.filename
-        
-        if panel.runModal() == .OK {
-            guard let url = panel.url else {
-                return
-            }
-            
-            do {
-                try data.write(to: url) 
-            } catch {
-                MacAlerts.error(error, window: view.window)
             }
         }
     }
@@ -836,7 +802,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
     
     func validateSshKeyPassphrase (_ completion : @escaping ( (_ continueSave : Bool) -> Void ) ) {
-        guard let key = model.keeAgentSshKey, key.openSshKey.isPassphraseProtected, !key.openSshKey.vaildatePassphrase(model.password) else {
+        guard let key = model.keeAgentSshKey, key.openSshKey.isPassphraseProtected, !key.openSshKey.validatePassphrase(model.password) else {
             completion(true)
             return
         }
@@ -1502,7 +1468,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     var canAddAttachment: Bool {
         if database.format == .keePass1 {
-            return model.attachmentsNoKeeAgent.count == 0
+            return model.filteredAttachments.count == 0
         }
 
         return database.format != .passwordSafe
@@ -1549,7 +1515,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     func addAttachment(_ filename: String, _ databaseAttachment: KeePassAttachmentAbstractionLayer) {
         var uniqueFilename = filename
 
-        if model.attachments.allKeys().contains(filename as NSString) {
+        if model.reservedAttachmentNames.contains(filename) {
             let foo = filename as NSString
             uniqueFilename = String(format: "%@-%@.%@", foo.deletingPathExtension, NSDate().fileNameCompatibleDateTimePrecise, foo.pathExtension)
         }
@@ -1563,13 +1529,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func deleteAttachment(_ filename: String) {
-        model.attachmentsNoKeeAgent.remove(filename as NSString)
+        model.filteredAttachments.remove(filename as NSString)
         refreshAttachments()
         onModelEdited()
     }
 
     func selectAttachmentWithName(_ name: String) {
-        guard let idx = model.attachmentsNoKeeAgent.allKeys().firstIndex(of: name as NSString) else {
+        guard let idx = model.filteredAttachments.allKeys().firstIndex(of: name as NSString) else {
             return
         }
 
@@ -1739,11 +1705,21 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func bindTags() {
-        tagsField.objectValue = model.tags
+        var tags = model.tags
+        
+        
+        
+
+
+
+
+
+
+        tagsField.objectValue = tags
 
         var popular = database.mostPopularTags
         popular.removeAll { tag in
-            model.tags.contains(tag)
+            tags.contains(tag)
         }
 
         if let cell = popupButtonTagsSuggestions.cell as? NSPopUpButtonCell {
@@ -1793,7 +1769,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func onTagsFieldEdited() {
-        NSLog("onTagsFieldEdited: [%@]", String(describing: tagsField.objectValue))
+
 
         guard let existingTags = tagsField.objectValue as? [String] else {
             return
@@ -1840,9 +1816,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         let selectedIdx = tableViewAttachments.selectedRow
-        if selectedIdx >= 0, selectedIdx < model.attachmentsNoKeeAgent.count {
-            let key = model.attachmentsNoKeeAgent.allKeys()[selectedIdx]
-            guard let attachment = model.attachmentsNoKeeAgent[key] else {
+        if selectedIdx >= 0, selectedIdx < model.filteredAttachments.count {
+            let key = model.filteredAttachments.allKeys()[selectedIdx]
+            guard let attachment = model.filteredAttachments[key] else {
                 return
             }
             let oldTitle = key as String
@@ -1860,7 +1836,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 return
             }
 
-            if model.attachments.allKeys().contains(newTitle as NSString) {
+            if model.reservedAttachmentNames.contains(newTitle) {
                 MacAlerts.info(NSLocalizedString("invalid_attachment_name", comment: "Invalid Attachment Name"),
                                informativeText: NSLocalizedString("attachment_name_already_exists", comment: "That attachment name is already used"),
                                window: view.window, completion: nil)
@@ -1914,9 +1890,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             return
         }
 
-        if idx >= 0, idx < model.attachmentsNoKeeAgent.count {
-            let key = model.attachmentsNoKeeAgent.allKeys()[idx]
-            guard let attachment = model.attachmentsNoKeeAgent[key] else {
+        if idx >= 0, idx < model.filteredAttachments.count {
+            let key = model.filteredAttachments.allKeys()[idx]
+            guard let attachment = model.filteredAttachments[key] else {
                 return
             }
 
@@ -1939,7 +1915,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     @IBAction func onDeleteAttachments(_: Any?) {
-        let keys = model.attachmentsNoKeeAgent.allKeys().enumerated().compactMap { index, b in
+        let keys = model.filteredAttachments.allKeys().enumerated().compactMap { index, b in
             tableViewAttachments.selectedRowIndexes.contains(index) ? b : nil
         }
 
@@ -2039,7 +2015,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         var filename = url.lastPathComponent
 
-        if model.attachments.allKeys().contains(filename as NSString) {
+        if model.reservedAttachmentNames.contains(filename) {
             filename = String(format: "%@-%@.%@", url.deletingPathExtension().lastPathComponent, NSDate().fileNameCompatibleDateTimePrecise, url.pathExtension)
         }
 
@@ -2073,9 +2049,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBAction func onAddField(_: Any) {
         let vc = EditCustomFieldController.fromStoryboard()
 
-        vc.existingKeySet = Set(model.customFields.map { field in
-            field.key
-        })
+        vc.existingKeySet = model.existingCustomFieldsKeySet
 
         vc.customFieldKeySet = database.customFieldKeySet
 
@@ -2094,13 +2068,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBAction func onEditField(_: Any?) {
         guard let idx = tableViewCustomFields.selectedRowIndexes.first else { return }
 
-        let field = model.customFields[idx]
+        let field = model.customFieldsFiltered[idx]
 
         let vc = EditCustomFieldController.fromStoryboard()
 
-        vc.existingKeySet = Set(model.customFields.map { field in
-            field.key
-        })
+        vc.existingKeySet = model.existingCustomFieldsKeySet
 
         vc.customFieldKeySet = database.customFieldKeySet
 
@@ -2138,9 +2110,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 extension CreateEditViewController: NSTableViewDataSource {
     func numberOfRows(in tableView: NSTableView) -> Int {
         if tableView == tableViewAttachments {
-            return Int(model.attachmentsNoKeeAgent.count)
+            return Int(model.filteredAttachments.count)
         } else if tableView == tableViewCustomFields {
-            return Int(model.customFields.count)
+            return Int(model.customFieldsFiltered.count)
         }
 
         return 0
@@ -2148,9 +2120,9 @@ extension CreateEditViewController: NSTableViewDataSource {
 
     func tableView(_ tableView: NSTableView, viewFor tableColumn: NSTableColumn?, row: Int) -> NSView? {
         if tableView == tableViewAttachments {
-            let attachmentKey = model.attachmentsNoKeeAgent.allKeys()
+            let attachmentKey = model.filteredAttachments.allKeys()
             let key = attachmentKey[row]
-            guard let attachment = model.attachmentsNoKeeAgent[key] else { return nil }
+            guard let attachment = model.filteredAttachments[key] else { return nil }
 
             if tableColumn?.identifier.rawValue == "Name" {
                 let identifier = TitleAndIconCell.NibIdentifier
@@ -2175,7 +2147,7 @@ extension CreateEditViewController: NSTableViewDataSource {
         } else if tableView == tableViewCustomFields {
             let isKeyColumn = tableColumn?.identifier.rawValue == "CustomFieldKeyColumn"
 
-            let field = model.customFields[row]
+            let field = model.customFieldsFiltered[row]
 
             if isKeyColumn {
                 let identifier = GenericAutoLayoutTableViewCell.NibIdentifier
@@ -2319,7 +2291,7 @@ extension CreateEditViewController: NSTableViewDelegate {
 
     @available(macOS 10.13, *)
     func pasteboardWriterForRow(_: NSTableView, row: Int) -> NSPasteboardWriting? {
-        let attachmentKey = model.attachmentsNoKeeAgent.allKeys()
+        let attachmentKey = model.filteredAttachments.allKeys()
         let key = attachmentKey[row]
 
         let filename = key as String
@@ -2356,7 +2328,7 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
             return
         }
 
-        if idx >= 0 && idx < model.attachmentsNoKeeAgent.count {
+        if idx >= 0 && idx < model.filteredAttachments.count {
             QLPreviewPanel.shared().makeKeyAndOrderFront(self)
         }
     }
@@ -2371,9 +2343,9 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
             return nil
         }
 
-        if idx >= 0, idx < model.attachmentsNoKeeAgent.count {
-            let key = model.attachmentsNoKeeAgent.allKeys()[idx]
-            guard let attachment = model.attachmentsNoKeeAgent[key] else {
+        if idx >= 0, idx < model.filteredAttachments.count {
+            let key = model.filteredAttachments.allKeys()[idx]
+            guard let attachment = model.filteredAttachments[key] else {
                 return nil
             }
 
@@ -2438,7 +2410,7 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
         do {
             if let userInfo = filePromiseProvider.userInfo as? [String: Any],
                let filename = userInfo[FilePromiseProviderUserInfoKeys.filename] as? String,
-               let attachment = model.attachmentsNoKeeAgent[filename as NSString]
+               let attachment = model.filteredAttachments[filename as NSString]
             {
                 try attachment.nonPerformantFullData.write(to: url)
             } else {

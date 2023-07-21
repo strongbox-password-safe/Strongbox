@@ -198,18 +198,8 @@ static NSString* getFreeTrialSuffix(void) {
         if ( Settings.sharedInstance.nextGenUI ) {
             
             return [NSString stringWithFormat:@"%@%@", metadata.nickName, freeTrialSuffix];
-            
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     NSString* statusSuffix = [self getStatusSuffix];
     
@@ -601,9 +591,21 @@ static NSString* getFreeTrialSuffix(void) {
             else if ( theAction == @selector(onToggleExclusionFromAudit:)) {
                 BOOL excluded = [self.viewModel isExcludedFromAudit:singleSelectedItem.uuid];
                 
-                menuItem.title = excluded ? NSLocalizedString(@"action_include_in_audit", @"Include in Audit") : NSLocalizedString(@"action_exclude_from_audit", @"Exclude from Audit");
+                menuItem.state = excluded ? NSControlStateValueOff : NSControlStateValueOn;
+                                
+                return singleSelectedItem != nil && !singleSelectedItem.isGroup;
+            }
+            else if ( theAction == @selector(onToggleExclusionFromAutoFill:)) {
+                BOOL excluded = [self.viewModel isExcludedFromAutoFill:singleSelectedItem.uuid];
                 
-                return ( singleSelectedItem != nil && ((!excluded && [self.viewModel isFlaggedByAudit:singleSelectedItem.uuid] ) || excluded)) ;
+                if ( singleSelectedItem != nil && !singleSelectedItem.isGroup ) {
+                    menuItem.state = excluded ? NSControlStateValueOff : NSControlStateValueOn;
+                    return YES;
+                }
+                else {
+                    menuItem.state = NSControlStateValueOff;
+                    return NO;
+                }
             }
             else if ( theAction == @selector(onNewGroupWithItems:)) {
                 if ( items.count && !itemsContainGroup ) {
@@ -710,7 +712,7 @@ static NSString* getFreeTrialSuffix(void) {
                     return NO;
                 }
 
-                if (@available(macOS 12.0, *)) { 
+                if (@available(macOS 12.0, *)) {
                     NSImageSymbolConfiguration* imageColour = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.systemRedColor];
                     
                     NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
@@ -720,7 +722,6 @@ static NSString* getFreeTrialSuffix(void) {
                     
                     menuItem.image = image2;
                 }
-
                 
                 if ( nodeSelected ) {
                     BOOL deleteWillOccur = ![self.viewModel canRecycle:item];
@@ -757,16 +758,26 @@ static NSString* getFreeTrialSuffix(void) {
                         return NO;
                     }
                 }
-                
-                
+                                
                 if (items.count == 0) {
+                    if (@available(macOS 12.0, *)) {
+
+                        
+                        NSImageSymbolConfiguration* imageLargeConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+                        
+                        NSImage* image = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:nil];
+                        NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
+                        
+                        menuItem.image = image2;
+                    }
+
                     return NO;
                 }
                 
                 BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
                     return ![self.viewModel canRecycle:obj];
                 }];
- 
+                
                 if ( items.count  > 1) {
                     NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_items", @"Recycle Items") : NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
                     [menuItem setTitle:loc];
@@ -774,6 +785,17 @@ static NSString* getFreeTrialSuffix(void) {
                 else {
                     NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
                     [menuItem setTitle:loc];
+                }
+                
+                if (@available(macOS 12.0, *)) {
+                    NSImageSymbolConfiguration* imageColour = [NSImageSymbolConfiguration configurationWithHierarchicalColor:deleteWillOccur ? NSColor.systemRedColor : NSColor.systemGreenColor];
+                    
+                    NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
+                    
+                    NSImage* image = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:nil];
+                    NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
+                    
+                    menuItem.image = image2;
                 }
                 
                 return YES;
@@ -803,8 +825,14 @@ static NSString* getFreeTrialSuffix(void) {
         else if ( theAction == @selector(onExportAsCsv:)) {
             return YES;
         }
+        else if ( theAction == @selector(onExportDatabase:) ) {
+            return YES;
+        }
         else if(theAction == @selector(onPrintDatabase:)) {
             return YES;
+        }
+        else if(theAction == @selector(onPrintSelected:)) {
+            return items.count > 0;
         }
         else if (theAction == @selector(onViewItemHistory:)) {
             return
@@ -907,10 +935,10 @@ static NSString* getFreeTrialSuffix(void) {
         menuItem.state = self.viewModel.showAlternatingRows ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
-    else if ( theAction == @selector(onVCToggleShowTotpCodes:)) {
-        menuItem.state = self.viewModel.showTotp ? NSControlStateValueOn : NSControlStateValueOff;
-        return YES;
-    }
+
+
+
+
     else if ( theAction == @selector(onVCToggleReadOnly:)) {
         menuItem.state = self.viewModel.isEffectivelyReadOnly ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
@@ -1160,6 +1188,16 @@ static NSString* getFreeTrialSuffix(void) {
     }
 }
 
+- (IBAction)onToggleExclusionFromAutoFill:(id)sender {
+    NSLog(@"onToggleExclusionFromAutoFill: [%@]", sender);
+    
+    Node* item = [self getSingleSelectedItem];
+    
+    if ( item ) {
+        [self.viewModel toggleAutoFillExclusion:item.uuid];
+    }
+}
+
 
 
 - (IBAction)onToggleFavouriteItemInSideBar:(id)sender {
@@ -1362,68 +1400,217 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onPrintDatabase:(id)sender {
+    [self printDatabase];
+}
+
+- (IBAction)onPrintSelected:(id)sender {
+    NSArray<Node*>* items = [self getSelectedItems];
+    
+    if ( items.count > 0 ) {
+        [self printItems];
+    }
+}
+
+- (void)printItems {
+    NSArray<Node*>* items = [self getSelectedItems];
+
+    NSString* htmlString = [self.viewModel getHtmlPrintStringForItems:self.databaseMetadata.nickName items:items];
+    
+    [self printHtmlString:htmlString];
+}
+
+- (void)printDatabase {
 
 
+
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
 
     NSString* htmlString = [self.viewModel getHtmlPrintString:self.databaseMetadata.nickName];
+    [self printHtmlString:htmlString];
+}
 
-    
-    
-    
-    
-    
-    
+- (void)printHtmlString:(NSString*)htmlString {
+    [self requestVerifyMasterCredentials:NSLocalizedString(@"verify_creds_before_print_bio_message_suffix", @"verify existing credentials before you can print.")
+                       manualCkfHeadline:NSLocalizedString(@"verify_creds_headline", @"Verify Master Credentials")
+                    manualCkfSubheadline:NSLocalizedString(@"verify_creds_before_print_subhead", @"For security reasons your current master credentials must be verified before you can print.")
+                              completion:^(BOOL userCancelled, BOOL verified, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                [MacAlerts error:error window:self.window];
+            }
+            else if ( userCancelled ) {
+                
+            }
+            else if ( verified ) {
+                [self printHtmlStringAfterVerify:htmlString];
+            }
+            else {
+                [self onLock:nil];
+                
+                [MacAlerts info:NSLocalizedString(@"credentials_incorrect_database_locked", @"Those credentials are incorrect and your database has now been locked for security reasons.")
+                         window:self.window];
+            }
+        });
+    }];
+}
 
-    
-    
-    
-    
+- (void)printHtmlStringAfterVerify:(NSString*)htmlString {
     WebView *webView = [[WebView alloc] init];
     [webView.mainFrame loadHTMLString:htmlString baseURL:nil];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         NSPrintOperation* printOp = [NSPrintOperation printOperationWithView:webView.mainFrame.frameView.documentView
                                                                    printInfo:NSPrintInfo.sharedPrintInfo];
-                                  
+        
         [printOp runOperation];
     });
 }
 
-- (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
-    if(self.viewModel && !self.viewModel.locked) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-            
-            NSString* loc = new ?
-            NSLocalizedString(@"mac_please_set_master_credentials", @"Please Enter the Master Credentials for this Database") :
-            NSLocalizedString(@"mac_change_master_credentials", @"Change Master Credentials");
-            
-            self.changeMasterPassword.titleText = loc;
-            self.changeMasterPassword.initialDatabaseFormat = self.viewModel.format;
-            self.changeMasterPassword.initialYubiKeyConfiguration = self.databaseMetadata.yubiKeyConfiguration;
-            self.changeMasterPassword.initialKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
-            
-            [self.window beginSheet:self.changeMasterPassword.window
-                  completionHandler:^(NSModalResponse returnCode) {
-                if(returnCode == NSModalResponseOK) {
-                    NSError* error;
-                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelectedFactors:self.contentViewController error:&error];
-                    
-                    if ( ckf ) {
-                        [self changeMasterCredentials:ckf];
-                    }
-                    else {
-                        NSString* loc = NSLocalizedString(@"mac_error_could_not_generate_composite_key", @"Could not generate Composite Key");
-                        [MacAlerts error:loc error:error window:self.window];
-                    }
-                }
-                
-                if(completion) {
-                    completion(returnCode == NSModalResponseOK);
-                }
-            }];
-        });
+
+
+- (IBAction)onChangeMasterPassword:(id)sender {
+    NSLog(@"onChangeMasterPassword: %hhd, %hhd", self.viewModel.document.isDocumentEdited, self.viewModel.document.hasUnautosavedChanges);
+    
+    if ( self.viewModel.document.isDocumentEdited ) {
+        [MacAlerts yesNo:NSLocalizedString(@"generic_unsaved_changes", @"Unsaved Changes")
+         informativeText:NSLocalizedString(@"unsaved_changes_question_save_now", @"You have pending unsaved changes which should be saved before continuing.\n\nWould you like to save now?")
+                  window:self.window completion:^(BOOL yesNo) {
+            if ( yesNo ) {
+                [self.viewModel.document saveDocumentWithDelegate:self
+                                                  didSaveSelector:@selector(onChangeMasterPassword:) 
+                                                      contextInfo:nil];
+            }
+        }];
     }
+    else {
+        [self requestVerifyMasterCredentials:NSLocalizedString(@"verify_creds_before_changing_bio_message_suffix", @"verify existing credentials before you can change them")
+                           manualCkfHeadline:NSLocalizedString(@"verify_creds_headline", @"Verify Master Credentials")
+                        manualCkfSubheadline:NSLocalizedString(@"verify_creds_subhead", @"For security reasons your current master credentials must be verified before you can change them.")
+                                  completion:^(BOOL userCancelled, BOOL verified, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( error ) {
+                    [MacAlerts error:error window:self.window];
+                }
+                else if ( userCancelled ) {
+                    
+                }
+                else if ( verified ) {
+                    [self promptToChangeMasterCredentials:^(BOOL okCancel) {
+                        if(okCancel) {
+                            [self.viewModel.document saveDocumentWithDelegate:self
+                                                              didSaveSelector:@selector(onMasterCredentialsChangedAndSaved:)
+                                                                  contextInfo:nil];
+                        }
+                    }];
+                }
+                else if ( !verified ) {
+                    [self onLock:nil];
+                
+                    [MacAlerts info:NSLocalizedString(@"credentials_incorrect_database_locked", @"Those credentials are incorrect and your database has now been locked for security reasons.")
+                             window:self.window];
+                }
+            });
+        }];
+    }
+}
+
+- (void)requestVerifyMasterCredentials:(NSString*)biometricMessage
+                     manualCkfHeadline:(NSString*)manualCkfHeadline
+                  manualCkfSubheadline:(NSString*)manualCkfSubheadline
+                            completion:(void (^)(BOOL userCancelled, BOOL verified, NSError* _Nullable error))completion {
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseUuid];
+    if ( url == nil ) {
+        completion(NO, NO, [Utils createNSError:@"Could not get working cache to verify credentials. Cannot continue." errorCode:-12345]);
+        return;
+    }
+
+    MacCompositeKeyDeterminer* ckd =
+    [MacCompositeKeyDeterminer determinerWithViewController:self.contentViewController
+                                                   database:self.viewModel.databaseMetadata
+                           isNativeAutoFillAppExtensionOpen:NO];
+    
+    [ckd getCkfs:biometricMessage
+  manualHeadline:manualCkfHeadline
+   manualSubhead:manualCkfSubheadline
+      completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        if ( result == kGetCompositeKeyResultError ) {
+            completion(NO, NO, error);
+        }
+        else if ( result == kGetCompositeKeyResultSuccess ) {
+            [self verifyCkfsAreCorrect:factors url:url completion:completion];
+        }
+        else {
+            completion(YES, NO, nil);
+        }
+    }];
+}
+
+- (void)verifyCkfsAreCorrect:(CompositeKeyFactors*)factors
+                         url:(NSURL*)url
+                  completion:(void (^)(BOOL userCancelled, BOOL correct, NSError* _Nullable error))completion {
+    [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"generic_verifying_ellipsis", @"Verifying...")
+                         viewController:self.contentViewController];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        [Serializator fromUrl:url ckf:factors completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+            [macOSSpinnerUI.sharedInstance dismiss];
+            
+            if ( error ) {
+                if ( error.code == StrongboxErrorCodes.incorrectCredentials ) {
+                    completion(NO, NO, nil);
+                }
+                else {
+                    completion(NO, NO, error);
+                }
+            }
+            else if ( userCancelled ) {
+                completion(YES, NO, nil);
+            }
+            else if ( model ) {
+                completion(NO, YES, nil);
+            }
+            else {
+                completion(NO, NO, nil);
+            }
+        }];
+    });
+}
+
+- (void)promptToChangeMasterCredentials:(void (^)(BOOL okCancel))completion {
+    self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
+    
+    self.changeMasterPassword.initialDatabaseFormat = self.viewModel.format;
+    self.changeMasterPassword.initialYubiKeyConfiguration = self.databaseMetadata.yubiKeyConfiguration;
+    self.changeMasterPassword.initialKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
+    
+    [self.window beginSheet:self.changeMasterPassword.window
+          completionHandler:^(NSModalResponse returnCode) {
+        if(returnCode == NSModalResponseOK) {
+            NSError* error;
+            CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelectedFactors:self.contentViewController error:&error];
+            
+            if ( ckf ) {
+                [self changeMasterCredentials:ckf];
+            }
+            else {
+                NSString* loc = NSLocalizedString(@"mac_error_could_not_generate_composite_key", @"Could not generate Composite Key");
+                [MacAlerts error:loc error:error window:self.window];
+            }
+        }
+        
+        if(completion) {
+            completion(returnCode == NSModalResponseOK);
+        }
+    }];
 }
 
 - (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
@@ -1446,17 +1633,6 @@ static NSString* getFreeTrialSuffix(void) {
     md.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
 }
 
-- (IBAction)onChangeMasterPassword:(id)sender {
-    [self promptForMasterPassword:NO
-                       completion:^(BOOL okCancel) {
-        if(okCancel) {
-            [self.viewModel.document saveDocumentWithDelegate:self
-                                              didSaveSelector:@selector(onMasterCredentialsChangedAndSaved:)
-                                                  contextInfo:nil];
-        }
-    }];
-}
-
 - (void)onMasterCredentialsChangedAndSaved:(id)param {
 
 
@@ -1476,9 +1652,9 @@ static NSString* getFreeTrialSuffix(void) {
     self.viewModel.showAlternatingRows = !self.viewModel.showAlternatingRows;
 }
 
-- (IBAction)onVCToggleShowTotpCodes:(id)sender {
-    self.viewModel.showTotp = !self.viewModel.showTotp;
-}
+
+
+
 
 - (IBAction)onVCToggleReadOnly:(id)sender {
     if ( !self.viewModel.readOnly ) {
@@ -1534,6 +1710,31 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onExportAsCsv:(id)sender {
+    [self requestVerifyMasterCredentials:NSLocalizedString(@"verify_creds_before_plaintext_export_bio_message_suffix", @"verify existing credentials before you can export in plaintext.")
+                       manualCkfHeadline:NSLocalizedString(@"verify_creds_headline", @"Verify Master Credentials")
+                    manualCkfSubheadline:NSLocalizedString(@"verify_creds_before_plaintext_export_subhead", @"For security reasons your current master credentials must be verified before you can export in plaintext.")
+                              completion:^(BOOL userCancelled, BOOL verified, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                [MacAlerts error:error window:self.window];
+            }
+            else if ( userCancelled ) {
+                
+            }
+            else if ( verified ) {
+                [self exportAsPlaintextCsv];
+            }
+            else {
+                [self onLock:nil];
+                
+                [MacAlerts info:NSLocalizedString(@"credentials_incorrect_database_locked", @"Those credentials are incorrect and your database has now been locked for security reasons.")
+                         window:self.window];
+            }
+        });
+    }];
+}
+
+- (void)exportAsPlaintextCsv {
     NSData* data = [Csv getSafeAsCsv:self.viewModel.database];
     if ( !data ) {
         [MacAlerts error:nil window:self.window];
@@ -2326,6 +2527,52 @@ static NSString* getFreeTrialSuffix(void) {
     }
 }
 
+- (IBAction)onExportDatabase:(id)sender {
+    MacDatabasePreferences* database = self.viewModel.databaseMetadata;
+    
+    NSSavePanel* panel = [NSSavePanel savePanel];
+    panel.nameFieldStringValue = database.exportFileName;
+    
+    if ( [panel runModal] != NSModalResponseOK ) {
+        return;
+    }
+    
+    NSURL* dest = panel.URL;
+    
+    [self export:dest];
+}
+
+- (void)export:(NSURL*)dest {
+    NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseMetadata.uuid];
+    NSLog(@"Export [%@] => [%@]", src, dest);
+    
+    if ( !src ) {
+        [MacAlerts info:NSLocalizedString(@"open_sequence_couldnt_open_local_message", "Could not open Strongbox's local copy of this database. A online sync is required.")
+                 window:self.window];
+    }
+    else {
+        NSError* errr;
+        BOOL copy;
+        
+        if ( [NSFileManager.defaultManager fileExistsAtPath:dest.path] ) {
+            NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:src.path error:nil];
+            NSData* data = [NSData dataWithContentsOfFile:src.path];
+            copy = [NSFileManager.defaultManager createFileAtPath:dest.path contents:data attributes:attr];
+        }
+        else {
+            copy = [NSFileManager.defaultManager copyItemAtURL:src toURL:dest error:&errr];
+        }
+        
+        if ( !copy ) {
+            [MacAlerts error:errr window:self.window];
+        }
+        else {
+            [MacAlerts info:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
+                     window:self.window];
+        }
+    }
+}
+
 - (IBAction)onCompareAndMerge:(id)sender {
     CompareAndMergeWizard* wizard = [CompareAndMergeWizard fromStoryboard];
     
@@ -2391,13 +2638,27 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
     else {
         [self.viewModel.commonModel replaceEntireUnderlyingDatabaseWith:merged];
         
-        [self.viewModel update:self.contentViewController
-                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+        
+        
+        
+        NSUUID* updateId = NSUUID.UUID;
+        NSLog(@"WindowController::synchronizeSecondDatabase start [%@]", updateId);
+        self.viewModel.commonModel.metadata.asyncUpdateId = updateId;
+
+        
+        [self.viewModel.commonModel asyncUpdateAndSync:^(AsyncJobResult * _Nonnull result) {
+            if ( [updateId isEqualTo:self.viewModel.commonModel.metadata.asyncUpdateId] ) {
+                self.viewModel.commonModel.metadata.asyncUpdateId = nil;
+            }
+            else {
+                NSLog(@"Not clearing asyncUpdateId as not the same as expected...");
+            }
+
             dispatch_async(dispatch_get_main_queue(), ^{
-                if ( error ) {
-                    [MacAlerts error:error window:self.window];
+                if ( result.error ) {
+                    [MacAlerts error:result.error window:self.window];
                 }
-                else if ( !userCancelled ) {
+                else if ( !result.userCancelled ) {
                     if ( synchronize ) {
                         [self synchronizeSecondDatabase:self.viewModel.database secondModelMetadata:secondModelMetadata secondModelUrl:secondModelUrl];
                     }
@@ -2406,6 +2667,8 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
                     }
                 }
             });
+            
+            [self.viewModel.commonModel asyncSync]; 
         }];
     }
 }
@@ -2415,12 +2678,24 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
                    secondModelUrl:(NSURL*)secondModelUrl {
     if ( secondModelMetadata ) {
         Model* model = [[Model alloc] initWithDatabase:mergedDatabase metaData:secondModelMetadata forcedReadOnly:NO isAutoFill:NO offlineMode:NO];
-        [model update:self.contentViewController handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+
+        
+        
+        
+        NSUUID* updateId = NSUUID.UUID;
+        NSLog(@"WindowController::synchronizeSecondDatabase start [%@]", updateId);
+        model.metadata.asyncUpdateId = updateId;
+
+        [model asyncUpdateAndSync:^(AsyncJobResult * _Nonnull result) {
+            if ( [updateId isEqualTo:model.metadata.asyncUpdateId] ) {
+                model.metadata.asyncUpdateId = nil;
+            }
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                if ( error ) {
-                    [MacAlerts error:error window:self.window];
+                if ( result.error ) {
+                    [MacAlerts error:result.error window:self.window];
                 }
-                else if ( !userCancelled ) {
+                else if ( !result.userCancelled ) {
                     [self messageMergeDoneSuccess];
                 }
             });

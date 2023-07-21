@@ -22,7 +22,7 @@ class CustomAppIconCellView: UICollectionViewCell {
 
     func setContent(_ image: UIImage, isPro: Bool = true) {
         imageView.image = image
-
+        
         labelPro.backgroundColor = .systemPurple
         labelPro.isHidden = !isPro
     }

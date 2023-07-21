@@ -11,7 +11,8 @@
 @implementation NSMutableArray (Extensions)
 
 - (void)mutableFilter:(BOOL (^)(id _Nonnull))block {
-    NSIndexSet* indices = [self indexesOfObjectsPassingTest:^BOOL(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    NSIndexSet* indices = [self indexesOfObjectsWithOptions:NSEnumerationConcurrent
+                                                passingTest:^BOOL(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return !block(obj);
     }];
     

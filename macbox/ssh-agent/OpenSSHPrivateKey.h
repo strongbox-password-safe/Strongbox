@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype _Nullable)newRsa;
 + (instancetype _Nullable)newEd25519;
 
-- (BOOL)isEqualTo:(id)object;
+- (BOOL)isEqualTo:(id _Nullable)object;
 
 @property (readonly) NSString* fingerprint;
 @property (readonly) NSString* publicKey;
@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL isPassphraseProtected;
 
-- (BOOL)vaildatePassphrase:(NSString*)passphrase;
+- (BOOL)validatePassphrase:(NSString*)passphrase;
 - (NSData*_Nullable)sign:(NSData*)challenge passphrase:(NSString*)passphrase flags:(u_int)flags;
 
 - (NSData*_Nullable)exportFileBlob:(NSString*)originalPassphrase exportPassphrase:(NSString*)exportPassphrase;

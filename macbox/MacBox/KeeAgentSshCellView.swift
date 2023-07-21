@@ -29,7 +29,7 @@ class KeeAgentSshCellView: NSTableCellView {
         stackPassphrase.isHidden = !key.openSshKey.isPassphraseProtected
         
         if ( key.openSshKey.isPassphraseProtected) {
-            let valid = key.openSshKey.vaildatePassphrase(field.value)
+            let valid = key.openSshKey.validatePassphrase(field.value)
             
             labelPassPhrase.stringValue = valid ? NSLocalizedString("ssh_agent_passphrase_protected", comment: "Passphrase Protected") : NSLocalizedString("ssh_agent_passphrase_protected_incorrect", comment: "Passphrase Protected (Entry Password Incorrect)")
             

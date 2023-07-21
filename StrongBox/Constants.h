@@ -16,6 +16,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const kDatabasesCollectionLockStateChangedNotification;
+
 @interface Constants : NSObject
 
 + (const NSSet<NSString*>*)reservedCustomFieldKeys;
@@ -42,6 +44,8 @@ extern NSString* const kDragAndDropExternalUti;
 extern NSString* const kDragAndDropSideBarHeaderMoveInternalUti;
 
 extern NSString* const kKeeAgentSettingsAttachmentName;
+
+extern NSString* const kIsExcludedFromAutoFillCustomDataKey;
 
 #if TARGET_OS_IPHONE
 

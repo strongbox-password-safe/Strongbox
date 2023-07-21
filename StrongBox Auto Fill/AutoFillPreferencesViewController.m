@@ -68,6 +68,18 @@
 
 @implementation AutoFillPreferencesViewController
 
++ (UINavigationController*)fromStoryboardWithModel:(Model*)model {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"AutoFillPreferences" bundle:nil];
+    
+    UINavigationController* ret = [sb instantiateInitialViewController];
+    
+    AutoFillPreferencesViewController* prefs = (AutoFillPreferencesViewController*)ret.topViewController;
+    
+    prefs.viewModel = model;
+    
+    return ret;
+}
+
 - (void)dealloc {
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }

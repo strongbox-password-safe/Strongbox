@@ -173,8 +173,6 @@
     }
 
     [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database.uuid];
-    
-    [database clearKeychainItems];
 }
 
 

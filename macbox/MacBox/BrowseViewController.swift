@@ -29,7 +29,7 @@ class BrowseViewController: NSViewController {
     @IBOutlet var scopePassword: NSSegmentedControl!
     @IBOutlet var scopeUrl: NSSegmentedControl!
     @IBOutlet var scopeTags: NSSegmentedControl!
-    @IBOutlet var outlineView: OutlineView!
+    @IBOutlet var outlineView: BrowseOutlineView!
     @IBOutlet var predicateEditor: NSPredicateEditor!
     @IBOutlet var predicateEditorHeightConstraint: NSLayoutConstraint!
     @IBOutlet var outlineViewTopConstraint: NSLayoutConstraint!
@@ -325,11 +325,11 @@ class BrowseViewController: NSViewController {
             return
         }
         
-        if !isSearching, case .auditIssues = navigationContext {
+
 
 
             refresh()
-        }
+
     }
 
     func onModelNotificationReceived(_ notification: Notification) {
@@ -811,10 +811,16 @@ extension BrowseViewController: NSOutlineViewDelegate {
         case .customFieldCount:
             cell = getGenericCell(String(item.fields.customFields.count))
         case .tags:
-            let tagArray: [String] = item.fields.tags.allObjects as! [String]
-            let sorted = tagArray.sorted { a, b in
+            var tags = Set ( item.fields.tags.allObjects as! [String] )
+            
+            if Settings.sharedInstance().shadeFavoriteTag {
+                tags.remove(kCanonicalFavouriteTag)
+            }
+            
+            let sorted = tags.sorted { a, b in
                 compareStrings(a, b) == .orderedAscending
             }
+            
             cell = getPillsCell(sorted, color: .white, backgroundColor: .linkColor, icon: Icon.tag.image())
         case .path:
             let path = database.getParentGroupPathDisplayString(item)
@@ -1205,7 +1211,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
     }
 
     func loadSearchItems() -> [Node] {
-        NSLog("✅ loadSearchItems... [%hhd]", database.showRecycleBinInSearchResults)
+
 
         let text = database.nextGenSearchText
         let scope = database.nextGenSearchScope

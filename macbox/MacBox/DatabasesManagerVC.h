@@ -11,7 +11,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kDatabasesListViewForceRefreshNotification;
-extern NSString* const kDatabasesCollectionLockStateChangedNotification;
 extern NSString* const kUpdateNotificationDatabasePreferenceChanged;
 
 @interface DatabasesManagerVC : NSViewController

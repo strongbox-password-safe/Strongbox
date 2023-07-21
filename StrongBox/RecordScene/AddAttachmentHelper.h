@@ -19,7 +19,7 @@ extern const int kMaxRecommendedAttachmentSize;
 + (instancetype)sharedInstance;
 
 - (void)beginAddAttachmentUi:(UIViewController*)vc
-               usedFilenames:(NSArray<NSString*>*)usedFilenames
+               usedFilenames:(NSSet<NSString*>*)usedFilenames
                        onAdd:(void(^)(NSString* filename, KeePassAttachmentAbstractionLayer* databaseAttachment))onAdd;
 
 @end

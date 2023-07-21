@@ -64,15 +64,15 @@
     return dataSource[indexPath.row];
 }
 
-- (void)updateSearchResults:(UISearchController*)searchController {
+- (void)updateSearchResults:(NSString*)searchText scope:(SearchScope)scope {
     BrowseSortConfiguration* sortConfig = [self.viewModel getDefaultSortConfiguration];
     
     BrowseSortField sortField = sortConfig.field;
     BOOL descending = sortConfig.descending;
     BOOL foldersSeparately = sortConfig.foldersOnTop;
 
-    self.searchResults = [self.viewModel search:searchController.searchBar.text
-                                          scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
+    self.searchResults = [self.viewModel search:searchText
+                                          scope:scope
                                     dereference:self.viewModel.metadata.searchDereferencedFields
                           includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
                               includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults

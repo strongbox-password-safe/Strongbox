@@ -72,9 +72,9 @@
 }
 
 - (instancetype)initAsTemplateDummyWithNickName:(NSString *)nickName
-                              storageProvider:(StorageProvider)storageProvider
-                                     fileName:(NSString *)fileName
-                               fileIdentifier:(NSString *)fileIdentifier  {
+                                storageProvider:(StorageProvider)storageProvider
+                                       fileName:(NSString *)fileName
+                                 fileIdentifier:(NSString *)fileIdentifier  {
     self = [super init];
     if (self) {
         _templateDummy = [[SafeMetaData alloc] initWithNickName:nickName storageProvider:storageProvider fileName:fileName fileIdentifier:fileIdentifier];
@@ -429,18 +429,6 @@
 
 
 
-- (BOOL)hideTotpInBrowse {
-    return self.metadata.hideTotpInBrowse;
-}
-
-- (void)setHideTotpInBrowse:(BOOL)hideTotpInBrowse {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.hideTotpInBrowse = hideTotpInBrowse;
-    }];
-}
-
-
-
 - (BOOL)showKeePass1BackupGroup {
     return self.metadata.showKeePass1BackupGroup;
 }
@@ -460,18 +448,6 @@
 - (void)setShowChildCountOnFolderInBrowse:(BOOL)showChildCountOnFolderInBrowse {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.showChildCountOnFolderInBrowse = showChildCountOnFolderInBrowse;
-    }];
-}
-
-
-
-- (BOOL)showFlagsInBrowse {
-    return self.metadata.showFlagsInBrowse;
-}
-
-- (void)setShowFlagsInBrowse:(BOOL)showFlagsInBrowse {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.showFlagsInBrowse = showFlagsInBrowse;
     }];
 }
 
@@ -537,18 +513,6 @@
 
 
 
-- (BOOL)showEmptyFieldsInDetailsView {
-    return self.metadata.showEmptyFieldsInDetailsView;
-}
-
-- (void)setShowEmptyFieldsInDetailsView:(BOOL)showEmptyFieldsInDetailsView {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.showEmptyFieldsInDetailsView = showEmptyFieldsInDetailsView;
-    }];
-}
-
-
-
 - (NSArray<NSNumber *> *)detailsViewCollapsedSections {
     return self.metadata.detailsViewCollapsedSections;
 }
@@ -568,18 +532,6 @@
 - (void)setEasyReadFontForAll:(BOOL)easyReadFontForAll {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.easyReadFontForAll = easyReadFontForAll;
-    }];
-}
-
-
-
-- (BOOL)hideTotp {
-    return self.metadata.hideTotp;
-}
-
-- (void)setHideTotp:(BOOL)hideTotp {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.hideTotp = hideTotp;
     }];
 }
 
@@ -665,6 +617,14 @@
     self.metadata.favourites = favourites;
 }
 
+- (NSArray<NSString *> *)autoFillExcludedItems {
+    return self.metadata.autoFillExcludedItems;
+}
+
+- (void)setAutoFillExcludedItems:(NSArray<NSString *> *)autoFillExcludedItems {
+    self.metadata.autoFillExcludedItems = autoFillExcludedItems;
+}
+
 
 
 - (NSArray<NSString *> *)auditExcludedItems {
@@ -696,18 +656,6 @@
 - (void)setMakeBackups:(BOOL)makeBackups {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.makeBackups = makeBackups;
-    }];
-}
-
-
-
-- (BOOL)hideTotpCustomFieldsInViewMode {
-    return self.metadata.hideTotpCustomFieldsInViewMode;
-}
-
-- (void)setHideTotpCustomFieldsInViewMode:(BOOL)hideTotpCustomFieldsInViewMode {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.hideTotpCustomFieldsInViewMode = hideTotpCustomFieldsInViewMode;
     }];
 }
 
@@ -764,18 +712,6 @@
 - (void)setColorizePasswords:(BOOL)colorizePasswords {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.colorizePasswords = colorizePasswords;
-    }];
-}
-
-
-
-- (BOOL)colorizeProtectedCustomFields {
-    return self.metadata.colorizeProtectedCustomFields;
-}
-
-- (void)setColorizeProtectedCustomFields:(BOOL)colorizeProtectedCustomFields {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.colorizeProtectedCustomFields = colorizeProtectedCustomFields;
     }];
 }
 
@@ -1391,7 +1327,7 @@
 }
 
 - (BOOL)lazySyncMode {
-     return self.metadata.lazySyncMode;
+    return self.metadata.lazySyncMode;
 }
 
 - (void)setLazySyncMode:(BOOL)lazySyncMode {
@@ -1468,6 +1404,96 @@
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.sortConfigurations = sortConfigurations;
     }];
+}
+
+
+
+
+
+- (BOOL)hideTotpCustomFieldsInViewMode {
+    return YES;
+    
+}
+
+
+
+
+
+
+
+
+
+- (BOOL)hideTotp {
+    return NO;
+    
+}
+
+
+
+
+
+
+
+
+
+- (BOOL)hideTotpInBrowse {
+    return NO;
+
+}
+
+
+
+
+
+
+
+
+
+
+- (BOOL)showEmptyFieldsInDetailsView {
+    return NO;
+
+}
+
+
+
+
+
+
+
+
+
+
+- (BOOL)colorizeProtectedCustomFields {
+    return self.colorizePasswords;
+
+}
+
+
+
+
+
+
+
+
+
+
+- (BOOL)showFlagsInBrowse {
+    return YES;
+
+}
+
+
+
+
+
+
+
+
+
+
+- (NSString *)exportFilename {
+    return self.metadata.exportFilename;
 }
 
 @end

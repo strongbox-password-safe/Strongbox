@@ -35,7 +35,7 @@
             self.model.metadata.convenienceMasterPassword.length ); 
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"ConvenienceExpiryOnboarding" bundle:nil];
     ConvenienceExpiryOnboardingViewController* vc = [storyboard instantiateInitialViewController];
     

@@ -28,9 +28,6 @@ enum BrowseViewColumn: String, CaseIterable {
     case uuid = "UuidColumn"
     case auditIssues = "AuditIsssuesColumn"
 
-    
-
-
     var identifier: NSUserInterfaceItemIdentifier {
         return NSUserInterfaceItemIdentifier(rawValue)
     }

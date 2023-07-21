@@ -16,9 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isDifferentFrom:(CustomFieldViewModel*)other;
 
-@property NSString* key;
-@property NSString* value;
-@property BOOL protected;
+
+
+@property (readonly) NSString* key;
+@property (readonly) NSString* value;
+@property (readonly) BOOL protected;
 @property BOOL concealedInUI;
 
 @end

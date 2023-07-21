@@ -216,7 +216,7 @@ class MainSplitViewController : UISplitViewController, UISplitViewControllerDele
         }
     }
 
-    func onAsyncUpdateDone ( result : AsyncUpdateResult , updateId : UUID, completion : ((_ : Bool ) -> Void)? = nil ) {
+    func onAsyncUpdateDone ( result : AsyncJobResult , updateId : UUID, completion : ((_ : Bool ) -> Void)? = nil ) {
         NSLog("Async Update [%@] Done with [%@]", String(describing: updateId), String(describing: result.success));
         
         if model.metadata.asyncUpdateId == updateId {

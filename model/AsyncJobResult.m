@@ -6,8 +6,8 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-#import "AsyncUpdateResult.h"
+#import "AsyncJobResult.h"
 
-@implementation AsyncUpdateResult
+@implementation AsyncJobResult
 
 @end

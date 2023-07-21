@@ -9,10 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "OnboardingModule.h"
 #import "GenericOnboardingModule.h"
+#import "RoundedBlueButton.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface GenericOnboardingViewController : UIViewController
+
+@property (weak, nonatomic) IBOutlet RoundedBlueButton *labelButton1;
 
 @property OnboardingModuleDoneBlock onDone;
 

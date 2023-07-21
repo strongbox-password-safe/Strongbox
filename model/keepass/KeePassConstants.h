@@ -58,7 +58,9 @@ static NSString* const kCustomIconListElementName = @"CustomIcons";
 static NSString* const kCustomIconElementName = @"Icon";
 static NSString* const kCustomIconDataElementName = @"Data";
 static NSString* const kAttributeProtected = @"Protected";
+
 static NSString* const kAttributeValueTrue = @"True";
+static NSString* const kAttributeValueFalse = @"False";
 
 static NSString* const kCustomDataElementName = @"CustomData";
 static NSString* const kCustomDataItemElementName = @"Item";

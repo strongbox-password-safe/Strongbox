@@ -41,10 +41,11 @@ public enum CustomAppIcon: CaseIterable {
     case todoChecklist
     case notepad
     case original
-
+    case white
+    
     var isPro: Bool {
         switch self {
-        case .original, .regular, .code, .binary, .bluey, .iridescent, .water, .lightBlue, .calendar1:
+        case .original, .regular, .code, .binary, .bluey, .iridescent, .water, .lightBlue, .white, .calendar1:
             return false
         default:
             return true
@@ -61,7 +62,7 @@ public enum CustomAppIcon: CaseIterable {
             return .fun
         case .weather, .modernCalculator, .lightBlueCalculator, .oldSchoolCalculator, .calendar1, .calendar2, .todoChecklist, .notepad:
             return .boringApp
-        case .proBadge, .regular, .zero, .black, .bluey, .iridescent, .lightBlue, .midnightFire, .red, .water, .original:
+        case .proBadge, .regular, .zero, .black, .bluey, .iridescent, .lightBlue, .midnightFire, .red, .water, .original, .white:
             return .strongbox
         }
         
@@ -131,6 +132,8 @@ public enum CustomAppIcon: CaseIterable {
             return "nuclear-power3"
         case .biohazard:
             return "biohazard"
+        case .white:
+            return "white"
         }
     }
 }

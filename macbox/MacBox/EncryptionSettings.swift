@@ -9,7 +9,9 @@
 import Cocoa
 
 class EncryptionSettings: NSViewController, NSMenuDelegate {
-    @IBOutlet weak var buttonSave: NSButton!
+    let EditableKdfs : [KdfAlgorithm] = [.aes256, .argon2d, .argon2id]
+    let EditableEncryption : [EncryptionAlgorithm] = [.aes256, .chaCha20, .twoFish256]
+    
     @IBOutlet weak var labelFormatAndVersion: NSTextField!
     @IBOutlet weak var popupKdf: NSPopUpButton!
     @IBOutlet weak var textFieldArgon2Memory: NSTextField!
@@ -34,10 +36,12 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
     @IBOutlet weak var labelUpgradeToV4Recommended: NSTextField!
     @IBOutlet weak var reduceArgonMemoryStack: NSStackView!
     @IBOutlet weak var upgradeToV4Stack: NSStackView!
+        
+    @IBOutlet weak var buttonRestoreDefaults: NSButton!
+    @IBOutlet weak var buttonClose: NSButton!
+    @IBOutlet weak var buttonSave: NSButton!
+    @IBOutlet weak var buttonDiscardChanges: NSButton!
     
-    let EditableKdfs : [KdfAlgorithm] = [.aes256, .argon2d, .argon2id]
-    let EditableEncryption : [EncryptionAlgorithm] = [.aes256, .chaCha20, .twoFish256]
-
     @objc var model : ViewModel! {
         didSet {
             savedSettings = EncryptionSettingsViewModel.fromDatabaseModel(model.database)
@@ -62,35 +66,12 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
 
         bindUI()
     }
-        
-    @IBAction func onClose(_ sender : Any?) {
-        view.window?.cancelOperation(nil)
-    }
 
     @objc var isDirty : Bool {
         let diff = currentSettings.isDifferent(from: savedSettings)
         return !model.isEffectivelyReadOnly && diff
     }
-
-    @objc func applyCurrentChanges () {
-        model.applyEncryptionSettingsViewModelChanges(currentSettings)
-        
-        savedSettings = EncryptionSettingsViewModel.fromDatabaseModel(model.database)
-        currentSettings = savedSettings.clone()
-
-        bindUI()
-    }
-
-    @objc func discardCurrentChanges () {
-        currentSettings = savedSettings.clone()
-        
-        bindUI()
-    }
-
-    @IBAction func onApplyChanges(_ sender: Any?) {
-        applyCurrentChanges()
-    }
-
+    
     func bindUI () {
         bindFormat()
         bindKdf()
@@ -100,9 +81,18 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         bindEncryption ()
         bindCompression()
         bindInnerProtectedStream()
-
+        
         buttonSave.isEnabled = isDirty
         buttonSave.isHidden = !isDirty
+        
+        buttonRestoreDefaults.isEnabled = !currentSettings.isStrongboxDefaultEncryptionSettings
+        buttonRestoreDefaults.isHidden = currentSettings.isStrongboxDefaultEncryptionSettings
+        
+        buttonClose.isHidden = isDirty
+        buttonClose.isEnabled = !isDirty
+        
+        buttonDiscardChanges.isEnabled = isDirty
+        buttonDiscardChanges.isHidden = !isDirty
     }
     
     func bindFormat () {
@@ -114,10 +104,10 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
                 let title = EncryptionSettingsViewModel.getAlternativeFormatString(format)
                 let item = NSMenuItem(title: title, action: #selector(onChangeFormat(sender:)), keyEquivalent: "")
                 item.target = self
-
+                
                 popupFormat.menu?.addItem(item)
             }
-
+            
             popupFormat.selectItem(at: currentSettings.format == .keePass4 ? 1 : 0 )
             popupFormat.isHidden = false
             popupFormat.isEnabled = !model.isEffectivelyReadOnly
@@ -130,22 +120,22 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         
         upgradeToV4Stack.isHidden = !currentSettings.shouldUpgradeToV4
     }
-
+    
     @objc func onChangeFormat(sender: Any?) {
         guard let sender = sender as? NSMenuItem else {
             return
         }
-
+        
         guard let idx = popupFormat.menu?.index(of: sender) else {
             NSLog("🔴 Could not find this menu item in the menu?!")
             return
         }
         
         currentSettings.format = idx == 0 ? .keePass : .keePass4
-
+        
         bindUI()
     }
-
+    
     func bindInnerProtectedStream ( ) {
         labelInnerStreamAlgo.stringValue = currentSettings.innerStreamCipher
         innerProtectedStreamStack.isHidden = !currentSettings.shouldShowInnerStreamEncryption
@@ -154,16 +144,16 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
     func bindCompression () {
         popupCompression.menu?.removeAllItems()
         labelCompression.stringValue = currentSettings.compressionString
-
+        
         if currentSettings.shouldShowCompressionSwitch, !model.isEffectivelyReadOnly {
             for compression in [ false, true ] {
                 let title = EncryptionSettingsViewModel.compressionString(forCompression: compression )
                 let item = NSMenuItem(title: title, action: #selector(onChangeCompression(sender:)), keyEquivalent: "")
                 item.target = self
-
+                
                 popupCompression.menu?.addItem(item)
             }
-
+            
             popupCompression.selectItem(at: currentSettings.compression ? 1 : 0 )
             
             popupCompression.isHidden = false
@@ -181,16 +171,16 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
     func bindEncryption ( ) {
         popupEncryption.menu?.removeAllItems()
         labelEncryption.stringValue = currentSettings.encryption
-
+        
         if currentSettings.encryptionIsEditable, !model.isEffectivelyReadOnly {
             for encryption in EditableEncryption {
                 let title = EncryptionSettingsViewModel.encryptionString(forAlgo: encryption)
                 let item = NSMenuItem(title: title, action: #selector(onChangeEncryption(sender:)), keyEquivalent: "")
                 item.target = self
-
+                
                 popupEncryption.menu?.addItem(item)
             }
-
+            
             if let idx = EditableEncryption.firstIndex(of: currentSettings.encryptionAlgorithm) {
                 popupEncryption.selectItem(at: idx)
             }
@@ -207,22 +197,22 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
             labelEncryption.isHidden = false
         }
     }
-
+    
     func bindKdf () {
         popupKdf.menu?.removeAllItems()
         let title = EncryptionSettingsViewModel.kdfString(forKdf: currentSettings.kdfAlgorithm )
-
+        
         labelKdf.stringValue = title
-
+        
         if currentSettings.kdfIsEditable, !model.isEffectivelyReadOnly {
             for kdf in EditableKdfs {
                 let title = EncryptionSettingsViewModel.kdfString(forKdf: kdf)
                 let item = NSMenuItem(title: title, action: #selector(onChangeKdf(sender:)), keyEquivalent: "")
                 item.target = self
-
+                
                 popupKdf.menu?.addItem(item)
             }
-
+            
             if let idx = EditableKdfs.firstIndex(of: currentSettings.kdfAlgorithm) {
                 popupKdf.selectItem(at: idx)
             }
@@ -239,12 +229,12 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
             labelKdf.isHidden = false
         }
     }
-
+    
     func bindIterations () {
         sliderIterations.minValue = currentSettings.minKdfIterations
         sliderIterations.maxValue = currentSettings.maxKdfIterations
         sliderIterations.doubleValue = log2( Double ( currentSettings.iterations ) )
-
+        
         stepperIterations.minValue = pow ( 2.0, currentSettings.minKdfIterations )
         stepperIterations.maxValue = pow ( 2.0, currentSettings.maxKdfIterations )
         stepperIterations.integerValue = Int ( currentSettings.iterations )
@@ -278,13 +268,13 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
     
     @IBAction func onStepperMemoryChanged(_ sender: Any) {
         currentSettings.argonMemory = UInt64 ( stepperMemory.integerValue ) * 1024 * 1024
-
+        
         bindUI()
     }
     
     @IBAction func onMemoryEdited(_ sender: Any) {
-
-    
+        
+        
         stepperMemory.integerValue = textFieldArgon2Memory.integerValue
         currentSettings.argonMemory = UInt64 ( stepperMemory.integerValue * 1024 * 1024 )
         
@@ -295,14 +285,14 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         guard let sender = sender as? NSMenuItem else {
             return
         }
-
+        
         guard let idx = popupCompression.menu?.index(of: sender) else {
             NSLog("🔴 Could not find this menu item in the menu?!")
             return
         }
         
         currentSettings.compression = idx == 1
-
+        
         bindUI()
     }
     
@@ -310,30 +300,30 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         guard let sender = sender as? NSMenuItem else {
             return
         }
-
+        
         guard let idx = popupEncryption.menu?.index(of: sender), let algo = EditableEncryption[safe: idx] else {
             NSLog("🔴 Could not find this menu item in the menu?!")
             return
         }
         
         currentSettings.encryptionAlgorithm = algo
-
+        
         bindUI()
     }
     
     @IBAction func onStepperParallelism(_ sender: Any) {
         currentSettings.argonParallelism = UInt32 ( stepperParallelism.integerValue )
-
+        
         bindUI()
     }
     
     @IBAction func onParallelismEdited(_ sender: Any) {
         NSLog("✅ onParallelismEdited = textField = [%ld]", textFieldParallelism.integerValue)
-    
+        
         stepperParallelism.integerValue = textFieldParallelism.integerValue
-    
+        
         currentSettings.argonParallelism = UInt32 ( stepperParallelism.integerValue )
-
+        
         bindUI()
     }
     
@@ -341,14 +331,14 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         guard let sender = sender as? NSMenuItem else {
             return
         }
-
+        
         guard let idx = popupKdf.menu?.index(of: sender), let kdf = EditableKdfs[safe: idx] else {
             NSLog("🔴 Could not find this menu item in the menu?!")
             return
         }
         
         currentSettings.kdfAlgorithm = kdf
-
+        
         bindUI()
     }
     
@@ -356,24 +346,59 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         let iter = powf ( 2.0, sliderIterations.floatValue )
         
         currentSettings.iterations = UInt64 ( iter )
-
+        
         bindUI()
     }
     
     @IBAction func onStepperIterationsChanged(_ sender: Any) {
-
-
+        
+        
         currentSettings.iterations = UInt64 ( stepperIterations.integerValue )
-
+        
         bindUI()
     }
     
     @IBAction func onIterationsChanged(_ sender: Any) {
-
-    
+        
+        
         stepperIterations.integerValue = textFieldIterations.integerValue
         currentSettings.iterations = UInt64 ( stepperIterations.integerValue )
         
         bindUI()
+    }
+
+    @objc func applyCurrentChanges () {
+        model.applyEncryptionSettingsViewModelChanges(currentSettings)
+        
+        savedSettings = EncryptionSettingsViewModel.fromDatabaseModel(model.database)
+        currentSettings = savedSettings.clone()
+
+        bindUI()
+    }
+
+    @objc func discardCurrentChanges () {
+        currentSettings = savedSettings.clone()
+        
+        bindUI()
+    }
+    
+    @IBAction func onRestoreDefaults(_ sender: Any) {
+        let defaults = EncryptionSettingsViewModel.defaults(for: currentSettings.format)
+        
+        currentSettings = defaults.clone()
+        
+        bindUI()
+    }
+    
+    @IBAction func onDiscardChange(_ sender: Any) {
+        discardCurrentChanges()
+    }
+    
+    @IBAction func onClose(_ sender : Any?) {
+        view.window?.cancelOperation(nil)
+    }
+
+    @IBAction func onApplyChanges(_ sender: Any?) {
+        applyCurrentChanges()
     }
 }

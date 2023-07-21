@@ -9,15 +9,96 @@
 import Cocoa
 import LocalAuthentication
 
+enum SSHAgentApprovalExpiryType : Codable {
+    case timed ( time : Date )
+    case quit
+}
+
+struct SSHAgentApproval : Codable {
+    var processName : String
+    var processId : String
+    var expiry : SSHAgentApprovalExpiryType
+}
+
+class SSHAgentSignRequest : NSObject {
+    var processName : String?
+    var processId : String?
+    var databaseUuid : String
+    var nodeId : UUID
+    var approved : Bool
+    var timestamp : Date
+    
+
+    init(processName: String? = nil, processId: String? = nil, databaseUuid: String, nodeId: UUID, approved: Bool, timestamp: Date) {
+        self.processName = processName
+        self.processId = processId
+        self.databaseUuid = databaseUuid
+        self.nodeId = nodeId
+        self.approved = approved
+        self.timestamp = timestamp
+    }
+}
+
 class SSHAgentRequestHandler: NSObject {
     @objc static let shared = SSHAgentRequestHandler()
     
     private enum Constants {
         static let SecureOfflinePkMapKey = "ssh-agent-offline-public-key-db-map"
+
     }
     
     override private init() {
         super.init()
+    }
+    
+    var signRequests = ConcurrentCircularBuffer<SSHAgentSignRequest>( capacity: 512 )
+    
+    var rawApprovals : [SSHAgentApproval] = []
+    
+    var approvals : [SSHAgentApproval] {
+        get {
+            let ret = rawApprovals.filter { approval in
+                if case .timed(time: let date ) = approval.expiry {
+                    return (date as NSDate).isInFuture
+                }
+                else {
+                    return true
+                }
+            }
+
+            rawApprovals = ret
+            
+            return ret
+        }
+        set {
+            rawApprovals = newValue
+        }
+    }
+    
+    func requiresApproval ( _ processName : String? ) -> Bool {
+        guard let processName else { return true }
+        
+        let firstApproval = approvals.first(where: { approval in
+            return approval.processName == processName
+        })
+        
+        return firstApproval == nil
+    }
+     
+    func addApproval ( _ processName : String, processId: String ) {
+        let expiryConfig = Settings.sharedInstance().sshAgentApprovalDefaultExpiryMinutes
+        
+        let expiry : SSHAgentApprovalExpiryType
+        if expiryConfig == -1 {
+            expiry = .quit
+        }
+        else {
+            let date = Date().addSec(n: expiryConfig * 60)
+            expiry = .timed(time: date)
+        }
+        
+        let approval = SSHAgentApproval(processName: processName, processId: processId, expiry: expiry)
+        approvals.append(approval)
     }
     
     @objc
@@ -58,26 +139,27 @@ class SSHAgentRequestHandler: NSObject {
     
     @objc
     public func getKnownPublicKeys() -> [Data] {
-        
+
         
         let unlockedDatabases = MacDatabasePreferences.allDatabases.filter { database in
             DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
         }
-
+        
         var used : Set<Data> = []
         var ret : [Data] = []
         for meta in unlockedDatabases {
             guard let model = DatabasesCollection.shared.getUnlocked(uuid: meta.uuid) else {
                 continue
             }
-                    
+            
             for node in model.keeAgentSSHKeyEntries {
-                guard let data = node.keeAgentEnabledSshPrivateKeyData, let key = OpenSSHPrivateKey.fromData(data) else {
+                guard let kaKey = node.keeAgentSshKeyViewModel, kaKey.enabled else {
                     continue
                 }
+                let key = kaKey.openSshKey
                 
-                NSLog("✅ Returning Identity %@", key );
-
+                
+                
                 let pkBlob = key.publicKeySerializationBlob
                 if !used.contains( pkBlob ) {
                     ret.append( pkBlob )
@@ -98,25 +180,25 @@ class SSHAgentRequestHandler: NSObject {
         
         return ret
     }
-        
+    
     @objc
-    public func signChallenge ( _ challenge : Data, requestedKeyBlobB64 : String, processName : String?, flags : u_int ) -> Data? {
-        if let node = getNodeBySerializationBlobBase64(requestedKeyBlobB64) {
-            return signChallengeWithNode(node, challenge, requestedKeyBlobB64: requestedKeyBlobB64, processName: processName, flags: flags)
+    public func signChallenge ( _ challenge : Data, requestedKeyBlobB64 : String, processName : String?, processId : String?, flags : u_int ) -> Data? {
+        if let (node, databaseUuid) = getNodeBySerializationBlobBase64(requestedKeyBlobB64) {
+            return signChallengeWithNode(node, databaseUuid, challenge, requestedKeyBlobB64: requestedKeyBlobB64, processName: processName, processId: processId, flags: flags)
         }
         else {
             NSLog("Could not find requested key in Unlocked Databases to sign in with... Checking Offline Map");
             
-            guard let node = getNodeFromOfflinePublicKeyWithUnlock( requestedKeyBlobB64, processName: processName ) else {
+            guard let (node, databaseUuid) = getNodeFromOfflinePublicKeyWithUnlock( requestedKeyBlobB64, processName: processName ) else {
                 NSLog("🔴 Unsuccessful Unlock or find the request key in the unlocked database")
                 return nil
             }
             
-            return signChallengeWithNode(node, challenge, requestedKeyBlobB64: requestedKeyBlobB64, processName: processName, flags: flags, skipAuthorize: true)
+            return signChallengeWithNode(node, databaseUuid, challenge, requestedKeyBlobB64: requestedKeyBlobB64, processName: processName, processId: processId, flags: flags, preAuthorized: true)
         }
     }
     
-    private func getNodeFromOfflinePublicKeyWithUnlock ( _ requestedKeyBlobB64 : String, processName : String?) -> Node? {
+    private func getNodeFromOfflinePublicKeyWithUnlock ( _ requestedKeyBlobB64 : String, processName : String?) -> (Node, String)? {
         let offlinePks = getOfflinePublicKeys()
         
         guard let requestKeyData = requestedKeyBlobB64.dataFromBase64,
@@ -132,8 +214,9 @@ class SSHAgentRequestHandler: NSObject {
         
         let pname = processName ?? NSLocalizedString("ssh_agent_unknown_process", comment: "Unknown Process")
         let reason = String (format: NSLocalizedString("ssh_agent_approve_unlock_key_use_fmt", comment: "unlock \"%@\" to allow \"%@\" to use an SSH Key"), database.nickName, pname )
-
+        
         DatabasesCollection.shared.initiateDatabaseUnlock(uuid: databaseUuid,
+                                                          syncAfterUnlock: true,
                                                           message : reason ) { success in
             go = success
             g.leave()
@@ -145,34 +228,51 @@ class SSHAgentRequestHandler: NSObject {
         else {
             NSLog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
         }
-
+        
         guard go else {
             return nil
         }
         
-        return getNodeBySerializationBlobBase64(requestedKeyBlobB64);
+        return  getNodeBySerializationBlobBase64(requestedKeyBlobB64)
     }
     
-    private func signChallengeWithNode ( _ node : Node, _ challenge : Data, requestedKeyBlobB64 : String, processName : String?, flags : u_int, skipAuthorize : Bool = false ) -> Data? {
+    private func signChallengeWithNode ( _ node : Node, _ databaseUuid : String, _ challenge : Data, requestedKeyBlobB64 : String, processName : String?, processId : String?, flags : u_int, preAuthorized : Bool = false ) -> Data? {
         
         
-        if !skipAuthorize && Settings.sharedInstance().requireApprovalSshAgent {
-            guard requestSignatureAuthorization(node, processName: processName) else {
-                NSLog("⚠️ Authorization Denied - Will not sign request");
-                return nil;
+        if requiresApproval(processName) {
+            if !preAuthorized {
+                guard requestSignatureAuthorization(node, processName: processName) else {
+                    NSLog("⚠️ Authorization Denied - Will not sign request");
+                    
+                    signRequests.add(SSHAgentSignRequest(processName: processName, processId: processId, databaseUuid: databaseUuid, nodeId: node.uuid, approved: false, timestamp: Date()))
+                    
+                    return nil;
+                }
             }
+            
+            addApproval(processName ?? NSLocalizedString("generic_unknown", comment: "Unknown"),
+                        processId: processId ?? NSLocalizedString("generic_unknown", comment: "Unknown"))
         }
         
+        signRequests.add(SSHAgentSignRequest(processName: processName,
+                                             processId: processId, 
+                                             databaseUuid: databaseUuid,
+                                             nodeId: node.uuid,
+                                             approved: true,
+                                             timestamp: Date()))
+
         
         
-        guard let data = node.keeAgentEnabledSshPrivateKeyData, let theKey = OpenSSHPrivateKey.fromData(data) else {
+        
+        guard let kaKey = node.keeAgentSshKeyViewModel, kaKey.enabled else {
             return nil
         }
+        let theKey = kaKey.openSshKey
         
         return theKey.sign(challenge, passphrase: node.fields.password, flags: flags)
     }
     
-    private func getNodeBySerializationBlobBase64( _ blobBase64 : String ) -> Node? {
+    private func getNodeBySerializationBlobBase64( _ blobBase64 : String ) -> (Node, String)? {
         let unlockedDatabases = MacDatabasePreferences.allDatabases.filter { database in
             DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
         }
@@ -183,12 +283,13 @@ class SSHAgentRequestHandler: NSObject {
             }
             
             for node in model.keeAgentSSHKeyEntries {
-                guard let data = node.keeAgentEnabledSshPrivateKeyData, let theKey = OpenSSHPrivateKey.fromData(data) else {
+                guard let kaKey = node.keeAgentSshKeyViewModel, kaKey.enabled else {
                     continue
                 }
-
+                let theKey = kaKey.openSshKey
+                
                 if theKey.publicKeySerializationBlobBase64 == blobBase64 {
-                    return node
+                    return (node, meta.uuid)
                 }
             }
         }
@@ -230,3 +331,45 @@ class SSHAgentRequestHandler: NSObject {
         return go
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

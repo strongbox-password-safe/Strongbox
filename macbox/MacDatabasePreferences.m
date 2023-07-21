@@ -544,16 +544,16 @@
 
 
 
-- (BOOL)doNotShowTotp {
-    return self.metadata.doNotShowTotp;
-}
 
-- (void)setDoNotShowTotp:(BOOL)doNotShowTotp {
-    [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.doNotShowTotp = doNotShowTotp;
-    }];
 
-}
+
+
+
+
+
+
+
+
 
 
 
@@ -1044,14 +1044,6 @@
     }];
 }
 
-- (NSArray<NSString *> *)favourites {
-    return self.metadata.favourites;
-}
-
-- (void)setFavourites:(NSArray<NSString *> *)favourites {
-    
-}
-
 - (DatabaseAuditorConfiguration *)auditConfig {
     return self.metadata.auditConfig;
 }
@@ -1059,16 +1051,6 @@
 - (void)setAuditConfig:(DatabaseAuditorConfiguration *)auditConfig {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.auditConfig = auditConfig;
-    }];
-}
-
-- (NSArray<NSString *> *)auditExcludedItems {
-    return self.metadata.auditExcludedItems;
-}
-
-- (void)setAuditExcludedItems:(NSArray<NSString *> *)auditExcludedItems {
-    [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.auditExcludedItems = auditExcludedItems;
     }];
 }
 
@@ -1116,7 +1098,7 @@
     debugLines[@"alwaysOpenOffline"] = [NSString stringWithFormat:@"%hhd", self.alwaysOpenOffline]; 
     debugLines[@"readOnly"] = [NSString stringWithFormat:@"%hhd", self.readOnly]; 
     debugLines[@"showQuickView"] = [NSString stringWithFormat:@"%hhd", self.showQuickView]; 
-    debugLines[@"doNotShowTotp"] = [NSString stringWithFormat:@"%hhd", self.doNotShowTotp]; 
+
     debugLines[@"noAlternatingRows"] = [NSString stringWithFormat:@"%hhd", self.noAlternatingRows]; 
     debugLines[@"showHorizontalGrid"] = [NSString stringWithFormat:@"%hhd", self.showHorizontalGrid]; 
     debugLines[@"showVerticalGrid"] = [NSString stringWithFormat:@"%hhd", self.showVerticalGrid]; 
@@ -1426,5 +1408,37 @@
         metadata.sideBarShowTotalCountOnHierarchy = sideBarShowTotalCountOnHierarchy;
     }];
 }
+
+
+
+- (NSArray<NSString *> *)favourites {
+    return self.metadata.favourites;
+}
+
+- (void)setFavourites:(NSArray<NSString *> *)favourites {
+    
+}
+
+- (NSArray<NSString *> *)autoFillExcludedItems {
+    return self.metadata.autoFillExcludedItems;
+}
+
+- (void)setAutoFillExcludedItems:(NSArray<NSString *> *)autoFillExcludedItems {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.autoFillExcludedItems = autoFillExcludedItems;
+    }];
+}
+
+- (NSArray<NSString *> *)auditExcludedItems {
+    return self.metadata.auditExcludedItems;
+}
+
+- (void)setAuditExcludedItems:(NSArray<NSString *> *)auditExcludedItems {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.auditExcludedItems = auditExcludedItems;
+    }];
+}
+
+
 
 @end

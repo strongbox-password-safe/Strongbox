@@ -13,6 +13,7 @@
 #import "FastMaps.h"
 #import "CrossPlatform.h"
 #import "Node+KeeAgentSSH.h"
+#import "Constants.h"
 
 #if TARGET_OS_IPHONE
 #import "KissXML.h" 
@@ -20,6 +21,16 @@
 
 static NSString* const kKeePass1BackupGroupName = @"Backup";
 static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
+static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
+    body { width: 800px; } \
+    .database-title { font-size: 36pt; text-align: center; } \
+    .group-title { font-size: 20pt; margin-top:20px; margin-bottom: 5px; text-align: center; font-weight: bold; } \
+    .entry-table {  border-collapse: collapse; margin-bottom: 10px; width: 800px; border: 1px solid black; } \
+    .entry-title { font-weight: bold; font-size: 16pt; padding: 5px; } \
+    table td, table th { border: 1px solid black; } \
+    .entry-field-label { width: 100px; padding: 2px; } \
+    .entry-field-value { font-family: Menlo; padding: 2px; max-width: 700px; word-wrap: break-word; } \
+    </style></head>";
 
 @interface DatabaseModel ()
 
@@ -371,7 +382,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         
         [item.fields.tags removeObject:tag];
     }
-        
+    
     [self rebuildFastMaps];
 }
 
@@ -412,7 +423,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if (undoData) {
         *undoData = [self getHierarchyCloneForReconstruction:items];
     }
-
+    
     
     
     
@@ -440,7 +451,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             [itemToMove touchLocationChanged:date]; 
         }
     }
-        
+    
     [self rebuildFastMaps]; 
     
     return !rollback;
@@ -453,7 +464,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     for (NodeHierarchyReconstructionData* reconItem in undoData) {
         Node* originalMovedItem = [self getItemById:reconItem.clonedNode.uuid];
-    
+        
         if (originalMovedItem && originalMovedItem.parent ) {
             [originalMovedItem.parent removeChild:originalMovedItem];
         }
@@ -510,7 +521,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if ( ![self validateAddChildren:items destination:destination] ) {
         return NO;
     }
-
+    
     if ( items == nil || destination == nil ) {
         return NO;
     }
@@ -524,7 +535,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if ( !suppressFastMapsRebuild ) {
         [self rebuildFastMaps];
     }
-
+    
     return YES;
 }
 
@@ -532,7 +543,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if ( itemIds == nil ) {
         return;
     }
-
+    
     NSArray<Node*>* items = [self getItemsById:itemIds];
     for ( Node* item in items ) {
         if ( item && item.parent ) {
@@ -550,7 +561,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (NSInteger)reorderItem:(NSUUID*)nodeId idx:(NSInteger)idx {
     Node* node = [self getItemById:nodeId];
-
+    
     if ( node ) {
         return [self reorderItem:node to:idx];
     }
@@ -561,7 +572,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (NSInteger)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node *)parentGroup {
-
+    
     
     if (from < 0 || from >= parentGroup.children.count) {
         return -1;
@@ -570,34 +581,34 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         return from;
     }
     
-
-
+    
+    
     Node* item = parentGroup.children[from];
     
     return [self reorderItem:item to:to];
 }
 
 - (NSInteger)reorderItem:(Node *)item to:(NSInteger)to {
-
-
+    
+    
     if (item.parent == nil) {
         NSLog(@"WARNWARN: Cannot change order of item, parent is nil");
         return -1;
     }
-
+    
     NSInteger currentIndex = [item.parent.children indexOfObject:item];
     if (currentIndex == NSNotFound) {
         NSLog(@"WARNWARN: Cannot change order of item, item not found in parent!");
         return -1;
     }
-
+    
     if (to >= item.parent.children.count || to < -1) {
         to = -1;
     }
     
     
     BOOL ret = [item.parent reorderChild:item to:to keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
-
+    
     if (ret) {
         [item touchLocationChanged];
     }
@@ -665,7 +676,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             NSLog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", entry, entry.parent);
         }
     }
-
+    
     for (Node* subgroup in group.childGroups) {
         if ([self deleteAllGroupItems:subgroup deletionDate:deletionDate] ) {
             deletedSomething = YES;
@@ -696,13 +707,13 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             NSLog(@"WARNWARN: Attempt to delete item with no parent");
             return;
         }
-
+        
         if ( item.isGroup ) {
             if ( [self deleteAllGroupItems:item deletionDate:now] ) {
                 deletedSomething = YES;
             }
         }
-
+        
         if ( item && item.parent ) {
             [item.parent removeChild:item];
             deletedSomething = YES;
@@ -735,7 +746,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     NSDate* now = NSDate.date;
     NSSet<Node*> *minimalNodeSet = [self getMinimalNodeSet:items];
-
+    
     BOOL ret = [self moveItems:minimalNodeSet.allObjects destination:self.recycleBinNode date:now undoData:undoData];
     
     if (ret) {
@@ -743,7 +754,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             [item touchAt:now]; 
         }
     }
-
+    
     return ret;
 }
 
@@ -782,7 +793,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     recycleBin.fields.enableAutoType = @(NO);
     
     [self addChildren:@[recycleBin] destination:self.effectiveRootGroup];
-
+    
     self.recycleBinNodeUuid = recycleBin.uuid;
     self.recycleBinChanged = [NSDate date];
     
@@ -820,7 +831,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         if (!includeGroups && node.isGroup) {
             return NO;
         }
-
+        
         if (!includeEntries && !node.isGroup) {
             return NO;
         }
@@ -847,7 +858,10 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }];
 }
 
-- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+- (BOOL)isTitleMatches:(NSString*)searchText
+                  node:(Node*)node
+           dereference:(BOOL)dereference
+           checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
     return [foo containsSearchString:searchText checkPinYin:checkPinYin];
 }
@@ -864,7 +878,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (BOOL)isEmailMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* email = node.fields.email;
-
+    
     NSString* foo = [self maybeDeref:email node:node maybe:dereference];
     return [foo containsSearchString:searchText checkPinYin:checkPinYin];
 }
@@ -885,18 +899,18 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
          dereference:(BOOL)dereference
          checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
-
+    
     if ( [foo.lowercaseString hasPrefix:kOtpAuthScheme] ) {
         
         
-
+        
         return NO;
     }
-
+    
     if ( [foo containsSearchString:searchText checkPinYin:checkPinYin] ) {
         return YES;
     }
-
+    
     for (NSString* altUrl in node.fields.alternativeUrls) {
         NSString* foo = [self maybeDeref:altUrl node:node maybe:dereference];
         if([foo containsSearchString:searchText checkPinYin:checkPinYin]) {
@@ -929,7 +943,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if ( [self isTagsMatches:searchText node:node checkPinYin:checkPinYin] ) {
         return YES;
     }
-        
+    
     if (self.format == kKeePass4 || self.format == kKeePass) {
         
         
@@ -945,7 +959,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             }
         }
     }
-            
+    
     if (self.format != kPasswordSafe) {
         BOOL attachmentMatch = [node.fields.attachments.allKeys anyMatch:^BOOL(NSString * _Nonnull obj) {
             return [obj containsSearchString:searchText checkPinYin:checkPinYin];
@@ -957,7 +971,6 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }
     
     
-
     
     return NO;
 }
@@ -983,7 +996,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (void)rebuildFastMaps {
     NSMutableDictionary<NSUUID*, Node*>* uuidMap = NSMutableDictionary.dictionary;
-        
+    
     NSMutableSet<NSUUID*> *expirySet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *attachmentSet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *keeAgentSshKeysSet = NSMutableSet.set;
@@ -993,15 +1006,15 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     NSCountedSet<NSString*> *emailSet = NSCountedSet.set;
     NSCountedSet<NSString*> *urlSet = NSCountedSet.set;
     NSCountedSet<NSString*> *customFieldKeySet = NSCountedSet.set;
-
+    
     NSInteger entryTotalCount = 0;
     NSInteger groupTotalCount = 0;
-
+    
     if ( self.rootNode ) {
         uuidMap[self.rootNode.uuid] = self.rootNode;
-
         
-                
+        
+        
         for (Node* node in self.rootNode.allChildren) { 
             Node* existing = uuidMap[node.uuid];
             
@@ -1019,7 +1032,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                 entryTotalCount++;
             }
         }
-
+        
         FastMaps* newMaps = [[FastMaps alloc] initWithUuidMap:uuidMap
                                               withExpiryDates:expirySet
                                               withAttachments:attachmentSet
@@ -1032,16 +1045,16 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                                             customFieldKeySet:customFieldKeySet
                                               entryTotalCount:entryTotalCount
                                               groupTotalCount:groupTotalCount];
-
+        
         _fastMaps = newMaps;
         
         
-
+        
         DatabaseFormat format = self.format;
         Node* keePass1BackupNode = (format == kKeePass1) ? self.keePass1BackupNode : nil;
         Node* kp2RecycleBin = (format == kKeePass || format == kKeePass4 ) ? self.recycleBinNode : nil;
         Node* recycler = kp2RecycleBin ? kp2RecycleBin : keePass1BackupNode;
-
+        
         for (Node* node in self.rootNode.allChildren) { 
             if ( recycler != nil && (node == recycler || [recycler contains:node]) ) {
                 continue;
@@ -1067,7 +1080,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             
             
             
-            if ( node.hasKeeAgentSshPrivateKey ) {
+            if ( node.keeAgentSshKeyViewModel ) {
                 [keeAgentSshKeysSet addObject:node.uuid];
             }
             
@@ -1086,30 +1099,30 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                     tagMap[tag] = NSMutableSet.set;
                     set = tagMap[tag];
                 }
-                                
+                
                 [set addObject:node.uuid];
             }
             
             
-
+            
             NSString* username = [Utils trim:node.fields.username];
             if ( username.length ) {
                 [usernameSet addObject:username];
             }
-
+            
             
             
             NSString* email = [Utils trim:node.fields.email];
             if ( email.length ) {
                 [emailSet addObject:email];
             }
-
+            
             
             
             for (NSString* key in node.fields.customFields.allKeys) {
                 [customFieldKeySet addObject:key];
             }
-
+            
             
             
             NSString* url = [Utils trim:node.fields.url];
@@ -1131,13 +1144,13 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                                         customFieldKeySet:customFieldKeySet
                                           entryTotalCount:entryTotalCount
                                           groupTotalCount:groupTotalCount];
-
+    
     _fastMaps = newMaps;
 }
 
 - (NSArray<NSUUID *> *)getItemIdsForTag:(NSString *)tag {
     NSSet<NSUUID*> *ret = self.fastMaps.tagMap[tag];
-
+    
     return ret ? ret.allObjects : @[];
 }
 
@@ -1166,7 +1179,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if (serializationId.length < 1) {
         return nil;
     }
-        
+    
     NSString* prefix = [serializationId substringToIndex:1];
     NSString* suffix = [serializationId substringFromIndex:1];
     
@@ -1195,12 +1208,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if (!node) {
         return nil;
     }
-
     
     
     
     
-
+    
+    
     BOOL groupCanUseUuid = self.format != kPasswordSafe;
     
     NSString *identifier;
@@ -1251,17 +1264,19 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     NSArray<NSString*>* trimmed = [self.fastMaps.tagMap.allKeys map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
         return [Utils trim:obj];
     }];
-
+    
     NSArray* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
         return obj.length > 0;
     }];
-
+    
     return [NSSet setWithArray:filtered];
 }
 
 - (NSArray<NSString*>*)mostPopularTags {
-    NSArray<NSString*>* tags = self.fastMaps.tagMap.allKeys;
+    NSMutableArray<NSString*>* tags = self.fastMaps.tagMap.allKeys.mutableCopy;
     
+    [tags removeObject:kCanonicalFavouriteTag];
+
     NSArray<NSString*>* sorted = [tags sortedArrayUsingComparator:^(id obj1, id obj2) {
         NSString* tag1 = obj1;
         NSString* tag2 = obj2;
@@ -1277,8 +1292,8 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         
         return (n <= m) ? (n < m)? NSOrderedDescending : NSOrderedSame : NSOrderedAscending;
     }];
-
-    return sorted; 
+    
+    return sorted;
 }
 
 - (NSArray<Node *> *)expiredEntries {
@@ -1468,7 +1483,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         [hierarchy insertObject:title atIndex:0];
         current = current.parent;
     }
-
+    
     
     if ( includeRootGroup ) {
         NSString* rootGroupName = (rootGroupNameInsteadOfSlash && self.effectiveRootGroup) ? self.effectiveRootGroup.title : @"/";
@@ -1481,7 +1496,6 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }
     
     return [hierarchy componentsJoinedByString:joinedBy];
-        
 }
 
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm {
@@ -1494,7 +1508,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }
     
     NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
-        
+    
     Node* current = vm;
     while (current.parent != nil && current.parent != self.effectiveRootGroup) {
         [hierarchy insertObject:current.parent.title atIndex:0];
@@ -1506,7 +1520,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if ( prependSlash ) {
         return [NSString stringWithFormat:@"/%@", path];
     }
-
+    
     return path;
 }
 
@@ -1563,7 +1577,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             willRecycle = NO;
         }
     }
-
+    
     return willRecycle;
 }
 
@@ -1580,21 +1594,27 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 
+- (NSString*)getHtmlPrintStringForItems:(NSString*)databaseName items:(NSArray<Node*>*)items {
+    
+    
+    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h4>Printed: %@</h6>    ", kPrintingStylesheet, [self htmlStringFromString:databaseName], NSDate.date.iso8601DateString];
+    
+    NSArray<Node*>* sorted = [items sortedArrayUsingComparator:finderStyleNodeComparator];
+
+    for(Node* node in sorted) {
+        if ( node.isGroup ) {
+            continue;
+        }
+        
+        [ret appendString:[self getHtmlStringForNode:node]];
+        [ret appendString:@"    </tr>\n"];
+    }
+    
+    [ret appendString:@"</body>\n</html>"];
+    return ret.copy;
+}
+
 - (NSString*)getHtmlPrintString:(NSString*)databaseName {
-    
-    NSString* stylesheet = @"<head><style type=\"text/css\"> \
-    body { width: 800px; } \
-    .database-title { font-size: 36pt; text-align: center; } \
-    .group-title { font-size: 20pt; margin-top:20px; margin-bottom: 5px; text-align: center; font-weight: bold; } \
-    .entry-table {  border-collapse: collapse; margin-bottom: 10px; width: 800px; border: 1px solid black; } \
-    .entry-title { font-weight: bold; font-size: 16pt; padding: 5px; } \
-    table td, table th { border: 1px solid black; } \
-    .entry-field-label { width: 100px; padding: 2px; } \
-    .entry-field-value { font-family: Menlo; padding: 2px; max-width: 700px; word-wrap: break-word; } \
-    </style></head>";
-    
-    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h4>Printed: %@</h6>    ", stylesheet, [self htmlStringFromString:databaseName], NSDate.date.iso8601DateString];
-    
     NSArray<Node*>* sortedGroups = [self.effectiveRootGroup.allChildGroups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         NSString* path1 = [self getPathDisplayString:obj1];
         NSString* path2 = [self getPathDisplayString:obj2];
@@ -1606,6 +1626,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if ( self.recycleBinNode ) {
         [allGroups removeObject:self.recycleBinNode];
     }
+    
+    
+    
+    
+    
+    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h4>Printed: %@</h6>    ", kPrintingStylesheet, [self htmlStringFromString:databaseName], NSDate.date.iso8601DateString];
     
     for(Node* group in allGroups) {
         if ( group.childRecords.count == 0 ) {
@@ -1642,6 +1668,8 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         [str appendString:[self getHtmlEntryFieldRow:@"Username" value: [self dereference:entry.fields.username node:entry]]];
         [str appendString:@"\n"];
     }
+    
+    
     
     [str appendString:[self getHtmlEntryFieldRow:@"Password" value:[self dereference:entry.fields.password node:entry]]];
     [str appendString:@"\n"];
@@ -1693,6 +1721,8 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     
     return [[escapedString stringByReplacingOccurrencesOfString:@"\r\n" withString:@"<br>"] stringByReplacingOccurrencesOfString:@"\n" withString:@"<br>"];
 }
+
+
 
 - (void)performPreSerializationTidy {
     [self trimKeePassHistory];

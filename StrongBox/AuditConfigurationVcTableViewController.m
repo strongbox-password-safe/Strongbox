@@ -75,6 +75,12 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 @implementation AuditConfigurationVcTableViewController
 
++ (instancetype)fromStoryboard {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"Audit" bundle:nil];
+    
+    return [sb instantiateInitialViewController];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 

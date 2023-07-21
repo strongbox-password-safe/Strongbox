@@ -30,7 +30,7 @@
     return !alreadyShown;
 }
 
-- (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
+- (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"FirstUnlockWelcomeView" bundle:nil];
     FirstUnlockWelcomeViewController* vc = [storyboard instantiateInitialViewController];
     

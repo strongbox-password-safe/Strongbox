@@ -46,7 +46,6 @@
 
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
-NSString* const kDatabasesCollectionLockStateChangedNotification = @"DatabasesCollectionLockStateChangedNotification";
 NSString* const kUpdateNotificationDatabasePreferenceChanged = @"UpdateNotificationDatabasePreferenceChanged";
 
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
@@ -261,9 +260,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)removeDatabase:(MacDatabasePreferences*)safe {
-    [safe remove];
     [safe clearSecureItems];
+    
     [BackupsManager.sharedInstance deleteAllBackups:safe];
+    
+    [MacSyncManager.sharedInstance removeDatabaseAndLocalCopies:safe];
+    
+    if ( safe.autoFillEnabled && safe.quickTypeEnabled ) {
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    }
+    
+    [SSHAgentRequestHandler.shared clearAllOfflinePublicKeys];
+    
+    [safe remove];
 }
 
 - (void)refreshVisibleRows {
@@ -807,6 +816,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if ( showSpinner ) {
         [self showProgressModal:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
     }
+    
     [MacSyncManager.sharedInstance backgroundSyncDatabase:database
                                                completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         if ( showSpinner ) {

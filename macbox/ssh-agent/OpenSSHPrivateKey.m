@@ -309,7 +309,7 @@ static const u_int kDefaultEd25519Bits = 256;
     return [NSString stringWithFormat:@"%@ (%@)", self.fingerprint, self.type];
 }
 
-- (BOOL)vaildatePassphrase:(nonnull NSString *)passphrase {
+- (BOOL)validatePassphrase:(nonnull NSString *)passphrase {
     const char* cPassphrase = [passphrase cStringUsingEncoding:NSUTF8StringEncoding];
     if ( cPassphrase == nil ) {
         NSLog(@"🔴 vaildatePassphrase: Could not get c String passphrase");

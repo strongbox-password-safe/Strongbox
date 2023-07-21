@@ -35,12 +35,14 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
 
     var popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)?
     var onCopyButton: ((DetailsViewField?) -> Void)?
+    var onQrCodeButton: ((DetailsViewField?) -> Void)?
 
     var field: DetailsViewField?
 
     func setContent(_ field: DetailsViewField,
                     popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
-                    onCopyButton: ((DetailsViewField?) -> Void)? = nil) {
+                    onCopyButton: ((DetailsViewField?) -> Void)? = nil,
+                    onQrCodeButton: ((DetailsViewField?) -> Void)? = nil) {
         self.field = field
         labelFieldName.stringValue = field.name
         self.popupMenuUpdater = popupMenuUpdater
@@ -48,6 +50,8 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
 
         self.onCopyButton = onCopyButton;
         self.copyButton.isHidden = onCopyButton == nil
+        
+        self.onQrCodeButton = onQrCodeButton;
         
         token = field.object as? OTPToken
     }
@@ -83,6 +87,10 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
         popupButton.performClick(nil)
     }
 
+    @IBAction func onQrCode(_ sender: Any) {
+        self.onQrCodeButton?(self.field)
+    }
+    
     @IBAction func onCopy(_ sender: Any) {
         self.onCopyButton?(self.field)
     }

@@ -38,8 +38,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 - (instancetype)clone;
 - (BOOL)isDifferentFrom:(EntryViewModel*)other;
 
-- (void)removeAttachment:(NSString*)filename; 
-- (NSUInteger)insertAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment;
+
 
 @property (nullable) NodeIcon* icon;
 @property NSString* title;
@@ -49,33 +48,40 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 @property NSString* notes;
 @property NSString* email;
 @property (nullable) NSDate* expires;
-
 @property (nullable) OTPToken* totp;
-@property (readonly) NSArray<CustomFieldViewModel*> *customFields;
-@property (readonly) MutableOrderedDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* attachments;
+@property BOOL hasHistory;
+@property (nullable) NSUUID* parentGroupUuid;
 @property (readonly) NSArray<ItemMetadataEntry*> *metadata;
+
+
+
+@property (readonly) BOOL sortCustomFields;
+@property (readonly) BOOL filterCustomFields; 
+@property (readonly) BOOL supportsCustomFields;
+
+@property (readonly) NSSet<NSString*> *existingCustomFieldsKeySet;
+@property (readonly) NSArray<CustomFieldViewModel*> *customFieldsFiltered;
+
+- (void)removeCustomFieldAtIndex:(NSUInteger)index;
+- (void)addCustomField:(CustomFieldViewModel*)field;
+- (void)addCustomField:(CustomFieldViewModel*)field atIndex:(NSUInteger)atIndex;
+- (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx;
+
+
+
+@property (readonly) MutableOrderedDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* filteredAttachments;
+@property (readonly) NSSet<NSString*>* reservedAttachmentNames;
+- (void)removeAttachment:(NSString*)filename;
+- (void)insertAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment;
+
+
 
 - (void)addTag:(NSString*)tag;
 - (void)removeTag:(NSString*)tag;
 - (void)resetTags:(NSSet<NSString*>*)tags;
 @property (readonly) NSArray<NSString*> *tags;
 
-@property BOOL hasHistory;
 
-@property (nullable) NSUUID* parentGroupUuid;
-
-@property BOOL sortCustomFields;
-
-- (void)removeCustomFieldAtIndex:(NSUInteger)index;
-
-- (NSUInteger)addCustomField:(CustomFieldViewModel*)field;
-- (NSUInteger)addCustomField:(CustomFieldViewModel*)field atIndex:(NSUInteger)atIndex;
-
-- (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx;
-
-
-
-@property (readonly) MutableOrderedDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* attachmentsNoKeeAgent;
 
 @property (nullable) KeeAgentSshKeyViewModel* keeAgentSshKey;
 - (void)setKeeAgentSshKeyEnabled:(BOOL)enabled;

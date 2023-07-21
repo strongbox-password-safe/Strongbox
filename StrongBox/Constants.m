@@ -11,6 +11,8 @@
 
 @implementation Constants
 
+NSString* const kDatabasesCollectionLockStateChangedNotification = @"DatabasesCollectionLockStateChangedNotification";
+
 const NSInteger kStorageProviderSFTPorWebDAVSecretMissingErrorCode = 172924134;
 
 const NSInteger kStorageProviderUserInteractionRequiredErrorCode = 17292412;
@@ -31,6 +33,8 @@ NSString* const kUrlStringKey = @"URL";
 NSString* const kNotesStringKey = @"Notes";
 
 NSString* const kKeeAgentSettingsAttachmentName = @"KeeAgent.settings";
+
+NSString* const kIsExcludedFromAutoFillCustomDataKey = @"KPEX_DoNotSuggestForAutoFill";
 
 const static NSSet<NSString*> *wellKnownKeys;
 

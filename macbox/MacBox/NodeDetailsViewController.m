@@ -646,7 +646,7 @@ static NSString* trimField(NSTextField* textField) {
 - (void)initializeTotp {
     [self bindUiToTotp];
     
-    if( self.model.showTotp && self.node.fields.otpToken ) {
+    if( self.node.fields.otpToken ) {
         if(self.timerRefreshOtp == nil) {
             self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshTotp:) userInfo:nil repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
@@ -666,7 +666,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)bindUiToTotp {
-    if( self.model.showTotp && self.node.fields.otpToken ) {
+    if( self.node.fields.otpToken ) {
         self.totpRow.hidden = NO;
         
         uint64_t remainingSeconds = self.node.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.node.fields.otpToken.period);

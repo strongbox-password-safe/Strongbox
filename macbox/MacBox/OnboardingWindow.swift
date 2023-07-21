@@ -10,6 +10,7 @@ import Cocoa
 
 class OnboardingWindow : NSWindow {
     var onboardingDoneCompletion : (() -> Void)? = nil
+    var allowEscapeToClose : Bool = true
     
     class func createOnboardingWindow( vc : NSViewController, onboardingDoneCompletion : @escaping () -> Void ) -> OnboardingWindow {
         let win = OnboardingWindow(contentViewController: vc)
@@ -30,7 +31,9 @@ class OnboardingWindow : NSWindow {
     }
     
     override func cancelOperation(_ sender: Any?) { 
-        close()
+        if allowEscapeToClose {
+            close()
+        }
     }
     
     override func close() {

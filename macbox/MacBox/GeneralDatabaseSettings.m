@@ -25,7 +25,7 @@
 @end
 
 @implementation GeneralDatabaseSettings
-
+ 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
