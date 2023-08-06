@@ -621,6 +621,10 @@
         }
         else if ( buttonIdCancelIsZero == 1 ) { 
             [self onShare:(GenericOnboardingViewController*)viewController database:model.metadata onDone:onDone];
+            
+            NSUInteger days = model.metadata.scheduleExportIntervalDays;
+            model.metadata.nextScheduledExport = [NSDate.date dateByAddingTimeInterval:days * 24 * 60 * 60];
+            model.metadata.lastScheduledExportModDate = modDate;
         }
         else if ( buttonIdCancelIsZero == 2) { 
             NSUInteger days = model.metadata.scheduleExportIntervalDays;
@@ -854,8 +858,10 @@
     return [DatabasePreferences forAllDatabasesOfProvider:kiCloud];
 }
 
-- (void)onShare:(GenericOnboardingViewController*)viewController database:(DatabasePreferences*)database onDone:(OnboardingModuleDoneBlock)onDone {
-    NSString* filename = database.exportFilename;
+- (void)onShare:(GenericOnboardingViewController*)viewController
+       database:(DatabasePreferences*)database
+         onDone:(OnboardingModuleDoneBlock)onDone {
+    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? database.exportFilename : database.fileName;
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];
     

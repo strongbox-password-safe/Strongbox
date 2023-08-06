@@ -82,6 +82,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
 @property (weak, nonatomic) IBOutlet UISwitch *switchMaskKeePassFavoriteTag;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellRedeemOfferCode;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAppendDateExportFilenames;
 
 @end
 
@@ -270,6 +271,8 @@
     
     AppPreferences.sharedInstance.shadeFavoriteTag = self.switchMaskKeePassFavoriteTag.on;
     
+    AppPreferences.sharedInstance.appendDateToExportFileName = self.switchAppendDateExportFilenames.on;
+
     [self bindPreferences];
 }
 
@@ -331,6 +334,7 @@
     self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;
     
     self.switchMaskKeePassFavoriteTag.on = AppPreferences.sharedInstance.shadeFavoriteTag;
+    self.switchAppendDateExportFilenames.on = AppPreferences.sharedInstance.appendDateToExportFileName;
 }
 
 - (void)bindCloudSessions {

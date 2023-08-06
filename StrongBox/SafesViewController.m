@@ -1395,7 +1395,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         return;
     }
     
-    NSString* filename = database.exportFilename;
+    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? database.exportFilename : database.fileName;
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];

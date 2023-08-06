@@ -18,6 +18,7 @@
 #import "NSDate+Extensions.h"
 #import "Serializator.h"
 #import "WorkingCopyManager.h"
+#import "AppPreferences.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate, UIActivityItemSource>
 
@@ -131,7 +132,8 @@
 }
 
 - (void)onShareWithData:(NSData*)data {
-    NSString* filename = self.exportFileName;
+    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? self.exportFileName : self.viewModel.metadata.fileName;
+    
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];

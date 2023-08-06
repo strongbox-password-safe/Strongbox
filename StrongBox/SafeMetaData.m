@@ -74,7 +74,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.keePassIconSet = kKeePassIconSetSfSymbols;
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
         
-        self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
+        self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
         self.autoLockOnDeviceLock = YES;
         self.autoFillConvenienceAutoUnlockTimeout = -1;

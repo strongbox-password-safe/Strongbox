@@ -184,7 +184,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* businessOrganisationName;
 @property BOOL shadeFavoriteTag;
 
+@property BOOL appendDateToExportFileName;
+
 @property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
+
 
 @end
 

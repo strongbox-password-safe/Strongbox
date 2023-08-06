@@ -66,10 +66,10 @@ class AdvancedAppPreferences: NSViewController {
         hideKeyFile.isHidden = settings.doNotRememberKeyFile
         enableThirdParty.isEnabled = settings.isPro;
         
-        if #available(macOS 11.0, *) {
-        } else {
-            useNextGenUI.isHidden = true
-        }
+
+
+            useNextGenUI.isHidden = true 
+
     }
 
     @IBAction func onChanged(_: Any) {

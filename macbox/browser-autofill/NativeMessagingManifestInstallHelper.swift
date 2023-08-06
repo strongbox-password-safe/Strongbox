@@ -22,12 +22,14 @@ struct ChromeNativeMessagingManifest : Encodable {
     var path : String
     let type : String = "stdio"
     
-#if DEBUG
+
+
+
+
+    
     let allowed_origins : [String] = ["chrome-extension:
-                                      "chrome-extension:
-#else
-    let allowed_origins : [String] = ["chrome-extension:
-#endif
+    
+
 }
 
 class NativeMessagingManifestInstallHelper: NSObject {

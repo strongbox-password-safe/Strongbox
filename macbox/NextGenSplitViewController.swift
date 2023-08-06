@@ -523,7 +523,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         let text = searchField.stringValue
         
         if database.nextGenSearchText != searchField.stringValue {
-            NSLog("Search Text Changed... [%@]", String(describing: text))
+
             database.nextGenSearchText = text
         }
     }

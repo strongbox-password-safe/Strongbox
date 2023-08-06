@@ -811,8 +811,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onShareWithData:(NSData*)data {
-    NSString* filename = self.viewModel.metadata.exportFilename;
-    
+    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? self.viewModel.metadata.exportFilename : self.viewModel.metadata.fileName;
+
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];

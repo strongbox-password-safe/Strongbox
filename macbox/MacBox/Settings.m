@@ -589,7 +589,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (BOOL)nextGenUI {
     if (@available(macOS 11.0, *)) {
-        return [self getBool:kNextGenUI fallback:YES];
+        return YES;
+
     }
     else {
         return NO;

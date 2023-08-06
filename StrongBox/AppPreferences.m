@@ -150,6 +150,7 @@ static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
 static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 static NSString* const kLastQuickTypeMultiDbRegularClear = @"lastQuickTypeMultiDbRegularClear";
+static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileName";
 
 @implementation AppPreferences
 
@@ -191,6 +192,14 @@ static NSString* const kLastQuickTypeMultiDbRegularClear = @"lastQuickTypeMultiD
 }
 
 
+
+- (BOOL)appendDateToExportFileName {
+    return [self getBool:kAppendDateToExportFileName fallback:YES];
+}
+
+- (void)setAppendDateToExportFileName:(BOOL)appendDateToExportFileName {
+    [self setBool:kAppendDateToExportFileName value:appendDateToExportFileName];
+}
 
 - (NSDate *)lastQuickTypeMultiDbRegularClear {
     NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;

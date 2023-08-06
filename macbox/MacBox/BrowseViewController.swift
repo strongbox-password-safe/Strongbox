@@ -139,7 +139,8 @@ class BrowseViewController: NSViewController {
 
             tableColumn.headerCell.title = column.title
             tableColumn.identifier = column.identifier
-            tableColumn.minWidth = 65
+            tableColumn.minWidth = 30
+            tableColumn.resizingMask = [.autoresizingMask, .userResizingMask]
             tableColumn.width = column == .title ? 200 : 150
             tableColumn.isHidden = !column.visibleByDefault
             tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: column.rawValue, ascending: true)
