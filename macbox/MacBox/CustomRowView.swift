@@ -13,13 +13,13 @@ class CustomRowView: NSTableRowView {
     // MMcG: Required or drawSelection is not called!!!
     override var backgroundColor: NSColor {
         get {
-            return .red
+            .red
         }
         set {}
     }
 
     override var interiorBackgroundStyle: NSView.BackgroundStyle {
-        return .normal 
+        .normal 
     }
 
     override func drawSelection(in dirtyRect: NSRect) {

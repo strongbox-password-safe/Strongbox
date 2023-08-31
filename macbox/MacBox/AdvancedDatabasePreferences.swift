@@ -11,7 +11,6 @@ import Cocoa
 class AdvancedDatabasePreferences: NSViewController {
     @IBOutlet var checkboxConcealEmptyProtected: NSButton!
     @IBOutlet var checkboxTitleIsEditable: NSButton!
-    @IBOutlet var checkboxOtherFieldsAreEditable: NSButton!
     @IBOutlet var checkboxShowRecycleBinInBrowse: NSButton!
     @IBOutlet var checkboxShowRecycleBinInSearch: NSButton!
     @IBOutlet var checkboxKeePassSortItems: NSButton!
@@ -32,10 +31,6 @@ class AdvancedDatabasePreferences: NSViewController {
             checkboxSortCustomFields.isHidden = true
         }
 
-        if Settings.sharedInstance().nextGenUI {
-            checkboxOtherFieldsAreEditable.isHidden = true
-        }
-
         bindUI()
     }
 
@@ -45,10 +40,9 @@ class AdvancedDatabasePreferences: NSViewController {
         checkboxShowRecycleBinInSearch.state = model.showRecycleBinInSearchResults ? .on : .off
         checkboxShowAutoCompleteSuggestions.state = !model.showAutoCompleteSuggestions ? .off : .on
         checkboxTitleIsEditable.state = !model.outlineViewTitleIsReadonly ? .on : .off
-        checkboxOtherFieldsAreEditable.state = model.outlineViewEditableFieldsAreReadonly ? .off : .on
         checkboxConcealEmptyProtected.state = model.concealEmptyProtectedFields ? .on : .off
         checkboxSortCustomFields.state = !model.customSortOrderForFields ? .on : .off
-        checkboxAlwaysAutoMerge.state = model.conflictResolutionStrategy == .autoMerge ?  .on : .off
+        checkboxAlwaysAutoMerge.state = model.conflictResolutionStrategy == .autoMerge ? .on : .off
     }
 
     @IBAction func onClose(_: Any) {
@@ -62,7 +56,6 @@ class AdvancedDatabasePreferences: NSViewController {
         model.showRecycleBinInSearchResults = checkboxShowRecycleBinInSearch.state == .on
         model.showAutoCompleteSuggestions = checkboxShowAutoCompleteSuggestions.state == .on
         model.outlineViewTitleIsReadonly = checkboxTitleIsEditable.state == .off
-        model.outlineViewEditableFieldsAreReadonly = checkboxOtherFieldsAreEditable.state == .off
         model.customSortOrderForFields = checkboxSortCustomFields.state == .off
         model.conflictResolutionStrategy = checkboxAlwaysAutoMerge.state == .on ? .autoMerge : .ask
 

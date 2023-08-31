@@ -25,6 +25,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
+
 @interface SafeMetaData : NSObject
 
 - (instancetype)initWithNickName:(NSString *)nickName

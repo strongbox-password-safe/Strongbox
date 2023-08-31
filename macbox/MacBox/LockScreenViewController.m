@@ -105,36 +105,34 @@
     
     NSString* about = [NSString stringWithFormat:fmt2, [Utils getAppVersion]];
     self.textFieldVersion.stringValue = about;
-        
+    
     [self customizeLockStackViewSpacing];
-            
+    
     NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch");
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
     self.buttonUnlockWithTouchId.hidden = YES;
-
+    
     [self bindRevealMasterPasswordTextField];
     
     self.textFieldMasterPassword.delegate = self;
     
     
     
-    if (@available(macOS 11.0, *)) {
-        NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-        
-        [self.buttonUnlockWithPassword setImage:[NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil]];
-        self.buttonUnlockWithPassword.symbolConfiguration = imageConfig;
-        
-        [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
-        self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
-    }
+    NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+    
+    [self.buttonUnlockWithPassword setImage:[NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil]];
+    self.buttonUnlockWithPassword.symbolConfiguration = imageConfig;
+    
+    [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
+    self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
     
     
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(bindProOrFreeTrialWrapper)
-                                               name:kProStatusChangedNotificationKey
+                                               name:kProStatusChangedNotification
                                              object:nil];
-
+    
     
     
     self.quickTrialStartContainer.wantsLayer = YES;
@@ -146,7 +144,7 @@
     self.labelLearnMore.onClick = ^{
         [weakSelf onLearnMoreUpgradeScreen];
     };
-
+    
     [self bindProOrFreeTrial];
 }
 
@@ -296,14 +294,9 @@
 - (void)bindRevealMasterPasswordTextField {
     NSImage* img = nil;
     
-    if (@available(macOS 11.0, *)) {
-        img = [NSImage imageWithSystemSymbolName:!self.textFieldMasterPassword.showsText ? @"eye" : @"eye.slash" accessibilityDescription:@""];
-        
-        [self.buttonToggleRevealMasterPasswordTip setSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
-    } else {
-        img = !self.textFieldMasterPassword.showsText ?
-         [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
-    }
+    img = [NSImage imageWithSystemSymbolName:!self.textFieldMasterPassword.showsText ? @"eye" : @"eye.slash" accessibilityDescription:@""];
+    
+    [self.buttonToggleRevealMasterPasswordTip setSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
     
     [self.buttonToggleRevealMasterPasswordTip setImage:img];
 }
@@ -484,24 +477,19 @@
             convenienceTitle = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
         }
         else if ( touchEnabled ) {
-            if (@available(macOS 11.0, *)) {
-                NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-                
-                [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
-                self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
-            }
-
+            NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+            
+            [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
+            self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
+            
             convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_id", @"Unlock with Touch ID");
         }
         else {
+            NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
             
-            if (@available(macOS 11.0, *)) {
-                NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-                
-                [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"lock.open.applewatch" accessibilityDescription:nil]];
-                self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
-            }
-
+            [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"lock.open.applewatch" accessibilityDescription:nil]];
+            self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
+            
             convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_apple_watch", @"Unlock with Watch");
         }
 
@@ -1454,15 +1442,13 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 - (void)onCmdPlusNumberPressed:(NSUInteger)number {
     
-
-    if (@available(macOS 10.13, *)) {
-
-
-        NSWindowTabGroup* group = self.view.window.tabGroup;
-
-        if ( self.view.window.tabbedWindows && number <= self.view.window.tabbedWindows.count ) {
-            group.selectedWindow = self.view.window.tabbedWindows[number - 1];
-        }
+    
+    
+    
+    NSWindowTabGroup* group = self.view.window.tabGroup;
+    
+    if ( self.view.window.tabbedWindows && number <= self.view.window.tabbedWindows.count ) {
+        group.selectedWindow = self.view.window.tabbedWindows[number - 1];
     }
 }
 

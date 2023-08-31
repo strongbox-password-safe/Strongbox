@@ -233,12 +233,7 @@
 #else
 + (NSImage*)getImageForProvider:(StorageProvider)provider {
     if (provider == kiCloud) {
-        if (@available(macOS 11.0, *)) {
-            return [NSImage imageWithSystemSymbolName:@"icloud.fill" accessibilityDescription:nil];
-        }
-        else {
-            return [NSImage imageNamed:@"cloud"];
-        }
+        return [NSImage imageWithSystemSymbolName:@"icloud.fill" accessibilityDescription:nil];
     }
     else if (provider == kMacFile) {
         if (@available(macOS 12.0, *)) {

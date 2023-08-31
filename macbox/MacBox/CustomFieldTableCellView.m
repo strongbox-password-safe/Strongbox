@@ -98,16 +98,11 @@
         
         [self.labelText setLineBreakMode:NSLineBreakByClipping];
         
-        if (@available(macOS 11.0, *)) {
-            [self.buttonShowHide setImage:[NSImage imageWithSystemSymbolName:@"eye" accessibilityDescription:nil]];
-        }
-        else {
-            [self.buttonShowHide setImage:[NSImage imageNamed:@"show"]];
-        }
+        [self.buttonShowHide setImage:[NSImage imageWithSystemSymbolName:@"eye" accessibilityDescription:nil]];
     }
     else {
         [self.labelText setLineBreakMode:self.singleLine ? NSLineBreakByClipping : NSLineBreakByWordWrapping];
-    
+        
         NSFont* font = self.protected ? [NSFont fontWithName:Settings.sharedInstance.easyReadFontName size:13.0f] : [NSFont systemFontOfSize:13.0f];
         
         if ( self.protected && Settings.sharedInstance.colorizePasswords ) {
@@ -127,17 +122,13 @@
                 limited = [self.val substringWithRange:[self.val lineRangeForRange:NSMakeRange(0, 0)]];
                 limited = trim (limited);
             }
-
+            
             self.labelText.stringValue = limited;
             self.labelText.textColor = self.plainTextColor;
         }
-
-        if (@available(macOS 11.0, *)) {
-            [self.buttonShowHide setImage:[NSImage imageWithSystemSymbolName:@"eye.slash" accessibilityDescription:nil]];
-        }
-        else {
-            [self.buttonShowHide setImage:[NSImage imageNamed:@"hide"]];
-        }
+        
+        
+        [self.buttonShowHide setImage:[NSImage imageWithSystemSymbolName:@"eye.slash" accessibilityDescription:nil]];
     }
             
     self.buttonShowHide.hidden = !self.protected;

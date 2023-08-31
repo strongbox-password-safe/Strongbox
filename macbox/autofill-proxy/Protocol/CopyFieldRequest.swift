@@ -7,26 +7,26 @@
 //
 
 class CopyFieldRequest: NSObject, Codable {
-    enum WellKnownField : Int, Codable {
+    enum WellKnownField: Int, Codable {
         case username
         case password
         case totp
     }
-    
-    var databaseId : String
-    var nodeId : UUID
-    var field : WellKnownField
-    
-    init(databaseId: String, nodeId: UUID, field: CopyFieldRequest.WellKnownField, customFieldName: String, explicitTotp : Bool = false) {
+
+    var databaseId: String
+    var nodeId: UUID
+    var field: WellKnownField
+
+    init(databaseId: String, nodeId: UUID, field: CopyFieldRequest.WellKnownField, customFieldName _: String, explicitTotp: Bool = false) {
         self.databaseId = databaseId
         self.nodeId = nodeId
         self.field = field
         _explicitTotp = explicitTotp
     }
-    
-    var explicitTotp : Bool { return _explicitTotp ?? false }
-    var _explicitTotp : Bool?
-    
+
+    var explicitTotp: Bool { _explicitTotp ?? false }
+    var _explicitTotp: Bool?
+
     enum CodingKeys: String, CodingKey {
         case databaseId
         case nodeId

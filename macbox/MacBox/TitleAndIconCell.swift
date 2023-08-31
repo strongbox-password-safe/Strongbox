@@ -24,13 +24,13 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        
+
         favStarIcon.isHidden = true
         trailingFavStar.isHidden = true
     }
 
     func setContent(_ attributedTitle: NSAttributedString,
-                    editable : Bool = false,
+                    editable: Bool = false,
                     iconImage: NSImage? = nil,
                     topSpacing: CGFloat = 4.0,
                     bottomSpacing: CGFloat = 4.0,
@@ -39,19 +39,25 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
                     showTrailingFavStar: Bool = false,
                     contentTintColor: NSColor? = nil,
                     count: String? = nil,
-                    onTitleEdited : (( _ text : String ) -> Void )? = nil)
+                    tooltip: String? = nil,
+                    onTitleEdited: ((_ text: String) -> Void)? = nil)
     {
         favStarIcon.isHidden = !showLeadingFavStar
         trailingFavStar.isHidden = !showTrailingFavStar
 
         title.attributedStringValue = attributedTitle
+
+
+
+        toolTip = tooltip
+
         title.isEditable = editable
         self.onTitleEdited = onTitleEdited
 
         icon.image = iconImage
         icon.contentTintColor = contentTintColor
 
-        if let count = count {
+        if let count {
             childCount.isHidden = false
             childCount.stringValue = count
         } else {
@@ -62,10 +68,10 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
         bottomSpaceConstraint.constant = bottomSpacing
         leadingSpaceConstraint.constant = leadingSpace
     }
-    
-    var onTitleEdited : (( _ text : String ) -> Void )? = nil
-    
-    @IBAction func onEdited(_ sender: Any) {
-        onTitleEdited?( title.stringValue )
+
+    var onTitleEdited: ((_ text: String) -> Void)? = nil
+
+    @IBAction func onEdited(_: Any) {
+        onTitleEdited?(title.stringValue)
     }
 }

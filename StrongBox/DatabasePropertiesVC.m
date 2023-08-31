@@ -319,7 +319,7 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
     }
         
     if ( indexPath.row == kReadOnlyRow ) {
-        if ( AppPreferences.sharedInstance.disableReadOnlyToggles ) {
+        if ( AppPreferences.sharedInstance.databasesAreAlwaysReadOnly ) {
             return 0.0f;
         }
     }

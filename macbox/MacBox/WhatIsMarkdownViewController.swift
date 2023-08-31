@@ -9,15 +9,14 @@
 import Cocoa
 
 class WhatIsMarkdownViewController: NSViewController {
-    @IBOutlet weak var moreInfoLink: HyperlinkTextField!
-    
+    @IBOutlet var moreInfoLink: HyperlinkTextField!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         moreInfoLink.href = "https:
         moreInfoLink.onClicked = {
             NSWorkspace.shared.open(URL(string: "https:
         }
     }
-    
 }

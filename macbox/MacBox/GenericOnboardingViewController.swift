@@ -6,9 +6,7 @@
 //  Copyright © 2022 Mark McGuill. All rights reserved.
 //
 
-import Foundation
 import AppKit
+import Foundation
 
-class  : NSViewController {
-    
-}
+class: NSViewController {}

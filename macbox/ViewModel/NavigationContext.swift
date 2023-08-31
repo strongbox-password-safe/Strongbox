@@ -1,5 +1,5 @@
 //
-//  NextGenNavigationContext.swift
+//  NavigationContext.swift
 //  MacBox
 //
 //  Created by Strongbox on 15/11/2021.

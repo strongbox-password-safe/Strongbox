@@ -13,8 +13,8 @@ class UrlTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenuD
     @IBOutlet var launchButton: NSButton!
     @IBOutlet var popupButton: NSPopUpButton!
     @IBOutlet var labelName: NSTextField!
-    @IBOutlet weak var copyButton: NSButton!
-    
+    @IBOutlet var copyButton: NSButton!
+
     override func awakeFromNib() {
         textFieldValue.onClicked = { [weak self] in
             self?.onLaunch?()
@@ -28,14 +28,15 @@ class UrlTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenuD
 
     func setContent(_ field: DetailsViewField,
                     popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
-                    onCopyButton: ((DetailsViewField?) -> Void)? = nil ) {
+                    onCopyButton: ((DetailsViewField?) -> Void)? = nil)
+    {
         self.field = field
         self.popupMenuUpdater = popupMenuUpdater
         popupButton.menu?.delegate = self
 
-        self.onCopyButton = onCopyButton;
-        self.copyButton.isHidden = onCopyButton == nil
-        
+        self.onCopyButton = onCopyButton
+        copyButton.isHidden = onCopyButton == nil
+
         labelName.stringValue = field.name
 
         textFieldValue.href = field.value
@@ -56,14 +57,14 @@ class UrlTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenuD
         popupButton.performClick(nil)
     }
 
-    @IBAction func onCopy(_ sender: Any) {
-        self.onCopyButton?(self.field)
+    @IBAction func onCopy(_: Any) {
+        onCopyButton?(field)
     }
-    
+
     func menuNeedsUpdate(_ menu: NSMenu) {
 
 
-        guard let field = field else {
+        guard let field else {
             return
         }
 

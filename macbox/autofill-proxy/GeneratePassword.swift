@@ -8,14 +8,13 @@
 
 import Foundation
 
-class GeneratePasswordRequest : Codable {
-}
+class GeneratePasswordRequest: Codable {}
 
-class GeneratePasswordResponse : Codable {
-    var password : String
-    var alternatives : [String]
-    
-    init(password: String, alternatives : [String]) {
+class GeneratePasswordResponse: Codable {
+    var password: String
+    var alternatives: [String]
+
+    init(password: String, alternatives: [String]) {
         self.password = password
         self.alternatives = alternatives
     }

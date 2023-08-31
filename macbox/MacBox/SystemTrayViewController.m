@@ -60,20 +60,18 @@
     
     
     self.fontMenlo = [NSFontManager.sharedFontManager fontWithFamily:@"Menlo" traits:kNilOptions weight:NSFontWeightRegular size:16.0];
-
-    if (@available(macOS 11.0, *)) {
-        [self.buttonRefresh setImage:[NSImage imageWithSystemSymbolName:@"arrow.triangle.2.circlepath" accessibilityDescription:nil]];
-        [self.buttonRefresh setControlSize:NSControlSizeLarge];
-        
-        [self.buttonPasswordPreferences setImage:[NSImage imageWithSystemSymbolName:@"gear" accessibilityDescription:nil]];
-        [self.buttonPasswordPreferences setControlSize:NSControlSizeLarge];
-
-        [self.barButtonDice setImage:[NSImage imageWithSystemSymbolName:@"die.face.6" accessibilityDescription:nil]];
-        [self.barButtonDice setControlSize:NSControlSizeLarge];
-        
-        [self.barButtonPreferences setImage:[NSImage imageWithSystemSymbolName:@"gear" accessibilityDescription:nil]];
-        [self.barButtonPreferences setControlSize:NSControlSizeLarge];
-    }
+    
+    [self.buttonRefresh setImage:[NSImage imageWithSystemSymbolName:@"arrow.triangle.2.circlepath" accessibilityDescription:nil]];
+    [self.buttonRefresh setControlSize:NSControlSizeLarge];
+    
+    [self.buttonPasswordPreferences setImage:[NSImage imageWithSystemSymbolName:@"gear" accessibilityDescription:nil]];
+    [self.buttonPasswordPreferences setControlSize:NSControlSizeLarge];
+    
+    [self.barButtonDice setImage:[NSImage imageWithSystemSymbolName:@"die.face.6" accessibilityDescription:nil]];
+    [self.barButtonDice setControlSize:NSControlSizeLarge];
+    
+    [self.barButtonPreferences setImage:[NSImage imageWithSystemSymbolName:@"gear" accessibilityDescription:nil]];
+    [self.barButtonPreferences setControlSize:NSControlSizeLarge];
     
     self.basic.onClick = ^{
         [self onBasicClick];
@@ -124,9 +122,7 @@
     databaseButton.identifier = db.uuid;
     
     [databaseButton setTitle:db.nickName];
-    if (@available(macOS 11.0, *)) {
-        [databaseButton setControlSize:NSControlSizeLarge];
-    }
+    [databaseButton setControlSize:NSControlSizeLarge];
     
     [databaseButton setFrameSize:NSMakeSize(300.,50.)];
     databaseButton.translatesAutoresizingMaskIntoConstraints = NO;

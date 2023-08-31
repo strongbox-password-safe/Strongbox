@@ -23,7 +23,6 @@
 #import "git-version.h"
 #import "SyncManager.h"
 #import "CustomizationManager.h"
-
 #import "StrongboxiOSFilesManager.h"
 
 #else
@@ -36,7 +35,6 @@
 #import "Settings.h"
 #import "MacSyncManager.h"
 #import "MacDatabasePreferences.h"
-
 #import "StrongboxMacFilesManager.h"
 
 #endif
@@ -152,6 +150,31 @@ int OPParentIDForProcessID(int pid)
     NSString* systemName = @"MacOS";
     NSString* systemVersion = [DebugHelper systemVersion];
 #endif
+
+
+    
+    if ( StrongboxProductBundle.isBusinessBundle ) {
+        [debugLines addObject:@"-------------------- MDM Config Settings -----------------------"];
+        
+
+        
+        if ( !MDMConfigManager.sharedInstance.configIsPresent ) {
+            [debugLines addObject:@"No MDM Settings Found."];
+        }
+        else {
+
+
+
+
+            
+            [debugLines addObject:[NSString stringWithFormat:@"OrganizationKey = %@", MDMConfigManager.sharedInstance.organizationKey]];
+            [debugLines addObject:[NSString stringWithFormat:@"ReadOnly = %hhd", MDMConfigManager.sharedInstance.readOnly]];
+            [debugLines addObject:[NSString stringWithFormat:@"DisablePrinting = %hhd", MDMConfigManager.sharedInstance.disablePrinting]];
+            [debugLines addObject:[NSString stringWithFormat:@"DisableExport = %hhd", MDMConfigManager.sharedInstance.disableExport]];
+        }
+    }
+    
+
     
     
     
@@ -258,12 +281,29 @@ int OPParentIDForProcessID(int pid)
     [debugLines addObject:[NSString stringWithFormat:@"System Name: %@", systemName]];
     [debugLines addObject:[NSString stringWithFormat:@"System Version: %@", systemVersion]];
 
+#if TARGET_OS_IPHONE
+    
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    
+    
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Network Interfaces"];
+    [debugLines addObject:@"--------------------"];
+
+    NSDictionary* addrs = [WifiAddressHelper getDebugAfInetAddresses];
+    
+    for ( NSString *intf in addrs.allKeys ) {
+        [debugLines addObject:[NSString stringWithFormat:@"[%@] => [%@]", intf, addrs[intf]]];
+    }
+#endif
+    
+#endif
+    
     
 
     [debugLines addObject:@"--------------------"];
     [debugLines addObject:@"Preferences"];
     [debugLines addObject:@"--------------------"];
-
 #if TARGET_OS_IPHONE
     NSUserDefaults *defs = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     NSDictionary* prefs = [defs persistentDomainForName:AppPreferences.sharedInstance.appGroupName];
@@ -392,6 +432,11 @@ int OPParentIDForProcessID(int pid)
         NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
         jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
         jsonDict[@"keyFileFileName"] = jsonDict[@"keyFileFileName"] ? @"<redacted>" : @"<Not Set>";
+        
+        jsonDict[@"databaseCreated"] = jsonDict[@"databaseCreated"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"databaseCreated"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
+        jsonDict[@"lastSyncAttempt"] = jsonDict[@"lastSyncAttempt"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"lastSyncAttempt"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
+        jsonDict[@"lastSyncRemoteModDate"] = jsonDict[@"lastSyncRemoteModDate"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"lastSyncRemoteModDate"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
+        
         NSString *thisSafe = [jsonDict description];
         [debugLines addObject:thisSafe];
     }

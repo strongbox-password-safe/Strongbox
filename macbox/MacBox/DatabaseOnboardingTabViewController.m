@@ -38,12 +38,8 @@
 
 + (BOOL)shouldPromptForAutoFillEnrol:(MacDatabasePreferences*)databaseMetadata {
     BOOL featureAvailable = Settings.sharedInstance.isPro;
-    BOOL autoFillAvailable = NO;
-    if ( @available(macOS 11.0, *) ) {
-        autoFillAvailable = YES;
-    }
     
-    BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !databaseMetadata.hasPromptedForAutoFillEnrol;
+    BOOL shouldPromptForAutoFillEnrol = featureAvailable && !databaseMetadata.hasPromptedForAutoFillEnrol;
     
     return shouldPromptForAutoFillEnrol;
 }
@@ -117,7 +113,8 @@
         self.viewModel.databaseMetadata.hasPromptedForAutoFillEnrol = YES;
     }
     
-    [self.view.window close];
+    [self.view.window.sheetParent endSheet:self.view.window];
+
 }
 
 - (void)updateQuickTypeAutoFillDatabases {

@@ -69,22 +69,20 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     self.textFieldPassword.delegate = self;
     [self fixStackViewSpacing];
-
-    if (@available(macOS 11.0, *)) {
-        NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-        
-        [self.buttonUnlock setImage:[NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil]];
-        self.buttonUnlock.symbolConfiguration = imageConfig;
-    }
+    
+    NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+    
+    [self.buttonUnlock setImage:[NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil]];
+    self.buttonUnlock.symbolConfiguration = imageConfig;
     
     self.concealed = YES;
     
     self.selectedKeyFileBookmark = [self contextAwareKeyFileBookmark];
     self.selectedYubiKeyConfiguration = self.database.yubiKeyConfiguration;
-
+    
     if ( self.headline ) {
         self.textFIeldHeadline.stringValue = self.headline;
     }
@@ -155,9 +153,7 @@
 - (void)bindConcealed {
     self.textFieldPassword.showsText = !self.concealed;
     
-    if (@available(macOS 11.0, *)) {
-        [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
-    }
+    [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
 }
 
 - (void)bindAdvanced {
@@ -225,6 +221,9 @@
 - (IBAction)onCancel:(id)sender {
     if ( self.presentingViewController ) {
         [self.presentingViewController dismissViewController:self];
+    }
+    else if ( self.view.window.sheetParent ) {
+        [self.view.window.sheetParent endSheet:self.view.window returnCode:NSModalResponseCancel];
     }
     else {
         [self.view.window close];

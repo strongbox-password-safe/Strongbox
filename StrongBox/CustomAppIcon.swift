@@ -42,7 +42,7 @@ public enum CustomAppIcon: CaseIterable {
     case notepad
     case original
     case white
-    
+
     var isPro: Bool {
         switch self {
         case .original, .regular, .code, .binary, .bluey, .iridescent, .water, .lightBlue, .white, .calendar1:
@@ -53,7 +53,7 @@ public enum CustomAppIcon: CaseIterable {
     }
 
     var image: UIImage {
-        return UIImage(named: plistKey)!
+        UIImage(named: plistKey)!
     }
 
     var category: CustomAppIconCategory {
@@ -65,7 +65,6 @@ public enum CustomAppIcon: CaseIterable {
         case .proBadge, .regular, .zero, .black, .bluey, .iridescent, .lightBlue, .midnightFire, .red, .water, .original, .white:
             return .strongbox
         }
-        
     }
 
     var plistKey: String {
@@ -159,13 +158,13 @@ enum CustomAppIconCategory: CaseIterable {
 public class CustomAppIconObjCHelper: NSObject {
     @objc
     public static func downgradeProIconIfInUse() {
-            guard !AppPreferences.sharedInstance().isPro,
-                  let iconName = UIApplication.shared.alternateIconName,
-                  let icon = CustomAppIcon.allCases.first(where: { $0.plistKey == iconName }) else { return }
+        guard !AppPreferences.sharedInstance().isPro,
+              let iconName = UIApplication.shared.alternateIconName,
+              let icon = CustomAppIcon.allCases.first(where: { $0.plistKey == iconName }) else { return }
 
         if icon.isPro {
             UIApplication.shared.setAlternateIconName(nil) { error in
-                if let error = error {
+                if let error {
                     NSLog("🔴 Error = [%@]", String(describing: error))
                 }
             }

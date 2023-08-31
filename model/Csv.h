@@ -21,7 +21,8 @@ static NSString* const kCSVHeaderTotp = @"OTPAuth";
 
 @interface Csv : NSObject
 
-+ (NSData*)getSafeAsCsv:(DatabaseModel*_Nullable)database;
++ (NSData*)getGroupAsCsv:(Node*_Nullable)database;
++ (NSData*)getNodesAsCsv:(NSArray<Node*>*)nodes;
 
 @end
 

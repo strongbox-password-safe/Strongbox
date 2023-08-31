@@ -13,6 +13,11 @@
 
 NSString* const kDatabasesCollectionLockStateChangedNotification = @"DatabasesCollectionLockStateChangedNotification";
 
+NSString *const kPreferenceGlobalShowShortcutNotification = @"GlobalShowStrongboxHotKey-New";
+NSString *const kPreferencesChangedNotification = @"preferencesChangedNotification";
+NSString *const kTotpUpdateNotification = @"TotpUpdateNotification";
+NSString* const kProStatusChangedNotification = @"proStatusChangedNotification";
+
 const NSInteger kStorageProviderSFTPorWebDAVSecretMissingErrorCode = 172924134;
 
 const NSInteger kStorageProviderUserInteractionRequiredErrorCode = 17292412;

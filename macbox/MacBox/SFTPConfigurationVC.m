@@ -218,7 +218,7 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self.presentingViewController dismissViewController:self];
+    [self.presentingViewController dismissViewController:self]; 
     self.onDone(NO, nil);
 }
 

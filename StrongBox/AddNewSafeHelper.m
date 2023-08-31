@@ -58,7 +58,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                            model:(DatabaseModel *)model
                       forceLocal:(BOOL)forceLocal
                       completion:(void (^)(BOOL userCancelled, DatabasePreferences* metadata, NSData* initialSnapshot, NSError* error))completion {
-    BOOL iCloud = !forceLocal && AppPreferences.sharedInstance.iCloudOn && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
+    BOOL iCloud = !forceLocal && !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name

@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) UIFont* title3Font;
 
 @property (readonly) UIFont* headlineFont;
+@property (readonly) UIFont* subheadlineFont;
 @property (readonly) UIFont* headlineItalicFont;
 @property (readonly) UIFont* italicFont;
 @property (readonly) UIFont* caption1Font;

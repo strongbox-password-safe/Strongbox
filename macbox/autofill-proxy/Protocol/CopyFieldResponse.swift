@@ -7,8 +7,8 @@
 //
 
 class CopyFieldResponse: NSObject, Codable {
-    var success : Bool
-    
+    var success: Bool
+
     init(success: Bool) {
         self.success = success
     }

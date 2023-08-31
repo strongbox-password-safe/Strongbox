@@ -69,8 +69,6 @@
     
 
 
-
-
     
     [self.masterStack setCustomSpacing:8.0f afterView:self.boxUnlockedBarIndicator];
 }
@@ -350,14 +348,12 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
         
         self.imageViewSyncing.image = [NSImage imageNamed:@"syncronize"];
         
-        if (@available(macOS 11.0, *)) {
-            self.imageViewSyncing.image = [NSImage imageWithSystemSymbolName:@"function" accessibilityDescription:nil];
-            self.imageViewSyncing.controlSize = NSControlSizeLarge;
-        }
-
+        self.imageViewSyncing.image = [NSImage imageWithSystemSymbolName:@"function" accessibilityDescription:nil];
+        self.imageViewSyncing.controlSize = NSControlSizeLarge;
+        
         NSColor *tint = NSColor.systemYellowColor;
         self.imageViewSyncing.contentTintColor = tint;
-
+        
         self.syncProgressIndicator.hidden = NO;
         [self.syncProgressIndicator startAnimation:nil];
     }

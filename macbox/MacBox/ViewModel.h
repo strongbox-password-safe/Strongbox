@@ -21,26 +21,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString* const kNotificationUserInfoKeyNode;
-extern NSString* const kNotificationUserInfoKeyBoolParam;
-
-extern NSString* const kModelUpdateNotificationCustomFieldsChanged;
-extern NSString* const kModelUpdateNotificationPasswordChanged;
 extern NSString* const kModelUpdateNotificationTitleChanged;
-extern NSString* const kModelUpdateNotificationUsernameChanged;
-extern NSString* const kModelUpdateNotificationEmailChanged;
-extern NSString* const kModelUpdateNotificationUrlChanged;
-extern NSString* const kModelUpdateNotificationNotesChanged;
 extern NSString* const kModelUpdateNotificationIconChanged;
-extern NSString* const kModelUpdateNotificationAttachmentsChanged;
-extern NSString* const kModelUpdateNotificationTotpChanged;
-extern NSString* const kNotificationUserInfoKeyIsBatchIconUpdate;
-extern NSString* const kModelUpdateNotificationExpiryChanged;
+
 extern NSString* const kModelUpdateNotificationItemsDeleted;
 extern NSString* const kModelUpdateNotificationItemsUnDeleted;
 extern NSString* const kModelUpdateNotificationItemsMoved;
 extern NSString* const kModelUpdateNotificationTagsChanged;
-extern NSString* const kModelUpdateNotificationSelectedItemChanged;
 extern NSString* const kModelUpdateNotificationDatabasePreferenceChanged;
 extern NSString* const kModelUpdateNotificationDatabaseUpdateStatusChanged;
 extern NSString* const kModelUpdateNotificationNextGenNavigationChanged;
@@ -91,56 +78,36 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (BOOL)applyModelEditsAndMoves:(EntryViewModel *)editModel toNode:(NSUUID*)nodeId;
 
 - (BOOL)setItemTitle:(Node* )item title:(NSString* )title;
-- (void)setItemUsername:(Node*)item username:(NSString*)username;
-- (void)setItemEmail:(Node*)item email:(NSString*)email;
-- (void)setItemUrl:(Node*)item url:(NSString*)url;
-- (void)setItemPassword:(Node*)item password:(NSString*)password;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
-- (void)setItemExpires:(Node*)item expiry:(NSDate*_Nullable)expiry;
 
 - (void)setGroupExpandedState:(Node*)item expanded:(BOOL)expanded;
 - (void)setSearchableState:(Node *)item searchable:(NSNumber*_Nullable)searchable;
 
-- (void)setItemIcon:(Node *)item image:(NSImage*)image;
 - (void)setItemIcon:(Node *)item icon:(NodeIcon*_Nullable)icon;
-- (void)setItemIcon:(Node *)item icon:(NodeIcon*_Nullable)icon batchUpdate:(BOOL)batchUpdate;
-
 - (void)batchSetIcons:(NSArray<Node*>*)items icon:(NodeIcon*)icon;
 - (void)batchSetIcons:(NSDictionary<NSUUID*, NSImage*>*)iconMap;
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 
-- (void)removeItemAttachment:(Node*)item filename:(NSString*)filename;
-- (void)addItemAttachment:(Node*)item filename:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment;
 
 
-- (void)addCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
-- (void)removeCustomField:(Node *)item key:(NSString *)key;
 
-
-- (void)editCustomField:(Node*)item
-       existingFieldKey:(NSString*_Nullable)existingFieldKey
-                    key:(NSString *_Nullable)key
-                  value:(StringValue *_Nullable)value;
-
-- (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
-- (void)clearTotp:(Node *)item;
-
-- (void)addItemTag:(Node* )item tag:(NSString*)tag;
-- (void)removeItemTag:(Node* )item tag:(NSString*)tag;
 - (void)addTagToItems:(const NSArray<Node *> *)items tag:(NSString*)tag;
 - (void)removeTagFromItems:(const NSArray<Node *> *)items tag:(NSString*)tag;
-
 - (void)renameTag:(NSString *)from to:(NSString*)to;
 - (void)deleteTag:(NSString*)tag;
 
 
 
-- (BOOL)addItem:(Node*)item parent:(Node*)parent;
+- (BOOL)isFavourite:(NSUUID*)itemId;
+- (void)toggleFavourite:(NSUUID*)itemId;
+@property (readonly) NSArray<Node*>* favourites;
+
+
+
+- (BOOL)addItem:(Node *)item parent:(Node *)parent;
 - (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent;
-- (BOOL)addNewRecord:(Node *)parentGroup;
-- (BOOL)addNewGroup:(Node *)parentGroup title:(NSString*)title;
 - (BOOL)addNewGroup:(Node *)parentGroup title:(NSString*)title group:(Node* _Nullable * _Nullable)group;
 
 - (Node*)getDefaultNewEntryNode:(Node *_Nonnull)parentGroup;
@@ -168,16 +135,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (NSString*)generatePassword;
 
-- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
-- (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
-
 - (NSString *)getGroupPathDisplayString:(Node *)node;
 - (NSString *)getGroupPathDisplayString:(Node *)node rootGroupNameInsteadOfSlash:(BOOL)rootGroupNameInsteadOfSlash;
-
 - (NSString *)getParentGroupPathDisplayString:(Node *)node;
 
 @property (readonly) BOOL recycleBinEnabled; 
@@ -239,7 +198,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property BOOL promptedForAutoFetchFavIcon;
 @property BOOL startWithSearch;
 @property BOOL outlineViewTitleIsReadonly;
-@property BOOL outlineViewEditableFieldsAreReadonly;
 
 @property BOOL showRecycleBinInSearchResults;
 @property BOOL showRecycleBinInBrowse;
@@ -301,12 +259,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (void)applyEncryptionSettingsViewModelChanges:(EncryptionSettingsViewModel*)encryptionSettings;
 
 @property KeePassIconSet iconSet;
-
-
-
-- (BOOL)isFavourite:(NSUUID*)itemId;
-- (void)toggleFavourite:(NSUUID*)itemId;
-@property (readonly) NSArray<Node*>* favourites;
 
 
 

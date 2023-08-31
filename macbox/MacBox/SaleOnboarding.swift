@@ -8,17 +8,16 @@
 
 import Cocoa
 
-@available(macOS 11.0, *)
 class SaleOnboardingModule: OnboardingModule {
     var isAppModal: Bool = false
     var window: NSWindow? = nil
-    
+
     var shouldDisplay: Bool {
-        return false
+        false
     }
-    
-    var windowController : NSWindowController? = nil
-    
+
+    var windowController: NSWindowController? = nil
+
     func instantiateViewController(completion: @escaping (() -> Void)) -> NSViewController {
         let ret = SwiftUIViewFactory.makeSaleOfferViewController(saleEndDate: Date(), existingSubscriber: false) { [weak self] in
             self?.redeemSale()
@@ -27,16 +26,16 @@ class SaleOnboardingModule: OnboardingModule {
         } dismissHandler: {
             completion()
         }
-        
+
         return ret
     }
 
-    func redeemSale ( ) {
+    func redeemSale() {
 
 
     }
-    
-    func showLifetimePurchaseScreen ( ) {
+
+    func showLifetimePurchaseScreen() {
 
 
 
@@ -44,7 +43,7 @@ class SaleOnboardingModule: OnboardingModule {
 
 
 
-        
+
         
     }
 }

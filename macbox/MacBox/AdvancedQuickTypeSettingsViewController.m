@@ -38,10 +38,9 @@
 - (void)bindUI {
     BOOL pro = Settings.sharedInstance.isPro;
     MacDatabasePreferences* meta = self.model.databaseMetadata;
-    BOOL safariPossible = [self safariAutoFillIsAvailableOnPlatform];
     BOOL safariEnabled = AutoFillManager.sharedInstance.isOnForStrongbox;
     
-    BOOL autoFillOn = pro && meta.autoFillEnabled && safariPossible && safariEnabled;
+    BOOL autoFillOn = pro && meta.autoFillEnabled && safariEnabled;
     BOOL quickTypeOn = autoFillOn && meta.quickTypeEnabled;
     
     [self.popupDisplayFormat selectItemAtIndex:meta.quickTypeDisplayFormat];
@@ -94,15 +93,6 @@
                                      unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds
                                                            nickName:meta.nickName];
     
-}
-
-- (BOOL)safariAutoFillIsAvailableOnPlatform {
-    if( @available(macOS 11.0, *) ) {
-        return YES;
-    }
-    else {
-        return NO;
-    }
 }
 
 @end

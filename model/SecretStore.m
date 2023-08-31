@@ -72,11 +72,6 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         *expired = NO;
     }
     
-    if ([SecretStore isUnsupportedOS]) {
-        NSLog(@"Unsupported OS...");
-        return nil;
-    }
-
     NSDictionary* wrapped = [self getWrappedObject:identifier];
     if(wrapped == nil) {
         
@@ -150,11 +145,6 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 - (BOOL)setSecureObject:(id)object forIdentifier:(NSString *)identifier expiryMode:(SecretExpiryMode)expiryMode expiresAt:(NSDate *)expiresAt {
     
-
-    if ([SecretStore isUnsupportedOS]) {
-        NSLog(@"SecretStore: Cannot set secure object - Unsupported OS...");
-        return NO;
-    }
 
     [self deleteSecureItem:identifier]; 
 
@@ -276,11 +266,6 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 
 - (void)deleteSecureItem:(NSString *)identifier {
-    if ([SecretStore isUnsupportedOS]) {
-        NSLog(@"Unsupported OS...");
-        return;
-    }
-
     [self deleteKeychainBlob:identifier];
     [self.ephemeralObjectStore removeObjectForKey:identifier];
     
@@ -294,11 +279,6 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 
 - (SecretExpiryMode)getSecureObjectExpiryMode:(NSString *)identifier {
-    if ([SecretStore isUnsupportedOS]) {
-        NSLog(@"Unsupported OS...");
-        return kUnknown;
-    }
-
     NSDictionary* wrapped = [self getWrappedObject:identifier];
     if(wrapped == nil) {
         return kUnknown;
@@ -309,11 +289,6 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 - (NSDate *)getSecureObjectExpiryDate:(NSString *)identifier {
-    if ([SecretStore isUnsupportedOS]) {
-        NSLog(@"Unsupported OS...");
-        return nil;
-    }
-
     NSDictionary* wrapped = [self getWrappedObject:identifier];
     if(wrapped == nil) {
         return nil;
@@ -336,59 +311,20 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 + (CFStringRef)keyType {
-#if TARGET_OS_IPHONE
     return kSecAttrKeyTypeECSECPrimeRandom;
-#else
-    if (@available(macOS 10.12, *)) {
-        return kSecAttrKeyTypeECSECPrimeRandom;
-    }
-    else {
-        return kSecAttrKeyTypeEC;
-    }
-#endif
 }
 
 + (SecKeyAlgorithm)algorithm {
-#if TARGET_OS_IPHONE
     return kSecKeyAlgorithmECIESEncryptionStandardVariableIVX963SHA256AESGCM;
-#else
-    if (@available(macOS 10.13, *)) {
-        return kSecKeyAlgorithmECIESEncryptionStandardVariableIVX963SHA256AESGCM;
-    }
-    else {
-        return kSecKeyAlgorithmECIESEncryptionCofactorX963SHA256AESGCM;
-    }
-#endif
 }
 
 - (BOOL)secureEnclaveAvailable {
     return self._secureEnclaveAvailable;
 }
 
-+ (BOOL)isUnsupportedOS {
-#if TARGET_OS_OSX
-    if (@available(macOS 10.12, *)) { } else {
-        NSLog(@"Mac OSX < 10.12 is not supported by the Strongbox Secret Store");
-        return YES;
-    }
-#endif
-    
-    return NO;
-}
-
 + (BOOL)isSecureEnclaveAvailable {
     if (TARGET_OS_SIMULATOR != 0) { 
 
-        return NO;
-    }
-
-    if ([SecretStore isUnsupportedOS]) {
-        NSLog(@"Unsupported OS...");
-        return NO;
-    }
-
-    if (@available(iOS 10.0, *)) { } else {
-        NSLog(@"Secure Enclave unavailable on iOS < 10.0");
         return NO;
     }
     
@@ -712,9 +648,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     [dictionary setObject:@NO forKey:(__bridge id)(kSecAttrSynchronizable)]; 
     
 #if TARGET_OS_OSX
-    if (@available(macOS 10.15, *)) {
-        [dictionary setObject:@YES forKey:(__bridge id)(kSecUseDataProtectionKeychain)];
-    }
+    [dictionary setObject:@YES forKey:(__bridge id)(kSecUseDataProtectionKeychain)];
 #endif
     
     return dictionary;

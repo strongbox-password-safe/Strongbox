@@ -24,9 +24,7 @@ class PillView: NSView, NibLoadable {
         layer?.backgroundColor = backgroundColor.cgColor
 
         imagePill.image = icon
-        if #available(macOS 11, *) {
-            imagePill.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
-        }
+        imagePill.symbolConfiguration = NSImage.SymbolConfiguration(scale: .large)
 
         imagePill.contentTintColor = color
     }

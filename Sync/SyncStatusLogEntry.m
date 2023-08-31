@@ -30,7 +30,9 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@: %@", self.timestamp.friendlyDateStringVeryShort, self.error ? self.error : self.message];
+    
+
+    return [NSString stringWithFormat:@"%@: %@", self.timestamp.friendlyDateTimeStringPrecise, self.error ? self.error : self.message];
 }
 
 @end

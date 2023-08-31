@@ -53,7 +53,6 @@ typedef NSViewController* _Nonnull (^MacCompositeKeyDeterminerOnDemandUIProvider
                          completion:(CompositeKeyDeterminedBlock)completion;
 
 @property (readonly) BOOL bioOrWatchUnlockIsPossible;
-@property BOOL createWindowForManualCredentialsEntry;
 
 + (BOOL)bioOrWatchUnlockIsPossible:(MacDatabasePreferences*)database;
 

@@ -10,9 +10,9 @@ import Cocoa
 
 class UrlCell: NSTableCellView {
     @IBOutlet var urlHyperLinkField: HyperlinkTextField!
-    
+
     static let NibIdentifier: NSUserInterfaceItemIdentifier = .init("UrlCellTableViewCell")
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
 
@@ -24,7 +24,7 @@ class UrlCell: NSTableCellView {
 
         urlHyperLinkField.linkColor = backgroundStyle == .emphasized ? .white : .linkColor
     }
-    
+
     override var backgroundStyle: NSView.BackgroundStyle {
         willSet {
             urlHyperLinkField.linkColor = newValue == .emphasized ? .white : .linkColor

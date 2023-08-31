@@ -11,7 +11,8 @@ import Cocoa
 class PopOutDetailsWindowController: NSWindowController {
     var database: ViewModel!
     var uuid: UUID!
-    
+
+    @objc
     class func fromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("PopOutDetails"), bundle: nil)
         return storyboard.instantiateInitialController() as! Self
@@ -19,22 +20,23 @@ class PopOutDetailsWindowController: NSWindowController {
 
     override func windowDidLoad() {
         super.windowDidLoad()
-        
+
         setupToolbar()
-        
+
         bindScreenCaptureBlock()
     }
-    
+
     func bindScreenCaptureBlock() {
-        if let window = window {
+        if let window {
             window.sharingType = Settings.sharedInstance().screenCaptureBlocked ? .none : .readOnly
         }
     }
-    
+
     var viewController: DetailViewController {
-        return contentViewController as! DetailViewController
+        contentViewController as! DetailViewController
     }
 
+    @objc
     func load(model: ViewModel, uuid: UUID) {
         database = model
         self.uuid = uuid
@@ -53,7 +55,7 @@ class PopOutDetailsWindowController: NSWindowController {
         window?.toolbar?.validateVisibleItems()
     }
 
-    @objc func onEditEntry2(_ sender : Any?) {
+    @objc func onEditEntry2(_: Any?) {
         if database.locked || database.isEffectivelyReadOnly {
             NSLog("🔴 Cannot edit locked or read-only database")
             return
@@ -67,25 +69,23 @@ class PopOutDetailsWindowController: NSWindowController {
         viewController.presentAsSheet(vc)
     }
 
-    var floatOnTop : Bool = false
-    
-    @objc func onToggleFloatOnTop(_ sender : Any?) {
+    var floatOnTop: Bool = false
+
+    @objc func onToggleFloatOnTop(_: Any?) {
         floatOnTop = !floatOnTop
-        
+
         window?.level = floatOnTop ? .floating : .normal
-        
-        if #available(macOS 11.0, *) {
-            guard let floatOnTopItem = window?.toolbar?.items.first(where: { item in
-                item.itemIdentifier == ToolbarItemIdentifiers.floatOnTop
-            }) else {
-                NSLog("🔴 Couldn't find the floatOnTop toolbar item")
-                return
-            }
-                    
-            floatOnTopItem.image = NSImage(systemSymbolName: floatOnTop ? "pin.slash" : "pin", accessibilityDescription: nil)
+
+        guard let floatOnTopItem = window?.toolbar?.items.first(where: { item in
+            item.itemIdentifier == ToolbarItemIdentifiers.floatOnTop
+        }) else {
+            NSLog("🔴 Couldn't find the floatOnTop toolbar item")
+            return
         }
+
+        floatOnTopItem.image = NSImage(systemSymbolName: floatOnTop ? "pin.slash" : "pin", accessibilityDescription: nil)
     }
-    
+
     @objc
     var isEditsInProgress: Bool {
         if let presentedViewControllers = viewController.presentedViewControllers {
@@ -97,16 +97,16 @@ class PopOutDetailsWindowController: NSWindowController {
                 }
             }
         }
-        
+
         return false
     }
-    
-    @objc func copy ( _ sender : Any? ) -> Any? {
+
+    @objc func copy(_: Any?) -> Any? {
         viewController.handleCopy()
     }
 }
 
-extension PopOutDetailsWindowController : NSToolbarDelegate {
+extension PopOutDetailsWindowController: NSToolbarDelegate {
     enum ToolbarItemIdentifiers {
         static let editEntry = NSToolbarItem.Identifier("editEntryToolbarItem")
         static let floatOnTop = NSToolbarItem.Identifier("floatOnTopToolbarItem")
@@ -120,7 +120,7 @@ extension PopOutDetailsWindowController : NSToolbarDelegate {
         toolbar.allowsUserCustomization = false
         toolbar.displayMode = .iconOnly
 
-        guard let window = window else {
+        guard let window else {
             NSLog("🔴 Window not ready")
             return
         }
@@ -130,23 +130,15 @@ extension PopOutDetailsWindowController : NSToolbarDelegate {
     }
 
     func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-        if #available(macOS 11.0, *) {
-            return [ToolbarItemIdentifiers.editEntry,
-                    ToolbarItemIdentifiers.floatOnTop]
-        } else {
-            return [] 
-        }
+        [ToolbarItemIdentifiers.editEntry,
+         ToolbarItemIdentifiers.floatOnTop]
     }
 
     func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-        if #available(macOS 11.0, *) {
-            return [ToolbarItemIdentifiers.editEntry,
-                    ToolbarItemIdentifiers.floatOnTop]
-        } else {
-            return [] 
-        }
+        [ToolbarItemIdentifiers.editEntry,
+         ToolbarItemIdentifiers.floatOnTop]
     }
-    
+
     func getEditEntryToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.editEntry)
 
@@ -156,15 +148,10 @@ extension PopOutDetailsWindowController : NSToolbarDelegate {
         toolbarItem.paletteLabel = loc2
         toolbarItem.toolTip = loc2
         toolbarItem.isEnabled = true
-        
+
         toolbarItem.target = self
         toolbarItem.action = #selector(onEditEntry2(_:))
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
-        } else {
-            toolbarItem.image = NSImage(named: NSImage.folderName) 
-        }
+        toolbarItem.image = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
 
         return toolbarItem
     }
@@ -172,45 +159,37 @@ extension PopOutDetailsWindowController : NSToolbarDelegate {
     func getFloatOnTopToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.floatOnTop)
 
-        let loc2 =  NSLocalizedString("window_toggle_float_on_top", comment: "Float on Top")
+        let loc2 = NSLocalizedString("window_toggle_float_on_top", comment: "Float on Top")
 
         toolbarItem.label = loc2
         toolbarItem.paletteLabel = loc2
         toolbarItem.toolTip = loc2
         toolbarItem.isEnabled = true
-        
         toolbarItem.target = self
         toolbarItem.action = #selector(onToggleFloatOnTop(_:))
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: floatOnTop ? "pin.slash" : "pin", accessibilityDescription: nil)
-        } else {
-            toolbarItem.image = NSImage(named: NSImage.folderName) 
-        }
+        toolbarItem.image = NSImage(systemSymbolName: floatOnTop ? "pin.slash" : "pin", accessibilityDescription: nil)
 
         return toolbarItem
     }
-    
+
     func toolbar(_: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar _: Bool) -> NSToolbarItem? {
         if itemIdentifier == ToolbarItemIdentifiers.editEntry {
             return getEditEntryToolbarItem()
-        }
-        else if itemIdentifier == ToolbarItemIdentifiers.floatOnTop {
+        } else if itemIdentifier == ToolbarItemIdentifiers.floatOnTop {
             return getFloatOnTopToolbarItem()
         }
-        
+
         return NSToolbarItem(itemIdentifier: itemIdentifier)
     }
 }
 
-extension PopOutDetailsWindowController : NSToolbarItemValidation {
+extension PopOutDetailsWindowController: NSToolbarItemValidation {
     func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
-        guard let action = item.action, let database = database else { return false }
+        guard let action = item.action, let database else { return false }
 
         if action == #selector(onEditEntry2(_:)) {
             return !database.locked && !database.isEffectivelyReadOnly
-        }
-        else if action == #selector(onToggleFloatOnTop(_:)) {
+        } else if action == #selector(onToggleFloatOnTop(_:)) {
             return true
         }
 

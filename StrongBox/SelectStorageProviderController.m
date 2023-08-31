@@ -92,15 +92,12 @@
     
     
     if ( !self.existing &&
-        AppPreferences.sharedInstance.iCloudOn &&
         !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-
         [sp addObject:AppleICloudProvider.sharedInstance];
     }
         
     
     
-
     [sp addObject:FilesAppUrlBookmarkProvider.sharedInstance];
 
     

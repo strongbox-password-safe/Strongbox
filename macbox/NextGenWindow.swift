@@ -8,9 +8,9 @@
 
 import Cocoa
 
-class NextGenWindow: NSWindow {    
+class NextGenWindow: NSWindow {
     override func doCommand(by selector: Selector) {
-//        NSLog("NextGenWindow::doCommand: [%@]", NSStringFromSelector(selector))
+        //        NSLog("NextGenWindow::doCommand: [%@]", NSStringFromSelector(selector))
 
         if selector == NSSelectorFromString("noop:") { // Weird selector for events that arent handled by the search field
             if checkEventForCmdNumberDown() {
@@ -22,7 +22,7 @@ class NextGenWindow: NSWindow {
     }
 
     override func keyDown(with event: NSEvent) {
-
+        
 
         if checkEventForCmdNumberDown() {
             return
@@ -36,7 +36,7 @@ class NextGenWindow: NSWindow {
             if key > 48, key < 58 {
                 let number = key - 48
 
-
+                
 
                 onCmdPlusNumberPressed(number: Int(number))
                 return true
@@ -47,17 +47,15 @@ class NextGenWindow: NSWindow {
     }
 
     func onCmdPlusNumberPressed(number: Int) {
+        
 
+        if let group = tabGroup,
+           let tabbedWindows,
+           number <= tabbedWindows.count
+        {
+            
 
-        if #available(macOS 10.13, *) {
-            if let group = tabGroup,
-               let tabbedWindows = tabbedWindows,
-               number <= tabbedWindows.count
-            {
-
-
-                group.selectedWindow = tabbedWindows[number - 1]
-            }
+            group.selectedWindow = tabbedWindows[number - 1]
         }
     }
 }

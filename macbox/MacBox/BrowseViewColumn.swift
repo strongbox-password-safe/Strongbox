@@ -29,7 +29,7 @@ enum BrowseViewColumn: String, CaseIterable {
     case auditIssues = "AuditIsssuesColumn"
 
     var identifier: NSUserInterfaceItemIdentifier {
-        return NSUserInterfaceItemIdentifier(rawValue)
+        NSUserInterfaceItemIdentifier(rawValue)
     }
 
     var visibleByDefault: Bool {
@@ -69,7 +69,7 @@ enum BrowseViewColumn: String, CaseIterable {
         case .uuid:
             return false
         case .auditIssues:
-            return false 
+            return false
         }
     }
 

@@ -23,8 +23,8 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
     @IBOutlet var labelNoneFoundHeader: NSTextField!
     @IBOutlet var labelPermissionsHeader: NSTextField!
     @IBOutlet var stackViewPreviewTotp: NSStackView!
-    @IBOutlet weak var checkboxAutoCommit: NSButton!
-    
+    @IBOutlet var checkboxAutoCommit: NSButton!
+
     struct ScanResult {
         var totpString: String
         var ownerWindow: String
@@ -45,29 +45,22 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         stackViewResultConfirm.setCustomSpacing(12, after: checkboxAutoCommit)
 
         stackViewPreviewTotp.isHidden = true 
-        
+
         bindUI()
 
         if hasPermissions {
             startScanning()
         }
     }
-    
-    var hasPermissions: Bool {
-        if #available(macOS 11.0, *) {
-            
-            
 
-            return CGPreflightScreenCaptureAccess()
-        } else {
-            return checkForScreenRecordingPermissionsOnMac()
-        }
+    var hasPermissions: Bool {
+        CGPreflightScreenCaptureAccess()
     }
 
-    @IBAction func onClose(_ sender: Any) {
+    @IBAction func onClose(_: Any) {
         dismiss(nil)
     }
-    
+
     @IBAction func onLooksGood(_: Any) {
         if let totp = scanResult?.totpString {
             onSetTotp?(totp)
@@ -81,17 +74,17 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         bindUI()
     }
 
-    @IBAction func onChangedAutoCommit(_ sender: Any) {
+    @IBAction func onChangedAutoCommit(_: Any) {
         if checkboxAutoCommit.state == .off {
             MacAlerts.areYouSure(NSLocalizedString("are_you_sure_auto_commit_totp_msg", comment: "Disabling Auto-Commit could mean you lose this TOTP if you forget to commit later. Are you sure?"),
-                                 window: view.window) { [weak self] response in
+                                 window: view.window)
+            { [weak self] response in
                 if response {
                     Settings.sharedInstance().autoCommitScannedTotp = false
                 }
                 self?.bindUI()
             }
-        }
-        else {
+        } else {
             Settings.sharedInstance().autoCommitScannedTotp = true
             bindUI()
         }
@@ -103,7 +96,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         stackViewResultConfirm.isHidden = scanResult == nil
         stackViewNoneFound.isHidden = scanResult != nil || isScanning || !hasPermissions
         checkboxAutoCommit.state = Settings.sharedInstance().autoCommitScannedTotp ? .on : .off
-        
+
         if let result = scanResult {
             imageView.image = result.image
             labelTotpUrl.stringValue = result.totpString
@@ -132,7 +125,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
     }
 
     @objc func bindTotpCode() {
-        if let scanResult = scanResult,
+        if let scanResult,
            let url = URL(string: scanResult.totpString),
            let totp = OTPToken(url: url)
         {
@@ -152,16 +145,11 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
 
 
     @IBAction func onLaunchPreferences(_: Any) {
-
-
-
-
         if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
             NSWorkspace.shared.open(url)
-
         }
-
     }
+
 
 
 
@@ -209,7 +197,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         progressIndicator.stopAnimation(nil)
         isScanning = false
 
-        if let result = result {
+        if let result {
 
             scanResult = result
         } else {
@@ -241,14 +229,14 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
 
                 
                 
-                
+
                 if let url = (string as NSString).urlExtendedParse {
 
-                    
+
                     if let _ = OTPToken(url: url) {
 
 
-                        
+
                         completionHandler(ScanResult(totpString: url.absoluteString, ownerWindow: ownerWindow, image: image))
                         return
                     }

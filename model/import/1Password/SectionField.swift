@@ -1,5 +1,5 @@
 //
-//  Field.swift
+//  SectionField.swift
 //  MacBox
 //
 //  Created by Strongbox on 22/10/2021.

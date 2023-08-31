@@ -8,23 +8,23 @@
 
 import Foundation
 
-class SearchRequest : Codable {
-    var query : String
-    
-    init ( query : String ) {
+class SearchRequest: Codable {
+    var query: String
+
+    init(query: String) {
         self.query = query
     }
 }
 
-class SearchResponse : Codable {
-    var results : [AutoFillCredential]
-    
-    init(results : [AutoFillCredential]) {
+class SearchResponse: Codable {
+    var results: [AutoFillCredential]
+
+    init(results: [AutoFillCredential]) {
         self.results = results
     }
-    
+
     @objc
-    func toJson () -> String? {
-        return AutoFillJsonHelper.toJson(object: self)
+    func toJson() -> String? {
+        AutoFillJsonHelper.toJson(object: self)
     }
 }

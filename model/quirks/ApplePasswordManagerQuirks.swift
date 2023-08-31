@@ -9,16 +9,17 @@
 import Foundation
 
 class ApplePasswordManagerQuirks {
-    private var equivalents : [ String : [String]] = [:]
-    
+    private var equivalents: [String: [String]] = [:]
+
     static let shared = ApplePasswordManagerQuirks()
-    
+
     private init() {
         let decoder = JSONDecoder()
 
         guard let url = Bundle.main.url(forResource: "websites-with-shared-credential-backends", withExtension: "json"),
               let data = try? Data(contentsOf: url),
-              let equivs = try? decoder.decode([[String]].self, from: data) else {
+              let equivs = try? decoder.decode([[String]].self, from: data)
+        else {
             NSLog("🔴 Could not load file 'websites-with-shared-credential-backends.json' from Bundle!")
             return
         }
@@ -29,8 +30,8 @@ class ApplePasswordManagerQuirks {
             }
         }
     }
-    
-    func getEquivalentDomains( _ domain : String ) -> [String] {
-        return equivalents[domain.lowercased()] ?? []
+
+    func getEquivalentDomains(_ domain: String) -> [String] {
+        equivalents[domain.lowercased()] ?? []
     }
 }

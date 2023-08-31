@@ -54,7 +54,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
 NSString* const kMasterDetailViewCloseNotification = @"kMasterDetailViewClose";
 NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
-NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
+
 NSString* const kAppStoreSaleNotificationKey = @"appStoreSaleNotification";
 NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-id";
 

@@ -98,7 +98,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL doNotShowAutoCompleteSuggestions;
 @property BOOL doNotShowChangeNotifications;
 @property BOOL outlineViewTitleIsReadonly;
-@property BOOL outlineViewEditableFieldsAreReadonly;
 @property BOOL concealEmptyProtectedFields;
 @property BOOL startWithSearch;
 @property BOOL showAdvancedUnlockOptions;

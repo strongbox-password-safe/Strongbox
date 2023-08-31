@@ -12,18 +12,17 @@ class NoClippingLayer: CALayer {
     override var masksToBounds: Bool {
         set {}
         get {
-            return false
+            false
         }
     }
 }
 
 class NoClippingView: NSView {
     override var wantsDefaultClipping: Bool {
-        return false
+        false
     }
-    
+
     override func makeBackingLayer() -> CALayer {
-        return NoClippingLayer()
-        
+        NoClippingLayer()
     }
 }

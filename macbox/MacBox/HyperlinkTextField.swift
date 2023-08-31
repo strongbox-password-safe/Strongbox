@@ -20,19 +20,19 @@ class HyperlinkTextField: NSTextField {
         return str.urlExtendedParse
     }
 
-    var linkColor : NSColor = .linkColor {
+    var linkColor: NSColor = .linkColor {
         didSet {
             refresh()
         }
     }
-    
+
     var href: String = "" {
         didSet {
             refresh()
         }
     }
 
-    func refresh( ) {
+    func refresh() {
         if let _ = parsedUrl {
             let attributes: [NSAttributedString.Key: Any] = [
                 NSAttributedString.Key.foregroundColor: linkColor,
@@ -43,7 +43,7 @@ class HyperlinkTextField: NSTextField {
             attributedStringValue = NSAttributedString(string: href)
         }
     }
-    
+
     override func resetCursorRects() {
         discardCursorRects()
 

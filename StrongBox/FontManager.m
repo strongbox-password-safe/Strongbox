@@ -39,7 +39,8 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
     _title1Font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle1];
     _title2Font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle2];
     _title3Font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle3];
-    _headlineFont = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline]; 
+    _headlineFont = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    _subheadlineFont = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     _caption1Font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
     _caption2Font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption2];
 

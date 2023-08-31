@@ -581,14 +581,18 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                       enabled:!ro
                                       handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf performSegueWithIdentifier:@"segueToChangeMasterCredentials" sender:nil]; }]];
     
-    [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_export_database", @"Export Database")
-                                  systemImage:@"square.and.arrow.up"
-                                      handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onExportDatabase:nil]; }]];
-
-    [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_print_database", @"Print Database")
-                                  systemImage:@"printer"
-                                      handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onPrint]; }]];
-
+    if ( !AppPreferences.sharedInstance.disableExport ) {
+        [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_export_database", @"Export Database")
+                                      systemImage:@"square.and.arrow.up"
+                                          handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onExportDatabase:nil]; }]];
+    }
+    
+    if ( !AppPreferences.sharedInstance.disablePrinting ) {
+        [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_print_database", @"Print Database")
+                                      systemImage:@"printer"
+                                          handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onPrint]; }]];
+    }
+    
     UIMenu* menu2 = [UIMenu menuWithTitle:@""
                                     image:nil
                                identifier:nil
@@ -3443,9 +3447,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 - (BOOL)isItemsCanBeExported {
-    return [DatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
+    BOOL moreThanOneDb = [DatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
         return ![obj.uuid isEqualToString:self.viewModel.metadata.uuid] && !obj.readOnly;
     }].count > 0;
+    
+    return !AppPreferences.sharedInstance.disableExport && moreThanOneDb;
 }
 
 - (void)onExportItemSingleItem:(Node*)node {

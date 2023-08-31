@@ -10,7 +10,7 @@ import Cocoa
 
 class AppPreferencesWindow: NSWindow {
     override var canBecomeKey: Bool {
-        return true
+        true
     }
 
     override func cancelOperation(_: Any?) { // Pickup Esc

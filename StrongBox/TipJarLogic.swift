@@ -7,7 +7,7 @@
 //
 
 #if !os(macOS)
-import UIKit
+    import UIKit
 #endif
 
 extension Notification.Name {
@@ -54,42 +54,41 @@ class TipJarLogic: NSObject {
     }
 
     private func getProductId(_ tip: Tip) -> String {
-#if !os(macOS)
-        if CustomizationManager.isAProBundle { 
-            return String(format: "pro.%@", tip.rawValue)
-        } else {
-            return tip.rawValue
-        }
-#else
-        if MacCustomizationManager.supportsTipJar { 
-            if MacCustomizationManager.isAProBundle { 
+        #if !os(macOS)
+            if CustomizationManager.isAProBundle { 
                 return String(format: "pro.%@", tip.rawValue)
             } else {
                 return tip.rawValue
             }
-        }
-        else {
-            NSLog("🔴 Tips not available on macOS standalone bundles!!");
-            return tip.rawValue;
-        }
-#endif
+        #else
+            if MacCustomizationManager.supportsTipJar { 
+                if MacCustomizationManager.isAProBundle { 
+                    return String(format: "pro.%@", tip.rawValue)
+                } else {
+                    return tip.rawValue
+                }
+            } else {
+                NSLog("🔴 Tips not available on macOS standalone bundles!!")
+                return tip.rawValue
+            }
+        #endif
     }
 
     private func loadTips() {
         guard StrongboxProductBundle.supportsTipJar else {
             NSLog("🔴 Tips not available in this bundle! Don't call this from this bundle!")
-            self.errorLoading = true
+            errorLoading = true
             return
         }
-        
+
         let productIds = Tip.allCases.map { tip in
             getProductId(tip)
         }
 
         RMStore.default().requestProducts(Set(productIds)) { [weak self] products, invalidProducts in
-            guard let self = self else { return }
+            guard let self else { return }
 
-            if invalidProducts != nil && !invalidProducts!.isEmpty {
+            if invalidProducts != nil, !invalidProducts!.isEmpty {
                 NSLog("Got Invalid Tips = [%@]", invalidProducts ?? "nil")
             }
 
@@ -117,7 +116,7 @@ class TipJarLogic: NSObject {
 
             self.isLoaded = true
         } failure: { [weak self] error in
-            guard let self = self else { return }
+            guard let self else { return }
 
             let err = error as NSError?
             if err != nil {
@@ -164,9 +163,9 @@ class TipJarLogic: NSObject {
             completion(error)
         }
     }
-    
-    func restorePrevious ( completion: @escaping (_ error: Error?) -> Void ) {
-        RMStore.default().restoreTransactions { transactions in
+
+    func restorePrevious(completion: @escaping (_ error: Error?) -> Void) {
+        RMStore.default().restoreTransactions { _ in
             NSLog("Transactions Restoreed!")
             completion(nil)
         } failure: { error in

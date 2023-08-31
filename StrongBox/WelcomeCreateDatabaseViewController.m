@@ -10,34 +10,26 @@
 #import "DatabasePreferences.h"
 #import "Utils.h"
 #import "MasterPasswordExplanationViewController.h"
+#import "AppPreferences.h"
+#import "iCloudSafesCoordinator.h"
 
 @interface WelcomeCreateDatabaseViewController () <UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldName;
+@property (weak, nonatomic) IBOutlet UILabel *labelLocalOnly;
+@property (weak, nonatomic) IBOutlet UILabel *labelICloud;
 
 @end
 
 @implementation WelcomeCreateDatabaseViewController
 
 - (BOOL)shouldAutorotate {
-    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
-    {
-        return YES; /* Device is iPad */
-    }
-    else {
-        return NO;
-    }
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
-    {
-        return UIInterfaceOrientationMaskAll; /* Device is iPad */
-    }
-    else {
-        return UIInterfaceOrientationMaskPortrait;
-    }
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -70,6 +62,11 @@
                  forControlEvents:UIControlEventEditingChanged];
     
     self.textFieldName.delegate = self;
+    
+    BOOL iCloud = !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
+
+    self.labelICloud.hidden = !iCloud;
+    self.labelLocalOnly.hidden = iCloud;
 }
 
 - (IBAction)onDismiss:(id)sender {

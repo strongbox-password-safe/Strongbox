@@ -284,12 +284,20 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     NSString* json = metaData.storageInfo;
 #endif
     
-    NSError* error;
-    NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]  options:kNilOptions error:&error];
-    
-    SFTPProviderData* foo = [SFTPProviderData fromSerializationDictionary:dictionary];
-    
-    return foo;
+    if ( json != nil ) {
+        NSData* data = [json dataUsingEncoding:NSUTF8StringEncoding];
+        NSError* error;
+        NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:data
+                                                                   options:kNilOptions
+                                                                     error:&error];
+        
+        SFTPProviderData* foo = [SFTPProviderData fromSerializationDictionary:dictionary];
+        
+        return foo;
+    }
+    else {
+        return nil;
+    }
 }
 
 - (METADATA_PTR )getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {

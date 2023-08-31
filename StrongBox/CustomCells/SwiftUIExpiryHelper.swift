@@ -11,12 +11,12 @@ import SwiftUI
 
 @available(iOS 16.0, *)
 @objc
-public class SwiftUIExpiryHelper : NSObject {
+public class SwiftUIExpiryHelper: NSObject {
     @objc
-    public class func foo ( cell : EditDateCell, expiry : Date ) {
+    public class func foo(cell: EditDateCell, expiry: Date) {
         let config = UIHostingConfiguration {
             NewExpiryCellView(date: expiry)
         }
-        cell.contentConfiguration = config;
+        cell.contentConfiguration = config
     }
 }

@@ -1,12 +1,12 @@
 //
-//  OnePuxContainer.swift
+//  OnePuxStructure.swift
 //  MacBox
 //
 //  Created by Strongbox on 01/02/2023.
 //  Copyright © 2023 Mark McGuill. All rights reserved.
 //
 
-enum OnePuxLoginFieldType : String, Codable {
+enum OnePuxLoginFieldType: String, Codable {
     case TextOrHtml = "T"
     case EmailAddress = "E"
     case URL = "U"
@@ -17,7 +17,7 @@ enum OnePuxLoginFieldType : String, Codable {
     case CheckBox = "C"
 }
 
-enum OnePuxCategory : String, Codable {
+enum OnePuxCategory: String, Codable {
     case Login = "001"
     case CreditCard = "002"
     case SecureNote = "003"
@@ -41,7 +41,7 @@ enum OnePuxCategory : String, Codable {
     case SshKey = "114"
     case CryptoWallet = "115"
 
-    var displayName : String {
+    var displayName: String {
         switch self {
         case .Login:
             return "Logins"
@@ -89,8 +89,8 @@ enum OnePuxCategory : String, Codable {
             return "Crypto Wallet"
         }
     }
-    
-    var icon : KeePassIconNames {
+
+    var icon: KeePassIconNames {
         switch self {
         case .Login:
             return .Identity
@@ -140,95 +140,95 @@ enum OnePuxCategory : String, Codable {
     }
 }
 
-class OnePuxSshKeyMetadata : Decodable {
-    let keyType : String?
-    let privateKey : String?
-    let fingerprint : String?
-    let publicKey : String?
+class OnePuxSshKeyMetadata: Decodable {
+    let keyType: String?
+    let privateKey: String?
+    let fingerprint: String?
+    let publicKey: String?
 }
 
-class OnePuxSshKey : Decodable {
-    let metadata : OnePuxSshKeyMetadata?
-    let privateKey : String?
+class OnePuxSshKey: Decodable {
+    let metadata: OnePuxSshKeyMetadata?
+    let privateKey: String?
 }
 
 class OnePuxItemOverviewAdditionalUrl: Decodable {
-    let label : String?
-    let url : String?
+    let label: String?
+    let url: String?
 }
 
 struct OnePuxFileAttachment: Decodable {
-    let fileName : String?
-    let documentId : String?
-    let decryptedSize : Int64?
+    let fileName: String?
+    let documentId: String?
+    let decryptedSize: Int64?
 }
 
 class OnePuxLoginField: Decodable {
-    let designation : String?
-    let name : String?
-    let value : String?
+    let designation: String?
+    let name: String?
+    let value: String?
     let fieldType: String?
 }
 
 class OnePuxSectionField: Decodable {
-    let title : String?
-    let id : String?
-    let value : [String : JSONAny]?
-    let file : OnePuxFileAttachment?
-    let guarded : Bool?
+    let title: String?
+    let id: String?
+    let value: [String: JSONAny]?
+    let file: OnePuxFileAttachment?
+    let guarded: Bool?
 }
 
 class OnePuxSection: Decodable {
-    let title : String?
-    let fields : [OnePuxSectionField]?
+    let title: String?
+    let fields: [OnePuxSectionField]?
 }
 
 class OnePuxItemDetails: Decodable {
     let notesPlain: String?
-    let documentAttributes : OnePuxFileAttachment?
-    let loginFields : [OnePuxLoginField]?
-    let sections : [OnePuxSection]?
-    let password : String? 
+    let documentAttributes: OnePuxFileAttachment?
+    let loginFields: [OnePuxLoginField]?
+    let sections: [OnePuxSection]?
+    let password: String? 
 }
 
 class OnePuxItemOverview: Decodable {
-    let title : String?
-    let url : String?
-    let urls : [OnePuxItemOverviewAdditionalUrl]?
-    let tags : [String]?
+    let title: String?
+    let url: String?
+    let urls: [OnePuxItemOverviewAdditionalUrl]?
+    let tags: [String]?
 }
 
 class OnePuxVaultItem: Decodable {
-    let uuid : String?
-    let favIndex : Int64?
-    let createdAt : Int64?
-    let updatedAt : Int64?
-    let trashed : Bool?
-    let categoryUuid : String?
-    let overview : OnePuxItemOverview?
-    let details : OnePuxItemDetails?
-    let state : String?
+    let uuid: String?
+    let favIndex: Int64?
+    let createdAt: Int64?
+    let updatedAt: Int64?
+    let trashed: Bool?
+    let categoryUuid: String?
+    let overview: OnePuxItemOverview?
+    let details: OnePuxItemDetails?
+    let state: String?
 }
 
 class OnePuxVaultAttributes: Decodable {
-    let name : String?
-    let uuid : String?
+    let name: String?
+    let uuid: String?
 }
 
 class OnePuxVault: Decodable {
-    let attrs : OnePuxVaultAttributes?
-    let items : [OnePuxVaultItem]?
+    let attrs: OnePuxVaultAttributes?
+    let items: [OnePuxVaultItem]?
 }
 
 class OnePuxAccountAttributes: Decodable {
-    let accountName : String?
-    let name : String?
-    let uuid : String?
+    let accountName: String?
+    let name: String?
+    let uuid: String?
 }
 
 class OnePuxAccount: Decodable {
-    let attrs : OnePuxAccountAttributes?
-    let vaults : [OnePuxVault]?
+    let attrs: OnePuxAccountAttributes?
+    let vaults: [OnePuxVault]?
 }
 
 class OnePuxContainer: Decodable {

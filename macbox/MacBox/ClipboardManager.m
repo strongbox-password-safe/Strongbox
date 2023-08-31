@@ -31,10 +31,8 @@
 - (void)copyConcealedString:(NSString *)string {
     [NSPasteboard.generalPasteboard clearContents]; 
     
-    if (@available(macOS 10.12, *)) {
-        if (!Settings.sharedInstance.clipboardHandoff) {
-            [NSPasteboard.generalPasteboard prepareForNewContentsWithOptions:NSPasteboardContentsCurrentHostOnly];
-        }
+    if (!Settings.sharedInstance.clipboardHandoff) {
+        [NSPasteboard.generalPasteboard prepareForNewContentsWithOptions:NSPasteboardContentsCurrentHostOnly];
     }
     
     if ( Settings.sharedInstance.concealClipboardFromMonitors ) {

@@ -11,7 +11,6 @@
 #import "AutoFillNewRecordSettings.h"
 #import "FavIconDownloadOptions.h"
 #import "ApplicationPreferences.h"
-#import "NotificationConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -75,9 +74,6 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL closeManagerOnLaunch;
 @property BOOL makeLocalRollingBackups;
 
-@property (nullable) NSDate* lastPromptedToUseNextGenUI;
-
-@property BOOL nextGenUI;
 @property BOOL miniaturizeOnCopy;
 @property BOOL hideOnCopy;
 @property BOOL quickRevealWithOptionKey;
@@ -148,7 +144,7 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL autoCommitScannedTotp;
 
-@property BOOL shadeFavoriteTag; 
+@property (readonly) BOOL shadeFavoriteTag; 
 @property BOOL runSshAgent;
 
 
@@ -158,6 +154,9 @@ extern NSString* const kCustomFieldsColumn;
 
 
 @property (nonatomic) NSInteger sshAgentApprovalDefaultExpiryMinutes;
+
+@property BOOL sshAgentRequestDatabaseUnlockAllowed;
+@property BOOL sshAgentPreventRapidRepeatedUnlockRequests;
 
 @end
 

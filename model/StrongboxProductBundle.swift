@@ -1,5 +1,5 @@
 //
-//  Bundle.swift
+//  StrongboxProductBundle.swift
 //  MacBox
 //
 //  Created by Strongbox on 13/06/2022.
@@ -9,8 +9,8 @@
 import Foundation
 
 @objc
-public class StrongboxProductBundle : NSObject {
-    enum BundleIdentifiers : String {
+public class StrongboxProductBundle: NSObject {
+    enum BundleIdentifiers: String {
         case unifiedFreemium = "com.markmcguill.strongbox"
         case unifiedPro = "com.markmcguill.strongbox.pro"
         case business = "com.markmcguill.strongbox.business"
@@ -18,8 +18,8 @@ public class StrongboxProductBundle : NSObject {
         case scotus = "com.markmcguill.strongbox.scotus"
         case macOSStandaloneFreemium = "com.markmcguill.strongbox.mac"
         case macOSStandalonePro = "com.markmcguill.strongbox.mac.pro"
-        
-        var isPro : Bool {
+
+        var isPro: Bool {
             switch self {
             case .unifiedFreemium:
                 return false
@@ -37,8 +37,8 @@ public class StrongboxProductBundle : NSObject {
                 return true
             }
         }
-        
-        var supportsTipJar : Bool {
+
+        var supportsTipJar: Bool {
             switch self {
             case .unifiedFreemium:
                 return true
@@ -56,27 +56,8 @@ public class StrongboxProductBundle : NSObject {
                 return false
             }
         }
-        
-        var supports3rdPartyStorageProviders : Bool {
-            switch self {
-            case .unifiedFreemium:
-                return true
-            case .unifiedPro:
-                return true
-            case .business:
-                return true
-            case .zero:
-                return false
-            case .scotus:
-                return false
-            case .macOSStandaloneFreemium:
-                return true
-            case .macOSStandalonePro:
-                return true
-            }
-        }
-        
-        var supportsSftpWebDAV : Bool {
+
+        var supports3rdPartyStorageProviders: Bool {
             switch self {
             case .unifiedFreemium:
                 return true
@@ -95,7 +76,7 @@ public class StrongboxProductBundle : NSObject {
             }
         }
 
-        var supportsFavIconDownloader : Bool {
+        var supportsSftpWebDAV: Bool {
             switch self {
             case .unifiedFreemium:
                 return true
@@ -113,8 +94,27 @@ public class StrongboxProductBundle : NSObject {
                 return true
             }
         }
-        
-        var displayName : String {
+
+        var supportsFavIconDownloader: Bool {
+            switch self {
+            case .unifiedFreemium:
+                return true
+            case .unifiedPro:
+                return true
+            case .business:
+                return true
+            case .zero:
+                return false
+            case .scotus:
+                return false
+            case .macOSStandaloneFreemium:
+                return true
+            case .macOSStandalonePro:
+                return true
+            }
+        }
+
+        var displayName: String {
             switch self {
             case .unifiedFreemium:
                 return "Universal (macOS & iOS, Freemium)"
@@ -133,149 +133,138 @@ public class StrongboxProductBundle : NSObject {
             }
         }
     }
-    
-    @objc class var isUnifiedProBundle : Bool {
+
+    @objc class var isUnifiedProBundle: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
             return bundle == .unifiedPro || bundle == .business
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isUnifiedProBundle()")
             return false
         }
     }
-    
-    @objc class var isBusinessBundle : Bool {
+
+    @objc class var isBusinessBundle: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
             return bundle == .business
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isBusinessBundle()")
             return false
         }
     }
 
-    @objc class var isUnifiedFreemiumBundle : Bool {
+    @objc class var isUnifiedFreemiumBundle: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
             return bundle == .unifiedFreemium
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isUnifiedFreemiumBundle()")
             return false
         }
     }
 
-    @objc class var isScotusEdition : Bool {
+    @objc class var isScotusEdition: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
             return bundle == .scotus
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isScotusEdition()")
             return false
         }
     }
-    
-    @objc class var isZeroEdition : Bool {
+
+    @objc class var isZeroEdition: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
             return bundle == .zero
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isZeroEdition()")
             return false
         }
     }
 
-    @objc class var isAProBundle : Bool {
+    @objc class var isAProBundle: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
             return bundle.isPro
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }
-    
-    @objc class var isTestFlightBuild : Bool {
-        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt" 
+
+    @objc class var isTestFlightBuild: Bool {
+        Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt" 
     }
-    
-    @objc class var displayName : String {
+
+    @objc class var displayName: String {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
             return bundle.displayName
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.displayName")
             return NSLocalizedString("generic_unknown", comment: "Unknown")
         }
     }
-    
-    @objc class var supportsTipJar : Bool {
+
+    @objc class var supportsTipJar: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
             
             return bundle.supportsTipJar
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }
-    
-    @objc class var supports3rdPartyStorageProviders : Bool {
+
+    @objc class var supports3rdPartyStorageProviders: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
             
             return bundle.supports3rdPartyStorageProviders
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }
-    
-    @objc class var supportsSftpWebDAV : Bool {
+
+    @objc class var supportsSftpWebDAV: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
             
             return bundle.supportsSftpWebDAV
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }
-    
-    @objc class var supportsFavIconDownloader : Bool {
+
+    @objc class var supportsFavIconDownloader: Bool {
         let bundleId = Utils.getAppBundleId()
-        
+
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
             
             return bundle.supportsFavIconDownloader
-        }
-        else {
+        } else {
             NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }

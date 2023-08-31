@@ -158,8 +158,8 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self dismissViewController:self];
-    
+    [self dismissViewController:self]; 
+
     self.onDone(YES, nil);
 }
 

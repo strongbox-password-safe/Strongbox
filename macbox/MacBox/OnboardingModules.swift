@@ -18,23 +18,23 @@ class OnboardingModules {
                                        body: NSLocalizedString("onboarding_autofill_msg_available_turn_on_question", comment: "Browser AutoFill is available but currently not turned on. Would you like to enable Browser AutoFill so that you can conveniently and securely login from within your browser?"),
                                        button1Title: NSLocalizedString("onboarding_autofill_option_turn_on_autofill", comment: "Turn On AutoFill"),
                                        button2Title: NSLocalizedString("generic_no_thanks", comment: "No Thanks"),
-           hideDismiss: true,
-           shouldDisplay: {
-            let settings = Settings.sharedInstance()
-            return settings.isPro && !settings.runBrowserAutoFillProxyServer && !settings.hasPromptedForThirdPartyAutoFill
-           },
-           onButton1: { viewController, completion in
-            Settings.sharedInstance().hasPromptedForThirdPartyAutoFill = true
-            Settings.sharedInstance().runBrowserAutoFillProxyServer = true
-            completion()
-        },
-           onButton2: { viewController, completion in
-            Settings.sharedInstance().hasPromptedForThirdPartyAutoFill = true
-            Settings.sharedInstance().runBrowserAutoFillProxyServer = false
-            completion()
-        })
+                                       hideDismiss: true,
+                                       shouldDisplay: {
+                                           let settings = Settings.sharedInstance()
+                                           return settings.isPro && !settings.runBrowserAutoFillProxyServer && !settings.hasPromptedForThirdPartyAutoFill
+                                       },
+                                       onButton1: { _, completion in
+                                           Settings.sharedInstance().hasPromptedForThirdPartyAutoFill = true
+                                           Settings.sharedInstance().runBrowserAutoFillProxyServer = true
+                                           completion()
+                                       },
+                                       onButton2: { _, completion in
+                                           Settings.sharedInstance().hasPromptedForThirdPartyAutoFill = true
+                                           Settings.sharedInstance().runBrowserAutoFillProxyServer = false
+                                           completion()
+                                       })
     }
-    
+
     class func getHasBeenDowngradedModule() -> OnboardingModule {
         let image = NSImage(imageLiteralResourceName: "cry-emoji")
 
@@ -69,8 +69,7 @@ class OnboardingModules {
                                                }
 
                                                viewController.presentAsSheet(vc)
-                                           }
-                                           else {
+                                           } else {
                                                UpgradeWindowController.show(0)
                                            }
                                        }, onButton2: { _, completion in

@@ -269,7 +269,7 @@ static const u_int kDefaultEd25519Bits = 256;
     
     u_char *signature = NULL;
     size_t slen = 0;
-    if ((ret = sshkey_sign(thePrivateKey, &signature, &slen, challenge.bytes, challenge.length, agent_decode_alg(thePrivateKey, flags), NULL, NULL, 0)) != 0) {
+    if (sshkey_sign(thePrivateKey, &signature, &slen, challenge.bytes, challenge.length, agent_decode_alg(thePrivateKey, flags), NULL, NULL, 0) != 0) {
         NSLog(@"🔴 Could not sign the challenge");
         sshkey_free(thePrivateKey);
         return nil;

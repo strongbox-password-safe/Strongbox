@@ -33,7 +33,7 @@ class TagsTableCellView: NSTableCellView, NSCollectionViewDataSource, NSCollecti
         let scrollView = collectionView.enclosingScrollView!
         scrollView.drawsBackground = false
         scrollView.contentView.drawsBackground = false
-                                                
+
         updateHeightConstraint()
     }
 
@@ -63,7 +63,7 @@ class TagsTableCellView: NSTableCellView, NSCollectionViewDataSource, NSCollecti
     }
 
     func collectionView(_: NSCollectionView, numberOfItemsInSection _: Int) -> Int {
-        return tags.count
+        tags.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {

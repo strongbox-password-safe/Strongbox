@@ -27,7 +27,6 @@
 @interface AdvancedDatabaseSettings ()
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBulkUpdateFavIcons;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStats;
@@ -52,16 +51,12 @@
     
 
     self.cellExport.imageView.image = [UIImage imageNamed:@"upload"];
-    self.cellPrint.imageView.image = [UIImage imageNamed:@"print"];
     self.cellViewAttachments.imageView.image = [UIImage imageNamed:@"attach"];
     self.cellBulkUpdateFavIcons.imageView.image = [UIImage imageNamed:@"picture"];
     self.cellStats.imageView.image = [UIImage imageNamed:@"statistics"];
 
     self.cellExport.imageView.image = [UIImage systemImageNamed:@"square.and.arrow.up"];
     [self.cellExport.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
-
-    self.cellPrint.imageView.image = [UIImage systemImageNamed:@"printer"];
-    [self.cellPrint.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
 
     self.cellViewAttachments.imageView.image = [UIImage systemImageNamed:@"paperclip"];
     [self.cellViewAttachments.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
@@ -78,12 +73,12 @@
 - (void)setupTableView {
     BOOL formatUnsupported = self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1;
     BOOL featureDisabled = AppPreferences.sharedInstance.disableFavIconFeature;
+    BOOL ro = self.viewModel.isReadOnly;
     
-    [self cell:self.cellBulkUpdateFavIcons setHidden:formatUnsupported || featureDisabled];
+    [self cell:self.cellBulkUpdateFavIcons setHidden:formatUnsupported || featureDisabled || ro];
     [self cell:self.cellViewAttachments setHidden:self.viewModel.database.attachmentPool.count == 0];
-    
-    
-    [self cell:self.cellPrint setHidden:YES];
+    [self cell:self.cellExport setHidden:AppPreferences.sharedInstance.disableExport];
+    [self cell:self.cellScheduledExport setHidden:AppPreferences.sharedInstance.disableExport];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -124,9 +119,6 @@
     if (cell == self.cellExport) {
         [self onExport];
     }
-    else if (cell == self.cellPrint) {
-        [self onPrint];
-    }
     else if (cell == self.cellViewAttachments) {
         [self viewAttachments];
     }
@@ -158,16 +150,6 @@
 
 - (void)onExport {
     [self performSegueWithIdentifier:@"segueToExportOptions" sender:nil];
-}
-
-- (void)onPrint {
-    NSString* htmlString = [self.viewModel.database getHtmlPrintString:self.viewModel.metadata.nickName];
-    
-    UIMarkupTextPrintFormatter *formatter = [[UIMarkupTextPrintFormatter alloc] initWithMarkupText:htmlString];
-    
-    UIPrintInteractionController.sharedPrintController.printFormatter = formatter;
-    
-    [UIPrintInteractionController.sharedPrintController presentAnimated:YES completionHandler:nil];
 }
 
 @end

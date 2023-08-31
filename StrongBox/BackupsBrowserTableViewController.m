@@ -111,14 +111,6 @@
         }];
     }];
 
-
-
-
-
-
-
-
-
     UITableViewRowAction *addLocalAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                              title:NSLocalizedString(@"backups_add_local", @"Add as Local Database")
                                                                            handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
@@ -136,27 +128,6 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"segueToExport"]) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    }
 }
 
 - (void)createAsLocalDatabase:(BackupItem*)item {

@@ -105,37 +105,36 @@
     
     
 
-    BOOL safariPossible = [self safariAutoFillIsAvailableOnPlatform];
     BOOL safariEnabled = AutoFillManager.sharedInstance.isOnForStrongbox;
 
-    self.labelSafariUnavailableOnPlatformMessage.hidden = safariPossible;
+    self.labelSafariUnavailableOnPlatformMessage.hidden = YES;
     
-    self.enableSystemExtension.enabled = pro && safariPossible && meta.autoFillEnabled;
-    self.enableSystemExtension.hidden = safariPossible && safariEnabled;
-    self.enableSystemExtension.state = safariPossible && safariEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.enableSystemExtension.enabled = pro && meta.autoFillEnabled;
+    self.enableSystemExtension.hidden = safariEnabled;
+    self.enableSystemExtension.state = safariEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     
     
     
-    self.autoLaunchSingleDatabase.enabled = pro && meta.autoFillEnabled && safariPossible && safariEnabled;
+    self.autoLaunchSingleDatabase.enabled = pro && meta.autoFillEnabled && safariEnabled;
     self.autoLaunchSingleDatabase.state = Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ? NSControlStateValueOn : NSControlStateValueOff;
     
     
 
-    self.useWormholeIfUnlocked.enabled = pro && meta.autoFillEnabled && safariPossible && safariEnabled;
+    self.useWormholeIfUnlocked.enabled = pro && meta.autoFillEnabled && safariEnabled;
     self.useWormholeIfUnlocked.state = meta.quickWormholeFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     
     
 
-    self.enableQuickType.enabled = pro && meta.autoFillEnabled && safariPossible && safariEnabled;
+    self.enableQuickType.enabled = pro && meta.autoFillEnabled && safariEnabled;
     self.enableQuickType.state = meta.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     
-    self.advancedQuickTypeSettings.enabled = pro && meta.autoFillEnabled && safariPossible && safariEnabled && meta.quickTypeEnabled;
+    self.advancedQuickTypeSettings.enabled = pro && meta.autoFillEnabled && safariEnabled && meta.quickTypeEnabled;
     
     
     
-    self.labelConvenienceAutoUnlock.textColor = (pro && meta.autoFillEnabled && safariPossible && safariEnabled) ? NSColor.labelColor : NSColor.disabledControlTextColor;
+    self.labelConvenienceAutoUnlock.textColor = (pro && meta.autoFillEnabled && safariEnabled) ? NSColor.labelColor : NSColor.disabledControlTextColor;
     
-    self.popupAutoUnlock.enabled = pro && meta.autoFillEnabled && safariPossible && safariEnabled;
+    self.popupAutoUnlock.enabled = pro && meta.autoFillEnabled && safariEnabled;
     NSInteger val = meta.autoFillConvenienceAutoUnlockTimeout;
     NSUInteger index = [self.autoUnlockOptions indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return obj.integerValue == val;
@@ -218,13 +217,11 @@
 }
 
 - (void)startRefreshTimer {
-    if ( @available(macOS 10.12, *) ){
-        __weak AutoFillSettingsViewController* weakSelf = self;
-        
-        self.timer = [NSTimer scheduledTimerWithTimeInterval:1. repeats:YES block:^(NSTimer * _Nonnull timer) {
-            [weakSelf bindUI];
-        }];
-    }
+    __weak AutoFillSettingsViewController* weakSelf = self;
+    
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:1. repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [weakSelf bindUI];
+    }];
 }
 
 - (void)killRefreshTimer {
@@ -242,15 +239,6 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     }
     else {
         return [Utils formatTimeInterval:val];
-    }
-}
-
-- (BOOL)safariAutoFillIsAvailableOnPlatform {
-    if( @available(macOS 11.0, *) ) {
-        return YES;
-    }
-    else {
-        return NO;
     }
 }
 

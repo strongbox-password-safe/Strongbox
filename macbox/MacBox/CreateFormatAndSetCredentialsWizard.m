@@ -329,9 +329,7 @@
 - (void)bindConcealed {
     self.textFieldNew.showsText = !self.concealed;
     
-    if (@available(macOS 11.0, *)) {
-        [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
-    }
+    [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
 }
 
 - (void)updateYubiKeyUi {

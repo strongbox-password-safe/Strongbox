@@ -34,12 +34,12 @@ class DetailsViewField {
     var fieldType: FieldType = .customField
     var object: Any?
     var showStrength: Bool = false
-    var showHistory : Bool = false
-    var showShare : Bool = false
-    var singleLineMode : Bool = false
-    var params : [String:String]
-    var leftImage: NSImage? = nil
-    
+    var showHistory: Bool = false
+    var showShare: Bool = false
+    var singleLineMode: Bool = false
+    var params: [String: String]
+    var leftImage: NSImage?
+
     init(name: String, value: String,
          fieldType: FieldType,
          concealed: Bool = false,
@@ -48,9 +48,9 @@ class DetailsViewField {
          object: Any? = nil,
          showStrength: Bool = false,
          showShare: Bool = false,
-         singleLineMode : Bool = false,
-         params : [String:String] = [:],
-         leftImage : NSImage? = nil )
+         singleLineMode: Bool = false,
+         params: [String: String] = [:],
+         leftImage: NSImage? = nil)
     {
         self.name = name
         self.value = value

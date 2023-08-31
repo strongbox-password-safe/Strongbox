@@ -92,7 +92,7 @@
 
 - (void)getCkfs:(NSString*_Nullable)message
      completion:(CompositeKeyDeterminedBlock)completion {
-    return [self getCkfs:nil manualHeadline:nil manualSubhead:nil completion:completion];
+    return [self getCkfs:message manualHeadline:nil manualSubhead:nil completion:completion];
 }
 
 - (void)getCkfs:(NSString *)message
@@ -172,8 +172,6 @@
     mce.subheadline = subheadline;
     
     mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
-        AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
-        appDelegate.isRequestingAutoFillManualCredentialsEntry = NO;
 
         if (userCancelled) {
             completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
@@ -187,32 +185,31 @@
         }
     };
     
-    if ( !self.createWindowForManualCredentialsEntry ) {
-        
-        [self.viewController presentViewControllerAsSheet:mce];
-    }
-    else {
-        
-        
-        
-        
-        AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
-        appDelegate.isRequestingAutoFillManualCredentialsEntry = YES; 
-        
-        
 
-        NSWindow* window = [NSWindow windowWithContentViewController:mce];
-        [window setLevel:NSFloatingWindowLevel];
-        
-        self.fooWc = [[NSWindowController alloc] initWithWindow:window]; 
-        [self.fooWc showWindow:nil];
-        [window center];
-        
-        [NSApp activateIgnoringOtherApps:YES];
-        [NSApp arrangeInFront:nil];
-        
-        [window makeKeyAndOrderFront:nil];
-    }
+        [self.viewController presentViewControllerAsSheet:mce];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)_getCkfsWithBiometrics:(NSString*_Nullable)message

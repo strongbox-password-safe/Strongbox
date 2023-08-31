@@ -63,12 +63,12 @@
     if ( self.encryptionChanged ) {
         [self promptToApplyChanges:^(BOOL cancelled) {
             if ( !cancelled ) {
-                [self.view.window close];
+                [self.view.window.sheetParent endSheet:self.view.window];
             }
         }];
     }
     else {
-        [self.view.window close];
+        [self.view.window.sheetParent endSheet:self.view.window];
     }
 }
 
@@ -95,11 +95,7 @@
     self.viewModel = model;
     self.initialTab = initialTab;
     
-    [self initializeTabs];
-    
-    if ( !Settings.sharedInstance.nextGenUI ) {
-        [self removeTabViewItem:self.tabViewItems[4]];
-    }
+    [self initializeTabs];    
 }
 
 - (void)initializeTabs {

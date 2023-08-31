@@ -36,9 +36,6 @@
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellManageKeyFiles;
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellUseICloud;
-@property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
-@property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCloudSessions;
 @property (weak, nonatomic) IBOutlet UILabel *labelCloudSessions;
 
@@ -62,7 +59,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchPinYinSearch;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchDropboxFolderOnly;
-@property (weak, nonatomic) IBOutlet UISwitch *switchNativeKeePassEmailField;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellInstantPin;
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
@@ -74,13 +70,13 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchMarkdownNotes;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDetectIfOffline;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDropboxAppFolder;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellNativeKeePassEmail;
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchNewEntryUsesParentGroupIcon;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStripUnusedIcons;
 @property (weak, nonatomic) IBOutlet UISwitch *pinCodeHapticFeedback;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
-@property (weak, nonatomic) IBOutlet UISwitch *switchMaskKeePassFavoriteTag;
+
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellRedeemOfferCode;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAppendDateExportFilenames;
 
@@ -117,7 +113,6 @@
         [self cell:self.cellDropboxAppFolder setHidden:YES];
     }
     
-    [self cell:self.cellNativeKeePassEmail setHidden:YES];
     [self cell:self.cellNewEntryDefaults setHidden:YES];
 
     if ( CustomizationManager.isAProBundle ) {
@@ -269,38 +264,11 @@
     
     AppPreferences.sharedInstance.stripUnusedIconsOnSave = self.switchStripUnusedIcons.on;
     
-    AppPreferences.sharedInstance.shadeFavoriteTag = self.switchMaskKeePassFavoriteTag.on;
+
     
     AppPreferences.sharedInstance.appendDateToExportFileName = self.switchAppendDateExportFilenames.on;
 
     [self bindPreferences];
-}
-
-- (IBAction)onUseICloud:(id)sender {
-    NSLog(@"Setting iCloudOn to %d", self.switchUseICloud.on);
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        [[AppPreferences sharedInstance] setICloudOn:self.switchUseICloud.on];
-        
-        [self bindCloudSessions];
-
 }
 
 - (void)bindPreferences {
@@ -333,26 +301,15 @@
     self.switchNewEntryUsesParentGroupIcon.on = AppPreferences.sharedInstance.useParentGroupIconOnCreate;
     self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;
     
-    self.switchMaskKeePassFavoriteTag.on = AppPreferences.sharedInstance.shadeFavoriteTag;
+
     self.switchAppendDateExportFilenames.on = AppPreferences.sharedInstance.appendDateToExportFileName;
 }
 
 - (void)bindCloudSessions {
-    self.switchUseICloud.on = [[AppPreferences sharedInstance] iCloudOn] && AppPreferences.sharedInstance.iCloudAvailable;
-    self.switchUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
-    
-    self.labelUseICloud.text = AppPreferences.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
-                                                                            NSLocalizedString(@"prefs_vc_use_icloud_disabled", @"Use iCloud (Unavailable)");
-    self.labelUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
-    
     if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
         [self cell:self.cellCloudSessions setHidden:YES];
     }
-    
-    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        [self cell:self.cellUseICloud setHidden:YES];
-    }
-    
+        
     [self reloadDataAnimated:NO];
 }
 

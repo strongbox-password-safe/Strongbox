@@ -222,7 +222,7 @@ class MyCodingKey: CodingKey {
     let key: String
 
     required init?(intValue _: Int) {
-        return nil
+        nil
     }
 
     required init?(stringValue: String) {
@@ -230,10 +230,10 @@ class MyCodingKey: CodingKey {
     }
 
     var intValue: Int? {
-        return nil
+        nil
     }
 
     var stringValue: String {
-        return key
+        key
     }
 }

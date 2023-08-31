@@ -145,7 +145,7 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
     
     NSLog(@"Performing Scheduled Check of Entitlements...");
      
-    if ( self.preferences.numberOfEntitlementCheckFails < 4 ) { 
+    if ( self.preferences.numberOfEntitlementCheckFails < 3 ) { 
         [self checkReceiptForTrialAndProEntitlements];
     }
     else {

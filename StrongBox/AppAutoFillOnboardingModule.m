@@ -33,7 +33,7 @@
         }
     }
     
-    return AutoFillManager.sharedInstance.isPossible && !AutoFillManager.sharedInstance.isOnForStrongbox;
+    return !AutoFillManager.sharedInstance.isOnForStrongbox;
 }
 
 - (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {

@@ -470,10 +470,8 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 - (BOOL)respondsToSelector:(SEL)aSelector{
     
     
-    if ( @available(macOS 10.12, *) ){
-        if ( aSelector == @selector(newWindowForTab:) ) {
-            return NO;
-        }
+    if ( aSelector == @selector(newWindowForTab:) ) {
+        return NO;
     }
     
     return [super respondsToSelector:aSelector];

@@ -9,6 +9,8 @@
 #import "ConvenienceExpiryOnboardingModule.h"
 #import "ConvenienceExpiryOnboardingViewController.h"
 #import "AppPreferences.h"
+#import "SafeMetaData.h"
+#import "NSDate+Extensions.h"
 
 @interface ConvenienceExpiryOnboardingModule ()
 
@@ -30,9 +32,10 @@
     return ( !self.model.metadata.convenienceExpiryOnboardingDone &&
             AppPreferences.sharedInstance.isPro &&
             self.model.metadata.isConvenienceUnlockEnabled &&
-            self.model.metadata.convenienceExpiryPeriod == -1 &&
             self.model.metadata.conveniencePasswordHasBeenStored &&
-            self.model.metadata.convenienceMasterPassword.length ); 
+            self.model.metadata.convenienceMasterPassword.length &&
+            self.model.metadata.convenienceExpiryPeriod == kDefaultConvenienceExpiryPeriodHours &&
+            [self.model.metadata.databaseCreated isMoreThanXDaysAgo:3] );
 }
 
 - (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {

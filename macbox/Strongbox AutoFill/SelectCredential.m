@@ -284,7 +284,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self dismissViewController:self];
+    [self dismissViewController:self]; 
     self.onDone(YES, nil, nil, nil);
 }
 

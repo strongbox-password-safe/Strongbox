@@ -42,23 +42,15 @@ import Foundation
     
 
     var colorCollection: ColorCollection {
-        if #available(iOS 13.0, macOS 11.0, *) {
-            return SBColorCollection()
-        } else {
-            return StaticColorCollection()
-        }
+        SBColorCollection()
     }
 
     var fontCollection: FontCollection {
-        if #available(iOS 13.0, macOS 11.0, *) {
-            return StrongboxFontCollection()
-        } else {
-            return StaticFontCollection()
-        }
+        StrongboxFontCollection()
     }
 
     var styler: DownStyler {
-        return DownStyler(configuration: DownStylerConfiguration(fonts: fontCollection, colors: colorCollection))
+        DownStyler(configuration: DownStylerConfiguration(fonts: fontCollection, colors: colorCollection))
     }
 
     public required init?(coder: NSCoder) {
@@ -106,7 +98,7 @@ import Foundation
 
 
         #elseif canImport(AppKit)
-            guard let textStorage = textStorage else { return }
+            guard let textStorage else { return }
 
             if markdownEnabled {
                 let down = Down(markdownString: string)
@@ -124,7 +116,7 @@ import Foundation
     #if canImport(AppKit)
         var refuseFirstResponder: Bool = false
         override var acceptsFirstResponder: Bool {
-            return !refuseFirstResponder
+            !refuseFirstResponder
         }
     #endif
 }

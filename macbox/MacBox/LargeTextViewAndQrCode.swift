@@ -27,9 +27,9 @@ class LargeTextViewAndQrCode: NSViewController {
     @IBOutlet var scrollView: NSScrollView!
     @IBOutlet var scrollViewHeightConstraint: NSLayoutConstraint!
     @IBOutlet var scrollViewMaximumHeightConstraint: NSLayoutConstraint!
-    @IBOutlet weak var labelSubtext: NSTextField!
-    @IBOutlet weak var labelLargeTextHeader: NSTextField!
-    
+    @IBOutlet var labelSubtext: NSTextField!
+    @IBOutlet var labelLargeTextHeader: NSTextField!
+
     var largeText: Bool = true
     var string: String = "" {
         didSet {
@@ -37,8 +37,8 @@ class LargeTextViewAndQrCode: NSViewController {
         }
     }
 
-    var subtext : String = ""
-    
+    var subtext: String = ""
+
     var characters: [Character] = []
     var fieldName: String = ""
 
@@ -80,10 +80,10 @@ class LargeTextViewAndQrCode: NSViewController {
 
         labelSubtext.stringValue = subtext
         labelSubtext.isHidden = subtext.count == 0
-        
+
         labelLargeTextHeader.stringValue = NSLocalizedString("generic_totp_secret", comment: "TOTP Secret")
         labelLargeTextHeader.isHidden = subtext.count == 0
-        
+
         
 
         updateHeightConstraint()
@@ -111,7 +111,7 @@ class LargeTextViewAndQrCode: NSViewController {
 
 extension LargeTextViewAndQrCode: NSCollectionViewDataSource {
     func collectionView(_: NSCollectionView, numberOfItemsInSection _: Int) -> Int {
-        return characters.count
+        characters.count
     }
 
     func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {

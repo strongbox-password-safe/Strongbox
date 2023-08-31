@@ -44,8 +44,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     @IBOutlet var buttonCancel: NSButton!
     @IBOutlet var buttonDone: NSButton!
-    @IBOutlet weak var buttonSave: NSButton!
-    
+    @IBOutlet var buttonSave: NSButton!
+
     @IBOutlet var imageViewIcon: ClickableImageView!
     @IBOutlet var textFieldTitle: MMcGACTextField!
     @IBOutlet var textFieldUsername: MMcGACTextField!
@@ -89,117 +89,116 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBOutlet var progressTotp: NSProgressIndicator!
     @IBOutlet var popupLocation: NSPopUpButton!
 
-    @IBOutlet weak var buttonNewEntryDefaults: NSButton!
+    @IBOutlet var buttonNewEntryDefaults: NSButton!
     @IBOutlet var buttonHistory: NSPopUpButton!
+
     
-    
-    
-    @IBOutlet weak var buttonAddOrGenerateSshKey: NSPopUpButton!
-    @IBOutlet weak var stackExistingSshKey: NSStackView!
-    @IBOutlet weak var stackSshKeeAgentMaster: NSStackView!
-    @IBOutlet weak var checkboxSshKeyAgentEnabled: NSButton!
-    @IBOutlet weak var labelSshKeyFingerprint: NSTextField!
-    @IBOutlet weak var labelSshKeyFilename: NSTextField!
-    
-    @IBAction func onAddKeeAgentSshKey(_ sender: Any) {
+
+    @IBOutlet var buttonAddOrGenerateSshKey: NSPopUpButton!
+    @IBOutlet var stackExistingSshKey: NSStackView!
+    @IBOutlet var stackSshKeeAgentMaster: NSStackView!
+    @IBOutlet var checkboxSshKeyAgentEnabled: NSButton!
+    @IBOutlet var labelSshKeyFingerprint: NSTextField!
+    @IBOutlet var labelSshKeyFilename: NSTextField!
+
+    @IBAction func onAddKeeAgentSshKey(_: Any) {
         let op = NSOpenPanel()
-        
+
         guard op.runModal() == .OK, let url = op.url else {
             return
         }
-        
-        let data : Data
+
+        let data: Data
         do {
             data = try Data(contentsOf: url)
-        }
-        catch {
+        } catch {
             MacAlerts.error(error, window: view.window)
             return
         }
-        
+
         guard let key = OpenSSHPrivateKey.fromData(data) else {
             MacAlerts.info(NSLocalizedString("ssh_agent_could_not_read_sshkey_file", comment: "Could not read this file. Are you sure it is a valid OpenSSH Private Key file?"),
                            window: view.window)
             return
         }
+
         
-        
-        
+
         let filename = url.lastPathComponent
-        
+
         if model.reservedAttachmentNames.contains(filename) || filename == kKeeAgentSettingsAttachmentName {
             MacAlerts.info("This filename already exists in Attachments. Cannot add duplicate attachment.", window: view.window)
             return
         }
+
         
-        
-        
+
         if !key.isPassphraseProtected || key.validatePassphrase(model.password) {
             continueAddKeeAgentSshKey(key, filename)
             return
         }
-        
+
         var incorrect = false
-        
+
         while true {
             let alert = MacAlerts()
-            
+
             let incorrectStr = NSLocalizedString("ssh_agent_ssh_key_passphrase_incorrect_try_again", comment: "That passphrase was incorrect. Please try again.")
-            
+
             let initialStr = NSLocalizedString("ssh_agent_sshkey_please_enter_passphrase_msg", comment: "This key is passphrase protected.\n\nPlease enter the passphrase to decrypt. Strongbox will then set the password of this entry to match.")
-            
+
             guard let passphrase = alert.input(incorrect ? incorrectStr : initialStr,
                                                defaultValue: "",
-                                               allowEmpty: false) else {
+                                               allowEmpty: false)
+            else {
                 return
             }
-            
+
             if key.validatePassphrase(passphrase) {
-                return continueAddKeeAgentSshKeyWithPasswordCheck(key, filename, passphrase: passphrase )
-            }
-            else {
+                return continueAddKeeAgentSshKeyWithPasswordCheck(key, filename, passphrase: passphrase)
+            } else {
                 incorrect = true
             }
         }
     }
-    
-    func continueAddKeeAgentSshKeyWithPasswordCheck ( _ key : OpenSSHPrivateKey, _ filename : String,  passphrase : String, _ enabled : Bool = true ) {
-        if model.password.count > 0 && model.password != passphrase {
+
+    func continueAddKeeAgentSshKeyWithPasswordCheck(_ key: OpenSSHPrivateKey, _ filename: String, passphrase: String, _: Bool = true) {
+        if model.password.count > 0, model.password != passphrase {
             MacAlerts.yesNo(NSLocalizedString("ssh_agent_overwrite_password", comment: "Overwrite Password?"),
                             informativeText: NSLocalizedString("ssh_agent_passphrase_password_mismatch", comment: "The passphrase does not match the existing password. Strongbox needs the password to match the passphrase to use this SSH Key properly.\n\nContinue to overwrite the current password?"),
-                            window: view.window) { [weak self] response in
+                            window: view.window)
+            { [weak self] response in
                 if response {
                     self?.continueAddKeeAgentSshKey(key, filename, passphrase: passphrase)
                 }
             }
-        }
-        else {
+        } else {
             continueAddKeeAgentSshKey(key, filename, passphrase: passphrase)
         }
     }
-    
-    func continueAddKeeAgentSshKey ( _ key : OpenSSHPrivateKey, _ filename : String,  passphrase : String? = nil, _ enabled : Bool = true) {
+
+    func continueAddKeeAgentSshKey(_ key: OpenSSHPrivateKey, _ filename: String, passphrase: String? = nil, _ enabled: Bool = true) {
         if let passphrase {
-            model.password = passphrase;
+            model.password = passphrase
         }
-        
+
         model.keeAgentSshKey = KeeAgentSshKeyViewModel.withKey(key, filename: filename, enabled: enabled)
         onModelEdited()
-        
+
         bindKeeAgentSshKey()
-        
+
         passwordField.stringValue = model.password 
         bindPasswordUI()
     }
-    
-    @IBAction func onToggleSshKeyEnabled(_ sender: Any) {
+
+    @IBAction func onToggleSshKeyEnabled(_: Any) {
         model.setKeeAgentSshKeyEnabled(checkboxSshKeyAgentEnabled.state == .on)
-        
+
         onModelEdited()
         bindKeeAgentSshKey()
     }
-    
-    @IBAction func onRemoveSshKey(_ sender: Any) {
+
+    @IBAction func onRemoveSshKey(_: Any) {
         MacAlerts.areYouSure(NSLocalizedString("ssh_agent_ays_remove_key", comment: "Are you sure you want to remove this SSH Key?"), window: view.window) { [weak self] resp in
             if resp {
                 self?.model.keeAgentSshKey = nil
@@ -208,26 +207,26 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             }
         }
     }
-    
-    @IBAction func onNewRsaKey(_ sender: Any) {
+
+    @IBAction func onNewRsaKey(_: Any) {
         guard let key = OpenSSHPrivateKey.newRsa() else {
             return
         }
-        
+
         addNewKey(key, filename: "id_rsa")
     }
-        
-    @IBAction func onNewEd25519(_ sender: Any) {
+
+    @IBAction func onNewEd25519(_: Any) {
         guard let key = OpenSSHPrivateKey.newEd25519() else {
             return
         }
-        
+
         addNewKey(key, filename: "id_ed25519")
     }
-    
-    func addNewKey ( _ key : OpenSSHPrivateKey, filename : String ) {
+
+    func addNewKey(_ key: OpenSSHPrivateKey, filename: String) {
         model.keeAgentSshKey = KeeAgentSshKeyViewModel.withKey(key, filename: filename, enabled: true)
-        
+
         onModelEdited()
         bindKeeAgentSshKey()
     }
@@ -272,7 +271,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         
 
         window.initialFirstResponder = textFieldTitle
-        
+
         bindScreenCaptureBlock()
     }
 
@@ -281,7 +280,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId),
               let dbModel = database.commonModel,
-              !node.isGroup else {
+              !node.isGroup
+        else {
             NSLog("🔴 Could not load initial node or node is a group!")
             return
         }
@@ -292,7 +292,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         setupUI()
 
         bindUiToModel()
-        
+
         bindActionButtonStatesAndTitles()
     }
 
@@ -301,9 +301,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             window.sharingType = Settings.sharedInstance().screenCaptureBlocked ? .none : .readOnly
         }
     }
-    
+
     var sortedGroups: [Node]!
-    
+
     func setupLocationUI() {
         let groups = database.allActiveGroups
 
@@ -319,19 +319,19 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             
             
-            
-            let clipLength = 72;
+
+            let clipLength = 72
             if title.count > clipLength {
                 let tail = title.suffix(clipLength - 3)
                 title = String(format: "...%@", String(tail))
             }
-            
+
             let item = NSMenuItem(title: title, action: #selector(onChangeLocation(sender:)), keyEquivalent: "")
 
             var icon = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
-            
+
             let isCustom = group.icon?.isCustom ?? false
-            
+
             if isCustom || database.iconSet != .sfSymbols {
                 icon = scaleImage(icon, CGSize(width: 16, height: 16))
             }
@@ -355,9 +355,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             
 
             var icon = database.rootGroup.isUsingKeePassDefaultIcon ? Icon.house.image() : NodeIconHelper.getIconFor(database.rootGroup, predefinedIconSet: database.iconSet, format: database.format)
-            
+
             let isCustom = database.rootGroup.icon?.isCustom ?? false
-            
+
             if isCustom || database.iconSet != .sfSymbols {
                 icon = scaleImage(icon, CGSize(width: 16, height: 16))
             }
@@ -373,19 +373,19 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         imageViewIcon.clickable = true
         imageViewIcon.showClickableBorder = true
         imageViewIcon.onClick = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.onIconClicked()
         }
     }
 
     func setupTitle() {
         textFieldTitle.onTextDidChange = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.model.title = trim(self.textFieldTitle.stringValue)
             self.onModelEdited()
         }
         textFieldTitle.onImagePasted = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.handlePasteImageIntoField()
         }
     }
@@ -394,16 +394,16 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         textFieldUsername.completions = Array(database.usernameSet)
         textFieldUsername.completionEnabled = database.showAutoCompleteSuggestions
         textFieldUsername.onTextDidChange = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.model.username = trim(self.textFieldUsername.stringValue)
             self.onModelEdited()
         }
         textFieldUsername.onEndEditing = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.checkForAndSkipDummyKludgeAutoFillAvoidanceField(self.textFieldUsername)
         }
         textFieldUsername.onImagePasted = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.handlePasteImageIntoField()
         }
 
@@ -414,12 +414,12 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         textFieldUrl.completions = Array(database.urlSet)
         textFieldUrl.completionEnabled = database.showAutoCompleteSuggestions
         textFieldUrl.onTextDidChange = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.model.url = trim(self.textFieldUrl.stringValue)
             self.onModelEdited()
         }
         textFieldUrl.onImagePasted = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.handlePasteImageIntoField()
         }
     }
@@ -428,46 +428,41 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         textFieldEmail.completions = Array(database.emailSet)
         textFieldEmail.completionEnabled = database.showAutoCompleteSuggestions
         textFieldEmail.onTextDidChange = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.model.email = trim(self.textFieldEmail.stringValue)
             self.onModelEdited()
         }
         popupButtonEmailSuggestions.menu?.delegate = self
         textFieldEmail.onImagePasted = { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
             self.handlePasteImageIntoField()
         }
     }
 
     func setupPassword() {
-        if #available(macOS 11.0, *) {
-            buttonPasswordPreferences.image = NSImage(systemSymbolName: "gear", accessibilityDescription: nil)
-            buttonPasswordPreferences.symbolConfiguration = .init(scale: .large)
+        buttonPasswordPreferences.image = NSImage(systemSymbolName: "gear", accessibilityDescription: nil)
+        buttonPasswordPreferences.symbolConfiguration = .init(scale: .large)
 
-            buttonGeneratePassword.image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)
-            buttonGeneratePassword.symbolConfiguration = .init(scale: .large)
-        }
+        buttonGeneratePassword.image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)
+        buttonGeneratePassword.symbolConfiguration = .init(scale: .large)
+
         passwordField.delegate = self
         passwordField.concealed = !Settings.sharedInstance().revealPasswordsImmediately
         popupButtonAlternativeSuggestions.menu?.delegate = self
 
-        if #available(macOS 11.0, *) {
-            dummyKludge.contentType = .oneTimeCode
-            dummyKludgeWidthConstraint.constant = 0.0
-        } else {
-            dummyKludge.isHidden = true 
-        }
+        dummyKludge.contentType = .oneTimeCode
+        dummyKludgeWidthConstraint.constant = 0.0
     }
 
     func setupNotes() {
         textViewNotes.delegate = self
-        
+
         textViewNotes.enabledTextCheckingTypes = 0
         textViewNotes.isAutomaticQuoteSubstitutionEnabled = false
         textViewNotes.isAutomaticTextReplacementEnabled = false
         textViewNotes.isAutomaticDashSubstitutionEnabled = false
         textViewNotes.isAutomaticLinkDetectionEnabled = false
-        
+
         popupButtonNotesSuggestions.menu?.delegate = self
 
         borderScrollNotes.wantsLayer = true
@@ -475,17 +470,15 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func setupTOTP() {
-        if #available(macOS 11.0, *) {
-            buttonRemoveTOTP.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
-            buttonRemoveTOTP.contentTintColor = .systemOrange
-        }
+        buttonRemoveTOTP.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
+        buttonRemoveTOTP.contentTintColor = .systemOrange
 
         NotificationCenter.default.addObserver(forName: .totpUpdate, object: nil, queue: nil) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             self.bindTOTP()
         }
     }
-    
+
     func setupUI() {
         setupLocationUI()
         setupIcon()
@@ -623,7 +616,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         } else {
             var parentGroup: Node?
 
-            if let newEntryParentGroupId = newEntryParentGroupId {
+            if let newEntryParentGroupId {
                 parentGroup = database.getItemBy(newEntryParentGroupId)
             }
 
@@ -632,16 +625,14 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
                 if database.format == .keePass1 {
                     parentGroup = database.rootGroup.childGroups.first
-                }
-                else {
+                } else {
                     parentGroup = database.rootGroup
                 }
             }
 
-            if let parentGroup = parentGroup {
+            if let parentGroup {
                 node = createNewEntryNode(parentGroup)
-            }
-            else {
+            } else {
                 NSLog("🔴 Could not load parent node!")
                 return nil
             }
@@ -659,11 +650,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         tableViewCustomFields.register(NSNib(nibNamed: NSNib.Name(GenericAutoLayoutTableViewCell.NibIdentifier.rawValue), bundle: nil), forIdentifier: GenericAutoLayoutTableViewCell.NibIdentifier)
         tableViewCustomFields.register(NSNib(nibNamed: NSNib.Name("CustomFieldTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("CustomFieldValueCellIdentifier"))
 
-        if #available(macOS 11.0, *) {
-            buttonRemoveField.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
-            buttonEditField.image = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
-            buttonAddField.image = NSImage(systemSymbolName: "plus.circle", accessibilityDescription: nil)
-        }
+        buttonRemoveField.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
+        buttonEditField.image = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
+        buttonAddField.image = NSImage(systemSymbolName: "plus.circle", accessibilityDescription: nil)
 
         tableViewCustomFields.doubleAction = #selector(onEditField(_:))
         tableViewCustomFields.onEnterKey = { [weak self] in
@@ -696,7 +685,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     private func createNewEntryNode(_ parentGroup: Node) -> Node {
-        return database.getDefaultNewEntryNode(parentGroup)
+        database.getDefaultNewEntryNode(parentGroup)
     }
 
     @IBAction func onDiscard(_: Any?) {
@@ -707,7 +696,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                             informativeText: NSLocalizedString("item_details_vc_are_you_sure_discard_changes", comment: "Are you sure you want to discard all your changes?"),
                             window: view.window, completion: { [weak self] response in
                                 if response {
-                                    guard let self = self else { return }
+                                    guard let self else { return }
                                     self.dismiss(nil)
                                 }
                             })
@@ -729,8 +718,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         if isSaveable {
             save(dismissAfterSave: true)
-        }
-        else if !isDifferent { 
+        } else if !isDifferent { 
             dismiss(nil)
         }
     }
@@ -765,20 +753,20 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard continueSave else {
                 return
             }
-            
+
             self?.validateSshKeyPassphrase { continueSave in
                 guard continueSave else {
                     return
                 }
-                
+
                 self?.postValidationSave(dismissAfterSave: dismissAfterSave)
             }
         }
     }
 
-    func validateAndFixPassword( _ completion : @escaping ( (_ continueSave : Bool) -> Void ) ) {
+    func validateAndFixPassword(_ completion: @escaping ((_ continueSave: Bool) -> Void)) {
         let value = model.password
-        
+
         if trim(value) == value {
             completion(true)
             return
@@ -788,32 +776,33 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                              informativeText: NSLocalizedString("field_tidy_message_tidy_up_password", comment: "There are some blank characters (e.g. spaces, tabs) at the start or end of your password.\n\nShould Strongbox tidy up these extraneous characters?"),
                              option1AndDefault: NSLocalizedString("field_tidy_choice_tidy_up_field", comment: "Tidy Up"),
                              option2: NSLocalizedString("field_tidy_choice_dont_tidy", comment: "Don't Tidy"),
-                             window: view.window) { [weak self] response in
+                             window: view.window)
+        { [weak self] response in
             if response == 0 {
                 self?.model.password = trim(value)
                 completion(true)
             } else if response == 1 {
                 completion(true)
-            }
-            else {
+            } else {
                 completion(false)
             }
         }
     }
-    
-    func validateSshKeyPassphrase (_ completion : @escaping ( (_ continueSave : Bool) -> Void ) ) {
+
+    func validateSshKeyPassphrase(_ completion: @escaping ((_ continueSave: Bool) -> Void)) {
         guard let key = model.keeAgentSshKey, key.openSshKey.isPassphraseProtected, !key.openSshKey.validatePassphrase(model.password) else {
             completion(true)
             return
         }
-        
+
         MacAlerts.yesNo(NSLocalizedString("ssh_agent_incorrect_sshkey_passphrase", comment: "Inccorect SSH Key Passphrase"),
                         informativeText: NSLocalizedString("ssh_agent_validation_passphrase_password_mismatch", comment: "The SSH Key is passphrase protected but the password for this entry is not the correct passphrase.\n\nDo you want to continue saving?"),
-                        window: view.window) { response in
+                        window: view.window)
+        { response in
             completion(response)
         }
     }
-    
+
     func postValidationSave(dismissAfterSave: Bool) {
         let nodeId: UUID
 
@@ -892,7 +881,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                         informativeText: NSLocalizedString("item_details_prompt_auto_fetch_favicon_message", comment: "Strongbox can automatically fetch FavIcons when an new entry is created or updated.\n\nWould you like to Strongbox to do this?"),
                                         window: view.window,
                                         completion: { [weak self] yesNo in
-                                            guard let self = self else { return }
+                                            guard let self else { return }
 
                                             self.database.promptedForAutoFetchFavIcon = true
                                             self.database.downloadFavIconOnChange = yesNo
@@ -912,53 +901,52 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func maybeDownloadFavIconAndExit(_ node: Node, dismissAfterSave: Bool) {
-#if NO_FAVICON_LIBRARY 
-        onSaveDone(node, dismissAfterSave: dismissAfterSave)
-#else
-        if database.downloadFavIconOnChange { 
-            let url = node.fields.url.urlExtendedParse
-            if url == nil {
-                onSaveDone(node, dismissAfterSave: dismissAfterSave)
-                return
-            }
+        #if NO_FAVICON_LIBRARY 
+            onSaveDone(node, dismissAfterSave: dismissAfterSave)
+        #else
+            if database.downloadFavIconOnChange {
+                let url = node.fields.url.urlExtendedParse
+                if url == nil {
+                    onSaveDone(node, dismissAfterSave: dismissAfterSave)
+                    return
+                }
 
-            macOSSpinnerUI.sharedInstance().show(NSLocalizedString("set_icon_vc_progress_downloading_favicon", comment: "Downloading FavIcon"), viewController: self)
+                macOSSpinnerUI.sharedInstance().show(NSLocalizedString("set_icon_vc_progress_downloading_favicon", comment: "Downloading FavIcon"), viewController: self)
 
-            DispatchQueue.global().async {
-                FavIconManager.sharedInstance().downloadPreferred(url!, options: .express()) { maybeImage in
-                    DispatchQueue.main.async { [weak self] in
-                        macOSSpinnerUI.sharedInstance().dismiss()
+                DispatchQueue.global().async {
+                    FavIconManager.sharedInstance().downloadPreferred(url!, options: .express()) { maybeImage in
+                        DispatchQueue.main.async { [weak self] in
+                            macOSSpinnerUI.sharedInstance().dismiss()
 
-                        guard let self = self else { return }
+                            guard let self else { return }
 
-                        if maybeImage != nil {
-                            self.database.setItemIcon(node, icon: NodeIcon.withCustomImage(maybeImage!))
+                            if maybeImage != nil {
+                                self.database.setItemIcon(node, icon: NodeIcon.withCustomImage(maybeImage!))
+                            }
+
+                            self.onSaveDone(node, dismissAfterSave: dismissAfterSave)
                         }
-
-                        self.onSaveDone(node, dismissAfterSave: dismissAfterSave)
                     }
                 }
+            } else {
+                onSaveDone(node, dismissAfterSave: dismissAfterSave)
             }
-        } else {
-            onSaveDone(node, dismissAfterSave: dismissAfterSave)
-        }
-#endif
+        #endif
     }
 
     func onSaveDone(_ node: Node, dismissAfterSave: Bool) {
         NSLog("✅ onSaveDone")
 
         
-        
-        if ( Settings.sharedInstance().autoSave ) { 
+
+        if Settings.sharedInstance().autoSave { 
             database.document?.save(nil)
         }
-                
+
         if dismissAfterSave {
             database.nextGenSelectedItems = [node.uuid]
             dismiss(nil)
-        }
-        else {
+        } else {
             guard let dbModel = database.commonModel else {
                 NSLog("🔴 Could not load common model!")
                 messageProblemSaving()
@@ -967,9 +955,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             model = EntryViewModel.fromNode(node, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
             preEditModelClone = model.clone()
-            
+
             initialNodeId = node.uuid 
-            
+
             bindUiToModel()
 
             bindActionButtonStatesAndTitles()
@@ -982,7 +970,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     @objc
     var isEditsInProgress: Bool {
-        return model.isDifferent(from: preEditModelClone)
+        model.isDifferent(from: preEditModelClone)
     }
 
     func bindActionButtonStatesAndTitles() {
@@ -990,38 +978,33 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         let isSaveable = isDifferent || initialNodeId == nil
 
         buttonDone.isEnabled = isSaveable || !isDifferent
-        
-        if ( isSaveable ) {
-            if ( Settings.sharedInstance().autoSave ) {
-                buttonDone.title = NSLocalizedString("mac_create_or_edit_save_changes_and_close", comment: "Save & Close (⌘⏎)");
-                buttonSave.title = NSLocalizedString("mac_create_or_edit_save_changes", comment: "Save (⌘S)");
+
+        if isSaveable {
+            if Settings.sharedInstance().autoSave {
+                buttonDone.title = NSLocalizedString("mac_create_or_edit_save_changes_and_close", comment: "Save & Close (⌘⏎)")
+                buttonSave.title = NSLocalizedString("mac_create_or_edit_save_changes", comment: "Save (⌘S)")
+            } else {
+                buttonDone.title = NSLocalizedString("mac_create_or_edit_commit_changes_and_close", comment: "Commit & Close (⌘⏎)")
+                buttonSave.title = NSLocalizedString("mac_create_or_edit_commit_changes", comment: "Commit (⌘S)")
             }
-            else {
-                buttonDone.title = NSLocalizedString("mac_create_or_edit_commit_changes_and_close", comment: "Commit & Close (⌘⏎)");
-                buttonSave.title = NSLocalizedString("mac_create_or_edit_commit_changes", comment: "Commit (⌘S)");
-            }
-        }
-        else {
-            buttonDone.title = NSLocalizedString("mac_create_or_edit_commit_close", comment: "Close (⌘⏎)");
+        } else {
+            buttonDone.title = NSLocalizedString("mac_create_or_edit_commit_close", comment: "Close (⌘⏎)")
         }
 
         buttonSave.isEnabled = isSaveable
         buttonSave.isHidden = !isSaveable
-        
+
         buttonCancel.title = isDifferent ? NSLocalizedString("discard_changes", comment: "Discard Changes") : NSLocalizedString("generic_cancel", comment: "Cancel")
 
         buttonCancel.isHidden = !isSaveable
         buttonNewEntryDefaults.isHidden = initialNodeId != nil
-        
-        if #available(macOS 10.12.2, *) {
-            buttonCancel.bezelColor = isDifferent ? .systemRed : nil
-        }
+        buttonCancel.bezelColor = isDifferent ? .systemRed : nil
     }
 
-    override func cancelOperation(_ sender: Any?) { 
+    override func cancelOperation(_: Any?) { 
         onDiscard(nil)
     }
-    
+
     func controlTextDidChange(_ obj: Notification) {
         guard let textField = obj.object as? NSTextField else { return }
 
@@ -1053,16 +1036,16 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         selectPredefinedIconController = SelectPredefinedIconController(windowNibName: NSNib.Name("SelectPredefinedIconController"))
-        guard let selectPredefinedIconController = selectPredefinedIconController else {
+        guard let selectPredefinedIconController else {
             return
         }
 
         selectPredefinedIconController.iconPool = Array(database.customIcons)
         selectPredefinedIconController.hideSelectFile = !database.formatSupportsCustomIcons
         selectPredefinedIconController.hideFavIconButton = !database.formatSupportsCustomIcons || !StrongboxProductBundle.supportsFavIconDownloader
-        
+
         selectPredefinedIconController.onSelectedItem = { [weak self] (icon: NodeIcon?, showFindFavIcons: Bool) in
-            guard let self = self else { return }
+            guard let self else { return }
             self.onIconSelected(icon: icon, showFindFavIcons: showFindFavIcons)
         }
         selectPredefinedIconController.iconSet = database.iconSet
@@ -1080,48 +1063,48 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func showFavIconDownloader() {
         #if !NO_FAVICON_LIBRARY
-        let vc = FavIconDownloader.newVC()
+            let vc = FavIconDownloader.newVC()
 
-        
+            
 
-        let dummyNode = createNewEntryNode(database.rootGroup)
-        model.apply(to: dummyNode, databaseFormat: database.format, legacySupplementaryTotp: false, addOtpAuthUrl: true)
+            let dummyNode = createNewEntryNode(database.rootGroup)
+            model.apply(to: dummyNode, databaseFormat: database.format, legacySupplementaryTotp: false, addOtpAuthUrl: true)
 
-        vc.nodes = [dummyNode]
-        vc.viewModel = database
+            vc.nodes = [dummyNode]
+            vc.viewModel = database
 
-        vc.onDone = { [weak self] (go: Bool, selectedFavIcons: [UUID: NSImage]?) in
-            guard let self = self else {
-                return
+            vc.onDone = { [weak self] (go: Bool, selectedFavIcons: [UUID: NSImage]?) in
+                guard let self else {
+                    return
+                }
+
+                if go {
+                    guard let selectedFavIcons else {
+                        NSLog("🔴 Select FavIcons null!")
+                        return
+                    }
+
+                    guard let single = selectedFavIcons.first else {
+                        NSLog("🔴 More than 1 FavIcons returned!")
+                        return
+                    }
+
+                    if single.key != dummyNode.uuid {
+                        NSLog("🔴 single.key != dummyNode.uuid")
+                        return
+                    }
+
+                    self.explicitSetIconAndUpdateUI(NodeIcon.withCustomImage(single.value))
+                }
             }
 
-            if go {
-                guard let selectedFavIcons = selectedFavIcons else {
-                    NSLog("🔴 Select FavIcons null!")
-                    return
-                }
-
-                guard let single = selectedFavIcons.first else {
-                    NSLog("🔴 More than 1 FavIcons returned!")
-                    return
-                }
-
-                if single.key != dummyNode.uuid {
-                    NSLog("🔴 single.key != dummyNode.uuid")
-                    return
-                }
-
-                self.explicitSetIconAndUpdateUI(NodeIcon.withCustomImage(single.value))
-            }
-        }
-
-        presentAsSheet(vc)
+            presentAsSheet(vc)
         #endif
     }
 
     func explicitSetIconAndUpdateUI(_ icon: NodeIcon?) {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.model.icon = icon
             self.imageViewIcon.image = NodeIconHelper.getNodeIcon(self.model.icon, predefinedIconSet: self.database.iconSet)
@@ -1159,12 +1142,12 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func bindPasswordUI() {
         PasswordStrengthUIHelper.bindPasswordStrength(model.password, labelStrength: labelStrength, progress: progressStrength)
-        
+
         let history = getPasswordHistoryMenu()
         buttonHistory.menu = history
         buttonHistory.isHidden = history == nil
     }
-    
+
     func bindKeeAgentSshKey() {
         stackSshKeeAgentMaster.isHidden = !database.isKeePass2Format
 
@@ -1174,28 +1157,28 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             checkboxSshKeyAgentEnabled.state = key.enabled ? .on : .off
             labelSshKeyFingerprint.stringValue = key.openSshKey.fingerprint
             labelSshKeyFilename.stringValue = key.filename
-        }
-        else {
+        } else {
             stackExistingSshKey.isHidden = true
             buttonAddOrGenerateSshKey.isHidden = false
         }
     }
-    
-    func getPasswordHistoryMenu( ) -> NSMenu? {
-        guard (database.format == .keePass4 || database.format == .keePass),
+
+    func getPasswordHistoryMenu() -> NSMenu? {
+        guard database.format == .keePass4 || database.format == .keePass,
               let initialNodeId,
-              let item = database.getItemBy(initialNodeId) else {
+              let item = database.getItemBy(initialNodeId)
+        else {
             return nil
         }
-        
-        return PasswordHistoryHelper.getPasswordHistoryMenu( item: item )
+
+        return PasswordHistoryHelper.getPasswordHistoryMenu(item: item)
     }
 
     @IBAction func onGenerationSettings(_: Any) {
         let vc = PasswordGenerationPreferences.fromStoryboard()
 
         vc.onClickSampleOverride = { [weak self] samplePassword in
-            guard let self = self else { return }
+            guard let self else { return }
 
             self.onGeneratePassword(samplePassword)
             vc.dismiss(nil)
@@ -1231,7 +1214,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 let item = NSMenuItem(title: "", action: #selector(onAlternativeSelection), keyEquivalent: "")
                 item.attributedTitle = colored
 
-                if let image = image {
+                if let image {
                     item.image = image
                 }
 
@@ -1322,9 +1305,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             colorize = false
             easyReadFont = false
 
-            if #available(macOS 11.0, *) {
-                image = NSImage(systemSymbolName: "tag", accessibilityDescription: nil)
-            }
+            image = NSImage(systemSymbolName: "tag", accessibilityDescription: nil)
         }
 
         refreshSuggestionsMenu(menu, suggestions: altSuggestions, colorize: colorize, easyReadFont: easyReadFont, image: image)
@@ -1392,7 +1373,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         if let textViewFound = view.window?.firstResponder as? NSTextView,
-            let dummyView = view.window?.fieldEditor(false, for: dummyKludge) {
+           let dummyView = view.window?.fieldEditor(false, for: dummyKludge)
+        {
             if textViewFound == dummyView {
                 if let textFieldFrom = sender as? NSTextField {
 
@@ -1420,10 +1402,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         tableViewAttachments.register(NSNib(nibNamed: NSNib.Name(GenericAutoLayoutTableViewCell.NibIdentifier.rawValue), bundle: nil), forIdentifier: GenericAutoLayoutTableViewCell.NibIdentifier)
 
-        if #available(macOS 10.13, *) {
-            tableViewAttachments.registerForDraggedTypes(NSFilePromiseReceiver.readableDraggedTypes.map { NSPasteboard.PasteboardType($0) })
-            tableViewAttachments.registerForDraggedTypes([.fileURL])
-        }
+        tableViewAttachments.registerForDraggedTypes(NSFilePromiseReceiver.readableDraggedTypes.map { NSPasteboard.PasteboardType($0) })
+        tableViewAttachments.registerForDraggedTypes([.fileURL])
 
         tableViewAttachments.setDraggingSourceOperationMask(.copy, forLocal: false)
         tableViewAttachments.onDeleteKey = { [weak self] in
@@ -1436,12 +1416,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             self?.previewSelectedItem()
         }
 
-        if #available(macOS 11.0, *) {
-            buttonDeleteAttachment.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
-            buttonAddAttachment.image = NSImage(systemSymbolName: "doc.badge.plus", accessibilityDescription: nil)
-            buttonSaveAs.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: nil)
-            buttonPreview.image = NSImage(systemSymbolName: "eye", accessibilityDescription: nil)
-        }
+        buttonDeleteAttachment.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
+        buttonAddAttachment.image = NSImage(systemSymbolName: "doc.badge.plus", accessibilityDescription: nil)
+        buttonSaveAs.image = NSImage(systemSymbolName: "square.and.arrow.up", accessibilityDescription: nil)
+        buttonPreview.image = NSImage(systemSymbolName: "eye", accessibilityDescription: nil)
 
         tableViewAttachments.doubleAction = #selector(onPreview(_:))
 
@@ -1597,10 +1575,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             setTotpWithString(string: str, steam: true)
         }
     }
-    
-    func setTotpFromQrCodeScanner ( _ totpString : String ) {
+
+    func setTotpFromQrCodeScanner(_ totpString: String) {
         setTotpWithString(string: totpString, steam: false)
-        
+
         if Settings.sharedInstance().autoCommitScannedTotp {
             save(dismissAfterSave: false)
         }
@@ -1621,10 +1599,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
     }
 
-    @IBAction func onScanForTotpQRCode(_ sender: Any) {
+    @IBAction func onScanForTotpQRCode(_: Any) {
         performSegue(withIdentifier: NSStoryboardSegue.Identifier("segueToQrCodeScanner"), sender: nil)
     }
-    
+
     override func prepare(for segue: NSStoryboardSegue, sender _: Any?) {
         if segue.identifier == "segueToQrCodeScanner" {
             if let vc = segue.destinationController as? QRCodeScanner {
@@ -1634,7 +1612,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             }
         }
     }
-    
+
     func scanPhotoLibraryImageForQRCode() {}
 
     @IBAction func onRemoveTOTP(_: Any) {
@@ -1650,10 +1628,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     
 
     func setupExpiry() {
-        if #available(macOS 11.0, *) {
-            buttonClearExpiry.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
-            buttonClearExpiry.contentTintColor = .systemOrange
-        }
+        buttonClearExpiry.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
+        buttonClearExpiry.contentTintColor = .systemOrange
     }
 
     @IBOutlet var datePickerExpiry: NSDatePicker!
@@ -1705,10 +1681,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func bindTags() {
-        var tags = model.tags
+        let tags = model.tags
+
         
-        
-        
+
 
 
 
@@ -1794,9 +1770,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         guard let existingTags = tagsField.objectValue as? [String] else {
             return
         }
-        
+
         let splitByDelimter = existingTags.flatMap { t in
-            return Utils.getTagsFromTagString(t)
+            Utils.getTagsFromTagString(t)
         }
 
 
@@ -1857,10 +1833,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         panel.title = NSLocalizedString("item_details_add_attachment_button", comment: "Add Attachment...")
         panel.allowsMultipleSelection = true
-
-        if #available(macOS 11.0, *) {
-            panel.allowedContentTypes = [.data]
-        }
+        panel.allowedContentTypes = [.data]
 
         if panel.runModal() == .OK {
             panel.urls.forEach { url in
@@ -1944,7 +1917,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
     }
 
-    @available(macOS 10.13, *)
     func handleDropOnToAttachmentsTable(_ tableView: NSTableView, draggingInfo: NSDraggingInfo, toRow: Int) -> Bool {
         var succeeded = handlePromisedDrops(draggingInfo: draggingInfo, toRow: toRow)
 
@@ -1955,7 +1927,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         return succeeded
     }
 
-    @available(macOS 10.13, *)
     func handleNonePromisedDrops(_ tableView: NSTableView, draggingInfo: NSDraggingInfo, toRow: Int) -> Bool {
         NSLog("handleNonePromisedDrops...")
 
@@ -1978,7 +1949,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         return !failed
     }
 
-    @available(macOS 10.13, *)
     func handlePromisedDrops(draggingInfo: NSDraggingInfo, toRow: Int) -> Bool {
         NSLog("handlePromisedDrops...")
 
@@ -2030,8 +2000,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     @IBAction func onRemoveField(_: Any?) {
         MacAlerts.areYouSure(NSLocalizedString("are_you_sure_delete_custom_field_s", comment: "Are you sure you want to delete the selected field(s)?"),
-                             window: view.window) { [weak self] go in
-            guard let self = self else { return }
+                             window: view.window)
+        { [weak self] go in
+            guard let self else { return }
 
             if go {
                 var offsetIndex = 0
@@ -2054,7 +2025,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         vc.customFieldKeySet = database.customFieldKeySet
 
         vc.onSetField = { [weak self] key, value, protected in
-            guard let self = self else { return }
+            guard let self else { return }
 
             let field = CustomFieldViewModel.customField(withKey: key, value: value, protected: protected)
             self.model.addCustomField(field)
@@ -2082,16 +2053,15 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         vc.field.protected = field.protected
 
         vc.onSetField = { [weak self] key, value, protected in
-            guard let self = self else { return }
+            guard let self else { return }
 
             let field = CustomFieldViewModel.customField(withKey: key, value: value, protected: protected)
 
             self.model.removeCustomField(at: UInt(idx))
-            
-            if ( self.model.sortCustomFields ) {
+
+            if self.model.sortCustomFields {
                 self.model.addCustomField(field)
-            }
-            else {
+            } else {
                 self.model.addCustomField(field, at: UInt(idx))
             }
 
@@ -2130,11 +2100,11 @@ extension CreateEditViewController: NSTableViewDataSource {
                 let cell = tableView.makeView(withIdentifier: identifier, owner: nil) as! TitleAndIconCell
 
                 let image = AttachmentPreviewHelper.shared.getPreviewImage(key as String, attachment)
-                
-                cell.setContent(NSAttributedString(string: key as String), editable: true, iconImage: image) { [weak self] text in
+
+                cell.setContent(NSAttributedString(string: key as String), editable: true, iconImage: image) { [weak self] _ in
                     self?.onAttachmentNameEdited(cell.title)
                 }
-                
+
                 return cell
             } else {
                 let identifier = GenericAutoLayoutTableViewCell.NibIdentifier
@@ -2183,17 +2153,9 @@ extension CreateEditViewController: NSTableViewDelegate {
                   canAddAttachment,
                   let items = info.draggingPasteboard.pasteboardItems else { return dragOperation }
 
-            if #available(macOS 10.13, *) { } else {
-                return dragOperation
-            }
-
             for item in items {
                 var type: NSPasteboard.PasteboardType
-                if #available(macOS 11.0, *) {
-                    type = NSPasteboard.PasteboardType(UTType.image.identifier)
-                } else {
-                    type = (kUTTypeData as NSPasteboard.PasteboardType)
-                }
+                type = NSPasteboard.PasteboardType(UTType.image.identifier)
 
                 if item.availableType(from: [type]) != nil {
                     
@@ -2214,8 +2176,7 @@ extension CreateEditViewController: NSTableViewDelegate {
             }
 
             return dragOperation
-        }
-        else if tableView == tableViewCustomFields {
+        } else if tableView == tableViewCustomFields {
             if dropOperation == .above, !model.sortCustomFields {
                 return [.move]
             }
@@ -2232,20 +2193,14 @@ extension CreateEditViewController: NSTableViewDelegate {
         if tableView == tableViewAttachments {
             guard canAddAttachment else { return false }
 
-            if #available(macOS 10.13, *) {
-                let ret = handleDropOnToAttachmentsTable(tableView, draggingInfo: info, toRow: row)
+            let ret = handleDropOnToAttachmentsTable(tableView, draggingInfo: info, toRow: row)
 
-                if !ret {
-                    MacAlerts.info(NSLocalizedString("edit_item_could_not_add_item_as_attachment", comment: "There was an error adding this item as an Attachment"), window: view.window)
-                }
+            if !ret {
+                MacAlerts.info(NSLocalizedString("edit_item_could_not_add_item_as_attachment", comment: "There was an error adding this item as an Attachment"), window: view.window)
+            }
 
-                return ret
-            }
-            else {
-                return false
-            }
-        }
-        else if tableView == tableViewCustomFields {
+            return ret
+        } else if tableView == tableViewCustomFields {
             if let str = info.draggingPasteboard.string(forType: NSPasteboard.PasteboardType(CustomFieldDragAndDropId)),
                let sourceRow = UInt(str)
             {
@@ -2276,11 +2231,8 @@ extension CreateEditViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, pasteboardWriterForRow row: Int) -> NSPasteboardWriting? {
         if tableView == tableViewAttachments {
-            if #available(macOS 10.13, *) {
-                return pasteboardWriterForRow(tableView, row: row)
-            }
-        }
-        else if tableView == tableViewCustomFields, !model.sortCustomFields {
+            return pasteboardWriterForRow(tableView, row: row)
+        } else if tableView == tableViewCustomFields, !model.sortCustomFields {
             let item = NSPasteboardItem()
             item.setString(String(row), forType: NSPasteboard.PasteboardType(CustomFieldDragAndDropId))
             return item
@@ -2289,29 +2241,14 @@ extension CreateEditViewController: NSTableViewDelegate {
         return nil
     }
 
-    @available(macOS 10.13, *)
     func pasteboardWriterForRow(_: NSTableView, row: Int) -> NSPasteboardWriting? {
         let attachmentKey = model.filteredAttachments.allKeys()
         let key = attachmentKey[row]
 
         let filename = key as String
         let filenameExtension = key.pathExtension
-
-        var provider: NSFilePromiseProvider
-        
-        if #available(macOS 11.0, *) {
-            let typeIdentifier = UTType(filenameExtension: filenameExtension) ?? UTType.data
-            provider = NSFilePromiseProvider(fileType: typeIdentifier.identifier, delegate: self)
-        }
-        else {
-            guard let typeIdentifier = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, filenameExtension as CFString, nil) else {
-                NSLog("🔴 Could not determine typeIdentifier for filename [%@]", key)
-                return nil
-            }
-            
-            provider = NSFilePromiseProvider(fileType: typeIdentifier.takeRetainedValue() as String, delegate: self)
-        }
-        
+        let typeIdentifier = UTType(filenameExtension: filenameExtension) ?? UTType.data
+        let provider = NSFilePromiseProvider(fileType: typeIdentifier.identifier, delegate: self)
         provider.userInfo = [FilePromiseProviderUserInfoKeys.filename: filename]
 
         return provider
@@ -2328,13 +2265,13 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
             return
         }
 
-        if idx >= 0 && idx < model.filteredAttachments.count {
+        if idx >= 0, idx < model.filteredAttachments.count {
             QLPreviewPanel.shared().makeKeyAndOrderFront(self)
         }
     }
 
     func numberOfPreviewItems(in _: QLPreviewPanel!) -> Int {
-        return tableViewAttachments.selectedRowIndexes.count
+        tableViewAttachments.selectedRowIndexes.count
     }
 
     func previewPanel(_: QLPreviewPanel!, previewItemAt index: Int) -> QLPreviewItem! {
@@ -2376,7 +2313,7 @@ extension CreateEditViewController: QLPreviewPanelDataSource {
 
 extension CreateEditViewController: QLPreviewPanelDelegate {
     override func acceptsPreviewPanelControl(_: QLPreviewPanel!) -> Bool {
-        return true
+        true
     }
 
     override func beginPreviewPanelControl(_ panel: QLPreviewPanel!) {
@@ -2390,7 +2327,6 @@ extension CreateEditViewController: QLPreviewPanelDelegate {
 }
 
 extension CreateEditViewController: NSFilePromiseProviderDelegate {
-    @available(macOS 10.12, *)
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, fileNameForType fileType: String) -> String {
         NSLog("filePromiseProvider::fileNameForType called with [%@]", fileType)
 
@@ -2403,7 +2339,6 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
         return "foo.png"
     }
 
-    @available(macOS 10.12, *)
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
         NSLog("filePromiseProvider - writePromiseTo: [%@]", String(describing: url))
 
@@ -2424,9 +2359,8 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
         }
     }
 
-    @available(macOS 10.12, *)
     func operationQueue(for _: NSFilePromiseProvider) -> OperationQueue {
-        return dragAndDropPromiseQueue
+        dragAndDropPromiseQueue
     }
 }
 

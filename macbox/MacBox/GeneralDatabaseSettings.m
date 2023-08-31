@@ -10,6 +10,7 @@
 #import "Settings.h"
 #import "AppDelegate.h"
 #import "KeePassIconSet.h"
+#import "Constants.h"
 
 @interface GeneralDatabaseSettings ()
 
@@ -35,7 +36,7 @@
     [self.popupIconSet.menu addItemWithTitle:getIconSetName(kKeePassIconSetSfSymbols) action:nil keyEquivalent:@""];
     [self.popupIconSet.menu addItemWithTitle:getIconSetName(kKeePassIconSetKeePassXC) action:nil keyEquivalent:@""];
 
-    self.iconSetView.hidden = !Settings.sharedInstance.nextGenUI;
+    self.iconSetView.hidden = NO;
 
     [self bindUI];
     

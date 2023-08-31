@@ -42,7 +42,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
         self.showQuickView = YES;
         self.outlineViewTitleIsReadonly = NO;
-        self.outlineViewEditableFieldsAreReadonly = YES;
         self.concealEmptyProtectedFields = YES;
         self.startWithSearch = YES; 
         self.visibleColumns = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
@@ -265,7 +264,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.doNotShowAutoCompleteSuggestions forKey:@"doNotShowAutoCompleteSuggestions"];
     [encoder encodeBool:self.doNotShowChangeNotifications forKey:@"doNotShowChangeNotifications"];
     [encoder encodeBool:self.outlineViewTitleIsReadonly forKey:@"outlineViewTitleIsReadonly"];
-    [encoder encodeBool:self.outlineViewEditableFieldsAreReadonly forKey:@"outlineViewEditableFieldsAreReadonly"];
     [encoder encodeBool:self.concealEmptyProtectedFields forKey:@"concealEmptyProtectedFields"];
     [encoder encodeBool:self.startWithSearch forKey:@"startWithSearch"];
     [encoder encodeBool:self.showAdvancedUnlockOptions forKey:@"showAdvancedUnlockOptions"];
@@ -489,10 +487,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         if ( [decoder containsValueForKey:@"outlineViewTitleIsReadonly"] ) {
             self.outlineViewTitleIsReadonly = [decoder decodeBoolForKey:@"outlineViewTitleIsReadonly"];
-        }
-
-        if ( [decoder containsValueForKey:@"outlineViewEditableFieldsAreReadonly"] ) {
-            self.outlineViewEditableFieldsAreReadonly = [decoder decodeBoolForKey:@"outlineViewEditableFieldsAreReadonly"];
         }
 
         if ( [decoder containsValueForKey:@"concealEmptyProtectedFields"] ) {

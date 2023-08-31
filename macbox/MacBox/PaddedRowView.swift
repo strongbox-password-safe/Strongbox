@@ -14,11 +14,11 @@ class PaddedRowView: NSTableRowView {
     // MMcG: Required or drawSelection is not called!!!
     override var backgroundColor: NSColor {
         get {
-            return .red
+            .red
         }
         set {}
     }
-    
+
 
 
 
@@ -29,7 +29,7 @@ class PaddedRowView: NSTableRowView {
 
 
 
-    
+
     override func drawSelection(in dirtyRect: NSRect) {
         if selectionHighlightStyle != .none {
             if isEmphasized {
@@ -46,7 +46,6 @@ class PaddedRowView: NSTableRowView {
                 let selectionPath = NSBezierPath(roundedRect: selectionRect, xRadius: 5, yRadius: 5)
                 selectionPath.fill()
             } else {
-                
                 
             }
         } else {

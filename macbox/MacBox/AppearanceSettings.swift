@@ -14,21 +14,21 @@ class AppearanceSettings: NSViewController {
     @IBOutlet var showCopyFieldsButton: NSButton!
     @IBOutlet var showManagerOnAllClosed: NSButton!
     @IBOutlet var hideManagerAfterLaunching: NSButton!
-    @IBOutlet weak var showManagerOnAppLaunch: NSButton!
-    
+    @IBOutlet var showManagerOnAppLaunch: NSButton!
+
     override func viewDidLoad() {
-        super.viewDidLoad() 
-        
+        super.viewDidLoad()
+
         
 
-        showManagerOnAllClosed.isHidden = true 
-        
+        showManagerOnAllClosed.isHidden = true
+
         bindUI()
     }
 
     private func bindUI() {
         let settings = Settings.sharedInstance()
-        
+
         markdown.state = settings.markdownNotes ? .on : .off
         colorizePasswords.state = settings.colorizePasswords ? .on : .off
         showCopyFieldsButton.state = settings.showCopyFieldButton ? .on : .off
@@ -36,7 +36,7 @@ class AppearanceSettings: NSViewController {
         hideManagerAfterLaunching.state = settings.closeManagerOnLaunch ? .on : .off
         showManagerOnAppLaunch.state = settings.showDatabasesManagerOnAppLaunch ? .on : .off
     }
-    
+
     @IBAction func onChanged(_: Any) {
         Settings.sharedInstance().markdownNotes = markdown.state == .on
         Settings.sharedInstance().colorizePasswords = colorizePasswords.state == .on
@@ -44,9 +44,9 @@ class AppearanceSettings: NSViewController {
         Settings.sharedInstance().showDatabasesManagerOnCloseAllWindows = showManagerOnAllClosed.state == .on
         Settings.sharedInstance().closeManagerOnLaunch = hideManagerAfterLaunching.state == .on
         Settings.sharedInstance().showDatabasesManagerOnAppLaunch = showManagerOnAppLaunch.state == .on
-        
+
         bindUI()
-        
+
         notifyChanged()
     }
 

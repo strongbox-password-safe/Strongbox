@@ -52,7 +52,6 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 
 - (void)initializeiCloudAccess {
     if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        AppPreferences.sharedInstance.iCloudAvailable = NO;
         return;
     }
     
@@ -62,7 +61,6 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         BOOL available = (_iCloudRoot != nil);
         
         NSLog(@"iCloud Initialization Done: Available = [%d]", available);
-        AppPreferences.sharedInstance.iCloudAvailable = available;
     });
 }
 
@@ -144,7 +142,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSURL *destURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:displayName extension:extension]];
     
     NSError * error;
-    BOOL success = [[NSFileManager defaultManager] setUbiquitous:[AppPreferences sharedInstance].iCloudOn itemAtURL:fileURL destinationURL:destURL error:&error];
+    BOOL success = [[NSFileManager defaultManager] setUbiquitous:YES itemAtURL:fileURL destinationURL:destURL error:&error];
     
     if (success) {
         NSString* newNickName = [self displayNameFromUrl:destURL];
@@ -176,7 +174,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
                                                  completion:^(DatabasePreferences *metadata, NSError *error)
          {
              if (error == nil) {
-                 NSLog(@"Copied %@ to %@ (%d)", newURL, metadata.fileIdentifier, [AppPreferences sharedInstance].iCloudOn);
+                 NSLog(@"Copied %@ to %@", newURL, metadata.fileIdentifier);
                  
                  safe.nickName = metadata.nickName;
                  safe.storageProvider = kLocalDevice;
@@ -280,7 +278,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     
     _iCloudURLsReady = YES;
     
-    if ([AppPreferences sharedInstance].iCloudOn && !_migrationInProcessDoNotUpdateSafesCollection) {
+    if ( !_migrationInProcessDoNotUpdateSafesCollection ) {
         [self syncICloudUpdateWithSafesCollection:_iCloudFiles];
     }
 

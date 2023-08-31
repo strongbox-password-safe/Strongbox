@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  OnePasswordImporter.swift
 //  MacBox
 //
 //  Created by Strongbox on 19/10/2021.
@@ -22,16 +22,16 @@ class OnePasswordImporter: NSObject, Importer {
     static let magicSplitter: String = "***5642bee8-a5ff-11dc-8314-0800200c9a66***"
 
     func convert(url: URL) throws -> DatabaseModel {
-        return try OnePasswordImporter.convertToStrongboxNodes(url: url)
+        try OnePasswordImporter.convertToStrongboxNodes(url: url)
     }
 
     @objc
     class func convertToStrongboxNodes(url: URL) throws -> DatabaseModel { 
         let wrapper = try FileWrapper(url: url, options: .immediate)
-        
+
         let data: Data?
         var attachments: [String: [String: Data]] = [:]
-        
+
         if wrapper.isDirectory {
             guard let fileWrappers = wrapper.fileWrappers,
                   let nodesDataIdx = fileWrappers.keys.firstIndex(where: { key in
@@ -41,9 +41,9 @@ class OnePasswordImporter: NSObject, Importer {
             else {
                 throw OnePasswordImporterError.CouldNotConvertStringToData
             }
-            
+
             attachments = findAttachments(fileWrappers)
-            
+
             let file = fileWrappers[nodesDataIdx].value
             if file.isRegularFile {
                 data = file.regularFileContents
@@ -53,8 +53,8 @@ class OnePasswordImporter: NSObject, Importer {
         } else {
             data = wrapper.regularFileContents
         }
-        
-        if let data = data {
+
+        if let data {
             if let string = String(data: data, encoding: .utf8) {
                 return try convertToStrongboxNodes(text: string, attachments: attachments)
             } else {
@@ -71,67 +71,67 @@ class OnePasswordImporter: NSObject, Importer {
                                      compositeKeyFactors: .password("a"),
                                      metadata: .withDefaultsFor(.keePass4),
                                      root: Node.rootWithDefaultKeePassEffectiveRootGroup())
-        
+
         let effectiveRootGroup = database.effectiveRootGroup
-        
+
         let jsonRecords = text.components(separatedBy: OnePasswordImporter.magicSplitter)
-        
+
         let records = try getRecords(jsonRecords)
+
         
+
         
-        
-        
-        
+
         let uniqueRecordTypes = Array(Set(records.compactMap { recordTypeByTypeName[$0.typeName ?? ""] }))
         let uniqueCategories = uniqueRecordTypes.compactMap { $0.category() }
-        
+
         var categoryToNodeMap: [ItemCategory: Node] = [:]
         for category in uniqueCategories {
             if category == .Unknown {
                 continue
             }
-            
+
             let categoryNode = Node(asGroup: category.rawValue, parent: effectiveRootGroup, keePassGroupTitleRules: true, uuid: nil)
-            
+
             if categoryNode != nil {
                 categoryNode!.icon = NodeIcon.withPreset(category.icon().rawValue)
                 effectiveRootGroup.addChild(categoryNode!, keePassGroupTitleRules: true)
                 categoryToNodeMap[category] = categoryNode!
             }
         }
+
         
-        
-        
+
         for record in records {
             let recordType = record.type
-            
+
             if !recordTypeIsProcessable(recordType) {
                 print("Unprocessable Record Type, Ignoring: \(String(describing: record.typeName))")
                 continue
             }
-            
+
             let category = recordType.category()
             let categoryNode = categoryToNodeMap[category]
             let parentNode = categoryNode ?? effectiveRootGroup
-            
+
             let entry = Node(asRecord: "", parent: parentNode)
-            
+
             record.fillStrongboxEntry(entry: entry)
-            
+
             if let uuid = record.uuid, let attachments = attachments[uuid] {
                 for attachment in attachments {
                     let dbA = KeePassAttachmentAbstractionLayer(nonPerformantWith: attachment.value, compressed: true, protectedInMemory: true)
                     entry.fields.attachments[attachment.key] = dbA
                 }
             }
-            
+
             parentNode.addChild(entry, keePassGroupTitleRules: true)
-            
+
             if let trashed = record.trashed, trashed {
                 database.recycleItems([entry])
             }
         }
-        
+
         return database
     }
 

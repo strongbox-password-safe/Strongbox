@@ -94,12 +94,6 @@
     if (cell == self.cellShare) {
         [self onShare];
     }
-
-
-
-
-
-
     else if(cell == self.cellEmailCsv) {
         [self exportCsvByEmail];
     }
@@ -109,9 +103,6 @@
     else if(cell == self.cellHtml) {
         [self exportHtmlByEmail];
     }
-
-
-
 }
 
 - (void)onShare {
@@ -182,7 +173,7 @@
 }
 
 - (void)copyCsv {
-    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database] encoding:NSUTF8StringEncoding];
+    NSString *newStr = [[NSString alloc] initWithData:[Csv getGroupAsCsv:self.viewModel.database.effectiveRootGroup] encoding:NSUTF8StringEncoding];
 
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:newStr];
     
@@ -226,7 +217,7 @@
 
 
 - (void)exportCsvByEmail {
-    NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database];
+    NSData *newStr = [Csv getGroupAsCsv:self.viewModel.database.effectiveRootGroup];
     NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
     [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr nickname:self.viewModel.metadata.nickName];
 }

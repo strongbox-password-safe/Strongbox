@@ -12,62 +12,63 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     deinit {
         NSLog("😎 DEINIT [NextGenSplitViewController]")
     }
-    
+
     private var loadedDocument: Bool = false
     private var database: ViewModel!
     var searchField: NSSearchField?
-    var diceToolbarItem : NSToolbarItem?
-    
+    var diceToolbarItem: NSToolbarItem?
+
     var windowController: WindowController {
-        return view.window!.windowController as! WindowController
+        view.window!.windowController as! WindowController
     }
-    
+
     var masterListView: BrowseViewController {
-        return children[1] as! BrowseViewController
+        children[1] as! BrowseViewController
     }
+
     var detailView: DetailViewController {
-        return children[2] as! DetailViewController
+        children[2] as! DetailViewController
     }
-    
+
     var navigationContext: NavigationContext {
-        return getNavContextFromModel(database)
+        getNavContextFromModel(database)
     }
-    
+
     @objc func onDocumentLoaded() {
         loadDocument()
     }
-    
+
     func loadDocument() {
         NSLog("========================================================================")
         NSLog("🚀 NextGenSplitViewController::loadDocument")
         NSLog("========================================================================")
-        
+
         if loadedDocument {
             return
         }
-        
+
         guard let doc = view.window?.windowController?.document as? Document else {
             NSLog("🔴 NextGenSplitViewController::load Document not set!")
             return
         }
-        
+
         let start = DispatchTime.now() 
-        
+
         database = doc.viewModel
         loadedDocument = true
-        
+
         splitView.autosaveName = String(format: "autosave-splitview-for-%@", database.databaseMetadata.uuid)
-        
+
         setupToolbar()
-        
+
         if database.nextGenSearchText.count > 0 {
             searchField?.stringValue = database.nextGenSearchText
         }
+
         
-        
-        
+
         NSLog("🚀 Initial Navigation Context = [%@], browse selected items = [%@]", String(describing: navigationContext), database.nextGenSelectedItems)
-        
+
         if case NavigationContext.none = navigationContext {
             let favourites = database.favourites.sorted { node1, node2 in
                 finderStyleNodeComparator(node1, node2) == .orderedAscending
@@ -75,109 +76,108 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
             if let favourite = favourites.first {
                 setModelNavigationContextWithViewNode(database, .favourites(favourite.uuid))
-            }
-            else {
+            } else {
                 setModelNavigationContextWithViewNode(database, .special(.allEntries))
             }
         }
-        
+
         loadChildSplitViews()
-        
+
         listenToModelUpdateNotifications()
-        
+
         let end = DispatchTime.now() 
         let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds 
         let timeInterval = Double(nanoTime) / 1_000_000_000 
-        
+
         NSLog("========================================================================")
         NSLog("⏱ ✅ Initial Document UI Load Time: %0.2f seconds", timeInterval)
         NSLog("========================================================================")
     }
-    
+
     var firstAppearance = true
     override func viewDidAppear() {
         super.viewDidAppear()
-        
+
         if database != nil, database.nextGenSearchText.count > 0 || database.startWithSearch, firstAppearance {
             firstAppearance = false
             onFind(nil)
         }
-        
+
         bindSyncButtonToSyncStatus()
     }
-    
+
     func listenToModelUpdateNotifications() {
         let notificationsOfInterest: [String] = [kModelUpdateNotificationNextGenNavigationChanged]
-        
+
         for ofInterest in notificationsOfInterest {
             NotificationCenter.default.addObserver(forName: NSNotification.Name(ofInterest), object: nil, queue: nil) { [weak self] notification in
-                guard let self = self else {
+                guard let self else {
                     return
                 }
-                
+
                 self.onModelNotificationReceived(notification)
             }
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name (kAsyncUpdateStarting), object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(kAsyncUpdateStarting), object: nil, queue: nil) { [weak self] notification in
             self?.onAsyncUpdateStarting(notification: notification)
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name (kAsyncUpdateDone), object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(kAsyncUpdateDone), object: nil, queue: nil) { [weak self] notification in
             self?.onAsyncUpdateDone(notification: notification)
         }
-        
-        NotificationCenter.default.addObserver(forName: NSNotification.Name (kSyncManagerDatabaseSyncStatusChanged), object: nil, queue: nil) { [weak self] notification in
+
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(kSyncManagerDatabaseSyncStatusChanged), object: nil, queue: nil) { [weak self] notification in
             self?.onSyncStatusChanged(notification: notification)
         }
     }
-    
-    func onAsyncUpdateStarting ( notification : Notification ) {
+
+    func onAsyncUpdateStarting(notification: Notification) {
         guard let databaseUuid = notification.object as? String,
-              databaseUuid == database.databaseUuid else {
+              databaseUuid == database.databaseUuid
+        else {
             return
         }
-        
+
         updateSyncButton(color: NSColor.systemBlue, animate: true)
     }
-    
-    func onAsyncUpdateDone ( notification : Notification ) {
+
+    func onAsyncUpdateDone(notification: Notification) {
         guard let asyncResult = notification.object as? AsyncJobResult,
-                asyncResult.databaseUuid == database.databaseUuid else {
+              asyncResult.databaseUuid == database.databaseUuid
+        else {
             return
         }
-        
+
         updateSyncButton()
-        
+
         if asyncResult.success {
             if !database.isInOfflineMode {
                 
                 NSLog("✅ NextGenSplitViewController::onAsyncUpdateDone Received Indication of Successful Save/Update")
-            }
-            else {
-                NSLog("✅ Async Update Done and in offline mode so displaying a toast to indicate success");
-                
+            } else {
+                NSLog("✅ Async Update Done and in offline mode so displaying a toast to indicate success")
+
                 showToastNotification(message: NSLocalizedString("generic_save_was_successful", comment: "Save Successful"))
             }
-        }
-        else {
+        } else {
             
         }
     }
 
-    func onSyncStatusChanged ( notification : Notification ) {
+    func onSyncStatusChanged(notification: Notification) {
         guard let databaseUuid = notification.object as? String,
-              databaseUuid == database.databaseUuid else {
+              databaseUuid == database.databaseUuid
+        else {
             return
         }
-        
-        let status = MacSyncManager.sharedInstance().getSyncStatus(database.databaseMetadata)
-        
 
-        
+        let status = MacSyncManager.sharedInstance().getSyncStatus(database.databaseMetadata)
+
+
+
         if status.state == .error {
             showToastNotification(message: NSLocalizedString("open_sequence_storage_provider_error_title", comment: "Sync Error"), error: true)
-            
 
 
 
@@ -197,110 +197,104 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
 
 
-        }
-        else if status.state == .backgroundButUserInteractionRequired {
-        }
-        else if status.state == .inProgress {
-        }
+
+        } else if status.state == .backgroundButUserInteractionRequired {}
+        else if status.state == .inProgress {}
         else {
             showToastNotification(message: NSLocalizedString("notification_sync_successful", comment: "Sync Successful"))
         }
-        
+
         bindSyncButtonToSyncStatus()
     }
 
-    func bindSyncButtonToSyncStatus () {
+    func bindSyncButtonToSyncStatus() {
         let status = MacSyncManager.sharedInstance().getSyncStatus(database.databaseMetadata)
+
         
-        
-        
+
         if status.state == .error {
             updateSyncButton(color: NSColor.systemRed, animate: false)
-        }
-        else if status.state == .backgroundButUserInteractionRequired {
+        } else if status.state == .backgroundButUserInteractionRequired {
             updateSyncButton(color: NSColor.systemYellow, animate: false)
-        }
-        else if status.state == .inProgress {
+        } else if status.state == .inProgress {
             updateSyncButton(color: NSColor.systemBlue, animate: true)
-        }
-        else {
+        } else {
             updateSyncButton(color: nil, animate: false)
         }
     }
-    
-    func showToastNotification( message : String, error : Bool = false) {
+
+    func showToastNotification(message: String, error: Bool = false) {
         if view.window?.isMiniaturized ?? true {
-            NSLog("Not Showing Popup Change notification because window is miniaturized");
-            return;
+            NSLog("Not Showing Popup Change notification because window is miniaturized")
+            return
         }
-        
-        showToastNotification(message: message, error: error,  yOffset: 150)
+
+        showToastNotification(message: message, error: error, yOffset: 150)
     }
 
-    func showToastNotification( message : String, error : Bool = false, yOffset : Float = 0.0 ) {
+    func showToastNotification(message: String, error: Bool = false, yOffset: Float = 0.0) {
 
 
 
-                
+
         DispatchQueue.main.async { [weak self] in
             let defaultColor = NSColor(deviceRed: 0.23, green: 0.5, blue: 0.82, alpha: 0.6)
             let errorColor = NSColor(deviceRed: 1, green: 0.55, blue: 0.05, alpha: 0.9)
-            
-            guard let hud = MBProgressHUD.showAdded(to: self?.view, animated: true) else {
 
+            guard let hud = MBProgressHUD.showAdded(to: self?.view, animated: true) else {
                 NSLog("🔴 Couldn't create Toast!")
                 return
             }
-            
-            hud.labelText = message;
-            hud.color = ( error ? errorColor : defaultColor )
+
+            hud.labelText = message
+            hud.color = (error ? errorColor : defaultColor)
             hud.mode = MBProgressHUDModeText
             hud.margin = 10
             hud.yOffset = yOffset
             hud.removeFromSuperViewOnHide = true
             hud.dismissible = true
-            
+
             let delay = error ? 3.0 : 0.5
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay ) {
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                 hud.hide(true)
             }
         }
     }
-    
-    func updateSyncButton ( color : NSColor? = nil, animate : Bool = false ) {
+
+    func updateSyncButton(color: NSColor? = nil, animate: Bool = false) {
         guard let syncToolbarItem = view.window?.toolbar?.visibleItems?.first(where: { item in
             item.itemIdentifier == ToolbarItemIdentifiers.syncButton
         }), let button = syncToolbarItem.view as? NSButton else {
             NSLog("🔴 Couldn't find Sync Toolbar Item")
             return
         }
-        
+
         button.contentTintColor = color
-        
+
         runSpinAnimationOnView(view: button, spin: animate)
     }
-    
-    func runSpinAnimationOnView (view : NSView, spin : Bool ) {
+
+    func runSpinAnimationOnView(view: NSView, spin: Bool) {
         guard let layer = view.layer else {
             NSLog("COuldn't get layer!")
             return
         }
-        
+
         layer.removeAllAnimations()
 
-        if ( spin ) {
-            layer.position = NSMakePoint(NSMidX(layer.frame), NSMidY(layer.frame)); 
-            layer.anchorPoint = NSMakePoint(0.5, 0.5); 
+        if spin {
+            layer.position = NSMakePoint(NSMidX(layer.frame), NSMidY(layer.frame)) 
+            layer.anchorPoint = NSMakePoint(0.5, 0.5) 
 
             let rotationAnimation = CABasicAnimation(keyPath: "transform.rotation.z")
-            
-            rotationAnimation.duration = 1.25;
-            rotationAnimation.isCumulative = true;
+
+            rotationAnimation.duration = 1.25
+            rotationAnimation.isCumulative = true
             rotationAnimation.toValue = NSNumber(floatLiteral: .pi * -2.0)
             rotationAnimation.repeatCount = Float.infinity
             rotationAnimation.isRemovedOnCompletion = false 
-            
+
             layer.add(rotationAnimation, forKey: "rotationAnimation")
         }
     }
@@ -309,18 +303,18 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         guard let notifyModel = notification.object as? ViewModel else {
             return
         }
-        
+
         if notifyModel != database {
             return
         }
-        
+
         if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenNavigationChanged) {
             NSLog("NextGenSplitView: Nav Changed")
-            
+
             searchField?.stringValue = ""
         }
     }
-    
+
     fileprivate func loadChildSplitViews() {
         for child in children {
             if let vc = child as? DocumentViewController {
@@ -328,17 +322,17 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             }
         }
     }
-    
+
     @objc func onLockDatabase(_: Any?) {
         NSApplication.shared.sendAction(#selector(WindowController.onLock(_:)), to: nil, from: self)
     }
-    
+
     @objc func onCreateGroup(_: Any?) {
         if database.locked || database.isEffectivelyReadOnly {
             NSLog("🔴 Cannot edit locked or read-only database")
             return
         }
-        
+
         let loc = NSLocalizedString("browse_vc_enter_group_name_message", comment: "Please Enter the New Group Name:")
         if let name = MacAlerts().input(loc, defaultValue: NSLocalizedString("browse_vc_group_name", comment: "Group Name"), allowEmpty: false) {
             let parentGroup: UUID
@@ -348,12 +342,12 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             default:
                 parentGroup = database.rootGroup.uuid
             }
-            
+
             guard let node = database.getItemBy(parentGroup) else {
                 NSLog("🔴 Selected Group not set for Editing!")
                 return
             }
-            
+
             if name.count != 0 {
                 var newGroup: Node?
                 if !database.addNewGroup(node, title: name, group: &newGroup) {
@@ -362,22 +356,22 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
                                    window: view.window,
                                    completion: nil)
                 } else {
-                    if let newGroup = newGroup {
+                    if let newGroup {
                         setModelNavigationContextWithViewNode(database, .regularHierarchy(newGroup.uuid))
                     }
                 }
             }
         }
     }
-    
+
     @objc func onCreateRecord(_: Any?) {
         createOrEdit()
     }
-    
-    @objc func onEditEntry(_: Any?) {
+
+    @objc func onEditSelectedEntry(_: Any?) {
         createOrEdit(false)
     }
-    
+
     @objc func onSync(_: Any?) {
 
 
@@ -385,22 +379,21 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
 
 
-            guard let doc = view.window?.windowController?.document as? Document else {
-                NSLog("🔴 NextGenSplitViewController::load Document not set!")
-                return
-            }
-            
-            if doc.hasUnautosavedChanges || doc.isDocumentEdited {
-                NSLog("NextGenSplitViewController::onSync: Sync called but there are unsaved changes. Saving then syncing...")
-                NSApplication.shared.sendAction(#selector(NSDocument.save(_:)), to: nil, from: self)
-            }
-            else {
-                NSLog("NextGenSplitViewController::onSync: Sync called and NO unsaved changes. Syncing...")
-                DatabasesCollection.shared.sync(uuid: database.databaseUuid, allowInteractive: true)
-            }
+        guard let doc = view.window?.windowController?.document as? Document else {
+            NSLog("🔴 NextGenSplitViewController::load Document not set!")
+            return
+        }
+
+        if doc.hasUnautosavedChanges || doc.isDocumentEdited {
+            NSLog("NextGenSplitViewController::onSync: Sync called but there are unsaved changes. Saving then syncing...")
+            NSApplication.shared.sendAction(#selector(NSDocument.save(_:)), to: nil, from: self)
+        } else {
+            NSLog("NextGenSplitViewController::onSync: Sync called and NO unsaved changes. Syncing...")
+            DatabasesCollection.shared.sync(uuid: database.databaseUuid, allowInteractive: true)
+        }
 
     }
-    
+
     @objc func onRollTheDice(_: Any?) {
         let vc = PasswordGenerationPreferences.fromStoryboard()
 
@@ -408,22 +401,22 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             present(vc, asPopoverRelativeTo: NSZeroRect, of: view, preferredEdge: .maxY, behavior: .transient)
         }
     }
-    
+
     func createOrEdit(_ createNew: Bool = true) {
         if database.locked || database.isEffectivelyReadOnly {
             NSLog("🔴 Cannot edit locked or read-only database")
             return
         }
-        
+
         let vc = CreateEditViewController.instantiateFromStoryboard()
-        
+
         if createNew {
             if case let .regularHierarchy(selectedGroup) = navigationContext, !database.is(inRecycled: selectedGroup) {
                 vc.initialParentNodeId = selectedGroup
             } else {
                 vc.initialParentNodeId = database.rootGroup.uuid
             }
-            
+
             guard vc.initialParentNodeId != nil else {
                 NSLog("🔴 Could not get initial parent node id!")
                 return
@@ -433,95 +426,144 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
                 NSLog("🔴 Selected Item not set for Editing!")
                 return
             }
-            
+
             vc.initialNodeId = selectedItem
         }
-        
+
         vc.database = database
-        
+
         presentAsSheet(vc)
     }
-    
+
     @objc func onShowHideQuickView(_: Any?) {
         toggleDetailsView()
     }
-    
+
     @objc func toggleDetailsView() {
         guard let panel = splitViewItems.last else {
             NSLog("🔴 Couldn't find last panel!")
             return
         }
-        
+
         panel.animator().isCollapsed = !panel.isCollapsed
     }
-    
+
     @objc func toggleLeadingSidebar() {
         toggleSidebar(nil)
     }
-    
+
     @objc func showDatabasePreferences() {
         NSApplication.shared.sendAction(#selector(WindowController.onGeneralDatabaseSettings(_:)), to: nil, from: self)
     }
-    
+
     @objc func showAppPreferences() {
         AppPreferencesWindowController.sharedInstance.show(tab: .general)
     }
-    
+
     @objc func showAutoFillPreferences() {
         NSApplication.shared.sendAction(#selector(WindowController.onDatabaseAutoFillSettings(_:)), to: nil, from: self)
     }
-    
+
     @objc func showEncryptionPreferences() {
         NSApplication.shared.sendAction(#selector(WindowController.onDatabaseEncryptionSettings(_:)), to: nil, from: self)
     }
-    
+
     @objc func showTouchIdPreferences() {
         NSApplication.shared.sendAction(#selector(WindowController.onConvenienceUnlockProperties(_:)), to: nil, from: self)
     }
-    
+
     @objc func showChangeMasterCredentials() {
         NSApplication.shared.sendAction(#selector(WindowController.onChangeMasterPassword(_:)), to: nil, from: self)
     }
-    
+
     @IBAction func onFind(_: Any?) {
         
-        
+
         guard let searchFieldItem = view.window?.toolbar?.visibleItems?.first(where: { item in
             item.itemIdentifier == ToolbarItemIdentifiers.searchField
         }) else {
             NSLog("🔴 Couldn't find Search Toolbar Item")
             return
         }
+
+        let searchToolbar: NSSearchToolbarItem = searchFieldItem as! NSSearchToolbarItem
+
         
-        if #available(macOS 11.0, *) {
-            let searchToolbar: NSSearchToolbarItem = searchFieldItem as! NSSearchToolbarItem
-            
-            
-            searchToolbar.beginSearchInteraction()
-            searchToolbar.searchField.selectText(nil)
-        } else {
-            
-            
-        }
+        searchToolbar.beginSearchInteraction()
+        searchToolbar.searchField.selectText(nil)
     }
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    func getRecentsSearchFieldMenu() -> NSMenu {
+        let cellMenu = NSMenu(title: "Search Menu title")
+        let item = NSMenuItem(title: "Clear", action: nil, keyEquivalent: "")
+
+        item.tag = NSSearchField.clearRecentsMenuItemTag
+        cellMenu.insertItem(item, at: 0)
+
+        let separator = NSMenuItem.separator()
+        separator.tag = NSSearchField.recentsTitleMenuItemTag
+        cellMenu.insertItem(separator, at: 1)
+
+        let recent = NSMenuItem(title: "Recent Searches", action: nil, keyEquivalent: "")
+        separator.tag = NSSearchField.recentsTitleMenuItemTag
+        cellMenu.insertItem(recent, at: 2)
+
+        let recents = NSMenuItem(title: "Recent Searches", action: nil, keyEquivalent: "")
+        recents.tag = NSSearchField.recentsMenuItemTag
+        cellMenu.insertItem(recents, at: 3)
+
+        return cellMenu
+    }
+
     @objc
     func onSearchAction(param: Any?) {
         guard let searchField = param as? NSSearchField else {
             NSLog("🔴 searchField not good")
             return
         }
+
         
-        
-        
+
         NSObject.cancelPreviousPerformRequests(withTarget: self)
-        
-        perform(#selector(self.updateSearch), with: searchField, afterDelay: 0.275) 
+
+        perform(#selector(updateSearch), with: searchField, afterDelay: 0.275) 
     }
-    
-    @objc public func updateSearch ( _ searchField : NSSearchField ) {
+
+    @objc public func updateSearch(_ searchField: NSSearchField) {
         let text = searchField.stringValue
-        
+
         if database.nextGenSearchText != searchField.stringValue {
 
             database.nextGenSearchText = text
@@ -530,19 +572,19 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         
-        
+
         guard let event = control.window?.currentEvent else {
             NSLog("🔴 Could not get current event")
             return false
         }
-        
+
         if control == searchField {
             if commandSelector == NSSelectorFromString("noop:") { 
                 if event.modifierFlags.contains(NSEvent.ModifierFlags.command) {
                     let aChar = event.charactersIgnoringModifiers?.first
+
                     
-                    
-                    
+
                     if aChar == "c" {
                         
                         if selectFirstItemInMasterAndMakeFirstResponderForSearchResult() {
@@ -552,87 +594,86 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
                     } else {}
                 }
             }
-            
+
             if commandSelector == #selector(moveDown) || commandSelector == #selector(insertNewline) {
                 
                 return selectFirstItemInMasterAndMakeFirstResponderForSearchResult()
             }
         }
-        
+
         return false
     }
-    
+
     func selectFirstItemInMasterAndMakeFirstResponderForSearchResult() -> Bool {
         NSLog("✅ selectFirstItemInMasterAndMakeFirstResponderForSearchResult")
-        
+
         let selected = masterListView.selectFirstItemIfAvailableForSearchResult()
-        
+
         if selected {
             guard let window = view.window else {
                 return false
             }
-            
+
             window.makeFirstResponder(masterListView.outlineView) 
         }
-        
+
         return selected
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
 
+    var popouts: [UUID: PopOutDetailsWindowController] = [:] 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    var popouts : [UUID : PopOutDetailsWindowController] = [:] 
-    
     @objc func onPopOutDetailsAndPin(_: Any?) {
         popOutDetails(pin: true)
     }
-    
+
     @objc func onPopOutDetails(_: Any?) {
         popOutDetails()
     }
-    
-    func popOutDetails(pin : Bool = false) {
+
+    func popOutDetails(pin _: Bool = false) {
         guard database.nextGenSelectedItems.count == 1, let uuid = database.nextGenSelectedItems.first else {
             NSLog("✅ onPopOutDetails - Selection invalid")
             return
         }
-        
+
         if let existing = popouts[uuid] {
             existing.showWindow(nil)
-        }
-        else {
+        } else {
             let popout = PopOutDetailsWindowController.fromStoryboard()
-            
+
             popout.load(model: database, uuid: uuid)
-            
+
             popouts[uuid] = popout
-            
+
             popout.showWindow(nil)
         }
     }
-    
-    func closeAllPresentedRecursive( viewController: NSViewController ) {
+
+    func closeAllPresentedRecursive(viewController: NSViewController) {
         if let presentedViewControllers = viewController.presentedViewControllers {
             for presented in presentedViewControllers {
                 closeAllPresentedRecursive(viewController: presented)
@@ -640,19 +681,19 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             }
         }
     }
-    
+
     @objc func onLockDoneKillAllWindows() {
         closeAllPresentedRecursive(viewController: self)
-        
+
         for popout in popouts.values {
             popout.close()
         }
-        
+
         popouts.removeAll()
     }
-    
-    @objc var editsInProgress : Bool {
-        if let presentedViewControllers = presentedViewControllers {
+
+    @objc var editsInProgress: Bool {
+        if let presentedViewControllers {
             for presentedViewController in presentedViewControllers {
                 if let editVc = presentedViewController as? CreateEditViewController {
                     if editVc.isEditsInProgress {
@@ -661,13 +702,13 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
                 }
             }
         }
-        
+
         for popout in popouts.values {
             if popout.isEditsInProgress {
                 return true
             }
         }
-        
+
         return false
     }
 }
@@ -688,115 +729,99 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         static let syncButton = NSToolbarItem.Identifier("syncToolbarItem")
         static let diceButton = NSToolbarItem.Identifier("diceButtonToolbarItem")
     }
-    
+
     func setupToolbar() {
         let toolbar = NSToolbar(identifier: "nextgen-toolbar-identifier-version-9.0")
-        
+
         toolbar.autosavesConfiguration = true
         toolbar.delegate = self
         toolbar.allowsUserCustomization = true 
         toolbar.displayMode = .iconOnly
-        
+
         guard let window = view.window else {
             NSLog("🔴 Window not ready")
             return
         }
-        
+
         window.toolbar = toolbar
         window.titlebarAppearsTransparent = false
     }
-    
+
     func toolbarDefaultItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-        if #available(macOS 11.0, *) {
-            return [ToolbarItemIdentifiers.toggleSideBar,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.databasePreferences,
-                    ToolbarItemIdentifiers.masterTracking,
-                    ToolbarItemIdentifiers.syncButton,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.diceButton,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.createGroup,
-                    ToolbarItemIdentifiers.addEntry,
-                    ToolbarItemIdentifiers.searchField,
-                    
-                    ToolbarItemIdentifiers.lockDatabase,
-                    ToolbarItemIdentifiers.detailTracking,
-                    ToolbarItemIdentifiers.editEntry,
-                    ToolbarItemIdentifiers.popoutDetails,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.toggleDetails]
-        } else {
-            return [] 
-        }
+        [ToolbarItemIdentifiers.toggleSideBar,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.databasePreferences,
+         ToolbarItemIdentifiers.masterTracking,
+         ToolbarItemIdentifiers.syncButton,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.diceButton,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.createGroup,
+         ToolbarItemIdentifiers.addEntry,
+         ToolbarItemIdentifiers.searchField,
+         
+         ToolbarItemIdentifiers.lockDatabase,
+         ToolbarItemIdentifiers.detailTracking,
+         ToolbarItemIdentifiers.editEntry,
+         ToolbarItemIdentifiers.popoutDetails,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.toggleDetails]
     }
-    
+
     func toolbarAllowedItemIdentifiers(_: NSToolbar) -> [NSToolbarItem.Identifier] {
-        if #available(macOS 11.0, *) {
-            return [ToolbarItemIdentifiers.toggleSideBar,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.databasePreferences,
-                    ToolbarItemIdentifiers.masterTracking,
-                    ToolbarItemIdentifiers.syncButton,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.diceButton,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.createGroup,
-                    ToolbarItemIdentifiers.addEntry,
-                    ToolbarItemIdentifiers.searchField,
-                    
-                    ToolbarItemIdentifiers.lockDatabase,
-                    ToolbarItemIdentifiers.detailTracking,
-                    ToolbarItemIdentifiers.editEntry,
-                    ToolbarItemIdentifiers.popoutDetails,
-                    NSToolbarItem.Identifier.flexibleSpace,
-                    ToolbarItemIdentifiers.toggleDetails]
-        } else {
-            return [] 
-        }
+        [ToolbarItemIdentifiers.toggleSideBar,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.databasePreferences,
+         ToolbarItemIdentifiers.masterTracking,
+         ToolbarItemIdentifiers.syncButton,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.diceButton,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.createGroup,
+         ToolbarItemIdentifiers.addEntry,
+         ToolbarItemIdentifiers.searchField,
+         
+         ToolbarItemIdentifiers.lockDatabase,
+         ToolbarItemIdentifiers.detailTracking,
+         ToolbarItemIdentifiers.editEntry,
+         ToolbarItemIdentifiers.popoutDetails,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.toggleDetails]
     }
-    
+
     func getSearchToolbarItem() -> NSToolbarItem {
-        if #available(macOS 11.0, *) {
-            let search = NSSearchToolbarItem(itemIdentifier: ToolbarItemIdentifiers.searchField)
-            
-            search.searchField.action = #selector(onSearchAction)
-            search.searchField.delegate = self
-            search.resignsFirstResponderWithCancel = false
-            
-            searchField = search.searchField
-            
-            return search
-        } else {
-            
-            return NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.searchField)
-        }
+        let search = NSSearchToolbarItem(itemIdentifier: ToolbarItemIdentifiers.searchField)
+
+        search.searchField.action = #selector(onSearchAction)
+        search.searchField.delegate = self
+        search.resignsFirstResponderWithCancel = false
+
+
+
+        searchField = search.searchField
+
+        return search
     }
-    
+
     func getPopOutDetailsToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.popoutDetails)
-        
+
         let loc = NSLocalizedString("action_verb_popout_details_window", comment: "Pop Out Details")
-        
+
         toolbarItem.label = loc
         toolbarItem.paletteLabel = loc
         toolbarItem.toolTip = loc
         toolbarItem.isEnabled = true
         toolbarItem.target = self
         toolbarItem.action = #selector(onPopOutDetails)
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "arrow.up.forward.square", accessibilityDescription: nil)
-        } else {
-            toolbarItem.image = NSImage(named: NSImage.folderName) 
-        }
-        
+        toolbarItem.image = NSImage(systemSymbolName: "arrow.up.forward.square", accessibilityDescription: nil)
+
         return toolbarItem
     }
-    
+
     func getCreateGroupToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.createGroup)
-        
+
         let loc = NSLocalizedString("create_group", comment: "Create Group")
         toolbarItem.label = loc
         toolbarItem.paletteLabel = loc
@@ -804,19 +829,14 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         toolbarItem.isEnabled = true
         toolbarItem.target = self
         toolbarItem.action = #selector(onCreateGroup)
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "folder.badge.plus", accessibilityDescription: nil)
-        } else {
-            toolbarItem.image = NSImage(named: NSImage.folderName) 
-        }
-        
+        toolbarItem.image = NSImage(systemSymbolName: "folder.badge.plus", accessibilityDescription: nil)
+
         return toolbarItem
     }
-    
+
     func getLockDatabaseToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.lockDatabase)
-        
+
         let loc = NSLocalizedString("verb_lock_database", comment: "Lock Database")
         toolbarItem.label = loc
         toolbarItem.paletteLabel = loc
@@ -824,51 +844,36 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         toolbarItem.isEnabled = true
         toolbarItem.target = self
         toolbarItem.action = #selector(onLockDatabase)
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "lock", accessibilityDescription: nil)
-        } else {
-            toolbarItem.image = NSImage(named: NSImage.folderName) 
-        }
-        
+        toolbarItem.image = NSImage(systemSymbolName: "lock", accessibilityDescription: nil)
+
         return toolbarItem
     }
-    
+
     func getEditEntryToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.editEntry)
-        
+
         toolbarItem.label = NSLocalizedString("browse_vc_action_edit", comment: "Edit")
-        
+
         let loc2 = NSLocalizedString("edit_entry", comment: "Edit Entry")
         toolbarItem.paletteLabel = loc2
         toolbarItem.toolTip = loc2
         toolbarItem.isEnabled = true
         toolbarItem.target = self
-        toolbarItem.action = #selector(onEditEntry)
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
-        } else {
-            toolbarItem.image = NSImage(named: NSImage.folderName) 
-        }
-        
+        toolbarItem.action = #selector(onEditSelectedEntry)
+        toolbarItem.image = NSImage(systemSymbolName: "pencil", accessibilityDescription: nil)
+
         return toolbarItem
     }
-    
+
     func getSyncToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.syncButton)
 
-        let image : NSImage
-        if #available(macOS 11.0, *) {
-            image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)!
-        } else {
-            image = NSImage(named: NSImage.folderName)! 
-        }
+        let image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)!
 
         let button = NSButton(image: image, target: self, action: #selector(onSync))
         button.isBordered = false
         toolbarItem.view = button
-        
+
         let loc = NSLocalizedString("generic_action_sync", comment: "Sync")
 
         toolbarItem.label = loc
@@ -877,34 +882,29 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         toolbarItem.isEnabled = true
 
         toolbarItem.action = #selector(onSync)
-        
+
         return toolbarItem
     }
-    
+
     func getDiceToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.diceButton)
 
-        let image : NSImage
-        
+        let image: NSImage
+
         if #available(macOS 12.0, *) {
             let smallimage = NSImage(systemSymbolName: "dice", accessibilityDescription: nil)!
             let config = NSImage.SymbolConfiguration(scale: .large)
             image = smallimage.withSymbolConfiguration(config) ?? smallimage
         } else {
-            if #available(macOS 11.0, *) {
-                let smallimage = NSImage(systemSymbolName: "die.face.6", accessibilityDescription: nil)!
-                let config = NSImage.SymbolConfiguration(scale: .large)
-                image = smallimage.withSymbolConfiguration(config) ?? smallimage
-            } else {
-                image = NSImage(named: NSImage.folderName)! 
-            }
+            let smallimage = NSImage(systemSymbolName: "die.face.6", accessibilityDescription: nil)!
+            let config = NSImage.SymbolConfiguration(scale: .large)
+            image = smallimage.withSymbolConfiguration(config) ?? smallimage
         }
-        
 
         let button = NSButton(image: image, target: self, action: #selector(onRollTheDice))
         button.isBordered = false
         toolbarItem.view = button
-        
+
         let loc = NSLocalizedString("popout_password_generator", comment: "Password Generator")
 
         toolbarItem.label = loc
@@ -913,138 +913,118 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         toolbarItem.isEnabled = true
 
         toolbarItem.action = #selector(onRollTheDice)
-        
+
         diceToolbarItem = toolbarItem
-        
+
         return toolbarItem
     }
-    
+
     func getCreateEntryToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.addEntry)
-        
+
         let loc = NSLocalizedString("create_entry", comment: "Create Entry")
-        
+
         toolbarItem.label = loc
         toolbarItem.paletteLabel = loc
         toolbarItem.toolTip = loc
         toolbarItem.isEnabled = true
         toolbarItem.target = self
         toolbarItem.action = #selector(onCreateRecord(_:))
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "plus.circle", accessibilityDescription: nil)
-        } else {
-            toolbarItem.image = NSImage(named: NSImage.folderName) 
-        }
-        
+        toolbarItem.image = NSImage(systemSymbolName: "plus.circle", accessibilityDescription: nil)
+
         return toolbarItem
     }
-    
+
     func getToggleDetailsToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.toggleDetails)
-        
+
         toolbarItem.isEnabled = true
         toolbarItem.target = self
         toolbarItem.action = #selector(toggleDetailsView)
-        
+
         let loc = NSLocalizedString("nextgen_toolbar_item_toggle_details_panel", comment: "Toggle Details Panel")
-        
+
         toolbarItem.paletteLabel = loc
         toolbarItem.toolTip = loc
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "sidebar.trailing", accessibilityDescription: nil)
-        } else {
-            
-        }
-        
+        toolbarItem.image = NSImage(systemSymbolName: "sidebar.trailing", accessibilityDescription: nil)
+
         return toolbarItem
     }
-    
+
     func getToggleSidebarToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.toggleSideBar)
-        
+
         let loc = NSLocalizedString("nextgen_toolbar_item_toggle_sidebar", comment: "Toggle Sidebar")
-        
+
         toolbarItem.paletteLabel = loc
         toolbarItem.toolTip = loc
-        
+
         toolbarItem.isEnabled = true
         toolbarItem.target = self
         toolbarItem.action = #selector(toggleLeadingSidebar)
-        
-        if #available(macOS 11.0, *) {
-            toolbarItem.image = NSImage(systemSymbolName: "sidebar.leading", accessibilityDescription: nil)
-        } else {
-            
-        }
-        
+        toolbarItem.image = NSImage(systemSymbolName: "sidebar.leading", accessibilityDescription: nil)
+
         return toolbarItem
     }
-    
+
     func getDatabasePreferencesToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.databasePreferences)
-        
+
         let menu = NSMenu(title: "")
-        
-        let loc1 = NSLocalizedString("nextgen_toolbar_settings_convenience_unlock_ellipsis", comment: "Touch ID & Watch Unlock Settings...");
+
+        let loc1 = NSLocalizedString("nextgen_toolbar_settings_convenience_unlock_ellipsis", comment: "Touch ID & Watch Unlock Settings...")
         menu.addItem(withTitle: loc1, action: #selector(showTouchIdPreferences), keyEquivalent: "")
-        
-        let loc2 = NSLocalizedString("nextgen_toolbar_settings_autofill_settings_ellipsis", comment: "AutoFill Settings...");
+
+        let loc2 = NSLocalizedString("nextgen_toolbar_settings_autofill_settings_ellipsis", comment: "AutoFill Settings...")
         menu.addItem(withTitle: loc2, action: #selector(showAutoFillPreferences), keyEquivalent: "")
-        
-        let loc3 = NSLocalizedString("nextgen_toolbar_settings_encryption_settings_ellipsis", comment: "Encryption Settings...");
+
+        let loc3 = NSLocalizedString("nextgen_toolbar_settings_encryption_settings_ellipsis", comment: "Encryption Settings...")
         menu.addItem(withTitle: loc3, action: #selector(showEncryptionPreferences), keyEquivalent: "")
-        
+
         menu.addItem(NSMenuItem.separator())
-        
-        let loc4 = NSLocalizedString("nextgen_toolbar_settings_change_master_credentials_ellipsis", comment: "Change Master Credentials...");
+
+        let loc4 = NSLocalizedString("nextgen_toolbar_settings_change_master_credentials_ellipsis", comment: "Change Master Credentials...")
         menu.addItem(withTitle: loc4, action: #selector(showChangeMasterCredentials), keyEquivalent: "")
-        
+
         menu.addItem(NSMenuItem.separator())
-        
-        let loc5 = NSLocalizedString("nextgen_toolbar_settings_database_settings_ellipsis", comment: "Database Settings...");
+
+        let loc5 = NSLocalizedString("nextgen_toolbar_settings_database_settings_ellipsis", comment: "Database Settings...")
         menu.addItem(withTitle: loc5, action: #selector(showDatabasePreferences), keyEquivalent: "")
-        
+
         menu.addItem(NSMenuItem.separator())
-        
-        let loc6 = NSLocalizedString("nextgen_toolbar_settings_application_preferences_ellipsis", comment: "Application Preferences...");
+
+        let loc6 = NSLocalizedString("nextgen_toolbar_settings_application_preferences_ellipsis", comment: "Application Preferences...")
         menu.addItem(withTitle: loc6, action: #selector(showAppPreferences), keyEquivalent: "")
-        
-        let segmentedControl = NSSegmentedControl(images: [Icon.preferences.image()], trackingMode: .momentary, target: self, action: nil);
+
+        let segmentedControl = NSSegmentedControl(images: [Icon.preferences.image()], trackingMode: .momentary, target: self, action: nil)
         segmentedControl.setShowsMenuIndicator(true, forSegment: 0)
         segmentedControl.setMenu(menu, forSegment: 0)
-        
+
         toolbarItem.view = segmentedControl
-        
+
         let loc = NSLocalizedString("generic_settings", comment: "Settings")
-        
+
         toolbarItem.paletteLabel = loc
         toolbarItem.toolTip = loc
         toolbarItem.isEnabled = true
-        
+
         return toolbarItem
     }
-    
+
     func toolbar(_: NSToolbar, itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier, willBeInsertedIntoToolbar _: Bool) -> NSToolbarItem? {
         if itemIdentifier == ToolbarItemIdentifiers.searchField {
             return getSearchToolbarItem()
         } else if itemIdentifier == ToolbarItemIdentifiers.createGroup {
             return getCreateGroupToolbarItem()
-        }
-        else if itemIdentifier == ToolbarItemIdentifiers.lockDatabase {
+        } else if itemIdentifier == ToolbarItemIdentifiers.lockDatabase {
             return getLockDatabaseToolbarItem()
-        }
-        else if itemIdentifier == ToolbarItemIdentifiers.editEntry {
+        } else if itemIdentifier == ToolbarItemIdentifiers.editEntry {
             return getEditEntryToolbarItem()
-        }
-        else if itemIdentifier == ToolbarItemIdentifiers.syncButton {
+        } else if itemIdentifier == ToolbarItemIdentifiers.syncButton {
             return getSyncToolbarItem()
-        }
-        else if itemIdentifier == ToolbarItemIdentifiers.diceButton {
+        } else if itemIdentifier == ToolbarItemIdentifiers.diceButton {
             return getDiceToolbarItem()
-        }
-        else if itemIdentifier == ToolbarItemIdentifiers.addEntry {
+        } else if itemIdentifier == ToolbarItemIdentifiers.addEntry {
             return getCreateEntryToolbarItem()
         } else if itemIdentifier == NSToolbarItem.Identifier.flexibleSpace {
             return NSToolbarItem(itemIdentifier: NSToolbarItem.Identifier.flexibleSpace)
@@ -1057,21 +1037,11 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         } else if itemIdentifier == ToolbarItemIdentifiers.databasePreferences {
             return getDatabasePreferencesToolbarItem()
         } else if itemIdentifier == ToolbarItemIdentifiers.masterTracking {
-            if #available(macOS 11.0, *) {
-                return NSTrackingSeparatorToolbarItem(identifier: itemIdentifier, splitView: self.splitView, dividerIndex: 0)
-            } else {
-                
-                
-            }
+            return NSTrackingSeparatorToolbarItem(identifier: itemIdentifier, splitView: splitView, dividerIndex: 0)
         } else if itemIdentifier == ToolbarItemIdentifiers.detailTracking {
-            if #available(macOS 11.0, *) {
-                return NSTrackingSeparatorToolbarItem(identifier: itemIdentifier, splitView: self.splitView, dividerIndex: 1)
-            } else {
-                
-                
-            }
+            return NSTrackingSeparatorToolbarItem(identifier: itemIdentifier, splitView: splitView, dividerIndex: 1)
         }
-        
+
         return NSToolbarItem(itemIdentifier: itemIdentifier)
     }
 }
@@ -1079,65 +1049,55 @@ extension NextGenSplitViewController: NSToolbarDelegate {
 extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidation {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
         guard let action = menuItem.action else { return false }
-        
+
         if action == #selector(onShowHideQuickView(_:)) {
             guard let panel = splitViewItems.last else {
                 NSLog("🔴 Couldn't find last panel!")
                 return false
             }
-            
+
             menuItem.title = panel.isCollapsed ? NSLocalizedString("main_menu_show_details_panel", comment: "Show Details Panel") : NSLocalizedString("main_menu_hide_details_panel", comment: "Hide Details Panel")
         }
-        
+
         return validateAction(action)
     }
-    
+
     func validateToolbarItem(_ item: NSToolbarItem) -> Bool {
         guard let action = item.action else { return false }
-        
+
         return validateAction(action)
     }
-    
+
     func validateAction(_ action: Selector) -> Bool {
-        var singleSelectedNode : Node? = nil
+        var singleSelectedNode: Node? = nil
 
         if !database.locked, database.nextGenSelectedItems.count == 1, let node = database.getItemBy(database.nextGenSelectedItems.first!) {
             singleSelectedNode = node
         }
-        
+
         if action == #selector(toggleLeadingSidebar) {
             return true
         } else if action == #selector(toggleDetailsView) {
             return true
-        }
-        else if action == #selector(showDatabasePreferences) {
+        } else if action == #selector(showDatabasePreferences) {
             return !database.locked
-        }
-        else if action == #selector(showAppPreferences) {
+        } else if action == #selector(showAppPreferences) {
             return true
-        }
-        else if action == #selector(showAutoFillPreferences) {
+        } else if action == #selector(showAutoFillPreferences) {
             return !database.locked
-        }
-        else if action == #selector(showEncryptionPreferences) {
+        } else if action == #selector(showEncryptionPreferences) {
             return !database.locked
-        }
-        else if action == #selector(showTouchIdPreferences) {
+        } else if action == #selector(showTouchIdPreferences) {
             return !database.locked
-        }
-        else if action == #selector(showChangeMasterCredentials) {
+        } else if action == #selector(showChangeMasterCredentials) {
             return !database.locked && !database.isEffectivelyReadOnly
-        }
-        else if action == #selector(onCreateGroup) {
+        } else if action == #selector(onCreateGroup) {
             return !database.locked && !database.isEffectivelyReadOnly
-        }
-        else if action == #selector(onPopOutDetails(_:)) {
+        } else if action == #selector(onPopOutDetails(_:)) {
             return !database.locked
-        }
-        else if action == #selector(onLockDatabase) {
+        } else if action == #selector(onLockDatabase) {
             return !database.locked && !database.isEffectivelyReadOnly
-        }
-        else if action == #selector(onCreateRecord) {
+        } else if action == #selector(onCreateRecord) {
             if database.format == .keePass1 { 
                 if case let .regularHierarchy(selectedGroup) = navigationContext {
                     if selectedGroup == database.rootGroup.uuid {
@@ -1145,21 +1105,20 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
                     }
                 }
             }
-            
+
             return !database.locked && !database.isEffectivelyReadOnly
-        } else if action == #selector(onEditEntry) {
+        } else if action == #selector(onEditSelectedEntry) {
             return !database.locked && singleSelectedNode != nil && !singleSelectedNode!.isGroup && !database.isEffectivelyReadOnly
         } else if action == #selector(onSync) {
             return !database.locked && !database.isEffectivelyReadOnly && !database.isInOfflineMode
-        }
-        else if action == #selector(onFind) {
+        } else if action == #selector(onFind) {
             return !database.locked
         } else if action == #selector(onShowHideQuickView(_:)) {
             return !database.locked
         }
-        
+
         NSLog("🔴 validateAction - not handled: [%@]", String(describing: action))
-        
+
         return false
     }
 }

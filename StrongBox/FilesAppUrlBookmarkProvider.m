@@ -14,6 +14,7 @@
 #import "StrongboxiOSFilesManager.h"
 #import "iCloudSafesCoordinator.h"
 #import "NSDate+Extensions.h"
+#import "AppPreferences.h"
 
 typedef void (^CreateCompletionBlock)(DatabasePreferences *metadata, const NSError *error);
 
@@ -110,7 +111,12 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
     BOOL isLocalSandboxFile = [fileParentPath isEqualToString:strongboxLocalDocumentsPath];
     BOOL isStrongboxICloudFile = strongboxICloudDocumentsPath ? [fileParentPath isEqualToString:strongboxICloudDocumentsPath] : NO;
 
-    if (isLocalSandboxFile || isStrongboxICloudFile) {
+    
+    
+    
+    
+    
+    if ( isLocalSandboxFile ||  ( isStrongboxICloudFile && !AppPreferences.sharedInstance.disableNetworkBasedFeatures )) {
         
         NSLog(@"New Database is actually local to Sandbox or iCloud - using simplified non iOS Files Storage Provider. [%d][%d]", isLocalSandboxFile, isStrongboxICloudFile);
     }

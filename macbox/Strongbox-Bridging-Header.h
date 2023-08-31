@@ -41,7 +41,6 @@
 #import "StreamUtils.h"
 #import "CustomFieldTableCellView.h"
 #import "EditCustomFieldController.h"
-#import "NotificationConstants.h"
 #import "Constants.h"
 #import "DatabaseSettingsTabViewController.h"
 #import "OEXTokenField.h"
@@ -102,3 +101,5 @@
 #import "ConcurrentCircularBuffer.h"
 
 #import "BrowseOutlineView.h"
+
+#import <Quartz/Quartz.h>

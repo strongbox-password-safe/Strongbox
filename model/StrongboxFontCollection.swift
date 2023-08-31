@@ -37,12 +37,6 @@ extension DownFont {
     }
 }
 
-
-@available(macOS 11.0, *)
-
-
-
-
 public struct StrongboxFontCollection: FontCollection {
     
 

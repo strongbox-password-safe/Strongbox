@@ -49,12 +49,12 @@ class TableViewWithKeyDownEvents: NSTableView {
     
 
     override func validateProposedFirstResponder(_ responder: NSResponder, for event: NSEvent?) -> Bool {
-        guard let overrideValidateProposedFirstResponderForRow = overrideValidateProposedFirstResponderForRow, let event = event else {
+        guard let overrideValidateProposedFirstResponderForRow, let event else {
             return super.validateProposedFirstResponder(responder, for: event)
         }
 
         let localLocation = convert(event.locationInWindow, from: nil)
-        let row = self.row(at: localLocation)
+        let row = row(at: localLocation)
 
         
 
@@ -72,25 +72,25 @@ class TableViewWithKeyDownEvents: NSTableView {
 
     private var _clickedRow: Int = -1
     override var clickedRow: Int {
-        get { return _clickedRow }
+        get { _clickedRow }
         set { _clickedRow = newValue }
     }
 
     override func mouseDown(with event: NSEvent) {
-        let row = self.row(at: convert(event.locationInWindow, from: nil))
+        let row = row(at: convert(event.locationInWindow, from: nil))
         clickedRow = row
 
         return super.mouseDown(with: event)
     }
 
     override func menu(for event: NSEvent) -> NSMenu? {
-        let row = self.row(at: convert(event.locationInWindow, from: nil))
+        let row = row(at: convert(event.locationInWindow, from: nil))
         clickedRow = row
 
         if row >= 0 {
             if isRowSelected(row) {
                 return menu
-            } else if let delegate = delegate {
+            } else if let delegate {
                 if delegate.tableView?(self, shouldSelectRow: row) ?? false {
                     selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
                     return menu
@@ -113,7 +113,7 @@ class TableViewWithKeyDownEvents: NSTableView {
         NSColor.controlBackgroundColor.set()
         clipRect.fill()
 
-        guard let emptyMessageProvider = emptyMessageProvider, numberOfRows == 0 else { return }
+        guard let emptyMessageProvider, numberOfRows == 0 else { return }
 
         guard let foo = emptyMessageProvider() else { return }
 

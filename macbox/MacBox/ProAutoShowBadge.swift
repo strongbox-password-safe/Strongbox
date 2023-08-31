@@ -1,5 +1,5 @@
 //
-//  ProLabelBadge.swift
+//  ProAutoShowBadge.swift
 //  MacBox
 //
 //  Created by Strongbox on 11/02/2022.
@@ -8,35 +8,35 @@
 
 import Cocoa
 
-class RoundedBadgeTextField : NSTextField {
+class RoundedBadgeTextField: NSTextField {
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+
         wantsLayer = true
         layer?.cornerRadius = 3
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.alignment = .center
-    
+
         let font = FontManager.shared.headlineItalicFont
-        
+
         usesSingleLineMode = true
-        attributedStringValue = NSAttributedString(string: self.stringValue, attributes: [.font: font, .paragraphStyle: paragraphStyle, .baselineOffset: 0.0])
+        attributedStringValue = NSAttributedString(string: stringValue, attributes: [.font: font, .paragraphStyle: paragraphStyle, .baselineOffset: 0.0])
     }
 }
 
-class RoundedPurpleBadgeTextField : RoundedBadgeTextField {
+class RoundedPurpleBadgeTextField: RoundedBadgeTextField {
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+
         backgroundColor = NSColor.systemPurple
         textColor = NSColor.white
     }
 }
 
-class RoundedBlueBadgeTextField : RoundedBadgeTextField {
+class RoundedBlueBadgeTextField: RoundedBadgeTextField {
     override func awakeFromNib() {
         super.awakeFromNib()
-        
+
         backgroundColor = NSColor.systemBlue
         textColor = NSColor.white
     }
@@ -46,6 +46,14 @@ class ProAutoShowBadge: RoundedBlueBadgeTextField {
     override func awakeFromNib() {
         super.awakeFromNib()
 
+        bindUi()
+
+        NotificationCenter.default.addObserver(forName: .proStatusChanged, object: nil, queue: nil) { [weak self] _ in
+            self?.bindUi()
+        }
+    }
+
+    func bindUi() {
         if Settings.sharedInstance().isPro {
             stringValue = ""
             isEnabled = false
@@ -56,7 +64,7 @@ class ProAutoShowBadge: RoundedBlueBadgeTextField {
             let proString = NSLocalizedString("pro_badge_text", comment: "Pro")
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.alignment = .center
-            
+
             usesSingleLineMode = true
             attributedStringValue = NSAttributedString(string: proString, attributes: [.font: FontManager.shared.headlineItalicFont, .baselineOffset: 0.0, .paragraphStyle: paragraphStyle])
         }

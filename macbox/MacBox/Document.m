@@ -13,7 +13,6 @@
 #import "Settings.h"
 #import "AppDelegate.h"
 #import "NSArray+Extensions.h"
-#import "NodeDetailsViewController.h"
 #import "BiometricIdHelper.h"
 #import "AutoFillManager.h"
 #import "SampleItemsGenerator.h"
@@ -26,7 +25,6 @@
 #import "DatabaseUnlocker.h"
 #import "MBProgressHUD.h"
 #import "Strongbox-Swift.h"
-#import "ViewController.h"
 #import "DatabasesManagerVC.h"
 
 NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationFullReload"; 
@@ -97,14 +95,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 - (void)makeWindowControllers {
     NSLog(@"makeWindowControllers -> viewModel = [%@]", self.viewModel);
 
-    if ( ( !Settings.sharedInstance.nextGenUI ) ) {
-        NSStoryboard* storyboard = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
-        
-        self.windowController = [storyboard instantiateControllerWithIdentifier:@"Document Window Controller"];
-    }
-    else {
-        self.windowController = [[NSStoryboard storyboardWithName:@"NextGen" bundle:nil] instantiateInitialController];
-    }
+    self.windowController = [[NSStoryboard storyboardWithName:@"NextGen" bundle:nil] instantiateInitialController];
     
     [self addWindowController:self.windowController];
     
@@ -301,11 +292,9 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 
 - (BOOL)isNextGenEditsInProgress {
-    if ( Settings.sharedInstance.nextGenUI ) {
-        if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
-            NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
-            return vc.editsInProgress;
-        }
+    if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
+        NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
+        return vc.editsInProgress;
     }
     
     return NO;
@@ -372,57 +361,34 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     NSLog(@"✅ Document::closeAllWindows");
     
     if ( !self.viewModel.locked ) {
-        if ( Settings.sharedInstance.nextGenUI ) {
-            if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
-                
-                
-                
-                NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
-                
-                [vc onLockDoneKillAllWindows];
-            }
-        }
-        else {
-            ViewController* vc = (ViewController*)self.windowController.contentViewController;
+        if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
             
-            [vc closeAllDetailsWindows:^{
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [vc stopObservingModelAndCleanup];
-                });
-            }];
+            
+            
+            NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
+            
+            [vc onLockDoneKillAllWindows];
         }
     }
 }
 
 - (IBAction)onSaveBeforeLockingCompletion:(id)sender {
     NSLog(@"Document::onSaveBeforeLockingCompletion called...");
-
+    
     [macOSSpinnerUI.sharedInstance dismiss];
     
-    if ( Settings.sharedInstance.nextGenUI ) {
+    
+    
+    if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
         
-        if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
-            
-            NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
-            
-            
-            [vc onLockDoneKillAllWindows];
-        }
+        NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
         
-        [self forceLock];
-    }
-    else {
-        ViewController* vc = (ViewController*)self.windowController.contentViewController;
         
-        __weak Document* weakSelf = self;
-        [vc closeAllDetailsWindows:^{
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf forceLock];
-                [vc stopObservingModelAndCleanup];
-            });
-        }];
+        [vc onLockDoneKillAllWindows];
     }
     
+    [self forceLock];
+ 
     
     
     if ( Settings.sharedInstance.clearClipboardEnabled ) {

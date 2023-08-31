@@ -282,7 +282,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 
 - (void)acceptNewConnections {
     while ( 1 ) {
-        
+
         
         int socket = accept (self.server_sock, NULL, NULL);
         
@@ -291,11 +291,11 @@ static NSString* const kSymlinkDirectory = @".strongbox";
             break;
         }
         
+        NSLog(@"🐞 SSHAgentServer accepted new connection...");
         
-        
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-            [self handleNewConnection:socket];
-        });
+
+        [self handleNewConnection:socket]; 
+
     }
     
     
@@ -480,9 +480,8 @@ static NSString* const kSymlinkDirectory = @".strongbox";
             continue;
         }
 
-        int r;
         const char* comment = "";
-        if ((r = sshkey_puts_opts(public, keys, SSHKEY_SERIALIZE_INFO)) != 0 || (r = sshbuf_put_cstring(keys, comment)) != 0) {
+        if (sshkey_puts_opts(public, keys, SSHKEY_SERIALIZE_INFO) != 0 || sshbuf_put_cstring(keys, comment) != 0) {
             sshkey_free(public);
             NSLog(@"🔴 Could not add key or comment");
             continue;
@@ -492,10 +491,9 @@ static NSString* const kSymlinkDirectory = @".strongbox";
         nentries++;
     }
 
-    int r;
-    if ((r = sshbuf_put_u8(msg, SSH2_AGENT_IDENTITIES_ANSWER)) != 0 ||
-        (r = sshbuf_put_u32(msg, nentries)) != 0 ||
-        (r = sshbuf_putb(msg, keys)) != 0) {
+    if (sshbuf_put_u8(msg, SSH2_AGENT_IDENTITIES_ANSWER) != 0 ||
+        sshbuf_put_u32(msg, nentries) != 0 ||
+        sshbuf_putb(msg, keys) != 0) {
         NSLog(@"🔴 Could not fill in reply");
         sshbuf_free(keys);
         sshbuf_free(msg);
@@ -536,10 +534,10 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 
     struct sshkey *requestedKey = NULL;
     u_int flags;
-    int r;
-    if ((r = sshkey_froms(eRequest, &requestedKey)) != SSH_ERR_SUCCESS ||
-        (r = sshbuf_get_stringb(eRequest, challenge)) != SSH_ERR_SUCCESS ||
-        (r = sshbuf_get_u32(eRequest, &flags)) != SSH_ERR_SUCCESS) {
+
+    if (sshkey_froms(eRequest, &requestedKey) != SSH_ERR_SUCCESS ||
+        sshbuf_get_stringb(eRequest, challenge) != SSH_ERR_SUCCESS ||
+        sshbuf_get_u32(eRequest, &flags) != SSH_ERR_SUCCESS) {
         NSLog(@"🔴 Error - Could not fill buffers for sign request.");
         sshbuf_free(msg);
         sshbuf_free(challenge);
@@ -554,7 +552,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     u_char* bloop;
     size_t bloopLen;
-    r = sshkey_plain_to_blob(requestedKey, &bloop, &bloopLen);
+    int r = sshkey_plain_to_blob(requestedKey, &bloop, &bloopLen);
     if ( r != SSH_ERR_SUCCESS ) {
         NSLog(@"🔴 Sign Request: Could not convert requested key to blob");
         sshbuf_free(msg);

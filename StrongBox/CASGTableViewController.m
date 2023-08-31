@@ -349,7 +349,7 @@
         [self cell:self.cellStrength setHidden:YES];
     }
     
-    if ( AppPreferences.sharedInstance.disableReadOnlyToggles ) {
+    if ( AppPreferences.sharedInstance.databasesAreAlwaysReadOnly ) {
         [self cell:self.cellReadOnly setHidden:YES];
     }
     

@@ -18,8 +18,8 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
     @IBOutlet var progressTotp: NSProgressIndicator!
     @IBOutlet var labelTotp: NSTextField!
     @IBOutlet var popupButton: NSPopUpButton!
-    @IBOutlet weak var copyButton: NSButton!
-    
+    @IBOutlet var copyButton: NSButton!
+
     override func awakeFromNib() {
         super.awakeFromNib()
 
@@ -42,17 +42,18 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
     func setContent(_ field: DetailsViewField,
                     popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
                     onCopyButton: ((DetailsViewField?) -> Void)? = nil,
-                    onQrCodeButton: ((DetailsViewField?) -> Void)? = nil) {
+                    onQrCodeButton: ((DetailsViewField?) -> Void)? = nil)
+    {
         self.field = field
         labelFieldName.stringValue = field.name
         self.popupMenuUpdater = popupMenuUpdater
         popupButton.menu?.delegate = self
 
-        self.onCopyButton = onCopyButton;
-        self.copyButton.isHidden = onCopyButton == nil
-        
-        self.onQrCodeButton = onQrCodeButton;
-        
+        self.onCopyButton = onCopyButton
+        copyButton.isHidden = onCopyButton == nil
+
+        self.onQrCodeButton = onQrCodeButton
+
         token = field.object as? OTPToken
     }
 
@@ -87,18 +88,18 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
         popupButton.performClick(nil)
     }
 
-    @IBAction func onQrCode(_ sender: Any) {
-        self.onQrCodeButton?(self.field)
+    @IBAction func onQrCode(_: Any) {
+        onQrCodeButton?(field)
     }
-    
-    @IBAction func onCopy(_ sender: Any) {
-        self.onCopyButton?(self.field)
+
+    @IBAction func onCopy(_: Any) {
+        onCopyButton?(field)
     }
-    
+
     func menuNeedsUpdate(_ menu: NSMenu) {
 
 
-        guard let field = field else {
+        guard let field else {
             return
         }
 

@@ -118,12 +118,8 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
         IMAGE_TYPE_PTR img = [UIImage systemImageNamed:obj];
         return img ? img : [UIImage systemImageNamed:@"lock"];
 #else
-        if (@available(macOS 11.0, *)) {
-            IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
-            return img ? img : kSmallLockImage;
-        } else {
-            return kSmallLockImage; 
-        };
+        IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
+        return img ? img : kSmallLockImage;
 #endif
     }];
 }
@@ -318,13 +314,8 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
         return isGroup ? kPwSafeFolderImage : kPwSafeRecordImage;
 #else
         if ( !large ) {
-            if ( Settings.sharedInstance.nextGenUI ) {
-                NSArray<IMAGE_TYPE_PTR>* iconSet = [NodeIconHelper getIconSet:kKeePassIconSetSfSymbols];
-                return isGroup ? iconSet[48] : iconSet[0];
-            }
-            else {
-                return isGroup ? kSmallYellowFolderImage : kSmallLockImage;
-            }
+            NSArray<IMAGE_TYPE_PTR>* iconSet = [NodeIconHelper getIconSet:kKeePassIconSetSfSymbols];
+            return isGroup ? iconSet[48] : iconSet[0];
         }
         else {
             return isGroup ? kFolderImage : kSmallLockImage;

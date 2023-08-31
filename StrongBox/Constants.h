@@ -18,6 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kDatabasesCollectionLockStateChangedNotification;
 
+extern NSString *const kPreferenceGlobalShowShortcutNotification;
+extern NSString *const kPreferencesChangedNotification;
+extern NSString *const kTotpUpdateNotification;
+extern NSString* const kProStatusChangedNotification;
+
 @interface Constants : NSObject
 
 + (const NSSet<NSString*>*)reservedCustomFieldKeys;

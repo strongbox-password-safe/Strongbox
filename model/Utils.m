@@ -564,51 +564,49 @@ NSString* localizedOnOrOffFromBool(BOOL george) {
 #else
 BOOL checkForScreenRecordingPermissionsOnMac(void) {
     
-    BOOL canRecordScreen = YES;
+    BOOL canRecordScreen = NO;
+    NSRunningApplication *runningApplication = NSRunningApplication.currentApplication;
+    NSNumber *ourProcessIdentifier = [NSNumber numberWithInteger:runningApplication.processIdentifier];
     
-    if ( @available(macOS 10.15, *) ) {
-        canRecordScreen = NO;
-        NSRunningApplication *runningApplication = NSRunningApplication.currentApplication;
-        NSNumber *ourProcessIdentifier = [NSNumber numberWithInteger:runningApplication.processIdentifier];
-
-        CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
-        NSUInteger numberOfWindows = CFArrayGetCount(windowList);
+    CFArrayRef windowList = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+    NSUInteger numberOfWindows = CFArrayGetCount(windowList);
+    
+    for (int index = 0; index < numberOfWindows; index++) {
         
-        for (int index = 0; index < numberOfWindows; index++) {
+        NSDictionary *windowInfo = (NSDictionary *)CFArrayGetValueAtIndex(windowList, index);
+        NSString *windowName = windowInfo[(id)kCGWindowName];
+        NSNumber *processIdentifier = windowInfo[(id)kCGWindowOwnerPID];
+        
+        
+        if (! [processIdentifier isEqual:ourProcessIdentifier]) {
             
-            NSDictionary *windowInfo = (NSDictionary *)CFArrayGetValueAtIndex(windowList, index);
-            NSString *windowName = windowInfo[(id)kCGWindowName];
-            NSNumber *processIdentifier = windowInfo[(id)kCGWindowOwnerPID];
-
+            pid_t pid = processIdentifier.intValue;
+            NSRunningApplication *windowRunningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
             
-            if (! [processIdentifier isEqual:ourProcessIdentifier]) {
+            if (! windowRunningApplication) {
                 
-                pid_t pid = processIdentifier.intValue;
-                NSRunningApplication *windowRunningApplication = [NSRunningApplication runningApplicationWithProcessIdentifier:pid];
+            }
+            else {
+                NSString *windowExecutableName = windowRunningApplication.executableURL.lastPathComponent;
                 
-                if (! windowRunningApplication) {
-                    
-                }
-                else {
-                    NSString *windowExecutableName = windowRunningApplication.executableURL.lastPathComponent;
-                    
-                    if (windowName) {
-                        if ([windowExecutableName isEqual:@"Dock"]) {
-                            
-                        }
-                        else {
-                            canRecordScreen = YES;
-                            break;
-                        }
+                if (windowName) {
+                    if ([windowExecutableName isEqual:@"Dock"]) {
+                        
+                    }
+                    else {
+                        canRecordScreen = YES;
+                        break;
                     }
                 }
             }
         }
-        CFRelease(windowList);
     }
+
+    CFRelease(windowList);
     
     return canRecordScreen;
 }
+
 #endif
 
 

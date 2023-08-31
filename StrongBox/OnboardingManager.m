@@ -10,7 +10,6 @@
 #import "OnboardingModule.h"
 
 #import "AppPreferences.h"
-#import "iCloudSafesCoordinator.h"
 #import "StrongboxiOSFilesManager.h"
 #import "FirstUnlockWelcomeModule.h"
 #import "ConvenienceUnlockOnboardingModule.h"
@@ -19,7 +18,6 @@
 #import "AutoFillOnboardingModule.h"
 #import "GenericOnboardingModule.h"
 #import "FreeTrialOnboardingModule.h"
-#import "iCloudMigrationOnboardingModule.h"
 #import "AppAutoFillOnboardingModule.h"
 #import "LastCrashReportModule.h"
 #import "UpgradeToProOnboardingModule.h"
@@ -27,7 +25,6 @@
 #import "BiometricsManager.h"
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
-#import "ExportOptionsTableViewController.h"
 #import "DatabasePreferences.h"
 #import "EncryptionSettingsViewModel.h"
 #import "BackupsManager.h"
@@ -73,8 +70,7 @@
     id<OnboardingModule> businessActivation = [self getBusinessActivationModule];
     id<OnboardingModule> welcomeToStrongbox = [self getFirstRunWelcomeToStrongboxModule];
     id<OnboardingModule> freeTrial = [self getFreeTrialOnboardingModule];
-    id<OnboardingModule> iCloud = [self getICloudOnboardingModule];
-    id<OnboardingModule> iCloudMigration = [self getICloudMigrationOnboardingModule];
+    
     id<OnboardingModule> autoFill = [self getAutoFillOnboardingModule];
     id<OnboardingModule> backupSettings = [self getBackupSettingsModule];
     id<OnboardingModule> crashReportModule = [self getLastCrashReportModule];
@@ -86,8 +82,6 @@
     
     NSArray<id<OnboardingModule>> *onboardingItems = @[businessActivation,
                                                        welcomeToStrongbox,
-                                                       iCloud,
-                                                       iCloudMigration,
                                                        autoFill,
                                                        freeTrial,
                                                        backupSettings,
@@ -131,7 +125,8 @@
     FirstUnlockWelcomeModule* firstUnlock = [[FirstUnlockWelcomeModule alloc] initWithModel:model];
     ConvenienceUnlockOnboardingModule* convenienceUnlock = [[ConvenienceUnlockOnboardingModule alloc] initWithModel:model];
     ConvenienceExpiryOnboardingModule* expiry = [[ConvenienceExpiryOnboardingModule alloc] initWithModel:model];
-    QuickLaunchOnboardingModule *quickLaunch = [[QuickLaunchOnboardingModule alloc] initWithModel:model];
+    
+
     AutoFillOnboardingModule* autoFill = [[AutoFillOnboardingModule alloc] initWithModel:model];
     
     id<OnboardingModule> scheduledExportOnboardingModule = [self getScheduledExportOnboardingModule:model];
@@ -147,7 +142,6 @@
                                                        convenienceUnlock,
                                                        expiry,
                                                        autoFill,
-                                                       quickLaunch,
                                                        scheduledExportOnboardingModule,
                                                        scheduledExportModule,
                                                        quickLaunchAppLockWarning,
@@ -269,72 +263,6 @@
 
 - (id<OnboardingModule>)getFreeTrialOnboardingModule {
     return [[FreeTrialOnboardingModule alloc] initWithModel:nil];
-}
-
-- (id<OnboardingModule>)getICloudOnboardingModule {
-    GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:nil];
-    module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
-        if ( AppPreferences.sharedInstance.iCloudPrompted ) {
-            return NO;
-        }
-        if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-            return NO;
-        }
-        
-        if ( iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest ) {
-            NSLog(@"iCloudOnboardingModule::shouldDisplay - iCloud Available...");
-
-            return !AppPreferences.sharedInstance.iCloudOn;
-        }
-        else {
-            NSLog(@"iCloudOnboardingModule::shouldDisplay - iCloud Not Available...");
-
-            return NO;
-        }
-    };
-    
-    NSString* strA = NSLocalizedString(@"safesvc_migrate_local_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices? (NB: Your existing cloud databases will not be affected)");
-    NSString* strB = NSLocalizedString(@"safesvc_migrate_local_no_existing", @"You can now use iCloud with Strongbox. Should your current local databases be migrated to iCloud and available on all your devices?");
-    NSString* str1 = NSLocalizedString(@"safesvc_use_icloud_question_existing", @"Would you like the option to use iCloud with Strongbox? (NB: Your existing cloud databases will not be affected)");
-    NSString* str2 = NSLocalizedString(@"safesvc_use_icloud_question_no_existing", @"You can now use iCloud with Strongbox. Would you like to have your databases available on all your devices?");
-    
-    BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
-    BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
-    NSString *message = existingLocalDeviceSafes ? (hasOtherCloudSafes ? strA : strB) : (hasOtherCloudSafes ? str1 : str2);
-
-    
-    module.image = [UIImage imageNamed:@"iCloud-lock"];
-    module.header = NSLocalizedString(@"safesvc_icloud_available_title", @"iCloud Available");
-    module.message = message;
-
-    module.button1 = NSLocalizedString(@"safesvc_option_use_icloud", @"Use iCloud");
-    module.button2 = NSLocalizedString(@"prefs_vc_dont_use_icloud_action", @"Don't Use iCloud");
-
-    module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
-        if ( buttonIdCancelIsZero == 0) { 
-            onDone(NO, YES);
-        }
-        else if ( buttonIdCancelIsZero == 1 ) { 
-            AppPreferences.sharedInstance.iCloudOn = YES;
-            AppPreferences.sharedInstance.iCloudPrompted = YES;
-        
-            [iCloudSafesCoordinator.sharedInstance startQuery]; 
-
-            onDone(NO, NO);
-        }
-        else { 
-            AppPreferences.sharedInstance.iCloudOn = NO;
-            AppPreferences.sharedInstance.iCloudPrompted = YES;
-
-            onDone(NO, NO);
-        }
-    };
-
-    return module;
-}
-
-- (id<OnboardingModule>)getICloudMigrationOnboardingModule {
-    return [[iCloudMigrationOnboardingModule alloc] initWithModel:nil];
 }
 
 - (id<OnboardingModule>)getBackupSettingsModule {
@@ -599,7 +527,7 @@
         BOOL modified = modDate ? ![modDate isEqualToDateWithinEpsilon:model.metadata.lastScheduledExportModDate] : YES;
         BOOL due = [model.metadata.nextScheduledExport isEarlierThan:NSDate.date];
         
-        return model.metadata.scheduledExport && modified && due;
+        return model.metadata.scheduledExport && modified && due && !AppPreferences.sharedInstance.disableExport;
     };
     
     module.image = [UIImage imageNamed:@"delivery"];

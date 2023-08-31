@@ -4,7 +4,7 @@ use_frameworks!
 
 abstract_target 'common-mac' do
   project 'macbox/MacBox.xcodeproj'
-  platform :osx, '10.15'
+  platform :osx, '11.0'
   
   pod 'libsodium'
   pod 'Down'
@@ -175,7 +175,7 @@ post_install do |installer|
     project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
-        config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '10.15'
+        config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '11.0'
       end
     end
   end

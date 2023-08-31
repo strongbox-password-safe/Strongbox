@@ -1,5 +1,5 @@
 //
-//  AttributedStringBrowseViewCell.swift
+//  SingleLinePillTableCellView.swift
 //  MacBox
 //
 //  Created by Strongbox on 07/02/2022.

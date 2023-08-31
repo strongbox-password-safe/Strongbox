@@ -17,7 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol ApplicationPreferences <NSObject>
 
 @property (nullable) NSData* duressDummyData;
-@property BOOL databasesAreAlwaysReadOnly;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 @property PasswordStrengthConfig* passwordStrengthConfig;
 @property BOOL checkPinYin;
@@ -37,6 +36,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL addOtpAuthUrl;
 
 @property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
+
+@property BOOL databasesAreAlwaysReadOnly;
+@property BOOL disableExport;
+@property BOOL disablePrinting;
+@property (nullable) NSString* businessOrganisationName;
 
 @end
 

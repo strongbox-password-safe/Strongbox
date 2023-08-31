@@ -30,15 +30,15 @@ class TipJarViewController: UITableViewController {
     @IBOutlet var cellTermsOfUse: UITableViewCell!
     @IBOutlet var cellPrivacyPolicy: UITableViewCell!
 
-    @IBOutlet weak var cellRestore: UITableViewCell!
-    
+    @IBOutlet var cellRestore: UITableViewCell!
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         bindPrices()
 
         NotificationCenter.default.addObserver(forName: .Tips.loaded, object: nil, queue: nil) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             DispatchQueue.main.async {
                 self.bindPrices()
             }
@@ -100,20 +100,17 @@ class TipJarViewController: UITableViewController {
             purchaseInProgress = true
 
             TipJarLogic.sharedInstance.purchase(.huge, completion: onPurchaseCompleted)
-        }
-        else if cell == cellRestore {
+        } else if cell == cellRestore {
             iOSSpinnerUI.sharedInstance().show(nil, viewController: self)
             purchaseInProgress = true
 
             TipJarLogic.sharedInstance.restorePrevious(completion: onPurchaseCompleted)
-        }
-        else if cell == cellPrivacyPolicy {
-            let url = URL (string: "https:
-            UIApplication.shared.open(url, options: [:], completionHandler: nil);
-        }
-        else if cell == cellTermsOfUse {
-            let url = URL (string: "https:
-            UIApplication.shared.open(url, options: [:], completionHandler: nil);
+        } else if cell == cellPrivacyPolicy {
+            let url = URL(string: "https:
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else if cell == cellTermsOfUse {
+            let url = URL(string: "https:
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
 
@@ -134,7 +131,7 @@ class TipJarViewController: UITableViewController {
                         title: NSLocalizedString("tip_purchased_title", comment: "⭐️ Wow ⭐️"),
                         message: NSLocalizedString("tip_purchased_message", comment: "\n❤️ Thank you so much ❤️\n\nSending good vibes your way from everyone at Strongbox HQ!"),
                         completion: { [weak self] in
-                            guard let self = self else { return }
+                            guard let self else { return }
 
                             self.dismiss(animated: true, completion: nil)
                         })

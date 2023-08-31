@@ -105,7 +105,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL doNotShowAutoCompleteSuggestions;
 @property BOOL doNotShowChangeNotifications;
 @property BOOL outlineViewTitleIsReadonly;
-@property BOOL outlineViewEditableFieldsAreReadonly;
 @property BOOL concealEmptyProtectedFields;
 @property BOOL startWithSearch;
 @property BOOL showAdvancedUnlockOptions;

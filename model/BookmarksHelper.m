@@ -178,13 +178,7 @@
 }
 
 + (void)stopAccessingSecurityScopedResource:(NSURL*)url {
-#if !TARGET_OS_IPHONE
-    if ( @available(macOS 11.0, *) ) { 
-        [url stopAccessingSecurityScopedResource];
-    }
-#else
     [url stopAccessingSecurityScopedResource];
-#endif
 }
 
 @end

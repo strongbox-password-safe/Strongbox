@@ -27,7 +27,7 @@ public class AppPreferencesWindowController: NSWindowController {
         let wc = storyboard.instantiateInitialController() as! AppPreferencesWindowController
         return wc
     }
-    
+
     @objc
     public func show(tab: AppPreferencesTab = .general) {
         let vc = contentViewController as! NSTabViewController

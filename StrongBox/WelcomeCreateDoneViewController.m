@@ -18,23 +18,11 @@
 @implementation WelcomeCreateDoneViewController
 
 - (BOOL)shouldAutorotate {
-    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
-    {
-        return YES; /* Device is iPad */
-    }
-    else {
-        return NO;
-    }
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
-    {
-        return UIInterfaceOrientationMaskAll; /* Device is iPad */
-    }
-    else {
-        return UIInterfaceOrientationMaskPortrait;
-    }
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)viewWillAppear:(BOOL)animated {

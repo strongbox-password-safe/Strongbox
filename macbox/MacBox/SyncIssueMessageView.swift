@@ -8,6 +8,4 @@
 
 import SwiftMessages
 
-class SyncIssueMessageView: MessageView {
-
-}
+class SyncIssueMessageView: MessageView {}

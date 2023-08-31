@@ -10,7 +10,7 @@ import Cocoa
 
 extension NSTextView { // H/T: https://stackoverflow.com/a/54228147/3963806
     var contentSize: CGSize {
-        guard let layoutManager = layoutManager, let textContainer = textContainer else {
+        guard let layoutManager, let textContainer else {
             print("textView no layoutManager or textContainer")
             return .zero
         }
@@ -29,7 +29,7 @@ class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
 
         textViewMarkdown.refuseFirstResponder = true
         textViewMarkdown.delegate = self
-        
+
         textViewMarkdown.enabledTextCheckingTypes = 0
         textViewMarkdown.isAutomaticQuoteSubstitutionEnabled = false
         textViewMarkdown.isAutomaticTextReplacementEnabled = false
@@ -39,21 +39,21 @@ class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
     override func prepareForReuse() {
         textViewMarkdown.markdownEnabled = false
         textViewMarkdown.string = "<Not Set>"
-                
+
         textViewMarkdown.enabledTextCheckingTypes = 0
         textViewMarkdown.isAutomaticQuoteSubstitutionEnabled = false
         textViewMarkdown.isAutomaticTextReplacementEnabled = false
         textViewMarkdown.isAutomaticDashSubstitutionEnabled = false
     }
 
-    var isSomeTextSelected : Bool {
-        return textViewMarkdown.selectedRange().length > 0
+    var isSomeTextSelected: Bool {
+        textViewMarkdown.selectedRange().length > 0
     }
-    
-    func copySelectedText () {
+
+    func copySelectedText() {
         textViewMarkdown.copy(self)
     }
-    
+
     func setMarkdownOrText(string: String, markdown: Bool = false) {
         textViewMarkdown.markdownEnabled = markdown
         textViewMarkdown.string = string

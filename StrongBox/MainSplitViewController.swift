@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  MainSplitViewController.swift
 //  Strongbox
 //
 //  Created by Strongbox on 10/12/2022.
@@ -8,46 +8,46 @@
 
 import Foundation
 
-class MainSplitViewController : UISplitViewController, UISplitViewControllerDelegate {
+class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
     deinit {
         unListenToNotifications()
-        
+
         NSLog("😎 DEINIT [MainSplitViewController]")
     }
-    
-    var cancelOtpTimer : Bool = false
-    var nextGenSyncInProgress : Bool = false
-    @objc var model : Model!
+
+    var cancelOtpTimer: Bool = false
+    var nextGenSyncInProgress: Bool = false
+    @objc var model: Model!
     @objc var hasAlreadyDoneStartWithSearch = false
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
+
         
-        
-        
+
         if UIDevice.current.userInterfaceIdiom == .pad {
             let fraction = 0.45
             preferredPrimaryColumnWidthFraction = fraction
             maximumPrimaryColumnWidth = fraction * UIScreen.main.bounds.size.width
         }
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-    
+
         NSLog("MainSplitViewController::viewDidLoad")
 
         
-        
+
         let browseTabController = BrowseTabViewController.fromStoryboard(model: model)
         let emptyDetails = UIStoryboard(name: "EmptyDetails", bundle: nil).instantiateInitialViewController()!
-        
+
         viewControllers = [browseTabController, emptyDetails]
 
-        delegate = self;
-        preferredDisplayMode = .allVisible;
+        delegate = self
+        preferredDisplayMode = .allVisible
 
-        listenToNotifications();
+        listenToNotifications()
 
         startOtpRefresh()
 
@@ -62,93 +62,94 @@ class MainSplitViewController : UISplitViewController, UISplitViewControllerDele
             self?.model.restartBackgroundAudit()
         }
     }
-    
+
     func beginOnLoadLazySync() {
         if model.isInOfflineMode {
-            NSLog("✅ MainSplitViewController::beginOnLoadLazySync. Offline Mode - Not Syncing.");
-            return;
+            NSLog("✅ MainSplitViewController::beginOnLoadLazySync. Offline Mode - Not Syncing.")
+            return
         }
-        
-        NSLog("✅ MainSplitViewController::beginOnLoadLazySync. Syncing....");
-        
+
+        NSLog("✅ MainSplitViewController::beginOnLoadLazySync. Syncing....")
+
         sync()
     }
-    
+
     func unListenToNotifications() {
         NotificationCenter.default.removeObserver(self)
     }
 
     func listenToNotifications() {
         unListenToNotifications()
-        
-        NSLog("MainSplitViewController: listenToNotifications");
-        
+
+        NSLog("MainSplitViewController: listenToNotifications")
+
 
 
     }
-        
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        NSLog("splitViewController::collapseSecondaryViewController 2nd [%@] -> primary [%@]", secondaryViewController, primaryViewController);
-        
-        guard let tabBar = self.viewControllers.first as? UITabBarController,
-              let masterNav = tabBar.selectedViewController as? UINavigationController else {
+
+    func splitViewController(_: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        NSLog("splitViewController::collapseSecondaryViewController 2nd [%@] -> primary [%@]", secondaryViewController, primaryViewController)
+
+        guard let tabBar = viewControllers.first as? UITabBarController,
+              let masterNav = tabBar.selectedViewController as? UINavigationController
+        else {
             NSLog("🔴 Could not determine masterNav from view hierarchy?")
             return false
         }
-        
+
         if let detailsNav = secondaryViewController as? UINavigationController,
-           let detailsVc = detailsNav.topViewController as? ItemDetailsViewController {
-            NSLog("Displaying a details view, will not collapse to Browse, collapsing to detail instead");
-            
+           let detailsVc = detailsNav.topViewController as? ItemDetailsViewController
+        {
+            NSLog("Displaying a details view, will not collapse to Browse, collapsing to detail instead")
+
             masterNav.pushViewController(detailsVc, animated: false)
-            
-            self.viewControllers = [primaryViewController];
-            
+
+            viewControllers = [primaryViewController]
+
             return true
         }
-        
+
         return false
     }
-    
-    func splitViewController(_ splitViewController: UISplitViewController, showDetail vc: UIViewController, sender: Any?) -> Bool {
+
+    func splitViewController(_: UISplitViewController, showDetail vc: UIViewController, sender _: Any?) -> Bool {
         NSLog("splitViewController::showDetail: [%@]", String(describing: vc))
-        
-        guard let tabBar = self.viewControllers.first as? UITabBarController,
-              let masterNav = tabBar.selectedViewController as? UINavigationController else {
+
+        guard let tabBar = viewControllers.first as? UITabBarController,
+              let masterNav = tabBar.selectedViewController as? UINavigationController
+        else {
             NSLog("🔴 Could not determine masterNav from view hierarchy?")
             return false
         }
 
-        if self.isCollapsed {
+        if isCollapsed {
             masterNav.pushViewController(vc, animated: true)
-        }
-        else {
+        } else {
             let nav = UINavigationController(rootViewController: vc)
-            self.viewControllers = [self.viewControllers.first! , nav]
+            viewControllers = [viewControllers.first!, nav]
         }
-        
+
         return true
     }
-    
-    func splitViewController(_ splitViewController: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
+
+    func splitViewController(_: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
         NSLog("splitViewController::separateSecondaryFrom: [%@]", String(describing: primaryViewController))
 
-        guard let tabBar = self.viewControllers.first as? UITabBarController,
-              let masterNav = tabBar.selectedViewController as? UINavigationController else {
+        guard let tabBar = viewControllers.first as? UITabBarController,
+              let masterNav = tabBar.selectedViewController as? UINavigationController
+        else {
             NSLog("🔴 Could not determine masterNav from view hierarchy?")
             return nil
         }
-        
+
         if let detailsVc = masterNav.topViewController as? ItemDetailsViewController {
             masterNav.popViewController(animated: false)
             return UINavigationController(rootViewController: detailsVc)
-        }
-        else {
+        } else {
             let storyboard = UIStoryboard(name: "EmptyDetails", bundle: nil)
             return storyboard.instantiateInitialViewController()
         }
     }
- 
 
 
 
@@ -160,12 +161,13 @@ class MainSplitViewController : UISplitViewController, UISplitViewControllerDele
 
 
 
-    
+
+
     @objc public func onClose() {
-        NSLog("MainSplitViewController: onClose");
-        
+        NSLog("MainSplitViewController: onClose")
+
         killOtpTimer()
-        
+
         NotificationCenter.default.post(name: .masterDetailViewClose, object: model.metadata.uuid)
 
         presentingViewController?.dismiss(animated: true)
@@ -174,8 +176,8 @@ class MainSplitViewController : UISplitViewController, UISplitViewControllerDele
     func killOtpTimer() {
         cancelOtpTimer = true
     }
-    
-    func startOtpRefresh () {
+
+    func startOtpRefresh() {
         NotificationCenter.default.post(name: .centralUpdateOtpUi, object: nil)
 
         if !cancelOtpTimer {
@@ -186,245 +188,236 @@ class MainSplitViewController : UISplitViewController, UISplitViewControllerDele
     }
 
     
-    
-    func getMostAppropriateViewControllerForInteraction( ) -> UIViewController {
+
+    func getMostAppropriateViewControllerForInteraction() -> UIViewController {
         if let nav = viewControllers.first as? UINavigationController, let visible = nav.visibleViewController {
             return visible
         }
 
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        
+
         return appDelegate.getVisibleViewController() ?? self
     }
+
     
-    
-    
-    @objc public func updateAndQueueSync( completion : ((_ savedWorkingCopy : Bool ) -> Void)? = nil ) {
-        NSLog("MainSplitViewController::updateAndQueueSync start");
-        
+
+    @objc public func updateAndQueueSync(completion: ((_ savedWorkingCopy: Bool) -> Void)? = nil) {
+        NSLog("MainSplitViewController::updateAndQueueSync start")
+
         let updateId = UUID()
         model.metadata.asyncUpdateId = updateId
 
         
-        
+
         let success = model.asyncUpdate { result in
             self.onAsyncUpdateDone(result: result, updateId: updateId, completion: completion)
         }
-        
+
         if !success, let completion {
             completion(false)
         }
     }
 
-    func onAsyncUpdateDone ( result : AsyncJobResult , updateId : UUID, completion : ((_ : Bool ) -> Void)? = nil ) {
-        NSLog("Async Update [%@] Done with [%@]", String(describing: updateId), String(describing: result.success));
-        
+    func onAsyncUpdateDone(result: AsyncJobResult, updateId: UUID, completion: ((_: Bool) -> Void)? = nil) {
+        NSLog("Async Update [%@] Done with [%@]", String(describing: updateId), String(describing: result.success))
+
         if model.metadata.asyncUpdateId == updateId {
-            model.metadata.asyncUpdateId = nil;
+            model.metadata.asyncUpdateId = nil
+        } else {
+            NSLog("Not clearing asyncUpdateID as another has been queued... [%@]", String(describing: model.metadata.asyncUpdateId))
         }
-        else {
-            NSLog("Not clearing asyncUpdateID as another has been queued... [%@]", String(describing: model.metadata.asyncUpdateId));
-        }
-        
+
         if result.success {
-            onUpdateSucceeded( completion: completion )
-        }
-        else {
+            onUpdateSucceeded(completion: completion)
+        } else {
             if result.userCancelled {
-                onUserCancelledDuringUpdate( completion: completion )
-            }
-            else {
-                onErrorDuringUpdate( error : result.error, completion: completion )
+                onUserCancelledDuringUpdate(completion: completion)
+            } else {
+                onErrorDuringUpdate(error: result.error, completion: completion)
             }
         }
     }
 
-    func onUpdateSucceeded( completion : ((_ : Bool ) -> Void)? ) {
+    func onUpdateSucceeded(completion: ((_: Bool) -> Void)?) {
         NSLog("MainSplitViewController::onUpdateSucceeded")
-        
+
         if !model.isInOfflineMode {
             sync()
         }
-        
+
         if let completion {
             completion(true)
         }
     }
 
-    func onUserCancelledDuringUpdate ( completion : ((_ : Bool ) -> Void)? ) {
+    func onUserCancelledDuringUpdate(completion: ((_: Bool) -> Void)?) {
         displayGenericUpdateProblemTryAgainAlert(completion: completion)
     }
-    
-    func onErrorDuringUpdate (error : Error?, completion : ((_ : Bool ) -> Void)?  ) {
+
+    func onErrorDuringUpdate(error: Error?, completion: ((_: Bool) -> Void)?) {
         displayGenericUpdateProblemTryAgainAlert(errorDescription: error?.localizedDescription, completion: completion)
     }
-    
-    func displayGenericUpdateProblemTryAgainAlert (errorDescription : String? = nil, completion : ((_ : Bool ) -> Void)? ) {
+
+    func displayGenericUpdateProblemTryAgainAlert(errorDescription: String? = nil, completion: ((_: Bool) -> Void)?) {
         let vc = getMostAppropriateViewControllerForInteraction()
-        
+
         var message = NSLocalizedString("error_could_not_save_message", comment: "Your changes could not be safely saved. You are now working on an in-memory version only of your database. We recommend you try to save again.")
-        
+
         if let errorDescription {
             message = message.appendingFormat("\n\n%@", errorDescription)
         }
-        
+
         Alerts.oneOptions(withCancel: vc,
                           title: NSLocalizedString("moveentry_vc_error_saving", comment: "Error Saving"),
                           message: message,
-                          buttonText: NSLocalizedString("sync_status_error_updating_try_again_action", comment: "Try Again")) { response in
+                          buttonText: NSLocalizedString("sync_status_error_updating_try_again_action", comment: "Try Again"))
+        { response in
             if response {
                 DispatchQueue.main.async { [weak self] in
                     self?.updateAndQueueSync(completion: completion)
                 }
-            }
-            else {
+            } else {
                 if let completion {
                     completion(false)
                 }
             }
         }
     }
+
     
-    
-    
-    @objc public func sync( completion : SyncAndMergeCompletionBlock? = nil ) {
+
+    @objc public func sync(completion: SyncAndMergeCompletionBlock? = nil) {
         NSLog("MainSplitViewController::sync BEGIN")
-         
+
         guard !model.isInOfflineMode else {
-            NSLog("🔴 Database is in Offline Mode - Cannot Sync!");
-            
+            NSLog("🔴 Database is in Offline Mode - Cannot Sync!")
+
             if let completion {
                 completion(.error, false, Utils.createNSError("🔴 Database is in Offline Mode - Cannot Sync!", errorCode: -1))
             }
-            
+
             return
         }
-        
+
         SyncManager.sharedInstance().backgroundSyncDatabase(model.metadata, join: false) { [weak self] result, localWasChanged, error in
             DispatchQueue.main.async { [weak self] in
-                self?.onSyncCompleted(result: result, localWasChanged: localWasChanged, error: error, wasInteractive: false, completion: completion )
+                self?.onSyncCompleted(result: result, localWasChanged: localWasChanged, error: error, wasInteractive: false, completion: completion)
             }
         }
     }
 
-    func interactiveSync ( interactiveVc : UIViewController, completion : SyncAndMergeCompletionBlock? ) {
+    func interactiveSync(interactiveVc: UIViewController, completion: SyncAndMergeCompletionBlock?) {
         SyncManager.sharedInstance().sync(model.metadata, interactiveVC: interactiveVc, key: model.ckfs, join: false) { [weak self] result, localWasChanged, error in
             DispatchQueue.main.async { [weak self] in
-                self?.onSyncCompleted(result: result, localWasChanged: localWasChanged, error: error, wasInteractive: true, completion: completion )
+                self?.onSyncCompleted(result: result, localWasChanged: localWasChanged, error: error, wasInteractive: true, completion: completion)
             }
         }
     }
-    
-    func onSyncCompleted ( result : SyncAndMergeResult, localWasChanged : Bool, error : Error?, wasInteractive : Bool, completion : SyncAndMergeCompletionBlock? ) {
+
+    func onSyncCompleted(result: SyncAndMergeResult, localWasChanged: Bool, error: Error?, wasInteractive: Bool, completion: SyncAndMergeCompletionBlock?) {
         if result == .success {
-            onSyncSuccess( localWasChanged: localWasChanged, completion: completion)
-        }
-        else if result == .error {
-            onSyncError( error: error, completion: completion )
-        }
-        else if result == .userPostponedSync {
+            onSyncSuccess(localWasChanged: localWasChanged, completion: completion)
+        } else if result == .error {
+            onSyncError(error: error, completion: completion)
+        } else if result == .userPostponedSync {
             onSyncUserPostponed(completion: completion)
-        }
-        else if result == .resultUserCancelled {
+        } else if result == .resultUserCancelled {
             onSyncUserCancelled(completion: completion)
-        }
-        else if result == .resultUserInteractionRequired {
-            onSyncUserInteractionRequired( wasInteractive: wasInteractive, completion: completion)
-        }
-        else {
+        } else if result == .resultUserInteractionRequired {
+            onSyncUserInteractionRequired(wasInteractive: wasInteractive, completion: completion)
+        } else {
             NSLog("🔴 Unknown or expected Sync Result!")
         }
     }
-    
-    func onSyncUserCancelled (completion : SyncAndMergeCompletionBlock?) {
+
+    func onSyncUserCancelled(completion: SyncAndMergeCompletionBlock?) {
         NSLog("MainSplitViewController::onSyncUserCancelled")
-        
+
         if let completion {
             completion(.resultUserCancelled, false, nil)
         }
     }
-    
-    func onSyncUserPostponed (completion : SyncAndMergeCompletionBlock?) {
+
+    func onSyncUserPostponed(completion: SyncAndMergeCompletionBlock?) {
         NSLog("MainSplitViewController::onSyncUserPostponed")
-        
+
         if let completion {
             completion(.userPostponedSync, false, nil)
         }
     }
-    
-    func onSyncUserInteractionRequired ( wasInteractive : Bool, completion : SyncAndMergeCompletionBlock? ) {
+
+    func onSyncUserInteractionRequired(wasInteractive: Bool, completion: SyncAndMergeCompletionBlock?) {
         NSLog("MainSplitViewController::onSyncUserInteractionRequired")
-        
+
         if wasInteractive {
-            NSLog("🔴 Something very wrong - User interaction required after an interactive sync? SANITY");
+            NSLog("🔴 Something very wrong - User interaction required after an interactive sync? SANITY")
             if let completion {
                 completion(.error, false, Utils.createNSError("Something very wrong - User interaction required after an interactive sync? SANITY", errorCode: -1))
             }
-            
+
             return
         }
-        
+
         let vc = getMostAppropriateViewControllerForInteraction()
-        
-        interactiveSync( interactiveVc: vc, completion: completion  )
+
+        interactiveSync(interactiveVc: vc, completion: completion)
     }
-    
-    func onSyncError ( error : Error?, completion : SyncAndMergeCompletionBlock? ) {
-        NSLog("🔴 MainSplitViewController::onSyncError - Error Occurred => [%@]", String.init(describing: error))
-        
+
+    func onSyncError(error: Error?, completion: SyncAndMergeCompletionBlock?) {
+        NSLog("🔴 MainSplitViewController::onSyncError - Error Occurred => [%@]", String(describing: error))
+
         let vc = getMostAppropriateViewControllerForInteraction()
-        
+
         let fmt = NSLocalizedString("sync_error_message_including_error_detail_fmt", comment: "Your database is safely saved but there was an error syncing. Would you like to try again or take a look at the Sync Log?\n\n%@\n")
-        
-        let message = String(format: fmt, error?.localizedDescription ?? "");
-        
+
+        let message = String(format: fmt, error?.localizedDescription ?? "")
+
         Alerts.twoOptions(withCancel: vc,
                           title: NSLocalizedString("open_sequence_storage_provider_error_title", comment: "Sync Error"),
                           message: message,
                           defaultButtonText: NSLocalizedString("sync_status_error_updating_try_again_action", comment: "Try Again"),
-                          secondButtonText: NSLocalizedString("safes_vc_action_view_sync_status", comment: "View Sync Log")) { [weak self] response in
+                          secondButtonText: NSLocalizedString("safes_vc_action_view_sync_status", comment: "View Sync Log"))
+        { [weak self] response in
             if response == 0 {
                 DispatchQueue.main.async { [weak self] in
                     self?.sync(completion: completion)
                 }
-            }
-            else if response == 1 {
+            } else if response == 1 {
                 self?.showSyncLog()
             }
         }
     }
-    
+
     func showSyncLog() {
         let nav = SyncLogViewController.create(withDatabase: model.metadata)
-        
+
         let vc = getMostAppropriateViewControllerForInteraction()
 
         vc.present(nav, animated: true)
     }
-    
-    func onSyncSuccess ( localWasChanged : Bool, completion : SyncAndMergeCompletionBlock? ) {
+
+    func onSyncSuccess(localWasChanged: Bool, completion: SyncAndMergeCompletionBlock?) {
         NSLog("✅ MainSplitViewController::onSyncSuccess => Sync Successfully Completed [localWasChanged = %@]", localizedYesOrNoFromBool(localWasChanged))
-        
+
         if localWasChanged {
-            let vc = getMostAppropriateViewControllerForInteraction() 
-                        
+            let vc = getMostAppropriateViewControllerForInteraction()
+
             model.reloadDatabase(fromLocalWorkingCopy: {
-                return vc
+                vc
             }, noProgressSpinner: false) { [weak self] success in
                 if success {
                     
                     NSLog("✅ Successfully reloaded database after Sync found changes")
-                }
-                else {
+                } else {
                     
-                    
-                    NSLog("🔴 Could not Unlock updated database after Sync. Key changed?! - Force Locking.");
-                    
+
+                    NSLog("🔴 Could not Unlock updated database after Sync. Key changed?! - Force Locking.")
+
                     self?.onClose()
                 }
             }
         }
-        
+
         if let completion {
             completion(.success, localWasChanged, nil)
         }

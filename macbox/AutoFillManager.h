@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-@property (readonly) BOOL isPossible;
 @property (readonly) BOOL isOnForStrongbox;
 
 - (void)updateAutoFillQuickTypeDatabase:(Model*)database

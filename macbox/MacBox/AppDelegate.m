@@ -13,14 +13,12 @@
 #import "Utils.h"
 #import "Strongbox.h"
 #import "BiometricIdHelper.h"
-#import "ViewController.h"
 #import "SafeStorageProviderFactory.h"
 #import "AboutViewController.h"
 #import "ClipboardManager.h"
 #import "DebugHelper.h"
 #import "MacUrlSchemes.h"
 #import "Shortcut.h"
-#import "NodeDetailsViewController.h"
 #import "Document.h"
 #import "SystemTrayViewController.h"
 #import "MainWindow.h"
@@ -141,9 +139,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)doDeferredAppLaunchTasks {
-    [self startAutoFillProxyServer];
+    [self startOrStopAutoFillProxyServer];
     
-    [self startSSHAgent];
+    [self startOrStopSSHAgent];
     
     [MacOnboardingManager beginAppOnboardingWithCompletion:^{
         NSLog(@"✅ Onboarding Completed...");
@@ -156,25 +154,41 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 }
 
-- (void)startSSHAgent {
+- (void)startOrStopSSHAgent {
     if ( Settings.sharedInstance.runSshAgent && Settings.sharedInstance.isPro ) {
-        
         if ( ![SSHAgentServer.sharedInstance start] ) {
             NSLog(@"🔴 Failed to start SSH Agent.");
+        }
+        else {
+            NSLog(@"✅ Started SSH Agent");
+        }
+    }
+    else {
+        if ( SSHAgentServer.sharedInstance.isRunning ) {
+            [SSHAgentServer.sharedInstance stop];
+            NSLog(@"🔴 Stopped SSH Agent");
         }
     }
 }
 
-- (void)startAutoFillProxyServer {
+- (void)startOrStopAutoFillProxyServer {
     if ( Settings.sharedInstance.runBrowserAutoFillProxyServer && Settings.sharedInstance.isPro ) {
         [NativeMessagingManifestInstallHelper installNativeMessagingHostsFiles];
         
         if ( ![AutoFillProxyServer.sharedInstance start] ) {
             NSLog(@"🔴 Failed to start AutoFillProxyServer.");
         }
+        else {
+            NSLog(@"✅ Started AutoFill Proxy");
+        }
     }
     else {
         [NativeMessagingManifestInstallHelper removeNativeMessagingHostsFiles];
+        
+        if ( AutoFillProxyServer.sharedInstance.isRunning ) {
+            [AutoFillProxyServer.sharedInstance stop];
+            NSLog(@"🔴 Stopped AutoFill Proxy");
+        }
     }
 }
 
@@ -285,7 +299,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
                                                  name:kPreferencesChangedNotification
                                                object:nil];
     
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotification object:nil];
     
     
     
@@ -603,7 +617,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         }
     }
     else {
-        [dc launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable];
+        if ( !self.suppressQuickLaunchForNextAppActivation ) {
+            [dc launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable];
+        }
+        else {
+            NSLog(@"ℹ️ showAndActivateStrongbox - Suppressed Quick Launch");
+            self.suppressQuickLaunchForNextAppActivation = NO; 
+        }
     }
 
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
@@ -641,37 +661,36 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
         [dc onAppStartup];
     }
-    else if ( !self.isRequestingAutoFillManualCredentialsEntry ) {
-        if ( [self isHiddenToTray] ) {
-            NSLog(@"✅ applicationDidBecomeActive - isHiddenToTray - showing dock icon and and activating");
-            
-            
-            
-            
-            
-            
-            
-            
-            [self showAndActivateStrongbox:nil];
-        }
-        else {
-
-
-
-
-
-
-
-            
-            
-            
-            
-            
-        }
+        
+    if ( [self isHiddenToTray] ) {
+        NSLog(@"✅ applicationDidBecomeActive - isHiddenToTray - showing dock icon and and activating");
+        
+        
+        
+        
+        
+        
+        
+        
+        [self showAndActivateStrongbox:nil];
     }
-    else {
-        NSLog(@"✅ applicationDidBecomeActive - Activated due to AutoFill Manual Credentials Entry request - NOP");
-    }
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    self.suppressQuickLaunchForNextAppActivation = NO; 
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)hasVisibleWindows {
@@ -798,9 +817,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     MASShortcut *globalShowShortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSEventModifierFlagCommand | NSEventModifierFlagOption];
     NSData *globalLaunchShortcutData = [NSKeyedArchiver archivedDataWithRootObject:globalShowShortcut];
 
-    [NSUserDefaults.standardUserDefaults registerDefaults:@{ kPreferenceGlobalShowShortcut : globalLaunchShortcutData }];
+    [NSUserDefaults.standardUserDefaults registerDefaults:@{ kPreferenceGlobalShowShortcutNotification : globalLaunchShortcutData }];
     
-    [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferenceGlobalShowShortcut toAction:^{
+    [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferenceGlobalShowShortcutNotification toAction:^{
         [self showAndActivateStrongbox:nil];
     }];
 }
@@ -1295,18 +1314,13 @@ static NSInteger clipboardChangeCount;
 - (void)onContactSupport:(id)sender {
     NSURL* launchableUrl = [NSURL URLWithString:@"https:
     
-    if (@available(macOS 10.15, *)) {
-        [[NSWorkspace sharedWorkspace] openURL:launchableUrl
-                                 configuration:NSWorkspaceOpenConfiguration.configuration
-                             completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
-            if ( error ) {
-                NSLog(@"Launch URL done. Error = [%@]", error);
-            }
-        }];
-    }
-    else {
-        [[NSWorkspace sharedWorkspace] openURL:launchableUrl];
-    }
+    [[NSWorkspace sharedWorkspace] openURL:launchableUrl
+                             configuration:NSWorkspaceOpenConfiguration.configuration
+                         completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+        if ( error ) {
+            NSLog(@"Launch URL done. Error = [%@]", error);
+        }
+    }];
 }
 
 - (IBAction)onAppPreferences:(id)sender {
@@ -1399,6 +1413,10 @@ static NSInteger clipboardChangeCount;
             menuItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
         }
     }
+    
+    [self startOrStopSSHAgent];
+    
+    [self startOrStopAutoFillProxyServer];
 }
 
 @end

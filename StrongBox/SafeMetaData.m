@@ -18,7 +18,7 @@
 
 #import "AppPreferences.h"
 
-static const NSInteger kDefaultConvenienceExpiryPeriodHours = -1; 
+const NSInteger kDefaultConvenienceExpiryPeriodHours = 2 * 168; 
 static const NSUInteger kDefaultScheduledExportIntervalDays = 28;  
 
 @interface SafeMetaData ()
@@ -833,11 +833,11 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.conveniencePasswordHasExpired = NO;
     }
 
-    if(expiringAfterHours == -1) {
+    if ( expiringAfterHours == -1 || convenienceMasterPassword.length == 0 ) { 
         self.convenienceExpiresAt = nil;
         [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:key];
     }
-    else if(expiringAfterHours == 0) {
+    else if ( expiringAfterHours == 0 ) {
         self.convenienceExpiresAt = nil;
         [SecretStore.sharedInstance setSecureEphemeralObject:convenienceMasterPassword forIdentifer:key];
     }

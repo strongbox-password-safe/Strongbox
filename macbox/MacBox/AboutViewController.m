@@ -99,7 +99,7 @@ static AboutViewController* sharedInstance;
     self.labelAbout.stringValue = [Utils getAppVersion];
     
     
-
+    
     self.labelLicense.textColor = NSColor.labelColor;
     BOOL linkToUpgradeScreen = NO;
     
@@ -143,23 +143,21 @@ static AboutViewController* sharedInstance;
     BOOL licensed = Settings.sharedInstance.isPro;
     NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
     
-    if (@available(macOS 11.0, *)) {
-        NSImage* image = [NSImage imageWithSystemSymbolName:license  accessibilityDescription:nil];
-        self.imageViewLicense.image = image;
-                
-        NSImageSymbolConfiguration* scaleConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-
-        if (@available(macOS 12.0, *)) {
-            NSImageSymbolConfiguration* proConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemGreenColor, NSColor.systemBlueColor]];
-            NSImageSymbolConfiguration* noneProConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemRedColor, NSColor.systemOrangeColor]];
-            NSImageSymbolConfiguration* imageConfig = licensed ? proConfig : noneProConfig;
-            
-            self.imageViewLicense.symbolConfiguration = [scaleConfig configurationByApplyingConfiguration:imageConfig];
-            
-        } else {
-            self.imageViewLicense.symbolConfiguration = scaleConfig;
-            self.imageViewLicense.contentTintColor = licensed ? NSColor.systemBlueColor : NSColor.systemOrangeColor;
-        }
+    NSImage* image = [NSImage imageWithSystemSymbolName:license  accessibilityDescription:nil];
+    self.imageViewLicense.image = image;
+    
+    NSImageSymbolConfiguration* scaleConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
+    
+    if (@available(macOS 12.0, *)) {
+        NSImageSymbolConfiguration* proConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemGreenColor, NSColor.systemBlueColor]];
+        NSImageSymbolConfiguration* noneProConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemRedColor, NSColor.systemOrangeColor]];
+        NSImageSymbolConfiguration* imageConfig = licensed ? proConfig : noneProConfig;
+        
+        self.imageViewLicense.symbolConfiguration = [scaleConfig configurationByApplyingConfiguration:imageConfig];
+        
+    } else {
+        self.imageViewLicense.symbolConfiguration = scaleConfig;
+        self.imageViewLicense.contentTintColor = licensed ? NSColor.systemBlueColor : NSColor.systemOrangeColor;
     }
 }
 

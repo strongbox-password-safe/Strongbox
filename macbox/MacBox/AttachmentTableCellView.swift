@@ -52,7 +52,7 @@ class AttachmentTableCellView: NSTableCellView, DetailTableCellViewPopupButton, 
     func menuNeedsUpdate(_ menu: NSMenu) {
 
 
-        guard let field = field else {
+        guard let field else {
             return
         }
 

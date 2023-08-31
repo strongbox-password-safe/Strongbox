@@ -16,11 +16,11 @@ protocol NibLoadable {
 
 extension NibLoadable where Self: NSView {
     static var nibName: String? {
-        return String(describing: Self.self)
+        String(describing: Self.self)
     }
 
     static func createFromNib(in bundle: Bundle = Bundle.main) -> Self? {
-        guard let nibName = nibName else { return nil }
+        guard let nibName else { return nil }
         var topLevelArray: NSArray?
         bundle.loadNibNamed(NSNib.Name(nibName), owner: self, topLevelObjects: &topLevelArray)
         guard let results = topLevelArray else { return nil }

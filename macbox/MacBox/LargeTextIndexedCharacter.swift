@@ -18,10 +18,5 @@ class LargeTextIndexedCharacter: NSCollectionViewItem {
         super.viewDidLoad()
         view.wantsLayer = true
         view.layer?.backgroundColor = NSColor.clear.cgColor
-
-
-        if #available(macOS 10.13, *) {
-
-        }
     }
 }

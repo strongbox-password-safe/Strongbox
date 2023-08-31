@@ -7,7 +7,7 @@
 //
 
 #import "AppPreferences.h"
-#import "Model.h"
+#import "Constants.h"
 #import "NSArray+Extensions.h"
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
@@ -30,7 +30,7 @@ static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
-static NSString* const kiCloudOn = @"iCloudOn";
+
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kShowDatabaseIcon = @"showDatabaseIcon";
 static NSString* const kShowDatabaseStatusIcon = @"showDatabaseStatusIcon";
@@ -69,9 +69,6 @@ static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDete
 
 
 static NSString* const kLaunchCountKey = @"launchCount";
-
-static NSString* const kiCloudWasOn = @"iCloudWasOn";
-static NSString* const kiCloudPrompted = @"iCloudPrompted";
 
 static NSString* const kInstallDate = @"installDate";
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
@@ -120,8 +117,6 @@ static NSString* const kHasPromptedThatFreeTrialWillEndSoon = @"hasPromptedThatF
 static NSString* const kAppHasBeenDowngradedToFreeEdition = @"appHasBeenDowngradedToFreeEdition";
 static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"hasPromptedThatAppHasBeenDowngradedToFreeEdition";
 
-static NSString* const kDisableReadOnlyToggles = @"disableReadOnlyToggles";
-static NSString* const kDatabasesAreAlwaysReadOnly = @"databasesAreAlwaysReadOnly";
 static NSString* const kDisableFavIconFeature = @"disableFavIconFeature";
 static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetworkStorageOptions";
 
@@ -151,6 +146,10 @@ static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
 static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 static NSString* const kLastQuickTypeMultiDbRegularClear = @"lastQuickTypeMultiDbRegularClear";
 static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileName";
+
+static NSString* const kDatabasesAreAlwaysReadOnly = @"databasesAreAlwaysReadOnly";
+static NSString* const kDisableExport = @"disableExport";
+static NSString* const kDisablePrinting = @"disablePrinting";
 
 @implementation AppPreferences
 
@@ -193,6 +192,22 @@ static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileNam
 
 
 
+- (BOOL)disableExport {
+    return [self getBool:kDisableExport];
+}
+
+- (void)setDisableExport:(BOOL)disableExport {
+    [self setBool:kDisableExport value:disableExport];
+}
+
+- (BOOL)disablePrinting {
+    return [self getBool:kDisablePrinting];
+}
+
+- (void)setDisablePrinting:(BOOL)disablePrinting {
+    [self setBool:kDisablePrinting value:disablePrinting];
+}
+
 - (BOOL)appendDateToExportFileName {
     return [self getBool:kAppendDateToExportFileName fallback:YES];
 }
@@ -223,13 +238,14 @@ static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileNam
     [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
-- (BOOL)shadeFavoriteTag {
-    return [self getBool:kShadeFavoriteTag fallback:YES];
+- (BOOL)shadeFavoriteTag { 
+    return YES;
+
 }
 
-- (void)setShadeFavoriteTag:(BOOL)shadeFavoriteTag {
-    [self setBool:kShadeFavoriteTag value:shadeFavoriteTag];
-}
+
+
+
 
 - (BOOL)hasMigratedToLazySync {
     return [self getBool:kHasMigratedToLazySync];
@@ -381,14 +397,6 @@ static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileNam
 
 - (void)setDisableNetworkBasedFeatures:(BOOL)disableNativeNetworkStorageOptions {
     [self setBool:kDisableNativeNetworkStorageOptions value:disableNativeNetworkStorageOptions];
-}
-
-- (BOOL)disableReadOnlyToggles {
-    return [self getBool:kDisableReadOnlyToggles];
-}
-
-- (void)setDisableReadOnlyToggles:(BOOL)disableReadOnlyToggles {
-    [self setBool:kDisableReadOnlyToggles value:disableReadOnlyToggles];
 }
 
 - (BOOL)databasesAreAlwaysReadOnly {
@@ -757,7 +765,7 @@ static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileNam
     
     [userDefaults synchronize];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotification object:nil];
 }
 
 - (BOOL)isPro {
@@ -897,14 +905,6 @@ static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileNam
 
 - (void)setInstantPinUnlocking:(BOOL)instantPinUnlocking {
     [self setBool:kInstantPinUnlocking value:instantPinUnlocking];
-}
-
-- (BOOL)iCloudOn {
-    return [self getBool:kiCloudOn];
-}
-
-- (void)setICloudOn:(BOOL)iCloudOn {
-    [self setBool:kiCloudOn value:iCloudOn];
 }
 
 - (FavIconDownloadOptions *)favIconDownloadOptions {
@@ -1115,34 +1115,10 @@ static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileNam
     [userDefaults synchronize];
 }
 
-- (BOOL)iCloudWasOn {
-    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudWasOn];
-}
-
--(void)setICloudWasOn:(BOOL)iCloudWasOn {
-    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:iCloudWasOn forKey:kiCloudWasOn];
-    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
-}
-
-- (BOOL)iCloudPrompted {
-    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudPrompted];
-}
-
-- (void)setICloudPrompted:(BOOL)iCloudPrompted {
-    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:iCloudPrompted forKey:kiCloudPrompted];
-    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
-}
-
 
 
 - (NSString*)getFlagsStringForDiagnostics {
-    return [NSString stringWithFormat:@"[%d[%ld]%d%d%d%d]",
-            AppPreferences.sharedInstance.isPro,
-            (long)self.launchCount,
-            AppPreferences.sharedInstance.iCloudOn,
-            self.iCloudWasOn,
-            self.iCloudPrompted,
-            self.iCloudAvailable];
+    return [NSString stringWithFormat:@"[%d[%ld]]", AppPreferences.sharedInstance.isPro, (long)self.launchCount];
 }
 
 - (BOOL)showKeePassCreateSafeOptions {

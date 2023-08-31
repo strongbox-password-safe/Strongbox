@@ -32,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (IBAction)onDelete:(id _Nullable)sender;
 
+- (IBAction)onPrintGroupFromSideBar:(id)sender;
+- (IBAction)onExportGroupFromSideBar:(id)sender;
+
 - (IBAction)onGeneralDatabaseSettings:(id)sender;
 - (IBAction)onConvenienceUnlockProperties:(id)sender;
 - (IBAction)onDatabaseAutoFillSettings:(id)sender;

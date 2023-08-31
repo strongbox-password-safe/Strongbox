@@ -132,43 +132,43 @@
                 
                 
                 database.storageProvider == kTwoDrive ) { 
-                NSLog(@"Migrating OneDrive Database [%@] to non lazy sync", database.nickName);
-                database.lazySyncMode = NO;
-            }
+                    NSLog(@"Migrating OneDrive Database [%@] to non lazy sync", database.nickName);
+                    database.lazySyncMode = NO;
+                }
         }
     }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO; 
     
     NSLog(@"SafesViewController::viewDidLoad");
-
+    
     self.tableView.hidden = YES;
     
     [self migrateToLazySync];
     
     [self customizeUI];
-            
+    
     [self checkForBrokenVirtualHardwareKeys];
     
     
     
     
-
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         
         
         
         
         [self internalRefresh];
-
+        
         self.tableView.hidden = NO;
         
         [self listenToNotifications];
-
+        
         if ( ![self isAppLocked] ) {
             NSLog(@"SafesViewController::viewDidLoad -> Initial Activation/Load - App is not Locked...");
             
@@ -215,7 +215,7 @@
     [super viewWillAppear:animated];
     
     NSLog(@"SafesViewController::viewWillAppear");
-
+    
     [self setupTips];
     
     self.navigationController.navigationBar.hidden = NO;
@@ -232,7 +232,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-
+    
     NSLog(@"SafesViewController::viewDidAppear");
 }
 
@@ -255,9 +255,9 @@
     NSLog(@"SafesViewController::internalRefresh");
     
     self.collection = DatabasePreferences.allDatabases;
-
+    
     self.tableView.separatorStyle = AppPreferences.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
-
+    
     [self.tableView reloadData];
     
     [self updateDynamicAppIconShortcuts];
@@ -272,21 +272,21 @@
     
     for ( DatabasePreferences* database in self.collection ) {
         UIMutableApplicationShortcutItem *mutableShortcutItem = [[UIMutableApplicationShortcutItem alloc] initWithType:@"quick-launch"  localizedTitle:database.nickName];
-
+        
         mutableShortcutItem.userInfo = @{ @"uuid" : database.uuid };
         mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithSystemImageName:@"cylinder.split.1x2"];
         
         [shortcuts addObject:mutableShortcutItem.copy];
     }
-
-
+    
+    
     
     [[UIApplication sharedApplication] setShortcutItems:shortcuts.copy];
 }
 
 - (void)performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem {
     NSLog(@"✅ performActionForShortcutItem: [%@]", shortcutItem.type);
-
+    
     if ( [shortcutItem.type isEqualToString:@"quick-launch"] ) {
         NSString* uuid = (NSString*)shortcutItem.userInfo[@"uuid"];
         
@@ -321,105 +321,115 @@
 
 - (void)customizeAddDatabaseButton {
     __weak SafesViewController* weakSelf = self;
-
+    
     UIMenuElement* quickStart = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_quick_start", @"Get Started Wizard")
-                                                  systemImage:@"wand.and.stars"
-                                                      handler:^(__kindof UIAction * _Nonnull action) {
+                                               systemImage:@"wand.and.stars"
+                                                   handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf showFirstDatabaseGetStartedWizard];
     }];
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
     UIMenuElement* newAdvancedDatabase = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_new_advanced", @"New Database")
-                                                   systemImage:@"plus.circle"
-                                                       handler:^(__kindof UIAction * _Nonnull action) {
+                                                        systemImage:@"plus.circle"
+                                                            handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onCreateNewSafe];
     }];
-
+    
     UIMenuElement* addExisting = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_add_existing", @"Add Existing")
                                                 systemImage:@"externaldrive.badge.plus"
                                                     handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onAddExistingSafe];
     }];
-
+    
     UIMenuElement* wifiTransfer = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_wifi_transfer", @"Wi-Fi Transfer")
                                                  systemImage:@"wifi"
                                                      handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToLocalNetworkServer" sender:nil];
     }];
-
+    
     UIMenuElement* import1P = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_1password_1pif", @"1Password (1Pif)")
                                                  handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImport1Password];
     }];
-
+    
     UIMenuElement* import1P1Pux = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_1password_1pux", @"1Password (1Pux)")
-                                                 handler:^(__kindof UIAction * _Nonnull action) {
+                                                     handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImport1Password1Pux];
     }];
-
+    
     UIMenuElement* importLastPass = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_lastpass", @"LastPass (CSV)")
-                                                     handler:^(__kindof UIAction * _Nonnull action) {
+                                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImportLastPass];
     }];
     UIMenuElement* importiCloud = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_icloud", @"Apple/iCloud Keychain (CSV)")
                                                      handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImportiCloud];
     }];
-
+    
     UIMenuElement* importCsv = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_csv", @"CSV...")
                                                   handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImportGenericCsv];
     }];
-
+    
     UIMenu* menu1 = [UIMenu menuWithTitle:@""
-                                   image:nil
-                              identifier:nil
-                                 options:UIMenuOptionsDisplayInline
-                                children:@[quickStart]];
-
+                                    image:nil
+                               identifier:nil
+                                  options:UIMenuOptionsDisplayInline
+                                 children:@[quickStart]];
+    
     UIMenu* menu2 = [UIMenu menuWithTitle:@""
-                                   image:nil
-                              identifier:nil
-                                 options:UIMenuOptionsDisplayInline
-                                children:@[newAdvancedDatabase, addExisting]];
-
+                                    image:nil
+                               identifier:nil
+                                  options:UIMenuOptionsDisplayInline
+                                 children:@[newAdvancedDatabase, addExisting]];
+    
     UIMenu* menuWifi = [UIMenu menuWithTitle:@""
-                                   image:nil
-                              identifier:nil
-                                 options:UIMenuOptionsDisplayInline
-                                children:@[wifiTransfer]];
-
+                                       image:nil
+                                  identifier:nil
+                                     options:UIMenuOptionsDisplayInline
+                                    children:@[wifiTransfer]];
+    
     UIMenu* import = [UIMenu menuWithTitle:NSLocalizedString(@"safesvc_import_submenu", @"Import")
                                      image:[UIImage systemImageNamed:@"square.and.arrow.down"]
                                 identifier:nil
                                    options:UIMenuOptionsDisplayInline
                                   children:@[import1P1Pux, import1P, importLastPass, importiCloud, importCsv]];
-
+    
     
     UIMenu* more = [UIMenu menuWithTitle:NSLocalizedString(@"safesvc_more_submenu", @"More")
                                    image:[UIImage systemImageNamed:@"ellipsis.circle"]
                               identifier:nil
                                  options:kNilOptions
                                 children:@[import]];
-
+    
     UIMenu* menu = [UIMenu menuWithTitle:@""
                                    image:nil
                               identifier:nil
                                  options:kNilOptions
                                 children:AppPreferences.sharedInstance.disableNetworkBasedFeatures ? @[menu1, menu2, more] : @[menu1, menu2, menuWifi, more]];
-
+    
     self.buttonAddSafe.action = nil;
     self.buttonAddSafe.menu = menu;
 }
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
+    [self refreshICloudFolderDatabases];
+    
     [self doAppOnboarding:userJustCompletedBiometricAuthentication quickLaunchWhenDone:YES];
+}
+
+- (void)refreshICloudFolderDatabases {
+    if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest ) {
+        NSLog(@"✅ refreshICloudFolderDatabases");
+        
+        [[iCloudSafesCoordinator sharedInstance] startQuery];
+    }
 }
 
 - (void)doAppOnboarding:(BOOL)userJustCompletedBiometricAuthentication quickLaunchWhenDone:(BOOL)quickLaunchWhenDone {
@@ -671,7 +681,7 @@
 - (void)listenToNotifications {
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onProStatusChanged:)
-                                               name:kProStatusChangedNotificationKey
+                                               name:kProStatusChangedNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -793,8 +803,8 @@
 - (NSAttributedString*)getEmptyDatasetTitle {
     NSString *text = NSLocalizedString(@"safes_vc_empty_databases_list_tableview_title", @"Title displayed in tableview when there are no databases setup");
     
-    NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline],
-                                 NSForegroundColorAttributeName: [UIColor lightGrayColor]};
+    NSDictionary *attributes = @{NSFontAttributeName:FontManager.sharedInstance.headlineFont,
+                                 NSForegroundColorAttributeName: UIColor.secondaryLabelColor };
     
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
@@ -806,8 +816,8 @@
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;
     paragraph.alignment = NSTextAlignmentCenter;
 
-    NSDictionary *attributes = @{NSFontAttributeName: FontManager.sharedInstance.regularFont,
-                                 NSForegroundColorAttributeName: [UIColor lightGrayColor],
+    NSDictionary *attributes = @{NSFontAttributeName: FontManager.sharedInstance.subheadlineFont,
+                                 NSForegroundColorAttributeName: UIColor.secondaryLabelColor,
                                  NSParagraphStyleAttributeName: paragraph};
 
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
@@ -1109,7 +1119,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     
     
     
-    BOOL shareAllowed = !AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil;
+    BOOL shareAllowed = !AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil && !AppPreferences.sharedInstance.disableExport;
     if (shareAllowed) [ma addObject:[self getContextualShareAction:indexPath]];
 
     if (self.collection.count > 1) {
@@ -1148,7 +1158,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         [ma addObject:[self getContextualMenuAutoFillQuickLaunchAction:indexPath]];
     }
     
-    if ( !AppPreferences.sharedInstance.disableReadOnlyToggles ) {
+    if ( !AppPreferences.sharedInstance.databasesAreAlwaysReadOnly ) {
         [ma addObject:[self getContextualMenuReadOnlyAction:indexPath]];
     }
     
@@ -1644,7 +1654,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     
     NSString *message;
     
-    if(safe.storageProvider == kiCloud && [AppPreferences sharedInstance].iCloudOn) {
+    if ( safe.storageProvider == kiCloud && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         message = NSLocalizedString(@"safes_vc_remove_icloud_databases_warning", @"warning message about removing database from icloud");
     }
     else {
@@ -2103,24 +2113,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName modDate:(NSDate*)modDate data:(NSData *)data {
-    if(AppPreferences.sharedInstance.iCloudOn) {
-        [Alerts twoOptionsWithCancel:self
-                               title:NSLocalizedString(@"safes_vc_copy_icloud_or_local", @"Question Title: Copy to icloud or to local")
-                             message:NSLocalizedString(@"safes_vc_copy_local_to_icloud", @"Question message: copy to iCloud or to Local")
-                   defaultButtonText:NSLocalizedString(@"safes_vc_copy_to_local", @"Default button: Copy to Local")
-                    secondButtonText:NSLocalizedString(@"safes_vc_copy_to_icloud", @"Second Button: Copy to iCLoud")
-                              action:^(int response) {
-                                  if(response == 0) {
-                                      [self addManualDownloadUrl:NO data:data modDate:modDate nickName:nickName];
-                                  }
-                                  else if(response == 1) {
-                                      [self addManualDownloadUrl:YES data:data modDate:modDate nickName:nickName];
-                                  }
-                              }];
-    }
-    else {
-        [self addManualDownloadUrl:NO data:data modDate:modDate nickName:nickName];
-    }
+    [self addManualDownloadUrl:NO data:data modDate:modDate nickName:nickName];
 }
 
 - (void)addManualDownloadUrl:(BOOL)iCloud data:(NSData*)data modDate:(NSDate*)modDate nickName:(NSString *)nickName {
@@ -2181,17 +2174,13 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     
     
     
+    UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_new_database_express", @"")
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) {
+                                                                [self onNewExpressDatabase];
+                                                            }];
 
-        UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_new_database_express", @"")
-                                                                  style:UIAlertActionStyleDefault
-                                                                handler:^(UIAlertAction *a) {
-                                                                    [self onNewExpressDatabase];
-                                                                }];
-        
-        
-        
-        [alertController addAction:quickAndEasyAction];
-  
+    [alertController addAction:quickAndEasyAction];
     
     
     
@@ -2700,26 +2689,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     NSString* extension = [Serializator getLikelyFileExtension:data];
     DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];
     
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
-
 }
 
 - (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {

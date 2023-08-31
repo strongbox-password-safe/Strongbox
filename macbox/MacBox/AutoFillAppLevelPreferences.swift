@@ -29,13 +29,11 @@ class AutoFillAppLevelPreferences: NSViewController {
     }
 
     func startRefreshTimer() {
-        if #available(macOS 10.12, *) {
-            timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { [weak self] _ in
-                guard let self = self else { return }
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true, block: { [weak self] _ in
+            guard let self else { return }
 
-                self.bindUI()
-            })
-        }
+            self.bindUI()
+        })
     }
 
     func killRefreshTimer() {
@@ -53,21 +51,10 @@ class AutoFillAppLevelPreferences: NSViewController {
     func bindUI() {
         let pro = Settings.sharedInstance().isPro
         let isOnForStrongbox = AutoFillManager.sharedInstance().isOnForStrongbox
-        let featureIsAvailable: Bool
-
-        if #available(macOS 11.0, *) {
-            featureIsAvailable = true
-        } else {
-            featureIsAvailable = false
-        }
+        let featureIsAvailable = true
 
         if !pro {
             labelProWarning.isHidden = false
-        } else if !featureIsAvailable {
-            labelProWarning.isHidden = false
-            labelProWarning.stringValue = NSLocalizedString("autofill_app_preferences_only_avail_big_sur", comment: "AutoFill is only available on macOS Big Sur+")
-            labelProWarning.textColor = .systemOrange
-            labelProWarning.alignment = .center
         } else if isOnForStrongbox {
             labelProWarning.isHidden = false
             labelProWarning.stringValue = NSLocalizedString("strongbox_is_enabled_for_autofill", comment: "✅ Strongbox is enabled for Password AutoFill")

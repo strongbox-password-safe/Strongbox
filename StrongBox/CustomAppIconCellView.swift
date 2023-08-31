@@ -1,5 +1,5 @@
 //
-//  CustomAppIconCellViewCollectionViewCell.swift
+//  CustomAppIconCellView.swift
 //  Strongbox
 //
 //  Created by Strongbox on 16/02/2022.
@@ -22,7 +22,7 @@ class CustomAppIconCellView: UICollectionViewCell {
 
     func setContent(_ image: UIImage, isPro: Bool = true) {
         imageView.image = image
-        
+
         labelPro.backgroundColor = .systemPurple
         labelPro.isHidden = !isPro
     }

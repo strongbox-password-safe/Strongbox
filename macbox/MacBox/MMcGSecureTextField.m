@@ -19,7 +19,6 @@
 @interface MMcGSecureTextField ()
 
 @property NSButton* buttonRevealConceal;
-@property (readonly) BOOL useSfSymbols;
 @property BOOL innerConcealed;
 
 @end
@@ -48,43 +47,22 @@
     return self;
 }
 
-- (BOOL)useSfSymbols {
-    if (@available(macOS 11.0, *)) {
-        return YES;
-    }
-    else {
-        return NO;
-    }
-}
-
 - (void)bindRevealConcealButtonImage{
-    if ( self.useSfSymbols ) {
-        if (@available(macOS 11.0, *)) {
-            if ( !self.concealed ) {
-                self.buttonRevealConceal.image = [NSImage imageWithSystemSymbolName:@"eye.slash" accessibilityDescription:nil];
-                self.buttonRevealConceal.symbolConfiguration = [NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge];
-                self.buttonRevealConceal.contentTintColor = NSColor.systemOrangeColor;
-            }
-            else {
-                self.buttonRevealConceal.image = [NSImage imageWithSystemSymbolName:@"eye" accessibilityDescription:nil];
-                self.buttonRevealConceal.symbolConfiguration = [NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge];
-                self.buttonRevealConceal.contentTintColor = nil; 
-            }
-        }
+    if ( !self.concealed ) {
+        self.buttonRevealConceal.image = [NSImage imageWithSystemSymbolName:@"eye.slash" accessibilityDescription:nil];
+        self.buttonRevealConceal.symbolConfiguration = [NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge];
+        self.buttonRevealConceal.contentTintColor = NSColor.systemOrangeColor;
     }
     else {
-        if ( !self.concealed ) {
-            self.buttonRevealConceal.image = [NSImage imageNamed:@"hide"];
-        }
-        else {
-            self.buttonRevealConceal.image = [NSImage imageNamed:@"show"];
-        }
+        self.buttonRevealConceal.image = [NSImage imageWithSystemSymbolName:@"eye" accessibilityDescription:nil];
+        self.buttonRevealConceal.symbolConfiguration = [NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge];
+        self.buttonRevealConceal.contentTintColor = nil;
     }
 }
 
 - (void)addRevealConcealButton {
     self.buttonRevealConceal = [[NSButton alloc] init];
-
+    
     self.buttonRevealConceal.bezelStyle = NSBezelStyleSmallSquare;
     self.buttonRevealConceal.wantsLayer = YES;
     self.buttonRevealConceal.layer.backgroundColor = NSColor.clearColor.CGColor;
@@ -97,32 +75,21 @@
     self.buttonRevealConceal.title = @"";
     
     [self bindRevealConcealButtonImage];
-
+    
     self.buttonRevealConceal.translatesAutoresizingMaskIntoConstraints = NO;
-
+    
     CGFloat height, trailingOffset;
-
-    if ( self.useSfSymbols ) {
-        height = self.frame.size.height;
-        trailingOffset = -4.0;
-    }
-    else {
-        height = 20.0;
-        CGFloat width = height;
-        trailingOffset = -8.0;
-
-        self.buttonRevealConceal.imageScaling = NSImageScaleProportionallyUpOrDown;
-
-        [self.buttonRevealConceal addConstraint:[NSLayoutConstraint constraintWithItem:self.buttonRevealConceal attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:width]];
-    }
+    
+    height = self.frame.size.height;
+    trailingOffset = -4.0;
     
     [self.buttonRevealConceal addConstraint:[NSLayoutConstraint constraintWithItem:self.buttonRevealConceal attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:height]];
     
     [self addSubview:self.buttonRevealConceal];
-
+    
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.buttonRevealConceal attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeCenterY multiplier:1 constant:0]];
     [self addConstraint:[NSLayoutConstraint constraintWithItem:self.buttonRevealConceal attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1 constant:trailingOffset]];
-
+    
     self.buttonRevealConceal.needsLayout = YES;
     self.needsUpdateConstraints = YES;
     

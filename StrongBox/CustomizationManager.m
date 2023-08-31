@@ -31,11 +31,9 @@
         NSLog(@"SCOTUS Edition... customizing...");
         
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
-        AppPreferences.sharedInstance.disableReadOnlyToggles = YES;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = YES;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
-        
         AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
         AppPreferences.sharedInstance.backupFiles = NO;
         AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
@@ -44,20 +42,22 @@
         NSLog(@"Graphene Edition... customizing...");
         
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
-        AppPreferences.sharedInstance.disableReadOnlyToggles = NO;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
     }
     else {
         AppPreferences.sharedInstance.disableFavIconFeature = NO;
-        AppPreferences.sharedInstance.disableReadOnlyToggles = NO;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = NO;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = NO;
     }
-    
+
     AppPreferences.sharedInstance.hideTipJar = !StrongboxProductBundle.supportsTipJar;
+    
+    if ( self.isBusinessEdition ) {
+        [MDMConfigManager.sharedInstance applyConfigToApp];
+    }
 }
 
 + (BOOL)isAProBundle {
@@ -74,6 +74,10 @@
 
 + (BOOL)isGrapheneEdition {
     return StrongboxProductBundle.isZeroEdition;
+}
+
++ (BOOL)isBusinessEdition {
+    return StrongboxProductBundle.isBusinessBundle;
 }
 
 @end

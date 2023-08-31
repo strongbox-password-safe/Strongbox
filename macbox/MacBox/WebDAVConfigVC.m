@@ -98,7 +98,7 @@
 
 - (IBAction)onCancel:(id)sender {
     self.onDone(NO, nil);
-    [self.presentingViewController dismissViewController:self];
+    [self.presentingViewController dismissViewController:self]; 
 }
 
 - (IBAction)onConnect:(id)sender {

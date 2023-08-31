@@ -217,9 +217,7 @@
 }
 
 - (void)stopAccessingSecurityScopedResource:(NSURL*)url {
-    if ( @available(macOS 11.0, *) ) { 
-        [url stopAccessingSecurityScopedResource];
-    }
+    [url stopAccessingSecurityScopedResource];
 }
 
 @end

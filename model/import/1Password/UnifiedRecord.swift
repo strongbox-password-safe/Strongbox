@@ -152,7 +152,7 @@ class UnifiedRecord: Decodable {
                 for section in secureContents!.sections! {
                     if section.fields != nil {
                         let sectionLabel = (section.title != nil && section.title!.count > 0) ? section.title : section.name
-                        
+
                         for field in section.fields! {
                             addSectionField(entry, sectionLabel, field: field)
                         }
@@ -196,7 +196,7 @@ class UnifiedRecord: Decodable {
         }
     }
 
-    fileprivate func addDateStringField(_ epoch: Int64, _ title: String, _ entry: Node, sectionLabel : String?) {
+    fileprivate func addDateStringField(_ epoch: Int64, _ title: String, _ entry: Node, sectionLabel: String?) {
         let date = Date(timeIntervalSince1970: TimeInterval(epoch))
         let mydf = DateFormatter()
         mydf.dateStyle = .long 
@@ -209,7 +209,7 @@ class UnifiedRecord: Decodable {
         guard let value = field.v, let title = field.t, let datatype = field.k, let name = field.n else {
             return
         }
-        
+
         let stringValue = (value.value as? String) ?? ""
 
         switch datatype {
@@ -319,7 +319,7 @@ class UnifiedRecord: Decodable {
         }
     }
 
-    func addEntryField(_ entry: Node, _ key: String, _ value: String, _ concealed: Bool = false, sectionLabel : String? = nil, name : String? = nil ) {
+    func addEntryField(_ entry: Node, _ key: String, _ value: String, _ concealed: Bool = false, sectionLabel: String? = nil, name: String? = nil) {
         if value.count > 0 {
             if key == "username" {
                 if entry.fields.username.count == 0 {
@@ -332,14 +332,14 @@ class UnifiedRecord: Decodable {
                     return
                 }
             } else if key == "url" {
-                BaseImporter.addUrl(entry, value) 
+                BaseImporter.addUrl(entry, value)
                 return
             }
         }
 
         let prefixSectionName = true
         var label = key.count > 0 ? key : name
-        
+
         if prefixSectionName, let sectionLabel, !sectionLabel.isEmpty, label != nil {
             label = String(format: "%@-%@", sectionLabel, label!)
         }

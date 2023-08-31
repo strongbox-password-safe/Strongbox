@@ -1,5 +1,5 @@
 //
-//  GetDatabasesResponse.swift
+//  GetStatusResponse.swift
 //  MacBox
 //
 //  Created by Strongbox on 16/08/2022.
@@ -9,18 +9,18 @@
 import Cocoa
 
 @objc
-class ServerSettings : NSObject, Codable {
+class ServerSettings: NSObject, Codable {
     @objc var supportsCreateNew: Bool = false
 }
 
 @objc
-class GetStatusResponse : NSObject, Codable {
-    @objc var serverVersionInfo : String = ""
-    @objc var databases : [DatabaseSummary] = []
+class GetStatusResponse: NSObject, Codable {
+    @objc var serverVersionInfo: String = ""
+    @objc var databases: [DatabaseSummary] = []
     @objc var serverSettings: ServerSettings? = nil
-    
+
     @objc
-    func toJson () -> String? {
-        return AutoFillJsonHelper.toJson(object: self)
+    func toJson() -> String? {
+        AutoFillJsonHelper.toJson(object: self)
     }
 }

@@ -217,16 +217,16 @@ class AuditConfigurationViewController: NSViewController {
 
         config.hibpCheckForNewBreachesIntervalSeconds = kHibpOnceAWeek
         database.auditConfig = config
-        
+
         restartAuditor()
     }
 
     @objc func onSetHibpIntervalOnceAMonth() {
         let config = database.auditConfig
         config.hibpCheckForNewBreachesIntervalSeconds = kHibpOnceEvery30Days
-        
+
         database.auditConfig = config
-        
+
         bindUI()
 
         restartAuditor()
@@ -262,7 +262,7 @@ class AuditConfigurationViewController: NSViewController {
             let locYes = NSLocalizedString("audit_hibp_warning_yes", comment: "Yes, I understand and agree")
 
             MacAlerts.twoOptions(withCancel: loc1, informativeText: loc2, option1AndDefault: locNo, option2: locYes, window: view.window) { [weak self] response in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 if response == 1 { 
                     let config = self.database.auditConfig
@@ -355,13 +355,9 @@ class AuditConfigurationViewController: NSViewController {
             refreshTimer = nil
         }
 
-        if #available(macOS 10.12, *) {
-            refreshTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { [weak self] _ in
-                NSLog("✅ restartBackgroundAudit...")
-                self?.database.restartBackgroundAudit()
-            }
-        } else {
-            
+        refreshTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { [weak self] _ in
+            NSLog("✅ restartBackgroundAudit...")
+            self?.database.restartBackgroundAudit()
         }
     }
 

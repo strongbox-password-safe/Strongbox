@@ -25,7 +25,7 @@ extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 - (void)clearClipboardWhereAppropriate;
 - (void)onStrongboxDidChangeClipboard; 
 
-@property BOOL isRequestingAutoFillManualCredentialsEntry; 
+@property BOOL suppressQuickLaunchForNextAppActivation; 
 
 @property (readonly) BOOL isWasLaunchedAsLoginItem;
 

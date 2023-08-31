@@ -581,7 +581,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         self.onDone(NO, nil);
     }
         
-    [self.presentingViewController dismissViewController:self];
+    [self.presentingViewController dismissViewController:self]; 
 }
 
 - (IBAction)onSetIcons:(id)sender {

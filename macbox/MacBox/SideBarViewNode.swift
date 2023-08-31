@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  SideBarViewNode.swift
 //  MacBox
 //
 //  Created by Strongbox on 27/01/2022.
@@ -13,7 +13,7 @@ class SideBarViewNode {
     let title: String
     let image: NSImage
     var children: [SideBarViewNode]
-    let headerNode : HeaderNode?
+    let headerNode: HeaderNode?
     let color: NSColor?
     let parent: SideBarViewNode?
     let databaseNodeChildCount: String?

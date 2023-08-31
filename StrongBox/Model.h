@@ -45,7 +45,6 @@ typedef void (^AsyncUpdateCompletion)(AsyncJobResult *result);
 extern NSString* const kAuditNodesChangedNotificationKey;
 extern NSString* const kAuditProgressNotificationKey;
 extern NSString* const kAuditCompletedNotificationKey;
-extern NSString* const kProStatusChangedNotificationKey;
 extern NSString* const kAppStoreSaleNotificationKey; 
 extern NSString* const kCentralUpdateOtpUiNotification;
 extern NSString* const kMasterDetailViewCloseNotification;

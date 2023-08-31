@@ -635,19 +635,6 @@
 
 
 
-- (BOOL)outlineViewEditableFieldsAreReadonly {
-    return self.metadata.outlineViewEditableFieldsAreReadonly;
-}
-
-- (void)setOutlineViewEditableFieldsAreReadonly:(BOOL)outlineViewEditableFieldsAreReadonly {
-    [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.outlineViewEditableFieldsAreReadonly = outlineViewEditableFieldsAreReadonly;
-    }];
-
-}
-
-
-
 - (BOOL)concealEmptyProtectedFields {
     return self.metadata.concealEmptyProtectedFields;
 }
@@ -1105,7 +1092,6 @@
     debugLines[@"doNotShowAutoCompleteSuggestions"] = [NSString stringWithFormat:@"%hhd", self.doNotShowAutoCompleteSuggestions]; 
     debugLines[@"doNotShowChangeNotifications"] = [NSString stringWithFormat:@"%hhd", self.doNotShowChangeNotifications]; 
     debugLines[@"outlineViewTitleIsReadonly"] = [NSString stringWithFormat:@"%hhd", self.outlineViewTitleIsReadonly]; 
-    debugLines[@"outlineViewEditableFieldsAreReadonly"] = [NSString stringWithFormat:@"%hhd", self.outlineViewEditableFieldsAreReadonly]; 
     debugLines[@"concealEmptyProtectedFields"] = [NSString stringWithFormat:@"%hhd", self.concealEmptyProtectedFields]; 
     debugLines[@"startWithSearch"] = [NSString stringWithFormat:@"%hhd", self.startWithSearch]; 
     debugLines[@"showAdvancedUnlockOptions"] = [NSString stringWithFormat:@"%hhd", self.showAdvancedUnlockOptions]; 

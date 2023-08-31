@@ -10,8 +10,8 @@ import SwiftUI
 
 struct NewExpiryCellView: View {
     @State
-    var date : Date
-    
+    var date: Date
+
     var body: some View {
         VStack(alignment: .leading) {
             Text("item_details_expires_field_title").font(.caption).foregroundColor(.secondary)
@@ -33,7 +33,7 @@ struct NewExpiryCellView: View {
                 }, label: {
                     Image(systemName: "x.circle").imageScale(.large)
                 })
-            }   
+            }
         }
     }
 }

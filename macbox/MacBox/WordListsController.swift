@@ -19,7 +19,7 @@ class WordListsController: NSViewController, NSTableViewDataSource, NSTableViewD
     }
 
     func numberOfRows(in _: NSTableView) -> Int {
-        return sortedWordListKeys.count
+        sortedWordListKeys.count
     }
 
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {

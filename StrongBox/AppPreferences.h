@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL monitorInternetConnectivity;
-@property (nonatomic) BOOL iCloudOn;
+
 @property FavIconDownloadOptions *favIconDownloadOptions;
 @property BOOL showDatabasesSeparator;
 @property BOOL showDatabaseStatusIcon;
@@ -92,10 +92,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)incrementLaunchCount;
 
 - (NSString*)getFlagsStringForDiagnostics;
-
-@property (nonatomic) BOOL iCloudWasOn;
-@property (nonatomic) BOOL iCloudPrompted;
-@property (nonatomic) BOOL iCloudAvailable;
 
 @property (nonatomic) NSDate* installDate;
 @property (nonatomic, readonly) NSInteger daysInstalled;
@@ -146,8 +142,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL hasPromptedThatFreeTrialWillEndSoon;
 
-@property BOOL disableReadOnlyToggles;
 @property BOOL databasesAreAlwaysReadOnly;
+@property BOOL disableExport;
+@property BOOL disablePrinting;
+
 @property BOOL disableFavIconFeature;
 @property BOOL disableNetworkBasedFeatures; 
 
@@ -182,7 +180,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hasMigratedToLazySync;
 
 @property (nullable) NSString* businessOrganisationName;
-@property BOOL shadeFavoriteTag;
+@property (readonly) BOOL shadeFavoriteTag;
 
 @property BOOL appendDateToExportFileName;
 

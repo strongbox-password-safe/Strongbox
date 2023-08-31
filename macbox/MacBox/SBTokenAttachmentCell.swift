@@ -10,11 +10,11 @@ import Cocoa
 
 class SBTokenAttachmentCell: OEXTokenAttachmentCell {
     override func titleMargin() -> CGFloat {
-        return 6.0
+        6.0
     }
 
     override func tokenMargin() -> CGFloat {
-        return 4.0
+        4.0
     }
 
     let heightPadding: CGFloat = 10.0
@@ -67,7 +67,7 @@ class SBTokenAttachmentCell: OEXTokenAttachmentCell {
     }
 
     override func tokenTitleColor(for _: OEXTokenDrawingMode) -> NSColor! {
-        return .white
+        .white
     }
 
     override func tokenPath(forBounds bounds: NSRect, joinStyle _: OEXTokenJoinStyle) -> NSBezierPath! {

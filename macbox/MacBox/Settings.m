@@ -7,7 +7,6 @@
 //
 
 #import "Settings.h"
-#import "NotificationConstants.h"
 #import "Utils.h"
 #import "Constants.h"
 #import "Model.h"
@@ -72,11 +71,9 @@ static NSString* const kMiniaturizeOnCopy = @"miniaturizeOnCopy";
 static NSString* const kQuickRevealWithOptionKey = @"quickRevealWithOptionKey";
 static NSString* const kMarkdownNotes = @"markdownNotes";
 static NSString* const kShowPasswordGenInTray = @"showPasswordGenInTray";
-static NSString* const kNextGenUI = @"nextGenUI-Production-17-Mar-2022";
 static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
 static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupplementaryTotpCustomFields";
 static NSString* const kQuitOnAllWindowsClosed = @"quitOnAllWindowsClosed";
-static NSString* const kLastPromptedToUseNextGenUI = @"lastPromptedToUseNextGenUI";
 static NSString* const kShowCopyFieldButton = @"showCopyFieldButton";
 static NSString* const kLockEvenIfEditing = @"lockEvenIfEditing";
 static NSString* const kScreenCaptureBlocked = @"screenCaptureBlocked";
@@ -113,6 +110,14 @@ static NSString* const kRunSshAgent = @"runSshAgent";
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
 static NSString* const kLastQuickTypeMultiDbRegularClear = @"lastQuickTypeMultiDbRegularClear";
 static NSString* const kSshAgentApprovalDefaultExpiryMinutes = @"sshAgentApprovalDefaultExpiryMinutes";
+
+
+
+static NSString* const kDatabasesAreAlwaysReadOnly = @"databasesAreAlwaysReadOnly";
+static NSString* const kDisableExport = @"disableExport";
+static NSString* const kDisablePrinting = @"disablePrinting";
+static NSString* const kSshAgentRequestDatabaseUnlockAllowed = @"sshAgentRequestDatabaseUnlockAllowed";
+static NSString* const kSshAgentPreventRapidRepeatedUnlockRequests = @"sshAgentPreventRapidRepeatedUnlockRequests";
 
 
 
@@ -167,7 +172,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 #ifndef IS_APP_EXTENSION
 
-- (void)factoryReset {
+- (void)clearAllDefaults {
     for (NSString* key in self.sharedAppGroupDefaults.dictionaryRepresentation.allKeys) {
         NSLog(@"✅ Deleting from Shared App Group: [%@]", key);
         [self.sharedAppGroupDefaults removeObjectForKey:key];
@@ -182,6 +187,10 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     }
     
     [NSUserDefaults.standardUserDefaults synchronize];
+}
+
+- (void)factoryReset {
+    [self clearAllDefaults];
     
     
     
@@ -214,11 +223,53 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     
     
     [NativeMessagingManifestInstallHelper removeNativeMessagingHostsFiles];
+    
+    [self clearAllDefaults]; 
 }
 
 #endif
 
 
+
+- (BOOL)sshAgentPreventRapidRepeatedUnlockRequests {
+    return [self getBool:kSshAgentPreventRapidRepeatedUnlockRequests fallback:YES];
+}
+
+- (void)setSshAgentPreventRapidRepeatedUnlockRequests:(BOOL)sshAgentPreventRapidRepeatedUnlockRequests {
+    [self setBool:kSshAgentPreventRapidRepeatedUnlockRequests value:sshAgentPreventRapidRepeatedUnlockRequests];
+}
+
+- (BOOL)sshAgentRequestDatabaseUnlockAllowed {
+    return [self getBool:kSshAgentRequestDatabaseUnlockAllowed fallback:YES];
+}
+
+- (void)setSshAgentRequestDatabaseUnlockAllowed:(BOOL)sshAgentRequestDatabaseUnlockAllowed {
+    [self setBool:kSshAgentRequestDatabaseUnlockAllowed value:sshAgentRequestDatabaseUnlockAllowed];
+}
+
+- (BOOL)databasesAreAlwaysReadOnly {
+    return [self getBool:kDatabasesAreAlwaysReadOnly];
+}
+
+- (void)setDatabasesAreAlwaysReadOnly:(BOOL)databasesAreAlwaysReadOnly {
+    [self setBool:kDatabasesAreAlwaysReadOnly value:databasesAreAlwaysReadOnly];
+}
+
+- (BOOL)disableExport {
+    return [self getBool:kDisableExport];
+}
+
+- (void)setDisableExport:(BOOL)disableExport {
+    [self setBool:kDisableExport value:disableExport];
+}
+
+- (BOOL)disablePrinting {
+    return [self getBool:kDisablePrinting];
+}
+
+- (void)setDisablePrinting:(BOOL)disablePrinting {
+    [self setBool:kDisablePrinting value:disablePrinting];
+}
 
 - (NSInteger)sshAgentApprovalDefaultExpiryMinutes {
     NSInteger ret = [self.sharedAppGroupDefaults integerForKey:kSshAgentApprovalDefaultExpiryMinutes];
@@ -272,11 +323,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (BOOL)shadeFavoriteTag {
     return YES;
-
-}
-
-- (void)setShadeFavoriteTag:(BOOL)shadeFavoriteTag {
-
 }
 
 - (BOOL)hasPromptedForThirdPartyAutoFill {
@@ -578,29 +624,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kMiniaturizeOnCopy value:miniaturizeOnCopy];
 }
 
-- (NSDate *)lastPromptedToUseNextGenUI {
-    return [self.sharedAppGroupDefaults objectForKey:kLastPromptedToUseNextGenUI];
-}
-
-- (void)setLastPromptedToUseNextGenUI:(NSDate *)lastPromptedToUseNextGenUI {
-    [self.sharedAppGroupDefaults setObject:lastPromptedToUseNextGenUI forKey:kLastPromptedToUseNextGenUI];
-    [self.sharedAppGroupDefaults synchronize];
-}
-
-- (BOOL)nextGenUI {
-    if (@available(macOS 11.0, *)) {
-        return YES;
-
-    }
-    else {
-        return NO;
-    }
-}
-
-- (void)setNextGenUI:(BOOL)nextGenUI {
-    [self setBool:kNextGenUI value:nextGenUI];
-}
-
 - (BOOL)makeLocalRollingBackups {
     return [self getBool:kMakeLocalRollingBackups fallback:YES];
 }
@@ -782,7 +805,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (void)setPro:(BOOL)value {
     [self setBool:kPro value:value];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotification object:nil];
 }
 
 - (NSInteger)autoLockIfInBackgroundTimeoutSeconds {
@@ -907,14 +930,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setPasswordStrengthConfig:(PasswordStrengthConfig *)passwordStrengthConfig {
     NSLog(@"🔴 NOTIMPL: setPasswordStrengthConfig");
-}
-
-- (BOOL)databasesAreAlwaysReadOnly {
-    return NO;
-}
-
-- (void)setDatabasesAreAlwaysReadOnly:(BOOL)databasesAreAlwaysReadOnly {
-    
 }
 
 - (BOOL)hasShownFirstRunWelcome {

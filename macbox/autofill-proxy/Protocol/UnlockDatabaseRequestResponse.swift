@@ -8,44 +8,44 @@
 
 import Cocoa
 
-class UnlockDatabaseRequest : NSObject, Codable {
-    var databaseId : String
-    
-    init ( databaseId : String ) {
+class UnlockDatabaseRequest: NSObject, Codable {
+    var databaseId: String
+
+    init(databaseId: String) {
         self.databaseId = databaseId
     }
 }
 
-class UnlockDatabaseResponse : NSObject, Codable {
-    var success : Bool
-    
-    init( success : Bool ) {
+class UnlockDatabaseResponse: NSObject, Codable {
+    var success: Bool
+
+    init(success: Bool) {
         self.success = success
     }
-    
+
     @objc
-    func toJson () -> String? {
-        return AutoFillJsonHelper.toJson(object: self)
+    func toJson() -> String? {
+        AutoFillJsonHelper.toJson(object: self)
     }
 }
 
-class LockDatabaseRequest : NSObject, Codable {
-    var databaseId : String
-    
-    init ( databaseId : String ) {
+class LockDatabaseRequest: NSObject, Codable {
+    var databaseId: String
+
+    init(databaseId: String) {
         self.databaseId = databaseId
     }
 }
 
-class LockDatabaseResponse : NSObject, Codable {
-    var success : Bool
-    
-    init( success : Bool ) {
+class LockDatabaseResponse: NSObject, Codable {
+    var success: Bool
+
+    init(success: Bool) {
         self.success = success
     }
-    
+
     @objc
-    func toJson () -> String? {
-        return AutoFillJsonHelper.toJson(object: self)
+    func toJson() -> String? {
+        AutoFillJsonHelper.toJson(object: self)
     }
 }

@@ -9,30 +9,30 @@
 import Foundation
 
 @objc
-public class SaleNowOnOnboardingModule : NSObject, OnboardingModule {
-    public required init(model: Model?) {
-        
-    }
-    
+public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
+    public required init(model _: Model?) {}
+
     public func shouldDisplay() -> Bool {
-        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription 
+        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription // Ignore Monthly's
         let nonePro = !AppPreferences.sharedInstance().isPro
-        let saleNowOn = SaleScheduleManager.sharedInstance().saleNowOn;
+        let saleNowOn = SaleScheduleManager.sharedInstance().saleNowOn
         let hasBeenPrompted = SaleScheduleManager.sharedInstance().userHasBeenPromptedAboutCurrentSale
 
         return !CustomizationManager.isAProBundle && saleNowOn && !hasBeenPrompted && (existingSubscriber || nonePro)
     }
-        
+
     public func instantiateViewController(_ onDone: @escaping OnboardingModuleDoneBlock) -> VIEW_CONTROLLER_PTR? {
-        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription;
-        
+        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription
+
         guard let saleEndDate = SaleScheduleManager.sharedInstance().currentSaleEndDate,
-              let inclusiveEndDate = Calendar.current.date(byAdding: .day, value: -1, to: saleEndDate) else {
+              let inclusiveEndDate = Calendar.current.date(byAdding: .day, value: -1, to: saleEndDate)
+        else {
             return nil
         }
-        
+
         let vcc = SwiftUIViewFactory.makeSaleOfferViewController(saleEndDate: inclusiveEndDate,
-                                                              existingSubscriber: existingSubscriber) {
+                                                                 existingSubscriber: existingSubscriber)
+        {
             SaleScheduleManager.sharedInstance().userHasBeenPromptedAboutCurrentSale = true
             SKPaymentQueue.default().presentCodeRedemptionSheet()
             onDone(false, true)
@@ -44,21 +44,21 @@ public class SaleNowOnOnboardingModule : NSObject, OnboardingModule {
             SaleScheduleManager.sharedInstance().userHasBeenPromptedAboutCurrentSale = true
             onDone(false, false)
         }
-        
+
         return vcc
     }
 
-    func showLifetimePurchaseScreen ( ) {
+    func showLifetimePurchaseScreen() {
         let vc = SKStoreProductViewController()
-     
-        vc.loadProduct(withParameters: [SKStoreProductParameterITunesItemIdentifier : NSNumber(value: 1481853033)])
-        
+
+        vc.loadProduct(withParameters: [SKStoreProductParameterITunesItemIdentifier: NSNumber(value: 1_481_853_033)])
+
         if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
-           let viewController = appDelegate.getVisibleViewController() {
+           let viewController = appDelegate.getVisibleViewController()
+        {
 
             viewController.present(vc, animated: true)
-        }
-        else {
+        } else {
             NSLog("🔴 Could find a view controller to present on!")
         }
     }

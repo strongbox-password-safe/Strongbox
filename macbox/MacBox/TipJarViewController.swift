@@ -9,47 +9,47 @@
 import Cocoa
 
 class TipJarViewController: NSViewController {
-    @IBOutlet weak var labelTerms: ClickableTextField!
-    @IBOutlet weak var labelPrivacy: ClickableTextField!
-    @IBOutlet weak var labelRestorePurchases: ClickableTextField!
-    @IBOutlet weak var labelDismiss: ClickableTextField!
-    
-    @IBOutlet weak var buttonLittle: NSButton!
-    @IBOutlet weak var buttonSmall: NSButton!
-    @IBOutlet weak var buttonMedium: NSButton!
-    @IBOutlet weak var buttonLarge: NSButton!
-    @IBOutlet weak var buttonHuge: NSButton!
-    @IBOutlet weak var buttonYearly: NSButton!
-    @IBOutlet weak var buttonMonthly: NSButton!
-    
+    @IBOutlet var labelTerms: ClickableTextField!
+    @IBOutlet var labelPrivacy: ClickableTextField!
+    @IBOutlet var labelRestorePurchases: ClickableTextField!
+    @IBOutlet var labelDismiss: ClickableTextField!
+
+    @IBOutlet var buttonLittle: NSButton!
+    @IBOutlet var buttonSmall: NSButton!
+    @IBOutlet var buttonMedium: NSButton!
+    @IBOutlet var buttonLarge: NSButton!
+    @IBOutlet var buttonHuge: NSButton!
+    @IBOutlet var buttonYearly: NSButton!
+    @IBOutlet var buttonMonthly: NSButton!
+
     @objc
     class func fromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: "TipJar", bundle: nil)
         return storyboard.instantiateInitialController() as! Self
     }
-    
+
     @objc func presentInNewWindow() {
         let window = EscapableWindow(contentViewController: self)
-        
+
         window.standardWindowButton(.miniaturizeButton)?.isHidden = true
         window.standardWindowButton(.zoomButton)?.isHidden = true
 
         view.window?.styleMask.remove(.miniaturizable)
- 
+
         window.makeKeyAndOrderFront(self)
     }
 
-    var originalLittleTitle : String = ""
-    var originalSmallTitle : String = ""
-    var originalMediumTitle : String = ""
-    var originalLargeTitle : String = ""
-    var originalHugeTitle : String = ""
-    var originalMonthlyTitle : String = ""
-    var originalYearlyTitle : String = ""
-    
+    var originalLittleTitle: String = ""
+    var originalSmallTitle: String = ""
+    var originalMediumTitle: String = ""
+    var originalLargeTitle: String = ""
+    var originalHugeTitle: String = ""
+    var originalMonthlyTitle: String = ""
+    var originalYearlyTitle: String = ""
+
     override func viewDidLoad() {
         super.viewDidLoad()
-                
+
         labelTerms.onClick = { [weak self] in
             self?.onTerms()
         }
@@ -62,7 +62,7 @@ class TipJarViewController: NSViewController {
         labelRestorePurchases.onClick = { [weak self] in
             self?.onRestorePurchases()
         }
-    
+
         originalLittleTitle = buttonLittle.title
         originalSmallTitle = buttonSmall.title
         originalMediumTitle = buttonMedium.title
@@ -74,7 +74,7 @@ class TipJarViewController: NSViewController {
         bindPrices()
 
         NotificationCenter.default.addObserver(forName: .Tips.loaded, object: nil, queue: nil) { [weak self] _ in
-            guard let self = self else { return }
+            guard let self else { return }
             DispatchQueue.main.async {
                 self.bindPrices()
             }
@@ -90,17 +90,16 @@ class TipJarViewController: NSViewController {
         buttonMonthly.title = String(format: "%@ (%@)", originalMonthlyTitle, TipJarLogic.sharedInstance.getTipPrice(.monthly))
         buttonYearly.title = String(format: "%@ (%@)", originalYearlyTitle, TipJarLogic.sharedInstance.getTipPrice(.annual))
     }
- 
-    let isPresentedAsSheet : Bool = false
-    
-    func dismissWindow () {
+
+    let isPresentedAsSheet: Bool = false
+
+    func dismissWindow() {
         DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            
+            guard let self else { return }
+
             if self.isPresentedAsSheet {
                 self.dismiss(nil)
-            }
-            else {
+            } else {
                 self.view.window?.close()
             }
         }
@@ -109,11 +108,11 @@ class TipJarViewController: NSViewController {
     func onTerms() {
         NSWorkspace.shared.open(URL(string: "https:
     }
-    
+
     func onPrivacy() {
         NSWorkspace.shared.open(URL(string: "https:
     }
-        
+
     func enableButtons(_ enable: Bool) {
         DispatchQueue.main.async { [weak self] in
             self?.buttonLittle.isEnabled = enable
@@ -126,42 +125,42 @@ class TipJarViewController: NSViewController {
 
             self?.labelRestorePurchases.isEnabled = enable
             self?.labelDismiss.isEnabled = enable
-            
+
             self?.labelRestorePurchases.textColor = enable ? .linkColor : .disabledControlTextColor
             self?.labelDismiss.textColor = enable ? .linkColor : .disabledControlTextColor
         }
     }
-    
-    var purchaseInProgress : Bool = false
-    @IBAction func onLittle(_ sender: Any) {
+
+    var purchaseInProgress: Bool = false
+    @IBAction func onLittle(_: Any) {
         beginPurchase(.little)
     }
-    
-    @IBAction func onSmall(_ sender: Any) {
+
+    @IBAction func onSmall(_: Any) {
         beginPurchase(.small)
     }
-    
-    @IBAction func onMedium(_ sender: Any) {
+
+    @IBAction func onMedium(_: Any) {
         beginPurchase(.medium)
     }
 
-    @IBAction func onLarge(_ sender: Any) {
+    @IBAction func onLarge(_: Any) {
         beginPurchase(.large)
     }
 
-    @IBAction func onHuge(_ sender: Any) {
+    @IBAction func onHuge(_: Any) {
         beginPurchase(.huge)
     }
 
-    @IBAction func onMonthly(_ sender: Any) {
+    @IBAction func onMonthly(_: Any) {
         beginPurchase(.monthly)
     }
 
-    @IBAction func onYearly(_ sender: Any) {
+    @IBAction func onYearly(_: Any) {
         beginPurchase(.annual)
     }
-    
-    func beginPurchase (_ tip : TipJarLogic.Tip ) {
+
+    func beginPurchase(_ tip: TipJarLogic.Tip) {
         if !TipJarLogic.sharedInstance.isLoaded || purchaseInProgress {
             return
         }
@@ -170,21 +169,21 @@ class TipJarViewController: NSViewController {
 
         purchaseInProgress = true
         enableButtons(false)
-        
+
         TipJarLogic.sharedInstance.purchase(tip, completion: onPurchaseCompleted(error:))
     }
-    
+
     func onPurchaseCompleted(error: Error?) {
         DispatchQueue.main.async { [weak self] in
             self?.onPurchaseCompletedInt(error: error)
         }
     }
-    
+
     func onPurchaseCompletedInt(error: Error?) {
         macOSSpinnerUI.sharedInstance().dismiss()
         purchaseInProgress = false
         enableButtons(true)
-        
+
         let nsError = error as NSError?
 
         if nsError != nil {
@@ -195,13 +194,13 @@ class TipJarViewController: NSViewController {
             MacAlerts.error(error, window: view.window)
         } else {
             MacAlerts.info(NSLocalizedString("tip_purchased_title", comment: "⭐️ Wow ⭐️"), informativeText: NSLocalizedString("tip_purchased_message", comment: "\n❤️ Thank you so much ❤️\n\nSending good vibes your way from everyone at Strongbox HQ!"), window: view.window, completion: { [weak self] in
-                guard let self = self else { return }
+                guard let self else { return }
 
                 self.dismissWindow()
             })
         }
     }
-    
+
     func onRestorePurchases() {
         macOSSpinnerUI.sharedInstance().show(NSLocalizedString("upgrade_vc_progress_restoring", comment: "Restoring..."), viewController: self)
 

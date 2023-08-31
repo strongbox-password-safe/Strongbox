@@ -33,17 +33,13 @@
         return YES;
     }
     
-    if ( @available(macOS 10.15, *) ) {
-        LAContext *localAuthContext = [[LAContext alloc] init];
-        NSError *authError;
-        BOOL ret = [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithWatch error:&authError];
-        
-        
-        
-        return ret;
-    }
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    NSError *authError;
+    BOOL ret = [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithWatch error:&authError];
     
-    return NO;
+    
+    
+    return ret;
 }
 
 - (BOOL)isTouchIdUnlockAvailable {
@@ -51,30 +47,21 @@
         return YES;
     }
     
-    if ( @available (macOS 10.12.2, *) ) {
-        LAContext *localAuthContext = [[LAContext alloc] init];
-        NSError *authError;
-        return [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError];
-    }
-    
-    return NO;
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    NSError *authError;
+    return [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError];
 }
 
 - (NSUInteger)getLAPolicy:(BOOL)touch watch:(BOOL)watch {
-    if ( @available(macOS 10.15, *) ) {
-        if ( touch && watch ) {
-            return LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch;
-        }
-        
-        if ( watch ) {
-            return LAPolicyDeviceOwnerAuthenticationWithWatch;
-        }
-        
-        return LAPolicyDeviceOwnerAuthenticationWithBiometrics;
+    if ( touch && watch ) {
+        return LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch;
     }
-    else { 
-        return LAPolicyDeviceOwnerAuthenticationWithBiometrics;
+    
+    if ( watch ) {
+        return LAPolicyDeviceOwnerAuthenticationWithWatch;
     }
+    
+    return LAPolicyDeviceOwnerAuthenticationWithBiometrics;
 }
 
 - (void)authorize:(MacDatabasePreferences *)database completion:(void (^)(BOOL, NSError *))completion {
@@ -104,36 +91,29 @@
         return;
     }
     
-    if ( @available (macOS 10.12.1, *)) {
-        LAContext *localAuthContext = [[LAContext alloc] init];
-
-        if (fallbackTitle.length == 0) { 
-            localAuthContext.localizedFallbackTitle = @""; 
-        }
-        else {
-            localAuthContext.localizedFallbackTitle = fallbackTitle;
-        }
-            
-        NSString* loc = reason.length ? reason : NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Unlock Database");
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    
+    if (fallbackTitle.length == 0) { 
+        localAuthContext.localizedFallbackTitle = @""; 
+    }
+    else {
+        localAuthContext.localizedFallbackTitle = fallbackTitle;
+    }
+    
+    NSString* loc = reason.length ? reason : NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Unlock Database");
+    
+    NSError *authError;
+    NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
+    
+    if([localAuthContext canEvaluatePolicy:policy error:&authError]) {
+        self.biometricsInProgress = YES;
         
-        NSError *authError;
-        NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
-        
-        if([localAuthContext canEvaluatePolicy:policy error:&authError]) {
-            self.biometricsInProgress = YES;
-            
-            [localAuthContext evaluatePolicy:policy
-                             localizedReason:loc
-                                       reply:^(BOOL success, NSError *error) {
-                                           completion(success, error);
-                                           self.biometricsInProgress = NO;
-                                       }];
-        }
-        else {
-            NSLog(@"Biometrics is not available on this device");
-            NSString* loc = NSLocalizedString(@"mac_biometrics_not_available", @"Biometrics is not available on this device!");
-            completion(NO, [Utils createNSError:loc errorCode:24321]);
-        }
+        [localAuthContext evaluatePolicy:policy
+                         localizedReason:loc
+                                   reply:^(BOOL success, NSError *error) {
+            completion(success, error);
+            self.biometricsInProgress = NO;
+        }];
     }
     else {
         NSLog(@"Biometrics is not available on this device");

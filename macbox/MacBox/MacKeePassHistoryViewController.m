@@ -9,7 +9,12 @@
 #import "MacKeePassHistoryViewController.h"
 #import "NodeIconHelper.h"
 #import "MacAlerts.h"
-#import "NodeDetailsViewController.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @interface MacKeePassHistoryViewController () <NSTableViewDelegate, NSTableViewDataSource>
 
@@ -52,25 +57,17 @@
         return;
     }
     
-    Node* node = self.history[row];
-    [self openDetails:node];
+    [self openDetails:row];
 }
 
-- (void)openDetails:(Node*)node {
-    [self performSegueWithIdentifier:@"segueToItemDetails" sender:node];
-}
-
-- (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
-    if([segue.identifier isEqualToString:@"segueToItemDetails"]) {
-        NSWindowController *wc = segue.destinationController;
-        NodeDetailsViewController* vc = (NodeDetailsViewController*)(wc.contentViewController);
-        
-        vc.node = sender;
-        vc.model = self.model;
-        vc.newEntry = NO;
-        vc.historicalItem = YES;
-        vc.onClosed = nil;
-    }
+- (void)openDetails:(NSUInteger)historicalIdx {    
+    Node* node = self.history[historicalIdx];
+    
+    DetailViewController* vc = [DetailViewController fromStoryboard];
+    
+    [self presentViewControllerAsSheet:vc];
+    
+    [vc loadWithExplicitDocument:self.model.document explicitItemUuid:node.uuid historicalIdx:historicalIdx];
 }
 
 - (IBAction)onShowPasswords:(id)sender {

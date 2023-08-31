@@ -170,7 +170,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesCollectionLockStateChangedNotification object:nil];
 }
 

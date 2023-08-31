@@ -1,5 +1,5 @@
 //
-//  Images.swift
+//  Icon.swift
 //  MacBox
 //
 //  Created by Strongbox on 15/11/2021.
@@ -27,121 +27,49 @@ enum Icon {
     case viewFinderCircleFill
     case favourite
     case sshKey
-    
+
     func image() -> NSImage {
         switch self {
         case .favourite:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "star", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "star", accessibilityDescription: nil)!
         case .recycleBin:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "trash", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "trash", accessibilityDescription: nil)!
         case .attachment:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "paperclip", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "document_empty_64")!
-            }
+            return NSImage(systemSymbolName: "paperclip", accessibilityDescription: nil)!
         case .expired:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "deskclock.fill", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "deskclock.fill", accessibilityDescription: nil)!
         case .nearlyExpired:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "deskclock", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "deskclock", accessibilityDescription: nil)!
         case .totp:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "timer", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "timer", accessibilityDescription: nil)!
         case .preferences:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "gear", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "preferences")!
-            }
+            return NSImage(systemSymbolName: "gear", accessibilityDescription: nil)!
         case .auditShield:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "checkmark.shield", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "checkmark.shield", accessibilityDescription: nil)!
         case .auditShieldFill:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "checkmark.shield.fill", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "checkmark.shield.fill", accessibilityDescription: nil)!
         case .listStar:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "list.star", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "list.star", accessibilityDescription: nil)!
         case .calendarBadgeClock:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "calendar.badge.clock", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "timer")!
-            }
+            return NSImage(systemSymbolName: "calendar.badge.clock", accessibilityDescription: nil)!
         case .folder:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "folder", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "folder")!
-            }
+            return NSImage(systemSymbolName: "folder", accessibilityDescription: nil)!
         case .tag:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "tag", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "tag")!
-            }
+            return NSImage(systemSymbolName: "tag", accessibilityDescription: nil)!
         case .tagFill:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "tag.fill", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "tag")!
-            }
+            return NSImage(systemSymbolName: "tag.fill", accessibilityDescription: nil)!
         case .house:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "house", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "house")!
-            }
+            return NSImage(systemSymbolName: "house", accessibilityDescription: nil)!
         case .houseFill:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "house.fill", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "house")!
-            }
+            return NSImage(systemSymbolName: "house.fill", accessibilityDescription: nil)!
         case .viewFinderCircleFill:
-            if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "viewfinder.circle.fill", accessibilityDescription: nil)!
-            } else {
-                return NSImage(named: "house")!
-            }
+            return NSImage(systemSymbolName: "viewfinder.circle.fill", accessibilityDescription: nil)!
         case .sshKey:
             if #available(macOS 12.0, *) {
                 return NSImage(systemSymbolName: "network.badge.shield.half.filled", accessibilityDescription: nil)!
             }
-            else if #available(macOS 11.0, *) {
-                return NSImage(systemSymbolName: "key", accessibilityDescription: nil)!
-            }
-            else {
-                return NSImage(named: "house")!
-            }
+
+            return NSImage(systemSymbolName: "key", accessibilityDescription: nil)!
         }
     }
 }
