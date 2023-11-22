@@ -52,7 +52,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nonatomic) BOOL quickTypeEnabled;
 @property (nonatomic) QuickTypeAutoFillDisplayFormat quickTypeDisplayFormat;
 
-@property (nonatomic) BOOL quickWormholeFillEnabled;
 @property (nonatomic) BOOL hasPromptedForAutoFillEnrol;
 
 - (SecretExpiryMode)getConveniencePasswordExpiryMode;
@@ -113,7 +112,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 
 
-@property BOOL autoFillScanAltUrls;
 @property BOOL autoFillScanCustomFields;
 @property BOOL autoFillScanNotes;
 
@@ -161,6 +159,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 
 
+@property BOOL includeAssociatedDomains;
 @property BOOL autoFillConcealedFieldsAsCreds;
 @property BOOL autoFillUnConcealedFieldsAsCreds;
 

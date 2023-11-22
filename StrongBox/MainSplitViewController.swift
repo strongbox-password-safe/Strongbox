@@ -45,7 +45,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         viewControllers = [browseTabController, emptyDetails]
 
         delegate = self
-        preferredDisplayMode = .allVisible
+        preferredDisplayMode = .allVisible 
 
         listenToNotifications()
 
@@ -85,10 +85,36 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
 
 
+
+
+
+
+
+
+        NotificationCenter.default.addObserver(self, selector: #selector(onAutoFillChangedConfig(object:)), name: .autoFillChangedConfig, object: nil)
+    }
+
+    @objc func onAutoFillChangedConfig(object _: Any?) {
+        NSLog("🟢 MainSplitViewController::onAutoFillChangedConfig - reloading and doing background sync...")
+
+        
+        
+
+        reloadModelFromWorkingCache { [weak self] success in
+            if success {
+                self?.sync() 
+            }
+        }
     }
 
     func splitViewController(_: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
         NSLog("splitViewController::collapseSecondaryViewController 2nd [%@] -> primary [%@]", secondaryViewController, primaryViewController)
+
+        if UIDevice.current.userInterfaceIdiom == .pad { 
+            if #available(iOS 17.0, *) {
+                return false
+            }
+        }
 
         guard let tabBar = viewControllers.first as? UITabBarController,
               let masterNav = tabBar.selectedViewController as? UINavigationController
@@ -100,10 +126,12 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         if let detailsNav = secondaryViewController as? UINavigationController,
            let detailsVc = detailsNav.topViewController as? ItemDetailsViewController
         {
-            NSLog("Displaying a details view, will not collapse to Browse, collapsing to detail instead")
+            NSLog("Displaying a details view, will not collapse to Browse, collapsing to detail instead - [displayMode = %@, isCollapsed = %hhd]", String(describing: displayMode), isCollapsed)
+
+            
+            detailsNav.popViewController(animated: false) 
 
             masterNav.pushViewController(detailsVc, animated: false)
-
             viewControllers = [primaryViewController]
 
             return true
@@ -134,6 +162,12 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
     func splitViewController(_: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
         NSLog("splitViewController::separateSecondaryFrom: [%@]", String(describing: primaryViewController))
+
+        if UIDevice.current.userInterfaceIdiom == .pad { 
+            if #available(iOS 17.0, *) {
+                return nil
+            }
+        }
 
         guard let tabBar = viewControllers.first as? UITabBarController,
               let masterNav = tabBar.selectedViewController as? UINavigationController
@@ -299,7 +333,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
             return
         }
 
-        SyncManager.sharedInstance().backgroundSyncDatabase(model.metadata, join: false) { [weak self] result, localWasChanged, error in
+        SyncManager.sharedInstance().backgroundSyncDatabase(model.metadata, join: false, key: model.ckfs) { [weak self] result, localWasChanged, error in
             DispatchQueue.main.async { [weak self] in
                 self?.onSyncCompleted(result: result, localWasChanged: localWasChanged, error: error, wasInteractive: false, completion: completion)
             }
@@ -396,26 +430,33 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         vc.present(nav, animated: true)
     }
 
+    fileprivate func reloadModelFromWorkingCache(_ completion: ((Bool) -> Void)? = nil) {
+        let vc = getMostAppropriateViewControllerForInteraction()
+
+        model.reloadDatabase(fromLocalWorkingCopy: {
+            vc
+        }, noProgressSpinner: false) { [weak self] success in
+            if success {
+                
+                NSLog("✅ Successfully reloaded database")
+
+            } else {
+                
+
+                NSLog("🔴 Could not Unlock updated database after reload. Key changed?! - Force Locking.")
+
+                self?.onClose()
+            }
+
+            completion?(success)
+        }
+    }
+
     func onSyncSuccess(localWasChanged: Bool, completion: SyncAndMergeCompletionBlock?) {
         NSLog("✅ MainSplitViewController::onSyncSuccess => Sync Successfully Completed [localWasChanged = %@]", localizedYesOrNoFromBool(localWasChanged))
 
         if localWasChanged {
-            let vc = getMostAppropriateViewControllerForInteraction()
-
-            model.reloadDatabase(fromLocalWorkingCopy: {
-                vc
-            }, noProgressSpinner: false) { [weak self] success in
-                if success {
-                    
-                    NSLog("✅ Successfully reloaded database after Sync found changes")
-                } else {
-                    
-
-                    NSLog("🔴 Could not Unlock updated database after Sync. Key changed?! - Force Locking.")
-
-                    self?.onClose()
-                }
-            }
+            reloadModelFromWorkingCache()
         }
 
         if let completion {

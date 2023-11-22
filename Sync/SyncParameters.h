@@ -30,7 +30,7 @@ typedef NS_ENUM (NSUInteger, SyncInProgressBehaviour) {
 @interface SyncParameters : NSObject
 
 @property (nullable) VIEW_CONTROLLER_PTR interactiveVC; 
-@property CompositeKeyFactors* key; 
+@property (nullable) CompositeKeyFactors* key; 
 @property SyncInProgressBehaviour inProgressBehaviour; 
 @property BOOL syncPullEvenIfModifiedDateSame; 
 @property BOOL syncForcePushDoNotCheckForConflicts; 

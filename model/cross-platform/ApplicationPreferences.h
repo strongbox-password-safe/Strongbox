@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 @property PasswordStrengthConfig* passwordStrengthConfig;
 @property BOOL checkPinYin;
+@property BOOL atomicSftpWrite;
 
 @property (nullable) NSDate* lastEntitlementCheckAttempt;
 @property NSUInteger numberOfEntitlementCheckFails;
@@ -30,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setPro:(BOOL)value;
 
 @property BOOL stripUnusedIconsOnSave;
+@property BOOL stripUnusedHistoricalIcons;
 @property BOOL useIsolatedDropbox;
 
 @property BOOL addLegacySupplementaryTotpCustomFields;
@@ -41,6 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL disableExport;
 @property BOOL disablePrinting;
 @property (nullable) NSString* businessOrganisationName;
+
+@property BOOL autoFillWroteCleanly;
 
 @end
 

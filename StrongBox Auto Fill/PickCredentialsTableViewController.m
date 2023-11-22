@@ -56,6 +56,14 @@ static NSString* const kGroupAllItems = @"all-items";
 
 @implementation PickCredentialsTableViewController
 
++ (instancetype)fromStoryboard {
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"SelectExistingAutoFillCredential" bundle:nil];
+
+    PickCredentialsTableViewController* vc = [mainStoryboard instantiateInitialViewController];
+    
+    return vc;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -132,10 +140,8 @@ static NSString* const kGroupAllItems = @"all-items";
         self.timerRefreshOtp = nil;
     }
     
-    if(!self.model.metadata.hideTotpInBrowse) {
-        self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
-        [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
-    }
+    self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(updateOtpCodes:) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -146,7 +152,7 @@ static NSString* const kGroupAllItems = @"all-items";
     if (!self.doneFirstAppearanceTasks) {
         self.doneFirstAppearanceTasks = YES;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
             [self smartInitializeSearch];
 
             [self.searchController.searchBar becomeFirstResponder];
@@ -175,15 +181,11 @@ static NSString* const kGroupAllItems = @"all-items";
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self.rootViewController exitWithUserCancelled:self.model.metadata];
+    self.completion(YES, nil, nil, nil);
 }
 
 - (void)smartInitializeSearch {
-    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-    
-    ASCredentialServiceIdentifier *serviceId =
-        
-        [serviceIdentifiers firstObject];
+    ASCredentialServiceIdentifier *serviceId = self.serviceIdentifiers.firstObject;
     
     if(serviceId) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
@@ -287,7 +289,7 @@ NSString *getPublicDomain(NSString* url) {
     return [BrowserAutoFillManager extractPSLDomainFromUrlWithUrl:url];
 }
 
-NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
+static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if(!domain.length) {
         return domain;
     }
@@ -299,20 +301,8 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)loadAllItems {
-    BrowseSortConfiguration* sortConfig = [self.model getDefaultSortConfiguration];
-
-
-
-
-
     return [self.model filterAndSortForBrowse:self.model.allEntries.mutableCopy
-                        includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
-                            includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
-                               includeExpired:self.model.metadata.showExpiredInSearch
-                                includeGroups:NO
-                              browseSortField:sortConfig.field
-                                   descending:sortConfig.descending
-                            foldersSeparately:sortConfig.foldersOnTop];
+                                includeGroups:NO];
 }
 
 - (NSArray<Node*>*)loadPinnedItems {
@@ -321,10 +311,6 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }
     
     BrowseSortConfiguration* sortConfig = [self.model getDefaultSortConfiguration];
-
-
-
-
     
     return [self.model filterAndSortForBrowse:self.model.favourites.mutableCopy
                         includeKeePass1Backup:NO
@@ -379,22 +365,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
-    BrowseSortConfiguration* sortConfig = [self.model getDefaultSortConfiguration];
-
-
-
-
-    
-    return [self.model search:searchText
-                        scope:scope
-                  dereference:self.model.metadata.searchDereferencedFields
-        includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
-            includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
-               includeExpired:self.model.metadata.showExpiredInSearch
-                includeGroups:NO
-              browseSortField:sortConfig.field
-                   descending:sortConfig.descending
-            foldersSeparately:sortConfig.foldersOnTop];
+    return [self.model search:searchText scope:scope includeGroups:NO];
 }
 
 
@@ -442,12 +413,10 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     
     if ( [group isEqualToString:kGroupServiceId] ) {
         UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:@"PickCredentialGenericCell" forIndexPath:indexPath];
-
-        NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
       
 
         cell.textLabel.text = @"";
-        cell.detailTextLabel.text = serviceIdentifiers.firstObject ? serviceIdentifiers.firstObject.identifier : NSLocalizedString(@"generic_none", @"None");
+        cell.detailTextLabel.text = self.serviceIdentifiers.firstObject ? self.serviceIdentifiers.firstObject.identifier : NSLocalizedString(@"generic_none", @"None");
         
         cell.imageView.image = nil;
         
@@ -503,9 +472,8 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     NSString* group = self.groups[indexPath.section];
     
     if ( [group isEqualToString:kGroupServiceId] ) {
-        NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-        if ( serviceIdentifiers.firstObject ) {
-            [ClipboardManager.sharedInstance copyStringWithNoExpiration:serviceIdentifiers.firstObject.identifier];
+        if ( self.serviceIdentifiers.firstObject ) {
+            [ClipboardManager.sharedInstance copyStringWithNoExpiration:self.serviceIdentifiers.firstObject.identifier];
         }
     }
     else if ( [group isEqualToString:kGroupActions] ) {
@@ -576,21 +544,28 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     NSString* group = self.groups[section];
 
-    if ( [group isEqualToString:kGroupNoMatchingItems] ) {
-        return self.showNoMatchesSection ? UITableViewAutomaticDimension : 0.1f;
-    }
 
-    if ( [group isEqualToString:kGroupAllItems] ) {
-        return self.showAllItemsSection ? UITableViewAutomaticDimension : 0.1f;
-    }
 
-    if ( ![group isEqualToString:kGroupServiceId] && ![group isEqualToString:kGroupActions] ) {
-        NSArray<Node*> *items = self.groupedResults[group];
-        if ( items.count == 0) {
-            return 0.1f;
+
+
+
+
+        if ( [group isEqualToString:kGroupNoMatchingItems] ) {
+            return self.showNoMatchesSection ? UITableViewAutomaticDimension : 0.1f;
         }
-    }
+        
+        if ( [group isEqualToString:kGroupAllItems] ) {
+            return self.showAllItemsSection ? UITableViewAutomaticDimension : 0.1f;
+        }
+        
+        if ( ![group isEqualToString:kGroupServiceId] && ![group isEqualToString:kGroupActions] ) {
+            NSArray<Node*> *items = self.groupedResults[group];
+            if ( items.count == 0) {
+                return 0.1f;
+            }
+        }
 
+    
     return UITableViewAutomaticDimension;
 }
 
@@ -605,29 +580,25 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         }
     }
     
+
+
+
+    
     return [super tableView:tableView heightForRowAtIndexPath:indexPath];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     NSString* group = self.groups[section];
 
-    if ( [group isEqualToString:kGroupServiceId] ) {
-        return UITableViewAutomaticDimension;
-    }
 
 
 
 
+        if ( [group isEqualToString:kGroupServiceId] ) {
+            return UITableViewAutomaticDimension;
+        }
 
-
-
-
-
-            return 0.1f;
-
-
-
-
+        return 0.1f;
 
 }
 
@@ -698,7 +669,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 - (void)proceedWithItem:(Node*)item {
     if ( item ) {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-            [self.rootViewController exitWithCredential:self.model item:item];
+            self.completion(NO, item, nil, nil);
         }];
     }
 }
@@ -750,15 +721,13 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     NSString* suggestedUrl = nil;
     NSString* suggestedNotes = nil;
     
-    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-
     if (AppPreferences.sharedInstance.storeAutoFillServiceIdentifiersInNotes) {
-        suggestedNotes = [[serviceIdentifiers map:^id _Nonnull(ASCredentialServiceIdentifier * _Nonnull obj, NSUInteger idx) {
+        suggestedNotes = [[self.serviceIdentifiers map:^id _Nonnull(ASCredentialServiceIdentifier * _Nonnull obj, NSUInteger idx) {
             return obj.identifier;
         }] componentsJoinedByString:@"\n\n"];
     }
     
-    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+    ASCredentialServiceIdentifier *serviceId = [self.serviceIdentifiers firstObject];
     if(serviceId) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = serviceId.identifier.urlExtendedParse;
@@ -813,11 +782,11 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                     AppPreferences.sharedInstance.dontNotifyToSwitchToMainAppForSync = YES;
                 }
                 
-                [self.rootViewController exitWithCredential:self.model.metadata user:username password:password];
+                self.completion(NO, nil, username, password);
             }];
         }
         else {
-            [self.rootViewController exitWithCredential:self.model.metadata user:username password:password];
+            self.completion(NO, nil, username, password);
         }
     });
 }
@@ -1065,31 +1034,8 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:allString];
 }
 
-
 - (UIAction*)getContextualMenuGenericCopy:(NSString*)locKey item:(Node*)item handler:(UIActionHandler)handler  {
     return [ContextMenuHelper getItem:NSLocalizedString(locKey, nil) systemImage:@"doc.on.doc" handler:handler];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @end

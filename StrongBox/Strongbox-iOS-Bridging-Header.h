@@ -26,6 +26,7 @@
 #import "NSDate+Extensions.h"
 #import "ObjCExceptionCatcherForSwift.h"
 #import "NSString+Extensions.h"
+#import "NSData+Extensions.h"
 #import "AutoFillCommon.h"
 #import "NSString+Levenshtein.h"
 #import "ItemDetailsViewController.h"
@@ -33,7 +34,6 @@
 #import "SyncLogViewController.h"
 #import "BrowseSafeView.h"
 #import "PropertySwitchTableViewCell.h"
-#import "NSString+Extensions.h"
 
 #import "StrongboxiOSFilesManager.h"
 #import "Constants.h"
@@ -49,3 +49,9 @@
 #import "OnboardingModule.h"
 #import "ProUpgradeIAPManager.h"
 #import "SaleScheduleManager.h"
+#import "EntryViewModel.h"
+
+#import "AutoFillManager.h"
+#import "PickCredentialsTableViewController.h"
+#import "NodeIconHelper.h"
+#import "Node+Passkey.h"

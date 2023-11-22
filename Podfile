@@ -7,7 +7,7 @@ abstract_target 'common-mac' do
   platform :osx, '11.0'
   
   pod 'libsodium'
-  pod 'Down'
+  pod 'SwiftCBOR'
   
   target 'Mac-Freemium' do
     pod 'MSAL'
@@ -82,7 +82,7 @@ abstract_target 'common-ios' do
     platform :ios, '14.0'
     
     pod 'libsodium'    
-    pod 'Down'
+    pod 'SwiftCBOR'
     
     target 'Strongbox-iOS' do
         pod 'ISMessages'
@@ -178,5 +178,16 @@ post_install do |installer|
         config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '11.0'
       end
     end
+  end
+  
+  # Fix XCode 15 issues
+
+  installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+      xcconfig_path = config.base_configuration_reference.real_path
+      xcconfig = File.read(xcconfig_path)
+      xcconfig_mod = xcconfig.gsub(/DT_TOOLCHAIN_DIR/, "TOOLCHAIN_DIR")
+      File.open(xcconfig_path, "w") { |file| file << xcconfig_mod }
+      end
   end
 end

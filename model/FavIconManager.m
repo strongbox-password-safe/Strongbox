@@ -9,6 +9,7 @@
 #import "FavIconManager.h"
 #import "Node.h"
 #import "NSString+Extensions.h"
+#import "NSArray+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -28,32 +29,36 @@
     return sharedInstance;
 }
 
-- (void)getFavIconsForUrls:(NSArray<NSURL*>*)urls
-                     queue:(NSOperationQueue*)queue
-                   options:(FavIconDownloadOptions*)options
-              withProgress:(void (^)(NSURL *url, NSArray<IMAGE_TYPE_PTR>* images))withProgress {
-    for (NSURL* url in urls) {
-        [queue addOperationWithBlock:^{
+- (void)getFavIconsForUrls:(NSArray<NSURL *> *)urls
+                     queue:(NSOperationQueue *)queue
+                   options:(FavIconDownloadOptions *)options
+                completion:(void (^)(NSArray<NodeIcon *> * _Nonnull))completion {
+    [queue addOperationWithBlock:^{
+        __block NSMutableArray<NodeIcon*>* allImages = NSMutableArray.array;
+        
+        for (NSURL* url in urls) {
             
             dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-
-            NSLog(@"Downloading FavIcon for... %@", url);
-
+            
             [self downloadAll:url
                       options:options
-                   completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
+                   completion:^(NSArray<NodeIcon *> * _Nullable icons) {
                 dispatch_semaphore_signal(sema);
-                    withProgress(url, images);
+                [allImages addObjectsFromArray:icons];
             }];
             
             dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-        }];
-    }
+        }
+        
+        if ( completion ) {
+            completion(allImages);
+        }
+    }];
 }
 
-- (void)downloadPreferred:(NSURL *)url
-                  options:(FavIconDownloadOptions*)options
-               completion:(void (^)(IMAGE_TYPE_PTR _Nullable))completion {
+- (void)downloadPreferred:(NSURL *)url 
+                  options:(FavIconDownloadOptions *)options
+               completion:(void (^)(NodeIcon * _Nullable icon))completion {
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
 
     @try {
@@ -67,7 +72,12 @@
         allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
                        error:&error
                   completion:^(NSArray<IMAGE_TYPE_PTR> * _Nullable images) {
-            IMAGE_TYPE_PTR best = [self selectBest:images];
+            NSArray<NodeIcon*>* icons = [images map:^id _Nonnull(IMAGE_TYPE_PTR  _Nonnull obj, NSUInteger idx) {
+                return [NodeIcon withCustomImage:obj];
+            }];
+            
+            NodeIcon *best = [self getIdealImage:icons options:options];
+            
             completion(best);
         }];
 #else
@@ -87,7 +97,7 @@
 
 - (void)downloadAll:(NSURL *)url
             options:(FavIconDownloadOptions*)options
-         completion:(void (^)(NSArray<IMAGE_TYPE_PTR>* _Nullable))completion {
+         completion:(void (^)(NSArray<NodeIcon*>* _Nullable icons ))completion {
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
 
     @try {
@@ -102,7 +112,10 @@
         allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
                        error:&error
                   completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
-           completion(images);
+            NSArray<NodeIcon*>* icons = [images map:^id _Nonnull(IMAGE_TYPE_PTR  _Nonnull obj, NSUInteger idx) {
+                return [NodeIcon withCustomImage:obj];
+            }];
+            completion(icons);
         }];
 #else
         NSLog(@"WARNWARN: attempt to use FavIcon library when compiled out.");
@@ -119,57 +132,51 @@
     } @finally {    }
 }
 
-- (IMAGE_TYPE_PTR)selectBest:(NSArray<IMAGE_TYPE_PTR>*)images {
-    NSArray<IMAGE_TYPE_PTR>* sorted = [images sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        IMAGE_TYPE_PTR imageA = (IMAGE_TYPE_PTR)obj1;
-        IMAGE_TYPE_PTR imageB = (IMAGE_TYPE_PTR)obj2;
-        
+- (NodeIcon*)getIdealImage:(NSArray<NodeIcon*> *)images
+                   options:(FavIconDownloadOptions *)options {
+    NSArray<NodeIcon*> *sorted = [self getSortedImages:images options:options];
+    
+    
+    
+    return [sorted firstOrDefault:^BOOL(NodeIcon * _Nonnull obj) {
+        return obj.estimatedStorageBytes < options.maxSize;
+    }];
+}
 
-
+- (NSArray<NodeIcon*>*)getSortedImages:(NSArray<NodeIcon*> *)images
+                               options:(FavIconDownloadOptions *)options {
+    NSArray<NodeIcon*>* sorted = [images sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        NodeIcon* a = obj1;
+        NodeIcon* b = obj2;
+         
+        NSInteger sizeA = a.estimatedStorageBytes;
+        NSInteger sizeB = b.estimatedStorageBytes;
         
+        NSInteger disA = abs( (int) (sizeA - options.idealSize )) / 1024;
+        NSInteger disB = abs( (int) (sizeB - options.idealSize )) / 1024;
         
-        if(imageA.size.width == 0) {
+        int distanceA = abs( (int) (a.customIconWidth - options.idealDimension));
+        int distanceB = abs( (int) (b.customIconWidth - options.idealDimension));
 
-            return NSOrderedAscending;
-        }
-        if(imageB.size.width == 0) {
-
-            return NSOrderedDescending;
-        }
-        
-        
-        
-        if(imageA.size.width != imageA.size.height) {
-
-            return NSOrderedDescending;
-        }
-        else if(imageB.size.width != imageB.size.height) {
-
-            return NSOrderedAscending;
-        }
-        
-        static const int kIdealFavIconDimension = 192;
-        
-        int distanceA = imageA.size.width - kIdealFavIconDimension;
-        int distanceB = imageB.size.width - kIdealFavIconDimension;
-
-
-
-        if(abs(distanceA) == abs(distanceB)) {
-            return distanceA > 0 ? NSOrderedAscending : NSOrderedDescending;
-        }
-        else {
-            return (abs(distanceA)) > (abs(distanceB)) ? NSOrderedDescending : NSOrderedAscending;
-        }
-        
-        return NSOrderedSame;
+        double cartesian1 = sqrt(pow(distanceA, 2) + pow(disA, 2));
+        double cartesian2 = sqrt(pow(distanceB, 2) + pow(disB, 2));
+           
+        return cartesian1 == cartesian2 ? NSOrderedSame : (cartesian1 < cartesian2 ? NSOrderedAscending : NSOrderedDescending );
     }];
     
-
-
-
+#ifdef DEBUG
+    NSLog(@"=============== 🟢 Sorted ================= ");
+    for (NodeIcon* icon in sorted) {
+        int fileSizeScore = abs( (int) (icon.estimatedStorageBytes - options.idealSize )) / 1024;
+        int dimensionScore = abs( (int) (icon.customIconWidth - options.idealDimension));
+        double cartesian = sqrt(pow(dimensionScore, 2) + pow(fileSizeScore, 2));
+        
+        NSLog(@"%dx%d - %@ - (fileSizeScore=%d, dimensionScore=%d, score=%f )", (int)icon.customIconWidth, (int)icon.customIconHeight, friendlyFileSizeString(icon.estimatedStorageBytes), fileSizeScore, dimensionScore, cartesian);
+    }
+    NSLog(@"=========================================== ");
+#endif
     
-    return sorted.firstObject;
+    return sorted;
 }
 
 - (NSURL*)cleanupUrl:(NSURL*)url trimToDomainOnly:(BOOL)trimToDomainOnly {

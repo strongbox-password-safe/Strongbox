@@ -359,7 +359,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         NSLog(@"WARNWARN: SECURE ENCLAVE NOT AVAILABLE");
     }
     else {
-        NSLog(@"OK. Secure Enclave available on device.");
+
     }
     
     return available;

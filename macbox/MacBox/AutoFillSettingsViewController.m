@@ -15,24 +15,18 @@
 #import "NSArray+Extensions.h"
 #import "AutoFillProxyServer.h"
 #import "Strongbox-Swift.h"
-#import "AdvancedQuickTypeSettingsViewController.h"
 #import "AdvancedAutoFillSettingsViewController.h"
 
 @interface AutoFillSettingsViewController ()
 
 @property (weak) IBOutlet NSButton *enableAutoFill;
-@property (weak) IBOutlet NSButton *enableQuickType;
-@property (weak) IBOutlet NSButton *useWormholeIfUnlocked;
 @property (weak) IBOutlet NSPopUpButton *popupAutoUnlock;
-@property (weak) IBOutlet NSTextField *labelSafariUnavailableOnPlatformMessage;
 @property NSArray<NSNumber*>* autoUnlockOptions;
 @property NSTimer* timer;
 @property (weak) IBOutlet NSButton *enableSystemExtension;
 @property (weak) IBOutlet NSButton *switchCopyTotp;
 @property (weak) IBOutlet NSStackView *stackViewProOnlyMessage;
-@property (weak) IBOutlet NSButton* autoLaunchSingleDatabase;
 @property (weak) IBOutlet NSTextField *labelConvenienceAutoUnlock;
-@property (weak) IBOutlet NSButton *advancedQuickTypeSettings;
 @property (weak) IBOutlet NSButton *advancedSettings;
 
 @end
@@ -60,8 +54,6 @@
         [self.popupAutoUnlock.menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
     
-    self.labelSafariUnavailableOnPlatformMessage.stringValue = NSLocalizedString(@"autofill_app_preferences_only_avail_big_sur", @"AutoFill is only available on macOS Big Sur+");
-
     [self bindUI];
 }
 
@@ -105,31 +97,11 @@
     
     
 
-    BOOL safariEnabled = AutoFillManager.sharedInstance.isOnForStrongbox;
-
-    self.labelSafariUnavailableOnPlatformMessage.hidden = YES;
-    
     self.enableSystemExtension.enabled = pro && meta.autoFillEnabled;
-    self.enableSystemExtension.hidden = safariEnabled;
+
+    BOOL safariEnabled = AutoFillManager.sharedInstance.isOnForStrongbox;
     self.enableSystemExtension.state = safariEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    
-    
-    
-    self.autoLaunchSingleDatabase.enabled = pro && meta.autoFillEnabled && safariEnabled;
-    self.autoLaunchSingleDatabase.state = Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ? NSControlStateValueOn : NSControlStateValueOff;
-    
-    
 
-    self.useWormholeIfUnlocked.enabled = pro && meta.autoFillEnabled && safariEnabled;
-    self.useWormholeIfUnlocked.state = meta.quickWormholeFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    
-    
-
-    self.enableQuickType.enabled = pro && meta.autoFillEnabled && safariEnabled;
-    self.enableQuickType.state = meta.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    
-    self.advancedQuickTypeSettings.enabled = pro && meta.autoFillEnabled && safariEnabled && meta.quickTypeEnabled;
-    
     
     
     self.labelConvenienceAutoUnlock.textColor = (pro && meta.autoFillEnabled && safariEnabled) ? NSColor.labelColor : NSColor.disabledControlTextColor;
@@ -143,12 +115,6 @@
     if (index != NSNotFound) {
         [self.popupAutoUnlock selectItemAtIndex:index];
     }
-}
-
-- (IBAction)onAutoLaunchSingleDatabase:(id)sender {
-    Settings.sharedInstance.autoFillAutoLaunchSingleDatabase = self.autoLaunchSingleDatabase.state == NSControlStateValueOn;
-
-    [self bindUI];
 }
 
 - (IBAction)onAutoUnlockChanged:(id)sender {
@@ -165,51 +131,24 @@
 }
 
 - (IBAction)onChanged:(id)sender {
-    BOOL oldQuickType = self.model.databaseMetadata.quickTypeEnabled;
     BOOL oldEnabled = self.model.databaseMetadata.autoFillEnabled;
 
     BOOL autoFillEnabled = self.enableAutoFill.state == NSControlStateValueOn;
     BOOL autoFillCopyTotp = self.switchCopyTotp.state == NSControlStateValueOn;
-    BOOL quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
-    BOOL quickWormholeFillEnabled = self.useWormholeIfUnlocked.state == NSControlStateValueOn;
 
     self.model.databaseMetadata.autoFillEnabled = autoFillEnabled;
     self.model.databaseMetadata.autoFillCopyTotp = autoFillCopyTotp;
-    self.model.databaseMetadata.quickTypeEnabled = quickTypeEnabled;
-    self.model.databaseMetadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
-
-    MacDatabasePreferences* meta = self.model.databaseMetadata;
-    
-    
-
-    BOOL quickTypeWasTurnOff = (oldQuickType == YES && oldEnabled == YES) &&
-        (meta.quickTypeEnabled == NO || meta.autoFillEnabled == NO);
-
-    if ( quickTypeWasTurnOff ) { 
-        NSLog(@"AutoFill QuickType was turned off - Clearing Database....");
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
-
-    BOOL quickTypeOn = (meta.quickTypeEnabled == YES && meta.autoFillEnabled == YES);
-    if ( quickTypeOn ) {
-        
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-
-        NSLog(@"AutoFill QuickType was turned off - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel
-                                                           databaseUuid:meta.uuid
-                                                          displayFormat:meta.quickTypeDisplayFormat
-                                                        alternativeUrls:meta.autoFillScanAltUrls
-                                                           customFields:meta.autoFillScanCustomFields
-                                                                  notes:meta.autoFillScanNotes
-                                           concealedCustomFieldsAsCreds:meta.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds
-                                                               nickName:meta.nickName];
-    }
-    
-    [self.model rebuildMapsAndCaches]; 
 
     [self bindUI];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ( autoFillEnabled != oldEnabled ) { 
+            NSLog(@"AutoFill QuickType was toggles - Clearing Database....");
+            [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+        }
+        
+        [self.model rebuildMapsAndCaches]; 
+    });
 }
 
 - (IBAction)onClose:(id)sender {
@@ -267,11 +206,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 }
 
 - (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
-    if ( [segue.identifier isEqualToString:@"segueToAdvancedQuickTypeSettings"] ) {
-        AdvancedQuickTypeSettingsViewController* vc = (AdvancedQuickTypeSettingsViewController*)segue.destinationController;
-        vc.model = self.model;
-    }
-    else if ([segue.identifier isEqualToString:@"segueToAdvancedSettings"] ) {
+    if ([segue.identifier isEqualToString:@"segueToAdvancedSettings"] ) {
         AdvancedAutoFillSettingsViewController* vc = (AdvancedAutoFillSettingsViewController*)segue.destinationController;
         vc.model = self.model;
     }

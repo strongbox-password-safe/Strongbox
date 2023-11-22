@@ -27,7 +27,11 @@
 }
 
 - (BOOL)shouldDisplay {
-    return !self.model.metadata.autoFillOnboardingDone && !self.model.metadata.autoFillEnabled && AutoFillManager.sharedInstance.isOnForStrongbox;
+    NSUInteger databasesUsingQuickType = [CommonDatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
+        return obj.autoFillEnabled && obj.quickTypeEnabled;
+    }].count;
+
+    return !self.model.metadata.autoFillOnboardingDone && !self.model.metadata.autoFillEnabled && AutoFillManager.sharedInstance.isOnForStrongbox && databasesUsingQuickType == 0;
 }
 
 - (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {

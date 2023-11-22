@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Node (KeeAgentSSH)
+@interface Node (KeeAgentSSH) 
 
 - (void)setKeeAgentSshKeyEnabled:(BOOL)enabled;
 @property (nullable) KeeAgentSshKeyViewModel* keeAgentSshKeyViewModel;

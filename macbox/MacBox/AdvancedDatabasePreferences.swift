@@ -61,6 +61,8 @@ class AdvancedDatabasePreferences: NSViewController {
 
         bindUI()
 
-        NotificationCenter.default.post(name: .preferencesChanged, object: nil)
+        DispatchQueue.main.async {
+            NotificationCenter.default.post(name: .preferencesChanged, object: nil)
+        }
     }
 }

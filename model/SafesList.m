@@ -19,7 +19,7 @@
 @property (strong, nonatomic) NSMutableArray<SafeMetaData*> *databasesList;
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
 
-@property (readonly) BOOL changedDatabaseSettingsFlag;
+@property (readonly) BOOL lastChangeByOtherComponent;
 @property ConcurrentMutableSet* editingSet; 
 
 @end
@@ -46,12 +46,16 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         self.dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
         self.editingSet = ConcurrentMutableSet.mutableSet;
         self.databasesList = [self deserialize];
+        
+        if ( self.lastChangeByOtherComponent ) { 
+            [self clearChangedDatabaseSettings];
+        }
     }
     
     return self;
 }
 
-- (BOOL)changedDatabaseSettingsFlag {
+- (BOOL)lastChangeByOtherComponent {
 #ifndef IS_APP_EXTENSION
     return AppPreferences.sharedInstance.autoFillDidChangeDatabases;
 #else
@@ -62,8 +66,10 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 - (void)setChangedDatabaseSettings {
 #ifndef IS_APP_EXTENSION
     AppPreferences.sharedInstance.mainAppDidChangeDatabases = YES;
+    AppPreferences.sharedInstance.autoFillDidChangeDatabases = NO;
 #else
     AppPreferences.sharedInstance.autoFillDidChangeDatabases = YES;
+    AppPreferences.sharedInstance.mainAppDidChangeDatabases = NO;
 #endif
 }
 
@@ -75,15 +81,21 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 #endif
 }
 
-- (void)reloadIfChangedByOtherComponent {
-    if ( self.changedDatabaseSettingsFlag ) { 
-
-
+- (BOOL)reloadIfChangedByOtherComponent {
+    if ( self.lastChangeByOtherComponent ) {
+#ifndef IS_APP_EXTENSION
+        NSLog(@"🟢 reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by AutoFill Extension...");
+#else
+        NSLog(@"🟢 reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by main Strongbox App...");
+#endif
         [self clearChangedDatabaseSettings];
         self.databasesList = [self deserialize];
+        
+        return YES;
     }
     else {
 
+        return NO;
     }
 }
 
@@ -139,6 +151,12 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 }
 
 - (void)serialize:(BOOL)listChanged databaseIdChanged:(NSString*)databaseIdChanged {
+    
+    
+    if ( self.lastChangeByOtherComponent ) {
+        NSLog(@"🔴 🔴 🔴 🔴 WARNWARN - Serialize called but changed by other component flag set! 🔴 🔴 🔴 🔴 ");
+    }
+    
     NSMutableArray<NSDictionary*>* jsonDatabases = NSMutableArray.array;
     
     for (SafeMetaData* database in self.databasesList) {
@@ -398,11 +416,16 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 - (void)setEditing:(SafeMetaData *)database editing:(BOOL)editing {
     NSLog(@"SafesList::setEditing: %@ => %hhd", database.nickName, editing);
     
-    if ( editing ) {
-        [self.editingSet addObject:database.uuid];
+    if ( database ) {
+        if ( editing ) {
+            [self.editingSet addObject:database.uuid];
+        }
+        else {
+            [self.editingSet removeObject:database.uuid];
+        }
     }
     else {
-        [self.editingSet removeObject:database.uuid];
+        NSLog(@"🔴 nil sent to SafesList setEditing?!");
     }
 }
 

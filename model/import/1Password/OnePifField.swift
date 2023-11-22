@@ -1,5 +1,5 @@
 //
-//  Field.swift
+//  OnePifField.swift
 //  MacBox
 //
 //  Created by Strongbox on 25/10/2021.
@@ -8,9 +8,9 @@
 
 // import Cocoa
 
-class Field: Decodable {
+class OnePifField: Decodable {
     var value: JSONAny?
-//    var type : String?
+
     var name: String?
     var designation: String?
 }

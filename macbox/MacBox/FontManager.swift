@@ -61,5 +61,8 @@ class FontManager: NSObject {
     }()
 
     @objc
+    let entryTitleFont: NSFont = .systemFont(ofSize: HeadLinePointSize, weight: .semibold)
+
+    @objc
     let caption1Font: NSFont = .preferredFont(forTextStyle: .caption1)
 }

@@ -77,7 +77,7 @@ class BaseImporter {
 
         var i = 2
 
-        while node.fields.customFields.containsKey(uniqueName as NSString) || Constants.reservedCustomFieldKeys().contains(uniqueName) {
+        while node.fields.customFields.containsKey(uniqueName as NSString) || Constants.reservedCustomFieldKeys.contains(uniqueName) {
             uniqueName = String(format: "%@-%d", base, i)
             i = i + 1
         }

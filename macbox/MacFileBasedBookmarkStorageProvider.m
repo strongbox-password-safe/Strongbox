@@ -10,6 +10,7 @@
 #import "BookmarksHelper.h"
 #import "Utils.h"
 #import "MacUrlSchemes.h"
+#import "NSDate+Extensions.h"
 
 @implementation MacFileBasedBookmarkStorageProvider
 
@@ -54,7 +55,10 @@
     
 }
 
-- (void)pullDatabase:(nonnull METADATA_PTR)safeMetaData interactiveVC:(VIEW_CONTROLLER_PTR _Nullable)viewController options:(nonnull StorageProviderReadOptions *)options completion:(nonnull StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(nonnull METADATA_PTR)safeMetaData 
+       interactiveVC:(VIEW_CONTROLLER_PTR _Nullable)viewController
+             options:(nonnull StorageProviderReadOptions *)options
+          completion:(nonnull StorageProviderReadCompletionBlock)completion {
 
     
     NSError *error;
@@ -73,9 +77,21 @@
     }
     
     NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+    NSDate* modDate = attr ? attr.fileModificationDate : nil;
     if (error) {
         
         NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
+    }
+    else {
+        if ( options && options.onlyIfModifiedDifferentFrom && modDate && [modDate isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom] ) {
+            if ( securitySucceeded ) {
+                [self stopAccessingSecurityScopedResource:url];
+            }
+
+            completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
+
+            return;
+        }
     }
 
     NSError *readError = nil;
@@ -88,7 +104,7 @@
 
     
     if ( data && !readError ) {
-        completion(kReadResultSuccess, data, attr ? attr.fileModificationDate : nil, nil);
+        completion(kReadResultSuccess, data, modDate, nil);
     }
     else {
 

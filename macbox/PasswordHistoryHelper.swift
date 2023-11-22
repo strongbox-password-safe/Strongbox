@@ -48,7 +48,7 @@ class PasswordHistoryHelper {
         var foundHistory = false
         for hist in history.reversed() {
             let pw = hist.fields.password
-            if pw.localizedCompare(currentPassword) == .orderedSame {
+            if pw.count == 0 || pw.localizedCompare(currentPassword) == .orderedSame {
                 continue
             }
 

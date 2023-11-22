@@ -10,9 +10,9 @@ import Cocoa
 
 class NextGenWindow: NSWindow {
     override func doCommand(by selector: Selector) {
-        //        NSLog("NextGenWindow::doCommand: [%@]", NSStringFromSelector(selector))
+        
 
-        if selector == NSSelectorFromString("noop:") { // Weird selector for events that arent handled by the search field
+        if selector == NSSelectorFromString("noop:") { 
             if checkEventForCmdNumberDown() {
                 return
             }

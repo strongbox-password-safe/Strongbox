@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (BOOL)isUnique:(NSString *)nickName;
 + (BOOL)isValid:(NSString *)nickName;
 
-+ (void)reloadIfChangedByOtherComponent;
++ (BOOL)reloadIfChangedByOtherComponent;
 
 + (BOOL)isEditing:(DatabasePreferences*)database;
 + (void)setEditing:(DatabasePreferences*)database editing:(BOOL)editing;
@@ -88,7 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, readonly) NSString* keyFileBookmark;
 @property (nullable, readonly) NSString* keyFileFileName;
-- (void)setKeyFile:(NSString*)keyFileBookmark keyFileFileName:(NSString*)keyFileFileName;
+- (void)setKeyFile:(NSString* _Nullable)keyFileBookmark keyFileFileName:(NSString* _Nullable)keyFileFileName;
 
 @property DatabaseFormat likelyFormat;
 @property (nonatomic) BOOL readOnly;
@@ -155,9 +155,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL lockEvenIfEditing;
 @property (nullable) NSDate* databaseCreated;
 @property NSUInteger unlockCount;
-@property BOOL autoFillScanAltUrls;
+
 @property BOOL autoFillScanCustomFields;
 @property BOOL autoFillScanNotes;
+@property BOOL includeAssociatedDomains;
 @property (nonatomic, strong, nullable) NSString* autoFillConvenienceAutoUnlockPassword;
 @property (nonatomic, readonly) BOOL isConvenienceUnlockEnabled; 
 @property (readonly) BOOL conveniencePasswordHasExpired; 
@@ -197,26 +198,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSArray<NSNumber*>* visibleTabs;
 @property BOOL hideTabBarIfOnlySingleTab;
 
-
 @property NSDictionary<NSString*, BrowseSortConfiguration*>* sortConfigurations;
-
-
-
-
-@property BrowseSortField browseSortField;
-@property BOOL browseSortOrderDescending;
-@property BOOL browseSortFoldersSeparately;
-
-
-
-@property (readonly) BOOL hideTotpCustomFieldsInViewMode;
-@property (readonly) BOOL showEmptyFieldsInDetailsView;
-@property (readonly) BOOL hideTotp;
-@property (readonly) BOOL colorizeProtectedCustomFields;
-@property (readonly) BOOL hideTotpInBrowse;
-@property (readonly) BOOL showFlagsInBrowse;
-
-
 
 @property (readonly) NSString* exportFilename;
 

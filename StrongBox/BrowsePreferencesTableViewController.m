@@ -16,13 +16,8 @@
 
 @interface BrowsePreferencesTableViewController () <UIAdaptivePresentationControllerDelegate> 
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellConfigureTabs;
-
-@property (weak, nonatomic) IBOutlet UISwitch *switchStartWithSearch;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpBrowseView;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *showChildCountOnFolder;
-@property (weak, nonatomic) IBOutlet UISwitch *showFlagsInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowIcons;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInSearch;
@@ -49,29 +44,18 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStartWithLastViewedEntry;
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellShowTotpInBrowse;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellShowFlags;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellStartWithSearch;
-
 @end
 
 @implementation BrowsePreferencesTableViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     self.navigationController.presentationController.delegate = self;
     
     [self bindPreferences];
     
     [self bindTableviewToFormat];
-    
-    
-    
-    [self cell:self.cellShowTotpInBrowse setHidden:YES];
-    [self cell:self.cellShowFlags setHidden:YES];
-    [self cell:self.cellConfigureTabs setHidden:YES];
-    [self cell:self.cellStartWithSearch setHidden:YES];
 }
 
 - (void)bindTableviewToFormat {
@@ -89,8 +73,6 @@
     self.databaseMetaData.hideIconInBrowse = !self.switchShowIcons.on;
     self.databaseMetaData.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
     
-    self.databaseMetaData.immediateSearchOnBrowse = self.switchStartWithSearch.on;
-    
     self.databaseMetaData.showLastViewedEntryOnUnlock = self.switchStartWithLastViewedEntry.on;
     
     self.databaseMetaData.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
@@ -107,19 +89,6 @@
     
     NSLog(@"Item Details Preferences Changed: [%@]", sender);
     
-
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
     [self bindPreferences];
 
     [self notifyDatabaseViewPreferencesChanged];
@@ -132,9 +101,7 @@
 - (void)bindPreferences {
     self.switchShowIcons.on = !self.databaseMetaData.hideIconInBrowse;
     self.showChildCountOnFolder.on = self.databaseMetaData.showChildCountOnFolderInBrowse;
-    self.showFlagsInBrowse.on = self.databaseMetaData.showFlagsInBrowse;
     
-    self.switchStartWithSearch.on = self.databaseMetaData.immediateSearchOnBrowse;
     self.switchStartWithLastViewedEntry.on = self.databaseMetaData.showLastViewedEntryOnUnlock;
     
     self.switchShowKeePass1BackupFolder.on = self.databaseMetaData.showKeePass1BackupGroup;
@@ -144,7 +111,6 @@
     
     self.labelBrowseItemSubtitle.text = [self getBrowseItemSubtitleFieldName:effective];
     
-    self.switchShowTotpBrowseView.on = !self.databaseMetaData.hideTotpInBrowse;
     self.switchShowRecycleBinInBrowse.on = !self.databaseMetaData.doNotShowRecycleBinInBrowse;
     
     
@@ -214,9 +180,6 @@
     }
     else if (cell == self.cellIconSet) {
         [self onChangeIconSet];
-    }
-    else if (cell == self.cellConfigureTabs ) {
-        [self onConfigureTabs];
     }
 
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -391,12 +354,6 @@
     if (self.onDone) {
         self.onDone();
     }
-}
-
-- (void)onConfigureTabs {
-    UINavigationController* nav = [ConfigureTabsViewController fromStoryboardWithModel:self.model];
-    
-    [self presentViewController:nav animated:YES completion:nil];
 }
 
 - (IBAction)onDone:(id)sender {

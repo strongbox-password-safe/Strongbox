@@ -9,11 +9,11 @@
 // <?xml version="1.0" encoding="UTF-16"?>
 // <EntrySettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 //     <AllowUseOfSshKey>true</AllowUseOfSshKey>
-//     <Location>
-//         <SelectedType>attachment</SelectedType>
-//         <AttachmentName>id_docker_foo_rsa</AttachmentName>
-//     </Location>
-// </EntrySettings>
+
+
+
+
+
 
 import Foundation
 

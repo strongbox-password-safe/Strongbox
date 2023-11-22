@@ -125,10 +125,10 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
         
         NSInteger days = [components day];
         
-        NSLog(@"%ld days since last entitlement check... [%@]", (long)days, self.preferences.lastEntitlementCheckAttempt);
+
         
         if ( days == 0 ) { 
-            NSLog(@"Already checked entitlements today... not rechecking...");
+
             return;
         }
         

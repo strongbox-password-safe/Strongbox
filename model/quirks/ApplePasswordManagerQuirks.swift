@@ -31,7 +31,7 @@ class ApplePasswordManagerQuirks {
         }
     }
 
-    func getEquivalentDomains(_ domain: String) -> [String] {
-        equivalents[domain.lowercased()] ?? []
+    func getEquivalentDomains(_ domain: String) -> Set<String> {
+        Set(equivalents[domain.lowercased()] ?? [])
     }
 }

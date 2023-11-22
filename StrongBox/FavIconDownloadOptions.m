@@ -8,14 +8,17 @@
 
 #import "FavIconDownloadOptions.h"
 
+static NSInteger kDefaultIdealSize = 4 * 1024;
+static NSInteger kDefaultMaxSize = 25 * 1024;
+static NSInteger kDefaultIdealDimension = 128;
+
 @implementation FavIconDownloadOptions
 
 + (instancetype)defaults {
     return [[FavIconDownloadOptions alloc] init];
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     
     if (self) {
@@ -25,6 +28,10 @@
         self.scanHtml = YES;
         self.google = NO;
         self.ignoreInvalidSSLCerts = NO;
+        
+        self.idealSize = kDefaultIdealSize;
+        self.maxSize = kDefaultMaxSize;
+        self.idealDimension = kDefaultIdealDimension;
     }
     
     return self;
@@ -50,6 +57,10 @@
     [encoder encodeBool:self.google forKey:@"google"];
     [encoder encodeBool:self.scanHtml forKey:@"scanHtml"];
     [encoder encodeBool:self.ignoreInvalidSSLCerts forKey:@"ignoreInvalidSSLCerts"];
+    
+    [encoder encodeInteger:self.maxSize forKey:@"maxSize"];
+    [encoder encodeInteger:self.idealSize forKey:@"idealSize"];
+    [encoder encodeInteger:self.idealDimension forKey:@"idealDimension"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -60,6 +71,27 @@
         self.google = [decoder decodeBoolForKey:@"google"];
         self.scanHtml = [decoder decodeBoolForKey:@"scanHtml"];
         self.ignoreInvalidSSLCerts = [decoder decodeBoolForKey:@"ignoreInvalidSSLCerts"];
+        
+        if ( [decoder containsValueForKey:@"maxSize"] ) {
+            self.maxSize = [decoder decodeIntegerForKey:@"maxSize"];
+        }
+        else {
+            self.maxSize = kDefaultMaxSize;
+        }
+        
+        if ( [decoder containsValueForKey:@"idealSize"] ) {
+            self.idealSize = [decoder decodeIntegerForKey:@"idealSize"];
+        }
+        else {
+            self.idealSize = kDefaultIdealSize;
+        }
+        
+        if ( [decoder containsValueForKey:@"idealDimension"] ) {
+            self.idealDimension = [decoder decodeIntegerForKey:@"idealDimension"];
+        }
+        else {
+            self.idealDimension = kDefaultIdealDimension;
+        }
     }
 
     return self;

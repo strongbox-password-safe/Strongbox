@@ -19,3 +19,36 @@ class GeneratePasswordResponse: Codable {
         self.alternatives = alternatives
     }
 }
+
+struct PasswordStrengthData: Codable {
+    var entropy: Double
+    var category: String
+    var summaryString: String
+}
+
+struct PasswordAndStrength: Codable {
+    var password: String
+    var strength: PasswordStrengthData
+}
+
+class GeneratePasswordV2Response: Codable {
+    var password: PasswordAndStrength
+    var alternatives: [PasswordAndStrength]
+
+    init(password: PasswordAndStrength, alternatives: [PasswordAndStrength]) {
+        self.password = password
+        self.alternatives = alternatives
+    }
+}
+
+class GetPasswordStrengthRequest: Codable {
+    var password: String
+}
+
+class GetPasswordStrengthResponse: Codable {
+    var strength: PasswordStrengthData
+
+    init(strength: PasswordStrengthData) {
+        self.strength = strength
+    }
+}

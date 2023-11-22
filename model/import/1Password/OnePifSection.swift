@@ -1,5 +1,5 @@
 //
-//  Section.swift
+//  OnePifSection.swift
 //  MacBox
 //
 //  Created by Strongbox on 22/10/2021.
@@ -8,7 +8,7 @@
 
 // import Cocoa
 
-class Section: Decodable {
+class OnePifSection: Decodable {
     var fields: [SectionField]? = nil
     var title: String? = nil
     var name: String? = nil

@@ -13,11 +13,11 @@
 @implementation AutoFillOnboardingViewController
 
 - (BOOL)shouldAutorotate {
-    return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskPortrait;
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskPortrait;
 }
 
 - (IBAction)onUseAutoFill:(id)sender {
@@ -25,15 +25,7 @@
     self.model.metadata.autoFillOnboardingDone = YES;
 
     if( self.model.metadata.quickTypeEnabled ) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model
-                                                           databaseUuid:self.model.metadata.uuid
-                                                          displayFormat:self.model.metadata.quickTypeDisplayFormat
-                                                        alternativeUrls:self.model.metadata.autoFillScanAltUrls
-                                                           customFields:self.model.metadata.autoFillScanCustomFields
-                                                                  notes:self.model.metadata.autoFillScanNotes
-                                           concealedCustomFieldsAsCreds:self.model.metadata.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.model.metadata.autoFillUnConcealedFieldsAsCreds
-                                                               nickName:self.model.metadata.nickName];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model clearFirst:NO];
     }
     
     if ( self.onDone ) {

@@ -13,7 +13,7 @@ class DatabasesManagerWindow: NSWindow {
         true
     }
 
-    override func cancelOperation(_: Any?) { // Pickup Esc
+    override func cancelOperation(_: Any?) { 
         close()
     }
 }

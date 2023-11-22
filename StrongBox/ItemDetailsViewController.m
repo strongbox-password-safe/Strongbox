@@ -44,7 +44,6 @@
 #import "Constants.h"
 #import "NSDate+Extensions.h"
 #import <MobileCoreServices/MobileCoreServices.h>
-#import "MarkdownCell.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -76,8 +75,9 @@ static NSInteger const kRowEmail = 4;
 static NSInteger const kRowTags = 5;
 static NSInteger const kRowExpires = 6;
 static NSInteger const kRowTotp = 7;
-static NSInteger const kRowSshKey = 8;
-static NSInteger const kSimpleRowCount = 9;
+static NSInteger const kRowPasskey = 8;
+static NSInteger const kRowSshKey = 9;
+static NSInteger const kSimpleRowCount = 10;
 
 static NSInteger const kSimpleFieldsSectionIdx = 0;
 static NSInteger const kNotesSectionIdx = 1;
@@ -98,6 +98,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
 static NSString* const kTagsViewCellId = @"TagsViewCell";
 static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
+static NSString* const kPasskeyTableCellViewId = @"PasskeyTableCellView";
+static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellView";
 
 
 
@@ -123,7 +125,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 
 #endif
 
-
+@property (readonly) BOOL supportsCustomFields;
 @property BOOL hideMetadataSection;
 
 #ifndef IS_APP_EXTENSION
@@ -134,6 +136,9 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 @property (readonly) BOOL isEffectivelyReadOnly;
 @property (readonly) DatabaseFormat databaseFormat;
 @property UIBarButtonItem* preferencesBarButton;
+
+@property NSArray<ItemMetadataEntry*>* metadataRows; 
+@property (readonly) BOOL hasHistory;
 
 @end
 
@@ -186,38 +191,6 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     return self.forcedReadOnly || self.databaseModel.isReadOnly;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    [UIView setAnimationsEnabled:NO];
-    
-    self.navigationController.toolbarHidden = YES;
-    self.navigationController.toolbar.hidden = YES;
-    
-    
-    
-    self.navigationController.navigationBarHidden = NO;
-    self.navigationController.navigationBar.prefersLargeTitles = NO;
-    
-    [self listenToNotifications];
-    
-    [self.tableView reloadData];
-    
-    
-    [self.tableView beginUpdates];
-    [self.tableView endUpdates];
-    
-    [UIView setAnimationsEnabled:YES];
-    
-    [self updateSyncBarButtonItemState];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    [self unListenToNotifications];
-}
-
 - (void)awakeFromNib {
     [super awakeFromNib];
     
@@ -256,7 +229,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     
     self.passwordConcealedInUi = !self.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
     
-    self.model = [self reloadViewModelFromNodeItem];
+    [self reloadViewModelFromNodeItem];
     [self bindNavBar];
     
     if(self.createNewItem || self.editImmediately) {
@@ -267,6 +240,75 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     
     [self listenToNotifications];
 }
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [UIView setAnimationsEnabled:NO];
+    
+    self.navigationController.toolbarHidden = YES;
+    self.navigationController.toolbar.hidden = YES;
+    
+    
+    
+    self.navigationController.navigationBarHidden = NO;
+    self.navigationController.navigationBar.prefersLargeTitles = NO;
+    
+    [self listenToNotifications];
+    
+    [self.tableView reloadData];
+    
+
+    
+    
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
+    
+    [UIView setAnimationsEnabled:YES];
+    
+    [self updateSyncBarButtonItemState];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self unListenToNotifications];
+}
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
 
 - (void)listenToNotifications {
     [self unListenToNotifications];
@@ -397,12 +439,17 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     [[NSNotificationCenter defaultCenter] postNotificationName:kDatabaseViewPreferencesChangedNotificationKey object:nil];
 }
 
-
 - (void)refreshPreferencesMenu {
     __weak ItemDetailsViewController* weakSelf = self;
     
     NSMutableArray<UIMenuElement*>* ma1 = [NSMutableArray array];
-    
+
+    [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"new_entry_defaults", @"New Entry Defaults")
+                                  systemImage:@"gear"
+                                      handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onConfigureDefaults];
+    }]];
+
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_easy_read_all", @"Easy Read Font on All Fields")
                                   systemImage:@"eyeglasses"
                                       enabled:YES
@@ -525,9 +572,11 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     [self.tableView registerNib:[UINib nibWithNibName:kTagsViewCellId bundle:nil] forCellReuseIdentifier:kTagsViewCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kMarkdownNotesCellId bundle:nil] forCellReuseIdentifier:kMarkdownNotesCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kSshKeyViewCellId bundle:nil] forCellReuseIdentifier:kSshKeyViewCellId];
+    [self.tableView registerNib:[UINib nibWithNibName:kPasskeyTableCellViewId bundle:nil] forCellReuseIdentifier:kPasskeyTableCellViewId];
+    [self.tableView registerNib:[UINib nibWithNibName:kMarkdownUIKitTableCellViewId bundle:nil] forCellReuseIdentifier:kMarkdownUIKitTableCellViewId];
     
     if (@available(iOS 15.0, *)) {
-        [self.tableView setSectionHeaderTopPadding:4.0f];
+        [self.tableView setSectionHeaderTopPadding:0.0f];
     }
     
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
@@ -635,7 +684,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 
 - (void)prepareTableViewForEditing {
     if ( self.editing ) {
-        if (self.model.supportsCustomFields) {
+        if (self.supportsCustomFields) {
             NSUInteger addCustomFieldIdx = self.model.customFieldsFiltered.count + kSimpleRowCount;
             
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx inSection:kSimpleFieldsSectionIdx]]
@@ -751,11 +800,13 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
         else if (indexPath.row == kRowTags) {
             return [self getTagsCell:indexPath];
         }
+        else if(indexPath.row == kRowPasskey) {
+            return [self getPasskeyCell:indexPath];
+        }
         else if(indexPath.row == kRowSshKey) {
             return [self getKeeAgentSshKeyCell:indexPath];
         }
         else {
-            
             return [self getCustomFieldCell:indexPath];
         }
     }
@@ -804,9 +855,13 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     }
 }
 
+- (BOOL)supportsCustomFields {
+    return (self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4);
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if(section == kSimpleFieldsSectionIdx) {
-        BOOL showAddCustomFieldRow = self.editing && self.model.supportsCustomFields;
+        BOOL showAddCustomFieldRow = self.editing && self.supportsCustomFields;
         return kSimpleRowCount + (self.model.customFieldsFiltered.count + (showAddCustomFieldRow ? 1 : 0));
     }
     else if (section == kNotesSectionIdx) {
@@ -816,14 +871,33 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
         return self.model.filteredAttachments.count + (self.editing ? 1 : 0);
     }
     else if (section == kMetadataSectionIdx) {
-        return self.model.metadata.count;
+        return self.metadataRows.count;
     }
     else if (section == kOtherSectionIdx) {
-        return self.model.hasHistory ? 1 : 0;
+        return self.hasHistory ? 1 : 0;
     }
     else {
         return 0;
     }
+}
+
+- (BOOL)hasHistory {    
+    if ( self.createNewItem ) {
+        return NO;
+    }
+    else if ( self.databaseFormat == kKeePass1 ) {
+        return NO;
+    }
+    else if (self.databaseFormat == kPasswordSafe ) {
+        return YES;
+    }
+    else if (self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4) {
+        Node* item = [self.databaseModel.database getItemById:self.itemId];
+        
+        return item && item.fields.keePassHistory.count > 0 ;
+    }
+    
+    return NO;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -831,7 +905,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
         return CGFLOAT_MIN;
     }
     
-    BOOL shouldHideEmpty = !self.databaseModel.metadata.showEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = !self.editing;
     
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if ( indexPath.row == kRowTitleAndIcon && !self.editing ) {
@@ -853,6 +927,15 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
                 return CGFLOAT_MIN;
             }
         }
+        else if ( indexPath.row == kRowPasskey ) {
+#ifndef IS_APP_EXTENSION
+            if ( !self.model.passkey ) {
+                return CGFLOAT_MIN;
+            }
+#else
+            return CGFLOAT_MIN;
+#endif
+        }
         else if ( indexPath.row == kRowSshKey ) {
 #ifndef IS_APP_EXTENSION
             if ( !self.editing && !self.model.keeAgentSshKey ) {
@@ -864,7 +947,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
         }
         else if(indexPath.row == kRowTotp) {
 #ifndef IS_APP_EXTENSION
-            if((!self.model.totp || self.databaseModel.metadata.hideTotp) && !self.editing) {
+            if( !self.model.totp && !self.editing) {
                 return CGFLOAT_MIN;
             }
 #else
@@ -903,7 +986,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     else if(indexPath.section == kMetadataSectionIdx && (self.editing || self.hideMetadataSection)) {
         return CGFLOAT_MIN;
     }
-    else if(indexPath.section == kOtherSectionIdx && (!self.model.hasHistory || self.editing)) {
+    else if(indexPath.section == kOtherSectionIdx && (!self.hasHistory || self.editing)) {
         return CGFLOAT_MIN;
     }
 #else
@@ -918,7 +1001,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    BOOL shouldHideEmpty = !self.databaseModel.metadata.showEmptyFieldsInDetailsView && !self.editing;
+    BOOL shouldHideEmpty = !self.editing;
     
     if(section == kSimpleFieldsSectionIdx) {
         return CGFLOAT_MIN;
@@ -935,7 +1018,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
     else if(section == kMetadataSectionIdx && (self.editing || self.hideMetadataSection)) {
         return CGFLOAT_MIN;
     }
-    else if(section == kOtherSectionIdx && (self.editing || !self.model.hasHistory)) {
+    else if(section == kOtherSectionIdx && (self.editing || !self.hasHistory)) {
         return CGFLOAT_MIN;
     }
 #else 
@@ -945,7 +1028,7 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
         return CGFLOAT_MIN;
     }
 #endif
-    
+
     return UITableViewAutomaticDimension;
 }
 
@@ -958,7 +1041,11 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
         if (indexPath.row == kRowSshKey ) {
             return (self.model.keeAgentSshKey ? UITableViewCellEditingStyleDelete : UITableViewCellEditingStyleInsert);
         }
-        
+
+        if (indexPath.row == kRowPasskey && self.model.passkey ) {
+            return UITableViewCellEditingStyleDelete;
+        }
+
         if (indexPath.row >= kSimpleRowCount) { 
             return indexPath.row - kSimpleRowCount == self.model.customFieldsFiltered.count ? UITableViewCellEditingStyleInsert : UITableViewCellEditingStyleDelete;
         }
@@ -1045,6 +1132,17 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
         else if(indexPath.section == kSimpleFieldsSectionIdx) {
             if (indexPath.row == kRowTotp) {
                 [self onClearTotp];
+            }
+            else if (indexPath.row == kRowPasskey) {
+                self.model.passkey = nil;
+                
+                [self.tableView performBatchUpdates:^{
+                    NSIndexPath* ip = [NSIndexPath indexPathForRow:kRowPasskey inSection:kSimpleFieldsSectionIdx];
+                    [self.tableView reloadRowsAtIndexPaths:@[ip]
+                                          withRowAnimation:UITableViewRowAnimationAutomatic];
+                } completion:^(BOOL finished) {
+                    [self onModelEdited];
+                }];
             }
             else if (indexPath.row == kRowSshKey) {
                 self.model.keeAgentSshKey = nil;
@@ -1146,13 +1244,9 @@ static NSString* const kSshKeyViewCellId = @"SshKeyViewCell";
 - (void)onAddAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment {
     NSLog(@"Adding new Attachment: [%@]", attachment);
     
-    
     [self.model insertAttachment:filename attachment:attachment]; 
     
     [self.tableView performBatchUpdates:^{
-        
-        
-        
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:kAttachmentsSectionIdx] withRowAnimation:UITableViewRowAnimationAutomatic];
         
     } completion:^(BOOL finished) {
@@ -1612,7 +1706,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     }
     
     if ( ![self.model applyToNode:ret
-                   databaseFormat:self.databaseFormat
+                            model:self.databaseModel
           legacySupplementaryTotp:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
                     addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl] ) {
         completion(nil);
@@ -1682,10 +1776,9 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     self.sni = [[SetNodeIconUiHelper alloc] init];
     
     [self.sni expressDownloadBestFavIcon:self.model.url
-                              completion:^(UIImage * _Nullable favIcon) {
+                              completion:^(NodeIcon * _Nullable favIcon) {
         if( favIcon ) {
-            NSData *data = UIImagePNGRepresentation(favIcon);
-            item.icon = [NodeIcon withCustom:data];
+            item.icon = favIcon;
         }
         
         completion();
@@ -1699,6 +1792,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
     
     [self.sni changeIcon:self
+                   model:self.databaseModel
                     node:self.itemId ? [self.databaseModel.database getItemById:self.itemId] : [self createNewEntryNode]
              urlOverride:urlHint
                   format:self.databaseModel.database.originalFormat
@@ -1741,20 +1835,30 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    if(self.editing) {
-        return nil; 
+    if ( self.editing ) {
+        return nil;
     }
     
-    CollapsibleTableViewHeader* header = [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"header"];
+
+
     
-    if(!header) {
-        header = [[CollapsibleTableViewHeader alloc] initWithReuseIdentifier:@"header"];
+    __weak ItemDetailsViewController* weakSelf = self;
+    
+    CollapsibleTableViewHeader* header;
+    
+    if ( section == kNotesSectionIdx ) {
+        header = [[CollapsibleTableViewHeader alloc] initWithOnCopy:^{
+            [weakSelf copyToClipboard:weakSelf.model.notes
+                              message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
+        }];
+    }
+    else {
+        header = [[CollapsibleTableViewHeader alloc] initWithOnCopy:nil];
     }
     
     [header setCollapsed:self.databaseModel.metadata.detailsViewCollapsedSections[section].boolValue];
     
     __weak CollapsibleTableViewHeader* weakHeader = header;
-    __weak ItemDetailsViewController* weakSelf = self;
     
     header.onToggleSection = ^() {
         BOOL toggled = !weakSelf.databaseModel.metadata.detailsViewCollapsedSections[section].boolValue;
@@ -1839,7 +1943,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             
         }
         else if(indexPath.section == kMetadataSectionIdx) {
-            ItemMetadataEntry* entry = self.model.metadata[indexPath.row];
+            ItemMetadataEntry* entry = self.metadataRows[indexPath.row];
             if(entry.copyable) {
                 [self copyToClipboard:entry.value message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), entry.key]];
             }
@@ -2012,25 +2116,56 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         return cell;
     }
     else {
-        SshKeyViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kSshKeyViewCellId forIndexPath:indexPath];
-        
-        OpenSSHPrivateKey* theKey = self.model.keeAgentSshKey.openSshKey;
-        
-        [cell setContent:self.model.keeAgentSshKey
-                password:self.model.password
-          viewController:self
-                editMode:self.editing
-               onCopyPub:^{
-            [self copyToClipboard:theKey.publicKey message:NSLocalizedString(@"generic_copied", @"Copied")];
+        if ( self.model.keeAgentSshKey ) {
+            SshKeyViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kSshKeyViewCellId forIndexPath:indexPath];
+            
+            OpenSSHPrivateKey* theKey = self.model.keeAgentSshKey.openSshKey;
+            
+            [cell setContent:self.model.keeAgentSshKey
+                    password:self.model.password
+              viewController:self
+                    editMode:self.editing
+                   onCopyPub:^{
+                [self copyToClipboard:theKey.publicKey message:NSLocalizedString(@"generic_copied", @"Copied")];
+            }
+               onCopyPrivate:^{
+                [self copyToClipboard:theKey.privateKey message:NSLocalizedString(@"generic_copied", @"Copied")];
+            }
+                onCopyFinger:^{
+                [self copyToClipboard:theKey.fingerprint message:NSLocalizedString(@"generic_copied", @"Copied")];
+            }];
+            
+            return cell;
         }
-           onCopyPrivate:^{
-            [self copyToClipboard:theKey.privateKey message:NSLocalizedString(@"generic_copied", @"Copied")];
+        else {
+            
+            return [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         }
-            onCopyFinger:^{
-            [self copyToClipboard:theKey.fingerprint message:NSLocalizedString(@"generic_copied", @"Copied")];
-        }];
+    }
+}
+
+- (UITableViewCell*)getPasskeyCell:(NSIndexPath*)indexPath {
+    if ( self.model.passkey ) {
+        PasskeyTableCellView* cell = [self.tableView dequeueReusableCellWithIdentifier:kPasskeyTableCellViewId forIndexPath:indexPath];
+        
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.editingAccessoryType = UITableViewCellAccessoryNone;
+        
+        cell.viewController = self;
+
+        cell.copyFunction = ^(NSString * _Nonnull string) {
+            [self copyToClipboard:string message:NSLocalizedString(@"generic_copied", @"Copied")];
+        };
+        cell.launchUrlFunction = ^(NSString * _Nonnull string) {
+            [self.databaseModel launchUrlString:string];
+        };
+
+        cell.passkey = self.model.passkey;
         
         return cell;
+    }
+    else {
+        return [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath]; 
     }
 }
 
@@ -2063,11 +2198,18 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         BOOL url = isValidUrl(value);
         UIImage *launchUrlImage = url ? [UIImage imageNamed:@"link"] : nil;
         
+        NSArray<NSString*>* associatedDomains = @[];
+        if ( url && self.databaseModel.metadata.includeAssociatedDomains ) {
+            NSSet<NSString*> *ads = [BrowserAutoFillManager getAssociatedDomainsWithUrl:value];
+            associatedDomains = [ads.allObjects sortedArrayUsingComparator:finderStringComparator];
+        }
+        
         [cell setForUrlOrCustomFieldUrl:NSLocalizedString(@"item_details_url_field_title", @"URL")
                                   value:value
                             formatAsUrl:url
                        rightButtonImage:launchUrlImage
-                        useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+                        useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
+                     associatedWebsites:associatedDomains];
         
         cell.onRightButton = ^{
             if (url) {
@@ -2147,39 +2289,67 @@ suggestionProvider:^NSString*(NSString *text) {
     }
 }
 
-- (UITableViewCell*)getNotesCell:(NSIndexPath*)indexPath {
+- (UITableViewCell*)getStandardNonMarkdownNotesCell:(NSString*)notes indexPath:(NSIndexPath*)indexPath {
     __weak ItemDetailsViewController* weakSelf = self;
     
-    if ( self.editing || self.databaseModel.metadata.easyReadFontForAll || !AppPreferences.sharedInstance.markdownNotes ) {
-        NotesTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kNotesCellId forIndexPath:indexPath];
+    NotesTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kNotesCellId forIndexPath:indexPath];
+    
+    [cell setNotes:notes
+          editable:self.editing
+   useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+    
+    cell.onNotesEdited = ^(NSString * _Nonnull notes) {
+        weakSelf.model.notes = notes;
+        [weakSelf onModelEdited];
+    };
+    
+    cell.onNotesDoubleTap = ^{
+        [weakSelf copyToClipboard:weakSelf.model.notes
+                          message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
+    };
+    
+    return cell;
+
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    
+    if ( !self.editing ) {
+        [self.tableView reloadData]; 
+    }
+}
+
+- (UITableViewCell*)getMarkdownNotesCell:(NSString*)markdown indexPath:(NSIndexPath*)indexPath {
+    BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+
+    NSError* error;
+    NSString* html = [StrongboxCMarkGFMHelper convertMarkdownWithMarkdown:markdown darkMode:dark error:&error];
+    
+    if ( error != nil || html.length == 0 ) {
+        NSLog(@"🔴 Could not convert notes markdown to HTML, returning standard notes cell");
+        return [self getStandardNonMarkdownNotesCell:markdown indexPath:indexPath];
+    }
+    
+    __weak ItemDetailsViewController* weakSelf = self;
+    
+    MarkdownUIKitTableCellView* cell = [self.tableView dequeueReusableCellWithIdentifier:kMarkdownUIKitTableCellViewId forIndexPath:indexPath];
+    
+    [cell setContentWithHtml:html onHeightChanged:^{
+        [weakSelf onCellHeightChangedNotification];
+    }];
+    
+    return cell;
+}
+
+- (UITableViewCell*)getNotesCell:(NSIndexPath*)indexPath {
+    NSString* notes = [self maybeDereference:self.model.notes];
         
-        [cell setNotes:[self maybeDereference:self.model.notes]
-              editable:self.editing
-       useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
-        
-        cell.onNotesEdited = ^(NSString * _Nonnull notes) {
-            weakSelf.model.notes = notes;
-            [weakSelf onModelEdited];
-        };
-        
-        cell.onNotesDoubleTap = ^{
-            [weakSelf copyToClipboard:weakSelf.model.notes
-                              message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
-        };
-        
-        return cell;
+    if ( self.editing || notes.length == 0 || self.databaseModel.metadata.easyReadFontForAll || !AppPreferences.sharedInstance.markdownNotes ) {
+        return [self getStandardNonMarkdownNotesCell:notes indexPath:indexPath];
     }
     else {
-        MarkdownCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kMarkdownNotesCellId forIndexPath:indexPath];
-        
-        [cell setNotes:[self maybeDereference:self.model.notes]];
-        
-        cell.onNotesDoubleTap = ^{
-            [weakSelf copyToClipboard:weakSelf.model.notes
-                              message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
-        };
-        
-        return cell;
+        return [self getMarkdownNotesCell:notes indexPath:indexPath];
     }
 }
 
@@ -2211,7 +2381,7 @@ suggestionProvider:^NSString*(NSString *text) {
             [cell setConcealableKey:cf.key
                               value:[self maybeDereference:cf.value]
                           concealed:cf.concealedInUI
-                           colorize:self.databaseModel.metadata.colorizeProtectedCustomFields
+                           colorize:YES
                               audit:nil
                        showStrength:NO];
             
@@ -2239,7 +2409,7 @@ suggestionProvider:^NSString*(NSString *text) {
             else {
                 BOOL url = isValidUrl(value);
                 UIImage *launchUrlImage = url ? [UIImage imageNamed:@"link"] : nil;
-                [cell setForUrlOrCustomFieldUrl:cf.key value:value formatAsUrl:url rightButtonImage:launchUrlImage useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+                [cell setForUrlOrCustomFieldUrl:cf.key value:value formatAsUrl:url rightButtonImage:launchUrlImage useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll associatedWebsites:@[]];
                 
                 if (url) {
                     cell.onRightButton = ^{
@@ -2323,7 +2493,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (UITableViewCell*)getMetadataCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
-    ItemMetadataEntry* entry = self.model.metadata[indexPath.row];
+    ItemMetadataEntry* entry = self.metadataRows[indexPath.row];
     
     [cell setKey:entry.key
            value:entry.value
@@ -2513,7 +2683,7 @@ suggestionProvider:^NSString*(NSString *text) {
         else {
             self.createNewItem = NO;
             self.itemId = item.uuid;
-            self.model = [self reloadViewModelFromNodeItem];
+            [self reloadViewModelFromNodeItem];
             self.preEditModelClone = [self.model clone];
             
             [self bindNavBar];
@@ -2529,9 +2699,7 @@ suggestionProvider:^NSString*(NSString *text) {
     }];
 }
 
-- (EntryViewModel*)reloadViewModelFromNodeItem {
-    DatabaseFormat format = self.databaseModel.database.originalFormat;
-    
+- (void)reloadViewModelFromNodeItem {
     Node* item;
     
     if ( self.createNewItem ) {
@@ -2548,14 +2716,12 @@ suggestionProvider:^NSString*(NSString *text) {
         }
     }
     
-    return [EntryViewModel fromNode:item
-                             format:format
-                              model:self.databaseModel
-                   sortCustomFields:!self.databaseModel.metadata.customSortOrderForFields];
+    self.metadataRows = [self.databaseModel getMetadataFromItem:item];
+    self.model = [EntryViewModel fromNode:item model:self.databaseModel];
 }
 
 - (void)performFullReload {
-    self.model = [self reloadViewModelFromNodeItem]; 
+    [self reloadViewModelFromNodeItem]; 
     [self.tableView reloadData];
     [self bindNavBar];
     [self updateSyncBarButtonItemState];
@@ -2628,7 +2794,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
     BOOL keePassHistoryAvailable = item.fields.keePassHistory.count > 0; 
 
-    if (!self.model.hasHistory || !keePassHistoryAvailable ) {
+    if (!self.hasHistory || !keePassHistoryAvailable ) {
         return nil;
     }
     
@@ -2639,7 +2805,7 @@ suggestionProvider:^NSString*(NSString *text) {
     __weak ItemDetailsViewController* weakSelf = self;
     
     for ( Node* hist in item.fields.keePassHistory.reverseObjectEnumerator ) {
-        if ( [hist.fields.password localizedCompare:currentPassword] == NSOrderedSame ) {
+        if ( hist.fields.password.length == 0 || [hist.fields.password localizedCompare:currentPassword] == NSOrderedSame ) {
             continue;
         }
         

@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)changeKeePassFormat:(DatabaseFormat)newFormat;
 
-- (void)performPreSerializationTidy;
+- (void)preSerializationPerformMaintenanceOrMigrations;
 - (NSSet<Node*>*)getMinimalNodeSet:items;
 
 - (BOOL)setItemTitle:(Node*)item title:(NSString*)title;
@@ -153,6 +153,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *attachmentEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *keeAgentSSHKeyEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *passkeyEntries;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
@@ -195,12 +196,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<Node*>*)getItemsById:(NSArray<NSUUID*>*)ids;
 
 - (NSArray<NSUUID*>*)getItemIdsForTag:(NSString*)tag;
+
 - (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag;
 - (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag;
 - (void)deleteTag:(NSString*)tag;
 - (void)renameTag:(NSString*)from to:(NSString*)to;
-- (void)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
-- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
+- (BOOL)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
+- (BOOL)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
 
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 

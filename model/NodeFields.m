@@ -23,21 +23,6 @@
 
 NSString* const kOtpAuthScheme = @"otpauth";
 
-static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
-static NSString* const kKeePassXcTotpSettingsKey = @"TOTP Settings";
-static NSString* const kKeeOtpPluginKey = @"otp";
-
-static NSString* const kOriginalWindowsSecretKey = @"TimeOtp-Secret";
-static NSString* const kOriginalWindowsSecretHexKey = @"TimeOtp-Secret-Hex";
-static NSString* const kOriginalWindowsSecretBase32Key = @"TimeOtp-Secret-Base32";
-static NSString* const kOriginalWindowsSecretBase64Key = @"TimeOtp-Secret-Base64";
-static NSString* const kOriginalWindowsOtpLengthKey = @"TimeOtp-Length";
-static NSString* const kOriginalWindowsOtpPeriodKey = @"TimeOtp-Period";
-static NSString* const kOriginalWindowsOtpAlgoKey = @"TimeOtp-Algorithm";
-
-static NSString* const kOriginalWindowsOtpAlgoValueSha256 = @"HMAC-SHA-256";
-static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
-
 @interface NodeFields ()
 
 @property BOOL hasCachedOtpToken;
@@ -60,28 +45,12 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     return _regex;
 }
 
-+ ( NSSet<NSString*>* )totpCustomFieldKeys {
-    static NSSet<NSString*>* totpKeys;
-    static dispatch_once_t onceToken;
-    
-    dispatch_once(&onceToken, ^{
-        totpKeys = @[kKeeOtpPluginKey,
-                   kKeePassXcTotpSeedKey,
-                   kKeePassXcTotpSettingsKey,
-                   kOriginalWindowsSecretKey,
-                   kOriginalWindowsSecretHexKey,
-                   kOriginalWindowsSecretBase32Key,
-                   kOriginalWindowsSecretBase64Key,
-                   kOriginalWindowsOtpLengthKey,
-                   kOriginalWindowsOtpPeriodKey,
-                   kOriginalWindowsOtpAlgoKey].set;
-    });
-    
-    return totpKeys;
++ (BOOL)isTotpCustomFieldKey:(NSString*)key {
+    return [Constants.TotpCustomFieldKeys containsObject:key];
 }
 
-+ (BOOL)isTotpCustomFieldKey:(NSString*)key {
-    return [[NodeFields totpCustomFieldKeys] containsObject:key];
++ (BOOL)isPasskeyCustomFieldKey:(NSString*)key {
+    return [Constants.PasskeyCustomFieldKeys containsObject:key];
 }
 
 + (BOOL)isAlternativeURLCustomFieldKey:(NSString*)key {

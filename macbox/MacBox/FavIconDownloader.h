@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^FavIconBulkDoneBlock)(BOOL go, NSDictionary<NSUUID*, NSImage*> * _Nullable selectedFavIcons);
+typedef void (^FavIconBulkDoneBlock)(BOOL go, NSDictionary<NSUUID*, NodeIcon*> * _Nullable selectedFavIcons);
 
 @interface FavIconDownloader : NSViewController
 

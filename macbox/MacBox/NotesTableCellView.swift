@@ -22,12 +22,11 @@ extension NSTextView { // H/T: https://stackoverflow.com/a/54228147/3963806
 
 class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
     @IBOutlet var heightConstraint: NSLayoutConstraint!
-    @IBOutlet var textViewMarkdown: SBDownTextView!
+    @IBOutlet var textViewMarkdown: NSTextView!
 
     override func awakeFromNib() {
         super.awakeFromNib()
 
-        textViewMarkdown.refuseFirstResponder = true
         textViewMarkdown.delegate = self
 
         textViewMarkdown.enabledTextCheckingTypes = 0
@@ -37,7 +36,6 @@ class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
     }
 
     override func prepareForReuse() {
-        textViewMarkdown.markdownEnabled = false
         textViewMarkdown.string = "<Not Set>"
 
         textViewMarkdown.enabledTextCheckingTypes = 0
@@ -55,7 +53,6 @@ class NotesTableCellView: NSTableCellView, NSTextViewDelegate {
     }
 
     func setMarkdownOrText(string: String, markdown: Bool = false) {
-        textViewMarkdown.markdownEnabled = markdown
         textViewMarkdown.string = string
 
         if !markdown {

@@ -159,10 +159,23 @@
             
             return;
         }
-
-        self.viewModel.metadata.isTouchIdEnabled = YES;
-        self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
-        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
+        
+        [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
+                                               fallbackTitle:@""
+                                                  completion:^(BOOL success, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( success ) {
+                    self.viewModel.metadata.isTouchIdEnabled = YES;
+                    self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
+                    self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
+                    
+                    [self bindUi];
+                }
+                else {
+                    [self bindUi];
+                }
+            });
+        }];
     }
 }
 

@@ -37,8 +37,9 @@
 #import "AutoFillProxyServer.h"
 #import "Strongbox-Swift.h"
 #import "SSHAgentServer.h"
+#import "DatabasesManager.h"
 
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS 
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     #import "GoogleDriveStorageProvider.h"
     #import "DropboxV2StorageProvider.h"
 #endif
@@ -111,7 +112,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         self.wasLaunchedAsLoginItem = YES;
     }
     else {
-        NSLog(@"Strongbox was NOT launched as a login item - just a regular launch");
+
     }
 }
 
@@ -140,15 +141,15 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)doDeferredAppLaunchTasks {
     [self startOrStopAutoFillProxyServer];
-    
+
     [self startOrStopSSHAgent];
-    
+
     [MacOnboardingManager beginAppOnboardingWithCompletion:^{
-        NSLog(@"✅ Onboarding Completed...");
+        
         
         [self checkForAllWindowsClosedScenario:nil appIsLaunching:YES];
     }];
-    
+
     [self monitorForQuickRevealKey];
     
     [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
@@ -160,7 +161,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             NSLog(@"🔴 Failed to start SSH Agent.");
         }
         else {
-            NSLog(@"✅ Started SSH Agent");
+
         }
     }
     else {
@@ -385,7 +386,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)checkForAllWindowsClosedScenario:(NSWindow*)windowAboutToBeClosed appIsLaunching:(BOOL)appIsLaunching {
-    NSLog(@"✅ AppDelegate::checkForAllWindowsClosedScenario - currentEvent = [%@]", NSApp.currentEvent);
+
     
     NSArray* docs = DocumentController.sharedDocumentController.documents;
     NSMutableArray* mainWindows = [docs map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
@@ -514,13 +515,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (BOOL)isHiddenToTray {
     BOOL ret = NSApp.activationPolicy != NSApplicationActivationPolicyRegular;
     
-    NSLog(@"isHiddenToTray: %@", localizedYesOrNoFromBool(ret));
+
     
     return ret;
 }
 
 - (void)showHideSystemStatusBarIcon {
-    NSLog(@"AppDelegate::showHideSystemStatusBarIcon");
+
     
     if (Settings.sharedInstance.showSystemTrayIcon) {
         if (!self.statusItem) {
@@ -566,7 +567,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)onSystemTrayIconClicked:(id)sender {
-    NSLog(@"onSystemTrayIconClicked [%@]", self.systemTrayPopover.contentViewController);
+
 
     NSTimeInterval interval = [NSDate.date timeIntervalSinceDate:self.systemTrayPopoverClosedAt];
 
@@ -576,19 +577,19 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if ( self.systemTrayPopoverClosedAt == nil || interval > 0.2f ) {
         
         
-        NSView* v = sender;
-        NSView* positioningView = [[NSView alloc] initWithFrame:v.bounds];
+        NSView* statusBarItem = sender;
+        NSView* positioningView = [[NSView alloc] initWithFrame:statusBarItem.bounds];
         positioningView.identifier = (NSUserInterfaceItemIdentifier)@"positioningView";
-        [v addSubview:positioningView];
+        [statusBarItem addSubview:positioningView];
         
-        [self.systemTrayPopover showRelativeToRect:positioningView.bounds ofView:positioningView preferredEdge:NSRectEdgeMinY];
-        v.bounds = NSOffsetRect(v.bounds, 0, v.bounds.size.height);
-
+        [self.systemTrayPopover showRelativeToRect:positioningView.bounds ofView:positioningView preferredEdge:NSRectEdgeMaxY];
+        positioningView.bounds = NSOffsetRect(statusBarItem.bounds, 0, statusBarItem.bounds.size.height); 
+        
         NSWindow* popoverWindow = self.systemTrayPopover.contentViewController.view.window;
         if ( popoverWindow ) {
             [popoverWindow setFrame:CGRectOffset(popoverWindow.frame, 0, 13) display:NO];
         }
-            
+        
         [self.systemTrayPopover.contentViewController.view.window makeKeyWindow]; 
     }
 }
@@ -646,7 +647,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-    NSLog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
+
 
     [self cancelAutoLockTimer];
     
@@ -655,7 +656,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if ( !self.firstActivationDone ) {
         self.firstActivationDone = YES;
         
-        NSLog(@"✅ applicationDidBecomeActive - First Activation");
+
 
         DocumentController* dc = NSDocumentController.sharedDocumentController;
 
@@ -1292,6 +1293,8 @@ static NSInteger clipboardChangeCount;
     else {
         NSLog(@"✅ applicationShouldTerminate? => Yes, immediately");
 
+        [DatabasesManager.sharedInstance forceSerialize];
+        
         return NSTerminateNow;
     }
 }
@@ -1306,6 +1309,8 @@ static NSInteger clipboardChangeCount;
     else {
         [macOSSpinnerUI.sharedInstance dismiss];
 
+        [DatabasesManager.sharedInstance forceSerialize];
+        
         NSLog(@"waitForAllSyncToFinishThenTerminate - All Syncs Done - Quitting app.");
         [NSApplication.sharedApplication replyToApplicationShouldTerminate:NSTerminateNow];
     }
@@ -1335,7 +1340,7 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)startRefreshOtpTimer {
-    NSLog(@"startRefreshOtpTimer");
+
     
     if(self.timerRefreshOtp == nil) {
         self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(publishTotpUpdateNotification) userInfo:nil repeats:YES];

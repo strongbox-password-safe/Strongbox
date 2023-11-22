@@ -23,7 +23,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *labelLargeText;
 @property (weak, nonatomic) IBOutlet UIImageView *qrCodeImageView;
-@property (weak, nonatomic) IBOutlet UIButton *buttonShowQrCode;
+
 @property (weak, nonatomic) IBOutlet UILabel *labelSubtext;
 @property (weak, nonatomic) IBOutlet UILabel *labelLargeTextCaption;
 
@@ -39,18 +39,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self.buttonShowQrCode setTitleColor:UIColor.labelColor forState:UIControlStateNormal];
+
+    
+
        
-    UIImage* img = [Utils getQrCode:self.string pointSize:self.qrCodeImageView.frame.size.width];
-    self.qrCodeImageView.image = img;
-    self.qrCodeImageView.hidden = NO;
+    self.qrCodeImageView.hidden = YES;
     
     UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(labelTapped)];
     tapGestureRecognizer.numberOfTapsRequired = 1;
     [self.labelLargeText addGestureRecognizer:tapGestureRecognizer];
     self.labelLargeText.userInteractionEnabled = YES;
 
-    
     UITapGestureRecognizer *tapGestureRecognizerSubtext = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(subtextTapped)];
     tapGestureRecognizerSubtext.numberOfTapsRequired = 1;
     [self.labelSubtext addGestureRecognizer:tapGestureRecognizerSubtext];
@@ -74,6 +73,25 @@
     self.labelSubtext.hidden = self.subtext.length == 0;
     self.labelLargeTextCaption.hidden = self.subtext.length == 0;
     self.labelLargeTextCaption.text = NSLocalizedString(@"generic_totp_secret", @"TOTP Secret");
+    
+    __weak LargeTextViewController* weakSelf = self;
+    
+    CGFloat width = self.qrCodeImageView.frame.size.width;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        [weakSelf loadQrCode:width];
+    });
+}
+
+- (void)loadQrCode:(CGFloat)width {
+    UIImage* img = [Utils getQrCode:self.string
+                          pointSize:width];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.qrCodeImageView.image = img;
+        
+        self.qrCodeImageView.hidden = NO;
+    });
 }
 
 - (IBAction)onDismiss:(id)sender {
@@ -88,9 +106,16 @@
     [self copyToClipboard:self.labelSubtext.text];
 }
 
-- (IBAction)onShowQrCode:(id)sender {
-    self.qrCodeImageView.hidden = !self.qrCodeImageView.hidden;
-}
+
+
+
+
+
+
+
+
+
+
 
 - (void)copyToClipboard:(NSString *)value {
     if (value.length == 0) {

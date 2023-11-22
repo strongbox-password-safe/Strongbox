@@ -13,6 +13,7 @@
 #import "SelectItemTableViewController.h"
 #import "Utils.h"
 #import "DatabasePreferences.h"
+#import <AuthenticationServices/AuthenticationServices.h>
 
 @interface AutoFillPreferencesViewController ()
 
@@ -25,7 +26,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelQuickTypeFormat;
 @property (weak, nonatomic) IBOutlet UILabel *labelConvenienceAutoUnlockTimeout;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCopyTOTP;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoLaunchSingle;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowFavourites;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSystemLevelEnabled;
@@ -39,25 +39,29 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *howTo5;
 @property (weak, nonatomic) IBOutlet UITableViewCell *howTo6;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *howToiOS171;
+@property (weak, nonatomic) IBOutlet UITableViewCell *howToiOS172;
+@property (weak, nonatomic) IBOutlet UITableViewCell *howToiOS173;
+
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowAutoFill;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowQuickType;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellQuickTypeFormat;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCopyTotp;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellAutoLaunchDatabase;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAutoSelectSingle;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowPinned;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellConvenienceAutoUnlock;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellUseHostOnly;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAddServiceIds;
 @property (weak, nonatomic) IBOutlet UISwitch *switchScanCustomFields;
-@property (weak, nonatomic) IBOutlet UISwitch *switchScanAlternativeURLs;
+@property (weak, nonatomic) IBOutlet UISwitch *switchIncludeAssociatedDomains;
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchScanNotes;
 @property (weak, nonatomic) IBOutlet UISwitch *switchSuggestConcealed;
 @property (weak, nonatomic) IBOutlet UISwitch *suggestUnconcealed;
 @property (weak, nonatomic) IBOutlet UISwitch *switchLongTapPreview;
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeAltUrls;
+@property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeIncludeAssociated;
 @property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeScanCustom;
 @property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeScanNotes;
 @property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeSuggestConcealable;
@@ -117,12 +121,30 @@
     
     
     
-    [self cell:self.howTo1 setHidden:onForStrongbox];
-    [self cell:self.howTo2 setHidden:onForStrongbox];
-    [self cell:self.howTo3 setHidden:onForStrongbox];
-    [self cell:self.howTo4 setHidden:onForStrongbox];
-    [self cell:self.howTo5 setHidden:onForStrongbox];
-    [self cell:self.howTo6 setHidden:onForStrongbox];
+    if (@available(iOS 17.0, *)) {
+        [self cell:self.howTo1 setHidden:YES];
+        [self cell:self.howTo2 setHidden:YES];
+        [self cell:self.howTo3 setHidden:YES];
+        [self cell:self.howTo4 setHidden:YES];
+        [self cell:self.howTo5 setHidden:YES];
+        [self cell:self.howTo6 setHidden:YES];
+        
+        [self cell:self.howToiOS171 setHidden:onForStrongbox];
+        [self cell:self.howToiOS172 setHidden:onForStrongbox];
+        [self cell:self.howToiOS173 setHidden:onForStrongbox];
+    }
+    else {
+        [self cell:self.howTo1 setHidden:onForStrongbox];
+        [self cell:self.howTo2 setHidden:onForStrongbox];
+        [self cell:self.howTo3 setHidden:onForStrongbox];
+        [self cell:self.howTo4 setHidden:onForStrongbox];
+        [self cell:self.howTo5 setHidden:onForStrongbox];
+        [self cell:self.howTo6 setHidden:onForStrongbox];
+        
+        [self cell:self.howToiOS171 setHidden:YES];
+        [self cell:self.howToiOS172 setHidden:YES];
+        [self cell:self.howToiOS173 setHidden:YES];
+    }
     
     
     
@@ -137,14 +159,16 @@
     [self cell:self.cellAllowQuickType setHidden:!on];
     [self cell:self.cellQuickTypeFormat setHidden:!on];
     [self cell:self.cellCopyTotp setHidden:!on];
-    [self cell:self.cellAutoLaunchDatabase setHidden:!on];
+    
     [self cell:self.cellAutoSelectSingle setHidden:!on];
     [self cell:self.cellShowPinned setHidden:!on];
     [self cell:self.cellConvenienceAutoUnlock setHidden:!on];
     [self cell:self.cellUseHostOnly setHidden:!on];
     [self cell:self.cellAddServiceIds setHidden:!on];
     [self cell:self.cellLongTapPreview setHidden:!on];
-    [self cell:self.quickTypeAltUrls setHidden:!on];
+    
+    [self cell:self.quickTypeIncludeAssociated setHidden:!on];
+    [self cell:self.quickTypeScanCustom setHidden:!on];
     [self cell:self.quickTypeScanCustom setHidden:!on];
     [self cell:self.quickTypeScanNotes setHidden:!on];
     [self cell:self.quickTypeSuggestConcealable setHidden:!on];
@@ -165,12 +189,13 @@
     
     
     
-    self.switchScanAlternativeURLs.on = self.viewModel.metadata.autoFillScanAltUrls;
+    self.switchIncludeAssociatedDomains.on = self.viewModel.metadata.includeAssociatedDomains;
     self.switchScanNotes.on = self.viewModel.metadata.autoFillScanNotes;
     self.switchScanCustomFields.on = self.viewModel.metadata.autoFillScanCustomFields;
     self.switchSuggestConcealed.on = self.viewModel.metadata.autoFillConcealedFieldsAsCreds;
     self.suggestUnconcealed.on = self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds;
-    self.switchScanAlternativeURLs.enabled = self.switchQuickTypeAutoFill.on;
+    
+    self.switchIncludeAssociatedDomains.enabled = self.switchQuickTypeAutoFill.on;
     self.switchScanNotes.enabled = self.switchQuickTypeAutoFill.on;
     self.switchScanCustomFields.enabled = self.switchQuickTypeAutoFill.on;
     self.switchSuggestConcealed.enabled = self.switchQuickTypeAutoFill.on;
@@ -180,7 +205,6 @@
     
     self.autoProceed.on = AppPreferences.sharedInstance.autoProceedOnSingleMatch;
     self.switchCopyTOTP.on = self.viewModel.metadata.autoFillCopyTotp;
-    self.switchAutoLaunchSingle.on = AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase;
     self.switchShowFavourites.on = AppPreferences.sharedInstance.autoFillShowFavourites;
     self.switchLongTapPreview.on = AppPreferences.sharedInstance.autoFillLongTapPreview;
     
@@ -220,7 +244,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     AppPreferences.sharedInstance.autoProceedOnSingleMatch = self.autoProceed.on;
     AppPreferences.sharedInstance.storeAutoFillServiceIdentifiersInNotes = self.addServiceIds.on;
     AppPreferences.sharedInstance.useFullUrlAsURLSuggestion = !self.useHostOnlyUrl.on;
-    AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase = self.switchAutoLaunchSingle.on;
+
     AppPreferences.sharedInstance.autoFillShowFavourites = self.switchShowFavourites.on;
     AppPreferences.sharedInstance.autoFillLongTapPreview = self.switchLongTapPreview.on;
     
@@ -240,21 +264,15 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
     self.viewModel.metadata.quickTypeEnabled = self.switchQuickTypeAutoFill.on;
-    self.viewModel.metadata.autoFillScanAltUrls = self.switchScanAlternativeURLs.on;
+
+    self.viewModel.metadata.includeAssociatedDomains = self.switchIncludeAssociatedDomains.on;
     self.viewModel.metadata.autoFillScanNotes = self.switchScanNotes.on;
     self.viewModel.metadata.autoFillScanCustomFields = self.switchScanCustomFields.on;
     self.viewModel.metadata.autoFillConcealedFieldsAsCreds = self.switchSuggestConcealed.on;
     self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds = self.suggestUnconcealed.on;
 
     if ( self.switchQuickTypeAutoFill.on ) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel
-                                                           databaseUuid:self.viewModel.metadata.uuid
-                                                          displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
-                                                        alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
-                                                           customFields:self.viewModel.metadata.autoFillScanCustomFields
-                                                                  notes:self.viewModel.metadata.autoFillScanNotes
-                                           concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds nickName:self.viewModel.metadata.nickName];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel clearFirst:NO];
     }
     
     [self bind];
@@ -274,15 +292,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
             
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel
-                                                               databaseUuid:self.viewModel.metadata.uuid
-                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
-                                                            alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
-                                                               customFields:self.viewModel.metadata.autoFillScanCustomFields
-                                                                      notes:self.viewModel.metadata.autoFillScanNotes
-                                               concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
-                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds
-                                                                   nickName:self.viewModel.metadata.nickName];
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel clearFirst:NO];
         }
         
         [self bind];
@@ -297,6 +307,13 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     }
     else if ( cell == self.cellConvenienceAutoUnlock ) {
         [self promptForConvenienceAutoUnlock];
+    }
+    else if ( cell == self.howToiOS171 ) {
+        if (@available(iOS 17.0, *)) {
+            [ASSettingsHelper openCredentialProviderAppSettingsWithCompletionHandler:^(NSError * _Nullable error) {
+
+            }];
+        }
     }
 
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -355,17 +372,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 
             
             
-            [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-            
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel
-                                                               databaseUuid:self.viewModel.metadata.uuid
-                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
-                                                            alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
-                                                               customFields:self.viewModel.metadata.autoFillScanCustomFields
-                                                                      notes:self.viewModel.metadata.autoFillScanNotes
-                                               concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
-                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds
-                                                                   nickName:self.viewModel.metadata.nickName];
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel clearFirst:YES];
 
             [self bind];
         }

@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)remove:(KeyType)key;
 - (void)removeObjectForKey:(KeyType)key;
 - (void)removeAllObjects;
+- (ValueType)removeObjectAtIndex:(NSUInteger)atIndex;
 
 @property (readonly) NSArray<KeyType>* keys;
 

@@ -12,7 +12,7 @@ import MSGraphClientSDK
 class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     typealias AuthenticateCompletionHandler = (_ client: MSHTTPClient?, _ accountIdentifier: String?, _ username: String?, _ userInteractionRequired: Bool, _ userCancelled: Bool, _ error: Error?) -> Void
 
-    static let uploadChunkSize = 10 * 320 * 1024 // Must be a multiple of 320 KB - Do not go above 4MB otherwise the small upload will fail
+    static let uploadChunkSize = 10 * 320 * 1024 
 
     @objc
     static let sharedInstance = TwoDriveStorageProvider()
@@ -28,7 +28,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         let config = MSALPublicClientApplicationConfig(clientId: TwoDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
 
         do {
-            application = try MSALPublicClientApplication(configuration: config)
+            application = try MSALPublicClientApplication(configuration: config) 
         } catch {
             NSLog("🔴 Could not load application OneDrive: [%@]", String(describing: error))
         }

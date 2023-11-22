@@ -117,7 +117,7 @@
     
     const NSSet<NSString*> *keePassReserved;
     
-    NSMutableSet* set = Constants.reservedCustomFieldKeys.mutableCopy;
+    NSMutableSet* set = Constants.ReservedCustomFieldKeys.mutableCopy;
     [set addObject:kCanonicalEmailFieldName];
     keePassReserved = [set copy];
     

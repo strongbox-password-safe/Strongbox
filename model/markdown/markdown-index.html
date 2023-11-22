@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+        <style>
+            :root {
+                color-scheme: light dark;
+            }
+
+            body {
+                margin: 0px;
+                padding: 0px;
+            }
+            
+            
+            .markdown-body {
+                box-sizing: border-box;
+                min-width: 200px;
+                max-width: 980px;
+                margin: 0 auto;
+                /* padding: 16px; */
+                /* border-radius: 5px; /*
+                /* --color-canvas-default: #0d1117 !important; */
+                /*        --color-canvas-default: #000000;*/
+                --color-canvas-default: transparent !important; /* Override the default style sheet below */
+            }
+        </style>
+
+        <link rel="stylesheet" href="github-markdown.css">
+            
+        <link rel="stylesheet" href="%@"> <!-- Highlight.js stylesheet -->
+        <script src="highlight.min.js"></script>
+        <script>hljs.highlightAll();</script>
+    </head>
+    <body>
+        <article class="markdown-body">
+            %@
+        </article>
+    </body>
+</html>

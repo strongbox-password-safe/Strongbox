@@ -15,7 +15,7 @@ class SideBarViewNode {
     var children: [SideBarViewNode]
     let headerNode: HeaderNode?
     let color: NSColor?
-    let parent: SideBarViewNode?
+    weak var parent: SideBarViewNode? 
     let databaseNodeChildCount: String?
 
     init(context: NavigationContext,

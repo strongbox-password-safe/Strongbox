@@ -248,11 +248,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 [self removeDatabase:database];
             }
             
-            BOOL quickTypeDb = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
-                return obj.autoFillEnabled && obj.quickTypeEnabled;
+            BOOL autoFillEnabled = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+                return obj.autoFillEnabled;
             }];
             
-            if ( quickTypeDb ) {
+            if ( autoFillEnabled ) {
                 [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
             }
         }
@@ -266,7 +266,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     [MacSyncManager.sharedInstance removeDatabaseAndLocalCopies:safe];
     
-    if ( safe.autoFillEnabled && safe.quickTypeEnabled ) {
+    if ( safe.autoFillEnabled ) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     }
     
@@ -350,6 +350,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     };
     
     result.onEndEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
+        [weakSelf refreshVisibleRows];
         [weakSelf startRefreshTimer];
     };
             
@@ -511,7 +512,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     vc.onDone = ^(BOOL success, StorageBrowserItem * _Nonnull selectedItem) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (success) {
-                NSLog(@"selected: [%@]", selectedItem);
+
                 
                 NSString* suggestedName = [selectedItem.name stringByDeletingPathExtension];
                 
@@ -523,7 +524,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                     [MacAlerts error:nil window:self.view.window];
                 }
                 else {
-                    NSLog(@"[%@]", newDatabase.fileUrl.absoluteString);
+
                     
                     [newDatabase add];
                     [self openDatabase:newDatabase];
@@ -818,6 +819,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     
     [MacSyncManager.sharedInstance backgroundSyncDatabase:database
+                                                      key:nil
                                                completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         if ( showSpinner ) {
             [self hideProgressModal];

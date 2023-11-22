@@ -24,13 +24,12 @@
 
 @implementation ConvenienceUnlockOnboardingViewController
 
-
 - (BOOL)shouldAutorotate {
-    return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskPortrait;
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)viewDidLoad {
@@ -59,14 +58,22 @@
 }
 
 - (IBAction)onUseBio:(id)sender {
-    self.model.metadata.isTouchIdEnabled = YES;
-    self.model.metadata.conveniencePasswordHasBeenStored = YES;
-    self.model.metadata.convenienceMasterPassword = self.model.database.ckfs.password;
-    self.model.metadata.hasBeenPromptedForConvenience = YES;
-    
-    if ( self.onDone ) {
-        self.onDone(NO, NO);
-    }
+    [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
+                                           fallbackTitle:@""
+                                              completion:^(BOOL success, NSError * _Nullable error) {
+        if ( success ) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.model.metadata.isTouchIdEnabled = YES;
+                self.model.metadata.conveniencePasswordHasBeenStored = YES;
+                self.model.metadata.convenienceMasterPassword = self.model.database.ckfs.password;
+                self.model.metadata.hasBeenPromptedForConvenience = YES;
+                
+                if ( self.onDone ) {
+                    self.onDone(NO, NO);
+                }
+            });
+        }
+    }];
 }
 
 - (IBAction)onUsePin:(id)sender {

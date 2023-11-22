@@ -58,6 +58,12 @@
 
 
 
+- (void)resetCursorRects {
+    [self discardCursorRects];
+    
+    [self addCursorRect:self.bounds cursor:NSCursor.pointingHandCursor];
+}
+
 - (void)mouseDown:(NSEvent *)theEvent {
     
 }

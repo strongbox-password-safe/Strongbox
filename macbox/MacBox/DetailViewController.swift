@@ -87,8 +87,15 @@ class DetailViewController: NSViewController {
 
     @objc func refresh() {
 
+
+
         cached = nil
         tableView.reloadData()
+
+
+
+
+
     }
 
     @objc
@@ -159,12 +166,12 @@ class DetailViewController: NSViewController {
         }
 
 
+
         guard let dbModel = database.commonModel else {
-            
             return []
         }
 
-        let model = EntryViewModel.fromNode(selectedNode, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
+        let model = EntryViewModel.fromNode(selectedNode, model: dbModel)
 
         var ret: [DetailsViewField] = []
 
@@ -177,6 +184,7 @@ class DetailViewController: NSViewController {
         ret.append(contentsOf: getExpiresFields(model))
         ret.append(contentsOf: loadUrlFields(model, selectedNode))
         ret.append(contentsOf: loadTagsFields(model))
+        ret.append(contentsOf: loadPasskeyFields(model))
         ret.append(contentsOf: loadKeeAgentSshFields(model))
         ret.append(contentsOf: loadCustomFields(model, selectedNode))
         ret.append(contentsOf: loadAttachments(model))
@@ -194,7 +202,8 @@ class DetailViewController: NSViewController {
         let titleField = DetailsViewField(name: NSLocalizedString("generic_fieldname_title", comment: "Title"),
                                           value: dereference(model.title, node: node),
                                           fieldType: .title,
-                                          icon: model.icon)
+                                          icon: model.icon,
+                                          object: model.favourite)
 
         return titleField
     }
@@ -311,6 +320,91 @@ class DetailViewController: NSViewController {
         return ret
     }
 
+    func loadPasskeyFields(_ model: EntryViewModel) -> [DetailsViewField] {
+        guard let passkey = model.passkey else {
+            return []
+        }
+
+        var ret: [DetailsViewField] = []
+
+        ret.append(DetailsViewField(name: NSLocalizedString("generic_noun_passkey", comment: "Passkey"),
+                                    value: "",
+                                    fieldType: .header,
+                                    object: nil))
+
+        
+
+        ret.append(DetailsViewField(name: NSLocalizedString("generic_algorithm", comment: "Algorithm"),
+                                    value: NSLocalizedString("passkey_ecdsa_es256_algo", comment: "ECDSA / ES256 (Elliptic Curve)"),
+                                    fieldType: .customField,
+                                    concealed: false,
+                                    concealable: false,
+                                    singleLineMode: true,
+                                    leftImage: Icon.algorithm.image()))
+
+        
+
+        ret.append(DetailsViewField(name: NSLocalizedString("passkey_relying_party", comment: "Relying Party"),
+                                    value: passkey.relyingPartyId,
+                                    fieldType: .customField,
+                                    concealed: false,
+                                    concealable: false,
+                                    singleLineMode: true))
+
+        
+
+        ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_username", comment: "Username"),
+                                    value: passkey.username,
+                                    fieldType: .customField,
+                                    concealed: false,
+                                    concealable: false,
+                                    singleLineMode: true))
+
+        
+
+        ret.append(DetailsViewField(name: NSLocalizedString("passkey_credential_id", comment: "Credential ID"),
+                                    value: passkey.credentialIdB64,
+                                    fieldType: .customField,
+                                    concealed: true,
+                                    concealable: true,
+                                    singleLineMode: false))
+
+        
+
+        ret.append(DetailsViewField(name: NSLocalizedString("passkey_user_handle", comment: "User Handle"),
+                                    value: passkey.userHandleB64,
+                                    fieldType: .customField,
+                                    concealed: true,
+                                    concealable: true,
+                                    singleLineMode: false))
+
+        
+
+        let pubShareFilename = String(format: "%@.pub", passkey.relyingPartyId)
+        ret.append(DetailsViewField(name: NSLocalizedString("generic_public_key", comment: "Public Key"),
+                                    value: passkey.publicKeyPem,
+                                    fieldType: .customField,
+                                    concealed: true,
+                                    concealable: true,
+                                    object: passkey,
+                                    showShare: true,
+                                    params: ["share_filename": pubShareFilename]))
+
+        
+
+        let privShareFilename = String(format: "%@.pem", passkey.relyingPartyId)
+        ret.append(DetailsViewField(name: NSLocalizedString("generic_private_key", comment: "Private Key"),
+                                    value: passkey.privateKeyPem,
+                                    fieldType: .customField,
+                                    concealed: true,
+                                    concealable: true,
+                                    object: passkey,
+                                    showShare: true,
+                                    params: ["share_filename": privShareFilename]))
+
+        return ret
+    }
+
     func getEmailFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
         if model.email.count > 0 {
             return [DetailsViewField(name: NSLocalizedString("generic_fieldname_email", comment: "Email"),
@@ -340,10 +434,22 @@ class DetailViewController: NSViewController {
     }
 
     func getUrlField(_ model: EntryViewModel, _ node: Node, _ dereferencedPassword: String) -> DetailsViewField {
-        DetailsViewField(name: NSLocalizedString("generic_fieldname_url", comment: "URL"),
-                         value: dereference(model.url, node: node),
-                         fieldType: .url,
-                         object: dereferencedPassword)
+        let actualUrl = dereference(model.url, node: node)
+        var associatedWebsites = ""
+
+        if database.databaseMetadata.includeAssociatedDomains {
+            let set = BrowserAutoFillManager.getAssociatedDomains(url: actualUrl)
+
+            let sorted = set.sorted()
+
+            associatedWebsites = sorted.joined(separator: ", ")
+        }
+
+        return DetailsViewField(name: NSLocalizedString("generic_fieldname_url", comment: "URL"),
+                                value: actualUrl,
+                                fieldType: .url,
+                                object: dereferencedPassword,
+                                params: ["associatedWebsites": associatedWebsites])
     }
 
     fileprivate func loadUrlFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
@@ -373,13 +479,7 @@ class DetailViewController: NSViewController {
     fileprivate func loadTagsFields(_ model: EntryViewModel) -> [DetailsViewField] {
         var ret: [DetailsViewField] = []
 
-        var tags = model.tags
-
-        if Settings.sharedInstance().shadeFavoriteTag {
-            if let idx = tags.firstIndex(of: kCanonicalFavouriteTag) {
-                tags.remove(at: idx)
-            }
-        }
+        let tags = model.tags
 
         if tags.count > 0 {
             ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_tags", comment: "Tags"), value: "", fieldType: .header, object: DetailsViewField.FieldType.tags))
@@ -460,17 +560,21 @@ class DetailViewController: NSViewController {
         return ret
     }
 
-    fileprivate func loadMetadataFields(_ model: EntryViewModel) -> [DetailsViewField] {
+    fileprivate func loadMetadataFields(_: EntryViewModel) -> [DetailsViewField] {
         var ret: [DetailsViewField] = []
 
-        if !model.metadata.isEmpty {
-            ret.append(DetailsViewField(name: NSLocalizedString("item_details_section_header_metadata", comment: "Metadata"),
-                                        value: "",
-                                        fieldType: .header,
-                                        object: DetailsViewField.FieldType.metadata))
+        if let databaseModel = database.commonModel, let node = getNode() {
+            let metadata = databaseModel.getMetadataFromItem(node)
 
-            for meta in model.metadata {
-                ret.append(DetailsViewField(name: meta.key, value: meta.value, fieldType: .metadata))
+            if !metadata.isEmpty {
+                ret.append(DetailsViewField(name: NSLocalizedString("item_details_section_header_metadata", comment: "Metadata"),
+                                            value: "",
+                                            fieldType: .header,
+                                            object: DetailsViewField.FieldType.metadata))
+
+                for meta in metadata {
+                    ret.append(DetailsViewField(name: meta.key, value: meta.value, fieldType: .metadata))
+                }
             }
         }
 
@@ -572,10 +676,18 @@ class DetailViewController: NSViewController {
         }
     }
 
-    func showPopupToast(_ message: String, view: NSView? = nil) {
-        let view = view ?? self.view
+    var windowController: WindowController {
+        view.window!.windowController as! WindowController
+    }
 
-        guard let hud = MBProgressHUD.showAdded(to: view, animated: true) else {
+    var splitViewController: NextGenSplitViewController {
+        windowController.contentViewController as! NextGenSplitViewController
+    }
+
+    func showPopupToast(_ message: String, view _: NSView? = nil) {
+
+
+        guard let hud = MBProgressHUD.showAdded(to: splitViewController.view, animated: true) else {
             return
         }
 
@@ -585,12 +697,11 @@ class DetailViewController: NSViewController {
         hud.labelText = message
         hud.color = defaultColor
         hud.mode = MBProgressHUDModeText
-        hud.margin = 0.0
-        hud.yOffset = 2.0
+        hud.margin = 12.0
+        hud.yOffset = 0.0
         hud.removeFromSuperViewOnHide = true
-        hud.dismissible = false
         hud.cornerRadius = 5.0
-        hud.dimBackground = true
+        hud.dismissible = true
 
         let when = DispatchTime.now() + 0.75
         DispatchQueue.main.asyncAfter(deadline: when) {
@@ -966,6 +1077,16 @@ class DetailViewController: NSViewController {
                 
                 onExportPublicKeyFromSshKey(field)
             }
+        } else if field.fieldType == .customField {
+            guard let data = field.value.data(using: .utf8) else {
+                NSLog("🔴 Could not get utf8 data for field to share")
+                return
+            }
+            guard let filename = field.params["share_filename"] else {
+                NSLog("🔴 Could not get share_filename for field to share")
+                return
+            }
+            share(filename, data)
         } else {
             NSLog("🔴 Unknown field type for sharing")
         }
@@ -1097,8 +1218,14 @@ class DetailViewController: NSViewController {
             return
         }
 
+        let filename = field.params["filename"] ?? NSLocalizedString("generic_unknown", comment: "Unknown")
+
+        share(filename, data)
+    }
+
+    func share(_ filename: String, _ data: Data) {
         let panel = NSSavePanel()
-        panel.nameFieldStringValue = field.params["filename"] ?? NSLocalizedString("generic_unknown", comment: "Unknown")
+        panel.nameFieldStringValue = filename
 
         if panel.runModal() == .OK {
             guard let url = panel.url else {
@@ -1125,21 +1252,9 @@ class DetailViewController: NSViewController {
             return
         }
 
-        let panel = NSSavePanel()
         let filename = field.params["filename"] ?? NSLocalizedString("generic_unknown", comment: "Unknown")
-        panel.nameFieldStringValue = filename.appending(".pub")
 
-        if panel.runModal() == .OK {
-            guard let url = panel.url else {
-                return
-            }
-
-            do {
-                try data.write(to: url)
-            } catch {
-                MacAlerts.error(error, window: view.window)
-            }
-        }
+        share(filename.appending(".pub"), data)
     }
 
     func toggleRevealConceal(_ field: DetailsViewField) {
@@ -1246,6 +1361,7 @@ extension DetailViewController: DocumentViewController {
 
         let auditNotificationsOfInterest: [String] = [
             
+            kAuditNewSwitchedOffNotificationKey,
             kAuditCompletedNotificationKey,
         ]
 
@@ -1299,6 +1415,18 @@ extension DetailViewController: DocumentViewController {
 
             self.refresh()
         }
+
+        
+
+        DistributedNotificationCenter.default.addObserver(self,
+                                                          selector: #selector(lightOrDarkAppearanceModeChanged(sender:)),
+                                                          name: NSNotification.Name(rawValue: "AppleInterfaceThemeChangedNotification"),
+                                                          object: nil)
+    }
+
+    @objc func lightOrDarkAppearanceModeChanged(sender _: NSNotification) {
+
+        refresh()
     }
 
     func onGenericRefreshNotificationReceived(_ notification: Notification) {
@@ -1319,6 +1447,8 @@ extension DetailViewController: DocumentViewController {
 
 
         if field.fieldType == .metadata {
+            return true
+        } else if field.fieldType == .title {
             return true
         } else if field.fieldType == .url {
             return true
@@ -1354,6 +1484,7 @@ extension DetailViewController: DocumentViewController {
         tableView.register(NSNib(nibNamed: NSNib.Name("UrlTableCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("UrlTableCellView"))
         tableView.register(NSNib(nibNamed: NSNib.Name("KeeAgentSshCellView"), bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier("KeeAgentSshCellView"))
         tableView.register(NSNib(nibNamed: AuditIssueTableCellView.nibName, bundle: nil), forIdentifier: AuditIssueTableCellView.reuseIdentifier)
+        tableView.register(NSNib(nibNamed: MarkdownCocoaTableCellView.NibIdentifier.rawValue, bundle: nil), forIdentifier: MarkdownCocoaTableCellView.NibIdentifier)
 
         tableView.selectionHighlightStyle = .regular
         tableView.overrideValidateProposedFirstResponderForRow = { [weak self] row in self?.overrideValidateProposedFirstResponderForRow(row: row) }
@@ -1421,9 +1552,20 @@ extension DetailViewController: DocumentViewController {
             return
         }
 
+        let currentlyDisplayingAuditIssue = fields.first { field in
+            field.fieldType == .auditIssue
+        } != nil
 
+        if notification.name.rawValue == kAuditNewSwitchedOffNotificationKey, currentlyDisplayingAuditIssue {
+            NSLog("✅ Browse::onAuditUpdateNotification [%@] - Audit Cleared Just switch off", String(describing: notification.name))
+            refresh()
+            return
+        }
 
-        refresh()
+        if let node = getNode(), database.isFlagged(byAudit: node.uuid) || currentlyDisplayingAuditIssue {
+            NSLog("✅ DetailViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
+            refresh()
+        }
     }
 
     func getPasswordHistoryMenu() -> NSMenu? {
@@ -1456,6 +1598,15 @@ extension DetailViewController: NSTableViewDataSource {
 }
 
 extension DetailViewController: NSTableViewDelegate {
+    func onTitleClicked() {
+        guard let node = getNode() else {
+            NSLog("🔴 couldn't get node!")
+            return
+        }
+
+        database.launchUrl(node)
+    }
+
     func onCopyField(field: DetailsViewField?) {
         if let field {
             copyFieldToClipboard(field)
@@ -1465,6 +1616,31 @@ extension DetailViewController: NSTableViewDelegate {
     func onShareField(field: DetailsViewField?, _ button: NSButton) {
         if let field {
             shareField(field, button)
+        }
+    }
+
+    func getNoneMarkdownNotesCell(_ field: DetailsViewField) -> NSTableCellView? {
+        guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("NotesTableCellView"), owner: nil) as? NotesTableCellView else {
+            return nil
+        }
+
+        cell.setMarkdownOrText(string: field.value, markdown: Settings.sharedInstance().markdownNotes)
+
+        return cell
+    }
+
+    func getNotesCell(_ field: DetailsViewField) -> NSTableCellView? {
+        if field.value.count > 0,
+           Settings.sharedInstance().markdownNotes,
+           let currentHtml = try? StrongboxCMarkGFMHelper.convertMarkdown(markdown: field.value, darkMode: DarkMode.isOn), currentHtml.count > 0
+        {
+            let cell = tableView.makeView(withIdentifier: MarkdownCocoaTableCellView.NibIdentifier, owner: self) as! MarkdownCocoaTableCellView
+
+            cell.setContent(html: currentHtml)
+
+            return cell
+        } else {
+            return getNoneMarkdownNotesCell(field)
         }
     }
 
@@ -1480,7 +1656,10 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
+            let associated = field.params["associatedWebsites"] ?? ""
+
             cell.setContent(field,
+                            associated,
                             popupMenuUpdater: { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) },
                             onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field) } : nil)
 
@@ -1543,8 +1722,21 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.titleLabel.stringValue = field.value
-            cell.image.image = NodeIconHelper.getNodeIcon(field.icon, predefinedIconSet: database!.iconSet)
+            let image = NodeIconHelper.getNodeIcon(field.icon, predefinedIconSet: database!.iconSet)
+            let fav = field.object as? Bool ?? false
+
+            cell.setContent(field.value, image, fav, !database.isEffectivelyReadOnly) {
+                [weak self] in
+                guard let node = self?.getNode() else {
+                    NSLog("🔴 Could not get node to toggleFavourite!")
+                    return
+                }
+
+                self?.database.toggleFavourite(node.uuid)
+            } _: { [weak self] in
+                NSLog("🚀 Title Click!")
+                self?.onTitleClicked()
+            }
 
             return cell
         case .headerWithTextButton:
@@ -1564,7 +1756,7 @@ extension DetailViewController: NSTableViewDelegate {
 
             let subtype = field.object as? DetailsViewField.FieldType
 
-            var sortImage = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: nil)
+            let sortImage = NSImage(systemSymbolName: "arrow.up.arrow.down", accessibilityDescription: nil)
 
             let sortTitle = String(format: NSLocalizedString("sort_status_fmt", comment: "Sort: %@"), database.customSortOrderForFields ? NSLocalizedString("generic_sort_order_custom", comment: "Custom") : NSLocalizedString("generic_sort_order_ascending", comment: "Ascending"))
 
@@ -1586,13 +1778,7 @@ extension DetailViewController: NSTableViewDelegate {
 
             return cell
         case .notes:
-            guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("NotesTableCellView"), owner: nil) as? NotesTableCellView else {
-                return nil
-            }
-
-            cell.setMarkdownOrText(string: field.value, markdown: Settings.sharedInstance().markdownNotes)
-
-            return cell
+            return getNotesCell(field)
         case .attachment:
             guard let cell = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier("AttachmentTableCellView"), owner: nil) as? AttachmentTableCellView else {
                 return nil

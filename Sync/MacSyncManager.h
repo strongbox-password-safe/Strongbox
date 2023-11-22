@@ -26,8 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)backgroundSyncAll;
 - (void)backgroundSyncOutstandingUpdates;
-- (void)backgroundSyncDatabase:(MacDatabasePreferences*)database;
-- (void)backgroundSyncDatabase:(MacDatabasePreferences*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion;
+- (void)backgroundSyncDatabase:(MacDatabasePreferences*)database key:(CompositeKeyFactors * _Nullable)key completion:(SyncAndMergeCompletionBlock _Nullable)completion;
+
 
 - (void)pollForChanges:(MacDatabasePreferences*)database completion:(SyncAndMergeCompletionBlock)completion;
 - (void)removeDatabaseAndLocalCopies:(MacDatabasePreferences*)database;

@@ -82,18 +82,12 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 
 
 
-
-
-@property BrowseSortField browseSortField;
-@property BOOL browseSortOrderDescending;
-@property BOOL browseSortFoldersSeparately;
-
 @property BrowseItemSubtitleField browseItemSubtitleField;
 @property BOOL immediateSearchOnBrowse;
-@property BOOL hideTotpInBrowse;
+
 @property BOOL showKeePass1BackupGroup;
 @property BOOL showChildCountOnFolderInBrowse;
-@property BOOL showFlagsInBrowse;
+
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;
 
@@ -106,10 +100,10 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property BOOL hideIconInBrowse;
 
 
-@property BOOL showEmptyFieldsInDetailsView;
+
 @property NSArray<NSNumber*>* detailsViewCollapsedSections;
 @property BOOL easyReadFontForAll;
-@property BOOL hideTotp;
+
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL showPasswordByDefaultOnEditScreen;
 
@@ -129,8 +123,6 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property NSUInteger maxBackupKeepCount;
 @property BOOL makeBackups;
 
-@property BOOL hideTotpCustomFieldsInViewMode;
-
 
 
 @property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
@@ -141,7 +133,6 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property DatabaseAuditorConfiguration* auditConfig;
 
 @property BOOL colorizePasswords;
-@property BOOL colorizeProtectedCustomFields;
 
 @property KeePassIconSet keePassIconSet;
 
@@ -204,8 +195,7 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property (nullable) NSDate* databaseCreated;
 @property NSUInteger unlockCount;
 
-
-@property BOOL autoFillScanAltUrls;
+@property BOOL includeAssociatedDomains;
 @property BOOL autoFillScanCustomFields;
 @property BOOL autoFillScanNotes;
 

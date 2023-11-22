@@ -245,7 +245,7 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
 
     configVC.onDone = ^(BOOL success, SFTPSessionConfiguration * _Nonnull configuration) {
         if (success) {
-            NSLog(@"SFTP config = [%@]...", configuration);
+
 
             [SFTPConnections.sharedInstance addOrUpdate:configuration];
             [self refresh];

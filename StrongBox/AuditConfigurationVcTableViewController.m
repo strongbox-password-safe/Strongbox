@@ -84,7 +84,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    [self cell:self.cellViewAllAuditIssues setHidden:self.hideShowAllAuditIssues]; 
+    [self cell:self.cellViewAllAuditIssues setHidden:YES]; 
     
     [self cell:self.cellCheckHibp setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
     [self cell:self.cellOnlineHibpInterval setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
@@ -319,8 +319,6 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     [self performSelector:@selector(saveSettingsAndRestartBackgroundAudit:) withObject:config afterDelay:0.25f];
     
-    [self.model stopAndClearAuditor];
-    
     [self bindUi];
 }
 
@@ -336,6 +334,14 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 - (void)restartBackgroundAudit {
     [self.model restartBackgroundAudit];
+    
+    
+
+    if ( self.model ) {
+        [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey
+                                                          object:@{ @"userStopped" : @(NO),
+                                                                    @"model" : self.model }];
+    }
 }
 
 - (IBAction)onHibpChanged:(id)sender {

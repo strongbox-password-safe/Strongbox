@@ -27,6 +27,8 @@ enum BrowseViewColumn: String, CaseIterable {
     case customIcon = "CustomIconColumn"
     case uuid = "UuidColumn"
     case auditIssues = "AuditIsssuesColumn"
+    case customIconSize = "CustomIconSize"
+    case size = "Size"
 
     var identifier: NSUserInterfaceItemIdentifier {
         NSUserInterfaceItemIdentifier(rawValue)
@@ -70,6 +72,10 @@ enum BrowseViewColumn: String, CaseIterable {
             return false
         case .auditIssues:
             return false
+        case .customIconSize:
+            return false
+        case .size:
+            return false
         }
     }
 
@@ -111,8 +117,10 @@ enum BrowseViewColumn: String, CaseIterable {
             return NSLocalizedString("generic_fieldname_id", comment: "ID")
         case .auditIssues:
             return NSLocalizedString("quick_view_title_audit_issues_title", comment: "Audit Issues")
-
-
+        case .customIconSize:
+            return NSLocalizedString("generic_fieldname_custom_icon_size", comment: "Custom Icon Size")
+        case .size:
+            return NSLocalizedString("generic_fieldname_estimated_size", comment: "Estimated Size")
         }
     }
 }

@@ -53,6 +53,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
         installForChromiumBasedBrowser("Library/Application Support/Thorium/NativeMessagingHosts")
 
         
+        
 
         installForChromiumBasedBrowser("Library/Application Support/Orion/NativeMessagingHosts")
     }

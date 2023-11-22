@@ -144,8 +144,8 @@
     return [SafesList.sharedInstance isUnique:nickName];
 }
 
-+ (void)reloadIfChangedByOtherComponent {
-    [SafesList.sharedInstance reloadIfChangedByOtherComponent];
++ (BOOL)reloadIfChangedByOtherComponent {
+    return [SafesList.sharedInstance reloadIfChangedByOtherComponent];
 }
 
 + (BOOL)isEditing:(DatabasePreferences *)database {
@@ -364,42 +364,6 @@
 - (void)setTapAction:(BrowseTapAction)tapAction {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.tapAction = tapAction;
-    }];
-}
-
-
-
-- (BrowseSortField)browseSortField {
-    return self.metadata.browseSortField;
-}
-
-- (void)setBrowseSortField:(BrowseSortField)browseSortField {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.browseSortField = browseSortField;
-    }];
-}
-
-
-
-- (BOOL)browseSortOrderDescending {
-    return self.metadata.browseSortOrderDescending;
-}
-
-- (void)setBrowseSortOrderDescending:(BOOL)browseSortOrderDescending {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.browseSortOrderDescending = browseSortOrderDescending;
-    }];
-}
-
-
-
-- (BOOL)browseSortFoldersSeparately {
-    return self.metadata.browseSortFoldersSeparately;
-}
-
-- (void)setBrowseSortFoldersSeparately:(BOOL)browseSortFoldersSeparately {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.browseSortFoldersSeparately = browseSortFoldersSeparately;
     }];
 }
 
@@ -1077,18 +1041,6 @@
 
 
 
-- (BOOL)autoFillScanAltUrls {
-    return self.metadata.autoFillScanAltUrls;
-}
-
-- (void)setAutoFillScanAltUrls:(BOOL)autoFillScanAltUrls {
-    [self update:^(SafeMetaData * _Nonnull metadata) {
-        metadata.autoFillScanAltUrls = autoFillScanAltUrls;
-    }];
-}
-
-
-
 - (BOOL)autoFillScanCustomFields {
     return self.metadata.autoFillScanCustomFields;
 }
@@ -1108,6 +1060,18 @@
 - (void)setAutoFillScanNotes:(BOOL)autoFillScanNotes {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.autoFillScanNotes = autoFillScanNotes;
+    }];
+}
+
+
+
+- (BOOL)includeAssociatedDomains {
+    return self.metadata.includeAssociatedDomains;
+}
+
+- (void)setIncludeAssociatedDomains:(BOOL)includeAssociatedDomains {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.includeAssociatedDomains = includeAssociatedDomains;
     }];
 }
 
@@ -1405,92 +1369,6 @@
         metadata.sortConfigurations = sortConfigurations;
     }];
 }
-
-
-
-
-
-- (BOOL)hideTotpCustomFieldsInViewMode {
-    return YES;
-    
-}
-
-
-
-
-
-
-
-
-
-- (BOOL)hideTotp {
-    return NO;
-    
-}
-
-
-
-
-
-
-
-
-
-- (BOOL)hideTotpInBrowse {
-    return NO;
-
-}
-
-
-
-
-
-
-
-
-
-
-- (BOOL)showEmptyFieldsInDetailsView {
-    return NO;
-
-}
-
-
-
-
-
-
-
-
-
-
-- (BOOL)colorizeProtectedCustomFields {
-    return self.colorizePasswords;
-
-}
-
-
-
-
-
-
-
-
-
-
-- (BOOL)showFlagsInBrowse {
-    return YES;
-
-}
-
-
-
-
-
-
-
-
-
 
 - (NSString *)exportFilename {
     return self.metadata.exportFilename;

@@ -129,7 +129,7 @@
     IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self.viewController
                                                                                            database:self.database
                                                                                      isAutoFillOpen:self.isAutoFillOpen
-                                                                            isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
+                                                         transparentAutoFillBackgroundForBiometrics:isAutoFillQuickTypeOpen
                                                                                 biometricPreCleared:biometricPreCleared
                                                                                 noConvenienceUnlock:explicitManualUnlock];
     

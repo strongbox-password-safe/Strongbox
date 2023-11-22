@@ -74,9 +74,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSString* keyFileBookmark;
 @property (nonatomic, strong, nullable) NSString* autoFillKeyFileBookmark;
 @property (nonatomic) BOOL autoFillEnabled;
+
 @property (nonatomic) BOOL quickTypeEnabled;
 @property (nonatomic) QuickTypeAutoFillDisplayFormat quickTypeDisplayFormat;
-@property (nonatomic) BOOL quickWormholeFillEnabled;
+
 @property (nonatomic) BOOL hasPromptedForAutoFillEnrol;
 @property (nullable) NSUUID* outstandingUpdateId;
 @property (nullable) NSDate* lastSyncRemoteModDate; 
@@ -114,7 +115,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL uiDoNotSortKeePassNodesInBrowseView;
 
 @property BOOL hasSetInitialWindowPosition;
-@property BOOL autoFillScanAltUrls;
 @property BOOL autoFillScanCustomFields;
 @property BOOL autoFillScanNotes;
 @property (nonatomic, strong, nullable) NSString* conveniencePin;
@@ -131,6 +131,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSInteger convenienceExpiryPeriod; 
 @property (nonatomic, strong, nullable) NSString* convenienceMasterPassword; 
 @property (nonatomic) BOOL conveniencePasswordHasBeenStored; 
+@property BOOL includeAssociatedDomains;
 @property BOOL autoFillConcealedFieldsAsCreds;
 @property BOOL autoFillUnConcealedFieldsAsCreds;
 @property (nullable) NSUUID* asyncUpdateId; 
@@ -171,6 +172,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;
+
+@property (readonly) BOOL searchDereferencedFields;
+@property (readonly) BOOL showKeePass1BackupGroup;
+@property (readonly) BOOL showExpiredInSearch;
+
 
 
 @end

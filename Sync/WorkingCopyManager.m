@@ -83,7 +83,7 @@
                                        ofItemAtPath:localWorkingCacheUrl.path
                                               error:&err2];
         
-        NSLog(@"Set Working Cache Attributes for [%@] to [%@] with error = [%@]", databaseUuid, dateModified, err2);
+
         
         if (err2 && error) {
             *error = err2;

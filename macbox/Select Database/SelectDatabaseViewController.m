@@ -11,7 +11,6 @@
 #import "DatabaseCellView.h"
 #import "NSArray+Extensions.h"
 #import "Settings.h"
-#import "AutoFillWormhole.h"
 
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
@@ -23,8 +22,6 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
 @property BOOL viewWillAppearFirstTimeDone;
 @property BOOL firstAppearanceDone;
-@property NSSet<NSString*> *unlockedDatabases;
-
 @end
 
 @implementation SelectDatabaseViewController
@@ -51,13 +48,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         
         self.tableView.doubleAction = @selector(onDoubleClick:);
         
-        self.unlockedDatabases = NSSet.set;
-        
         [self refresh];
-        
-        if ( self.autoFillMode ) {
-            [self checkWormholeForUnlockedDatabases];
-        }
     }
 }
 
@@ -72,7 +63,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
             return obj.autoFillEnabled;
         }].count;
         
-        if ( self.autoFillMode && count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
+        if ( self.autoFillMode && count == 1 ) {
             NSLog(@"Single Database Launching...");
             
             MacDatabasePreferences* database = self.databases.firstObject;
@@ -80,65 +71,10 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
             __weak SelectDatabaseViewController* weakSelf = self;
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [weakSelf dismissViewController:self];
-                weakSelf.onDone(NO, database);
+                [weakSelf dismissAndComplete:NO database:database];
             });
         }
     }
-}
-
-- (void)checkWormholeForUnlockedDatabases {
-    [self.wormhole clearAllMessageContents];
-    
-    NSLog(@"✅ checkWormholeForUnlockedDatabases");
-    
-    __block BOOL gotResponse = NO;
-    __block NSMutableSet<NSString*> *unlocked = NSMutableSet.set;
-    
-    for (MacDatabasePreferences* database in self.databases) {
-        NSLog(@"Sending status request for %@", database.uuid);
-        
-        [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(), @"database-id" : database.uuid }
-                              identifier:kAutoFillWormholeDatabaseStatusRequestId];
-        
-        NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, database.uuid];
-        
-        [self.wormhole listenForMessageWithIdentifier:responseId
-                                             listener:^(id messageObject) {
-            
-            
-            NSDictionary* dict = messageObject;
-            NSString* userSession = dict[@"user-session-id"];
-            
-            if ( [userSession isEqualToString:NSUserName()] ) { 
-                NSString* databaseId = dict[@"unlocked"];
-                
-                NSLog(@"AutoFill-Wormhole: Got Database Status Response Message [%@] is unlocked", databaseId);
-                
-                gotResponse = YES;
-                [unlocked addObject:databaseId];
-                
-                self.unlockedDatabases = unlocked;
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [self refresh];
-                });
-            }
-        }];
-    }
-    
-    CGFloat timeout = 0.5f;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (!gotResponse) {
-            NSLog(@"No wormhole response after %f seconds...", timeout);
-            
-            for (MacDatabasePreferences* database in self.databases) {
-                NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, database.uuid];
-                [self.wormhole stopListeningForMessageWithIdentifier:responseId];
-            }
-            
-            [self.wormhole clearAllMessageContents];
-        }
-    });
 }
 
 - (void)refresh {
@@ -158,9 +94,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self dismissViewController:self]; 
-
-    self.onDone(YES, nil);
+    [self dismissAndComplete:YES database:nil];
 }
 
 - (void)onDoubleClick:(id)sender {
@@ -180,9 +114,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
             return;
         }
         
-        [self dismissViewController:self];
-        
-        self.onDone(NO, database);
+        [self dismissAndComplete:NO database:database];
     }
 }
 
@@ -240,6 +172,20 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     MacDatabasePreferences* database = [self.databases objectAtIndex:row];
 
     self.buttonSelect.enabled = ![self isDisabled:database];
+}
+
+- (void)dismissAndComplete:(BOOL)userCancelled database:(MacDatabasePreferences*)database {
+    if ( self.presentingViewController ) {
+        [self.presentingViewController dismissViewController:self];
+    }
+    else if ( self.view.window.sheetParent ) {
+        [self.view.window.sheetParent endSheet:self.view.window returnCode:NSModalResponseCancel];
+    }
+    else {
+        [self.view.window close];
+    }
+    
+    self.onDone(userCancelled, database);
 }
 
 @end

@@ -66,7 +66,7 @@
         NSUInteger lastIndex = self.data.count - 1;
         topObject = [self.data objectAtIndex:lastIndex];
         
-        NSLog(@"popAndClear: %lu", (unsigned long)lastIndex);
+
         
         [self.data removeAllObjects];
     });

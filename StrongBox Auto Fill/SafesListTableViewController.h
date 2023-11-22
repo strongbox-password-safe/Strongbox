@@ -11,9 +11,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^SelectAutoFillDatabaseCompletion)(BOOL userCancelled, DatabasePreferences* _Nullable database);
+
 @interface SafesListTableViewController : UITableViewController
 
-@property (nonatomic, weak) CredentialProviderViewController *rootViewController;
++ (UINavigationController*)navControllerfromStoryboard:(SelectAutoFillDatabaseCompletion)completion;
+
+@property (nonatomic, copy) SelectAutoFillDatabaseCompletion completion;
 
 @end
 

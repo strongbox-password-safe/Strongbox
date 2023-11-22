@@ -14,6 +14,7 @@
 #import "FavIconDownloadOptions.h"
 #import "AppPreferences.h"
 #import "NSString+Extensions.h"
+#import "ConcurrentMutableDictionary.h"
 
 typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     kFavIconBulkStatusInitial,
@@ -38,29 +39,34 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 
 @property FavIconDownloadOptions* options;
 @property FavIconBulkDownloadStatus status;
-@property NSMutableDictionary<NSURL*, NSArray<UIImage*>*>* results;
+
 @property NSOperationQueue* queue;
-@property NSArray<Node*> *validNodes;
-@property NSArray<NSURL*> *validUniqueUrls;
+@property NSArray<NSUUID*> *validNodes;
+
+@property ConcurrentMutableDictionary<NSUUID*, NSArray<NodeIcon*>*>* nodeImagesMap;
+
 @property NSArray<Node*> *nodes;
 @property (nonatomic, copy) FavIconBulkDoneBlock onDone;
 
 
 @property NSURL* singleNodeUrlOverride;
 
+@property Model* model;
+
 @end
 
 @implementation FavIconBulkViewController
 
-+ (void)presentModal:(UIViewController *)presentingVc node:(id)node urlOverride:(NSString *)urlOverride onDone:(FavIconBulkDoneBlock)onDone {
-    [FavIconBulkViewController presentModal:presentingVc nodes:@[node] urlOverride:urlOverride onDone:onDone];
++ (void)presentModal:(UIViewController *)presentingVc model:(Model*)model node:(id)node urlOverride:(NSString *)urlOverride onDone:(FavIconBulkDoneBlock)onDone {
+    [FavIconBulkViewController presentModal:presentingVc model:model nodes:@[node] urlOverride:urlOverride onDone:onDone];
 }
 
-+ (void)presentModal:(UIViewController *)presentingVc nodes:(NSArray<Node *> *)nodes onDone:(FavIconBulkDoneBlock)onDone {
-    [FavIconBulkViewController presentModal:presentingVc nodes:nodes urlOverride:nil onDone:onDone];
++ (void)presentModal:(UIViewController *)presentingVc model:(Model*)model nodes:(NSArray<Node *> *)nodes onDone:(FavIconBulkDoneBlock)onDone {
+    [FavIconBulkViewController presentModal:presentingVc model:model nodes:nodes urlOverride:nil onDone:onDone];
 }
 
 + (void)presentModal:(UIViewController *)presentingVc
+               model:(Model*)model
                nodes:(NSArray<Node *> *)nodes
          urlOverride:(NSString *)urlOverride
               onDone:(FavIconBulkDoneBlock)onDone {
@@ -70,6 +76,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     
     FavIconBulkViewController* vc = (FavIconBulkViewController*)nav.topViewController;
     
+    vc.model = model;
     vc.nodes = nodes;
     vc.onDone = onDone;
     vc.singleNodeUrlOverride = urlOverride ? urlOverride.urlExtendedParse : nil;
@@ -77,75 +84,87 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     [presentingVc presentViewController:nav animated:YES completion:NULL];
 }
 
-- (void)loadAndValidateNodesAndUrls {
-    BOOL overwriteExisting = self.switchOverwriteExisting.on;
-
-    self.validNodes = @[];
-    self.validUniqueUrls = @[];
-
-    if(self.singleNodeUrlOverride) {
-        if(self.nodes.count != 1 || self.singleNodeUrlOverride.absoluteString.length == 0) {
-            return;
-        }
-        
-        Node* singleton = self.nodes.firstObject;
-        
-        if(singleton.isGroup) {
-            return;
-        }
-
-        if(overwriteExisting || singleton.isUsingKeePassDefaultIcon) {
-            self.validNodes = @[singleton];
-            self.validUniqueUrls = @[self.singleNodeUrlOverride];
-        }
-    }
-    else {
-        self.validNodes = [[self.nodes filter:^BOOL(Node * _Nonnull obj) {
-            return !obj.isGroup &&
-            obj.fields.url.length != 0 &&
-            obj.fields.url.urlExtendedParse != nil &&
-            (overwriteExisting || obj.isUsingKeePassDefaultIcon);
-        }] sortedArrayUsingComparator:finderStyleNodeComparator];
-
-        NSMutableSet<NSURL*> *added = [NSMutableSet setWithCapacity:self.nodes.count];
-        NSMutableArray<NSURL*> *addedArray = [NSMutableArray arrayWithCapacity:self.nodes.count];
-        
-        for (Node* node in self.validNodes) {
-            NSURL* url = node.fields.url.urlExtendedParse;
-            if(![added containsObject:url]) {
-                [added addObject:url];
-                [addedArray addObject:url];
-            }
-        }
-        
-        self.validUniqueUrls = addedArray.copy;
-    }
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     [self.navigationController setModalInPresentation:YES]; 
     
     UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onStartStop)];
     singleTap.numberOfTapsRequired = 1;
     [self.imageViewStartStop addGestureRecognizer:singleTap];
-
+    
     [self loadAndValidateNodesAndUrls];
     
     self.queue = [NSOperationQueue new];
     self.queue.maxConcurrentOperationCount = 8;
     
-    self.results = @{}.mutableCopy;
-    
+    self.nodeImagesMap = ConcurrentMutableDictionary.mutableDictionary;
+
     self.options = FavIconDownloadOptions.defaults;
- 
+    
     [self bindUi];
     
-    if(self.validUniqueUrls.count == 1) {
+    if(self.validNodes.count == 1) {
         
         
         [self onStartStop];
+    }
+}
+
+- (BOOL)urlIsValid:(NSString*)url {
+    if ( url.length == 0 ) {
+        return NO;
+    }
+    
+    NSURL* urlParsed = url.urlExtendedParseAddingDefaultScheme;
+    
+    if ( url == nil || urlParsed.scheme.length == 0 ) {
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (NSSet<NSURL*>*)getUrlsForNode:(Node*)obj {
+    NSMutableSet* ret = NSMutableSet.set;
+    
+    if ( [self urlIsValid:obj.fields.url] ) {
+        [ret addObject:obj.fields.url.urlExtendedParse];
+    }
+    
+    NSArray<NSURL*>* alts = [obj.fields.alternativeUrls map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        return obj.urlExtendedParse;
+    }];
+    
+    [ret addObjectsFromArray:alts];
+    
+    return ret;
+}
+
+- (BOOL)isValidFavIconableNode:(Node*)obj overwriteExisting:(BOOL)overwriteExisting {
+    if ( obj.isGroup ) {
+        return NO;
+    }
+    
+    if ( !overwriteExisting && !obj.icon.isCustom ) {
+        return NO;
+    }
+    
+    return [self getUrlsForNode:obj].anyObject != nil;
+}
+
+- (void)loadAndValidateNodesAndUrls {
+    BOOL overwriteExisting = self.switchOverwriteExisting.on;
+    
+    if ( self.singleNodeUrlOverride && self.nodes.count > 0 ) {
+        self.validNodes = [self urlIsValid:self.singleNodeUrlOverride.absoluteString] ? @[self.nodes.firstObject.uuid] : @[];
+    }
+    else {
+        self.validNodes = [[[self.nodes filter:^BOOL(Node * _Nonnull obj) {
+            return [self isValidFavIconableNode:obj overwriteExisting:overwriteExisting];
+        }] sortedArrayUsingComparator:finderStyleNodeComparator] map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+            return obj.uuid;
+        }];
     }
 }
 
@@ -156,29 +175,35 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         self.status == kFavIconBulkStatusInProgress ||
         self.status == kFavIconBulkStatusPausing)];
 
-    self.buttonViewResults.hidden = self.buttonRetry.hidden =
-        self.results.count == 0 ||
-        self.validUniqueUrls.count == 0 ||
+    self.buttonRetry.hidden = self.validNodes.count == 0 ||
+        self.status == kFavIconBulkStatusInProgress ||
+        self.status == kFavIconBulkStatusPausing;
+
+    BOOL atLeastOneResult = [self.nodeImagesMap.allValues anyMatch:^BOOL(NSArray<NodeIcon*> * _Nonnull obj) {
+        return obj.count > 0;
+    }];
+    
+    self.buttonViewResults.hidden = !atLeastOneResult ||
         self.status == kFavIconBulkStatusInProgress ||
         self.status == kFavIconBulkStatusPausing;
     
-    NSUInteger errored = [self.results.allValues filter:^BOOL(NSArray<UIImage *> * _Nonnull obj) {
+    NSUInteger errored = [self.nodeImagesMap.allValues filter:^BOOL(NSArray<UIImage *> * _Nonnull obj) {
         return obj.count == 0;
     }].count;
     
-    self.labelSuccesses.text = self.validUniqueUrls.count == 0 ? @"" : @(self.results.count - errored).stringValue;
-    self.errorCountLabel.text = self.validUniqueUrls.count == 0 ? @"" : @(errored).stringValue;
+    self.labelSuccesses.text = self.validNodes.count == 0 ? @"" : @(self.nodeImagesMap.count - errored).stringValue;
+    self.errorCountLabel.text = self.validNodes.count == 0 ? @"" : @(errored).stringValue;
     
-    self.progressLabel.text = [NSString stringWithFormat:@"%lu/%lu", (unsigned long)self.results.count, (unsigned long)self.validUniqueUrls.count];
-    self.progressLabel.hidden = self.validUniqueUrls.count == 0;
+    self.progressLabel.text = [NSString stringWithFormat:@"%lu/%lu", (unsigned long)self.nodeImagesMap.count, (unsigned long)self.validNodes.count];
+    self.progressLabel.hidden = self.validNodes.count == 0;
     
-    self.progressView.progress = self.validUniqueUrls.count == 0 ? 0 : (float)self.results.count / (float)self.validUniqueUrls.count;
+    self.progressView.progress = self.validNodes.count == 0 ? 0 : (float)self.nodeImagesMap.count / (float)self.validNodes.count;
     
     [self bindStartStopStatusImage:errored];
 }
 
 - (void)bindStartStopStatusImage:(NSUInteger)errored {
-    if(self.validUniqueUrls.count == 0) {
+    if(self.validNodes.count == 0) {
         [self.imageViewStartStop setImage:[UIImage imageNamed:@"cancel"]];
         self.imageViewStartStop.tintColor = UIColor.systemGrayColor;
         self.imageViewStartStop.userInteractionEnabled = NO;
@@ -189,9 +214,9 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
        self.status == kFavIconBulkStatusPaused) {
         [self.imageViewStartStop setImage:[UIImage imageNamed:@"Play"]];
 
-        self.imageViewStartStop.tintColor = self.validUniqueUrls.count > 0 ? nil : UIColor.systemGrayColor;
+        self.imageViewStartStop.tintColor = self.validNodes.count > 0 ? nil : UIColor.systemGrayColor;
 
-        self.imageViewStartStop.userInteractionEnabled = self.validUniqueUrls.count > 0;
+        self.imageViewStartStop.userInteractionEnabled = self.validNodes.count > 0;
     }
     else if(self.status == kFavIconBulkStatusInProgress) {
         [self.imageViewStartStop setImage:[UIImage imageNamed:@"Pause"]];
@@ -207,7 +232,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
          [self.imageViewStartStop setImage:[UIImage imageNamed:@"ok"]];
             self.imageViewStartStop.tintColor = UIColor.systemGreenColor;
         }
-        else if (errored == self.validUniqueUrls.count) {
+        else if (errored == self.validNodes.count) {
             [self.imageViewStartStop setImage:[UIImage imageNamed:@"cancel"]];
             self.imageViewStartStop.tintColor = UIColor.systemRedColor;
         }
@@ -219,7 +244,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (NSString*)getStatusString {
-    if(self.validUniqueUrls.count == 0) {
+    if(self.validNodes.count == 0) {
         return NSLocalizedString(@"favicon_status_no_eligible_items", @"No eligible items with valid URLs found...");
     }
     
@@ -247,7 +272,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (void)onStartStop {
-    if(self.status == kFavIconBulkStatusInitial && self.validUniqueUrls.count > 0) {
+    if(self.status == kFavIconBulkStatusInitial && self.validNodes.count > 0) {
         [self startOrResume];
     }
     else if (self.status == kFavIconBulkStatusInProgress) {
@@ -259,8 +284,8 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (IBAction)onRetry:(id)sender {
-    NSArray<NSURL*>* errored = [self.results.allKeys filter:^BOOL(NSURL * _Nonnull obj) {
-        return self.results[obj].count == 0;
+    NSArray<NSUUID*>* errored = [self.nodeImagesMap.allKeys filter:^BOOL(NSUUID * _Nonnull obj) {
+        return self.nodeImagesMap[obj].count == 0;
     }];
 
     if(errored.count == 0) {
@@ -273,7 +298,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
             }
         }];
     }
-    else if (errored.count == self.results.count) {
+    else if (errored.count == self.nodeImagesMap.count) {
         [self retryAll];
     }
     else {
@@ -294,7 +319,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (void)retryAll {
-    [self.results removeAllObjects];
+    [self.nodeImagesMap removeAllObjects];
     
     [self bindUi];
     
@@ -302,11 +327,11 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (void)retryFailed {
-    NSArray<NSURL*>* errored = [self.results.allKeys filter:^BOOL(NSURL * _Nonnull obj) {
-        return self.results[obj].count == 0;
+    NSArray<NSUUID*>* errored = [self.nodeImagesMap.allKeys filter:^BOOL(NSUUID * _Nonnull obj) {
+        return self.nodeImagesMap[obj].count == 0;
     }];
 
-    [self.results removeObjectsForKeys:errored];
+    [self.nodeImagesMap removeObjectsForKeys:errored];
     
     [self bindUi];
     
@@ -315,24 +340,39 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 
 - (void)startOrResume {
     self.status = kFavIconBulkStatusInProgress;
-
-    self.queue.suspended = YES;
-
-    NSMutableArray<NSURL*>* todo = self.validUniqueUrls.mutableCopy;
     
-    for (NSURL* done in self.results) {
-        [todo removeObject:done];
+    self.queue.suspended = YES;
+    
+    NSMutableArray<NSUUID*>* remaining = self.validNodes.mutableCopy;
+    
+    for ( NSUUID* alreadyDone in self.nodeImagesMap.allKeys ) {
+        [remaining removeObject:alreadyDone];
     }
     
-    [FavIconManager.sharedInstance getFavIconsForUrls:todo
-                                                queue:self.queue
-                                              options:AppPreferences.sharedInstance.favIconDownloadOptions
-                                         withProgress:^(NSURL * _Nonnull url, NSArray<UIImage *> * _Nonnull images) {
-        [self onProgressUpdate:url images:images];
-    }];
-
+    for ( NSUUID* uuid in remaining ) {
+        Node* node = [self.model getItemById:uuid];
+        if ( node == nil ) {
+            node = [self.nodes firstOrDefault:^BOOL(Node * _Nonnull obj) {
+                return [obj.uuid isEqual:uuid];
+            }];
+        }
+        
+        if (!node) {
+            continue;
+        }
+        
+        NSSet<NSURL*>* urls = self.singleNodeUrlOverride ? [NSSet setWithObject:self.singleNodeUrlOverride] : [self getUrlsForNode:node];
+        
+        [FavIconManager.sharedInstance getFavIconsForUrls:urls.allObjects
+                                                    queue:self.queue
+                                                  options:AppPreferences.sharedInstance.favIconDownloadOptions
+                                               completion:^(NSArray<NodeIcon*> * _Nonnull images) {
+            [self onProgressUpdate:uuid images:images];
+        }];
+    }
+    
     self.queue.suspended = NO;
-
+    
     [self bindUi];
 }
 
@@ -354,18 +394,22 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     [self bindUi];
 }
 
-- (void)onProgressUpdate:(NSURL*)url images:(NSArray<UIImage *>* _Nonnull)images {
-    self.results[url] = images;
+- (void)onProgressUpdate:(NSUUID*)uuid images:(NSArray<NodeIcon*>* _Nonnull)images {
+    self.nodeImagesMap[uuid] = images;
     
-    if(self.results.count == self.validUniqueUrls.count) {
+    
+    
+    if(self.nodeImagesMap.count == self.validNodes.count) {
         self.status = kFavIconBulkStatusDone;
     }
+    
+    
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self bindUi];
         
         if(self.status == kFavIconBulkStatusDone) {
-            NSUInteger errored = [self.results.allValues filter:^BOOL(NSArray<UIImage *> * _Nonnull obj) {
+            NSUInteger errored = [self.nodeImagesMap.allValues filter:^BOOL(NSArray<NodeIcon*> * _Nonnull obj) {
                 return obj.count == 0;
             }].count;
             
@@ -377,7 +421,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (IBAction)onPreviewResults:(id)sender {
-    if (self.results.count > 0) {
+    if (self.nodeImagesMap.count > 0) {
         [self performSegueWithIdentifier:@"segueToFavIconDownloadedResults" sender:nil];
     }
 }
@@ -386,9 +430,9 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     if([segue.identifier isEqualToString:@"segueToFavIconDownloadedResults"]) {
         FavIconDownloadResultsViewController* vc = (FavIconDownloadResultsViewController*)segue.destinationViewController;
         
-        vc.results = self.results;
-        vc.nodes = self.validNodes;
-        vc.singleNodeUrlOverride = self.singleNodeUrlOverride;
+        vc.nodes = self.nodes;
+        vc.nodeImagesMap = self.nodeImagesMap;
+        vc.validNodes = self.validNodes;
         vc.onDone = self.onDone;
     }
 }

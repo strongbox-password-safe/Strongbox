@@ -274,19 +274,6 @@
 
 
 
-- (BOOL)quickWormholeFillEnabled {
-    return self.metadata.quickWormholeFillEnabled;
-}
-
-- (void)setQuickWormholeFillEnabled:(BOOL)quickWormholeFillEnabled {
-    [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
-    }];
-
-}
-
-
-
 - (BOOL)hasPromptedForAutoFillEnrol {
     return self.metadata.hasPromptedForAutoFillEnrol;
 }
@@ -739,19 +726,6 @@
 
 
 
-- (BOOL)autoFillScanAltUrls {
-    return self.metadata.autoFillScanAltUrls;
-}
-
-- (void)setAutoFillScanAltUrls:(BOOL)autoFillScanAltUrls {
-    [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoFillScanAltUrls = autoFillScanAltUrls;
-    }];
-
-}
-
-
-
 - (BOOL)autoFillScanCustomFields {
     return self.metadata.autoFillScanCustomFields;
 }
@@ -944,6 +918,18 @@
 
 
 
+- (BOOL)includeAssociatedDomains {
+    return self.metadata.includeAssociatedDomains;
+}
+
+- (void)setIncludeAssociatedDomains:(BOOL)includeAssociatedDomains {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.includeAssociatedDomains = includeAssociatedDomains;
+    }];
+}
+
+
+
 - (BOOL)autoFillConcealedFieldsAsCreds {
     return self.metadata.autoFillConcealedFieldsAsCreds;
 }
@@ -952,7 +938,6 @@
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.autoFillConcealedFieldsAsCreds = autoFillConcealedFieldsAsCreds;
     }];
-
 }
 
 
@@ -1066,7 +1051,6 @@
     debugLines[@"autoFillEnabled"] = [NSString stringWithFormat:@"%hhd", self.autoFillEnabled]; 
     debugLines[@"quickTypeEnabled"] = [NSString stringWithFormat:@"%hhd", self.quickTypeEnabled]; 
     debugLines[@"quickTypeDisplayFormat"] = [NSString stringWithFormat:@"%ld", (long)self.quickTypeDisplayFormat]; 
-    debugLines[@"quickWormholeFillEnabled"] = [NSString stringWithFormat:@"%hhd", self.quickWormholeFillEnabled]; 
     debugLines[@"hasPromptedForAutoFillEnrol"] = [NSString stringWithFormat:@"%hhd", self.hasPromptedForAutoFillEnrol]; 
     debugLines[@"outstandingUpdateId"] = [NSString stringWithFormat:@"%@", self.outstandingUpdateId]; 
     debugLines[@"lastSyncRemoteModDate"] = [NSString stringWithFormat:@"%@", self.lastSyncRemoteModDate.iso8601DateString]; 
@@ -1100,7 +1084,7 @@
     debugLines[@"showRecycleBinInSearchResults"] = [NSString stringWithFormat:@"%hhd", self.showRecycleBinInSearchResults]; 
     debugLines[@"uiDoNotSortKeePassNodesInBrowseView"] = [NSString stringWithFormat:@"%hhd", self.uiDoNotSortKeePassNodesInBrowseView]; 
     debugLines[@"hasSetInitialWindowPosition"] = [NSString stringWithFormat:@"%hhd", self.hasSetInitialWindowPosition]; 
-    debugLines[@"autoFillScanAltUrls"] = [NSString stringWithFormat:@"%hhd", self.autoFillScanAltUrls]; 
+
     debugLines[@"autoFillScanCustomFields"] = [NSString stringWithFormat:@"%hhd", self.autoFillScanCustomFields]; 
     debugLines[@"autoFillScanNotes"] = [NSString stringWithFormat:@"%hhd", self.autoFillScanNotes]; 
     debugLines[@"unlockCount"] = [NSString stringWithFormat:@"%ld", self.unlockCount]; 
@@ -1423,6 +1407,22 @@
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.auditExcludedItems = auditExcludedItems;
     }];
+}
+
+
+
+
+
+- (BOOL)searchDereferencedFields {
+    return YES;
+}
+
+- (BOOL)showKeePass1BackupGroup {
+    return self.showRecycleBinInSearchResults;
+}
+
+- (BOOL)showExpiredInSearch {
+    return YES;
 }
 
 

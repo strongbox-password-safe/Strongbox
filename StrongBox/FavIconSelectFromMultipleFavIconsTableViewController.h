@@ -14,10 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FavIconSelectFromMultipleFavIconsTableViewController : UITableViewController
 
 @property Node* node;
-@property NSArray<UIImage*> *images;
-@property NSUInteger selectedIndex;
+@property NSArray<NodeIcon*> *images;
+@property (nullable) NSNumber* selectedIdx;
 
-@property (nonatomic, copy) void (^onChangedSelection)(NSUInteger index);
+@property (nonatomic, copy) void (^onChangedSelection)(NSNumber *idx);
 
 @end
 

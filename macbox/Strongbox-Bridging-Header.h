@@ -25,6 +25,7 @@
 #import "AutoFillManager.h"
 #import "EntryViewModel.h"
 #import "NSDate+Extensions.h"
+#import "NSData+Extensions.h"
 #import "WindowController.h"
 #import "OutlineView.h"
 #import "ClickableImageView.h"
@@ -103,3 +104,8 @@
 #import "BrowseOutlineView.h"
 
 #import <Quartz/Quartz.h>
+
+#import "MMWormhole.h"
+
+#import "Node+Passkey.h"
+#import "NewEntryDefaultsHelper.h"

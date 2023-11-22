@@ -37,7 +37,7 @@
 }
 
 - (void)stop {
-    NSLog(@"AutoFillProxyServer::STOP ENTER");
+
 
     if ( !self.isRunning ) {
         return;
@@ -51,17 +51,19 @@
         self.server_sock = -1;
     }
     
-    NSLog(@"Proxy Server shutdown done...");
+
     
-    NSLog(@"AutoFillProxyServer::STOP EXIT");
+
     
     _isRunning = NO;
 }
 
 - (BOOL)start {
-    NSLog(@"AutoFillProxyServer::start ENTER");
 
-    [self stop];
+
+    if ( self.isRunning ) {
+        return YES;
+    }
     
     NSString* path = getSocketPath(NO);
     if ( !path ) {
@@ -111,7 +113,7 @@
         return NO;
     }
     
-    int listenResult = listen (self.server_sock, 48);
+    int listenResult = listen (self.server_sock, SOMAXCONN);
     if ( listenResult == -1 ) {
         NSLog(@"🔴 Error listening on socket: %s\n", strerror(errno));
         return NO;
@@ -121,7 +123,7 @@
         [self acceptNewConnections];
     }];
 
-    NSLog(@"AutoFillProxyServer::start EXIT ✅");
+
 
     _isRunning = YES;
     return YES; 
@@ -134,15 +136,17 @@
         int socket = accept (self.server_sock, NULL, NULL);
 
         if ( socket == -1 ) {
-            NSLog(@"⚠️ AutoFillProxyServer failed to accept new connection (possibly due to shutdown...)");
+            NSLog(@"⚠️ AutoFillProxyServer failed to accept new connection (possibly due to shutdown...) - %s", strerror(errno));
             break;
         }
         
 
 
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        
+        
+
             [self handleNewConnection:socket];
-        });
+
     }
     
 
@@ -150,6 +154,8 @@
 
 - (void)handleNewConnection:(int)socket {
     
+    
+
     
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
@@ -166,12 +172,14 @@
     if ( !jsonRequest ) {
         
         NSLog(@"🔴 Could not read valid JSON object! Connection done.");
+        shutdown(socket, SHUT_RDWR);
+        close(socket);
         return;
     }
     
     
         
-    NSString* jsonResponse = [self handleRequest:jsonRequest];
+    NSString* jsonResponse = [AutoFillRequestHandler.shared handleJsonRequestWithJson:jsonRequest];
     
     
     
@@ -186,27 +194,17 @@
     
     NSUInteger len = msg.length;
     
-    if ( len > 50 * 1024 ) {
-        NSLog(@"⚠️ Writing Large JSON Response of length [%lu]", len);
-    }
-    
     [outputStream write:msg.bytes maxLength:len];
     [outputStream close];
     
     shutdown(socket, SHUT_RDWR);
     close(socket);
     
-    
-}
 
-- (NSString*)handleRequest:(NSString*)jsonRequest {
-    AutoFillEncryptedResponse* response = [AutoFillRequestHandler.shared handleJsonRequestWithJson:jsonRequest];
 
-    NSString* json = [response toJson];
+
     
     
-
-    return json;
 }
 
 @end

@@ -9,16 +9,21 @@
 #import "AutoFillCommon.h"
 #import "NSString+Extensions.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 static NSString* const kMailToScheme = @"mailto";
 
 @implementation AutoFillCommon
 
-+ (NSSet<NSString*>*)getUniqueUrlsForNode:(DatabaseModel*)database
-                                     node:(Node*)node
-                          alternativeUrls:(BOOL)alternativeUrls
-                             customFields:(BOOL)customFields
-                                    notes:(BOOL)notes {
++ (NSSet<NSString*>*)getUniqueUrlsForNode:(Model*)model
+                                     node:(Node*)node {
     NSMutableArray<NSString*> *collectedUrls = [NSMutableArray array];
+    
+    DatabaseModel* database = model.database;
     
     
     
@@ -28,19 +33,17 @@ static NSString* const kMailToScheme = @"mailto";
     }
     
     
-    
-    if ( alternativeUrls ) {
-        for ( NSString* altUrl in node.fields.alternativeUrls) {
-            if(altUrl.length) {
-                NSString* derefed = [database dereference:altUrl node:node];
-                [collectedUrls addObject:derefed];
-            }
+
+    for ( NSString* altUrl in node.fields.alternativeUrls) {
+        if(altUrl.length) {
+            NSString* derefed = [database dereference:altUrl node:node];
+            [collectedUrls addObject:derefed];
         }
     }
         
     
     
-    if ( customFields ) {
+    if ( model.metadata.autoFillScanCustomFields ) {
         for(NSString* key in node.fields.customFields.allKeys) {
             if ( ![NodeFields isAlternativeURLCustomFieldKey:key] ) { 
                 StringValue* strValue = node.fields.customFields[key];
@@ -52,7 +55,7 @@ static NSString* const kMailToScheme = @"mailto";
     
     
 
-    if ( notes) {
+    if ( model.metadata.autoFillScanNotes ) {
         NSString* notesField = [database dereference:node.fields.notes node:node];
 
         if(notesField.length) {
@@ -71,7 +74,33 @@ static NSString* const kMailToScheme = @"mailto";
             [uniqueUrls addObject:parsed.absoluteString];
         }
     }
-                                   
+         
+    
+    
+    if ( model.metadata.includeAssociatedDomains ) {
+        NSMutableArray<NSString*>* additional = NSMutableArray.array;
+        
+        for ( NSString* url in uniqueUrls ) {
+            NSSet<NSString*>* equivs = [BrowserAutoFillManager getAssociatedDomainsWithUrl:url];
+            
+            if ( equivs.anyObject ) {
+
+                [additional addObjectsFromArray:equivs.allObjects];
+            }
+        }
+        
+        if ( additional.count ) {
+
+            
+            for ( NSString* expUrl in additional ) {
+                NSURL* parsed = expUrl.urlExtendedParseAddingDefaultScheme;
+                if ( parsed && parsed.absoluteString ) {
+                    [uniqueUrls addObject:parsed.absoluteString];
+                }
+            }
+        }
+    }
+        
     return uniqueUrls;
 }
 

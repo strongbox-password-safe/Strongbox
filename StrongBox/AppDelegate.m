@@ -38,6 +38,8 @@
 
 #endif
 
+#import "AutoFillDarwinNotification.h"
+
 
 
 @interface AppDelegate ()
@@ -94,7 +96,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     if ( !CustomizationManager.isAProBundle ) {
         [ProUpgradeIAPManager.sharedInstance initialize]; 
     }
-        
+    
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
         
 #ifdef DEBUG
@@ -102,7 +104,21 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     NSLog(@"🚀 Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
 #endif
     
+    [self observeAutoFillDarwinNotifications];
+    
     return YES;
+}
+
+- (void)observeAutoFillDarwinNotifications {
+    [AutoFillDarwinNotification registerForNotifications:^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            BOOL reloadedDueToAutoFillChange = [DatabasePreferences reloadIfChangedByOtherComponent];
+            
+            NSLog(@"🟢 onAutoFillDidExit: %hhd", reloadedDueToAutoFillChange);
+            
+            [SyncManager.sharedInstance backgroundSyncAllAutoFillExit];
+        });
+    }];
 }
 
 - (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {

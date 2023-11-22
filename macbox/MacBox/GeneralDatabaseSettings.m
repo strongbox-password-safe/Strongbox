@@ -82,7 +82,9 @@
 
     [self bindUI];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+    });
 }
 
 - (IBAction)onTextBoxMonitorIntervalChanged:(id)sender {

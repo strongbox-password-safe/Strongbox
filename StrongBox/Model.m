@@ -30,27 +30,16 @@
 #import "WorkingCopyManager.h"
 #import "Constants.h"
 
-#if TARGET_OS_IPHONE
-
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
-#else
-
-#ifndef IS_APP_EXTENSION
-#import "Strongbox-Swift.h"
-#else
-#import "Strongbox_AutoFill-Swift.h"
-#endif
-
-#endif
-
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
 NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
+NSString* const kAuditNewSwitchedOffNotificationKey = @"kAuditNewSwitchedOffNotificationKey";
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
 NSString* const kMasterDetailViewCloseNotification = @"kMasterDetailViewClose";
 NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
@@ -112,9 +101,9 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 }
 
 - (void)dealloc {
-    NSLog(@"=====================================================================");
+    
     NSLog(@"😎 Model DEALLOC...");
-    NSLog(@"=====================================================================");
+    
 }
 
 - (void)closeAndCleanup { 
@@ -274,20 +263,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (void)refreshAutoFillQuickTypeDatabase:(BOOL)clearFirst {
 #ifndef IS_APP_EXTENSION 
-    if ( clearFirst ) {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
-    
-    if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self
-                                                           databaseUuid:self.metadata.uuid
-                                                          displayFormat:self.metadata.quickTypeDisplayFormat
-                                                        alternativeUrls:self.metadata.autoFillScanAltUrls
-                                                           customFields:self.metadata.autoFillScanCustomFields
-                                                                  notes:self.metadata.autoFillScanNotes
-                                           concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds
-                                                               nickName:self.metadata.nickName];
+    if( self.metadata.autoFillEnabled ) {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self clearFirst:clearFirst];
     }
 #endif
 }
@@ -403,8 +380,8 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (BOOL)asyncJob:(AsyncJobType)jobType
       completion:(AsyncUpdateCompletion _Nullable)completion {
-    NSLog(@"asyncUpdateAndSync ENTER");
-
+    
+    
     if ( self.isReadOnly && jobType != kAsyncJobTypeSyncOnly ) {
         NSLog(@"🔴 WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
         return NO;
@@ -420,9 +397,9 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     dispatch_async(self.asyncUpdateEncryptionQueue, ^{
         [self dequeueOutstandingAsyncUpdateAndProcess];
     });
-
-    NSLog(@"asyncUpdateAndSync EXIT");
-
+    
+    
+    
     return YES;
 }
 
@@ -438,7 +415,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 }
 
 - (void)beginJobWithDatabaseClone:(NSUUID*)updateId job:(AsyncUpdateJob*)job {
-    NSLog(@"queueAsyncUpdateWithDatabaseClone ENTER - [%@]", NSThread.currentThread.name);
+    
     
     _isRunningAsyncUpdate = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -454,7 +431,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     else if ( job.jobType == kAsyncJobTypeSyncOnly ) {
         [self beginAsyncSync:NSUUID.UUID updateMutex:mutex job:job];
     }
-
+    
     dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
     
     NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
@@ -552,7 +529,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
                success:(BOOL)success
          userCancelled:(BOOL)userCancelled
 userInteractionRequired:(BOOL)userInteractionRequired
-          localWasChanged:(BOOL)localWasChanged
+       localWasChanged:(BOOL)localWasChanged
            updateMutex:(dispatch_group_t)updateMutex
                  error:(NSError*)error {
     NSLog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localWasChanged=%hhd, error=%@", updateId, success, userInteractionRequired, localWasChanged, error);
@@ -569,7 +546,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     self.lastAsyncUpdateResult = result;
     _isRunningAsyncUpdate = NO;
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{ 
         [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:result];
         
         if ( job.completion ) {
@@ -599,7 +576,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         }
         
         ret = [url URLByAppendingPathComponent:NSUUID.UUID.UUIDString].path;
-        NSLog(@"MacOS - getUniqueStreamingFilename [FINAL] = [%@]", ret);
+        
 #endif
     } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
     
@@ -614,10 +591,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)restartBackgroundAudit {
     if (!self.isNativeAutoFillAppExtensionOpen && self.metadata.auditConfig.auditInBackground) {
-         [self restartAudit];
+        [self restartAudit];
     }
     else {
         NSLog(@"Audit not configured to run. Skipping.");
+        [self stopAndClearAuditor]; 
     }
 }
 
@@ -630,20 +608,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
 - (void)stopAndClearAuditor {
     [self stopAudit];
     [self createNewAuditor];
-
-    __weak Model* weakSelf = self; 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ( weakSelf ) {
-            [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@{ @"userStopped" : @(NO), @"model" : weakSelf }];
-        }
-    });
 }
 
 - (void)createNewAuditor {
 #ifndef IS_APP_EXTENSION
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
-
+    
     __weak Model* weakSelf = self;
     self.auditor = [[DatabaseAuditor alloc] initWithPro:self.applicationPreferences.isPro
                                          strengthConfig:self.applicationPreferences.passwordStrengthConfig
@@ -664,20 +635,20 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     [self.auditor start:self.database
                  config:self.metadata.auditConfig
-            nodesChanged:^{
-
+           nodesChanged:^{
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( weakSelf ) {
                 [NSNotificationCenter.defaultCenter postNotificationName:kAuditNodesChangedNotificationKey object:@{ @"model" : weakSelf }];
             }
         });
     }
-    progress:^(double progress) {
+               progress:^(double progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
         });
     } completion:^(BOOL userStopped) {
-
+        
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( weakSelf ) {
                 [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@{ @"userStopped" : @(userStopped), @"model" : weakSelf }];
@@ -796,14 +767,14 @@ userInteractionRequired:(BOOL)userInteractionRequired
 - (NSArray<Node*>*)getExcludedAuditItems {
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
-  
+    
     return [self.database.allActiveEntries filter:^BOOL(Node * _Nonnull obj) {
         if ( !obj.fields.qualityCheck ) {
             return YES;
         }
-
+        
         NSString* sid = [self.database getCrossSerializationFriendlyIdId:obj.uuid];
-
+        
         return [set containsObject:sid];
     }];
 }
@@ -815,16 +786,16 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }
     
     NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
-
+    
     return [set containsObject:sid];
 }
 
 - (void)excludeFromAudit:(Node *)node exclude:(BOOL)exclude {
     node.fields.qualityCheck = !exclude;
-        
+    
     NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-        
+    
     NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
     
     if (exclude) {
@@ -905,7 +876,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
         self.metadata.autoFillExcludedItems = mutable.allObjects;
     }
     
-    [self refreshAutoFillSuggestions:YES];
+    if ( self.metadata.autoFillEnabled && exclude ) {
+        [self removeItemsFromAutoFillQuickType:@[node]];
+    }
+    
+    [self refreshAutoFillSuggestions];
     
     return self.isKeePass2Format;
 }
@@ -966,6 +941,28 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 
 
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node *)destination {
+    return [self moveItems:items destination:destination undoData:nil];
+}
+
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node *)destination undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
+    BOOL ret = [self.database moveItems:items destination:destination undoData:undoData];
+    
+    if ( self.metadata.autoFillEnabled ) {
+        [self removeItemsFromAutoFillQuickType:items];
+        
+        [self refreshAutoFillSuggestions];
+    }
+    
+    return ret;
+}
+
+- (void)undoMove:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
+    [self.database undoMove:undoData];
+}
+
+
+
 - (BOOL)isInRecycled:(NSUUID *)itemId {
     return [self.database isInRecycled:itemId];
 }
@@ -975,11 +972,43 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 - (void)deleteItems:(const NSArray<Node *> *)items {
-    [self.database deleteItems:items];
+    [self deleteItems:items undoData:nil];
+}
+
+- (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
+    [self.database deleteItems:items undoData:undoData];
+    
+    if ( self.metadata.autoFillEnabled ) {
+        [self removeItemsFromAutoFillQuickType:items];
+    }
+}
+
+- (void)unDelete:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
+    [self.database unDelete:undoData];
 }
 
 - (BOOL)recycleItems:(const NSArray<Node *> *)items {
-    return [self.database recycleItems:items];
+    return [self recycleItems:items undoData:nil];
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
+    BOOL ret = [self.database recycleItems:items undoData:undoData];
+    
+    if ( ret ) {
+        if ( self.metadata.autoFillEnabled ) {
+            [self removeItemsFromAutoFillQuickType:items];
+        }
+    }
+    
+    return ret;
+}
+
+- (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
+    [self.database undoRecycle:undoData];
+}
+
+- (void)removeItemsFromAutoFillQuickType:(const NSArray<Node *> *)items {
+    [AutoFillManager.sharedInstance removeItemsFromQuickType:items database:self];
 }
 
 - (void)emptyRecycleBin {
@@ -1104,20 +1133,30 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)legacyAddFavourite:(NSUUID*)itemId {
     NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
-    NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
-    
-    [favs addObject:sid];
-    
-    [self resetLegacyFavourites:favs];
+    if ( sid ) {
+        NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
+        
+        [favs addObject:sid];
+        
+        [self resetLegacyFavourites:favs];
+    }
+    else {
+        NSLog(@"🔴 legacyAddFavourite - Could not get sid");
+    }
 }
 
 - (void)legacyRemoveFavourite:(NSUUID*)itemId {
     NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
-    NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
-    
-    [favs removeObject:sid];
-    
-    [self resetLegacyFavourites:favs];
+    if ( sid ) {
+        NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
+        
+        [favs removeObject:sid];
+        
+        [self resetLegacyFavourites:favs];
+    }
+    else {
+        NSLog(@"🔴 legacyRemoveFavourite - Could not get sid");
+    }
 }
 
 - (void)resetLegacyFavourites:(NSSet<NSString*>*)favs {
@@ -1184,7 +1223,20 @@ userInteractionRequired:(BOOL)userInteractionRequired
     return [self.database dereference:text node:node];
 }
 
-
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(SearchScope)scope
+            includeGroups:(BOOL)includeGroups {
+    return [self search:searchText
+                  scope:scope
+            dereference:self.metadata.searchDereferencedFields
+  includeKeePass1Backup:self.metadata.showKeePass1BackupGroup
+      includeRecycleBin:self.metadata.showRecycleBinInSearchResults
+         includeExpired:self.metadata.showExpiredInSearch
+          includeGroups:includeGroups
+        browseSortField:kBrowseSortFieldTitle
+             descending:NO
+      foldersSeparately:YES];
+}
 
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope
@@ -1258,6 +1310,19 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSLog(@"✅ SEARCH for [%@] done in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
 
     return ret;
+}
+
+
+- (NSArray<Node *> *)filterAndSortForBrowse:(NSMutableArray<Node *> *)nodes
+                              includeGroups:(BOOL)includeGroups {
+    return [self filterAndSortForBrowse:nodes 
+                  includeKeePass1Backup:self.metadata.showKeePass1BackupGroup
+                      includeRecycleBin:self.metadata.showRecycleBinInSearchResults
+                         includeExpired:self.metadata.showExpiredInSearch
+                          includeGroups:includeGroups
+                        browseSortField:kBrowseSortFieldTitle
+                             descending:NO
+                      foldersSeparately:YES];
 }
 
 - (NSArray<Node *> *)filterAndSortForBrowse:(NSMutableArray<Node *> *)nodes
@@ -1563,10 +1628,12 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 
 
+#if !TARGET_OS_IPHONE 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
 #ifndef IS_APP_EXTENSION 
     if ( self.metadata.autoFillEnabled ) {
-        NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString domainNodeMap:self.domainNodeMap];
+        NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString 
+                                                                    domainNodeMap:self.domainNodeMap];
         
         NSArray<Node*> *ret = [self getItemsById:matches.allObjects];
         
@@ -1587,24 +1654,21 @@ userInteractionRequired:(BOOL)userInteractionRequired
     return @[];
 #endif
 }
+#endif
 
 - (void)rebuildAutoFillDomainNodeMap {
-    NSLog(@"Model::rebuildAutoFillDomainNodeMap");
 
-#ifndef IS_APP_EXTENSION 
+    _domainNodeMap = @{};
+    
+#if !TARGET_OS_IPHONE 
     if ( self.metadata.autoFillEnabled ) {
-        _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self
-                                                   alternativeUrls:self.metadata.autoFillScanAltUrls
-                                                      customFields:self.metadata.autoFillScanCustomFields
-                                                             notes:self.metadata.autoFillScanNotes];
-    }
-    else {
-        _domainNodeMap = @{};
+        _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self];
     }
 #else
     _domainNodeMap = @{};
 #endif
 }
+
 
 #if TARGET_OS_IPHONE
 
@@ -1625,14 +1689,8 @@ userInteractionRequired:(BOOL)userInteractionRequired
     BrowseSortConfiguration* config = self.metadata.sortConfigurations[@(viewType).stringValue];
 
     if ( config == nil ) { 
-        BrowseSortConfiguration* legacyConfig = [[BrowseSortConfiguration alloc] init];
-        
-        legacyConfig.field = self.metadata.browseSortField;
-        legacyConfig.descending = self.metadata.browseSortOrderDescending;
-        legacyConfig.foldersOnTop = self.metadata.browseSortFoldersSeparately;
-        legacyConfig.showAlphaIndex = viewType == kBrowseViewTypeList || viewType == kBrowseViewTypeTotpList;
-        
-        return legacyConfig;
+        config = [BrowseSortConfiguration defaults];
+        config.showAlphaIndex = viewType == kBrowseViewTypeList || viewType == kBrowseViewTypeTotpList;
     }
     
     return config;
@@ -1688,12 +1746,50 @@ userInteractionRequired:(BOOL)userInteractionRequired
     return [self.database renameTag:from to:to];
 }
 
-- (void)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+- (BOOL)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
     return [self.database addTagToItems:ids tag:tag];
 }
 
-- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+- (BOOL)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
     return [self.database removeTagFromItems:ids tag:tag];
+}
+
+- (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item {
+    NSMutableArray<ItemMetadataEntry*>* metadata = [NSMutableArray array];
+
+    [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
+
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
+                                                  value:item.fields.created ? item.fields.created.friendlyDateTimeStringPrecise : @""
+                                               copyable:NO]];
+    
+
+
+
+
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
+                                                  value:item.fields.modified ? item.fields.modified.friendlyDateTimeStringPrecise : @""
+                                               copyable:NO]];
+        
+
+
+
+
+
+
+
+
+
+
+
+
+    NSString* path = [self.database getPathDisplayString:item.parent includeRootGroup:YES rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
+    
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_fieldname_location", @"Location")
+                                                  value:path
+                                               copyable:NO]];
+
+    return metadata;
 }
 
 @end

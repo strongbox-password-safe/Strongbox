@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)determinerWithViewController:(VIEW_CONTROLLER_PTR)viewController
                                     database:(METADATA_PTR)safe
                               isAutoFillOpen:(BOOL)isAutoFillOpen
-                     isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
+  transparentAutoFillBackgroundForBiometrics:(BOOL)transparentAutoFillBackgroundForBiometrics
                          biometricPreCleared:(BOOL)biometricPreCleared
                          noConvenienceUnlock:(BOOL)noConvenienceUnlock;
 

@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSData* oneTimeKeyFileData;
 @property DatabaseFormat format;
 @property BOOL readOnly;
+@property BOOL renameFileToMatch;
 
 @end
 

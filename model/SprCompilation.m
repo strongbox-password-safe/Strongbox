@@ -98,7 +98,10 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
             NSString* compiled = [self sprCompileRegexMatch:match test:test node:node database:database error:&matchError];
 
             if(!compiled) {
+#ifdef DEBUG
                 NSLog(@"Failed to compile Error: [%@]", matchError);
+
+#endif
                 if(error) {
                     *error = matchError;
                 }

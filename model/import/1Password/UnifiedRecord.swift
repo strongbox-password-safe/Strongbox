@@ -124,7 +124,7 @@ class UnifiedRecord: Decodable {
             
 
             if secureContents!.fields != nil {
-                let fields: [Field] = secureContents!.fields!
+                let fields: [OnePifField] = secureContents!.fields!
 
                 for field in fields {
                     addField(entry, field: field)
@@ -168,7 +168,7 @@ class UnifiedRecord: Decodable {
         }
     }
 
-    func addField(_ entry: Node, field: Field) {
+    func addField(_ entry: Node, field: OnePifField) {
         guard let value = field.value, let name = field.name else {
             return
         }

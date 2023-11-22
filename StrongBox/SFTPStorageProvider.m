@@ -14,6 +14,7 @@
 #import "Constants.h"
 #import "NSDate+Extensions.h"
 #import "SFTPConnections.h"
+#import "CrossPlatform.h"
 
 #if TARGET_OS_IPHONE
 
@@ -239,7 +240,12 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
             [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:viewController];
         }
         
-        if(![sftp writeContents:data toFileAtPath:providerData.filePath progress:nil]) {
+        BOOL atomicWrite = CrossPlatformDependencies.defaults.applicationPreferences.atomicSftpWrite;
+        
+        NSString* tmpFile = atomicWrite ? [NSString stringWithFormat:@"%@.%@.strongbox.tmp", providerData.filePath, NSUUID.UUID.UUIDString] : providerData.filePath;
+
+        
+        if(![sftp writeContents:data toFileAtPath:tmpFile progress:nil]) {
             if (viewController) {
                 [self dismissProgressSpinner];
             }
@@ -248,17 +254,60 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
             completion(kUpdateResultError, nil, error);
         }
         else {
-            NMSFTPFile* attr = [sftp infoForFileAtPath:providerData.filePath];
-            if(!attr) {
-                error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
-                completion(kUpdateResultError, nil, error);
+            if ( atomicWrite ) {
+                NSString* tmpFile2 = [NSString stringWithFormat:@"%@.%@.strongbox.tmp", providerData.filePath, NSUUID.UUID.UUIDString];
+                BOOL rename1 = [sftp renameFileAtPath:providerData.filePath to:tmpFile2];
+                
+                if ( rename1 ) {
+                    BOOL rename2 = [sftp renameFileAtPath:tmpFile to:providerData.filePath];
+                    
+                    if ( rename2 ) {
+                        
+                        
+                        BOOL deleteTmp = [sftp removeFileAtPath:tmpFile2];
+                        if (!deleteTmp) {
+                            NSLog(@"🔴 Could not cleanup temporary SFTP file!");
+                        }
+                        
+                        NMSFTPFile* attr = [sftp infoForFileAtPath:providerData.filePath];
+                        if(!attr) {
+                            error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+                            completion(kUpdateResultError, nil, error);
+                        }
+                        
+                        if (viewController) {
+                            [self dismissProgressSpinner];
+                        }
+                        
+                        completion(kUpdateResultSuccess, attr.modificationDate, nil);
+                    }
+                    else {
+                        NSLog(@"🔴 SFTP: Rename 2 was not successful!");
+                        
+                        error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
+                        completion(kUpdateResultError, nil, error);
+                    }
+                }
+                else {
+                    NSLog(@"🔴 SFTP: Rename 1 was not successful!");
+                    
+                    error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
+                    completion(kUpdateResultError, nil, error);
+                }
             }
-            
-            if (viewController) {
-                [self dismissProgressSpinner];
+            else { 
+                NMSFTPFile* attr = [sftp infoForFileAtPath:providerData.filePath];
+                if(!attr) {
+                    error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+                    completion(kUpdateResultError, nil, error);
+                }
+                
+                if (viewController) {
+                    [self dismissProgressSpinner];
+                }
+                
+                completion(kUpdateResultSuccess, attr.modificationDate, nil);
             }
-            
-            completion(kUpdateResultSuccess, attr.modificationDate, nil);
         }
         
         [sftp.session disconnect];

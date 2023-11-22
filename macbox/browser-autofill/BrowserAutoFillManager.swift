@@ -50,41 +50,36 @@ public class BrowserAutoFillManager: NSObject {
         }
     }
 
+    @objc class func getAssociatedDomains(url: String) -> Set<String> {
+        let domain = extractPSLDomainFromUrl(url: url)
+
+        var equivs = ApplePasswordManagerQuirks.shared.getEquivalentDomains(domain)
+
+        
+
+        if let u = URL(string: url), let host = u.host, equivs.contains(host.lowercased()) {
+            equivs.remove(host)
+        }
+
+        return equivs
+    }
+
     @objc class func getMatchingNodes(url: String, domainNodeMap: [String: Set<UUID>]) -> Set<UUID> {
 
 
         let domain = extractPSLDomainFromUrl(url: url)
 
-        var ret: Set<UUID> = Set()
-
-        if let direct = domainNodeMap[domain] {
-            ret = direct
-        } else {
-            
-
-            for equivalentDomain in ApplePasswordManagerQuirks.shared.getEquivalentDomains(domain) {
-                
-
-                if let found = domainNodeMap[equivalentDomain] {
-                    
-                    ret = found
-                    break
-                }
-            }
-        }
+        let ret: Set<UUID> = domainNodeMap[domain] ?? Set()
 
 
 
-        if !ret.isEmpty {
 
-        } else {
 
-        }
 
         return ret
     }
 
-    @objc class func loadDomainNodeMap(_ model: Model, alternativeUrls: Bool = true, customFields: Bool = false, notes: Bool = false) -> [String: Set<UUID>] {
+    @objc class func loadDomainNodeMap(_ model: Model) -> [String: Set<UUID>] {
         let startTime = CFAbsoluteTimeGetCurrent()
 
         let allSearchable = model.database.allSearchableNoneExpiredEntries
@@ -93,11 +88,7 @@ public class BrowserAutoFillManager: NSObject {
         var mutableRet: [String: Set<UUID>] = [:]
 
         for node in all {
-            let uniqueUrls = AutoFillCommon.getUniqueUrls(forNode: model.database,
-                                                          node: node,
-                                                          alternativeUrls: alternativeUrls,
-                                                          customFields: customFields,
-                                                          notes: notes)
+            let uniqueUrls = AutoFillCommon.getUniqueUrls(forNode: model, node: node)
 
             let domains = Set(uniqueUrls.map { extractPSLDomainFromUrl(url: $0) })
 
@@ -108,7 +99,7 @@ public class BrowserAutoFillManager: NSObject {
 
         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
-        NSLog("⏱ loadDomainNodeMap: Loaded \(mutableRet.count) domains from \(all.count) entries in \(timeElapsed) s.")
+        NSLog("🐞 ⏱ loadDomainNodeMap: Loaded \(mutableRet.count) domains from \(all.count) entries in \(timeElapsed) s.")
 
         return mutableRet
     }

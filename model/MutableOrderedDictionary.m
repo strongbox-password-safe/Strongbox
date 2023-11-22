@@ -51,6 +51,22 @@
     self[key] = nil;
 }
 
+- (id)removeObjectAtIndex:(NSUInteger)atIndex {
+    if ( atIndex >= 0 && atIndex < self.orderedKeys.count ) {
+        id key = self.orderedKeys[atIndex];
+        id value = self.kvps[key];
+        
+        [self.orderedKeys removeObjectAtIndex:atIndex];
+        [self.kvps removeObjectForKey:key];
+        
+        return value;
+    }
+    else {
+        NSLog(@"⚠️ WARN attempt to remove object at non existent index");
+        return nil;
+    }
+}
+
 - (void)removeObjectForKey:(id)key {
     self[key] = nil;
 }

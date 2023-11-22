@@ -397,7 +397,7 @@ extension CompareDatabasesViewController: NSTableViewDataSource, NSTableViewDele
             return cell
         } else {
             let cell = tableView.makeView(withIdentifier: TitleAndIconCell.NibIdentifier, owner: self) as! TitleAndIconCell
-            cell.setContent(NSAttributedString(string: row.text), iconImage: row.icon, contentTintColor: row.iconTintColor)
+            cell.setContent(row.text, iconImage: row.icon, iconTintColor: row.iconTintColor)
             return cell
         }
     }

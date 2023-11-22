@@ -34,7 +34,7 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 + (void)initialize {
     if(self == [CustomFieldEditorViewController class]) {
-        keePassReservedNames = [NSSet setWithArray:[[[Constants reservedCustomFieldKeys] allObjects] map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        keePassReservedNames = [NSSet setWithArray:[[Constants.ReservedCustomFieldKeys allObjects] map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
             return obj.lowercaseString;
         }]];
     }

@@ -10,7 +10,7 @@ import AppKit
 import Foundation
 
 class CustomRowView: NSTableRowView {
-    // MMcG: Required or drawSelection is not called!!!
+    
     override var backgroundColor: NSColor {
         get {
             .red

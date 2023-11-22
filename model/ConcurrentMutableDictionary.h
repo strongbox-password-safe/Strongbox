@@ -14,16 +14,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)mutableDictionary;
 
-- (void)setObject:(id)object forKey:(nonnull id<NSCopying>)forKey;
+- (void)setObject:(ValueType)object forKey:(nonnull id<NSCopying>)forKey;
 - (nullable ValueType)objectForKey:(nonnull KeyType)key;
-- (void)removeObjectForKey:(nonnull id<NSCopying>)forKey;
-
-- (id)objectForKeyedSubscript:(KeyType)key;
+- (nullable ValueType)objectForKeyedSubscript:(KeyType)key;
 - (void)setObject:(ValueType)obj forKeyedSubscript:(KeyType)key;
+
+- (void)removeObjectForKey:(nonnull id<NSCopying>)forKey;
+- (void)removeObjectsForKeys:(NSArray<KeyType> *)keyArray;
 
 - (void)removeAllObjects;
 
 @property (readonly) NSArray<KeyType>* allKeys;
+@property (readonly) NSArray<ValueType>* allValues;
+@property (readonly) NSUInteger count;
 
 @end
 

@@ -125,6 +125,22 @@ BOOL isValidUrl(NSString* urlString) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 + (NSString*)getUsername {
     return NSFullUserName();
 }
@@ -423,6 +439,18 @@ UIImage* scaleImage(UIImage* image, CGSize newSize) {
 
 NSColor* NSColorFromRGB(NSUInteger rgbValue) {
     return [NSColor colorWithCalibratedRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0];
+}
+
++ (NSImage *)imageTintedWithColor:(NSImage*)img tint:(NSColor *)tint {
+    NSImage *image = [img copy];
+    if (tint) {
+        [image lockFocus];
+        [tint set];
+        NSRect imageRect = {NSZeroPoint, [image size]};
+        NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceAtop);
+        [image unlockFocus];
+    }
+    return image;
 }
 
 NSImage* scaleImage(NSImage* image, CGSize newSize) {

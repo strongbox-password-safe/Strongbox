@@ -26,7 +26,12 @@ NS_ASSUME_NONNULL_BEGIN
                     audit:(NSString*_Nullable)audit
              showStrength:(BOOL)showStrength;
 
-- (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*_Nullable)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont;
+- (void)setForUrlOrCustomFieldUrl:(NSString*)key 
+                            value:(NSString*)value
+                      formatAsUrl:(BOOL)formatAsUrl
+                 rightButtonImage:(UIImage*_Nullable)rightButtonImage 
+                  useEasyReadFont:(BOOL)useEasyReadFont
+               associatedWebsites:(NSArray<NSString*>*)associatedWebsites;
 
 - (void)pokeValue:(NSString *)value;
 

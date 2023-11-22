@@ -71,7 +71,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 + (BOOL)isTotpCustomFieldKey:(NSString*)key;
++ (BOOL)isPasskeyCustomFieldKey:(NSString*)key;
 + (BOOL)isAlternativeURLCustomFieldKey:(NSString*)key;
+
 - (void)addSecondaryUrl:(NSString*)url optionalCustomFieldSuffixLabel:(NSString*_Nullable)optionalCustomFieldSuffixLabel;
 
 + (NodeFields *)deserialize:(NSDictionary *)dict;

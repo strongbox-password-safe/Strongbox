@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BrowseSortConfiguration : NSObject
 
++ (instancetype)defaults;
+
 @property BOOL descending;
 @property BOOL foldersOnTop;
 @property BrowseSortField field;

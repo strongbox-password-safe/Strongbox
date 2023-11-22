@@ -44,12 +44,12 @@
 #import "MacCompositeKeyDeterminer.h"
 #import "MacConflictResolutionWizard.h"
 
+#endif
+
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
-#import "Strongbox_AutoFill-Swift.h"
-#endif
-
+#import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
 NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
@@ -248,9 +248,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }
     
     NSDate* localModDate;
-    [self getExistingLocalCopy:databaseUuid modified:&localModDate];
+    [self getExistingWorkingCache:databaseUuid modified:&localModDate];
     if (!localModDate) {
-        NSLog(@"Could not get local Mod Date. Cannot test for remote changes.");
+        NSLog(@"Could not get working copy Mod Date. Cannot test for remote changes.");
         completion(kSyncAndMergeError, NO, nil);
         return;
     }
@@ -283,7 +283,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     BOOL forcePull = parameters.syncPullEvenIfModifiedDateSame;
     NSDate* localModDate;
-    [self getExistingLocalCopy:databaseUuid modified:&localModDate];
+    [self getExistingWorkingCache:databaseUuid modified:&localModDate];
 
     StorageProviderReadOptions* opts = [[StorageProviderReadOptions alloc] init];
     
@@ -309,7 +309,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     NSString* providerDisplayName = [SafeStorageProviderFactory getStorageDisplayName:database];
 
-    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, provider=%@, localMod=%@, lastRemoteSyncMod=%@]",
+    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, provider=%@, workingCacheMod=%@, lastCheckedSourceMod=%@]",
                             (parameters.interactiveVC ? @"YES" : @"NO"),
                             (database.outstandingUpdateId != nil ? @"YES" : @"NO"),
                             forcePull,
@@ -334,11 +334,11 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         }
         else if (result == kReadResultModifiedIsSameAsLocal) {
             if ( database.outstandingUpdateId != nil ) {
-                [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Modified same as Local - Outstanding Update Express Scenario..."]];
+                [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Source Mod Date same as Last Time we Checked, no source updates to worry about - Outstanding Update Express Scenario..."]];
                 [self handleOutstandingUpdate:databaseUuid syncId:syncId expressUpdateMode:YES remoteData:nil remoteModified:localModDate parameters:parameters completion:completion];
             }
             else {
-                [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Modified same as Local"]];
+                [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Source Mod same as Working Copy Mod"]];
                 [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:error];
                 completion(kSyncAndMergeSuccess, NO, nil);
             }
@@ -385,7 +385,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                      parameters:(SyncParameters*)parameters
                      completion:(SyncAndMergeCompletionBlock)completion {
     NSDate* localModDate;
-    NSURL* localCopy = [self getExistingLocalCopy:databaseUuid modified:&localModDate];
+    NSURL* localCopy = [self getExistingWorkingCache:databaseUuid modified:&localModDate];
     NSData* localData;
     NSError* error;
     if (localCopy) {
@@ -668,17 +668,31 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
     [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Source DB has also changed. Conflict. Auto Merging..."];
 
-    if ( !parameters.key ) {
+    
+    
+    
+    
+    
+    
+    if ( !parameters.key ||
+        ( parameters.key.yubiKeyCR != nil && parameters.interactiveVC == nil ) ||
+        (compareFirst && parameters.interactiveVC == nil ) ) { 
         
         
         
-        NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_cannot_merge_in_background", @"Cannot merge without credentials or in Background Sync mode. You must now do an Online Sync to resolve this conflict.") errorCode:-1];
+        
+        
+
+        
+        [self logMessage:databaseUuid syncId:syncId message:@"Cannot Merge either because we don't have credentials or we are in non interactive mode and a compare is requested..."];
+
         [self logAndPublishStatusChange:databaseUuid
                                  syncId:syncId
-                                  state:kSyncOperationStateError
-                                  error:error];
+                                  state:kSyncOperationStateBackgroundButUserInteractionRequired
+                                  error:nil];
         
-        completion(kSyncAndMergeError, NO, error);
+        completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
+
         return;
     }
     
@@ -711,7 +725,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     IOSCompositeKeyDeterminer *determiner = [IOSCompositeKeyDeterminer determinerWithViewController:vc
                                                                                            database:database
                                                                                      isAutoFillOpen:NO
-                                                                            isAutoFillQuickTypeOpen:NO
+                                                         transparentAutoFillBackgroundForBiometrics:NO
                                                                                 biometricPreCleared:NO
                                                                                 noConvenienceUnlock:YES]; 
     
@@ -740,16 +754,21 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                                          forceReadOnly:NO
                                       isNativeAutoFillAppExtensionOpen:NO
                                                            offlineMode:NO];
-
-    [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
-               viewController:parameters.interactiveVC];
-        
+    unlocker.noProgressSpinner = parameters.interactiveVC == nil;
+    
+    if ( parameters.interactiveVC ) {
+        [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
+              viewController:parameters.interactiveVC];
+    }
+    
     [unlocker unlockAtUrl:localUrl
                       key:parameters.key
        keyFromConvenience:NO
                completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.spinnerUi dismiss];
+            if ( parameters.interactiveVC ) {
+                [self.spinnerUi dismiss];
+            }
 
             if ( result == kUnlockDatabaseResultSuccess ) {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Merge Working Copy and Source: Unlock of Working copy successful. Unlocking Source..."]];
@@ -771,32 +790,43 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Incorrect Credentials unlocking working copy... requesting credentials manually."]];
                 
-                [self requestCredentials:parameters.interactiveVC
-                                database:database
-                              completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, NSError * _Nullable error) {
-                    if ( result == kGetCompositeKeyResultError ) {
-                        [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not get credentials for working copy."]];
-                        [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
-                        completion(kSyncAndMergeError, NO, error);
-                    }
-                    else if ( result == kGetCompositeKeyResultSuccess ) {
-                        [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Successfully got manual credentials for working copy. Will try unlock working copy again..."]];
-                        parameters.key = factors;
-
-                        [self mergeLocalAndRemoteUrls:databaseUuid
-                                               syncId:syncId
-                                             localUrl:localUrl
-                                            remoteUrl:remoteUrl
-                                           parameters:parameters
-                                         compareFirst:compareFirst
-                                           completion:completion];
-                    }
-                    else {
-
-                        [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Working Copy Merge Get Credentials."];
-                        [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
-                    }
-                }];
+                if ( !parameters.interactiveVC ) {
+                    [self logAndPublishStatusChange:databaseUuid
+                                             syncId:syncId
+                                              state:kSyncOperationStateBackgroundButUserInteractionRequired
+                                              error:nil];
+                    
+                    completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
+                }
+                else {
+                    [self requestCredentials:parameters.interactiveVC
+                                    database:database
+                                  completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, NSError * _Nullable error) {
+                        if ( result == kGetCompositeKeyResultError ) {
+                            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not get credentials for working copy."]];
+                            [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
+                            completion(kSyncAndMergeError, NO, error);
+                        }
+                        else if ( result == kGetCompositeKeyResultSuccess ) {
+                            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Successfully got manual credentials for working copy. Will try unlock working copy again..."]];
+                            parameters.key = factors;
+                            
+                            [self mergeLocalAndRemoteUrls:databaseUuid
+                                                   syncId:syncId
+                                                 localUrl:localUrl
+                                                remoteUrl:remoteUrl
+                                               parameters:parameters
+                                             compareFirst:compareFirst
+                                               completion:completion];
+                        }
+                        else {
+                            
+                            [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Working Copy Merge Get Credentials."];
+                            [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
+                        }
+                        
+                    }];
+                }
             }
             else {
 
@@ -821,16 +851,21 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                                          forceReadOnly:NO
                                       isNativeAutoFillAppExtensionOpen:NO
                                                            offlineMode:NO];
+    unlocker.noProgressSpinner = parameters.interactiveVC == nil;
     
-    [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
-          viewController:parameters.interactiveVC];
-        
+    if ( parameters.interactiveVC ) {
+        [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
+              viewController:parameters.interactiveVC];
+    }
+    
     [unlocker unlockAtUrl:remoteUrl
                       key:parameters.key
        keyFromConvenience:NO
                completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.spinnerUi dismiss];
+            if ( parameters.interactiveVC ) {
+                [self.spinnerUi dismiss];
+            }
             
             if ( result == kUnlockDatabaseResultSuccess ) {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Merge Working Copy and Source: Unlock of Source successful. Merging Models..."]];
@@ -844,33 +879,43 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Incorrect Credentials unlocking source copy... requesting credentials manually."]];
                 
-                [self requestCredentials:parameters.interactiveVC
-                                database:database
-                              completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, NSError * _Nullable error) {
-                    if ( result == kGetCompositeKeyResultError ) {
-                        [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not get credentials for source copy."]];
-                        [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
-                        completion(kSyncAndMergeError, NO, error);
-                    }
-                    else if ( result == kGetCompositeKeyResultSuccess ) {
-                        [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Successfully got manual credentials for source copy. Will try unlock source copy again..."]];
-                        parameters.key = factors;
-
-                        [self mergeLocalAndRemoteUrlsUnlockSecondDatabaseContinuation:databaseUuid
-                                                                               syncId:syncId
-                                                                             localUrl:localUrl
-                                                                            remoteUrl:remoteUrl
-                                                                           parameters:parameters
-                                                                         compareFirst:compareFirst
-                                                                                 mine:mine
-                                                                           completion:completion];
-                    }
-                    else {
-
-                        [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Source Copy Merge Get Credentials."];
-                        [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
-                    }
-                }];
+                if ( !parameters.interactiveVC ) {
+                    [self logAndPublishStatusChange:databaseUuid
+                                             syncId:syncId
+                                              state:kSyncOperationStateBackgroundButUserInteractionRequired
+                                              error:nil];
+                    
+                    completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
+                }
+                else {
+                    [self requestCredentials:parameters.interactiveVC
+                                    database:database
+                                  completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, NSError * _Nullable error) {
+                        if ( result == kGetCompositeKeyResultError ) {
+                            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Could not get credentials for source copy."]];
+                            [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
+                            completion(kSyncAndMergeError, NO, error);
+                        }
+                        else if ( result == kGetCompositeKeyResultSuccess ) {
+                            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Merge: Successfully got manual credentials for source copy. Will try unlock source copy again..."]];
+                            parameters.key = factors;
+                            
+                            [self mergeLocalAndRemoteUrlsUnlockSecondDatabaseContinuation:databaseUuid
+                                                                                   syncId:syncId
+                                                                                 localUrl:localUrl
+                                                                                remoteUrl:remoteUrl
+                                                                               parameters:parameters
+                                                                             compareFirst:compareFirst
+                                                                                     mine:mine
+                                                                               completion:completion];
+                        }
+                        else {
+                            
+                            [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Source Copy Merge Get Credentials."];
+                            [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
+                        }
+                    }];
+                }
             }
             else {
 
@@ -893,13 +938,17 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     DatabaseModel* merged = [mine clone];
     DatabaseMerger* syncer= [DatabaseMerger mergerFor:merged theirs:theirs];
 
-    [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:parameters.interactiveVC];
+    if ( parameters.interactiveVC ) {
+        [self.spinnerUi show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:parameters.interactiveVC];
+    }
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         BOOL success = [syncer merge];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.spinnerUi dismiss];
+            if ( parameters.interactiveVC ) {
+                [self.spinnerUi dismiss];
+            }
             
             if ( success ) {
                 [self logMessage:databaseUuid syncId:syncId message:@"Pre-Merge Succeeded..."];
@@ -939,7 +988,19 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
          interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
             completion:(SyncAndMergeCompletionBlock)completion {
     if ( compareFirst ) {
-        [self compare:databaseUuid mine:mine merged:merged syncId:syncId interactiveVC:interactiveVC completion:completion];
+        if ( interactiveVC == nil ) {
+            [self logMessage:databaseUuid syncId:syncId message:@"Cannot Merge either because we are in non interactive mode and a compare is requested..."];
+            
+            [self logAndPublishStatusChange:databaseUuid
+                                     syncId:syncId
+                                      state:kSyncOperationStateBackgroundButUserInteractionRequired
+                                      error:nil];
+            
+            completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
+        }
+        else {
+            [self compare:databaseUuid mine:mine merged:merged syncId:syncId interactiveVC:interactiveVC completion:completion];
+        }
     }
     else {
         [self mergeLocalAndRemote:databaseUuid merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
@@ -1051,8 +1112,10 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                        interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
                               syncId:(NSUUID*)syncId
                           completion:(SyncAndMergeCompletionBlock)completion {
-    [self.spinnerUi show:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:interactiveVC];
-
+    if ( interactiveVC ) {
+        [self.spinnerUi show:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:interactiveVC];
+    }
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory]; 
         [outputStream open];
@@ -1066,7 +1129,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             NSData* mergedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
 
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.spinnerUi dismiss];
+                if ( interactiveVC ) {
+                    [self.spinnerUi dismiss];
+                }
                 
                 if (userCancelled) {
                     [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
@@ -1161,8 +1226,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 takeABackup:(BOOL)takeABackup
                  completion:(SyncAndMergeCompletionBlock)completion {
     NSError* error;
-    if(![self setLocalCopy:data dateModified:dateModified database:databaseUuid takeABackup:takeABackup error:&error]) {
-        [self logMessage:databaseUuid syncId:syncId message:@"Could not sync working copy from source db."];
+    if(![self setWorkingCache:data dateModified:dateModified database:databaseUuid takeABackup:takeABackup error:&error]) {
+        [self logMessage:databaseUuid syncId:syncId message:@"Could not sync working copy from source."];
 
         [self logAndPublishStatusChange:databaseUuid
                                  syncId:syncId
@@ -1172,7 +1237,12 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         completion(kSyncAndMergeError, NO, error);
     }
     else {
-        [self logMessage:databaseUuid syncId:syncId message:@"Working copy successfully synced with source db."];
+        NSDate* localModDate;
+        [self getExistingWorkingCache:databaseUuid modified:&localModDate];
+
+        [self logMessage:databaseUuid syncId:syncId
+                 message:[NSString stringWithFormat:@"Working copy successfully synced with source db. Expected = [%@], Actual [%@]", dateModified.friendlyDateTimeStringBothPrecise, localModDate.friendlyDateTimeStringBothPrecise]];
+        
         [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:nil];
 
         
@@ -1187,17 +1257,17 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
 
 
-- (NSURL*_Nullable)getExistingLocalCopy:(NSString*)databaseUuid modified:(NSDate**)modified {
+- (NSURL*_Nullable)getExistingWorkingCache:(NSString*)databaseUuid modified:(NSDate**)modified {
     return [WorkingCopyManager.sharedInstance getLocalWorkingCache:databaseUuid modified:modified];
 }
 
-- (NSURL*)setLocalCopy:(NSData*)data
-          dateModified:(NSDate*)dateModified
-              database:(NSString*)databaseUuid
-           takeABackup:(BOOL)takeABackup
-                 error:(NSError**)error {
+- (NSURL*)setWorkingCache:(NSData*)data
+             dateModified:(NSDate*)dateModified
+                 database:(NSString*)databaseUuid
+              takeABackup:(BOOL)takeABackup
+                    error:(NSError**)error {
     if ( takeABackup ) {
-        NSURL* localWorkingCache = [self getExistingLocalCopy:databaseUuid modified:nil];
+        NSURL* localWorkingCache = [self getExistingWorkingCache:databaseUuid modified:nil];
         
         if (localWorkingCache) { 
             METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];

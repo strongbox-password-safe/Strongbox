@@ -100,7 +100,7 @@
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
     
-    NSString* loc = reason.length ? reason : NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Unlock Database");
+    NSString* loc = reason.length ? reason : NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Unlock Database");
     
     NSError *authError;
     NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];

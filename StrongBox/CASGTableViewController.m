@@ -37,6 +37,9 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellYubiKey;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellRenameLocalFile;
+@property (weak, nonatomic) IBOutlet UISwitch *switchRenameLocalFile;
+
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowEmpty;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowEmpty;
 
@@ -73,6 +76,7 @@
     self.navigationController.presentationController.delegate = self;
     [self setupUi];
     
+    self.switchRenameLocalFile.on = YES;
     self.selectedName = self.initialName;
     self.selectedFormat = self.initialFormat;
     
@@ -297,6 +301,7 @@
     creds.oneTimeKeyFileData = self.selectedOneTimeKeyFileData;
     creds.format = self.selectedFormat;
     creds.readOnly = self.switchReadOnly.on;
+    creds.renameFileToMatch = self.switchRenameLocalFile.on && self.showFileRenameOption;
     creds.yubiKeyConfig = self.selectedYubiKeyConfig;
     
     self.onDone(YES, creds);
@@ -317,6 +322,8 @@
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellAllowEmpty setHidden:YES];
         [self cell:self.cellStrength setHidden:YES];
+        
+        [self cell:self.cellRenameLocalFile setHidden:self.mode != kCASGModeRenameDatabase || !self.showFileRenameOption];
     }
     else if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         [self cell:self.cellDatabaseName setHidden:!(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
@@ -327,6 +334,7 @@
         
         [self cell:self.cellFormat setHidden:self.mode == kCASGModeCreateExpress];
         [self cell:self.cellReadOnly setHidden:YES];
+        [self cell:self.cellRenameLocalFile setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:self.mode == kCASGModeCreateExpress || !showAllowEmpty];
     }
@@ -336,6 +344,7 @@
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
         [self cell:self.cellReadOnly setHidden:YES];
+        [self cell:self.cellRenameLocalFile setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
     }
@@ -347,6 +356,7 @@
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
         [self cell:self.cellStrength setHidden:YES];
+        [self cell:self.cellRenameLocalFile setHidden:YES];
     }
     
     if ( AppPreferences.sharedInstance.databasesAreAlwaysReadOnly ) {

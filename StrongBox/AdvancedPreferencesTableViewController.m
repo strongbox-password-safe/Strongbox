@@ -74,11 +74,15 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchNewEntryUsesParentGroupIcon;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStripUnusedIcons;
+@property (weak, nonatomic) IBOutlet UISwitch *stripHistoricalCustomIconsOnSave;
+
 @property (weak, nonatomic) IBOutlet UISwitch *pinCodeHapticFeedback;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
-
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellRedeemOfferCode;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAppendDateExportFilenames;
+@property (weak, nonatomic) IBOutlet UISwitch *atomicSftpWrites;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAtomicSftpWrites;
 
 @end
 
@@ -105,6 +109,7 @@
         [self cell:self.cellWebDAVConnections setHidden:YES];
         [self cell:self.cellDetectIfOffline setHidden:YES];
         [self cell:self.cellDropboxAppFolder setHidden:YES];
+        [self cell:self.cellAtomicSftpWrites setHidden:YES];
     }
     
     if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions && AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
@@ -263,10 +268,10 @@
     AppPreferences.sharedInstance.useParentGroupIconOnCreate = self.switchNewEntryUsesParentGroupIcon.on;
     
     AppPreferences.sharedInstance.stripUnusedIconsOnSave = self.switchStripUnusedIcons.on;
-    
-
-    
+    AppPreferences.sharedInstance.stripUnusedHistoricalIcons = self.stripHistoricalCustomIconsOnSave.on;
+        
     AppPreferences.sharedInstance.appendDateToExportFileName = self.switchAppendDateExportFilenames.on;
+    AppPreferences.sharedInstance.atomicSftpWrite = self.atomicSftpWrites.on;
 
     [self bindPreferences];
 }
@@ -299,10 +304,12 @@
 
     self.switchMarkdownNotes.on = AppPreferences.sharedInstance.markdownNotes;
     self.switchNewEntryUsesParentGroupIcon.on = AppPreferences.sharedInstance.useParentGroupIconOnCreate;
-    self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;
     
-
+    self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;
+    self.stripHistoricalCustomIconsOnSave.on = AppPreferences.sharedInstance.stripUnusedHistoricalIcons;
+    
     self.switchAppendDateExportFilenames.on = AppPreferences.sharedInstance.appendDateToExportFileName;
+    self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
 }
 
 - (void)bindCloudSessions {

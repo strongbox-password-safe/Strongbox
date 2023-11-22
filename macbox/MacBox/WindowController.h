@@ -30,7 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)onCopyNotes:(id)sender;
 - (IBAction)onCopyTotp:(id)sender;
 
-- (IBAction)onDelete:(id _Nullable)sender;
+
+- (void)onDeleteItems:(NSArray<Node*>*)items
+           completion:( void (^ _Nullable)(BOOL success) )completion;
 
 - (IBAction)onPrintGroupFromSideBar:(id)sender;
 - (IBAction)onExportGroupFromSideBar:(id)sender;

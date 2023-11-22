@@ -70,6 +70,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property (readonly) BOOL formatSupportsCustomIcons;
 
+- (NSArray<Node *>*)getItemsById:(NSArray<NSUUID *>*)uuids;
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
@@ -85,11 +86,10 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (void)setItemIcon:(Node *)item icon:(NodeIcon*_Nullable)icon;
 - (void)batchSetIcons:(NSArray<Node*>*)items icon:(NodeIcon*)icon;
-- (void)batchSetIcons:(NSDictionary<NSUUID*, NSImage*>*)iconMap;
+- (void)batchSetIcons:(NSDictionary<NSUUID*, NodeIcon*>*)iconMap;
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
-
 
 
 
@@ -109,8 +109,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 - (BOOL)addItem:(Node *)item parent:(Node *)parent;
 - (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent;
 - (BOOL)addNewGroup:(Node *)parentGroup title:(NSString*)title group:(Node* _Nullable * _Nullable)group;
-
-- (Node*)getDefaultNewEntryNode:(Node *_Nonnull)parentGroup;
 
 
 
@@ -152,6 +150,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *attachmentEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *keeAgentSshKeyEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *passkeyEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableNoneExpiredEntries;
@@ -263,7 +262,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 
 - (void)restartBackgroundAudit;
-- (void)stopAndClearAuditor;
 
 
 

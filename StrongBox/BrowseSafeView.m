@@ -403,7 +403,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self refreshMoreMenu];
     
     self.sortiOS14Button = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"arrow.up.arrow.down" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleSmall]] menu:nil];
-    [rightBarButtons insertObject:self.sortiOS14Button atIndex:1];
+    
+    if ( !self.isDisplayingRootTagsList ) { 
+        [rightBarButtons insertObject:self.sortiOS14Button atIndex:1];
+    }
     [self refreshSortMenu];
     
     [rightBarButtons addObject:self.syncBarButton];
@@ -751,7 +754,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     __weak BrowseSafeView* weakSelf = self;
     
     vc.viewModel = self.viewModel;
-    vc.onDatabaseBulkIconUpdate = ^(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+    vc.onDatabaseBulkIconUpdate = ^(NSDictionary<NSUUID *, NodeIcon *> * _Nullable selectedFavIcons) {
         [weakSelf onDatabaseBulkIconUpdate:selectedFavIcons];
     };
     
@@ -760,12 +763,11 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self presentViewController:nav animated:YES completion:nil];
 }
 
-- (void)onDatabaseBulkIconUpdate:(NSDictionary<NSUUID *,UIImage *> * _Nullable)selectedFavIcons {
+- (void)onDatabaseBulkIconUpdate:(NSDictionary<NSUUID *,NodeIcon *> * _Nullable)selectedFavIcons {
     for(Node* node in self.viewModel.database.allActiveEntries) {
-        UIImage* img = selectedFavIcons[node.uuid];
-        if(img) {
-            NSData *data = UIImagePNGRepresentation(img);
-            node.icon = [NodeIcon withCustom:data];
+        NodeIcon* icon = selectedFavIcons[node.uuid];
+        if( icon ) {
+            node.icon = icon;
         }
     }
     [self updateAndRefresh];
@@ -867,12 +869,14 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     NSNumber* numNote = dict[@"userStopped"];
     NSLog(@"✅ Audit Completed... [%@]- userStopped = [%@]", self, numNote);
+  
     
-    if (numNote.boolValue) { 
-        return;
-    }
     
-    if ( self.isDisplayingRoot ) {
+
+
+
+
+    if ( self.isDisplayingRoot && self.viewModel.metadata.auditConfig.auditInBackground ) {
         NSNumber* issueCount = self.viewModel.auditIssueCount;
         if (issueCount == nil) {
             NSLog(@"WARNWARN: Invalid Audit Issue Count but Audit Completed Notification Received. Stale BrowseView... ignore");
@@ -1233,6 +1237,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     __weak BrowseSafeView* weakSelf = self;
     [self.sni changeIcon:self
+                   model:self.viewModel
                     node:item
              urlOverride:nil
                   format:self.viewModel.database.originalFormat
@@ -1289,7 +1294,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [self onDeleteSingleItem:indexPath completion:completionHandler];
     }];
     
-    removeAction.image = [UIImage systemImageNamed:@"trash"];
+    removeAction.image = [UIImage systemImageNamed:@"trash.fill"];
     removeAction.backgroundColor = UIColor.systemRedColor;
     
     return removeAction;
@@ -1751,7 +1756,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else {
         Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
         title = (currentGroup == nil || currentGroup.parent == nil) ? self.viewModel.metadata.nickName : currentGroup.title;
-        image = [NodeIconHelper getIconForNode:currentGroup predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat];
+        
+        if ( currentGroup ) {
+            image = [NodeIconHelper getIconForNode:currentGroup predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat];
+        }
+        
         tint = self.viewModel.database.recycleBinNode == currentGroup ? Constants.recycleBinTintColor : nil;
     }
     
@@ -2735,7 +2744,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"browse_vc_action_delete", @"Delete")
-                                     systemImage:@"trash"
+                                     systemImage:@"trash.fill"
                                          handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onDeleteTag:tag completion:nil];
     }];
@@ -3176,14 +3185,14 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     if ( !willRecycle ) {
         return [ContextMenuHelper getDestructiveItem:title
-                                         systemImage:@"trash"
+                                         systemImage:@"trash.fill"
                                              handler:^(__kindof UIAction * _Nonnull action) {
             [weakSelf onDeleteSingleItem:indexPath completion:nil];
         }];
     }
     else {
         return [ContextMenuHelper getItem:title
-                              systemImage:@"trash"
+                              systemImage:@"trash.fill"
                                    colour:UIColor.systemGreenColor
                                   handler:^(__kindof UIAction * _Nonnull action) {
             [weakSelf onDeleteSingleItem:indexPath completion:nil];
@@ -3496,7 +3505,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                 [self onExportItemsToDatabaseUnlockDestinationDone:kUnlockDatabaseResultSuccess model:expressAttempt itemsToExport:itemsToExport error:nil];
             }
             else {
-                IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self database:destinationDatabase isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+                IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self 
+                                                                                                       database:destinationDatabase
+                                                                                                 isAutoFillOpen:NO
+                                                                     transparentAutoFillBackgroundForBiometrics:NO
+                                                                                            biometricPreCleared:NO
+                                                                                            noConvenienceUnlock:NO];
+                
                 [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
                     if (result == kGetCompositeKeyResultSuccess) {
                         DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:destinationDatabase viewController:self forceReadOnly:NO isNativeAutoFillAppExtensionOpen:NO offlineMode:YES];

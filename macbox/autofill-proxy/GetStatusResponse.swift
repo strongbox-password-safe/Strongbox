@@ -9,12 +9,13 @@
 import Cocoa
 
 @objc
-class ServerSettings: NSObject, Codable {
+public class ServerSettings: NSObject, Codable {
     @objc var supportsCreateNew: Bool = false
+    @objc var markdownNotes: Bool = false
 }
 
 @objc
-class GetStatusResponse: NSObject, Codable {
+public class GetStatusResponse: NSObject, Codable {
     @objc var serverVersionInfo: String = ""
     @objc var databases: [DatabaseSummary] = []
     @objc var serverSettings: ServerSettings? = nil

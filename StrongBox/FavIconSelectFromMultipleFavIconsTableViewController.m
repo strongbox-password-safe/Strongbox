@@ -9,6 +9,7 @@
 #import "FavIconSelectFromMultipleFavIconsTableViewController.h"
 #import "Utils.h"
 #import "BrowseItemCell.h"
+#import "AppPreferences.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
@@ -33,15 +34,27 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
-    UIImage* image = self.images[indexPath.row];
-    if( image.size.height != image.size.width && MIN(image.size.width, image.size.height) > 512 ) {
+    UIImage* img;
+    NodeIcon* icon = self.images[indexPath.row];
+    if( icon.customIconHeight != icon.customIconWidth && MIN(icon.customIconWidth, icon.customIconHeight) > 512 ) {
         NSLog(@"🔴 Down scaling icon...");
-        image = scaleImage(image, CGSizeMake(192, 192));
+        img = scaleImage(icon.customIcon, CGSizeMake(192, 192));
     }
-
+    else {
+        img = icon.customIcon;
+    }
+    
+    BOOL largeIcon = icon.estimatedStorageBytes > AppPreferences.sharedInstance.favIconDownloadOptions.maxSize;
+    
+    NSString* subtitle = [NSString stringWithFormat:@"%@ (%dx%d) %@",
+                          largeIcon ? @"⚠️ " : @"",
+                          (int)icon.customIconWidth,
+                          (int)icon.customIconHeight,
+                          friendlyFileSizeString(icon.estimatedStorageBytes)];
+    
     [cell setRecord:self.node.title
-           subtitle:[NSString stringWithFormat:@"%dx%d", (int)image.size.width, (int)image.size.height]
-               icon:image
+           subtitle:subtitle 
+               icon:img
       groupLocation:@""
               flags:@[]
      flagTintColors:@{}
@@ -50,17 +63,30 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
            hideIcon:NO
               audit:@""];
 
-    cell.accessoryType = indexPath.row == self.selectedIndex ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    cell.accessoryType = self.selectedIdx == nil ? UITableViewCellAccessoryNone : ((indexPath.row == self.selectedIdx.unsignedIntValue) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone);
     
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    self.selectedIndex = indexPath.row;
+    if ( self.selectedIdx == nil ) {
+        self.selectedIdx = @(indexPath.row);
+    }
+    else {
+        NSUInteger selectedIndex = self.selectedIdx.unsignedIntValue;
+        
+        if ( selectedIndex != indexPath.row ) {
+            self.selectedIdx = @(indexPath.row);
+            
+        }
+        else {
+            self.selectedIdx = nil; 
+        }
+    }
+    
+    self.onChangedSelection(self.selectedIdx);
     
     [self.tableView reloadData];
-    
-    self.onChangedSelection(self.selectedIndex);
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
  

@@ -170,7 +170,7 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
             return;
         }
 
-        NSLog(@"✅ Rotating KDBX4 Hardware Key Challenge");
+
         
         [kdf rotateHardwareKeyChallenge];
         

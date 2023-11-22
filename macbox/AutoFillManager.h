@@ -18,17 +18,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL isOnForStrongbox;
 
-- (void)updateAutoFillQuickTypeDatabase:(Model*)database
-                           databaseUuid:(NSString*)databaseUuid
-                          displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
-                        alternativeUrls:(BOOL)alternativeUrls
-                           customFields:(BOOL)customFields
-                                  notes:(BOOL)notes
-           concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
-         unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds
-                               nickName:(NSString*)nickName;
+- (void)updateAutoFillQuickTypeDatabase:(Model *)database clearFirst:(BOOL)clearFirst;
 
 - (void)clearAutoFillQuickTypeDatabase;
+
+- (void)refreshQuickTypeAfterAutoFillAddition:(Node*)node database:(Model*)database;
+
+- (void)removeItemsFromQuickType:(const NSArray<Node*>*)items database:(Model*)database;
 
 @end
 

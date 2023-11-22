@@ -14,11 +14,11 @@ struct AutoFillCredentialCustomField: Codable {
     var concealable: Bool
 }
 
-class AutoFillCredential: Codable {
+public class AutoFillCredential: Codable {
     var uuid: UUID
     var databaseId: String
     var title: String
-    var icon: String 
+    var icon: String
     var username: String
     var password: String
     var url: String
@@ -28,8 +28,8 @@ class AutoFillCredential: Codable {
     var databaseName: String
     var tags: [String]
     var favourite: Bool
-
-    
+    var notes: String
+    var modified: String
 
     init(uuid: UUID,
          databaseId: String,
@@ -43,7 +43,9 @@ class AutoFillCredential: Codable {
          attachmentFileNames: [String] = [],
          databaseName: String,
          tags: [String],
-         favourite: Bool)
+         favourite: Bool,
+         notes: String,
+         modified: String)
     {
         self.uuid = uuid
         self.title = title
@@ -58,5 +60,7 @@ class AutoFillCredential: Codable {
         self.databaseName = databaseName
         self.tags = tags
         self.favourite = favourite
+        self.modified = modified
+        self.notes = notes
     }
 }

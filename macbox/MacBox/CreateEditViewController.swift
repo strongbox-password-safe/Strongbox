@@ -94,6 +94,36 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     
 
+    @IBOutlet var buttonFavourite: NSButton!
+
+    @IBAction func onToggleFavourite(_: Any) {
+        model.favourite = !model.favourite
+        onModelEdited()
+        bindFavourite()
+    }
+
+    func bindFavourite() {
+        buttonFavourite.contentTintColor = model.favourite ? .systemYellow : .systemGray
+        buttonFavourite.image = NSImage(systemSymbolName: model.favourite ? "star.fill" : "star", accessibilityDescription: nil)
+    }
+
+    
+
+    @IBOutlet var textFieldPasskeyRelyingPartyId: NSTextField!
+    @IBOutlet var stackViewPasskey: NSStackView!
+
+    @IBAction func onRemovePasskey(_: Any) {
+        MacAlerts.areYouSure(NSLocalizedString("passkey_ays_remove_key", comment: "Are you sure you want to remove the passkey from this entry?"), window: view.window) { [weak self] resp in
+            if resp {
+                self?.model.passkey = nil
+                self?.onModelEdited()
+                self?.bindPasskey()
+            }
+        }
+    }
+
+    
+
     @IBOutlet var buttonAddOrGenerateSshKey: NSPopUpButton!
     @IBOutlet var stackExistingSshKey: NSStackView!
     @IBOutlet var stackSshKeeAgentMaster: NSStackView!
@@ -278,15 +308,17 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId),
-              let dbModel = database.commonModel,
-              !node.isGroup
-        else {
+        guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId), !node.isGroup else {
             NSLog("🔴 Could not load initial node or node is a group!")
             return
         }
 
-        model = EntryViewModel.fromNode(node, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
+        guard let dbModel = database.commonModel else {
+            NSLog("🔴 Could not load common model!")
+            return
+        }
+
+        model = EntryViewModel.fromNode(node, model: dbModel)
         preEditModelClone = model.clone()
 
         setupUI()
@@ -595,6 +627,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         bindLocation()
         bindPasswordUI()
         bindKeeAgentSshKey()
+        bindPasskey()
+        bindFavourite()
     }
 
     
@@ -685,7 +719,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     private func createNewEntryNode(_ parentGroup: Node) -> Node {
-        database.getDefaultNewEntryNode(parentGroup)
+        NewEntryDefaultsHelper.getDefaultNewEntryNode(database.database, parentGroup: parentGroup)
     }
 
     @IBAction func onDiscard(_: Any?) {
@@ -813,8 +847,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 return
             }
 
+            guard let dbModel = database.commonModel else {
+                NSLog("🔴 Could not load common model!")
+                return
+            }
+
             let success = model.apply(to: node,
-                                      databaseFormat: database.format,
+                                      model: dbModel,
                                       legacySupplementaryTotp: Settings.sharedInstance().addLegacySupplementaryTotpCustomFields,
                                       addOtpAuthUrl: Settings.sharedInstance().addOtpAuthUrl)
 
@@ -920,8 +959,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
                             guard let self else { return }
 
-                            if maybeImage != nil {
-                                self.database.setItemIcon(node, icon: NodeIcon.withCustomImage(maybeImage!))
+                            if let maybeImage {
+                                self.database.setItemIcon(node, icon: maybeImage)
                             }
 
                             self.onSaveDone(node, dismissAfterSave: dismissAfterSave)
@@ -934,17 +973,42 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         #endif
     }
 
+    fileprivate func selectEditedItem(_ node: Node) {
+        guard let parentNodeUuid = node.parent?.uuid else {
+            return
+        }
+
+        let currentContext = getNavContextFromModel(database)
+
+        if case .regularHierarchy = currentContext {
+            setModelNavigationContextWithViewNode(database, .regularHierarchy(parentNodeUuid))
+            database.nextGenSelectedItems = [node.uuid]
+        } else {
+            setModelNavigationContextWithViewNode(database, .special(.allEntries))
+            database.nextGenSelectedItems = [node.uuid]
+        }
+    }
+
+    var savedNewItemSoShouldSelectOnDismiss: Bool = false
     func onSaveDone(_ node: Node, dismissAfterSave: Bool) {
-        NSLog("✅ onSaveDone")
+
 
         
 
         if Settings.sharedInstance().autoSave { 
-            database.document?.save(nil)
+            DispatchQueue.main.async { [weak self] in 
+                self?.database.document?.save(nil)
+            }
+        }
+
+        if !savedNewItemSoShouldSelectOnDismiss { 
+            savedNewItemSoShouldSelectOnDismiss = initialNodeId == nil
         }
 
         if dismissAfterSave {
-            database.nextGenSelectedItems = [node.uuid]
+            if savedNewItemSoShouldSelectOnDismiss { 
+                selectEditedItem(node)
+            }
             dismiss(nil)
         } else {
             guard let dbModel = database.commonModel else {
@@ -953,7 +1017,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 return
             }
 
-            model = EntryViewModel.fromNode(node, format: database.format, model: dbModel, sortCustomFields: !database.customSortOrderForFields)
+            model = EntryViewModel.fromNode(node, model: dbModel)
             preEditModelClone = model.clone()
 
             initialNodeId = node.uuid 
@@ -1067,13 +1131,22 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             
 
-            let dummyNode = createNewEntryNode(database.rootGroup)
-            model.apply(to: dummyNode, databaseFormat: database.format, legacySupplementaryTotp: false, addOtpAuthUrl: true)
+            guard let dbModel = database.commonModel else {
+                NSLog("🔴 Could not load common model!")
+                return
+            }
+
+            guard let dummyNode = getExistingOrNewEntry(newEntryParentGroupId: database.rootGroup.uuid) else {
+                NSLog("🔴 Could not load existing or new entry node")
+                return
+            }
+
+            model.apply(to: dummyNode, model: dbModel, legacySupplementaryTotp: false, addOtpAuthUrl: true)
 
             vc.nodes = [dummyNode]
             vc.viewModel = database
 
-            vc.onDone = { [weak self] (go: Bool, selectedFavIcons: [UUID: NSImage]?) in
+            vc.onDone = { [weak self] (go: Bool, selectedFavIcons: [UUID: NodeIcon]?) in
                 guard let self else {
                     return
                 }
@@ -1094,7 +1167,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                         return
                     }
 
-                    self.explicitSetIconAndUpdateUI(NodeIcon.withCustomImage(single.value))
+                    self.explicitSetIconAndUpdateUI(single.value)
                 }
             }
 
@@ -1160,6 +1233,14 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         } else {
             stackExistingSshKey.isHidden = true
             buttonAddOrGenerateSshKey.isHidden = false
+        }
+    }
+
+    func bindPasskey() {
+        stackViewPasskey.isHidden = model.passkey == nil
+
+        if let passkey = model.passkey {
+            textFieldPasskeyRelyingPartyId.stringValue = passkey.relyingPartyId
         }
     }
 
@@ -1683,14 +1764,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     func bindTags() {
         let tags = model.tags
 
-        
-
-
-
-
-
-
-
         tagsField.objectValue = tags
 
         var popular = database.mostPopularTags
@@ -2101,7 +2174,7 @@ extension CreateEditViewController: NSTableViewDataSource {
 
                 let image = AttachmentPreviewHelper.shared.getPreviewImage(key as String, attachment)
 
-                cell.setContent(NSAttributedString(string: key as String), editable: true, iconImage: image) { [weak self] _ in
+                cell.setContent(key as String, editable: true, iconImage: image) { [weak self] _ in
                     self?.onAttachmentNameEdited(cell.title)
                 }
 

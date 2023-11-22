@@ -17,10 +17,12 @@
 #import "GoogleDriveManager.h"
 #endif
 
-#import "Strongbox-Swift.h"
+#endif
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
 #else
-#import "Strongbox_AutoFill-Swift.h"
+#import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
 NSString* const kTitleColumn = @"TitleColumn";
@@ -104,7 +106,6 @@ static NSString* const kConcealClipboardFromMonitors = @"concealClipboardFromMon
 static NSString* const kAutoCommitScannedTotp = @"autoCommitScannedTotp";
 static NSString* const kHideOnCopy = @"hideOnCopy";
 static NSString* const kHasPromptedForThirdPartyAutoFill = @"hasPromptedForThirdPartyAutoFill";
-static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 static NSString* const kRunSshAgent = @"runSshAgent";
 
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
@@ -118,6 +119,10 @@ static NSString* const kDisableExport = @"disableExport";
 static NSString* const kDisablePrinting = @"disablePrinting";
 static NSString* const kSshAgentRequestDatabaseUnlockAllowed = @"sshAgentRequestDatabaseUnlockAllowed";
 static NSString* const kSshAgentPreventRapidRepeatedUnlockRequests = @"sshAgentPreventRapidRepeatedUnlockRequests";
+static NSString* const kAutoFillWroteCleanly = @"autoFillWroteCleanly";
+static NSString* const kAtomicSftpWrite = @"atomicSftpWrite";
+static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcons";
+
 
 
 
@@ -231,6 +236,29 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+- (BOOL)stripUnusedHistoricalIcons {
+    return [self getBool:kStripUnusedHistoricalIcons fallback:Settings.sharedInstance.stripUnusedIconsOnSave];
+}
+
+- (void)setStripUnusedHistoricalIcons:(BOOL)stripUnusedHistoricalIcons {
+    [self setBool:kStripUnusedHistoricalIcons value:stripUnusedHistoricalIcons];
+}
+
+- (BOOL)atomicSftpWrite {
+    return [self getBool:kAtomicSftpWrite fallback:YES];
+}
+
+- (void)setAtomicSftpWrite:(BOOL)atomicSftpWrite {
+    [self setBool:kAtomicSftpWrite value:atomicSftpWrite];
+}
+- (BOOL)autoFillWroteCleanly {
+    return [self getBool:kAutoFillWroteCleanly fallback:YES]; 
+}
+
+- (void)setAutoFillWroteCleanly:(BOOL)autoFillWroteCleanly {
+    [self setBool:kAutoFillWroteCleanly value:autoFillWroteCleanly];
+}
+
 - (BOOL)sshAgentPreventRapidRepeatedUnlockRequests {
     return [self getBool:kSshAgentPreventRapidRepeatedUnlockRequests fallback:YES];
 }
@@ -319,10 +347,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setRunSshAgent:(BOOL)runSshAgent {
     [self setBool:kRunSshAgent value:runSshAgent];
-}
-
-- (BOOL)shadeFavoriteTag {
-    return YES;
 }
 
 - (BOOL)hasPromptedForThirdPartyAutoFill {
@@ -466,7 +490,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     
     launchCount++;
     
-    NSLog(@"Application has been launched %ld times", (long)launchCount);
+
     
     [self.userDefaults setInteger:launchCount forKey:kLaunchCountKey];
     [self.userDefaults synchronize];
@@ -646,14 +670,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setHideDockIconOnAllMinimized:(BOOL)hideDockIconOnAllMinimized {
     return [self setBool:kHideDockIconOnAllMinimized value:hideDockIconOnAllMinimized];
-}
-
-- (BOOL)autoFillAutoLaunchSingleDatabase {
-    return [self getBool:kAutoLaunchSingleDatabase fallback:YES];
-}
-
-- (void)setAutoFillAutoLaunchSingleDatabase:(BOOL)autoFillAutoLaunchSingleDatabase {
-    return [self setBool:kAutoLaunchSingleDatabase value:autoFillAutoLaunchSingleDatabase];
 }
 
 - (BOOL)showAutoFillTotpCopiedMessage {

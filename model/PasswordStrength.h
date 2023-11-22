@@ -12,7 +12,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PasswordStrength : NSObject
 
-+ (instancetype)withEntropy:(double)entropy guessesPerSecond:(NSUInteger)guessesPerSecond characterCount:(NSUInteger)characterCount showCharacterCount:(BOOL)showCharacterCount;
++ (instancetype)withEntropy:(double)entropy 
+           guessesPerSecond:(NSUInteger)guessesPerSecond
+             characterCount:(NSUInteger)characterCount 
+         showCharacterCount:(BOOL)showCharacterCount;
 
 @property double entropy;
 @property (readonly) NSString* category;

@@ -168,7 +168,7 @@
             
             
 
-            if(value.protected == NO && value.value.length == 0 && [Constants.reservedCustomFieldKeys containsObject:key]) {
+            if(value.protected == NO && value.value.length == 0 && [Constants.ReservedCustomFieldKeys containsObject:key]) {
                 continue;
             }
 
@@ -346,7 +346,7 @@
     MutableOrderedDictionary<NSString*, StringValue*> *ret = [[MutableOrderedDictionary alloc] init];
     
     for (NSString* key in self.strings.allKeys) {
-        if([Constants.reservedCustomFieldKeys containsObject:key]) {
+        if([Constants.ReservedCustomFieldKeys containsObject:key]) {
             StringValue* string = self.strings[key];
             ret[key] = string;
         }
@@ -359,7 +359,7 @@
     MutableOrderedDictionary<NSString*, StringValue*> *ret = [[MutableOrderedDictionary alloc] init];
     
     for (NSString* key in self.strings.allKeys) {
-        if(![Constants.reservedCustomFieldKeys containsObject:key]) {
+        if(![Constants.ReservedCustomFieldKeys containsObject:key]) {
             StringValue* string = self.strings[key];
             ret[key] = string;
         }

@@ -10,9 +10,9 @@
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-@property (strong, nonatomic) UIWindow *window;
+@property (strong, nonatomic, nullable) UIWindow *window;
 @property (readonly) BOOL isAppLocked;
-@property NSDate* appLaunchTime;
+@property (nullable) NSDate* appLaunchTime;
 
 - (UIViewController*_Nullable)getVisibleViewController;
 

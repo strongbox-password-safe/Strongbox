@@ -73,6 +73,8 @@ class TipJarViewController: NSViewController {
 
         bindPrices()
 
+        TipJarLogic.sharedInstance.refresh()
+
         NotificationCenter.default.addObserver(forName: .Tips.loaded, object: nil, queue: nil) { [weak self] _ in
             guard let self else { return }
             DispatchQueue.main.async {

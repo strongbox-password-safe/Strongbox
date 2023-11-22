@@ -9,10 +9,10 @@
 import Cocoa
 
 // class NoSortIndicatorTableHeaderCell : NSTableHeaderCell {
-//    override func drawSortIndicator(withFrame cellFrame: NSRect, in controlView: NSView, ascending: Bool, priority: Int) {
-//
-//    }
-// }
+
+
+
+
 
 class BrowseViewController: NSViewController {
     deinit {
@@ -93,7 +93,16 @@ class BrowseViewController: NSViewController {
         searchParametersViewHeightConstraint.constant = 0
     }
 
+    @IBOutlet var searchBarCustomView: NSView!
     func adjustHeightConstraintsWithAnimation() {
+        if isSearching {
+            searchBarCustomView.isHidden = false
+            searchParametersViewHeightConstraint.constant = 90
+        } else {
+            searchBarCustomView.isHidden = true
+            searchParametersViewHeightConstraint.constant = 0
+        }
+
         if predicateEditor.intrinsicContentSize.height == 0.0 {
             outlineViewTopConstraint.animator().constant = -2
         } else {
@@ -101,12 +110,6 @@ class BrowseViewController: NSViewController {
         }
 
         predicateEditorHeightConstraint.animator().constant = predicateEditor.intrinsicContentSize.height
-
-        if isSearching {
-            searchParametersViewHeightConstraint.constant = 90
-        } else {
-            searchParametersViewHeightConstraint.constant = 0
-        }
     }
 
     @objc func onToggleColumn(_ sender: NSMenuItem) {
@@ -141,7 +144,7 @@ class BrowseViewController: NSViewController {
             tableColumn.identifier = column.identifier
             tableColumn.minWidth = 30
             tableColumn.resizingMask = [.autoresizingMask, .userResizingMask]
-            tableColumn.width = column == .title ? 200 : 150
+            tableColumn.width = column == .title ? 300 : 200
             tableColumn.isHidden = !column.visibleByDefault
             tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: column.rawValue, ascending: true)
 
@@ -252,6 +255,7 @@ class BrowseViewController: NSViewController {
 
         let auditNotificationsOfInterest: [String] = [
             
+            kAuditNewSwitchedOffNotificationKey,
             kAuditCompletedNotificationKey,
         ]
 
@@ -327,11 +331,37 @@ class BrowseViewController: NSViewController {
             return
         }
 
+        if notification.name.rawValue == kAuditNewSwitchedOffNotificationKey {
+            NSLog("✅ Browse::onAuditUpdateNotification [%@] - Audit Cleared Just switch off", String(describing: notification.name))
+            refresh()
+            return
+        }
 
+        if case .auditIssues = navigationContext {
+            NSLog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
 
+            refresh()
+            return
+        }
 
-        refresh()
+        guard let column = outlineView.tableColumn(withIdentifier: BrowseViewColumn.auditIssues.identifier) else {
+            return
+        }
 
+        if column.isHidden {
+            NSLog("✅ Ignoring Audit Update Notificatoin Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+            return
+        }
+
+        if let _ = items.first(where: { node in
+            database.isFlagged(byAudit: node.uuid)
+        }) {
+            NSLog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+
+            refresh()
+        } else {
+            NSLog("✅ Ignoring Audit Update Notificatoin Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+        }
     }
 
     func onModelNotificationReceived(_ notification: Notification) {
@@ -346,10 +376,10 @@ class BrowseViewController: NSViewController {
             notification.name == NSNotification.Name(kModelUpdateNotificationNextGenSearchContextChanged) ||
             notification.name == NSNotification.Name(kModelUpdateNotificationItemsDeleted)
         {
-            NSLog("BrowseViewController::-Notify: Navigation/Search Context/Delete - will select first item if can't maintain selection")
+
             refresh(maintainSelectionIfPossible: true, selectFirstItemIfSelectionNotFound: true)
         } else {
-            NSLog("BrowseViewController::-Notify: Model Update notification received - refreshing...")
+
             refresh()
         }
     }
@@ -365,7 +395,10 @@ class BrowseViewController: NSViewController {
     }
 
     func refresh(maintainSelectionIfPossible: Bool = true, selectFirstItemIfSelectionNotFound: Bool = false) {
+        
 
+
+        outlineView.beginUpdates()
 
         adjustHeightConstraintsWithAnimation() 
 
@@ -384,11 +417,18 @@ class BrowseViewController: NSViewController {
         loadAndSortItems()
         outlineView.reloadData()
 
+        outlineView.endUpdates()
+
         refreshSearchResultsSummaryText()
 
         if maintainSelectionIfPossible {
             bindSelectionToModel(selectFirstItemIfSelectionNotFound: selectFirstItemIfSelectionNotFound)
         }
+
+
+
+
+
     }
 
     func refreshSearchResultsSummaryText() {
@@ -545,6 +585,16 @@ class BrowseViewController: NSViewController {
             let auditIssues2 = database.getQuickAuditAllIssuesVeryBriefSummary(forNode: node2.uuid)
 
             return compareInts(auditIssues1.count, auditIssues2.count, ascending: ascending)
+        case .customIconSize:
+            let s1 = node1.icon?.estimatedStorageBytes ?? 0
+            let s2 = node2.icon?.estimatedStorageBytes ?? 0
+
+            return compareInts(Int(s1), Int(s2), ascending: ascending)
+        case .size:
+            let s1 = node1.estimatedSize
+            let s2 = node2.estimatedSize
+
+            return compareInts(Int(s1), Int(s2), ascending: ascending)
         }
     }
 
@@ -588,7 +638,13 @@ class BrowseViewController: NSViewController {
         let possiblyDereferencedText = database.isDereferenceableText(node.title)
         let editable = !possiblyDereferencedText && !database.isEffectivelyReadOnly && !database.outlineViewTitleIsReadonly
 
-        cell.setContent(NSAttributedString(string: title), editable: editable, iconImage: icon, showTrailingFavStar: favourite, contentTintColor: .linkColor) { [weak self] text in
+        cell.setContent(title,
+                        font: FontManager.shared.entryTitleFont,
+                        editable: editable,
+                        iconImage: icon,
+                        showTrailingFavStar: favourite,
+                        iconTintColor: .linkColor)
+        { [weak self] text in
             self?.onTitleEdited(text, node: node)
         }
 
@@ -682,8 +738,25 @@ class BrowseViewController: NSViewController {
         }
     }
 
-    func deleteSelected() {
-        NSApplication.shared.sendAction(#selector(WindowController.onDelete(_:)), to: nil, from: self)
+    @objc
+    func onDelete(_: Any?) {
+        let selected = database.getItemsById(database.nextGenSelectedItems)
+
+        var nextIdx: Int? = nil
+        if let topIdx = outlineView.selectedRowIndexes.first {
+            nextIdx = topIdx
+        }
+
+        windowController.onDeleteItems(selected) { [weak self] deletedOrRecycled in
+            if deletedOrRecycled, let nextIdx, let self {
+                if items.count == 0 {}
+                else if nextIdx >= items.count {
+                    outlineView.selectRowIndexes(IndexSet(integer: items.count - 1), byExtendingSelection: false)
+                } else {
+                    outlineView.selectRowIndexes(IndexSet(integer: nextIdx), byExtendingSelection: false)
+                }
+            }
+        }
     }
 }
 
@@ -691,17 +764,73 @@ extension BrowseViewController: NSMenuItemValidation, NSMenuDelegate {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
 
 
-        guard let id = menuItem.identifier else {
+        if menuItem.action == #selector(onDelete) {
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+
+            return true
+        } else if menuItem.action == #selector(onToggleColumn(_:)) {
+            guard let id = menuItem.identifier else {
+                return false
+            }
+
+            guard let tableColumn = outlineView.tableColumn(withIdentifier: id) else {
+                return false
+            }
+
+            menuItem.state = tableColumn.isHidden ? .off : .on
+
+            return true
+        } else {
+            NSLog("🔴 BrowseViewController::validateMenuItem Unknown Item - [%@] - %@", menuItem, String(describing: menuItem.action))
             return false
         }
-
-        guard let tableColumn = outlineView.tableColumn(withIdentifier: id) else {
-            return false
-        }
-
-        menuItem.state = tableColumn.isHidden ? .off : .on
-
-        return true
     }
 }
 
@@ -736,7 +865,7 @@ extension BrowseViewController: DocumentViewController {
         }
         outlineView.onDeleteKey = { [weak self] in
             guard let self else { return }
-            self.deleteSelected()
+            self.onDelete(nil)
         }
 
         
@@ -810,9 +939,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
         case .tags:
             var tags = Set(item.fields.tags.allObjects as! [String])
 
-            if Settings.sharedInstance().shadeFavoriteTag {
-                tags.remove(kCanonicalFavouriteTag)
-            }
+            tags.remove(kCanonicalFavouriteTag) 
 
             let sorted = tags.sorted { a, b in
                 compareStrings(a, b) == .orderedAscending
@@ -838,11 +965,12 @@ extension BrowseViewController: NSOutlineViewDelegate {
                 compareStrings(a, b) == .orderedAscending
             }
             cell = getPillsCell(sorted, color: .white, backgroundColor: .orange, icon: Icon.auditShield.image())
-
-
-
-
-
+        case .customIconSize:
+            let str = item.icon == nil ? "" : friendlyMemorySizeString(Int64(item.icon!.estimatedStorageBytes))
+            cell = getGenericCell(str, node: item)
+        case .size:
+            let str = friendlyMemorySizeString(Int64(item.estimatedSize))
+            cell = getGenericCell(str, node: item)
         }
 
         cell.alphaValue = item.expired ? ExpiredCellAlpha : 1.0
@@ -1107,6 +1235,8 @@ extension BrowseViewController: NSOutlineViewDataSource {
             return loadAttachmentEntries()
         case .keeAgentSshKeyEntries:
             return loadKeeAgentSshKeyEntries()
+        case .passkeys:
+            return loadPasskeys()
         }
     }
 
@@ -1173,6 +1303,10 @@ extension BrowseViewController: NSOutlineViewDataSource {
 
     func loadKeeAgentSshKeyEntries() -> [Node] {
         database.keeAgentSshKeyEntries
+    }
+
+    func loadPasskeys() -> [Node] {
+        database.passkeyEntries
     }
 
     func loadTagChildEntries(_ tag: String) -> [Node] {

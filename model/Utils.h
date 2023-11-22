@@ -31,6 +31,14 @@ alpha:1.0]
 
 #endif
 
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+typedef UIImage* IMAGE_TYPE_PTR;
+#else
+#import <Cocoa/Cocoa.h>
+typedef NSImage* IMAGE_TYPE_PTR;
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Utils : NSObject
@@ -44,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)hostname;
 + (NSString *)getUsername;
 + (NSURL*)userHomeDirectoryEvenInSandbox;
+
+
 
 NSString* keePassStringIdFromUuid(NSUUID* uuid);
 NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
@@ -93,6 +103,8 @@ UIImage* scaleImage(UIImage* image, CGSize newSize);
 + (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize;
 
 #else
+
++ (NSImage *)imageTintedWithColor:(NSImage*)img tint:(NSColor *)tint;
 
 + (NSImage*)getQrCode:(NSString*)string pointSize:(NSUInteger)pointSize;
 

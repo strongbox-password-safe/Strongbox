@@ -9,22 +9,10 @@
 #import "Node+KeeAgentSSH.h"
 #import "Constants.h"
 
-#if TARGET_OS_IPHONE
-
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
-#endif
-
-#else
-
-#ifndef IS_APP_EXTENSION
-#import "Strongbox-Swift.h"
-#else
-#import "Strongbox_AutoFill-Swift.h"
-#endif
-
 #endif
 
 @interface Node ()

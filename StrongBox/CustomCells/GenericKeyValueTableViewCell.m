@@ -45,6 +45,9 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonHistory;
 
+@property (weak, nonatomic) IBOutlet UIStackView *stackAssociatedWebsites;
+@property (weak, nonatomic) IBOutlet UILabel *labelAssociatedWebsites;
+
 @end
 
 @implementation GenericKeyValueTableViewCell
@@ -180,7 +183,8 @@ rightButtonImage:nil
                             value:(NSString*)value
                       formatAsUrl:(BOOL)formatAsUrl
                  rightButtonImage:(UIImage*)rightButtonImage
-                  useEasyReadFont:(BOOL)useEasyReadFont {
+                  useEasyReadFont:(BOOL)useEasyReadFont
+               associatedWebsites:(NSArray<NSString*>*)associatedWebsites {
     [self setKey:key
            value:value
          editing:NO
@@ -192,7 +196,8 @@ rightButtonImage:rightButtonImage
        concealed:NO
    colorizeValue:NO
            audit:nil
-    showStrength:NO];
+    showStrength:NO
+associatedWebsites:associatedWebsites];
 }
 
 - (void)setConcealableKey:(NSString *)key
@@ -216,7 +221,8 @@ rightButtonImage:image
        concealed:concealed
    colorizeValue:colorize
            audit:audit
-    showStrength:showStrength];
+    showStrength:showStrength 
+associatedWebsites:@[]];
 }
 
 
@@ -242,7 +248,8 @@ rightButtonImage:rightButtonImage
        concealed:concealed
    colorizeValue:colorizeValue
            audit:nil
-    showStrength:NO];
+    showStrength:NO
+associatedWebsites:@[]];
 }
 
 - (void)setKey:(NSString*)key
@@ -256,7 +263,8 @@ rightButtonImage:(UIImage*)rightButtonImage
      concealed:(BOOL)concealed
  colorizeValue:(BOOL)colorizeValue
          audit:(NSString*_Nullable)audit
-  showStrength:(BOOL)showStrength {
+  showStrength:(BOOL)showStrength
+associatedWebsites:(NSArray<NSString*>*)associatedWebsites {
     [self bindKey:key];
         
     self.selectAllOnEdit = selectAllOnEdit;
@@ -280,6 +288,15 @@ rightButtonImage:(UIImage*)rightButtonImage
     [self bindAudit:audit];
     [self bindRightButton];
     [self bindStrength:showStrength];
+    
+    [self bindAssociatedWebsites:associatedWebsites];
+}
+
+- (void)bindAssociatedWebsites:(NSArray<NSString*>*)associatedWebsites {
+    self.stackAssociatedWebsites.hidden = associatedWebsites.count == 0;
+    
+    NSString* sites = [associatedWebsites componentsJoinedByString:@", "];
+    self.labelAssociatedWebsites.text = sites;
 }
 
 - (void)setOnRightButton:(void (^)(void))onRightButton {

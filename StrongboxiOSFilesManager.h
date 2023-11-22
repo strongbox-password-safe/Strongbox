@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* appSupportDirectory;
 @property (readonly, nullable) NSURL* syncManagerLocalWorkingCachesDirectory;
 @property (readonly, nullable) NSURL* syncManagerMergeWorkingDirectory;
-@property (readonly, nullable) NSURL* sharedLocalDeviceDatabasesDirectory;
+
 
 @property (readonly, nullable) NSString* tmpAttachmentPreviewPath;
 

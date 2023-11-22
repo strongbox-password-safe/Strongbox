@@ -13,11 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AutoFillCommon : NSObject
 
-+ (NSSet<NSString*>*)getUniqueUrlsForNode:(DatabaseModel*)database
-                                     node:(Node*)node
-                          alternativeUrls:(BOOL)alternativeUrls
-                             customFields:(BOOL)customFields
-                                    notes:(BOOL)notes;
++ (NSSet<NSString*>*)getUniqueUrlsForNode:(Model*)model
+                                     node:(Node*)node;
+
 @end
 
 NS_ASSUME_NONNULL_END

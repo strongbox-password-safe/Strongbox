@@ -155,7 +155,7 @@ class DatabasesCollection: NSObject {
             startPollForRemoteChangesTimer(uuid: model.databaseUuid)
         }
 
-        NSLog("✅ unlocked database [%@] added to collection...", model.metadata.nickName)
+
 
         notifyLockStateChanged(uuid: model.databaseUuid)
     }
@@ -208,7 +208,7 @@ class DatabasesCollection: NSObject {
 
         let ret = DBManagerPanel.sharedInstance.contentViewController!
 
-
+        
 
         return ret
     }
@@ -248,7 +248,7 @@ class DatabasesCollection: NSObject {
 
         
 
-
+        
 
         
         
@@ -319,7 +319,7 @@ class DatabasesCollection: NSObject {
     @objc func forceLock(uuid: String) {
         unlockedCollection.removeObject(forKey: uuid as NSString)
         stopPollForRemoteChangesTimer(uuid: uuid)
-        NSLog("✅ unlocked database [%@] removed from collection...", uuid)
+
 
         notifyLockStateChanged(uuid: uuid)
     }
@@ -375,7 +375,7 @@ class DatabasesCollection: NSObject {
     }
 
     private func startPollForRemoteChangesTimer(uuid: String) {
-        NSLog("startPollForRemoteChangesTimer")
+
 
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
             NSLog("🔴 No such database")
@@ -408,7 +408,7 @@ class DatabasesCollection: NSObject {
     }
 
     private func pollForDatabaseRemoteChanges(uuid: String) {
-
+        
 
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
             NSLog("🔴 No such database")
@@ -464,7 +464,7 @@ class DatabasesCollection: NSObject {
                                                       forceReadOnly: Bool = false,
                                                       completion: UnlockDatabaseCompletionBlock? = nil)
     {
-        NSLog("✅ unlockModelFromLocalWorkingCopy - %@", database.uuid)
+
 
         let openOffline = database.alwaysOpenOffline || offlineUnlockRequested
 
@@ -474,10 +474,10 @@ class DatabasesCollection: NSObject {
                                         offlineMode: openOffline)
         {
             if let eagerVc {
-                NSLog("On Demand UI requested by DatabaseUnlocker - returning eagerly provided VC")
+
                 return eagerVc
             } else {
-                NSLog("On Demand UI requested by DatabaseUnlocker - returning background VC")
+
                 return DatabasesCollection.getDbManagerPanelVc()
             }
         }
@@ -486,7 +486,7 @@ class DatabasesCollection: NSObject {
         unlocker.noProgressSpinner = !showProgressSpinner
 
         unlocker.unlockLocal(withKey: ckfs, keyFromConvenience: fromConvenience) { [weak self] result, model, error in
-            NSLog("✅ Unlocked Local with %@, %@, %@", String(describing: result), String(describing: model), String(describing: error))
+
 
             if result == .success, let model {
                 self?.addOrUpdateUnlocked(model: model)
@@ -534,7 +534,7 @@ class DatabasesCollection: NSObject {
         }
 
         let updateId = UUID()
-        NSLog("DatabasesCollection::updateAndQueueSync start [%@]", String(describing: uuid))
+
         model.metadata.asyncUpdateId = updateId
 
         return model.asyncUpdate { result in
@@ -559,10 +559,10 @@ class DatabasesCollection: NSObject {
     }
 
     func onUpdateSucceeded(_ model: Model, _ allowInteractiveSync: Bool) {
-        NSLog("DatabasesCollection::onUpdateSucceeded")
+
 
         if !model.isInOfflineMode {
-            sync(uuid: model.databaseUuid, allowInteractive: allowInteractiveSync)
+            sync(uuid: model.databaseUuid, allowInteractive: allowInteractiveSync, ckfsForConflict: model.ckfs)
         } else {
             
             
@@ -606,7 +606,9 @@ class DatabasesCollection: NSObject {
             return
         }
 
-        if let model = getUnlocked(uuid: uuid) {
+        let model = getUnlocked(uuid: uuid)
+
+        if let model {
             if model.isInOfflineMode {
                 NSLog("🔴 Database is in Offline Mode - Cannot Sync!")
                 completion?(.error, false, Utils.createNSError("🔴 Database is in Offline Mode - Cannot Sync!", errorCode: -1234))
@@ -620,9 +622,14 @@ class DatabasesCollection: NSObject {
             }
         }
 
-        MacSyncManager.sharedInstance().backgroundSyncDatabase(prefs) { [weak self] result, localWasChanged, error in
+        
+        
+
+        let ckfs = ckfsForConflict ?? model?.ckfs 
+
+        MacSyncManager.sharedInstance().backgroundSyncDatabase(prefs, key: ckfs) { [weak self] result, localWasChanged, error in
             DispatchQueue.main.async { [weak self] in
-                self?.onSyncCompleted(result: result, metadata: prefs, localWasChanged: localWasChanged, error: error, allowInteractive: allowInteractive, wasInteractive: false, suppressErrorAlerts: suppressErrorAlerts, ckfsForConflict: ckfsForConflict, completion: completion)
+                self?.onSyncCompleted(result: result, metadata: prefs, localWasChanged: localWasChanged, error: error, allowInteractive: allowInteractive, wasInteractive: false, suppressErrorAlerts: suppressErrorAlerts, ckfsForConflict: ckfs, completion: completion)
             }
         }
     }
@@ -752,10 +759,10 @@ class DatabasesCollection: NSObject {
     }
 
     func onSyncSuccess(uuid: String, localWasChanged: Bool, allowInteractive: Bool, completion: SyncAndMergeCompletionBlock?) {
-        NSLog("✅ DatabasesCollection::onSyncSuccess => Sync Successfully Completed [localWasChanged = %@]", localizedYesOrNoFromBool(localWasChanged))
+
 
         if localWasChanged, let existing = getUnlocked(uuid: uuid) {
-            NSLog("DatabasesCollection::onSyncSuccess - database is unlocked - refreshing our unlocked model...")
+
 
             
             
@@ -793,5 +800,38 @@ class DatabasesCollection: NSObject {
         DispatchQueue.main.async {
             NotificationCenter.default.post(name: .genericRefreshAllDatabaseViews, object: uuid)
         }
+    }
+
+    @objc public func reloadFromWorkingCopy(_ uuid: String, dispatchSyncAfterwards: Bool) { 
+        if let existing = getUnlocked(uuid: uuid) {
+            existing.reloadDatabase(fromLocalWorkingCopy: {
+                let vc = self.getMostAppropriateViewControllerForInteraction(uuid: uuid)
+                return vc
+            }, noProgressSpinner: true) { [weak self] success in
+                if success {
+                    
+                    
+
+                    NSLog("✅ Successfully reloaded Model after explicit reload request")
+
+                    if dispatchSyncAfterwards {
+                        self?.sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true)
+                    }
+                } else {
+                    
+
+                    NSLog("🔴 Could not Unlock updated database after explicit reload request. Key changed?! - Force Locking.")
+                    self?.forceLock(uuid: uuid)
+                }
+            }
+        } else {
+            if dispatchSyncAfterwards { 
+                sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true)
+            }
+        }
+    }
+
+    @objc public func getUnlockedDatabases() -> [Model] {
+        unlockedCollection.allValues
     }
 }

@@ -8,12 +8,18 @@
 
 #import "AdvancedAutoFillSettingsViewController.h"
 #import "AutoFillManager.h"
+#import "Settings.h"
 
 @interface AdvancedAutoFillSettingsViewController ()
 
-@property (weak) IBOutlet NSButton *includeAlternativeUrls;
 @property (weak) IBOutlet NSButton *scanCustomFields;
 @property (weak) IBOutlet NSButton *scanNotesForUrls;
+
+@property (weak) IBOutlet NSButton *enableQuickType;
+@property (weak) IBOutlet NSPopUpButton *popupDisplayFormat;
+@property (weak) IBOutlet NSButton *addUnconcealedFields;
+@property (weak) IBOutlet NSButton *addConcealedFields;
+@property (weak) IBOutlet NSButton *includeAssociated;
 
 @end
 
@@ -22,48 +28,90 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self setupQuickTypePopup];
+    
     [self bindUI];
+}
+
+- (void)setupQuickTypePopup {
+    [self.popupDisplayFormat.menu removeAllItems];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatTitleThenUsername) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatUsernameOnly) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatTitleOnly) action:nil keyEquivalent:@""];
+    
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatDatabaseThenTitleThenUsername) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatDatabaseThenTitle) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatDatabaseThenUsername) action:nil keyEquivalent:@""];
 }
 
 - (void)bindUI {
     MacDatabasePreferences* meta = self.model.databaseMetadata;
     
-    self.includeAlternativeUrls.state = meta.autoFillScanAltUrls ? NSControlStateValueOn : NSControlStateValueOff;
     self.scanCustomFields.state = meta.autoFillScanCustomFields ? NSControlStateValueOn : NSControlStateValueOff;
     self.scanNotesForUrls.state = meta.autoFillScanNotes ? NSControlStateValueOn : NSControlStateValueOff;
+
+    BOOL pro = Settings.sharedInstance.isPro;
+    BOOL safariEnabled = AutoFillManager.sharedInstance.isOnForStrongbox;
+
+    self.enableQuickType.enabled = pro && meta.autoFillEnabled && safariEnabled;
+    self.enableQuickType.state = meta.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    
+    BOOL autoFillOn = pro && meta.autoFillEnabled && safariEnabled;
+    BOOL quickTypeOn = autoFillOn && meta.quickTypeEnabled;
+    
+    [self.popupDisplayFormat selectItemAtIndex:meta.quickTypeDisplayFormat];
+    
+    self.popupDisplayFormat.enabled = quickTypeOn;
+    
+    self.includeAssociated.state = meta.includeAssociatedDomains ? NSControlStateValueOn : NSControlStateValueOff;
+    self.addConcealedFields.state = meta.autoFillConcealedFieldsAsCreds ? NSControlStateValueOn : NSControlStateValueOff;
+    self.addUnconcealedFields.state = meta.autoFillUnConcealedFieldsAsCreds ? NSControlStateValueOn : NSControlStateValueOff;
+
 }
 
 - (IBAction)onChanged:(id)sender {
-    BOOL autoFillScanAltUrls = self.includeAlternativeUrls.state == NSControlStateValueOn;
     BOOL autoFillScanCustomFields = self.scanCustomFields.state == NSControlStateValueOn;
     BOOL autoFillScanNotes = self.scanNotesForUrls.state == NSControlStateValueOn;
 
-    self.model.databaseMetadata.autoFillScanAltUrls = autoFillScanAltUrls;
     self.model.databaseMetadata.autoFillScanCustomFields = autoFillScanCustomFields;
     self.model.databaseMetadata.autoFillScanNotes = autoFillScanNotes;
 
+    BOOL quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
+    self.model.databaseMetadata.quickTypeEnabled = quickTypeEnabled;
+
+    BOOL concealedCustomFieldsAsCreds = self.addConcealedFields.state == NSControlStateValueOn;
+    BOOL unConcealedCustomFieldsAsCreds = self.addUnconcealedFields.state == NSControlStateValueOn;
+    
+    self.model.databaseMetadata.includeAssociatedDomains = self.includeAssociated.state == NSControlStateValueOn;
+    self.model.databaseMetadata.autoFillConcealedFieldsAsCreds = concealedCustomFieldsAsCreds;
+    self.model.databaseMetadata.autoFillUnConcealedFieldsAsCreds = unConcealedCustomFieldsAsCreds;
+    
     [self updateAutoFillDatabases];
     
     [self bindUI];
 }
 
+- (IBAction)onDisplayFormatChanged:(id)sender {
+    NSInteger newIndex = self.popupDisplayFormat.indexOfSelectedItem;
+    
+    if ( newIndex != self.model.databaseMetadata.quickTypeDisplayFormat ) {
+        self.model.databaseMetadata.quickTypeDisplayFormat = newIndex;
+        
+        NSLog(@"AutoFill QuickType Format was changed - Populating Database....");
+        
+        [self updateAutoFillDatabases];
+        
+        [self bindUI];
+    }
+}
+
 - (void)updateAutoFillDatabases {
-    [self.model rebuildMapsAndCaches];
-    
-    
-    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    
-    MacDatabasePreferences* meta = self.model.databaseMetadata;
-    
-    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.commonModel
-                                                       databaseUuid:meta.uuid
-                                                      displayFormat:meta.quickTypeDisplayFormat
-                                                    alternativeUrls:meta.autoFillScanAltUrls
-                                                       customFields:meta.autoFillScanCustomFields
-                                                              notes:meta.autoFillScanNotes
-                                       concealedCustomFieldsAsCreds:meta.autoFillConcealedFieldsAsCreds
-                                     unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds
-                                                           nickName:meta.nickName];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+        
+        [self.model rebuildMapsAndCaches];
+    });
 }
 
 @end

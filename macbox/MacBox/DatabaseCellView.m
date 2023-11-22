@@ -26,8 +26,9 @@
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
-#import "Strongbox_AutoFill-Swift.h"
+#import "Strongbox_Auto_Fill-Swift.h"
 #endif
+
 
 @interface DatabaseCellView () <NSTextFieldDelegate>
 
@@ -393,12 +394,12 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
 - (void)controlTextDidEndEditing:(NSNotification *)obj {
 
  
-    [self endEditingNickname];
     [self setNewNicknameIfValidOtherwiseRestore];
+    [self endEditingNickname];
 }
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
-    NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
+
 
     if (commandSelector == NSSelectorFromString(@"insertNewline:")) { 
         [self endEditingNickname];
@@ -420,7 +421,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
         [MacDatabasePreferences isValid:trimmed] &&
         [MacDatabasePreferences isUnique:trimmed] ) {
         
-        [MacDatabasePreferences fromUuid:self.uuid].nickName = trimmed;
+        [MacDatabasePreferences getById:self.uuid].nickName = trimmed;
     }
     else {
         [self restoreOriginalNickname];

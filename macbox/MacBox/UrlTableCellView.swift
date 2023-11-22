@@ -15,6 +15,9 @@ class UrlTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenuD
     @IBOutlet var labelName: NSTextField!
     @IBOutlet var copyButton: NSButton!
 
+    @IBOutlet var stackViewAssociated: NSStackView!
+    @IBOutlet var labelAssociated: NSTextField!
+
     override func awakeFromNib() {
         textFieldValue.onClicked = { [weak self] in
             self?.onLaunch?()
@@ -25,8 +28,10 @@ class UrlTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenuD
     var onCopyButton: ((DetailsViewField?) -> Void)?
 
     var field: DetailsViewField?
+    var associatedWebsites: String = ""
 
     func setContent(_ field: DetailsViewField,
+                    _ associatedWebsites: String,
                     popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)? = nil,
                     onCopyButton: ((DetailsViewField?) -> Void)? = nil)
     {
@@ -42,6 +47,14 @@ class UrlTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenuD
         textFieldValue.href = field.value
         let str = field.value as NSString
         launchButton.isHidden = str.urlExtendedParse == nil
+
+        self.associatedWebsites = associatedWebsites
+        bindAssociated()
+    }
+
+    func bindAssociated() {
+        stackViewAssociated.isHidden = associatedWebsites.count == 0
+        labelAssociated.stringValue = associatedWebsites
     }
 
     var onLaunch: (() -> Void)?

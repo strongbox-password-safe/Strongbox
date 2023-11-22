@@ -114,14 +114,14 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
     return url;
 }
 
-- (NSURL*)sharedLocalDeviceDatabasesDirectory { 
-    NSURL* url = self.sharedAppGroupDirectory;
-    NSURL* ret = [url URLByAppendingPathComponent:@"local-databases"];
 
-    [self createIfNecessary:ret];
 
-    return ret;
-}
+
+
+
+
+
+
 
 - (void)createIfNecessary:(NSURL*)url {
     NSError* error;
@@ -199,7 +199,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
     
     
     [self setIncludeExcludeFromBackup:self.documentsDirectory include:localDocuments];
-    [self setIncludeExcludeFromBackup:self.sharedLocalDeviceDatabasesDirectory include:localDocuments];
+
             
     
     
@@ -250,7 +250,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 
 - (void)deleteAllLocalAndAppGroupFiles {
     [self deleteAllInDirectory:self.documentsDirectory];
-    [self deleteAllInDirectory:self.sharedLocalDeviceDatabasesDirectory];
+
     [self deleteAllInDirectory:self.keyFilesDirectory];
     [self deleteAllInDirectory:self.backupFilesDirectory];
     [self deleteAllInDirectory:self.preferencesDirectory];

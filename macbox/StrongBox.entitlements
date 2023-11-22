@@ -56,6 +56,7 @@
 		<string>/Library/Application Support/Arc/User Data/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Sidekick/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Orion/NativeMessagingHosts/</string>
+		<string>/Library/Application Support/Thorium/NativeMessagingHosts/</string>
 	</array>
 </dict>
 </plist>

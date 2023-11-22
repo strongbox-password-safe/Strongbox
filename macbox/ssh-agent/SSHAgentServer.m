@@ -213,7 +213,10 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 
 - (BOOL)start {
     
-    
+    if ( self.isRunning ) {
+        return YES;
+    }
+
     [self stop];
     
     NSString* path = [self getSocketPath];
@@ -274,7 +277,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
         [self acceptNewConnections];
     }];
     
-    NSLog(@"SSHAgentServer::start EXIT ✅");
+
     
     _isRunning = YES;
     return YES;
@@ -291,7 +294,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
             break;
         }
         
-        NSLog(@"🐞 SSHAgentServer accepted new connection...");
+
         
 
         [self handleNewConnection:socket]; 

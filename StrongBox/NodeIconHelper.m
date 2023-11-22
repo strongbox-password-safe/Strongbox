@@ -43,7 +43,7 @@ static NSArray<IMAGE_TYPE_PTR> *kKeePassXCIconSet;
 }
 
 static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
-    NSArray<NSString*>* names = @[@"lock",
+    NSArray<NSString*>* names = @[@"lock.fill",
                                   @"globe",
                                   @"exclamationmark.triangle",
                                   @"hifispeaker",
@@ -86,12 +86,12 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
                                   @"magnifyingglass.circle",
                                   @"hexagon",
                                   @"memories",
-                                  @"trash",
+                                  @"trash.circle.fill",
                                   @"mappin.circle",
                                   @"clear",
                                   @"questionmark.circle",
                                   @"archivebox",
-                                  @"folder",
+                                  @"folder.fill",
                                   @"folder.badge.person.crop",
                                   @"folder.circle",
                                   @"lock.open",
@@ -113,16 +113,24 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
                                   @"signature",
                                   @"equal.square"];
     
-    return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+    NSMutableArray *mut = names.mutableCopy;
+    
+    if (@available(iOS 15.4, macOS 12.3, *)) {
+        mut[58] = @"person.badge.key.fill";
+    }
+    
+    return [mut map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
 #if TARGET_OS_IPHONE
         IMAGE_TYPE_PTR img = [UIImage systemImageNamed:obj];
-        return img ? img : [UIImage systemImageNamed:@"lock"];
+        return img ? [img imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate] : [[UIImage systemImageNamed:@"lock.fill"] imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate];
 #else
         IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
+        
         return img ? img : kSmallLockImage;
 #endif
     }];
 }
+
 
 static NSArray<IMAGE_TYPE_PTR>* loadKeePassXCIconSet(void) {
     NSArray<NSString*>* names = @[@"KPXC_C00_Password",
@@ -330,7 +338,13 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
         }
 
         if(icon.isCustom) {
-            return [NodeIconHelper getCustomIcon:icon];
+            if( icon.customIconWidth != icon.customIconHeight && MIN(icon.customIconWidth, icon.customIconHeight) > 512 ) {
+                NSLog(@"🔴 Down Sampling icon...");
+                return scaleImage(icon.customIcon, CGSizeMake(192, 192));
+            }
+            else {
+                return icon.customIcon;
+            }
         }
         else if(icon.preset >= 0 && icon.preset < iconSet.count) {
             return iconSet[icon.preset];
@@ -339,51 +353,6 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
             return isGroup ? iconSet[48] : iconSet[0];
         }
     }
-}
-
-+ (IMAGE_TYPE_PTR)getCustomIcon:(NodeIcon *)icon {
-    if ( icon.cachedImage ) {
-        
-        return icon.cachedImage;
-    }
-
-    @try {
-        if ( !icon.isCustom || icon.custom == nil ) {
-            return nil;
-        }
-            
-        
-        
-    #if TARGET_OS_IPHONE
-        IMAGE_TYPE_PTR img = [UIImage imageWithData:icon.custom];
-    #else
-        IMAGE_TYPE_PTR img = [[NSImage alloc] initWithData:icon.custom];
-    #endif
-
-        if(!img) {
-            return nil;
-        }
-        
-        IMAGE_TYPE_PTR image;    
-        if( image.size.height != image.size.width && MIN(image.size.width, image.size.height) > 512 ) {
-            NSLog(@"🔴 Down Sampling icon...");
-            image = scaleImage(image, CGSizeMake(192, 192));
-        }
-        
-        image = image ? image : img;
-        
-        if ( image ) {
-            icon.cachedImage = image;
-        }
-        else {
-            NSLog(@"WARNWARN: Couldn't Load Image!");
-        }
-        
-        return image;
-    } @catch (NSException *exception) {
-        NSLog(@"Exception in getCustomIcon: [%@]", exception);
-        return nil;
-    } @finally { }
 }
 
 + (NSArray<IMAGE_TYPE_PTR>*)getKeePassIconSet {

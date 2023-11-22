@@ -285,6 +285,8 @@ class AuditConfigurationViewController: NSViewController {
 
         let config = database.auditConfig
 
+        let newlySwitchedOff = config.auditInBackground && checkboxAuditDatabase.state == .off
+
         config.auditInBackground = checkboxAuditDatabase.state == .on
 
         config.checkForNoPasswords = checkboxEmpty.state == .on
@@ -310,7 +312,7 @@ class AuditConfigurationViewController: NSViewController {
 
         bindUI()
 
-        restartAuditor()
+        restartAuditor(newlySwitchedOff: newlySwitchedOff)
     }
 
     @IBAction func onSliderLengthChanged(_: Any) {
@@ -349,15 +351,28 @@ class AuditConfigurationViewController: NSViewController {
         labelSimilar.stringValue = String(format: "%0.1f%%", sliderSimilar.doubleValue)
     }
 
-    func restartAuditor() {
+    func restartAuditor(newlySwitchedOff: Bool = false) {
         if refreshTimer != nil {
             refreshTimer?.invalidate()
             refreshTimer = nil
         }
 
         refreshTimer = Timer.scheduledTimer(withTimeInterval: 0.15, repeats: false) { [weak self] _ in
-            NSLog("✅ restartBackgroundAudit...")
-            self?.database.restartBackgroundAudit()
+            self?.foo(newlySwitchedOff: newlySwitchedOff)
+        }
+    }
+
+    func foo(newlySwitchedOff: Bool) {
+        database.restartBackgroundAudit()
+
+        if newlySwitchedOff {
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+
+                NotificationCenter.default.post(name: NSNotification.Name(rawValue: kAuditNewSwitchedOffNotificationKey), object: [
+                    "model": database.commonModel,
+                ])
+            }
         }
     }
 

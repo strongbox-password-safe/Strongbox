@@ -15,6 +15,12 @@
 #import "LocalDatabaseIdentifier.h"
 #import "NSDate+Extensions.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 @implementation LocalDeviceStorageProvider
 
 + (instancetype)sharedInstance {
@@ -35,7 +41,7 @@
         _browsableExisting = YES;
         _rootFolderOnly = YES;
         _defaultForImmediatelyOfferOfflineCache = NO;
-        _supportsConcurrentRequests = YES;
+        _supportsConcurrentRequests = NO;
         
         return self;
     }
@@ -68,8 +74,13 @@ suggestedFilename:(NSString *)suggestedFilename
     
     
     
-    if(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data modDate:nil]) {
+    if ( suggestedFilename == nil ) {
         suggestedFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
+    }
+    
+    if(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data modDate:nil]) {
+        suggestedFilename = [Utils insertTimestampInFilename:suggestedFilename];
+
         while(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data modDate:nil]) {
             suggestedFilename = [Utils insertTimestampInFilename:suggestedFilename];
         }
@@ -274,6 +285,51 @@ suggestedFilename:(NSString *)suggestedFilename
 - (BOOL)isUsingSharedStorage:(DatabasePreferences*)metadata {
     LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:metadata];
     return identifier.sharedStorage;
+}
+
+- (BOOL)renameFilename:(DatabasePreferences*)database filename:(NSString*)filename error:(NSError**)error {
+    NSURL* url = [self getFileUrl:database];
+    NSString* fullPath = url.absoluteURL.path;
+    NSString* oldExtension = fullPath.pathExtension;
+    
+    NSString* stripped = [MMcGSwiftUtils stripInvalidFilenameCharacters:filename];
+    NSString* sanitisedFilename = [stripped stringByAppendingPathExtension:oldExtension ? oldExtension : @""];
+    
+    NSString* baseDir = fullPath.stringByDeletingLastPathComponent;
+    NSString* newPath = [baseDir stringByAppendingPathComponent:sanitisedFilename];
+    
+    if ( [NSFileManager.defaultManager fileExistsAtPath:newPath] ) {
+        NSLog(@"🔴 Problem renaming local file!");
+        
+        if ( error ) {
+            *error = [Utils createNSError:NSLocalizedString(@"error_rename_file_already_exists", @"Cannot rename file as a file with that name already exists.") errorCode:-1234];
+        }
+        
+        return NO;
+    }
+    
+    LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:database];
+    identifier.filename = sanitisedFilename;
+    
+    
+    
+    NSError* err;
+    if (! [NSFileManager.defaultManager moveItemAtPath:fullPath toPath:newPath error:&err] ) {
+        NSLog(@"🔴 Problem renaming local file! [%@]", err);
+        
+        if ( error ) {
+            *error = err;
+        }
+        
+        return NO;
+    }
+    
+    
+    
+    database.fileName = identifier.filename;
+    database.fileIdentifier = [identifier toJson];
+    
+    return YES;
 }
 
 @end

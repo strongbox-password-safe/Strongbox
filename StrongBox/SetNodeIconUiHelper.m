@@ -24,17 +24,20 @@
 
 @property UIViewController *viewController;
 @property (copy) ChangeIconCompletionBlock completionBlock;
+@property Model* model;
 
 @end
 
 @implementation SetNodeIconUiHelper
 
 - (void)changeIcon:(UIViewController *)viewController
+             model:(Model*)model
               node:(Node *)node
        urlOverride:(NSString *)urlOverride
             format:(DatabaseFormat)format
     keePassIconSet:(KeePassIconSet)keePassIconSet
         completion:(ChangeIconCompletionBlock)completion {
+    self.model = model;
     self.viewController = viewController;
     self.completionBlock = completion;
     
@@ -139,7 +142,7 @@
         [self downloadFavIcon:viewController
                         nodes:node.allChildRecords
                       urlOverride:urlOverride
-                   completion:^(BOOL go, NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+                   completion:^(BOOL go, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selectedFavIcons) {
             [self completeDownloadFavIcons:go isGroup:YES selectedFavIcons:selectedFavIcons completion:completion];
         }];
     }
@@ -147,7 +150,7 @@
         [self downloadFavIcon:viewController
                         nodes:@[node]
                   urlOverride:urlOverride
-                   completion:^(BOOL go, NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+                   completion:^(BOOL go, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selectedFavIcons) {
             [self completeDownloadFavIcons:go isGroup:NO selectedFavIcons:selectedFavIcons completion:completion];
         }];
     }
@@ -159,34 +162,36 @@
              completion:(FavIconBulkDoneBlock)completion {
     if (urlOverride) {
         [FavIconBulkViewController presentModal:presentingVc
+                                          model:self.model
                                            node:nodes.firstObject
                                     urlOverride:urlOverride
-                                         onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
+                                         onDone:^(BOOL go, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selectedFavIcons) {
             [presentingVc dismissViewControllerAnimated:YES completion:nil];
             completion(go, selectedFavIcons);
         }];
     }
     else {
         [FavIconBulkViewController presentModal:presentingVc
+                                          model:self.model
                                           nodes:nodes
-                                         onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
+                                         onDone:^(BOOL go, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selectedFavIcons) {
             [presentingVc dismissViewControllerAnimated:YES completion:nil];
             completion(go, selectedFavIcons);
         }];
     }
 }
 
-- (void)completeDownloadFavIcons:(BOOL)go isGroup:(BOOL)isGroup selectedFavIcons:(NSDictionary<NSUUID *,UIImage *> * _Nullable)selectedFavIcons completion:(ChangeIconCompletionBlock)completion {
+- (void)completeDownloadFavIcons:(BOOL)go 
+                         isGroup:(BOOL)isGroup
+                selectedFavIcons:(NSDictionary<NSUUID *, NodeIcon *> * _Nullable)selectedFavIcons
+                      completion:(ChangeIconCompletionBlock)completion {
     NSMutableDictionary<NSUUID*, NodeIcon*>* ret = NSMutableDictionary.dictionary;
     
     if (go) {
         for (NSUUID* nodeUuidKey in selectedFavIcons) {
-            UIImage* foo = selectedFavIcons[nodeUuidKey];
-            if (foo) {
-                NSData* bar = UIImagePNGRepresentation(foo);
-                if (bar) {
-                    ret[nodeUuidKey] = [NodeIcon withCustom:bar];
-                }
+            NodeIcon* icon = selectedFavIcons[nodeUuidKey];
+            if ( icon ) {
+                ret[nodeUuidKey] = icon;
             }
         }
     }
@@ -194,7 +199,8 @@
     completion(go, isGroup, ret);
 }
 
-- (void)expressDownloadBestFavIcon:(NSString*)urlOverride completion:(void (^)(UIImage * _Nullable))completion {
+- (void)expressDownloadBestFavIcon:(NSString *)urlOverride 
+                        completion:(void (^)(NodeIcon * _Nullable))completion {
     NSURL* url = [self smartDetermineUrlFromHint:urlOverride];
     
     if (url) {
@@ -204,7 +210,7 @@
 
             [FavIconManager.sharedInstance downloadPreferred:url
                                                      options:FavIconDownloadOptions.express
-                                                  completion:^(UIImage * _Nullable image) {
+                                                  completion:^(NodeIcon * _Nullable image) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [SVProgressHUD dismiss];
                     completion(image);

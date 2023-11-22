@@ -143,13 +143,14 @@ static NSString* const kPinCodeHapticFeedback = @"pinCodeHapticFeedback";
 static NSString* const kHasMigratedToLazySync = @"hasMigratedToLazySync-Iteration-5-RB-OneDrive";
 static NSString* const kVisibleBrowseTabs = @"visibleBrowseTabs";
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
-static NSString* const kShadeFavoriteTag = @"shadeFavoriteTag";
 static NSString* const kLastQuickTypeMultiDbRegularClear = @"lastQuickTypeMultiDbRegularClear";
 static NSString* const kAppendDateToExportFileName = @"appendDateToExportFileName";
 
 static NSString* const kDatabasesAreAlwaysReadOnly = @"databasesAreAlwaysReadOnly";
 static NSString* const kDisableExport = @"disableExport";
 static NSString* const kDisablePrinting = @"disablePrinting";
+static NSString* const kAtomicSftpWrite = @"atomicSftpWrite";
+static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcons";
 
 @implementation AppPreferences
 
@@ -191,6 +192,22 @@ static NSString* const kDisablePrinting = @"disablePrinting";
 }
 
 
+
+- (BOOL)stripUnusedHistoricalIcons {
+    return [self getBool:kStripUnusedHistoricalIcons fallback:AppPreferences.sharedInstance.stripUnusedIconsOnSave];
+}
+
+- (void)setStripUnusedHistoricalIcons:(BOOL)stripUnusedHistoricalIcons {
+    [self setBool:kStripUnusedHistoricalIcons value:stripUnusedHistoricalIcons];
+}
+
+- (BOOL)atomicSftpWrite {
+    return [self getBool:kAtomicSftpWrite fallback:YES];
+}
+
+- (void)setAtomicSftpWrite:(BOOL)atomicSftpWrite {
+    [self setBool:kAtomicSftpWrite value:atomicSftpWrite];
+}
 
 - (BOOL)disableExport {
     return [self getBool:kDisableExport];
@@ -237,15 +254,6 @@ static NSString* const kDisablePrinting = @"disablePrinting";
     [AppPreferences.sharedInstance.sharedAppGroupDefaults setObject:businessOrganisationName forKey:kBusinessOrganisationName];
     [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
-
-- (BOOL)shadeFavoriteTag { 
-    return YES;
-
-}
-
-
-
-
 
 - (BOOL)hasMigratedToLazySync {
     return [self getBool:kHasMigratedToLazySync];

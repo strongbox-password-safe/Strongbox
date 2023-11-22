@@ -39,9 +39,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
 
     func loadDocument() {
-        NSLog("========================================================================")
-        NSLog("🚀 NextGenSplitViewController::loadDocument")
-        NSLog("========================================================================")
+
 
         if loadedDocument {
             return
@@ -67,7 +65,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
         
 
-        NSLog("🚀 Initial Navigation Context = [%@], browse selected items = [%@]", String(describing: navigationContext), database.nextGenSelectedItems)
+
 
         if case NavigationContext.none = navigationContext {
             let favourites = database.favourites.sorted { node1, node2 in
@@ -89,9 +87,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds 
         let timeInterval = Double(nanoTime) / 1_000_000_000 
 
-        NSLog("========================================================================")
         NSLog("⏱ ✅ Initial Document UI Load Time: %0.2f seconds", timeInterval)
-        NSLog("========================================================================")
     }
 
     var firstAppearance = true
@@ -844,7 +840,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         toolbarItem.isEnabled = true
         toolbarItem.target = self
         toolbarItem.action = #selector(onLockDatabase)
-        toolbarItem.image = NSImage(systemSymbolName: "lock", accessibilityDescription: nil)
+        toolbarItem.image = NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)
 
         return toolbarItem
     }

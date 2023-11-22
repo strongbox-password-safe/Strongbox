@@ -11,34 +11,26 @@
 #import "DatabasePreferences.h"
 #import "RoundedBlueButton.h"
 #import "AppPreferences.h"
+#import <AuthenticationServices/AuthenticationServices.h>
 
 @interface TurnOnAutoFillViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonDone;
 @property (weak, nonatomic) IBOutlet RoundedBlueButton *buttonDontUse;
+@property (weak, nonatomic) IBOutlet UIStackView *stackIOs17;
+@property (weak, nonatomic) IBOutlet RoundedBlueButton *buttonIOS17;
+@property (weak, nonatomic) IBOutlet UIStackView *stackOldInstructions;
 
 @end
 
 @implementation TurnOnAutoFillViewController
 
 - (BOOL)shouldAutorotate {
-    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
-    {
-        return YES; /* Device is iPad */
-    }
-    else {
-        return NO;
-    }
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad;
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad )
-    {
-        return UIInterfaceOrientationMaskAll; /* Device is iPad */
-    }
-    else {
-        return UIInterfaceOrientationMaskPortrait;
-    }
+    return UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad ? UIInterfaceOrientationMaskAll : UIInterfaceOrientationMaskPortrait;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -62,6 +54,17 @@
                                              object:nil];
 
     self.buttonDontUse.backgroundColor = UIColor.systemOrangeColor;
+    
+    if ( @available(iOS 17.0, *) ) {
+        self.buttonIOS17.hidden = NO;
+        self.stackIOs17.hidden = NO;
+        self.stackOldInstructions.hidden = YES;
+    }
+    else {
+        self.buttonIOS17.hidden = YES;
+        self.stackIOs17.hidden = YES;
+        self.stackOldInstructions.hidden = NO;
+    }
 }
 
 - (void)appBecameActive {
@@ -69,7 +72,9 @@
         NSLog(@"AutoFill has been switched on!");
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self onSetupLater:nil];
+            [NSNotificationCenter.defaultCenter removeObserver:self];            
+            AppPreferences.sharedInstance.lastAskToEnableAutoFill = NSDate.date;
+            self.onDone();
         });
     }
     else {
@@ -79,10 +84,18 @@
 
 - (IBAction)onSetupLater:(id)sender {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-
+    
     AppPreferences.sharedInstance.lastAskToEnableAutoFill = NSDate.date;
     
     self.onDone();
+}
+
+- (IBAction)onOpenAutoFillPreferences:(id)sender {
+    if (@available(iOS 17.0, *)) {
+        [ASSettingsHelper openCredentialProviderAppSettingsWithCompletionHandler:^(NSError * _Nullable error) {
+
+        }];
+    }
 }
 
 - (IBAction)onDontUse:(id)sender {

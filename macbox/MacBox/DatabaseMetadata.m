@@ -45,7 +45,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.concealEmptyProtectedFields = YES;
         self.startWithSearch = YES; 
         self.visibleColumns = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
-        self.autoFillScanAltUrls = YES;
+        
         self.autoFillScanCustomFields = NO;
         self.autoFillScanNotes = NO;
         self.autoFillConcealedFieldsAsCreds = YES;
@@ -66,6 +66,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.sideBarChildCountSeparator = @"/";
         self.sideBarChildCountShowZero = YES;
         self.sideBarShowTotalCountOnHierarchy = YES;
+        
+        self.includeAssociatedDomains = YES;
+        self.quickTypeEnabled = YES;
     }
     
     return self;
@@ -227,7 +230,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.autoFillEnabled forKey:@"autoFillEnabled"];
     [encoder encodeBool:self.quickTypeEnabled forKey:@"quickTypeEnabled"];
     [encoder encodeBool:self.hasPromptedForAutoFillEnrol forKey:@"hasPromptedForAutoFillEnrol"];
-    [encoder encodeBool:self.quickWormholeFillEnabled forKey:@"quickWormholeFillEnabled"];
     [encoder encodeInteger:self.quickTypeDisplayFormat forKey:@"quickTypeDisplayFormat"];
 
     [encoder encodeInteger:self.conflictResolutionStrategy forKey:@"conflictResolutionStrategy2"];
@@ -277,7 +279,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     
     [encoder encodeBool:self.hasSetInitialWindowPosition forKey:@"hasSetInitialWindowPosition"];
     
-    [encoder encodeBool:self.autoFillScanAltUrls forKey:@"autoFillScanAltUrls"];
     [encoder encodeBool:self.autoFillScanCustomFields forKey:@"autoFillScanCustomFields"];
     [encoder encodeBool:self.autoFillScanNotes forKey:@"autoFillScanNotes"];
     
@@ -321,6 +322,8 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeObject:self.sideBarChildCountSeparator forKey:@"sideBarChildCountSeparator"];
     [encoder encodeBool:self.sideBarChildCountShowZero forKey:@"sideBarChildCountShowZero"];
     [encoder encodeBool:self.sideBarShowTotalCountOnHierarchy forKey:@"sideBarShowTotalCountOnHierarchy"];
+    
+    [encoder encodeBool:self.includeAssociatedDomains forKey:@"includeAssociatedDomains"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -360,6 +363,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         if([decoder containsValueForKey:@"quickTypeEnabled"]) {
             self.quickTypeEnabled = [decoder decodeBoolForKey:@"quickTypeEnabled"];
         }
+        else {
+            self.quickTypeEnabled = YES;
+        }
 
         if([decoder containsValueForKey:@"autoFillEnabled"]) {
             self.autoFillEnabled = [decoder decodeBoolForKey:@"autoFillEnabled"];
@@ -369,10 +375,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.hasPromptedForAutoFillEnrol = [decoder decodeBoolForKey:@"hasPromptedForAutoFillEnrol"];
         }
 
-        if([decoder containsValueForKey:@"quickWormholeFillEnabled"]) {
-            self.quickWormholeFillEnabled = [decoder decodeBoolForKey:@"quickWormholeFillEnabled"];
-        }
-        
         if([decoder containsValueForKey:@"quickTypeDisplayFormat"]) {
             self.quickTypeDisplayFormat = [decoder decodeIntegerForKey:@"quickTypeDisplayFormat"];
         }
@@ -532,12 +534,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         
         
-        if ( [decoder containsValueForKey:@"autoFillScanAltUrls"] ) {
-            self.autoFillScanAltUrls = [decoder decodeBoolForKey:@"autoFillScanAltUrls"];
-        }
-        else {
-            self.autoFillScanAltUrls = YES;
-        }
         if ( [decoder containsValueForKey:@"autoFillScanCustomFields"] ) {
             self.autoFillScanCustomFields = [decoder decodeBoolForKey:@"autoFillScanCustomFields"];
         }
@@ -726,6 +722,13 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         else {
             self.sideBarShowTotalCountOnHierarchy = YES;
         }
+        
+        if ( [decoder containsValueForKey:@"includeAssociatedDomains"] ) {
+            self.includeAssociatedDomains = [decoder decodeBoolForKey:@"includeAssociatedDomains"];
+        }
+        else {
+            self.includeAssociatedDomains = YES;
+        }
     }
     
     return self;
@@ -817,7 +820,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     NSString* key = [NSString stringWithFormat:@"autoFillExcludedItems-%@", self.uuid];
     [SecretStore.sharedInstance setSecureObject:autoFillExcludedItems forIdentifier:key];
 }
-
 
 
 

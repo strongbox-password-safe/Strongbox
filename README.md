@@ -96,7 +96,7 @@ You can read more about this library [here](https://dropbox.tech/security/zxcvbn
 Major credit to Sam Schlinkert and his fantastic [Orchard Street Wordlists](https://github.com/sts10/orchard-street-wordlists) project. Sam has been super helpful in pointing out various issues and suggesting corrections to our wordlists. Thanks Sam! Also, credit to Aaron Toponce for his "Fandom" wordlists which improve upon the EFF Fandom lists.
 
 ** Various Libraries **
-We use many different libraries in the app here are just a few:
+We use many different libraries in the app here are just a few, many thanks to all involved:
 
 - Dropbox-iOS-SDK
 - Google-API-Client
@@ -118,6 +118,9 @@ We use many different libraries in the app here are just a few:
 - WSTagsField (https://github.com/whitesmith/WSTagsField)
 - Common Passwords List from https://github.com/danielmiessler/SecLists
 - Finnish & Icelandic diceware word lists - SmirGel
-- Down (Swift Markdown library) - https://github.com/johnxnguyen/Down
 - OTPAuth - https://github.com/hectorm/otpauth
 - SwiftDomainParser - https://github.com/Dashlane/SwiftDomainParser
+- cmark-gfm - https://github.com/github/cmark-gfm
+- libcmark_gfm - https://github.com/KristopherGBaker/libcmark_gfm
+- highlight.js - https://github.com/highlightjs/highlight.js 
+- github-markdown-css - https://github.com/sindresorhus/github-markdown-css

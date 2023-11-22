@@ -14,12 +14,14 @@ class DatabaseSummary: NSObject, Codable {
     var nickName: String
     var autoFillEnabled: Bool
     var locked: Bool
+    var includeFavIconForNewEntries: Bool
 
     @objc
-    init(uuid: String, nickName: String, autoFillEnabled: Bool = false, locked: Bool = true) {
+    init(uuid: String, nickName: String, autoFillEnabled: Bool, includeFavIconForNewEntries: Bool, locked: Bool) {
         self.uuid = uuid
         self.nickName = nickName
         self.autoFillEnabled = autoFillEnabled
         self.locked = locked
+        self.includeFavIconForNewEntries = includeFavIconForNewEntries
     }
 }

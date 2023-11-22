@@ -136,14 +136,15 @@ class SshAgentSettings: NSViewController {
         stackSymLink.isHidden = true 
 
         let settings = Settings.sharedInstance()
+        let pro = settings.isPro
 
-        checkboxRunSshAgent.state = (settings.runSshAgent && settings.isPro) ? .on : .off
+        checkboxRunSshAgent.state = (settings.runSshAgent && pro) ? .on : .off
 
-        stackErrorLaunching.isHidden = !(settings.runSshAgent && settings.isPro && !SSHAgentServer.sharedInstance().isRunning)
+        stackErrorLaunching.isHidden = !(settings.runSshAgent && pro && !SSHAgentServer.sharedInstance().isRunning)
 
-        stackViewApprovals.isHidden = !(settings.runSshAgent && settings.isPro && SSHAgentServer.sharedInstance().isRunning)
+        stackViewApprovals.isHidden = !(settings.runSshAgent && pro && SSHAgentServer.sharedInstance().isRunning)
 
-        checkboxRunSshAgent.isEnabled = settings.isPro
+        checkboxRunSshAgent.isEnabled = pro
 
         let mins = settings.sshAgentApprovalDefaultExpiryMinutes
 
@@ -164,18 +165,21 @@ class SshAgentSettings: NSViewController {
             comboExpiry.selectItem(at: idx)
         }
 
-        labelHeaderConfig.textColor = (settings.runSshAgent && settings.isPro) ? .labelColor : .secondaryLabelColor
-        labelSymlnkBody.textColor = (settings.runSshAgent && settings.isPro) ? .labelColor : .secondaryLabelColor
-        labelSnippetText.textColor = (settings.runSshAgent && settings.isPro) ? .labelColor : .secondaryLabelColor
+        labelHeaderConfig.textColor = (settings.runSshAgent && pro) ? .labelColor : .secondaryLabelColor
+        labelSymlnkBody.textColor = (settings.runSshAgent && pro) ? .labelColor : .secondaryLabelColor
+        labelSnippetText.textColor = (settings.runSshAgent && pro) ? .labelColor : .secondaryLabelColor
 
-        buttonCreateSymlink.isEnabled = (settings.runSshAgent && settings.isPro)
-        buttonCopySnippet.isEnabled = (settings.runSshAgent && settings.isPro)
-        textView.textColor = (settings.runSshAgent && settings.isPro) ? .systemGreen : .secondaryLabelColor
-        textView.isSelectable = settings.isPro
+        buttonCreateSymlink.isEnabled = (settings.runSshAgent && pro)
+        buttonCopySnippet.isEnabled = (settings.runSshAgent && pro)
+        textView.textColor = (settings.runSshAgent && pro) ? .systemGreen : .secondaryLabelColor
+        textView.isSelectable = pro
 
 
 
         checkboxAllowUnlockRequests.state = settings.sshAgentRequestDatabaseUnlockAllowed ? .on : .off
         checkboxPreventRapidUnlocks.state = settings.sshAgentPreventRapidRepeatedUnlockRequests ? .on : .off
+
+        checkboxAllowUnlockRequests.isEnabled = pro
+        checkboxPreventRapidUnlocks.isEnabled = pro
     }
 }

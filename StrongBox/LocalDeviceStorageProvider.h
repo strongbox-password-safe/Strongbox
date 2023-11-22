@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
      extension:(NSString *)extension
           data:(NSData *)data
        modDate:(NSDate*)modDate
-suggestedFilename:(NSString*)suggestedFilename
+suggestedFilename:(NSString* _Nullable)suggestedFilename
     completion:(void (^)(METADATA_PTR metadata, NSError *_Nullable error))completion;
 
 
@@ -49,6 +49,8 @@ suggestedFilename:(NSString*)suggestedFilename
 - (BOOL)fileNameExistsInDefaultStorage:(NSString*)filename; 
 - (BOOL)isUsingSharedStorage:(METADATA_PTR )metadata;
 - (void)delete:(METADATA_PTR )safeMetaData completion:(void (^ _Nullable)(NSError *_Nullable error))completion;
+
+- (BOOL)renameFilename:(DatabasePreferences*)database filename:(NSString*)filename error:(NSError**)error;
 
 @end
 

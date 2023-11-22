@@ -9,7 +9,7 @@
 import Cocoa
 
 class GroupPropertiesViewController: NSViewController, NSTextViewDelegate {
-    @IBOutlet var textViewNotes: SBDownTextView!
+    @IBOutlet var textViewNotes: NSTextView!
     @IBOutlet var labelTitle: NSTextField!
     @IBOutlet var segmentSearchable: NSSegmentedControl!
     @IBOutlet var inheritedStateLabel: NSTextField!
@@ -140,12 +140,10 @@ class GroupPropertiesViewController: NSViewController, NSTextViewDelegate {
 
     func bindNotes() {
         if textViewNotes.isEditable {
-            textViewNotes.markdownEnabled = false
             textViewNotes.string = group.fields.notes
         } else {
             let markdown = Settings.sharedInstance().markdownNotes
 
-            textViewNotes.markdownEnabled = markdown
             textViewNotes.string = group.fields.notes
 
             if !markdown {

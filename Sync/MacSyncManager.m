@@ -44,12 +44,14 @@
 }
 
 - (void)backgroundSyncDatabase:(MacDatabasePreferences*)database {
-    [self backgroundSyncDatabase:database completion:nil];
+    [self backgroundSyncDatabase:database key:nil completion:nil];
 }
 
+
 - (void)backgroundSyncDatabase:(MacDatabasePreferences*)database
+                           key:(CompositeKeyFactors * _Nullable)key 
                     completion:(SyncAndMergeCompletionBlock _Nullable)completion {
-    NSLog(@"backgroundSyncDatabase enter [%@]", database);
+
         
     if ( database.alwaysOpenOffline ) {
         NSLog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
@@ -64,13 +66,14 @@
     params.inProgressBehaviour = kInProgressBehaviourJoin;
     params.syncForcePushDoNotCheckForConflicts = NO;
     params.syncPullEvenIfModifiedDateSame = NO;
+    params.key = key;
+    
 
-    NSLog(@"BACKGROUND SYNC Start: [%@]", database.nickName);
 
     [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
+
         
         if (completion) {
             completion(result, localWasChanged, error);

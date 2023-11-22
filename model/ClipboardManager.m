@@ -60,14 +60,13 @@
 - (void)copyStringWithDefaultExpiration:(NSString *)value {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
-
     if(AppPreferences.sharedInstance.clearClipboardEnabled && AppPreferences.sharedInstance.clearClipboardAfterSeconds > 0) {
         
         
         
         NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:AppPreferences.sharedInstance.clearClipboardAfterSeconds];
         
-        NSLog(@"Expiration: %@", expirationTime);
+        
         
         [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
                      options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) ,

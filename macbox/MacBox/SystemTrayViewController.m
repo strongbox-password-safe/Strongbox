@@ -82,7 +82,7 @@
     
     [self bindUI];
     
-    [self sizePopoverToFit];
+    [self sizeAndPositionPopoverToFit];
 }
 
 - (void)viewWillAppear {
@@ -92,7 +92,7 @@
     
     [self bindUI];
     
-    [self sizePopoverToFit];
+    [self sizeAndPositionPopoverToFit];
     
     [self onRefresh:nil];
 }
@@ -179,7 +179,7 @@
     }
 }
 
-- (void)sizePopoverToFit {
+- (void)sizeAndPositionPopoverToFit {
     CGSize old = self.view.frame.size;
     CGSize fit = [self.view fittingSize];
 
@@ -380,7 +380,7 @@
     
     [self bindUI];
     
-    [self sizePopoverToFit];
+    [self sizeAndPositionPopoverToFit];
 }
 
 - (IBAction)onPasswordPreferences:(id)sender {

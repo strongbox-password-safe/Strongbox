@@ -101,7 +101,7 @@
        textColor:(UIColor *)textColor {
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
-    self.titleLabel.textColor = textColor;
+    self.titleLabel.textColor = textColor ? textColor : UIColor.labelColor;
     
     self.iconImageView.image = hideIcon ? nil : icon;
     self.iconImageView.tintColor = tintColor;
@@ -155,11 +155,36 @@
          otpToken:(OTPToken *)otpToken
          hideIcon:(BOOL)hideIcon
             audit:(NSString*_Nullable)audit {
+    [self setRecord:title
+           subtitle:subtitle
+               icon:icon
+      groupLocation:groupLocation
+              flags:flags
+     flagTintColors:flagTintColors
+            expired:expired
+           otpToken:otpToken
+           hideIcon:hideIcon
+              audit:nil
+     imageTintColor:nil];
+}
+
+- (void)setRecord:(NSString *)title
+         subtitle:(NSString *)subtitle
+             icon:(UIImage *)icon
+    groupLocation:(NSString *)groupLocation
+            flags:(NSArray<UIImage *> *)flags
+   flagTintColors:(NSDictionary<NSNumber *,UIColor *> *)flagTintColors
+          expired:(BOOL)expired
+         otpToken:(OTPToken *)otpToken
+         hideIcon:(BOOL)hideIcon
+            audit:(NSString *)audit
+   imageTintColor:(UIColor *)imageTintColor {
     self.titleLabel.text = title.length ? title : @" ";
-    self.titleLabel.font = FontManager.sharedInstance.regularFont;
+    self.titleLabel.font = FontManager.sharedInstance.headlineFont;
+    self.titleLabel.textColor = UIColor.labelColor;
     
     self.iconImageView.image = hideIcon ? nil :icon;
-    self.iconImageView.tintColor = nil;
+    self.iconImageView.tintColor = imageTintColor;
     self.iconImageView.hidden = hideIcon;
     
     self.usernameLabel.text = subtitle;

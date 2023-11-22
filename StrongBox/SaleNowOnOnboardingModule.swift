@@ -13,7 +13,7 @@ public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
     public required init(model _: Model?) {}
 
     public func shouldDisplay() -> Bool {
-        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription // Ignore Monthly's
+        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription 
         let nonePro = !AppPreferences.sharedInstance().isPro
         let saleNowOn = SaleScheduleManager.sharedInstance().saleNowOn
         let hasBeenPrompted = SaleScheduleManager.sharedInstance().userHasBeenPromptedAboutCurrentSale

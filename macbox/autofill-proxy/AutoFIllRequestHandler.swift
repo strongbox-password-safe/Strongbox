@@ -1,5 +1,5 @@
 //
-//  AutoFIllRequestHandler.swift
+//  AutoFillRequestHandler.swift
 //  MacBox
 //
 //  Created by Strongbox on 26/08/2022.
@@ -17,35 +17,115 @@ import Foundation
         super.init()
     }
 
-    @objc func handleJsonRequest(json: String) -> AutoFillEncryptedResponse {
+    @objc func handleJsonRequest(json: String) -> String {
         guard let request = AutoFillEncryptedRequest.from(json: json) else {
-            return AutoFillEncryptedResponse.error(message: "Could not convert request to JSON")
+            return AutoFillEncryptedResponse.error(message: "Could not convert request to JSON").toJson()
         }
+
+        let startTime = NSDate.timeIntervalSinceReferenceDate
+
+        var ret: AutoFillEncryptedResponse
 
         switch request.messageType {
         case .status:
-            return handleGetStatusRequest(request)
+            ret = handleGetStatusRequest(request)
         case .search:
-            return handleSearchRequest(request)
+            ret = handleSearchRequest(request)
         case .getCredentialsForUrl:
-            return handleGetCredentialsForUrlRequest(request)
+            ret = handleGetCredentialsForUrlRequest(request)
         case .copyField:
-            return handleCopyFieldRequest(request)
+            ret = handleCopyFieldRequest(request)
         case .lock:
-            return handleLockDatabaseRequest(request)
+            ret = handleLockDatabaseRequest(request)
         case .unlock:
-            return handleUnlockDatabaseRequest(request)
+            ret = handleUnlockDatabaseRequest(request)
         case .createEntry:
-            return handleCreateEntryRequest(request)
+            ret = handleCreateEntryRequest(request)
         case .getGroups:
-            return handleGetGroupsRequest(request)
+            ret = handleGetGroupsRequest(request)
         case .getNewEntryDefaults:
-            return handleGetNewEntryDefaultsRequest(request)
+            ret = handleGetNewEntryDefaultsRequest(request)
         case .generatePassword:
-            return handleGeneratePasswordRequest(request)
+            ret = handleGeneratePasswordRequest(request)
         case .getIcon:
-            return handleGetIconRequest(request)
+            ret = handleGetIconRequest(request)
+        case .generatePasswordV2:
+            ret = handleGeneratePasswordV2Request(request)
+        case .getPasswordStrength:
+            ret = handleGetPasswordStrengthRequest(request)
+        case .getNewEntryDefaultsV2:
+            ret = handleGetNewEntryDefaultsV2Request(request)
+        case .getFavourites:
+            ret = handleGetFavouritesRequest(request)
         }
+
+        let response = ret.toJson()
+
+        let perf = NSDate.timeIntervalSinceReferenceDate - startTime
+        let size = response.count
+
+        if perf > 0.05 || size > (30 * 1024) {
+            NSLog("🐞 PERF: Processed AutoFill [%@] request in %f seconds (%d bytes)", request.messageType.description, perf, size)
+        }
+
+        return response
+    }
+
+    func handleGetFavouritesRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+
+        guard let jsonRequest = request.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let favRequest = try? decoder.decode(GetFavouritesRequest.self, from: data)
+        else {
+            NSLog("🔴 Can't decode GetFavouritesRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode GetFavouritesRequest from message JSON")
+        }
+
+        let unlockedDatabases = MacDatabasePreferences.allDatabases.filter { database in
+            database.autoFillEnabled && DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
+        }
+
+        let takeRequested = (favRequest.take ?? GetFavouritesRequest.DefaultMaxResults)
+        let take = takeRequested > GetFavouritesRequest.AbsoluteMaxResults ? GetFavouritesRequest.AbsoluteMaxResults : takeRequested
+        if takeRequested > GetFavouritesRequest.AbsoluteMaxResults {
+            NSLog("⚠️ WARN: GetFavourites - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, GetFavouritesRequest.AbsoluteMaxResults)
+        }
+
+        let skip = favRequest.skip ?? 0
+
+        let credentials = getFavourites(unlockedDatabases: unlockedDatabases, skip: skip, take: take)
+
+        let response = GetFavouritesResponse(results: credentials)
+
+        let json = AutoFillJsonHelper.toJson(object: response)
+
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
+    }
+
+    func getFavourites(unlockedDatabases: [MacDatabasePreferences], skip: Int, take: Int) -> [AutoFillCredential] {
+        var collected: [(Model, Node)] = []
+        for database in unlockedDatabases {
+            guard let model = DatabasesCollection.shared.getUnlocked(uuid: database.uuid) else {
+                continue
+            }
+
+            let nodes = model.favourites
+
+            let thisDbResults = nodes.map { node in
+                (model, node)
+            }
+
+            collected += thisDbResults
+        }
+
+        #if DEBUG
+            NSLog("✅ getFavourites - skip %d, take %d, with Result Count %d", skip, take, collected.count)
+        #endif
+
+        let credentials = getResultsWindow(collected, skip, take)
+
+        return credentials
     }
 
     func handleCopyFieldRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
@@ -95,13 +175,15 @@ import Foundation
     func handleGetStatusRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
         let response = GetStatusResponse()
 
-        response.serverSettings = ServerSettings()
+        let settings = ServerSettings()
 
-        response.serverSettings?.supportsCreateNew = true
+        settings.supportsCreateNew = true
+        settings.markdownNotes = Settings.sharedInstance().markdownNotes
 
+        response.serverSettings = settings
         response.serverVersionInfo = Utils.getAppVersion()
         response.databases = MacDatabasePreferences.allDatabases.map { obj in
-            DatabaseSummary(uuid: obj.uuid, nickName: obj.nickName, autoFillEnabled: obj.autoFillEnabled, locked: !DatabasesCollection.shared.isUnlocked(uuid: obj.uuid))
+            DatabaseSummary(uuid: obj.uuid, nickName: obj.nickName, autoFillEnabled: obj.autoFillEnabled, includeFavIconForNewEntries: obj.expressDownloadFavIconOnNewOrUrlChanged, locked: !DatabasesCollection.shared.isUnlocked(uuid: obj.uuid))
         }
 
         let json = AutoFillJsonHelper.toJson(object: response)
@@ -120,15 +202,13 @@ import Foundation
             return AutoFillEncryptedResponse.error(message: "Can't decode SearchRequest from message JSON")
         }
 
-
-
         let unlockedDatabases = MacDatabasePreferences.allDatabases.filter { database in
             database.autoFillEnabled && DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
         }
 
-        
 
-        var results: [AutoFillCredential] = []
+
+        var collected: [(Model, Node)] = []
         for database in unlockedDatabases {
             guard let model = DatabasesCollection.shared.getUnlocked(uuid: database.uuid) else {
                 continue
@@ -139,24 +219,53 @@ import Foundation
                                      dereference: true,
                                      includeKeePass1Backup: false, includeRecycleBin: false, includeExpired: false, includeGroups: false, browseSortField: .title, descending: false, foldersSeparately: false)
 
-            
 
-            let matches = nodes.map { node in
-                convertNodeToAutoFillCredential(database, model, node, includeIcon: false)
+
+            collected += nodes.map { node in
+                (model, node)
             }
-
-            results += matches
         }
 
-        
+        let takeRequested = (searchRequest.take ?? SearchRequest.DefaultMaxResults)
+        let take = takeRequested > SearchRequest.AbsoluteMaxResults ? SearchRequest.AbsoluteMaxResults : takeRequested
+        if takeRequested > SearchRequest.AbsoluteMaxResults {
+            NSLog("⚠️ WARN: Search - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, SearchRequest.AbsoluteMaxResults)
+        }
 
-        results = Array(results.prefix(50)) 
+        let skip = searchRequest.skip ?? 0
+
+        #if DEBUG
+            NSLog("✅ Got Search Request - Query = [%@] - skip %d, take %d, with Result Count %d", searchRequest.query, skip, take, collected.count)
+        #endif
+
+        let results = getResultsWindow(collected, skip, take)
 
         let response = SearchResponse(results: results)
 
         let json = AutoFillJsonHelper.toJson(object: response)
 
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
+    }
+
+    func getResultsWindow(_ collected: [(Model, Node)], _ skipIn: Int, _ takeIn: Int) -> [AutoFillCredential] {
+        var skip = skipIn
+        var take = takeIn
+
+        if skip > collected.count {
+            NSLog("⚠️ WARN: getResultsWindow - Paging: Skip (%d) greater than result count (%d) - zeroing skip and take", skip, collected.count)
+            skip = 0
+            take = 0
+        }
+
+        let window = collected.suffix(from: skip).prefix(take)
+
+        let results: [AutoFillCredential] = window.enumerated().map { idx, item in
+            let (model, node) = item
+            let includeNIcons = 3 
+            return convertNodeToAutoFillCredential(model, node, includeIcon: idx < includeNIcons)
+        }
+
+        return results
     }
 
     func handleLockDatabaseRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
@@ -220,7 +329,7 @@ import Foundation
                 g.leave()
             }
 
-            if g.wait(timeout: .now() + 5) == .timedOut {
+            if g.wait(timeout: .now() + 10) == .timedOut {
                 NSLog("⚠️ Waiting for Database Unlock, timed out.")
             } else {
                 NSLog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
@@ -250,46 +359,61 @@ import Foundation
 
         guard let jsonRequest = request.decryptMessage(keyPair: keyPair),
               let data = jsonRequest.data(using: .utf8),
-              let searchRequest = try? decoder.decode(CredentialsForUrlRequest.self, from: data)
+              let gcfuRequest = try? decoder.decode(CredentialsForUrlRequest.self, from: data)
         else {
             NSLog("🔴 Can't decode CredentialsForUrlRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode CredentialsForUrlRequest from message JSON")
         }
 
 
-
         let unlockedDatabases = MacDatabasePreferences.allDatabases.filter { database in
             database.autoFillEnabled && DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
         }
 
-
-
-        var credentials: [AutoFillCredential] = []
-        for database in unlockedDatabases {
-            guard let model = DatabasesCollection.shared.getUnlocked(uuid: database.uuid) else {
-                continue
-            }
-
-            let nodes = model.getAutoFillMatchingNodes(forUrl: searchRequest.url)
-
-
-
-            let urlCredentialMatches = nodes.map { node in
-                convertNodeToAutoFillCredential(database, model, node)
-            }
-
-            credentials += urlCredentialMatches
-        }
-
         
 
-        credentials = Array(credentials.prefix(15))
+        let takeRequested = (gcfuRequest.take ?? CredentialsForUrlRequest.DefaultMaxResults)
+        let take = takeRequested > CredentialsForUrlRequest.AbsoluteMaxResults ? CredentialsForUrlRequest.AbsoluteMaxResults : takeRequested
+        if takeRequested > CredentialsForUrlRequest.AbsoluteMaxResults {
+            NSLog("⚠️ WARN: Get Credentials for URL - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, CredentialsForUrlRequest.AbsoluteMaxResults)
+        }
+
+        let skip = gcfuRequest.skip ?? 0
+
+        let credentials = getCredentialsForUrl(unlockedDatabases: unlockedDatabases, url: gcfuRequest.url, skip: skip, take: take)
 
         let response = CredentialsForUrlResponse(results: credentials, unlockedDatabaseCount: unlockedDatabases.count)
 
         let json = AutoFillJsonHelper.toJson(object: response)
 
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
+    }
+
+    func getCredentialsForUrl(unlockedDatabases: [MacDatabasePreferences], url: String, skip: Int, take: Int) -> [AutoFillCredential] {
+        var collected: [(Model, Node)] = []
+        for database in unlockedDatabases {
+            guard let model = DatabasesCollection.shared.getUnlocked(uuid: database.uuid) else {
+                continue
+            }
+
+            let nodes = model.getAutoFillMatchingNodes(forUrl: url)
+
+            
+
+            let thisDbResults = nodes.map { node in
+                (model, node)
+            }
+
+            collected += thisDbResults
+        }
+
+        #if DEBUG
+            NSLog("✅ getCredentialsForUrl - URL = [%@] - skip %d, take %d, with Result Count %d", url, skip, take, collected.count)
+        #endif
+
+        let credentials = getResultsWindow(collected, skip, take)
+
+        return credentials
     }
 
     func handleCreateEntryRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
@@ -352,6 +476,46 @@ import Foundation
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
     }
 
+    func handleGeneratePasswordV2Request(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(GeneratePasswordRequest.self, from: data)
+        else {
+            NSLog("🔴 Can't decode handleGeneratePasswordV2Request from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode handleGeneratePasswordV2Request from message JSON")
+        }
+
+        NSLog("✅ Got handleGeneratePasswordV2Request")
+
+        let response = generatePasswordV2(request: request)
+
+        let json = AutoFillJsonHelper.toJson(object: response)
+
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
+    }
+
+    func handleGetPasswordStrengthRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(GetPasswordStrengthRequest.self, from: data)
+        else {
+            NSLog("🔴 Can't decode handleGetPasswordStrengthRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode handleGetPasswordStrengthRequest from message JSON")
+        }
+
+        NSLog("✅ Got handleGetPasswordStrengthRequest")
+
+        let response = getPasswordStrength(request)
+
+        let json = AutoFillJsonHelper.toJson(object: response)
+
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
+    }
+
     func handleGetNewEntryDefaultsRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
         let decoder = JSONDecoder()
 
@@ -372,6 +536,26 @@ import Foundation
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
     }
 
+    func handleGetNewEntryDefaultsV2Request(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+
+        guard let jsonRequest = encryptedRequest.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let request = try? decoder.decode(GetNewEntryDefaultsRequest.self, from: data)
+        else {
+            NSLog("🔴 Can't decode GetNewEntryDefaultsRequestV2 from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode GetNewEntryDefaultsRequestV2 from message JSON")
+        }
+
+        NSLog("✅ Got GetNewEntryDefaultsRequestV2 [databaseId = %@]", request.databaseId)
+
+        let response = getNewEntryDefaultsV2(request: request)
+
+        let json = AutoFillJsonHelper.toJson(object: response)
+
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: encryptedRequest.clientPublicKey, keyPair: keyPair)
+    }
+
     func handleGetIconRequest(_ encryptedRequest: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
         let decoder = JSONDecoder()
 
@@ -383,7 +567,7 @@ import Foundation
             return AutoFillEncryptedResponse.error(message: "Can't decode GetIconRequest from message JSON")
         }
 
-        NSLog("Got getIconRequest - Database ID = [%@]", request.databaseId)
+
 
         guard let prefs = MacDatabasePreferences.getById(request.databaseId),
               prefs.autoFillEnabled,
@@ -406,7 +590,7 @@ import Foundation
 
     
 
-    func convertNodeToAutoFillCredential(_ database: MacDatabasePreferences, _ model: Model, _ node: Node, includeIcon: Bool = true) -> AutoFillCredential {
+    func convertNodeToAutoFillCredential(_ model: Model, _ node: Node, includeIcon: Bool = true) -> AutoFillCredential {
         var iconBase64Encoded = ""
 
         if includeIcon {
@@ -417,35 +601,56 @@ import Foundation
 
 
 
-        let vm = EntryViewModel.fromNode(node, format: model.originalFormat, model: model, sortCustomFields: !database.customSortOrderForFields)
+        let vm = EntryViewModel.fromNode(node, model: model)
 
         let cfs = vm.customFieldsFiltered.map { cfvm in
-            AutoFillCredentialCustomField(key: cfvm.key, value: cfvm.value, concealable: cfvm.protected)
+            AutoFillCredentialCustomField(key: cfvm.key,
+                                          value: String(cfvm.value.prefix(1024)),
+                                          concealable: cfvm.protected)
         }
 
         let atts = vm.filteredAttachments.allKeys().map { $0 as String }
 
-        let credential = AutoFillCredential(uuid: node.uuid, 
-                                            databaseId: database.uuid,
+        let credential = AutoFillCredential(uuid: node.uuid,
+                                            databaseId: model.metadata.uuid,
                                             title: model.dereference(vm.title, node: node),
                                             username: model.dereference(vm.username, node: node),
                                             password: model.dereference(vm.password, node: node),
                                             url: model.dereference(vm.url, node: node),
                                             totp: vm.totp?.url(true).absoluteString ?? "",
-                                            icon: iconBase64Encoded, 
+                                            icon: iconBase64Encoded,
                                             customFields: cfs,
                                             attachmentFileNames: atts,
-                                            databaseName: database.nickName,
-                                            tags: vm.tags, 
-                                            favourite: model.isFavourite(node.uuid)) 
+                                            databaseName: model.metadata.nickName,
+                                            tags: vm.tags,
+                                            favourite: vm.favourite,
+                                            notes: String(vm.notes.prefix(1024)),
+                                            modified: (node.fields.modified as? NSDate)?.friendlyDateTimeString ?? "")
 
         return credential
     }
 
-    func getNodeIconPngData(_ model: Model, _ node: Node) -> String? {
-        
+    let iconCache = ConcurrentMutableDictionary<NSString, NSString>()
 
-        let image = NodeIconHelper.getIconFor(node, predefinedIconSet: model.metadata.iconSet, format: model.originalFormat)
+    func getNodeIconPngData(_ model: Model, _ node: Node) -> String? {
+        let key = String(format: "%@-%@-%ld", model.databaseUuid, node.uuid.uuidString, node.fields.modified?.timeIntervalSinceReferenceDate ?? 0)
+
+
+
+
+
+        if let cached = iconCache.object(forKey: key as NSString) {
+
+            return cached as String
+        }
+
+        var image = NodeIconHelper.getIconFor(node, predefinedIconSet: model.metadata.iconSet, format: model.originalFormat)
+
+        if node.icon == nil || !(node.icon?.isCustom ?? false) {
+            if model.metadata.iconSet == .sfSymbols {
+                image = Utils.imageTinted(withColor: image, tint: .systemBlue) 
+            }
+        }
 
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             NSLog("🔴 Could not get cgimage for node icon")
@@ -460,7 +665,13 @@ import Foundation
             return nil
         }
 
-        return pngData.base64EncodedString()
+        let ret = pngData.base64EncodedString()
+
+        iconCache.setObject(ret as NSString, forKey: key as NSString)
+
+
+
+        return ret
     }
 
     func copyUsername(model: Model, itemId: UUID) {
@@ -572,7 +783,7 @@ import Foundation
         response.uuid = newNode.uuid.uuidString
 
         if let foundNode = model.getItemBy(newNode.uuid) {
-            response.credential = convertNodeToAutoFillCredential(prefs, model, foundNode)
+            response.credential = convertNodeToAutoFillCredential(model, foundNode)
         }
 
         return response
@@ -622,6 +833,36 @@ import Foundation
         return GeneratePasswordResponse(password: pw, alternatives: alternatives)
     }
 
+    func generatePasswordV2(request _: GeneratePasswordRequest) -> GeneratePasswordV2Response {
+        let pw = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+        let pw1 = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+        let pw2 = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+        let pw3 = PasswordMaker.sharedInstance().generateAlternate(for: Settings.sharedInstance().passwordGenerationConfig)
+        let pw4 = PasswordMaker.sharedInstance().generateAlternate(for: Settings.sharedInstance().passwordGenerationConfig)
+        let pw5 = PasswordMaker.sharedInstance().generateAlternate(for: Settings.sharedInstance().passwordGenerationConfig)
+
+        let alternatives = [getPasswordAndStrength(pw1),
+                            getPasswordAndStrength(pw2),
+                            getPasswordAndStrength(pw3),
+                            getPasswordAndStrength(pw4),
+                            getPasswordAndStrength(pw5)]
+
+        return GeneratePasswordV2Response(password: getPasswordAndStrength(pw), alternatives: alternatives)
+    }
+
+    func getPasswordStrength(_ request: GetPasswordStrengthRequest) -> GetPasswordStrengthResponse {
+        let strength = PasswordStrengthTester.getStrength(request.password, config: Settings.sharedInstance().passwordStrengthConfig)
+        let pwsd = PasswordStrengthData(entropy: strength.entropy, category: strength.category, summaryString: strength.summaryString)
+
+        return GetPasswordStrengthResponse(strength: pwsd)
+    }
+
+    func getPasswordAndStrength(_ pw: String) -> PasswordAndStrength {
+        let strength = PasswordStrengthTester.getStrength(pw, config: Settings.sharedInstance().passwordStrengthConfig)
+        let pwsd = PasswordStrengthData(entropy: strength.entropy, category: strength.category, summaryString: strength.summaryString)
+        return PasswordAndStrength(password: pw, strength: pwsd)
+    }
+
     func getNewEntryDefaults(request: GetNewEntryDefaultsRequest) -> GetNewEntryDefaultsResponse {
         guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled,
               let model = DatabasesCollection.shared.getUnlocked(uuid: prefs.uuid)
@@ -640,6 +881,29 @@ import Foundation
         let password = defaultConfig.passwordAutoFillMode == .none ? "" : defaultConfig.passwordAutoFillMode == .generated ? generated : defaultConfig.passwordCustomAutoFill
 
         let response = GetNewEntryDefaultsResponse(username: username, password: password, mostPopularUsernames: model.database.mostPopularUsernames)
+
+        return response
+    }
+
+    func getNewEntryDefaultsV2(request: GetNewEntryDefaultsRequest) -> GetNewEntryDefaultsV2Response {
+        guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled,
+              let model = DatabasesCollection.shared.getUnlocked(uuid: prefs.uuid)
+        else {
+            let response = GetNewEntryDefaultsV2Response(error: "Can't find AutoFillEnabled database to Unlock")
+            return response
+        }
+
+        let defaultConfig = Settings.sharedInstance().autoFillNewRecordSettings
+
+        let mostPopularUsername = model.database.mostPopularUsername ?? ""
+        let username = defaultConfig.usernameAutoFillMode == .none ? "" : defaultConfig.usernameAutoFillMode == .mostUsed ? mostPopularUsername : defaultConfig.usernameCustomAutoFill
+
+        let generated = PasswordMaker.sharedInstance().generate(forConfigOrDefault: Settings.sharedInstance().passwordGenerationConfig)
+
+        let password = defaultConfig.passwordAutoFillMode == .none ? "" : defaultConfig.passwordAutoFillMode == .generated ? generated : defaultConfig.passwordCustomAutoFill
+        let passwordAndStrength = getPasswordAndStrength(password)
+
+        let response = GetNewEntryDefaultsV2Response(username: username, password: passwordAndStrength, mostPopularUsernames: model.database.mostPopularUsernames)
 
         return response
     }

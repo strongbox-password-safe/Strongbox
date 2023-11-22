@@ -80,8 +80,14 @@
 }
 
 - (IBAction)onAppLockChanged:(id)sender {
-    if(self.segmentAppLock.selectedSegmentIndex == kPinCode || self.segmentAppLock.selectedSegmentIndex == kBoth) {
+    if ( self.segmentAppLock.selectedSegmentIndex == kPinCode ) {
         [self requestAppLockPinCodeAndConfirm];
+    }
+    else if ( self.segmentAppLock.selectedSegmentIndex == kBiometric ) {
+        [self requestBiometric:NO];
+    }
+    else if ( self.segmentAppLock.selectedSegmentIndex == kBoth) {
+        [self requestBiometric:YES];
     }
     else {
         AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
@@ -172,7 +178,6 @@
 
     AppPreferences.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
     AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
-    
     AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics = self.switchCoalesceBiometrics.on;
     
     [self bindAppLock];
@@ -244,6 +249,27 @@
     vc.title = title;
     
     [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)requestBiometric:(BOOL)requestPinCodeAfterwards {
+    [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
+                                           fallbackTitle:@""
+                                              completion:^(BOOL success, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( success ) {
+                if ( requestPinCodeAfterwards ) {
+                    [self requestAppLockPinCodeAndConfirm];
+                }
+                else {
+                    AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
+                    [self bindAppLock];
+                }
+            }
+            else {
+                [self bindAppLock];
+            }
+        });
+    }];
 }
 
 @end

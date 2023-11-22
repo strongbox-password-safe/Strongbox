@@ -35,7 +35,7 @@ static const int kMaxFailedPinAttempts = 3;
 @property (nonnull) UIViewController* viewController;
 @property (nonnull) DatabasePreferences* database;
 @property BOOL isAutoFillOpen;
-@property BOOL isAutoFillQuickTypeOpen;
+@property BOOL transparentAutoFillBackgroundForBiometrics;
 @property BOOL biometricPreCleared; 
 @property BOOL noConvenienceUnlock;
 
@@ -48,13 +48,13 @@ static const int kMaxFailedPinAttempts = 3;
 + (instancetype)determinerWithViewController:(UIViewController *)viewController
                                     database:(DatabasePreferences *)database
                               isAutoFillOpen:(BOOL)isAutoFillOpen
-                     isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
+                     transparentAutoFillBackgroundForBiometrics:(BOOL)transparentAutoFillBackgroundForBiometrics
                          biometricPreCleared:(BOOL)biometricPreCleared
                          noConvenienceUnlock:(BOOL)noConvenienceUnlock {
     return [[IOSCompositeKeyDeterminer alloc] initWithViewController:viewController
                                                          database:database
                                                    isAutoFillOpen:isAutoFillOpen
-                                          isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
+                                          transparentAutoFillBackgroundForBiometrics:transparentAutoFillBackgroundForBiometrics
                                               biometricPreCleared:biometricPreCleared
                                               noConvenienceUnlock:noConvenienceUnlock];
 }
@@ -62,7 +62,7 @@ static const int kMaxFailedPinAttempts = 3;
 - (instancetype)initWithViewController:(UIViewController *)viewController
                               database:(DatabasePreferences *)database
                         isAutoFillOpen:(BOOL)isAutoFillOpen
-               isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
+               transparentAutoFillBackgroundForBiometrics:(BOOL)transparentAutoFillBackgroundForBiometrics
                    biometricPreCleared:(BOOL)biometricPreCleared
                    noConvenienceUnlock:(BOOL)noConvenienceUnlock {
     self = [super init];
@@ -70,7 +70,7 @@ static const int kMaxFailedPinAttempts = 3;
         self.viewController = viewController;
         self.database = database;
         self.isAutoFillOpen = isAutoFillOpen;
-        self.isAutoFillQuickTypeOpen = isAutoFillQuickTypeOpen;
+        self.transparentAutoFillBackgroundForBiometrics = transparentAutoFillBackgroundForBiometrics;
         self.biometricPreCleared = biometricPreCleared;
         self.noConvenienceUnlock = noConvenienceUnlock;
     }
@@ -320,33 +320,40 @@ static const int kMaxFailedPinAttempts = 3;
 
 
 - (void)showBiometricAuthentication:(NSString*)password {
-    
-    
     if(self.biometricPreCleared) {
         NSLog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
         [self onBiometricAuthenticationDone:password success:YES error:nil];
     }
     else {
-        
 
-        CGFloat previousAlpha = self.viewController.view.alpha;
-        if (self.isAutoFillQuickTypeOpen) {
+        
+        CGFloat delay = 0.0;
+        if (self.transparentAutoFillBackgroundForBiometrics) {  
             self.viewController.view.alpha = 0.0f;
+            delay = 0.35;
         }
         
-        BOOL ret = [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
-                                                          fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
-                                                             completion:^(BOOL success, NSError * _Nullable error) {
-            [self onBiometricAuthenticationDone:password success:success error:error];
-            
-            if (self.isAutoFillQuickTypeOpen) {
-                self.viewController.view.alpha = previousAlpha;
-            }
-        }];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            BOOL ret = [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
+                                                   fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
+                                                      completion:^(BOOL success, NSError * _Nullable error) {
+                    [self onBiometricAuthenticationDone:password success:success error:error];
+                    
+                
+                
 
-        if(!ret) { 
-            NSLog(@"iOS13 Biometric Bug? Please try shaking your device to make the Biometric dialog appear. This is expected to be fixed in iOS13.2. Tap OK now and then shake.");
-        }
+
+
+
+
+
+
+            }];
+
+            if(!ret) {
+                self.completion(kGetCompositeKeyResultError, nil, NO, [Utils createNSError:@"Could not complete biometric request" errorCode:-1234]);
+            }
+        });
     }
 }
 
@@ -377,12 +384,18 @@ static const int kMaxFailedPinAttempts = 3;
     else {
         if (error.code == LAErrorAuthenticationFailed) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts   warn:self.viewController
-                         title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
-                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_message_fmt", @"%@ Authentication Failed. You must now enter your password manually to open the database."), biometricIdName]
-                    completion:^{
+                [Alerts oneOptionsWithCancel:self.viewController
+                                       title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
+                                     message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_message_fmt", @"%@ Authentication Failed. You must now enter your password manually to open the database."), biometricIdName]
+                                  buttonText:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
+                                      action:^(BOOL response) {
+                    if ( response ) {
                         [self promptForManualCredentials];
-                    }];
+                    }
+                    else {
+                        self.completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
+                    }
+                }];
             });
         }
         else if (error.code == LAErrorUserFallback) {
@@ -390,14 +403,20 @@ static const int kMaxFailedPinAttempts = 3;
                 [self promptForManualCredentials];
             });
         }
-        else if (error.code != LAErrorUserCancel) {
+        else if ( error.code != LAErrorUserCancel ) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts   warn:self.viewController
-                         title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
-                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
-                    completion:^{
+                [Alerts oneOptionsWithCancel:self.viewController
+                                       title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
+                                     message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
+                                  buttonText:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
+                                      action:^(BOOL response) {
+                    if ( response ) {
                         [self promptForManualCredentials];
-                    }];
+                    }
+                    else {
+                        self.completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
+                    }
+                }];
             });
         }
         else {

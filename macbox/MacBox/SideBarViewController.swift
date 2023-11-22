@@ -82,6 +82,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
         let auditNotificationsOfInterest: [String] = [
             
+            kAuditNewSwitchedOffNotificationKey,
             kAuditCompletedNotificationKey,
         ]
 
@@ -257,9 +258,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
     func loadTagsSideBarNodes() -> SideBarViewNode? {
         var tags = database.tagSet
 
-        if Settings.sharedInstance().shadeFavoriteTag {
-            tags.remove(kCanonicalFavouriteTag)
-        }
+        tags.remove(kCanonicalFavouriteTag)
 
         let sortedTags = tags.sorted { a, b in
             finderStringCompare(a, b) == .orderedAscending
@@ -293,7 +292,16 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
         
 
-        let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.fastEntryTotalCount) : ""
+        var recycleBinEntryCount = 0
+
+        if let recycleBinNode = database.recycleBinNode {
+            recycleBinEntryCount = recycleBinNode.allChildRecords.count
+        }
+
+        let allEntriesCount = database.fastEntryTotalCount - recycleBinEntryCount
+
+        let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", allEntriesCount) : ""
+
         let allEntriesNode = SideBarViewNode(context: .special(.allEntries), title: NSLocalizedString("quick_view_title_all_entries_title", comment: "All Entries"),
                                              image: Icon.listStar.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
@@ -304,25 +312,18 @@ class SideBarViewController: NSViewController, DocumentViewController {
         let totp = !database.totpEntries.isEmpty
         let attachment = !database.attachmentEntries.isEmpty
         let keeAgentSshKeys = !database.keeAgentSshKeyEntries.isEmpty
+        let passkeys = !database.passkeyEntries.isEmpty
 
         
 
-        if expired {
-            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.expiredEntries.count) : ""
+        if passkeys {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.passkeyEntries.count) : ""
 
-            let entry = SideBarViewNode(context: .special(.expiredEntries), title: NSLocalizedString("browse_vc_section_title_expired", comment: "Expired"),
-                                        image: Icon.expired.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
-
-            specialNodes.append(entry)
-        }
-
-        
-
-        if nearlyExpired {
-            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.nearlyExpiredEntries.count) : ""
-
-            let entry = SideBarViewNode(context: .special(.nearlyExpiredEntries), title: NSLocalizedString("browse_vc_section_title_nearly_expired", comment: "Nearly Expired"),
-                                        image: Icon.nearlyExpired.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
+            let entry = SideBarViewNode(context: .special(.passkeys),
+                                        title: NSLocalizedString("generic_noun_plural_passkeys", comment: "Passkeys"),
+                                        image: Icon.passkey.image(),
+                                        parent: specialsHeader,
+                                        databaseNodeChildCount: childCount)
 
             specialNodes.append(entry)
         }
@@ -359,6 +360,28 @@ class SideBarViewController: NSViewController, DocumentViewController {
                                         image: Icon.sshKey.image(),
                                         parent: specialsHeader,
                                         databaseNodeChildCount: childCount)
+
+            specialNodes.append(entry)
+        }
+
+        
+
+        if expired {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.expiredEntries.count) : ""
+
+            let entry = SideBarViewNode(context: .special(.expiredEntries), title: NSLocalizedString("browse_vc_section_title_expired", comment: "Expired"),
+                                        image: Icon.expired.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
+
+            specialNodes.append(entry)
+        }
+
+        
+
+        if nearlyExpired {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.nearlyExpiredEntries.count) : ""
+
+            let entry = SideBarViewNode(context: .special(.nearlyExpiredEntries), title: NSLocalizedString("browse_vc_section_title_nearly_expired", comment: "Nearly Expired"),
+                                        image: Icon.nearlyExpired.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
             specialNodes.append(entry)
         }
@@ -517,6 +540,9 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     private func refresh() {
+
+
+
         let newHeaders = databaseHeaderNodes
         var newData: [SideBarViewNode] = []
 
@@ -526,21 +552,33 @@ class SideBarViewController: NSViewController, DocumentViewController {
             }
         }
 
+
+
+
         headerNodeStates = newHeaders
         viewNodes = newData
 
         let scrollOffset = outlineView.enclosingScrollView?.contentView.bounds.origin
 
+        outlineView.beginUpdates()
+
         outlineView.reloadData()
 
         expandStructure() 
 
+        outlineView.endUpdates()
+
         bindSelectionToModelNavigationContext()
 
-        if let scrollOffset {
+        if let scrollOffset, scrollOffset != CGPointZero {
             outlineView.enclosingScrollView?.contentView.scroll(scrollOffset)
         }
+
+
+
     }
+
+    var isPerformingProgrammaticExpandCollapse: Bool = false
 
     private func expandRegularHierarchyIfFieldIsExpanded(_ node: SideBarViewNode) {
         if case let .regularHierarchy(uuid) = node.context {
@@ -557,8 +595,6 @@ class SideBarViewController: NSViewController, DocumentViewController {
             }
         }
     }
-
-    var isPerformingProgrammaticExpandCollapse: Bool = false
 
     private func expandStructure() {
         isPerformingProgrammaticExpandCollapse = true
@@ -668,7 +704,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func onModelNavigationContextChanged() {
-        NSLog("✅ SideBarViewController::onModelNavigationContextChanged...")
+
 
         bindSelectionToModelNavigationContext()
     }
@@ -702,6 +738,8 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func bindSelectionToModelNavigationContext() {
+
+
         if isSearching {
             outlineView.selectRowIndexes(IndexSet(), byExtendingSelection: false)
             return
@@ -718,6 +756,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
             if row != -1 {
                 outlineView.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+
                 return
             }
         } else if navContext == .none {
@@ -888,24 +927,19 @@ extension SideBarViewController: NSOutlineViewDelegate {
         if node.headerNode == nil {
             let cell = outlineView.makeView(withIdentifier: TitleAndIconCell.NibIdentifier, owner: self) as! TitleAndIconCell
 
-            let attr: NSAttributedString
             if database.isKeePass2Format, database.sortKeePassNodes, database.recycleBinEnabled, database.recycleBinNode != nil, node.context == .regularHierarchy(database.recycleBinNode!.uuid) {
                 
 
-                let style = NSMutableParagraphStyle()
-                style.lineBreakMode = .byTruncatingTail
-                attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.italicBodyFont, .paragraphStyle: style])
-
-                cell.setContent(attr, iconImage: node.image, topSpacing: 16.0, count: node.databaseNodeChildCount)
+                cell.setContent(node.title,
+                                font: FontManager.shared.italicBodyFont,
+                                textTintColor: Constants.recycleBinTintColor,
+                                iconImage: node.image,
+                                topSpacing: 16.0,
+                                iconTintColor: Constants.recycleBinTintColor,
+                                count: node.databaseNodeChildCount)
             } else {
                 let style = NSMutableParagraphStyle()
                 style.lineBreakMode = .byTruncatingTail
-                attr = NSAttributedString(string: node.title, attributes: [.font: FontManager.shared.bodyFont, .paragraphStyle: style])
-
-                var fav = false
-                if case .favourites = node.context {
-                    fav = true
-                }
 
                 
 
@@ -923,28 +957,39 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
                     let editable = !possiblyDereferencedText && !database.isEffectivelyReadOnly && !database.outlineViewTitleIsReadonly
 
-                    cell.setContent(attr,
-                                    editable: editable,
-                                    iconImage: node.image,
-                                    showTrailingFavStar: fav,
-                                    count: node.databaseNodeChildCount,
-                                    tooltip: childNode.fields.notes)
-                    { [weak self] text in
-                        self?.onNodeTitleEdited(text, node: childNode)
+                    if case .favourites = node.context {
+                        cell.setContent(node.title,
+                                        font: FontManager.shared.entryTitleFont,
+                                        editable: editable,
+                                        iconImage: node.image,
+                                        showTrailingFavStar: false,
+                                        iconTintColor: .linkColor,
+                                        count: node.databaseNodeChildCount,
+                                        tooltip: childNode.fields.notes)
+                        { [weak self] text in
+                            self?.onNodeTitleEdited(text, node: childNode)
+                        }
+                    } else { 
+                        cell.setContent(node.title,
+                                        editable: editable,
+                                        iconImage: node.image,
+                                        count: node.databaseNodeChildCount,
+                                        tooltip: childNode.fields.notes)
+                        { [weak self] text in
+                            self?.onNodeTitleEdited(text, node: childNode)
+                        }
                     }
                 } else if case let .tags(tag) = node.context {
-                    cell.setContent(attr,
+                    cell.setContent(node.title,
                                     editable: true,
                                     iconImage: node.image,
-                                    showTrailingFavStar: fav,
                                     count: node.databaseNodeChildCount)
                     { [weak self] text in
                         self?.onTagTitleEdited(tag, text)
                     }
                 } else {
-                    cell.setContent(attr,
+                    cell.setContent(node.title,
                                     iconImage: node.image,
-                                    showLeadingFavStar: fav,
                                     count: node.databaseNodeChildCount)
                 }
             }
@@ -1043,6 +1088,8 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
         if selected.context != .none {
             setModelNavigationContextWithViewNode(database, selected.context)
+
+            if case .favourites = selected.context {}
         }
     }
 

@@ -20,8 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (SyncStatus*)getSyncStatus:(DatabasePreferences*)database;
 
-- (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
+- (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join key:(CompositeKeyFactors*_Nullable)key completion:(SyncAndMergeCompletionBlock)completion;
 - (void)backgroundSyncAll;
+- (void)backgroundSyncAllAutoFillExit;
 - (void)backgroundSyncOutstandingUpdates;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;
 
@@ -36,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeDatabaseAndLocalCopies:(DatabasePreferences*)database;
 
 - (void)startMonitoringDocumentsDirectory;
+- (void)startMonitoringWorkingCacheDirectory;
 
 #ifndef IS_APP_EXTENSION
 - (BOOL)toggleLocalDatabaseFilesVisibility:(DatabasePreferences*)metadata error:(NSError**)error;

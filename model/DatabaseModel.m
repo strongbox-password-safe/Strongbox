@@ -14,6 +14,7 @@
 #import "CrossPlatform.h"
 #import "Node+KeeAgentSSH.h"
 #import "Constants.h"
+#import "Node+Passkey.h"
 
 #if TARGET_OS_IPHONE
 #import "KissXML.h" 
@@ -156,13 +157,14 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 }
 
 - (NSDictionary<NSUUID *,NodeIcon *> *)iconPool {
-    NSArray<Node*>* allNodes = [self getAllNodesReferencingCustomIcons:self.rootNode];
-    
-    
-    
-    
-    
     const BOOL stripUnusedIcons = self.preferences.stripUnusedIconsOnSave;
+    const BOOL stripUnusedHistoricalIcons = self.preferences.stripUnusedIconsOnSave;
+
+    NSArray<Node*>* allNodes = [self getAllNodesReferencingCustomIcons:self.rootNode includeHistorical:!stripUnusedHistoricalIcons];
+    
+    
+    
+    
     
     NSMutableDictionary<NSUUID*, NodeIcon*>* newIconPool = stripUnusedIcons ? @{}.mutableCopy : self.backingIconPool.mutableCopy;
     
@@ -175,17 +177,21 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         }
     }
     
-    NSLog(@"New Icon Pool count = %lu", (unsigned long)newIconPool.count);
+
     
     self.backingIconPool = newIconPool.copy;
     
     return self.backingIconPool.copy;
 }
 
-- (NSArray<Node*>*)getAllNodesReferencingCustomIcons:(Node *)root {
+- (NSArray<Node*>*)getAllNodesReferencingCustomIcons:(Node *)root includeHistorical:(BOOL)includeHistorical {
     NSArray<Node*>* currentCustomIconNodes = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return node.icon != nil && node.icon.isCustom;
     }];
+    
+    if ( !includeHistorical ) {
+        return currentCustomIconNodes;
+    }
     
     NSArray<Node*>* allNodesWithHistoryAndCustomIcons = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup && [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
@@ -305,31 +311,11 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 }
 
 - (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag {
-    Node* node = [self getItemById:itemId];
-    
-    if ( node ) {
-        if ( ![node.fields.tags containsObject:tag] ) {
-            [node.fields.tags addObject:tag];
-            [self rebuildFastMaps];
-            return YES;
-        }
-    }
-    
-    return NO;
+    return [self addTagToItems:@[itemId] tag:tag];
 }
 
 - (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag {
-    Node* node = [self getItemById:itemId];
-    
-    if ( node ) {
-        if ( [node.fields.tags containsObject:tag] ) {
-            [node.fields.tags removeObject:tag];
-            [self rebuildFastMaps];
-            return YES;
-        }
-    }
-    
-    return NO;
+    return [self removeTagFromItems:@[itemId] tag:tag];
 }
 
 - (void)deleteTag:(NSString*)tag {
@@ -346,7 +332,9 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     [self addTagToItems:ids tag:to];
 }
 
-- (void)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+- (BOOL)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+    BOOL modifiedSomething = NO;
+    
     NSArray<Node*>* items = [self getItemsById:ids];
     
     for (Node* item in items) {
@@ -356,18 +344,22 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         
         [self addHistoricalNode:item];
         [item touch:YES touchParents:NO];
+        modifiedSomething = YES;
         
         [item.fields.tags addObject:tag];
     }
     
     [self rebuildFastMaps];
+    
+    return modifiedSomething;
 }
 
-- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
-    [self removeTagFromItems:ids tag:tag touchAndAddHistory:YES];
+- (BOOL)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
+    return [self removeTagFromItems:ids tag:tag touchAndAddHistory:YES];
 }
 
-- (void)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag touchAndAddHistory:(BOOL)touchAndAddHistory {
+- (BOOL)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag touchAndAddHistory:(BOOL)touchAndAddHistory {
+    BOOL modifiedSomething = NO;
     NSArray<Node*>* items = [self getItemsById:ids];
     
     for (Node* item in items) {
@@ -378,12 +370,15 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         if ( touchAndAddHistory ) {
             [self addHistoricalNode:item];
             [item touch:YES touchParents:NO];
+            modifiedSomething = YES;
         }
         
         [item.fields.tags removeObject:tag];
     }
     
     [self rebuildFastMaps];
+    
+    return modifiedSomething;
 }
 
 
@@ -995,11 +990,14 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 
 
 - (void)rebuildFastMaps {
+
+              
     NSMutableDictionary<NSUUID*, Node*>* uuidMap = NSMutableDictionary.dictionary;
     
     NSMutableSet<NSUUID*> *expirySet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *attachmentSet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *keeAgentSshKeysSet = NSMutableSet.set;
+    NSMutableSet<NSUUID*> *passkeysSet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *totpSet = NSMutableSet.set;
     NSMutableDictionary<NSString*, NSMutableSet<NSUUID*>*>* tagMap = NSMutableDictionary.dictionary;
     NSCountedSet<NSString*> *usernameSet = NSCountedSet.set;
@@ -1037,6 +1035,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
                                               withExpiryDates:expirySet
                                               withAttachments:attachmentSet
                                           withKeeAgentSshKeys:keeAgentSshKeysSet
+                                                 withPasskeys:passkeysSet
                                                     withTotps:totpSet
                                                        tagMap:tagMap
                                                   usernameSet:usernameSet
@@ -1082,6 +1081,12 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
             
             if ( node.keeAgentSshKeyViewModel ) {
                 [keeAgentSshKeysSet addObject:node.uuid];
+            }
+            
+            
+            
+            if ( node.passkey ) {
+                [passkeysSet addObject:node.uuid];
             }
             
             
@@ -1136,6 +1141,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
                                           withExpiryDates:expirySet
                                           withAttachments:attachmentSet
                                       withKeeAgentSshKeys:keeAgentSshKeysSet
+                                             withPasskeys:passkeysSet
                                                 withTotps:totpSet
                                                    tagMap:tagMap
                                               usernameSet:usernameSet
@@ -1146,6 +1152,9 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
                                           groupTotalCount:groupTotalCount];
     
     _fastMaps = newMaps;
+    
+
+
 }
 
 - (NSArray<NSUUID *> *)getItemIdsForTag:(NSString *)tag {
@@ -1260,7 +1269,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     return [self orderedByMostFrequentDescending:self.fastMaps.usernameSet];
 }
 
-- (NSSet<NSString*> *)tagSet {
+- (NSSet<NSString*> *)tagSet { 
     NSArray<NSString*>* trimmed = [self.fastMaps.tagMap.allKeys map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
         return [Utils trim:obj];
     }];
@@ -1268,14 +1277,14 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     NSArray* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
         return obj.length > 0;
     }];
-    
+
     return [NSSet setWithArray:filtered];
 }
 
 - (NSArray<NSString*>*)mostPopularTags {
     NSMutableArray<NSString*>* tags = self.fastMaps.tagMap.allKeys.mutableCopy;
     
-    [tags removeObject:kCanonicalFavouriteTag];
+    [tags removeObject:kCanonicalFavouriteTag]; 
 
     NSArray<NSString*>* sorted = [tags sortedArrayUsingComparator:^(id obj1, id obj2) {
         NSString* tag1 = obj1;
@@ -1340,6 +1349,14 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     __weak DatabaseModel* weakSelf = self;
     
     return [self.fastMaps.withKeeAgentSshKeys.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [weakSelf getItemById:obj];
+    }];
+}
+
+- (NSArray<Node *> *)passkeyEntries {
+    __weak DatabaseModel* weakSelf = self;
+    
+    return [self.fastMaps.withPasskeys.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [weakSelf getItemById:obj];
     }];
 }
@@ -1483,7 +1500,6 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         [hierarchy insertObject:title atIndex:0];
         current = current.parent;
     }
-    
     
     if ( includeRootGroup ) {
         NSString* rootGroupName = (rootGroupNameInsteadOfSlash && self.effectiveRootGroup) ? self.effectiveRootGroup.title : @"/";
@@ -1724,8 +1740,25 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 
 
 
-- (void)performPreSerializationTidy {
+- (void)preSerializationPerformMaintenanceOrMigrations {
+    
+    
+    
+    
+    [self migrateOlderPasskeysForUsernameIssue]; 
+    
     [self trimKeePassHistory];
+}
+
+- (void)migrateOlderPasskeysForUsernameIssue {
+    for ( Node* node in self.passkeyEntries ) {
+        StringValue *usernameSv = node.fields.customFields[@"KPXC_PASSKEY_USERNAME"];
+        
+        if ( usernameSv == nil ) {
+            NSLog(@"🟢 Migrate older Passkey format for node %@", node.uuid);
+            [node.fields setCustomField:@"KPXC_PASSKEY_USERNAME" value:[StringValue valueWithString:node.fields.username protected:NO]];
+        }
+    }
 }
 
 - (void)trimKeePassHistory {

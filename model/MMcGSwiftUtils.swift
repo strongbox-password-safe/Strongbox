@@ -9,20 +9,20 @@
 import Foundation
 
 class MMcGSwiftUtils: NSObject {
-//    class func generateRoundCornerImage(image : UIImage , radius : CGFloat) -> UIImage {
-//        let imageLayer = CALayer()
-//        imageLayer.frame = CGRect(0, 0, image.size.width, image.size.height)
-//        imageLayer.contents = image.cgImage
-//        imageLayer.masksToBounds = true
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     @objc class func navTitleWithImageAndText(titleText: String, image: UIImage?, tint: UIColor?) -> UIView {
         let imageView = UIImageView()
@@ -54,5 +54,19 @@ class MMcGSwiftUtils: NSObject {
         stackViewTitle.sizeToFit()
 
         return stackViewTitle
+    }
+
+    @objc
+    public class func stripInvalidFilenameCharacters(_ originalFilename: String) -> String {
+        var invalidCharacters = CharacterSet(charactersIn: ":/")
+        invalidCharacters.formUnion(.newlines)
+        invalidCharacters.formUnion(.illegalCharacters)
+        invalidCharacters.formUnion(.controlCharacters)
+
+        let newFilename = originalFilename
+            .components(separatedBy: invalidCharacters)
+            .joined(separator: "")
+
+        return newFilename
     }
 }

@@ -22,6 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL scanHtml;
 @property BOOL ignoreInvalidSSLCerts;
 
+@property NSInteger idealSize;
+@property NSInteger maxSize;
+@property NSInteger idealDimension;
+
 @property (readonly) BOOL isValid;
 
 @end

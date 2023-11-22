@@ -148,7 +148,7 @@
          yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                 allowFallback:(BOOL)allowFallback
                    completion:(CompositeKeyDeterminedBlock)completion {
-    NSLog(@"MacCompositeKeyDeterminer::getCkfsWithBiometrics...");
+
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self _getCkfsWithBiometrics:message
@@ -244,6 +244,7 @@
         requiredDummyAutoFillSheet.onCancelButton = ^{
             completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
         };
+        
         [self.viewController presentViewControllerAsSheet:requiredDummyAutoFillSheet];
     }
     
@@ -253,9 +254,11 @@
                                      completion:^(BOOL success, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             
+            
             if ( requiredDummyAutoFillSheet ) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [self.viewController dismissViewController:requiredDummyAutoFillSheet];
+                    [requiredDummyAutoFillSheet.view.window.sheetParent endSheet:requiredDummyAutoFillSheet.view.window returnCode:NSModalResponseCancel];
+                    
                 });
             }
             

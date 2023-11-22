@@ -102,7 +102,6 @@
 
         self.viewModel.databaseMetadata.autoFillEnabled = enableAutoFill;
         self.viewModel.databaseMetadata.quickTypeEnabled = enableAutoFill;
-        self.viewModel.databaseMetadata.quickWormholeFillEnabled = enableAutoFill;
 
         if ( enableAutoFill ) {
             [self updateQuickTypeAutoFillDatabases];
@@ -118,15 +117,7 @@
 }
 
 - (void)updateQuickTypeAutoFillDatabases {
-    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.commonModel
-                                                       databaseUuid:self.viewModel.databaseMetadata.uuid
-                                                      displayFormat:self.viewModel.databaseMetadata.quickTypeDisplayFormat
-                                                    alternativeUrls:self.viewModel.databaseMetadata.autoFillScanAltUrls
-                                                       customFields:self.viewModel.databaseMetadata.autoFillScanCustomFields
-                                                              notes:self.viewModel.databaseMetadata.autoFillScanNotes
-                                       concealedCustomFieldsAsCreds:self.viewModel.databaseMetadata.autoFillConcealedFieldsAsCreds
-                                     unConcealedCustomFieldsAsCreds:self.viewModel.databaseMetadata.autoFillUnConcealedFieldsAsCreds
-                                                           nickName:self.viewModel.databaseMetadata.nickName];
+    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.commonModel clearFirst:NO];
 }
 
 - (void)viewWillAppear {

@@ -47,7 +47,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
     self = [super init];
     
     if (self) {
-        NSLog(@"✅ Document::init");
+
         
 
     }
@@ -93,7 +93,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 }
 
 - (void)makeWindowControllers {
-    NSLog(@"makeWindowControllers -> viewModel = [%@]", self.viewModel);
+
 
     self.windowController = [[NSStoryboard storyboardWithName:@"NextGen" bundle:nil] instantiateInitialController];
     
@@ -123,19 +123,19 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
         return;
     }
     
-    NSLog(@"✅ Document::onLockStateChanged");
+
     
     [self bindToLockState];
 }
 
 - (void)bindToLockState {
-    NSLog(@"✅ Document::bindToLockState");
+
 
     Model* model = [DatabasesCollection.shared getUnlockedWithUuid:self.databaseMetadata.uuid];
     
     if ( !self.viewModel || self.viewModel.locked ) {
         if ( model ) {
-            NSLog(@"✅ Document::bindToLockState => Newly Unlocked");
+
 
             _viewModel = [[ViewModel alloc] initUnlocked:self databaseUuid:self.databaseMetadata.uuid model:model];
             [self bindWindowControllerAfterLockStatusChange];
@@ -171,7 +171,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing  _Nullable *)outError {
-    NSLog(@"Document::readFromURL [%@] at [%@]", self.databaseMetadata.nickName, url);
+
 
     if ( !self.viewModel ) { 
         _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
@@ -231,7 +231,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
            ofType:(NSString *)typeName
  forSaveOperation:(NSSaveOperationType)saveOperation
 completionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    NSLog(@"✅ saveToURL: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, url);
+
     
     BOOL updateQueued = [DatabasesCollection.shared updateAndQueueSyncWithUuid:self.databaseMetadata.uuid allowInteractiveSync:YES];
     
@@ -255,7 +255,10 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *) coder {
 
-    [coder encodeObject:self.fileURL forKey:@"StrongboxNonFileRestorationStateURL"];
+    
+    [coder encodeObject:self.fileURL.absoluteString forKey:kDocumentRestorationNSCoderKeyForUrl];
+    
+    [super encodeRestorableStateWithCoder:coder];
 }
 
 - (NSURL *)presentedItemURL {
@@ -358,7 +361,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)closeAllWindows {
-    NSLog(@"✅ Document::closeAllWindows");
+
     
     if ( !self.viewModel.locked ) {
         if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
@@ -466,7 +469,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
                         [DatabasesCollection.shared syncWithUuid:self.databaseMetadata.uuid
                                                 allowInteractive:YES
                                              suppressErrorAlerts:NO
-                                                 ckfsForConflict:nil 
+                                                 ckfsForConflict:self.viewModel.compositeKeyFactors
                                                       completion:nil];
                     }
                     
@@ -482,7 +485,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
                 [DatabasesCollection.shared syncWithUuid:self.databaseMetadata.uuid
                                         allowInteractive:YES
                                      suppressErrorAlerts:NO
-                                         ckfsForConflict:nil 
+                                         ckfsForConflict:self.viewModel.compositeKeyFactors
                                               completion:nil];
 
                 self.isPromptingAboutUnderlyingFileChange = NO;

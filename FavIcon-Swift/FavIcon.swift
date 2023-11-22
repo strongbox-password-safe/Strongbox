@@ -9,11 +9,11 @@
 // http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+
+
+
+
+
 
 import Foundation
 
@@ -187,7 +187,7 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                 let checkFavIconOperation = CheckURLExistsOperation(url: favIconURL, session: urlSession)
                 let checkFavIcon = urlRequestOperation(checkFavIconOperation) { result in
                     if case let .success(actualURL) = result {
-                        print("Common File Success: ", actualURL)
+
                         syncQueue.sync {
                             icons.append(DetectedIcon(url: actualURL, type: .classic))
                         }
@@ -357,11 +357,17 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
     @objc static var insecureUrlSessionProvider: URLSessionProvider = FavIcon.createInsecureURLSession
 
     @objc static func createDefaultURLSession() -> URLSession {
-        return URLSession.shared
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.timeoutIntervalForRequest = 5.0
+        sessionConfig.timeoutIntervalForResource = 5.0
+        return URLSession(configuration: sessionConfig)
     }
 
     @objc static func createInsecureURLSession() -> URLSession {
-        return URLSession(configuration: URLSessionConfiguration.default, delegate: AuthSessionDelegate(), delegateQueue: nil)
+        let sessionConfig = URLSessionConfiguration.default
+        sessionConfig.timeoutIntervalForRequest = 5.0
+        sessionConfig.timeoutIntervalForResource = 5.0
+        return URLSession(configuration: sessionConfig, delegate: AuthSessionDelegate(), delegateQueue: nil)
     }
 }
 

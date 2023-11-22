@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CollapsibleTableViewHeader : UITableViewHeaderFooterView
 
 @property (nonatomic, copy) void (^onToggleSection)(void);
+
+- (instancetype)initWithOnCopy:(void(^ _Nullable )(void))onCopy;
 - (void)setCollapsed:(BOOL)collapsed;
 
 @end

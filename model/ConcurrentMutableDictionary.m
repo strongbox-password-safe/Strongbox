@@ -42,11 +42,37 @@
     });
 }
 
+- (void)removeObjectsForKeys:(NSArray *)keyArray {
+    dispatch_barrier_async(self.dataQueue, ^{ 
+        [self.data removeObjectsForKeys:keyArray];
+    });
+}
+
 - (NSArray *)allKeys {
     __block NSArray* result;
     
     dispatch_sync(self.dataQueue, ^{  
         result = self.data.allKeys;
+    });
+    
+    return result;
+}
+
+- (NSUInteger)count {
+    __block NSUInteger result;
+    
+    dispatch_sync(self.dataQueue, ^{  
+        result = self.data.count;
+    });
+    
+    return result;
+}
+
+- (NSArray *)allValues {
+    __block NSArray* result;
+    
+    dispatch_sync(self.dataQueue, ^{  
+        result = self.data.allValues;
     });
     
     return result;

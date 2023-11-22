@@ -9,13 +9,15 @@
 #import <Foundation/Foundation.h>
 #import "CustomFieldViewModel.h"
 #import "OTPToken.h"
-#import "ItemMetadataEntry.h"
 #import "KeePassAttachmentAbstractionLayer.h"
 #import "MutableOrderedDictionary.h"
 #import "Node.h"
 #import "DatabaseFormat.h"
-#import "Model.h"
 #import "KeeAgentSshKeyViewModel.h"
+#import "AutoFillNewRecordSettings.h"
+#import "Model.h"
+
+@class Passkey;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,15 +25,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)demoItem;
 
-+ (instancetype)fromNode:(Node *)item
-                  format:(DatabaseFormat)format
-                   model:(Model*)model
-        sortCustomFields:(BOOL)sortCustomFields;
++ (instancetype)newEmptyEntry;
+
++ (instancetype)newEntryWithDefaults:(AutoFillNewRecordSettings *)settings
+                 mostPopularUsername:(NSString*)mostPopularUsername
+                   generatedPassword:(NSString*)generatedPassword
+                    mostPopularEmail:(NSString*)mostPopularEmail;
+
++ (instancetype)fromNode:(Node *)item model:(Model*)model;
 
 - (BOOL)applyToNode:(Node*)ret
-     databaseFormat:(DatabaseFormat)databaseFormat
+              model:(Model*)model
 legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
       addOtpAuthUrl:(BOOL)addOtpAuthUrl;
+
+
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -39,6 +47,8 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 - (BOOL)isDifferentFrom:(EntryViewModel*)other;
 
 
+
+@property BOOL favourite;
 
 @property (nullable) NodeIcon* icon;
 @property NSString* title;
@@ -49,16 +59,11 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 @property NSString* email;
 @property (nullable) NSDate* expires;
 @property (nullable) OTPToken* totp;
-@property BOOL hasHistory;
 @property (nullable) NSUUID* parentGroupUuid;
-@property (readonly) NSArray<ItemMetadataEntry*> *metadata;
 
 
 
 @property (readonly) BOOL sortCustomFields;
-@property (readonly) BOOL filterCustomFields; 
-@property (readonly) BOOL supportsCustomFields;
-
 @property (readonly) NSSet<NSString*> *existingCustomFieldsKeySet;
 @property (readonly) NSArray<CustomFieldViewModel*> *customFieldsFiltered;
 
@@ -85,6 +90,10 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 
 @property (nullable) KeeAgentSshKeyViewModel* keeAgentSshKey;
 - (void)setKeeAgentSshKeyEnabled:(BOOL)enabled;
+
+
+
+@property (nullable) Passkey* passkey;
 
 @end
 

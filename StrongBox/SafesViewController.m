@@ -39,7 +39,6 @@
 #import "ProUpgradeIAPManager.h"
 #import "BiometricsManager.h"
 #import "BookmarksHelper.h"
-#import "YubiManager.h"
 #import "FreeTrialOnboardingViewController.h"
 #import "AppPreferences.h"
 #import "SyncManager.h"
@@ -421,6 +420,8 @@
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
     [self refreshICloudFolderDatabases];
     
+    [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
+    
     [self doAppOnboarding:userJustCompletedBiometricAuthentication quickLaunchWhenDone:YES];
 }
 
@@ -479,9 +480,8 @@
     
     
     
-    [DatabasePreferences reloadIfChangedByOtherComponent];
+    BOOL reloadedDueToAutoFillChange = [DatabasePreferences reloadIfChangedByOtherComponent];
     self.collection = DatabasePreferences.allDatabases;
-    [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     [self refresh]; 
 
     
@@ -500,6 +500,23 @@
             [self doAppActivationTasks:NO];
         }
     }
+    
+    if ( reloadedDueToAutoFillChange ) {
+        [self notifyUnlockedDatabaseAutoFillChangesMade];
+    }
+}
+
+- (void)notifyUnlockedDatabaseAutoFillChangesMade {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ( self.unlockedDatabase ) {
+            NSLog(@"AutoFill Changes were made and unlocked database open, notify to reload");
+            [NSNotificationCenter.defaultCenter postNotificationName:kAutoFillChangedConfigNotification object:nil];
+        }
+        else {
+            NSLog(@"AutoFill Changes were made and no unlocked database open doing a background sync on all");
+            [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
+        }
+    });
 }
 
 - (void)onAppLockScreenWillBeDismissed:(void (^)(void))completion {
@@ -1390,7 +1407,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 - (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath  {
     return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"generic_remove", @"Remove")
-                                     systemImage:@"trash"
+                                     systemImage:@"trash.fill"
                                          handler:^(__kindof UIAction * _Nonnull action) {
         [self removeSafe:indexPath];
     }];
@@ -1721,6 +1738,22 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 
 
+- (void)renameDatabase:(DatabasePreferences*)database name:(NSString*)name renameFile:(BOOL)renameFile {
+    database.nickName = name;
+    
+    BOOL allowFileRename = database.storageProvider == kLocalDevice;
+    if ( renameFile &&  allowFileRename ) {
+        NSError* error;
+        if ( ![LocalDeviceStorageProvider.sharedInstance renameFilename:database filename:name error:&error] ) {
+            NSLog(@"🔴 Error Renaming... [%@]", error);
+            
+            if ( error ) {
+                [Alerts error:self error:error];
+            }
+        }
+    }
+}
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ( [segue.identifier isEqualToString:@"segueToMasterDetail"] ) {
         MainSplitViewController *svc = segue.destinationViewController;
@@ -1764,10 +1797,13 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         scVc.mode = kCASGModeRenameDatabase;
         scVc.initialName = database.nickName;
         
+        BOOL allowFileRename = database.storageProvider == kLocalDevice;
+        scVc.showFileRenameOption = allowFileRename;
+        
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
-                    database.nickName = creds.name;
+                    [self renameDatabase:database name:creds.name renameFile:creds.renameFileToMatch && allowFileRename];
                 }
             }];
         };
@@ -2758,18 +2794,21 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     
     NSDate* modDate = attr.fileModificationDate;
     
+
+    
     NSString* nickName = [NSString stringWithFormat:@"Local Copy of %@", database.nickName];
     NSString* extension = [Serializator getLikelyFileExtension:data];
+    
     [LocalDeviceStorageProvider.sharedInstance create:nickName
                                             extension:extension
                                                  data:data
                                               modDate:modDate
-                                    suggestedFilename:nickName
+                                    suggestedFilename:database.fileName
                                            completion:^(DatabasePreferences * _Nonnull metadata, NSError * _Nonnull error) {
         if(error || !metadata) {
             [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
             return;
-        }
+        } 
         
         [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
 

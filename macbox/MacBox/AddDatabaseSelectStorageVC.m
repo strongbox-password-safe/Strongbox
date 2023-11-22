@@ -55,7 +55,7 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
 }
 
 - (void)loadItems:(StorageBrowserItem*)sbi {
-    NSLog(@"loadItems: [%@]", sbi);
+
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [self.provider list:sbi.providerData

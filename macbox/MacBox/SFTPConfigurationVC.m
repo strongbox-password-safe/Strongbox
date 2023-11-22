@@ -103,7 +103,7 @@
     openPanel.showsHiddenFiles = YES;
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
-            NSLog(@"onLocateKey: %@", openPanel.URL);
+
 
             NSError* error;
             NSData* key = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];

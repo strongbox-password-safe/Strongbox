@@ -1,9 +1,9 @@
 //
 //  AutoFillNewRecordSettings.m
-//  Strongbox
+//  Strongbox-iOS
 //
-//  Created by Mark on 09/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Created by Mark on 04/10/2018.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "AutoFillNewRecordSettings.h"
@@ -20,10 +20,10 @@ static NSString* const kNewEntryDefaultsCustomNotes = @"Strongbox-NewEntryDefaul
 
 + (instancetype)defaults {
     AutoFillNewRecordSettings *defaultInstance = [[AutoFillNewRecordSettings alloc] init];
-    
+        
     defaultInstance.titleAutoFillMode = kDefault;
     defaultInstance.titleCustomAutoFill = NSLocalizedString(@"defaults_model_custom_title_default", @"Custom Title Default Text");
-        
+    
     defaultInstance.usernameAutoFillMode = kMostUsed;
     defaultInstance.usernameCustomAutoFill = NSLocalizedString(@"defaults_model_custom_username_default", @"Custom Username Default Text");
     
@@ -32,7 +32,7 @@ static NSString* const kNewEntryDefaultsCustomNotes = @"Strongbox-NewEntryDefaul
     
     defaultInstance.emailAutoFillMode = kMostUsed;
     defaultInstance.emailCustomAutoFill = NSLocalizedString(@"defaults_model_custom_email_default", @"Custom Email Default Text");
-
+    
     defaultInstance.urlAutoFillMode = kNone;
     defaultInstance.urlCustomAutoFill = NSLocalizedString(@"defaults_model_custom_url_default", @"Custom URL Default Text");
     
@@ -49,7 +49,6 @@ static NSString* const kNewEntryDefaultsCustomNotes = @"Strongbox-NewEntryDefaul
     [aCoder encodeObject:@(self.emailAutoFillMode) forKey:@"emailAutoFillMode"];
     [aCoder encodeObject:@(self.urlAutoFillMode) forKey:@"urlAutoFillMode"];
     [aCoder encodeObject:@(self.notesAutoFillMode) forKey:@"notesAutoFillMode"];
-
 }
 
 -(id)initWithCoder:(NSCoder *)aDecoder{

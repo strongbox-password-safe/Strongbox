@@ -8,9 +8,20 @@
 
 #import "AutoFillLoadingVC.h"
 
+@interface AutoFillLoadingVC ()
+@property (weak) IBOutlet NSProgressIndicator *spinner;
+
+@end
+
 @implementation AutoFillLoadingVC
 
-- (IBAction)onCancel:(id)sender {   
+- (void)viewWillAppear {
+    [super viewWillAppear];
+    
+    [self.spinner startAnimation:nil];
+}
+
+- (IBAction)onCancel:(id)sender {
     self.onCancelButton();
 }
 

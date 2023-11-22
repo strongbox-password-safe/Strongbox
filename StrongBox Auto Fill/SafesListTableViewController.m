@@ -13,7 +13,6 @@
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "CredentialProviderViewController.h"
 #import "SVProgressHUD.h"
-#import "PickCredentialsTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "DatabaseCell.h"
 #import "Utils.h"
@@ -27,6 +26,7 @@
 #import "DatabaseUnlocker.h"
 #import "DuressActionHelper.h"
 #import "AppPreferences.h"
+#import "WorkingCopyManager.h"
 
 @interface SafesListTableViewController ()
 
@@ -36,6 +36,16 @@
 @end
 
 @implementation SafesListTableViewController
+
++ (UINavigationController *)navControllerfromStoryboard:(SelectAutoFillDatabaseCompletion)completion {
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainInterface" bundle:nil];
+    UINavigationController* ret = [mainStoryboard instantiateViewControllerWithIdentifier:@"SafesListNavigationController"];
+    
+    SafesListTableViewController* databasesList = ((SafesListTableViewController*)(ret.topViewController));
+    databasesList.completion = completion;
+    
+    return ret;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -51,7 +61,7 @@
             return [obj.uuid isEqualToString:AppPreferences.sharedInstance.autoFillQuickLaunchUuid];
         }];
      
-        if(database && [[self getInitialViewController] autoFillIsPossibleWithSafe:database]) {
+        if( database && [self autoFillIsPossibleWithSafe:database]) {
             NSLog(@"AutoFill - Quick Launch configured and possible... launching db");
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -60,23 +70,14 @@
             return;
         }
     }
-    
-    
-    
-    if ( AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
-        NSArray<DatabasePreferences*> *possibles = [self.safes filter:^BOOL(DatabasePreferences * _Nonnull obj) {
-            return [[self getInitialViewController] autoFillIsPossibleWithSafe:obj];
-        }];
-        
-        if ( possibles.count == 1 ) {
-            NSLog(@"AutoFill - single enabled database and Auto Proceed switched on... launching db");
+}
 
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self openDatabase:possibles.firstObject];
-            });
-            return;
-        }
+- (BOOL)autoFillIsPossibleWithSafe:(DatabasePreferences*)safeMetaData {
+    if(!safeMetaData.autoFillEnabled) {
+        return NO;
     }
+        
+    return [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safeMetaData.uuid modified:nil];
 }
 
 - (void)setupUi {
@@ -104,10 +105,6 @@
     [self.navigationController setToolbarHidden:NO];
     self.navigationController.toolbar.hidden = NO;
     self.navigationController.toolbarHidden = NO;
-}
-
-- (IBAction)onCancel:(id)sender {
-    [[self getInitialViewController] exitWithUserCancelled:nil];
 }
 
 - (NSAttributedString *)getTitleForEmptyDataSet {
@@ -148,15 +145,11 @@
     DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
     DatabasePreferences *safe = [self.safes objectAtIndex:indexPath.row];
     
-    BOOL autoFillPossible = [[self getInitialViewController] autoFillIsPossibleWithSafe:safe];
+    BOOL autoFillPossible = [self autoFillIsPossibleWithSafe:safe];
 
     [cell populateCell:safe disabled:!autoFillPossible autoFill:YES];
     
     return cell;
-}
-
-- (CredentialProviderViewController *)getInitialViewController {
-    return self.rootViewController;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -167,86 +160,16 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+- (IBAction)onCancel:(id)sender {
+
+        self.completion(YES, nil);
+
+}
+
 - (void)openDatabase:(DatabasePreferences*)safe {
-    IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
-    [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
-        if (result == kGetCompositeKeyResultSuccess) {
-            AppPreferences.sharedInstance.autoFillExitedCleanly = NO; 
-            DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:safe viewController:self forceReadOnly:NO isNativeAutoFillAppExtensionOpen:YES offlineMode:YES];
-            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
-                AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
-                [self onUnlockDone:result model:model error:error];
-            }];
-        }
-        else if (result == kGetCompositeKeyResultError) {
-            [self messageErrorAndExit:error];
-        }
-        else if (result == kGetCompositeKeyResultDuressIndicated) {
-            [DuressActionHelper performDuressAction:self database:safe isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
-                [self onUnlockDone:result model:model error:error];
-                [self refreshSafes]; 
-            }];
-        }
-        else {
 
-        }
-    }];
-}
+        self.completion(NO, safe);
 
-- (void)onUnlockDone:(UnlockDatabaseResult)result model:(Model * _Nullable)model error:(NSError * _Nullable)error {
-    NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
-    
-    if(result == kUnlockDatabaseResultSuccess) {
-        [self onUnlockedSuccessfully:model];
-    }
-    else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
-        [self onCancel:nil];
-    }
-    else if (result == kUnlockDatabaseResultIncorrectCredentials) {
-        
-        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
-        [[self getInitialViewController] exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
-    }
-    else if (result == kUnlockDatabaseResultError) {
-        [self messageErrorAndExit:error];
-    }
-}
-
-- (void)onUnlockedSuccessfully:(Model*)model {
-    if (model.metadata.autoFillConvenienceAutoUnlockTimeout == -1 ) {
-        [self.rootViewController onboardForAutoFillConvenienceAutoUnlock:self database:model.metadata completion:^{
-            [self continueUnlockDatabase:model];
-        }];
-    }
-    else {
-        [self continueUnlockDatabase:model];
-    }
-}
-
-- (void)continueUnlockDatabase:(Model*)model  {
-    if ( model.metadata.autoFillConvenienceAutoUnlockTimeout > 0 ) {
-        model.metadata.autoFillConvenienceAutoUnlockPassword = model.database.ckfs.password;
-        [self.rootViewController markLastUnlockedAtTime:model.metadata];
-    }
-
-    [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
-}
-
-- (void)messageErrorAndExit:(NSError*)error {
-    [Alerts error:self
-            title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-            error:error
-       completion:^{
-        [[self getInitialViewController] exitWithErrorOccurred:error];
-    }];
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ( [segue.identifier isEqualToString:@"toPickCredentialsFromSafes"] ) {
-        PickCredentialsTableViewController *vc = segue.destinationViewController;
-        vc.model = (Model *)sender;
-        vc.rootViewController = self.rootViewController;
-    }
 }
 
 @end

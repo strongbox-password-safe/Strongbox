@@ -9,11 +9,11 @@
 import Foundation
 import SwiftUI
 
-// class StrongboxHostingController<Content> : NSHostingController<Content> where Content : View {
-//    override func viewDidAppear() {
-//        super.viewDidAppear()
-//
-//        view.window?.center()
+
+
+
+
+
 
 
 

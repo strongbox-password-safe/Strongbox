@@ -32,6 +32,8 @@
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Strongbox Password Database (Non File)";
 
+static BOOL didRestoreAWindowAtStartup;
+
 @interface DocumentController ()
 
 @property BOOL hasDoneAppStartupTasks;
@@ -49,6 +51,8 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 }
 
 - (void)newDocument:(id)sender {
+    NSLog(@"newDocument");
+    
     
 
     [DBManagerPanel.sharedInstance show];
@@ -208,7 +212,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
                                 completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
     MacDatabasePreferences* database = [MacDatabasePreferences fromUrl:url];
     
-    NSLog(@"openDocumentWithContentsOfURL: [%@] => Metadata = [%@]", url, database);
+
     
     NSURL* maybeManaged = database ? url : managedUrlFromFileUrl(url);
     
@@ -272,6 +276,8 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 }
 
 - (void)openDocument:(id)sender {
+    NSLog(@"openDocument");
+    
     
     
     
@@ -332,7 +338,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 }
 
 - (void)onAppStartup {
-    NSLog(@"✅ DocumentController::onAppStartup: document count = [%ld]", self.documents.count);
+
     
     [self doAppStartupTasksOnceOnly];
 }
@@ -349,7 +355,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 - (void)doAppStartupTasksOnceOnly2 {
     self.hasDoneAppStartupTasks = YES;
     
-    NSLog(@"doAppStartupTasksOnceOnly - Doing tasks as they have not yet been done");
+
     
     AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
     if ( appDelegate.isWasLaunchedAsLoginItem && Settings.sharedInstance.showSystemTrayIcon ) {
@@ -359,16 +365,32 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
         if( self.startupDatabases.count ) {
             [self launchStartupDatabases];
         }
-        else if ( self.documents.count == 0 ) {
-            if ( Settings.sharedInstance.showDatabasesManagerOnAppLaunch ) {
-                NSLog(@"DocumentController::doAppStartupTasksOnceOnly2 -> Empty Startup - Showing Databases Manager because so configured");
-                
-                [DBManagerPanel.sharedInstance show];
+        else {
+            if ( didRestoreAWindowAtStartup ) { 
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self checkForEmptyLaunch];
+                });
             }
             else {
-                NSLog(@"DocumentController::doAppStartupTasksOnceOnly2 -> Empty Startup - Not Showing DB Manager because so configured...");
+                [self checkForEmptyLaunch];
             }
         }
+    }
+}
+
+- (void)checkForEmptyLaunch {
+    if ( self.documents.count == 0 ) {
+        if ( Settings.sharedInstance.showDatabasesManagerOnAppLaunch ) {
+
+            
+            [DBManagerPanel.sharedInstance show];
+        }
+        else {
+
+        }
+    }
+    else {
+
     }
 }
 
@@ -412,18 +434,28 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 + (void)restoreWindowWithIdentifier:(NSUserInterfaceItemIdentifier)identifier
                               state:(NSCoder *)state
                   completionHandler:(void (^)(NSWindow * _Nullable, NSError * _Nullable))completionHandler {
+
     
-    
-    if ([state containsValueForKey:@"StrongboxNonFileRestorationStateURL"] ) {
-        NSURL *nonFileRestorationStateURL = [state decodeObjectForKey:@"StrongboxNonFileRestorationStateURL"];
+    if ([state containsValueForKey:kDocumentRestorationNSCoderKeyForUrl] ) {
+        NSString *nonFileRestorationStateURL = [state decodeObjectOfClass:NSString.class forKey:kDocumentRestorationNSCoderKeyForUrl];
         
         if ( nonFileRestorationStateURL ) {
+
             
+            NSURL* url = [NSURL URLWithString:nonFileRestorationStateURL];
+            if (!url ) {
+                NSLog(@"🔴 restoreWindowWithIdentifier... could not cast string to URL: [%@]", nonFileRestorationStateURL);
+                return;
+            }
             
-            [[self sharedDocumentController] reopenDocumentForURL:nonFileRestorationStateURL
-                                                withContentsOfURL:nonFileRestorationStateURL
+            didRestoreAWindowAtStartup = YES;
+            
+            [[self sharedDocumentController] reopenDocumentForURL:url
+                                                withContentsOfURL:url
                                                           display:NO
                                                 completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+
+                
                 NSWindow *resultWindow = nil;
                 
                 if (!documentWasAlreadyOpen) {
@@ -447,7 +479,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
                 completionHandler(resultWindow, error);
             }];
         }
-        
+       
         return;
     }
     

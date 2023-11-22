@@ -216,7 +216,7 @@
     
     
     
-    if(self.requestInProgress) {
+    if ( self.requestInProgress ) {
         
         NSLog(@"WARN: WARN: Biometric Request is already in Progress - Not launching again...");
         return NO;
@@ -240,7 +240,7 @@
                                    }
                                    completion(success, error);
                                }];
-    
+
     return YES;
 }
 

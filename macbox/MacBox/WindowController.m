@@ -319,14 +319,19 @@ static NSString* getFreeTrialSuffix(void) {
     }
 }
 
-- (NSArray<Node*>*)getMinimalSelectedEntriesOnly {
-    NSArray<Node*>* items = [self getSelectedItems];
-    
-    return [self getMinimalRecursiveEntriesOnly:items];
+- (NSArray<Node*>*)getMinimalSelectedEntriesOnly2 {
+    return [self getMinimalSelectedEntriesOnly2:NO];
 }
 
-- (NSArray<Node*>*)getMinimalRecursiveEntriesOnly:(NSArray<Node*>*)items {
+- (NSArray<Node*>*)getMinimalSelectedEntriesOnly2:(BOOL)searchableOnly {
+    NSArray<Node*>* items = [self getSelectedItems];
+    
+    return [self getMinimalRecursiveEntriesOnly2:items searchableOnly:searchableOnly];
+}
+
+- (NSArray<Node*>*)getMinimalRecursiveEntriesOnly2:(NSArray<Node*>*)items searchableOnly:(BOOL)searchableOnly {
     NSSet<Node*>* minimalItems = [self.viewModel getMinimalNodeSet:items];
+    
     NSArray<Node*>* entries = [minimalItems.allObjects flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         NSMutableArray* ret = NSMutableArray.array;
         
@@ -339,8 +344,15 @@ static NSString* getFreeTrialSuffix(void) {
         
         return ret;
     }];
-    
-    return entries;
+
+    if ( searchableOnly ) {
+        return [entries filter:^BOOL(Node * _Nonnull obj) {
+            return obj.isSearchable;
+        }];
+    }
+    else {
+        return entries;
+    }
 }
 
 
@@ -353,10 +365,10 @@ static NSString* getFreeTrialSuffix(void) {
     
     
     for (NSMenuItem *item in menu.itemArray) {
-        if ( item.action == @selector(onAddTagToItems:)) {
+        if ( item.action == @selector(onAddTagToItemsParentDummyMenuAction:)) {
             [self populateAddTagToItemsSubMenu:item.submenu];
         }
-        else if (item.action == @selector(onRemoveTagFromItems:)) {
+        else if (item.action == @selector(onRemoveTagFromItemsParentDummyMenuAction:)) {
             [self populateRemoveTagFromItemsSubMenu:item.submenu];
         }
         else if ([item.identifier isEqualToString:@"copy-field-submenu-identifier"]) {
@@ -427,6 +439,8 @@ static NSString* getFreeTrialSuffix(void) {
         NSMutableSet* withCommonRemoved = self.viewModel.tagSet.mutableCopy;
         [withCommonRemoved minusSet:inter];
         
+        [withCommonRemoved removeObject:kCanonicalFavouriteTag];
+        
         
         
         NSArray<NSString*>* sortedTags = [withCommonRemoved.allObjects sortedArrayUsingComparator:finderStringComparator];
@@ -457,6 +471,8 @@ static NSString* getFreeTrialSuffix(void) {
         for ( Node* item in items ) {
             [all addObjectsFromArray:item.fields.tags.allObjects];
         }
+        
+        [all removeObject:kCanonicalFavouriteTag];
         
         NSArray<NSString*>* sortedTags = [all.allObjects sortedArrayUsingComparator:finderStringComparator];
         
@@ -547,6 +563,9 @@ static NSString* getFreeTrialSuffix(void) {
                 
                 return NO;
             }
+            else if ( theAction == @selector(onAddTagToItemsParentDummyMenuAction:) || theAction == @selector(onRemoveTagFromItemsParentDummyMenuAction:)) {
+                return YES;
+            }
             else if ( theAction == @selector(onAddTagToItems:) || theAction == @selector(onAddNewTagToItems:)) {
                 if ( items.count && isKeePass2 && !itemsContainGroup) {
                     return YES;
@@ -608,7 +627,7 @@ static NSString* getFreeTrialSuffix(void) {
                     return NO;
                 }
                 
-                NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly:@[item]];
+                NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly2:@[item] searchableOnly:YES];
                 
                 return entries.count != 0;
             }
@@ -630,7 +649,7 @@ static NSString* getFreeTrialSuffix(void) {
                     return NO;
                 }
                 
-                NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly];
+                NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly2:NO]; 
                 
                 return entries.count != 0;
             }
@@ -650,7 +669,7 @@ static NSString* getFreeTrialSuffix(void) {
                     
                     NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
                     
-                    NSImage* image = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:nil];
+                    NSImage* image = [NSImage imageWithSystemSymbolName:@"trash.fill" accessibilityDescription:nil];
                     NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
                     
                     menuItem.image = image2;
@@ -667,7 +686,7 @@ static NSString* getFreeTrialSuffix(void) {
                         
                         NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
                         
-                        NSImage* image = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:nil];
+                        NSImage* image = [NSImage imageWithSystemSymbolName:@"trash.fill" accessibilityDescription:nil];
                         NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
                         
                         menuItem.image = image2;
@@ -680,56 +699,6 @@ static NSString* getFreeTrialSuffix(void) {
                     [menuItem setTitle:loc];
                     return YES;
                 }
-            }
-            else if (theAction == @selector(onDelete:)) {
-                if ( [self.window.firstResponder isKindOfClass:NSTextView.class] ) {
-                    
-                    
-                    
-                    
-                    return NO;
-                }
-                
-                if (items.count == 0) {
-                    if (@available(macOS 12.0, *)) {
-                        
-                        
-                        NSImageSymbolConfiguration* imageLargeConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-                        
-                        NSImage* image = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:nil];
-                        NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
-                        
-                        menuItem.image = image2;
-                    }
-                    
-                    return NO;
-                }
-                
-                BOOL deleteWillOccur = [items anyMatch:^BOOL(Node * _Nonnull obj) {
-                    return ![self.viewModel canRecycle:obj];
-                }];
-                
-                if ( items.count  > 1) {
-                    NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_items", @"Recycle Items") : NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
-                    [menuItem setTitle:loc];
-                }
-                else {
-                    NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
-                    [menuItem setTitle:loc];
-                }
-                
-                if (@available(macOS 12.0, *)) {
-                    NSImageSymbolConfiguration* imageColour = [NSImageSymbolConfiguration configurationWithHierarchicalColor:deleteWillOccur ? NSColor.systemRedColor : NSColor.systemGreenColor];
-                    
-                    NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
-                    
-                    NSImage* image = [NSImage imageWithSystemSymbolName:@"trash" accessibilityDescription:nil];
-                    NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
-                    
-                    menuItem.image = image2;
-                }
-                
-                return YES;
             }
             else if (theAction == @selector(onDuplicateItem:)) {
                 return singleSelectedItem != nil;
@@ -932,7 +901,7 @@ static NSString* getFreeTrialSuffix(void) {
         return;
     }
     
-    NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly:@[item]];
+    NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly2:@[item] searchableOnly:YES];
     [self onDownloadFavIconsForEntries:entries];
 }
 
@@ -1186,6 +1155,13 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 
+- (IBAction)onAddTagToItemsParentDummyMenuAction:(id)sender {
+    
+}
+- (IBAction)onRemoveTagFromItemsParentDummyMenuAction:(id)sender {
+    
+}
+
 - (IBAction)onAddTagToItems:(id)sender {
     
     
@@ -1233,14 +1209,14 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (void)unsubscribeFromNotifications {
-    NSLog(@"✅ WindowController::unsubscribeFromNotifications");
+
     
     [NSNotificationCenter.defaultCenter removeObserver:self];
     [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)listenToEventsOfInterest {
-    NSLog(@"✅ WindowController::listenToEventsOfInterest");
+
     
     [self unsubscribeFromNotifications]; 
     
@@ -1289,7 +1265,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)onGenericDatabasePreferencesChanged {
-    NSLog(@"WindowController::onDatabasePreferencesChanged");
+
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self synchronizeWindowTitleWithDocumentName]; 
@@ -1334,7 +1310,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onDownloadFavIcons:(id)sender {
-    NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly];
+    NSArray<Node*>* entries = [self getMinimalSelectedEntriesOnly2:NO];
     
     [self onDownloadFavIconsForEntries:entries];
 }
@@ -1351,7 +1327,7 @@ static NSString* getFreeTrialSuffix(void) {
     vc.viewModel = self.viewModel;
     
     __weak WindowController* weakSelf = self;
-    vc.onDone = ^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
+    vc.onDone = ^(BOOL go, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selectedFavIcons) {
         if(go) {
             [weakSelf.viewModel batchSetIcons:selectedFavIcons];
         }
@@ -1720,44 +1696,42 @@ static NSString* getFreeTrialSuffix(void) {
     }
 }
 
-- (IBAction)onDelete:(id)sender {
-    NSArray<Node *> *items = [self getSelectedItems];
-    if (items.count == 0) {
-        return;
-    }
-    
-    [self onDeleteItems:items];
+- (void)onDeleteItems:(NSArray<Node*>*)items {
+    [self onDeleteItems:items completion:nil];
 }
 
-- (void)onDeleteItems:(NSArray<Node*>*)items {
+- (void)onDeleteItems:(NSArray<Node*>*)items
+           completion:( void (^ _Nullable)(BOOL success) )completion {
     NSDictionary* grouped = [items groupBy:^id _Nonnull(Node * _Nonnull obj) {
         BOOL delete = [self.viewModel canRecycle:obj];
         return @(delete);
     }];
     
-    Node* parentToSelectAfterDelete = nil;
+    Node* selectAfterDelete = nil;
     if ( items.count == 1 && items.firstObject.isGroup ) {
         Node* node = items.firstObject;
-        parentToSelectAfterDelete = node.parent;
+        selectAfterDelete = node.parent;
     }
     
     const NSArray<Node*> *toBeDeleted = grouped[@(NO)];
     const NSArray<Node*> *toBeRecycled = grouped[@(YES)];
     
     if ( toBeDeleted == nil ) {
-        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled parentToSelectAfterDelete:parentToSelectAfterDelete];
+        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled completion:completion];
     }
     else {
         if ( toBeRecycled == nil ) {
-            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted parentToSelectAfterDelete:parentToSelectAfterDelete];
+            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted completion:completion];
         }
         else { 
-            [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled parentToSelectAfterDelete:parentToSelectAfterDelete];
+            [self postValidationPartialDeleteRecycleWithConfirm:toBeDeleted toBeRecycled:toBeRecycled completion:completion];
         }
     }
 }
 
-- (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled parentToSelectAfterDelete:(Node*)parentToSelectAfterDelete {
+- (void)postValidationPartialDeleteRecycleWithConfirm:(const NSArray<Node*>*)toBeDeleted
+                                         toBeRecycled:(const NSArray<Node*>*)toBeRecycled 
+                                           completion:( void (^ _Nullable)(BOOL success) )completion {
     [MacAlerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
      informativeText:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
               window:self.window
@@ -1774,22 +1748,28 @@ static NSString* getFreeTrialSuffix(void) {
                 [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
                 informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
                          window:self.window
-                     completion:nil];
+                     completion:^{
+                    if ( completion ) {
+                        completion(NO);
+                    }
+                }];
             }
             else {
-                [self onDeleteOrRecycleSuccessfullyDone:parentToSelectAfterDelete];
+                if ( completion ) {
+                    completion(YES);
+                }
+            }
+        }
+        else {
+            if ( completion ) {
+                completion(NO);
             }
         }
     }];
 }
 
-- (void)onDeleteOrRecycleSuccessfullyDone:(Node*)parentToSelectAfterDelete {
-    
-    
-    
-}
-
-- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items parentToSelectAfterDelete:(Node*)parentToSelectAfterDelete {
+- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items
+                                           completion:( void (^ _Nullable)(BOOL success) )completion {
     NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
     
     NSString* message;
@@ -1808,12 +1788,20 @@ static NSString* getFreeTrialSuffix(void) {
               window:self.window completion:^(BOOL yesNo) {
         if (yesNo) {
             [self.viewModel deleteItems:items];
-            [self onDeleteOrRecycleSuccessfullyDone:parentToSelectAfterDelete];
+            if ( completion ) {
+                completion(YES);
+            }
+        }
+        else {
+            if ( completion ) {
+                completion(NO);
+            }
         }
     }];
 }
 
-- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items parentToSelectAfterDelete:(Node*)parentToSelectAfterDelete {
+- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items
+                                            completion:( void (^ _Nullable)(BOOL success) )completion {
     NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
     NSString* message;
     if (items.count > 1) {
@@ -1836,14 +1824,21 @@ static NSString* getFreeTrialSuffix(void) {
                 [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
                 informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
                          window:self.window
-                     completion:nil];
+                     completion:^{
+                    if ( completion ) {
+                        completion(NO);
+                    }
+                }];
             }
             else {
-                [self onDeleteOrRecycleSuccessfullyDone:parentToSelectAfterDelete];
+                if ( completion ) {
+                    completion(YES);
+                }
             }
         }
     }];
 }
+
 
 
 -(void)dereferenceAndCopyToPasteboard:(NSString*)text item:(Node*)item {
@@ -2304,15 +2299,22 @@ static NSString* getFreeTrialSuffix(void) {
     }
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSColor *defaultColor = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
+
+
+
+
+        
+        CIColor *color = [CIColor colorWithCGColor:NSColor.systemBlueColor.CGColor];
+        NSColor* defaultColor = [NSColor colorWithDeviceRed:color.red green:color.green blue:color.blue alpha:color.alpha];
+        
         NSColor *errorColor = [NSColor colorWithDeviceRed:1 green:0.55 blue:0.05 alpha:0.90];
         
         MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.contentViewController.view animated:YES];
         hud.labelText = message;
         hud.color = error ? errorColor : defaultColor;
         hud.mode = MBProgressHUDModeText;
-        hud.margin = 10.f;
-        hud.yOffset = yOffset;
+        hud.margin = 12.f;
+        hud.yOffset = 0.0f;
         hud.removeFromSuperViewOnHide = YES;
         hud.dismissible = YES;
         
@@ -2829,7 +2831,7 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
 }
 
 - (BOOL)windowShouldClose:(NSWindow *)sender {
-    NSLog(@"✅ WindowController::windowShouldClose");
+
 
     if ( !Settings.sharedInstance.hasAskedAboutDatabaseOpenInBackground && self.viewModel && !self.viewModel.locked ) {
         [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"mac_on_window_close_action_title", @"Lock Database?")

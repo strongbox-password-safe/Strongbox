@@ -31,6 +31,9 @@
 @property (nonatomic, strong) dispatch_queue_t dispatchQueue;
 @property (nonatomic, strong) dispatch_source_t source;
 
+@property (nonatomic, strong) dispatch_queue_t wcDispatchQueue;
+@property (nonatomic, strong) dispatch_source_t wcSource;
+
 @end
 
 @implementation SyncManager
@@ -59,6 +62,17 @@
     }
 }
 
+- (void)backgroundSyncAllAutoFillExit {
+    for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
+        
+        
+        
+        if ( database.storageProvider != kSFTP ) { 
+            [self backgroundSyncDatabase:database];
+        }
+    }
+}
+
 - (void)backgroundSyncLocalDeviceDatabasesOnly {
     for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
         if (database.storageProvider == kLocalDevice) {
@@ -72,22 +86,23 @@
 }
 
 - (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join {
-    [self backgroundSyncDatabase:database join:join completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError *  error) { }];
+    [self backgroundSyncDatabase:database join:join key:nil completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError *  error) { }];
 }
 
-- (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
+- (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join key:(CompositeKeyFactors*_Nullable)key completion:(SyncAndMergeCompletionBlock)completion {
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
     params.syncForcePushDoNotCheckForConflicts = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
     params.syncPullEvenIfModifiedDateSame = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
-
-    NSLog(@"BACKGROUND SYNC Start: [%@]", database.nickName);
+    params.key = key;
+    
+    NSLog(@"🟢 BACKGROUND SYNC Start: [%@]", database.nickName);
 
     [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
+        NSLog(@"🟢 BACKGROUND SYNC DONE: [%@] - [%@] - workingCacheWasChanged = %hhd - [%@]", database.nickName, syncResultToString(result), localWasChanged, error);
         completion(result, localWasChanged, error);
     }];
 }
@@ -177,6 +192,39 @@
 
 
 
+
+
+
+
+
+
+
+- (void)startMonitoringWorkingCacheDirectory {
+    NSString * homeDirectory = StrongboxFilesManager.sharedInstance.syncManagerLocalWorkingCachesDirectory.path;
+    
+    int filedes = open([homeDirectory cStringUsingEncoding:NSASCIIStringEncoding], O_EVTONLY);
+    
+    self.wcDispatchQueue = dispatch_queue_create("WorkingCacheMonitorQueue", 0);
+    
+    
+    self.wcSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, filedes, DISPATCH_VNODE_WRITE, _dispatchQueue);
+    
+    dispatch_source_set_event_handler(self.wcSource, ^(){
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            NSLog(@"🚀 Working Cache File Change Detected!");
+            
+
+
+
+        });
+    });
+        
+    dispatch_source_set_cancel_handler(self.wcSource, ^() {
+        close(filedes);
+    });
+    
+    dispatch_resume(self.wcSource);
+}
 
 
 - (void)startMonitoringDocumentsDirectory {

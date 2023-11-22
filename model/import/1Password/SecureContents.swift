@@ -10,8 +10,8 @@
 
 class SecureContents: Decodable {
     var notesPlain: String? = nil
-    var sections: [Section]? = nil
+    var sections: [OnePifSection]? = nil
     var URLs: [[String: String]]? = nil
-    var fields: [Field]? = nil
+    var fields: [OnePifField]? = nil
     var password: String? = nil
 }

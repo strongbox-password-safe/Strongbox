@@ -10,7 +10,12 @@
 #import "sodium.h"
 #import "NSString+Extensions.h"
 #import "NSData+Extensions.h"
+
+#ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @implementation CryptoBoxHelper
 

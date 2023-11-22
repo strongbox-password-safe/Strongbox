@@ -17,6 +17,7 @@ typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, BOOL isRecursiveGroupFavI
 @interface SetNodeIconUiHelper : NSObject
 
 - (void)changeIcon:(UIViewController *)viewController
+             model:(Model*)model
               node:(Node* _Nonnull)node
        urlOverride:(NSString* _Nullable)urlOverride
             format:(DatabaseFormat)format
@@ -24,7 +25,7 @@ typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, BOOL isRecursiveGroupFavI
         completion:(ChangeIconCompletionBlock)completion;
 
 - (void)expressDownloadBestFavIcon:(NSString*)urlOverride
-                        completion:(void (^)(UIImage * _Nullable))completion;
+                        completion:(void (^)(NodeIcon * _Nullable icon))completion;
 
 @property NSDictionary<NSUUID*, NodeIcon*>* customIcons;
 

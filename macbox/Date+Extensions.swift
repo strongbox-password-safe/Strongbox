@@ -10,10 +10,10 @@ import Foundation
 
 extension Date {
     static func randomDate(range: Int) -> Date {
-        // Get the interval for the current date
+        
         let interval = Date().timeIntervalSince1970
-        // There are 86,400 milliseconds in a day (ignoring leap dates)
-        // Multiply the 86,400 milliseconds against the valid range of days
+        
+        
         let intervalRange = Double(86400 * range)
         
         let random = Double(arc4random_uniform(UInt32(intervalRange)) + 1)

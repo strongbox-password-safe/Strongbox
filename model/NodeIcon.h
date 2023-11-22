@@ -20,10 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeIcon : NSObject
 
-#if !TARGET_OS_IPHONE
 + (instancetype _Nullable)withCustomImage:(IMAGE_TYPE_PTR)image;
-#endif
-
 + (instancetype)withCustom:(NSData*)custom;
 + (instancetype)withCustom:(NSData*)custom name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
 + (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*)uuid name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
@@ -41,7 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSUUID* uuid;
 @property NSInteger preferredOrder;
 
-@property IMAGE_TYPE_PTR cachedImage;
+@property (readonly, nullable) IMAGE_TYPE_PTR customIcon; 
+@property (readonly) NSUInteger customIconWidth;
+@property (readonly) NSUInteger customIconHeight;
 
 @end
 

@@ -77,9 +77,12 @@
     PasswordGenerationConfig* config = [PasswordGenerationConfig defaults];
     config.algorithm = kPasswordGenerationAlgorithmDiceware; 
     config.wordCount = 5;
-        
+
+#ifdef DEBUG
+    self.textFieldPw.text = @"a";
+#else
     self.textFieldPw.text = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
-    
+#endif
     [self.textFieldPw addTarget:self
                          action:@selector(textFieldPasswordDidChange:)
                forControlEvents:UIControlEventEditingChanged];

@@ -10,6 +10,16 @@
 
 @implementation BrowseSortConfiguration
 
++ (instancetype)defaults {
+    BrowseSortConfiguration* config = [[BrowseSortConfiguration alloc] init];
+    
+    config.field = kBrowseSortFieldTitle;
+    config.foldersOnTop = YES;
+    config.showAlphaIndex = YES;
+    
+    return config;
+}
+
 - (NSDictionary *)getJsonSerializationDictionary {
     return @{
         @"field" : @(self.field),

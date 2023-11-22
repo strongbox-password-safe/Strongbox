@@ -419,17 +419,10 @@
 }
 
 - (void)updateQuickTypeAutoFill:(Model*)openedSafe {
-    if ( self.database.autoFillEnabled && self.database.quickTypeEnabled && !self.isNativeAutoFillAppExtensionOpen ) {
+    if ( self.database.autoFillEnabled && !self.isNativeAutoFillAppExtensionOpen ) {
         
         
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe
-                                                           databaseUuid:self.database.uuid
-                                                          displayFormat:self.database.quickTypeDisplayFormat
-                                                        alternativeUrls:self.database.autoFillScanAltUrls
-                                                           customFields:self.database.autoFillScanCustomFields
-                                                                  notes:self.database.autoFillScanNotes
-                                           concealedCustomFieldsAsCreds:self.database.autoFillConcealedFieldsAsCreds
-                                         unConcealedCustomFieldsAsCreds:self.database.autoFillUnConcealedFieldsAsCreds nickName:self.database.nickName];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe clearFirst:NO];
     }
 }
 

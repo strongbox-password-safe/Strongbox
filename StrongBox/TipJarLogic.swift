@@ -40,6 +40,10 @@ class TipJarLogic: NSObject {
         }
     }
 
+    public func refresh() {
+        loadTips()
+    }
+
     @objc
     var isLoaded: Bool = false {
         didSet {

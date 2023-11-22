@@ -10,7 +10,42 @@ import CryptoKit
 import Foundation
 
 @objc
-enum AutoFillMessageType: NSInteger, Codable {
+enum AutoFillMessageType: NSInteger, Codable, CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .status:
+            return "status"
+        case .search:
+            return "search"
+        case .getCredentialsForUrl:
+            return "getCredentialsForUrl"
+        case .copyField:
+            return "copyField"
+        case .lock:
+            return "lock"
+        case .unlock:
+            return "unlock"
+        case .createEntry:
+            return "createEntry"
+        case .getGroups:
+            return "getGroups"
+        case .getNewEntryDefaults:
+            return "getNewEntryDefaults"
+        case .generatePassword:
+            return "generatePassword"
+        case .getIcon:
+            return "getIcon"
+        case .generatePasswordV2:
+            return "generatePasswordV2"
+        case .getPasswordStrength:
+            return "getPasswordStrength"
+        case .getNewEntryDefaultsV2:
+            return "getNewEntryDefaultsV2"
+        case .getFavourites:
+            return "getFavourites"
+        }
+    }
+
     case status
     case search
     case getCredentialsForUrl
@@ -22,14 +57,45 @@ enum AutoFillMessageType: NSInteger, Codable {
     case getNewEntryDefaults
     case generatePassword
     case getIcon
+    case generatePasswordV2
+    case getPasswordStrength
+    case getNewEntryDefaultsV2
+    case getFavourites
+}
+
+enum AutoFillProtocolError: Error {
+    case generic(detail: String)
 }
 
 @objc
-class AutoFillEncryptedRequest: NSObject, Codable {
+public class AutoFillEncryptedRequest: NSObject, Codable {
     @objc var clientPublicKey: String = ""
     @objc var nonce: String = ""
     @objc var message: String = ""
     @objc var messageType: AutoFillMessageType = .status
+
+    class func createEncryptedRequest(_ receiverPublicKey: String? = nil, _ message: String? = nil, _ messageType: AutoFillMessageType = .status) throws -> (AutoFillEncryptedRequest, String) {
+        let keyPair: BoxKeyPair = CryptoBoxHelper.createKeyPair()
+
+        let ret = AutoFillEncryptedRequest()
+
+        ret.nonce = CryptoBoxHelper.createNonce()
+        ret.messageType = messageType
+        ret.clientPublicKey = keyPair.publicKey
+
+        if let message {
+            guard let receiverPublicKey else {
+                throw AutoFillProtocolError.generic(detail: "Could not seal with crypto box because no receiver public key was provided.")
+            }
+
+            guard let cipherText = CryptoBoxHelper.seal(message, nonce: ret.nonce, theirPublicKey: receiverPublicKey, myPrivateKey: keyPair.privateKey) else {
+                throw AutoFillProtocolError.generic(detail: "Could not seal with crypto box.")
+            }
+            ret.message = cipherText
+        }
+
+        return (ret, keyPair.privateKey)
+    }
 
     @objc
     class func from(json: String) -> AutoFillEncryptedRequest? {
@@ -51,6 +117,10 @@ class AutoFillEncryptedRequest: NSObject, Codable {
         } else {
             return ""
         }
+    }
+
+    func toJson() -> String {
+        AutoFillJsonHelper.toJson(object: self)
     }
 }
 
@@ -89,6 +159,32 @@ class AutoFillEncryptedResponse: NSObject, Codable {
         return ret
     }
 
+    @objc
+    class func from(json: String) -> AutoFillEncryptedResponse? {
+        let decoder = JSONDecoder()
+
+        guard let data = json.data(using: .utf8),
+              let response = try? decoder.decode(AutoFillEncryptedResponse.self, from: data)
+        else {
+            NSLog("🔴 Could not decode AutoFillEncryptedRequest object from JSON")
+            return nil
+        }
+
+        return response
+    }
+
+    func decryptMessage(keyPair: BoxKeyPair) -> String? {
+        decryptMessage(privateKey: keyPair.privateKey)
+    }
+
+    func decryptMessage(privateKey: String) -> String? {
+        if message.count > 0 {
+            return CryptoBoxHelper.unSeal(message, nonce: nonce, theirPublicKey: serverPublicKey, myPrivateKey: privateKey)
+        } else {
+            return ""
+        }
+    }
+
     @objc func toJson() -> String {
         AutoFillJsonHelper.toJson(object: self)
     }
@@ -97,7 +193,9 @@ class AutoFillEncryptedResponse: NSObject, Codable {
 class AutoFillJsonHelper {
     class func toJson(object: some Codable) -> String {
         let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+
+
         guard let encodedData = try? encoder.encode(object),
               let jsonString = String(data: encodedData, encoding: .utf8)
         else {

@@ -24,6 +24,7 @@
 #import "AutoFillManager.h"
 #import "EntryViewModel.h"
 #import "NSDate+Extensions.h"
+#import "NSData+Extensions.h"
 #import "WindowController.h"
 #import "OutlineView.h"
 #import "ClickableImageView.h"
@@ -57,3 +58,10 @@
 #import "AutoFillCommon.h"
 #import "NSString+Levenshtein.h"
 #import "XMLWriter.h"
+#import "Node+Passkey.h"
+#import "AutoFillProxy.h"
+#import "CryptoBoxHelper.h"
+
+
+#import "MMWormhole.h"
+#import "NewEntryDefaultsHelper.h"

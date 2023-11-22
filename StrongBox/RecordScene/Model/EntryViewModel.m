@@ -16,16 +16,20 @@
 #import "NSArray+Extensions.h"
 #import "NSDate+Extensions.h"
 #import "Node+KeeAgentSSH.h"
+#import "Node+Passkey.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @interface EntryViewModel()
 
 @property NSMutableArray<CustomFieldViewModel*>* mutableCustomFields;
 @property MutableOrderedDictionary<NSString*, KeePassAttachmentAbstractionLayer*>* mutableAttachments;
 @property NSMutableSet<NSString*>* mutableTags;
-
 @property (readonly) NSArray<CustomFieldViewModel*> *customFieldsUnfiltered;
-@property DatabaseFormat format;
-
 @property (readonly) NSSet<NSString*>* supplementaryReservedAttachmentFilenames;
 
 @end
@@ -55,12 +59,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
         @"abc.pdf" : dbAttachment,
         @"cool.mpg" : dbAttachment
     };
-        
-    NSArray<ItemMetadataEntry*>* metadata = @[ [ItemMetadataEntry entryWithKey:@"ID" value:NSUUID.UUID.UUIDString copyable:YES],
-                                [ItemMetadataEntry entryWithKey:@"Created" value:@"November 21 at 13:21" copyable:NO],
-                                [ItemMetadataEntry entryWithKey:@"Accessed" value:@"Yesterday at 08:21" copyable:NO],
-                                [ItemMetadataEntry entryWithKey:@"Modified" value:@"Today at 15:53" copyable:NO]];
-    
+            
     OTPToken* token;
     NSData* secretData = [NSData secretWithString:@"The Present King of France"];
     if(secretData) {
@@ -78,110 +77,86 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
                                                            tags:nil
                                                            totp:token
                                                            icon:[NodeIcon withPreset:12]
+                                                      favourite:NO
                                                    customFields:@[ c1, c2, c3]
                                                     attachments:attachments
-                                                       metadata:metadata
-                                                     hasHistory:YES
                                                 parentGroupUuid:nil
                                                  keeAgentSshKey:nil
                                                sortCustomFields:YES
-                                             filterCustomFields:YES
-                                                         format:kKeePass4
-                                        reservedAttachmentNames:NSSet.set];
+                                        reservedAttachmentNames:NSSet.set
+                                                        passkey:nil];
     
     return ret;
 }
 
-+ (instancetype)fromNode:(Node *)item
-                  format:(DatabaseFormat)format
-                   model:(Model *)model
-        sortCustomFields:(BOOL)sortCustomFields {
-    NSArray<ItemMetadataEntry*>* metadata = [EntryViewModel getMetadataFromItem:item model:model];
-    
-    
-    
-    BOOL keePassHistoryAvailable = item.fields.keePassHistory.count > 0 && (format == kKeePass || format == kKeePass4);
-    BOOL historyAvailable = format == kPasswordSafe || keePassHistoryAvailable;
-   
-    
-    
-    NSMutableArray<CustomFieldViewModel*>* customFieldModels = NSMutableArray.array;
-    for ( NSString* key in item.fields.customFieldsNoEmail.allKeys ) {
-        StringValue* value = item.fields.customFieldsNoEmail[key];
-        [customFieldModels addObject:[CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected]];
-    }
-    
-    
-    
-    NSSet<NSString*>* reservedAttachmentNames = NSSet.set;
-    NSMutableDictionary* attachmentsNoKeeAgent = item.fields.attachments.mutableCopy;
-    if ( item.keeAgentSshKeyViewModel ) {
-        [attachmentsNoKeeAgent removeObjectForKey:kKeeAgentSettingsAttachmentName];
-        [attachmentsNoKeeAgent removeObjectForKey:item.keeAgentSshKeyViewModel.filename];
-        reservedAttachmentNames =  @[kKeeAgentSettingsAttachmentName, item.keeAgentSshKeyViewModel.filename].set;
-    }
-            
-    EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
-                                                       username:item.fields.username
-                                                       password:item.fields.password
-                                                            url:item.fields.url
-                                                          notes:item.fields.notes
-                                                          email:item.fields.email
-                                                        expires:item.fields.expires
-                                                           tags:item.fields.tags
-                                                           totp:item.fields.otpToken
-                                                           icon:item.icon
-                                                   customFields:customFieldModels
-                                                    attachments:attachmentsNoKeeAgent
-                                                       metadata:metadata
-                                                     hasHistory:historyAvailable
-                                                parentGroupUuid:item.parent.uuid
-                                                 keeAgentSshKey:item.keeAgentSshKeyViewModel
-                                               sortCustomFields:sortCustomFields
-                                             filterCustomFields:YES
-                                                         format:format
-                                        reservedAttachmentNames:reservedAttachmentNames];
-    
-    return ret;
++ (instancetype)newEmptyEntry {
+    return [[EntryViewModel alloc] initEmpty];
 }
 
-+ (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item
-                                              model:(Model *)model {
-    NSMutableArray<ItemMetadataEntry*>* metadata = [NSMutableArray array];
-
-    [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
-
-    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
-                                                  value:item.fields.created ? item.fields.created.friendlyDateTimeStringPrecise : @""
-                                               copyable:NO]];
++ (instancetype)newEntryWithDefaults:(AutoFillNewRecordSettings *)settings
+                 mostPopularUsername:(NSString*)mostPopularUsername
+                   generatedPassword:(NSString*)generatedPassword
+                    mostPopularEmail:(NSString*)mostPopularEmail {
+    NSString *title = settings.titleAutoFillMode == kDefault ?
+    NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
+    settings.titleCustomAutoFill;
     
-
-
-
-
-    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
-                                                  value:item.fields.modified ? item.fields.modified.friendlyDateTimeStringPrecise : @""
-                                               copyable:NO]];
+    NSString* username = settings.usernameAutoFillMode == kNone ? @"" :
+    settings.usernameAutoFillMode == kMostUsed ? mostPopularUsername : settings.usernameCustomAutoFill;
+    
+    NSString *password =
+    settings.passwordAutoFillMode == kNone ? @"" :
+    settings.passwordAutoFillMode == kGenerated ? generatedPassword : settings.passwordCustomAutoFill;
+    
+    NSString* email =
+    settings.emailAutoFillMode == kNone ? @"" :
+    settings.emailAutoFillMode == kMostUsed ? mostPopularEmail : settings.emailCustomAutoFill;
+    
+    NSString* url = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
+    
+    NSString* notes = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
         
+    return [[EntryViewModel alloc] initWithTitle:title
+                                        username:username
+                                        password:password
+                                             url:url
+                                           notes:notes
+                                           email:email];
+}
 
+- (instancetype)initEmpty {
+    return [self initWithTitle:@""
+                      username:@""
+                      password:@""
+                           url:@""
+                         notes:@""
+                         email:@""];
+}
 
-
-
-
-
-
-
-
-
-
-
-    NSString* path = [model.database getPathDisplayString:item.parent includeRootGroup:YES rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
-    
-    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_fieldname_location", @"Location")
-                                                  value:path
-                                               copyable:NO]];
-
-    return metadata;
+- (instancetype)initWithTitle:(NSString *)title
+                     username:(NSString *)username
+                     password:(NSString *)password
+                          url:(NSString *)url
+                        notes:(NSString *)notes
+                        email:(NSString *)email {
+    return [self initWithTitle:title
+                      username:username
+                      password:password
+                           url:url
+                         notes:notes
+                         email:email
+                       expires:nil
+                          tags:NSSet.set
+                          totp:nil
+                          icon:nil
+                     favourite:NO
+                  customFields:@[]
+                   attachments:@{}
+               parentGroupUuid:nil
+                keeAgentSshKey:nil
+              sortCustomFields:NO
+       reservedAttachmentNames:NSSet.set
+                       passkey:nil];
 }
 
 - (instancetype)initWithTitle:(NSString *)title
@@ -194,16 +169,14 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
                          tags:(NSSet<NSString*>*)tags
                          totp:(OTPToken *)totp
                          icon:(NodeIcon*)icon
+                    favourite:(BOOL)favourite
                  customFields:(NSArray<CustomFieldViewModel *> *)customFields
                   attachments:(nonnull NSDictionary<NSString *,KeePassAttachmentAbstractionLayer *> *)attachments
-                     metadata:(nonnull NSArray<ItemMetadataEntry *> *)metadata
-                   hasHistory:(BOOL)hasHistory
               parentGroupUuid:(NSUUID*_Nullable)parentGroupUuid
                keeAgentSshKey:(KeeAgentSshKeyViewModel*)keeAgentSshKey
              sortCustomFields:(BOOL)sortCustomFields
-           filterCustomFields:(BOOL)filterCustomFields
-                       format:(DatabaseFormat)format
-      reservedAttachmentNames:(NSSet<NSString*>*)reservedAttachmentNames {
+      reservedAttachmentNames:(NSSet<NSString*>*)reservedAttachmentNames 
+                      passkey:(Passkey* _Nullable)passkey {
     if (self = [super init]) {
         self.title = title;
         self.username = username;
@@ -215,11 +188,11 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
         self.mutableTags = tags ? tags.mutableCopy : [NSMutableSet set];
         self.notes = notes;
         self.icon = icon;
+        self.favourite = favourite;
         
         NSArray<CustomFieldViewModel*>* tmp = customFields ? customFields : @[];
         
         _sortCustomFields = sortCustomFields;
-        _filterCustomFields = filterCustomFields;
         
         if ( sortCustomFields ) {
             tmp = [tmp sortedArrayUsingComparator:customFieldKeyComparator];
@@ -232,13 +205,10 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
             self.mutableAttachments[filename] = attachments[filename];
         }
         _supplementaryReservedAttachmentFilenames = reservedAttachmentNames;
-
-        _metadata = metadata;
         
-        self.hasHistory = hasHistory;
         self.parentGroupUuid = parentGroupUuid;
         self.keeAgentSshKey = keeAgentSshKey;
-        self.format = format;
+        self.passkey = passkey;
     }
     
     return self;
@@ -255,16 +225,14 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
                                                              tags:self.mutableTags
                                                              totp:self.totp
                                                              icon:self.icon
+                                                        favourite:self.favourite
                                                      customFields:self.customFieldsUnfiltered
                                                       attachments:self.filteredAttachments.dictionary
-                                                         metadata:self.metadata
-                                                       hasHistory:self.hasHistory
                                                   parentGroupUuid:self.parentGroupUuid
-                                                   keeAgentSshKey:self.keeAgentSshKey
+                                                   keeAgentSshKey:self.keeAgentSshKey  
                                                  sortCustomFields:self.sortCustomFields
-                                               filterCustomFields:YES
-                                                           format:self.format
-                                          reservedAttachmentNames:self.supplementaryReservedAttachmentFilenames];
+                                          reservedAttachmentNames:self.supplementaryReservedAttachmentFilenames
+                                                          passkey:self.passkey]; 
 
     return model;
 }
@@ -305,7 +273,13 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     if (!( ( self.icon == nil && other.icon == nil ) || (self.icon && [self.icon isEqual:other.icon]) )) { 
         return YES; 
     }
-        
+
+    
+    
+    if ( self.favourite != other.favourite ) {
+        return YES;
+    }
+    
     
     
     if ( self.customFieldsUnfiltered.count != other.customFieldsUnfiltered.count ) {
@@ -358,7 +332,13 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
         (![self.keeAgentSshKey isEqualTo:other.keeAgentSshKey] )) {
         return YES;
     }
-            
+    
+    
+    
+    if (!( ( self.passkey == nil && other.passkey == nil ) || (self.passkey && [self.passkey isSameAs:other.passkey]) )) {
+        return YES;
+    }
+    
     return NO;
 }
 
@@ -423,21 +403,16 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
 
 
 - (void)removeCustomFieldAtIndex:(NSUInteger)index {
-    if ( self.filterCustomFields ) {
-        NSArray* filtered = self.customFieldsFiltered;
-        
-        if ( ! ( index >= 0 && index < filtered.count ) ) {
-            NSLog(@"🔴 removeCustomFieldAtIndex with invalid indices %ld", index);
-            return;
-        }
-        
-        CustomFieldViewModel* field = [filtered objectAtIndex:index];
-        
-        [self.mutableCustomFields removeObject:field];
+    NSArray* filtered = self.customFieldsFiltered;
+    
+    if ( ! ( index >= 0 && index < filtered.count ) ) {
+        NSLog(@"🔴 removeCustomFieldAtIndex with invalid indices %ld", index);
+        return;
     }
-    else {
-        [self.mutableCustomFields removeObjectAtIndex:index];
-    }
+    
+    CustomFieldViewModel* field = [filtered objectAtIndex:index];
+    
+    [self.mutableCustomFields removeObject:field];
 }
 
 - (void)addCustomField:(CustomFieldViewModel *)field {
@@ -464,12 +439,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
             idx = fallbackIdx;
         }
         else {
-            if ( self.filterCustomFields ) {
-                idx = [self translateFilteredIndex:atIndex];
-            }
-            else {
-                idx = atIndex;
-            }
+            idx = [self translateFilteredIndex:atIndex];
         }
     }
     
@@ -484,32 +454,20 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
         return;
     }
     
-    if ( self.filterCustomFields ) {
-        NSArray* filtered = self.customFieldsFiltered;
-        
-        if ( ! ( sourceIdx >= 0 && sourceIdx < filtered.count && destinationIdx >= 0 && destinationIdx < filtered.count && sourceIdx != destinationIdx ) ) {
-            NSLog(@"🔴 moveCustomFieldAtIndex with invalid indices %ld -> %ld", sourceIdx, destinationIdx);
-            return;
-        }
-
-        
-
-        NSUInteger unfilterDestIdx = [self translateFilteredIndex:destinationIdx];
-
-        CustomFieldViewModel* field = [filtered objectAtIndex:sourceIdx]; 
-        [self.mutableCustomFields removeObject:field];
-        [self.mutableCustomFields insertObject:field atIndex:unfilterDestIdx];
+    NSArray* filtered = self.customFieldsFiltered;
+    
+    if ( ! ( sourceIdx >= 0 && sourceIdx < filtered.count && destinationIdx >= 0 && destinationIdx < filtered.count && sourceIdx != destinationIdx ) ) {
+        NSLog(@"🔴 moveCustomFieldAtIndex with invalid indices %ld -> %ld", sourceIdx, destinationIdx);
+        return;
     }
-    else {
-        if ( ! ( sourceIdx >= 0 && sourceIdx < self.mutableCustomFields.count && destinationIdx >= 0 && destinationIdx < self.mutableCustomFields.count && sourceIdx != destinationIdx ) ) {
-            NSLog(@"🔴 moveCustomFieldAtIndex with invalid indices %ld -> %ld", sourceIdx, destinationIdx);
-            return;
-        }
-        
-        id object = [self.mutableCustomFields objectAtIndex:sourceIdx];
-        [self.mutableCustomFields removeObjectAtIndex:sourceIdx];
-        [self.mutableCustomFields insertObject:object atIndex:destinationIdx];
-    }
+    
+    
+    
+    NSUInteger unfilterDestIdx = [self translateFilteredIndex:destinationIdx];
+    
+    CustomFieldViewModel* field = [filtered objectAtIndex:sourceIdx]; 
+    [self.mutableCustomFields removeObject:field];
+    [self.mutableCustomFields insertObject:field atIndex:unfilterDestIdx];
 }
 
 - (NSArray<CustomFieldViewModel *> *)customFieldsUnfiltered {
@@ -517,14 +475,9 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
 }
 
 - (NSArray<CustomFieldViewModel *> *)customFieldsFiltered {
-    if ( self.filterCustomFields ) {
-        return [self.customFieldsUnfiltered filter:^BOOL(CustomFieldViewModel * _Nonnull obj) {
-            return ![NodeFields isTotpCustomFieldKey:obj.key]; 
-        }];
-    }
-    else {
-        return self.customFieldsUnfiltered;
-    }
+    return [self.customFieldsUnfiltered filter:^BOOL(CustomFieldViewModel * _Nonnull obj) {
+        return ![NodeFields isTotpCustomFieldKey:obj.key] && ![NodeFields isPasskeyCustomFieldKey:obj.key]; 
+    }];
 }
 
 - (NSUInteger)translateFilteredIndex:(NSUInteger)atIndex {
@@ -558,8 +511,59 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
 
 
 
++ (instancetype)fromNode:(Node *)item model:(Model*)model {
+    
+    
+    NSMutableArray<CustomFieldViewModel*>* customFieldModels = NSMutableArray.array;
+    for ( NSString* key in item.fields.customFieldsNoEmail.allKeys ) {
+        StringValue* value = item.fields.customFieldsNoEmail[key];
+        [customFieldModels addObject:[CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected]];
+    }
+    
+    
+    
+    NSSet<NSString*>* reservedAttachmentNames = NSSet.set;
+    NSMutableDictionary* attachmentsNoKeeAgent = item.fields.attachments.mutableCopy;
+    if ( item.keeAgentSshKeyViewModel ) {
+        [attachmentsNoKeeAgent removeObjectForKey:kKeeAgentSettingsAttachmentName];
+        [attachmentsNoKeeAgent removeObjectForKey:item.keeAgentSshKeyViewModel.filename];
+        reservedAttachmentNames =  @[kKeeAgentSettingsAttachmentName, item.keeAgentSshKeyViewModel.filename].set;
+    }
+     
+    
+    
+    BOOL favourite = [model isFavourite:item.uuid];
+    NSMutableSet<NSString*>* filteredTags = item.fields.tags.mutableCopy;
+    [filteredTags removeObject:kCanonicalFavouriteTag];
+    
+    
+    
+    BOOL sortFields = !model.metadata.customSortOrderForFields;
+
+    EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
+                                                       username:item.fields.username
+                                                       password:item.fields.password
+                                                            url:item.fields.url
+                                                          notes:item.fields.notes
+                                                          email:item.fields.email
+                                                        expires:item.fields.expires
+                                                           tags:filteredTags
+                                                           totp:item.fields.otpToken
+                                                           icon:item.icon
+                                                      favourite:favourite
+                                                   customFields:customFieldModels
+                                                    attachments:attachmentsNoKeeAgent
+                                                parentGroupUuid:item.parent.uuid
+                                                 keeAgentSshKey:item.keeAgentSshKeyViewModel
+                                               sortCustomFields:sortFields  
+                                        reservedAttachmentNames:reservedAttachmentNames
+                                                        passkey:item.passkey];
+    
+    return ret;
+}
+
 - (BOOL)applyToNode:(Node*)ret
-     databaseFormat:(DatabaseFormat)databaseFormat
+              model:(Model*)model
 legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
       addOtpAuthUrl:(BOOL)addOtpAuthUrl {
     if (! [ret setTitle:self.title keePassGroupTitleRules:NO] ) {
@@ -588,6 +592,8 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
         [ret.fields clearTotp]; 
 
         if(self.totp != nil) {
+            DatabaseFormat databaseFormat = model.originalFormat;
+            
             [ret.fields setTotp:self.totp
                appendUrlToNotes:databaseFormat == kPasswordSafe || databaseFormat == kKeePass1
                 addLegacyFields:legacySupplementaryTotp
@@ -630,6 +636,33 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
     
     [ret.fields.tags removeAllObjects];
     [ret.fields.tags addObjectsFromArray:self.tags];
+    
+    if ( model.formatSupportsTags ) {
+        if ( self.favourite ) {
+            [ret.fields.tags addObject:kCanonicalFavouriteTag];
+        }
+        else {
+            [ret.fields.tags removeObject:kCanonicalFavouriteTag];
+        }
+    }
+    else { 
+        
+        
+        
+        
+        if ( self.favourite ) {
+            [model addFavourite:ret.uuid];
+        }
+        else {
+            [model removeFavourite:ret.uuid];
+        }
+    }
+    
+    
+    
+    if ( ![self.passkey isSameAs:ret.passkey] ) { 
+        ret.passkey = self.passkey;
+    }
     
     
     
@@ -720,10 +753,6 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
     else {
         NSLog(@"🔴 setKeeAgentSshKeyEnabled when no key is set!");
     }
-}
-
-- (BOOL)supportsCustomFields {
-    return (self.format == kKeePass || self.format == kKeePass4);
 }
 
 @end

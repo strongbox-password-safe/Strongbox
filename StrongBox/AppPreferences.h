@@ -65,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL autoFillExitedCleanly;
 @property BOOL autoFillWroteCleanly;
+
 @property BOOL haveWarnedAboutAutoFillCrash;
 @property BOOL dontNotifyToSwitchToMainAppForSync;
 
@@ -175,17 +176,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL useParentGroupIconOnCreate;
 
 @property BOOL stripUnusedIconsOnSave;
+@property BOOL stripUnusedHistoricalIcons;
+
 @property BOOL pinCodeHapticFeedback;
 
 @property BOOL hasMigratedToLazySync;
 
 @property (nullable) NSString* businessOrganisationName;
-@property (readonly) BOOL shadeFavoriteTag;
 
 @property BOOL appendDateToExportFileName;
 
 @property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
 
+@property BOOL atomicSftpWrite;
 
 @end
 

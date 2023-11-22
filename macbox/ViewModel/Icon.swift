@@ -27,13 +27,15 @@ enum Icon {
     case viewFinderCircleFill
     case favourite
     case sshKey
+    case passkey
+    case algorithm
 
     func image() -> NSImage {
         switch self {
         case .favourite:
             return NSImage(systemSymbolName: "star", accessibilityDescription: nil)!
         case .recycleBin:
-            return NSImage(systemSymbolName: "trash", accessibilityDescription: nil)!
+            return NSImage(systemSymbolName: "trash.fill", accessibilityDescription: nil)!
         case .attachment:
             return NSImage(systemSymbolName: "paperclip", accessibilityDescription: nil)!
         case .expired:
@@ -70,6 +72,14 @@ enum Icon {
             }
 
             return NSImage(systemSymbolName: "key", accessibilityDescription: nil)!
+        case .passkey:
+            if #available(macOS 12.3, *) {
+                return NSImage(systemSymbolName: "person.badge.key.fill", accessibilityDescription: nil)!
+            }
+
+            return NSImage(systemSymbolName: "key.fill", accessibilityDescription: nil)!
+        case .algorithm:
+            return NSImage(systemSymbolName: "function", accessibilityDescription: nil)!
         }
     }
 }

@@ -17,9 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)fromStoryboard;
 
 @property (nonatomic, copy) void (^onDone)(BOOL userCancelled, MacDatabasePreferences*_Nullable database);
-@property MMWormhole* wormhole;
 @property BOOL autoFillMode;
 @property (nullable) NSSet<NSString*>* disabledDatabases;
+@property NSSet<NSString*> *unlockedDatabases;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -121,6 +121,7 @@
 
     NSMutableData *ret = [[NSMutableData alloc] init];
     unsigned char *localIv = iv;
+    unsigned char ct[TWOFISH_BLOCK_SIZE];
 
     for (int i = 0; i < blockCount; i++) {
         
@@ -136,7 +137,6 @@
             pt[j] = b ^ c;
         }
 
-        unsigned char ct[TWOFISH_BLOCK_SIZE];
         twofish_ecb_encrypt(pt, ct, &cbckey);
 
         [ret appendBytes:ct length:TWOFISH_BLOCK_SIZE]; 

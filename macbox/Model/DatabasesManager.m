@@ -11,10 +11,17 @@
 #import "NSArray+Extensions.h"
 #import "Settings.h"
 #import "MacUrlSchemes.h"
+#import "MutableOrderedDictionary.h"
 
 @interface DatabasesManager()
 
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
+
+
+
+
+@property MutableOrderedDictionary<NSString*, DatabaseMetadata*>* backingDatabases;
+@property (readonly) MutableOrderedDictionary<NSString*, DatabaseMetadata*>* databases;
 
 @end
 
@@ -42,7 +49,11 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     return self;
 }
 
-- (NSMutableArray<DatabaseMetadata*>*)deserializeFromUserDefaults:(NSUserDefaults*)defaults {
+
+
+- (NSArray<DatabaseMetadata*>*)deserializeFromUserDefaults:(NSUserDefaults*)defaults {
+
+
     NSData *encodedObject = [defaults objectForKey:kDatabasesDefaultsKey];
     
     if(encodedObject == nil) {
@@ -50,89 +61,124 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     }
     
     NSArray<DatabaseMetadata*> *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    
+
+
+
     return [[NSMutableArray<DatabaseMetadata*> alloc] initWithArray:object];
 }
 
 - (void)serializeToUserDefaults:(NSUserDefaults*)defaults data:(NSArray<DatabaseMetadata*>*)data {
+
+    
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:data];
     [defaults setObject:encodedObject forKey:kDatabasesDefaultsKey];
     [defaults synchronize];
+    
+
+
 }
 
-- (NSMutableArray<DatabaseMetadata*>*)deserialize {
-    return [self deserializeFromUserDefaults:Settings.sharedInstance.sharedAppGroupDefaults];
+- (void)serialize {
+
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(actualSerialize) object:nil];
+        [self performSelector:@selector(actualSerialize) withObject:nil afterDelay:0.1f];
+    });
 }
 
-- (void)serialize:(NSArray<DatabaseMetadata*>*)data {
-    [self serializeToUserDefaults:Settings.sharedInstance.sharedAppGroupDefaults data:data];
+- (void)actualSerialize {
+    [self serializeToUserDefaults:Settings.sharedInstance.sharedAppGroupDefaults data:self.databases.allValues];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
     });
 }
+
+- (void)forceSerialize {
+    dispatch_barrier_sync(self.dataQueue, ^{
+        [self actualSerialize];
+    });
+}
+
+- (void)forceReload {
+    dispatch_barrier_sync(self.dataQueue, ^{
+        [self load];
+    });
+}
+
+- (void)load {
+    NSArray<DatabaseMetadata*>* dbs = [self deserializeFromUserDefaults:Settings.sharedInstance.sharedAppGroupDefaults];
     
+    MutableOrderedDictionary<NSString*, DatabaseMetadata*>* swap = [[MutableOrderedDictionary alloc] init];
+    for (DatabaseMetadata* db in dbs) {
+        [swap addKey:db.uuid andValue:db];
+    }
+    
+    self.backingDatabases = swap;
+}
+
+- (MutableOrderedDictionary<NSString *,DatabaseMetadata *> *)databases {
+    
+    
+    
+    
+    
+    
+
+    if ( dispatch_get_current_queue() == self.dataQueue ) { 
+        return [self getOrLoadDatabases];
+    }
+    else {
+        __block MutableOrderedDictionary<NSString *,DatabaseMetadata *> *result;
+        
+        dispatch_sync(self.dataQueue, ^{
+            result = [self getOrLoadDatabases];
+        });
+        
+        return result;
+    }
+}
+
+- (MutableOrderedDictionary<NSString *,DatabaseMetadata *> *)getOrLoadDatabases {
+    if ( !self.backingDatabases ) {
+        [self load];
+    }
+    
+    return self.backingDatabases;
+}
+
+
+
+- (NSArray<DatabaseMetadata *> *)snapshot {
+    return self.databases.allValues;
+}
+
 
 
 - (void)add:(DatabaseMetadata *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
-        [databases addObject:safe];
-        [self serialize:databases];
+        [self.databases addKey:safe.uuid andValue:safe];
+        [self serialize];
     });
-}
-
-- (NSArray<DatabaseMetadata *> *)snapshot {
-    __block NSArray<DatabaseMetadata *> *result;
-
-    
-    
-    
-    
-    
-    
-    
-    if ( dispatch_get_current_queue() == self.dataQueue ) { 
-        result = [self deserialize].copy;
-    }
-    else {
-        dispatch_sync(self.dataQueue, ^{ result = [self deserialize].copy; });
-    }
-    
-    return result;
 }
 
 - (void)remove:(NSString*_Nonnull)uuid {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
-
-        NSUInteger index = [databases indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            return [obj.uuid isEqualToString:uuid];
-        }];
-        
-        if(index != NSNotFound) {
-            [databases removeObjectAtIndex:index];
-            [self serialize:databases];
-        }
-        else {
-            NSLog(@"WARN: Attempt to remove a safe not found in list... [%@]", uuid);
-        }
+        [self.databases remove:uuid];
+        [self serialize];
     });
 }
 
 - (void)atomicUpdate:(NSString *)uuid touch:(void (^)(DatabaseMetadata * _Nonnull))touch {
-    dispatch_barrier_async(self.dataQueue, ^{  
-        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
-
-        NSUInteger index = [databases indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            return [obj.uuid isEqualToString:uuid];
-        }];
+    dispatch_barrier_async(self.dataQueue, ^{
+        DatabaseMetadata* metadata = self.databases[uuid];
         
-        if(index != NSNotFound) {
-            DatabaseMetadata* metadata = databases[index];
-            
+        if ( metadata ) {
             if ( touch ) {
                 touch ( metadata );
-                [self serialize:databases];
+                [self serialize];
             }
         }
         else {
@@ -143,22 +189,17 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
 
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
-
-        DatabaseMetadata* item = [databases objectAtIndex:sourceIndex];
+        DatabaseMetadata* item = [self.databases removeObjectAtIndex:sourceIndex];
+        [self.databases insertKey:item.uuid withValue:item atIndex:destinationIndex];
         
-        [databases removeObjectAtIndex:sourceIndex];
-        
-        [databases insertObject:item atIndex:destinationIndex];
-        
-        [self serialize:databases];
+        [self serialize];
     });
 }
 
+
+
 - (DatabaseMetadata *)getDatabaseById:(NSString *)uuid {
-    return [self.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
-        return [obj.uuid isEqualToString:uuid];
-    }];
+    return self.databases[uuid];
 }
 
 - (DatabaseMetadata *)getDatabaseByFileUrl:(NSURL *)url {

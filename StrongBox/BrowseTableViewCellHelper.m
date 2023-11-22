@@ -132,17 +132,14 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
         
         NSDictionary<NSNumber*, UIColor*> *flagTintColors = @{};
         
-        NSString* briefAudit = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node.uuid] : @"";
-        NSArray* flags = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];
+        NSString* briefAudit = !noFlags ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node.uuid] : @"";
+        NSArray* flags = !noFlags ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];
         
         if(node.isGroup) {
             BOOL isRecycleBin = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
 
             NSString* childCount = self.viewModel.metadata.showChildCountOnFolderInBrowse && showGroupChildCount ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
-                
-            UIColor *textColor = nil;
-
-            
+                            
             [cell setGroup:title
                       icon:icon
                 childCount:childCount
@@ -152,7 +149,7 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
                      flags:flags
             flagTintColors:flagTintColors
                   hideIcon:self.viewModel.metadata.hideIconInBrowse
-                 textColor:textColor];
+                 textColor:isRecycleBin ? Constants.recycleBinTintColor : nil];
         }
         else {
             NSString* subtitle = [self getBrowseItemSubtitle:node subtitleOverride:subtitleOverride];
@@ -164,8 +161,8 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
                       flags:flags
              flagTintColors:flagTintColors
                     expired:node.expired
-                   otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
-                   hideIcon:self.viewModel.metadata.hideIconInBrowse
+                   otpToken:node.fields.otpToken
+                   hideIcon:NO
                       audit:briefAudit];
             
             cell.accessoryType = accessoryType;
@@ -176,13 +173,6 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
 }
 
 - (NSArray<UIImage*>*)getFlags:(Node*)node isFlaggedByAudit:(BOOL)isFlaggedByAudit tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
-    if ( !self.viewModel.metadata.showFlagsInBrowse ) {
-        if(*tintColors) {
-            *tintColors = @{};
-        }
-        return @[];
-    }
-
     NSMutableArray<UIImage*> *flags = NSMutableArray.array;
     NSMutableDictionary<NSNumber*, UIColor*> *tintsMap = NSMutableDictionary.dictionary;
     

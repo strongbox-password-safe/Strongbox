@@ -417,13 +417,22 @@
 }
 
 - (void)bindUnlockButtons {
+    [self bindManualUnlockButtonFast];
+    
+    [self bindBiometricButtonOnLockScreen];
+
+    BOOL bioAvailable = self.buttonUnlockWithTouchId.enabled && !self.buttonUnlockWithTouchId.hidden;
+
+    BOOL enabled = [self manualCredentialsAreValid];
+    self.buttonUnlockWithPassword.hidden = !enabled && bioAvailable;
+}
+
+- (void)bindManualUnlockButtonFast { 
     BOOL enabled = [self manualCredentialsAreValid];
     [self.buttonUnlockWithPassword setEnabled:enabled];
-
-    [self bindBiometricButtonOnLockScreen];
     
     BOOL bioAvailable = self.buttonUnlockWithTouchId.enabled && !self.buttonUnlockWithTouchId.hidden;
-    
+
     self.buttonUnlockWithPassword.hidden = !enabled && bioAvailable;
 }
 
@@ -970,7 +979,7 @@
                     factors:(CompositeKeyFactors*)factors
             fromConvenience:(BOOL)fromConvenience
                       error:(NSError*)error {
-    NSLog(@"LockScreenViewController -> handleGetCkfsResult [%@] - Error = [%@] - Convenience = [%hhd]", result == kGetCompositeKeyResultSuccess ? @"Succeeded" : @"Failed", error, fromConvenience);
+
 
     if ( result == kGetCompositeKeyResultSuccess ) {
         [self unlockWithCkfs:factors fromConvenience:fromConvenience];
@@ -988,7 +997,7 @@
 
 - (void)unlockWithCkfs:(CompositeKeyFactors*)compositeKeyFactors
        fromConvenience:(BOOL)fromConvenience {
-    NSLog(@"LockScreenViewController::unlockWithCkfs ENTER");
+
     
     
     
@@ -1027,10 +1036,10 @@ viewController:(NSViewController *)viewController
     alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     fromConvenience:(BOOL)fromConvenience
     completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
-    NSLog(@"LockScreenViewController::unlock: [%@]", self.document.fileURL );
+
     
     if ( !self.databaseMetadata.userRequestOfflineOpenEphemeralFlagForDocument && !self.databaseMetadata.alwaysOpenOffline ) {
-        NSLog(@"ONLINE MODE: syncWorkingCopyAndUnlock");
+
         
         [self syncWorkingCopyAndUnlock:viewController
                    alertOnJustPwdWrong:alertOnJustPwdWrong
@@ -1055,7 +1064,7 @@ viewController:(NSViewController *)viewController
                  fromConvenience:(BOOL)fromConvenience
                              key:(CompositeKeyFactors*)key
                       completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
-    NSLog(@"syncWorkingCopyAndUnlock ENTER");
+
     
     [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")
                          viewController:self];
@@ -1204,7 +1213,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
                       ckfs:(CompositeKeyFactors*)ckfs
            fromConvenience:(BOOL)fromConvenience
                      error:(NSError*)error {
-    NSLog(@"LockScreenViewController -> handleUnlockResult [%@] - error = [%@]", success ? @"Succeeded" : @"Failed", error);
+
 
     if ( success ) {
         [self enableMasterCredentialsEntry:YES];
@@ -1313,8 +1322,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 - (void)controlTextDidChange:(id)obj {
 
-    [self bindUnlockButtons];
-
+    [self bindManualUnlockButtonFast];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {

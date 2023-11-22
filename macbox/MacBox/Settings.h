@@ -59,7 +59,6 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL showDatabasesManagerOnCloseAllWindows;
 
 @property BOOL showAutoFillTotpCopiedMessage;
-@property BOOL autoFillAutoLaunchSingleDatabase;
 
 @property (nonatomic) BOOL autoSave;
 
@@ -131,6 +130,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL useParentGroupIconOnCreate;
 
 @property BOOL stripUnusedIconsOnSave;
+@property BOOL stripUnusedHistoricalIcons;
 
 @property BOOL runBrowserAutoFillProxyServer;
 
@@ -143,8 +143,6 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL concealClipboardFromMonitors;
 
 @property BOOL autoCommitScannedTotp;
-
-@property (readonly) BOOL shadeFavoriteTag; 
 @property BOOL runSshAgent;
 
 
@@ -157,6 +155,9 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL sshAgentRequestDatabaseUnlockAllowed;
 @property BOOL sshAgentPreventRapidRepeatedUnlockRequests;
+
+@property BOOL autoFillWroteCleanly;
+@property BOOL atomicSftpWrite;
 
 @end
 

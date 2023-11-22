@@ -19,6 +19,11 @@ extern NSString* const kDatabasesListChangedNotification;
 
 @property (nonatomic, nonnull, readonly) NSArray<DatabaseMetadata*> *snapshot;
 
+
+
+- (void)forceSerialize;
+- (void)forceReload;
+
 - (void)add:(DatabaseMetadata *_Nonnull)safe;
 - (void)remove:(NSString*_Nonnull)uuid;
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
@@ -30,7 +35,6 @@ extern NSString* const kDatabasesListChangedNotification;
 - (BOOL)isValid:(NSString *)nickName;
 
 - (DatabaseMetadata*_Nullable)getDatabaseById:(NSString*)uuid;
-- (DatabaseMetadata*_Nullable)getDatabaseByFileUrl:(NSURL *)url;
 - (DatabaseMetadata*)addOrGet:(NSURL *)url;
 
 - (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested;

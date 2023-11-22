@@ -57,9 +57,9 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 @implementation ViewModel
 
 - (void)dealloc {
-    NSLog(@"=====================================================================");
+
     NSLog(@"😎 ViewModel DEALLOC...");
-    NSLog(@"=====================================================================");
+
 }
 
 - (instancetype)initLocked:(Document*)document
@@ -128,6 +128,16 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     else {
         NSLog(@"🔴 getItemById - Model Locked cannot get item.");
+        return nil;
+    }
+}
+
+- (NSArray<Node *> *)getItemsById:(NSArray<NSUUID *> *)uuids {
+    if ( !self.locked ) {
+        return [self.innerModel getItemsById:uuids];
+    }
+    else {
+        NSLog(@"🔴 getItemsById - Model Locked cannot get item.");
         return nil;
     }
 }
@@ -208,6 +218,16 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     else {
         NSLog(@"🔴 keeAgentSSHKeyEntries - Model Locked cannot get item.");
+        return @[];
+    }
+}
+
+- (NSArray<Node *> *)passkeyEntries {
+    if ( !self.locked ) {
+        return self.database.passkeyEntries;
+    }
+    else {
+        NSLog(@"🔴 passkeyEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -320,15 +340,6 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     else {
         NSLog(@"🔴 restartBackgroundAudit - Model Locked.");
-    }
-}
-
-- (void)stopAndClearAuditor {
-    if ( !self.locked ) {
-        return [self.innerModel stopAndClearAuditor];
-    }
-    else {
-        NSLog(@"🔴 stopAndClearAuditor - Model Locked.");
     }
 }
 
@@ -595,16 +606,28 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         
         [self rebuildMapsAndCaches];
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTitleChanged
-                                                              object:self
-                                                            userInfo:nil];
-        });
+        [self notifyOnMain:kModelUpdateNotificationTitleChanged];
         
         return YES;
     }
     
     return NO;
+}
+
+- (void)notifyOnMain:(NSString*)notificationName {
+    if ( NSThread.isMainThread ) {
+        [NSNotificationCenter.defaultCenter postNotificationName:notificationName
+                                                          object:self
+                                                        userInfo:nil];
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:notificationName
+                                                              object:self
+                                                            userInfo:nil];
+        });
+    }
+
 }
 
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes {
@@ -702,7 +725,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     Node* cloneForApplication = [node clone];
     
     if ( ![editModel applyToNode:cloneForApplication
-                  databaseFormat:self.format
+                           model:self.commonModel
          legacySupplementaryTotp:NO
                    addOtpAuthUrl:YES] ) {
         return NO;
@@ -781,12 +804,8 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         
         [self rebuildMapsAndCaches];
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemEdited
-                                                              object:self
-                                                            userInfo:nil];
-        });
-        
+        [self notifyOnMain:kModelUpdateNotificationItemEdited];
+                
         return YES;
     }
     
@@ -797,6 +816,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 - (void)batchSetIcons:(NSArray<Node*>*)items icon:(NodeIcon*)icon {
     if(self.locked) {
+        
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
@@ -814,9 +834,11 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self.document.undoManager setActionName:loc];
     [self.document.undoManager endUndoGrouping];
+    
+    [self notifyOnMain:kModelUpdateNotificationIconChanged];
 }
 
-- (void)batchSetIcons:(NSDictionary<NSUUID *,NSImage *>*)iconMap {
+- (void)batchSetIcons:(NSDictionary<NSUUID *,NodeIcon *>*)iconMap {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -827,16 +849,12 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self.document.undoManager beginUndoGrouping];
     
-    for (Node* item in self.rootGroup.allChildRecords) {
-        NSImage* selectedImage = iconMap[item.uuid];
-        if(selectedImage) {
-            CGImageRef cgRef = [selectedImage CGImageForProposedRect:NULL context:nil hints:nil];
-            
-            if (cgRef) { 
-                NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
-                NSData *selectedImageData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
-                [self setItemIcon:item icon:[NodeIcon withCustom:selectedImageData] batchUpdate:YES];
-            }
+    
+    for ( Node* item in [self.database getItemsById:iconMap.allKeys] ) {
+        NodeIcon* icon = iconMap[item.uuid];
+        
+        if ( icon ) {
+            [self setItemIcon:item icon:icon batchUpdate:YES];
         }
     }
     
@@ -844,6 +862,8 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self.document.undoManager setActionName:loc];
     [self.document.undoManager endUndoGrouping];
+    
+    [self notifyOnMain:kModelUpdateNotificationIconChanged];
 }
 
 - (void)setItemIcon:(Node *)item icon:(NodeIcon*)icon {
@@ -889,6 +909,10 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_icon_change", @"Icon Change");
     [self.document.undoManager setActionName:loc];
+    
+    if ( !batchUpdate ) {
+        [self notifyOnMain:kModelUpdateNotificationIconChanged];
+    }
 }
 
 
@@ -926,11 +950,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     NSString* loc = NSLocalizedString(@"mac_undo_action_delete_history_item", @"Delete History Item");
     [self.document.undoManager setActionName:loc];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationHistoryItemDeleted
-                                                          object:self
-                                                        userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationHistoryItemDeleted];
 }
 
 - (void)restoreHistoryItem:(Node *)item historicalItem:(Node *)historicalItem {
@@ -970,9 +990,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self rebuildMapsAndCaches];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationHistoryItemRestored object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationHistoryItemRestored];
 }
 
 
@@ -1024,9 +1042,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [self.document.undoManager setActionName:loc];
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationTagsChanged];
 }
 
 - (NSArray<Node *> *)favourites {
@@ -1075,10 +1091,6 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         NSString* loc = NSLocalizedString(@"item_settings_action_verb_toggle_suggest_in_autofill", @"Toggle Suggest in AutoFill");
         [self.document.undoManager setActionName:loc];
     }
-
-
-
-
 }
 
 - (BOOL)isExcludedFromAutoFill:(NSUUID *)item {
@@ -1147,9 +1159,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self rebuildMapsAndCaches];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationTagsChanged];
 }
 
 - (void)removeItemTag:(Node *)item tag:(NSString *)tag modified:(NSDate*)modified {
@@ -1206,9 +1216,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self rebuildMapsAndCaches];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationTagsChanged];
 }
 
 - (void)renameTag:(NSString *)from to:(NSString*)to {
@@ -1258,9 +1266,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self rebuildMapsAndCaches];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationTagsChanged];
 }
 
 - (void)deleteTag:(NSString *)tag {
@@ -1270,10 +1276,6 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 }
 
 
-
-- (NSString*)getDefaultTitle {
-    return NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled");
-}
 
 - (NSSet<Node *> *)getMinimalNodeSet:(const NSArray<Node *> *)nodes {
     return [self.database getMinimalNodeSet:nodes];
@@ -1326,12 +1328,10 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     NSString* loc = children.count > 1 ? NSLocalizedString(@"mac_undo_action_add_items", @"Add Items") : NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
     [self.document.undoManager setActionName:loc];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsAdded
-                                                      object:self
-                                                    userInfo:nil];
-    
     [self rebuildMapsAndCaches];
     
+    [self notifyOnMain:kModelUpdateNotificationItemsAdded];
+
     return YES;
 }
 
@@ -1363,9 +1363,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self rebuildMapsAndCaches];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
-                                                      object:self
-                                                    userInfo:nil];
+    [self notifyOnMain:kModelUpdateNotificationItemsDeleted];
 }
 
 - (BOOL)canRecycle:(Node *)item {
@@ -1382,7 +1380,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     NSArray<NodeHierarchyReconstructionData*>* undoData;
-    [self.database deleteItems:items undoData:&undoData];
+    [self.innerModel deleteItems:items undoData:&undoData];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] unDeleteItems:undoData];
     
@@ -1391,11 +1389,9 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self.document.undoManager setActionName:loc];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
-                                                      object:self
-                                                    userInfo:nil];
-    
     [self rebuildMapsAndCaches];
+
+    [self notifyOnMain:kModelUpdateNotificationItemsDeleted];
 }
 
 - (void)unDeleteItems:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
@@ -1407,7 +1403,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return;
     }
     
-    [self.database unDelete:undoData];
+    [self.innerModel unDelete:undoData];
     
     NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
         return obj.clonedNode;
@@ -1422,9 +1418,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self rebuildMapsAndCaches];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsUnDeleted
-                                                      object:self
-                                                    userInfo:nil];
+    [self notifyOnMain:kModelUpdateNotificationItemsUnDeleted];
 }
 
 
@@ -1439,7 +1433,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     NSArray<NodeHierarchyReconstructionData*> *undoData;
-    BOOL ret = [self.database recycleItems:items undoData:&undoData];
+    BOOL ret = [self.innerModel recycleItems:items undoData:&undoData];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] unRecycleItems:undoData];
     
@@ -1448,9 +1442,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     [self.document.undoManager setActionName:loc];
     
     if (ret) {
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
-                                                          object:self
-                                                        userInfo:nil];
+        [self notifyOnMain:kModelUpdateNotificationItemsDeleted];
     }
     
     [self rebuildMapsAndCaches];
@@ -1467,7 +1459,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return;
     }
     
-    [self.database undoRecycle:undoData];
+    [self.innerModel undoRecycle:undoData];
     
     NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
         return obj.clonedNode;
@@ -1480,11 +1472,9 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self.document.undoManager setActionName:loc];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsUnDeleted
-                                                      object:self
-                                                    userInfo:nil];
-    
     [self rebuildMapsAndCaches];
+    
+    [self notifyOnMain:kModelUpdateNotificationItemsUnDeleted];
 }
 
 - (BOOL)isInRecycled:(NSUUID *)itemId {
@@ -1508,23 +1498,21 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     NSArray<NodeHierarchyReconstructionData*> *undoData;
-    BOOL ret = [self.database moveItems:items destination:destination undoData:&undoData];
-    
-    [[self.document.undoManager prepareWithInvocationTarget:self] unMove:undoData destination:destination];
-    
-    NSString* loc = items.count > 1 ? NSLocalizedString(@"mac_undo_action_move_items", @"Move Items") :
-    NSLocalizedString(@"mac_undo_action_move_item", @"Move Item");
-    
-    [self.document.undoManager setActionName:loc];
+    BOOL ret = [self.innerModel moveItems:items destination:destination undoData:&undoData];
     
     if (ret) {
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsMoved
-                                                          object:self
-                                                        userInfo:nil];
+        [[self.document.undoManager prepareWithInvocationTarget:self] unMove:undoData destination:destination];
+        
+        NSString* loc = items.count > 1 ? NSLocalizedString(@"mac_undo_action_move_items", @"Move Items") :
+        NSLocalizedString(@"mac_undo_action_move_item", @"Move Item");
+        
+        [self.document.undoManager setActionName:loc];
+        
+        [self rebuildMapsAndCaches];
+
+        [self notifyOnMain:kModelUpdateNotificationItemsMoved];
     }
-    
-    [self rebuildMapsAndCaches];
-    
+        
     return ret;
 }
 
@@ -1537,7 +1525,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return;
     }
     
-    [self.database undoMove:undoData];
+    [self.innerModel undoMove:undoData];
     
     NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
         return obj.clonedNode;
@@ -1550,11 +1538,9 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self.document.undoManager setActionName:loc];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsMoved
-                                                      object:self
-                                                    userInfo:nil];
-    
     [self rebuildMapsAndCaches];
+    
+    [self notifyOnMain:kModelUpdateNotificationItemsMoved];
 }
 
 - (BOOL)moveItemsIntoNewGroup:(const NSArray<Node *> *)items parentGroup:(Node *)parentGroup title:(NSString *)title group:(Node **)group {
@@ -1615,8 +1601,8 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [[self.document.undoManager prepareWithInvocationTarget:self] reorderItem:nodeId idx:prevIdx];
         
         [self.document.undoManager setActionName:NSLocalizedString(@"mac_undo_action_move_item", @"Move Item")];
-        
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemReOrdered object:self userInfo:@{ }];
+    
+        [self notifyOnMain:kModelUpdateNotificationItemReOrdered];
     }
     
     return prevIdx;
@@ -1649,55 +1635,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 }
 
 
-- (Node*)getDefaultNewEntryNode:(Node *_Nonnull)parentGroup {
-    AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
-    BOOL useParentGroupIcon = Settings.sharedInstance.useParentGroupIconOnCreate;
-    
-    
-    
-    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? [self getDefaultTitle] :
-    autoFill.titleAutoFillMode == kSmartUrlFill ? [self getSmartFillTitle] : autoFill.titleCustomAutoFill;
-    
-    
-    
-    NSString *actualUsername = autoFill.usernameAutoFillMode == kNone ? @"" :
-    autoFill.usernameAutoFillMode == kMostUsed ? [self getAutoFillMostPopularUsername] : autoFill.usernameCustomAutoFill;
-    
-    
-    
-    NSString *actualPassword = autoFill.passwordAutoFillMode == kNone ? @"" : autoFill.passwordAutoFillMode == kGenerated ? [self generatePassword] : autoFill.passwordCustomAutoFill;
-    
-    
-    
-    NSString *actualEmail = autoFill.emailAutoFillMode == kNone ? @"" :
-    autoFill.emailAutoFillMode == kMostUsed ? [self getAutoFillMostPopularEmail] : autoFill.emailCustomAutoFill;
-    
-    
-    
-    NSString *actualUrl = autoFill.urlAutoFillMode == kNone ? @"" :
-    autoFill.urlAutoFillMode == kSmartUrlFill ? [self getSmartFillUrl] : autoFill.urlCustomAutoFill;
-    
-    
-    
-    NSString *actualNotes = autoFill.notesAutoFillMode == kNone ? @"" :
-    autoFill.notesAutoFillMode == kClipboard ? [self getSmartFillNotes] : autoFill.notesCustomAutoFill;
-    
-    
-    
-    NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
-                                                          url:actualUrl
-                                                     password:actualPassword
-                                                        notes:actualNotes
-                                                        email:actualEmail];
-    
-    Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields uuid:nil];
-    
-    if ( useParentGroupIcon && !parentGroup.isUsingKeePassDefaultIcon ) {
-        record.icon = parentGroup.icon;
-    }
-    
-    return record;
-}
+
 
 - (Node*)getNewGroupWithSafeName:(Node *)parentGroup title:(NSString *)title {
     if ( !parentGroup ) {
@@ -1718,63 +1656,11 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     return newGroup;
 }
 
-- (NSString*)getSmartFillTitle {
-    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
-    
-    if(clipboardText) {
-        
-        
-        NSURL *url = clipboardText.urlExtendedParse;
-        
-        if (url && url.scheme && url.host)
-        {
-            return url.host;
-        }
-    }
-    
-    return [self getDefaultTitle];
-}
-
-- (NSString*)getSmartFillUrl {
-    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
-    
-    if(clipboardText) {
-        NSURL *url = clipboardText.urlExtendedParse;
-        if (url && url.scheme && url.host)
-        {
-            return clipboardText;
-        }
-    }
-    
-    return @"";
-}
-
-- (NSString*)getSmartFillNotes {
-    NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
-    NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
-    
-    if(clipboardText) {
-        return clipboardText;
-    }
-    
-    return @"";
-}
-
-- (NSString*)getAutoFillMostPopularUsername {
-    return self.database.mostPopularUsername == nil ? @"" : self.database.mostPopularUsername;
-}
-
-- (NSString*)getAutoFillMostPopularEmail {
-    return self.database.mostPopularEmail == nil ? @"" : self.database.mostPopularEmail;
-}
-
 - (Node*)getItemFromSerializationId:(NSString*)serializationId {
     return [self.database getItemByCrossSerializationFriendlyId:serializationId];
 }
 
-- (NSString*)generatePassword {
+- (NSString *)generatePassword {
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:Settings.sharedInstance.passwordGenerationConfig];
 }
 
@@ -2110,15 +1996,11 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 
 - (void)publishDatabasePreferencesChangedNotification {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationDatabasePreferenceChanged object:self userInfo:@{ }];
-    });
+    [self notifyOnMain:kModelUpdateNotificationDatabasePreferenceChanged];
 }
 
 - (void)publishDatabaseUpdateStatusChangedNotification {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationDatabaseUpdateStatusChanged object:self userInfo:@{ }];
-    });
+    [self notifyOnMain:kModelUpdateNotificationDatabaseUpdateStatusChanged];
 }
 
 
@@ -2312,16 +2194,11 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 - (void)publishNextGenSelectedItemsChanged {
 
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNextGenSelectedItemsChanged object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationNextGenSelectedItemsChanged];
 }
 
 - (void)publishNextGenNavigationContextChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNextGenNavigationChanged object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationNextGenNavigationChanged];
 }
 
 
@@ -2360,9 +2237,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 }
 
 - (void)publishNextGenSearchContextChanged {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationNextGenSearchContextChanged object:self userInfo:nil];
-    });
+    [self notifyOnMain:kModelUpdateNotificationNextGenSearchContextChanged];
 }
 
 

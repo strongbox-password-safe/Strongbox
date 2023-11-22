@@ -68,7 +68,7 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 
 
-- (void)reloadIfChangedByOtherComponent;
+- (BOOL)reloadIfChangedByOtherComponent;
 
 - (void)notifyDatabasesListChanged;
 - (void)notifyDatabaseChanged:(NSString*)databaseIdChanged;

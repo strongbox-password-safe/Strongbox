@@ -207,7 +207,7 @@
            format:(DatabaseFormat)format
      outputStream:(NSOutputStream*)outputStream
        completion:(SaveCompletionBlock)completion {
-    [database performPreSerializationTidy]; 
+    [database preSerializationPerformMaintenanceOrMigrations]; 
 
     id<AbstractDatabaseFormatAdaptor> adaptor = [Serializator getAdaptor:format];
 
@@ -216,9 +216,9 @@
     [adaptor save:database
      outputStream:outputStream
        completion:^(BOOL userCancelled, NSString*_Nullable debugXml, NSError*_Nullable error){
-        NSLog(@"====================================== PERF ======================================");
-        NSLog(@"SERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startTime);
-        NSLog(@"====================================== PERF ======================================");
+
+        NSLog(@"🐞 Serializator::SERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startTime);
+
         
         completion(userCancelled, nil, error);
     }];
@@ -373,9 +373,9 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
        completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         [stream close];
         
-        NSLog(@"====================================== PERF ======================================");
-        NSLog(@"DESERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startDecryptTime);
-        NSLog(@"====================================== PERF ======================================");
+
+        NSLog(@"🐞 Serializator::DESERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startDecryptTime);
+
 
         if(userCancelled || database == nil || error || innerStreamError ) {
             completion(userCancelled, nil, error ? error : innerStreamError);

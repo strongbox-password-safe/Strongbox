@@ -231,7 +231,7 @@ const NSUInteger kSectionIdxLast = 3;
         else {
             NSSet<NSString*>* tags = self.viewModel.database.tagSet;
             
-            if ( AppPreferences.sharedInstance.shadeFavoriteTag && [tags containsObject:kCanonicalFavouriteTag] ) {
+            if ( [tags containsObject:kCanonicalFavouriteTag] ) {
                 NSMutableSet<NSString*>* mut = self.viewModel.database.tagSet.mutableCopy;
                 [mut removeObject:kCanonicalFavouriteTag];
                 tags = [mut copy];

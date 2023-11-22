@@ -19,14 +19,18 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var addLegacyTotpFields: NSButton!
     @IBOutlet var useIsolatedDropbox: NSButton!
     @IBOutlet var stripUnusedIcons: NSButton!
+    @IBOutlet var stripHistoricalIcons: NSButton!
+
     @IBOutlet var enableThirdParty: NSButton!
     @IBOutlet var quitClosesAllWindowsNotTerminate: NSButton!
     @IBOutlet var concealedClipboard: NSButton!
+    @IBOutlet var atomicSftpWrites: NSButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         useIsolatedDropbox.isHidden = !StrongboxProductBundle.supports3rdPartyStorageProviders
+        atomicSftpWrites.isHidden = !StrongboxProductBundle.supportsSftpWebDAV
 
         bindUI()
 
@@ -51,10 +55,14 @@ class AdvancedAppPreferences: NSViewController {
         addTotpOtpAuth.state = settings.addOtpAuthUrl ? .on : .off
         addLegacyTotpFields.state = settings.addLegacySupplementaryTotpCustomFields ? .on : .off
         useIsolatedDropbox.state = settings.useIsolatedDropbox ? .on : .off
+
         stripUnusedIcons.state = Settings.sharedInstance().stripUnusedIconsOnSave ? .on : .off
+        stripHistoricalIcons.state = Settings.sharedInstance().stripUnusedHistoricalIcons ? .on : .off
+
         enableThirdParty.state = settings.isPro && settings.runBrowserAutoFillProxyServer ? .on : .off
         quitClosesAllWindowsNotTerminate.state = settings.quitTerminatesProcessEvenInSystemTrayMode ? .off : .on
         concealedClipboard.state = settings.concealClipboardFromMonitors ? .on : .off
+        atomicSftpWrites.state = settings.atomicSftpWrite ? .on : .off
 
         
 
@@ -78,9 +86,11 @@ class AdvancedAppPreferences: NSViewController {
         settings.addLegacySupplementaryTotpCustomFields = addLegacyTotpFields.state == .on
         settings.useIsolatedDropbox = useIsolatedDropbox.state == .on
         settings.stripUnusedIconsOnSave = stripUnusedIcons.state == .on
+        settings.stripUnusedHistoricalIcons = stripHistoricalIcons.state == .on
         settings.quitTerminatesProcessEvenInSystemTrayMode = quitClosesAllWindowsNotTerminate.state == .off
         settings.runBrowserAutoFillProxyServer = enableThirdParty.state == .on
         settings.concealClipboardFromMonitors = concealedClipboard.state == .on
+        settings.atomicSftpWrite = atomicSftpWrites.state == .on
 
         notifyChanged()
     }

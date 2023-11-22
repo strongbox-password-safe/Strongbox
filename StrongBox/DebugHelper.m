@@ -374,11 +374,10 @@ int OPParentIDForProcessID(int pid)
         
         NSArray* failedSyncs = [syncs filter:^BOOL(NSArray<SyncStatusLogEntry *> * _Nonnull sync) {
             return [sync anyMatch:^BOOL(SyncStatusLogEntry * _Nonnull status) {
-                return status.state == kSyncOperationStateError;
+                return status.state == kSyncOperationStateError || status.state == kSyncOperationStateBackgroundButUserInteractionRequired || status.state == kSyncOperationStateUserCancelled;
             }];
         }];
         
-
         NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
         
         for (NSArray* failed in failedSyncs) {

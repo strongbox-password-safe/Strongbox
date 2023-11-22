@@ -677,9 +677,9 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         return low;
     }];
     
-    NSLog(@"====================================== PERF ======================================");
+
     NSLog(@"LOW ENTROPY CHECK took [%f] seconds for %lu items", NSDate.timeIntervalSinceReferenceDate - startTime, (unsigned long)self.auditableNonEmptyPasswordNodes.count);
-    NSLog(@"====================================== PERF ======================================");
+
 
     return [lowEntropy map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;

@@ -53,7 +53,7 @@
 
         NSURL* url = [metadata.backupsDirectory URLByAppendingPathComponent:filename];
 
-        NSLog(@"Creating Backup [%@]", url);
+
         
         NSError* error;
         BOOL success = [NSFileManager.defaultManager copyItemAtURL:snapshot toURL:url error:&error];

@@ -29,3 +29,21 @@ class GetNewEntryDefaultsResponse: Codable {
         self.mostPopularUsernames = mostPopularUsernames
     }
 }
+
+class GetNewEntryDefaultsV2Response: Codable {
+    var username: String?
+    var mostPopularUsernames: [String]?
+    var password: PasswordAndStrength?
+
+    var error: String?
+
+    init(error: String) {
+        self.error = error
+    }
+
+    init(username: String, password: PasswordAndStrength, mostPopularUsernames: [String]) {
+        self.username = username
+        self.password = password
+        self.mostPopularUsernames = mostPopularUsernames
+    }
+}

@@ -66,27 +66,46 @@
             [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-07-01"]     
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-07-05"]],
             
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-24"]     
+            
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-24"]
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-28"]],
             
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-03-15"]     
+            
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-12-24"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-12-27"]],
+            
+            
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-03-15"]
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-03-18"]],
 
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-07-04"]     
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-07-08"]],
             
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-11-29"]      
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-05-31"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-06-04"]],
+            
+            
+
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-08-30"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-09-03"]],
+
+            
+            
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-11-29"]
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-12-03"]],
             
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-03-14"]     
+            
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-12-24"]
+                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-12-27"]],
+            
+            
+            
+            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-03-14"]
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-03-18"]],
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-07-04"]     
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-07-07"]],
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-11-28"]     
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-12-02"]],
-
         ];
     }
     

@@ -17,7 +17,7 @@
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
-#import "Strongbox_AutoFill-Swift.h"
+#import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
 
@@ -37,6 +37,7 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 @property (weak) IBOutlet NSTextField *cautionImpreciseWarning;
 
 @property BOOL doneSmartInit;
+@property (weak) IBOutlet NSButton *buttonCreateNew;
 
 @end
 
@@ -69,6 +70,13 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
         
         self.tableView.emptyString = text;
         self.cautionImpreciseWarning.hidden = YES;
+        
+        if (@available(macOS 13.0, *)) {
+            self.buttonCreateNew.hidden = self.model.isReadOnly;
+        }
+        else {
+            self.buttonCreateNew.hidden = YES;
+        }
     }
 }
 
@@ -130,7 +138,7 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 }
 
 - (void)loadItems {
-    self.items = [self.model filterAndSortForBrowse:self.model.database.effectiveRootGroup.allChildRecords.mutableCopy
+    self.items = [self.model filterAndSortForBrowse:self.model.allEntries.mutableCopy
                               includeKeePass1Backup:NO
                                   includeRecycleBin:NO
                                      includeExpired:NO
@@ -273,19 +281,16 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if (index != NSNotFound) {
         Node* node = [self getDataSource][index];
         
-        [self dismissViewController:self];
-        
         NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
         NSString* user = [self.model dereference:node.fields.username node:node];
         NSString* password = [self.model dereference:node.fields.password node:node];
 
-        self.onDone(NO, user, password, totp);
+        [self dismissAndComplete:NO createNew:NO username:user password:password totp:totp];
     }
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self dismissViewController:self]; 
-    self.onDone(YES, nil, nil, nil);
+    [self dismissAndComplete:YES createNew:NO username:nil password:nil totp:nil];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
@@ -337,6 +342,24 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
         [super keyDown:theEvent];
     }
+}
+
+- (IBAction)onCreateNew:(id)sender {
+    [self dismissAndComplete:NO createNew:YES username:nil password:nil totp:nil];
+}
+
+- (void)dismissAndComplete:(BOOL)userCancelled createNew:(BOOL)createNew username:(NSString*_Nullable)username password:(NSString*_Nullable)password totp:(NSString*_Nullable)totp {
+    if ( self.presentingViewController ) {
+        [self.presentingViewController dismissViewController:self];
+    }
+    else if ( self.view.window.sheetParent ) {
+        [self.view.window.sheetParent endSheet:self.view.window returnCode:NSModalResponseCancel];
+    }
+    else {
+        [self.view.window close];
+    }
+    
+    self.onDone(userCancelled, createNew, username, password, totp);
 }
 
 @end

@@ -113,7 +113,7 @@
     
     [self manageDatabaseProperties];
     
-    [self.mine performPreSerializationTidy];
+    [self.mine preSerializationPerformMaintenanceOrMigrations];
 
     [self.mine rebuildFastMaps];
     

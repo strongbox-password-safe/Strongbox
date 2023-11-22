@@ -8,6 +8,7 @@
 
 #import "Constants.h"
 #import "Utils.h"
+#import "NSArray+Extensions.h"
 
 @implementation Constants
 
@@ -17,6 +18,7 @@ NSString *const kPreferenceGlobalShowShortcutNotification = @"GlobalShowStrongbo
 NSString *const kPreferencesChangedNotification = @"preferencesChangedNotification";
 NSString *const kTotpUpdateNotification = @"TotpUpdateNotification";
 NSString* const kProStatusChangedNotification = @"proStatusChangedNotification";
+NSString* const kAutoFillChangedConfigNotification = @"autoFillChangedConfigNotification";
 
 const NSInteger kStorageProviderSFTPorWebDAVSecretMissingErrorCode = 172924134;
 
@@ -37,9 +39,30 @@ NSString* const kPasswordStringKey = @"Password";
 NSString* const kUrlStringKey = @"URL";
 NSString* const kNotesStringKey = @"Notes";
 
+NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
+NSString* const kKeePassXcTotpSettingsKey = @"TOTP Settings";
+NSString* const kKeeOtpPluginKey = @"otp";
+NSString* const kOriginalWindowsSecretKey = @"TimeOtp-Secret";
+NSString* const kOriginalWindowsSecretHexKey = @"TimeOtp-Secret-Hex";
+NSString* const kOriginalWindowsSecretBase32Key = @"TimeOtp-Secret-Base32";
+NSString* const kOriginalWindowsSecretBase64Key = @"TimeOtp-Secret-Base64";
+NSString* const kOriginalWindowsOtpLengthKey = @"TimeOtp-Length";
+NSString* const kOriginalWindowsOtpPeriodKey = @"TimeOtp-Period";
+NSString* const kOriginalWindowsOtpAlgoKey = @"TimeOtp-Algorithm";
+NSString* const kOriginalWindowsOtpAlgoValueSha256 = @"HMAC-SHA-256";
+NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
+
 NSString* const kKeeAgentSettingsAttachmentName = @"KeeAgent.settings";
 
 NSString* const kIsExcludedFromAutoFillCustomDataKey = @"KPEX_DoNotSuggestForAutoFill";
+
+NSString* const kPasskeyCustomFieldKeyRelyingParty = @"KPEX_PASSKEY_RELYING_PARTY";
+NSString* const kPasskeyCustomFieldKeyUserId = @"KPEX_PASSKEY_GENERATED_USER_ID";
+NSString* const kPasskeyCustomFieldKeyPrivateKeyPem = @"KPEX_PASSKEY_PRIVATE_KEY_PEM";
+NSString* const kPasskeyCustomFieldKeyUserHandle = @"KPEX_PASSKEY_USER_HANDLE";
+NSString* const kPasskeyCustomFieldKeyUsername = @"KPXC_PASSKEY_USERNAME";
+
+NSString* const kDocumentRestorationNSCoderKeyForUrl = @"StrongboxNonFileRestorationStateURLAsString";
 
 const static NSSet<NSString*> *wellKnownKeys;
 
@@ -48,7 +71,9 @@ const static NSSet<NSString*> *wellKnownKeys;
         kUserInteractionRequiredError = [Utils createNSError:kStorageProviderUserInteractionRequiredErrorMessage errorCode:kStorageProviderUserInteractionRequiredErrorCode];
 
 #if TARGET_OS_IPHONE
-        kRecycleBinTintColor = ColorFromRGB(0x008f54); 
+        kRecycleBinTintColor = ColorFromRGB(0x7DC583); 
+#else
+        kRecycleBinTintColor = ColorFromRGB(0x7DC583); 
 #endif
         
         wellKnownKeys = [NSSet setWithArray:@[  kTitleStringKey,
@@ -59,8 +84,45 @@ const static NSSet<NSString*> *wellKnownKeys;
     }
 }
 
-+ (const NSSet<NSString*>*)reservedCustomFieldKeys {
++ (const NSSet<NSString *> *)TotpCustomFieldKeys {
+    static NSSet<NSString*>* totpKeys;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        totpKeys = @[kKeeOtpPluginKey,
+                     kKeePassXcTotpSeedKey,
+                     kKeePassXcTotpSettingsKey,
+                     kOriginalWindowsSecretKey,
+                     kOriginalWindowsSecretHexKey,
+                     kOriginalWindowsSecretBase32Key,
+                     kOriginalWindowsSecretBase64Key,
+                     kOriginalWindowsOtpLengthKey,
+                     kOriginalWindowsOtpPeriodKey,
+                     kOriginalWindowsOtpAlgoKey].set;
+    });
+    
+    return totpKeys;
+}
+
++ (const NSSet<NSString *> *)ReservedCustomFieldKeys {
     return wellKnownKeys;
+}
+
++ (const NSSet<NSString *> *)PasskeyCustomFieldKeys {
+    static NSSet<NSString*>* keys;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        keys = @[
+            kPasskeyCustomFieldKeyRelyingParty,
+            kPasskeyCustomFieldKeyUserId,
+            kPasskeyCustomFieldKeyPrivateKeyPem,
+            kPasskeyCustomFieldKeyUserHandle,
+            kPasskeyCustomFieldKeyUsername,
+        ].set;
+    });
+    
+    return keys;
 }
 
 #if TARGET_OS_IPHONE
@@ -68,6 +130,14 @@ const static NSSet<NSString*> *wellKnownKeys;
 static UIColor* kRecycleBinTintColor;
 
 + (UIColor *)recycleBinTintColor {
+    return kRecycleBinTintColor;
+}
+
+#else
+
+static NSColor* kRecycleBinTintColor;
+
++ (NSColor *)recycleBinTintColor {
     return kRecycleBinTintColor;
 }
 

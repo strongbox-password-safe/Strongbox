@@ -41,20 +41,44 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
     self.nodeSelected = @{}.mutableCopy;
     
-    NSMutableArray* success = @[].mutableCopy;
-    NSMutableArray* fail = @[].mutableCopy;
-    for (Node* node in self.nodes) {
-        NSArray<UIImage*>* images = [self getImagesForNode:node];
+    NSMutableArray<Node*>* success = @[].mutableCopy;
+    NSMutableArray<Node*>* fail = @[].mutableCopy;
+    
+    for (NSUUID* uuid in self.validNodes) {
+        NSArray<NodeIcon*>* images = [self getSortedImagesForNode:uuid];
         
         if(images == nil) {
             continue; 
         }
         else if (images.count == 0) {
+            Node* node = [self.model getItemById:uuid];
+            if ( node == nil ) { 
+                node = [self.nodes firstOrDefault:^BOOL(Node * _Nonnull obj) {
+                    return [obj.uuid isEqual:uuid];
+                }];
+            }
+
+            if (!node) {
+                continue;
+            }
+
             [fail addObject:node];
         }
         else {
+            Node* node = [self.model getItemById:uuid];
+            if ( node == nil ) {
+                node = [self.nodes firstOrDefault:^BOOL(Node * _Nonnull obj) {
+                    return [obj.uuid isEqual:uuid];
+                }];
+            }
+
+            if (!node) {
+                continue;
+            }
+
             [success addObject:node];
-            self.nodeSelected[node.uuid] = [self selectBestImageIndex:images];
+            
+            [self autoSelectBestImageIndex:uuid];
         }
     }
     
@@ -82,129 +106,90 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     return section == 1 && self.failed.count > 0 ? NSLocalizedString(@"generic_failed", @"Failed") : [super tableView:tableView titleForHeaderInSection:section];
 }
 
-- (NSArray<UIImage*>*)getImagesForNode:(Node*)node {
-    NSArray<UIImage*> *ret = self.results[self.singleNodeUrlOverride ? self.singleNodeUrlOverride : node.fields.url.urlExtendedParse];
-    
-    return [ret sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        UIImage* imageA = obj1;
-        UIImage* imageB = obj2;
-        
-        return imageA.size.width == imageB.size.width ? NSOrderedSame : ( imageA.size.width > imageB.size.width ? NSOrderedAscending : NSOrderedDescending);
-    }];
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
-
-    Node* node = indexPath.section == 0 ? self.successful[indexPath.row] : self.failed[indexPath.row];
-
-
-    
-    UIImage* image = nil;
-    
-    NSArray<UIImage*>* images = [self getImagesForNode:node];
-    NSNumber* selectedIndex = self.nodeSelected[node.uuid];
-    
-    image = (images && selectedIndex != nil && selectedIndex.intValue < images.count && selectedIndex.intValue >= 0) ? images[selectedIndex.intValue] : nil;
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-  
-
-
-    
-    
-    
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
+    Node* node = indexPath.section == 0 ? self.successful[indexPath.row] : self.failed[indexPath.row];
+    BOOL failed = indexPath.section != 0;
 
-    
-    
-    image = image ? image : [UIImage imageNamed:@"error"];
-    
-    if( image.size.height != image.size.width && MIN(image.size.width, image.size.height) > 512 ) {
-        NSLog(@"🔴 Down scaling icon...");
-        image = scaleImage(image, CGSizeMake(128, 128));
-    }
-    
-    
-    
     NSString* subtitle;
-    if (images.count > 1) {
-        subtitle = [NSString stringWithFormat:NSLocalizedString(@"favicon_results_n_icons_found_with_xy_resolution_fmt", @"%lu Icons Found (%dx%d selected)"),
-                                     (unsigned long)images.count,
-                                     (int)image.size.width,
-                                     (int)image.size.height];
+    UIImage* img;
+    NodeIcon* icon;
+    
+    if ( failed ) {
+        img = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+        subtitle = NSLocalizedString(@"favicon_results_no_icons_found", @"No FavIcons Found");
     }
     else {
-        subtitle = image ? [NSString stringWithFormat:NSLocalizedString(@"favicon_results_one_icon_found_with_xy_resolution_fmt", @"%dx%d selected"),
-                                             (int)image.size.width,
-                                             (int)image.size.height] : NSLocalizedString(@"favicon_results_no_icons_found", @"No FavIcons Found");
+        icon = [self getSelectedImageForNode:node.uuid];
+        NSUInteger resultCount = self.nodeImagesMap[node.uuid].count;
+
+        if ( icon ) {
+            if( icon.customIconHeight != icon.customIconWidth && MIN(icon.customIconWidth, icon.customIconHeight) > 512 ) {
+                NSLog(@"🔴 Down scaling icon...");
+                img = scaleImage(icon.customIcon, CGSizeMake(128, 128));
+            }
+            else {
+                img = icon.customIcon;
+            }
+            
+            subtitle = [NSString stringWithFormat:@"%lu Icons Found (%dx%d selected) %@",
+                        (unsigned long)resultCount,
+                        (int)icon.customIconWidth,
+                        (int)icon.customIconHeight,
+                        friendlyFileSizeString(icon.estimatedStorageBytes)];
+        }
+        else {
+            img = [UIImage systemImageNamed:@"xmark.circle"];
+            subtitle = [NSString stringWithFormat:@"%lu Icons Found (None Selected)", (unsigned long)resultCount];
+        }
     }
-
     
-    
-
-    image = image ? image : [UIImage imageNamed:@"error"];
-
     [cell setRecord:node.title
            subtitle:subtitle
-               icon:image
+               icon:img
       groupLocation:@""
               flags:@[]
      flagTintColors:@{}
             expired:NO
            otpToken:nil
            hideIcon:NO
-              audit:@""];
+              audit:@""
+     imageTintColor:!failed ? nil : UIColor.systemOrangeColor];
     
+    cell.accessoryType = indexPath.section == 0 ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
     
-    if(indexPath.section == 0) {
-        cell.accessoryType = images.count > 1 ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
-    }
-    else {
-        cell.accessoryType = UITableViewCellAccessoryNone;
-    }
-    
-    cell.detailTextLabel.textColor = image ? nil : UIColor.systemRedColor;
-
     return cell;
 }
 
-- (NSNumber*)selectBestImageIndex:(NSArray<UIImage*>*)images {
-    UIImage* image = [FavIconManager.sharedInstance selectBest:images];
-    return @([images indexOfObject:image]);
+
+
+- (NSArray<NodeIcon*>*)getSortedImagesForNode:(NSUUID*)uuid {
+    NSArray<NodeIcon*>* icons = self.nodeImagesMap[uuid];
+    
+    return [FavIconManager.sharedInstance getSortedImages:icons
+                                                  options:AppPreferences.sharedInstance.favIconDownloadOptions];
+}
+
+- (void)autoSelectBestImageIndex:(NSUUID*)uuid {
+    NSArray<NodeIcon*>* sorted = [self getSortedImagesForNode:uuid];
+    
+    NodeIcon* best = [FavIconManager.sharedInstance getIdealImage:sorted
+                                                          options:AppPreferences.sharedInstance.favIconDownloadOptions];
+
+    if ( best != nil ) {
+        NSUInteger bestIndex = [sorted indexOfObject:best];
+        self.nodeSelected[uuid] = @(bestIndex);
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Node* node = indexPath.section == 0 ? self.successful[indexPath.row] : self.failed[indexPath.row];
+
 
     if(indexPath.section == 0) {
-        NSArray<UIImage*>* images = [self getImagesForNode:node];
-        if(images.count > 1) {
+
+
             [self performSegueWithIdentifier:@"segueToViewMultipleFavIcons" sender:indexPath];
-        }
+
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -215,15 +200,16 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
         NSIndexPath* indexPath = (NSIndexPath*)sender;
         Node* node = self.successful[indexPath.row];
         
-        NSArray<UIImage*>* images = [self getImagesForNode:node];
+        NSArray<NodeIcon*>* images = [self getSortedImagesForNode:node.uuid];
         
         FavIconSelectFromMultipleFavIconsTableViewController* vc = (FavIconSelectFromMultipleFavIconsTableViewController*)segue.destinationViewController;
         
         vc.node = node;
         vc.images = images;
-        vc.selectedIndex = self.nodeSelected[node.uuid].intValue;
-        vc.onChangedSelection = ^(NSUInteger index) {
-            self.nodeSelected[node.uuid] = @(index);
+        vc.selectedIdx = self.nodeSelected[node.uuid];
+
+        vc.onChangedSelection = ^(NSNumber * _Nonnull idx) {
+            self.nodeSelected[node.uuid] = idx;
             [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         };
     }
@@ -233,16 +219,25 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     self.onDone(NO, nil);
 }
 
-- (IBAction)onDone:(id)sender {
-    NSMutableDictionary<NSUUID*, UIImage*> *selected = @{}.mutableCopy;
+- (NodeIcon*)getSelectedImageForNode:(NSUUID*)uuid {
+    NSNumber* index = self.nodeSelected[uuid];
+    
+    NSArray<NodeIcon*>* images = [self getSortedImagesForNode:uuid];
+    
+    if (images != nil && index != nil && index.intValue < images.count && index.intValue >= 0) {
+        return images[index.intValue];
+    }
+     
+    return nil;
+}
 
-    for (Node* obj in self.successful) {
-        NSNumber* index = self.nodeSelected[obj.uuid];
-        
-        NSArray<UIImage*>* images = [self getImagesForNode:obj];
-        
-        if (images != nil && index != nil && index.intValue < images.count && index.intValue >= 0) {
-            selected[obj.uuid] = images[index.intValue];
+- (IBAction)onDone:(id)sender {
+    NSMutableDictionary<NSUUID*, NodeIcon*> *selected = @{}.mutableCopy;
+
+    for (Node* node in self.successful) {
+        NodeIcon* image = [self getSelectedImageForNode:node.uuid];
+        if ( image ) {
+            selected[node.uuid] = image;
         }
     }
     

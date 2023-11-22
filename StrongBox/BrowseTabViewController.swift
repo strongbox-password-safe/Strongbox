@@ -118,9 +118,7 @@ class BrowseTabViewController: UITabBarController {
             if tab == .tags {
                 var tags = model.database.tagSet
 
-                if AppPreferences.sharedInstance().shadeFavoriteTag {
-                    tags.remove(kCanonicalFavouriteTag)
-                }
+                tags.remove(kCanonicalFavouriteTag)
 
                 if tags.isEmpty {
                     continue

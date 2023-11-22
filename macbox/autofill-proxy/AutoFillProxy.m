@@ -83,8 +83,8 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
             break;
         }
         else {
-
-
+            NSLog(@"Incomplete Buffer = %@",  [[NSString alloc] initWithData:inBuf encoding:NSUTF8StringEncoding]);
+            NSLog(@"Incomplete Buffer = %@",  inBuf.hexString);
         }
         
         if ( read == 0 ) {
@@ -142,7 +142,7 @@ NSString* sendMessageOverSocket (NSString* request, BOOL hardcodeSandboxTestingP
 
     NSData* data = [request dataUsingEncoding:NSUTF8StringEncoding];
 
-    NSLog(@"UTF8 Encoded to %lu length", data.length);
+
     
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;

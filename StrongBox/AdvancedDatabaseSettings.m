@@ -23,6 +23,7 @@
 #import "AppPreferences.h"
 #import "StatisticsPropertiesViewController.h"
 #import "ScheduledExportConfigurationViewController.h"
+#import "AutoFillNewRecordSettingsController.h"
 
 @interface AdvancedDatabaseSettings ()
 
@@ -31,6 +32,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBulkUpdateFavIcons;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStats;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellScheduledExport;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFetchFavIcon;
 
 @end
 
@@ -66,6 +69,15 @@
     
     self.cellStats.imageView.image = [UIImage systemImageNamed:@"number.circle"];
     [self.cellStats.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+    
+
+    self.cellScheduledExport.imageView.image = [UIImage systemImageNamed:@"calendar.badge.clock"];
+    [self.cellScheduledExport.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+    
+    self.cellNewEntryDefaults.imageView.image = [UIImage systemImageNamed:@"gear"];
+    [self.cellStats.imageView setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+    
+    [self bindUI];
     
     [self setupTableView];
 }
@@ -128,17 +140,21 @@
     else if ( cell == self.cellScheduledExport ) {
         [self performSegueWithIdentifier:@"segueToScheduledExport" sender:self.viewModel];
     }
+    else if ( cell == self.cellNewEntryDefaults ) {
+        [self onConfigureDefaults];
+    }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)onBulkUpdateFavIcons {
     [FavIconBulkViewController presentModal:self
-                                      nodes:self.viewModel.database.allActiveEntries
-                                     onDone:^(BOOL go, NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
+                                      model:self.viewModel
+                                      nodes:self.viewModel.database.allSearchableEntries
+                                     onDone:^(BOOL go, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selectedFavIcons) {
         [self dismissViewControllerAnimated:YES completion:nil];
         
-        if(go && selectedFavIcons) {
+        if ( go && selectedFavIcons ) {
             self.onDatabaseBulkIconUpdate(selectedFavIcons); 
         }
     }];
@@ -150,6 +166,31 @@
 
 - (void)onExport {
     [self performSegueWithIdentifier:@"segueToExportOptions" sender:nil];
+}
+
+- (IBAction)onToggleAutoFetchFavIcon:(id)sender {
+    self.viewModel.metadata.tryDownloadFavIconForNewRecord = !self.viewModel.metadata.tryDownloadFavIconForNewRecord;
+
+    [self bindUI];
+}
+
+- (void)bindUI {
+    self.switchAutoFetchFavIcon.on = self.viewModel.metadata.tryDownloadFavIconForNewRecord;
+}
+
+- (void)onConfigureDefaults {
+    AutoFillNewRecordSettingsController* vc = AutoFillNewRecordSettingsController.fromStoryboard;
+    
+    vc.onDone = ^{
+        [self dismissViewControllerAnimated:YES completion:nil];
+    };
+    
+    UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    
+    nav.toolbarHidden = YES;
+    nav.toolbar.hidden = YES;
+    
+    [self presentViewController:nav animated:YES completion:nil];
 }
 
 @end
