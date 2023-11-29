@@ -32,7 +32,7 @@ public class StrongboxCMarkGFMHelper: NSObject {
 
         
 
-        let options = CMARK_OPT_FOOTNOTES 
+        let options = CMARK_OPT_FOOTNOTES | CMARK_OPT_HARDBREAKS | CMARK_OPT_VALIDATE_UTF8 | CMARK_OPT_SMART
 
         guard let parser = cmark_parser_new(options) else {
             NSLog("🔴 Error creating cmark parser")

@@ -131,7 +131,16 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
             
             detailsNav.popViewController(animated: false) 
 
+            
+
+            detailsVc.willMove(toParent: nil)
+            detailsVc.view.removeFromSuperview()
+            detailsVc.removeFromParent()
+
+            
+
             masterNav.pushViewController(detailsVc, animated: false)
+
             viewControllers = [primaryViewController]
 
             return true

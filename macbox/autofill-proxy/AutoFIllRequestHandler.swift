@@ -57,6 +57,8 @@ import Foundation
             ret = handleGetNewEntryDefaultsV2Request(request)
         case .getFavourites:
             ret = handleGetFavouritesRequest(request)
+        case .copyString:
+            ret = handleCopyStringRequest(request)
         }
 
         let response = ret.toJson()
@@ -165,7 +167,27 @@ import Foundation
             copyPassword(model: model, itemId: copyRequest.nodeId)
         }
 
-        let response = CopyFieldResponse(success: true)
+        let response = BooleanAutoFillResponse(success: true)
+
+        let json = AutoFillJsonHelper.toJson(object: response)
+
+        return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
+    }
+
+    func handleCopyStringRequest(_ request: AutoFillEncryptedRequest) -> AutoFillEncryptedResponse {
+        let decoder = JSONDecoder()
+
+        guard let jsonRequest = request.decryptMessage(keyPair: keyPair),
+              let data = jsonRequest.data(using: .utf8),
+              let copyRequest = try? decoder.decode(CopyStringRequest.self, from: data)
+        else {
+            NSLog("🔴 Can't decode CopyFieldRequest from message JSON")
+            return AutoFillEncryptedResponse.error(message: "Can't decode CopyFieldRequest from message JSON")
+        }
+
+        copyString(copyRequest.value)
+
+        let response = BooleanAutoFillResponse(success: true)
 
         let json = AutoFillJsonHelper.toJson(object: response)
 
@@ -703,13 +725,16 @@ import Foundation
             return
         }
 
-        ClipboardManager.sharedInstance().copyConcealedString(token.password)
-        scheduleClipboardClearingTask()
+        copyString(token.password)
     }
 
     func dereferenceAndCopy(model: Model, text: String, item: Node) {
         let deref = model.dereference(text, node: item)
-        ClipboardManager.sharedInstance().copyConcealedString(deref)
+        copyString(deref)
+    }
+
+    func copyString(_ string: String) {
+        ClipboardManager.sharedInstance().copyConcealedString(string)
         scheduleClipboardClearingTask()
     }
 

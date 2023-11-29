@@ -13,7 +13,8 @@ public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
     public required init(model _: Model?) {}
 
     public func shouldDisplay() -> Bool {
-        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription 
+        let existingSubscriber = false 
+
         let nonePro = !AppPreferences.sharedInstance().isPro
         let saleNowOn = SaleScheduleManager.sharedInstance().saleNowOn
         let hasBeenPrompted = SaleScheduleManager.sharedInstance().userHasBeenPromptedAboutCurrentSale
@@ -22,7 +23,7 @@ public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
     }
 
     public func instantiateViewController(_ onDone: @escaping OnboardingModuleDoneBlock) -> VIEW_CONTROLLER_PTR? {
-        let existingSubscriber = ProUpgradeIAPManager.sharedInstance().hasActiveYearlySubscription
+        let existingSubscriber = false 
 
         guard let saleEndDate = SaleScheduleManager.sharedInstance().currentSaleEndDate,
               let inclusiveEndDate = Calendar.current.date(byAdding: .day, value: -1, to: saleEndDate)
@@ -56,7 +57,6 @@ public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
         if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
            let viewController = appDelegate.getVisibleViewController()
         {
-
             viewController.present(vc, animated: true)
         } else {
             NSLog("🔴 Could find a view controller to present on!")

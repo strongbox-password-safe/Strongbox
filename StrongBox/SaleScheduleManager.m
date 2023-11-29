@@ -41,6 +41,12 @@
         
         
         
+        
+        
+        
+        
+        
+        
         self.schedule = @[
             [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-11-26"]
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-11-30"]], 
@@ -70,6 +76,9 @@
             
             [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-24"]
                          andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-28"]],
+            
+            
+            
             
             
             

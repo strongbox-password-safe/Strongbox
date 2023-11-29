@@ -43,6 +43,8 @@ enum AutoFillMessageType: NSInteger, Codable, CustomStringConvertible {
             return "getNewEntryDefaultsV2"
         case .getFavourites:
             return "getFavourites"
+        case .copyString:
+            return "copyString"
         }
     }
 
@@ -61,6 +63,7 @@ enum AutoFillMessageType: NSInteger, Codable, CustomStringConvertible {
     case getPasswordStrength
     case getNewEntryDefaultsV2
     case getFavourites
+    case copyString
 }
 
 enum AutoFillProtocolError: Error {

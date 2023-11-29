@@ -49,7 +49,7 @@ typedef enum : NSUInteger {
 
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
-@property (nonatomic, strong) UINavigationController* currentlyPresentedNavController;
+@property (nonatomic, strong) UINavigationController* currentlyPresentedNavController; 
 @property (nonatomic, strong) NSArray<ASCredentialServiceIdentifier *> * serviceIdentifiers;
 
 @property id credentialIdentity;
@@ -698,7 +698,6 @@ typedef enum : NSUInteger {
         
         if ( !self.allowUserInteractionAndMessaging ) { 
             
-            
             NSLog(@"🟢 TOTP Copy Required - we must be interactive... retrying in interactive mode...");
             [self exitWithUserInteractionRequired];
             return;
@@ -708,24 +707,29 @@ typedef enum : NSUInteger {
         [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:totp];
         NSLog(@"🟢 Copied TOTP to Pasteboard...");
         
-        if ( AppPreferences.sharedInstance.showAutoFillTotpCopiedMessage && self.allowUserInteractionAndMessaging ) {
-            [Alerts twoOptions:self.vcToPresentOn
-                         title:NSLocalizedString(@"autofill_info_totp_copied_title", @"TOTP Copied")
-                       message:NSLocalizedString(@"autofill_info_totp_copied_message", @"Your TOTP Code has been copied to the clipboard.")
-             defaultButtonText:NSLocalizedString(@"autofill_add_entry_sync_required_option_got_it", @"Got it!")
-              secondButtonText:NSLocalizedString(@"autofill_add_entry_sync_required_option_dont_tell_again", @"Don't tell me again")
-                        action:^(BOOL response) {
-                if ( !response ) { 
+        
+        
+        completion();
+        
 
-                    AppPreferences.sharedInstance.showAutoFillTotpCopiedMessage = NO;
-                }
-                
-                completion();
-            }];
-        }
-        else {
-            completion();
-        }
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     else {
         completion();

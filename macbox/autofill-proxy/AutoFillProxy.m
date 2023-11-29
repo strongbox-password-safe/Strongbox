@@ -83,8 +83,10 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
             break;
         }
         else {
-            NSLog(@"Incomplete Buffer = %@",  [[NSString alloc] initWithData:inBuf encoding:NSUTF8StringEncoding]);
-            NSLog(@"Incomplete Buffer = %@",  inBuf.hexString);
+#ifdef DEBUG
+            NSLog(@"🔴 Incomplete Buffer = %@",  [[NSString alloc] initWithData:inBuf encoding:NSUTF8StringEncoding]);
+            NSLog(@"🔴 Incomplete Buffer = %@",  inBuf.hexString);
+#endif
         }
         
         if ( read == 0 ) {

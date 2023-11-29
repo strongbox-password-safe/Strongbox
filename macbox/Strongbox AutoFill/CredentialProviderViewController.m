@@ -1022,11 +1022,21 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     [self exitWithUserCancelled:nil];
 }
 
-- (void)copyTotpIfPossible:(MacDatabasePreferences*)unlockedDatabase totp:(NSString*)totp completion:(void (^) (void))completion {
+- (void)copyTotpIfPossible:(MacDatabasePreferences*)unlockedDatabase 
+                      totp:(NSString*)totp
+                completion:(void (^) (void))completion {
     BOOL pro = Settings.sharedInstance.isPro;
     
     if (pro) {
         if ( totp.length && unlockedDatabase.autoFillCopyTotp ) {
+            if ( !self.withUserInteraction ) {
+                
+                
+                NSLog(@"🟢 TOTP Copy Required - we must be interactive... retrying in interactive mode...");
+                [self exitWithUserInteractionRequired];
+                return;
+            }
+            
             [ClipboardManager.sharedInstance copyConcealedString:totp];
 
             
