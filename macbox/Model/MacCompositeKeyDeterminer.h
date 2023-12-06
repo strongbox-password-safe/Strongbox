@@ -54,6 +54,8 @@ typedef NSViewController* _Nonnull (^MacCompositeKeyDeterminerOnDemandUIProvider
 
 @property (readonly) BOOL bioOrWatchUnlockIsPossible;
 
+@property BOOL verifyCkfsMode; 
+
 + (BOOL)bioOrWatchUnlockIsPossible:(MacDatabasePreferences*)database;
 
 

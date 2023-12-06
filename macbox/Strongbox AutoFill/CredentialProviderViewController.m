@@ -69,44 +69,45 @@
 
 - (void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     [self commonInit];
-    
+
     NSLog(@"🟢 AutoFill: provideCredentialWithoutUserInteractionForIdentity [%@]", credentialIdentity);
-    
+
     self.quickTypeMode = YES;
-    
+
     BOOL pro = Settings.sharedInstance.isPro;
-    
+
     if ( !pro ) {
-        [self exitWithUserInteractionRequired];
+        [self exitWithUserCancelled:nil];
         return;
     }
-    
+
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
     NSLog(@"Checking wormhole to see if Main App can provide credentials immediately...");
-    
+
     if ( identifier ) {
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:identifier.databaseId];
-        
+
         if ( database && database.autoFillEnabled && database.autoFillEnabled && database.quickTypeEnabled ) {
             [self doWormholePasswordFill:identifier];
             return;
         }
     }
-    
+
     [self exitWithUserInteractionRequired];
 }
 
 - (void)provideCredentialWithoutUserInteractionForRequest:(id<ASCredentialRequest>)credentialRequest {
     [self commonInit];
-    
+
     NSLog(@"🟢 provideCredentialWithoutUserInteractionForRequest [%@]", credentialRequest);
+    
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
         self.quickTypeMode = YES;
         
         BOOL pro = Settings.sharedInstance.isPro;
         
         if ( !pro ) {
-            [self exitWithUserInteractionRequired];
+            [self exitWithUserCancelled:nil];
             return;
         }
         
@@ -183,7 +184,13 @@
             NSString* password = payload[@"password"];
             NSString* totp = payload[@"totp"];
             
-            [self exitWithCredential:metadata username:username password:password totp:totp];
+            if ( username && password ) {
+                [self exitWithCredential:metadata username:username password:password totp:totp];
+            }
+            else {
+                NSLog(@"🔴 Successful wormhole quicktype request but nothing in secret store? => UI");
+                [self exitWithUserInteractionRequired];
+            }
         }
         else {
             [self exitWithUserInteractionRequired];
@@ -217,7 +224,7 @@
     BOOL pro = Settings.sharedInstance.isPro;
     
     if ( !pro ) {
-        [self exitWithUserInteractionRequired];
+        [self exitWithUserCancelled:nil];
         return;
     }
     
@@ -264,24 +271,24 @@
             else {
                 [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
                 
-                [MacAlerts info:NSLocalizedString(@"autofill_error_unknown_db_title", @"Strongbox: Unknown Database")
-                informativeText:NSLocalizedString(@"autofill_error_unknown_db_message", @"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
-                         window:self.view.window
-                     completion:^{
+
+
+
+
                     [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
-                }];
+
             }
         });
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
-        [MacAlerts info:NSLocalizedString(@"autofill_error_unknown_item_title",@"Strongbox: Error Locating Entry")
-        informativeText:NSLocalizedString(@"autofill_error_unknown_item_message",@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
-                 window:self.view.window
-             completion:^{
+
+
+
+
             [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
-        }];
+
     }
 }
 
@@ -684,25 +691,30 @@
 }
 
 - (void)onboardForAutoFillConvenienceAutoUnlock:(void (^)(void))completion {
-    [MacAlerts threeOptions:NSLocalizedString(@"autofill_auto_unlock_title", @"Auto Unlock Feature")
-            informativeText:NSLocalizedString(@"autofill_auto_unlock_message", @"Auto Unlock lets you avoid repeatedly unlocking your database in AutoFill mode within a configurable time window. Would you like to use this handy feature?\n\nNB: Your password is stored in the Secure Enclave for this feature.")
-          option1AndDefault:NSLocalizedString(@"autofill_auto_unlock_try_3_minutes", @"Great, lets try 3 mins")
-                    option2:NSLocalizedString(@"autofill_auto_unlock_try_10_minutes", @"I'd prefer 10 mins")
-                    option3:NSLocalizedString(@"mac_upgrade_no_thanks", @"No Thanks")
-                     window:self.view.window
-                 completion:^(NSUInteger option) {
-        if (option == 1) {
-            self.database.autoFillConvenienceAutoUnlockTimeout = 180;
-        }
-        else if (option == 2) {
-            self.database.autoFillConvenienceAutoUnlockTimeout = 600;
-        }
-        else if (option == 3) {
-            self.database.autoFillConvenienceAutoUnlockTimeout = 0;
-        }
-        
-        completion();
-    }];
+    if (@available(macOS 13.0, *)) {
+        [MacAlerts threeOptions:NSLocalizedString(@"autofill_auto_unlock_title", @"Auto Unlock Feature")
+                informativeText:NSLocalizedString(@"autofill_auto_unlock_message", @"Auto Unlock lets you avoid repeatedly unlocking your database in AutoFill mode within a configurable time window. Would you like to use this handy feature?\n\nNB: Your password is stored in the Secure Enclave for this feature.")
+              option1AndDefault:NSLocalizedString(@"autofill_auto_unlock_try_3_minutes", @"Great, lets try 3 mins")
+                        option2:NSLocalizedString(@"autofill_auto_unlock_try_10_minutes", @"I'd prefer 10 mins")
+                        option3:NSLocalizedString(@"mac_upgrade_no_thanks", @"No Thanks")
+                         window:self.view.window
+                     completion:^(NSUInteger option) {
+            if (option == 1) {
+                self.database.autoFillConvenienceAutoUnlockTimeout = 180;
+            }
+            else if (option == 2) {
+                self.database.autoFillConvenienceAutoUnlockTimeout = 600;
+            }
+            else if (option == 3) {
+                self.database.autoFillConvenienceAutoUnlockTimeout = 0;
+            }
+            
+            completion();
+        }];
+    }
+    else {
+        completion(); 
+    }
 }
 
 
@@ -733,12 +745,12 @@
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
-        [MacAlerts info:@"Strongbox: Error Locating This Record"
-        informativeText:@"Strongbox could not find this record in the database any longer. It is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill."
-                 window:self.view.window
-             completion:^{
+
+
+
+
             [self exitWithErrorOccurred:[Utils createNSError:@"Could not find record in database" errorCode:-1]];
-        }];
+
     }
 }
 
@@ -988,13 +1000,15 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+
         
-        [MacAlerts info:@"Strongbox: Error Locating This Record"
-        informativeText:@"Strongbox could not find this record in the database any longer. It is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill."
-                 window:self.view.window
-             completion:^{
+        
+
+
+
+
             [self exitWithErrorOccurred:[Utils createNSError:@"Could not find record in database" errorCode:-1]];
-        }];
+
     }
     
 }
@@ -1040,20 +1054,23 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             [ClipboardManager.sharedInstance copyConcealedString:totp];
 
             
+            
             if ( Settings.sharedInstance.showAutoFillTotpCopiedMessage && self.withUserInteraction ) {
-                [MacAlerts twoOptions:NSLocalizedString(@"autofill_info_totp_copied_title", @"TOTP Copied")
-                      informativeText:NSLocalizedString(@"autofill_info_totp_copied_message", @"Your TOTP Code has been copied to the clipboard.")
-                    option1AndDefault:NSLocalizedString(@"autofill_add_entry_sync_required_option_got_it", @"Got it!")
-                              option2:NSLocalizedString(@"autofill_add_entry_sync_required_option_dont_tell_again", @"Don't tell me again")
-                               window:self.view.window
-                           completion:^(NSUInteger zeroForCancel) {
-                    if ( zeroForCancel == 2 ) { 
+                
+                
 
-                        Settings.sharedInstance.showAutoFillTotpCopiedMessage = NO;
-                    }
+
+
+
+
+
+
+
+
+
                     
                     completion();
-                }];
+
             }
             else {
                 completion();

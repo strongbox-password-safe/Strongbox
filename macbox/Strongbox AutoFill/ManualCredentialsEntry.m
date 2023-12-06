@@ -80,8 +80,10 @@
     
     self.concealed = YES;
     
-    self.selectedKeyFileBookmark = [self contextAwareKeyFileBookmark];
-    self.selectedYubiKeyConfiguration = self.database.yubiKeyConfiguration;
+    if ( !self.verifyCkfsMode ) {
+        self.selectedKeyFileBookmark = [self contextAwareKeyFileBookmark];
+        self.selectedYubiKeyConfiguration = self.database.yubiKeyConfiguration;
+    }
     
     if ( self.headline ) {
         self.textFIeldHeadline.stringValue = self.headline;
@@ -158,6 +160,7 @@
 
 - (void)bindAdvanced {
     BOOL advanced = self.database.showAdvancedUnlockOptions;
+    
     self.acceptEmptyPassword.hidden = !advanced;
     self.labelKeyFile.hidden = !advanced;
     self.popupKeyFile.hidden = !advanced;
@@ -302,7 +305,7 @@
         }
     }
 
-    if (configuredUrl) {
+    if ( configuredUrl && !self.verifyCkfsMode ) {
         NSString* configuredTitle = Settings.sharedInstance.hideKeyFileNameOnLockScreen ?
                                         NSLocalizedString(@"mac_key_file_configured_but_filename_hidden", @"[Configured]") :
                                         [NSString stringWithFormat:NSLocalizedString(@"mac_key_file_filename_configured_fmt", @"%@ [Configured]"), configuredUrl.lastPathComponent];
@@ -524,7 +527,7 @@
 
     
     
-    YubiKeyConfiguration* configured = self.database.yubiKeyConfiguration;
+    YubiKeyConfiguration* configured = self.verifyCkfsMode ? nil : self.database.yubiKeyConfiguration;
     YubiKeyConfiguration* selected = self.selectedYubiKeyConfiguration;
     
 

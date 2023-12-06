@@ -780,7 +780,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     
     
     
-    
 
     func save(dismissAfterSave: Bool) {
         validateAndFixPassword { [weak self] continueSave in
@@ -973,22 +972,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         #endif
     }
 
-    fileprivate func selectEditedItem(_ node: Node) {
-        guard let parentNodeUuid = node.parent?.uuid else {
-            return
-        }
-
-        let currentContext = getNavContextFromModel(database)
-
-        if case .regularHierarchy = currentContext {
-            setModelNavigationContextWithViewNode(database, .regularHierarchy(parentNodeUuid))
-            database.nextGenSelectedItems = [node.uuid]
-        } else {
-            setModelNavigationContextWithViewNode(database, .special(.allEntries))
-            database.nextGenSelectedItems = [node.uuid]
-        }
-    }
-
     var savedNewItemSoShouldSelectOnDismiss: Bool = false
     func onSaveDone(_ node: Node, dismissAfterSave: Bool) {
 
@@ -1025,6 +1008,22 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             bindUiToModel()
 
             bindActionButtonStatesAndTitles()
+        }
+    }
+
+    fileprivate func selectEditedItem(_ node: Node) {
+        guard let parentNodeUuid = node.parent?.uuid else {
+            return
+        }
+
+        let currentContext = getNavContextFromModel(database)
+
+        if case .regularHierarchy = currentContext {
+            setModelNavigationContextWithViewNode(database, .regularHierarchy(parentNodeUuid))
+            database.nextGenSelectedItems = [node.uuid]
+        } else {
+            setModelNavigationContextWithViewNode(database, .special(.allEntries))
+            database.nextGenSelectedItems = [node.uuid]
         }
     }
 

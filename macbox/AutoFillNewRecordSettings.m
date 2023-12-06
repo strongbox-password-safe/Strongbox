@@ -30,7 +30,7 @@ static NSString* const kNewEntryDefaultsCustomNotes = @"Strongbox-NewEntryDefaul
     defaultInstance.passwordAutoFillMode = kGenerated;
     defaultInstance.passwordCustomAutoFill = NSLocalizedString(@"defaults_model_custom_password_default", @"Custom Password Default Text");
     
-    defaultInstance.emailAutoFillMode = kMostUsed;
+    defaultInstance.emailAutoFillMode = kNone;
     defaultInstance.emailCustomAutoFill = NSLocalizedString(@"defaults_model_custom_email_default", @"Custom Email Default Text");
     
     defaultInstance.urlAutoFillMode = kNone;

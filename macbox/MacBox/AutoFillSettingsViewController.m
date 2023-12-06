@@ -137,6 +137,7 @@
     BOOL autoFillCopyTotp = self.switchCopyTotp.state == NSControlStateValueOn;
 
     self.model.databaseMetadata.autoFillEnabled = autoFillEnabled;
+    
     self.model.databaseMetadata.autoFillCopyTotp = autoFillCopyTotp;
 
     [self bindUI];
@@ -145,6 +146,8 @@
         if ( autoFillEnabled != oldEnabled ) { 
             NSLog(@"AutoFill QuickType was toggles - Clearing Database....");
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+            
+            self.model.databaseMetadata.quickTypeEnabled = autoFillEnabled; 
         }
         
         [self.model rebuildMapsAndCaches]; 

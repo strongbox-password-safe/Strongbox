@@ -1789,6 +1789,26 @@ userInteractionRequired:(BOOL)userInteractionRequired
                                                   value:path
                                                copyable:NO]];
 
+    
+    
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"group_properties_searchable", @"Searchable")
+                                                  value:localizedYesOrNoFromBool(item.isSearchable)
+                                               copyable:NO]];
+
+    
+    
+    BOOL autofillable = item.isSearchable && ![self isExcludedFromAutoFill:item.uuid] && !item.expired;
+    
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_autofill_suggestable", @"Suggestable in AutoFill")
+                                                  value:localizedYesOrNoFromBool(autofillable)
+                                               copyable:NO]];
+
+    
+    
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"browse_vc_section_title_expired", @"Expired")
+                                                  value:localizedYesOrNoFromBool(item.expired)
+                                               copyable:NO]];
+
     return metadata;
 }
 

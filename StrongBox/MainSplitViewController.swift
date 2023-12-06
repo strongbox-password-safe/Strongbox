@@ -129,6 +129,10 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
             NSLog("Displaying a details view, will not collapse to Browse, collapsing to detail instead - [displayMode = %@, isCollapsed = %hhd]", String(describing: displayMode), isCollapsed)
 
             
+            
+            
+            
+
             detailsNav.popViewController(animated: false) 
 
             

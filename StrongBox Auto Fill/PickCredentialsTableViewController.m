@@ -94,8 +94,8 @@ static NSString* const kGroupAllItems = @"all-items";
         kGroupUrlMatches,
         kGroupTitleMatches,
         kGroupAllFieldsMatches,
-        kGroupPinned,
         kGroupActions,
+        kGroupPinned,
         kGroupServiceId,
         kGroupAllItems
     ];

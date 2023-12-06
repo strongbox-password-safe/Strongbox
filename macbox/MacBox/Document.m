@@ -22,7 +22,6 @@
 #import "MacSyncManager.h"
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
-#import "DatabaseUnlocker.h"
 #import "MBProgressHUD.h"
 #import "Strongbox-Swift.h"
 #import "DatabasesManagerVC.h"

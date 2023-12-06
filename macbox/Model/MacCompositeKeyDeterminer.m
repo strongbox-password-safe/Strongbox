@@ -167,9 +167,9 @@
     ManualCredentialsEntry* mce = [[ManualCredentialsEntry alloc] initWithNibName:@"ManualCredentialsEntry" bundle:nil];
     mce.databaseUuid = self.database.uuid;
     mce.isNativeAutoFillAppExtensionOpen = self.isNativeAutoFillAppExtensionOpen;
-    
     mce.headline = headline;
     mce.subheadline = subheadline;
+    mce.verifyCkfsMode = self.verifyCkfsMode;
     
     mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
 

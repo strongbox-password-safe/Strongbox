@@ -207,6 +207,13 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    
+    
+    self.navigationController.toolbarHidden = YES;
+    self.navigationController.toolbar.hidden = YES;
+    self.navigationController.navigationBarHidden = NO;
+    self.navigationController.navigationBar.prefersLargeTitles = NO;
+
     self.hideMetadataSection = !AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
     
 #ifndef IS_APP_EXTENSION
@@ -244,22 +251,26 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    [UIView setAnimationsEnabled:NO];
-    
-    self.navigationController.toolbarHidden = YES;
-    self.navigationController.toolbar.hidden = YES;
     
     
     
-    self.navigationController.navigationBarHidden = NO;
-    self.navigationController.navigationBar.prefersLargeTitles = NO;
-    
-    [self listenToNotifications];
-    
-    [self.tableView reloadData];
     
 
     
+    
+
+
+
+
+
+    
+    
+    [UIView setAnimationsEnabled:NO];
+
+    [self listenToNotifications]; 
+    
+    [self.tableView reloadData]; 
+        
     
     [self.tableView beginUpdates];
     [self.tableView endUpdates];

@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL isNativeAutoFillAppExtensionOpen;
 @property NSString* databaseUuid;
 
+@property BOOL verifyCkfsMode; 
+
 @property NSString* headline;
 @property (nullable) NSString* subheadline;
 

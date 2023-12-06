@@ -1476,6 +1476,8 @@ static NSString* getFreeTrialSuffix(void) {
                                                    database:self.viewModel.databaseMetadata
                            isNativeAutoFillAppExtensionOpen:NO];
     
+    ckd.verifyCkfsMode = YES; 
+    
     [ckd getCkfs:biometricMessage
   manualHeadline:manualCkfHeadline
    manualSubhead:manualCkfSubheadline
@@ -1495,32 +1497,61 @@ static NSString* getFreeTrialSuffix(void) {
 - (void)verifyCkfsAreCorrect:(CompositeKeyFactors*)factors
                          url:(NSURL*)url
                   completion:(void (^)(BOOL userCancelled, BOOL correct, NSError* _Nullable error))completion {
-    [macOSSpinnerUI.sharedInstance show:NSLocalizedString(@"generic_verifying_ellipsis", @"Verifying...")
-                         viewController:self.contentViewController];
+    DatabaseUnlocker *unlocker = [DatabaseUnlocker unlockerForDatabase:self.viewModel.databaseMetadata
+                                                        viewController:self.contentViewController
+                                                         forceReadOnly:NO
+                                      isNativeAutoFillAppExtensionOpen:NO
+                                                           offlineMode:NO];
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        [Serializator fromUrl:url ckf:factors completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-            [macOSSpinnerUI.sharedInstance dismiss];
-            
-            if ( error ) {
-                if ( error.code == StrongboxErrorCodes.incorrectCredentials ) {
-                    completion(NO, NO, nil);
-                }
-                else {
-                    completion(NO, NO, error);
-                }
-            }
-            else if ( userCancelled ) {
-                completion(YES, NO, nil);
-            }
-            else if ( model ) {
-                completion(NO, YES, nil);
-            }
-            else {
-                completion(NO, NO, nil);
-            }
-        }];
-    });
+
+    
+    [unlocker unlockLocalWithKey:factors
+              keyFromConvenience:NO
+                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+        
+        
+        if ( result == kUnlockDatabaseResultSuccess ) {
+            completion(NO, YES, nil);
+        }
+        else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
+            completion(NO, NO, nil);
+        }
+        else if ( result == kUnlockDatabaseResultError ) {
+            completion(NO, NO, error);
+        }
+        else {
+            completion(NO, NO, nil);
+        }
+    }];
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)promptToChangeMasterCredentials:(void (^)(BOOL okCancel))completion {
