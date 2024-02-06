@@ -299,7 +299,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     
     if ( !connection ) {
         NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
-        completion(nil, error);
+        completion(YES, nil, error);
         return;
     }
     
@@ -307,7 +307,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
        completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
             NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
-            completion(nil, error);
+            completion(YES, nil, error);
             return;
         }
         
@@ -323,7 +323,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         
         listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
             if(!success) {
-                completion(nil, error);
+                completion(YES, nil, error);
             }
             else {
                 NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
@@ -337,12 +337,12 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 
                 if (!responseItem) {
                     NSError* error = [Utils createNSError:@"Could not get attributes of webdav file" errorCode:-2];
-                    completion(nil, error);
+                    completion(YES, nil, error);
                     return;
                 }
                 
                 NSDate* modDate = responseItem.modificationDate;
-                completion(modDate, nil);
+                completion(YES, modDate, nil);
             }
         };
         

@@ -12,6 +12,12 @@
 #import "Settings.h"
 #import "StrongboxErrorCodes.h"
 
+@interface BiometricIdHelper ()
+
+@property LAContext *inProgressLaContext;
+
+@end
+
 @implementation BiometricIdHelper
 
 + (instancetype)sharedInstance {
@@ -91,13 +97,13 @@
         return;
     }
     
-    LAContext *localAuthContext = [[LAContext alloc] init];
+    LAContext* lac = [[LAContext alloc] init];
     
     if (fallbackTitle.length == 0) { 
-        localAuthContext.localizedFallbackTitle = @""; 
+        lac.localizedFallbackTitle = @""; 
     }
     else {
-        localAuthContext.localizedFallbackTitle = fallbackTitle;
+        lac.localizedFallbackTitle = fallbackTitle;
     }
     
     NSString* loc = reason.length ? reason : NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Unlock Database");
@@ -105,20 +111,31 @@
     NSError *authError;
     NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
     
-    if([localAuthContext canEvaluatePolicy:policy error:&authError]) {
-        self.biometricsInProgress = YES;
+    if([lac canEvaluatePolicy:policy error:&authError]) {
+        self.inProgressLaContext = lac;
+        __weak BiometricIdHelper *weakSelf = self;
         
-        [localAuthContext evaluatePolicy:policy
+        [self.inProgressLaContext evaluatePolicy:policy
                          localizedReason:loc
                                    reply:^(BOOL success, NSError *error) {
             completion(success, error);
-            self.biometricsInProgress = NO;
+            weakSelf.inProgressLaContext = nil;
         }];
     }
     else {
         NSLog(@"Biometrics is not available on this device");
         NSString* loc = NSLocalizedString(@"mac_biometrics_not_available", @"Biometrics is not available on this device!");
         completion(NO, [Utils createNSError:loc errorCode:24321]);
+    }
+}
+
+- (BOOL)biometricsInProgress {
+    return self.inProgressLaContext != nil;
+}
+
+- (void)invalidateCurrentRequest {
+    if(self.biometricsInProgress) {
+        [self.inProgressLaContext invalidate];
     }
 }
 

@@ -191,15 +191,18 @@ interactiveVC:(NSViewController *)interactiveVC
 
 - (BOOL)syncInProgress {
     for (MacDatabasePreferences* database in MacDatabasePreferences.allDatabases) {
-        SyncStatus *status = [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:database.uuid];
-        
-        if ( status.state == kSyncOperationStateInProgress ) {
-
+        if ( [self syncInProgressForDatabase:database.uuid]) {
             return YES;
         }
     }
-
+    
     return NO;
+}
+
+- (BOOL)syncInProgressForDatabase:(NSString*)databaseId {
+    SyncStatus *status = [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:databaseId];
+    
+    return status.state == kSyncOperationStateInProgress;
 }
 
 - (void)removeDatabaseAndLocalCopies:(MacDatabasePreferences*)database {

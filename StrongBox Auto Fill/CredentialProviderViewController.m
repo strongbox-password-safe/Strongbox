@@ -57,7 +57,7 @@ typedef enum : NSUInteger {
 @property (readonly) UIViewController* vcToPresentOn;
 
 @property AutoFillOperationMode mode;
-@property BOOL allowUserInteractionAndMessaging;
+@property BOOL allowUserInteractionAndMessaging; 
 @property BOOL initializedUI;
 
 @end
@@ -527,6 +527,8 @@ typedef enum : NSUInteger {
 }
 
 - (void)createAndSaveNewPasskey:(Model *)model  API_AVAILABLE(ios(17.0)) {
+    NSLog(@"🟢 createAndSaveNewPasskey...");
+    
     if ( !model.isKeePass2Format ) {
         NSLog(@"🔴 Cannot create a Passkey in none KeePass2 format.");
         NSError* error = [Utils createNSError:@"Passkeys are unsupported this database format. Passkeys are only supported by the KeePass 2 format." errorCode:-1];
@@ -778,7 +780,7 @@ typedef enum : NSUInteger {
         database.autoFillLastUnlockedAt = NSDate.date;
     }
     
-    [self sendAutoFillExitNotification];
+
 }
 
 - (DatabasePreferences*)getSingleEnabledDatabase {
@@ -833,8 +835,8 @@ typedef enum : NSUInteger {
     return identifier ? [DatabasePreferences fromUuid:identifier.databaseId] : nil;
 }
 
-- (void)sendAutoFillExitNotification {
-    [AutoFillDarwinNotification sendNotification];
-}
+
+
+
 
 @end

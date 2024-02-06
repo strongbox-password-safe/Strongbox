@@ -12,8 +12,14 @@ struct SaleOfferView: View {
     var dismiss: (() -> Void)!
     var onLifetime: (() -> Void)!
     var redeem: (() -> Void)!
-    var saleEndDate: Date
+    var sale: Sale!
     var existingSubscriber: Bool
+
+    var saleEndDate: Date {
+        let inclusiveEndDate = Calendar.current.date(byAdding: .day, value: -1, to: sale.end)
+
+        return inclusiveEndDate ?? Date()
+    }
 
     static let endDateFormat: DateFormatter = {
         let formatter = DateFormatter()
@@ -83,18 +89,28 @@ struct SaleOfferView: View {
                                         image.foregroundColor(.yellow)
                                     }
                                 #endif
-                                Text(existingSubscriber ? "sale_view_subscriber_title" : "sale_view_regular_title")
-                                    .font(.title)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
-                                    .multilineTextAlignment(.center)
-                                    .fixedSize(horizontal: false, vertical: true)
 
-                                Text(existingSubscriber ? "sale_view_subscriber_message" : "sale_view_regular_message")
-                                    .multilineTextAlignment(.center)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white)
-                                    .fixedSize(horizontal: false, vertical: true)
+                                VStack(spacing: 16) {
+                                    Text(existingSubscriber ? "sale_view_subscriber_title" : "sale_view_regular_title")
+                                        .font(.title)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.center)
+                                        .fixedSize(horizontal: false, vertical: true)
+
+                                    if let title = sale.title {
+                                        Text(title)
+                                            .font(.headline)
+                                            .foregroundColor(.yellow)
+                                            .multilineTextAlignment(.center)
+                                    }
+
+                                    Text(existingSubscriber ? "sale_view_subscriber_message" : "sale_view_regular_message")
+                                        .multilineTextAlignment(.center)
+                                        .font(.subheadline)
+                                        .foregroundColor(.white)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
                             }
                         }
                         VStack(spacing: 12) {
@@ -102,18 +118,35 @@ struct SaleOfferView: View {
                                 Button(action: {
                                     redeem()
                                 }, label: {
-                                    Text(existingSubscriber ? "sale_view_subscriber_cta" : "sale_view_regular_cta")
-                                        .foregroundColor(.white)
-                                        .font(.headline)
-                                        .fontWeight(.bold)
-                                        .frame(height: 56)
-                                        .frame(minWidth: 0, maxWidth: 300)
-                                        .background(LinearGradient(gradient: Gradient(colors: [buttonStartColor, buttonEndColor]),
-                                                                   startPoint: .topLeading,
-                                                                   endPoint: .bottomTrailing))
-                                        .shadow(radius: 5)
-                                        .cornerRadius(10)
-                                        .keyboardShortcut(.defaultAction)
+                                    VStack {
+                                        if let promoCode = sale.promoCode {
+                                            HStack {
+                                                Text("Use Promo Code:")
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.white)
+                                                    .multilineTextAlignment(.center)
+
+                                                Text("\(promoCode)")
+                                                    .font(.headline)
+                                                    .fontWeight(.bold)
+                                                    .foregroundColor(.yellow)
+                                                    .multilineTextAlignment(.center)
+                                            }
+                                        }
+
+                                        Text(existingSubscriber ? "sale_view_subscriber_cta" : "sale_view_regular_cta")
+                                            .foregroundColor(.white)
+                                            .font(.headline)
+                                            .fontWeight(.bold)
+                                            .frame(height: 56)
+                                            .frame(minWidth: 0, maxWidth: 300)
+                                            .background(LinearGradient(gradient: Gradient(colors: [buttonStartColor, buttonEndColor]),
+                                                                       startPoint: .topLeading,
+                                                                       endPoint: .bottomTrailing))
+                                            .shadow(radius: 5)
+                                            .cornerRadius(10)
+                                            .keyboardShortcut(.defaultAction)
+                                    }
                                 })
                                 .buttonStyle(.plain)
 
@@ -172,6 +205,6 @@ struct SaleOfferView: View {
 
 struct SubscriberSaleOffer_Previews: PreviewProvider {
     static var previews: some View {
-        SaleOfferView(saleEndDate: Date(), existingSubscriber: false)
+        SaleOfferView(sale: Sale(startLondonNoonTimeInclusive: "2025-03-14", endLondonNoonTimeExclusive: "2025-03-18", title: "Black Friday Special", promoCode: "IRE25"), existingSubscriber: false)
     }
 }

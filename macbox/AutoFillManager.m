@@ -19,6 +19,7 @@
 #import "AutoFillCommon.h"
 #import "CrossPlatform.h"
 #import "Node+Passkey.h"
+#import "Constants.h"
 
 
 
@@ -152,7 +153,8 @@
     return sortedEntries;
 }
 
-- (ASPasskeyCredentialIdentity*)getPasskeyAutoFillCredentialIdentity:(Node*)node databaseUuid:(NSString*)databaseUuid API_AVAILABLE(ios(17.0), macos (14.0)) {
+- (ASPasskeyCredentialIdentity*)getPasskeyAutoFillCredentialIdentity:(Node*)node 
+                                                        databaseUuid:(NSString*)databaseUuid API_AVAILABLE(ios(17.0), macos (14.0)) {
     if ( node.passkey == nil ) {
         return nil;
     }
@@ -174,11 +176,12 @@
     NSSet<NSString*>* uniqueUrls = [AutoFillCommon getUniqueUrlsForNode:database node:node];
     
     NSMutableArray<ASPasswordCredentialIdentity*> *passwordIdentities = [NSMutableArray array];
+    
+    BOOL usedEmailAsUser = NO;
+    for ( NSString* url in uniqueUrls ) {
+        ASPasswordCredentialIdentity* iden = [self getIdentity:node url:url database:database fieldKey:nil fieldValue:nil usedEmailAsUser:&usedEmailAsUser];
 
-    if ( node.fields.username.length && node.fields.password.length ) { 
-        for ( NSString* url in uniqueUrls ) {
-            ASPasswordCredentialIdentity* iden = [self getIdentity:node url:url database:database fieldKey:nil fieldValue:nil];
-            
+        if ( iden ) {
             [passwordIdentities addObject:iden];
         }
     }
@@ -199,8 +202,13 @@
             if (![NodeFields isAlternativeURLCustomFieldKey:key] &&
                 ![NodeFields isTotpCustomFieldKey:key] &&
                 ![NodeFields isPasskeyCustomFieldKey:key] ) {
-                StringValue* sv = node.fields.customFields[key];
                 
+                if ( usedEmailAsUser && [key isEqualToString:kCanonicalEmailFieldName] ) { 
+                    break;
+                }
+
+                StringValue* sv = node.fields.customFields[key];
+
                 if ( database.metadata.autoFillConcealedFieldsAsCreds && sv.protected ) {
                     if ( sv.value.length ) {
                         ASPasswordCredentialIdentity* iden = [self getIdentity:node
@@ -209,7 +217,9 @@
                                                                       fieldKey:key
                                                                     fieldValue:sv.value];
                         
-                        [customFieldIdentities addObject:iden];
+                        if ( iden ) {
+                            [customFieldIdentities addObject:iden];
+                        }
                     }
 
                 }
@@ -220,7 +230,10 @@
                                                                       database:database
                                                                       fieldKey:key
                                                                     fieldValue:sv.value];
-                        [customFieldIdentities addObject:iden];
+                        
+                        if ( iden ) {
+                            [customFieldIdentities addObject:iden];
+                        }
                     }
                 }
             }
@@ -238,21 +251,44 @@
     
     return passwordIdentities;
 }
-                                
-- (ASPasswordCredentialIdentity*)getIdentity:(Node*)node
-                                         url:(NSString*)url
-                                    database:(Model*)database
-                                    fieldKey:(NSString*)fieldKey
-                                  fieldValue:(NSString*)fieldValue {
+
+- (ASPasswordCredentialIdentity*_Nullable)getIdentity:(Node*)node
+                                                  url:(NSString*)url
+                                             database:(Model*)database
+                                             fieldKey:(NSString*)fieldKey
+                                           fieldValue:(NSString*)fieldValue {
+    return [self getIdentity:node url:url database:database fieldKey:fieldKey fieldValue:fieldValue usedEmailAsUser:nil];
+}
+
+- (ASPasswordCredentialIdentity*_Nullable)getIdentity:(Node*)node
+                                                  url:(NSString*)url
+                                             database:(Model*)database
+                                             fieldKey:(NSString*)fieldKey
+                                           fieldValue:(NSString*)fieldValue
+                                      usedEmailAsUser:(BOOL* _Nullable)usedEmailAsUser {
     QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:database.metadata.uuid nodeId:node.uuid.UUIDString fieldKey:fieldKey];
     ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
     
-    NSString* username;
+    NSString* user;
+    BOOL usingEmailAsUser = NO;
     if ( fieldKey == nil ) {
-        username = [database dereference:node.fields.username node:node];
+        user = [database dereference:node.fields.username node:node];
+        
+        if ( user.length == 0 ) {
+            user = [database dereference:node.fields.email node:node]; 
+            usingEmailAsUser = YES;
+        }
     }
     else {
-        username = fieldKey;
+        user = fieldKey;
+    }
+
+    if ( user.length == 0 ) {
+        return nil;
+    }
+    
+    if ( usedEmailAsUser ) {
+        *usedEmailAsUser = usingEmailAsUser;
     }
     
     NSString* title = [database dereference:node.title node:node];
@@ -263,23 +299,23 @@
     QuickTypeAutoFillDisplayFormat displayFormat = database.metadata.quickTypeDisplayFormat;
     NSString* nickName = database.metadata.nickName;
     
-    if ( displayFormat == kQuickTypeFormatTitleThenUsername && username.length) {
-        quickTypeText = [NSString stringWithFormat:@"%@ (%@)", title, username];
+    if ( displayFormat == kQuickTypeFormatTitleThenUsername && user.length) {
+        quickTypeText = [NSString stringWithFormat:@"%@ (%@)", title, user];
     }
-    else if ( displayFormat == kQuickTypeFormatUsernameOnly && username.length ) {
-        quickTypeText = username;
+    else if ( displayFormat == kQuickTypeFormatUsernameOnly && user.length ) {
+        quickTypeText = user;
     }
-    else if ( displayFormat == kQuickTypeFormatDatabaseThenTitleThenUsername && username.length) {
-        quickTypeText = [NSString stringWithFormat:@"[%@] %@ (%@)", nickName, title, username];
+    else if ( displayFormat == kQuickTypeFormatDatabaseThenTitleThenUsername && user.length) {
+        quickTypeText = [NSString stringWithFormat:@"[%@] %@ (%@)", nickName, title, user];
     }
-    else if ( displayFormat == kQuickTypeFormatDatabaseThenUsername && username.length) {
-        quickTypeText = [NSString stringWithFormat:@"[%@] %@", nickName, username];
+    else if ( displayFormat == kQuickTypeFormatDatabaseThenUsername && user.length) {
+        quickTypeText = [NSString stringWithFormat:@"[%@] %@", nickName, user];
     }
     else if ( displayFormat == kQuickTypeFormatDatabaseThenTitle) {
         quickTypeText = [NSString stringWithFormat:@"[%@] %@", nickName, title];
     }
     else if ( fieldKey != nil ) {
-        quickTypeText = username;
+        quickTypeText = user;
     }
     
     if ( [database isFavourite:node.uuid] ) {
@@ -312,18 +348,26 @@
         
         
         
-        if ( lastFullClear == nil || [lastFullClear isMoreThanXDaysAgo:14] ) { 
+        if ( lastFullClear == nil || [lastFullClear isMoreThanXDaysAgo:7] ) { 
             NSLog(@"✅ Doing a full clear of the QuickType AutoFill database because the last clear was on [%@]", lastFullClear.friendlyDateString);
             
-            [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:nil];
+            [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:^(BOOL success, NSError * _Nullable error) {
+                NSLog(@"lastQuickTypeMultiDbRegularClear - Clear Done");
+                
+                [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities
+                                                                     completion:^(BOOL success, NSError * _Nullable error) {
+                    
+                }];
+            }];
             
             CrossPlatformDependencies.defaults.applicationPreferences.lastQuickTypeMultiDbRegularClear = NSDate.date;
         }
-        
-        [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities
-                                                             completion:^(BOOL success, NSError * _Nullable error) {
-
-        }];
+        else {
+            [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities
+                                                                 completion:^(BOOL success, NSError * _Nullable error) {
+                
+            }];
+        }
     }
 }
 
@@ -388,10 +432,12 @@
     else {
         ASPasswordCredentialIdentity* aspcid = [self getIdentity:node url:node.fields.url database:database fieldKey:nil fieldValue:nil];
         
-        [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:@[aspcid]
-                                                             completion:^(BOOL success, NSError * _Nullable error) {
-            NSLog(@"refreshQuickTypeAfterAutoFillAddition Done: %hhd - %@", success, error);
-        }];
+        if ( aspcid ) {
+            [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:@[aspcid]
+                                                                 completion:^(BOOL success, NSError * _Nullable error) {
+                NSLog(@"refreshQuickTypeAfterAutoFillAddition Done: %hhd - %@", success, error);
+            }];
+        }
     }
 }
 

@@ -501,7 +501,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     else {
         ret.hideTabBarIfOnlySingleTab = NO;
     }
-    
+        
     
     
     if ( jsonDictionary[@"sortConfigurations"] != nil ) {
@@ -521,14 +521,19 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.sortConfigurations = @{};
     }
     
+    
+    
+    if ( jsonDictionary[@"allowPulldownRefreshSyncInOfflineMode"] != nil ) {
+        ret.allowPulldownRefreshSyncInOfflineMode = ((NSNumber*)jsonDictionary[@"allowPulldownRefreshSyncInOfflineMode"]).boolValue;
+    }
+    else {
+        ret.allowPulldownRefreshSyncInOfflineMode = NO;
+    }
+
+    
+    
     return ret;
 }
-
-- (void)setKeyFile:(NSString*)keyFileBookmark keyFileFileName:(NSString*)keyFileFileName {
-    _keyFileBookmark = keyFileBookmark;
-    _keyFileFileName = keyFileFileName;
-}
-
 - (NSDictionary *)getJsonSerializationDictionary {
     NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithDictionary:@{
         @"uuid" : self.uuid,
@@ -614,6 +619,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"persistLazyEvenLastSyncErrors" : @(self.persistLazyEvenLastSyncErrors),
         @"showLastViewedEntryOnUnlock" : @(self.showLastViewedEntryOnUnlock),
         @"hideTabBarIfOnlySingleTab" : @(self.hideTabBarIfOnlySingleTab),
+        @"allowPulldownRefreshSyncInOfflineMode" : @(self.allowPulldownRefreshSyncInOfflineMode)
     }];
     
     if (self.nickName != nil) {
@@ -717,6 +723,11 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 }
 
 
+
+- (void)setKeyFile:(NSString*)keyFileBookmark keyFileFileName:(NSString*)keyFileFileName {
+    _keyFileBookmark = keyFileBookmark;
+    _keyFileFileName = keyFileFileName;
+}
 
 - (NSArray<NSString *> *)autoFillExcludedItems {
     NSString *key = [NSString stringWithFormat:@"%@-autoFillExcludedItems", self.uuid];

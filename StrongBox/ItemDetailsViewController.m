@@ -258,11 +258,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
     
     
-
-
-
-
-
+    
     
     
     [UIView setAnimationsEnabled:NO];

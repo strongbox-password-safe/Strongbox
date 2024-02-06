@@ -25,13 +25,11 @@ public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
     public func instantiateViewController(_ onDone: @escaping OnboardingModuleDoneBlock) -> VIEW_CONTROLLER_PTR? {
         let existingSubscriber = false 
 
-        guard let saleEndDate = SaleScheduleManager.sharedInstance().currentSaleEndDate,
-              let inclusiveEndDate = Calendar.current.date(byAdding: .day, value: -1, to: saleEndDate)
-        else {
+        guard let sale = SaleScheduleManager.sharedInstance().currentSale else {
             return nil
         }
 
-        let vcc = SwiftUIViewFactory.makeSaleOfferViewController(saleEndDate: inclusiveEndDate,
+        let vcc = SwiftUIViewFactory.makeSaleOfferViewController(sale: sale,
                                                                  existingSubscriber: existingSubscriber)
         {
             SaleScheduleManager.sharedInstance().userHasBeenPromptedAboutCurrentSale = true

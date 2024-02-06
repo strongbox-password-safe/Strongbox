@@ -44,7 +44,7 @@
     return [NSDate isMoreThanXSecondsAgo:self seconds:seconds];
 }
 
-- (BOOL)isEqualToDateWithinEpsilon:(NSDate *)other {
+- (BOOL)isEqualToDateWithinEpsilon:(NSDate * _Nullable)other {
     if (other == nil) {
         return NO;
     }
@@ -177,6 +177,20 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZZ"];
 
     return [dateFormatter stringFromDate:self];
+}
+
+- (NSString*)iso8601DateStringWithFractionalSeconds {
+    NSISO8601DateFormatter* dateFormatter = [[NSISO8601DateFormatter alloc] init];
+    dateFormatter.formatOptions = NSISO8601DateFormatWithInternetDateTime | NSISO8601DateFormatWithFractionalSeconds;
+    
+    return [dateFormatter stringFromDate:self];
+}
+
++ (instancetype)FromIso8601DateStringWithFractionalSeconds:(NSString *)string {
+    NSISO8601DateFormatter* dateFormatter = [[NSISO8601DateFormatter alloc] init];
+    dateFormatter.formatOptions = NSISO8601DateFormatWithInternetDateTime | NSISO8601DateFormatWithFractionalSeconds;
+
+    return [dateFormatter dateFromString:string];
 }
 
 + (instancetype)fromYYYY_MM_DDString:(NSString *)string {

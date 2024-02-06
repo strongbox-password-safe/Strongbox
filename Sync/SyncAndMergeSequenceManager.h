@@ -36,8 +36,6 @@ NSString* syncResultToString(SyncAndMergeResult result);
                       parameters:(SyncParameters*)parameters
                       completion:(SyncAndMergeCompletionBlock)completion;
 
-
-
 @end
 
 NS_ASSUME_NONNULL_END

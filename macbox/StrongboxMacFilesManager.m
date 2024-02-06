@@ -55,8 +55,11 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 }
 
 - (NSString *)desktopPath {
+
+
+
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSUserDomainMask, YES );
-    
+
     return paths.firstObject;
 }
 

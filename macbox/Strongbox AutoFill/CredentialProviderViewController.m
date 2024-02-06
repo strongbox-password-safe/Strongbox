@@ -44,7 +44,16 @@
 @property (nullable) MacDatabasePreferences* database;
 @property (nullable) QuickTypeRecordIdentifier* quickTypeIdentifier;
 
-@property BOOL withUserInteraction;
+
+
+
+
+
+
+
+
+@property BOOL withoutUserInteraction;
+
 @property BOOL quickTypeMode;
 
 @property id passkeyCredentialRequest;
@@ -58,7 +67,7 @@
 
 @implementation CredentialProviderViewController
 
-- (void)commonInit {
+- (void)commonInit { 
     NSLog(@"🟢 AutoFill::commonInit");
     
     [DatabasesManager.sharedInstance forceReload];
@@ -73,7 +82,8 @@
     NSLog(@"🟢 AutoFill: provideCredentialWithoutUserInteractionForIdentity [%@]", credentialIdentity);
 
     self.quickTypeMode = YES;
-
+    self.withoutUserInteraction = YES;
+    
     BOOL pro = Settings.sharedInstance.isPro;
 
     if ( !pro ) {
@@ -101,9 +111,10 @@
 
     NSLog(@"🟢 provideCredentialWithoutUserInteractionForRequest [%@]", credentialRequest);
     
+    self.withoutUserInteraction = YES;
+    self.quickTypeMode = YES;
+    
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
-        self.quickTypeMode = YES;
-        
         BOOL pro = Settings.sharedInstance.isPro;
         
         if ( !pro ) {
@@ -143,7 +154,7 @@
                                                                       @"clientDataHash" : request.clientDataHash }
                                                         completion:^(BOOL success, NSDictionary<NSString *,id> * _Nullable response) {
             if ( success ) {
-                NSString* totp = response[@"totp"];
+
                 NSData* userHandle = response[@"userHandle"];
                 NSString* relyingParty = response[@"relyingParty"];
                 NSData* credentialID = response[@"credentialID"];
@@ -158,7 +169,7 @@
                                                                                                      credentialID:credentialID];
                 
                 MacDatabasePreferences* metadata = [MacDatabasePreferences fromUuid:identifier.databaseId];
-                [self exitWithPasskeyAssertion:metadata credential:credential totp:totp];
+                [self exitWithPasskeyAssertion:metadata credential:credential totp:nil]; 
             }
             else {
                 [self exitWithUserInteractionRequired];
@@ -182,10 +193,10 @@
             
             NSString* username = payload[@"user"];
             NSString* password = payload[@"password"];
-            NSString* totp = payload[@"totp"];
+
             
             if ( username && password ) {
-                [self exitWithCredential:metadata username:username password:password totp:totp];
+                [self exitWithCredential:metadata username:username password:password totp:nil];
             }
             else {
                 NSLog(@"🔴 Successful wormhole quicktype request but nothing in secret store? => UI");
@@ -206,7 +217,6 @@
     
     NSLog(@"🟢 prepareInterfaceForPasskeyRegistration [%@]", registrationRequest);
     
-    self.withUserInteraction = YES;
     self.quickTypeMode = NO;
     self.requireWormhole = YES;
     
@@ -227,11 +237,11 @@
         [self exitWithUserCancelled:nil];
         return;
     }
-    
+
+    self.quickTypeMode = YES;
+
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
         self.passkeyCredentialRequest = credentialRequest;
-        self.quickTypeMode = YES;
-        self.withUserInteraction = YES;
         
         id<ASCredentialIdentity> credentialIdentity = credentialRequest.credentialIdentity;
         
@@ -249,7 +259,6 @@
     NSLog(@"AutoFill: prepareInterfaceToProvideCredentialForIdentity [%@]", credentialIdentity);
     
     self.quickTypeMode = YES;
-    self.withUserInteraction = YES;
     
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
     
@@ -298,10 +307,10 @@
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     [self commonInit];
     
-    
+
+    NSLog(@"🟢 prepareCredentialListForServiceIdentifiers");
     
     self.quickTypeMode = NO;
-    self.withUserInteraction = YES;
     
     self.serviceIdentifiers = serviceIdentifiers;
 }
@@ -544,9 +553,11 @@
 
 - (void)unlock:(NSString*)conveniencePassword {
     if ( conveniencePassword ) {
+        NSLog(@"🟢 Unlocking with convenience password");
         [self unlockWithExplicitPassword:conveniencePassword];
     }
     else {
+        NSLog(@"🟢 Could not unlock with convenience/wormhole... regular sequence");
         [self doRegularUnlockSequence];
     }
 }
@@ -565,7 +576,7 @@
 }
 
 - (void)doRegularUnlockSequence {
-
+    NSLog(@"🟢 doRegularUnlockSequence ENTER");
     
     MacCompositeKeyDeterminer* det = [MacCompositeKeyDeterminer determinerWithViewController:self
                                                                                     database:self.database
@@ -597,7 +608,7 @@
                     factors:(CompositeKeyFactors*)factors
             fromConvenience:(BOOL)fromConvenience
                       error:(NSError*)error {
-    NSLog(@"AutoFill -> handleGetCkfsResult [%@] - Error = [%@] - Convenience = [%hhd]", result == kGetCompositeKeyResultSuccess ? @"Succeeded" : @"Failed", error, fromConvenience);
+    NSLog(@"🟢 AutoFill -> handleGetCkfsResult [%@] - Error = [%@] - Convenience = [%hhd]", result == kGetCompositeKeyResultSuccess ? @"Succeeded" : @"Failed", error, fromConvenience);
     
     if ( result == kGetCompositeKeyResultSuccess ) {
         [self unlockDatabaseWithCkf:factors isConvenienceUnlock:fromConvenience];
@@ -653,18 +664,21 @@
 
 - (void)onSucccesfullyUnlocked:(Model*)model {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (self.database.autoFillConvenienceAutoUnlockTimeout == -1 && self.withUserInteraction ) {
-            [self onboardForAutoFillConvenienceAutoUnlock:^{
-                [self continueUnlockedDatabase:model];
-            }];
-        }
-        else {
+        
+
+
+
+
+
+
             [self continueUnlockedDatabase:model];
-        }
+
     });
 }
 
 - (void)continueUnlockedDatabase:(Model*)model {
+    NSLog(@"🟢 CredentialProviderViewController::continueUnlockedDatabase");
+    
     if ( self.database.autoFillConvenienceAutoUnlockTimeout > 0 ) {
         self.database.autoFillConvenienceAutoUnlockPassword = model.database.ckfs.password;
         [self markLastUnlockedAtTime:self.database];
@@ -690,32 +704,32 @@
     }
 }
 
-- (void)onboardForAutoFillConvenienceAutoUnlock:(void (^)(void))completion {
-    if (@available(macOS 13.0, *)) {
-        [MacAlerts threeOptions:NSLocalizedString(@"autofill_auto_unlock_title", @"Auto Unlock Feature")
-                informativeText:NSLocalizedString(@"autofill_auto_unlock_message", @"Auto Unlock lets you avoid repeatedly unlocking your database in AutoFill mode within a configurable time window. Would you like to use this handy feature?\n\nNB: Your password is stored in the Secure Enclave for this feature.")
-              option1AndDefault:NSLocalizedString(@"autofill_auto_unlock_try_3_minutes", @"Great, lets try 3 mins")
-                        option2:NSLocalizedString(@"autofill_auto_unlock_try_10_minutes", @"I'd prefer 10 mins")
-                        option3:NSLocalizedString(@"mac_upgrade_no_thanks", @"No Thanks")
-                         window:self.view.window
-                     completion:^(NSUInteger option) {
-            if (option == 1) {
-                self.database.autoFillConvenienceAutoUnlockTimeout = 180;
-            }
-            else if (option == 2) {
-                self.database.autoFillConvenienceAutoUnlockTimeout = 600;
-            }
-            else if (option == 3) {
-                self.database.autoFillConvenienceAutoUnlockTimeout = 0;
-            }
-            
-            completion();
-        }];
-    }
-    else {
-        completion(); 
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -883,7 +897,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (void)createAndSaveNewPasskey:(Model*)model API_AVAILABLE(macos(14.0)) {
-
+    NSLog(@"🟢 AUTOFILL: createAndSaveNewPasskey ENTER");
     
     if ( !model.isKeePass2Format ) {
         NSLog(@"🔴 Cannot create a Passkey in none KeePass2 format.");
@@ -898,7 +912,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                                        parentViewController:self
                                                       error:&error
                                                  completion:^(BOOL userCancelled, ASPasskeyRegistrationCredential * _Nullable response, NSError * _Nullable error) {
-
+        NSLog(@"🟢 getAutoFillRegistrationCredential - userCancelled = [%hhd], error = [%@]", userCancelled, error);
         
         
         
@@ -1041,49 +1055,10 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                 completion:(void (^) (void))completion {
     BOOL pro = Settings.sharedInstance.isPro;
     
-    if (pro) {
-        if ( totp.length && unlockedDatabase.autoFillCopyTotp ) {
-            if ( !self.withUserInteraction ) {
-                
-                
-                NSLog(@"🟢 TOTP Copy Required - we must be interactive... retrying in interactive mode...");
-                [self exitWithUserInteractionRequired];
-                return;
-            }
-            
-            [ClipboardManager.sharedInstance copyConcealedString:totp];
-
-            
-            
-            if ( Settings.sharedInstance.showAutoFillTotpCopiedMessage && self.withUserInteraction ) {
-                
-                
-
-
-
-
-
-
-
-
-
-
-                    
-                    completion();
-
-            }
-            else {
-                completion();
-            }
-        }
-        else {
-            completion();
-        }
-    }
-    else {
-
+    if (!pro) {
         
-        if ( self.view && self.view.window && self.withUserInteraction ) {
+        
+        if ( self.view && self.view.window && !self.withoutUserInteraction ) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [MacAlerts info:NSLocalizedString(@"mac_autofill_pro_feature_title", @"Pro Feature")
                 informativeText:NSLocalizedString(@"mac_autofill_pro_feature_upgrade-message", @"AutoFill is only available on the Pro edition of Strongbox. You can upgrade like this:\n\n1. Launch Strongbox\n2. Click the 'Strongbox' menu\n3. Click 'Upgrade to Pro...'.\n\nThank you!")
@@ -1097,6 +1072,45 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             [self exitWithUserCancelled:unlockedDatabase];
         }
     }
+    
+    if ( totp.length && unlockedDatabase.autoFillCopyTotp ) {
+        if ( self.withoutUserInteraction ) {
+            
+            
+            NSLog(@"🟢 TOTP Copy Required - we must be interactive... retrying in interactive mode...");
+            [self exitWithUserInteractionRequired];
+            return;
+        }
+        
+        [ClipboardManager.sharedInstance copyConcealedString:totp];
+        NSLog(@"🟢 Copied TOTP to Pasteboard...");
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+    
+    completion();
 }
 
 
@@ -1114,9 +1128,9 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (void)exitWithUserInteractionRequired {
-    NSLog(@"🟢 EXIT: User Interaction Required");
-    
     [self notifyMainAppAutoFillExited];
+    
+    NSLog(@"🟢 EXIT: User Interaction Required");
     
     [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain
                                                                       code:ASExtensionErrorCodeUserInteractionRequired
@@ -1150,8 +1164,8 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 - (void)exitWithErrorOccurred:(NSError*)error {
     NSLog(@"🟢 🔴 EXIT: Error Occured [%@]", error);
     
-    if ( self.withUserInteraction ) {
-        [MacAlerts error:error 
+    if ( !self.withoutUserInteraction ) {
+        [MacAlerts error:error
                   window:self.view.window
               completion:^{
             [self notifyMainAppAutoFillExited];
@@ -1205,7 +1219,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     [self copyTotpIfPossible:database totp:totp completion:^{
         [weakSelf markLastUnlockedAtTime:database];
         
-        [self notifyMainAppAutoFillExited];
+        [weakSelf notifyMainAppAutoFillExited];
         
         [weakSelf.extensionContext completeAssertionRequestWithSelectedPasskeyCredential:credential
                                                                        completionHandler:^(BOOL expired) {

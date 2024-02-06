@@ -121,7 +121,12 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
     
     return [mut map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
 #if TARGET_OS_IPHONE
-        IMAGE_TYPE_PTR img = [UIImage systemImageNamed:obj];
+        IMAGE_TYPE_PTR img;
+        if (@available(iOS 16.0, *)) {
+            img = [[UIImage systemImageNamed:obj] imageWithConfiguration:[UIImageSymbolConfiguration configurationPreferringMonochrome]];
+        } else {
+            img = [UIImage systemImageNamed:obj];
+        }
         return img ? [img imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate] : [[UIImage systemImageNamed:@"lock.fill"] imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate];
 #else
         IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];

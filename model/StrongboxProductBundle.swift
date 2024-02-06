@@ -76,6 +76,25 @@ public class StrongboxProductBundle: NSObject {
             }
         }
 
+        var supportsWiFiSync: Bool {
+            switch self {
+            case .unifiedFreemium:
+                return true
+            case .unifiedPro:
+                return true
+            case .business:
+                return true
+            case .zero:
+                return false
+            case .scotus:
+                return false
+            case .macOSStandaloneFreemium:
+                return true
+            case .macOSStandalonePro:
+                return true
+            }
+        }
+
         var supportsSftpWebDAV: Bool {
             switch self {
             case .unifiedFreemium:
@@ -234,6 +253,18 @@ public class StrongboxProductBundle: NSObject {
         }
     }
 
+    @objc class var supportsWiFiSync: Bool {
+        let bundleId = Utils.getAppBundleId()
+
+        if let bundle = BundleIdentifiers(rawValue: bundleId) {
+            
+            return bundle.supportsWiFiSync
+        } else {
+            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.supportsWiFiSync()")
+            return false
+        }
+    }
+
     @objc class var supports3rdPartyStorageProviders: Bool {
         let bundleId = Utils.getAppBundleId()
 
@@ -241,7 +272,7 @@ public class StrongboxProductBundle: NSObject {
             
             return bundle.supports3rdPartyStorageProviders
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
+            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.supports3rdPartyStorageProviders()")
             return false
         }
     }

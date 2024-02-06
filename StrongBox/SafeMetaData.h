@@ -239,6 +239,8 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 
 @property (readonly) NSString* exportFilename;
 
+@property BOOL allowPulldownRefreshSyncInOfflineMode;
+
 @end
 
 NS_ASSUME_NONNULL_END

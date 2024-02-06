@@ -23,8 +23,10 @@
     #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
         #import "GoogleDriveStorageProvider.h"
         #import "DropboxV2StorageProvider.h"
+    #endif
 
-        #import "Strongbox-Swift.h" 
+    #ifndef IS_APP_EXTENSION
+        #import "Strongbox-Swift.h"
     #endif
 #else
     #import "MacUrlSchemes.h"
@@ -56,6 +58,9 @@
     }
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
+    }
+    else if ( providerId == kWiFiSync ) {
+        return WiFiSyncStorageProvider.sharedInstance;
     }
 #else
     if (providerId == kMacFile) {
@@ -104,7 +109,7 @@
     return [SafeStorageProviderFactory getDisplayNameForProvider:provider database:nil];
 }
 
-+ (NSString*)getDisplayNameForProvider:(StorageProvider)provider database:(METADATA_PTR )database {
++ (NSString*)getDisplayNameForProvider:(StorageProvider)provider database:(METADATA_PTR _Nullable )database {
     NSString* _displayName;
     
     if (provider == kiCloud) {
@@ -117,8 +122,8 @@
     else if (provider == kLocalDevice) {
         if (database) {
             _displayName = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
-                NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
-                NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
+            NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
+            NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
         }
         else {
             _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
@@ -126,6 +131,9 @@
                 _displayName = @"Local Device";
             }
         }
+    }
+    else if ( provider == kWiFiSync ) {
+        return NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync");
     }
 #else
     else if (provider == kMacFile) {
@@ -188,10 +196,6 @@
     return _displayName;
 }
 
-+ (NSString*)getIcon:(METADATA_PTR )database {
-    return [SafeStorageProviderFactory getIconForProvider:database.storageProvider];
-}
-
 + (NSString*)getIconForProvider:(StorageProvider)provider {
     if (provider == kiCloud) {
         return @"cloud";
@@ -229,9 +233,40 @@
 }
 
 #if TARGET_OS_IPHONE
++ (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider {
+    return [self getImageForProvider:provider database:nil];
+}
 
++ (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider database:(METADATA_PTR)database {
+    if (provider == kWiFiSync) {
+        UIImage* image = [UIImage systemImageNamed:@"externaldrive.fill.badge.wifi"];
+        
+        if (@available(iOS 15.0, *)) {
+            BOOL isLive = NO;
+            if ( database ) {
+#ifndef IS_APP_EXTENSION
+                NSString* serverName = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:database];
+                if ( serverName ) {
+                    isLive = [WiFiSyncBrowser.shared serverIsPresent:serverName];
+                }
+#endif
+            }
+            
+            UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[isLive ? UIColor.systemGreenColor : UIColor.systemGrayColor, UIColor.systemBlueColor]];
+            
+            return [image imageByApplyingSymbolConfiguration:config];
+        }
+
+        
+        return image;
+    }
+    else {
+        NSString* name = [self getIconForProvider:provider];
+        return [UIImage imageNamed:name];
+    }
+}
 #else
-+ (NSImage*)getImageForProvider:(StorageProvider)provider {
++ (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider {
     if (provider == kiCloud) {
         return [NSImage imageWithSystemSymbolName:@"icloud.fill" accessibilityDescription:nil];
     }

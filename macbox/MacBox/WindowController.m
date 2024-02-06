@@ -1627,7 +1627,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 - (IBAction)onVCToggleReadOnly:(id)sender {
     if ( !self.viewModel.readOnly ) {
-        if ( [DatabasesCollection.shared documentIsOpenWithPendingChangesWithUuid:self.viewModel.databaseUuid] ) {
+        if ( [DatabasesCollection.shared databaseHasEditsOrIsBeingEditedWithUuid:self.viewModel.databaseUuid] ) {
             [MacAlerts info:NSLocalizedString(@"read_only_unavailable_title", @"Read Only Unavailable")
             informativeText:NSLocalizedString(@"read_only_unavailable_pending_changes_message", @"You currently have changes pending and so you cannot switch to Read Only mode. You must save or discard your current changes first.")
                      window:self.window
@@ -2750,7 +2750,6 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
         NSLog(@"WindowController::synchronizeSecondDatabase start [%@]", updateId);
         self.viewModel.commonModel.metadata.asyncUpdateId = updateId;
 
-        
         [self.viewModel.commonModel asyncUpdateAndSync:^(AsyncJobResult * _Nonnull result) {
             if ( [updateId isEqualTo:self.viewModel.commonModel.metadata.asyncUpdateId] ) {
                 self.viewModel.commonModel.metadata.asyncUpdateId = nil;

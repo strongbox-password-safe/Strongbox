@@ -14,6 +14,7 @@ typedef NS_ENUM (NSUInteger, StorageProviderUpdateResult) {
     kUpdateResultError,
     kUpdateResultSuccess,
     kUpdateResultUserInteractionRequired,
+    kUpdateResultUnavailable 
 };
 
 NS_ASSUME_NONNULL_END

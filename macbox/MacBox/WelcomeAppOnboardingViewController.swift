@@ -33,6 +33,11 @@ class WelcomeAppOnboardingViewController: NSViewController {
     @IBOutlet var stackViewStartAtLogin: NSStackView!
     @IBOutlet var stackViewAutoFill: NSStackView!
 
+    @IBOutlet var checkboxWiFi: NSButton!
+    @IBOutlet var stackWiFI: NSStackView!
+
+    @IBOutlet var checkboxMarkdownNotes: NSButton!
+
     var completion: (() -> Void)!
 
     class func fromStoryboard() -> Self {
@@ -59,6 +64,11 @@ class WelcomeAppOnboardingViewController: NSViewController {
 
         checkboxAutoFill.state = Settings.sharedInstance().isPro ? .on : .off
         checkboxAutoFill.isEnabled = Settings.sharedInstance().isPro
+
+        checkboxMarkdownNotes.state = Settings.sharedInstance().markdownNotes ? .on : .off
+        checkboxWiFi.state = Settings.sharedInstance().wiFiSyncOn ? .on : .off
+
+        stackWiFI.isHidden = !StrongboxProductBundle.supportsWiFiSync
     }
 
     @IBAction func onLetsGo(_: Any) {
@@ -103,6 +113,16 @@ class WelcomeAppOnboardingViewController: NSViewController {
                 NativeMessagingManifestInstallHelper.removeNativeMessagingHostsFiles()
             }
         }
+
+        
+
+        Settings.sharedInstance().markdownNotes = checkboxMarkdownNotes.state == .on
+
+        
+
+        Settings.sharedInstance().wiFiSyncOn = checkboxWiFi.state == .on
+
+        try? WiFiSyncServer.shared.startOrStopWiFiSyncServerAccordingToSettings()
 
         
 

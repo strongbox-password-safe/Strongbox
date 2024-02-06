@@ -293,7 +293,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 
 
-- (BOOL)isNextGenEditsInProgress {
+- (BOOL)isEditsInProgress {
     if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
         NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
         return vc.editsInProgress;
@@ -329,7 +329,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         return;
     }
     
-    BOOL isEditing = [self isNextGenEditsInProgress];
+    BOOL isEditing = [self isEditsInProgress];
 
     NSLog(@"Document::initiateLockSequence called... isEditing = %hhd", isEditing);
 

@@ -1374,4 +1374,14 @@
     return self.metadata.exportFilename;
 }
 
+- (BOOL)allowPulldownRefreshSyncInOfflineMode {
+    return self.metadata.allowPulldownRefreshSyncInOfflineMode;
+}
+
+- (void)setAllowPulldownRefreshSyncInOfflineMode:(BOOL)allowPulldownRefreshSyncInOfflineMode {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.allowPulldownRefreshSyncInOfflineMode = allowPulldownRefreshSyncInOfflineMode;
+    }];
+}
+
 @end

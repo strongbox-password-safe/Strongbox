@@ -9,6 +9,7 @@
 #import "AutoFillOnboardingModule.h"
 #import "AutoFillManager.h"
 #import "AutoFillOnboardingViewController.h"
+#import "NSDate+Extensions.h"
 
 @interface AutoFillOnboardingModule ()
 
@@ -31,7 +32,10 @@
         return obj.autoFillEnabled && obj.quickTypeEnabled;
     }].count;
 
-    return !self.model.metadata.autoFillOnboardingDone && !self.model.metadata.autoFillEnabled && AutoFillManager.sharedInstance.isOnForStrongbox && databasesUsingQuickType == 0;
+    NSDate* cutoff = [NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-01-08"];
+    BOOL newish = [self.model.metadata.databaseCreated isLaterThan:cutoff]; 
+    
+    return !self.model.metadata.autoFillOnboardingDone && !self.model.metadata.autoFillEnabled && AutoFillManager.sharedInstance.isOnForStrongbox && newish;
 }
 
 - (UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {

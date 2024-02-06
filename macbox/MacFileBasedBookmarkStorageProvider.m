@@ -118,7 +118,7 @@
     
     if(error || !url) {
         NSLog(@"Error or nil URL in Files App Provider: %@", error);
-        completion(nil, error);
+        completion(YES, nil, error);
         return;
     }
 
@@ -138,7 +138,7 @@
         [self stopAccessingSecurityScopedResource:url];
     }
     
-    completion(attr.fileModificationDate, error);
+    completion(YES, attr.fileModificationDate, error);
 }
 
 - (void)pushDatabase:(nonnull METADATA_PTR)safeMetaData interactiveVC:(VIEW_CONTROLLER_PTR _Nullable)viewController data:(nonnull NSData *)data completion:(nonnull StorageProviderUpdateCompletionBlock)completion {
@@ -167,25 +167,32 @@
     }
     
     BOOL success = [data writeToURL:url options:kNilOptions error:&error];
-    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-
-    if (error) {
+    if ( !success ) {
+        if ( securitySucceeded ) {
+            [self stopAccessingSecurityScopedResource:url];
+        }
         
-        NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
-    }
-
-    if ( securitySucceeded ) {
-        [self stopAccessingSecurityScopedResource:url];
-    }
-    
-    if ( success ) {
-        completion(kUpdateResultSuccess, attr ? attr.fileModificationDate : nil, nil);
+        completion(kUpdateResultError, nil, error);
     }
     else {
-        NSError *err = [Utils createNSError:NSLocalizedString(@"files_provider_problem_saving", @"Problem Saving to External File") errorCode:-1];
-        completion(kUpdateResultError, nil, err);
+        NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+        if (error) {
+            
+            NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
+        }
+        
+        if ( securitySucceeded ) {
+            [self stopAccessingSecurityScopedResource:url];
+        }
+        
+        if ( success ) {
+            completion(kUpdateResultSuccess, attr ? attr.fileModificationDate : nil, nil);
+        }
+        else {
+            NSError *err = error ? error : [Utils createNSError:NSLocalizedString(@"files_provider_problem_saving", @"Problem Saving to External File") errorCode:-1];
+            completion(kUpdateResultError, nil, err);
+        }
     }
-
 }
 
 - (void)readWithProviderData:(NSObject * _Nullable)providerData

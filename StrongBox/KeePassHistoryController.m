@@ -106,7 +106,7 @@
         
         vc.createNewItem = NO;
         
-        Node* node = self.historicalItems[index.intValue];
+        Node* node = self.items[index.intValue];
         
         vc.itemId = node.uuid;
         vc.historicalIndex = index;

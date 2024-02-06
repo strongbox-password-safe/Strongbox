@@ -111,7 +111,7 @@ class DetailViewController: NSViewController {
                     cellView.copySelectedText()
                     let loc = NSLocalizedString("mac_notes_partially_copied_to_clipboard", comment: "Notes (Partially) Copied")
 
-                    showPopupToast(loc, view: cellView)
+                    showPopupToast(loc)
 
                     return true
                 }
@@ -659,13 +659,13 @@ class DetailViewController: NSViewController {
 
     
 
-    func copyFieldToClipboard(_ name: String, _ value: String, notificationView: NSView?) {
+    func copyFieldToClipboard(_ name: String, _ value: String) {
         ClipboardManager.sharedInstance().copyConcealedString(value)
 
         let loc = NSLocalizedString("mac_field_copied_to_clipboard_no_item_title_fmt", comment: "%@ Copied")
         let message = String(format: loc, name)
 
-        showPopupToast(message, view: notificationView)
+        showPopupToast(message)
 
         if Settings.sharedInstance().miniaturizeOnCopy {
             view.window?.miniaturize(nil)
@@ -676,18 +676,26 @@ class DetailViewController: NSViewController {
         }
     }
 
-    var windowController: WindowController {
-        view.window!.windowController as! WindowController
+    var splitViewController: NextGenSplitViewController? { 
+        guard let window = view.window,
+              let windowController = window.windowController as? WindowController
+        else {
+            return nil
+        }
+
+        return windowController.contentViewController as? NextGenSplitViewController
     }
 
-    var splitViewController: NextGenSplitViewController {
-        windowController.contentViewController as! NextGenSplitViewController
+    var appropriateToastView: NSView {
+        if let displayView = splitViewController?.view {
+            return displayView
+        } else {
+            return view
+        }
     }
 
-    func showPopupToast(_ message: String, view _: NSView? = nil) {
-
-
-        guard let hud = MBProgressHUD.showAdded(to: splitViewController.view, animated: true) else {
+    func showPopupToast(_ message: String) {
+        guard let hud = MBProgressHUD.showAdded(to: appropriateToastView, animated: true) else {
             return
         }
 
@@ -1036,9 +1044,9 @@ class DetailViewController: NSViewController {
     func copyFieldToClipboard(_ field: DetailsViewField) {
         if field.fieldType == .totp {
             guard let token = field.object as? OTPToken else { return }
-            copyFieldToClipboard(field.name, token.password, notificationView: rowViewForField(field))
+            copyFieldToClipboard(field.name, token.password)
         } else {
-            copyFieldToClipboard(field.name, field.value, notificationView: rowViewForField(field))
+            copyFieldToClipboard(field.name, field.value)
         }
     }
 
@@ -1093,7 +1101,7 @@ class DetailViewController: NSViewController {
     }
 
     func copyFieldNameToClipboard(_ field: DetailsViewField) {
-        copyFieldToClipboard(NSLocalizedString("generic_field_name", comment: "Field Name"), field.name, notificationView: rowViewForField(field))
+        copyFieldToClipboard(NSLocalizedString("generic_field_name", comment: "Field Name"), field.name)
     }
 
     func launchUrl(_ field: DetailsViewField) {
@@ -1107,7 +1115,7 @@ class DetailViewController: NSViewController {
 
         if database.launchUrlString(field.value) {
             if let password = field.object as? String {
-                copyFieldToClipboard(NSLocalizedString("generic_fieldname_password", comment: "Password"), password, notificationView: rowViewForField(field))
+                copyFieldToClipboard(NSLocalizedString("generic_fieldname_password", comment: "Password"), password)
             }
         }
     }

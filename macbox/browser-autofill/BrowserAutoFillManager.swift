@@ -154,6 +154,38 @@ public class BrowserAutoFillManager: NSObject {
 
                 
 
+                
+                
+
+                let components1 = Array(fullDomain1.split(separator: ".").reversed())
+                let components2 = Array(fullDomain2.split(separator: ".").reversed())
+                let targetComponents = Array(targetDomain.split(separator: ".").reversed())
+
+                let checkCount = min(min(components1.count, components2.count), targetComponents.count)
+
+                if checkCount > 0 {
+                    for idx in 0 ... checkCount - 1 { 
+                        let comp1 = components1[idx]
+                        let comp2 = components2[idx]
+                        let target = targetComponents[idx]
+
+                        let comp1Match = comp1 == target
+                        let comp2Match = comp2 == target
+
+                        if comp1Match, comp2Match { 
+                            continue
+                        } else if comp1Match {
+                            return .orderedAscending
+                        } else if comp2Match {
+                            return .orderedDescending
+                        } else { 
+                            break
+                        }
+                    }
+                }
+
+                
+
                 let targetPslDomain = extractPSLDomainFromUrl(url: url)
                 let pslDomain1 = extractPSLDomainFromUrl(url: node1.fields.url)
                 let pslDomain2 = extractPSLDomainFromUrl(url: node2.fields.url)

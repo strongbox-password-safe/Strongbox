@@ -466,7 +466,7 @@
 - (id<OnboardingModule>)getScheduledExportOnboardingModule:(Model*)model {
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];
     module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
-        if ( model.metadata.scheduledExportOnboardingDone ) {
+        if ( model.metadata.scheduledExportOnboardingDone || AppPreferences.sharedInstance.disableExport ) {
             return NO;
         }
         

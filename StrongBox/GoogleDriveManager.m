@@ -356,10 +356,10 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 
         if ( error ) {
             NSLog(@"%@", error);
-            handler(nil, error);
+            handler(YES, nil, error);
         }
         else if (userInteractionRequired) {
-            handler(nil, [Utils createNSError:@"User Interaction Required from getModDate" errorCode:346]);
+            handler(YES, nil, [Utils createNSError:@"User Interaction Required from getModDate" errorCode:346]);
         }
         else {
             [self _getModDate:parentOrJson fileName:fileName completion:handler];
@@ -373,17 +373,17 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     [self findSafeFile:parentOrJson fileName:fileName completion:^(GTLRDrive_File *file, NSError *error) {
         if ( error ) {
             NSLog(@"_getModDate: %@", error);
-            handler(nil, error);
+            handler(YES, nil, error);
         }
         else {
             if ( !file ) {
                 NSLog(@"Google Drive::_getModDate No such file found...");
                 error = [Utils createNSError:@"Your database file could not be found on Google Drive. Try removing the database and re-adding it." errorCode:-1];
-                handler(nil, error);
+                handler(YES, nil, error);
             }
             else {
 
-                handler(file.modifiedTime.date, nil);
+                handler(YES, file.modifiedTime.date, nil);
             }
         }
     }];

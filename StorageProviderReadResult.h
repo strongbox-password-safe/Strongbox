@@ -15,6 +15,7 @@ typedef NS_ENUM (NSUInteger, StorageProviderReadResult) {
     kReadResultSuccess,
     kReadResultBackgroundReadButUserInteractionRequired,
     kReadResultModifiedIsSameAsLocal,
+    kReadResultUnavailable, 
 };
 
 NS_ASSUME_NONNULL_END

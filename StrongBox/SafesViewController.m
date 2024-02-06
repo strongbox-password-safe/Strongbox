@@ -91,6 +91,9 @@
 #import "VirtualYubiKeys.h"
 #import "Strongbox-Swift.h"
 
+static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUpdated";
+static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdated";
+
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
@@ -113,6 +116,8 @@
 @property NSString* importFormat;
 
 @property (nullable) NSString* overrideQuickLaunchWithAppShortcutQuickLaunchUuid;
+
+@property NSArray<DebugLine*> *debugLines;
 
 @end
 
@@ -253,6 +258,8 @@
 - (void)internalRefresh {
     NSLog(@"SafesViewController::internalRefresh");
     
+    self.debugLines = [DebugLogger.snapshot reverseObjectEnumerator].allObjects;
+    
     self.collection = DatabasePreferences.allDatabases;
     
     self.tableView.separatorStyle = AppPreferences.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
@@ -347,11 +354,11 @@
     }];
     
     UIMenuElement* wifiTransfer = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_wifi_transfer", @"Wi-Fi Transfer")
-                                                 systemImage:@"wifi"
+                                                 systemImage:@"network"
                                                      handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToLocalNetworkServer" sender:nil];
     }];
-    
+
     UIMenuElement* import1P = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_1password_1pif", @"1Password (1Pif)")
                                                  handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImport1Password];
@@ -388,30 +395,31 @@
                                   options:UIMenuOptionsDisplayInline
                                  children:@[newAdvancedDatabase, addExisting]];
     
-    UIMenu* menuWifi = [UIMenu menuWithTitle:@""
-                                       image:nil
-                                  identifier:nil
-                                     options:UIMenuOptionsDisplayInline
-                                    children:@[wifiTransfer]];
-    
     UIMenu* import = [UIMenu menuWithTitle:NSLocalizedString(@"safesvc_import_submenu", @"Import")
                                      image:[UIImage systemImageNamed:@"square.and.arrow.down"]
                                 identifier:nil
                                    options:UIMenuOptionsDisplayInline
                                   children:@[import1P1Pux, import1P, importLastPass, importiCloud, importCsv]];
     
+    UIMenu* advanced = [UIMenu menuWithTitle:NSLocalizedString(@"generic_advanced_noun", @"Advanced")
+                                     image:[UIImage systemImageNamed:@"gearshape.2.fill"]
+                                identifier:nil
+                                   options:UIMenuOptionsDisplayInline
+                                  children:@[wifiTransfer]];
+    
+    BOOL showTransferOverLan = !AppPreferences.sharedInstance.disableNetworkBasedFeatures;
     
     UIMenu* more = [UIMenu menuWithTitle:NSLocalizedString(@"safesvc_more_submenu", @"More")
                                    image:[UIImage systemImageNamed:@"ellipsis.circle"]
                               identifier:nil
                                  options:kNilOptions
-                                children:@[import]];
+                                children:!showTransferOverLan ? @[import] : @[import, advanced]];
     
     UIMenu* menu = [UIMenu menuWithTitle:@""
                                    image:nil
                               identifier:nil
                                  options:kNilOptions
-                                children:AppPreferences.sharedInstance.disableNetworkBasedFeatures ? @[menu1, menu2, more] : @[menu1, menu2, menuWifi, more]];
+                                children:@[menu1, menu2, more]];
     
     self.buttonAddSafe.action = nil;
     self.buttonAddSafe.menu = menu;
@@ -422,6 +430,10 @@
     
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     
+    
+    
+    [self startWiFiSyncObservation];
+
     [self doAppOnboarding:userJustCompletedBiometricAuthentication quickLaunchWhenDone:YES];
 }
 
@@ -476,14 +488,14 @@
         self.appLockSuppressedForBiometricAuth = NO;
         return;
     }
-
+    
     
     
     
     BOOL reloadedDueToAutoFillChange = [DatabasePreferences reloadIfChangedByOtherComponent];
     self.collection = DatabasePreferences.allDatabases;
     [self refresh]; 
-
+    
     
     
     if ( [self shouldLockUnlockedDatabase] ) {
@@ -501,9 +513,35 @@
         }
     }
     
+    
+    
     if ( reloadedDueToAutoFillChange ) {
         [self notifyUnlockedDatabaseAutoFillChangesMade];
     }
+}
+
+- (void)startWiFiSyncObservation {
+    if ( !StrongboxProductBundle.supportsWiFiSync || AppPreferences.sharedInstance.disableWiFiSync ) {
+        return;
+    }
+    
+    if ( !AppPreferences.sharedInstance.wiFiSyncHasRequestedNetworkPermissions ) {
+        NSLog(@"⚠️ WiFi Sync Browser cannot start because it has not yet been granted permissions...");
+        return;
+    }
+    
+    [DebugLogger info:@"SafesViewController::startWiFiSyncObservation..."];
+    
+    [WiFiSyncBrowser.shared startBrowsing:NO
+                               completion:^(BOOL success) {
+        if ( !success ) {
+            NSLog(@"🔴 Could not start WiFi Browser! error = [%@]", WiFiSyncBrowser.shared.lastError);
+        }
+        else {
+            NSLog(@"🟢 WiFiBrowser Started");
+        }
+    }];
+    
 }
 
 - (void)notifyUnlockedDatabaseAutoFillChangesMade {
@@ -705,12 +743,12 @@
                                            selector:@selector(refresh)
                                                name:kDatabasesListChangedNotification
                                              object:nil];
-
+    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseUpdated:)
                                                name:kDatabaseUpdatedNotification
                                              object:nil];
-
+    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(appResignActive)
                                                name:UIApplicationWillResignActiveNotification
@@ -735,8 +773,17 @@
                                            selector:@selector(onMainSplitViewControllerClosed:)
                                                name:kMasterDetailViewCloseNotification
                                              object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(refresh)
+                                               name:kWifiBrowserResultsUpdatedNotification
+                                             object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(refresh)
+                                               name:kDebugLoggerLinesUpdatedNotification
+                                             object:nil];
 }
-
 
 - (void)onDatabaseUpdated:(id)param {
     NSNotification* notification = param;
@@ -864,25 +911,34 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+#ifdef DEBUG
+    return 2;
+#else
     return 1;
+#endif
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (self.collection.count == 0) {
-        __weak id weakSelf = self;
-        [self.tableView setEmptyTitle:[self getEmptyDatasetTitle]
-                          description:[self getEmptyDatasetDescription]
-                          buttonTitle:[self getEmptyDatasetButtonTitle]
-                        bigBlueBounce:YES
-                         buttonAction:^{
-            [weakSelf showFirstDatabaseGetStartedWizard];
-        }];
+    if ( section == 0 ) {
+        if (self.collection.count == 0) {
+            __weak id weakSelf = self;
+            [self.tableView setEmptyTitle:[self getEmptyDatasetTitle]
+                              description:[self getEmptyDatasetDescription]
+                              buttonTitle:[self getEmptyDatasetButtonTitle]
+                            bigBlueBounce:YES
+                             buttonAction:^{
+                [weakSelf showFirstDatabaseGetStartedWizard];
+            }];
+        }
+        else {
+            [self.tableView setEmptyTitle:nil];
+        }
+        
+        return self.collection.count;
     }
     else {
-        [self.tableView setEmptyTitle:nil];
+        return self.debugLines.count;
     }
-    
-    return self.collection.count;
 }
 
 - (void)showFirstDatabaseGetStartedWizard {
@@ -911,16 +967,51 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
+    if ( indexPath.section == 0 ) {
+        DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
+        
+        if ( indexPath.row < self.collection.count ) { 
+            DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
+            
+            [cell populateCell:database];
+        }
+        
+        return cell;
+    }
+    else {
+        DebugLine* line = self.debugLines[indexPath.row];
+        
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"debug-logger-cell-id" forIndexPath:indexPath];
+        
+        cell.textLabel.text = line.line;
+        cell.detailTextLabel.text = line.date.iso8601DateStringWithFractionalSeconds;
+        UIImage* image = [UIImage systemImageNamed:@"info.circle"];
+        
+        cell.imageView.image = image;
+        
+        if (line.category == DebugLineCategoryError ) {
+            cell.imageView.tintColor = UIColor.systemRedColor;
+        }
+        else if ( line.category == DebugLineCategoryWarn ) {
+            cell.imageView.tintColor = UIColor.systemOrangeColor;
+        }
+        else if ( line.category == DebugLineCategoryInfo ) {
+            cell.imageView.tintColor = UIColor.systemGreenColor;
+        }
+        else if ( line.category == DebugLineCategoryDebug ) {
+            cell.imageView.tintColor = UIColor.systemBlueColor;
+        }
 
-    if ( indexPath.row < self.collection.count ) { 
-        DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
+        return cell;
+    }
+}
 
-        [cell populateCell:database];
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if ( section == 1 ) {
+        return @"Debug Log";
     }
     
-    return cell;
-    
+    return [super tableView:tableView titleForHeaderInSection:section];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -928,7 +1019,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (self.editing) {
+    if ( self.editing || indexPath.section != 0 ) {
+        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
         return;
     }
     
@@ -989,7 +1081,8 @@
 explicitManualUnlock:(BOOL)explicitManualUnlock
  biometricPreCleared:(BOOL)biometricPreCleared
       explicitOnline:(BOOL)explicitOnline {
-    NSLog(@"======================== OPEN DATABASE: %@ [EON: %hhd, EOFF: %hhd, MAN: %hhd, BPC: %hhd] ============================", safe.nickName, explicitOnline, explicitOffline, explicitManualUnlock, biometricPreCleared);
+    NSLog(@"======================== OPEN DATABASE: %@ [EON: %hhd, EOFF: %hhd, MAN: %hhd, BPC: %hhd] ============================",
+          safe.nickName, explicitOnline, explicitOffline, explicitManualUnlock, biometricPreCleared);
         
     biometricPreCleared = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics && biometricPreCleared;
     
@@ -1056,6 +1149,10 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 
 - (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point {
+    if ( indexPath.section != 0 ) {
+        return nil;
+    }
+    
     return [UIContextMenuConfiguration configurationWithIdentifier:nil
                                                    previewProvider:nil
                                                     actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
@@ -2262,16 +2359,12 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
     
     BOOL existingSubscriber = ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription;
-    NSDate* saleEndDate = SaleScheduleManager.sharedInstance.currentSaleEndDate;
+    Sale* sale = SaleScheduleManager.sharedInstance.currentSale;
     
-    if ( saleEndDate ) {
-        NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
-        [dateComponents setDay:-1];
-        NSDate *inclusiveEndDate = [[NSCalendar currentCalendar] dateByAddingComponents:dateComponents toDate:saleEndDate options:0];
-
+    if ( sale ) {
         __weak SafesViewController* weakSelf = self;
-        UIViewController* vc = [SwiftUIViewFactory makeSaleOfferViewControllerWithSaleEndDate:inclusiveEndDate
-                                                                           existingSubscriber:existingSubscriber
+        UIViewController* vc = [SwiftUIViewFactory makeSaleOfferViewControllerWithSale:sale
+                                                                    existingSubscriber:existingSubscriber
          redeemHandler:^{
             [weakSelf dismissViewControllerAnimated:YES completion:^{
                 SKPaymentQueue* queue = SKPaymentQueue.defaultQueue;
@@ -2287,6 +2380,9 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         vc.modalPresentationStyle = UIModalPresentationFormSheet;
         
         [self presentViewController:vc animated:YES completion:nil];
+    }
+    else {
+        NSLog(@"🔴 Can't show sale screen - no sale on!");
     }
 }
 
@@ -2368,22 +2464,27 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         if ( !AppPreferences.sharedInstance.isPro ) {
             return YES;
         }
-
-        if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription ) {
-            NSDate* expiry = ProUpgradeIAPManager.sharedInstance.currentSubscriptionRenewalOrExpiry;
+        
+        if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription && 
+            SaleScheduleManager.sharedInstance.currentSale.showToExistingSubscribers ) {
             
-            if ( expiry ) {
-                NSDateComponents *dateComponents = [[NSDateComponents alloc] init];
-                [dateComponents setMonth:1];
-                                
-                NSDate* startNext = SaleScheduleManager.sharedInstance.saleAfterNextSaleStartDate;
-                
-                NSDate *expiryDeadline = [[NSCalendar currentCalendar] dateByAddingComponents:dateComponents
-                                                                                       toDate:startNext
-                                                                                      options:0];
-                
-                return [expiry isEarlierThan:expiryDeadline];
-            }
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+            return YES;
         }
     }
     

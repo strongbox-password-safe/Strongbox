@@ -123,6 +123,9 @@ static NSString* const kAutoFillWroteCleanly = @"autoFillWroteCleanly";
 static NSString* const kAtomicSftpWrite = @"atomicSftpWrite";
 static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcons";
 
+static NSString* const kWiFiSyncOn = @"wiFiSyncOn";
+static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
+static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
 
 
 
@@ -172,6 +175,17 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setBool:(NSString*)key value:(BOOL)value {
     [self.userDefaults setBool:value forKey:key];
+    [self.userDefaults synchronize];
+}
+
+- (NSString*)getString:(NSString*)key fallback:(NSString*)fallback {
+    NSString* obj = [self.userDefaults objectForKey:key];
+    
+    return obj != nil ? obj : fallback;
+}
+
+- (void)setString:(NSString*)key value:(NSString*)value {
+    [self.userDefaults setObject:value forKey:key];
     [self.userDefaults synchronize];
 }
 
@@ -229,12 +243,56 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     
     [NativeMessagingManifestInstallHelper removeNativeMessagingHostsFiles];
     
-    [self clearAllDefaults]; 
+    
+    
+    [SecretStore.sharedInstance deleteSecureItem:kWiFiSyncPasscodeSSKey];
+    
+    
+    
+    [self clearAllDefaults];
 }
 
 #endif
 
 
+
+- (BOOL)wiFiSyncOn {
+    return [self getBool:kWiFiSyncOn fallback:NO];
+}
+
+- (void)setWiFiSyncOn:(BOOL)wiFiSyncOn {
+    [self setBool:kWiFiSyncOn value:wiFiSyncOn];
+}
+
+- (NSString *)wiFiSyncPasscode {
+    NSString* passcode = [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
+    
+    if (!passcode) {
+        passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
+        [self setWiFiSyncPasscode:passcode];
+    }
+    
+    return passcode;
+}
+
+- (void)setWiFiSyncPasscode:(NSString *)wiFiSyncPasscode {
+    [SecretStore.sharedInstance setSecureString:wiFiSyncPasscode forIdentifier:kWiFiSyncPasscodeSSKey];
+}
+
+- (NSString *)wiFiSyncServiceName {
+    NSString* current = [self getString:kWiFiSyncServiceName fallback:nil];
+    
+    if ( !current ) {
+        current = [NSString stringWithFormat:@"%@ (%@)", NSHost.currentHost.localizedName, NSUserName()];
+        [self setWiFiSyncServiceName:current];
+    }
+    
+    return current;
+}
+
+- (void)setWiFiSyncServiceName:(NSString *)wiFiSyncServiceName {
+    [self setString:kWiFiSyncServiceName value:wiFiSyncServiceName];
+}
 
 - (BOOL)stripUnusedHistoricalIcons {
     return [self getBool:kStripUnusedHistoricalIcons fallback:Settings.sharedInstance.stripUnusedIconsOnSave];

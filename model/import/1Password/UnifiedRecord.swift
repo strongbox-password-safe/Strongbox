@@ -46,7 +46,7 @@ class UnifiedRecord: Decodable {
     var type: RecordType {
         let maybeRecordType: RecordType? = typeName == nil ? .Unknown : recordTypeByTypeName[typeName!]
         if maybeRecordType == nil {
-            print("⚠️ Unknown Record Type: \(String(describing: typeName))")
+            NSLog("⚠️ Unknown Record Type: \(String(describing: typeName))")
         }
         return maybeRecordType ?? .Unknown
     }
@@ -284,7 +284,7 @@ class UnifiedRecord: Decodable {
                 addDateStringField(epoch!, title, entry, sectionLabel: sectionLabel)
 
             } else {
-                print("🔴 Unknown Date format value: [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
+                NSLog("🔴 Unknown Date format value: [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
             }
 
 

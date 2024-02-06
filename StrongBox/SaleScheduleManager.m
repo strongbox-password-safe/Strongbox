@@ -12,11 +12,12 @@
 #import "NSArray+Extensions.h"
 #import "AppPreferences.h"
 
+#import "Strongbox-Swift.h"
+
 @interface SaleScheduleManager ()
 
-@property NSArray<MMcGPair<NSDate*, NSDate*>*> *schedule;
-@property (readonly, nullable) MMcGPair<NSDate*, NSDate*>* currentSale;
-@property (readonly, nullable) MMcGPair<NSDate*, NSDate*>* saleAfterNextSale;
+@property NSArray<Sale*> *newerSchedule;
+@property (readonly, nullable) Sale* saleAfterNextSale;
 
 @end
 
@@ -36,113 +37,34 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        self.schedule = @[
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-11-26"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-11-30"]], 
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-12-24"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2021-12-27"]], 
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-03-17"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-03-21"]], 
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-06-03"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-06-07"]], 
-
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-09-02"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-09-05"]], 
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-11-25"]   
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2022-11-29"]],
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-03-17"]     
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-03-20"]],
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-07-01"]     
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-07-05"]],
-            
-            
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-24"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-11-28"]],
-            
-            
-            
-            
-            
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-12-24"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2023-12-27"]],
-            
-            
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-03-15"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-03-18"]],
-
-            
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-05-31"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-06-04"]],
-            
-            
-
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-08-30"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-09-03"]],
-
-            
-            
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-11-29"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-12-03"]],
-            
-            
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-12-24"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-12-27"]],
-            
-            
-            
-            [MMcGPair pairOfA:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-03-14"]
-                         andB:[NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2025-03-18"]],
-        ];
+        self.newerSchedule = Sale.schedule;
     }
     
     return self;
 }
 
-- (MMcGPair<NSDate*, NSDate*>*)currentSale {
+- (Sale*)currentSale {
     NSDate* now = NSDate.date;
-    
-    MMcGPair<NSDate*, NSDate*>* ret = [self.schedule firstOrDefault:^BOOL(MMcGPair<NSDate *,NSDate *> * _Nonnull obj) {
-        return [now isLaterThan:obj.a] && [now isEarlierThan:obj.b];
+
+    Sale* ret = [self.newerSchedule firstOrDefault:^BOOL(Sale * _Nonnull obj) {
+        return [now isLaterThan:obj.start] && [now isEarlierThan:obj.end];
     }];
-    
+
     return ret;
 }
 
-- (MMcGPair<NSDate*, NSDate*>*)saleAfterNextSale {
+- (Sale*)saleAfterNextSale {
     NSDate* now = NSDate.date;
     
-    NSUInteger idx = [self.schedule indexOfFirstMatch:^BOOL(MMcGPair<NSDate *,NSDate *> * _Nonnull obj) {
-        return [now isLaterThan:obj.a] && [now isEarlierThan:obj.b];
+    NSUInteger idx = [self.newerSchedule indexOfFirstMatch:^BOOL(Sale* _Nonnull obj) {
+        return [now isLaterThan:obj.start] && [now isEarlierThan:obj.end];
     }];
     
     if ( idx != NSNotFound ) {
         idx++;
 
-        if ( idx < self.schedule.count ) {
-            return self.schedule[idx];
+        if ( idx < self.newerSchedule.count ) {
+            return self.newerSchedule[idx];
         }
     }
     
@@ -150,7 +72,7 @@
 }
 
 - (NSDate *)saleAfterNextSaleStartDate {
-    return self.saleAfterNextSale.a;
+    return self.saleAfterNextSale.start;
 }
 
 - (BOOL)saleNowOn {
@@ -158,14 +80,14 @@
 }
 
 - (NSDate *)currentSaleEndDate {
-    return self.currentSale.b;
+    return self.currentSale.end;
 }
 
 - (BOOL)userHasBeenPromptedAboutCurrentSale {
     NSDate* now = NSDate.date;
 
-    NSInteger idx = [self.schedule indexOfFirstMatch:^BOOL(MMcGPair<NSDate *,NSDate *> * _Nonnull obj) {
-        return [now isLaterThan:obj.a] && [now isEarlierThan:obj.b];
+    NSInteger idx = [self.newerSchedule indexOfFirstMatch:^BOOL(Sale* _Nonnull obj) {
+        return [now isLaterThan:obj.start] && [now isEarlierThan:obj.end];
     }];
     
     if ( idx == NSNotFound ) {
@@ -181,8 +103,8 @@
 - (void)setUserHasBeenPromptedAboutCurrentSale:(BOOL)userHasBeenPromptedAboutCurrentSale {
     NSDate* now = NSDate.date;
 
-    NSInteger idx = [self.schedule indexOfFirstMatch:^BOOL(MMcGPair<NSDate *,NSDate *> * _Nonnull obj) {
-        return [now isLaterThan:obj.a] && [now isEarlierThan:obj.b];
+    NSInteger idx = [self.newerSchedule indexOfFirstMatch:^BOOL(Sale* _Nonnull obj) {
+        return [now isLaterThan:obj.start] && [now isEarlierThan:obj.end];
     }];
 
     if ( idx == NSNotFound ) {

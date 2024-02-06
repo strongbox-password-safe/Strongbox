@@ -106,7 +106,7 @@ class OnePasswordImporter: NSObject, Importer {
             let recordType = record.type
 
             if !recordTypeIsProcessable(recordType) {
-                print("Unprocessable Record Type, Ignoring: \(String(describing: record.typeName))")
+                NSLog("Unprocessable Record Type, Ignoring: \(String(describing: record.typeName))")
                 continue
             }
 

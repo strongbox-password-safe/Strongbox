@@ -97,7 +97,12 @@ NSData* hmacSha1(NSData *data, NSData* key);
 NSData*_Nullable getRandomData(uint32_t length);
 uint32_t getRandomUint32(void);
 
+#if TARGET_OS_IPHONE && !IS_APP_EXTENSION
++ (void)openStrongboxSettingsAndPermissionsScreen;
+#endif
+
 #if TARGET_OS_IPHONE
+
 UIImage* scaleImage(UIImage* image, CGSize newSize);
 + (UIImage *)makeRoundedImage:(UIImage*)image radius:(float)radius;
 + (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize;

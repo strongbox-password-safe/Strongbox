@@ -56,6 +56,8 @@
 @property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
 @property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 
+@property (readonly) BOOL showStrength;
+@property BOOL allowEmptyOrNoPasswordEntry; 
 @end
 
 @implementation CASGTableViewController
@@ -73,6 +75,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
   
+    self.allowEmptyOrNoPasswordEntry = AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
+    
     self.navigationController.presentationController.delegate = self;
     [self setupUi];
     
@@ -99,6 +103,8 @@
 }
 
 - (void)setupUi {
+    self.navigationItem.prompt = self.initialName ? self.initialName : nil;
+
     if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         [self setTitle:NSLocalizedString(@"casg_create_database_action", @"Create Database")];
         [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_create_action", @"Create")];
@@ -138,7 +144,7 @@
                             forControlEvents:UIControlEventEditingChanged];
     
     self.textFieldPassword.delegate = self;
-    self.textFieldPassword.enablesReturnKeyAutomatically = !AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.textFieldPassword.enablesReturnKeyAutomatically = !self.allowEmptyOrNoPasswordEntry;
     
     self.textFieldConfirmPassword.delegate = self;
     
@@ -162,7 +168,7 @@
     [self addShowHideToTextField:self.textFieldConfirmPassword tag:2];
     
     self.textFieldPassword.placeholder =
-        (self.mode == kCASGModeGetCredentials || AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry) ?
+        (self.mode == kCASGModeGetCredentials || self.allowEmptyOrNoPasswordEntry) ?
             NSLocalizedString(@"casg_text_field_placeholder_password", @"Password") :
             NSLocalizedString(@"casg_text_field_placeholder_password_required", @"Password (Required)");
 }
@@ -313,6 +319,8 @@
                                                                 self.selectedFormat == kKeePass ||
                                                                 self.selectedFormat == kFormatUnknown;
 
+    [self cell:self.cellStrength setHidden:!self.showStrength];
+    
     if(self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
         [self cell:self.cellKeyFile setHidden:YES];
         [self cell:self.cellYubiKey setHidden:YES];
@@ -321,7 +329,6 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellAllowEmpty setHidden:YES];
-        [self cell:self.cellStrength setHidden:YES];
         
         [self cell:self.cellRenameLocalFile setHidden:self.mode != kCASGModeRenameDatabase || !self.showFileRenameOption];
     }
@@ -355,7 +362,6 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
-        [self cell:self.cellStrength setHidden:YES];
         [self cell:self.cellRenameLocalFile setHidden:YES];
     }
     
@@ -517,9 +523,16 @@
     [self validateUi];
 }
 
+- (BOOL)showStrength {
+    return self.mode != kCASGModeAddExisting && self.mode != kCASGModeRenameDatabase && self.mode != kCASGModeGetCredentials;
+}
+
 - (void)textFieldPasswordDidChange:(id)sender {
     [self validateUi];
-    [self bindStrength];
+
+    if ( self.showStrength ) {
+        [self bindStrength];
+    }
 }
 
 - (void)textFieldConfirmPasswordDidChange:(id)sender {
@@ -634,7 +647,7 @@
                                     self.initialFormat == kFormatUnknown ||
                                     (self.initialFormat == kKeePass1 && [self keyFileIsSet]);
     
-    return self.textFieldPassword.text.length || (formatAllowsEmptyOrNone && AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry);
+    return (formatAllowsEmptyOrNone && self.allowEmptyOrNoPasswordEntry) || self.textFieldPassword.text.length;
 }
 
 - (BOOL)canSet {
@@ -652,7 +665,7 @@
 
 - (BOOL)passwordIsValid {
     BOOL formatAllowsEmptyOrNone = self.selectedFormat != kPasswordSafe;
-    BOOL preferenceAllowsEmpty = AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
+    BOOL preferenceAllowsEmpty = self.allowEmptyOrNoPasswordEntry;
     
     return (preferenceAllowsEmpty && formatAllowsEmptyOrNone) ? YES : self.textFieldPassword.text.length > 0;
 }
@@ -668,12 +681,13 @@
 
 - (IBAction)onAdvancedChanged:(id)sender {
     AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
+    self.allowEmptyOrNoPasswordEntry = AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
     
     [self bindUi];
 }
 
 - (void)bindAdvanced {
-    self.switchAllowEmpty.on = AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.switchAllowEmpty.on = self.allowEmptyOrNoPasswordEntry;
 }
 
 - (void)bindYubiKey {

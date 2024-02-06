@@ -22,12 +22,14 @@ NS_ASSUME_NONNULL_BEGIN
          database:(MacDatabasePreferences *)database
        completion:(void (^)(BOOL, NSError *))completion;
 
+- (void)invalidateCurrentRequest; 
+
 @property (readonly) BOOL isTouchIdUnlockAvailable;
 @property (readonly) BOOL isWatchUnlockAvailable;
 @property (readonly) NSString* biometricIdName;
 
 @property BOOL dummyMode;
-@property BOOL biometricsInProgress;
+@property (readonly) BOOL biometricsInProgress;
 
 @end
 

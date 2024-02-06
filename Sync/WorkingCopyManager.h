@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isLocalWorkingCacheAvailable:(NSString*)databaseUuid modified:(NSDate*_Nullable*_Nullable)modified;
 
+- (NSDate* _Nullable)getModDate:(NSString*)databaseUuid;
 - (NSURL*_Nullable)getLocalWorkingCache:(NSString*)databaseUuid;
 - (NSURL*_Nullable)getLocalWorkingCache:(NSString*)databaseUuid modified:(NSDate *_Nullable*_Nullable)modified;
 - (NSURL*_Nullable)getLocalWorkingCache:(NSString*)databaseUuid modified:(NSDate *_Nullable*_Nullable)modified fileSize:(unsigned long long*_Nullable)fileSize;

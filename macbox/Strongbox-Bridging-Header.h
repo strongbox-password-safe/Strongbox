@@ -109,3 +109,4 @@
 
 #import "Node+Passkey.h"
 #import "NewEntryDefaultsHelper.h"
+#import "DatabaseMerger.h"

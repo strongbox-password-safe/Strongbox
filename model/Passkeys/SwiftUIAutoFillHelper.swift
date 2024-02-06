@@ -249,7 +249,7 @@ class SwiftUIAutoFillHelper: NSObject {
     }
 
     func handlePasskeyWizardResponse(_ passkey: Passkey, _ model: Model, _ sortedGroups: [Node], _ cancel: Bool, _ createNew: Bool, _ title: String?, _ selectedGroupIdx: Int?, _ selectedEntry: UUID?, _ completion: @escaping ((_ cancelled: Bool, _ error: Error?) -> Void)) {
-        NSLog("🟢 handlePasskeyWizardResponse")
+        
 
         if cancel {
             completion(true, nil)
@@ -346,7 +346,7 @@ class SwiftUIAutoFillHelper: NSObject {
     @available(macOS 14.0, iOS 17.0, *)
     @objc
     func getAutoFillAssertion(request: ASPasskeyCredentialRequest, passkey: Passkey) throws -> ASPasskeyAssertionCredential {
-        NSLog("🟢 provideCredentialWithoutUserInteraction = [%@]", request)
+        NSLog("🟢 getAutoFillAssertion = [%@]", request)
 
         guard let authenticatorData = passkey.getAuthenticatorData(includeAttestedCredentialData: false) else {
             throw SwiftUIAutoFillHelperError.Assertion(detail: "🔴 Could not generate Authenticator Data")
@@ -365,7 +365,7 @@ class SwiftUIAutoFillHelper: NSObject {
     @available(macOS 14.0, iOS 17.0, *)
     @objc
     public func getAutoFillAssertionSignatureDer(clientDataHash: Data, authenticatorData: Data, passkey: Passkey) throws -> Data {
-        NSLog("🟢 provideCredentialWithoutUserInteraction = [%@]", clientDataHash.base64EncodedString())
+        NSLog("🟢 getAutoFillAssertionSignatureDer = [%@]", clientDataHash.base64EncodedString())
 
         var concatenation = Data(authenticatorData)
         concatenation.append(clientDataHash)

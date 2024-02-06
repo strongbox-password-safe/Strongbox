@@ -117,12 +117,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    
-    
-    
-    
-    
 
+
+
+    
     [self determineIfLaunchedAsLoginItem];
     
     
@@ -144,6 +142,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [self startOrStopSSHAgent];
 
+    [self startOrStopWiFiSyncServer];
+    
     [MacOnboardingManager beginAppOnboardingWithCompletion:^{
         
         
@@ -153,6 +153,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [self monitorForQuickRevealKey];
     
     [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
+
+    
 }
 
 - (void)startOrStopSSHAgent {
@@ -190,6 +192,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             [AutoFillProxyServer.sharedInstance stop];
             NSLog(@"🔴 Stopped AutoFill Proxy");
         }
+    }
+}
+
+- (void)startOrStopWiFiSyncServer {
+    NSError* error;
+    if (! [WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
+        NSLog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
     }
 }
 
@@ -1329,7 +1338,7 @@ static NSInteger clipboardChangeCount;
 }
 
 - (IBAction)onAppPreferences:(id)sender {
-    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabGeneral];
+    [AppPreferencesWindowController.sharedInstance showGeneralTab];
 }
 
 - (void)clearAsyncUpdateIdsAndEphemeralOfflineFlags {

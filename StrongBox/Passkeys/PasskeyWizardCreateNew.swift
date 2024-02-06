@@ -81,13 +81,17 @@ import SwiftUI
                             .background(.blue)
                             .cornerRadius(5)
                         }
+                        .buttonStyle(BorderlessButtonStyle()) 
+                        
+                        
 
                         Button {
                             dismiss()
-                            completion?(true, false, nil, nil, nil)
+                            completion?(true, true, nil, nil, nil)
                         } label: {
                             Text("generic_cancel")
                         }
+                        .buttonStyle(BorderlessButtonStyle())
                     }
                     .padding()
                 }
@@ -172,7 +176,8 @@ import SwiftUI
 
                 HStack(spacing: 12) {
                     Button {
-                        dismiss()
+
+
                         completion?(true, false, nil, nil, nil)
                     } label: {
                         Text("generic_cancel")
@@ -181,7 +186,8 @@ import SwiftUI
                     .keyboardShortcut(.cancelAction)
 
                     Button {
-                        dismiss()
+
+
                         completion?(false, true, title, selectedGroupIdx, nil)
                     } label: {
                         HStack {

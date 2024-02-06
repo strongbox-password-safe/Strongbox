@@ -21,8 +21,6 @@ class SwiftUIViewFactory: NSObject {
     @objc static func makeImportResultViewController(messages: [ImportMessage] = [], dismissHandler: @escaping ((_ cancel: Bool) -> Void)) -> NSViewController {
         let hostingController = NSHostingController(rootView: ImportResultView(dismiss: dismissHandler, messages: messages))
 
-        
-
         hostingController.preferredContentSize = NSSize(width: 400, height: 400)
         if #available(macOS 13.0, *) {
             hostingController.sizingOptions = .preferredContentSize
@@ -31,7 +29,7 @@ class SwiftUIViewFactory: NSObject {
         return hostingController
     }
 
-    @objc static func makeSaleOfferViewController(saleEndDate: Date,
+    @objc static func makeSaleOfferViewController(sale: Sale,
                                                   existingSubscriber: Bool,
                                                   redeemHandler: @escaping (() -> Void),
                                                   onLifetimeHandler: @escaping (() -> Void),
@@ -40,7 +38,7 @@ class SwiftUIViewFactory: NSObject {
         let hostingController = NSHostingController(rootView: SaleOfferView(dismiss: dismissHandler,
                                                                             onLifetime: onLifetimeHandler,
                                                                             redeem: redeemHandler,
-                                                                            saleEndDate: saleEndDate,
+                                                                            sale: sale,
                                                                             existingSubscriber: existingSubscriber))
 
         hostingController.preferredContentSize = NSSize(width: 400, height: 400)

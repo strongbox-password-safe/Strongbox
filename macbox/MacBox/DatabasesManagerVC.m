@@ -908,7 +908,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         BOOL isReadOnly = model ? model.isReadOnly : database.readOnly;
 
         if ( !isReadOnly ) {
-            if ( [DatabasesCollection.shared documentIsOpenWithPendingChangesWithUuid:databaseId] ) {
+            if ( [DatabasesCollection.shared databaseHasEditsOrIsBeingEditedWithUuid:databaseId] ) {
                 [MacAlerts info:NSLocalizedString(@"read_only_unavailable_title", @"Read Only Unavailable")
                 informativeText:NSLocalizedString(@"read_only_unavailable_pending_changes_message", @"You currently have changes pending and so you cannot switch to Read Only mode. You must save or discard your current changes first.")
                          window:self.view.window

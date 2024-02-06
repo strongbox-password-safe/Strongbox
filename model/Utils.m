@@ -158,6 +158,14 @@ BOOL isValidUrl(NSString* urlString) {
     return [fmt stringFromTimeInterval:seconds];
 }
 
+#if TARGET_OS_IPHONE && !IS_APP_EXTENSION
++ (void)openStrongboxSettingsAndPermissionsScreen {
+    NSString* settings = [NSString stringWithFormat:@"%@&path=LOCATION/%@", UIApplicationOpenSettingsURLString, NSBundle.mainBundle.bundleIdentifier];
+    NSURL* url = [NSURL URLWithString:settings];
+    [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+}
+#endif
+
 NSString* friendlyFileSizeString(long long byteCount) {
     return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
 }
@@ -218,11 +226,11 @@ NSComparator finderStringComparator = ^(id obj1, id obj2)
 + (BOOL)isiPadPro {
     
 
-    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) && MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) > 1024;
+    return (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad) && MAX(UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height) > 1024;
 }
 
 + (BOOL)isiPad {
-    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad);
+    return (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad);
 }
 
 #endif

@@ -364,6 +364,10 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         createOrEdit()
     }
 
+    @objc func onDeleteOrRecycleItem(_: Any?) {
+        NSApplication.shared.sendAction(#selector(BrowseViewController.onDeleteOrRecycleSelectedBrowseViewItems(_:)), to: nil, from: self)
+    }
+
     @objc func onEditSelectedEntry(_: Any?) {
         createOrEdit(false)
     }
@@ -453,7 +457,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
 
     @objc func showAppPreferences() {
-        AppPreferencesWindowController.sharedInstance.show(tab: .general)
+        AppPreferencesWindowController.sharedInstance.showGeneralTab()
     }
 
     @objc func showAutoFillPreferences() {
@@ -724,6 +728,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         static let popoutDetails = NSToolbarItem.Identifier("popoutDetailsToolbarItem")
         static let syncButton = NSToolbarItem.Identifier("syncToolbarItem")
         static let diceButton = NSToolbarItem.Identifier("diceButtonToolbarItem")
+        static let deleteButton = NSToolbarItem.Identifier("deleteButtonToolbarItem")
     }
 
     func setupToolbar() {
@@ -754,6 +759,9 @@ extension NextGenSplitViewController: NSToolbarDelegate {
          NSToolbarItem.Identifier.flexibleSpace,
          ToolbarItemIdentifiers.createGroup,
          ToolbarItemIdentifiers.addEntry,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.deleteButton,
+         NSToolbarItem.Identifier.flexibleSpace,
          ToolbarItemIdentifiers.searchField,
          
          ToolbarItemIdentifiers.lockDatabase,
@@ -775,6 +783,9 @@ extension NextGenSplitViewController: NSToolbarDelegate {
          NSToolbarItem.Identifier.flexibleSpace,
          ToolbarItemIdentifiers.createGroup,
          ToolbarItemIdentifiers.addEntry,
+         NSToolbarItem.Identifier.flexibleSpace,
+         ToolbarItemIdentifiers.deleteButton,
+         NSToolbarItem.Identifier.flexibleSpace,
          ToolbarItemIdentifiers.searchField,
          
          ToolbarItemIdentifiers.lockDatabase,
@@ -931,6 +942,22 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         return toolbarItem
     }
 
+    func getDeleteOrRecycleEntryToolbarItem() -> NSToolbarItem {
+        let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.deleteButton)
+
+        let loc = NSLocalizedString("generic_recycle_item", comment: "Recycle Item")
+
+        toolbarItem.label = loc
+        toolbarItem.paletteLabel = loc
+        toolbarItem.toolTip = loc
+        toolbarItem.isEnabled = true
+        toolbarItem.target = self
+        toolbarItem.action = #selector(onDeleteOrRecycleItem(_:))
+        toolbarItem.image = NSImage(systemSymbolName: "trash", accessibilityDescription: nil)
+
+        return toolbarItem
+    }
+
     func getToggleDetailsToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.toggleDetails)
 
@@ -1020,6 +1047,8 @@ extension NextGenSplitViewController: NSToolbarDelegate {
             return getSyncToolbarItem()
         } else if itemIdentifier == ToolbarItemIdentifiers.diceButton {
             return getDiceToolbarItem()
+        } else if itemIdentifier == ToolbarItemIdentifiers.deleteButton {
+            return getDeleteOrRecycleEntryToolbarItem()
         } else if itemIdentifier == ToolbarItemIdentifiers.addEntry {
             return getCreateEntryToolbarItem()
         } else if itemIdentifier == NSToolbarItem.Identifier.flexibleSpace {
@@ -1066,6 +1095,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
 
     func validateAction(_ action: Selector) -> Bool {
         var singleSelectedNode: Node? = nil
+        var atLeastOneSelected = database.nextGenSelectedItems.count != 0
 
         if !database.locked, database.nextGenSelectedItems.count == 1, let node = database.getItemBy(database.nextGenSelectedItems.first!) {
             singleSelectedNode = node
@@ -1105,6 +1135,8 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onEditSelectedEntry) {
             return !database.locked && singleSelectedNode != nil && !singleSelectedNode!.isGroup && !database.isEffectivelyReadOnly
+        } else if action == #selector(onDeleteOrRecycleItem) {
+            return !database.locked && atLeastOneSelected && !database.isEffectivelyReadOnly
         } else if action == #selector(onSync) {
             return !database.locked && !database.isEffectivelyReadOnly && !database.isInOfflineMode
         } else if action == #selector(onFind) {

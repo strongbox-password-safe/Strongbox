@@ -19,7 +19,7 @@ class SaleOnboardingModule: OnboardingModule {
     var windowController: NSWindowController? = nil
 
     func instantiateViewController(completion: @escaping (() -> Void)) -> NSViewController {
-        let ret = SwiftUIViewFactory.makeSaleOfferViewController(saleEndDate: Date(), existingSubscriber: false) { [weak self] in
+        let ret = SwiftUIViewFactory.makeSaleOfferViewController(sale: Sale(startLondonNoonTimeInclusive: "2024-01-10", endLondonNoonTimeExclusive: "2024-01-15"), existingSubscriber: false) { [weak self] in
             self?.redeemSale()
         } onLifetimeHandler: { [weak self] in
             self?.showLifetimePurchaseScreen()

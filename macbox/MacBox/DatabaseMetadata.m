@@ -34,7 +34,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
-        self.autoFillConvenienceAutoUnlockTimeout = -1; 
+        self.autoFillConvenienceAutoUnlockTimeout = 180; 
         self.monitorForExternalChanges = YES;
         self.autoReloadAfterExternalChanges = YES;
         self.makeBackups = YES;

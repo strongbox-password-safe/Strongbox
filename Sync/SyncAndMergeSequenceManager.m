@@ -115,6 +115,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                           @(kSFTP),
                                           @(kWebDAV),
                                           @(kTwoDrive),
+                                          @(kWiFiSync),
         ];
 #else
         NSArray<NSNumber*> *supported = @[@(kSFTP),
@@ -258,15 +259,19 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
     
 
-    [provider getModDate:database completion:^(NSDate * _Nonnull modDate, NSError * _Nullable error) {
+    [provider getModDate:database completion:^(BOOL storageIsAvailable, NSDate * _Nullable modDate, NSError * _Nullable error) {
 
-
-        if (!modDate) {
-            completion(kSyncAndMergeError, NO, error);
+        if ( storageIsAvailable ) { 
+            if (!modDate) {
+                completion(kSyncAndMergeError, NO, error);
+            }
+            else {
+                BOOL changed = ![modDate isEqualToDateWithinEpsilon:localModDate];
+                completion(kSyncAndMergeSuccess, changed, nil);
+            }
         }
         else {
-            BOOL changed = ![modDate isEqualToDateWithinEpsilon:localModDate];
-            completion(kSyncAndMergeSuccess, changed, nil);
+            completion(kSyncAndMergeSuccess, NO, nil); 
         }
     }];
 }
@@ -320,6 +325,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateInProgress message:initialLog];
 
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
+    
     [provider pullDatabase:database
              interactiveVC:parameters.interactiveVC
                    options:opts
@@ -335,13 +341,18 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         else if (result == kReadResultModifiedIsSameAsLocal) {
             if ( database.outstandingUpdateId != nil ) {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Source Mod Date same as Last Time we Checked, no source updates to worry about - Outstanding Update Express Scenario..."]];
-                [self handleOutstandingUpdate:databaseUuid syncId:syncId expressUpdateMode:YES remoteData:nil remoteModified:localModDate parameters:parameters completion:completion];
+                [self handleOutstandingUpdate:databaseUuid syncId:syncId expressUpdateMode:YES remoteData:nil remoteModified:opts.onlyIfModifiedDifferentFrom parameters:parameters completion:completion];
             }
             else {
                 [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Source Mod same as Working Copy Mod"]];
                 [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:error];
                 completion(kSyncAndMergeSuccess, NO, nil);
             }
+        }
+        else if (result == kReadResultUnavailable ) {
+            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Database is currently unavailable, will not read or update but safe to ignore/postpone this sync request."]];
+            [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:error];
+            completion(kSyncAndMergeSuccess, NO, nil);
         }
         else if (result == kReadResultSuccess) {
             [self onPulledRemoteDatabase:databaseUuid syncId:syncId localModDate:localModDate remoteData:data remoteModified:dateModified parameters:parameters completion:completion];
@@ -370,7 +381,13 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
     if (!database.outstandingUpdateId || localModDate == nil) {
         [self logMessage:databaseUuid syncId:syncId message:@"No Updates to Push, syncing working copy from source."];
-        [self setLocalAndComplete:remoteData dateModified:remoteModified database:databaseUuid syncId:syncId localWasChanged:YES takeABackup:YES completion:completion];
+        [self setLocalAndComplete:remoteData 
+                     dateModified:remoteModified
+                         database:databaseUuid
+                           syncId:syncId
+                  localWasChanged:YES
+                      takeABackup:YES
+                       completion:completion];
     }
     else {
         [self handleOutstandingUpdate:databaseUuid syncId:syncId expressUpdateMode:NO remoteData:remoteData remoteModified:remoteModified parameters:parameters completion:completion];
@@ -408,7 +425,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         BOOL forcePush = parameters.syncForcePushDoNotCheckForConflicts;
         
         METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
-
+  
         BOOL noRemoteChange = (database.lastSyncRemoteModDate && [database.lastSyncRemoteModDate isEqualToDateWithinEpsilon:remoteModified]);
         
         if ( forcePush || noRemoteChange || expressUpdateMode ) { 
@@ -451,7 +468,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 #endif
     
     if ( !parameters.interactiveVC && strategy == kConflictResolutionStrategyAsk ) {
-        
         [self logAndPublishStatusChange:databaseUuid
                                  syncId:syncId
                                   state:kSyncOperationStateBackgroundButUserInteractionRequired
@@ -1194,6 +1210,14 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                       message:@"Sync Conflict - User Interaction Required"];
 
             completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
+        }
+        else if ( result == kUpdateResultUnavailable ) {
+            [self logAndPublishStatusChange:databaseUuid
+                                     syncId:syncId
+                                      state:kSyncOperationStateDone
+                                      error:error];
+            
+            completion(kSyncAndMergeSuccess, NO, nil);
         }
         else {
             database.outstandingUpdateId = nil;

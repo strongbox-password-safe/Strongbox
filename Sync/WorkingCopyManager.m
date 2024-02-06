@@ -152,4 +152,12 @@
     return url;
 }
 
+- (NSDate *)getModDate:(NSString *)databaseUuid {
+    NSDate* ret = nil;
+    
+    [self getLocalWorkingCache:databaseUuid modified:&ret];
+    
+    return ret;
+}
+
 @end

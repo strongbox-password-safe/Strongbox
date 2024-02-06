@@ -15,6 +15,12 @@ extern NSString* const kDatabaseCell;
 
 @interface DatabaseCell : UITableViewCell
 
+- (void)setContent:(NSString*)name
+       topSubtitle:(NSString*)topSubtitle
+         subtitle1:(NSString*)subtitle1
+         subtitle2:(NSString*)subtitle2
+      providerIcon:(UIImage*)providerIcon;
+
 - (void)populateCell:(DatabasePreferences*)database;
 - (void)populateCell:(DatabasePreferences *)database disabled:(BOOL)disabled;
 - (void)populateCell:(DatabasePreferences*)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill;

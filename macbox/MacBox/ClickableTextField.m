@@ -17,12 +17,14 @@
 
 - (void)resetCursorRects {
     [self discardCursorRects];
-
-    [self addCursorRect:self.bounds cursor:NSCursor.pointingHandCursor];
+    
+    if ( self.isEnabled ) {
+        [self addCursorRect:self.bounds cursor:NSCursor.pointingHandCursor];
+    }
 }
 
 - (void)mouseUp:(NSEvent *)event {    
-    if ( self.onClick ) {
+    if ( self.onClick && self.isEnabled ) {
         self.onClick();
     }
 }

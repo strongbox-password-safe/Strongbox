@@ -82,6 +82,14 @@ NSString* const kDatabaseCell = @"DatabaseCell";
     self.status6.userInteractionEnabled = enabled;
 }
 
+- (void)setContent:(NSString*)name
+       topSubtitle:(NSString*)topSubtitle
+         subtitle1:(NSString*)subtitle1
+         subtitle2:(NSString*)subtitle2
+      providerIcon:(UIImage*)providerIcon {
+    [self set:name topSubtitle:topSubtitle subtitle1:subtitle1 subtitle2:subtitle2 providerIcon:providerIcon statusImages:@[] rotateLastImage:NO tints:@[] disabled:NO];
+}
+
 - (void)set:(NSString*)name
 topSubtitle:(NSString*)topSubtitle
   subtitle1:(NSString*)subtitle1
@@ -161,8 +169,7 @@ rotateLastImage:(BOOL)rotateLastImage
     NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:AppPreferences.sharedInstance.databaseCellSubtitle1];
     NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:AppPreferences.sharedInstance.databaseCellSubtitle2];
     
-    NSString* databaseIconName = [SafeStorageProviderFactory getIcon:database];
-    UIImage* databaseIcon = AppPreferences.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:databaseIconName] : nil;
+    UIImage* databaseIcon = AppPreferences.sharedInstance.showDatabaseIcon ? [SafeStorageProviderFactory getImageForProvider:database.storageProvider database:database] : nil;
 
     if (disabled) {
         databaseIcon = AppPreferences.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel"] : nil;

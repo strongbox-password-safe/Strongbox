@@ -14,7 +14,6 @@
 #import "KeyFileParser.h"
 #import "Utils.h"
 #import "AutoFillManager.h"
-#import "CASGTableViewController.h"
 #import "AddNewSafeHelper.h"
 #import "StrongboxiOSFilesManager.h"
 #import "StrongboxUIDocument.h"

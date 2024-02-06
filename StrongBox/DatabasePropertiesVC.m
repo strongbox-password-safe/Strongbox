@@ -15,19 +15,21 @@
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "OfflineDetectedBehaviour.h"
+#import "Strongbox-Swift.h"
 
-static NSUInteger const kReadOnlyRow = 0;
-static NSUInteger const kQuickLaunchRow = 1;
-static NSUInteger const kLazySyncRow = 2;
-static NSUInteger const kLazySyncPersistRow = 3;
-static NSUInteger const kOfflineDetectedBehaviour = 4;
-static NSUInteger const kCouldNotConnectBehaviour = 5;
-static NSUInteger const kAlwaysOpenOffline = 6;
-static NSUInteger const kConflictResolutionStrategyRow = 7;
-static NSUInteger const kBackupsRow = 8;
-static NSUInteger const kViewSyncLogRow = 9;
+static NSUInteger const kRowWiFiSyncServiceName = 0;
+static NSUInteger const kReadOnlyRow = 1;
+static NSUInteger const kQuickLaunchRow = 2;
+static NSUInteger const kLazySyncRow = 3;
+static NSUInteger const kLazySyncPersistRow = 4;
+static NSUInteger const kOfflineDetectedBehaviour = 5;
+static NSUInteger const kCouldNotConnectBehaviour = 6;
+static NSUInteger const kAlwaysOpenOffline = 7;
+static NSUInteger const kConflictResolutionStrategyRow = 8;
+static NSUInteger const kBackupsRow = 9;
+static NSUInteger const kViewSyncLogRow = 10;
 
-static NSUInteger const kRowCount = 10;
+static NSUInteger const kRowCount = 11;
 
 @interface DatabasePropertiesVC ()
 
@@ -192,6 +194,18 @@ static NSUInteger const kRowCount = 10;
         
         return cell;
     }
+    else if ( indexPath.row == kRowWiFiSyncServiceName ) {
+        PropertySwitchTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kPropertySwitchTableViewCellId forIndexPath:indexPath];
+
+        cell.titleLabel.text = NSLocalizedString(@"wifi_sync_properties_service_name", @"Service Name");
+        cell.subtitleLabel.text = self.database.storageProvider == kWiFiSync ? [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:self.database] : @"";
+        cell.switchBool.hidden = YES;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        return cell;
+    }
+
     
     return [super tableView:tableView cellForRowAtIndexPath:indexPath];
 }
@@ -312,7 +326,9 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
          indexPath.row == kViewSyncLogRow ||
          indexPath.row == kLazySyncRow ||
          indexPath.row == kLazySyncPersistRow ||
-         indexPath.row == kConflictResolutionStrategyRow ) {
+         indexPath.row == kConflictResolutionStrategyRow ||
+         indexPath.row == kRowWiFiSyncServiceName
+        ) {
         if ( self.database.storageProvider == kLocalDevice || AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
 #ifdef DEBUG
             return [super tableView:tableView heightForRowAtIndexPath:indexPath];
@@ -332,10 +348,24 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
         return 0.0f;
     }
     
-    if (
-        indexPath.row == kOfflineDetectedBehaviour ||
-        indexPath.row == kCouldNotConnectBehaviour ) {
+    if ( indexPath.row == kOfflineDetectedBehaviour ||
+         indexPath.row == kLazySyncRow ||
+         indexPath.row == kLazySyncPersistRow ||
+         indexPath.row == kCouldNotConnectBehaviour ) {
+        if ( self.database.storageProvider == kWiFiSync ) {
+            return 0.0f;
+        }
+    }
+    
+    if ( indexPath.row == kOfflineDetectedBehaviour ||
+         indexPath.row == kCouldNotConnectBehaviour ) {
         if ( self.database.lazySyncMode ) {
+            return 0.0f;
+        }
+    }
+    
+    if ( indexPath.row == kRowWiFiSyncServiceName ) {
+        if ( self.database.storageProvider != kWiFiSync ) {
             return 0.0f;
         }
     }

@@ -739,7 +739,7 @@ class BrowseViewController: NSViewController {
     }
 
     @objc
-    func onDelete(_: Any?) {
+    func onDeleteOrRecycleSelectedBrowseViewItems(_: Any?) {
         let selected = database.getItemsById(database.nextGenSelectedItems)
 
         var nextIdx: Int? = nil
@@ -764,7 +764,7 @@ extension BrowseViewController: NSMenuItemValidation, NSMenuDelegate {
     func validateMenuItem(_ menuItem: NSMenuItem) -> Bool {
 
 
-        if menuItem.action == #selector(onDelete) {
+        if menuItem.action == #selector(onDeleteOrRecycleSelectedBrowseViewItems) {
             
             
             
@@ -865,7 +865,7 @@ extension BrowseViewController: DocumentViewController {
         }
         outlineView.onDeleteKey = { [weak self] in
             guard let self else { return }
-            self.onDelete(nil)
+            self.onDeleteOrRecycleSelectedBrowseViewItems(nil)
         }
 
         

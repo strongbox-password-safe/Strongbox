@@ -32,15 +32,18 @@ class NextGenWindow: NSWindow {
     }
 
     func checkEventForCmdNumberDown() -> Bool {
-        if let event = currentEvent, event.modifierFlags.contains(.command), let key = event.charactersIgnoringModifiers?.first?.asciiValue {
-            if key > 48, key < 58 {
-                let number = key - 48
+        if let event = currentEvent,
+           event.type == .keyDown,
+           event.modifierFlags.contains(.command),
+           let key = event.charactersIgnoringModifiers?.first?.asciiValue,
+           key > 48, key < 58
+        {
+            let number = key - 48
 
-                
+            
 
-                onCmdPlusNumberPressed(number: Int(number))
-                return true
-            }
+            onCmdPlusNumberPressed(number: Int(number))
+            return true
         }
 
         return false

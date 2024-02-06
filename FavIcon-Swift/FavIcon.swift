@@ -58,7 +58,7 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
 
 
         guard let serverTrust = challenge.protectionSpace.serverTrust else {
-            print(challenge)
+            NSLog("%@", challenge)
             completionHandler(.rejectProtectionSpace, nil)
             return
         }

@@ -407,7 +407,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     
     if ( !connection ) {
         NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
-        completion(nil, error );
+        completion(YES, nil, error );
         return;
     }
     
@@ -418,7 +418,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                   viewController:nil
                       completion:^(BOOL userInteractionRequired, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
         if ( sftp == nil || error) {
-            completion(nil, error);
+            completion(YES, nil, error);
             return;
         }
         
@@ -427,7 +427,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
             [sftp.session disconnect];
             
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
-            completion(nil, error);
+            completion(YES, nil, error);
             return;
         }
         
@@ -436,7 +436,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
         
         
         
-        completion(attr.modificationDate, nil);
+        completion(YES, attr.modificationDate, nil);
     }];
 }
 

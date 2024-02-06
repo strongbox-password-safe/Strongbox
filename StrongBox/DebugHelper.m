@@ -142,7 +142,7 @@ int OPParentIDForProcessID(int pid)
     NSMutableArray<NSString*>* debugLines = [NSMutableArray array];
     
 #if TARGET_OS_IPHONE
-    NSString* model = [[UIDevice currentDevice] model];
+    NSString* model = UIDevice.modelName;
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
 #else
@@ -493,7 +493,7 @@ int OPParentIDForProcessID(int pid)
                     [ret addObject:[NSString stringWithFormat:@"%@ - %@", relativePath, error]];
                 }
                 else {
-                    [ret addObject:[NSString stringWithFormat:@"[%@] %@ - %@", relativePath, friendlyFileSizeString(attributes.fileSize), attributes.fileModificationDate.friendlyDateTimeStringPrecise]];
+                    [ret addObject:[NSString stringWithFormat:@"[%@] %@ - M%@ / C%@", relativePath, friendlyFileSizeString(attributes.fileSize), attributes.fileModificationDate.friendlyDateTimeStringPrecise, attributes.fileCreationDate.friendlyDateTimeStringPrecise]];
                 }
             }
             else{

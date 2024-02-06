@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface StorageBrowserItem : NSObject
 
 + (instancetype)itemWithName:(NSString*)name identifier:(NSString*)identifier folder:(BOOL)folder providerData:(id)providerData;
@@ -18,3 +20,5 @@
 @property (nonatomic) NSObject *providerData;
 
 @end
+
+NS_ASSUME_NONNULL_END

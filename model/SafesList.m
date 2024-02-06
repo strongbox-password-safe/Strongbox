@@ -45,7 +45,16 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     if (self = [super init]) {
         self.dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
         self.editingSet = ConcurrentMutableSet.mutableSet;
-        self.databasesList = [self deserialize];
+        
+        NSMutableArray<SafeMetaData*>* deserialized;
+        NSError* error;
+        
+        if ( [self deserialize2:&deserialized error:&error] ) {
+            self.databasesList = [deserialized mutableCopy];
+        }
+        else {
+            self.databasesList = @[].mutableCopy;
+        }
         
         if ( self.lastChangeByOtherComponent ) { 
             [self clearChangedDatabaseSettings];
@@ -89,9 +98,18 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         NSLog(@"🟢 reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by main Strongbox App...");
 #endif
         [self clearChangedDatabaseSettings];
-        self.databasesList = [self deserialize];
         
-        return YES;
+        NSMutableArray<SafeMetaData*>* deserialized;
+        NSError* error;
+        
+        if ( [self deserialize2:&deserialized error:&error] ) {
+            self.databasesList = [deserialized mutableCopy];
+            return YES;
+        }
+        else {
+            NSLog(@"🔴 reloadIfChangedByOtherComponent => Error deserializing: [%@]", error);
+            return NO;
+        }
     }
     else {
 
@@ -107,43 +125,64 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     return result;
 }
 
-- (NSMutableArray<SafeMetaData*>*)deserialize {
+- (BOOL)deserialize2:(NSMutableArray<SafeMetaData*>**)databases 
+               error:(NSError**)error {
     NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
     
-    NSError* error;
+    NSError* coorderror;
     __block NSError* readError;
     __block NSData* json = nil;
     NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
     
     [fileCoordinator coordinateReadingItemAtURL:fileUrl
                                         options:kNilOptions
-                                          error:&error
+                                          error:&coorderror
                                      byAccessor:^(NSURL * _Nonnull newURL) {
         json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
     }];
-    
-    if (!json || error || readError) {
+
+    if (!json || coorderror || readError) {
         if ( readError.code != NSFileReadNoSuchFileError ) {
-            NSLog(@"🔴 Error reading file for databases: [%@] - [%@]", error, readError);
+            NSLog(@"🔴 Error reading file for databases: [%@] - [%@]", coorderror, readError);
+            AppPreferences.sharedInstance.databasesSerializationError = [NSString stringWithFormat:@"Read Error: [%@]", *error];
+            
+            
+            
+            NSException *e = [NSException exceptionWithName:@"DatabasesJSON Read Exception" reason:@"Could not read databases.json" userInfo:nil];
+            @throw e;
+            return NO;
         }
-        
-        return @[].mutableCopy;
+        else {
+            *error = readError ? readError : coorderror;
+            AppPreferences.sharedInstance.databasesSerializationError = [NSString stringWithFormat:@"Read Error: [%@]", *error];
+            return NO;
+        }
     }
 
-    NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
+    NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&coorderror];
 
-    if (error) {
-        NSLog(@"Error getting json dictionaries for databases: [%@]", error);
-        return @[].mutableCopy;
+    if (coorderror) {
+        NSLog(@"Error getting json dictionaries for databases: [%@]", coorderror);
+        *error = coorderror;
+        AppPreferences.sharedInstance.databasesSerializationError = [NSString stringWithFormat:@"JSON Error: [%@]", *error];
+        
+        
+        
+        NSException *e = [NSException exceptionWithName:@"DatabasesJSON Read Exception" reason:@"Error getting json dictionaries for databases" userInfo:nil];
+        @throw e;
+        return NO;
     }
 
     NSMutableArray<SafeMetaData*> *ret = NSMutableArray.array;
+    
     for (NSDictionary* jsonDatabase in jsonDatabases) {
         SafeMetaData* database = [SafeMetaData fromJsonSerializationDictionary:jsonDatabase];
         [ret addObject:database];
     }
     
-    return ret;
+    *databases = ret;
+    
+    return YES;
 }
 
 - (void)serialize:(BOOL)listChanged {

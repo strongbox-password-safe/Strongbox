@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^StorageProviderReadCompletionBlock)(StorageProviderReadResult result, NSData *_Nullable data, NSDate*_Nullable dateModified, const NSError *_Nullable error);
 typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult result, NSDate*_Nullable newRemoteModDate, const NSError *_Nullable error);
-typedef void (^StorageProviderGetModDateCompletionBlock)(NSDate*_Nullable modDate, const NSError *_Nullable error);
+typedef void (^StorageProviderGetModDateCompletionBlock)(BOOL storageIsAvailable, NSDate*_Nullable modDate, const NSError *_Nullable error);
 
 @protocol SafeStorageProvider <NSObject>
 
@@ -65,6 +65,8 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(NSDate*_Nullable modDat
     viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController
         completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, const NSError * _Nullable error))completion;
 
+
+
 - (void)readWithProviderData:(NSObject * _Nullable)providerData
               viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController
                      options:(StorageProviderReadOptions*)options
@@ -75,8 +77,11 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(NSDate*_Nullable modDat
 
 - (METADATA_PTR _Nullable)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData;
 
+
+
 - (void)getModDate:(METADATA_PTR)safeMetaData
         completion:(StorageProviderGetModDateCompletionBlock)completion;
+
 
 @end
 

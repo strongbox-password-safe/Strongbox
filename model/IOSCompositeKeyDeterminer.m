@@ -477,6 +477,7 @@ static const int kMaxFailedPinAttempts = 3;
     scVc.initialKeyFileBookmark = self.database.keyFileBookmark;
     scVc.initialReadOnly = self.database.readOnly;
     scVc.initialYubiKeyConfig = self.database.contextAwareYubiKeyConfig;
+    scVc.initialName = self.database.nickName;
     
     scVc.validateCommonKeyFileMistakes = self.database.keyFileBookmark == nil; 
     

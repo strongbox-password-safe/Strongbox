@@ -820,6 +820,7 @@
     
     
     
+    
     NSString* desktop = StrongboxFilesManager.sharedInstance.desktopPath;
     openPanel.directoryURL = desktop ? [NSURL fileURLWithPath:desktop] : nil;
     
@@ -1220,6 +1221,11 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
         self.textFieldMasterPassword.stringValue = @"";
         [self stopObservingModelChanges];
+        
+        
+        
+        
+        [BiometricIdHelper.sharedInstance invalidateCurrentRequest];
     }
     else {
         [self onUnsuccessfulUnlock:ckfs error:error fromConvenience:fromConvenience incorrectCredentials:incorrectCredentials];

@@ -1096,12 +1096,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     
     
-    if ( !self.viewModel.isInOfflineMode ) {
+
         UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
         [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
         
         self.tableView.refreshControl = refreshControl;
-    }
+
 }
 
 - (CGFloat)cellHeight {
@@ -2765,7 +2765,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         }
     }
     
-    if (item.fields.password.length) [ma addObject:[self getContextualMenuShowLargePasswordAction:indexPath item:item]];
+    if (item.fields.password.length) {
+        [ma addObject:[self getContextualMenuCopyPasswordAction:indexPath item:item]];
+        [ma addObject:[self getContextualMenuShowLargePasswordAction:indexPath item:item]];
+    }
     
     if (!item.isGroup && [self.viewModel isFlaggedByAudit:item.uuid] ) {
         [ma addObject:[self getContextualMenuAuditSettingsAction:indexPath item:item]];
@@ -3255,24 +3258,55 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     if ( self.viewModel.isInOfflineMode ) {
-        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")
-                                   message:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_message", @"Database Not Refreshed")
-                                  duration:1.5f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeInfo
-                             alertPosition:ISAlertPositionTop
-                                   didHide:^(BOOL finished) {
-            [weakSelf.tableView.refreshControl endRefreshing];
-        }];
         
-        return;
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        if ( self.viewModel.metadata.allowPulldownRefreshSyncInOfflineMode ) {
+            [self doSyncAfterPulldownRefresh:YES];
+        }
+        else {
+            [Alerts twoOptionsWithCancel:self
+                                   title:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_question_title", @"Sync in Offline Mode?")
+                                 message:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_question_message", @"Would you like to sync even though the database is in Offline mode?")
+                       defaultButtonText:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_option_sync_once", @"Sync this once")
+                        secondButtonText:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_option_always", @"Always sync when I do this")
+                                  action:^(int response) {
+                if ( response == 0 ) { 
+                    [self doSyncAfterPulldownRefresh:YES];
+                }
+                else if ( response == 1 ) { 
+                    self.viewModel.metadata.allowPulldownRefreshSyncInOfflineMode = YES;
+                    [self doSyncAfterPulldownRefresh:YES];
+                }
+                else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [weakSelf.tableView.refreshControl endRefreshing];
+                    });
+                }
+            }];
+        }
     }
+    else {
+        [self doSyncAfterPulldownRefresh:NO];
+    }
+}
+
+- (void)doSyncAfterPulldownRefresh:(BOOL)ignoreOfflineMode {
+    __weak BrowseSafeView* weakSelf = self;
     
-    [self.parentSplitViewController syncWithCompletion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+    [self.parentSplitViewController syncWithIgnoreOfflineModeAndTrySync:ignoreOfflineMode
+                                                             completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf.tableView.refreshControl endRefreshing];
-
+            
             if ( localWasChanged ) {
                 [StrongboxToastMessages showSlimInfoStatusBarWithBody:NSLocalizedString(@"browse_vc_pulldown_refresh_updated_title", @"Database Updated")
                                                                 delay:1.5];

@@ -24,6 +24,7 @@ typedef NS_ENUM (NSUInteger, StorageProvider) {
     kWebDAV,
       
     kTwoDrive,
+    kWiFiSync,
     /* ---- */
     kStorageProviderCount
 };

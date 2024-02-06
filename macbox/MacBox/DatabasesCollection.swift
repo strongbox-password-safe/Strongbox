@@ -173,12 +173,12 @@ class DatabasesCollection: NSObject {
         return dc.document(forDatabase: uuid)
     }
 
-    @objc public func documentIsOpenWithPendingChanges(uuid: String) -> Bool {
+    @objc public func databaseHasEditsOrIsBeingEdited(uuid: String) -> Bool {
         guard let doc = documentForDatabase(uuid: uuid) else {
             return false
         }
 
-        return doc.hasUnautosavedChanges || doc.isDocumentEdited
+        return doc.hasUnautosavedChanges || doc.isDocumentEdited || doc.isEditsInProgress 
     }
 
     @objc public func closeAnyDocumentWindows(uuid: String) {
@@ -602,6 +602,7 @@ class DatabasesCollection: NSObject {
 
         guard !prefs.alwaysOpenOffline else { 
             NSLog("🔴 Database is in Offline Mode - Cannot Sync!")
+
             completion?(.error, false, Utils.createNSError("🔴 Database is in Offline Mode - Cannot Sync!", errorCode: -1234))
             return
         }
@@ -802,7 +803,7 @@ class DatabasesCollection: NSObject {
         }
     }
 
-    @objc public func reloadFromWorkingCopy(_ uuid: String, dispatchSyncAfterwards: Bool) { 
+    @objc public func reloadFromWorkingCopy(_ uuid: String, dispatchSyncAfterwards: Bool, completion: (() -> Void)? = nil) { 
         if let existing = getUnlocked(uuid: uuid) {
             existing.reloadDatabase(fromLocalWorkingCopy: {
                 let vc = self.getMostAppropriateViewControllerForInteraction(uuid: uuid)
@@ -815,18 +816,27 @@ class DatabasesCollection: NSObject {
                     NSLog("✅ Successfully reloaded Model after explicit reload request")
 
                     if dispatchSyncAfterwards {
-                        self?.sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true)
+                        self?.sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true) { _, _, _ in
+                            completion?()
+                        }
+                    } else {
+                        completion?()
                     }
                 } else {
                     
 
                     NSLog("🔴 Could not Unlock updated database after explicit reload request. Key changed?! - Force Locking.")
                     self?.forceLock(uuid: uuid)
+                    completion?()
                 }
             }
         } else {
             if dispatchSyncAfterwards { 
-                sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true)
+                sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true) { _, _, _ in
+                    completion?()
+                }
+            } else {
+                completion?()
             }
         }
     }

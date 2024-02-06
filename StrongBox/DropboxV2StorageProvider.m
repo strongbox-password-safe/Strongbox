@@ -108,10 +108,10 @@
 
     [self performTaskWithAuthorizationIfNecessary:nil task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
         if (error) {
-            completion(nil, error);
+            completion(YES, nil, error);
         }
         else if (userInteractionRequired) {
-            completion(nil, [Utils createNSError:@"User Interaction Required from getModDate" errorCode:346]);
+            completion(YES, nil, [Utils createNSError:@"User Interaction Required from getModDate" errorCode:346]);
         }
         else {
             DBUserClient *client = DBClientsManager.authorizedClient;
@@ -124,10 +124,10 @@
                     
 
                     
-                    completion(metadata.serverModified, nil);
+                    completion(YES, metadata.serverModified, nil);
                 }
                 else {
-                    completion(nil, [Utils createNSError:@"Error getModDate" errorCode:347]);
+                    completion(YES, nil, [Utils createNSError:@"Error getModDate" errorCode:347]);
                 }
             }];
         }

@@ -322,7 +322,7 @@ class SSHAgentRequestHandler: NSObject {
         let context = LAContext()
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
-            print(error?.localizedDescription ?? "Can't evaluate policy")
+            NSLog(error?.localizedDescription ?? "Can't evaluate policy")
             return false
         }
 
@@ -337,7 +337,7 @@ class SSHAgentRequestHandler: NSObject {
 
         context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
             if let error {
-                print(error.localizedDescription)
+                NSLog(error.localizedDescription)
             }
 
             go = success

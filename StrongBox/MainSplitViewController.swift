@@ -45,7 +45,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         viewControllers = [browseTabController, emptyDetails]
 
         delegate = self
-        preferredDisplayMode = .allVisible 
+        preferredDisplayMode = .oneBesideSecondary 
 
         listenToNotifications()
 
@@ -110,12 +110,6 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     func splitViewController(_: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
         NSLog("splitViewController::collapseSecondaryViewController 2nd [%@] -> primary [%@]", secondaryViewController, primaryViewController)
 
-        if UIDevice.current.userInterfaceIdiom == .pad { 
-            if #available(iOS 17.0, *) {
-                return false
-            }
-        }
-
         guard let tabBar = viewControllers.first as? UITabBarController,
               let masterNav = tabBar.selectedViewController as? UINavigationController
         else {
@@ -133,15 +127,18 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
             
             
 
-            detailsNav.popViewController(animated: false) 
+            detailsNav.navigationBar.isHidden = true 
+
+            
+
+            detailsNav.popViewController(animated: false)
+            detailsNav.removeFromParent()
 
             
 
             detailsVc.willMove(toParent: nil)
             detailsVc.view.removeFromSuperview()
             detailsVc.removeFromParent()
-
-            
 
             masterNav.pushViewController(detailsVc, animated: false)
 
@@ -175,12 +172,6 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
     func splitViewController(_: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
         NSLog("splitViewController::separateSecondaryFrom: [%@]", String(describing: primaryViewController))
-
-        if UIDevice.current.userInterfaceIdiom == .pad { 
-            if #available(iOS 17.0, *) {
-                return nil
-            }
-        }
 
         guard let tabBar = viewControllers.first as? UITabBarController,
               let masterNav = tabBar.selectedViewController as? UINavigationController
@@ -333,10 +324,10 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
     
 
-    @objc public func sync(completion: SyncAndMergeCompletionBlock? = nil) {
+    @objc func sync(ignoreOfflineModeAndTrySync: Bool = false, completion: SyncAndMergeCompletionBlock? = nil) {
         NSLog("MainSplitViewController::sync BEGIN")
 
-        guard !model.isInOfflineMode else {
+        guard !model.isInOfflineMode || ignoreOfflineModeAndTrySync else {
             NSLog("🔴 Database is in Offline Mode - Cannot Sync!")
 
             if let completion {

@@ -146,7 +146,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL databasesAreAlwaysReadOnly;
 @property BOOL disableExport;
 @property BOOL disablePrinting;
-
+@property BOOL disableWiFiSync;
 @property BOOL disableFavIconFeature;
 @property BOOL disableNetworkBasedFeatures; 
 
@@ -189,6 +189,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
 
 @property BOOL atomicSftpWrite;
+
+@property NSString* databasesSerializationError;
+
+@property BOOL wiFiSyncHasRequestedNetworkPermissions;
 
 @end
 

@@ -219,14 +219,20 @@
         return;
     }
     
-    NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
     
+    
+    NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
+
+    if ( totp.length && model.metadata.autoFillCopyTotp ) {
+        NSLog(@"🟢 Copy TOTP to clipboard for AutoFill after wormhole request...");
+        [ClipboardManager.sharedInstance copyConcealedString:totp];
+    }
+
     [self.wormhole passMessageObject:@{
         @"success" : @(YES),
         @"userHandle": passkey.userHandleData,
         @"relyingParty": passkey.relyingPartyId,
         @"credentialID": passkey.credentialIdData,
-        @"totp": totp,
         @"signature": signatureDer,
         @"authenticatorData": authenticatorData
     } identifier:kAutoFillWormholePasskeyAssertionResponseId];
@@ -245,7 +251,8 @@
     }
     
     [DatabasesCollection.shared reloadFromWorkingCopy:databaseId 
-                               dispatchSyncAfterwards:YES];
+                               dispatchSyncAfterwards:YES
+                                           completion:nil];
 
     [self.wormhole passMessageObject:@{ @"success" : @(YES) }
                           identifier:kAutoFillWormholeSyncResponseId];
@@ -325,16 +332,26 @@
     }
     
     NSString* user = [model dereference:node.fields.username node:node];
+    password = password ? password : @"";
+
     NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
     
-    password = password ? password : @"";
+    
+    
+    
+    if ( totp.length && model.metadata.autoFillCopyTotp ) {
+        NSLog(@"🟢 Copy TOTP to clipboard for AutoFill after wormhole request...");
+        [ClipboardManager.sharedInstance copyConcealedString:totp];
+    }
+    
+    
     
     NSLog(@"[%@] - AutoFill found matching node - returning", model.metadata.nickName);
     
     NSDictionary* securePayload = @{
         @"user" : user,
         @"password" : password,
-        @"totp" : totp,
+
     };
     
     NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 

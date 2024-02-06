@@ -32,13 +32,10 @@
 	<true/>
 	<key>com.apple.security.network.client</key>
 	<true/>
+	<key>com.apple.security.network.server</key>
+	<true/>
 	<key>com.apple.security.print</key>
 	<true/>
-	<key>keychain-access-groups</key>
-	<array>
-		<string>$(AppIdentifierPrefix)com.markmcguill.strongbox.mac</string>
-		<string>$(AppIdentifierPrefix)com.microsoft.identity.universalstorage</string>
-	</array>
 	<key>com.apple.security.temporary-exception.files.home-relative-path.read-write</key>
 	<array>
 		<string>/Library/Application Support/librewolf/NativeMessagingHosts/</string>
@@ -57,6 +54,11 @@
 		<string>/Library/Application Support/Sidekick/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Orion/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Thorium/NativeMessagingHosts/</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.markmcguill.strongbox.mac</string>
+		<string>$(AppIdentifierPrefix)com.microsoft.identity.universalstorage</string>
 	</array>
 </dict>
 </plist>

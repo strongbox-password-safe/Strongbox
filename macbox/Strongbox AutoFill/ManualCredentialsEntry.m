@@ -339,6 +339,8 @@
     
     
     
+    
+    
     NSString* desktop = StrongboxFilesManager.sharedInstance.desktopPath;
     openPanel.directoryURL = desktop ? [NSURL fileURLWithPath:desktop] : nil;
 

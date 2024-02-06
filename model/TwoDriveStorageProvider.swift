@@ -534,9 +534,9 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             NSLog("driveItem = %@, error = %@", String(describing: driveItem?.lastModifiedDateTime), String(describing: error))
 
             if userInteractionRequired {
-                completion(nil, Utils.createNSError("User Interaction Required from getModDate", errorCode: 346))
+                completion(true, nil, Utils.createNSError("User Interaction Required from getModDate", errorCode: 346))
             } else {
-                completion(driveItem?.lastModifiedDateTime, error)
+                completion(true, driveItem?.lastModifiedDateTime, error)
             }
         }
     }

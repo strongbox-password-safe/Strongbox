@@ -151,6 +151,9 @@ static NSString* const kDisableExport = @"disableExport";
 static NSString* const kDisablePrinting = @"disablePrinting";
 static NSString* const kAtomicSftpWrite = @"atomicSftpWrite";
 static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcons";
+static NSString* const kDatabasesSerializationError = @"databasesSerializationError";
+static NSString* const kWiFiSyncHasBeenGrantedPermission = @"wiFiSyncHasBeenGrantedPermission";
+static NSString* const kDisableWiFiSync = @"disableWiFiSync";
 
 @implementation AppPreferences
 
@@ -192,6 +195,30 @@ static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcon
 }
 
 
+
+- (BOOL)disableWiFiSync {
+    return [self getBool:kDisableWiFiSync];
+}
+
+- (void)setDisableWiFiSync:(BOOL)disableWiFiSync {
+    [self setBool:kDisableWiFiSync value:disableWiFiSync];
+}
+
+- (BOOL)wiFiSyncHasRequestedNetworkPermissions {
+    return [self getBool:kWiFiSyncHasBeenGrantedPermission];
+}
+
+- (void)setWiFiSyncHasRequestedNetworkPermissions:(BOOL)wiFiSyncHasBeenGrantedPermission {
+    [self setBool:kWiFiSyncHasBeenGrantedPermission value:wiFiSyncHasBeenGrantedPermission];
+}
+
+- (NSString *)databasesSerializationError {
+    return [self getString:kDatabasesSerializationError];
+}
+
+- (void)setDatabasesSerializationError:(NSString *)databasesSerializationError {
+    [self setString:kDatabasesSerializationError value:databasesSerializationError];
+}
 
 - (BOOL)stripUnusedHistoricalIcons {
     return [self getBool:kStripUnusedHistoricalIcons fallback:AppPreferences.sharedInstance.stripUnusedIconsOnSave];

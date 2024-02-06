@@ -18,14 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString*)getStorageDisplayName:(METADATA_PTR)database;
 + (NSString*)getStorageDisplayNameForProvider:(StorageProvider)provider;
 
-+ (NSString*)getIcon:(METADATA_PTR)database;
-+ (NSString*)getIconForProvider:(StorageProvider)provider;
-
-#if TARGET_OS_IPHONE
-
-#else
-+ (NSImage*)getImageForProvider:(StorageProvider)provider;
-#endif
++ (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider;
++ (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider database:(METADATA_PTR _Nullable)database;
 
 @end
 

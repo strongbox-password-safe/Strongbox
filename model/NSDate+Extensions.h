@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isMoreThanXDaysAgo:(NSUInteger)days;
 - (BOOL)isMoreThanXSecondsAgo:(NSUInteger)seconds;
 
-- (BOOL)isEqualToDateWithinEpsilon:(NSDate*)other;
+- (BOOL)isEqualToDateWithinEpsilon:(NSDate*_Nullable)other;
 - (BOOL)isLaterThan:(NSDate*)other;
 - (BOOL)isEarlierThan:(NSDate*)other;
 
@@ -32,7 +32,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString* friendlyDateStringVeryShort;
 @property (readonly) NSString* friendlyDateStringVeryShortDateOnly;
 @property (readonly) NSString* friendlyDateTimeStringPrecise;
-@property (readonly) NSString* iso8601DateString;
+
+
+@property (readonly) NSString* iso8601DateString; 
+- (NSString*)iso8601DateStringWithFractionalSeconds;
++ (instancetype)FromIso8601DateStringWithFractionalSeconds:(NSString *)string;
+
+
+
 @property (readonly) NSString* friendlyTimeStringPrecise;
 @property (readonly) NSString* friendlyDateTimeStringBothPrecise;
 

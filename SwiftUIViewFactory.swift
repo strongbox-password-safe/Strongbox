@@ -18,13 +18,19 @@ class SwiftUIViewFactory: NSObject {
         return hostingController
     }
 
-    @objc static func makeSaleOfferViewController(saleEndDate: Date,
+    @objc static func makeSaleOfferViewController(sale: Sale,
                                                   existingSubscriber: Bool,
                                                   redeemHandler: @escaping (() -> Void),
                                                   onLifetimeHandler: @escaping (() -> Void),
                                                   dismissHandler: @escaping (() -> Void)) -> UIViewController
     {
-        let hostingController = UIHostingController(rootView: SaleOfferView(dismiss: dismissHandler, onLifetime: onLifetimeHandler, redeem: redeemHandler, saleEndDate: saleEndDate, existingSubscriber: existingSubscriber))
+        let hostingController = UIHostingController(rootView: SaleOfferView(dismiss: dismissHandler, onLifetime: onLifetimeHandler, redeem: redeemHandler, sale: sale, existingSubscriber: existingSubscriber))
+
+        return hostingController
+    }
+
+    @objc static func makeWiFiSyncPasscodeViewController(_ server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig, _ pinCode: String?) -> Void)) -> UIViewController {
+        let hostingController = UIHostingController(rootView: PasscodeEntryView(server: server, onDone: onDone))
 
         return hostingController
     }

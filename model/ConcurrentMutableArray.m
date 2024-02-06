@@ -37,11 +37,24 @@
     });
 }
 
+- (void)addObjectsFromArray:(NSArray *)otherArray {
+    dispatch_barrier_async(self.dataQueue, ^{
+        [self.data addObjectsFromArray:otherArray];
+    });
+}
+
 - (void)removeObject:(id)object {
     dispatch_barrier_async(self.dataQueue, ^{
         [self.data removeObject:object];
     });
 }
+
+- (void)removeAllObjects {
+    dispatch_barrier_async(self.dataQueue, ^{
+        [self.data removeAllObjects];
+    });
+}
+
 
 - (id)dequeueHead {
     __block id headObject = nil;

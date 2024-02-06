@@ -388,7 +388,7 @@
         self.onShowClicked( nil );
     }
 
-    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabPasswordGeneration];
+    [AppPreferencesWindowController.sharedInstance showPasswordGenerationTab];
 }
 
 - (IBAction)onShowPreferences:(id)sender {
@@ -396,7 +396,7 @@
         self.onShowClicked( nil );
     }
     
-    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabGeneral];
+    [AppPreferencesWindowController.sharedInstance showGeneralTab];
 }
 
 @end

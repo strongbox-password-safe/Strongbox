@@ -159,6 +159,10 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL autoFillWroteCleanly;
 @property BOOL atomicSftpWrite;
 
+@property BOOL wiFiSyncOn;
+@property (nullable) NSString* wiFiSyncServiceName;
+@property NSString* wiFiSyncPasscode;
+
 @end
 
 

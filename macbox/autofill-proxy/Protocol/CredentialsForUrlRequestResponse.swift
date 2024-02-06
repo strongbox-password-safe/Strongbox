@@ -9,7 +9,7 @@
 import Cocoa
 
 class CredentialsForUrlRequest: Codable {
-    static let DefaultMaxResults = 48 
+    static let DefaultMaxResults = 24 
     static let AbsoluteMaxResults = 48 
 
     var url: String

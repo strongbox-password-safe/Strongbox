@@ -13,6 +13,7 @@
 #import "NodeIconHelper.h"
 #import "UITableView+EmptyDataSet.h"
 #import "Serializator.h"
+#import "DatabaseCell.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -63,7 +64,18 @@
         [self setToolbarItems:toolbarButtons animated:YES];
     }
 
-    self.tableView.tableFooterView = [UIView new];
+    [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
+
+    self.tableView.estimatedSectionHeaderHeight = 0.1f;
+    self.tableView.estimatedSectionFooterHeight = 0.1f;
+    self.tableView.sectionFooterHeight = 0.1f;
+    self.tableView.sectionHeaderHeight = 0.1f;
+    self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 0.01f)];
+    
+    if (@available(iOS 15.0, *)) {
+        self.tableView.sectionHeaderTopPadding = 0.1f;
+    }
+
     
     self.navigationItem.prompt = self.existing ?
     NSLocalizedString(@"sbtvc_select_database_file", @"Please Select Database File") :
@@ -150,44 +162,62 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"StorageBrowserItemCell" forIndexPath:indexPath];
-
     StorageBrowserItem *file = _items[indexPath.row];
-
-    cell.textLabel.text = file.name;
-    cell.userInteractionEnabled = self.existing || file.folder;
-    cell.textLabel.enabled = self.existing || file.folder;
+    
+    UIImage* img;
+    UIColor* tintColor;
     
     if (_safeStorageProvider.providesIcons) {
         NSValue *myKey = [NSValue valueWithNonretainedObject:file];
-        cell.imageView.tintColor = nil;
-
+        
+        tintColor = nil;
+        img = _defaultFileImage;
+        
         if (!_iconsCache[myKey]) {
             [_safeStorageProvider loadIcon:file.providerData
                             viewController:self
                                 completion:^(UIImage *image) {
                                     dispatch_async(dispatch_get_main_queue(), ^(void) {
                                         self->_iconsCache[myKey] = image;
-
-                                        cell.imageView.image = image;
-                                        NSArray *rowsToReload = @[indexPath];
-                                        [self.tableView reloadRowsAtIndexPaths:rowsToReload
+                                        [self.tableView reloadRowsAtIndexPaths:@[indexPath]
                                               withRowAnimation:UITableViewRowAnimationNone];
                                         });
                                 }];
         }
         else {
-            cell.imageView.image = _iconsCache[myKey];
+            img = _iconsCache[myKey];
         }
     }
     else {
-        cell.imageView.image = file.folder ? _defaultFolderImage : _defaultFileImage;
-        cell.imageView.tintColor = nil;
+        img = file.folder ? _defaultFolderImage : _defaultFileImage;
+        tintColor = nil;
     }
 
-    cell.accessoryType = file.folder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
-    
-    return cell;
+
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"StorageBrowserItemCell" forIndexPath:indexPath];
+        cell.textLabel.text = file.name;
+        cell.imageView.image = img;
+        
+        cell.userInteractionEnabled = self.existing || file.folder;
+        cell.textLabel.enabled = self.existing || file.folder;
+        cell.imageView.tintColor = tintColor;
+        
+        cell.accessoryType = file.folder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
+
+        return cell;
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
