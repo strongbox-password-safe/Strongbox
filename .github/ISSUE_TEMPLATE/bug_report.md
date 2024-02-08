@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Create a report to help us improve
-title: ''
+title: "[BUG]"
 labels: ''
 assignees: ''
 
@@ -10,8 +10,8 @@ assignees: ''
 **Preliminaries**
 I have ensured that:
 
-[ ] I am running the latest version of Strongbox on the App Store by searching for Strongbox and clicking into it to see the Update button (or not)
-[ ] I have performed a full restart of my device no matter how annoying that is
+- [ ] I am running the latest version of Strongbox on the App Store by searching for Strongbox and clicking into it to see the Update button (or not)
+- [ ] I have performed a full restart of my device no matter how annoying that is
 
 **Versions**
 **On macOS (please complete the following information):**
