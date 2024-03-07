@@ -36,7 +36,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         url = [url URLByAppendingPathComponent:@"Documents"];
     }
     
-
+    
     
     return url;
 }
@@ -48,18 +48,18 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         url = [url URLByDeletingLastPathComponent];
     }
     
-
-
+    
+    
     return url;
-
+    
 }
 
 - (NSString *)desktopPath {
-
-
-
+    
+    
+    
     NSArray* paths = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSUserDomainMask, YES );
-
+    
     return paths.firstObject;
 }
 
@@ -68,31 +68,15 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     return rawHome ? [NSString stringWithCString:rawHome encoding:NSUTF8StringEncoding] : nil;
 }
 
-- (NSString *)tmpEncryptedAttachmentPath {
-    NSArray<NSURL*>* appSupportDirs = [NSFileManager.defaultManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask];
-    
-    NSURL* appSupportUrl = appSupportDirs.firstObject;
-    NSString* path = appSupportUrl ? appSupportUrl.path : NSTemporaryDirectory();
-    
-    NSString *ret =  [path stringByAppendingPathComponent:kEncAttachmentDirectoryName];
-    NSError* error;
-    
-    if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
-    }
-
-    return ret;
-}
-
 - (NSString*)tmpAttachmentPreviewPath {
     NSString* ret = [NSTemporaryDirectory() stringByAppendingPathComponent:@"att_pr"];
-
+    
     NSError* error;
     if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
         NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
     }
-
-
+    
+    
     
     return ret;
 }
@@ -158,7 +142,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 }
 
 - (void)deleteAllTmpWorkingFiles { 
-    [self deleteAllTmpEncryptedAttachmentWorkingFiles];
     [self deleteAllTmpSyncMergeWorkingFiles];
     [self deleteAllTmpEncryptionStreamFiles];
 }
@@ -166,11 +149,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 - (void)deleteAllNukeFromOrbit {
     NSLog(@"🔴 WARNWARN: NUKE FROM ORBIT...");
     [self deleteAllContentsOfDirectory:self.sharedAppGroupDirectory.path];
-}
-
-- (void)deleteAllTmpEncryptedAttachmentWorkingFiles { 
-    NSString* tmpPath = [self tmpEncryptedAttachmentPath];
-    [self deleteAllContentsOfDirectory:tmpPath];
 }
 
 - (void)deleteAllTmpSyncMergeWorkingFiles {

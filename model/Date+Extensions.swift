@@ -50,7 +50,7 @@ extension JSONEncoder.DateEncodingStrategy {
 
 
 
-extension Date {
+public extension Date {
     static func randomDate(range: Int) -> Date {
         
         let interval = Date().timeIntervalSince1970
@@ -84,7 +84,7 @@ extension Date {
 
 
 
-extension Date {
+public extension Date {
     func isEqualToDateWithinEpsilon(_ other: Date) -> Bool {
         (self as NSDate).isEqualToDate(withinEpsilon: other)
     }

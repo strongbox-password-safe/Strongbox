@@ -59,9 +59,6 @@
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
     }
-    else if ( providerId == kWiFiSync ) {
-        return WiFiSyncStorageProvider.sharedInstance;
-    }
 #else
     if (providerId == kMacFile) {
         return MacFileBasedBookmarkStorageProvider.sharedInstance;
@@ -87,7 +84,10 @@
         return SFTPStorageProvider.sharedInstance;
     }
 #endif
-    
+    else if ( providerId == kWiFiSync ) {
+        return WiFiSyncStorageProvider.sharedInstance;
+    }
+
     NSLog(@"WARNWARN: Unknown Storage Provider!");
     return nil;
 }
@@ -131,9 +131,6 @@
                 _displayName = @"Local Device";
             }
         }
-    }
-    else if ( provider == kWiFiSync ) {
-        return NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync");
     }
 #else
     else if (provider == kMacFile) {
@@ -188,6 +185,9 @@
 #else
         _displayName = @"DAV";
 #endif
+    }
+    else if ( provider == kWiFiSync ) {
+        return NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync");
     }
     else {
         _displayName = @"SafeStorageProviderFactory::getDisplayName Unknown";
@@ -267,6 +267,10 @@
 }
 #else
 + (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider {
+    return [self getImageForProvider:provider database:nil];
+}
+
++ (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider database:(METADATA_PTR)database {
     if (provider == kiCloud) {
         return [NSImage imageWithSystemSymbolName:@"icloud.fill" accessibilityDescription:nil];
     }
@@ -294,6 +298,29 @@
     }
     else if(provider == kWebDAV) {
         return [NSImage imageNamed:@"cloud-webdav"];
+    }
+    else if (provider == kWiFiSync) {
+        NSImage* image = [NSImage imageWithSystemSymbolName:@"externaldrive.fill.badge.wifi" accessibilityDescription:nil];
+        
+        if (@available(macOS 12.0, *)) {
+            BOOL isLive = NO;
+            if ( database ) {
+                
+#ifndef IS_APP_EXTENSION
+                NSString* serverName = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:database];
+                if ( serverName ) {
+                    isLive = [WiFiSyncBrowser.shared serverIsPresent:serverName];
+                }
+#endif
+            }
+               
+            NSImageSymbolConfiguration* config = [NSImageSymbolConfiguration configurationWithPaletteColors:@[isLive ? NSColor.systemGreenColor : NSColor.systemGrayColor, NSColor.systemBlueColor]];
+            
+            image = [image imageWithSymbolConfiguration:config];
+            
+        }
+        
+        return image;
     }
     else {
         NSLog(@"SafeStorageProviderFactory::getImageForProvider Unknown");

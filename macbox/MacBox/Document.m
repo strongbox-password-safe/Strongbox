@@ -216,7 +216,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 }
 
 - (IBAction)saveDocument:(id)sender {
-    NSLog(@"Document::saveDocument");
+    NSLog(@"✅ Document::saveDocument");
 
     if(self.viewModel.locked || self.viewModel.isEffectivelyReadOnly) {
         NSLog(@"🔴 WARNWARN: Document is Read-Only or Locked! How did you get here?");
@@ -230,7 +230,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
            ofType:(NSString *)typeName
  forSaveOperation:(NSSaveOperationType)saveOperation
 completionHandler:(void (^)(NSError * _Nullable))completionHandler {
-
+    NSLog(@"✅ Document::saveToURL: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, url);
     
     BOOL updateQueued = [DatabasesCollection.shared updateAndQueueSyncWithUuid:self.databaseMetadata.uuid allowInteractiveSync:YES];
     

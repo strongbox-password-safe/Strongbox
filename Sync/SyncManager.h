@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)backgroundSyncDatabase:(DatabasePreferences*)database join:(BOOL)join key:(CompositeKeyFactors*_Nullable)key completion:(SyncAndMergeCompletionBlock)completion;
 - (void)backgroundSyncAll;
-- (void)backgroundSyncAllAutoFillExit;
+
 - (void)backgroundSyncOutstandingUpdates;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;
 
@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 #ifndef IS_APP_EXTENSION
 - (BOOL)toggleLocalDatabaseFilesVisibility:(DatabasePreferences*)metadata error:(NSError**)error;
 #endif
+
+- (BOOL)syncInProgressForDatabase:(NSString*)databaseId;
 
 @end
 

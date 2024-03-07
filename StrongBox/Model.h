@@ -70,8 +70,9 @@ extern NSString* const kAsyncUpdateStarting;
 @property (readonly) BOOL formatSupportsCustomIcons;
 @property (readonly) BOOL formatSupportsTags;
 
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allItems;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableNoneExpiredEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableEntries;
+
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *keeAgentSSHKeyEntries;
 
 @property (nonatomic, nonnull) CompositeKeyFactors *ckfs;
@@ -134,7 +135,9 @@ extern NSString* const kAsyncUpdateStarting;
 - (void)toggleAuditExclusion:(NSUUID *)uuid;
 - (void)excludeFromAudit:(Node*)node exclude:(BOOL)exclude;
 - (BOOL)isExcludedFromAudit:(NSUUID*)item;
-- (NSArray<Node*>*)getExcludedAuditItems;
+
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *excludedFromAuditItems;
+
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;
 
 - (void)closeAndCleanup;
@@ -142,7 +145,7 @@ extern NSString* const kAsyncUpdateStarting;
 
 
 - (BOOL)toggleAutoFillExclusion:(NSUUID*)uuid;
-- (BOOL)setExcludedFromAutoFill:(NSUUID*)uuid exclude:(BOOL)exclude;
+- (BOOL)setItemsExcludedFromAutoFill:(NSArray<NSUUID *>*)uuids exclude:(BOOL)exclude;
 - (BOOL)isExcludedFromAutoFill:(NSUUID*)item;
 
 

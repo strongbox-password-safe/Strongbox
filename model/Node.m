@@ -270,7 +270,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     Node* newParent = parentNode ? parentNode : self.parent;
     NSUUID* newUuid = cloneUuid ? self.uuid : nil;
     
-    if (newParent == nil) {
+    if ( newParent == nil ) {
         
         newUuid = nil;
     }
@@ -284,7 +284,10 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     ret.icon = self.icon;
 
-    ret.linkedData = self.linkedData;
+    if ( cloneUuid ) { 
+        
+        ret.linkedData = self.linkedData;
+    }
     
     if ( ret.isGroup && cloneRecursive ) {
         for (Node* child in self.children) {
@@ -304,7 +307,10 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
 
 
-- (BOOL)mergePropertiesInFromNode:(Node *)mergeNode mergeLocationChangedDate:(BOOL)mergeLocationChangedDate includeHistory:(BOOL)includeHistory keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+- (BOOL)mergePropertiesInFromNode:(Node *)mergeNode 
+         mergeLocationChangedDate:(BOOL)mergeLocationChangedDate
+                   includeHistory:(BOOL)includeHistory
+           keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     if (self.isGroup != mergeNode.isGroup) {
         NSLog(@"WARNWARN: mergePropertiesInFromNode - group not group");
         return NO;
@@ -316,7 +322,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     self.icon = mergeNode.icon;
     
-    self.linkedData = self.linkedData;
+    self.linkedData = self.linkedData; 
     
     [self.fields mergePropertiesInFromNode:mergeNode.fields mergeLocationChangedDate:mergeLocationChangedDate includeHistory:includeHistory];
     

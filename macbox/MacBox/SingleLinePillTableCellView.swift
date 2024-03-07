@@ -43,6 +43,8 @@ class SingleLinePillTableCellView: NSTableCellView {
 
             stackView.addView(view, in: .leading)
         }
+
+        stackView.clipsToBounds = true
     }
 
     func createPill(_ string: String, color: NSColor, backgroundColor: NSColor, icon: NSImage) -> NSView? {

@@ -190,7 +190,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         self.asyncUpdateEncryptionQueue = dispatch_queue_create("Model-AsyncUpdateEncryptionQueue", DISPATCH_QUEUE_SERIAL);
         self.asyncUpdatesStack = ConcurrentMutableStack.mutableStack;
         
-        _cachedLegacyFavourites = [NSSet setWithArray:self.metadata.favourites];
+        _cachedLegacyFavourites = [NSSet setWithArray:self.metadata.legacyFavouritesStore];
         
         if ( self.applicationPreferences.databasesAreAlwaysReadOnly ) {
             self.forcedReadOnly = YES;
@@ -479,6 +479,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     NSError* localUpdateError;
     BOOL success = [self.syncManagement updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&localUpdateError];
+    
     [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
     
     if (!success) { 
@@ -612,14 +613,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)createNewAuditor {
 #ifndef IS_APP_EXTENSION
-    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
-    
     __weak Model* weakSelf = self;
     self.auditor = [[DatabaseAuditor alloc] initWithPro:self.applicationPreferences.isPro
                                          strengthConfig:self.applicationPreferences.passwordStrengthConfig
                                              isExcluded:^BOOL(Node * _Nonnull item) {
-        return [weakSelf isExcludedFromAuditHelper:set uuid:item.uuid];
+        return [weakSelf isExcludedFromAudit:item.uuid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
         weakSelf.metadata.auditConfig = config;
@@ -757,65 +755,28 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 
 
-- (BOOL)isExcludedFromAudit:(NSUUID *)item {
-    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
-    
-    return [self isExcludedFromAuditHelper:set uuid:item];
-}
-
-- (NSArray<Node*>*)getExcludedAuditItems {
-    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
-    
-    return [self.database.allActiveEntries filter:^BOOL(Node * _Nonnull obj) {
-        if ( !obj.fields.qualityCheck ) {
-            return YES;
-        }
-        
-        NSString* sid = [self.database getCrossSerializationFriendlyIdId:obj.uuid];
-        
-        return [set containsObject:sid];
-    }];
-}
-
-- (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set uuid:(NSUUID*)uuid {
-    Node* node = [self.database getItemById:uuid];
-    if ( !node.fields.qualityCheck ) { 
-        return YES;
-    }
-    
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
-    
-    return [set containsObject:sid];
-}
-
-- (void)excludeFromAudit:(Node *)node exclude:(BOOL)exclude {
-    node.fields.qualityCheck = !exclude;
-    
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
-    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-    
-    NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
-    
-    if (exclude) {
-        if ( self.originalFormat != kKeePass4 ) { 
-            [mutable addObject:sid];
-        }
+- (BOOL)isExcludedFromAudit:(NSUUID *)uuid {
+    if ( self.originalFormat == kKeePass4 ) {
+        return [self.database isExcludedFromAudit:uuid];
     }
     else {
-        [mutable removeObject:sid];
+        NSSet<NSString*> *legacyExcluded = [NSSet setWithArray:self.metadata.auditExcludedItems];
+        NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
+        return [legacyExcluded containsObject:sid];
     }
-    
-    self.metadata.auditExcludedItems = mutable.allObjects;
 }
 
-- (void)oneTimeHibpCheck:(NSString *)password completion:(void (^)(BOOL, NSError * _Nonnull))completion {
-    if (self.auditor) {
-        [self.auditor oneTimeHibpCheck:password completion:completion];
+- (NSArray<Node *> *)excludedFromAuditItems {
+    if ( self.originalFormat == kKeePass4 ) {
+        return self.database.excludedFromAuditItems;
     }
     else {
-        completion (NO, [Utils createNSError:@"Auditor Unavailable!" errorCode:-2345]);
+        NSSet<NSString*> *legacyExcluded = [NSSet setWithArray:self.metadata.auditExcludedItems];
+        
+        return [self.database.allActiveEntries filter:^BOOL(Node * _Nonnull obj) {
+            NSString* sid = [self.database getCrossSerializationFriendlyIdId:obj.uuid];
+            return [legacyExcluded containsObject:sid];
+        }];
     }
 }
 
@@ -828,6 +789,40 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }
     else {
         NSLog(@"🔴 WARNWARN Attempt to exclude none existent node from Audit?!");
+    }
+}
+
+- (void)excludeFromAudit:(Node *)node exclude:(BOOL)exclude {
+    if ( self.originalFormat == kKeePass4 ) {
+        [self.database excludeFromAudit:node.uuid exclude:exclude];
+    }
+    else {
+        NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
+        NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
+        
+        NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
+        
+        if (exclude) {
+            if ( self.originalFormat != kKeePass4 ) { 
+                [mutable addObject:sid];
+            }
+        }
+        else {
+            [mutable removeObject:sid];
+        }
+        
+        self.metadata.auditExcludedItems = mutable.allObjects;
+    }
+}
+
+
+
+- (void)oneTimeHibpCheck:(NSString *)password completion:(void (^)(BOOL, NSError * _Nonnull))completion {
+    if (self.auditor) {
+        [self.auditor oneTimeHibpCheck:password completion:completion];
+    }
+    else {
+        completion (NO, [Utils createNSError:@"Auditor Unavailable!" errorCode:-2345]);
     }
 }
 
@@ -851,33 +846,37 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BOOL)toggleAutoFillExclusion:(NSUUID *)uuid {
     BOOL isExcluded = [self isExcludedFromAutoFill:uuid];
-    return [self setExcludedFromAutoFill:uuid exclude:!isExcluded];
+    return [self setItemsExcludedFromAutoFill:@[uuid] exclude:!isExcluded];
 }
 
-- (BOOL)setExcludedFromAutoFill:(NSUUID *)uuid exclude:(BOOL)exclude {
-    Node* node = [self getItemById:uuid];
+- (BOOL)setItemsExcludedFromAutoFill:(NSArray<NSUUID *> *)uuids exclude:(BOOL)exclude {
+    NSArray<Node*>* nodes = [self getItemsById:uuids];
     
     if ( self.isKeePass2Format ) {
-        node.fields.isAutoFillExcluded = exclude;
+        for ( Node* node in nodes ) {
+            node.fields.isAutoFillExcluded = exclude;
+        }
     }
     else {
-        NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
         NSArray<NSString*> *excluded = self.metadata.autoFillExcludedItems;
-        
         NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
         
-        if ( exclude ) {
-            [mutable addObject:sid];
-        }
-        else {
-            [mutable removeObject:sid];
+        for ( Node* node in nodes ) {
+            NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
+            
+            if ( exclude ) {
+                [mutable addObject:sid];
+            }
+            else {
+                [mutable removeObject:sid];
+            }
         }
         
         self.metadata.autoFillExcludedItems = mutable.allObjects;
     }
     
     if ( self.metadata.autoFillEnabled && exclude ) {
-        [self removeItemsFromAutoFillQuickType:@[node]];
+        [self removeItemsFromAutoFillQuickType:nodes];
     }
     
     [self refreshAutoFillSuggestions];
@@ -1173,7 +1172,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         return sid;
     }];
     self.cachedLegacyFavourites = [NSSet setWithArray:trimmed];
-    self.metadata.favourites = trimmed;
+    self.metadata.legacyFavouritesStore = trimmed;
 }
 
 
@@ -1197,8 +1196,12 @@ userInteractionRequired:(BOOL)userInteractionRequired
     return [ret sortedArrayUsingComparator:finderStyleNodeComparator];
 }
 
-- (NSArray<Node *> *)allItems {
-    return self.database.effectiveRootGroup.allChildren;
+- (NSArray<Node *> *)allSearchableEntries {
+    return self.database.allSearchableEntries;
+}
+
+- (NSArray<Node *> *)allSearchableNoneExpiredEntries {
+    return self.database.allSearchableNoneExpiredEntries;
 }
 
 -(NSArray<Node *> *)allEntries {
@@ -1635,9 +1638,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
         NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString 
                                                                     domainNodeMap:self.domainNodeMap];
         
-        NSArray<Node*> *ret = [self getItemsById:matches.allObjects];
+        NSArray<Node*> *ret2 = [self getItemsById:matches.allObjects];
         
-        return [ret sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        NSArray<Node*> *filtered = [ret2 filter:^BOOL(Node * _Nonnull obj) {
+            return [self dereference:obj.fields.password node:obj].length > 0;
+        }];
+        
+        return [filtered sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
             return [BrowserAutoFillManager compareMatchesWithNode1:obj1
                                                              node2:obj2
                                                                url:urlString
@@ -1691,6 +1698,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if ( config == nil ) { 
         config = [BrowseSortConfiguration defaults];
         config.showAlphaIndex = viewType == kBrowseViewTypeList || viewType == kBrowseViewTypeTotpList;
+        
+        
+        
+        if ( viewType == kBrowseViewTypeList ) {
+            config.field = kBrowseSortFieldModified;
+            config.descending = true;
+        }
     }
     
     return config;

@@ -158,6 +158,46 @@ BOOL isValidUrl(NSString* urlString) {
     return [fmt stringFromTimeInterval:seconds];
 }
 
++ (NSString *)likelyFileExtensionForData:(NSData *)data {
+    uint8_t c;
+    [data getBytes:&c length:1];
+    
+    switch (c) {
+        case 0xFF:
+            
+            return @"jpeg";
+            break;
+        case 0x89:
+            
+            return @"png";
+            break;
+        case 0x47:
+            
+            return @"gif";
+            break;
+        case 0x49:
+        case 0x4D:
+            
+            return @"tiff";
+            break;
+        case 0x25:
+            
+            return @"pdf";
+            break;
+            
+            
+            
+            
+        case 0x46:
+            
+            return @"txt";
+            break;
+        default:
+            return @"txt";
+    }
+    return nil;
+}
+
 #if TARGET_OS_IPHONE && !IS_APP_EXTENSION
 + (void)openStrongboxSettingsAndPermissionsScreen {
     NSString* settings = [NSString stringWithFormat:@"%@&path=LOCATION/%@", UIApplicationOpenSettingsURLString, NSBundle.mainBundle.bundleIdentifier];
@@ -504,6 +544,18 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
         NSLog(@"Exception in scaleImage: [%@]", exception);
         return image;
     } @finally { }
+}
+
++ (void)dismissViewControllerCorrectly:(NSViewController*)vc {
+    if ( vc.presentingViewController ) {
+        [vc.presentingViewController dismissViewController:vc];
+    }
+    else if ( vc.view.window.sheetParent ) {
+        [vc.view.window.sheetParent endSheet:vc.view.window returnCode:NSModalResponseCancel];
+    }
+    else {
+        [vc.view.window close];
+    }
 }
 
 #endif

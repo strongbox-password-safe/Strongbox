@@ -12,6 +12,10 @@ class ProLabel: UILabel {
     override func awakeFromNib() {
         super.awakeFromNib()
 
+        bindUi()
+    }
+
+    func bindUi() {
         clipsToBounds = true
         layer.cornerRadius = 3
 
@@ -21,7 +25,13 @@ class ProLabel: UILabel {
 
         backgroundColor = .systemBlue
 
-        attributedText = NSAttributedString(string: proString,
-                                            attributes: [.font: FontManager.sharedInstance().headlineItalicFont])
+        attributedText = NSAttributedString(string: proString, attributes: [.font: proFont])
+    }
+
+    @objc
+    var proFont: UIFont = FontManager.sharedInstance().headlineItalicFont {
+        didSet {
+            bindUi()
+        }
     }
 }

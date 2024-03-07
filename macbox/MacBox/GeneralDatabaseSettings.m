@@ -51,7 +51,7 @@
     
     [self bindUI];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kSettingsChangedNotification object:nil];
 }
 
 - (void)bindUI {
@@ -83,7 +83,7 @@
     [self bindUI];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:kSettingsChangedNotification object:nil];
     });
 }
 

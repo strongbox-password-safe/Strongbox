@@ -64,8 +64,11 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 #ifdef DEBUG
     
     [[NSUserDefaults standardUserDefaults] setValue:@(NO) forKey:@"_UIConstraintBasedLayoutLogUnsatisfiable"];
+
+    NSLog(@"🚀 Documents Directory: [%@]", StrongboxFilesManager.sharedInstance.documentsDirectory);
+    NSLog(@"🚀 Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
 #endif
-    
+
     [self installTopLevelExceptionHandlers];
     
     
@@ -98,12 +101,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     }
     
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
-        
-#ifdef DEBUG
-    NSLog(@"🚀 Documents Directory: [%@]", StrongboxFilesManager.sharedInstance.documentsDirectory);
-    NSLog(@"🚀 Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
-#endif
-    
+            
 
         
     return YES;
@@ -162,8 +160,6 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         
         
         [StrongboxFilesManager.sharedInstance deleteAllInboxItems];
-         
-        [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
         [StrongboxFilesManager.sharedInstance deleteAllTmpWorkingFiles];
     }
 }
@@ -264,12 +260,34 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
     
     
+    [self startOrStopWiFiSyncServer];
+    
+    
+    
     self.hasDoneInitialActivation = YES;
     
     self.enterBackgroundTime = nil;
 }
 
+- (void)startOrStopWiFiSyncServer {
+#ifndef NO_SFTP_WEBDAV_SP 
+    NSError* error;
+    if (! [WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
+        NSLog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
+    }
+#endif
+}
+
+- (void)stopWiFiSyncServer {
+#ifndef NO_SFTP_WEBDAV_SP 
+    NSError* error;
+    [WiFiSyncServer.shared stopWith:nil]; 
+#endif
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application {
+    [self stopWiFiSyncServer];
+    
     self.appLockSuppressedForBiometricAuth = NO;
     if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
         NSLog(@"AppDelegate::applicationWillResignActive - suppressAppBackgroundTriggers = YES");

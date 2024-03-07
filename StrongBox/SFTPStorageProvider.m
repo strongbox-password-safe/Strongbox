@@ -340,7 +340,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                                                                    options:kNilOptions
                                                                      error:&error];
         
-        SFTPProviderData* foo = [SFTPProviderData fromSerializationDictionary:dictionary];
+        SFTPProviderData * foo = [SFTPProviderData fromSerializationDictionary:dictionary];
         
         return foo;
     }

@@ -68,18 +68,28 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
 
         if case NavigationContext.none = navigationContext {
-            let favourites = database.favourites.sorted { node1, node2 in
-                finderStyleNodeComparator(node1, node2) == .orderedAscending
-            }
 
-            if let favourite = favourites.first {
-                setModelNavigationContextWithViewNode(database, .favourites(favourite.uuid))
-            } else {
-                setModelNavigationContextWithViewNode(database, .special(.allEntries))
-            }
+
+
+
+
+
+
+            setModelNavigationContextWithViewNode(database, .special(.allEntries))
+        }
+
+        if !database.databaseMetadata.hasSetInitialUnlockedFrame {
+            NSLog("🐞 First Launch of Database! Making reasonable size and centering...")
+
+            view.window?.setFrame(NSMakeRect(0, 0, 1250, 750), display: true, animate: false)
+            view.window?.center()
+
+            database.databaseMetadata.hasSetInitialUnlockedFrame = true
         }
 
         loadChildSplitViews()
+
+        
 
         listenToModelUpdateNotifications()
 
@@ -457,7 +467,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
 
     @objc func showAppPreferences() {
-        AppPreferencesWindowController.sharedInstance.showGeneralTab()
+        AppSettingsWindowController.sharedInstance.showGeneralTab()
     }
 
     @objc func showAutoFillPreferences() {
@@ -1016,7 +1026,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let loc6 = NSLocalizedString("nextgen_toolbar_settings_application_preferences_ellipsis", comment: "Application Preferences...")
+        let loc6 = NSLocalizedString("nextgen_toolbar_settings_application_preferences_ellipsis", comment: "Application Settings...")
         menu.addItem(withTitle: loc6, action: #selector(showAppPreferences), keyEquivalent: "")
 
         let segmentedControl = NSSegmentedControl(images: [Icon.preferences.image()], trackingMode: .momentary, target: self, action: nil)

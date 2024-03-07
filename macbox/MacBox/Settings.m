@@ -127,6 +127,8 @@ static NSString* const kWiFiSyncOn = @"wiFiSyncOn";
 static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
 static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
 
+static NSString* const kDisableWiFiSyncClientMode = @"disableWiFiSyncClientMode";
+
 
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
@@ -246,6 +248,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     
     
     [SecretStore.sharedInstance deleteSecureItem:kWiFiSyncPasscodeSSKey];
+
     
     
     
@@ -256,11 +259,19 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
-- (BOOL)wiFiSyncOn {
+- (BOOL)disableWiFiSyncClientMode {
+    return [self getBool:kDisableWiFiSyncClientMode];
+}
+
+- (void)setDisableWiFiSyncClientMode:(BOOL)disableWiFiSyncClientMode {
+    [self setBool:kDisableWiFiSyncClientMode value:disableWiFiSyncClientMode];
+}
+
+- (BOOL)runAsWiFiSyncSourceDevice {
     return [self getBool:kWiFiSyncOn fallback:NO];
 }
 
-- (void)setWiFiSyncOn:(BOOL)wiFiSyncOn {
+- (void)setRunAsWiFiSyncSourceDevice:(BOOL)wiFiSyncOn {
     [self setBool:kWiFiSyncOn value:wiFiSyncOn];
 }
 

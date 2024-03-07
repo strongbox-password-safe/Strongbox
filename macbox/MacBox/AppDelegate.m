@@ -73,11 +73,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 @property NSTimer* timerRefreshOtp;
 @property NSDate* appLaunchTime;
 
-@property BOOL explicitQuitRequest;
 @property BOOL firstActivationDone;
 @property BOOL wasLaunchedAsLoginItem;
 
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
+@property (readonly) BOOL quitsToSystemTrayInsteadOfTerminates;
+@property (readonly) BOOL isQuitFromDockEvent;
 
 @end
 
@@ -155,6 +156,24 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 
     
+}
+
+- (void)startWiFiSyncObservation {
+    if ( !StrongboxProductBundle.supportsWiFiSync || Settings.sharedInstance.disableWiFiSyncClientMode ) {
+        return;
+    }
+    
+    NSLog(@"AppDelegate::startWiFiSyncObservation...");
+    
+    [WiFiSyncBrowser.shared startBrowsing:NO
+                               completion:^(BOOL success) {
+        if ( !success ) {
+            NSLog(@"🔴 Could not start WiFi Browser! error = [%@]", WiFiSyncBrowser.shared.lastError);
+        }
+        else {
+            NSLog(@"🟢 WiFiBrowser Started");
+        }
+    }];
 }
 
 - (void)startOrStopSSHAgent {
@@ -305,8 +324,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onPreferencesChanged:)
-                                                 name:kPreferencesChangedNotification
+                                             selector:@selector(onSettingsChanged:)
+                                                 name:kSettingsChangedNotification
                                                object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotification object:nil];
@@ -320,10 +339,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     
     
-    [NSWorkspace.sharedWorkspace.notificationCenter addObserver:self
-                                                       selector:@selector(onLogoutRestartOrShutdown:)
-                                                           name:NSWorkspaceWillPowerOffNotification
-                                                         object:nil];
+
+
+
+
 }
 
 - (void)cleanupWorkingDirectories {
@@ -503,7 +522,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             
             
             
-            [NSApp activateIgnoringOtherApps:YES];
+
+            [[NSRunningApplication currentApplication] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)]; 
+            
             [NSApp arrangeInFront:nil];
             
             NSLog(@"🚀 AppDelegate::showHideDockIcon: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
@@ -627,7 +648,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         }
     }
     else {
+        NSLog(@"ℹ️ showAndActivateStrongbox - No Special Database Indicated");
+        
         if ( !self.suppressQuickLaunchForNextAppActivation ) {
+            NSLog(@"ℹ️ showAndActivateStrongbox - Quick Launch not suppressed...");
             [dc launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable];
         }
         else {
@@ -638,7 +662,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     [NSApp arrangeInFront:nil];
-    [NSApp activateIgnoringOtherApps:YES];
+
+    
+    [[NSRunningApplication currentApplication] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)]; 
 
     
 
@@ -685,6 +711,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         [self showAndActivateStrongbox:nil];
     }
     
+    
         
         
         
@@ -699,6 +726,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         
     
+    
+    [self startWiFiSyncObservation];
     
     self.suppressQuickLaunchForNextAppActivation = NO; 
 }
@@ -942,8 +971,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 
-- (void)onPreferencesChanged:(NSNotification*)notification {
-    NSLog(@"AppDelegate::Preferences Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
+- (void)onSettingsChanged:(NSNotification*)notification {
+    NSLog(@"AppDelegate::Settings Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
 
     [self initializeClipboardWatchingTask];
     [self showHideSystemStatusBarIcon];
@@ -1053,7 +1082,7 @@ static NSInteger clipboardChangeCount;
     @synchronized (self) {
         if([appCustomPasteboard canReadItemWithDataConformingToTypes:@[kDragAndDropExternalUti]]) {
             [appCustomPasteboard clearContents];
-            NSLog(@"Clearing Custom App Pasteboard!");
+            NSLog(@"Clearing Custom App Clipboard!");
         }
     }
 }
@@ -1061,7 +1090,7 @@ static NSInteger clipboardChangeCount;
 - (IBAction)onFloatOnTopToggle:(id)sender {
     Settings.sharedInstance.floatOnTop = !Settings.sharedInstance.floatOnTop;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kSettingsChangedNotification object:nil];
 }
 
 
@@ -1086,11 +1115,19 @@ static NSInteger clipboardChangeCount;
 }
 
 - (IBAction)onImportFromiCloudCsvFile:(id)sender {
-    [self requestImportFile:[[iCloudImporter alloc] init]];
+    [self requestImportFile:[[iCloudImporter alloc] init] showGenericWarning:YES];
 }
 
 - (IBAction)onImportFromLastPassCsvFile:(id)sender {
-    [self requestImportFile:[[LastPassImporter alloc] init]];
+    [self requestImportFile:[[LastPassImporter alloc] init] showGenericWarning:YES];
+}
+
+- (IBAction)onImportFromEnpassJson:(id)sender {
+    [self requestImportFile:[[EnpassImporter alloc] init] showGenericWarning:YES];
+}
+
+- (IBAction)onImportFromBitwardenJson:(id)sender {
+    [self requestImportFile:[[BitwardenImporter alloc] init] showGenericWarning:YES];
 }
 
 - (IBAction)onImport1Password1Pif:(id)sender {
@@ -1104,7 +1141,7 @@ static NSInteger clipboardChangeCount;
              window:DBManagerPanel.sharedInstance.window
          completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self requestImportFile:[[OnePasswordImporter alloc] init]];
+            [self requestImportFile:[[OnePasswordImporter alloc] init] showGenericWarning:NO];
         });
     }];
 }
@@ -1120,9 +1157,30 @@ static NSInteger clipboardChangeCount;
              window:DBManagerPanel.sharedInstance.window
          completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self requestImportFile:[[OnePassword1PuxImporter alloc] init]];
+            [self requestImportFile:[[OnePassword1PuxImporter alloc] init] showGenericWarning:NO];
         });
     }];
+}
+
+- (void)requestImportFile:(NSObject<Importer>*)importer showGenericWarning:(BOOL)showGenericWarning {
+    if ( showGenericWarning ) {
+        [DBManagerPanel.sharedInstance show]; 
+        
+        NSString* title = NSLocalizedString(@"generic_import_warning_title", @"Import Warning");
+        NSString* msg = NSLocalizedString(@"generic_import_warning_msg", @"The import process may not be perfect and some features may not be available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+        
+        [MacAlerts info:title
+        informativeText:msg
+                 window:DBManagerPanel.sharedInstance.window
+             completion:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self requestImportFile:importer];
+            });
+        }];
+    }
+    else {
+        [self requestImportFile:importer];
+    }
 }
 
 - (void)requestImportFile:(NSObject<Importer>*)importer {
@@ -1249,36 +1307,54 @@ static NSInteger clipboardChangeCount;
     }
 }
 
-- (IBAction)onSystemTrayQuitStrongbox:(id)sender {
-    self.explicitQuitRequest = YES;
-    [NSApplication.sharedApplication terminate:nil];
+- (IBAction)onStrongboxQuit:(id)sender {
+    NSLog(@"✅ onStrongboxQuit...");
+
+    if ( self.quitsToSystemTrayInsteadOfTerminates ) {
+        NSLog(@"✅ onStrongboxQuit => Should we actually? No -> Closing all windows instead");
+        
+        [self quitToSystemTrayInsteadOfTerminate];
+    }
+    else {
+        NSLog(@"✅ onStrongboxQuit... Should we actually? YES terminating process");
+        [NSApplication.sharedApplication terminate:nil];
+    }
 }
 
-- (void)onLogoutRestartOrShutdown:(NSNotification *)notification {
-    NSLog(@"✅ onLogoutRestartOrShutdown...");
+- (BOOL)quitsToSystemTrayInsteadOfTerminates {
+    return Settings.sharedInstance.configuredAsAMenuBarApp && !Settings.sharedInstance.quitTerminatesProcessEvenInSystemTrayMode;
+}
+
+- (void)quitToSystemTrayInsteadOfTerminate {
+    [self closeAllDatabases];
+    
+    [DBManagerPanel.sharedInstance close];
+}
+
+- (BOOL)isQuitFromDockEvent {
     
     
     
     
+    NSAppleEventDescriptor* appleEvent = NSAppleEventManager.sharedAppleEventManager.currentAppleEvent;
+    pid_t senderPID = [[appleEvent attributeDescriptorForKeyword:keySenderPIDAttr] int32Value];
     
+    if ( appleEvent && appleEvent.eventID == kAEQuitApplication && senderPID != 0 ) {
+        NSRunningApplication *sender = [NSRunningApplication runningApplicationWithProcessIdentifier:senderPID];
+        
+        return (sender && [@"com.apple.dock" isEqualToString:sender.bundleIdentifier] );
+    }
     
-    self.explicitQuitRequest = YES;
+    return NO;
 }
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-    BOOL explicit = self.explicitQuitRequest;
-    self.explicitQuitRequest = NO; 
-
-    if ( Settings.sharedInstance.configuredAsAMenuBarApp && !Settings.sharedInstance.quitTerminatesProcessEvenInSystemTrayMode ) {
-        if ( !explicit ) {
-            NSLog(@"✅ applicationShouldTerminate => No - Closing all windows instead");
-
-            [self closeAllDatabases];
-            
-            [DBManagerPanel.sharedInstance close];
-            
-            return NSTerminateCancel;
-        }
+    if ( self.isQuitFromDockEvent && self.quitsToSystemTrayInsteadOfTerminates ) {
+        NSLog(@"✅ Quit from Dock => Should we actually? No -> Closing all windows instead");
+        
+        [self quitToSystemTrayInsteadOfTerminate];
+        
+        return NSTerminateCancel;
     }
         
     [self stopRefreshOtpTimer];
@@ -1337,8 +1413,8 @@ static NSInteger clipboardChangeCount;
     }];
 }
 
-- (IBAction)onAppPreferences:(id)sender {
-    [AppPreferencesWindowController.sharedInstance showGeneralTab];
+- (IBAction)onAppSettings:(id)sender {
+    [AppSettingsWindowController.sharedInstance showGeneralTab];
 }
 
 - (void)clearAsyncUpdateIdsAndEphemeralOfflineFlags {

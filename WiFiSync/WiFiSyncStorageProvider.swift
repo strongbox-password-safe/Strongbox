@@ -7,7 +7,6 @@
 //
 
 import Network
-import UIKit
 
 @objc
 class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
@@ -68,7 +67,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
-        guard let config = WiFiSyncServerConnectionConfig.fromJson(database.fileIdentifier) else {
+        guard let config = getServerConfigFromDatabase(database) else {
             NSLog("🔴 WiFiSyncStorageProvider::pullDatabase - Could not read config for WiFi Sync Server")
             completion(.readResultError, nil, nil, Utils.createNSError("Could not read config for WiFi Sync Server", errorCode: -123))
             return
@@ -89,13 +88,20 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
                     return
                 }
 
+                guard error == nil else {
+                    NSLog("🔴 Error while getting mod date! [%@] - will continue to try pull anyway", String(describing: error))
+                    completion(.readResultError, nil, nil, error ?? Utils.createNSError("Could not read (getModDate failed)", errorCode: -1))
+                    return
+                }
+
                 if let modDate, modDate.isEqualToDateWithinEpsilon(currentMod) {
                     NSLog("🟢 WiFiSyncStorageProvider::pullDatabase - Modified is the same as local - not pulling entire DB")
                     completion(.readResultModifiedIsSameAsLocal, nil, nil, nil)
                 } else {
-                    NSLog("🔴 Error while getting mod date! [%@] - will continue to try pull anyway", String(describing: error))
-
-                    completion(.readResultError, nil, nil, error ?? Utils.createNSError("Could not read (getModDate failed)", errorCode: -1))
+                    readDatabase(databaseId: config.databaseId,
+                                 endpoint: endpoint,
+                                 passcode: config.passcode,
+                                 completion: completion)
                 }
             }
         } else {
@@ -114,7 +120,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
-        guard let config = WiFiSyncServerConnectionConfig.fromJson(database.fileIdentifier) else {
+        guard let config = getServerConfigFromDatabase(database) else {
             NSLog("🔴 Could not read config for WiFi Sync Server")
             completion(.updateResultError, nil, Utils.createNSError("Could not read config for WiFi Sync Server", errorCode: -123))
             return
@@ -160,14 +166,9 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         listWithEndpoint(connectionConfig.endpoint, passcode) { _, databases, error in
             if let databases {
                 
-                let mapped = databases.map {
-                    StorageBrowserItem(name: $0.nickName,
-                                       identifier: $0.uuid,
-                                       folder: false,
-                                       providerData: [
-                                           "databaseId": $0.uuid,
-                                           "filename": $0.filename,
-                                       ])
+
+                let mapped = databases.compactMap { [weak self] database in
+                    self?.mapDatabaseToSbi(connectionConfig.name, database)
                 }
 
                 completion(false, mapped, nil)
@@ -181,10 +182,44 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         }
     }
 
+    func mapDatabaseToSbi(_ serverName: String, _ database: WiFiSyncDatabaseSummary) -> StorageBrowserItem {
+        let sbi = StorageBrowserItem(name: database.nickName,
+                                     identifier: database.uuid,
+                                     folder: false,
+                                     providerData: [
+                                         "databaseId": database.uuid,
+                                         "filename": database.filename,
+                                     ])
+
+        sbi.disabled = databaseAlreadyExists(serverName, database)
+
+        return sbi
+    }
+
+    func databaseAlreadyExists(_ server: String, _ database: WiFiSyncDatabaseSummary) -> Bool {
+        #if os(iOS)
+            let allDatabases = DatabasePreferences.allDatabases
+        #else
+            let allDatabases = MacDatabasePreferences.allDatabases
+        #endif
+
+        let match = allDatabases.first { existing in
+            if existing.storageProvider == .kWiFiSync,
+               let config = getServerConfigFromDatabase(existing)
+            {
+                return database.uuid == config.databaseId && server == config.serverName
+            }
+
+            return false
+        }
+
+        return match != nil
+    }
+
     func listWithEndpoint(_ endpoint: NWEndpoint, _ passcode: String, _ completion: @escaping (Bool, [WiFiSyncDatabaseSummary]?, Error?) -> Void) {
         let connection = WiFiSyncClientConnection(endpoint: endpoint, passcode: passcode)
 
-        connection.listDatabases { databases, error in
+        connection.listDatabases(nil) { databases, error in
             completion(databases != nil, databases, error)
         }
     }
@@ -209,7 +244,9 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
     }
 
     @objc class var wiFiSyncIsPossible: Bool {
-        StrongboxProductBundle.supportsWiFiSync && !AppPreferences.sharedInstance().disableWiFiSync && AppPreferences.sharedInstance().isPro
+        let prefs = CrossPlatformDependencies.defaults().applicationPreferences
+
+        return StrongboxProductBundle.supportsWiFiSync && !prefs.disableWiFiSyncClientMode && prefs.isPro
     }
 
     func readDatabase(databaseId: String, endpoint: NWEndpoint, passcode: String, completion: @escaping StorageProviderReadCompletionBlock) {
@@ -233,55 +270,29 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         }
     }
 
-    func getDatabasePreferences(_ nickName: String, providerData: NSObject) -> METADATA_PTR? {
-        guard let dict = providerData as? [String: String],
-              let databaseId = dict["databaseId"],
-              let filename = dict["filename"],
-              let connectionConfig = explicitConnectionConfig,
-              let passcode = connectionConfig.passcode
-        else {
-            NSLog("🔴 Could not get UUID to Read Database or Explicit server and Passcode not set but READ called?!")
-            return nil
-        }
-
-        let config = WiFiSyncServerConnectionConfig.newConfig(databaseId: databaseId, serverName: connectionConfig.name, passcode: passcode)
-        let json = config.json
-
-        let ret = DatabasePreferences.templateDummy(withNickName: nickName, storageProvider: storageId, fileName: filename, fileIdentifier: json)
-
-        return ret
-    }
-
-    @objc
-    func getWifiSyncServerNameFromDatabaseMetadata(_ database: METADATA_PTR) -> String? {
-        guard let config = WiFiSyncServerConnectionConfig.fromJson(database.fileIdentifier) else {
-            return nil
-        }
-
-        return config.serverName
-    }
-
     func getEndpointForServer(_ config: WiFiSyncServerConnectionConfig) -> NWEndpoint? {
         WiFiSyncBrowser.shared.getEndpoint(config.serverName)
     }
 
     func getModDate(_ database: METADATA_PTR, completion: @escaping StorageProviderGetModDateCompletionBlock) {
-        NSLog("🟢 WiFiSyncStorageProvider::getModDate ENTER")
+
 
         guard WiFiSyncStorageProvider.wiFiSyncIsPossible else {
             completion(true, nil, Utils.createNSError("WiFi Sync is not available. Pro Only, not available on Zero.", errorCode: -1234))
             return
         }
 
-        guard let config = WiFiSyncServerConnectionConfig.fromJson(database.fileIdentifier) else {
+        guard let config = getServerConfigFromDatabase(database) else {
             NSLog("🔴 WiFiSyncStorageProvider::pullDatabase - Could not read config for WiFi Sync Server")
             completion(true, nil, Utils.createNSError("Could not read config for WiFi Sync Server", errorCode: -123))
             return
         }
 
         if let endpoint = getEndpointForServer(config) {
-            listWithEndpoint(endpoint, config.passcode) { success, items, error in
-                if success {
+            let connection = WiFiSyncClientConnection(endpoint: endpoint, passcode: config.passcode)
+
+            connection.listDatabases(config.databaseId) { items, error in
+                if items != nil {
                     guard let items, let database = items.first(where: { database in database.uuid == config.databaseId }) else {
                         NSLog("🔴 WiFiSyncStorageProvider::getModDate - Could not get databases or match database for server!")
                         completion(true, nil, Utils.createNSError("Could not get databases or match database for server!", errorCode: -1))
@@ -297,7 +308,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
                 }
             }
         } else {
-            NSLog("🔴 WiFiSyncStorageProvider::getModDate - Could not get endpoint for server!")
+
             completion(false, nil, nil)
         }
     }
@@ -307,13 +318,89 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func loadIcon(_: NSObject, viewController _: VIEW_CONTROLLER_PTR, completion: @escaping (IMAGE_TYPE_PTR) -> Void) {
-        let baseImage = UIImage(systemName: "externaldrive.fill.badge.wifi")!
+        #if os(iOS)
+            let baseImage = UIImage(systemName: "externaldrive.fill.badge.wifi")!
 
-        if #available(iOS 15.0, *) {
-            let config = UIImage.SymbolConfiguration(paletteColors: [.systemGreen, .systemBlue])
-            completion(baseImage.applyingSymbolConfiguration(config)!)
-        } else {
-            completion(baseImage)
+            if #available(iOS 15.0, *) {
+                let config = UIImage.SymbolConfiguration(paletteColors: [.systemGreen, .systemBlue])
+                completion(baseImage.applyingSymbolConfiguration(config)!)
+            } else {
+                completion(baseImage)
+            }
+        #else
+            let baseImage = NSImage(systemSymbolName: "externaldrive.fill.badge.wifi", accessibilityDescription: nil)!
+
+            if #available(macOS 12.0, *) {
+                let config = NSImage.SymbolConfiguration(paletteColors: [.systemGreen, .systemBlue])
+                completion(baseImage.withSymbolConfiguration(config)!)
+            } else {
+                completion(baseImage)
+            }
+        #endif
+    }
+
+    @objc
+    func getWifiSyncServerNameFromDatabaseMetadata(_ database: METADATA_PTR) -> String? {
+        guard let config = getServerConfigFromDatabase(database) else {
+            return nil
         }
+
+        return config.serverName
+    }
+
+    func getServerConfigFromDatabase(_ metaData: METADATA_PTR) -> WiFiSyncServerConnectionConfig? {
+        #if os(iOS)
+            return WiFiSyncServerConnectionConfig.fromJson(metaData.fileIdentifier)
+        #else
+            guard let storageInfo = metaData.storageInfo else {
+                NSLog("🔴 Could not read storage info Wi-Fi Sync in database.")
+                return nil
+            }
+
+            return WiFiSyncServerConnectionConfig.fromJson(storageInfo)
+        #endif
+    }
+
+    func getDatabasePreferences(_ nickName: String, providerData: NSObject) -> METADATA_PTR? {
+        guard let dict = providerData as? [String: String],
+              let databaseId = dict["databaseId"],
+              let filename = dict["filename"],
+              let connectionConfig = explicitConnectionConfig,
+              let passcode = connectionConfig.passcode
+        else {
+            NSLog("🔴 Could not get UUID to Read Database or Explicit server and Passcode not set but READ called?!")
+            return nil
+        }
+
+        let config = WiFiSyncServerConnectionConfig.newConfig(databaseId: databaseId, serverName: connectionConfig.name, passcode: passcode)
+        let json = config.json
+
+        #if os(iOS)
+            let ret = DatabasePreferences.templateDummy(withNickName: nickName, storageProvider: storageId, fileName: filename, fileIdentifier: json)
+        #else
+            var components = URLComponents()
+
+            components.scheme = kStrongboxWiFiSyncUrlScheme
+            components.path = filename.hasPrefix("/") ? filename : String(format: "/%@", filename)
+
+            guard let url = components.url else {
+                NSLog("🔴 Could not generate URL - WiFi Sync")
+                return nil
+            }
+
+            let ret = MacDatabasePreferences.templateDummy(withNickName: nickName, storageProvider: storageId, fileUrl: url, storageInfo: json)
+
+            let queryItem = URLQueryItem(name: "uuid", value: ret.uuid)
+            components.queryItems = [queryItem] 
+
+            guard let url2 = components.url else {
+                NSLog("🔴 Could not generate URL - WiFi Sync")
+                return nil
+            }
+
+            ret.fileUrl = url2
+        #endif
+
+        return ret
     }
 }

@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSDate* lastHibpOnlineCheck;
 @property (readonly) BOOL showCachedHibpHits;
 
+@property BOOL excludeShortNumericPINCodes;
+
 @end
 
 NS_ASSUME_NONNULL_END

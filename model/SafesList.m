@@ -20,7 +20,6 @@
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
 
 @property (readonly) BOOL lastChangeByOtherComponent;
-@property ConcurrentMutableSet* editingSet; 
 
 @end
 
@@ -44,7 +43,6 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 - (instancetype)init {
     if (self = [super init]) {
         self.dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
-        self.editingSet = ConcurrentMutableSet.mutableSet;
         
         NSMutableArray<SafeMetaData*>* deserialized;
         NSError* error;
@@ -444,28 +442,6 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
     
     return ![nicknamesLowerCase containsObject:nickName.lowercaseString];
-}
-
-
-
-- (BOOL)isEditing:(SafeMetaData *)database {
-    return [self.editingSet containsObject:database.uuid];
-}
-
-- (void)setEditing:(SafeMetaData *)database editing:(BOOL)editing {
-    NSLog(@"SafesList::setEditing: %@ => %hhd", database.nickName, editing);
-    
-    if ( database ) {
-        if ( editing ) {
-            [self.editingSet addObject:database.uuid];
-        }
-        else {
-            [self.editingSet removeObject:database.uuid];
-        }
-    }
-    else {
-        NSLog(@"🔴 nil sent to SafesList setEditing?!");
-    }
 }
 
 @end

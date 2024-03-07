@@ -87,18 +87,22 @@ struct PasscodeEntryView: View {
                     .font(.subheadline)
             }
 
-            SecureInputView("wifi_sync_passcode_noun", text: $passcode)
-                .autocorrectionDisabled()
-                .autocapitalization(.none)
-                .keyboardType(advancedPasscode ? .default : .numberPad)
-                .multilineTextAlignment(.center)
-                .textFieldStyle(.roundedBorder)
-                .textContentType(.password)
-                .font(.largeTitle)
+            #if os(iOS)
+                SecureInputView("wifi_sync_passcode_noun", text: $passcode)
+                    .autocorrectionDisabled()
+                    .autocapitalization(.none)
+                    .keyboardType(advancedPasscode ? .default : .numberPad)
+                    .multilineTextAlignment(.center)
+                    .textFieldStyle(.roundedBorder)
+                    .textContentType(.password)
+                    .font(.largeTitle)
 
-                .padding(.horizontal, 30)
-                .focused()
-                .id(advancedPasscode)
+                    .padding(.horizontal, 30)
+                    .focused()
+                    .id(advancedPasscode)
+            #else
+                SecureInputView("wifi_sync_passcode_noun", text: $passcode)
+            #endif
 
             Button {
                 presentationMode.wrappedValue.dismiss()
@@ -129,7 +133,7 @@ struct PasscodeEntryView: View {
 
             VStack(alignment: .leading, spacing: 20) {
                 Toggle(isOn: $advancedPasscode) {
-                    Text("Advanced Passcode (Alphanumeric)")
+                    Text("advanced_passcode_alphanumeric")
                 }
 
                 VStack(alignment: .leading, spacing: 8) {

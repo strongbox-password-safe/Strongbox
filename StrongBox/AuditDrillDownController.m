@@ -159,7 +159,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"auditDrillDownBasicCellId" forIndexPath:indexPath];
             cell.imageView.image = nil;
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-            cell.textLabel.text = NSLocalizedString(@"audit_drill_down_go_to_database_audit_preferences", @"Database Audit Preferences");
+            cell.textLabel.text = NSLocalizedString(@"audit_drill_down_go_to_database_audit_preferences", @"Database Audit Settings");
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
             return cell;
@@ -246,7 +246,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if (section == kSectionSettingsIdx) {
-        return NSLocalizedString(@"audit_drill_down_section_header_preferences", @"Preferences");
+        return NSLocalizedString(@"audit_drill_down_section_header_preferences", @"Settings");
     }
     else if (section == kSectionBasicIdx) {
         return NSLocalizedString(@"audit_drill_down_section_header_summary", @"Summary");

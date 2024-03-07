@@ -101,6 +101,8 @@ uint32_t getRandomUint32(void);
 + (void)openStrongboxSettingsAndPermissionsScreen;
 #endif
 
++ (NSString *)likelyFileExtensionForData:(NSData *)data;
+
 #if TARGET_OS_IPHONE
 
 UIImage* scaleImage(UIImage* image, CGSize newSize);
@@ -118,6 +120,8 @@ NSImage* scaleImage(NSImage* image, CGSize newSize);
 BOOL checkForScreenRecordingPermissionsOnMac(void);
 
 NSColor* NSColorFromRGB(NSUInteger rgbValue);
+
++ (void)dismissViewControllerCorrectly:(NSViewController*)vc;
 
 #endif
 

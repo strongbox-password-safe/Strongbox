@@ -10,10 +10,6 @@
 #import "Alerts.h"
 #import "AppPreferences.h"
 
-@interface AutoFillNewRecordSettingsController ()
-
-@end
-
 @implementation AutoFillNewRecordSettingsController
 
 + (AutoFillNewRecordSettingsController *)fromStoryboard {

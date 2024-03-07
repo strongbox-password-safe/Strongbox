@@ -506,7 +506,7 @@ class DetailViewController: NSViewController {
             for field in filtered {
                 let concealEmpty = database.concealEmptyProtectedFields
                 let isEmpty = field.value.count == 0
-                let concealable = (isEmpty && concealEmpty) || (!isEmpty && field.concealedInUI)
+                let concealable = field.protected && ((isEmpty && concealEmpty) || (!isEmpty && field.concealedInUI))
 
                 let deref = dereference(field.value, node: node)
 
@@ -1418,7 +1418,7 @@ extension DetailViewController: DocumentViewController {
                 self?.onGenericRefreshNotificationReceived(notification)
             }
 
-        NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: .settingsChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self else { return }
 
             self.refresh()

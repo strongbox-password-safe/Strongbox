@@ -31,7 +31,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)generateWithDefaultConfig;
 - (NSString*)generateEmail;
 - (NSString*)generateRandomWord;
-    
+- (NSString*)getFirstName;
+- (NSString*)changeWordCasing:(PasswordGenerationWordCasing)casing word:(NSString*)word;
+
 - (BOOL)isCommonPassword:(NSString*)password;
 
 #if TARGET_OS_IPHONE

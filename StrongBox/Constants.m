@@ -15,7 +15,7 @@
 NSString* const kDatabasesCollectionLockStateChangedNotification = @"DatabasesCollectionLockStateChangedNotification";
 
 NSString *const kPreferenceGlobalShowShortcutNotification = @"GlobalShowStrongboxHotKey-New";
-NSString *const kPreferencesChangedNotification = @"preferencesChangedNotification";
+NSString *const kSettingsChangedNotification = @"settingsChangedNotification";
 NSString *const kTotpUpdateNotification = @"TotpUpdateNotification";
 NSString* const kProStatusChangedNotification = @"proStatusChangedNotification";
 NSString* const kAutoFillChangedConfigNotification = @"autoFillChangedConfigNotification";

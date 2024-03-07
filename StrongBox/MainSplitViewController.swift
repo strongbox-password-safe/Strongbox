@@ -92,6 +92,10 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
 
         NotificationCenter.default.addObserver(self, selector: #selector(onAutoFillChangedConfig(object:)), name: .autoFillChangedConfig, object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(onWiFiSyncUpdatedWorkingCopy(object:)),
+                                               name: Notification.Name("wiFiSyncServiceNameDidChange"), 
+                                               object: nil)
     }
 
     @objc func onAutoFillChangedConfig(object _: Any?) {
@@ -105,6 +109,14 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
                 self?.sync() 
             }
         }
+    }
+
+    @objc func onWiFiSyncUpdatedWorkingCopy(object _: Any?) {
+        NSLog("🟢 MainSplitViewController::onWiFiSyncUpdatedWorkingCopy - reloading from working copy...")
+
+        
+
+        reloadModelFromWorkingCache()
     }
 
     func splitViewController(_: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {

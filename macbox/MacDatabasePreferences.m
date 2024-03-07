@@ -721,7 +721,16 @@
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.hasSetInitialWindowPosition = hasSetInitialWindowPosition;
     }];
+}
 
+- (BOOL)hasSetInitialUnlockedFrame {
+    return self.metadata.hasSetInitialUnlockedFrame;
+}
+
+- (void)setHasSetInitialUnlockedFrame:(BOOL)hasSetInitialUnlockedFrame {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.hasSetInitialUnlockedFrame = hasSetInitialUnlockedFrame;
+    }];
 }
 
 
@@ -784,6 +793,16 @@
         metadata.likelyFormat = likelyFormat;
     }];
 
+}
+
+- (NSString *)lastKnownEncryptionSettings {
+    return self.metadata.lastKnownEncryptionSettings;
+}
+
+- (void)setLastKnownEncryptionSettings:(NSString *)lastKnownEncryptionSettings {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.lastKnownEncryptionSettings = lastKnownEncryptionSettings;
+    }];
 }
 
 
@@ -1042,7 +1061,7 @@
 
 
 
-- (NSDictionary<NSString*, NSString *> *)debugInfoLines {
+- (NSDictionary<NSString*, NSString *> *)debugInfoLines_old {
     NSMutableDictionary<NSString*, NSString*>* debugLines = NSMutableDictionary.dictionary;
     
     debugLines[@"nickName"] = self.nickName; 
@@ -1115,7 +1134,7 @@
     return debugLines;
 }
 
-- (NSDictionary<NSString*, NSString *> *)debugInfoLines_old {
+- (NSDictionary<NSString*, NSString *> *)debugInfoLines {
     NSMutableDictionary<NSString*, NSString*>* debugLines = NSMutableDictionary.dictionary;
     
     @autoreleasepool {
@@ -1381,12 +1400,14 @@
 
 
 
-- (NSArray<NSString *> *)favourites {
-    return self.metadata.favourites;
+- (NSArray<NSString *> *)legacyFavouritesStore {
+    return self.metadata.legacyFavouritesStore;
 }
 
-- (void)setFavourites:(NSArray<NSString *> *)favourites {
-    
+- (void)setLegacyFavouritesStore:(NSArray<NSString *> *)legacyFavouritesStore {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.legacyFavouritesStore = legacyFavouritesStore;
+    }];
 }
 
 - (NSArray<NSString *> *)autoFillExcludedItems {

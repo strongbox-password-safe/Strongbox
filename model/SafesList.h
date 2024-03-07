@@ -49,11 +49,6 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 
 
-- (BOOL)isEditing:(SafeMetaData*)database;
-- (void)setEditing:(SafeMetaData*)database editing:(BOOL)editing;
-
-
-
 
 
 

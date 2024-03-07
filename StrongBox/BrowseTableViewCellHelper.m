@@ -235,7 +235,7 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
             return self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
             break;
         case kBrowseItemSubtitleEmail:
-            return node.fields.email;
+            return self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.fields.email node:node] : node.fields.email;
             break;
         case kBrowseItemSubtitleModified:
             return node.fields.modified ? node.fields.modified.friendlyDateTimeString : @"";

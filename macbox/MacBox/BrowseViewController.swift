@@ -57,7 +57,7 @@ class BrowseViewController: NSViewController {
 
         adjustHeightConstraintsWithAnimation()
 
-        NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: .settingsChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self else { return }
 
             self.refresh()
@@ -144,7 +144,7 @@ class BrowseViewController: NSViewController {
             tableColumn.identifier = column.identifier
             tableColumn.minWidth = 30
             tableColumn.resizingMask = [.autoresizingMask, .userResizingMask]
-            tableColumn.width = column == .title ? 300 : 200
+            tableColumn.width = column.initialSize
             tableColumn.isHidden = !column.visibleByDefault
             tableColumn.sortDescriptorPrototype = NSSortDescriptor(key: column.rawValue, ascending: true)
 
@@ -172,7 +172,7 @@ class BrowseViewController: NSViewController {
         let databaseId = database.databaseUuid
         outlineView.autosaveName = String(format: "master-outlineview-columns-autosave-for-%@", databaseId)
         outlineView.autosaveTableColumns = true
-
+        outlineView.columnAutoresizingStyle = .lastColumnOnlyAutoresizingStyle
         outlineView.headerView?.menu = columnsMenu
         outlineView.menu?.delegate = windowController
     }
@@ -841,6 +841,13 @@ extension BrowseViewController: DocumentViewController {
         loadDocument()
     }
 
+    fileprivate func setupInitialSortingConfiguration() {
+        if outlineView.sortDescriptors.isEmpty { 
+            NSLog("🐞 BrowseViewController::setupInitialSortingConfiguration - Configuring initial sort mode as none currently set")
+            outlineView.sortDescriptors.append(NSSortDescriptor(key: BrowseViewColumn.modified.rawValue, ascending: false))
+        }
+    }
+
     func loadDocument() {
         if loadedDocument {
             return
@@ -855,6 +862,8 @@ extension BrowseViewController: DocumentViewController {
         loadedDocument = true
 
         setupColumns()
+
+        setupInitialSortingConfiguration()
 
         bindSearchParameters()
 
@@ -871,9 +880,11 @@ extension BrowseViewController: DocumentViewController {
         
 
         refresh() 
+
         outlineView.delegate = self
         outlineView.dataSource = self
-        bindSelectionToModel(selectFirstItemIfSelectionNotFound: false) 
+
+        bindSelectionToModel(selectFirstItemIfSelectionNotFound: true) 
 
         
 
@@ -1237,6 +1248,8 @@ extension BrowseViewController: NSOutlineViewDataSource {
             return loadKeeAgentSshKeyEntries()
         case .passkeys:
             return loadPasskeys()
+        case .allFavourites:
+            return loadAllFavourites()
         }
     }
 
@@ -1282,6 +1295,8 @@ extension BrowseViewController: NSOutlineViewDataSource {
             return getItemsByUuid(report.entriesWithTwoFactorAvailable)
         case .allEntries:
             return getItemsByUuid(report.allEntries)
+        case .excludedItems:
+            return database.excludedFromAuditEntries
         }
     }
 
@@ -1307,6 +1322,10 @@ extension BrowseViewController: NSOutlineViewDataSource {
 
     func loadPasskeys() -> [Node] {
         database.passkeyEntries
+    }
+
+    func loadAllFavourites() -> [Node] {
+        database.favourites
     }
 
     func loadTagChildEntries(_ tag: String) -> [Node] {

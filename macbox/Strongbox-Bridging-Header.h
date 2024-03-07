@@ -100,6 +100,7 @@
 #import "XMLWriter.h"
 
 #import "ConcurrentCircularBuffer.h"
+#import "ConcurrentMutableArray.h"
 
 #import "BrowseOutlineView.h"
 
@@ -110,3 +111,5 @@
 #import "Node+Passkey.h"
 #import "NewEntryDefaultsHelper.h"
 #import "DatabaseMerger.h"
+
+#import "Model.h"

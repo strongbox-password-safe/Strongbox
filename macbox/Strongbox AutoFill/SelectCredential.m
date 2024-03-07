@@ -138,7 +138,7 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 }
 
 - (void)loadItems {
-    self.items = [self.model filterAndSortForBrowse:self.model.allEntries.mutableCopy
+    self.items = [self.model filterAndSortForBrowse:self.model.allSearchableNoneExpiredEntries.mutableCopy
                               includeKeePass1Backup:NO
                                   includeRecycleBin:NO
                                      includeExpired:NO
@@ -283,6 +283,10 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         
         NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
         NSString* user = [self.model dereference:node.fields.username node:node];
+        if ( user.length == 0 ) {
+            user = [self.model.database dereference:node.fields.email node:node]; 
+        }
+        
         NSString* password = [self.model dereference:node.fields.password node:node];
 
         [self dismissAndComplete:NO createNew:NO username:user password:password totp:totp];

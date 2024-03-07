@@ -29,10 +29,10 @@
 
 + (NSArray<HeaderNodeState *> *)defaults {
     return @[   [HeaderNodeState withHeader:kHeaderNodeFavourites expanded:YES],
-                [HeaderNodeState withHeader:kHeaderNodeRegularHierarchy expanded:YES],
+                [HeaderNodeState withHeader:kHeaderNodeSpecial expanded:YES],
                 [HeaderNodeState withHeader:kHeaderNodeTags expanded:YES],
-                [HeaderNodeState withHeader:kHeaderNodeAuditIssues expanded:YES],
-                [HeaderNodeState withHeader:kHeaderNodeSpecial expanded:YES]];
+                [HeaderNodeState withHeader:kHeaderNodeRegularHierarchy expanded:YES],
+                [HeaderNodeState withHeader:kHeaderNodeAuditIssues expanded:YES]];
 }
 
 - (void)encodeWithCoder:(nonnull NSCoder *)coder {

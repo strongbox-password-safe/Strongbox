@@ -18,8 +18,6 @@ extern NSString* const kUpdateNotificationQuickRevealStateChanged;
 
 - (IBAction)onUpgradeToFullVersion:(id)sender;
 
-- (IBAction)onSystemTrayQuitStrongbox:(id)sender;
-
 
 
 - (void)clearClipboardWhereAppropriate;

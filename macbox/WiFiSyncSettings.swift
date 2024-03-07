@@ -67,7 +67,7 @@ class WiFiSyncSettings: NSViewController {
     }
 
     @IBAction func onSwitchToggleOnOff(_: Any) {
-        Settings.sharedInstance().wiFiSyncOn = onOff.state == .on
+        Settings.sharedInstance().runAsWiFiSyncSourceDevice = onOff.state == .on
 
         restartWiFiSyncServerAndBindUI()
     }

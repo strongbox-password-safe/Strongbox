@@ -198,8 +198,10 @@
         cell.textLabel.text = file.name;
         cell.imageView.image = img;
         
-        cell.userInteractionEnabled = self.existing || file.folder;
-        cell.textLabel.enabled = self.existing || file.folder;
+    BOOL enabled = (self.existing || file.folder) && !file.disabled;
+    
+        cell.userInteractionEnabled = enabled;
+        cell.textLabel.enabled = enabled;
         cell.imageView.tintColor = tintColor;
         
         cell.accessoryType = file.folder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;

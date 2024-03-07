@@ -103,7 +103,7 @@ class AuditDrillDown: NSViewController {
 
         guard let node = database.getItemBy(uuid) else { return }
 
-        database.setItemAuditExclusion(node, exclude: exclude)
+        database.setItemAuditExclusion(node, exclude: exclude, isPartOfBatch: false)
 
         checkboxAuditItem.state = database.isExcluded(fromAudit: uuid) ? .off : .on
     }
@@ -132,8 +132,10 @@ extension AuditDrillDown: NSTableViewDelegate {
     func getTitleCell(node: Node) -> NSTableCellView {
         let cell = tableDupes.makeView(withIdentifier: TitleAndIconCell.NibIdentifier, owner: self) as! TitleAndIconCell
 
-        cell.icon.objectValue = getIconForNode(node)
-        cell.title.stringValue = dereference(text: node.title, node: node)
+        cell.setContent(dereference(text: node.title, node: node), iconImage: getIconForNode(node), iconTintColor: .systemBlue)
+
+
+
 
         return cell
     }

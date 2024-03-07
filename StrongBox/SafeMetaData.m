@@ -46,8 +46,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.uuid = [[NSUUID UUID] UUIDString];
         self.failedPinAttempts = 0;
         self.likelyFormat = kFormatUnknown;
-        self.browseViewType = kBrowseViewTypeHierarchy;
-
+        self.browseViewType = kBrowseViewTypeList;
 
         self.browseItemSubtitleField = kBrowseItemSubtitleUsername;
         self.showChildCountOnFolderInBrowse = YES;
@@ -529,6 +528,12 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     else {
         ret.allowPulldownRefreshSyncInOfflineMode = NO;
     }
+    
+    
+    
+    if ( jsonDictionary[@"lastKnownEncryptionSettings"] != nil ) {
+        ret.lastKnownEncryptionSettings = jsonDictionary[@"lastKnownEncryptionSettings"];
+    }
 
     
     
@@ -619,7 +624,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"persistLazyEvenLastSyncErrors" : @(self.persistLazyEvenLastSyncErrors),
         @"showLastViewedEntryOnUnlock" : @(self.showLastViewedEntryOnUnlock),
         @"hideTabBarIfOnlySingleTab" : @(self.hideTabBarIfOnlySingleTab),
-        @"allowPulldownRefreshSyncInOfflineMode" : @(self.allowPulldownRefreshSyncInOfflineMode)
+        @"allowPulldownRefreshSyncInOfflineMode" : @(self.allowPulldownRefreshSyncInOfflineMode),
     }];
     
     if (self.nickName != nil) {
@@ -719,6 +724,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret[@"sortConfigurations"] = dicts;
     }
 
+    if ( self.lastKnownEncryptionSettings ) {
+        ret[@"lastKnownEncryptionSettings"] = self.lastKnownEncryptionSettings;
+    }
+    
     return ret;
 }
 
@@ -767,7 +776,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     }
 }
 
-- (NSArray<NSString *> *)favourites {
+- (NSArray<NSString *> *)legacyFavouritesStore {
     NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];
     
     NSArray<NSString *>* ret = [SecretStore.sharedInstance getSecureObject:key];
@@ -775,11 +784,11 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     return ret ? ret : @[];
 }
 
-- (void)setFavourites:(NSArray<NSString *> *)favourites {
+- (void)setLegacyFavouritesStore:(NSArray<NSString *> *)legacyFavouritesStore {
     NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];
     
-    if(favourites) {
-        [SecretStore.sharedInstance setSecureObject:favourites forIdentifier:key];
+    if(legacyFavouritesStore) {
+        [SecretStore.sharedInstance setSecureObject:legacyFavouritesStore forIdentifier:key];
     }
     else {
         [SecretStore.sharedInstance deleteSecureItem:key];
@@ -921,7 +930,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 - (void)clearKeychainItems {
     self.convenienceMasterPassword = nil;
     self.autoFillConvenienceAutoUnlockPassword = nil;
-    self.favourites = nil;
+    self.legacyFavouritesStore = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;
 }

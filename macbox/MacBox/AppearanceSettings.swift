@@ -51,6 +51,6 @@ class AppearanceSettings: NSViewController {
     }
 
     func notifyChanged() {
-        NotificationCenter.default.post(name: .preferencesChanged, object: nil)
+        NotificationCenter.default.post(name: .settingsChanged, object: nil)
     }
 }

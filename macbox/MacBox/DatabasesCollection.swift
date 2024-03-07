@@ -41,10 +41,10 @@ class DatabasesCollection: NSObject {
     private func listenToEvents() {
         listenToScreenLockEvents()
 
-        NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: .settingsChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self else { return }
 
-            self.onPreferencesChanged()
+            self.onSettingsChanged()
         }
 
         NotificationCenter.default.addObserver(forName: .DatabasesCollection.autoLockAppInBackgroundTimeout, object: nil, queue: nil) { [weak self] _ in
@@ -342,8 +342,8 @@ class DatabasesCollection: NSObject {
 
     
 
-    func onPreferencesChanged() {
-        NSLog("DatabasesCollection::onPreferencesChanged() notification received")
+    func onSettingsChanged() {
+        NSLog("DatabasesCollection::onSettingsChanged() notification received")
 
         
 
@@ -408,7 +408,7 @@ class DatabasesCollection: NSObject {
     }
 
     private func pollForDatabaseRemoteChanges(uuid: String) {
-        
+        DebugLogger.debug(String(format: "pollForDatabaseRemoteChanges: %@", uuid))
 
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
             NSLog("🔴 No such database")
@@ -421,6 +421,7 @@ class DatabasesCollection: NSObject {
         }
 
         pollingInProgressSetC.add(uuid as NSString)
+
         MacSyncManager.sharedInstance().poll(forChanges: prefs) { [weak self] result, changesPresent, error in
             self?.pollingInProgressSetC.remove(uuid as NSString)
 

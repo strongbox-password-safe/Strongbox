@@ -29,6 +29,7 @@ enum Icon {
     case sshKey
     case passkey
     case algorithm
+    case auditExclusion
 
     func image() -> NSImage {
         switch self {
@@ -80,6 +81,8 @@ enum Icon {
             return NSImage(systemSymbolName: "key.fill", accessibilityDescription: nil)!
         case .algorithm:
             return NSImage(systemSymbolName: "function", accessibilityDescription: nil)!
+        case .auditExclusion:
+            return NSImage(systemSymbolName: "shield.slash", accessibilityDescription: nil)!
         }
     }
 }

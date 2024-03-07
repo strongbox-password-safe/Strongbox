@@ -56,7 +56,7 @@ class WiFiSyncOneShotClientConnection {
         switch result {
         case let .success(success):
             let (host, port) = success
-            NSLog("🟢 Resolved service to: \(host) on \(port)")
+
             connect(host: host, port: port)
         case let .failure(failure):
             onError(failure)

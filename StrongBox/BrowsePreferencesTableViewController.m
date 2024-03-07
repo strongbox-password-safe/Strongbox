@@ -68,8 +68,6 @@
 }
 
 - (IBAction)onGenericPreferencesChanged:(id)sender {
-    NSLog(@"Generic Preference Changed: [%@]", sender);
-    
     self.databaseMetaData.hideIconInBrowse = !self.switchShowIcons.on;
     self.databaseMetaData.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
     
@@ -86,9 +84,7 @@
     self.databaseMetaData.showQuickViewNearlyExpired = self.switchShowNearlyExpired.on;
     self.databaseMetaData.showQuickViewFavourites = self.switchShowFavourites.on;
     self.databaseMetaData.showQuickViewExpired = self.switchShowSpecialExpired.on;
-    
-    NSLog(@"Item Details Preferences Changed: [%@]", sender);
-    
+        
     [self bindPreferences];
 
     [self notifyDatabaseViewPreferencesChanged];
@@ -251,7 +247,7 @@
 }
 
 - (void)onChangeBrowseItemSubtitle {
-    NSArray<NSNumber*>* options = self.format != kPasswordSafe ?
+    NSArray<NSNumber*>* options = self.format == kKeePass1 ?
         @[@(kBrowseItemSubtitleNoField),
           @(kBrowseItemSubtitleUsername),
           @(kBrowseItemSubtitlePassword),

@@ -6,8 +6,6 @@
 //  Copyright © 2024 Mark McGuill. All rights reserved.
 //
 
-import UIKit
-
 @objc
 enum DebugLineCategory: Int {
     case debug

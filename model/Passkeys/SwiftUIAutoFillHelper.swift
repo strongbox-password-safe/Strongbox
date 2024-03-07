@@ -224,7 +224,7 @@ class SwiftUIAutoFillHelper: NSObject {
         let rootPath = getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
         sortedPaths.insert(rootPath, at: 0)
 
-        let entries = NSMutableArray(array: model.allEntries)
+        let entries = NSMutableArray(array: model.allSearchableNoneExpiredEntries)
         let sorted = model.filterAndSort(forBrowse: entries, includeGroups: false)
 
         let wizard = PasskeyWizard(title: passkey.relyingPartyId,

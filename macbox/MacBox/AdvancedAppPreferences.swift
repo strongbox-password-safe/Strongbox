@@ -34,7 +34,7 @@ class AdvancedAppPreferences: NSViewController {
 
         bindUI()
 
-        NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: .settingsChanged, object: nil, queue: nil) { [weak self] _ in
             self?.bindUI()
         }
 
@@ -96,7 +96,7 @@ class AdvancedAppPreferences: NSViewController {
     }
 
     func notifyChanged() {
-        NotificationCenter.default.post(name: .preferencesChanged, object: nil)
+        NotificationCenter.default.post(name: .settingsChanged, object: nil)
     }
 
     @IBAction func onFactoryReset(_: Any) {

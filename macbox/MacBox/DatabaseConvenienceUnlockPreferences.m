@@ -84,7 +84,7 @@
     }
     else {
         if ( Settings.sharedInstance.isPro ) {
-            self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Preferences > Security & Privacy)");
+            self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Settings > Touch ID & Password)");
         }
     }
         

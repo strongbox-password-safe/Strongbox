@@ -48,6 +48,8 @@ class AuditConfigurationViewController: NSViewController {
     @IBOutlet var labelOnlineHibpInterval: NSTextField!
     @objc var database: ViewModel!
 
+    @IBOutlet var ignoreShortNumericOnly: NSButton!
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -188,6 +190,8 @@ class AuditConfigurationViewController: NSViewController {
 
         buttonExcludedItems.isEnabled = config.auditInBackground
 
+        ignoreShortNumericOnly.state = config.excludeShortNumericPINCodes ? .on : .off
+
         bindAuditStatusWithProgress()
     }
 
@@ -305,6 +309,8 @@ class AuditConfigurationViewController: NSViewController {
 
         config.checkForSimilarPasswords = checkboxSimilar.state == .on
         config.levenshteinSimilarityThreshold = (Double(sliderSimilar.intValue) / 100.0)
+
+        config.excludeShortNumericPINCodes = ignoreShortNumericOnly.state == .on
 
         
 

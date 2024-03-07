@@ -105,13 +105,15 @@ class WiFiSyncClientConnection {
         connection.connect()
     }
 
-    public func listDatabases(completion: @escaping (([WiFiSyncDatabaseSummary]?, Error?) -> Void)) {
+    public func listDatabases(_ databaseId: String?, completion: @escaping (([WiFiSyncDatabaseSummary]?, Error?) -> Void)) {
         let connection = WiFiSyncOneShotClientConnection(endpoint: endpoint,
                                                          passcode: passcode,
                                                          onConnected: { connection in
-                                                             NSLog("🟢 WiFiSyncClientConnection::listDatabases Connected...")
 
-                                                             guard connection.send(nil, .listDatabasesRequest) else {
+
+                                                             let data = databaseId != nil ? databaseId!.data(using: .utf8) : nil
+
+                                                             guard connection.send(data, .listDatabasesRequest) else {
                                                                  completion(nil, Utils.createNSError("Could not begin send!", errorCode: -1))
                                                                  return
                                                              }

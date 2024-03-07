@@ -332,6 +332,10 @@
     }
     
     NSString* user = [model dereference:node.fields.username node:node];
+    if ( user.length == 0 ) {
+        user = [model.database dereference:node.fields.email node:node]; 
+    }
+    
     password = password ? password : @"";
 
     NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";

@@ -74,6 +74,7 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 - (void)setKeyFile:(NSString*)keyFileBookmark keyFileFileName:(NSString*)keyFileFileName;
 
 @property DatabaseFormat likelyFormat;
+@property NSString* lastKnownEncryptionSettings;
 
 @property (nonatomic) BOOL readOnly;
 @property BrowseViewType browseViewType;
@@ -115,7 +116,7 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property BOOL showQuickViewNearlyExpired;
 @property BOOL showQuickViewExpired;
 
-@property (nullable) NSArray<NSString*>* favourites;
+@property (nullable) NSArray<NSString*>* legacyFavouritesStore;
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;
  

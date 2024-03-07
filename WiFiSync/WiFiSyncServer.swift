@@ -39,6 +39,8 @@ class WiFiSyncServer: NSObject {
     @objc
     static var shared = WiFiSyncServer()
 
+    let settings = CrossPlatformDependencies.defaults().applicationPreferences
+
     @objc var lastError: String? = nil
 
     var connections: ConcurrentMutableSet<WiFiSyncInboundConnection> = .init()
@@ -50,18 +52,19 @@ class WiFiSyncServer: NSObject {
     }
 
     var wiFiSyncIsPossible: Bool {
-        Settings.sharedInstance().isPro && StrongboxProductBundle.supportsWiFiSync
+        settings.isPro && StrongboxProductBundle.supportsWiFiSync
     }
 
     @objc
     func startOrStopWiFiSyncServerAccordingToSettings() throws {
-        if Settings.sharedInstance().wiFiSyncOn, wiFiSyncIsPossible {
-            try WiFiSyncServer.shared.start(name: Settings.sharedInstance().wiFiSyncServiceName, passcode: Settings.sharedInstance().wiFiSyncPasscode)
+        if settings.runAsWiFiSyncSourceDevice, wiFiSyncIsPossible {
+            try WiFiSyncServer.shared.start(name: settings.wiFiSyncServiceName, passcode: settings.wiFiSyncPasscode)
         } else {
             WiFiSyncServer.shared.stop()
         }
     }
 
+    @objc
     func stop(with error: String? = nil) {
         if isRunning {
             listener?.stateUpdateHandler = nil
@@ -82,7 +85,7 @@ class WiFiSyncServer: NSObject {
     func start(name: String? = nil, passcode: String) throws {
         stop()
 
-        if !wiFiSyncIsPossible || !Settings.sharedInstance().wiFiSyncOn {
+        if !wiFiSyncIsPossible || !settings.runAsWiFiSyncSourceDevice {
             NSLog("⚠️ Not starting WiFi Sync Service as not Pro or enabled")
         }
 
@@ -135,7 +138,7 @@ class WiFiSyncServer: NSObject {
     }
 
     func registrationStateChanged(_ change: NWListener.ServiceRegistrationChange) {
-
+        
 
         if case let .add(nWEndpoint) = change {
             if case let NWEndpoint.service(name: name, type: _, domain: _, interface: _) = nWEndpoint {
@@ -147,16 +150,22 @@ class WiFiSyncServer: NSObject {
     
 
     func onNewConnection(_ connection: NWConnection) {
-        let incoming = WiFiSyncInboundConnection(connection: connection) { [weak self] connection, error in
+        #if os(iOS)
+            let managementInterface = IOSWiFiSyncManagementInterface()
+        #else
+            let managementInterface = MacWiFiSyncManagementInterface()
+        #endif
+
+        let incoming = WiFiSyncInboundConnection(connection: connection, managementInterface: managementInterface) { [weak self] connection, error in
             guard let self else { return }
 
             NSLog("onErrorOrClose for connection: [\(String(describing: connection))], Error = [\(String(describing: error))]")
 
-
-
-
-
-
+            
+            
+            
+            
+            
 
             connections.remove(connection)
 
@@ -167,4 +176,6 @@ class WiFiSyncServer: NSObject {
 
         NSLog("newConnection: [\(connections.count()) current connections]")
     }
+
+    
 }

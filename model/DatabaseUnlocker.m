@@ -16,6 +16,7 @@
 #import "StrongboxErrorCodes.h"
 #import "Argon2KdfCipher.h"
 #import "CrossPlatform.h"
+#import "EncryptionSettingsViewModel.h"
 
 #if TARGET_OS_IPHONE
 
@@ -368,7 +369,13 @@
             
             self.database.emptyOrNilPwPreferNilCheckFirst = !self.database.emptyOrNilPwPreferNilCheckFirst;
                         
-            if ( secondCheck.yubiKeyCR != nil ) {
+#if TARGET_OS_IPHONE
+            BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil && self.database.yubiKeyConfig.mode != kVirtual;
+#else
+            BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil; 
+#endif
+            
+            if ( physicalYubiKey ) { 
                 
                 
                 [self dismissSpinner]; 
@@ -431,6 +438,11 @@
         
         
         self.database.likelyFormat = openedSafe.originalFormat;
+        
+        EncryptionSettingsViewModel* enc = [EncryptionSettingsViewModel fromDatabaseModel:openedSafe];
+        
+        self.database.lastKnownEncryptionSettings = enc.debugString; 
+        
         self.database.unlockCount++;
     }
 }

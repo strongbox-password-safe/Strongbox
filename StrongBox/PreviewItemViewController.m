@@ -19,6 +19,9 @@
 @property OTPToken* otpToken;
 @property NSTimer* timerRefreshOtp;
 
+@property Model* model;
+@property Node* item;
+
 @end
 
 @implementation PreviewItemViewController
@@ -30,6 +33,9 @@
 - (instancetype)initForItem:(Node *)item andModel:(Model *)model  {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
+        self.item = item;
+        self.model = model;
+        
         UIImage* icon = [NodeIconHelper getIconForNode:item predefinedIconSet:model.metadata.keePassIconSet format:model.database.originalFormat];
 
         UIImageView *imageView = [[UIImageView alloc] init];
@@ -37,7 +43,7 @@
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         
         UILabel *labelTitle = [[UILabel alloc] init];
-        labelTitle.text = item.title;
+        labelTitle.text = [self maybeDereference:item.title];
         labelTitle.font = FontManager.sharedInstance.title3Font;
         
         UIStackView* stackViewTitle = [[UIStackView alloc] initWithArrangedSubviews:@[imageView, labelTitle]];
@@ -58,8 +64,12 @@
         
         MutableOrderedDictionary<NSString*, NSString*> *orderedFields = [[MutableOrderedDictionary alloc] init];
         
-        if (item.fields.username.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_username", @"Username") andValue:item.fields.username];
-        if (item.fields.email.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_email", @"Email") andValue:item.fields.email];
+        if (item.fields.username.length) {
+            [orderedFields addKey:NSLocalizedString(@"generic_fieldname_username", @"Username") andValue:[self maybeDereference:item.fields.username]];
+        }
+        if (item.fields.email.length) {
+            [orderedFields addKey:NSLocalizedString(@"generic_fieldname_email", @"Email") andValue:[self maybeDereference:item.fields.email]];
+        }
 
         
         
@@ -67,16 +77,20 @@
         for(NSString* key in sortedKeys) {
             if ( ![NodeFields isTotpCustomFieldKey:key] ) {
                 StringValue* sv = item.fields.customFields[key];
-                if ( !sv.protected && sv.value.length ) {
-                    [orderedFields addKey:key andValue:sv.value];
+                NSString* derefed = [self maybeDereference:sv.value];
+                
+                if ( !sv.protected && derefed.length ) {
+                    [orderedFields addKey:key andValue:derefed];
                 }
             }
         }
 
         
         
-        if (item.fields.notes.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_notes", @"Notes") andValue:item.fields.notes];
-
+        if (item.fields.notes.length) {
+            [orderedFields addKey:NSLocalizedString(@"generic_fieldname_notes", @"Notes") andValue:[self maybeDereference:item.fields.notes]];
+        }
+        
         
 
         NSMutableArray<UIView*>* fieldViews = [NSMutableArray array];
@@ -211,6 +225,10 @@
     }];
     
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+}
+
+- (NSString*)maybeDereference:(NSString*)text {
+    return self.model.metadata.viewDereferencedFields ? [self.model.database dereference:text node:self.item] : text;
 }
 
 @end

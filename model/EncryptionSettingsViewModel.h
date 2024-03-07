@@ -59,6 +59,7 @@ typedef NS_ENUM (NSUInteger, InnerStreamAlgorithm) {
 @property (readonly) NSString* encryption;
 @property (readonly) NSString* compressionString;
 @property (readonly) NSString* innerStreamCipher;
+@property (readonly) NSString* debugString;
 
 @property (readonly) BOOL shouldUpgradeToV4;
 @property (readonly) BOOL shouldReduceArgon2Memory;

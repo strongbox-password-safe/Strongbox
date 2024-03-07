@@ -371,8 +371,8 @@
     }
 }
 
-- (IBAction)onQuit:(id)sender {    
-    [NSApplication.sharedApplication sendAction:@selector(onSystemTrayQuitStrongbox:) to:nil from:nil];
+- (IBAction)onQuit:(id)sender {  
+    [NSApplication.sharedApplication terminate:nil];
 }
 
 - (IBAction)onShowPasswordGenerator:(id)sender {
@@ -388,7 +388,7 @@
         self.onShowClicked( nil );
     }
 
-    [AppPreferencesWindowController.sharedInstance showPasswordGenerationTab];
+    [AppSettingsWindowController.sharedInstance showPasswordGenerationTab];
 }
 
 - (IBAction)onShowPreferences:(id)sender {
@@ -396,7 +396,7 @@
         self.onShowClicked( nil );
     }
     
-    [AppPreferencesWindowController.sharedInstance showGeneralTab];
+    [AppSettingsWindowController.sharedInstance showGeneralTab];
 }
 
 @end

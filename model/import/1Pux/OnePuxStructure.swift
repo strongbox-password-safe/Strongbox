@@ -183,12 +183,18 @@ class OnePuxSection: Decodable {
     let fields: [OnePuxSectionField]?
 }
 
+class OnePuxHistoricalPassword: Decodable {
+    let value: String?
+    let time: Int64?
+}
+
 class OnePuxItemDetails: Decodable {
     let notesPlain: String?
     let documentAttributes: OnePuxFileAttachment?
     let loginFields: [OnePuxLoginField]?
     let sections: [OnePuxSection]?
     let password: String? 
+    let passwordHistory: [OnePuxHistoricalPassword]?
 }
 
 class OnePuxItemOverview: Decodable {

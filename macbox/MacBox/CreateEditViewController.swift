@@ -163,11 +163,47 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         
 
-        if !key.isPassphraseProtected || key.validatePassphrase(model.password) {
-            continueAddKeeAgentSshKey(key, filename)
-            return
-        }
+        if key.isPassphraseProtected {
+            var passphrase = model.password
 
+            if !key.validatePassphrase(model.password) {
+                guard let inputPassphrase = requestUserInputSshKeyPassphrase(key) else { return }
+
+                passphrase = inputPassphrase
+            }
+
+            continueAddSshKeyWithRequestToRemovePassphrase(key, passphrase, filename)
+        } else {
+            continueAddKeeAgentSshKey(key, filename)
+        }
+    }
+
+    func continueAddSshKeyWithRequestToRemovePassphrase(_ key: OpenSSHPrivateKey, _ passphrase: String, _ filename: String) {
+        MacAlerts.twoOptions(withCancel: NSLocalizedString("ssh_key_agent_passphrase_perf_problem_prompt_title", comment: "Passphrase Performance Issues"),
+                             informativeText: NSLocalizedString("ssh_key_agent_passphrase_perf_problem_prompt_message", comment: "To avoid performance problems, it is best to store this SSH key without the extra passphrase encryption layer.\nNB: Your SSH key is still securely protected by KeePass encryption.\n\nIs it OK if Strongbox stores this SSH key in an optimized fashion?"),
+                             option1AndDefault: NSLocalizedString("ssh_key_agent_passphrase_perf_problem_prompt_option_yes", comment: "Yes, that's a great idea"),
+                             option2: NSLocalizedString("generic_no_thanks", comment: "No Thanks"),
+                             window: view.window)
+        { [weak self] response in
+            guard let self else { return }
+
+            if response == 0 {
+                guard let data = key.exportFileBlob(passphrase, exportPassphrase: ""),
+                      let newNoPassphraseKey = OpenSSHPrivateKey.fromData(data)
+                else {
+                    MacAlerts.info(NSLocalizedString("ssh_agent_could_not_read_sshkey_file", comment: "Could not read this file. Are you sure it is a valid OpenSSH Private Key file?"),
+                                   window: view.window)
+                    return
+                }
+
+                continueAddKeeAgentSshKey(newNoPassphraseKey, filename)
+            } else if response == 1 {
+                continueAddKeeAgentSshKeyWithPasswordCheck(key, filename, passphrase: passphrase)
+            }
+        }
+    }
+
+    func requestUserInputSshKeyPassphrase(_ key: OpenSSHPrivateKey) -> String? {
         var incorrect = false
 
         while true {
@@ -181,11 +217,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                                defaultValue: "",
                                                allowEmpty: false)
             else {
-                return
+                return nil
             }
 
             if key.validatePassphrase(passphrase) {
-                return continueAddKeeAgentSshKeyWithPasswordCheck(key, filename, passphrase: passphrase)
+                return passphrase
             } else {
                 incorrect = true
             }
@@ -262,11 +298,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     
-
-
-
-
-
+    
+    
+    
+    
+    
 
     
     
@@ -570,9 +606,9 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         let foo = NSMutableAttributedString(string: final, attributes: attributes)
 
-
-
-
+        
+        
+        
         return foo
     }
 
@@ -588,7 +624,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         let node = sortedGroups[idx]
 
-
+        
 
         model.parentGroupUuid = node.uuid
 
@@ -974,13 +1010,15 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     var savedNewItemSoShouldSelectOnDismiss: Bool = false
     func onSaveDone(_ node: Node, dismissAfterSave: Bool) {
-
+        
 
         
 
         if Settings.sharedInstance().autoSave { 
-            DispatchQueue.main.async { [weak self] in 
-                self?.database.document?.save(nil)
+            guard let doc = database.document else { return } 
+
+            DispatchQueue.main.async { 
+                doc.save(nil)
             }
         }
 
@@ -1078,7 +1116,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         } else if textField == tagsField {
             onTagsFieldEdited()
         } else {
-
+            
         }
     }
 
@@ -1413,7 +1451,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func textView(_ textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
-
+        
 
         if textView == textViewNotes {
             if commandSelector == #selector(NSResponder.insertTab(_:)) {
@@ -1430,7 +1468,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func textDidChange(_ notification: Notification) {
         if let textView = notification.object as? NSTextView {
-
+            
 
             guard let newNotes = textView.textStorage?.string else {
                 NSLog("🔴 Problem getting text from textViewNotes")
@@ -1448,7 +1486,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     @objc func skipDummyKludgeAutoFillAvoidanceField(_ sender: Any?) {
         guard let event = view.window?.currentEvent, event.type == .keyDown else { 
-
+            
             return
         }
 
@@ -1457,7 +1495,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         {
             if textViewFound == dummyView {
                 if let textFieldFrom = sender as? NSTextField {
-
+                    
                     if textFieldFrom == textFieldUsername {
                         view.window?.makeFirstResponder(passwordField)
                     } else if textFieldFrom == passwordField {
@@ -1751,11 +1789,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     
 
     func setupTags() {
-
-
-
-
-
+        
+        
+        
+        
+        
         popupButtonTagsSuggestions.menu?.delegate = self
         tagsField.delegate = self
     }
@@ -1797,7 +1835,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         var allowed = tokens
 
-
+        
 
         allowed.removeAll { tag in
             model.tags.contains(tag)
@@ -1808,16 +1846,16 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 model.addTag(newTag)
             }
 
-
+            
             onModelEdited()
         }
 
-
+        
         return allowed
     }
 
     func onTagsFieldEdited() {
-
+        
 
         guard let existingTags = tagsField.objectValue as? [String] else {
             return
@@ -1832,7 +1870,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 model.removeTag(deletedTag)
             }
 
-
+            
 
             onModelEdited()
         }
@@ -1847,7 +1885,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             Utils.getTagsFromTagString(t)
         }
 
-
+        
 
         let fieldTags = Set(splitByDelimter)
 
@@ -2141,11 +2179,34 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             self.onModelEdited()
         }
 
-
-
-
+        
+        
+        
 
         presentAsSheet(vc)
+    }
+
+    func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
+        guard let event = control.window?.currentEvent else {
+            NSLog("🔴 Could not get current event")
+            return false
+        }
+
+        if control == passwordField { 
+            if commandSelector == NSSelectorFromString("noop:") { 
+                if event.modifierFlags.contains(NSEvent.ModifierFlags.command) {
+                    let aChar = event.charactersIgnoringModifiers?.first
+
+                    if aChar == "c" {
+                        ClipboardManager.sharedInstance().copyConcealedString(passwordField.stringValue)
+
+                        return true
+                    }
+                }
+            }
+        }
+
+        return false
     }
 }
 

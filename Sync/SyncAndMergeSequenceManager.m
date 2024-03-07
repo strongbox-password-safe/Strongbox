@@ -123,7 +123,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                           @(kMacFile),
                                           @(kTwoDrive),
                                           @(kGoogleDrive),
-                                          @(kDropbox)];
+                                          @(kDropbox),
+                                          @(kWiFiSync),
+        ];
 #endif
 
         for (NSNumber* providerIdNum in supported) {
@@ -248,25 +250,18 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         return;
     }
     
-    NSDate* localModDate;
-    [self getExistingWorkingCache:databaseUuid modified:&localModDate];
-    if (!localModDate) {
-        NSLog(@"Could not get working copy Mod Date. Cannot test for remote changes.");
-        completion(kSyncAndMergeError, NO, nil);
-        return;
-    }
-    
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
     
-
     [provider getModDate:database completion:^(BOOL storageIsAvailable, NSDate * _Nullable modDate, NSError * _Nullable error) {
+
 
         if ( storageIsAvailable ) { 
             if (!modDate) {
                 completion(kSyncAndMergeError, NO, error);
             }
             else {
-                BOOL changed = ![modDate isEqualToDateWithinEpsilon:localModDate];
+                BOOL changed = ![modDate isEqualToDateWithinEpsilon:database.lastSyncRemoteModDate]; 
+                
                 completion(kSyncAndMergeSuccess, changed, nil);
             }
         }

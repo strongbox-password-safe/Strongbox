@@ -19,6 +19,7 @@ enum NavigationContext: Equatable {
         case nearlyExpiredEntries
         case keeAgentSshKeyEntries
         case passkeys
+        case allFavourites
     }
 
     enum AuditNavigationCategory: Equatable {
@@ -31,6 +32,7 @@ enum NavigationContext: Equatable {
         case lowEntropy
         case twoFactorAvailable
         case allEntries
+        case excludedItems
     }
 
     case none 
@@ -74,6 +76,8 @@ func convertSpecialToOGSpecial(_ special: NavigationContext.SpecialNavigationIte
         return OGNavigationSpecialKeeAgentSshKeyItems
     case .passkeys:
         return OGNavigationSpecialPasskeys
+    case .allFavourites:
+        return OGNavigationSpecialAllFavourites
     }
 }
 
@@ -97,6 +101,8 @@ func convertAuditCategoryToOGCategory(_ category: NavigationContext.AuditNavigat
         return OGNavigationAuditCategoryTwoFactorAvailable
     case .allEntries:
         return OGNavigationAuditCategoryAllEntries
+    case .excludedItems:
+        return OGNavigationAuditCategoryExcludedItems
     }
 }
 
@@ -151,6 +157,8 @@ func getNavContextFromModel(_ database: ViewModel) -> NavigationContext {
             navContext = .auditIssues(.twoFactorAvailable)
         case OGNavigationAuditCategoryAllEntries:
             navContext = .auditIssues(.allEntries)
+        case OGNavigationAuditCategoryExcludedItems:
+            navContext = .auditIssues(.excludedItems)
         default:
             NSLog("🔴 Unknown OG Nav Context")
         }
@@ -170,7 +178,8 @@ func getNavContextFromModel(_ database: ViewModel) -> NavigationContext {
             navContext = .special(.keeAgentSshKeyEntries)
         case OGNavigationSpecialPasskeys:
             navContext = .special(.passkeys)
-
+        case OGNavigationSpecialAllFavourites:
+            navContext = .special(.allFavourites)
         default:
             NSLog("🔴 Unknown OG Nav Context")
         }

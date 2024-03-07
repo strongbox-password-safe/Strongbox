@@ -25,6 +25,7 @@
 #import "PasswordGenerationViewController.h"
 #import "CustomizationManager.h"
 #import <StoreKit/StoreKit.h>
+#import "Strongbox-Swift.h"
 
 @interface AdvancedPreferencesTableViewController ()
 
@@ -50,7 +51,7 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
-@property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAddLegacyTotp;
@@ -79,10 +80,30 @@
 @property (weak, nonatomic) IBOutlet UISwitch *pinCodeHapticFeedback;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellRedeemOfferCode;
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchAppendDateExportFilenames;
+@property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
+@property (weak, nonatomic) IBOutlet UISwitch *switchZipExports;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellZipExports;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellHideExport;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellExportDate;
+
 @property (weak, nonatomic) IBOutlet UISwitch *atomicSftpWrites;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAtomicSftpWrites;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchWiFiSyncSource;
+@property (weak, nonatomic) IBOutlet UILabel *labelPasscode;
+@property (weak, nonatomic) IBOutlet UILabel *labelWiFiSyncServiceName;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellWiFiSyncSwitch;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellWiFiSyncPasscode;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellWiFiSyncServiceName;
+
+@property (weak, nonatomic) IBOutlet UILabel *wiFiSyncLastError;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellWiFiSyncLastError;
+@property (weak, nonatomic) IBOutlet ProLabel *wiFiSyncProLabel;
+@property (weak, nonatomic) IBOutlet UILabel *labelWiFiSyncSwitch;
 
 @end
 
@@ -104,12 +125,22 @@
     
     
     
+    if ( AppPreferences.sharedInstance.disableExport ) { 
+        [self cell:self.cellZipExports setHidden:YES];
+        [self cell:self.cellHideExport setHidden:YES];
+        [self cell:self.cellExportDate setHidden:YES];
+    }
+    
     if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         [self cell:self.cellSftpConnections setHidden:YES];
         [self cell:self.cellWebDAVConnections setHidden:YES];
         [self cell:self.cellDetectIfOffline setHidden:YES];
         [self cell:self.cellDropboxAppFolder setHidden:YES];
         [self cell:self.cellAtomicSftpWrites setHidden:YES];
+        
+        [self cell:self.cellWiFiSyncSwitch setHidden:YES];
+        [self cell:self.cellWiFiSyncPasscode setHidden:YES];
+        [self cell:self.cellWiFiSyncServiceName setHidden:YES];
     }
     
     if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions && AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
@@ -124,9 +155,22 @@
         [self cell:self.cellRedeemOfferCode setHidden:YES];
     }
     
+    [self cell:self.cellWiFiSyncLastError setHidden:YES];
+    
     [self bindPreferences];
     [self bindCloudSessions];
-    [self bindGeneral];
+    [self bindPasswordStrength];
+    [self bindWiFiSyncSource];
+        
+#ifndef NO_SFTP_WEBDAV_SP 
+    __weak AdvancedPreferencesTableViewController* weakSelf = self;
+    [NSNotificationCenter.defaultCenter addObserverForName:NSNotification.wiFiSyncServiceNameDidChange
+                                                    object:nil
+                                                     queue:nil
+                                                usingBlock:^(NSNotification * _Nonnull notification) {
+        [weakSelf bindWiFiSyncSource];
+    }];
+#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -181,7 +225,7 @@
                 AppPreferences.sharedInstance.passwordStrengthConfig = config;
             }
              
-            [self bindGeneral];
+            [self bindPasswordStrength];
         }];
     }
     else if ( cell == self.cellAdversaryStrength ) {
@@ -208,7 +252,41 @@
                 config.adversaryGuessesPerSecond = options[selectedIndex].unsignedIntegerValue;
                 AppPreferences.sharedInstance.passwordStrengthConfig = config;
             }
-            [self bindGeneral];
+            [self bindPasswordStrength];
+        }];
+    }
+    else if ( cell == self.cellWiFiSyncPasscode ) {
+        [Alerts OkCancelWithTextField:self
+                      secureTextField:NO
+                 textFieldPlaceHolder:NSLocalizedString(@"wifi_sync_passcode_noun", @"Passcode")
+                        textFieldText:AppPreferences.sharedInstance.wiFiSyncPasscode
+                                title:NSLocalizedString(@"wifi_sync_passcode_noun", @"Passcode")
+                              message:NSLocalizedString(@"wifi_sync_change_passcode_message", @"Passcode is required on other devices to connect to this device.")
+                           completion:^(NSString *text, BOOL response) {
+            if ( response ) {
+                if ( text.length == 0 ) {
+                    text = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
+                }
+                
+                AppPreferences.sharedInstance.wiFiSyncPasscode = text;
+                
+                [self restartOrStopWiFiSyncSource];
+            }
+        }];
+    }
+    else if ( cell == self.cellWiFiSyncServiceName ) {
+        [Alerts OkCancelWithTextField:self
+                      secureTextField:NO
+                 textFieldPlaceHolder:NSLocalizedString(@"wifi_sync_properties_service_name", @"Service Name")
+                        textFieldText:AppPreferences.sharedInstance.wiFiSyncServiceName
+                                title:NSLocalizedString(@"wifi_sync_properties_service_name", @"Service Name")
+                              message:NSLocalizedString(@"wifi_sync_change_service_name_message", @"")
+                           completion:^(NSString *text, BOOL response) {
+            if ( response ) {
+                AppPreferences.sharedInstance.wiFiSyncServiceName = text;
+                
+                [self restartOrStopWiFiSyncSource];
+            }
         }];
     }
 }
@@ -238,7 +316,8 @@
     AppPreferences.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
     
     AppPreferences.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
-    AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
+
+    
     AppPreferences.sharedInstance.allowThirdPartyKeyboards = self.switchAllowThirdPartyKeyboards.on;
 
     AppPreferences.sharedInstance.showMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
@@ -271,6 +350,9 @@
     AppPreferences.sharedInstance.stripUnusedHistoricalIcons = self.stripHistoricalCustomIconsOnSave.on;
         
     AppPreferences.sharedInstance.appendDateToExportFileName = self.switchAppendDateExportFilenames.on;
+    AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
+    AppPreferences.sharedInstance.zipExports = self.switchZipExports.on;
+
     AppPreferences.sharedInstance.atomicSftpWrite = self.atomicSftpWrites.on;
 
     [self bindPreferences];
@@ -287,7 +369,6 @@
 
     self.switchBackupFiles.on = AppPreferences.sharedInstance.backupFiles;
     self.switchBackupImportedKeyFiles.on = AppPreferences.sharedInstance.backupIncludeImportedKeyFiles;
-    self.switchHideExportOnDatabaseMenu.on = AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu;
     self.switchAllowThirdPartyKeyboards.on = AppPreferences.sharedInstance.allowThirdPartyKeyboards;
     
     self.switchShowMetadataOnDetailsScreen.on = AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
@@ -308,7 +389,10 @@
     self.switchStripUnusedIcons.on = AppPreferences.sharedInstance.stripUnusedIconsOnSave;
     self.stripHistoricalCustomIconsOnSave.on = AppPreferences.sharedInstance.stripUnusedHistoricalIcons;
     
+    self.switchHideExportOnDatabaseMenu.on = AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu;
+    self.switchZipExports.on = AppPreferences.sharedInstance.zipExports;
     self.switchAppendDateExportFilenames.on = AppPreferences.sharedInstance.appendDateToExportFileName;
+    
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
 }
 
@@ -320,10 +404,61 @@
     [self reloadDataAnimated:NO];
 }
 
-- (void)bindGeneral {
+- (void)bindPasswordStrength {
 
     self.labelPasswordStrengthAlgo.text = stringForPasswordStrengthAlgo(AppPreferences.sharedInstance.passwordStrengthConfig.algorithm);
     self.labelAdversary.text = stringForAdversaryStrength(AppPreferences.sharedInstance.passwordStrengthConfig.adversaryGuessesPerSecond);
+}
+
+- (IBAction)onWiFiSyncSourceChanged:(id)sender {
+    AppPreferences.sharedInstance.runAsWiFiSyncSourceDevice = self.switchWiFiSyncSource.on;
+    
+    [self restartOrStopWiFiSyncSource];
+}
+
+- (void)restartOrStopWiFiSyncSource {
+#ifndef NO_SFTP_WEBDAV_SP 
+    NSError* error;
+    
+    if ( ![WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
+        NSLog(@"🔴 Error stopping/starting Wi-Fi Sync Source %@", error);
+        
+        [Alerts error:self error:error];
+    }
+    
+    [self bindWiFiSyncSource];
+#endif
+}
+
+- (void)bindWiFiSyncSource {
+    BOOL isPro = AppPreferences.sharedInstance.isPro;
+    BOOL isOn = AppPreferences.sharedInstance.runAsWiFiSyncSourceDevice && isPro;
+    
+    self.switchWiFiSyncSource.on = isOn;
+    self.switchWiFiSyncSource.enabled = isPro;
+    self.labelWiFiSyncSwitch.enabled = isPro;
+    
+    self.wiFiSyncProLabel.proFont = FontManager.sharedInstance.caption2Font;
+    self.wiFiSyncProLabel.hidden = isPro;
+
+#ifndef NO_SFTP_WEBDAV_SP 
+    self.wiFiSyncLastError.text = WiFiSyncServer.shared.lastError;
+
+    NSString* serviceName = WiFiSyncServer.shared.lastRegisteredServiceName.length != 0 ? WiFiSyncServer.shared.lastRegisteredServiceName : (AppPreferences.sharedInstance.wiFiSyncServiceName.length != 0 && !isOn ? AppPreferences.sharedInstance.wiFiSyncServiceName : NSLocalizedString(@"generic_loading", @"Loading..."));
+    
+    self.labelWiFiSyncServiceName.text = serviceName;
+    
+    self.labelWiFiSyncServiceName.enabled = WiFiSyncServer.shared.lastRegisteredServiceName.length != 0 || (AppPreferences.sharedInstance.wiFiSyncServiceName.length != 0 && !isOn);
+
+    [self cell:self.cellWiFiSyncLastError setHidden:WiFiSyncServer.shared.lastError == nil];
+#endif
+
+    self.labelPasscode.text = AppPreferences.sharedInstance.wiFiSyncPasscode;
+    
+    [self cell:self.cellWiFiSyncPasscode setHidden:!isOn];
+    [self cell:self.cellWiFiSyncServiceName setHidden:!isOn];
+
+    [self reloadDataAnimated:YES];
 }
 
 - (void)promptForInteger:(NSString*)title

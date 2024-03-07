@@ -146,7 +146,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL databasesAreAlwaysReadOnly;
 @property BOOL disableExport;
 @property BOOL disablePrinting;
-@property BOOL disableWiFiSync;
+@property BOOL disableWiFiSyncClientMode;
 @property BOOL disableFavIconFeature;
 @property BOOL disableNetworkBasedFeatures; 
 
@@ -193,6 +193,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* databasesSerializationError;
 
 @property BOOL wiFiSyncHasRequestedNetworkPermissions;
+
+@property BOOL zipExports;
+
+@property BOOL runAsWiFiSyncSourceDevice;
+@property (nullable) NSString* wiFiSyncServiceName;
+@property NSString* wiFiSyncPasscode;
 
 @end
 

@@ -29,11 +29,12 @@ NS_ASSUME_NONNULL_BEGIN
                          urlSet:(NSCountedSet<NSString*> *)urlSet
               customFieldKeySet:(NSCountedSet<NSString*> *)customFieldKeySet
                 entryTotalCount:(NSInteger)entryTotalCount
-                groupTotalCount:(NSInteger)groupTotalCount;
-;
+                groupTotalCount:(NSInteger)groupTotalCount
+              excludedFromAudit:(NSSet<NSUUID*>*)excludedFromAudit;
 
 @property (readonly) NSDictionary<NSUUID*, Node*>* uuidMap;
 @property (readonly) NSSet<NSUUID*> *withExpiryDates;
+@property (readonly) NSSet<NSUUID*> *excludedFromAudit;
 @property (readonly) NSSet<NSUUID*> *withAttachments;
 @property (readonly) NSSet<NSUUID*> *withKeeAgentSshKeys;
 @property (readonly) NSSet<NSUUID*> *withPasskeys;

@@ -56,7 +56,7 @@
 }
 
 - (void)refreshItems {
-    self.items = [self.model getExcludedAuditItems];
+    self.items = self.model.excludedFromAuditItems;
 
     [self.tableView reloadData];
 }

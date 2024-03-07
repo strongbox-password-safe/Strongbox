@@ -62,17 +62,6 @@
     }
 }
 
-- (void)backgroundSyncAllAutoFillExit {
-    for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
-        
-        
-        
-        if ( database.storageProvider != kSFTP ) { 
-            [self backgroundSyncDatabase:database];
-        }
-    }
-}
-
 - (void)backgroundSyncLocalDeviceDatabasesOnly {
     for (DatabasePreferences* database in DatabasePreferences.allDatabases) {
         if (database.storageProvider == kLocalDevice) {
@@ -107,7 +96,9 @@
     }];
 }
 
-- (void)sync:(DatabasePreferences *)database interactiveVC:(UIViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
+- (void)sync:(DatabasePreferences *)database 
+interactiveVC:(UIViewController *)interactiveVC
+         key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.interactiveVC = interactiveVC;
@@ -173,6 +164,12 @@
     return [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:database.uuid];
 }
 
+- (BOOL)syncInProgressForDatabase:(NSString*)databaseId {
+    SyncStatus *status = [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:databaseId];
+    
+    return status.state == kSyncOperationStateInProgress;
+}
+
 
 
 - (NSString *)getPrimaryStorageDisplayName:(DatabasePreferences *)database {
@@ -225,7 +222,6 @@
     
     dispatch_resume(self.wcSource);
 }
-
 
 - (void)startMonitoringDocumentsDirectory {
     NSString * homeDirectory = StrongboxFilesManager.sharedInstance.documentsDirectory.path;

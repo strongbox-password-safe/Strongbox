@@ -63,6 +63,7 @@
 #import "EncryptionPreferencesViewController.h"
 
 #import "Strongbox-Swift.h"
+#import "ExportHelper.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -372,7 +373,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [leftBarButtons addObject:self.closeBarButton];
     }
 
-    UIImage* image = [UIImage systemImageNamed:@"slider.horizontal.3"];
+    UIImage* image = [UIImage systemImageNamed:@"gear"];
     self.preferencesBarButton = [[UIBarButtonItem alloc] initWithImage:image menu:nil];
 
     [leftBarButtons addObject:self.preferencesBarButton];
@@ -380,7 +381,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
     [self.navigationItem.backBarButtonItem setTitle:@""];
     
-    [self refreshPreferencesMenu];
+    [self refreshSettingsMenu];
         
     self.navigationItem.leftBarButtonItems = leftBarButtons;
 }
@@ -498,7 +499,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)refreshButtonDropdownMenus {
     [self refreshMoreMenu];
     [self refreshSortMenu];
-    [self refreshPreferencesMenu];
+    [self refreshSettingsMenu];
 }
 
 - (void)refreshMoreMenu {
@@ -614,9 +615,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.moreiOS14Button.menu = menu;
 }
 
-- (void)refreshPreferencesMenu {
+- (void)refreshSettingsMenu {
     __weak BrowseSafeView* weakSelf = self;
-        
+    BOOL ro = self.viewModel.isReadOnly;
+    
     NSMutableArray<UIMenuElement*>* ma1 = [NSMutableArray array];
     
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_start_with_search", @"Start with Search") systemImage:@"magnifyingglass" enabled:YES checked:self.viewModel.metadata.immediateSearchOnBrowse handler:^(__kindof UIAction * _Nonnull action) { [weakSelf toggleStartWithSearch]; }]];
@@ -640,7 +642,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
     
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")
-                                  systemImage:@"list.dash"
+                                  systemImage:@"slider.horizontal.3"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToCustomizeView" sender:nil];
     }]];
@@ -688,6 +690,13 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [weakSelf showEncryptionSettings];
     }]];
 
+    if ( !ro ) {
+        [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_set_master_credentials", @"Set Master Credentials")
+                                      systemImage:@"ellipsis.rectangle"
+                                          enabled:YES
+                                          handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf performSegueWithIdentifier:@"segueToChangeMasterCredentials" sender:nil]; }]];
+    }
+    
     UIMenu* menu2 = [UIMenu menuWithTitle:@""
                                     image:nil
                                identifier:nil
@@ -800,55 +809,25 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (IBAction)onExportDatabase:(id)sender {
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseUuid];
-    if (!localCopyUrl) {
-        [Alerts error:self error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
-        return;
-    }
-    
-    NSError* err;
-    NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
-    if (err) {
-        [Alerts error:self error:err];
-        return;
-    }
-
-    [self onShareWithData:data];
+    [self onShare];
 }
 
-- (void)onShareWithData:(NSData*)data {
-    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? self.viewModel.metadata.exportFilename : self.viewModel.metadata.fileName;
-
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    
-    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
-    
-    NSError* err;
-    [data writeToFile:f options:kNilOptions error:&err];
-    
-    if (err) {
-        [Alerts error:self error:err];
+- (void)onShare {
+    DatabasePreferences* database = self.viewModel.metadata;
+    NSError* error;
+    NSURL* url = [ExportHelper getExportFile:database error:&error];
+    if ( !url || error ) {
+        [Alerts error:self error:error];
         return;
     }
-    
-    NSURL* url = [NSURL fileURLWithPath:f];
+
     NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
-    
-    
     activityViewController.popoverPresentationController.barButtonItem = self.moreiOS14Button;
-    
-    
-    
-    
-    
+        
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-        NSError *errorBlock;
-        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
-            NSLog(@"error deleting file %@", errorBlock);
-            return;
-        }
+        [ExportHelper cleanupExportFiles:url];
     }];
     
     [self presentViewController:activityViewController animated:YES completion:nil];
@@ -1865,7 +1844,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     
-    if ( [DatabasePreferences isEditing:self.viewModel.metadata] ) {
+    if ( [AppModel.shared isEditing:self.viewModel.databaseUuid] ) {
         [Alerts yesNo:self
                 title:NSLocalizedString(@"item_details_vc_discard_changes", @"Discard Changes?")
               message:NSLocalizedString(@"item_details_vc_are_you_sure_discard_changes", @"Are you sure you want to discard all your changes?")
@@ -2808,13 +2787,18 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
 
     if (!self.viewModel.isReadOnly) {
-        if (!item.isGroup) {
-            if ( self.viewModel.metadata.autoFillEnabled ) {
-                [ma addObject:[self getContextualMenuExcludeFromAutoFillAction:indexPath item:item]];
+        if ( !item.isGroup ) {
+            if ( item.isSearchable ) {
+                if ( self.viewModel.metadata.autoFillEnabled ) {
+                    [ma addObject:[self getContextualMenuExcludeFromAutoFillAction:indexPath item:item]];
+                }
+                
+                if ( self.viewModel.metadata.auditConfig.auditInBackground ) {
+                    [ma addObject:[self getContextualMenuExcludeFromAuditAction:indexPath item:item]];
+                }
             }
-            
-            if ( self.viewModel.metadata.auditConfig.auditInBackground ) {
-                [ma addObject:[self getContextualMenuExcludeFromAuditAction:indexPath item:item]];
+            else {
+                [ma addObject:[self getContextualMenuDisabledInfoItem:indexPath item:item text:NSLocalizedString( @"item_is_not_searchable", @"Item is not searchable")]];
             }
         }
     }
@@ -3050,6 +3034,19 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                               handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf toggleAuditExclusion:item];
     }];
+}
+
+- (UIAction*)getContextualMenuDisabledInfoItem:(NSIndexPath*)indexPath item:(Node*)item text:(NSString*)text {
+
+    
+    return [ContextMenuHelper getItem:text
+                          systemImage:@"info.circle"
+                               colour:UIColor.secondaryLabelColor
+                                large:NO
+                          destructive:NO
+                              enabled:NO
+                              checked:NO
+                              handler:^(__kindof UIAction * _Nonnull action) { }];
 }
 
 - (UIAction*)getContextualMenuAuditSettingsAction:(NSIndexPath*)indexPath item:(Node*)item {
@@ -3679,11 +3676,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         return obj.uuid;
     }].set;
 
-    NSSet<NSUUID*>* destIds = [destinationModel.allItems map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+    NSArray<Node*>* allItems = destinationModel.database.effectiveRootGroup.allChildren;
+    
+    NSSet<NSUUID*>* destIds = [allItems map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;
     }].set;
     
-    NSMutableSet *intersection = srcIds.mutableCopy;
+    NSMutableSet *intersection = srcIds.mutableCopy;    
     [intersection intersectSet:destIds];
     
     return intersection;

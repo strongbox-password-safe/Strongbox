@@ -19,7 +19,7 @@ extension NWParameters {
 
         self.init(tls: NWParameters.tlsOptions(passcode: passcode), tcp: tcpOptions)
 
-        includePeerToPeer = true
+        includePeerToPeer = false
 
         let options = NWProtocolFramer.Options(definition: WifiSyncProtocol.definition)
 

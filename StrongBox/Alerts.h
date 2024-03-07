@@ -153,6 +153,14 @@
 - (void)OkCancelWithPasswordNonEmpty:(VIEW_CONTROLLER_PTR)viewController
                           completion:(void (^) (NSString *password, BOOL response))completion;
 
++ (void)OkCancelWithTextField:(UIViewController *)viewController
+              secureTextField:(BOOL)secureTextField
+         textFieldPlaceHolder:(NSString *)textFieldPlaceHolder
+                textFieldText:(NSString *)textFieldText
+                        title:(NSString *)title
+                      message:(NSString *)message
+                   completion:(void (^) (NSString *password, BOOL response))completion;
+
 #if TARGET_OS_IPHONE
 
 + (void)actionSheet:(VIEW_CONTROLLER_PTR)viewController

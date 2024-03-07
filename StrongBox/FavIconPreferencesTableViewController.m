@@ -73,8 +73,8 @@
     }
     else {
         [Alerts warn:self
-               title:NSLocalizedString(@"favicon_invalid_preferences_alert_title", @"Invalid FavIcon Preferences")
-             message:NSLocalizedString(@"favicon_invalid_preferences_alert_message", @"This set of preferences will not produce valid FavIcon results.")];
+               title:NSLocalizedString(@"favicon_invalid_preferences_alert_title", @"Invalid FavIcon Settings")
+             message:NSLocalizedString(@"favicon_invalid_preferences_alert_message", @"se settings will not produce valid FavIcon results.")];
     }
     
     [self bindUi];

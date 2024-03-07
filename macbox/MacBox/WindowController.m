@@ -161,6 +161,16 @@ static NSString* getFreeTrialSuffix(void) {
         path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
     }
 #endif
+    
+#ifndef IS_APP_EXTENSION
+    else if ( metadata.storageProvider == kWiFiSync ) {
+        NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
+        
+        if ( name ) {
+            path = [NSString stringWithFormat:@"%@ on '%@' - %@", metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ]; 
+        }
+    }
+#endif
     else {
         path = @"🔴 RUH ROH! getStorageLocationSubtitle";
     }
@@ -195,11 +205,11 @@ static NSString* getFreeTrialSuffix(void) {
                 });
             }
             else {
-                NSLog(@"Unknown Content View Controller in Set Document: [%@]", self.contentViewController.class);
+                NSLog(@"🔴 Unknown Content View Controller in Set Document: [%@]", self.contentViewController.class);
             }
         }
         else {
-            NSLog(@"WARNWARN: No Content View Controller");
+            NSLog(@"🔴 WARNWARN: No Content View Controller");
         }
         
         
@@ -225,7 +235,6 @@ static NSString* getFreeTrialSuffix(void) {
     
     [self bindScreenCaptureAllowed];
     
-    CGRect oldFrame = self.contentViewController.view.frame;
     NSViewController* vc;
     
     if ( self.databaseIsLocked ) {
@@ -239,7 +248,8 @@ static NSString* getFreeTrialSuffix(void) {
     
     
     
-    [vc.view setFrame:oldFrame];
+    [vc.view setFrame:self.contentViewController.view.frame];
+    
     self.contentViewController = vc;
     if ( [self.contentViewController respondsToSelector:@selector(onDocumentLoaded)]) {
         [self.contentViewController performSelector:@selector(onDocumentLoaded)];
@@ -358,7 +368,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
-    
+
     
     
     
@@ -538,21 +548,28 @@ static NSString* getFreeTrialSuffix(void) {
                 }
             }
             else if ( theAction == @selector(onToggleExclusionFromAudit:)) {
-                BOOL excluded = [self.viewModel isExcludedFromAudit:singleSelectedItem.uuid];
-                
-                menuItem.state = excluded ? NSControlStateValueOff : NSControlStateValueOn;
-                
-                return singleSelectedItem != nil && !singleSelectedItem.isGroup;
-            }
-            else if ( theAction == @selector(onToggleExclusionFromAutoFill:)) {
-                BOOL excluded = [self.viewModel isExcludedFromAutoFill:singleSelectedItem.uuid];
-                
-                if ( singleSelectedItem != nil && !singleSelectedItem.isGroup ) {
-                    menuItem.state = excluded ? NSControlStateValueOff : NSControlStateValueOn;
-                    return YES;
+                if ( items.count > 0 ) {
+                    BOOL excluded = [self.viewModel isExcludedFromAudit:items.firstObject.uuid];
+                    
+                    menuItem.state = NSControlStateValueOff;
+                    menuItem.title = excluded ? NSLocalizedString(@"action_include_items_in_audit_verb", @"Include in Audit") : NSLocalizedString(@"action_exclude_items_from_audit_verb", @"Exclude from Audit");
+                    
+                    return items.count > 0 && !itemsContainGroup;
                 }
                 else {
+                    return NO;
+                }
+            }
+            else if ( theAction == @selector(onToggleExclusionFromAutoFill:)) {
+                if ( items.count > 0 ) {
+                    BOOL excluded = [self.viewModel isExcludedFromAutoFill:items.firstObject.uuid];
+                    
                     menuItem.state = NSControlStateValueOff;
+                    menuItem.title = excluded ? NSLocalizedString(@"action_suggest_items_in_autofill_verb", @"Suggest in AutoFill") : NSLocalizedString(@"action_do_not_suggest_items_in_autofill_verb", @"Do not suggest in AutoFill");
+                    
+                    return items.count > 0 && !itemsContainGroup;
+                }
+                else {
                     return NO;
                 }
             }
@@ -1102,20 +1119,24 @@ static NSString* getFreeTrialSuffix(void) {
 - (IBAction)onToggleExclusionFromAudit:(id)sender {
     NSLog(@"onToggleExclusionFromAudit: [%@]", sender);
     
-    Node* item = [self getSingleSelectedItem];
+    NSArray<Node*>* items = [self getSelectedItems];
     
-    if ( item ) {
-        [self.viewModel setItemAuditExclusion:item exclude:![self.viewModel isExcludedFromAudit:item.uuid]];
+    if ( items && items.count ) {
+        BOOL exclude = ![self.viewModel isExcludedFromAudit:items.firstObject.uuid]; 
+        
+        [self.viewModel batchExcludeItemsFromAudit:items exclude:exclude];
     }
 }
 
 - (IBAction)onToggleExclusionFromAutoFill:(id)sender {
     NSLog(@"onToggleExclusionFromAutoFill: [%@]", sender);
     
-    Node* item = [self getSingleSelectedItem];
+    NSArray<Node*>* items = [self getSelectedItems];
     
-    if ( item ) {
-        [self.viewModel toggleAutoFillExclusion:item.uuid];
+    if ( items && items.count ) {
+        BOOL exclude = ![self.viewModel isExcludedFromAutoFill:items.firstObject.uuid]; 
+        
+        [self.viewModel batchExcludeItemsFromAutoFill:items exclude:exclude];
     }
 }
 
@@ -1222,7 +1243,7 @@ static NSString* getFreeTrialSuffix(void) {
     
     if ( !self.databaseIsLocked ) { 
         
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSettingsChanged:) name:kSettingsChangedNotification object:nil];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(onDatabaseModelPreferencesChanged:) name:kModelUpdateNotificationDatabasePreferenceChanged object:nil];
@@ -1235,8 +1256,8 @@ static NSString* getFreeTrialSuffix(void) {
                                              selector:@selector(onDatabasePreferencesChanged:) name:kDatabasesCollectionLockStateChangedNotification object:nil];
 }
 
-- (void)onPreferencesChanged:(NSNotification*)notification {
-    NSLog(@"WindowController::onPreferencesChanged");
+- (void)onSettingsChanged:(NSNotification*)notification {
+    NSLog(@"WindowController::onSettingsChanged");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self bindFloatWindowOnTop];

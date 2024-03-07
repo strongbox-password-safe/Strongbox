@@ -31,7 +31,8 @@
         NSLog(@"SCOTUS Edition... customizing...");
         
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
-        AppPreferences.sharedInstance.disableWiFiSync = YES;
+        AppPreferences.sharedInstance.disableWiFiSyncClientMode = YES;
+        
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = YES;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
@@ -43,14 +44,14 @@
         NSLog(@"Graphene Edition... customizing...");
         
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
-        AppPreferences.sharedInstance.disableWiFiSync = YES;
+        AppPreferences.sharedInstance.disableWiFiSyncClientMode = YES;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
     }
     else {
         AppPreferences.sharedInstance.disableFavIconFeature = NO;
-        AppPreferences.sharedInstance.disableWiFiSync = NO;
+        AppPreferences.sharedInstance.disableWiFiSyncClientMode = NO;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
         AppPreferences.sharedInstance.disableNetworkBasedFeatures = NO;
         AppPreferences.sharedInstance.disableThirdPartyStorageOptions = NO;

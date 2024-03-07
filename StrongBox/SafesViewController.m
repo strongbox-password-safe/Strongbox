@@ -89,7 +89,7 @@
 #import "NSString+Extensions.h"
 #import "SafesList.h"
 #import "VirtualYubiKeys.h"
-#import "Strongbox-Swift.h"
+#import "ExportHelper.h"
 
 static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUpdated";
 static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdated";
@@ -106,8 +106,6 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 @property NSURL* enqueuedImportUrl;
 @property BOOL enqueuedImportCanOpenInPlace;
 
-@property (nonatomic, strong) NSDate *unlockedDatabaseWentIntoBackgroundAt;
-@property DatabasePreferences* unlockedDatabase; 
 @property BOOL appLockSuppressedForBiometricAuth;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonDice;
@@ -118,6 +116,8 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 @property (nullable) NSString* overrideQuickLaunchWithAppShortcutQuickLaunchUuid;
 
 @property NSArray<DebugLine*> *debugLines;
+
+@property (nonatomic, strong) NSDate *unlockedDatabaseWentIntoBackgroundAt;
 
 @end
 
@@ -256,7 +256,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)internalRefresh {
-    NSLog(@"SafesViewController::internalRefresh");
+
     
     self.debugLines = [DebugLogger.snapshot reverseObjectEnumerator].allObjects;
     
@@ -312,7 +312,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 - (void)customizeUI {
     [self customizeAddDatabaseButton];
     
-    [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_preferences", @"Preferences")];
+    [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_settings", @"Settings")];
     [self.buttonCustomizeView setAccessibilityLabel:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")];
     [self.buttonAddSafe setAccessibilityLabel:NSLocalizedString(@"casg_add_action", @"Add")];
     
@@ -369,6 +369,15 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         [weakSelf onImport1Password1Pux];
     }];
     
+    UIMenuElement* importEnpass = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_enpass_json", @"Enpass (JSON)")
+                                                 handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportEnpass];
+    }];
+    UIMenuElement* importBitwarden = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_bitwarden_json", @"Bitwarden (JSON)")
+                                                 handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportBitwarden];
+    }];
+    
     UIMenuElement* importLastPass = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_lastpass", @"LastPass (CSV)")
                                                        handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImportLastPass];
@@ -399,7 +408,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
                                      image:[UIImage systemImageNamed:@"square.and.arrow.down"]
                                 identifier:nil
                                    options:UIMenuOptionsDisplayInline
-                                  children:@[import1P1Pux, import1P, importLastPass, importiCloud, importCsv]];
+                                  children:@[import1P1Pux, import1P, importBitwarden, importEnpass, importLastPass, importiCloud, importCsv]];
     
     UIMenu* advanced = [UIMenu menuWithTitle:NSLocalizedString(@"generic_advanced_noun", @"Advanced")
                                      image:[UIImage systemImageNamed:@"gearshape.2.fill"]
@@ -521,7 +530,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)startWiFiSyncObservation {
-    if ( !StrongboxProductBundle.supportsWiFiSync || AppPreferences.sharedInstance.disableWiFiSync ) {
+    if ( !StrongboxProductBundle.supportsWiFiSync || AppPreferences.sharedInstance.disableWiFiSyncClientMode ) {
         return;
     }
     
@@ -541,12 +550,11 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
             NSLog(@"🟢 WiFiBrowser Started");
         }
     }];
-    
 }
 
 - (void)notifyUnlockedDatabaseAutoFillChangesMade {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ( self.unlockedDatabase ) {
+        if ( AppModel.shared.unlockedDatabase ) {
             NSLog(@"AutoFill Changes were made and unlocked database open, notify to reload");
             [NSNotificationCenter.defaultCenter postNotificationName:kAutoFillChangedConfigNotification object:nil];
         }
@@ -579,9 +587,13 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (BOOL)shouldLockUnlockedDatabase {
-    if ( self.unlockedDatabaseWentIntoBackgroundAt && self.unlockedDatabase ) {
-        BOOL isEditing = [DatabasePreferences isEditing:self.unlockedDatabase];
-        BOOL dontLockIfEditing = !self.unlockedDatabase.lockEvenIfEditing;
+    Model* model = AppModel.shared.unlockedDatabase;
+    
+    if ( self.unlockedDatabaseWentIntoBackgroundAt && model ) {
+        DatabasePreferences *prefs = model.metadata;
+        
+        BOOL isEditing = [AppModel.shared isEditing:prefs.uuid];
+        BOOL dontLockIfEditing = !prefs.lockEvenIfEditing;
         
         if ( isEditing && dontLockIfEditing ) {
             NSLog(@"Not locking database because user is currently editing.");
@@ -590,7 +602,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         
         NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.unlockedDatabaseWentIntoBackgroundAt];
         
-        NSNumber *seconds = self.unlockedDatabase.autoLockTimeoutSeconds;
+        NSNumber *seconds = prefs.autoLockTimeoutSeconds;
         
         NSLog(@"Autolock Time [%@s] - background Time: [%f].", seconds, secondsBetween);
         
@@ -616,11 +628,11 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
     NSLog(@"onMainSplitViewControllerClosed [%@]", databaseId);
 
-    if ( self.unlockedDatabase ) {
+    if ( AppModel.shared.unlockedDatabase ) {
         NSLog(@"onMainSplitViewControllerClosed - Matching unlock db - clearing unlocked state.");
 
-        if ( [self.unlockedDatabase.uuid isEqualToString:databaseId] ) {
-            self.unlockedDatabase = nil;
+        if ( [AppModel.shared isUnlocked:databaseId] ) {
+            [AppModel.shared closeDatabase];
             self.unlockedDatabaseWentIntoBackgroundAt = nil;
         }
         else {
@@ -634,10 +646,13 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 - (void)onDeviceLocked {
     NSLog(@"onDeviceLocked - Device Lock detected - locking open database if so configured...");
-    
-    if ( self.unlockedDatabase && self.unlockedDatabase.autoLockOnDeviceLock ) {
-        BOOL isEditing = [DatabasePreferences isEditing:self.unlockedDatabase];
-        BOOL dontLockIfEditing = !self.unlockedDatabase.lockEvenIfEditing;
+    Model* model = AppModel.shared.unlockedDatabase;
+
+    if ( model && model.metadata.autoLockOnDeviceLock ) {
+        DatabasePreferences *prefs = model.metadata;
+        
+        BOOL isEditing = [AppModel.shared isEditing:prefs.uuid];
+        BOOL dontLockIfEditing = !prefs.lockEvenIfEditing;
         
         if ( isEditing && dontLockIfEditing ) {
             NSLog(@"Not locking database because user is currently editing.");
@@ -655,7 +670,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)lockUnlockedDatabase:(void (^ __nullable)(void))completion {
-    if ( self.unlockedDatabase ) {
+    if ( AppModel.shared.unlockedDatabase ) {
         NSLog(@"Locking Unlocked Database...");
                 
         if ( ![self isAppLocked] ) {
@@ -664,15 +679,15 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
             
             
             
-            [DatabasePreferences setEditing:self.unlockedDatabase editing:NO];
+            [AppModel.shared markAsEditingWithId:AppModel.shared.unlockedDatabase.databaseUuid editing:NO];
 
             
             
             UINavigationController* nav = self.navigationController;
             [nav popToRootViewControllerAnimated:NO];
             [self dismissViewControllerAnimated:NO completion:completion];
-            
-            self.unlockedDatabase = nil; 
+
+            [AppModel.shared closeDatabase]; 
             self.unlockedDatabaseWentIntoBackgroundAt = nil;
         }
         else {
@@ -1139,7 +1154,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)showUnlockedDatabase:(Model*)model {
-    self.unlockedDatabase = model.metadata;
+    [AppModel.shared unlockDatabase:model]; 
     
     [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
 }
@@ -1514,36 +1529,14 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 - (void)onShare:(NSIndexPath*)indexPath {
     DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
-
-    if (!database) {
-        return;
-    }
     
-    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? database.exportFilename : database.fileName;
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    
-    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
-    
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
-    if (!localCopyUrl) {
-        [Alerts error:self error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
-        return;
-    }
-    
-    NSError* err;
-    NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
-    if (err) {
-        [Alerts error:self error:err];
+    NSError* error;
+    NSURL* url = [ExportHelper getExportFile:database error:&error];
+    if ( !url || error ) {
+        [Alerts error:self error:error];
         return;
     }
 
-    [data writeToFile:f options:kNilOptions error:&err];
-    if (err) {
-        [Alerts error:self error:err];
-        return;
-    }
-    
-    NSURL* url = [NSURL fileURLWithPath:f];
     NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
@@ -1555,11 +1548,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     activityViewController.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
     
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-        NSError *errorBlock;
-        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
-            NSLog(@"error deleting file %@", errorBlock);
-            return;
-        }
+        [ExportHelper cleanupExportFiles:url];
     }];
     
     [self presentViewController:activityViewController animated:YES completion:nil];
@@ -2504,7 +2493,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         BOOL freeTrialAvailable = ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable;
         
         NSString *upgradeButtonTitle = freeTrialAvailable ?
-        NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Upgrade (Free 'Pro' Trial)...") :
+        NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Try Pro free for 3 months") :
         NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Please Upgrade...");
         
         [self showToolbar:upgradeButtonTitle
@@ -2534,7 +2523,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)requestBiometricBeforeOpeningPreferences {
-    [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_preferences_message", @"Identify to Open Preferences")
+    [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_preferences_message", @"Identify to Open Settings")
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -3132,6 +3121,24 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     } ];
 }
 
+- (void)onImportEnpass {
+    [Alerts info:self
+           title:NSLocalizedString(@"safes_vc_import_enpass", @"Import Enpass")
+         message:NSLocalizedString(@"safes_vc_import_json_message", @"Strongbox can import JSON files. Tap OK to select your exported JSON file.")
+      completion:^{
+        [self continueImportFileSelection:@"Enpass"];
+    } ];
+}
+
+- (void)onImportBitwarden {
+    [Alerts info:self
+           title:NSLocalizedString(@"safes_vc_import_bitwarden", @"Import Bitwarden")
+         message:NSLocalizedString(@"safes_vc_import_json_message", @"Strongbox can import JSON files. Tap OK to select your exported JSON file.")
+      completion:^{
+        [self continueImportFileSelection:@"Bitwarden"];
+    } ];
+}
+
 - (void)onImportGenericCsv {
     NSString* loc = NSLocalizedString(@"mac_csv_file_must_contain_header_and_fields", @"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.");
 
@@ -3190,7 +3197,12 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     else if ( [self.importFormat isEqualToString:@"CSV"] ) {
         [self importCsv:url];
     }
-
+    else if ( [self.importFormat isEqualToString:@"Enpass"] ) {
+        [self importEnpass:url];
+    }
+    else if ( [self.importFormat isEqualToString:@"Bitwarden"] ) {
+        [self importBitwarden:url];
+    }
 }
 
 - (void)import1Password1Pux:(NSURL*)url {
@@ -3203,6 +3215,36 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
       completion:^{
         NSError* error;
         id<Importer> importer = [[OnePassword1PuxImporter alloc] init];
+        ImportResult* result = [importer convertExWithUrl:url error:&error];
+        [self addImportedDatabase:result.database messages:result.messages error:error];
+    }];
+}
+
+- (void)importBitwarden:(NSURL*)url {
+    NSString* title = NSLocalizedString(@"generic_import_warning_title", @"Import Warning");
+    NSString* msg = NSLocalizedString(@"generic_import_warning_msg", @"The import process may not be perfect and some features may not be available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        id<Importer> importer = [[BitwardenImporter alloc] init];
+        ImportResult* result = [importer convertExWithUrl:url error:&error];
+        [self addImportedDatabase:result.database messages:result.messages error:error];
+    }];
+}
+
+- (void)importEnpass:(NSURL*)url {
+    NSString* title = NSLocalizedString(@"generic_import_warning_title", @"Import Warning");
+    NSString* msg = NSLocalizedString(@"generic_import_warning_msg", @"The import process may not be perfect and some features may not be available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+    
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        id<Importer> importer = [[EnpassImporter alloc] init];
         ImportResult* result = [importer convertExWithUrl:url error:&error];
         [self addImportedDatabase:result.database messages:result.messages error:error];
     }];
@@ -3382,8 +3424,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (void)handleUrlSchemeNavigationRequestWithDatabase:(DatabasePreferences*)database path:(NSString*)path query:(NSString*)query {
     NSLog(@"URL Nav Scheme Requests Database = [%@] be Unlocked... - path = %@, query = %@", database.nickName, path, query);
 
-    if ( self.unlockedDatabase) {
-        if ( [self.unlockedDatabase.uuid isEqualToString:database.uuid] ) {
+    if ( AppModel.shared.unlockedDatabase) {
+        if ( [AppModel.shared.unlockedDatabase.databaseUuid isEqualToString:database.uuid] ) {
             NSLog(@"Database Already Unlocked and Open...");
             
         }

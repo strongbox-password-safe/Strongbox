@@ -10,6 +10,7 @@
 #import "StrongboxMacFilesManager.h"
 
 NSString* const kStrongboxSFTPUrlScheme = @"sftp";
+NSString* const kStrongboxWiFiSyncUrlScheme = @"wifi";
 NSString* const kStrongboxOneDriveUrlScheme = @"onedrive";
 NSString* const kStrongboxGoogleDriveUrlScheme = @"googledrive";
 NSString* const kStrongboxDropboxUrlScheme = @"dropbox";

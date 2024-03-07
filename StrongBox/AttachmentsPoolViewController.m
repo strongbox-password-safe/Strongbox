@@ -132,7 +132,7 @@
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
-    [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+    [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentFiles];
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {

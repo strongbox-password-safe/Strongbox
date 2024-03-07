@@ -262,8 +262,6 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     
     [UIView setAnimationsEnabled:NO];
-
-    [self listenToNotifications]; 
     
     [self.tableView reloadData]; 
         
@@ -274,6 +272,8 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     [UIView setAnimationsEnabled:YES];
     
     [self updateSyncBarButtonItemState];
+    
+    [self listenToNotifications]; 
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -395,7 +395,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     [self.navigationItem.backBarButtonItem setTitle:@""];
     
-    [self refreshPreferencesMenu];
+    [self refreshCustomizeViewMenu];
     
     self.navigationItem.leftBarButtonItems = self.splitViewController ? @[self.splitViewController.displayModeButtonItem, self.preferencesBarButton] : @[self.preferencesBarButton];
 }
@@ -431,13 +431,13 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                 [self notifyDatabaseViewPreferencesChanged];
             }
             
-            [self refreshPreferencesMenu];
+            [self refreshCustomizeViewMenu];
         }];
     }
     else {
         self.databaseModel.metadata.easyReadFontForAll = !self.databaseModel.metadata.easyReadFontForAll;
 
-        [self refreshPreferencesMenu];
+        [self refreshCustomizeViewMenu];
         [self notifyDatabaseViewPreferencesChanged];
     }
 }
@@ -446,7 +446,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     [[NSNotificationCenter defaultCenter] postNotificationName:kDatabaseViewPreferencesChangedNotificationKey object:nil];
 }
 
-- (void)refreshPreferencesMenu {
+- (void)refreshCustomizeViewMenu {
     __weak ItemDetailsViewController* weakSelf = self;
     
     NSMutableArray<UIMenuElement*>* ma1 = [NSMutableArray array];
@@ -473,7 +473,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                                           handler:^(__kindof UIAction * _Nonnull action) {
             weakSelf.databaseModel.metadata.tryDownloadFavIconForNewRecord = !weakSelf.databaseModel.metadata.tryDownloadFavIconForNewRecord;
             [weakSelf notifyDatabaseViewPreferencesChanged];
-            [weakSelf refreshPreferencesMenu];
+            [weakSelf refreshCustomizeViewMenu];
         }]];
     }
     
@@ -484,7 +484,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                                       handler:^(__kindof UIAction * _Nonnull action) {
         weakSelf.databaseModel.metadata.showPasswordByDefaultOnEditScreen = !weakSelf.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
         [weakSelf notifyDatabaseViewPreferencesChanged];
-        [weakSelf refreshPreferencesMenu];
+        [weakSelf refreshCustomizeViewMenu];
     }]];
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_colorize_passwords", @"Colorize Passwords")
                                   systemImage:@"paintbrush.pointed"
@@ -493,7 +493,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                                       handler:^(__kindof UIAction * _Nonnull action) {
         weakSelf.databaseModel.metadata.colorizePasswords = !weakSelf.databaseModel.metadata.colorizePasswords;
         [weakSelf notifyDatabaseViewPreferencesChanged];
-        [weakSelf refreshPreferencesMenu];
+        [weakSelf refreshCustomizeViewMenu];
     }]];
     
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_sort_custom_fields", @"Sort Custom Fields")
@@ -503,7 +503,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                                       handler:^(__kindof UIAction * _Nonnull action) {
         weakSelf.databaseModel.metadata.customSortOrderForFields = !weakSelf.databaseModel.metadata.customSortOrderForFields;
         [weakSelf notifyDatabaseViewPreferencesChanged];
-        [weakSelf refreshPreferencesMenu];
+        [weakSelf refreshCustomizeViewMenu];
     }]];
 
     UIMenu* menu1 = [UIMenu menuWithTitle:@""
@@ -512,7 +512,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                                   options:UIMenuOptionsDisplayInline
                                  children:ma1];
     
-    UIMenu* menu = [UIMenu menuWithTitle:NSLocalizedString(@"generic_settings", @"Settings")
+    UIMenu* menu = [UIMenu menuWithTitle:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")
                                    image:nil
                               identifier:nil
                                  options:kNilOptions
@@ -601,7 +601,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)onCancelConfirmed {
     if ( self.createNewItem ) {
-        [DatabasePreferences setEditing:self.databaseModel.metadata editing:NO];
+        [AppModel.shared markAsEditingWithId:self.databaseModel.databaseUuid editing:NO];
         
         if ( self.splitViewController ) {
             if (self.splitViewController.isCollapsed ) { 
@@ -759,7 +759,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         [self bindNavBar];
     }
     
-    [DatabasePreferences setEditing:self.databaseModel.metadata editing:editing];
+    [AppModel.shared markAsEditingWithId:self.databaseModel.databaseUuid editing:editing];
     
     [self.tableView performBatchUpdates:^{
         [self prepareTableViewForEditing];
@@ -1263,7 +1263,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
-        [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+        [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentFiles];
     });
 }
 
@@ -1274,13 +1274,29 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
     NSString* filename = self.model.filteredAttachments.allKeys[index];
     KeePassAttachmentAbstractionLayer* attachment = self.model.filteredAttachments[filename];
+    NSData* data = attachment.nonPerformantFullData;
+    
+    if ( filename.pathExtension.length == 0 ) {
+        NSString *extension = [Utils likelyFileExtensionForData:data];
+        
+        filename = [filename stringByAppendingPathExtension:extension];
+    }
     
     NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     
-    NSInputStream* attStream = [attachment getPlainTextInputStream];
-    [StreamUtils pipeFromStream:attStream to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
-    
+
+
+
     NSURL* url = [NSURL fileURLWithPath:f];
+
+    NSError* error;
+    if ( ![data writeToURL:url options:kNilOptions error:&error] ) {
+        NSLog(@"🔴 Error writing preview attachment %@", error);
+    }
+    
+    if ( ![QLPreviewController canPreviewItem:url] ) {
+        NSLog(@"🔴 Won't be able to preview this item!");
+    }
     
     return url;
 }
@@ -2238,7 +2254,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
     __weak ItemDetailsViewController* weakSelf = self;
     
     [cell setKey:NSLocalizedString(@"item_details_email_field_title", @"Email")
-           value:self.model.email
+           value:[self maybeDereference:self.model.email]
          editing:self.editing
  useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
 rightButtonImage:nil
@@ -2798,35 +2814,39 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (UIMenu*)getPasswordHistoryMenu {
     Node* item = [self.databaseModel.database getItemById:self.itemId];
-
-    BOOL keePassHistoryAvailable = item.fields.keePassHistory.count > 0; 
-
-    if (!self.hasHistory || !keePassHistoryAvailable ) {
+    
+    NSArray<PasswordChangeEvent*>* changeHistory = [PasswordHistoryProcessor getHistoryChangeEventsWithItem:item];
+    
+    if (!self.hasHistory || changeHistory.count == 0 ) {
         return nil;
     }
     
     NSMutableArray<UIMenu*>* mut = NSMutableArray.array;
     
-    NSDate* mod = item.fields.modified;
-    NSString* currentPassword = item.fields.password;
     __weak ItemDetailsViewController* weakSelf = self;
     
-    for ( Node* hist in item.fields.keePassHistory.reverseObjectEnumerator ) {
-        if ( hist.fields.password.length == 0 || [hist.fields.password localizedCompare:currentPassword] == NSOrderedSame ) {
-            continue;
-        }
-        
-        NSString* pw = hist.fields.password;
-        UIAction *action = [UIAction actionWithTitle:pw
+    for ( PasswordChangeEvent* changeEvent in changeHistory ) {
+        UIAction *action = [UIAction actionWithTitle:changeEvent.password
                                                image:nil
                                           identifier:nil
                                              handler:^(__kindof UIAction * _Nonnull action) {
-            [weakSelf copyToClipboard:pw message:NSLocalizedString(@"item_details_password_copied", @"Password Copied")];
+            [weakSelf copyToClipboard:changeEvent.password message:NSLocalizedString(@"item_details_password_copied", @"Password Copied")];
         }];
         
-        NSString* fmt = NSLocalizedString(@"password_history_this_password_was_used_until_fmt", "Used until %@");
-        NSString* header = [NSString stringWithFormat:fmt, mod.friendlyDateTimeString];
-
+        NSString* fmt;
+        
+        if  ( changeEvent == changeHistory.firstObject && changeHistory.count > 1 ) {
+            fmt = NSLocalizedString(@"password_history_this_password_was_used_until_most_recent_fmt", @"Most Recent (Used until %@)");
+        }
+        else if ( changeEvent == changeHistory.lastObject && changeHistory.count > 1 ) {
+            fmt = NSLocalizedString(@"password_history_this_password_was_used_until_oldest_fmt", @"Oldest (Used until %@)");
+        }
+        else {
+            fmt = NSLocalizedString(@"password_history_this_password_was_used_until_fmt", @"Used until %@");
+        }
+        
+        NSString* header = [NSString stringWithFormat:fmt, changeEvent.wasUsedUntil.friendlyDateTimeStringPrecise];
+        
         UIMenu* submenu = [UIMenu menuWithTitle:header
                                           image:nil
                                      identifier:nil
@@ -2834,16 +2854,13 @@ suggestionProvider:^NSString*(NSString *text) {
                                        children:@[action]];
         
         [mut addObject:submenu];
-        
-        mod = hist.fields.modified;
-        currentPassword = hist.fields.password;
     }
-        
-    return mut.count ? [UIMenu menuWithTitle:NSLocalizedString(@"password_history_previous_passwords", @"Previous Passwords")
-                                       image:nil
-                                  identifier:nil
-                                     options:UIMenuOptionsDisplayInline
-                                    children:mut] : nil;
+    
+    return [UIMenu menuWithTitle:NSLocalizedString(@"password_history_previous_passwords", @"Previous Passwords")
+                           image:nil
+                      identifier:nil
+                         options:UIMenuOptionsDisplayInline
+                        children:mut];
 }
 
 @end

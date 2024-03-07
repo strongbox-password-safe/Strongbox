@@ -147,6 +147,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *expiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *nearlyExpiredEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *excludedFromAuditEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *attachmentEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *keeAgentSshKeyEntries;
@@ -265,8 +266,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 
 
-- (void)toggleAutoFillExclusion:(NSUUID*)uuid;
-
+- (void)batchExcludeItemsFromAutoFill:(NSArray<Node*>*)items exclude:(BOOL)exclude;
 - (BOOL)isExcludedFromAutoFill:(NSUUID*)item;
 
 @property (readonly, nullable) NSNumber* auditIssueCount;
@@ -281,9 +281,13 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property (readonly) NSUInteger auditIssueNodeCount;
 
 - (BOOL)isExcludedFromAudit:(NSUUID*)item;
-- (NSArray<Node*>*)getExcludedAuditItems;
+
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError*_Nullable error))completion;
-- (void)setItemAuditExclusion:(Node*)node exclude:(BOOL)exclude;
+
+- (void)setItemAuditExclusion:(Node*)node exclude:(BOOL)exclude isPartOfBatch:(BOOL)isPartOfBatch;
+
+- (void)batchExcludeItemsFromAudit:(NSArray<Node*>*)items exclude:(BOOL)exclude;
+
 @property (readonly, nullable) DatabaseAuditReport* auditReport;
 
 

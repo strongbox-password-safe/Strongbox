@@ -86,15 +86,6 @@
 - (KeePassGroup*)buildXmlGroup:(Node*)group attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     KeePassGroup *ret = [[KeePassGroup alloc] initWithContext:self.xmlParsingContext];
     
-    if ( group.linkedData && [ group.linkedData isKindOfClass:NSArray.class ] ) { 
-        NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)group.linkedData;
-        if ( unmanagedChildren && unmanagedChildren.count ) {
-            for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
-                [ret addUnknownChildObject:unmanagedChild];
-            }
-        }
-    }
-
     
     
     ret.times.lastAccessTime = group.fields.accessed;
@@ -151,17 +142,7 @@
 
 - (Entry*)buildXmlEntry:(Node*)node stripHistory:(BOOL)stripHistory attachmentsPool:(NSArray<KeePassAttachmentAbstractionLayer *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
-  
-    if ( node.linkedData && [node.linkedData isKindOfClass:NSArray.class] ) { 
-        NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)node.linkedData;
-    
-        if ( unmanagedChildren && unmanagedChildren.count ) {
-            for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
-                [ret addUnknownChildObject:unmanagedChild];
-            }
-        }
-    }
-    
+      
     ret.uuid = node.uuid;
 
     if ( node.icon ) {
@@ -347,8 +328,6 @@
     
     [parentNode addChild:groupNode keePassGroupTitleRules:YES];
 
-    
-
     return YES;
 }
 
@@ -458,8 +437,6 @@
             [fields.keePassHistory addObject:historicalEntryNode];
         }
     }
-
-    
     
     return entryNode;
 }

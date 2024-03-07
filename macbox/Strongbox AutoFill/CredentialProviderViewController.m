@@ -50,9 +50,8 @@
 
 
 
-
-
 @property BOOL withoutUserInteraction;
+@property BOOL hasDoneCommonInit;
 
 @property BOOL quickTypeMode;
 
@@ -67,10 +66,16 @@
 
 @implementation CredentialProviderViewController
 
-- (void)commonInit { 
-    NSLog(@"🟢 AutoFill::commonInit");
-    
-    [DatabasesManager.sharedInstance forceReload];
+- (void)commonInit {
+    if ( !self.hasDoneCommonInit ) {
+        NSLog(@"🟢 AutoFill::commonInit");
+        self.hasDoneCommonInit = YES;
+        
+        [DatabasesManager.sharedInstance forceReload];
+    }
+    else {
+        NSLog(@"🟢 AutoFill::commonInit - Already Inited");
+    }
 }
 
 
@@ -321,6 +326,8 @@
     [super viewDidLoad];
     
     NSLog(@"🟢 viewDidLoad");
+    
+    [self commonInit];
 }
 
 - (void)viewWillAppear {
@@ -751,6 +758,10 @@
         }
         
         NSString* user = [model dereference:node.fields.username node:node];
+        if ( user.length == 0 ) {
+            user = [model.database dereference:node.fields.email node:node]; 
+        }
+
         NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
         
         password = password ? password : @"";
@@ -880,19 +891,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 - (void)dismissAllPresentedViewControllers {
     for ( NSViewController* vc in self.presentedViewControllers ) {
-        [self dismissViewControllerCorrectly:vc];
-    }
-}
-
-- (void)dismissViewControllerCorrectly:(NSViewController*)vc {
-    if ( vc.presentingViewController ) {
-        [vc.presentingViewController dismissViewController:vc];
-    }
-    else if ( vc.view.window.sheetParent ) {
-        [vc.view.window.sheetParent endSheet:vc.view.window returnCode:NSModalResponseCancel];
-    }
-    else {
-        [vc.view.window close];
+        [Utils dismissViewControllerCorrectly:vc];
     }
 }
 
@@ -1083,7 +1082,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         }
         
         [ClipboardManager.sharedInstance copyConcealedString:totp];
-        NSLog(@"🟢 Copied TOTP to Pasteboard...");
+        NSLog(@"🟢 Copied TOTP to Clipboard...");
         
         
 

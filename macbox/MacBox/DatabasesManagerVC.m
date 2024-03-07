@@ -47,6 +47,7 @@
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
 NSString* const kUpdateNotificationDatabasePreferenceChanged = @"UpdateNotificationDatabasePreferenceChanged";
+NSString* const kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUpdated";
 
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
@@ -75,8 +76,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)killRefreshTimer {
-
-
+    
+    
     if ( self.timerRefresh ) {
         [self.timerRefresh invalidate];
         self.timerRefresh = nil;
@@ -86,15 +87,15 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)startRefreshTimer {
     [self killRefreshTimer];
     
-
-
+    
+    
     self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refreshVisibleRows) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
 }
 
 - (void)viewWillAppear {
     [super viewWillAppear];
-
+    
     if(!self.hasLoaded) {
         self.hasLoaded = YES;
         [self doInitialSetup];
@@ -105,17 +106,17 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     
     
-
-
+    
+    
     NSButton *zoomButton = [self.view.window standardWindowButton:NSWindowZoomButton];
     NSButton *minButton = [self.view.window standardWindowButton:NSWindowMiniaturizeButton];
-
+    
     [zoomButton setEnabled:NO];
     [minButton setEnabled:NO];
-
+    
     [self.view.window makeKeyAndOrderFront:nil];
     [self.view.window center];
-
+    
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.doubleAction = @selector(onDoubleClick:);
@@ -126,43 +127,26 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     [self.tableView registerForDraggedTypes:@[kDragAndDropId]];
     self.tableView.emptyString = NSLocalizedString(@"mac_no_databases_initial_message", @"No Databases Here Yet.\n\nClick 'Add Database...' below to get started...");
-
+    
     self.tableView.headerView = nil;
     [self.tableView sizeLastColumnToFit];
     
     [self loadDatabases];
     [self.tableView reloadData];
-
     
-
+    
+    
     if(self.databaseIds.count) {
         [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     }
-
     
-    
-    [self customizeAddButtonMenu];
-    
-    
+    [self customizeAddDatabaseSubMenu];
     
     [self listenToEvents];
     
     [self bindVersionSubtitle];
     
     [self startRefreshTimer];
-}
-
-- (void)customizeAddButtonMenu {
-    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddGoogleDriveDatabase:)];
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddDropboxDatabase:)];
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddOneDriveDatabase:)];
-    }
-
-    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddSFTPDatabase:)];
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddWebDav:)];
-    }
 }
 
 - (void)listenToEvents {
@@ -172,6 +156,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesCollectionLockStateChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kWifiBrowserResultsUpdatedNotification object:nil];
 }
 
 - (void)bindVersionSubtitle {
@@ -208,17 +193,17 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     
     NSMutableSet<MacDatabasePreferences*>* selected = NSMutableSet.set;
-
+    
     [self performActionOnSelected:^(MacDatabasePreferences *database) {
         [selected addObject:database];
     }];
     
     
-
+    
     BOOL atLeastOneUnlocked = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         return [DatabasesCollection.shared isUnlockedWithUuid:obj.uuid];
     }];
-
+    
     if ( atLeastOneUnlocked ) {
         [MacAlerts info:NSLocalizedString(@"mac_at_least_one_db_unlocked_cannot_remove", @"At least one of these databases is unlocked. You must lock this database before you can remove it.")
                  window:self.view.window];
@@ -230,13 +215,13 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     NSString* single = NSLocalizedString(@"are_you_sure_delete_database_single", @"Are you sure you want to remove this database from Strongbox?\n\nNB: The underlying database file will not be deleted. Just Strongbox's settings for this database.");
     
     NSString* multiple = NSLocalizedString(@"are_you_sure_delete_database_multiple", @"Are you sure you want to remove these databases from Strongbox?\n\nNB: The underlying database files will not be deleted. Just Strongbox's settings for these databases.");
-        
+    
     NSString *message = selected.count > 1 ? multiple : single;
     
     [MacAlerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
-  informativeText:message
-           window:self.view.window
-       completion:^(BOOL yesNo) {
+     informativeText:message
+              window:self.view.window
+          completion:^(BOOL yesNo) {
         if (yesNo) {
             for (MacDatabasePreferences* database in selected) {
                 if ( [DatabasesCollection.shared isUnlockedWithUuid:database.uuid] ) {
@@ -276,7 +261,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)refreshVisibleRows {
-
+    
     
     NSIndexSet* set = self.tableView.selectedRowIndexes;
     
@@ -290,11 +275,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     NSScrollView* scrollView = [self.tableView enclosingScrollView];
     CGPoint originalScrollPos = scrollView.documentVisibleRect.origin;
     
-
-
-
-
-
+    
+    
+    
+    
+    
     
     [self.tableView reloadData];
     
@@ -318,27 +303,27 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     NSString* databaseId = [self.databaseIds objectAtIndex:row];
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
     
-    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV;
+    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV && !StrongboxProductBundle.supportsWiFiSync;
     BOOL disabled = database.storageProvider != kMacFile && filesOnly;
-
+    
     return !disabled;
 }
 
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
-
+    
     
     
     NSString* databaseId = [self.databaseIds objectAtIndex:row];
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
-    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV;
+    
+    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV && !StrongboxProductBundle.supportsWiFiSync;
     BOOL disabled = database.storageProvider != kMacFile && filesOnly;
     
     [result setWithDatabase:database disabled:disabled];
-
+    
     __weak DatabasesManagerVC* weakSelf = self;
-
+    
     result.onBeginEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
         NSInteger row = [weakSelf.tableView rowForView:cell];
         if ( row != -1 && weakSelf.tableView.selectedRow != row ) {
@@ -353,7 +338,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [weakSelf refreshVisibleRows];
         [weakSelf startRefreshTimer];
     };
-            
+    
     return result;
 }
 
@@ -363,7 +348,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         NSLog(@"WARN WARN WARN: Could not find column: %@", identifier);
         return;
     }
-
+    
     NSTableColumn *col = [self.tableView.tableColumns objectAtIndex:colIdx];
     
     if(col.hidden != !show) {
@@ -379,7 +364,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     NSString* databaseId = self.databaseIds[row];
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+    
     [self openDatabase:database];
 }
 
@@ -390,14 +375,14 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)openDatabase:(MacDatabasePreferences*)database offline:(BOOL)offline {
     DocumentController* dc = DocumentController.sharedDocumentController;
     
-    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV;
+    BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV && !StrongboxProductBundle.supportsWiFiSync;
     BOOL disabled = database.storageProvider != kMacFile && filesOnly;
-
+    
     if ( disabled ) {
         NSLog(@"🔴 Attempt to unlock unsupported Database Storage Provider");
         return;
     }
-
+    
     
     Model* existing = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
     if ( !existing ) {
@@ -408,18 +393,18 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     
     [self showProgressModal:NSLocalizedString(@"generic_loading", "Loading...")];
-        
+    
     [dc openDatabase:database completion:^(NSError *error) {
         [self hideProgressModal];
         
         if(error) {
-           NSString* loc = NSLocalizedString(@"mac_problem_opening_db",
-                                             @"There was a problem opening this file.");
-
-           [MacAlerts error:loc
-                      error:error
-                     window:self.view.window
-                 completion:nil];
+            NSString* loc = NSLocalizedString(@"mac_problem_opening_db",
+                                              @"There was a problem opening this file.");
+            
+            [MacAlerts error:loc
+                       error:error
+                      window:self.view.window
+                  completion:nil];
         }
         else {
             if ( Settings.sharedInstance.closeManagerOnLaunch ) {
@@ -471,16 +456,16 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)onAddSFTPDatabase:(id)sender {
 #ifndef NO_SFTP_WEBDAV_SP
     SFTPConnectionsManager* vc = [SFTPConnectionsManager instantiateFromStoryboard];
-
+    
     __weak DatabasesManagerVC* weakSelf = self;
     vc.onSelected = ^(SFTPSessionConfiguration * _Nonnull connection) {
         SFTPStorageProvider* provider = [[SFTPStorageProvider alloc] init];
         provider.explicitConnection = connection;
         provider.maintainSessionForListing = YES;
-    
+        
         [weakSelf showStorageBrowserForProvider:provider];
     };
-        
+    
     [self presentViewControllerAsSheet:vc];
 #endif
 }
@@ -494,17 +479,26 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         WebDAVStorageProvider* provider = [[WebDAVStorageProvider alloc] init];
         provider.explicitConnection = connection;
         provider.maintainSessionForListing = YES;
-    
+        
         [weakSelf showStorageBrowserForProvider:provider];
     };
-        
+    
     [self presentViewControllerAsSheet:vc];
 #endif
 }
 
+- (void)onAddWifiSyncDatabase:(WiFiSyncServerConfig*)server
+                     passcode:(NSString*)passcode {
+    WiFiSyncStorageProvider *sp = [[WiFiSyncStorageProvider alloc] init];
+    
+    server.passcode = passcode;
+    sp.explicitConnectionConfig = server;
+    
+    [self showStorageBrowserForProvider:sp];
+}
 
 
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+
 - (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider {
     AddDatabaseSelectStorageVC* vc = [AddDatabaseSelectStorageVC newViewController];
     vc.provider = provider;
@@ -512,19 +506,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     vc.onDone = ^(BOOL success, StorageBrowserItem * _Nonnull selectedItem) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if (success) {
-
+                
                 
                 NSString* suggestedName = [selectedItem.name stringByDeletingPathExtension];
                 
                 suggestedName = [DatabasesManager.sharedInstance getUniqueNameFromSuggestedName:suggestedName];
                 
                 MacDatabasePreferences *newDatabase = [provider getDatabasePreferences:suggestedName providerData:selectedItem.providerData];
-                    
+                
                 if (!newDatabase) {
                     [MacAlerts error:nil window:self.view.window];
                 }
                 else {
-
+                    
                     
                     [newDatabase add];
                     [self openDatabase:newDatabase];
@@ -535,6 +529,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     [self presentViewControllerAsSheet:vc];
 }
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 #endif
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
@@ -544,7 +540,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)keyDown:(NSEvent *)theEvent {
     NSString *chars = theEvent.charactersIgnoringModifiers;
     unichar aChar = [chars characterAtIndex:0];
-
+    
     if( aChar == NSDeleteCharacter || aChar == NSBackspaceCharacter || aChar == 63272 ) {
         [self onRemove:nil];
     }
@@ -555,7 +551,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         }];
     }
     else {
-
+        
         [super keyDown:theEvent];
     }
 }
@@ -564,7 +560,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [self.tableView.selectedRowIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
         NSString* databaseId = self.databaseIds[idx];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+        
         if (action) {
             action(database);
         }
@@ -613,10 +609,153 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     return YES;
 }
 
+- (NSMenuItem*)createHeaderMenuItem:(NSString*)title {
+    NSMenuItem* item = [[NSMenuItem alloc] init];
+    
+    item.attributedTitle = [[NSAttributedString alloc] initWithString:title
+                                                           attributes:@{
+        NSFontAttributeName : FontManager.shared.boldCaption1Font,
+        NSForegroundColorAttributeName : NSColor.secondaryLabelColor
+    }];
+    item.enabled = NO;
+    return item;
+}
+
+- (void)menuNeedsUpdate:(NSMenu *)menu {
+
+    
+    [self populateWifiSyncMenu];
+}
+
+- (void)customizeAddDatabaseSubMenu {
+    NSMenu* menu = self.buttonAdd.menu;
+    
+    
+    
+    NSMenuItem* itemFilesHeader = [self createHeaderMenuItem:NSLocalizedString(@"add_database_on_my_mac", @"On My Mac")];
+    [menu insertItem:itemFilesHeader atIndex:1];
+    
+    
+    
+    NSUInteger currentIdxForSection = 4;
+    
+    if ( StrongboxProductBundle.supportsWiFiSync && !Settings.sharedInstance.disableWiFiSyncClientMode ) {
+        NSMenuItem* itemWiFiSyncHeader = [self createHeaderMenuItem:NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync")];
+        itemWiFiSyncHeader.action = @selector(onDummyWiFiSyncParentMenuAction:);
+    
+        [menu insertItem:NSMenuItem.separatorItem atIndex:currentIdxForSection++];
+        [menu insertItem:itemWiFiSyncHeader atIndex:currentIdxForSection++];
+
+        currentIdxForSection += 2; 
+    }
+    else {
+        [menu removeItemAtIndex:currentIdxForSection];
+    }
+    
+    
+    
+    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddGoogleDriveDatabase:)];
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddDropboxDatabase:)];
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddOneDriveDatabase:)];
+    }
+    else {
+        NSMenuItem* itemThirdPartyHeader = [self createHeaderMenuItem:NSLocalizedString(@"select_storage_header_third_party", @"Third Party Integrations")];
+        [menu insertItem:itemThirdPartyHeader atIndex:currentIdxForSection];
+        
+        currentIdxForSection += 5;
+    }
+    
+    
+    
+    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddSFTPDatabase:)];
+        [self removeMenuItemFromAddButtonMenu:@selector(onAddWebDav:)];
+    }
+    else {
+        NSMenuItem* itemServersHeader = [self createHeaderMenuItem:NSLocalizedString(@"select_storage_header_servers", @"Servers")];
+        [menu insertItem:itemServersHeader atIndex:currentIdxForSection];
+        
+        currentIdxForSection++;
+        
+        if ( !Settings.sharedInstance.isPro ) {
+            NSMenuItem* menuItem = [menu itemAtIndex:currentIdxForSection];
+            
+            menuItem.enabled = NO;
+            if (@available(macOS 14.0, *)) {
+                menuItem.badge = [[NSMenuItemBadge alloc] initWithString:NSLocalizedString(@"pro_badge_text_all_caps", @"PRO")];
+            }
+            else {
+                menuItem.title = NSLocalizedString(@"mac_add_sftp_pro_only", @"Add SFTP Database... (Pro)");
+            }
+            currentIdxForSection++;
+            
+            menuItem = [menu itemAtIndex:currentIdxForSection];
+            
+            if (@available(macOS 14.0, *)) {
+                menuItem.badge = [[NSMenuItemBadge alloc] initWithString:NSLocalizedString(@"pro_badge_text_all_caps", @"PRO")];
+            }
+            else {
+                menuItem.title = NSLocalizedString(@"mac_add_webdav_pro_only",  @"Add WebDAV Database... (Pro)");
+            }
+            
+            menuItem.enabled = NO;
+        }
+    }
+}
+
+- (void)populateWifiSyncMenu {
+    NSMenu* menu = self.buttonAdd.menu;
+    
+    if ( !StrongboxProductBundle.supportsWiFiSync || Settings.sharedInstance.disableWiFiSyncClientMode ) {
+        return;
+    }
+    
+    
+    
+    [self removeAllMenuItemFromAddButtonMenu:@selector(onSelectWiFiSyncDatabase:)];
+    
+    
+    
+    NSArray<NSMenuItem*>* subItems;
+    NSArray<WiFiSyncServerConfig*>* wiFiSyncDevices = [self getWiFiSyncDevices];
+    if ( wiFiSyncDevices.count > 0 ) {
+        subItems = [wiFiSyncDevices map:^id _Nonnull(WiFiSyncServerConfig * _Nonnull obj, NSUInteger idx) {
+            NSMenuItem* server = [[NSMenuItem alloc] initWithTitle:obj.name action:@selector(onSelectWiFiSyncDatabase:) keyEquivalent:@""];
+            server.image = [self getWiFiSyncMenuItemImage:Settings.sharedInstance.isPro];
+            return server;
+        }];
+    }
+    else {
+        NSMenuItem* server = [[NSMenuItem alloc] initWithTitle:@"No Devices Found" action:@selector(onSelectWiFiSyncDatabase:)  keyEquivalent:@""]; 
+        server.enabled = NO;
+        server.image = [self getWiFiSyncMenuItemImage:NO];
+        subItems = @[server];
+    }
+    
+    NSUInteger idx = [self getAddButtonItemIndex:@selector(onDummyWiFiSyncParentMenuAction:)] + 1;
+    
+    for ( NSMenuItem* item in subItems ) {
+        if ( !Settings.sharedInstance.isPro ) {
+            item.enabled = NO;
+            if (@available(macOS 14.0, *)) {
+                item.badge = [[NSMenuItemBadge alloc] initWithString:NSLocalizedString(@"pro_badge_text_all_caps", @"PRO")];
+            }
+            else {
+                item.title = [NSString stringWithFormat:@"%@ (%@)", item.title, NSLocalizedString(@"pro_badge_text", @"Pro")];
+            }
+        }
+        
+        [menu insertItem:item atIndex:idx++];
+    }
+}
+
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+    NSLog(@"🚀 validateUserInterfaceItem: [%@]", anItem);
+    
     SEL theAction = [anItem action];
-
-
+    
+    
     MacDatabasePreferences* database = nil;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
@@ -660,7 +799,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         if( database != nil ) {
             Model* model = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
             BOOL isReadOnly = model ? model.isReadOnly : database.readOnly;
-
+            
             NSMenuItem* item = (NSMenuItem*)anItem;
             [item setState:isReadOnly ? NSControlStateValueOn : NSControlStateValueOff];
             return YES;
@@ -671,41 +810,22 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             return YES;
         }
     }
-    else if ( theAction == @selector(onAddSFTPDatabase:)) {
-        if ( !Settings.sharedInstance.isPro ) {
-            NSMenuItem* item = (NSMenuItem*)anItem;
-            item.title = NSLocalizedString(@"mac_add_sftp_pro_only", @"Add SFTP Database... (Pro)");
-        }
-        return Settings.sharedInstance.isPro;
-    }
-    else if ( theAction == @selector(onAddWebDav:)) {
-        if ( !Settings.sharedInstance.isPro ) {
-            NSMenuItem* item = (NSMenuItem*)anItem;
-            item.title = NSLocalizedString(@"mac_add_webdav_pro_only",  @"Add WebDAV Database... (Pro)");
-        }
-
-        return Settings.sharedInstance.isPro;
-    }
-    else if ( theAction == @selector(onAddOneDriveDatabase:) ) {
-        return YES;
-    }
-    else if ( theAction == @selector(onAddGoogleDriveDatabase:) ) {
-        return YES;
-    }
-    else if ( theAction == @selector(onAddDropboxDatabase:) ) {
-        return YES;
-    }
-    else if ( theAction == @selector(onOpenFromFiles:) ) {
-        return YES;
-    }
-    else if ( theAction == @selector(onNewDatabase:) ) {
-        return YES;
-    }
     else if (theAction == @selector(onRemove:)) {
         return self.tableView.selectedRowIndexes.count;
     }
     else if ( theAction == @selector(onLock:)) {
-        return self.tableView.selectedRowIndexes.count == 1 && database && [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+        BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+        
+        return self.tableView.selectedRowIndexes.count == 1 && database && isUnlocked;
+    }
+    else if ( theAction == @selector(onLockOrUnlock:)) {
+        BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+        
+        NSMenuItem* item = (NSMenuItem*)anItem;
+        
+        [item setTitle:isUnlocked ? NSLocalizedString(@"generic_verb_lock_action", @"Lock") : NSLocalizedString(@"casg_unlock_action", @"unlock")];
+        
+        return self.tableView.selectedRowIndexes.count == 1 && database;
     }
     else if (theAction == @selector(onToggleLaunchAtStartup:)) {
         if(self.tableView.selectedRow != -1) {
@@ -715,15 +835,71 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         
         return self.tableView.selectedRow != -1;
     }
-
+    
     return NO;
+}
+
+- (NSArray<WiFiSyncServerConfig*>*)getWiFiSyncDevices {
+    NSMutableArray<WiFiSyncServerConfig*>* allWiFiSyncDevices = [WiFiSyncBrowser.shared.availableServers mutableCopy];
+    NSArray<WiFiSyncServerConfig*>* wiFiSyncDevices = allWiFiSyncDevices;
+    
+    if ( WiFiSyncServer.shared.isRunning ) { 
+        NSString* myName = WiFiSyncServer.shared.lastRegisteredServiceName;
+
+        if ( myName.length ) {
+            wiFiSyncDevices = [allWiFiSyncDevices filter:^BOOL(WiFiSyncServerConfig * _Nonnull obj) {
+                return ![obj.name isEqualToString:myName];
+            }];
+        }
+    }
+    
+    return wiFiSyncDevices;
+}
+
+- (NSImage*)getWiFiSyncMenuItemImage:(BOOL)live {
+    NSImage* image = [NSImage imageWithSystemSymbolName:@"externaldrive.fill.badge.wifi" accessibilityDescription:nil];
+    
+    if (@available(macOS 12.0, *)) {
+        NSImageSymbolConfiguration* config = [NSImageSymbolConfiguration configurationWithPaletteColors:live ? @[NSColor.systemGreenColor, NSColor.systemBlueColor] : @[NSColor.systemGrayColor]];
+        
+        image = [image imageWithSymbolConfiguration:config];
+    }
+    
+    return image;
+}
+
+- (IBAction)onDummyWiFiSyncParentMenuAction:(id)sender {
+    
+}
+
+- (IBAction)onSelectWiFiSyncDatabase:(id)sender {
+    NSMenuItem* item = sender;
+        
+    WiFiSyncServerConfig* server = [WiFiSyncBrowser.shared getServerConfig:item.title];
+    
+    if ( server ) {
+        NSViewController* vc = [SwiftUIViewFactory makeWiFiSyncPassCodeEntryViewControllerWithServer:server
+                                                                                              onDone:^(WiFiSyncServerConfig * server, NSString *passcode) {
+            NSViewController* sheet = self.presentedViewControllers.firstObject;
+            [Utils dismissViewControllerCorrectly:sheet];
+            
+            if ( server && passcode && passcode.length ) {
+                [self onAddWifiSyncDatabase:server passcode:passcode];
+            }
+        }];
+        
+        [self presentViewControllerAsSheet:vc];
+    }
+    else {
+        [MacAlerts error:nil window:self.view.window];
+    }
 }
 
 - (IBAction)onViewSyncLog:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+        
         SyncLogViewController* vc = [SyncLogViewController showForDatabase:database];
         [self presentViewControllerAsSheet:vc];
     }
@@ -744,7 +920,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         }
         else {
             
-
+            
             [DatabasesCollection.shared syncWithUuid:databaseId allowInteractive:YES suppressErrorAlerts:NO ckfsForConflict:nil completion:nil];
         }
     }
@@ -754,7 +930,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+        
         [self performSegueWithIdentifier:@"segueToBackups" sender:database.uuid];
     }
 }
@@ -763,8 +939,26 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-       
-        [DatabasesCollection.shared initiateLockRequestWithUuid:database.uuid];
+        
+        BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+        if ( isUnlocked ) {
+            [DatabasesCollection.shared initiateLockRequestWithUuid:database.uuid];
+        }
+    }
+}
+
+- (IBAction)onLockOrUnlock:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
+        
+        BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+        if ( isUnlocked ) {
+            [DatabasesCollection.shared initiateLockRequestWithUuid:database.uuid];
+        }
+        else {
+            [self openDatabase:database];
+        }
     }
 }
 
@@ -783,10 +977,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow == -1) {
         return;
     }
-
+    
     NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+    
     NSSavePanel* panel = [NSSavePanel savePanel];
     panel.nameFieldStringValue = database.exportFileName;
     
@@ -872,10 +1066,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow == -1) {
         return;
     }
-
+    
     NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+    
     [self openDatabase:database offline:YES];
 }
 
@@ -883,7 +1077,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+        
         database.launchAtStartup = !database.launchAtStartup;
     }
 }
@@ -892,7 +1086,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+        
         database.alwaysOpenOffline = !database.alwaysOpenOffline;
         
         [self publishDatabasePreferencesChangedNotification:databaseId];
@@ -906,7 +1100,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         
         Model* model = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
         BOOL isReadOnly = model ? model.isReadOnly : database.readOnly;
-
+        
         if ( !isReadOnly ) {
             if ( [DatabasesCollection.shared databaseHasEditsOrIsBeingEditedWithUuid:databaseId] ) {
                 [MacAlerts info:NSLocalizedString(@"read_only_unavailable_title", @"Read Only Unavailable")
@@ -916,7 +1110,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 return;
             }
         }
-
+        
         database.readOnly = !database.readOnly;
         
         [self publishDatabasePreferencesChangedNotification:databaseId];
@@ -931,7 +1125,6 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 }
 
-    
 - (void)publishDatabasePreferencesChangedNotification:(NSString*)databaseUuid {
     
     
@@ -942,8 +1135,21 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     });
 }
 
+- (NSUInteger)getAddButtonItemIndex:(SEL)action {
+    NSMenu* topLevelMenuItem = self.buttonAdd.menu;
+    
+    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.action == action;
+    }];
+    
+    return index;
+}
 
-- (void)removeMenuItemFromAddButtonMenu:(SEL)action {
+- (void)removeAllMenuItemFromAddButtonMenu:(SEL)action {
+    while ( [self removeMenuItemFromAddButtonMenu:action] ) ;
+}
+
+- (BOOL)removeMenuItemFromAddButtonMenu:(SEL)action {
     NSMenu* topLevelMenuItem = self.buttonAdd.menu;
     
     NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -953,8 +1159,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if( topLevelMenuItem &&  index != NSNotFound) {
         
         [topLevelMenuItem removeItemAtIndex:index];
+        return YES;
     }
     else {
+        return NO;
         
     }
 }

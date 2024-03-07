@@ -9,6 +9,18 @@ import Foundation
 import Network
 import OSLog
 
+protocol WiFiSyncManagementInterface {
+    func isEditsAreInProgress(id: String) -> Bool
+
+    func isSyncInProgress(id: String) -> Bool
+
+    func getDatabaseSummaries(id: String?, _ completion: @escaping (([WiFiSyncDatabaseSummary]) -> Void))
+
+    func pullDatabase(id: String, _ completion: @escaping (((Date, Data)?) -> Void))
+
+    func pushDatabase(id: String, _ data: Data, _ completion: @escaping ((_ success: Bool, _ mod: Date?, _ error: String?) -> Void)) throws
+}
+
 class WiFiSyncInboundConnection {
     static let ConnectionQ: DispatchQueue = .init(label: "Wi-Fi-Sync-Inbound-Connection-Queue")
 
@@ -17,8 +29,10 @@ class WiFiSyncInboundConnection {
 
     static var badConsecutivePasscodes = 0
 
-    init(connection: NWConnection, onErrorOrClosed: ((WiFiSyncInboundConnection, Error?) -> Void)?) {
+    let managementInterface: WiFiSyncManagementInterface
+    init(connection: NWConnection, managementInterface: WiFiSyncManagementInterface, onErrorOrClosed: ((WiFiSyncInboundConnection, Error?) -> Void)?) {
         self.connection = connection
+        self.managementInterface = managementInterface
         self.onErrorOrClosed = onErrorOrClosed
 
 
@@ -79,7 +93,7 @@ class WiFiSyncInboundConnection {
 
         switch message.wifiSyncMessageType {
         case .listDatabasesRequest:
-            handleListDatabases()
+            handleListDatabases(content)
         case .getDatabaseRequest:
             handleGetDatabaseRequest(content, message)
         case .pushDatabaseRequest:
@@ -91,35 +105,41 @@ class WiFiSyncInboundConnection {
 
     
 
-    func handleListDatabases() {
+    func handleListDatabases(_ content: Data?) {
+        let databaseId = content != nil ? String(data: content!, encoding: .utf8) : nil
+
+        NSLog("🟢 handleListDatabases: \(String(describing: databaseId))")
+
         let message = NWProtocolFramer.Message(wiFiSyncMessageType: .listDatabasesResponse)
 
         let context = NWConnection.ContentContext(identifier: "listDatabasesResponse",
                                                   metadata: [message])
 
-        let summaries = getDatabaseSummaries()
+        getDatabaseSummaries(databaseId) { [weak self] summaries in
+            guard let self else { return }
 
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        encoder.dateEncodingStrategy = .iso8601withFractionalSeconds
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+            encoder.dateEncodingStrategy = .iso8601withFractionalSeconds
 
-        guard let encodedData = try? encoder.encode(summaries) else {
-            NSLog("🔴 WiFiSyncInboundConnection::handleListDatabases => could not encode to JSON")
-            connection.forceCancel()
-            return
+            guard let encodedData = try? encoder.encode(summaries) else {
+                NSLog("🔴 WiFiSyncInboundConnection::handleListDatabases => could not encode to JSON")
+                connection.forceCancel()
+                return
+            }
+
+            connection.send(content: encodedData, contentContext: context, isComplete: true,
+                            completion: .contentProcessed { error in
+                                if let error {
+                                    NSLog("🔴 WiFiSyncInboundConnection::handleListDatabases - Send Completed: \(String(describing: error)) - encoded data length: \(encodedData.count)")
+                                } else {
+                                    
+                                }
+
+                                
+                                
+                            })
         }
-
-        connection.send(content: encodedData, contentContext: context, isComplete: true,
-                        completion: .contentProcessed { error in
-                            if let error {
-                                NSLog("🔴 WiFiSyncInboundConnection::handleListDatabases - Send Completed: \(String(describing: error)) - encoded data length: \(encodedData.count)")
-                            } else {
-
-                            }
-
-                            
-                            
-                        })
     }
 
     func handleGetDatabaseRequest(_ content: Data?, _: NWProtocolFramer.Message) {
@@ -131,26 +151,30 @@ class WiFiSyncInboundConnection {
 
         NSLog("🟢 handleGetDatabaseRequest: \(String(describing: databaseId))")
 
-        var nsmod: NSDate?
+        managementInterface.pullDatabase(id: databaseId) { [weak self] modAndEncryptedData in
+            guard let self else { return }
 
-        guard let url = WorkingCopyManager.sharedInstance().getLocalWorkingCache(databaseId, modified: &nsmod, fileSize: nil),
-              let workingCopy = try? Data(contentsOf: url),
-              let mod = nsmod as? Date
-        else {
+            handlePullDatabaseResponse(databaseId, modAndEncryptedData) 
+        }
+    }
+
+    func handlePullDatabaseResponse(_ databaseId: String, _ modAndEncryptedData: (Date, Data)?) {
+        guard let modAndEncryptedData else {
             NSLog("🔴 Could not getLocalWorkingCache or read it, or the mod date")
             connection.forceCancel()
             return
         }
 
-        let modDateStr = mod.iso8601withFractionalSeconds
+        let mod = modAndEncryptedData.0
+        let enc = modAndEncryptedData.1
 
-        guard var combined = modDateStr.data(using: .utf8) else {
+        guard var combined = mod.iso8601withFractionalSeconds.data(using: .utf8) else {
             NSLog("🔴 Could not convert moddate to data")
             connection.forceCancel()
             return
         }
 
-        combined.append(workingCopy)
+        combined.append(enc)
 
         let message = NWProtocolFramer.Message(wiFiSyncMessageType: .getDatabaseResponse)
 
@@ -172,26 +196,11 @@ class WiFiSyncInboundConnection {
         NSLog("🟢 handleGetDatabaseRequest done: \(String(describing: databaseId))")
     }
 
-    func isEditsAreInProgress(_ database: MacDatabasePreferences) -> Bool {
-        var ret = false
-
-        DispatchQueue.main.sync {
-            ret = DatabasesCollection.shared.databaseHasEditsOrIsBeingEdited(uuid: database.uuid)
-        }
-
-        return ret
-    }
-
-    func isSyncInProgress(_ database: MacDatabasePreferences) -> Bool {
-        MacSyncManager.sharedInstance().syncInProgress(forDatabase: database.uuid)
-    }
-
     func handlePushDatabaseRequest(_ content: Data?, _: NWProtocolFramer.Message) {
         let uuidStringLength = 36
 
         guard let allData = content,
-              let databaseId = String(data: allData.prefix(uuidStringLength), encoding: .utf8),
-              let database = MacDatabasePreferences.getById(databaseId)
+              let databaseId = String(data: allData.prefix(uuidStringLength), encoding: .utf8)
         else {
             NSLog("🔴 handlePushDatabaseRequest - Could not read content or get databaseId/database")
             sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false, newModDate: nil, error: "Could not read content or get databaseId/database"))
@@ -200,11 +209,11 @@ class WiFiSyncInboundConnection {
 
         NSLog("🟢 handlePushDatabaseRequest: \(String(describing: databaseId))")
 
-        if isEditsAreInProgress(database) {
+        if managementInterface.isEditsAreInProgress(id: databaseId) {
             NSLog("🔴 Edits are in progress, push is not possible. Save changes on remote WiFi Server before pushing.")
             sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false, newModDate: nil,
                                                                 error: NSLocalizedString("wifi_sync_edits_in_progress_try_again", comment: "Edits are in progress, so updating is not currently possible. Finish edits on destination Wi-Fi device and try again.")))
-        } else if isSyncInProgress(database) {
+        } else if managementInterface.isEditsAreInProgress(id: databaseId) {
             NSLog("🔴 A sync is in progress so updating is not currently possible. Allow Sync to finish on destination Wi-Fi device and try again.")
 
             sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false,
@@ -214,21 +223,10 @@ class WiFiSyncInboundConnection {
             let updatedDatabase = allData.suffix(from: uuidStringLength)
 
             do {
-                try MacSyncManager.sharedInstance().updateLocalCopyMark(asRequiringSync: database, data: updatedDatabase) 
-
-                
-                
-
-                DatabasesCollection.shared.reloadFromWorkingCopy(databaseId, dispatchSyncAfterwards: true) { [weak self] in
+                try managementInterface.pushDatabase(id: databaseId, updatedDatabase) { [weak self] success, mod, error in
                     guard let self else { return }
 
-                    guard let mod = WorkingCopyManager.sharedInstance().getModDate(databaseId) else {
-                        NSLog("🔴 handlePushDatabaseRequest - Could not read current mod date of working cache")
-                        sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false, newModDate: nil, error: "Could not read current mod date of working cache"))
-                        return
-                    }
-
-                    sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: true, newModDate: mod, error: nil))
+                    sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: success, newModDate: mod, error: error))
                 }
             } catch {
                 NSLog("🔴 handlePushDatabaseRequest - Error Updating Local: [%@]", String(describing: error))
@@ -270,27 +268,7 @@ class WiFiSyncInboundConnection {
 
     
 
-    func getDatabaseSummaries() -> [WiFiSyncDatabaseSummary] {
-        let summaries: [WiFiSyncDatabaseSummary] = MacDatabasePreferences.allDatabases.compactMap { database in
-            var nsmod: NSDate?
-            var fsize: UInt64 = 0
-
-            guard WorkingCopyManager.sharedInstance().getLocalWorkingCache(database.uuid, modified: &nsmod, fileSize: &fsize) != nil,
-                  let mod = nsmod as? Date
-            else {
-                NSLog("⚠️ Could not get working cache or mod date for database: [%@] - Skipping...", database.nickName)
-                return nil
-            }
-
-            let filename = database.fileUrl.lastPathComponent
-
-            return WiFiSyncDatabaseSummary(uuid: database.uuid,
-                                           filename: filename,
-                                           nickName: database.nickName,
-                                           modDate: mod,
-                                           fileSize: fsize)
-        }
-
-        return summaries
+    func getDatabaseSummaries(_ id: String?, _ completion: @escaping (([WiFiSyncDatabaseSummary]) -> Void)) {
+        managementInterface.getDatabaseSummaries(id: id, completion)
     }
 }

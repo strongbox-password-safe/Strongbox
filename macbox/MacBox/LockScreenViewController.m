@@ -216,7 +216,7 @@
     
     if ( !self.databaseMetadata.hasSetInitialWindowPosition ) {
         NSLog(@"First Launch of Database! Making reasonable size and centering...");
-        [self.view.window setFrame:NSMakeRect(0,0, 600, 750) display:YES];
+        [self.view.window setFrame:NSMakeRect(0,0, 600, 550) display:YES];
         [self.view.window center];
         
         self.databaseMetadata.hasSetInitialWindowPosition = YES;
@@ -910,7 +910,8 @@
         return doc.windowControllers.firstObject.contentViewController;
     }
     else {
-        [NSApp activateIgnoringOtherApps:YES];
+
+        [[NSRunningApplication currentApplication] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)]; 
         [NSApp arrangeInFront:nil];
         
         [DBManagerPanel.sharedInstance show];

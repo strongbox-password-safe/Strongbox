@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSString* uuid; 
 
-+ (instancetype)fromUuid:(NSString*)uuid;
++ (instancetype _Nullable)fromUuid:(NSString*)uuid;
 + (NSArray<DatabasePreferences*>*)forAllDatabasesOfProvider:(StorageProvider)provider;
 + (NSArray<DatabasePreferences*>*)filteredDatabases:(BOOL (^)(DatabasePreferences* database))block;
 
@@ -59,8 +59,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)reloadIfChangedByOtherComponent;
 
-+ (BOOL)isEditing:(DatabasePreferences*)database;
-+ (void)setEditing:(DatabasePreferences*)database editing:(BOOL)editing;
 + (void)deleteAll;
 
 @property (class, readonly) NSArray<DatabasePreferences*>* iCloudDatabases;
@@ -94,6 +92,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL readOnly;
 @property BrowseViewType browseViewType;
 @property BrowseTapAction tapAction;
+
+@property NSString* lastKnownEncryptionSettings;
 
 @property BrowseItemSubtitleField browseItemSubtitleField;
 @property BOOL immediateSearchOnBrowse;
@@ -176,7 +176,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property NSArray<NSNumber*>* detailsViewCollapsedSections;
-@property (nullable) NSArray<NSString*>* favourites;
+@property (nullable) NSArray<NSString*>* legacyFavouritesStore;
 @property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;

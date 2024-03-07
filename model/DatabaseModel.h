@@ -155,6 +155,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *keeAgentSSHKeyEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *passkeyEntries;
 
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *excludedFromAuditItems;
+- (BOOL)isExcludedFromAudit:(NSUUID*)nodeId;
+- (void)excludeFromAudit:(NSUUID*)nodeId exclude:(BOOL)exclude;
+
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
 

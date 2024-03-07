@@ -113,7 +113,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     self.gestureRecognizerClick.enabled = nickNameEditClickEnabled;
     
     @try {
-        self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:metadata.storageProvider];
+        self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:metadata.storageProvider database:metadata];
 
         [self bindTextFields:metadata];
     
@@ -291,24 +291,35 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     NSString* fileMod = @"";
     NSString* title = metadata.nickName ? metadata.nickName : @"";
 
+    path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
+
+#ifndef IS_APP_EXTENSION
+    if ( metadata.storageProvider == kWiFiSync ) {
+        NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
+        
+        if ( name ) {
+            path = [NSString stringWithFormat:@"%@ on '%@' - %@", 
+                    metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
+        }
+    }
+#endif
+    
 #ifndef NO_SFTP_WEBDAV_SP
+    
     if ( metadata.storageProvider == kSFTP ) {
         SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
         
         path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
     }
-    else if ( metadata.storageProvider == kWebDAV ) {
+    
+    if ( metadata.storageProvider == kWebDAV ) {
         WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
         
         path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
     }
-    else {
-#endif
-        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
-#ifndef NO_SFTP_WEBDAV_SP
-    }
-#endif
     
+#endif
+
     NSDate* modDate;
     unsigned long long size;
     NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata.uuid

@@ -171,7 +171,19 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
         cell.alphaValue = 0.7f;
     }
     
+    BOOL enabled = !sbi.disabled;
+    
+    cell.textField.enabled = enabled;
+    cell.textField.textColor = enabled ? nil : NSColor.secondaryLabelColor;
+    cell.imageView.enabled = enabled;
+    
     return cell;
+}
+
+- (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item {
+    StorageBrowserItem* sbi = item;
+
+    return !sbi.disabled;
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {

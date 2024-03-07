@@ -19,6 +19,7 @@
 #import "Serializator.h"
 #import "WorkingCopyManager.h"
 #import "AppPreferences.h"
+#import "ExportHelper.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate, UIActivityItemSource>
 
@@ -106,38 +107,14 @@
 }
 
 - (void)onShare {
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseUuid];
-    if (!localCopyUrl) {
-        [Alerts error:self error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
+    DatabasePreferences* database = self.viewModel.metadata;
+    NSError* error;
+    NSURL* url = [ExportHelper getExportFile:database error:&error];
+    if ( !url || error ) {
+        [Alerts error:self error:error];
         return;
     }
-    
-    NSError* err;
-    NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
-    if (err) {
-        [Alerts error:self error:err];
-        return;
-    }
-    
-    [self onShareWithData:data];
-}
 
-- (void)onShareWithData:(NSData*)data {
-    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? self.exportFileName : self.viewModel.metadata.fileName;
-    
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    
-    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
-    
-    NSError* err;
-    [data writeToFile:f options:kNilOptions error:&err];
-    
-    if (err) {
-        [Alerts error:self error:err];
-        return;
-    }
-    
-    NSURL* url = [NSURL fileURLWithPath:f];
     NSArray *activityItems = @[url]; 
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
@@ -151,11 +128,7 @@
     __weak ExportOptionsTableViewController* weakSelf = self;
 
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-        NSError *errorBlock;
-        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
-            NSLog(@"error deleting file %@", errorBlock);
-            return;
-        }
+        [ExportHelper cleanupExportFiles:url];
         
         if ( completed ) {
             [weakSelf informSuccessAndDismiss];
@@ -401,18 +374,6 @@
     if ( self.onDone ) {
         self.onDone();
     }
-}
-
-- (NSString*)exportFileName {
-    NSString* extension = self.viewModel.metadata.fileName.pathExtension;
-    NSString* withoutExtension = [self.viewModel.metadata.fileName stringByDeletingPathExtension];
-    NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
-    
-    NSString* ret = [newFileName stringByAppendingPathExtension:extension];
-    
-    NSLog(@"Export Filename: [%@]", ret);
-    
-    return  ret;
 }
 
 @end

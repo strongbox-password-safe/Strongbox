@@ -7,7 +7,6 @@
 //
 
 import Network
-import UIKit
 
 @objc
 class WiFiSyncServerConfig: NSObject, Identifiable {

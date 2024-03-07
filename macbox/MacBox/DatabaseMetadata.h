@@ -109,6 +109,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 /* =================================================================================================== */
 
 @property BOOL hasSetInitialWindowPosition;
+@property BOOL hasSetInitialUnlockedFrame;
 
 
 
@@ -119,11 +120,12 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 
 @property (nonatomic, strong, nullable) NSString* conveniencePin;
-@property (nullable) NSArray<NSString*>* favourites;
+@property (nullable) NSArray<NSString*>* legacyFavouritesStore;
 @property DatabaseAuditorConfiguration* auditConfig;
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 @property NSUInteger unlockCount;
 @property DatabaseFormat likelyFormat;
+@property NSString* lastKnownEncryptionSettings;
 @property BOOL emptyOrNilPwPreferNilCheckFirst; 
 
 

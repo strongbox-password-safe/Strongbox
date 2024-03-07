@@ -608,9 +608,19 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         return obj.fields.password.length < self.config.minimumLength; 
     }];
 
+    if ( self.config.excludeShortNumericPINCodes ) {
+        results = [results filter:^BOOL(Node * _Nonnull obj) {
+            return ![self isShortNumericOnlyPinCode:obj.fields.password];
+        }];
+    }
+    
     return [results map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;
     }].set;
+}
+
+- (BOOL)isShortNumericOnlyPinCode:(NSString*)password {
+    return password.length <= 8 && password.isAllDigits;
 }
 
 - (NSDictionary<NSString*, NSSet<NSUUID*>*>*)checkForDuplicatedPasswords {
@@ -623,6 +633,12 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     for (Node* entry in self.auditableNonEmptyPasswordNodes) {
         
         NSString* password = entry.fields.password;
+        
+        
+        
+        if ( self.config.excludeShortNumericPINCodes && [self isShortNumericOnlyPinCode:password] ) {
+            continue;
+        }
         
         if (self.config.caseInsensitiveMatchForDuplicates) {
             password = password.lowercaseString;
@@ -656,6 +672,12 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     }
 
     NSArray<Node*>* common = [self.auditableNonEmptyPasswordNodes filter:^BOOL(Node * _Nonnull obj) {
+        
+        
+        if ( self.config.excludeShortNumericPINCodes && [self isShortNumericOnlyPinCode:obj.fields.password] ) {
+            return NO;
+        }
+        
         return [PasswordMaker.sharedInstance isCommonPassword:obj.fields.password];
     }];
     
@@ -672,6 +694,12 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
         
     NSArray<Node*>* lowEntropy = [self.auditableNonEmptyPasswordNodes filter:^BOOL(Node * _Nonnull obj) {
+        
+        
+        if ( self.config.excludeShortNumericPINCodes && [self isShortNumericOnlyPinCode:obj.fields.password] ) {
+            return NO;
+        }
+        
         PasswordStrength* strength = [PasswordStrengthTester getStrength:obj.fields.password config:self.strengthConfig];
         BOOL low = strength.entropy < ((double)self.config.lowEntropyThreshold);
         return low;
@@ -705,6 +733,12 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 
         [uncheckedOthers removeObject:entry];
 
+        
+        
+        if ( self.config.excludeShortNumericPINCodes && [self isShortNumericOnlyPinCode:password] ) {
+            continue;
+        }
+        
         for (Node* other in uncheckedOthers) {
             if (i % 1000 == 0) {
                 
@@ -750,7 +784,15 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         return;
     }
     
-    NSDictionary<NSString*, NSArray<Node*>*> *nodesByPasswords = [self.auditableNonEmptyPasswordNodes groupBy:^id _Nonnull(Node * _Nonnull obj) {
+    NSArray<Node*>* filtered = [self.auditableNonEmptyPasswordNodes filter:^BOOL(Node * _Nonnull obj) {
+        if ( self.config.excludeShortNumericPINCodes && [self isShortNumericOnlyPinCode:obj.fields.password] ) {
+            return NO;
+        }
+        
+        return YES;
+    }];
+    
+    NSDictionary<NSString*, NSArray<Node*>*> *nodesByPasswords = [filtered groupBy:^id _Nonnull(Node * _Nonnull obj) {
         return obj.fields.password;
     }];
     

@@ -96,7 +96,6 @@ final class BonjourResolver: NSObject, NetServiceDelegate {
     }
 
     func timeout() {
-        NSLog("⚠️ Bonjour Resolver Timed Out")
         stop(with: .failure(BonjourResolverError.timeout))
     }
 
@@ -113,6 +112,11 @@ final class BonjourResolver: NSObject, NetServiceDelegate {
 
         if let completionHandler {
             self.completionHandler = nil
+
+            if case .failure(BonjourResolverError.timeout) = result {
+                NSLog("⚠️ Bonjour Resolver Timed Out")
+            }
+
             completionHandler(result)
         }
     }

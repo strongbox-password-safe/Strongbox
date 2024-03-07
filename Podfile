@@ -15,7 +15,6 @@ abstract_target 'common-mac' do
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
-    pod 'SSZipArchive', '2.4.3'
   end
   
   target 'Mac-Pro' do
@@ -24,7 +23,6 @@ abstract_target 'common-mac' do
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
-    pod 'SSZipArchive', '2.4.3'
   end
   
   target 'Mac-Unified-Freemium' do
@@ -33,7 +31,6 @@ abstract_target 'common-mac' do
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
-    pod 'SSZipArchive', '2.4.3'
   end
   
   target 'Mac-Unified-Pro' do
@@ -42,11 +39,10 @@ abstract_target 'common-mac' do
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
-    pod 'SSZipArchive', '2.4.3'
   end
   
   target 'Mac-Graphene' do
-    pod 'SSZipArchive', '2.4.3'
+    
   end
   
   target 'Mac-Business' do
@@ -55,7 +51,6 @@ abstract_target 'common-mac' do
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
-    pod 'SSZipArchive', '2.4.3'
   end
   
   target 'Mac-Freemium-AutoFill' do
@@ -92,8 +87,6 @@ abstract_target 'common-ios' do
         pod 'GoogleSignIn'
         pod 'MSAL'
         pod 'MSGraphClientSDK'
-        pod 'SwiftMessages'
-        pod 'SSZipArchive', '2.4.3'
     end
 
     target 'Strongbox-iOS-Pro' do
@@ -104,8 +97,6 @@ abstract_target 'common-ios' do
         pod 'GoogleSignIn'
         pod 'MSAL'
         pod 'MSGraphClientSDK'
-        pod 'SwiftMessages'
-        pod 'SSZipArchive', '2.4.3'
     end
 
     target 'Strongbox-iOS-Business' do
@@ -116,21 +107,15 @@ abstract_target 'common-ios' do
       pod 'GoogleSignIn'
       pod 'MSAL'
       pod 'MSGraphClientSDK'
-      pod 'SwiftMessages'
-      pod 'SSZipArchive', '2.4.3'
     end
 
     target 'Strongbox-iOS-SCOTUS' do
         pod 'ISMessages'
-        pod 'SwiftMessages'
-        pod 'SSZipArchive', '2.4.3'
     end    
 
     target 'Strongbox-iOS-Graphene' do
         pod 'MTBBarcodeScanner'
         pod 'ISMessages'
-        pod 'SwiftMessages'
-        pod 'SSZipArchive', '2.4.3'
     end  
 
     target 'Strongbox-Auto-Fill' do

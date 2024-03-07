@@ -1,5 +1,5 @@
 //
-//  AppPreferencesWindowController.swift
+//  AppSettingsWindowController.swift
 //  MacBox
 //
 //  Created by Strongbox on 19/11/2021.
@@ -9,13 +9,13 @@
 import Cocoa
 
 @objc
-public class AppPreferencesWindowController: NSWindowController {
+public class AppSettingsWindowController: NSWindowController {
     @objc
-    static let sharedInstance: AppPreferencesWindowController = .instantiateFromStoryboard()
+    static let sharedInstance: AppSettingsWindowController = .instantiateFromStoryboard()
 
-    private class func instantiateFromStoryboard() -> AppPreferencesWindowController {
+    private class func instantiateFromStoryboard() -> AppSettingsWindowController {
         let storyboard = NSStoryboard(name: "AppPreferences", bundle: nil)
-        let wc = storyboard.instantiateInitialController() as! AppPreferencesWindowController
+        let wc = storyboard.instantiateInitialController() as! AppSettingsWindowController
         return wc
     }
 

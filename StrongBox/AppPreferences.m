@@ -9,6 +9,8 @@
 #import "AppPreferences.h"
 #import "Constants.h"
 #import "NSArray+Extensions.h"
+#import "SecretStore.h"
+#import "PasswordMaker.h"
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 static NSString* cachedAppGroupName;
@@ -154,6 +156,11 @@ static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcon
 static NSString* const kDatabasesSerializationError = @"databasesSerializationError";
 static NSString* const kWiFiSyncHasBeenGrantedPermission = @"wiFiSyncHasBeenGrantedPermission";
 static NSString* const kDisableWiFiSync = @"disableWiFiSync";
+static NSString* const kZipExports = @"zipExports";
+
+static NSString* const kWiFiSyncOn = @"wiFiSyncOn";
+static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
+static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
 
 @implementation AppPreferences
 
@@ -196,12 +203,51 @@ static NSString* const kDisableWiFiSync = @"disableWiFiSync";
 
 
 
-- (BOOL)disableWiFiSync {
+- (BOOL)disableWiFiSyncClientMode {
     return [self getBool:kDisableWiFiSync];
 }
 
-- (void)setDisableWiFiSync:(BOOL)disableWiFiSync {
+- (void)setDisableWiFiSyncClientMode:(BOOL)disableWiFiSync {
     [self setBool:kDisableWiFiSync value:disableWiFiSync];
+}
+
+- (BOOL)runAsWiFiSyncSourceDevice {
+    return [self getBool:kWiFiSyncOn fallback:NO];
+}
+
+- (void)setRunAsWiFiSyncSourceDevice:(BOOL)wiFiSyncOn {
+    [self setBool:kWiFiSyncOn value:wiFiSyncOn];
+}
+
+- (NSString *)wiFiSyncPasscode {
+    NSString* passcode = [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
+    
+    if (!passcode) {
+        passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
+        [self setWiFiSyncPasscode:passcode];
+    }
+    
+    return passcode;
+}
+
+- (void)setWiFiSyncPasscode:(NSString *)wiFiSyncPasscode {
+    [SecretStore.sharedInstance setSecureString:wiFiSyncPasscode forIdentifier:kWiFiSyncPasscodeSSKey];
+}
+
+- (NSString *)wiFiSyncServiceName {
+    return [self getString:kWiFiSyncServiceName fallback:nil];
+}
+
+- (void)setWiFiSyncServiceName:(NSString *)wiFiSyncServiceName {
+    [self setString:kWiFiSyncServiceName value:wiFiSyncServiceName];
+}
+
+- (BOOL)zipExports {
+    return [self getBool:kZipExports fallback:YES];
+}
+
+- (void)setZipExports:(BOOL)zipExports {
+    [self setBool:kZipExports value:zipExports];
 }
 
 - (BOOL)wiFiSyncHasRequestedNetworkPermissions {

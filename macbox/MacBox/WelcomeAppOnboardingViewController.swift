@@ -66,7 +66,7 @@ class WelcomeAppOnboardingViewController: NSViewController {
         checkboxAutoFill.isEnabled = Settings.sharedInstance().isPro
 
         checkboxMarkdownNotes.state = Settings.sharedInstance().markdownNotes ? .on : .off
-        checkboxWiFi.state = Settings.sharedInstance().wiFiSyncOn ? .on : .off
+        checkboxWiFi.state = Settings.sharedInstance().runAsWiFiSyncSourceDevice ? .on : .off
 
         stackWiFI.isHidden = !StrongboxProductBundle.supportsWiFiSync
     }
@@ -120,13 +120,13 @@ class WelcomeAppOnboardingViewController: NSViewController {
 
         
 
-        Settings.sharedInstance().wiFiSyncOn = checkboxWiFi.state == .on
+        Settings.sharedInstance().runAsWiFiSyncSourceDevice = checkboxWiFi.state == .on
 
         try? WiFiSyncServer.shared.startOrStopWiFiSyncServerAccordingToSettings()
 
         
 
-        NotificationCenter.default.post(name: .preferencesChanged, object: nil)
+        NotificationCenter.default.post(name: .settingsChanged, object: nil)
 
         Settings.sharedInstance().hasShownFirstRunWelcome = true
 

@@ -29,6 +29,17 @@ class SwiftUIViewFactory: NSObject {
         return hostingController
     }
 
+    @objc static func makeWiFiSyncPassCodeEntryViewController(server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig?, _ passcode: String?) -> Void)) -> NSViewController {
+        let hostingController = NSHostingController(rootView: MacWiFiSyncPasscodeEntryView(server: server, onDone: onDone))
+
+        hostingController.preferredContentSize = NSSize(width: 350, height: 400)
+        if #available(macOS 13.0, *) {
+            hostingController.sizingOptions = .preferredContentSize
+        }
+
+        return hostingController
+    }
+
     @objc static func makeSaleOfferViewController(sale: Sale,
                                                   existingSubscriber: Bool,
                                                   redeemHandler: @escaping (() -> Void),

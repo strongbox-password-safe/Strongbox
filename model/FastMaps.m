@@ -22,7 +22,8 @@
                          urlSet:(NSCountedSet<NSString *> *)urlSet
               customFieldKeySet:(NSCountedSet<NSString *> *)customFieldKeySet
                 entryTotalCount:(NSInteger)entryTotalCount 
-                groupTotalCount:(NSInteger)groupTotalCount {
+                groupTotalCount:(NSInteger)groupTotalCount
+              excludedFromAudit:(NSSet<NSUUID *> *)excludedFromAudit {
     if (self = [super init]) {
         _uuidMap = [uuidMap copy];
         _withExpiryDates = [withExpiryDates copy];
@@ -40,6 +41,7 @@
         _customFieldKeySet = customFieldKeySet;
         _entryTotalCount = entryTotalCount;
         _groupTotalCount = groupTotalCount;
+        _excludedFromAudit = excludedFromAudit;
     }
     
     return self;

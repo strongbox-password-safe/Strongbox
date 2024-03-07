@@ -39,6 +39,7 @@
 #import "AppleICloudProvider.h"
 #import "Strongbox-Swift.h"
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
+#import "NSArray+Extensions.h"
 
 NSString *const kSectionThirdParty = @"3rd_party";
 NSString *const kSectionOwnServer = @"own_servers";
@@ -72,7 +73,25 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 }
 
 - (void)loadWiFiSyncDevices {
-    self.wiFiSyncDevices = [WiFiSyncBrowser.shared.availableServers copy];
+#ifndef NO_SFTP_WEBDAV_SP
+    NSMutableArray<WiFiSyncServerConfig*>* allWiFiSyncDevices = [WiFiSyncBrowser.shared.availableServers mutableCopy];
+    
+    NSArray<WiFiSyncServerConfig*>* wiFiSyncDevices = allWiFiSyncDevices;
+    
+    if ( WiFiSyncServer.shared.isRunning ) { 
+        NSString* myName = WiFiSyncServer.shared.lastRegisteredServiceName;
+        
+        if ( myName.length ) {
+            wiFiSyncDevices = [allWiFiSyncDevices filter:^BOOL(WiFiSyncServerConfig * _Nonnull obj) {
+                return ![obj.name isEqualToString:myName];
+            }];
+        }
+    }
+
+    self.wiFiSyncDevices = wiFiSyncDevices;
+#else
+    self.wiFiSyncDevices = @[];
+#endif
 }
 
 - (void)observeWiFiSyncDevices {
@@ -107,7 +126,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     if ( self.existing ) {
         self.providersForSectionMap[kSectioniOSNative] = @[@(kFilesAppUrlBookmark)];
 
-        if ( !AppPreferences.sharedInstance.disableWiFiSync && StrongboxProductBundle.supportsWiFiSync ) {
+        if ( !AppPreferences.sharedInstance.disableWiFiSyncClientMode && StrongboxProductBundle.supportsWiFiSync ) {
             [self loadWiFiSyncDevices];
             [self observeWiFiSyncDevices];
             

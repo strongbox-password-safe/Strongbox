@@ -65,4 +65,12 @@ class FontManager: NSObject {
 
     @objc
     let caption1Font: NSFont = .preferredFont(forTextStyle: .caption1)
+
+    @objc
+    let boldCaption1Font: NSFont = {
+        let base = NSFont.preferredFont(forTextStyle: .caption1)
+
+        let ret = NSFontManager.shared.convert(base, toHaveTrait: .boldFontMask)
+        return ret
+    }()
 }

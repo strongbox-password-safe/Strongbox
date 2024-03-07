@@ -20,6 +20,17 @@
 
         [Settings.sharedInstance setPro:YES];
     }
+    
+    if ( StrongboxProductBundle.isZeroEdition ) {
+        NSLog(@"Graphene Edition... customizing...");
+        
+        Settings.sharedInstance.disableWiFiSyncClientMode = YES;
+        Settings.sharedInstance.databasesAreAlwaysReadOnly = NO;
+    }
+    else {
+        Settings.sharedInstance.disableWiFiSyncClientMode = NO;
+        Settings.sharedInstance.databasesAreAlwaysReadOnly = NO;
+    }
 }
 
 + (BOOL)isUnifiedBundle {

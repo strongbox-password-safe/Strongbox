@@ -9,15 +9,19 @@
 import Cocoa
 
 class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
-    @IBOutlet var icon: NSImageView!
+    @IBOutlet private var icon: NSImageView!
     @IBOutlet var title: NSTextField!
-    @IBOutlet var topSpaceConstraint: NSLayoutConstraint!
-    @IBOutlet var leadingSpaceConstraint: NSLayoutConstraint!
-    @IBOutlet var bottomSpaceConstraint: NSLayoutConstraint!
-    @IBOutlet var childCount: NSTextField!
-    @IBOutlet var trailingFavStar: NSImageView!
+    @IBOutlet private var topSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet private var leadingSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet private var bottomSpaceConstraint: NSLayoutConstraint!
+    @IBOutlet private var childCount: NSTextField!
+    @IBOutlet private var trailingFavStar: NSImageView!
 
     @IBOutlet var titleWidthConstraint: NSLayoutConstraint!
+
+
+
+
 
     static let NibIdentifier: NSUserInterfaceItemIdentifier = .init("TitleAndIconCell")
 

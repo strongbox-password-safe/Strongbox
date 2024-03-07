@@ -66,6 +66,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UILabel *labelLowEntropy;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchTwoFactorAuth;
+@property (weak, nonatomic) IBOutlet UISwitch *switchIgnorePINCodes;
 
 
 
@@ -182,6 +183,9 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     self.labelEntropyThreshold.text = [NSString stringWithFormat:@"%0.1f", (double)self.model.metadata.auditConfig.lowEntropyThreshold];
 
     
+    
+    self.switchIgnorePINCodes.on = self.model.metadata.auditConfig.excludeShortNumericPINCodes;
+
     
     
     [self bindAuditStatusWithProgress:nil];
@@ -313,6 +317,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     config.checkForLowEntropy = self.switchLowEntropy.on;
     config.lowEntropyThreshold = self.sliderEntropyThreshold.value;
     config.checkForTwoFactorAvailable = self.switchTwoFactorAuth.on;
+    config.excludeShortNumericPINCodes = self.switchIgnorePINCodes.on;
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(restartBackgroundAudit) object:nil];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(saveSettingsAndRestartBackgroundAudit:) object:nil];

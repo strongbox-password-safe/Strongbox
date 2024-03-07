@@ -148,16 +148,6 @@
     return [SafesList.sharedInstance reloadIfChangedByOtherComponent];
 }
 
-+ (BOOL)isEditing:(DatabasePreferences *)database {
-    SafeMetaData* meta = database.metadata;
-    return [SafesList.sharedInstance isEditing:meta];
-}
-
-+ (void)setEditing:(DatabasePreferences *)database editing:(BOOL)editing {
-    SafeMetaData* meta = database.metadata;
-    [SafesList.sharedInstance setEditing:meta editing:editing];
-}
-
 + (void)deleteAll {
     [SafesList.sharedInstance deleteAll];
 }
@@ -328,6 +318,16 @@
 - (void)setLikelyFormat:(DatabaseFormat)likelyFormat {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.likelyFormat = likelyFormat;
+    }];
+}
+
+- (NSString *)lastKnownEncryptionSettings {
+    return self.metadata.lastKnownEncryptionSettings;
+}
+
+- (void)setLastKnownEncryptionSettings:(NSString *)lastKnownEncryptionSettings {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.lastKnownEncryptionSettings = lastKnownEncryptionSettings;
     }];
 }
 
@@ -573,12 +573,12 @@
 
 
 
-- (NSArray<NSString *> *)favourites {
-    return self.metadata.favourites;
+- (NSArray<NSString *> *)legacyFavouritesStore {
+    return self.metadata.legacyFavouritesStore;
 }
 
-- (void)setFavourites:(NSArray<NSString *> *)favourites {
-    self.metadata.favourites = favourites;
+- (void)setLegacyFavouritesStore:(NSArray<NSString *> *)legacyFavouritesStore {
+    self.metadata.legacyFavouritesStore = legacyFavouritesStore;
 }
 
 - (NSArray<NSString *> *)autoFillExcludedItems {

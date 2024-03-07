@@ -57,21 +57,6 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
     }
 }
 
-- (void)dealloc {
-    [self cleanup];
-}
-
-- (void)cleanup {
-    if (self.encryptedSessionFilePath) {
-        NSError* error;
-        [NSFileManager.defaultManager removeItemAtPath:self.encryptedSessionFilePath error:&error];
-
-    }
-    
-    self.encryptedSessionFilePath = nil;
-    self.encryptionKey = nil;
-}
-
 - (instancetype)initNonPerformantWithData:(NSData *)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory {
     return [self initWithStream:[NSInputStream inputStreamWithData:data] protectedInMemory:protectedInMemory compressed:compressed];
 }
@@ -140,7 +125,12 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
         self.compressed = compressed;
         self.encryptionKey = getRandomData(kCCKeySizeAES256);
         self.encryptionIV = getRandomData(kCCBlockSizeAES128);
-        self.encryptedSessionFilePath = [self getUniqueFileName];
+        
+#if defined(TARGET_OS_IPHONE) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
+        if ( kMemoryPerfMeasuresEnabled ) {
+            self.encryptedSessionFilePath = [self getUniqueFileName];
+        }
+#endif
         
 
         
@@ -283,15 +273,17 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
     return [NSData dataWithContentsOfStream:[self getPlainTextInputStream]];
 }
 
+#if defined(TARGET_OS_IPHONE) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
 - (NSString*)getUniqueFileName {
     NSString* ret;
     
     do {
-        ret = [StrongboxFilesManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+        ret = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
     } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
     
     return ret;
 }
+#endif
 
 - (NSUInteger)length {
     return self.attachmentLength;

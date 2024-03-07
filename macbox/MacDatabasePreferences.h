@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearSecureItems;
 @property (nonatomic, strong, nullable) YubiKeyConfiguration* yubiKeyConfiguration;
 @property NSArray<NSString*>* visibleColumns;
-@property (nullable) NSArray<NSString*>* favourites;
+@property (nullable) NSArray<NSString*>* legacyFavouritesStore;
 @property DatabaseAuditorConfiguration* auditConfig;
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 - (void)triggerPasswordExpiry;
@@ -115,11 +115,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL uiDoNotSortKeePassNodesInBrowseView;
 
 @property BOOL hasSetInitialWindowPosition;
+@property BOOL hasSetInitialUnlockedFrame;
+
 @property BOOL autoFillScanCustomFields;
 @property BOOL autoFillScanNotes;
 @property (nonatomic, strong, nullable) NSString* conveniencePin;
 @property NSUInteger unlockCount;
 @property DatabaseFormat likelyFormat;
+@property NSString* lastKnownEncryptionSettings;
 @property BOOL emptyOrNilPwPreferNilCheckFirst; 
 @property (nonatomic) BOOL isTouchIdEnabled;
 @property (nonatomic) BOOL isWatchUnlockEnabled;

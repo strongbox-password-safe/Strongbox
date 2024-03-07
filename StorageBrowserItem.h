@@ -12,12 +12,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface StorageBrowserItem : NSObject
 
-+ (instancetype)itemWithName:(NSString*)name identifier:(NSString*)identifier folder:(BOOL)folder providerData:(id)providerData;
++ (instancetype)itemWithName:(NSString*)name identifier:(NSString*)identifier folder:(BOOL)folder providerData:(id _Nullable)providerData;
 
 @property (nonatomic) BOOL folder;
 @property (nonatomic) NSString *name;
 @property (nonatomic) NSString *identifier; 
-@property (nonatomic) NSObject *providerData;
+@property (nonatomic, nullable) NSObject *providerData;
+@property BOOL disabled;
 
 @end
 

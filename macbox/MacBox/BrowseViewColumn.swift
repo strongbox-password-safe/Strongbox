@@ -34,6 +34,17 @@ enum BrowseViewColumn: String, CaseIterable {
         NSUserInterfaceItemIdentifier(rawValue)
     }
 
+    var initialSize: CGFloat {
+        switch self {
+        case .title:
+            return 175
+        case .username:
+            return 100
+        default:
+            return 150
+        }
+    }
+
     var visibleByDefault: Bool {
         switch self {
         case .title:
@@ -55,13 +66,13 @@ enum BrowseViewColumn: String, CaseIterable {
         case .expires:
             return false
         case .totp:
-            return true
+            return false
         case .attachmentCount:
             return false
         case .customFieldCount:
             return false
         case .tags:
-            return true
+            return false
         case .path:
             return false
         case .historicalItemCount:

@@ -313,18 +313,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 }
 
 - (NSString *)tmpEncryptionStreamPath {
-    NSString *ret =  [NSTemporaryDirectory() stringByAppendingPathComponent:kEncryptionStreamDirectoryName];
-    NSError* error;
-    
-    if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
-    }
-
-    return ret;
-}
-
-- (NSString *)tmpEncryptedAttachmentPath {
-    NSString *ret =  [NSTemporaryDirectory() stringByAppendingPathComponent:kEncAttachmentDirectoryName];
+    NSString *ret =  [NSTemporaryDirectory() stringByAppendingPathComponent:kEncryptionStreamDirectoryName]; 
     NSError* error;
     
     if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
@@ -347,19 +336,18 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
     return ret;
 }
 
-- (void)deleteAllTmpAttachmentPreviewFiles {
-    NSString* tmpPath = [self tmpAttachmentPreviewPath];
-    [self deleteAllContentsOfDirectory:tmpPath];
-}
-
 - (void)deleteAllTmpWorkingFiles { 
-    [self deleteAllTmpEncryptedAttachmentWorkingFiles];
     [self deleteAllTmpSyncMergeWorkingFiles];
-    [self deleteAllTmpEncryptionStreamFiles];
+    [self deleteAllTmpDirectoryFiles];
+    [self deleteAllTmpAttachmentFiles];
 }
 
-- (void)deleteAllTmpEncryptedAttachmentWorkingFiles { 
-    NSString* tmpPath = [self tmpEncryptedAttachmentPath];
+- (void)deleteAllTmpDirectoryFiles { 
+    [self deleteAllContentsOfDirectory:NSTemporaryDirectory()]; 
+}
+
+- (void)deleteAllTmpAttachmentFiles {
+    NSString* tmpPath = self.tmpAttachmentPreviewPath;
     [self deleteAllContentsOfDirectory:tmpPath];
 }
 

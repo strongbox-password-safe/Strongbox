@@ -7,7 +7,6 @@
 
 import Network
 import OSLog
-import UIKit
 
 extension Notification.Name {
     static let wifiBrowserResultsUpdated = Notification.Name("wifiBrowserResultsUpdated")
@@ -50,7 +49,9 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
     @objc
     func startBrowsing(_ forceStopFirst: Bool = false, completion: @escaping ((Bool) -> Void)) {
-        guard StrongboxProductBundle.supportsWiFiSync else {
+        let prefs = CrossPlatformDependencies.defaults().applicationPreferences
+
+        guard StrongboxProductBundle.supportsWiFiSync, !prefs.disableWiFiSyncClientMode else {
             NSLog("🔴 Bundle does not support WiFi sync! Do not call Browser start()")
             return
         }
@@ -176,6 +177,7 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
         getServerConfig(serverName) != nil
     }
 
+    @objc
     func getServerConfig(_ serverName: String) -> WiFiSyncServerConfig? {
         availableBackingStore.snapshot.first { server in
             server.name == serverName
@@ -276,7 +278,7 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
         if let explicit {
             availableBackingStore.addObjects(from: explicit)
         } else if let browser {
-            NSLog("🐞 Updating WiFi Sync Servers with \(browser.browseResults)")
+
 
             let newServers = browser.browseResults.compactMap { result in
                 if case let NWEndpoint.service(name: name, type: _, domain: _, interface: _) = result.endpoint {

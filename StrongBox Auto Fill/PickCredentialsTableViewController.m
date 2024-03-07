@@ -301,8 +301,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)loadAllItems {
-    return [self.model filterAndSortForBrowse:self.model.allEntries.mutableCopy
-                                includeGroups:NO];
+    return [self.model filterAndSortForBrowse:self.model.allSearchableNoneExpiredEntries.mutableCopy includeGroups:NO];
 }
 
 - (NSArray<Node*>*)loadPinnedItems {
@@ -435,7 +434,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             cell.userInteractionEnabled = [self canCreateNewCredential];
         }
         else {
-            cell.textLabel.text = NSLocalizedString(@"generic_preferences", @"Preferences");
+            cell.textLabel.text = NSLocalizedString(@"generic_settings", @"Settings");
             cell.imageView.image = [UIImage systemImageNamed:@"gear"];
             
             cell.textLabel.textColor = UIColor.systemBlueColor;

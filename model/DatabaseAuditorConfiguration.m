@@ -42,6 +42,8 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         self.hibpCaveatAccepted = NO;
         self.hibpCheckForNewBreachesIntervalSeconds = 7 * 24 * 60 * 60; 
         self.lastHibpOnlineCheck = nil;
+        
+        self.excludeShortNumericPINCodes = YES;
     }
         
     return self;
@@ -76,6 +78,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     if (jsonDictionary[@"lastKnownAuditIssueCount"] != nil ) ret.lastKnownAuditIssueCount = ((NSNumber*)(jsonDictionary[@"lastKnownAuditIssueCount"]));
     if (jsonDictionary[@"lowEntropyThreshold"] != nil ) ret.lowEntropyThreshold = ((NSNumber*)(jsonDictionary[@"lowEntropyThreshold"])).unsignedIntegerValue;
     if (jsonDictionary[@"checkForTwoFactorAvailable"] != nil ) ret.checkForTwoFactorAvailable = ((NSNumber*)(jsonDictionary[@"checkForTwoFactorAvailable"])).boolValue;
+    if (jsonDictionary[@"excludeShortNumericPINCodes"] != nil ) ret.excludeShortNumericPINCodes = ((NSNumber*)(jsonDictionary[@"excludeShortNumericPINCodes"])).boolValue;
 
     return ret;
 }
@@ -99,6 +102,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
 
         @"lowEntropyThreshold" : @(self.lowEntropyThreshold),
         @"checkForTwoFactorAvailable" : @(self.checkForTwoFactorAvailable),
+        @"excludeShortNumericPINCodes" : @(self.excludeShortNumericPINCodes),
     }];
 
     if( self.lastHibpOnlineCheck != nil) {
@@ -141,7 +145,14 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
             self.showAuditPopupNotifications = NO;
         }
 
+        if ( [coder containsValueForKey:@"excludeShortNumericPINCodes"] ) {
+            self.excludeShortNumericPINCodes = [coder decodeBoolForKey:@"excludeShortNumericPINCodes"];
+        }
+        else {
+            self.excludeShortNumericPINCodes = YES;
+        }
     }
+    
     return self;
 }
 
@@ -164,6 +175,8 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     [coder encodeBool:self.checkForTwoFactorAvailable forKey:@"checkForTwoFactorAvailable"];
     [coder encodeObject:self.lastHibpOnlineCheck forKey:@"lastHibpOnlineCheck"];
     [coder encodeObject:self.lastKnownAuditIssueCount forKey:@"lastKnownAuditIssueCount"];
+    
+    [coder encodeBool:self.excludeShortNumericPINCodes forKey:@"excludeShortNumericPINCodes"];
 }
 
 @end

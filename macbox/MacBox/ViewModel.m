@@ -192,6 +192,16 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
 }
 
+- (NSArray<Node *> *)excludedFromAuditEntries {
+    if ( !self.locked ) {
+        return self.innerModel.excludedFromAuditItems;
+    }
+    else {
+        NSLog(@"🔴 excludedFromAuditEntries - Model Locked cannot get item.");
+        return @[];
+    }
+}
+
 - (NSArray<Node *> *)totpEntries {
     if ( !self.locked ) {
         return self.database.totpEntries;
@@ -441,11 +451,11 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
 }
 
-- (void)setItemAuditExclusion:(Node*)node exclude:(BOOL)exclude {
-    [self setItemAuditExclusion:node exclude:exclude modified:nil];
+- (void)setItemAuditExclusion:(Node*)node exclude:(BOOL)exclude isPartOfBatch:(BOOL)isPartOfBatch {
+    [self setItemAuditExclusion:node exclude:exclude modified:nil isPartOfBatch:isPartOfBatch];
 }
 
-- (void)setItemAuditExclusion:(Node*)node exclude:(BOOL)exclude modified:(NSDate*)modified {
+- (void)setItemAuditExclusion:(Node*)node exclude:(BOOL)exclude modified:(NSDate*)modified isPartOfBatch:(BOOL)isPartOfBatch {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -476,12 +486,36 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self touchAndModify:node modDate:modified];
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] setItemAuditExclusion:node exclude:!exclude modified:oldModified];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemAuditExclusion:node exclude:!exclude modified:oldModified isPartOfBatch:isPartOfBatch];
     
     if(!self.document.undoManager.isUndoing) {
         NSString* loc = NSLocalizedString(@"item_settings_action_verb_toggle_suggest_in_audit", @"Toggle Audit this Item");
         [self.document.undoManager setActionName:loc];
     }
+    
+    if ( !isPartOfBatch ) {
+        [self restartBackgroundAudit];
+    }
+}
+
+- (void)batchExcludeItemsFromAudit:(NSArray<Node*>*)items exclude:(BOOL)exclude {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    if ( self.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 batchExcludeItemsFromAudit - Model is RO!");
+        return;
+    }
+    
+    [self.document.undoManager beginUndoGrouping];
+    
+    for (Node* node in items) {
+        [self setItemAuditExclusion:node exclude:exclude isPartOfBatch:YES];
+    }
+    
+    [self.document.undoManager setActionName:exclude ? NSLocalizedString(@"action_exclude_items_from_audit_verb", @"Exclude from Audit") : NSLocalizedString(@"action_include_items_in_audit_verb", @"Include in Audit")];
+    [self.document.undoManager endUndoGrouping];
     
     [self restartBackgroundAudit];
 }
@@ -493,16 +527,6 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     else {
         NSLog(@"🔴 isExcludedFromAudit - Model Locked.");
         return NO;
-    }
-}
-
-- (NSArray<Node*>*)getExcludedAuditItems {
-    if ( !self.locked ) {
-        return [self.innerModel getExcludedAuditItems];
-    }
-    else {
-        NSLog(@"🔴 getExcludedAuditItems - Model Locked.");
-        return @[];
     }
 }
 
@@ -1057,40 +1081,104 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 
 
-- (void)toggleAutoFillExclusion:(NSUUID *)uuid {
-    [self toggleAutoFillExclusion:uuid modified:nil];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)setItemAutoFillExclusion:(Node*)node exclude:(BOOL)exclude {
+    [self setItemAutoFillExclusion:node exclude:exclude modified:nil];
 }
 
-- (void)toggleAutoFillExclusion:(NSUUID *)uuid modified:(NSDate*)modified {
+- (void)setItemAutoFillExclusion:(Node*)node exclude:(BOOL)exclude modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
+    
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 toggleAutoFillExclusion - Model is RO!");
+        NSLog(@"🔴 setItemAutoFillExclusion - Model is RO!");
         return;
     }
     
-    Node* item = [self getItemById:uuid];
-    NSDate* oldModified = item.fields.modified;
+    if ( [self isExcludedFromAutoFill:node.uuid] == exclude ) {
+        NSLog(@"✅ NOP - setItemAutoFillExclusion");
+        return;
+    }
+    
+    NSDate* oldModified = node.fields.modified;
     
     if(self.document.undoManager.isUndoing) {
-        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+        if ( node.fields.keePassHistory.count > 0 ) {
+            [node.fields.keePassHistory removeLastObject];
+        }
     }
     else {
-        Node* cloneForHistory = [item cloneForHistory];
-        [item.fields.keePassHistory addObject:cloneForHistory];
+        Node* cloneForHistory = [node cloneForHistory];
+        [node.fields.keePassHistory addObject:cloneForHistory];
     }
     
-    [self.innerModel toggleAutoFillExclusion:uuid];
+    [self.innerModel setItemsExcludedFromAutoFill:@[node.uuid] exclude:exclude]; 
     
-    [self touchAndModify:item modDate:modified];
+    [self touchAndModify:node modDate:modified];
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] toggleAutoFillExclusion:uuid modified:oldModified];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemAutoFillExclusion:node exclude:!exclude modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
         NSString* loc = NSLocalizedString(@"item_settings_action_verb_toggle_suggest_in_autofill", @"Toggle Suggest in AutoFill");
         [self.document.undoManager setActionName:loc];
     }
+}
+
+- (void)batchExcludeItemsFromAutoFill:(NSArray<Node*>*)items exclude:(BOOL)exclude {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    if ( self.isEffectivelyReadOnly ) {
+        NSLog(@"🔴 batchExcludeItemsFromAudit - Model is RO!");
+        return;
+    }
+    
+    [self.document.undoManager beginUndoGrouping];
+    
+    for (Node* node in items) {
+        [self setItemAutoFillExclusion:node exclude:exclude];
+    }
+    
+    NSString* loc = NSLocalizedString(@"item_settings_action_verb_toggle_suggest_in_autofill", @"Toggle Suggest in AutoFill");
+    [self.document.undoManager setActionName:loc];
+    [self.document.undoManager endUndoGrouping];
 }
 
 - (BOOL)isExcludedFromAutoFill:(NSUUID *)item {

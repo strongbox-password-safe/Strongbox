@@ -8,7 +8,7 @@
 
 import Foundation
 
-class PasswordHistoryHelper {
+public class PasswordHistoryHelper {
     class func getHeaderMenuItem(_ title: String, headline: Bool = false) -> NSMenuItem {
         let menuItemHeader = NSMenuItem(title: title, action: nil, keyEquivalent: "")
         menuItemHeader.isEnabled = false
@@ -24,9 +24,9 @@ class PasswordHistoryHelper {
     }
 
     class func getPasswordHistoryMenu(item: Node) -> NSMenu? {
-        guard let history = item.fields.keePassHistory as? [Node],
-              item.fields.keePassHistory.count > 0
-        else {
+        let changeHistory = PasswordHistoryProcessor.getHistory(item: item)
+
+        guard !changeHistory.isEmpty else {
             return nil
         }
 
@@ -43,33 +43,30 @@ class PasswordHistoryHelper {
         ret.items.append(getHeaderMenuItem(NSLocalizedString("password_history_previous_passwords", comment: "Previous Passwords"), headline: true))
         ret.items.append(NSMenuItem.separator())
 
-        var mod = item.fields.modified as NSDate?
-        var currentPassword = item.fields.password
-        var foundHistory = false
-        for hist in history.reversed() {
-            let pw = hist.fields.password
-            if pw.count == 0 || pw.localizedCompare(currentPassword) == .orderedSame {
-                continue
+        for changeEvent in changeHistory {
+            let mod = changeEvent.0
+            let pw = changeEvent.1
+
+            let fmt: String
+            if changeEvent == changeHistory.first!, changeHistory.count > 1 {
+                fmt = NSLocalizedString("password_history_this_password_was_used_until_most_recent_fmt", comment: "Most Recent (Used until %@)")
+            } else if changeEvent == changeHistory.last!, changeHistory.count > 1 {
+                fmt = NSLocalizedString("password_history_this_password_was_used_until_oldest_fmt", comment: "Oldest (Used until %@)")
+            } else {
+                fmt = NSLocalizedString("password_history_this_password_was_used_until_fmt", comment: "Used until %@")
             }
 
-            if let mod { 
-                let fmt = NSLocalizedString("password_history_this_password_was_used_until_fmt", comment: "Used until %@")
-                let header = String(format: fmt, mod.friendlyDateTimeString)
-                ret.items.append(getHeaderMenuItem(header))
-            }
+            let header = String(format: fmt, (mod as NSDate).friendlyDateTimeStringPrecise)
+            ret.items.append(getHeaderMenuItem(header))
 
             let menuItem = NSMenuItem(title: pw, action: #selector(PasswordHistoryHelper.copyHistoricalPassword(sender:)), keyEquivalent: "")
             menuItem.target = self
 
             ret.items.append(menuItem)
             ret.items.append(NSMenuItem.separator())
-
-            mod = hist.fields.modified as NSDate?
-            currentPassword = pw
-            foundHistory = true
         }
 
-        return foundHistory ? ret : nil
+        return ret
     }
 
     @objc class func copyHistoricalPassword(sender: Any?) {

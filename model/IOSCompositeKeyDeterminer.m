@@ -580,7 +580,7 @@ static const int kMaxFailedPinAttempts = 3;
 
             if ( usingImportedKeyFile && self.isAutoFillOpen ) {
                     [Alerts error:self.viewController
-                            title:NSLocalizedString(@"open_sequence_error_reading_key_file_autofill_context", @"Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences")
+                            title:NSLocalizedString(@"open_sequence_error_reading_key_file_autofill_context", @"Could not read Key File. Has it been imported properly? Check Key Files Management in Settings")
                             error:error
                        completion:^{
                         self.completion(kGetCompositeKeyResultError, nil, NO, error);

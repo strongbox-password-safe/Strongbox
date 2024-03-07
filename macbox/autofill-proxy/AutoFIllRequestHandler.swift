@@ -11,6 +11,8 @@ import Foundation
 @objc class AutoFillRequestHandler: NSObject {
     var keyPair: BoxKeyPair = CryptoBoxHelper.createKeyPair()
 
+    static let MaxFieldLength = 8192
+
     @objc static let shared = AutoFillRequestHandler()
 
     override private init() {
@@ -627,7 +629,7 @@ import Foundation
 
         let cfs = vm.customFieldsFiltered.map { cfvm in
             AutoFillCredentialCustomField(key: cfvm.key,
-                                          value: String(cfvm.value.prefix(1024)),
+                                          value: String(cfvm.value.prefix(AutoFillRequestHandler.MaxFieldLength)),
                                           concealable: cfvm.protected)
         }
 
@@ -646,7 +648,7 @@ import Foundation
                                             databaseName: model.metadata.nickName,
                                             tags: vm.tags,
                                             favourite: vm.favourite,
-                                            notes: String(vm.notes.prefix(1024)),
+                                            notes: String(vm.notes.prefix(AutoFillRequestHandler.MaxFieldLength)),
                                             modified: (node.fields.modified as? NSDate)?.friendlyDateTimeString ?? "")
 
         return credential

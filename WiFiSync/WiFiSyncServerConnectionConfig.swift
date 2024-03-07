@@ -6,8 +6,6 @@
 //  Copyright © 2023 Mark McGuill. All rights reserved.
 //
 
-import UIKit
-
 @objc
 class WiFiSyncServerConnectionConfig: NSObject, Codable {
     @objc var serverName: String

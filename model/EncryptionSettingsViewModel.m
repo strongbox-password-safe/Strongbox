@@ -16,6 +16,7 @@
 #import "PwSafeDatabase.h"
 #import "Argon2dKdfCipher.h"
 #import "Argon2idKdfCipher.h"
+#import "Utils.h"
 
 @interface EncryptionSettingsViewModel ()
 
@@ -23,6 +24,8 @@
 @property KdfAlgorithm _kdfAlgorithm;
 
 @property (nullable) NSString* subVersion;
+
+@property (nullable) NSString* generator;
 
 @end
 
@@ -96,7 +99,7 @@
             NSLog(@"WARNWARN - Unknown Datavase format");
             break;
     }
-
+    
     return nil;
 }
 
@@ -134,6 +137,8 @@
     ret.encryptionAlgorithm = [EncryptionSettingsViewModel getEncryptionAlgorithm:databaseModel.meta.cipherUuid];
     ret.compression = databaseModel.meta.compressionFlags == kGzipCompressionFlag;
     ret.innerStreamAlgorithm = [EncryptionSettingsViewModel getInnerStreamAlgorithm:databaseModel.meta.innerRandomStreamId];
+
+    ret.generator = databaseModel.meta.generator;
     
     return ret;
 }
@@ -176,6 +181,7 @@
     EncryptionSettingsViewModel* ret = [[EncryptionSettingsViewModel alloc] init];
     
     ret.format = kKeePass4;
+    ret.generator = databaseModel.meta.generator;
     
     [EncryptionSettingsViewModel fillKeePass4FromMeta:ret meta:databaseModel.meta];
         
@@ -565,6 +571,15 @@
     EncryptionSettingsViewModel *defaults = [EncryptionSettingsViewModel defaultsForFormat:self.format];
     
     return ![self isEncryptionParamsDifferentFrom:defaults];
+}
+
+- (NSString *)debugString {
+    if ( self.kdfAlgorithm == kKdfAlgorithmArgon2d || self.kdfAlgorithm == kKdfAlgorithmArgon2d ) {
+        return [NSString stringWithFormat:@"%@/%@ %@ (I%llu/P%u)/%@/%@/%@/%@", [self formatAndVersion], self.kdf, friendlyMemorySizeString(self.argonMemory), self.iterations, self.argonParallelism, self.encryption, self.innerStreamCipher, self.compressionString, self.generator];
+    }
+    else {
+        return [NSString stringWithFormat:@"%@/%@ (I%llu)/%@/%@/%@/%@", [self formatAndVersion], self.kdf, self.iterations, self.encryption, self.innerStreamCipher, self.compressionString, self.generator];
+    }
 }
 
 @end

@@ -18,7 +18,7 @@ class AuditExcludedItems: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        excludedItems = database.getExcludedAuditItems()
+        excludedItems = database.excludedFromAuditEntries
 
         tableView.register(NSNib(nibNamed: TitleAndIconCell.NibIdentifier.rawValue, bundle: nil), forIdentifier: TitleAndIconCell.NibIdentifier)
 
@@ -40,8 +40,10 @@ extension AuditExcludedItems: NSTableViewDataSource, NSTableViewDelegate {
     func getTitleCell(node: Node) -> NSTableCellView {
         let cell = tableView.makeView(withIdentifier: TitleAndIconCell.NibIdentifier, owner: self) as! TitleAndIconCell
 
-        cell.icon.objectValue = getIconForNode(node)
-        cell.title.stringValue = dereference(text: node.title, node: node)
+        cell.setContent(dereference(text: node.title, node: node), iconImage: getIconForNode(node), iconTintColor: .systemBlue)
+
+        
+
 
         return cell
     }

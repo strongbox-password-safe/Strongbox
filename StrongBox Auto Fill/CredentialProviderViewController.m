@@ -30,6 +30,7 @@
 #import "PickCredentialsTableViewController.h"
 #import "EntryViewModel.h"
 #import "Node+Passkey.h"
+#import "StrongboxiOSFilesManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -50,6 +51,7 @@ typedef enum : NSUInteger {
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
 @property (nonatomic, strong) UINavigationController* currentlyPresentedNavController; 
+
 @property (nonatomic, strong) NSArray<ASCredentialServiceIdentifier *> * serviceIdentifiers;
 
 @property id credentialIdentity;
@@ -57,17 +59,34 @@ typedef enum : NSUInteger {
 @property (readonly) UIViewController* vcToPresentOn;
 
 @property AutoFillOperationMode mode;
-@property BOOL allowUserInteractionAndMessaging; 
 @property BOOL initializedUI;
+
+
+
+
+
+
+
+@property BOOL withoutUserInteraction;
+@property BOOL hasDoneCommonInit;
 
 @end
 
 @implementation CredentialProviderViewController
 
 - (void)commonInit {
-    NSLog(@"🟢 CredentialProviderViewController::commonInit"); 
-    
-    [DatabasePreferences reloadIfChangedByOtherComponent]; 
+    if ( !self.hasDoneCommonInit ) {
+        self.hasDoneCommonInit = YES;
+        
+        NSLog(@"🟢 CredentialProviderViewController::commonInit"); 
+                
+        [StrongboxFilesManager.sharedInstance deleteAllTmpDirectoryFiles];
+        
+        [DatabasePreferences reloadIfChangedByOtherComponent]; 
+    }
+    else {
+        NSLog(@"🟢 CredentialProviderViewController::commonInit already done");
+    }
 }
 
 
@@ -77,7 +96,8 @@ typedef enum : NSUInteger {
     [self commonInit];
     
     self.mode = AutoFillOperationModeGetPasswordQuickType;
-    self.allowUserInteractionAndMessaging = NO;
+    self.withoutUserInteraction = YES;
+    
     self.credentialIdentity = credentialIdentity;
     
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
@@ -110,7 +130,6 @@ typedef enum : NSUInteger {
     [self commonInit];
     
     self.mode = AutoFillOperationModeGetPasswordQuickType;
-    self.allowUserInteractionAndMessaging = YES;
     self.credentialIdentity = credentialIdentity;
 }
 
@@ -119,7 +138,6 @@ typedef enum : NSUInteger {
     [self commonInit];
     
     self.mode = AutoFillOperationModeGetPasswordManualSelect;
-    self.allowUserInteractionAndMessaging = YES;
     self.serviceIdentifiers = serviceIdentifiers;
 }
 
@@ -130,7 +148,6 @@ typedef enum : NSUInteger {
     [self commonInit];
     
     self.mode = AutoFillOperationModeRegisterPasskey;
-    self.allowUserInteractionAndMessaging = YES;
     self.passkeyCredentialRequest = registrationRequest;
     
     [self delayedInitializeUI];
@@ -142,7 +159,7 @@ typedef enum : NSUInteger {
     
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
         self.mode = AutoFillOperationModeGetPasskeyAssertionQuickTypeNoUI;
-        self.allowUserInteractionAndMessaging = NO;
+        self.withoutUserInteraction = YES;
         self.passkeyCredentialRequest = credentialRequest;
         
         id<ASCredentialIdentity> credentialIdentity = credentialRequest.credentialIdentity;
@@ -178,7 +195,6 @@ typedef enum : NSUInteger {
     
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
         self.mode = AutoFillOperationModeGetPasskeyAssertionManualOrQuickTypeWithUI;
-        self.allowUserInteractionAndMessaging = YES;
         self.passkeyCredentialRequest = credentialRequest;
         self.credentialIdentity = credentialRequest.credentialIdentity;
         
@@ -323,8 +339,6 @@ typedef enum : NSUInteger {
 }
 
 - (void)unlockWithQuickTypeIdentifier {
-    
-    
     QuickTypeRecordIdentifier* identifier;
     
     if (@available(iOS 17.0, *)) {
@@ -415,7 +429,7 @@ typedef enum : NSUInteger {
 
 - (void)onUnlockedDatabase:(Model*)model
        quickTypeIdentifier:(QuickTypeRecordIdentifier*)identifier {
-    if (model.metadata.autoFillConvenienceAutoUnlockTimeout == -1 && self.allowUserInteractionAndMessaging ) {
+    if (model.metadata.autoFillConvenienceAutoUnlockTimeout == -1 && !self.withoutUserInteraction ) {
         [self onboardForAutoFillConvenienceAutoUnlock:model.metadata
                                            completion:^{
             [self continueUnlockedDatabase:model quickTypeIdentifier:identifier];
@@ -672,8 +686,11 @@ typedef enum : NSUInteger {
 
 - (void)exitWithCredential:(Model*)model item:(Node*)item quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier {
     NSString* user = [model.database dereference:item.fields.username node:item];
-    
-    NSString* password = @"";
+    if ( user.length == 0 ) {
+        user = [model.database dereference:item.fields.email node:item]; 
+    }
+
+    NSString* password = nil;
     
     if ( quickTypeIdentifier && quickTypeIdentifier.fieldKey ) {
         StringValue* sv = item.fields.customFields[quickTypeIdentifier.fieldKey];
@@ -698,8 +715,7 @@ typedef enum : NSUInteger {
     NSString* totp = item.fields.otpToken ? item.fields.otpToken.password : @"";
     if ( totp.length && model.metadata.autoFillCopyTotp ) {
         
-        if ( !self.allowUserInteractionAndMessaging ) { 
-            
+        if ( self.withoutUserInteraction ) { 
             NSLog(@"🟢 TOTP Copy Required - we must be interactive... retrying in interactive mode...");
             [self exitWithUserInteractionRequired];
             return;
@@ -709,29 +725,7 @@ typedef enum : NSUInteger {
         [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:totp];
         NSLog(@"🟢 Copied TOTP to Pasteboard...");
         
-        
-        
         completion();
-        
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
     else {
         completion();
@@ -779,6 +773,8 @@ typedef enum : NSUInteger {
     if ( database ) {
         database.autoFillLastUnlockedAt = NSDate.date;
     }
+    
+    [StrongboxFilesManager.sharedInstance deleteAllTmpDirectoryFiles];
     
 
 }

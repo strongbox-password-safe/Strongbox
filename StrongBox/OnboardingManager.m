@@ -33,6 +33,7 @@
 #import "Strongbox-Swift.h"
 #import "SaleScheduleManager.h"
 #import "GenericOnboardingViewController.h"
+#import "ExportHelper.h"
 
 @interface OnboardingManager ()
 
@@ -278,7 +279,7 @@
     module.image = [UIImage imageNamed:@"backup"];
 
     module.header = NSLocalizedString(@"backup_settings_prompt_title", @"Backup Settings");
-    module.message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox includes all local files (including database backups) and local device databases in Apple backups of this device. However imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok?");
+    module.message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox includes all local files (including database backups) and local device databases in Apple backups of this device. However imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Settings > Advanced.\n\nDoes this sound ok?");
 
     module.button1 = NSLocalizedString(@"backup_settings_prompt_option_yes_looks_good", @"Yes, the defaults sound good");
     module.button2 = NSLocalizedString(@"backup_settings_prompt_yes_but_include_key_files", @"Yes, but also backup imported Key Files");
@@ -595,7 +596,7 @@
     quickLaunchAppLockWarning.button2 = NSLocalizedString(@"generic_dont_tell_again", @"Don't Tell me Again");
     quickLaunchAppLockWarning.header = NSLocalizedString(@"onboarding_configuration_issue_title", @"Configuration Issue");
     
-    NSString *fmt = NSLocalizedString(@"app_lock_coalescing_with_quick_launch_warning", @"There is a configuration issue you should be aware of. You are using %@ for both App Lock and Quick Launch. In addition you allow device passcode fallback for App Lock.\n\nThis leads to a situation where you can unlock your database using only your device passcode.\n\nIf you do not want this you can do any of the following: Disable App Lock passcode fallback, or Quick Launch, or %@ Database Unlock, or coalescing of unlocks (Advanced Preferences).");
+    NSString *fmt = NSLocalizedString(@"app_lock_coalescing_with_quick_launch_warning", @"There is a configuration issue you should be aware of. You are using %@ for both App Lock and Quick Launch. In addition you allow device passcode fallback for App Lock.\n\nThis leads to a situation where you can unlock your database using only your device passcode.\n\nIf you do not want this you can do any of the following: Disable App Lock passcode fallback, or Quick Launch, or %@ Database Unlock, or coalescing of unlocks.");
 
     NSString* msg = [NSString stringWithFormat:fmt, BiometricsManager.sharedInstance.biometricIdName, BiometricsManager.sharedInstance.biometricIdName, BiometricsManager.sharedInstance.biometricIdName];
     quickLaunchAppLockWarning.message = msg;
@@ -708,7 +709,8 @@
     
     module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
         if ( model.metadata.kdbx4UpgradeDontAskAgain ||
-            model.metadata.unlockCount < 20 ||
+            model.metadata.lazySyncMode ||
+            model.metadata.unlockCount < 10 ||
             model.isReadOnly ) {
             return NO;
         }
@@ -723,16 +725,6 @@
                 return NO;
             }
         }
-
-        unsigned long long fileSize = 0;
-        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:model.metadata.uuid
-                                                                            modified:nil
-                                                                            fileSize:&fileSize];
-        
-        const unsigned long long kMinFileSize = 0.8f * 1024 * 1024;
-        if ( !workingCopy || fileSize < kMinFileSize ) {
-            return NO;
-        }
         
         return YES;
     };
@@ -746,10 +738,14 @@
         
     module.message = msg;
 
-   module.button1 = NSLocalizedString(@"generic_yes_great_idea_bang", @"Yes, Great Idea!");
-   module.button2 = NSLocalizedString(@"generic_not_right_now", @"Not Right Now");
-   module.button3 = NSLocalizedString(@"generic_dont_ask_again", @"Dont't Ask Again");
-   
+    module.button1 = NSLocalizedString(@"generic_yes_great_idea_bang", @"Yes, Great Idea!");
+    
+    module.button2 = NSLocalizedString(@"generic_not_right_now", @"Not Right Now");
+    module.button2Color = UIColor.systemGrayColor;
+    
+    module.button3 = NSLocalizedString(@"generic_dont_ask_again", @"Dont't Ask Again");
+    module.button3Color = UIColor.systemGrayColor;
+    
     module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
         model.metadata.lastAskedAboutKdbx4Upgrade = NSDate.date;
         
@@ -789,30 +785,13 @@
 - (void)onShare:(GenericOnboardingViewController*)viewController
        database:(DatabasePreferences*)database
          onDone:(OnboardingModuleDoneBlock)onDone {
-    NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? database.exportFilename : database.fileName;
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
-    
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
-    if (!localCopyUrl) {
-        [Alerts error:viewController error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
+    NSError* error;
+    NSURL* url = [ExportHelper getExportFile:database error:&error];
+    if ( !url || error ) {
+        [Alerts error:viewController error:error];
         return;
     }
-    
-    NSError* err;
-    NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
-    if (err) {
-        [Alerts error:viewController error:err];
-        return;
-    }
-    
-    [data writeToFile:f options:kNilOptions error:&err];
-    if (err) {
-        [Alerts error:viewController error:err];
-        return;
-    }
-    
-    NSURL* url = [NSURL fileURLWithPath:f];
+
     NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
@@ -823,12 +802,8 @@
     activityViewController.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
     
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-        NSError *errorBlock;
-        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
-            NSLog(@"error deleting file %@", errorBlock);
-            return;
-        }
-        
+        [ExportHelper cleanupExportFiles:url];
+
         onDone(NO, NO);
     }];
     

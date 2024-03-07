@@ -995,6 +995,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     NSMutableDictionary<NSUUID*, Node*>* uuidMap = NSMutableDictionary.dictionary;
     
     NSMutableSet<NSUUID*> *expirySet = NSMutableSet.set;
+    NSMutableSet<NSUUID*> *excludedFromAuditSet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *attachmentSet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *keeAgentSshKeysSet = NSMutableSet.set;
     NSMutableSet<NSUUID*> *passkeysSet = NSMutableSet.set;
@@ -1043,7 +1044,8 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
                                                        urlSet:urlSet
                                             customFieldKeySet:customFieldKeySet
                                               entryTotalCount:entryTotalCount
-                                              groupTotalCount:groupTotalCount];
+                                              groupTotalCount:groupTotalCount
+                                            excludedFromAudit:excludedFromAuditSet];
         
         _fastMaps = newMaps;
         
@@ -1069,6 +1071,12 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
             
             if ( node.fields.expires != nil ) {
                 [expirySet addObject:node.uuid];
+            }
+            
+            
+            
+            if ( !node.fields.qualityCheck ) {
+                [excludedFromAuditSet addObject:node.uuid];
             }
             
             
@@ -1149,7 +1157,8 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
                                                    urlSet:urlSet
                                         customFieldKeySet:customFieldKeySet
                                           entryTotalCount:entryTotalCount
-                                          groupTotalCount:groupTotalCount];
+                                          groupTotalCount:groupTotalCount
+                                        excludedFromAudit:excludedFromAuditSet];
     
     _fastMaps = newMaps;
     
@@ -1357,6 +1366,36 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     __weak DatabaseModel* weakSelf = self;
     
     return [self.fastMaps.withPasskeys.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [weakSelf getItemById:obj];
+    }];
+}
+
+- (void)excludeFromAudit:(NSUUID *)nodeId exclude:(BOOL)exclude {
+    Node* node = [self getItemById:nodeId];
+    
+    BOOL shouldQualityCheck = !exclude;
+    
+    if ( node && node.fields.qualityCheck != shouldQualityCheck ) { 
+        node.fields.qualityCheck = shouldQualityCheck;
+        
+        [self rebuildFastMaps];
+    }
+    else {
+        NSLog(@"⚠️ Could not find item or item is already in this audit exclusion state. WARNWARN");
+    }
+}
+
+- (BOOL)isExcludedFromAudit:(NSUUID *)nodeId {
+    Node* node = [self getItemById:nodeId];
+    return !node.fields.qualityCheck;
+    
+    
+}
+
+- (NSArray<Node *> *)excludedFromAuditItems {
+    __weak DatabaseModel* weakSelf = self;
+    
+    return [self.fastMaps.excludedFromAudit.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [weakSelf getItemById:obj];
     }];
 }

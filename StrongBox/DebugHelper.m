@@ -302,7 +302,7 @@ int OPParentIDForProcessID(int pid)
     
 
     [debugLines addObject:@"--------------------"];
-    [debugLines addObject:@"Preferences"];
+    [debugLines addObject:@"Settings"];
     [debugLines addObject:@"--------------------"];
 #if TARGET_OS_IPHONE
     NSUserDefaults *defs = AppPreferences.sharedInstance.sharedAppGroupDefaults;

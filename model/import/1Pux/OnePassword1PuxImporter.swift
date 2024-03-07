@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import SSZipArchive
+import Zip
 
 enum OnePassword1PuxImporterError: Error {
     case Unknown
@@ -16,6 +16,19 @@ enum OnePassword1PuxImporterError: Error {
 }
 
 class OnePassword1PuxImporter: NSObject, Importer {
+    struct UnresolvedSsoReference {
+        var provider: String
+        var vaultUuid: String
+        var itemUuid: String
+        var nodeId: UUID
+    }
+
+    struct IntermediateResult {
+        var messages: [ImportMessage] = []
+        var ssoReferencesToResolve: [UnresolvedSsoReference] = []
+        var vaultItemToNodeMap: [String: Node] = [:]
+    }
+
     var allowedFileTypes: [String] = ["1pux"]
 
     func convert(url: URL) throws -> DatabaseModel {
@@ -47,11 +60,9 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
         StrongboxFilesManager.sharedInstance().createIfNecessary(uniqDir)
 
-        
+        Zip.addCustomFileExtension(url.pathExtension) 
 
-        guard SSZipArchive.unzipFile(atPath: url.path, toDestination: uniqDir.path) else {
-            throw OnePassword1PuxImporterError.CouldNotUnzip
-        }
+        try Zip.unzipFile(url, destination: uniqDir, overwrite: true, password: nil)
 
         return uniqDir
     }
@@ -77,18 +88,36 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
         let multipleAccounts = accounts.count > 1
 
-        var messages: [ImportMessage] = []
+        var intermediateResult = IntermediateResult()
 
         for account in accounts {
-            let tmp = try processAccount(database: database, account: account, multipleAccounts: multipleAccounts, attachmentsDir: attachmentsDir)
-
-            messages.append(contentsOf: tmp)
+            try processAccount(database: database, account: account, multipleAccounts: multipleAccounts, attachmentsDir: attachmentsDir, intermediateResult: &intermediateResult)
         }
 
-        return messages
+        database.rebuildFastMaps()
+
+        
+
+        for ssoReferencesToResolve in intermediateResult.ssoReferencesToResolve {
+            let key = getVaultItemMapKey(ssoReferencesToResolve.vaultUuid, ssoReferencesToResolve.itemUuid)
+
+            guard let referencedNode = intermediateResult.vaultItemToNodeMap[key],
+                  let nodeToFixUp = database.getItemBy(ssoReferencesToResolve.nodeId)
+            else {
+                intermediateResult.messages.append(ImportMessage("Could not find references SSO Login Item", .error))
+                continue
+            }
+
+            addCustomField(node: nodeToFixUp,
+                           name: String(format: "Sign In With"),
+                           value: String(format: "%@ (%@) [%@]", referencedNode.title, referencedNode.fields.username, ssoReferencesToResolve.provider),
+                           protected: false)
+        }
+
+        return intermediateResult.messages
     }
 
-    func processAccount(database: DatabaseModel, account: OnePuxAccount, multipleAccounts: Bool, attachmentsDir: URL) throws -> [ImportMessage] {
+    func processAccount(database: DatabaseModel, account: OnePuxAccount, multipleAccounts: Bool, attachmentsDir: URL, intermediateResult: inout IntermediateResult) throws {
         var accountGroup = database.effectiveRootGroup
 
         if multipleAccounts {
@@ -99,22 +128,18 @@ class OnePassword1PuxImporter: NSObject, Importer {
         guard let vaults = account.vaults else {
             let msg = String(format: "⚠️ No vaults found for account = [%@]", String(describing: account.attrs?.name))
             NSLog(msg)
-            return [ImportMessage(msg, .warning)]
+            intermediateResult.messages.append(ImportMessage(msg, .warning))
+            return
         }
 
         let multipleVaults = vaults.count > 1
 
-        var collected: [ImportMessage] = []
         for vault in vaults {
-            let msgs = try processVault(database: database, vault: vault, accountGroup: accountGroup, multipleVaults: multipleVaults, attachmentsDir: attachmentsDir)
-
-            collected.append(contentsOf: msgs)
+            try processVault(database: database, vault: vault, accountGroup: accountGroup, multipleVaults: multipleVaults, attachmentsDir: attachmentsDir, intermediateResult: &intermediateResult)
         }
-
-        return collected
     }
 
-    func processVault(database: DatabaseModel, vault: OnePuxVault, accountGroup: Node, multipleVaults: Bool, attachmentsDir: URL) throws -> [ImportMessage] {
+    func processVault(database: DatabaseModel, vault: OnePuxVault, accountGroup: Node, multipleVaults: Bool, attachmentsDir: URL, intermediateResult: inout IntermediateResult) throws {
         var vaultGroup = accountGroup
 
         if multipleVaults {
@@ -125,40 +150,45 @@ class OnePassword1PuxImporter: NSObject, Importer {
         guard let items = vault.items else {
             let msg = String(format: "⚠️ No items found for vault = [%@]", String(describing: vault.attrs?.name))
             NSLog(msg)
-            return [ImportMessage(msg, .warning)]
+            intermediateResult.messages.append(ImportMessage(msg, .warning))
+            return
         }
-
-        var collected: [ImportMessage] = []
 
         for item in items {
-            let msgs = try processItem(database: database, item: item, vaultGroup: vaultGroup, attachmentsDir: attachmentsDir)
-            collected.append(contentsOf: msgs)
+            try processItem(database: database, vault: vault, item: item, vaultGroup: vaultGroup, attachmentsDir: attachmentsDir, intermediateResult: &intermediateResult)
         }
-
-        return collected
     }
 
-    func processItem(database: DatabaseModel, item: OnePuxVaultItem, vaultGroup: Node, attachmentsDir: URL) throws -> [ImportMessage] {
-        var messages: [ImportMessage] = []
+    func getVaultItemMapKey(_ vaultUuid: String, _ itemUuid: String) -> String {
+        String(format: "%@-%@", vaultUuid, itemUuid)
+    }
 
-        let parentGroup: Node
-        if let categoryId = item.categoryUuid {
+    func processItem(database: DatabaseModel, vault: OnePuxVault, item: OnePuxVaultItem, vaultGroup: Node, attachmentsDir: URL, intermediateResult: inout IntermediateResult) throws {
+        guard let itemUuid = item.uuid, let vaultUuid = vault.attrs?.uuid else {
+            intermediateResult.messages.append(ImportMessage("No Item or Vault UUID found for entry. Ignoring", .error))
+            return
+        }
+
+        var parentGroup: Node = vaultGroup
+
+        if let state = item.state, state == "archived" {
+            if let arch = getOrCreateArchiveGroup(database, vaultGroup) {
+                parentGroup = arch
+            }
+        } else if let categoryId = item.categoryUuid {
             let (pg, msgs) = createOrGetCategoryGroup(categoryId: categoryId, vaultGroup: vaultGroup, item: item)
 
             parentGroup = pg
-            messages.append(contentsOf: msgs)
+            intermediateResult.messages.append(contentsOf: msgs)
         } else {
-            messages.append(ImportMessage("CategoryUuid not found for item", .error))
-            parentGroup = vaultGroup
+            intermediateResult.messages.append(ImportMessage("CategoryUuid not found for item", .error))
         }
 
         let node = Node(asRecord: "Unknown", parent: parentGroup)
+        intermediateResult.vaultItemToNodeMap[getVaultItemMapKey(vaultUuid, itemUuid)] = node
+
         node.icon = parentGroup.icon
         parentGroup.addChild(node, keePassGroupTitleRules: true)
-
-        if let state = item.state, state == "archived" {
-            database.recycleItems([node])
-        }
 
         if let trashed = item.trashed, trashed {
             database.recycleItems([node])
@@ -183,11 +213,32 @@ class OnePassword1PuxImporter: NSObject, Importer {
         }
 
         if let details = item.details {
-            let msgs = try processItemDetails(node: node, details: details, categoryId: item.categoryUuid, attachmentsDir: attachmentsDir)
-            messages.append(contentsOf: msgs)
+            try processItemDetails(node: node, details: details, categoryId: item.categoryUuid, attachmentsDir: attachmentsDir, intermediateResult: &intermediateResult)
         }
+    }
 
-        return messages
+    var archiveGroup: Node? = nil
+    func getOrCreateArchiveGroup(_ database: DatabaseModel, _ parentGroup: Node?) -> Node? {
+        if let archiveGroup {
+            return archiveGroup
+        } else {
+            guard let group = Node(asGroup: "_archived",
+                                   parent: parentGroup ?? database.effectiveRootGroup,
+                                   keePassGroupTitleRules: true, uuid: nil),
+                database.addChildren([group], destination: database.effectiveRootGroup)
+            else {
+                return nil
+            }
+
+            archiveGroup = group
+
+            group.icon = NodeIcon.withPreset(KeePassIconNames.Tux.rawValue)
+
+            group.fields.enableSearching = false
+            group.fields.enableAutoType = false
+
+            return group
+        }
     }
 
     func processOverview(_ overview: OnePuxItemOverview, _ node: Node) {
@@ -214,16 +265,14 @@ class OnePassword1PuxImporter: NSObject, Importer {
         }
     }
 
-    func processItemDetails(node: Node, details: OnePuxItemDetails, categoryId: String?, attachmentsDir: URL) throws -> [ImportMessage] {
+    func processItemDetails(node: Node, details: OnePuxItemDetails, categoryId: String?, attachmentsDir: URL, intermediateResult: inout IntermediateResult) throws {
         if let notes = details.notesPlain, !notes.isEmpty {
             node.fields.notes = notes
         }
 
-        var collected: [ImportMessage] = []
-
         if let attachment = details.documentAttributes {
             let msgs = try processAttachment(node: node, attachment: attachment, attachmentsDir: attachmentsDir)
-            collected.append(contentsOf: msgs)
+            intermediateResult.messages.append(contentsOf: msgs)
         }
 
         if let loginFields = details.loginFields {
@@ -234,8 +283,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
         if let sections = details.sections {
             for section in sections {
-                let msgs = try processSection(node: node, section: section, categoryId: categoryId, attachmentsDir: attachmentsDir)
-                collected.append(contentsOf: msgs)
+                try processSection(node: node, section: section, categoryId: categoryId, attachmentsDir: attachmentsDir, intermediateResult: &intermediateResult)
             }
         }
 
@@ -247,7 +295,22 @@ class OnePassword1PuxImporter: NSObject, Importer {
             }
         }
 
-        return collected
+        if let passwordHistories = details.passwordHistory {
+            if let createdAt = node.fields.created { 
+                var newMod = createdAt
+
+                for passwordHistory in passwordHistories {
+                    if let pw = passwordHistory.value, let time = passwordHistory.time {
+                        let changedAt = Date(timeIntervalSince1970: TimeInterval(time))
+
+
+                        BaseImporter.addHistoricalPasswordEntry(node, pw, newMod)
+
+                        newMod = changedAt 
+                    }
+                }
+            }
+        }
     }
 
     func processLoginField(node: Node, field: OnePuxLoginField) {
@@ -291,36 +354,28 @@ class OnePassword1PuxImporter: NSObject, Importer {
         }
     }
 
-    func processSection(node: Node, section: OnePuxSection, categoryId: String?, attachmentsDir: URL) throws -> [ImportMessage] {
+    func processSection(node: Node, section: OnePuxSection, categoryId: String?, attachmentsDir: URL, intermediateResult: inout IntermediateResult) throws {
         let sectionTitle = section.title ?? UUID().uuidString
-
-        var collected: [ImportMessage] = []
 
         if let fields = section.fields {
             for field in fields {
-                let msgs = try processSectionField(node: node, sectionTitle: sectionTitle, field: field, categoryId: categoryId, attachmentsDir: attachmentsDir)
-
-                collected.append(contentsOf: msgs)
+                try processSectionField(node: node, sectionTitle: sectionTitle, field: field, categoryId: categoryId, attachmentsDir: attachmentsDir, intermediateResult: &intermediateResult)
             }
         }
-
-        return collected
     }
 
-    func processSectionField(node: Node, sectionTitle: String, field: OnePuxSectionField, categoryId: String?, attachmentsDir: URL) throws -> [ImportMessage] {
-        var collected: [ImportMessage] = []
-
+    func processSectionField(node: Node, sectionTitle: String, field: OnePuxSectionField, categoryId: String?, attachmentsDir: URL, intermediateResult: inout IntermediateResult) throws {
         if let file = field.file {
             let msgs = try processAttachment(node: node, attachment: file, attachmentsDir: attachmentsDir)
-            collected.append(contentsOf: msgs)
-            return collected
+            intermediateResult.messages.append(contentsOf: msgs)
+            return
         }
 
         guard let fieldValue = field.value, let key = fieldValue.keys.first, let value = fieldValue[key] else {
             let msg = String(format: "🔴 No value or key found for Section Field!", String(describing: field.value))
             NSLog(msg)
-            collected.append(ImportMessage(msg, .error))
-            return collected
+            intermediateResult.messages.append(ImportMessage(msg, .error))
+            return
         }
 
         
@@ -341,7 +396,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
         let isUsername = key == "username" || field.title == "username" || field.id == "username"
         if isUsername, node.fields.username.isEmpty, let str = value.value as? String {
             node.fields.username = str
-            return collected
+            return
         }
 
         
@@ -353,7 +408,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
             } else {
                 addCustomField(node: node, name: fieldName, value: str, protected: true)
             }
-            return collected
+            return
         }
 
         
@@ -367,10 +422,10 @@ class OnePassword1PuxImporter: NSObject, Importer {
                                         appendUrlToNotes: false,
                                         addLegacyFields: prefs.addLegacySupplementaryTotpCustomFields,
                                         addOtpAuthUrl: prefs.addOtpAuthUrl)
-                    return collected
+                    return
                 } else if let otpUrl = token.url(true) {
                     node.fields.addSecondaryUrl(otpUrl.absoluteString, optionalCustomFieldSuffixLabel: fieldName)
-                    return collected
+                    return
                 }
             } else {
                 
@@ -382,12 +437,12 @@ class OnePassword1PuxImporter: NSObject, Importer {
         if let categoryId, let category = OnePuxCategory(rawValue: categoryId) {
             if category == .Server, let fieldId = field.id, fieldId == "url", let str = value.value as? String {
                 addUrl(node, str, fieldName)
-                return collected
+                return
             }
 
             if category == .API_Credential, let fieldId = field.id, fieldId == "credential", node.fields.password.isEmpty, let str = value.value as? String {
                 node.fields.password = str
-                return collected
+                return
             }
 
             if category == .SshKey {
@@ -408,15 +463,15 @@ class OnePassword1PuxImporter: NSObject, Importer {
                     
                     
 
-                    return collected
+                    return
                 } else {
                     let msg = String(format: "Could not properly parse SSH Key: [%@] - [%@] - [%@]", String(describing: value.value), node.title, String(describing: node.uuid))
                     NSLog(msg)
-                    collected.append(ImportMessage(msg, .warning))
+                    intermediateResult.messages.append(ImportMessage(msg, .warning))
 
                     addCustomField(node: node, name: "UNK-SSH-KEY", value: String(describing: value.value), protected: false)
 
-                    return collected
+                    return
                 }
             }
         }
@@ -425,7 +480,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
         if key == "address", let addressDict = value.value as? [String: Any] {
             processSectionAddressField(addressDict, node, fieldName)
-            return collected
+            return
         }
 
         
@@ -443,7 +498,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
                 addCustomField(node: node, name: "provider", value: provider)
             }
 
-            return collected
+            return
         }
 
         
@@ -456,7 +511,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
             addCustomField(node: node, name: fieldName, value: dateFmt)
 
-            return collected
+            return
         }
 
         
@@ -468,7 +523,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
             let str = String(format: "%0.2d/%0.4d", month, year)
             addCustomField(node: node, name: fieldName, value: str)
 
-            return collected
+            return
         }
 
         if key == "file", 
@@ -476,9 +531,28 @@ class OnePassword1PuxImporter: NSObject, Importer {
            let filename = fileDict["fileName"] as? String,
            let documentId = fileDict["documentId"] as? String
         {
-            try processAttachment(node: node, documentId: documentId, filename: filename, attachmentsDir: attachmentsDir)
+            let messages = processAttachment(node: node, documentId: documentId, filename: filename, attachmentsDir: attachmentsDir)
+            intermediateResult.messages.append(contentsOf: messages)
+            return
+        }
 
-            return collected
+        if key == "ssoLogin", 
+           let fileDict = value.value as? [String: Any],
+           let provider = fileDict["provider"] as? String
+        {
+            if let itemReference = fileDict["item"] as? [String: String],
+               let vaultUuid = itemReference["vaultUuid"],
+               let itemUuid = itemReference["itemUuid"]
+            {
+                intermediateResult.ssoReferencesToResolve.append(UnresolvedSsoReference(provider: provider, vaultUuid: vaultUuid, itemUuid: itemUuid, nodeId: node.uuid)) 
+            } else {
+                addCustomField(node: node,
+                               name: "Sign In With",
+                               value: provider,
+                               protected: field.guarded ?? false)
+            }
+
+            return
         }
 
         
@@ -494,12 +568,10 @@ class OnePassword1PuxImporter: NSObject, Importer {
         } else {
             let msg = String(format: "Could not properly import structured field: [%@] - [%@] - [%@]", String(describing: value.value), node.title, String(describing: node.uuid))
             NSLog(msg)
-            collected.append(ImportMessage(msg, .warning))
+            intermediateResult.messages.append(ImportMessage(msg, .warning))
 
             addCustomField(node: node, name: "UNK", value: String(describing: value.value), protected: false)
         }
-
-        return collected
     }
 
     func processSectionAddressField(_ addressDict: [String: Any], _ node: Node, _: String) {
@@ -542,23 +614,27 @@ class OnePassword1PuxImporter: NSObject, Importer {
             return [ImportMessage("No Document ID or Filename for file Attachment!", .error)]
         }
 
-        try processAttachment(node: node, documentId: documentId, filename: filename, attachmentsDir: attachmentsDir)
-
-        return []
+        return processAttachment(node: node, documentId: documentId, filename: filename, attachmentsDir: attachmentsDir)
     }
 
-    func processAttachment(node: Node, documentId: String, filename: String, attachmentsDir: URL) throws {
+    func processAttachment(node: Node, documentId: String, filename: String, attachmentsDir: URL) -> [ImportMessage] {
         let filePath = String(format: "%@__%@", documentId, filename)
         let fileUrl = attachmentsDir.appendingPathComponent(filePath)
 
-        let data = try Data(contentsOf: fileUrl)
+        do {
+            let data = try Data(contentsOf: fileUrl)
 
-        var uniqueFilename = filename
-        if node.fields.attachments[filename] != nil {
-            uniqueFilename = String(format: "%@-%@", documentId, filename)
+            var uniqueFilename = filename
+            if node.fields.attachments[filename] != nil {
+                uniqueFilename = String(format: "%@-%@", documentId, filename)
+            }
+
+            node.fields.attachments[uniqueFilename] = KeePassAttachmentAbstractionLayer(nonPerformantWith: data, compressed: true, protectedInMemory: true)
+
+            return []
+        } catch {
+            return [ImportMessage(String(format: "Could not find attachment named [%@] for [%@]: [%@]", filename, node.title, error.localizedDescription), .error)]
         }
-
-        node.fields.attachments[uniqueFilename] = KeePassAttachmentAbstractionLayer(nonPerformantWith: data, compressed: true, protectedInMemory: true)
     }
 
     

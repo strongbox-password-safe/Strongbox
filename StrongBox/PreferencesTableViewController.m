@@ -53,6 +53,9 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewClipboard;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellProStatus;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellNoneCommercialUse;
+
+
 @end
 
 @implementation PreferencesTableViewController
@@ -137,12 +140,15 @@
     if ( AppPreferences.sharedInstance.isPro ) {
         self.imageViewContactSupport.image =  [UIImage systemImageNamed:@"bubble.left"];
         self.imageViewContactSupport.tintColor = UIColor.systemPurpleColor;
+        
+        [self cell:self.cellNoneCommercialUse setHidden:YES];
     }
     else {
         [self cell:self.cellContactSupport setHidden:YES];
     }
     
     self.imageViewClipboard.image =  [UIImage systemImageNamed:@"doc.on.doc"];
+    
     
     [self reloadDataAnimated:YES];
 }

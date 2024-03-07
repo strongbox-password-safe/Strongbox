@@ -67,7 +67,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func listenToModelUpdateNotifications() {
-        NotificationCenter.default.addObserver(forName: .preferencesChanged, object: nil, queue: nil) { [weak self] _ in
+        NotificationCenter.default.addObserver(forName: .settingsChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self else { return }
 
             self.refresh()
@@ -313,6 +313,21 @@ class SideBarViewController: NSViewController, DocumentViewController {
         let attachment = !database.attachmentEntries.isEmpty
         let keeAgentSshKeys = !database.keeAgentSshKeyEntries.isEmpty
         let passkeys = !database.passkeyEntries.isEmpty
+        let favourites = !database.favourites.isEmpty
+
+        
+
+        if favourites {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.favourites.count) : ""
+
+            let entry = SideBarViewNode(context: .special(.allFavourites),
+                                        title: NSLocalizedString("browse_vc_section_title_pinned", comment: "Favourites"),
+                                        image: Icon.favourite.image(),
+                                        parent: specialsHeader,
+                                        databaseNodeChildCount: childCount)
+
+            specialNodes.append(entry)
+        }
 
         
 
@@ -394,6 +409,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
     }
 
     func loadAuditSideBarNodes() -> SideBarViewNode? {
+        guard database.databaseMetadata.auditConfig.auditInBackground else {
+            return nil
+        }
+
         guard let report = database.auditReport else {
             NSLog("🔴 No Audit Report available - cannot load audit issues")
             return nil
@@ -520,6 +539,23 @@ class SideBarViewController: NSViewController, DocumentViewController {
                                                    image: Icon.auditShield.image(),
                                                    parent: auditHeader,
                                                    color: .systemOrange,
+                                                   databaseNodeChildCount: childCount)
+
+            auditNodes.append(auditEntriesNode)
+        }
+
+        
+
+        let excluded = database.format == .keePass4 && !database.excludedFromAuditEntries.isEmpty 
+
+        if excluded {
+            let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.excludedFromAuditEntries.count) : ""
+
+            let auditEntriesNode = SideBarViewNode(context: .auditIssues(.excludedItems),
+                                                   title: NSLocalizedString("nav_excluded_items", comment: "Excluded"),
+                                                   image: Icon.auditExclusion.image(),
+                                                   parent: auditHeader,
+                                                   color: .systemGray,
                                                    databaseNodeChildCount: childCount)
 
             auditNodes.append(auditEntriesNode)

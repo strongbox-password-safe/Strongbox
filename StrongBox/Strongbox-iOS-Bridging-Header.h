@@ -58,3 +58,7 @@
 #import "SecretStore.h"
 #import "ConcurrentMutableArray.h"
 #import "ConcurrentCircularBuffer.h"
+#import "ConcurrentMutableSet.h"
+#import "EncryptionSettingsViewModel.h"
+#import "WorkingCopyManager.h"
+#import "SafesList.h"

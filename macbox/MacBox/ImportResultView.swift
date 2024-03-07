@@ -137,18 +137,17 @@ struct ImportResultView: View {
                 Text("generic_cancel")
             })
 
-            let defaultButton = Button(action: {
-                dismiss(false)
-            }, label: {
-                HStack {
-                    Text("import_next_step_set_password")
-
-                    Image(systemName: "chevron.forward.2")
-                }
-                .padding(12)
-            })
-
             #if os(macOS)
+                let defaultButton = Button(action: {
+                    dismiss(false)
+                }, label: {
+                    HStack {
+                        Text("import_next_step_set_password")
+
+                        Image(systemName: "chevron.forward.2")
+                    }
+                })
+
                 cancelButton
                     .controlSize(.large)
                     .keyboardShortcut(.cancelAction)
@@ -157,6 +156,17 @@ struct ImportResultView: View {
                     .controlSize(.large)
                     .keyboardShortcut(.defaultAction)
             #else
+                let defaultButton = Button(action: {
+                    dismiss(false)
+                }, label: {
+                    HStack {
+                        Text("import_next_step_set_password")
+
+                        Image(systemName: "chevron.forward.2")
+                    }
+                    .padding(12)
+                })
+
                 if #available(iOS 15.0, *) {
                     defaultButton
                         .controlSize(.large)

@@ -30,7 +30,7 @@ import SwiftMessages
         }
     }
 
-    @objc public class func showToast(title: String, body: String, category _: ToastMessageCategory = .info, icon: ToastIcon = .info) {
+    @MainActor @objc public class func showToast(title: String, body: String, category _: ToastMessageCategory = .info, icon: ToastIcon = .info) {
         var config = SwiftMessages.Config()
 
         config.presentationStyle = .top
@@ -52,7 +52,7 @@ import SwiftMessages
         SwiftMessages.show(config: config, view: view)
     }
 
-    @objc public class func showSlimInfoStatusBar(body: String, delay: TimeInterval) {
+    @MainActor @objc public class func showSlimInfoStatusBar(body: String, delay: TimeInterval) {
         var config = SwiftMessages.Config()
 
         config.presentationStyle = .top
@@ -69,11 +69,11 @@ import SwiftMessages
         SwiftMessages.show(config: config, view: view)
     }
 
-    @objc public class func hideAll() {
+    @MainActor @objc public class func hideAll() {
         SwiftMessages.hideAll()
     }
 
-    @objc public class func showSyncIssueBanner(buttonHandler: (() -> Void)?) {
+    @MainActor @objc public class func showSyncIssueBanner(buttonHandler: (() -> Void)?) {
         var config = SwiftMessages.Config()
 
         config.presentationStyle = .top

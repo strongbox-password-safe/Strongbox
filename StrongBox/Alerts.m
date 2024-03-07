@@ -499,38 +499,6 @@
                      completion:completion];
 }
 
-+ (void)OkCancelWithTextField:(UIViewController *)viewController
-                textFieldText:(NSString *)textFieldText
-                        title:(NSString *)title
-                      message:(NSString *)message
-                   completion:(void (^) (NSString *text, BOOL response))completion {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
-                                                                                 message:message
-                                                                          preferredStyle:UIAlertControllerStyleAlert];
-        [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
-            textField.text = textFieldText;
-        }];
-        
-        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
-                                                      style:UIAlertActionStyleDefault
-                                                    handler:^(UIAlertAction *a) {
-                                                        completion((alertController.textFields[0]).text, true);
-                                                    }];
-        
-        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
-                                                               style:UIAlertActionStyleCancel
-                                                             handler:^(UIAlertAction *a) {
-                                                                 completion(nil, false);
-                                                             }];
-        
-        [alertController addAction:defaultAction];
-        [alertController addAction:cancelAction];
-    
-        [viewController presentViewController:alertController animated:YES completion:nil];
-    });
-}
-                   
 - (void)OkCancelWithTextFieldNotEmpty:(UIViewController *)viewController
                 textFieldText:(NSString *)textFieldText
                    completion:(void (^) (NSString *text, BOOL response))completion {
@@ -593,9 +561,52 @@
                      completion:completion];
 }
 
+
++ (void)OkCancelWithTextField:(UIViewController *)viewController
+                textFieldText:(NSString *)textFieldText
+                        title:(NSString *)title
+                      message:(NSString *)message
+                   completion:(void (^) (NSString *text, BOOL response))completion {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
+            textField.text = textFieldText;
+        }];
+        
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) {
+            completion((alertController.textFields[0]).text, true);
+        }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) {
+            completion(nil, false);
+        }];
+        
+        [alertController addAction:defaultAction];
+        [alertController addAction:cancelAction];
+        
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
+}
+
 + (void)OkCancelWithTextField:(UIViewController *)viewController
               secureTextField:(BOOL)secureTextField
          textFieldPlaceHolder:(NSString *)textFieldPlaceHolder
+                        title:(NSString *)title
+                      message:(NSString *)message
+                   completion:(void (^) (NSString *password, BOOL response))completion {
+    [Alerts OkCancelWithTextField:viewController secureTextField:secureTextField textFieldPlaceHolder:textFieldPlaceHolder textFieldText:@"" title:title message:message completion:completion];
+}
+
++ (void)OkCancelWithTextField:(UIViewController *)viewController
+              secureTextField:(BOOL)secureTextField
+         textFieldPlaceHolder:(NSString *)textFieldPlaceHolder
+                textFieldText:(NSString *)textFieldText
                         title:(NSString *)title
                       message:(NSString *)message
                    completion:(void (^) (NSString *password, BOOL response))completion {
@@ -607,6 +618,7 @@
         [alertController addTextFieldWithConfigurationHandler:^(UITextField *_Nonnull textField) {
                              textField.placeholder = textFieldPlaceHolder;
                              textField.secureTextEntry = secureTextField;
+                             textField.text = textFieldText;
                          }];
 
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
