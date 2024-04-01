@@ -58,9 +58,12 @@ NSString* const kIsExcludedFromAutoFillCustomDataKey = @"KPEX_DoNotSuggestForAut
 
 NSString* const kPasskeyCustomFieldKeyRelyingParty = @"KPEX_PASSKEY_RELYING_PARTY";
 NSString* const kPasskeyCustomFieldKeyUserId = @"KPEX_PASSKEY_GENERATED_USER_ID";
+NSString* const kPasskeyCustomFieldKeyKpXcUpdatedCredentialId = @"KPEX_PASSKEY_CREDENTIAL_ID";
 NSString* const kPasskeyCustomFieldKeyPrivateKeyPem = @"KPEX_PASSKEY_PRIVATE_KEY_PEM";
 NSString* const kPasskeyCustomFieldKeyUserHandle = @"KPEX_PASSKEY_USER_HANDLE";
-NSString* const kPasskeyCustomFieldKeyUsername = @"KPXC_PASSKEY_USERNAME";
+
+NSString* const kPasskeyCustomFieldKeyUsernameIncorrect = @"KPXC_PASSKEY_USERNAME";
+NSString* const kPasskeyCustomFieldKeyUsernameCanonical = @"KPEX_PASSKEY_USERNAME";
 
 NSString* const kDocumentRestorationNSCoderKeyForUrl = @"StrongboxNonFileRestorationStateURLAsString";
 
@@ -116,9 +119,11 @@ const static NSSet<NSString*> *wellKnownKeys;
         keys = @[
             kPasskeyCustomFieldKeyRelyingParty,
             kPasskeyCustomFieldKeyUserId,
+            kPasskeyCustomFieldKeyKpXcUpdatedCredentialId,  
             kPasskeyCustomFieldKeyPrivateKeyPem,
             kPasskeyCustomFieldKeyUserHandle,
-            kPasskeyCustomFieldKeyUsername,
+            kPasskeyCustomFieldKeyUsernameIncorrect,
+            kPasskeyCustomFieldKeyUsernameCanonical, 
         ].set;
     });
     

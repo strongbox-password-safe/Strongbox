@@ -19,20 +19,31 @@
 
 - (Passkey *)passkey {
     Passkey* passkey = nil;
-    
+
     StringValue *rp = self.fields.customFields[kPasskeyCustomFieldKeyRelyingParty];
-    StringValue *credId = self.fields.customFields[kPasskeyCustomFieldKeyUserId];
     StringValue *pk = self.fields.customFields[kPasskeyCustomFieldKeyPrivateKeyPem];
     StringValue *userHandle = self.fields.customFields[kPasskeyCustomFieldKeyUserHandle];
-    StringValue *usernameSv = self.fields.customFields[kPasskeyCustomFieldKeyUsername];
     
-    NSString* username = (usernameSv) ? usernameSv.value : self.fields.username; 
     
-    if ( rp && credId && pk && userHandle ) {
+    
+    StringValue *usernameSvMyBad = self.fields.customFields[kPasskeyCustomFieldKeyUsernameIncorrect];
+    StringValue *usernameSvCanonical = self.fields.customFields[kPasskeyCustomFieldKeyUsernameCanonical];
+    StringValue *usernameSv = usernameSvCanonical ? usernameSvCanonical : usernameSvMyBad;
+    
+    NSString* username = usernameSv ? usernameSv.value : self.fields.username;
+
+    
+    
+    StringValue *ogCredId = self.fields.customFields[kPasskeyCustomFieldKeyUserId];
+    StringValue *altKpXcCredId = self.fields.customFields[kPasskeyCustomFieldKeyKpXcUpdatedCredentialId]; 
+    
+    NSString* credentialId = altKpXcCredId ? altKpXcCredId.value : (ogCredId ? ogCredId.value : nil);
+    
+    if ( rp && credentialId && pk && userHandle ) {
         passkey = [[Passkey alloc] initWithRelyingPartyId:rp.value
                                                  username:username
                                             userHandleB64:userHandle.value
-                                          credentialIdB64:credId.value
+                                          credentialIdB64:credentialId
                                             privateKeyPem:pk.value];
     }
 
@@ -42,17 +53,21 @@
 - (void)setPasskey:(Passkey *)passkey {
     if ( passkey ) {
         [self.fields setCustomField:kPasskeyCustomFieldKeyRelyingParty value:[StringValue valueWithString:passkey.relyingPartyId protected:NO]];
-        [self.fields setCustomField:kPasskeyCustomFieldKeyUserId value:[StringValue valueWithString:passkey.credentialIdB64 protected:YES]];
+        [self.fields setCustomField:kPasskeyCustomFieldKeyKpXcUpdatedCredentialId value:[StringValue valueWithString:passkey.credentialIdB64 protected:YES]];
         [self.fields setCustomField:kPasskeyCustomFieldKeyPrivateKeyPem value:[StringValue valueWithString:passkey.privateKeyPem protected:YES]];
         [self.fields setCustomField:kPasskeyCustomFieldKeyUserHandle value:[StringValue valueWithString:passkey.userHandleB64 protected:YES]];
-        [self.fields setCustomField:kPasskeyCustomFieldKeyUsername value:[StringValue valueWithString:passkey.username protected:NO]];
+        [self.fields setCustomField:kPasskeyCustomFieldKeyUsernameCanonical value:[StringValue valueWithString:passkey.username protected:NO]];
     }
     else {
         [self.fields removeCustomField:kPasskeyCustomFieldKeyRelyingParty];
-        [self.fields removeCustomField:kPasskeyCustomFieldKeyUserId];
         [self.fields removeCustomField:kPasskeyCustomFieldKeyPrivateKeyPem];
         [self.fields removeCustomField:kPasskeyCustomFieldKeyUserHandle];
-        [self.fields removeCustomField:kPasskeyCustomFieldKeyUsername];
+        
+        [self.fields removeCustomField:kPasskeyCustomFieldKeyUserId];
+        [self.fields removeCustomField:kPasskeyCustomFieldKeyKpXcUpdatedCredentialId]; 
+        
+        [self.fields removeCustomField:kPasskeyCustomFieldKeyUsernameIncorrect]; 
+        [self.fields removeCustomField:kPasskeyCustomFieldKeyUsernameCanonical];
     }
 }
 

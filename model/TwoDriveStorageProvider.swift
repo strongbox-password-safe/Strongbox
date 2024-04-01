@@ -91,14 +91,33 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
             return ret
         #else
-            guard let filename = (dItem.name! as NSString).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed),
-                  let url = URL(string: String(format: "%@:
-            else {
+
+            guard let filename = dItem.name else {
                 NSLog("🔴 Not a proper URL for OneDrive.")
                 return nil
             }
 
-            return MacDatabasePreferences.templateDummy(withNickName: nickName, storageProvider: storageId, fileUrl: url, storageInfo: json)
+            var components = URLComponents()
+            components.scheme = kStrongboxGoogleDriveUrlScheme
+            components.path = String(format: "/host/%@", filename) 
+
+            guard let url = components.url else {
+                NSLog("🔴 Not a proper URL for OneDrive.")
+                return nil
+            }
+
+            let metadata = MacDatabasePreferences.templateDummy(withNickName: nickName, storageProvider: storageId, fileUrl: url, storageInfo: json)
+
+            components.queryItems = [URLQueryItem(name: "uuid", value: metadata.uuid)]
+
+            guard let url2 = components.url else {
+                NSLog("🔴 Not a proper URL for OneDrive.")
+                return nil
+            }
+
+            metadata.fileUrl = url2
+
+            return metadata
         #endif
     }
 

@@ -459,20 +459,32 @@
     return [self getDatabaseMetadata:file.name parentPath:parent nickName:nickName];
 }
 
-- (METADATA_PTR)getDatabaseMetadata:(NSString*)filename parentPath:(NSString*)parentPath nickName:(NSString*)nickName {
+- (METADATA_PTR)getDatabaseMetadata:(NSString*)filename
+                         parentPath:(NSString*)parentPath
+                           nickName:(NSString*)nickName {
 #if TARGET_OS_IPHONE
             METADATA_PTR metadata = [DatabasePreferences templateDummyWithNickName:nickName
                                                                    storageProvider:self.storageId
                                                                           fileName:filename
                                                                     fileIdentifier:parentPath];
 #else
-            NSString* escapedFilename = [filename stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
-            NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@:
-            
-            METADATA_PTR metadata = [MacDatabasePreferences templateDummyWithNickName:nickName
-                                                                      storageProvider:self.storageId
-                                                                              fileUrl:url
-                                                                          storageInfo:parentPath];
+    NSURLComponents* components = [[NSURLComponents alloc] init];
+    components.scheme = kStrongboxDropboxUrlScheme;
+    components.path = [NSString stringWithFormat:@"/host/%@", filename]; 
+    
+
+                
+    METADATA_PTR metadata = [MacDatabasePreferences templateDummyWithNickName:nickName
+                                                              storageProvider:self.storageId
+                                                                      fileUrl:components.URL
+                                                                  storageInfo:parentPath];
+
+
+    components.queryItems = @[[NSURLQueryItem queryItemWithName:@"uuid" value:metadata.uuid]];
+    metadata.fileUrl = components.URL;
+    
+
+
 #endif
     
     return metadata;

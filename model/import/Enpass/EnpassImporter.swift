@@ -227,6 +227,7 @@ class EnpassImporter: NSObject, Importer {
                 }
             } else {
                 messages.append(ImportMessage(String(format: "Could not find folder/tag [%@]", String(describing: hierarchicalUuid)), .warning))
+                break 
             }
         }
     }

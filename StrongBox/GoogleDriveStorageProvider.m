@@ -328,15 +328,20 @@
                                          fileName:file.name
                                    fileIdentifier:json];
 #else
-    NSString* filename = [file.name stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
+    NSURLComponents* components = [[NSURLComponents alloc] init];
+    components.scheme = kStrongboxGoogleDriveUrlScheme;
+    components.path = [NSString stringWithFormat:@"/host/%@", file.name]; 
+        
+    METADATA_PTR metadata = [MacDatabasePreferences templateDummyWithNickName:nickName
+                                                              storageProvider:self.storageId
+                                                                      fileUrl:components.URL
+                                                                  storageInfo:json];
     
-    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@:
     
-    return [MacDatabasePreferences templateDummyWithNickName:nickName
-                                             storageProvider:self.storageId
-                                                     fileUrl:url
-                                                 storageInfo:json];
+    components.queryItems = @[[NSURLQueryItem queryItemWithName:@"uuid" value:metadata.uuid]];
+    metadata.fileUrl = components.URL;
     
+    return metadata;
 #endif
 }
 

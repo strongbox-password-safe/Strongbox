@@ -1210,20 +1210,32 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 - (void)exitWithPasskeyAssertion:(MacDatabasePreferences*)database
                       credential:(ASPasskeyAssertionCredential*)credential
-                            totp:(NSString*)totp API_AVAILABLE(macos(14.0)){
+                            totp:(NSString*)totp API_AVAILABLE(macos(14.0)) {
     NSLog(@"🟢 EXIT: exitWithPasskeyAssertion...");
     
     __weak CredentialProviderViewController* weakSelf = self;
     
-    [self copyTotpIfPossible:database totp:totp completion:^{
-        [weakSelf markLastUnlockedAtTime:database];
-        
-        [weakSelf notifyMainAppAutoFillExited];
-        
-        [weakSelf.extensionContext completeAssertionRequestWithSelectedPasskeyCredential:credential
-                                                                       completionHandler:^(BOOL expired) {
-            NSLog(@"🟢 Finished assertion request with expired = %hhd", expired);
+    if ( totp.length ) {
+        [self copyTotpIfPossible:database
+                            totp:totp
+                      completion:^{
+            [weakSelf continueExitWithPasskeyAssertion:database credential:credential];
         }];
+    }
+    else {
+        [self continueExitWithPasskeyAssertion:database credential:credential];
+    }
+}
+
+- (void)continueExitWithPasskeyAssertion:(MacDatabasePreferences*)database
+                              credential:(ASPasskeyAssertionCredential*)credential API_AVAILABLE(macos(14.0)) {
+    [self markLastUnlockedAtTime:database];
+    
+    [self notifyMainAppAutoFillExited];
+    
+    [self.extensionContext completeAssertionRequestWithSelectedPasskeyCredential:credential
+                                                               completionHandler:^(BOOL expired) {
+        NSLog(@"🟢 Finished assertion request with expired = %hhd", expired);
     }];
 }
 

@@ -43,9 +43,12 @@ extern NSString* const kOriginalWindowsOtpAlgoValueSha512;
 
 extern NSString* const kPasskeyCustomFieldKeyRelyingParty;
 extern NSString* const kPasskeyCustomFieldKeyUserId;
+extern NSString* const kPasskeyCustomFieldKeyKpXcUpdatedCredentialId;
 extern NSString* const kPasskeyCustomFieldKeyPrivateKeyPem;
 extern NSString* const kPasskeyCustomFieldKeyUserHandle;
-extern NSString* const kPasskeyCustomFieldKeyUsername;
+
+extern NSString* const kPasskeyCustomFieldKeyUsernameIncorrect;
+extern NSString* const kPasskeyCustomFieldKeyUsernameCanonical;
 
 extern NSString* const kDocumentRestorationNSCoderKeyForUrl;
 
