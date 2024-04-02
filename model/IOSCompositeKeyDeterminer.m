@@ -20,7 +20,7 @@
 #import "BookmarksHelper.h"
 #import "StrongboxiOSFilesManager.h"
 #import "Serializator.h"
-#import "KeyFileParser.h"
+#import "KeyFileManagement.h"
 #import "YubiManager.h"
 #import "Utils.h"
 #import "VirtualYubiKeys.h"
@@ -560,7 +560,7 @@ static const int kMaxFailedPinAttempts = 3;
             format = [Serializator getDatabaseFormat:url];
         }
 
-        keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+        keyFileDigest = [KeyFileManagement getDigestFromSources:keyFileBookmark
                                             keyFileFileName:keyFileFileName
                                          onceOffKeyFileData:oneTimeKeyFileData
                                                      format:format

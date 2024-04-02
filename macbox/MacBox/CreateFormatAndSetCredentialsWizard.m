@@ -10,7 +10,6 @@
 #import "Settings.h"
 #import "MacAlerts.h"
 #import "Utils.h"
-#import "KeyFileParser.h"
 #import "BookmarksHelper.h"
 #import "MacHardwareKeyManager.h"
 #import "PasswordStrengthTester.h"
@@ -18,6 +17,8 @@
 #import "MacCompositeKeyDeterminer.h"
 #import "PasswordStrengthUIHelper.h"
 #import "KSPasswordField.h"
+#import "KeyFileManagement.h"
+#import "Strongbox-Swift.h"
 
 @interface CreateFormatAndSetCredentialsWizard () <NSTabViewDelegate>
 
@@ -37,6 +38,7 @@
 @property (weak) IBOutlet NSButton *checkboxUseAPassword;
 @property (weak) IBOutlet NSButton *checkboxUseAKeyFile;
 @property (weak) IBOutlet NSButton *buttonBrowse;
+@property (weak) IBOutlet NSButton *buttonCreateNewKeyFile;
 @property (weak) IBOutlet NSTextField *labelKeyFilePath;
 
 @property (weak) IBOutlet NSButton *formatPasswordSafe;
@@ -96,7 +98,7 @@
     _selectedDatabaseFormat = self.initialDatabaseFormat;
     _selectedKeyFileBookmark = self.initialKeyFileBookmark;
     _selectedYubiKeyConfiguration = self.initialYubiKeyConfiguration;
-
+    
     self.showAdvanced = self.initialKeyFileBookmark != nil || self.initialYubiKeyConfiguration != nil;
     
     self.useAKeyFile = self.selectedKeyFileBookmark != nil;
@@ -115,8 +117,8 @@
     [self.tabView selectTabViewItem:self.tabView.tabViewItems[self.createSafeWizardMode ? 0 : 1]];
     
     NSString* loc = self.createSafeWizardMode ?
-        NSLocalizedString(@"mac_create_new_database_title", @"Create New Password Database") :
-        NSLocalizedString(@"mac_enter_database_master_credentials", @"Enter Database Master Credentials");
+    NSLocalizedString(@"mac_create_new_database_title", @"Create New Password Database") :
+    NSLocalizedString(@"mac_enter_database_master_credentials", @"Enter Database Master Credentials");
     
     self.window.title = loc;
     
@@ -152,8 +154,64 @@
 
 - (void)controlTextDidChange:(NSNotification *)obj {
     [self bindPasswordStrength];
-
+    
     [self validateUi];
+}
+
+- (IBAction)onCreateNew:(id)sender {
+    __weak CreateFormatAndSetCredentialsWizard* weakSelf = self;
+    
+    KeyFile* keyFile = [KeyFileManagement generateNewV2];
+    
+    [SwiftUIViewFactory showKeyFileGeneratorScreenWithKeyFile:keyFile
+                                                      onPrint:^{
+        [weakSelf onPrintKeyFileRecoverySheet:keyFile];
+    } onSave:^BOOL{
+        NSURL* url = [weakSelf onSaveKeyFile:keyFile];
+    
+        if ( url ) {
+            [self onSelectedKeyFileUrl:url];
+        }
+        
+        return url != nil;
+    }];
+}
+
+- (NSURL*)onSaveKeyFile:(KeyFile*)keyFile {
+    NSSavePanel* panel = NSSavePanel.savePanel;
+    panel.nameFieldStringValue = @"keyfile.keyx";
+    
+    
+    [panel setTitle:NSLocalizedString(@"new_key_file_save_key_file", @"Save Key File")];
+    
+    NSInteger result = [panel runModal];
+    if ( result == NSModalResponseOK ) {
+        if ( panel.URL ) {
+            NSData* data = [keyFile.xml dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+            if ( !data ) {
+                [MacAlerts error:[Utils createNSError:@"Could not get xml data!" errorCode:123]
+                          window:self.window];
+                
+                return nil;
+            }
+
+            NSError* error;
+            if ( ![data writeToURL:panel.URL options:kNilOptions error:&error] ) {
+                [MacAlerts error:error window:self.window];
+                
+                return nil;
+            }
+            else {
+                return panel.URL;
+            }
+        }
+    }
+    
+    return nil;
+}
+
+- (void)onPrintKeyFileRecoverySheet:(KeyFile*)keyFile {
+    [keyFile printRecoverySheet];
 }
 
 - (IBAction)onBrowse:(id)sender {
@@ -164,21 +222,27 @@
         openPanel.directoryURL = [url URLByDeletingLastPathComponent];
     }
                   
+    openPanel.allowsMultipleSelection = NO;
+    
     [openPanel beginSheetModalForWindow:self.window
                       completionHandler:^(NSInteger result) {
         if (result == NSModalResponseOK) {
-            NSError* error;
-            NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];
-            
-            if (error) {
-                [MacAlerts error:error window:self.window];
-            }
-            else {
-                self->_selectedKeyFileBookmark = bookmark;
-                [self bindUi];
-            }
+            [self onSelectedKeyFileUrl:openPanel.URL];
         }
     }];
+}
+
+- (void)onSelectedKeyFileUrl:(NSURL*)url {
+    NSError* error;
+    NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:url readOnly:YES error:&error];
+    
+    if (error) {
+        [MacAlerts error:error window:self.window];
+    }
+    else {
+        self->_selectedKeyFileBookmark = bookmark;
+        [self bindUi];
+    }
 }
 
 - (IBAction)onUseAPassword:(id)sender {
@@ -307,6 +371,7 @@
     
     self.checkboxUseAKeyFile.state = self.useAKeyFile ? NSControlStateValueOn : NSControlStateValueOff;
     self.buttonBrowse.enabled = self.useAKeyFile;
+    self.buttonCreateNewKeyFile.enabled = self.useAKeyFile;
     self.labelKeyFilePath.enabled = self.useAKeyFile;
     
     NSURL* url = self.selectedKeyFileBookmark ? [BookmarksHelper getExpressUrlFromBookmark:self.selectedKeyFileBookmark] : nil;

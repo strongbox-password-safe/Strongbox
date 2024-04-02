@@ -204,6 +204,9 @@ import Foundation
         settings.supportsCreateNew = true
         settings.markdownNotes = Settings.sharedInstance().markdownNotes
 
+        settings.colorizePasswords = Settings.sharedInstance().colorizePasswords
+        settings.colorBlindPalette = Settings.sharedInstance().colorizeUseColorBlindPalette
+
         response.serverSettings = settings
         response.serverVersionInfo = Utils.getAppVersion()
         response.databases = MacDatabasePreferences.allDatabases.map { obj in

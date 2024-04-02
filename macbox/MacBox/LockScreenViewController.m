@@ -19,7 +19,6 @@
 #import "MacHardwareKeyManager.h"
 #import "BookmarksHelper.h"
 #import "StrongboxErrorCodes.h"
-#import "KeyFileParser.h"
 #import "MBProgressHUD.h"
 #import "MacCompositeKeyDeterminer.h"
 #import "NSDate+Extensions.h"

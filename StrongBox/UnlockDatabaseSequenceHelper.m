@@ -11,7 +11,6 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Alerts.h"
 #import "SVProgressHUD.h"
-#import "KeyFileParser.h"
 #import "Utils.h"
 #import "AutoFillManager.h"
 #import "AddNewSafeHelper.h"

@@ -65,3 +65,5 @@
 
 #import "MMWormhole.h"
 #import "NewEntryDefaultsHelper.h"
+
+#import "KeyFile.h"

@@ -8,7 +8,7 @@
 
 #import "AddNewSafeHelper.h"
 #import "Alerts.h"
-#import "KeyFileParser.h"
+#import "KeyFileManagement.h"
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "YubiManager.h"
@@ -159,7 +159,7 @@ static DatabaseModel* getNewDatabase(NSString* password,
                                      NSError** error) {
     NSData* keyFileDigest = nil;
     if ( keyFileBookmark || keyFileFileName || onceOffKeyFileData ) {
-        keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+        keyFileDigest = [KeyFileManagement getDigestFromSources:keyFileBookmark
                                             keyFileFileName:keyFileFileName
                                          onceOffKeyFileData:onceOffKeyFileData
                                                      format:format

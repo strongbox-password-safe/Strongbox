@@ -42,7 +42,7 @@
 #import "Platform.h"
 #import "MMcGPair.h"
 #import "ConvenienceUnlockPreferences.h"
-#import "KeyFileParser.h"
+#import "KeyFileManagement.h"
 #import "SecondDatabaseListTableViewController.h"
 #import "DatabaseUnlocker.h"
 #import "IOSCompositeKeyDeterminer.h"
@@ -3346,7 +3346,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     if( keyFileInvolved ) {
         NSError* error;
-        NSData* keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+        NSData* keyFileDigest = [KeyFileManagement getDigestFromSources:keyFileBookmark
                                                     keyFileFileName:keyFileFileName
                                                  onceOffKeyFileData:oneTimeKeyFileData
                                                              format:self.viewModel.database.originalFormat

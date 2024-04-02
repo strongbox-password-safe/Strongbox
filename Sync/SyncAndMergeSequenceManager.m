@@ -278,7 +278,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         completion(kSyncAndMergeError, NO, nil);
         return;
     }
-    
+        
     database.lastSyncAttempt = NSDate.date;
     
     BOOL forcePull = parameters.syncPullEvenIfModifiedDateSame;
@@ -304,9 +304,15 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         }
     }
     else {
-        opts.onlyIfModifiedDifferentFrom = forcePull ? nil : localModDate;
+        
+
+            opts.onlyIfModifiedDifferentFrom = forcePull ? nil : localModDate;
+
+
+
+
     }
-    
+
     NSString* providerDisplayName = [SafeStorageProviderFactory getStorageDisplayName:database];
 
     NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, provider=%@, workingCacheMod=%@, lastCheckedSourceMod=%@]",

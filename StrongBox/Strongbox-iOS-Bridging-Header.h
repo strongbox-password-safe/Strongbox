@@ -62,3 +62,5 @@
 #import "EncryptionSettingsViewModel.h"
 #import "WorkingCopyManager.h"
 #import "SafesList.h"
+#import "KeyFile.h"
+#import "ClipboardManager.h"

@@ -113,3 +113,4 @@
 #import "DatabaseMerger.h"
 
 #import "Model.h"
+#import "KeyFile.h"

@@ -8,10 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "DatabaseFormat.h"
+#import "KeyFile.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface KeyFileParser : NSObject
+@interface KeyFileManagement : NSObject
+
++ (KeyFile*)generateNewV2;
 
 + (nullable NSData *)getNonePerformantKeyFileDigest:(NSData*)data
                                         checkForXml:(BOOL)checkForXml; 

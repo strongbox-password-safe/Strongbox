@@ -34,4 +34,60 @@ class SwiftUIViewFactory: NSObject {
 
         return hostingController
     }
+
+    @objc static func showKeyFileGeneratorScreen(keyFile: KeyFile,
+                                                 onPrint: @escaping (() -> Void),
+                                                 onSave: @escaping (() -> Bool),
+                                                 onDismiss: @escaping (() -> Void)) -> UIViewController
+    {
+        let view = GenerateKeyFileScreen(keyFile: keyFile, onPrint: onPrint, onSave: onSave) {
+            onDismiss()
+        }
+
+        let hostingController = UIHostingController(rootView: view)
+
+        return hostingController
+    }
+
+    @objc static func showKeyFileRecoveryScreen(onRecover: @escaping ((_ keyFile: KeyFile) -> Void),
+                                                onDismiss: @escaping (() -> Void)) -> UIViewController
+    {
+        let view = RecoverKeyFileScreen(verifyHash: { codes, hash in
+                                            guard let keyFile = KeyFile.fromHexCodes(codes) else {
+                                                return false
+                                            }
+
+                                            return keyFile.hashString == hash
+                                        },
+                                        validateCodes: { codes in
+                                            KeyFile.fromHexCodes(codes) != nil
+                                        },
+                                        onRecover: { codes in
+                                            guard let keyFile = KeyFile.fromHexCodes(codes) else {
+                                                NSLog("🔴 ERROR: Invalid Hex Codes for Key File, should never happen!")
+                                                return
+                                            }
+
+                                            onRecover(keyFile)
+                                            onDismiss()
+                                        }) {
+            onDismiss()
+        }
+
+        let hostingController = UIHostingController(rootView: view)
+
+        return hostingController
+    }
+
+    @objc static func getLargeTextDisplayView(text: String, font: UIFont, colorMapper: @escaping ((_ character: String) -> UIColor), onTapped: @escaping (() -> Void)) -> UIViewController {
+        let view = LargeTextDisplayView(text: text, font: Font(font), colorMapper: { char in
+            Color(colorMapper(char))
+        }) {
+            onTapped()
+        }
+
+        let hostingController = UIHostingController(rootView: view.ignoresSafeArea())
+
+        return hostingController
+    }
 }

@@ -298,7 +298,9 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
         NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
         
         if ( name ) {
-            path = [NSString stringWithFormat:@"%@ on '%@' - %@", 
+            NSString* fmt = NSLocalizedString(@"wifi_sync_storage_location_title_fmt", @"%@ on '%@' - %@");
+            
+            path = [NSString stringWithFormat:fmt, 
                     metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
         }
     }

@@ -19,7 +19,6 @@
 #import "ClipboardManager.h"
 #import "BiometricIdHelper.h"
 #import <LocalAuthentication/LocalAuthentication.h>
-#import "KeyFileParser.h"
 #import "SelectDatabaseViewController.h"
 #import "SelectCredential.h"
 #import "AutoFillWormhole.h"

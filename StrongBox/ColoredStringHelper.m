@@ -111,6 +111,14 @@ static COLOR_PTR defaultNonColorizedColor;
     return ret.copy;
 }
 
++ (COLOR_PTR)getColorForCharacter:(NSString*)character darkMode:(BOOL)darkMode colorBlind:(BOOL)colorBlind {
+    CharacterType type = [ColoredStringHelper getCharacterType:character];
+    
+    Palette *palette = darkMode ? (colorBlind ? &darkColorBlind : &dark )  : (colorBlind ? &lightColorBlind : &light);
+    
+    return [ColoredStringHelper getColorForCharacterType:type palette:palette];
+}
+
 + (NSDictionary*)getAttributesForCharacterType:(CharacterType)type
                                       colorize:(BOOL)colorize
                                        palette:(Palette*)palette

@@ -27,7 +27,8 @@ public class StrongboxCMarkGFMHelper: NSObject {
         return true
     }
 
-    private static func convertToHtmlFragment(markdown: String) throws -> String {
+    @objc
+    static func convertToHtmlFragment(markdown: String) throws -> String {
         cmark_gfm_core_extensions_ensure_registered()
 
         

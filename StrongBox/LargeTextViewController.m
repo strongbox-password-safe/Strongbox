@@ -12,6 +12,7 @@
 #import "AppPreferences.h"
 #import "Utils.h"
 #import "ClipboardManager.h"
+#import "ColoredStringHelper.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -19,13 +20,20 @@
 
 #endif
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 @interface LargeTextViewController ()
 
-@property (weak, nonatomic) IBOutlet UILabel *labelLargeText;
 @property (weak, nonatomic) IBOutlet UIImageView *qrCodeImageView;
-
 @property (weak, nonatomic) IBOutlet UILabel *labelSubtext;
 @property (weak, nonatomic) IBOutlet UILabel *labelLargeTextCaption;
+@property (weak, nonatomic) IBOutlet UIStackView *topStackView;
+@property (weak, nonatomic) IBOutlet UIButton *buttonDismiss;
+@property UIViewController* swiftUILargeTextView;
 
 @end
 
@@ -39,35 +47,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-
-    
-
-       
     self.qrCodeImageView.hidden = YES;
-    
-    UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(labelTapped)];
-    tapGestureRecognizer.numberOfTapsRequired = 1;
-    [self.labelLargeText addGestureRecognizer:tapGestureRecognizer];
-    self.labelLargeText.userInteractionEnabled = YES;
+
+    [self loadSwiftUIView];
 
     UITapGestureRecognizer *tapGestureRecognizerSubtext = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(subtextTapped)];
     tapGestureRecognizerSubtext.numberOfTapsRequired = 1;
     [self.labelSubtext addGestureRecognizer:tapGestureRecognizerSubtext];
     self.labelSubtext.userInteractionEnabled = YES;
-
-    if (!self.colorize) {
-        self.labelLargeText.font = FontManager.sharedInstance.easyReadFontForTotp;
-        self.labelLargeText.text = self.string;
-    }
-    else {
-        BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-        BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
-    
-        self.labelLargeText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.string
-                                                                                      colorize:YES
-                                                                                      darkMode:dark
-                                                                                    colorBlind:colorBlind font:FontManager.sharedInstance.easyReadFontForTotp];
-    }
     
     self.labelSubtext.text = self.subtext;
     self.labelSubtext.hidden = self.subtext.length == 0;
@@ -81,6 +68,33 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [weakSelf loadQrCode:width];
     });
+}
+
+- (void)loadSwiftUIView {
+    BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+    BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
+    
+    self.swiftUILargeTextView = [SwiftUIViewFactory getLargeTextDisplayViewWithText:self.string
+                                                                          font:FontManager.sharedInstance.easyReadFontForTotp
+                                                                   colorMapper:^UIColor * _Nonnull(NSString * _Nonnull character) {
+        return self.colorize ? [ColoredStringHelper getColorForCharacter:character darkMode:dark colorBlind:colorBlind] : UIColor.labelColor;
+    } onTapped:^{
+        [self labelTapped];
+    }];
+
+    [self addChildViewController:self.swiftUILargeTextView];
+    self.swiftUILargeTextView.view.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.swiftUILargeTextView.view];
+    [self.swiftUILargeTextView didMoveToParentViewController:self];
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [self.swiftUILargeTextView.view.leftAnchor constraintEqualToAnchor:self.view.leftAnchor constant:20],
+        [self.swiftUILargeTextView.view.rightAnchor constraintEqualToAnchor:self.view.rightAnchor constant:-20],
+        [self.swiftUILargeTextView.view.topAnchor constraintEqualToAnchor:self.topStackView.bottomAnchor constant:20],
+        [self.swiftUILargeTextView.view.bottomAnchor constraintGreaterThanOrEqualToAnchor:self.view.bottomAnchor constant:20],
+    ]];
+    
+    [self.view layoutIfNeeded];
 }
 
 - (void)loadQrCode:(CGFloat)width {
@@ -99,23 +113,12 @@
 }
 
 - (void)labelTapped {
-    [self copyToClipboard:self.labelLargeText.text];
+    [self copyToClipboard:self.string];
 }
     
 - (void)subtextTapped {
     [self copyToClipboard:self.labelSubtext.text];
 }
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)copyToClipboard:(NSString *)value {
     if (value.length == 0) {

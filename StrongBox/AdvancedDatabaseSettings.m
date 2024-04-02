@@ -10,7 +10,6 @@
 #import "IOsUtils.h"
 #import "Alerts.h"
 #import "Utils.h"
-#import "KeyFileParser.h"
 #import "PinsConfigurationController.h"
 #import "AutoFillManager.h"
 #import "ExportOptionsTableViewController.h"

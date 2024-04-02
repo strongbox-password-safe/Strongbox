@@ -12,6 +12,8 @@ import Cocoa
 public class ServerSettings: NSObject, Codable {
     @objc var supportsCreateNew: Bool = false
     @objc var markdownNotes: Bool = false
+    @objc var colorBlindPalette: Bool = false
+    @objc var colorizePasswords: Bool = true
 }
 
 @objc

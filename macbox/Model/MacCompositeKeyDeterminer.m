@@ -14,11 +14,17 @@
 #import "Utils.h"
 #import "WorkingCopyManager.h"
 #import "Serializator.h"
-#import "KeyFileParser.h"
+#import "KeyFileManagement.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "StrongboxErrorCodes.h"
 #import "AutoFillLoadingVC.h"
 #import "AppDelegate.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @interface MacCompositeKeyDeterminer ()
 
@@ -164,6 +170,19 @@
 - (void)_getCkfsWithManualUnlock:(NSString *)headline
                      subheadline:(NSString *)subheadline
                       completion:(CompositeKeyDeterminedBlock)completion {
+#ifndef IS_APP_EXTENSION
+    Document* doc = [DatabasesCollection.shared documentForDatabaseWithUuid:self.database.uuid];
+    if ( doc && doc.viewModel.locked ) {
+        [doc close]; 
+    }
+#endif
+
+    [self getCkfsWithManualUnlockMiniWindow:headline subheadline:subheadline completion:completion];
+}
+
+- (void)getCkfsWithManualUnlockMiniWindow:(NSString *)headline
+                              subheadline:(NSString *)subheadline
+                               completion:(CompositeKeyDeterminedBlock)completion {
     ManualCredentialsEntry* mce = [[ManualCredentialsEntry alloc] initWithNibName:@"ManualCredentialsEntry" bundle:nil];
     mce.databaseUuid = self.database.uuid;
     mce.isNativeAutoFillAppExtensionOpen = self.isNativeAutoFillAppExtensionOpen;
@@ -172,7 +191,6 @@
     mce.verifyCkfsMode = self.verifyCkfsMode;
     
     mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
-
         if (userCancelled) {
             completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
         }
@@ -398,7 +416,7 @@
 
     if( keyFileBookmark ) {
         NSError *keyFileParseError;
-        keyFileDigest = [KeyFileParser getDigestFromBookmark:keyFileBookmark
+        keyFileDigest = [KeyFileManagement getDigestFromBookmark:keyFileBookmark
                                              keyFileFileName:nil
                                                       format:formatKeyFileHint
                                                        error:&keyFileParseError];

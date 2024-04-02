@@ -167,7 +167,8 @@ static NSString* getFreeTrialSuffix(void) {
         NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
         
         if ( name ) {
-            path = [NSString stringWithFormat:@"%@ on '%@' - %@", metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ]; 
+            NSString* fmt = NSLocalizedString(@"wifi_sync_storage_location_title_fmt", @"%@ on '%@' - %@");
+            path = [NSString stringWithFormat:fmt, metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ]; 
         }
     }
 #endif
@@ -648,6 +649,13 @@ static NSString* getFreeTrialSuffix(void) {
                 
                 return entries.count != 0;
             }
+            else if (theAction == @selector(onFindAllFavIcons:)) {
+                if ( !isKeePass2 || !StrongboxProductBundle.supportsFavIconDownloader ) {
+                    return NO;
+                }
+                
+                return YES;
+            }
             else if (theAction == @selector(onEmptyRecycleBin:)) {
                 if ( !isKeePass2 ) {
                     return NO;
@@ -920,6 +928,16 @@ static NSString* getFreeTrialSuffix(void) {
     
     NSArray<Node*>* entries = [self getMinimalRecursiveEntriesOnly2:@[item] searchableOnly:YES];
     [self onDownloadFavIconsForEntries:entries];
+}
+
+- (IBAction)onFindAllFavIcons:(id)sender {
+    BOOL isKeePass2 = self.viewModel && !self.viewModel.locked && (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+    
+    if ( !isKeePass2 || !StrongboxProductBundle.supportsFavIconDownloader ) {
+        return;
+    }
+    
+    [self onDownloadFavIconsForEntries:self.viewModel.database.allSearchableEntries];
 }
 
 - (IBAction)onEmptyRecycleBin:(id)sender {

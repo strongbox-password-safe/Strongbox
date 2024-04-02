@@ -3162,7 +3162,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+
     
     NSURL* url = [urls objectAtIndex:0];
 

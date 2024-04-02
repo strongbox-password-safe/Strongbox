@@ -14,6 +14,7 @@
 #import "UITableView+EmptyDataSet.h"
 #import "Serializator.h"
 #import "DatabaseCell.h"
+#import "SVProgressHUD.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -266,10 +267,16 @@
 - (void)validateSelectedDatabase:(StorageBrowserItem *)file indexPath:(NSIndexPath *)indexPath  {
     StorageProviderReadOptions *options = [[StorageProviderReadOptions alloc] init];
 
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"Reading...")];
+    
     [self.safeStorageProvider readWithProviderData:file.providerData
                                     viewController:self
                                            options:options
                                         completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+        
         [self  readForValidationDone:result file:file data:data initialDateModified:dateModified error:error];
     }];
 }

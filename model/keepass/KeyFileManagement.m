@@ -6,7 +6,7 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "KeyFileParser.h"
+#import "KeyFileManagement.h"
 #import "NSData+Extensions.h"
 #import "NSArray+Extensions.h"
 #import "NSString+Extensions.h"
@@ -14,29 +14,27 @@
 #import "Utils.h"
 
 #if TARGET_OS_IPHONE
+
 #import "StrongboxiOSFilesManager.h"
+#import "KissXML.h" 
+
 #else
+
 #import "StrongboxMacFilesManager.h"
+
 #endif
 
 #import "Sha256PassThroughOutputStream.h"
 #import "StreamUtils.h"
 #import <CommonCrypto/CommonCrypto.h>
 
-#if TARGET_OS_IPHONE
-#import "KissXML.h" 
-#endif
-
-static NSString* const kKeyFileRootElementName = @"KeyFile";
-static NSString* const kKeyElementName = @"Key";
-static NSString* const kDataElementName = @"Data";
-static NSString* const kMetaElementName = @"Meta";
-static NSString* const kVersionElementName = @"Version";
-static NSString* const kHashAttributeName = @"Hash";
-
 static const NSUInteger kStreamReadThreshold = 16 * 1024;
 
-@implementation KeyFileParser
+@implementation KeyFileManagement
+
++ (KeyFile *)generateNewV2 {
+    return [KeyFile newV2];
+}
 
 + (NSData *)getDigest:(NSInputStream*)inStream
          streamLength:(unsigned long long)streamLength
@@ -87,7 +85,7 @@ static const NSUInteger kStreamReadThreshold = 16 * 1024;
     
     
     if(checkForXml) {
-        NSData* xml = [KeyFileParser getXmlKey:data];
+        NSData* xml = [KeyFileManagement getXmlKey:data];
         if(xml) {
             return xml;
         }
@@ -101,7 +99,7 @@ static const NSUInteger kStreamReadThreshold = 16 * 1024;
 
     
 
-    NSData* textHex = [KeyFileParser getHexTextKey:data];
+    NSData* textHex = [KeyFileManagement getHexTextKey:data];
     if(textHex) {
         return textHex;
     }
@@ -117,7 +115,7 @@ static const NSUInteger kStreamReadThreshold = 16 * 1024;
     if(isAll64CharactersAreHex(data)) {
         NSString *text = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         
-        return [KeyFileParser dataWithHexString:text];
+        return [KeyFileManagement dataWithHexString:text];
     }
 
     return nil;
@@ -289,7 +287,7 @@ BOOL isAll64CharactersAreHex(NSData* data) {
                   keyFileFileName:(NSString*)keyFileFileName
                            format:(DatabaseFormat)format
                             error:(NSError **)error {
-    return [KeyFileParser getDigestFromSources:keyFileBookmark
+    return [KeyFileManagement getDigestFromSources:keyFileBookmark
                                keyFileFileName:nil
                             onceOffKeyFileData:nil
                                         format:format
@@ -315,7 +313,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
     BOOL securitySucceeded = [keyFileUrl startAccessingSecurityScopedResource];
     NSInputStream* inStream = [NSInputStream inputStreamWithURL:keyFileUrl];
     
-    NSData* ret = [KeyFileParser getDigest:inStream streamLength:fileSize checkForXml:format != kKeePass1];
+    NSData* ret = [KeyFileManagement getDigest:inStream streamLength:fileSize checkForXml:format != kKeePass1];
     
     if ( securitySucceeded ) {
         [keyFileUrl stopAccessingSecurityScopedResource];
@@ -362,7 +360,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
     }
         
     if ( keyFileBookmark ) {
-        NSData* bookmarkData = [KeyFileParser getByBookmark:error format:format keyFileBookmark:keyFileBookmark];
+        NSData* bookmarkData = [KeyFileManagement getByBookmark:error format:format keyFileBookmark:keyFileBookmark];
         
         if ( bookmarkData ) {
             return bookmarkData;
@@ -379,7 +377,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
     if ( onceOffKeyFileData ) {
         NSInputStream* inStream = [NSInputStream inputStreamWithData:onceOffKeyFileData];
         
-        return [KeyFileParser getDigest:inStream
+        return [KeyFileManagement getDigest:inStream
                            streamLength:onceOffKeyFileData.length
                             checkForXml:format != kKeePass1];
     }

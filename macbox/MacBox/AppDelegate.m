@@ -38,6 +38,7 @@
 #import "Strongbox-Swift.h"
 #import "SSHAgentServer.h"
 #import "DatabasesManager.h"
+#import "KeyFileManagement.h"
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     #import "GoogleDriveStorageProvider.h"
@@ -1507,6 +1508,71 @@ static NSInteger clipboardChangeCount;
     [self startOrStopSSHAgent];
     
     [self startOrStopAutoFillProxyServer];
+}
+
+
+
+- (IBAction)onRecoverKeyFile:(id)sender {
+    __weak AppDelegate* weakSelf = self;
+    
+    [SwiftUIViewFactory showKeyFileRecoveryScreen:^(KeyFile * _Nonnull keyFile) {
+        [weakSelf onSaveKeyFile:keyFile];
+    }];
+}
+
+- (IBAction)onGenerateKeyFile:(id)sender {
+    __weak AppDelegate* weakSelf = self;
+    
+    KeyFile* keyFile = [KeyFileManagement generateNewV2];
+    
+    [SwiftUIViewFactory showKeyFileGeneratorScreenWithKeyFile:keyFile
+                                                      onPrint:^{
+        [weakSelf onPrintKeyFileRecoverySheet:keyFile];
+    } onSave:^BOOL{
+        return [weakSelf onSaveKeyFile:keyFile];
+    }];
+}
+
+- (BOOL)onSaveKeyFile:(KeyFile*)keyFile {
+    NSSavePanel* panel = NSSavePanel.savePanel;
+    panel.nameFieldStringValue = @"keyfile.keyx";
+    
+    
+    [panel setTitle:NSLocalizedString(@"new_key_file_save_key_file", @"Save Key File")];
+    
+    NSInteger result = [panel runModal];
+    if ( result == NSModalResponseOK ) {
+        if ( panel.URL ) {
+            NSData* data = [keyFile.xml dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
+            
+            if ( !data ) {
+                [DBManagerPanel.sharedInstance show];
+                
+                [MacAlerts error:[Utils createNSError:@"Could not get xml data!" errorCode:123]
+                          window:DBManagerPanel.sharedInstance.contentViewController.view.window];
+                
+                return NO;
+            }
+            
+            NSError* error;
+            if ( ![data writeToURL:panel.URL options:kNilOptions error:&error] ) {
+                [DBManagerPanel.sharedInstance show];
+                
+                [MacAlerts error:error window:DBManagerPanel.sharedInstance.contentViewController.view.window];
+                
+                return NO;
+            }
+            else {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
+- (void)onPrintKeyFileRecoverySheet:(KeyFile*)keyFile {
+    [keyFile printRecoverySheet];
 }
 
 @end

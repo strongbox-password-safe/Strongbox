@@ -22,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ColoredStringHelper : NSObject
 
++ (COLOR_PTR)getColorForCharacter:(NSString*)character darkMode:(BOOL)darkMode colorBlind:(BOOL)colorBlind;
+
 + (NSAttributedString *)getColorizedAttributedString:(NSString *)password
                                             colorize:(BOOL)colorize
                                             darkMode:(BOOL)darkMode
