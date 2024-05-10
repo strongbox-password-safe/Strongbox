@@ -105,7 +105,7 @@ suggestedFilename:nil
     NSLog(@"Want to create file at %@", fileURL);
     
     dispatch_async(dispatch_get_main_queue(), ^{ 
-        [SVProgressHUD showWithStatus:@"Uploading..."];
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_saving_ellipsis", @"Saving...")];
         
         StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithData:data fileUrl:fileURL];
         
@@ -304,7 +304,7 @@ suggestedFilename:nil
 }
 
 - (DatabasePreferences *)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData {
-        NSLog(@"NOTIMPL: getDatabasePreferences");
+    NSLog(@"NOTIMPL: getDatabasePreferences");
     return nil;
 }
 

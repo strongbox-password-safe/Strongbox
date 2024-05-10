@@ -246,10 +246,9 @@ class BrowseViewController: NSViewController {
             self?.onDocumentUpdateNotificationReceived(notification)
         }
 
-        NotificationCenter.default.addObserver(forName: .genericRefreshAllDatabaseViews, object: nil, queue: nil)
-            { [weak self] notification in
-                self?.onGenericRefreshNotificationReceived(notification)
-            }
+        NotificationCenter.default.addObserver(forName: .genericRefreshAllDatabaseViews, object: nil, queue: nil) { [weak self] notification in
+            self?.onGenericRefreshNotificationReceived(notification)
+        }
 
         
 

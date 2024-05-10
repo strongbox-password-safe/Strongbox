@@ -107,6 +107,13 @@ public class BrowserAutoFillManager: NSObject {
     @objc public class func compareMatches(node1: Node, node2: Node, url: String, isFavourite: (Node) -> Bool) -> ComparisonResult {
         
 
+        
+        
+        
+        
+        
+        
+
         if isFavourite(node1) {
 
 

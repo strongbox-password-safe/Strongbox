@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)fromUrl:(NSURL*)url;
 + (instancetype _Nullable)getById:(NSString *)databaseId;
 
++ (NSArray<MacDatabasePreferences*>*)forAllDatabasesOfProvider:(StorageProvider)provider;
+
 + (NSArray<MacDatabasePreferences*>*)filteredDatabases:(BOOL (^)(MacDatabasePreferences* database))block;
 
 + (instancetype)templateDummyWithNickName:(NSString *)nickName
@@ -58,6 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
 + (BOOL)isUnique:(NSString *)nickName;
 + (BOOL)isValid:(NSString *)nickName;
++ (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested;
 
 + (MacDatabasePreferences*)addOrGet:(NSURL *)url;
 
@@ -181,6 +184,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL showExpiredInSearch;
 
 
+
+@property BOOL isSharedInCloudKit; 
 
 @end
 

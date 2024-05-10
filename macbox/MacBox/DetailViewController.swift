@@ -1413,10 +1413,9 @@ extension DetailViewController: DocumentViewController {
             }
         }
 
-        NotificationCenter.default.addObserver(forName: .genericRefreshAllDatabaseViews, object: nil, queue: nil)
-            { [weak self] notification in
-                self?.onGenericRefreshNotificationReceived(notification)
-            }
+        NotificationCenter.default.addObserver(forName: .genericRefreshAllDatabaseViews, object: nil, queue: nil) { [weak self] notification in
+            self?.onGenericRefreshNotificationReceived(notification)
+        }
 
         NotificationCenter.default.addObserver(forName: .settingsChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self else { return }

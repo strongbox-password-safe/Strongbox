@@ -92,7 +92,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
 
 - (NSUInteger)getDefaultMonitorExternalChangesInterval {
-    return (self.storageProvider == kMacFile || self.storageProvider == kWiFiSync) ? 5 : 30;
+    return (self.storageProvider == kLocalDevice || self.storageProvider == kWiFiSync) ? 5 : 30;
 }
 
 
@@ -334,6 +334,8 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     if ( self.lastKnownEncryptionSettings ) {
         [encoder encodeObject:self.lastKnownEncryptionSettings forKey:@"lastKnownEncryptionSettings"];
     }
+    
+    [encoder encodeBool:self.isSharedInCloudKit forKey:@"isSharedInCloudKit"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -555,7 +557,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.autoFillScanCustomFields = [decoder decodeBoolForKey:@"autoFillScanCustomFields"];
         }
         else {
-            self.autoFillScanCustomFields = YES;
+            self.autoFillScanCustomFields = YES; 
         }
         if ( [decoder containsValueForKey:@"autoFillScanNotes"] ) {
             self.autoFillScanNotes = [decoder decodeBoolForKey:@"autoFillScanNotes"];
@@ -739,7 +741,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         else {
             self.sideBarShowTotalCountOnHierarchy = YES;
         }
-        
+     
         if ( [decoder containsValueForKey:@"includeAssociatedDomains"] ) {
             self.includeAssociatedDomains = [decoder decodeBoolForKey:@"includeAssociatedDomains"];
         }
@@ -749,6 +751,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         if ( [decoder containsValueForKey:@"lastKnownEncryptionSettings"] ) {
             self.lastKnownEncryptionSettings = [decoder decodeObjectForKey:@"lastKnownEncryptionSettings"];
+        }
+        
+        if ( [decoder containsValueForKey:@"isSharedInCloudKit"] ) {
+            self.isSharedInCloudKit = [decoder decodeBoolForKey:@"isSharedInCloudKit"];
         }
     }
     
@@ -766,7 +772,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 }
 
 - (BOOL)isLocalDeviceDatabase {
-    return self.storageProvider == kMacFile;
+    return self.storageProvider == kLocalDevice;
 }
 
 

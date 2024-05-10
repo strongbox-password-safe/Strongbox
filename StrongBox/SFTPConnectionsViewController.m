@@ -13,7 +13,7 @@
 #import "SFTPSessionConfigurationViewController.h"
 #import "Alerts.h"
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
 #import "SFTPStorageProvider.h"
 #endif
 
@@ -237,7 +237,7 @@
     }];
     
     NSArray<DatabasePreferences*>* using = [possibles filter:^BOOL(DatabasePreferences * _Nonnull obj) {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
         SFTPSessionConfiguration* config = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:obj];
         return ( config && [config.identifier isEqualToString:connection.identifier] );
 #else

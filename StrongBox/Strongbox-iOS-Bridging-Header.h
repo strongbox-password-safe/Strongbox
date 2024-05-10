@@ -64,3 +64,5 @@
 #import "SafesList.h"
 #import "KeyFile.h"
 #import "ClipboardManager.h"
+#import "DatabaseNuker.h"
+

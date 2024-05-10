@@ -45,7 +45,7 @@
     #import "DropboxV2StorageProvider.h"
 #endif
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     #import "WebDAVStorageProvider.h"
     #import "SFTPStorageProvider.h"
     #import "WebDAVConnections.h"
@@ -146,6 +146,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [self startOrStopWiFiSyncServer];
     
+    [self refreshCloudKitDatabases]; 
+    
     [MacOnboardingManager beginAppOnboardingWithCompletion:^{
         
         
@@ -157,6 +159,19 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
 
     
+    
+}
+
+- (void)refreshCloudKitDatabases {
+#ifndef NO_NETWORKING
+    NSLog(@"🏴‍☠️ refreshCloudKitDatabases"); 
+    
+    if ( !Settings.sharedInstance.disableNetworkBasedFeatures ) { 
+        if (@available(macOS 12.0, *)) {
+            [CloudKitDatabasesInteractor.shared refreshAndMerge];
+        }
+    }
+#endif 
 }
 
 - (void)startWiFiSyncObservation {
@@ -1520,7 +1535,7 @@ static NSInteger clipboardChangeCount;
     }];
 }
 
-- (IBAction)onGenerateKeyFile:(id)sender {
+- (IBAction)onGenerateKeyFile:(id)sender {    
     __weak AppDelegate* weakSelf = self;
     
     KeyFile* keyFile = [KeyFileManagement generateNewV2];

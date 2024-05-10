@@ -18,6 +18,7 @@
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
 #import "iCloudSafesCoordinator.h"
+#import "Strongbox-Swift.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 
@@ -60,12 +61,18 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                       completion:(void (^)(BOOL userCancelled, DatabasePreferences* metadata, NSData* initialSnapshot, NSError* error))completion {
     BOOL iCloud = !forceLocal && !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
     
+    
+    id<SafeStorageProvider> provider = iCloud ? AppleICloudProvider.sharedInstance : LocalDeviceStorageProvider.sharedInstance;
+    
+    
+
+    
     [AddNewSafeHelper createDatabase:vc
                                 name:name
                      keyFileBookmark:nil
                      keyFileFileName:nil
                             database:model
-                            provider:iCloud ? AppleICloudProvider.sharedInstance : LocalDeviceStorageProvider.sharedInstance
+                            provider:provider
                         parentFolder:nil
                        yubiKeyConfig:nil
                           completion:completion];
@@ -130,6 +137,8 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 
             dispatch_async(dispatch_get_main_queue(), ^(void) { 
                 [SVProgressHUD dismiss];
+
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_saving_ellipsis", @"Saving...")];
                 
                 [provider create:name
                        extension:[Serializator getDefaultFileExtensionForFormat:format]
@@ -142,6 +151,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                     metadata.contextAwareYubiKeyConfig = yubiKeyConfig;
 
                     dispatch_async(dispatch_get_main_queue(), ^(void) {
+                        [SVProgressHUD dismiss];
                         completion(NO, metadata, data, error);
                     });
                  }];

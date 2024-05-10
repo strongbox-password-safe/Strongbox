@@ -123,6 +123,19 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
 
 
+- (void)application:(UIApplication *)application userDidAcceptCloudKitShareWithMetadata:(CKShareMetadata *)cloudKitShareMetadata {
+#ifndef NO_NETWORKING
+    NSLog(@"userDidAcceptCloudKitShareWithMetadata: [%@]", cloudKitShareMetadata);
+    
+    if (@available(iOS 15.0, *)) {
+        [CloudKitDatabasesInteractor.shared acceptShareWithMetadata:cloudKitShareMetadata 
+                                                  completionHandler:^(NSError * _Nullable error) {
+            NSLog(@"acceptShareWithMetadata done with [%@]", error);
+        }];
+    }
+#endif
+}
+
 - (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void (^)(BOOL))completionHandler {
     SafesViewController *safesViewController = [self getInitialViewController];
     [safesViewController performActionForShortcutItem:shortcutItem];
@@ -152,6 +165,16 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     
     [iCloudSafesCoordinator.sharedInstance initializeiCloudAccess];
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)cleanupWorkingDirectories:(NSDictionary *)launchOptions {
@@ -191,8 +214,8 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     NSLog(@"openURL: [%@] => [%@] - Source App: [%@]", options, url, options[UIApplicationOpenURLOptionsSourceApplicationKey]);
     
     if ([url.scheme isEqualToString:@"strongbox"]) {
-        SafesViewController *safesViewController = [self getInitialViewController];
-        [safesViewController handleUrlSchemeNavigationRequest:url];
+
+
         return YES;
     }
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
@@ -270,7 +293,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 }
 
 - (void)startOrStopWiFiSyncServer {
-#ifndef NO_SFTP_WEBDAV_SP 
+#ifndef NO_NETWORKING 
     NSError* error;
     if (! [WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
         NSLog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
@@ -279,7 +302,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 }
 
 - (void)stopWiFiSyncServer {
-#ifndef NO_SFTP_WEBDAV_SP 
+#ifndef NO_NETWORKING 
     NSError* error;
     [WiFiSyncServer.shared stopWith:nil]; 
 #endif

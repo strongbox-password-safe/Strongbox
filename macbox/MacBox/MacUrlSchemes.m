@@ -10,17 +10,18 @@
 #import "StrongboxMacFilesManager.h"
 
 NSString* const kStrongboxSFTPUrlScheme = @"sftp";
-NSString* const kStrongboxWiFiSyncUrlScheme = @"wifi";
+NSString* const kStrongboxWebDAVUrlScheme = @"webdav";
 NSString* const kStrongboxOneDriveUrlScheme = @"onedrive";
 NSString* const kStrongboxGoogleDriveUrlScheme = @"googledrive";
 NSString* const kStrongboxDropboxUrlScheme = @"dropbox";
-
-NSString* const kStrongboxWebDAVUrlScheme = @"webdav";
 NSString* const kStrongboxFileUrlScheme = @"file";
 NSString* const kStrongboxSyncManagedFileUrlScheme = @"sb-sync-managed-file";
 
+NSString* const kStrongboxWiFiSyncUrlScheme = @"wifi";
+NSString* const kStrongboxCloudUrlScheme = @"strongbox-cloud";
+
 StorageProvider storageProviderFromUrl(NSURL* url) {
-    return url ? storageProviderFromUrlScheme(url.scheme) : kMacFile;
+    return url ? storageProviderFromUrlScheme(url.scheme) : kLocalDevice;
 }
 
 StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
@@ -39,8 +40,14 @@ StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
     else if ( [scheme isEqualToString:kStrongboxDropboxUrlScheme ] ) {
         return kDropbox;
     }
-
-    return kMacFile;
+    else if ( [scheme isEqualToString:kStrongboxWiFiSyncUrlScheme ] ) {
+        return kWiFiSync;
+    }
+    else if ( [scheme isEqualToString:kStrongboxCloudUrlScheme ] ) {
+        return kCloudKit;
+    }
+    
+    return kLocalDevice;
 }
 
 
@@ -104,15 +111,3 @@ NSString* getFriendlyICloudPath(NSString* path) {
 
     return getPathRelativeToUserHome(path);
 }
-
-
-
-
-
-
-
-
-
-
-
-

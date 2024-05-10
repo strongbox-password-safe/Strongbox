@@ -1946,7 +1946,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         panel.allowedContentTypes = [.data]
 
         if panel.runModal() == .OK {
-            panel.urls.forEach { url in
+            for url in panel.urls {
                 addAttachmentWithUrl(url)
             }
         }
@@ -2010,7 +2010,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                              window: view.window)
         { [weak self] go in
             if go {
-                keys.forEach { key in
+                for key in keys {
                     self?.deleteAttachment(key as String)
                 }
             }
@@ -2116,7 +2116,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             if go {
                 var offsetIndex = 0
-                self.tableViewCustomFields.selectedRowIndexes.forEach { row in
+                for row in self.tableViewCustomFields.selectedRowIndexes {
                     self.model.removeCustomField(at: UInt(row - offsetIndex))
                     offsetIndex += 1
                 }

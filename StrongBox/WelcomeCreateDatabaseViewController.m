@@ -65,7 +65,7 @@
     
     BOOL iCloud = !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
 
-    self.labelICloud.hidden = !iCloud;
+    self.labelICloud.hidden = !iCloud; 
     self.labelLocalOnly.hidden = iCloud;
 }
 

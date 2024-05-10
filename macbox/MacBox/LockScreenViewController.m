@@ -1115,7 +1115,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
                key:(CompositeKeyFactors*)key
              error:(NSError*)error
         completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
-    if ( self.databaseMetadata.storageProvider == kMacFile && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
+    if ( self.databaseMetadata.storageProvider == kLocalDevice && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
         completion(NO, NO, NO, error);
     }
     else {
@@ -1198,7 +1198,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
         [self showIncorrectPasswordToast];
     }
     else if (error) {
-        if ( self.databaseMetadata.storageProvider == kMacFile && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
+        if ( self.databaseMetadata.storageProvider == kLocalDevice && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
             [self askAboutRelocatingDatabase:ckfs fromConvenience:fromConvenience];
         }
         else {

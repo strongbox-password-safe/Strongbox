@@ -16,7 +16,7 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 @interface SafesList : NSObject
 
-+ (instancetype _Nullable)sharedInstance;
++ (instancetype)sharedInstance;
 @property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *snapshot;
 
 - (SafeMetaData *)getById:(NSString*)uuid;
@@ -24,8 +24,8 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 - (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
 
 + (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
-- (NSString*_Nullable)getSuggestedNewDatabaseName;
-- (NSString*_Nullable)getUniqueNameFromSuggestedName:(NSString*)suggested;
+- (NSString*)getSuggestedNewDatabaseName;
+- (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested;
 
 - (BOOL)isUnique:(NSString *)nickName;
 - (BOOL)isValid:(NSString *)nickName;
@@ -45,7 +45,6 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 - (void)add:(SafeMetaData *_Nonnull)safe initialCache:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
 
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
-- (void)deleteAll;
 
 
 

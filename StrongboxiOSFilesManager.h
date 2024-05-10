@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* syncManagerMergeWorkingDirectory;
 
 
-@property (readonly, nullable) NSString* tmpAttachmentPreviewPath;
+@property (readonly, nonnull) NSString* tmpAttachmentPreviewPath;
 
 - (void)createIfNecessary:(NSURL*)url;
 

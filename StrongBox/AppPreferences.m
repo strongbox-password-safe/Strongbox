@@ -161,6 +161,8 @@ static NSString* const kZipExports = @"zipExports";
 static NSString* const kWiFiSyncOn = @"wiFiSyncOn";
 static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
 static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
+static NSString* const kCloudKitZoneCreated = @"cloudKitZoneCreated";
+static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppShortcutMenu";
 
 @implementation AppPreferences
 
@@ -202,6 +204,22 @@ static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
 }
 
 
+
+- (BOOL)showDatabasesOnAppShortcutMenu {
+    return [self getBool:kShowDatabasesOnAppShortcutMenu fallback:YES];
+}
+
+- (void)setShowDatabasesOnAppShortcutMenu:(BOOL)showDatabasesOnAppShortcutMenu {
+    [self setBool:kShowDatabasesOnAppShortcutMenu value:showDatabasesOnAppShortcutMenu];
+}
+
+- (BOOL)cloudKitZoneCreated {
+    return [self getBool:kCloudKitZoneCreated];
+}
+
+- (void)setCloudKitZoneCreated:(BOOL)cloudKitZoneCreated {
+    [self setBool:kCloudKitZoneCreated value:cloudKitZoneCreated];
+}
 
 - (BOOL)disableWiFiSyncClientMode {
     return [self getBool:kDisableWiFiSync];

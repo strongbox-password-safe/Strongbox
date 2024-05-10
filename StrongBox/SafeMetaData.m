@@ -388,7 +388,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.autoFillScanCustomFields = ((NSNumber*)jsonDictionary[@"autoFillScanCustomFields"]).boolValue;
     }
     else {
-        ret.autoFillScanCustomFields = YES;
+        ret.autoFillScanCustomFields = YES; 
     }
 
     
@@ -536,6 +536,15 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     }
 
     
+
+    if ( jsonDictionary[@"isSharedInCloudKit"] != nil ) {
+        ret.isSharedInCloudKit = ((NSNumber*)jsonDictionary[@"isSharedInCloudKit"]).boolValue;
+    }
+    else {
+        ret.isSharedInCloudKit = NO;
+    }
+
+    
     
     return ret;
 }
@@ -625,6 +634,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"showLastViewedEntryOnUnlock" : @(self.showLastViewedEntryOnUnlock),
         @"hideTabBarIfOnlySingleTab" : @(self.hideTabBarIfOnlySingleTab),
         @"allowPulldownRefreshSyncInOfflineMode" : @(self.allowPulldownRefreshSyncInOfflineMode),
+        @"isSharedInCloudKit" : @(self.isSharedInCloudKit),
     }];
     
     if (self.nickName != nil) {
@@ -927,14 +937,6 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     }
 }
 
-- (void)clearKeychainItems {
-    self.convenienceMasterPassword = nil;
-    self.autoFillConvenienceAutoUnlockPassword = nil;
-    self.legacyFavouritesStore = nil;
-    self.duressPin = nil;
-    self.conveniencePin = nil;
-}
-
 - (NSURL *)backupsDirectory {
     NSURL* url = [StrongboxFilesManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
     
@@ -1042,6 +1044,16 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
     
     return [newFileName stringByAppendingPathExtension:extension];
+}
+
+
+
+- (void)clearKeychainItems {
+    self.convenienceMasterPassword = nil;
+    self.autoFillConvenienceAutoUnlockPassword = nil;
+    self.legacyFavouritesStore = nil;
+    self.duressPin = nil;
+    self.conveniencePin = nil;
 }
 
 @end

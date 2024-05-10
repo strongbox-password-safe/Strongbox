@@ -114,3 +114,5 @@
 
 #import "Model.h"
 #import "KeyFile.h"
+#import "DatabaseNuker.h"
+#import "CommonDatabasePreferences.h"

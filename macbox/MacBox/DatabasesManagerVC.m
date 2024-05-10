@@ -29,7 +29,7 @@
 #import "DatabasesManager.h"
 #import "AboutViewController.h"
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     #import "SFTPStorageProvider.h"
     #import "SFTPConnectionsManager.h"
     #import "WebDAVConnectionsManager.h"
@@ -42,6 +42,7 @@
 #endif
 
 #import "Strongbox-Swift.h"
+#import "DatabaseNuker.h"
 
 
 
@@ -231,33 +232,13 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 [DatabasesCollection.shared closeAnyDocumentWindowsWithUuid:database.uuid];
                 
                 [self removeDatabase:database];
-            }
-            
-            BOOL autoFillEnabled = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
-                return obj.autoFillEnabled;
-            }];
-            
-            if ( autoFillEnabled ) {
-                [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-            }
+            }            
         }
     }];
 }
 
 - (void)removeDatabase:(MacDatabasePreferences*)safe {
-    [safe clearSecureItems];
-    
-    [BackupsManager.sharedInstance deleteAllBackups:safe];
-    
-    [MacSyncManager.sharedInstance removeDatabaseAndLocalCopies:safe];
-    
-    if ( safe.autoFillEnabled ) {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
-    
-    [SSHAgentRequestHandler.shared clearAllOfflinePublicKeys];
-    
-    [safe remove];
+    [DatabaseNuker nuke:safe];
 }
 
 - (void)refreshVisibleRows {
@@ -304,7 +285,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
     
     BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV && !StrongboxProductBundle.supportsWiFiSync;
-    BOOL disabled = database.storageProvider != kMacFile && filesOnly;
+    BOOL disabled = database.storageProvider != kLocalDevice && filesOnly;
     
     return !disabled;
 }
@@ -318,7 +299,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
     
     BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV && !StrongboxProductBundle.supportsWiFiSync;
-    BOOL disabled = database.storageProvider != kMacFile && filesOnly;
+    BOOL disabled = database.storageProvider != kLocalDevice && filesOnly;
     
     [result setWithDatabase:database disabled:disabled];
     
@@ -376,7 +357,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     DocumentController* dc = DocumentController.sharedDocumentController;
     
     BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV && !StrongboxProductBundle.supportsWiFiSync;
-    BOOL disabled = database.storageProvider != kMacFile && filesOnly;
+    BOOL disabled = database.storageProvider != kLocalDevice && filesOnly;
     
     if ( disabled ) {
         NSLog(@"🔴 Attempt to unlock unsupported Database Storage Provider");
@@ -454,7 +435,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)onAddSFTPDatabase:(id)sender {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     SFTPConnectionsManager* vc = [SFTPConnectionsManager instantiateFromStoryboard];
     
     __weak DatabasesManagerVC* weakSelf = self;
@@ -471,7 +452,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (IBAction)onAddWebDav:(id)sender {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     WebDAVConnectionsManager* vc = [WebDAVConnectionsManager instantiateFromStoryboard];
     
     __weak DatabasesManagerVC* weakSelf = self;

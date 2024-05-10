@@ -17,6 +17,12 @@
 #import "WorkingCopyManager.h"
 #import "LocalDeviceStorageProvider.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 NSString* const kDatabaseCell = @"DatabaseCell";
 
 @interface DatabaseCell ()
@@ -198,9 +204,34 @@ rotateLastImage:(BOOL)rotateLastImage
     NSMutableArray<UIImage*> *ret = NSMutableArray.array;
     NSMutableArray *tnts = NSMutableArray.array;
 
+    
+    
     if(database.hasUnresolvedConflicts) {
         [ret addObject:[UIImage imageNamed:@"error"]];
         [tnts addObject:NSNull.null];
+    }
+    
+    
+    
+    if ( database.storageProvider == kCloudKit ) {
+        BOOL shared = database.isSharedInCloudKit;
+
+        if ( shared ) {
+            UIImage* cloudkitSharedIndicator = [UIImage systemImageNamed:@"person.2.fill"];
+            
+            if (@available(iOS 15.0, *)) {
+                NSArray<UIColor*>* colors = @[UIColor.systemBlueColor, UIColor.systemGreenColor];
+                UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:colors];
+                UIImage* coloured = [cloudkitSharedIndicator imageByApplyingSymbolConfiguration:config];
+                
+                [ret addObject:coloured];
+            }
+            else {
+                [ret addObject:cloudkitSharedIndicator];
+            }
+            
+            [tnts addObject:NSNull.null];
+        }
     }
     
     if (AppPreferences.sharedInstance.showDatabaseStatusIcon) {
@@ -209,11 +240,15 @@ rotateLastImage:(BOOL)rotateLastImage
 
         BOOL isQuickLaunch = [quickLaunchUuid isEqualToString:database.uuid];
         BOOL isAFQuickLaunch = [afQuickLaunchUuid isEqualToString:database.uuid];
-                
+    
+        
+        
         if ( isQuickLaunch ) {
             [ret addObject:[UIImage imageNamed:@"rocket"]];
             [tnts addObject:NSNull.null];
         }
+        
+        
         
         if ( isAFQuickLaunch && !isQuickLaunch ) {
             if ( database.autoFillEnabled ) {
@@ -222,22 +257,27 @@ rotateLastImage:(BOOL)rotateLastImage
             }
         }
         
+        
+        
         if(database.readOnly) {
             [ret addObject:[UIImage systemImageNamed:@"eyeglasses"]];
             [tnts addObject:UIColor.systemGrayColor];
         }
     }
+        
+    
     
     if (database.outstandingUpdateId) {
         [ret addObject:[UIImage imageNamed:@"upload"]];
         [tnts addObject:UIColor.orangeColor];
     }
     
+    
+    
     if (syncState == kSyncOperationStateInProgress ||
         syncState == kSyncOperationStateError ||
         syncState == kSyncOperationStateBackgroundButUserInteractionRequired ||
         syncState == kSyncOperationStateUserCancelled) {
-        
         UIImage* syncImage = [UIImage systemImageNamed:@"arrow.triangle.2.circlepath"];
         
         [ret addObject:syncImage];

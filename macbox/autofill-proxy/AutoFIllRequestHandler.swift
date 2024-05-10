@@ -344,27 +344,7 @@ import Foundation
             return AutoFillEncryptedResponse.error(message: "Can't find AutoFillEnabled database to Unlock")
         }
 
-        var go = false
-        if !DatabasesCollection.shared.isUnlocked(uuid: request.databaseId) {
-            let g = DispatchGroup()
-            g.enter()
-
-            DatabasesCollection.shared.initiateDatabaseUnlock(uuid: request.databaseId,
-                                                              syncAfterUnlock: true)
-            { success in
-                go = success
-                g.leave()
-            }
-
-            if g.wait(timeout: .now() + 10) == .timedOut {
-                NSLog("⚠️ Waiting for Database Unlock, timed out.")
-            } else {
-                NSLog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
-            }
-        } else {
-            
-            go = true
-        }
+        let go = DatabasesCollection.shared.initiateUnlockWithSynchronousTimeout(request.databaseId, timeoutSeconds: 10)
 
         let response = UnlockDatabaseResponse(success: go)
 

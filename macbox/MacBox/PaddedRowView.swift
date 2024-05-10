@@ -7,8 +7,9 @@
 //
 
 import Cocoa
+
 // import AppKit
-// import Foundation
+
 
 class PaddedRowView: NSTableRowView {
     

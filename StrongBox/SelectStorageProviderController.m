@@ -13,7 +13,7 @@
 #import "Alerts.h"
 #import "StorageBrowserTableViewController.h"
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 #endif
@@ -73,7 +73,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 }
 
 - (void)loadWiFiSyncDevices {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     NSMutableArray<WiFiSyncServerConfig*>* allWiFiSyncDevices = [WiFiSyncBrowser.shared.availableServers mutableCopy];
     
     NSArray<WiFiSyncServerConfig*>* wiFiSyncDevices = allWiFiSyncDevices;
@@ -346,7 +346,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
                 [self onCreateThroughFilesApp];
             }
         }
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
         else if ( providerId.intValue == kWebDAV ) {
             [self getWebDAVConnection];
         }
@@ -462,7 +462,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
 - (void)getWebDAVConnection {
     WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
     vc.selectMode = YES;

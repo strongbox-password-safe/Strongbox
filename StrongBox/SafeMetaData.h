@@ -242,6 +242,8 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 
 @property BOOL allowPulldownRefreshSyncInOfflineMode;
 
+@property BOOL isSharedInCloudKit; 
+
 @end
 
 NS_ASSUME_NONNULL_END

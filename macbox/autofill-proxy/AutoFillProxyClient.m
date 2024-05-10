@@ -30,6 +30,7 @@ NSString* jsonResponseOK(void);
 
 BOOL isLaunchStrongboxMessage(NSString* str, NSString** initiateUnlockDatabaseUuid);
 BOOL launchStrongbox(NSString* _Nullable initiateUnlockDatabaseUuid, NSError** error);
+
 void sigHandler(int sig) {
     exit(1);
 }

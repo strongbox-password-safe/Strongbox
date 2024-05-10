@@ -10,6 +10,7 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "BrowseSortConfiguration.h"
+#import "DatabaseNuker.h"
 
 @interface DatabasePreferences ()
 
@@ -148,8 +149,10 @@
     return [SafesList.sharedInstance reloadIfChangedByOtherComponent];
 }
 
-+ (void)deleteAll {
-    [SafesList.sharedInstance deleteAll];
++ (void)nukeAll {
+    for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
+        [DatabaseNuker nuke:database];
+    }
 }
 
 - (NSDictionary *)getJsonSerializationDictionary {
@@ -1381,6 +1384,16 @@
 - (void)setAllowPulldownRefreshSyncInOfflineMode:(BOOL)allowPulldownRefreshSyncInOfflineMode {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.allowPulldownRefreshSyncInOfflineMode = allowPulldownRefreshSyncInOfflineMode;
+    }];
+}
+
+- (BOOL)isSharedInCloudKit {
+    return self.metadata.isSharedInCloudKit;
+}
+
+- (void)setIsSharedInCloudKit:(BOOL)isSharedInCloudKit {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.isSharedInCloudKit = isSharedInCloudKit;
     }];
 }
 

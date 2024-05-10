@@ -104,7 +104,8 @@ class OnePassword1PuxImporter: NSObject, Importer {
             guard let referencedNode = intermediateResult.vaultItemToNodeMap[key],
                   let nodeToFixUp = database.getItemBy(ssoReferencesToResolve.nodeId)
             else {
-                intermediateResult.messages.append(ImportMessage("Could not find references SSO Login Item", .error))
+                intermediateResult.messages.append(ImportMessage("Could not find reference for '\(ssoReferencesToResolve.provider)' SSO Login Item. Key = [\(key)]", .error))
+
                 continue
             }
 

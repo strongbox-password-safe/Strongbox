@@ -59,14 +59,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)reloadIfChangedByOtherComponent;
 
-+ (void)deleteAll;
++ (void)nukeAll;
 
 @property (class, readonly) NSArray<DatabasePreferences*>* iCloudDatabases;
 @property (class, readonly) NSArray<DatabasePreferences*>* localDeviceDatabases;
 @property (class, readonly) NSArray<DatabasePreferences*>* allDatabases;
 
 - (NSDictionary*)getJsonSerializationDictionary;
-+ (NSString*_Nullable)getUniqueNameFromSuggestedName:(NSString*)suggested;
++ (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested;
 + (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 
 
@@ -203,6 +203,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString* exportFilename;
 
 @property BOOL allowPulldownRefreshSyncInOfflineMode;
+
+@property BOOL isSharedInCloudKit; 
 
 @end
 

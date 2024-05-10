@@ -18,7 +18,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "SafeStorageProviderFactory.h"
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 #endif
@@ -225,118 +225,35 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
 }
 
 - (void)bindTextFields:(MacDatabasePreferences*)metadata {
-    if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] && ![metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-        [self bindTextFieldsForNoneFileDatabase:metadata];
-    }
-    else {
-        [self bindTextFieldsForFileDatabase:metadata];
-    }
-}
-
-- (void)bindTextFieldsForFileDatabase:(MacDatabasePreferences*)metadata {
-    NSString* path = @"";
     NSString* fileSize = @"";
     NSString* fileMod = @"";
     NSString* title = metadata.nickName ? metadata.nickName : @"";
-
     
-    
-    
-    
-    
-    
-    NSURL* url;
-    
-    if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-        url = fileUrlFromManagedUrl(metadata.fileUrl);
-    }
-    else {
-        url = metadata.fileUrl;
-    }
-    
-    if ( url ) {
-
-
-
-        
-        if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
-            path = getFriendlyICloudPath(url.path);
-            self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:kiCloud];
-        }
-        else {
-            path = [NSString stringWithFormat:@"%@ (%@)", getPathRelativeToUserHome(url.path), [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
-        }
-        
-        NSError* error;
-        NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-        if (error) {
-            NSLog(@"Error getting attributes of database file: [%@]", error);
-            path = [NSString stringWithFormat:@"(%ld) %@", (long)error.code, error.localizedDescription];
-        }
-        else {
-            fileSize = friendlyFileSizeString(attr.fileSize);
-            fileMod = attr.fileModificationDate.friendlyDateTimeStringPrecise;
-        }
-    }
-
-    self.textFieldName.stringValue = title;
-    self.textFieldSubtitleLeft.stringValue = path;
-    self.textFieldSubtitleTopRight.stringValue = fileSize;
-    self.textFieldSubtitleBottomRight.stringValue = fileMod;
-}
-
-- (void)bindTextFieldsForNoneFileDatabase:(MacDatabasePreferences*)metadata {
-    NSString* path = @"";
-    NSString* fileSize = @"";
-    NSString* fileMod = @"";
-    NSString* title = metadata.nickName ? metadata.nickName : @"";
-
-    path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
-
-#ifndef IS_APP_EXTENSION
-    if ( metadata.storageProvider == kWiFiSync ) {
-        NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
-        
-        if ( name ) {
-            NSString* fmt = NSLocalizedString(@"wifi_sync_storage_location_title_fmt", @"%@ on '%@' - %@");
-            
-            path = [NSString stringWithFormat:fmt, 
-                    metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
-        }
-    }
-#endif
-    
-#ifndef NO_SFTP_WEBDAV_SP
-    
-    if ( metadata.storageProvider == kSFTP ) {
-        SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
-        
-        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
-    }
-    
-    if ( metadata.storageProvider == kWebDAV ) {
-        WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
-        
-        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
-    }
-    
-#endif
-
     NSDate* modDate;
     unsigned long long size;
     NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata.uuid
-                                                                         modified:&modDate
-                                                                         fileSize:&size];
-    
+                                                                        modified:&modDate
+                                                                        fileSize:&size];
     if ( workingCopy ) {
         fileSize = friendlyFileSizeString(size);
         fileMod = modDate.friendlyDateTimeStringPrecise;
     }
     
     self.textFieldName.stringValue = title;
-    self.textFieldSubtitleLeft.stringValue = path;
     self.textFieldSubtitleTopRight.stringValue = fileSize;
     self.textFieldSubtitleBottomRight.stringValue = fileMod;
+    self.textFieldSubtitleLeft.stringValue = [SafeStorageProviderFactory getStorageSubtitleForDatabasesManager:metadata];
+    
+    if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] || [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+        NSURL* url = [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ? fileUrlFromManagedUrl(metadata.fileUrl) : metadata.fileUrl;
+
+        
+        
+
+        if ( url && [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
+            self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:kiCloud];
+        }
+    }
 }
 
 - (void)bindSyncState:(MacDatabasePreferences *)metadata showSyncState:(BOOL)showSyncState {

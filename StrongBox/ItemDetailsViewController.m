@@ -49,7 +49,6 @@
 
 #import "ISMessages/ISMessages.h"
 #import "SetNodeIconUiHelper.h"
-#import "QRCodeScannerViewController.h"
 #import "Strongbox-Swift.h"
 #import "NavBarSyncButtonHelper.h"
 
@@ -1442,7 +1441,6 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 }
 
 - (void)onSetTotp {
-#ifndef IS_APP_EXTENSION
     [Alerts fourOptionsWithCancel:self
                             title:NSLocalizedString(@"item_details_setup_totp_how_title", @"How would you like to setup TOTP?")
                           message:NSLocalizedString(@"item_details_setup_totp_how_message", @"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL")
@@ -1452,21 +1450,17 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                  fourthButtonText:NSLocalizedString(@"item_details_setup_totp_manual_steam", @"Manual (Steam Token)...")
                            action:^(int response) {
         if(response == 0){
-#ifndef IS_READ_ONLY_BUILD
-            
-            QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
+            TOTPScannerViewController* vc = [[TOTPScannerViewController alloc] init];
+
             vc.modalPresentationStyle = UIModalPresentationFormSheet;
             
-            vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
-                [self dismissViewControllerAnimated:YES completion:nil];
-                if(response) {
-                    NSURL* url = string.urlExtendedParse; 
-                    [self setTotpWithString:url.absoluteString steam:NO];
-                }
+            __weak ItemDetailsViewController* weakSelf = self;
+            vc.onFoundTOTP = ^(NSURL* url) {
+                [weakSelf setTotpWithString:url.absoluteString steam:NO];
             };
             
             [self presentViewController:vc animated:YES completion:nil];
-#endif
+
         }
         else if(response == 1) {
             [self scanPhotoLibraryImageForQRCode];
@@ -1483,7 +1477,6 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
             }];
         }
     }];
-#endif
 }
 
 - (void)setTotpWithString:(NSString*)string steam:(BOOL)steam {

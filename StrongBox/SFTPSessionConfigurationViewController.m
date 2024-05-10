@@ -12,7 +12,7 @@
 #import "Utils.h"
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
 #import "SFTPStorageProvider.h"
 #endif
 
@@ -99,7 +99,7 @@
     configuration.privateKey = self.privateKey;
     configuration.initialDirectory = self.textFieldPath.text;
     
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     [SFTPStorageProvider.sharedInstance testConnection:configuration viewController:self completion:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {

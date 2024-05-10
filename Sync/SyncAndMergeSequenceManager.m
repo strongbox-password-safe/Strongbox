@@ -116,15 +116,17 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                           @(kWebDAV),
                                           @(kTwoDrive),
                                           @(kWiFiSync),
+                                          @(kCloudKit),
         ];
 #else
         NSArray<NSNumber*> *supported = @[@(kSFTP),
                                           @(kWebDAV),
-                                          @(kMacFile),
+                                          @(kLocalDevice),
                                           @(kTwoDrive),
                                           @(kGoogleDrive),
                                           @(kDropbox),
                                           @(kWiFiSync),
+                                          @(kCloudKit),
         ];
 #endif
 
@@ -204,7 +206,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             
             [self syncOrPoll:databaseUuid syncId:syncId parameters:request.parameters completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
                 if ( done ) {
-                    NSLog(@"WARNWARN: Completion Called when already completed! - NOP - WARNWARN");
+                    NSLog(@"🔴 WARNWARN: Completion Called when already completed! - NOP - WARNWARN");
                     return;
                 }
                 done = YES;
@@ -304,13 +306,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         }
     }
     else {
-        
-
-            opts.onlyIfModifiedDifferentFrom = forcePull ? nil : localModDate;
-
-
-
-
+        opts.onlyIfModifiedDifferentFrom = forcePull ? nil : database.lastSyncRemoteModDate;
     }
 
     NSString* providerDisplayName = [SafeStorageProviderFactory getStorageDisplayName:database];

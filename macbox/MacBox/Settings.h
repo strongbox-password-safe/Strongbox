@@ -164,6 +164,9 @@ extern NSString* const kCustomFieldsColumn;
 @property NSString* wiFiSyncPasscode;
 
 @property BOOL disableWiFiSyncClientMode;
+@property BOOL disableNetworkBasedFeatures;
+
+@property BOOL cloudKitZoneCreated;
 
 @end
 

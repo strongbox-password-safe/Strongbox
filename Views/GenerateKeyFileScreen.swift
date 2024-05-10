@@ -152,7 +152,6 @@ struct GenerateKeyFileScreen: View {
                             }
                         })
                         .frame(minWidth: 0, maxWidth: .infinity)
-
                         .keyboardShortcut(.defaultAction)
 
                         #if os(macOS)

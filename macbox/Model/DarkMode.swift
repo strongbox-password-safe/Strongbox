@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct DarkMode {
+enum DarkMode {
     static var isOn: Bool {
         let osxMode: String? = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
         return osxMode != nil && osxMode == "Dark"

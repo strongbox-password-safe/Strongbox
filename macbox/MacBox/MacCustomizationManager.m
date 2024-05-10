@@ -25,11 +25,13 @@
         NSLog(@"Graphene Edition... customizing...");
         
         Settings.sharedInstance.disableWiFiSyncClientMode = YES;
+        Settings.sharedInstance.disableNetworkBasedFeatures = YES;
         Settings.sharedInstance.databasesAreAlwaysReadOnly = NO;
     }
     else {
         Settings.sharedInstance.disableWiFiSyncClientMode = NO;
         Settings.sharedInstance.databasesAreAlwaysReadOnly = NO;
+        Settings.sharedInstance.disableNetworkBasedFeatures = NO;
     }
 }
 

@@ -13,6 +13,7 @@
 #import "NSArray+Extensions.h"
 #import "WorkingCopyManager.h"
 #import "ConcurrentMutableSet.h"
+#import "DatabaseNuker.h"
 
 @interface SafesList()
 
@@ -367,17 +368,6 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         
         [self.databasesList insertObject:item atIndex:destinationIndex];
         
-        [self serialize:YES];
-    });
-}
-
-- (void)deleteAll {
-    for(SafeMetaData* database in self.snapshot) {
-        [database clearKeychainItems];
-    }
-    
-    dispatch_barrier_async(self.dataQueue, ^{
-        [self.databasesList removeAllObjects];
         [self serialize:YES];
     });
 }

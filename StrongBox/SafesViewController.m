@@ -64,7 +64,7 @@
 
 #import "OnboardingManager.h"
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 #endif
@@ -90,6 +90,7 @@
 #import "SafesList.h"
 #import "VirtualYubiKeys.h"
 #import "ExportHelper.h"
+#import "DatabaseNuker.h"
 
 static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUpdated";
 static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdated";
@@ -276,13 +277,15 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 - (void)updateDynamicAppIconShortcuts {
     NSMutableArray<UIApplicationShortcutIcon*>* shortcuts = [[NSMutableArray alloc] init];
     
-    for ( DatabasePreferences* database in self.collection ) {
-        UIMutableApplicationShortcutItem *mutableShortcutItem = [[UIMutableApplicationShortcutItem alloc] initWithType:@"quick-launch"  localizedTitle:database.nickName];
-        
-        mutableShortcutItem.userInfo = @{ @"uuid" : database.uuid };
-        mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithSystemImageName:@"cylinder.split.1x2"];
-        
-        [shortcuts addObject:mutableShortcutItem.copy];
+    if ( AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu ) {
+        for ( DatabasePreferences* database in self.collection ) {
+            UIMutableApplicationShortcutItem *mutableShortcutItem = [[UIMutableApplicationShortcutItem alloc] initWithType:@"quick-launch"  localizedTitle:database.nickName];
+            
+            mutableShortcutItem.userInfo = @{ @"uuid" : database.uuid };
+            mutableShortcutItem.icon = [UIApplicationShortcutIcon iconWithSystemImageName:@"cylinder.split.1x2"];
+            
+            [shortcuts addObject:mutableShortcutItem.copy];
+        }
     }
     
     
@@ -436,6 +439,8 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
     [self refreshICloudFolderDatabases];
+ 
+    [self refreshCloudKitDatabases]; 
     
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     
@@ -452,6 +457,20 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         
         [[iCloudSafesCoordinator sharedInstance] startQuery];
     }
+}
+
+- (void)refreshCloudKitDatabases {
+#ifndef NO_NETWORKING
+    NSLog(@"✅ refreshCloudKitDatabases"); 
+    
+    
+    
+    if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        if (@available(iOS 15.0, *)) {
+            [CloudKitDatabasesInteractor.shared refreshAndMerge];
+        }
+    }
+#endif
 }
 
 - (void)doAppOnboarding:(BOOL)userJustCompletedBiometricAuthentication quickLaunchWhenDone:(BOOL)quickLaunchWhenDone {
@@ -1248,8 +1267,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     
     
     
-    BOOL shareAllowed = !AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil && !AppPreferences.sharedInstance.disableExport;
-    if (shareAllowed) [ma addObject:[self getContextualShareAction:indexPath]];
+    BOOL exportAllowed = !AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil && !AppPreferences.sharedInstance.disableExport;
+    if (exportAllowed) [ma addObject:[self getContextualExportAction:indexPath]];
 
     if (self.collection.count > 1) {
         [ma addObject:[self getContextualReOrderDatabasesAction:indexPath]];
@@ -1303,6 +1322,14 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     DatabasePreferences *safe = self.collection[indexPath.row];
 
+    if ( safe.storageProvider == kCloudKit ) {
+        if (@available(iOS 15.0, *)) {
+            
+            
+            [ma addObject:[self getContextualMenuCloudKitShareAction:indexPath]];
+        }
+    }
+
     [ma addObject:[self getContextualMenuRenameAction:indexPath]];
 
     NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
@@ -1315,7 +1342,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }
     
     [ma addObject:[self getContextualMenuRemoveAction:indexPath]];
-
+    
     return [UIMenu menuWithTitle:@""
                            image:nil
                       identifier:nil
@@ -1323,11 +1350,11 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                         children:ma];
 }
 
-- (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath  {
+- (UIAction*)getContextualExportAction:(NSIndexPath*)indexPath  {
     UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"generic_export", @"Export")
                                     systemImage:@"square.and.arrow.up"
                                         handler:^(__kindof UIAction * _Nonnull action) {
-        [self onShare:indexPath];
+        [self onExport:indexPath];
     }];
 
     return ret;
@@ -1525,9 +1552,17 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }];
 }
 
+- (UIAction*)getContextualMenuCloudKitShareAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(15.0)) {
+    return [ContextMenuHelper getItem:NSLocalizedString(@"generic_share_action_ellipsis", @"Share...")
+                          systemImage:@"person.3"
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [self onCloudKitShare:indexPath];
+    }];
+}
 
 
-- (void)onShare:(NSIndexPath*)indexPath {
+
+- (void)onExport:(NSIndexPath*)indexPath {
     DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
     
     NSError* error;
@@ -1760,6 +1795,10 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     if ( safe.storageProvider == kiCloud && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         message = NSLocalizedString(@"safes_vc_remove_icloud_databases_warning", @"warning message about removing database from icloud");
     }
+    else if ( safe.storageProvider == kCloudKit && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        
+        message = @"Are you sure you want to delete this database? It will be removed from all of your devices and cannot be undone.\n\nPlease consider taking a backup local copy first."; 
+    }
     else {
         message = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_are_you_sure_remove_database_fmt", @"are you sure you want to remove database prompt with format string on end"),
                          (safe.storageProvider == kiCloud || safe.storageProvider == kLocalDevice)  ? @"" : NSLocalizedString(@"safes_vc_extra_info_underlying_database", @"extra info appended to string about the underlying storage type")];
@@ -1778,14 +1817,15 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (void)removeAndCleanupSafe:(DatabasePreferences *)safe {
     if (safe.storageProvider == kLocalDevice) {
         [[LocalDeviceStorageProvider sharedInstance] delete:safe
-                completion:^(NSError *error) {
-                    if (error != nil) {
-                        NSLog(@"Error removing local file: %@", error);
-                    }
-                    else {
-                        NSLog(@"Removed Local File Successfully.");
-                    }
-                }];
+                                                 completion:^(NSError *error) {
+            if (error != nil) {
+                NSLog(@"Error removing local file: %@", error);
+            }
+            else {
+                NSLog(@"Removed Local File Successfully.");
+                [DatabaseNuker nuke:safe];
+            }
+        }];
     }
     else if (safe.storageProvider == kiCloud) {
         [[AppleICloudProvider sharedInstance] delete:safe completion:^(NSError *error) {
@@ -1796,30 +1836,15 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
             }
             else {
                 NSLog(@"iCloud file removed");
+                [DatabaseNuker nuke:safe];
             }
         }];
     }
-
-    [SyncManager.sharedInstance removeDatabaseAndLocalCopies:safe];
-    [safe clearKeychainItems];
-    
-    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    
-    
-    
-    if([AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
-        AppPreferences.sharedInstance.quickLaunchUuid = nil;
+    else if (safe.storageProvider == kCloudKit) {
+        if (@available(iOS 15.0, *)) {
+            [self deleteCloudKitDatabase:safe];
+        }
     }
-
-    if([AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:safe.uuid]) {
-        AppPreferences.sharedInstance.autoFillQuickLaunchUuid = nil;
-    }
-
-    
-    
-    [BackupsManager.sharedInstance deleteAllBackups:safe];
-    
-    [safe removeFromDatabasesList];
 }
 
 
@@ -1836,6 +1861,13 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
             if ( error ) {
                 [Alerts error:self error:error];
             }
+        }
+    }
+    
+    if (@available(iOS 15.0, *)) {
+        if ( database.storageProvider == kCloudKit ) {
+            
+            [self renameCloudKitDatabase:database nick:name];
         }
     }
 }
@@ -2947,7 +2979,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)editConnection:(DatabasePreferences*)database {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     if ( database.storageProvider == kWebDAV ) {
         WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
         vc.selectMode = YES;
@@ -2994,7 +3026,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)changeWebDAVDatabaseConnection:(DatabasePreferences*)database connection:(WebDAVSessionConfiguration*)connection {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
     pd.connectionIdentifier = connection.identifier;
     
@@ -3004,7 +3036,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)changeSFTPDatabaseConnection:(DatabasePreferences*)database connection:(SFTPSessionConfiguration*)connection {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
     pd.connectionIdentifier = connection.identifier;
     
@@ -3014,7 +3046,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)editFilePath:(DatabasePreferences*)database {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     if ( database.storageProvider != kWebDAV && database.storageProvider != kSFTP ) {
         return;
     }
@@ -3076,7 +3108,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)changeSFTPFilePath:(DatabasePreferences*)database providerData:(SFTPProviderData*)providerData {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     DatabasePreferences* newDb = [SFTPStorageProvider.sharedInstance getDatabasePreferences:database.nickName providerData:providerData];
     
     database.fileName = newDb.fileName;
@@ -3085,7 +3117,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)changeWebDAVFilePath:(DatabasePreferences*)database providerData:(WebDAVProviderData*)providerData {
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
     DatabasePreferences* newDb = [WebDAVStorageProvider.sharedInstance getDatabasePreferences:database.nickName providerData:providerData];
     
     database.fileName = newDb.fileName;
@@ -3372,74 +3404,139 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 
 
-- (void)handleUrlSchemeNavigationRequest:(NSURL *)url {
-    NSLog(@"Strongbox URL Scheme: [%@]", url);
+- (void)onCloudKitShare:(NSIndexPath*)indexPath API_AVAILABLE(ios(15.0)) {
+#ifndef NO_NETWORKING
+    DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
     
-    return;
+    CloudKitSharingUIHelper* helper = [[CloudKitSharingUIHelper alloc] initWithDatabase:database 
+                                                                   parentViewController:self];
+                                                                                
+    CGRect rect = [self.tableView rectForRowAtIndexPath:indexPath];
     
-    NSURLComponents* components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
-    
-    NSLog(@"Host = %@", components.host );
-
-    NSString* databaseId = components.host;
-    
-    DatabasePreferences* database = nil;
-    
-    NSUUID* iden = [[NSUUID alloc] initWithUUIDString:databaseId];
-    DatabasePreferences* nickNameMatch = [DatabasePreferences.allDatabases firstOrDefault:^BOOL(DatabasePreferences * _Nonnull obj) {
-        return [obj.nickName caseInsensitiveCompare:databaseId] == NSOrderedSame;
+    [helper presentWithRect:rect 
+                 sourceView:self.tableView
+              fooCompletion:^{
+        NSLog(@"Helper has been captured! [%@]", helper);
     }];
-    
-    if ( databaseId.length == 0 ) {
-        database = DatabasePreferences.allDatabases.firstObject;
-        NSLog(@"No Database Specified. Will use first.");
-    }
-    else if ( iden != nil ) {
-        NSLog(@"Database UUID Specified... [%@]", iden.UUIDString); 
-        database = [DatabasePreferences fromUuid:databaseId];
-    }
-    else if ( nickNameMatch ) { 
-        database = nickNameMatch;
-        NSLog(@"Database NickName Specified");
-    }
-    else if ( databaseId.isAllDigits ) {
-        NSLog(@"Database Index Specified: [%ld]", (long)databaseId.integerValue);
-        NSArray* databases = DatabasePreferences.allDatabases;
-        if ( databaseId.integerValue < databases.count ) {
-            database = databases[databaseId.integerValue];
-        }
-    }
-    
-    if ( database ) {
-        NSString* path = components.path;
-        NSString* query = components.query;
-
-        [self handleUrlSchemeNavigationRequestWithDatabase:database path:path query:query];
-    }
-    else {
-        
-    }
+#endif
 }
 
-- (void)handleUrlSchemeNavigationRequestWithDatabase:(DatabasePreferences*)database path:(NSString*)path query:(NSString*)query {
-    NSLog(@"URL Nav Scheme Requests Database = [%@] be Unlocked... - path = %@, query = %@", database.nickName, path, query);
 
-    if ( AppModel.shared.unlockedDatabase) {
-        if ( [AppModel.shared.unlockedDatabase.databaseUuid isEqualToString:database.uuid] ) {
-            NSLog(@"Database Already Unlocked and Open...");
-            
-        }
-        else {
-            NSLog(@"Different Database Already Open..."); 
-        }
-    }
-    else {
-        
-        [self openDatabase:database];
-    }
+-(void)renameCloudKitDatabase:(DatabasePreferences*)database nick:(NSString*)nick API_AVAILABLE(ios(15.0)) {
+#ifndef NO_NETWORKING
+    [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
+                                        viewController:self];
+    
+    [CloudKitDatabasesInteractor.shared renameWithDatabase:database nickName:nick completionHandler:^(NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+                NSLog(@"🔴 Error renaming Cloudkit Database [%@]", error);
+                [Alerts error:self error:error];
+                [self refreshCloudKitDatabases]; 
+            }
+            else {
+                [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+                
+
+            }
+        });
+    }];
+#endif
+}
+
+-(void)deleteCloudKitDatabase:(DatabasePreferences*)database API_AVAILABLE(ios(15.0)) {
+#ifndef NO_NETWORKING
+    [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_deleting_ellipsis", @"Deleting...")
+                                        viewController:self];
+    
+    [CloudKitDatabasesInteractor.shared deleteWithDatabase:database completionHandler:^(NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+                NSLog(@"🔴 Error deleting Cloudkit Database [%@]", error);
+                [Alerts error:self error:error];
+            }
+            else {
+                [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+                
+                [self refreshCloudKitDatabases]; 
+            }
+        });
+    }];
+#endif
 }
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

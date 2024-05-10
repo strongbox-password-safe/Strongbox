@@ -200,6 +200,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* wiFiSyncServiceName;
 @property NSString* wiFiSyncPasscode;
 
+@property BOOL cloudKitZoneCreated;
+
+@property BOOL showDatabasesOnAppShortcutMenu;
+
 @end
 
 NS_ASSUME_NONNULL_END

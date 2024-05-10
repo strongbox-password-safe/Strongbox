@@ -23,6 +23,7 @@ static NSString* const kEncryptedBlobServiceName = @"Strongbox-Credential-Store"
 static NSString* const kWrappedObjectObjectKey = @"theObject";
 static NSString* const kWrappedObjectExpiryKey = @"expiry";
 static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
+static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-blob-";
 
 @interface SecretStore ()
 
@@ -264,6 +265,35 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 
+
+- (void)factoryReset {
+    NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:4];
+    
+    [dictionary setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
+    [dictionary setObject:kEncryptedBlobServiceName forKey:(__bridge id)kSecAttrService];
+    [dictionary setObject:(__bridge id)kSecMatchLimitAll forKey:(__bridge id)kSecMatchLimit];
+    [dictionary setObject:@YES forKey:(__bridge id)kSecReturnAttributes];
+    [dictionary setObject:@NO forKey:(__bridge id)(kSecAttrSynchronizable)]; 
+    
+#if TARGET_OS_OSX
+    [dictionary setObject:@YES forKey:(__bridge id)(kSecUseDataProtectionKeychain)];
+#endif
+    
+    CFArrayRef result = nil;
+    OSStatus ret = SecItemCopyMatching((__bridge CFDictionaryRef)dictionary, (CFTypeRef*)&result);
+    if ( ret == errSecSuccess ) {
+        NSArray<NSDictionary *>* array = (__bridge NSArray*)result;
+        
+        for ( NSDictionary* dict in array ) {
+            NSString* identifier = dict[(__bridge id)kSecAttrAccount];
+            
+            if ( [identifier hasPrefix:kAccountPrefix] ) {
+                identifier = [identifier substringFromIndex:kAccountPrefix.length];
+                [self deleteSecureItem:identifier];
+            }
+        }
+    }
+}
 
 - (void)deleteSecureItem:(NSString *)identifier {
     [self deleteKeychainBlob:identifier];
@@ -633,12 +663,12 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     if ( status != errSecSuccess && status != errSecItemNotFound ) {
         NSLog(@"Error Deleting Keychain Blob: [%d]", (int)status);
     }
-    
+        
 
 }
 
 - (NSMutableDictionary*)getBlobQuery:(NSString*)identifier {
-    NSString* blobId = [NSString stringWithFormat:@"strongbox-credential-store-encrypted-blob-%@", identifier];
+    NSString* blobId = [NSString stringWithFormat:@"%@%@", kAccountPrefix, identifier];
 
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:4];
     

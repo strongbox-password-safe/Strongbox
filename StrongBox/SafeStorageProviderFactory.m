@@ -12,7 +12,7 @@
     #import "LocalDeviceStorageProvider.h"
 
     #ifndef IS_APP_EXTENSION
-        #ifndef NO_SFTP_WEBDAV_SP
+        #ifndef NO_NETWORKING
             #import "SFTPStorageProvider.h"
             #import "WebDAVStorageProvider.h"
         #endif
@@ -60,7 +60,7 @@
         return FilesAppUrlBookmarkProvider.sharedInstance;
     }
 #else
-    if (providerId == kMacFile) {
+    if (providerId == kLocalDevice) {
         return MacFileBasedBookmarkStorageProvider.sharedInstance;
     }
 #endif
@@ -76,12 +76,16 @@
         return TwoDriveStorageProvider.sharedInstance;
     }
 #endif
-#ifndef NO_SFTP_WEBDAV_SP
+    
+#ifndef NO_NETWORKING
     else if(providerId == kWebDAV) {
         return WebDAVStorageProvider.sharedInstance;
     }
     else if(providerId == kSFTP) {
         return SFTPStorageProvider.sharedInstance;
+    }
+    else if ( providerId == kCloudKit ) {
+        return CloudKitStorageProvider.sharedInstance;
     }
 #endif
     else if ( providerId == kWiFiSync ) {
@@ -133,7 +137,7 @@
         }
     }
 #else
-    else if (provider == kMacFile) {
+    else if (provider == kLocalDevice) {
         if (database) {
             if ( [database.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
                 _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
@@ -189,6 +193,9 @@
     else if ( provider == kWiFiSync ) {
         return NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync");
     }
+    else if ( provider == kCloudKit ) {
+        return @"Strongbox Cloud"; 
+    }
     else {
         _displayName = @"SafeStorageProviderFactory::getDisplayName Unknown";
     }
@@ -205,7 +212,7 @@
         return @"iphone_x";
     }
 #else
-    else if (provider == kMacFile) {
+    else if (provider == kLocalDevice) {
         return @"lock";
     }
 #endif
@@ -260,6 +267,14 @@
         
         return image;
     }
+    else if ( provider == kCloudKit ) {
+        if (@available(iOS 16.0, *)) {
+            return [UIImage systemImageNamed:@"cloud.circle"];
+        }
+        else {
+            return [UIImage systemImageNamed:@"cloud"];
+        }
+    }
     else {
         NSString* name = [self getIconForProvider:provider];
         return [UIImage imageNamed:name];
@@ -274,7 +289,7 @@
     if (provider == kiCloud) {
         return [NSImage imageWithSystemSymbolName:@"icloud.fill" accessibilityDescription:nil];
     }
-    else if (provider == kMacFile) {
+    else if (provider == kLocalDevice) {
         if (@available(macOS 12.0, *)) {
             return [NSImage imageWithSystemSymbolName:@"lock.laptopcomputer" accessibilityDescription:nil];
         } else {
@@ -313,7 +328,7 @@
                 }
 #endif
             }
-               
+            
             NSImageSymbolConfiguration* config = [NSImageSymbolConfiguration configurationWithPaletteColors:@[isLive ? NSColor.systemGreenColor : NSColor.systemGrayColor, NSColor.systemBlueColor]];
             
             image = [image imageWithSymbolConfiguration:config];
@@ -322,11 +337,149 @@
         
         return image;
     }
+    else if (provider == kCloudKit ) {
+        if (@available(macOS 13.0, *)) {
+            return [NSImage imageWithSystemSymbolName:@"cloud.circle" accessibilityDescription:nil];
+        }
+        else {
+            return [NSImage imageWithSystemSymbolName:@"cloud" accessibilityDescription:nil];
+        }
+    }
     else {
         NSLog(@"SafeStorageProviderFactory::getImageForProvider Unknown");
         return nil;
     }
 }
+#endif
+
+#if !TARGET_OS_IPHONE
+
++ (NSString *)getStorageSubtitleForDatabaseWindow:(METADATA_PTR)metadata {
+    NSString* path = @"";
+    
+    if ( metadata.storageProvider == kLocalDevice ) {
+        if ( (YES) ) {
+            NSURL* url;
+            
+            if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+                url = fileUrlFromManagedUrl(metadata.fileUrl);
+            }
+            else {
+                url = metadata.fileUrl;
+            }
+            
+            if ( url ) {
+                if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
+                    path = getFriendlyICloudPath(url.path);
+                }
+                else {
+                    path = getPathRelativeToUserHome(url.path);
+                }
+            }
+        }
+    }
+#ifndef NO_NETWORKING
+    else if ( metadata.storageProvider == kSFTP ) {
+        SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+        
+        path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
+    }
+    else if ( metadata.storageProvider == kWebDAV ) {
+        WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+        
+        path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
+    }
+#endif
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    else if ( metadata.storageProvider == kTwoDrive || metadata.storageProvider == kGoogleDrive || metadata.storageProvider == kDropbox ) {
+        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
+    }
+#endif
+    
+#ifndef IS_APP_EXTENSION
+    else if ( metadata.storageProvider == kWiFiSync ) {
+        NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
+        
+        if ( name ) {
+            NSString* fmt = NSLocalizedString(@"wifi_sync_storage_location_title_fmt", @"%@ on '%@' - %@");
+            path = [NSString stringWithFormat:fmt, metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
+        }
+    }
+    else if ( metadata.storageProvider == kCloudKit ) {
+        return @"Strongbox Cloud";
+    }
+#endif
+    else {
+        path = @"🔴 RUH ROH! getStorageLocationSubtitle";
+    }
+    
+    return path;
+}
+
++ (NSString *)getStorageSubtitleForDatabasesManager:(METADATA_PTR)metadata {
+    if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] || [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+        NSURL* url = [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ? fileUrlFromManagedUrl(metadata.fileUrl) : metadata.fileUrl;
+
+        NSString* subtitle = NSLocalizedString(@"generic_error", @"Error");
+
+        if ( url ) {
+            if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
+                subtitle = getFriendlyICloudPath(url.path);
+            }
+            else {
+                subtitle = [NSString stringWithFormat:@"%@ (%@)", getPathRelativeToUserHome(url.path), [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
+            }
+            
+            NSError* error;
+            [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+            if (error) {
+                NSLog(@"Error getting attributes of database file: [%@]", error);
+                subtitle = [NSString stringWithFormat:@"(%ld) %@", (long)error.code, error.localizedDescription];
+            }
+        }
+        
+        return subtitle;
+    }
+    else {
+        NSString* subtitle = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
+        
+#ifndef IS_APP_EXTENSION
+        if ( metadata.storageProvider == kWiFiSync ) {
+            NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
+            
+            if ( name ) {
+                NSString* fmt = NSLocalizedString(@"wifi_sync_storage_location_title_fmt", @"%@ on '%@' - %@");
+                
+                return [NSString stringWithFormat:fmt,
+                            metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
+            }
+        }
+#endif
+        
+#ifndef NO_NETWORKING
+        
+        if ( metadata.storageProvider == kSFTP ) {
+            SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+            
+            return [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
+        }
+        
+        if ( metadata.storageProvider == kWebDAV ) {
+            WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+            
+            return [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
+        }
+        
+#endif
+        
+        if ( metadata.storageProvider == kCloudKit ) {
+            return @"Strongbox Cloud";
+        }
+        
+        return subtitle;
+    }
+}
+
 #endif
 
 @end

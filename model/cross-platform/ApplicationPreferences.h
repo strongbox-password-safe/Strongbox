@@ -51,6 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* wiFiSyncPasscode;
 
 @property BOOL disableWiFiSyncClientMode;
+@property BOOL disableNetworkBasedFeatures;
+
+@property BOOL cloudKitZoneCreated;
 
 @end
 

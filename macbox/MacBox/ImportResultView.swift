@@ -41,7 +41,6 @@ struct ImportResultView: View {
                 .padding(.horizontal, 20)
                 .navigationTitle("import_successful_title")
                 .navigationBarTitleDisplayMode(NavigationBarItem.TitleDisplayMode.inline)
-
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button("generic_cancel") {
@@ -74,7 +73,7 @@ struct ImportResultView: View {
                 okCancelButtons
             }
             .frame(maxWidth: 450, maxHeight: 400)
-            .padding(30)
+            .padding(20)
         }
     #endif
 

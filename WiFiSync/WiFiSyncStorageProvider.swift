@@ -275,7 +275,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func getModDate(_ database: METADATA_PTR, completion: @escaping StorageProviderGetModDateCompletionBlock) {
-
+        
 
         guard WiFiSyncStorageProvider.wiFiSyncIsPossible else {
             completion(true, nil, Utils.createNSError("WiFi Sync is not available. Pro Only, not available on Zero.", errorCode: -1234))
@@ -308,7 +308,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
                 }
             }
         } else {
-
+            
             completion(false, nil, nil)
         }
     }

@@ -9,8 +9,8 @@
 import Cocoa
 
 class CredentialsForUrlRequest: Codable {
-    static let DefaultMaxResults = 12 
-    static let AbsoluteMaxResults = 24 
+    static let DefaultMaxResults = 12
+    static let AbsoluteMaxResults = 24
 
     var url: String
     var skip: Int? = 0

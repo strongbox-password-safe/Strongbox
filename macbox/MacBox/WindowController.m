@@ -34,7 +34,7 @@
 #import "DatabaseFormatIncompatibilityHelper.h"
 #import "DatabaseMerger.h"
 
-#ifndef NO_SFTP_WEBDAV_SP
+#ifndef NO_NETWORKING
 
 #import "SFTPStorageProvider.h" 
 #import "WebDAVStorageProvider.h"
@@ -121,62 +121,7 @@ static NSString* getFreeTrialSuffix(void) {
     Document* doc = (Document*)self.document;
     MacDatabasePreferences* metadata = doc.viewModel.databaseMetadata;
     
-    NSString* path = @"";
-    
-    if ( metadata.storageProvider == kMacFile ) {
-        if ( (YES) ) {
-            NSURL* url;
-            
-            if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-                url = fileUrlFromManagedUrl(metadata.fileUrl);
-            }
-            else {
-                url = metadata.fileUrl;
-            }
-            
-            if ( url ) {
-                if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
-                    path = getFriendlyICloudPath(url.path);
-                }
-                else {
-                    path = getPathRelativeToUserHome(url.path);
-                }
-            }
-        }
-    }
-#ifndef NO_SFTP_WEBDAV_SP
-    else if ( metadata.storageProvider == kSFTP ) {
-        SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
-        
-        path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
-    }
-    else if ( metadata.storageProvider == kWebDAV ) {
-        WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
-        
-        path = [NSString stringWithFormat:@"%@ (%@ - %@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider]];
-    }
-#endif
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    else if ( metadata.storageProvider == kTwoDrive || metadata.storageProvider == kGoogleDrive || metadata.storageProvider == kDropbox ) {
-        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
-    }
-#endif
-    
-#ifndef IS_APP_EXTENSION
-    else if ( metadata.storageProvider == kWiFiSync ) {
-        NSString* name = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:metadata];
-        
-        if ( name ) {
-            NSString* fmt = NSLocalizedString(@"wifi_sync_storage_location_title_fmt", @"%@ on '%@' - %@");
-            path = [NSString stringWithFormat:fmt, metadata.fileUrl.lastPathComponent, name, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ]; 
-        }
-    }
-#endif
-    else {
-        path = @"🔴 RUH ROH! getStorageLocationSubtitle";
-    }
-    
-    return path;
+    return [SafeStorageProviderFactory getStorageSubtitleForDatabaseWindow:metadata];
 }
 
 - (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {

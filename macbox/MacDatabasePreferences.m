@@ -43,6 +43,12 @@
     }];
 }
 
++ (NSArray<MacDatabasePreferences *> *)forAllDatabasesOfProvider:(StorageProvider)provider {
+    return [DatabasesManager.sharedInstance.snapshot map:^id _Nonnull(DatabaseMetadata * _Nonnull obj, NSUInteger idx) {
+        return obj.storageProvider == provider ? [MacDatabasePreferences fromUuid:obj.uuid] : nil; 
+    }];
+}
+
 + (NSArray<MacDatabasePreferences *> *)filteredDatabases:(BOOL (^)(MacDatabasePreferences * _Nonnull))block {
     return [MacDatabasePreferences.allDatabases filter:block];
 }
@@ -137,7 +143,21 @@
     return [DatabasesManager.sharedInstance isValid:nickName];
 }
 
++ (NSString *)getUniqueNameFromSuggestedName:(NSString *)suggested {
+    return [DatabasesManager.sharedInstance getUniqueNameFromSuggestedName:suggested];
+}
 
+
+
+- (BOOL)isSharedInCloudKit {
+    return self.metadata.isSharedInCloudKit;
+}
+
+- (void)setIsSharedInCloudKit:(BOOL)isSharedInCloudKit {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.isSharedInCloudKit = isSharedInCloudKit;
+    }];
+}
 
 
 

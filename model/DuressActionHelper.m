@@ -13,6 +13,7 @@
 #import "AutoFillManager.h"
 #import "DatabasePreferences.h"
 #import "SyncManager.h"
+#import "DatabaseNuker.h"
 
 @implementation DuressActionHelper
 
@@ -51,13 +52,8 @@
 }
 
 + (void)removeOrDeleteSafe:(DatabasePreferences*)database {
-    [SyncManager.sharedInstance removeDatabaseAndLocalCopies:database];
     
-    [database clearKeychainItems];
-    
-    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    
-    [database removeFromDatabasesList];
+    [DatabaseNuker nuke:database];
 }
 
 @end

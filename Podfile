@@ -81,7 +81,6 @@ abstract_target 'common-ios' do
     
     target 'Strongbox-iOS' do
         pod 'ISMessages'
-        pod 'MTBBarcodeScanner'
         pod 'ObjectiveDropboxOfficial'
         pod 'GoogleAPIClientForREST/Drive'
         pod 'GoogleSignIn'
@@ -91,7 +90,6 @@ abstract_target 'common-ios' do
 
     target 'Strongbox-iOS-Pro' do
         pod 'ISMessages'
-        pod 'MTBBarcodeScanner'
         pod 'ObjectiveDropboxOfficial'
         pod 'GoogleAPIClientForREST/Drive'
         pod 'GoogleSignIn'
@@ -101,7 +99,6 @@ abstract_target 'common-ios' do
 
     target 'Strongbox-iOS-Business' do
       pod 'ISMessages'
-      pod 'MTBBarcodeScanner'
       pod 'ObjectiveDropboxOfficial'
       pod 'GoogleAPIClientForREST/Drive'
       pod 'GoogleSignIn'
@@ -114,7 +111,6 @@ abstract_target 'common-ios' do
     end    
 
     target 'Strongbox-iOS-Graphene' do
-        pod 'MTBBarcodeScanner'
         pod 'ISMessages'
     end  
 

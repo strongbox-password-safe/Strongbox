@@ -55,7 +55,10 @@
         self.textFieldName.stringValue = self.initialConfiguration.name ? self.initialConfiguration.name : @"";
         self.textFieldHost.stringValue = self.initialConfiguration.host;
         self.textFieldUsername.stringValue = self.initialConfiguration.username;
-        self.textFieldPassword.stringValue = self.initialConfiguration.password;
+        
+        NSString* pw = self.initialConfiguration.password ? self.initialConfiguration.password : @"";
+        self.textFieldPassword.stringValue = pw;
+        
         self.buttonPrivateKey.state = self.initialConfiguration.authenticationMode == kPrivateKey ? NSControlStateValueOn : NSControlStateValueOff;
         self.textFieldPath.stringValue = self.initialConfiguration.initialDirectory;
         

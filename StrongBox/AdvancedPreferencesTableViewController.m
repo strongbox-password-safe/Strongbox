@@ -105,6 +105,8 @@
 @property (weak, nonatomic) IBOutlet ProLabel *wiFiSyncProLabel;
 @property (weak, nonatomic) IBOutlet UILabel *labelWiFiSyncSwitch;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowDatabasesOnAppShortcutsMenu;
+
 @end
 
 @implementation AdvancedPreferencesTableViewController
@@ -162,7 +164,7 @@
     [self bindPasswordStrength];
     [self bindWiFiSyncSource];
         
-#ifndef NO_SFTP_WEBDAV_SP 
+#ifndef NO_NETWORKING 
     __weak AdvancedPreferencesTableViewController* weakSelf = self;
     [NSNotificationCenter.defaultCenter addObserverForName:NSNotification.wiFiSyncServiceNameDidChange
                                                     object:nil
@@ -354,7 +356,12 @@
     AppPreferences.sharedInstance.zipExports = self.switchZipExports.on;
 
     AppPreferences.sharedInstance.atomicSftpWrite = self.atomicSftpWrites.on;
+    AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu = self.switchShowDatabasesOnAppShortcutsMenu.on;
 
+    if ( !AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu ) {
+        [[UIApplication sharedApplication] setShortcutItems:@[]]; 
+    }
+    
     [self bindPreferences];
 }
 
@@ -394,6 +401,7 @@
     self.switchAppendDateExportFilenames.on = AppPreferences.sharedInstance.appendDateToExportFileName;
     
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
+    self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
 }
 
 - (void)bindCloudSessions {
@@ -417,7 +425,7 @@
 }
 
 - (void)restartOrStopWiFiSyncSource {
-#ifndef NO_SFTP_WEBDAV_SP 
+#ifndef NO_NETWORKING 
     NSError* error;
     
     if ( ![WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
@@ -441,7 +449,7 @@
     self.wiFiSyncProLabel.proFont = FontManager.sharedInstance.caption2Font;
     self.wiFiSyncProLabel.hidden = isPro;
 
-#ifndef NO_SFTP_WEBDAV_SP 
+#ifndef NO_NETWORKING 
     self.wiFiSyncLastError.text = WiFiSyncServer.shared.lastError;
 
     NSString* serviceName = WiFiSyncServer.shared.lastRegisteredServiceName.length != 0 ? WiFiSyncServer.shared.lastRegisteredServiceName : (AppPreferences.sharedInstance.wiFiSyncServiceName.length != 0 && !isOn ? AppPreferences.sharedInstance.wiFiSyncServiceName : NSLocalizedString(@"generic_loading", @"Loading..."));

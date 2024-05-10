@@ -213,6 +213,36 @@ class DatabasesCollection: NSObject {
         return ret
     }
 
+    func initiateUnlockWithSynchronousTimeout(_ databaseId: String, timeoutSeconds: CGFloat, syncAfterUnlock: Bool = true, message: String? = nil) -> Bool {
+        if isUnlocked(uuid: databaseId) {
+            NSLog("⚠️ This database was already unlocked! NOP")
+            return true
+        }
+
+        var go = false
+
+        let semaphore = DispatchSemaphore(value: 0)
+        var done = false
+        DatabasesCollection.shared.initiateDatabaseUnlock(uuid: databaseId, syncAfterUnlock: syncAfterUnlock, message: message) { success in
+            if done {
+                NSLog("🔴 WARNWARN: Database Unlock Completion Called more than once?! 1.59.9 issue?")
+                return
+            } else {
+                done = true
+                go = success
+                semaphore.signal()
+            }
+        }
+
+        if semaphore.wait(timeout: .now() + timeoutSeconds) == .timedOut {
+            NSLog("⚠️ Waiting for Database Unlock, timed out.")
+        } else {
+            NSLog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
+        }
+
+        return go
+    }
+
     public func initiateDatabaseUnlock(uuid: String, syncAfterUnlock: Bool, message: String? = nil, completion: ((_: Bool) -> Void)? = nil) {
         if isUnlocked(uuid: uuid) {
             NSLog("⚠️ This database was already unlocked! NOP")
@@ -356,7 +386,7 @@ class DatabasesCollection: NSObject {
         NSLog("Stop all Polling Timers...")
 
         let keys = pollingTimersC.allKeys
-        keys.forEach { key in
+        for key in keys {
             if let timer = pollingTimersC.object(forKey: key) {
                 timer.invalidate()
             }

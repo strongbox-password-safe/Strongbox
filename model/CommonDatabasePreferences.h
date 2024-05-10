@@ -12,12 +12,14 @@
 #if TARGET_OS_IPHONE
 
 #import "DatabasePreferences.h"
+
 typedef DatabasePreferences* METADATA_PTR;
 typedef DatabasePreferences CommonDatabasePreferences;
 
 #else
 
 #import "MacDatabasePreferences.h"
+
 typedef MacDatabasePreferences* METADATA_PTR;
 typedef MacDatabasePreferences CommonDatabasePreferences;
 

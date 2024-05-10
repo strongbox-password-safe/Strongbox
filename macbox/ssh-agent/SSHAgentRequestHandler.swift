@@ -221,26 +221,10 @@ class SSHAgentRequestHandler: NSObject {
 
         
 
-        var go = false
-        let g = DispatchGroup()
-        g.enter()
-
         let pname = processName ?? NSLocalizedString("ssh_agent_unknown_process", comment: "Unknown Process")
         let reason = String(format: NSLocalizedString("ssh_agent_approve_unlock_key_use_fmt", comment: "unlock \"%@\" to allow \"%@\" to use an SSH Key"), database.nickName, pname)
 
-        DatabasesCollection.shared.initiateDatabaseUnlock(uuid: databaseUuid,
-                                                          syncAfterUnlock: true,
-                                                          message: reason)
-        { success in
-            go = success
-            g.leave()
-        }
-
-        if g.wait(timeout: .now() + 15) == .timedOut {
-            NSLog("⚠️ Waiting for Database Unlock, timed out.")
-        } else {
-            NSLog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
-        }
+        let go = DatabasesCollection.shared.initiateUnlockWithSynchronousTimeout(databaseUuid, timeoutSeconds: 15, message: reason)
 
         if go {
             

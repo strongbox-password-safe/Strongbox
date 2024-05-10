@@ -201,6 +201,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;
 
+@property BOOL isSharedInCloudKit; 
+
 @end
 
 NS_ASSUME_NONNULL_END

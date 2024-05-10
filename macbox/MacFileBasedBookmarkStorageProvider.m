@@ -27,7 +27,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _storageId = kMacFile;
+        _storageId = kLocalDevice;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = NO;

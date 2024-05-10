@@ -38,7 +38,6 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(BOOL storageIsAvailable
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
-
 @property (nonatomic, readonly) BOOL defaultForImmediatelyOfferOfflineCache;
 @property (nonatomic, readonly) BOOL privacyOptInRequired;
 
@@ -72,7 +71,8 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(BOOL storageIsAvailable
                      options:(StorageProviderReadOptions*)options
                   completion:(StorageProviderReadCompletionBlock)completionHandler;
 
-- (void)loadIcon:(NSObject *)providerData viewController:(VIEW_CONTROLLER_PTR )viewController
+- (void)loadIcon:(NSObject *)providerData 
+  viewController:(VIEW_CONTROLLER_PTR )viewController
       completion:(void (^)(IMAGE_TYPE_PTR image))completionHandler;
 
 - (METADATA_PTR _Nullable)getDatabasePreferences:(NSString *)nickName providerData:(NSObject *)providerData;
@@ -81,7 +81,6 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(BOOL storageIsAvailable
 
 - (void)getModDate:(METADATA_PTR)safeMetaData
         completion:(StorageProviderGetModDateCompletionBlock)completion;
-
 
 @end
 

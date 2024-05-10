@@ -128,6 +128,8 @@ static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
 static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
 
 static NSString* const kDisableWiFiSyncClientMode = @"disableWiFiSyncClientMode";
+static NSString* const kCloudKitZoneCreated = @"cloudKitZoneCreated";
+static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetworkStorageOptions";
 
 
 
@@ -258,6 +260,22 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 #endif
 
 
+
+- (BOOL)disableNetworkBasedFeatures {
+    return [self getBool:kDisableNativeNetworkStorageOptions];
+}
+
+- (void)setDisableNetworkBasedFeatures:(BOOL)disableNativeNetworkStorageOptions {
+    [self setBool:kDisableNativeNetworkStorageOptions value:disableNativeNetworkStorageOptions];
+}
+
+- (BOOL)cloudKitZoneCreated {
+    return [self getBool:kCloudKitZoneCreated];
+}
+
+- (void)setCloudKitZoneCreated:(BOOL)cloudKitZoneCreated {
+    [self setBool:kCloudKitZoneCreated value:cloudKitZoneCreated];
+}
 
 - (BOOL)disableWiFiSyncClientMode {
     return [self getBool:kDisableWiFiSyncClientMode];
