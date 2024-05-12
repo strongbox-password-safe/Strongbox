@@ -26,7 +26,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
     @objc
     func refreshAndMerge() {
-         
+        
 
         Task {
             do {

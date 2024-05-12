@@ -163,6 +163,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)refreshCloudKitDatabases {
+    return;
+    
 #ifndef NO_NETWORKING
     NSLog(@"🏴‍☠️ refreshCloudKitDatabases"); 
     

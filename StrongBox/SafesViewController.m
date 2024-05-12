@@ -460,6 +460,8 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)refreshCloudKitDatabases {
+    return;
+    
 #ifndef NO_NETWORKING
     NSLog(@"✅ refreshCloudKitDatabases"); 
     
@@ -1844,6 +1846,10 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         if (@available(iOS 15.0, *)) {
             [self deleteCloudKitDatabase:safe];
         }
+    }
+    else {
+        [DatabaseNuker nuke:safe];
+        NSLog(@"Database removed");
     }
 }
 

@@ -181,11 +181,22 @@ class AdvancedAppPreferences: NSViewController {
 
         
 
+        SSHAgentServer.sharedInstance().stop()
+
+        
+
         Settings.sharedInstance().factoryReset()
 
         
 
-        restartStrongbox()
+        SecretStore.sharedInstance().factoryReset()
+
+        
+
+
+
+        NSApp.terminate(self)
+        exit(0)
     }
 
     func restartStrongbox(afterDelay seconds: TimeInterval = 1.0) {
