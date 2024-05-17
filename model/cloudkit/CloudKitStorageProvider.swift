@@ -93,7 +93,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
                 return
             }
 
-            Task {
+            Task { 
                 do {
                     let foo = try await CloudKitManager.shared.updateDatabase(cloudKitId, dataBlob: data)
 
@@ -140,7 +140,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
                 return
             }
 
-            Task {
+            Task { 
                 do {
                     let foo = try await CloudKitManager.shared.getDatabase(id: cloudKitId, includeDataBlob: false)
 
@@ -163,7 +163,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
     func readDatabase(databaseId: CloudKitDatabaseIdentifier, completion: @escaping StorageProviderReadCompletionBlock) {
         NSLog("🟢 CloudKitStorageProvider::readDatabase to \(databaseId)")
 
-        Task {
+        Task { 
             do {
                 let foo = try await CloudKitManager.shared.getDatabase(id: databaseId, includeDataBlob: true)
 

@@ -93,7 +93,7 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
     func share(completion: @escaping (CKShare?, CKContainer?, Error?) -> Void) {
         NSLog("Share Called!")
 
-        Task {
+        Task { 
             do {
                 let result = try await CloudKitDatabasesInteractor.shared.beginSharing(for: database)
 

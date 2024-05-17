@@ -28,7 +28,7 @@ class CloudKitDatabasesInteractor: NSObject {
     func refreshAndMerge() {
         
 
-        Task {
+        Task { 
             do {
                 try await refreshAndMergeInternal() 
             } catch {
@@ -158,7 +158,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
             
 
-            Task {
+            Task { 
                 try await SyncManager.sharedInstance().backgroundSyncDatabase(newDatabasePrefs, join: true, key: nil) 
             }
         #else

@@ -186,12 +186,19 @@ suggestedFilename:(NSString *)suggestedFilename
 - (void)delete:(DatabasePreferences *)safeMetaData completion:(void (^)(NSError *error))completion {
     NSURL *url = [self getFileUrl:safeMetaData];
 
-    NSError *error;
-
-    [[NSFileManager defaultManager] removeItemAtPath:url.path error:&error];
-
-    if(completion != nil) {
-        completion(error);
+    if ( [NSFileManager.defaultManager fileExistsAtPath:url.path] ) {
+        NSError *error;
+        
+        [[NSFileManager defaultManager] removeItemAtPath:url.path error:&error];
+        
+        if(completion != nil) {
+            completion(error);
+        }
+    }
+    else {
+        if(completion != nil) {
+            completion(nil);
+        }
     }
 }
 
