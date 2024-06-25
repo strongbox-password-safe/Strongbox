@@ -98,7 +98,11 @@ NSData*_Nullable getRandomData(uint32_t length);
 uint32_t getRandomUint32(void);
 
 #if TARGET_OS_IPHONE && !IS_APP_EXTENSION
+
+@property (class, readonly) BOOL isAppInForeground;
+
 + (void)openStrongboxSettingsAndPermissionsScreen;
+
 #endif
 
 + (NSString *)likelyFileExtensionForData:(NSData *)data;

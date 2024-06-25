@@ -433,19 +433,13 @@ class BrowseViewController: NSViewController {
     func refreshSearchResultsSummaryText() {
         if let image = NSImage(systemSymbolName: "magnifyingglass.circle.fill", accessibilityDescription: nil) {
             let largeConfig = NSImage.SymbolConfiguration(scale: .large)
-            if #available(macOS 12.0, *) {
-                let colorConfig = NSImage.SymbolConfiguration(hierarchicalColor: items.count == 0 ? .secondaryLabelColor : .systemGreen)
+            let colorConfig = NSImage.SymbolConfiguration(hierarchicalColor: items.count == 0 ? .secondaryLabelColor : .systemGreen)
 
-                let config = largeConfig.applying(colorConfig)
+            let config = largeConfig.applying(colorConfig)
 
-                let imageLarge = image.withSymbolConfiguration(config)
+            let imageLarge = image.withSymbolConfiguration(config)
 
-                imageViewSearchSummary.image = imageLarge
-            } else {
-                let imageLarge = image.withSymbolConfiguration(largeConfig)
-
-                imageViewSearchSummary.image = imageLarge
-            }
+            imageViewSearchSummary.image = imageLarge
         }
 
         if items.count == 1 {
@@ -774,6 +768,13 @@ extension BrowseViewController: NSMenuItemValidation, NSMenuDelegate {
             
             
             
+
+
+
+
+
+
+
             
             
             
@@ -791,6 +792,7 @@ extension BrowseViewController: NSMenuItemValidation, NSMenuDelegate {
             
             
             
+
             
             
             
@@ -799,17 +801,7 @@ extension BrowseViewController: NSMenuItemValidation, NSMenuDelegate {
             
             
             
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
+
             
             
 

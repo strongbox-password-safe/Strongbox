@@ -11,14 +11,14 @@
 #import "Utils.h"
 #import "MasterPasswordExplanationViewController.h"
 #import "AppPreferences.h"
-#import "iCloudSafesCoordinator.h"
+#import "Strongbox-Swift.h"
 
 @interface WelcomeCreateDatabaseViewController () <UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *nextButton;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldName;
 @property (weak, nonatomic) IBOutlet UILabel *labelLocalOnly;
-@property (weak, nonatomic) IBOutlet UILabel *labelICloud;
+@property (weak, nonatomic) IBOutlet UILabel *labelStrongboxSync;
 
 @end
 
@@ -63,10 +63,14 @@
     
     self.textFieldName.delegate = self;
     
-    BOOL iCloud = !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
-
-    self.labelICloud.hidden = !iCloud; 
-    self.labelLocalOnly.hidden = iCloud;
+#ifndef NO_NETWORKING
+    BOOL storeOnCloudKit = !AppPreferences.sharedInstance.disableNetworkBasedFeatures && CloudKitDatabasesInteractor.shared.fastIsAvailable;
+#else
+    BOOL storeOnCloudKit = NO;
+#endif
+    
+    self.labelStrongboxSync.hidden = !storeOnCloudKit;
+    self.labelLocalOnly.hidden = storeOnCloudKit;
 }
 
 - (IBAction)onDismiss:(id)sender {

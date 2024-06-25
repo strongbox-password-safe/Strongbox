@@ -6,6 +6,7 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
+import CloudKit
 import Cocoa
 
 class AdvancedAppPreferences: NSViewController {
@@ -25,6 +26,10 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var quitClosesAllWindowsNotTerminate: NSButton!
     @IBOutlet var concealedClipboard: NSButton!
     @IBOutlet var atomicSftpWrites: NSButton!
+
+    @IBOutlet var stackViewStrongboxSyncStatus: NSStackView!
+    @IBOutlet var labelStrongboxSyncStatus: NSTextField!
+    @IBOutlet var imageViewStrongboxSyncStatus: NSImageView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -71,7 +76,59 @@ class AdvancedAppPreferences: NSViewController {
         useColorBindPalette.isHidden = !settings.colorizePasswords
         hideKeyFile.isHidden = settings.doNotRememberKeyFile
         enableThirdParty.isEnabled = settings.isPro
+
+        
+
+        stackViewStrongboxSyncStatus.isHidden = Settings.sharedInstance().disableNetworkBasedFeatures
+
+        #if !NO_NETWORKING
+            labelStrongboxSyncStatus.textColor = .secondaryLabelColor
+            labelStrongboxSyncStatus.stringValue = NSLocalizedString("generic_loading", comment: "Loading...")
+            imageViewStrongboxSyncStatus.image = NSImage(systemSymbolName: "arrow.triangle.2.circlepath", accessibilityDescription: nil)!
+
+            Task.detached(priority: .background) { [weak self] in
+                guard let self else { return }
+
+                do {
+                    let status = try await CloudKitDatabasesInteractor.shared.getCloudKitAccountStatus()
+
+                    await updateStrongboxSyncStatus(status: status, error: nil)
+                } catch {
+                    await updateStrongboxSyncStatus(status: nil, error: error)
+                }
+            }
+        #endif
     }
+
+    #if !NO_NETWORKING
+        @MainActor
+        func updateStrongboxSyncStatus(status: CKAccountStatus?, error: Error?) {
+            if let error {
+                labelStrongboxSyncStatus.textColor = .systemRed
+                labelStrongboxSyncStatus.stringValue = "\(error)"
+
+                imageViewStrongboxSyncStatus.image = NSImage(systemSymbolName: "exclamationmark.triangle", accessibilityDescription: nil)!
+                    .withSymbolConfiguration(NSImage.SymbolConfiguration(hierarchicalColor: .systemRed))
+            } else if let status {
+                labelStrongboxSyncStatus.textColor = status == .available ? .secondaryLabelColor : .systemOrange
+                labelStrongboxSyncStatus.stringValue = CloudKitDatabasesInteractor.getAccountStatusString(status: status)
+
+                if status == .available {
+                    imageViewStrongboxSyncStatus.image = NSImage(systemSymbolName: "checkmark.circle", accessibilityDescription: nil)!
+                        .withSymbolConfiguration(NSImage.SymbolConfiguration(hierarchicalColor: .systemGreen))
+                } else {
+                    imageViewStrongboxSyncStatus.image = NSImage(systemSymbolName: "exclamationmark.triangle", accessibilityDescription: nil)!
+                        .withSymbolConfiguration(NSImage.SymbolConfiguration(hierarchicalColor: .systemOrange))
+                }
+            } else {
+                labelStrongboxSyncStatus.textColor = .systemRed
+                labelStrongboxSyncStatus.stringValue = NSLocalizedString("generic_unknown", comment: "Unknown")
+
+                imageViewStrongboxSyncStatus.image = NSImage(systemSymbolName: "exclamationmark.triangle", accessibilityDescription: nil)!
+                    .withSymbolConfiguration(NSImage.SymbolConfiguration(hierarchicalColor: .systemRed))
+            }
+        }
+    #endif
 
     @IBAction func onChanged(_: Any) {
         let settings = Settings.sharedInstance()

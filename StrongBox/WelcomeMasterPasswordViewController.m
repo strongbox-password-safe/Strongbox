@@ -132,8 +132,14 @@
         }
         else {
             self.database = metadata;
-            [self.database addWithDuplicateCheck:initialSnapshot initialCacheModDate:NSDate.date];
-            [self performSegueWithIdentifier:@"segueToDone" sender:nil];
+            
+            NSError* addError;
+            if ( ![self.database addWithDuplicateCheck:initialSnapshot initialCacheModDate:NSDate.date error:&addError] ) {
+                [Alerts error:self error:addError];
+            }
+            else {
+                [self performSegueWithIdentifier:@"segueToDone" sender:nil];
+            }
         }
     }];
 }

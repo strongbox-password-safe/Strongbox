@@ -34,15 +34,26 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 - (void)remove:(NSString*_Nonnull)uuid;
 
-- (NSString*_Nullable)addWithDuplicateCheck:(SafeMetaData *)safe
-                      initialCache:(NSData *)initialCache
-               initialCacheModDate:(NSDate *)initialCacheModDate;
 
 
+- (BOOL)add:(SafeMetaData *)safe
+      error:(NSError *__autoreleasing  _Nullable *  _Nullable )error;
 
+- (BOOL)add:(SafeMetaData *)safe
+initialCache:(NSData * _Nullable )initialCache
+initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
+      error:(NSError* _Nullable * _Nullable )error;
 
+- (BOOL)addWithDuplicateCheck:(SafeMetaData *)safe
+                 initialCache:(NSData * _Nullable )initialCache
+          initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
+                        error:(NSError* _Nullable * _Nullable )error;
 
-- (void)add:(SafeMetaData *_Nonnull)safe initialCache:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
+- (BOOL)addWithDuplicateCheck:(SafeMetaData *)safe
+                 initialCache:(NSData * _Nullable )initialCache
+          initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
+                duplicateUuid:(NSString* _Nullable * _Nullable )duplicatedUuid
+                        error:(NSError* _Nullable * _Nullable )error;
 
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 

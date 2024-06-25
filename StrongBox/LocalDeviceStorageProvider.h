@@ -26,27 +26,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-- (void)    create:(NSString *)nickName
-         extension:(NSString *)extension
-              data:(NSData *)data
-      parentFolder:(NSObject * _Nullable)parentFolder
-    viewController:(VIEW_CONTROLLER_PTR  _Nullable)viewController
-        completion:(void (^)(METADATA_PTR metadata, NSError *_Nullable error))completion;
-
-
-
 - (void)create:(NSString *)nickName
-     extension:(NSString *)extension
+      fileName:(NSString *)fileName
           data:(NSData *)data
        modDate:(NSDate*)modDate
-suggestedFilename:(NSString* _Nullable)suggestedFilename
-    completion:(void (^)(METADATA_PTR metadata, NSError *_Nullable error))completion;
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion;
 
 
+
+- (BOOL)writeToDocumentsWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data modDate:(NSDate*_Nullable)modDate;
 - (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data modDate:(NSDate*_Nullable)modDate;
 
 - (NSURL *)getFileUrl:(METADATA_PTR )safeMetaData; 
 - (BOOL)fileNameExistsInDefaultStorage:(NSString*)filename; 
+- (BOOL)fileNameExistsInDocumentsFolder:(NSString*)filename; 
 - (BOOL)isUsingSharedStorage:(METADATA_PTR )metadata;
 - (void)delete:(METADATA_PTR )safeMetaData completion:(void (^ _Nullable)(NSError *_Nullable error))completion;
 

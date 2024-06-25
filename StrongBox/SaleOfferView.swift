@@ -70,24 +70,16 @@ struct SaleOfferView: View {
                                 let image = Image(systemName: "gift").font(.system(size: 72))
 
                                 #if os(macOS)
-                                    if #available(macOS 12.0, *) {
-                                        image
-                                            .foregroundStyle(
-                                                .linearGradient(colors: [.yellow, .pink], startPoint: .top, endPoint: .bottomTrailing)
-                                            )
-                                    } else {
-                                        image.foregroundColor(.yellow)
-                                    }
+                                    image
+                                        .foregroundStyle(
+                                            .linearGradient(colors: [.yellow, .pink], startPoint: .top, endPoint: .bottomTrailing)
+                                        )
 
                                 #else
-                                    if #available(iOS 15.0, *) {
-                                        image
-                                            .foregroundStyle(
-                                                .linearGradient(colors: [.yellow, .pink], startPoint: .top, endPoint: .bottomTrailing)
-                                            )
-                                    } else {
-                                        image.foregroundColor(.yellow)
-                                    }
+                                    image
+                                        .foregroundStyle(
+                                            .linearGradient(colors: [.yellow, .pink], startPoint: .top, endPoint: .bottomTrailing)
+                                        )
                                 #endif
 
                                 VStack(spacing: 16) {

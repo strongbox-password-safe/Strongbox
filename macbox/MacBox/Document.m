@@ -42,20 +42,6 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
     NSLog(@"😎 Document DEALLOC...");
 }
 
-- (instancetype)init {
-    self = [super init];
-    
-    if (self) {
-
-        
-
-    }
-    
-    return self;
-}
-
-
-
 - (MacDatabasePreferences *)databaseMetadata {
     if ( self.viewModel ) {
         return self.viewModel.databaseMetadata;

@@ -458,7 +458,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 - (void)_getFilesAndFolders:(VIEW_CONTROLLER_PTR)viewController
      parentFolderIdentifier:(NSString *)parentFolderIdentifier
                  completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler {
-    [self showProgressSpinner:NSLocalizedString(@"", @"") viewController:viewController];
+    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_listing", @"Listing...") viewController:viewController];
 
 
 

@@ -336,6 +336,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     }
     
     [encoder encodeBool:self.isSharedInCloudKit forKey:@"isSharedInCloudKit"];
+    [encoder encodeBool:self.isOwnedByMeCloudKit forKey:@"isOwnedByMeCloudKit"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -557,8 +558,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.autoFillScanCustomFields = [decoder decodeBoolForKey:@"autoFillScanCustomFields"];
         }
         else {
-            self.autoFillScanCustomFields = YES; 
+            self.autoFillScanCustomFields = NO;
         }
+        
         if ( [decoder containsValueForKey:@"autoFillScanNotes"] ) {
             self.autoFillScanNotes = [decoder decodeBoolForKey:@"autoFillScanNotes"];
         }
@@ -755,6 +757,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         
         if ( [decoder containsValueForKey:@"isSharedInCloudKit"] ) {
             self.isSharedInCloudKit = [decoder decodeBoolForKey:@"isSharedInCloudKit"];
+        }
+        if ( [decoder containsValueForKey:@"isOwnedByMeCloudKit"] ) {
+            self.isOwnedByMeCloudKit = [decoder decodeBoolForKey:@"isOwnedByMeCloudKit"];
         }
     }
     

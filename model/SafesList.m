@@ -14,6 +14,7 @@
 #import "WorkingCopyManager.h"
 #import "ConcurrentMutableSet.h"
 #import "DatabaseNuker.h"
+#import "Utils.h"
 
 @interface SafesList()
 
@@ -111,7 +112,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         }
     }
     else {
-
+        
         return NO;
     }
 }
@@ -124,7 +125,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     return result;
 }
 
-- (BOOL)deserialize2:(NSMutableArray<SafeMetaData*>**)databases 
+- (BOOL)deserialize2:(NSMutableArray<SafeMetaData*>**)databases
                error:(NSError**)error {
     NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
     
@@ -139,7 +140,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
                                      byAccessor:^(NSURL * _Nonnull newURL) {
         json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
     }];
-
+    
     if (!json || coorderror || readError) {
         if ( readError.code != NSFileReadNoSuchFileError ) {
             NSLog(@"🔴 Error reading file for databases: [%@] - [%@]", coorderror, readError);
@@ -157,9 +158,9 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
             return NO;
         }
     }
-
+    
     NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&coorderror];
-
+    
     if (coorderror) {
         NSLog(@"Error getting json dictionaries for databases: [%@]", coorderror);
         *error = coorderror;
@@ -171,7 +172,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         @throw e;
         return NO;
     }
-
+    
     NSMutableArray<SafeMetaData*> *ret = NSMutableArray.array;
     
     for (NSDictionary* jsonDatabase in jsonDatabases) {
@@ -205,16 +206,16 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     NSError* error;
     NSUInteger options = NSJSONWritingPrettyPrinted;
     options |= NSJSONWritingSortedKeys;
-
+    
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonDatabases options:options error:&error];
-
+    
     if (error) {
         NSLog(@"Error getting json for databases: [%@]", error);
         return;
     }
-
+    
     NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
-
+    
     NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
     __block NSError *writeError = nil;
     __block BOOL success = NO;
@@ -224,14 +225,14 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
                                      byAccessor:^(NSURL *newURL) {
         success = [json writeToURL:newURL options:NSDataWritingAtomic error:&writeError];
     }];
-
+    
     if (!success || error || writeError) {
         NSLog(@"Error writing Databases file: [%@]-[%@]", error, writeError);
         return;
     }
     
     [self setChangedDatabaseSettings];
-
+    
     if (listChanged) {
         [self notifyDatabasesListChanged];
     }
@@ -260,7 +261,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
         
         if(index != NSNotFound) {
             SafeMetaData* metadata = self.databasesList[index];
-
+            
             if ( touch ) {
                 touch ( metadata );
                 [self serialize:NO databaseIdChanged:uuid];
@@ -282,66 +283,145 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     return [SafesList.sharedInstance getById:uuid];
 }
 
-- (void)add:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
-    dispatch_barrier_async(self.dataQueue, ^{
-        [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate];
-    });
+
+
+
+
+
+
+
+- (BOOL)add:(SafeMetaData *)safe
+      error:(NSError *__autoreleasing  _Nullable *)error {
+    return [self add:safe initialCache:nil initialCacheModDate:nil error:error];
 }
 
-- (NSString*)addWithDuplicateCheck:(SafeMetaData *)safe
+- (BOOL)add:(SafeMetaData *)safe
+initialCache:(NSData *)initialCache
+initialCacheModDate:(NSDate *)initialCacheModDate
+      error:(NSError *__autoreleasing  _Nullable *)error {
+    return [self addWithMaybeDuplicateCheck:safe
+                          checkForDuplicate:NO
+                               initialCache:initialCache
+                        initialCacheModDate:initialCacheModDate
+                              duplicateUuid:nil
+                                      error:error];
+}
+
+- (BOOL)addWithDuplicateCheck:(SafeMetaData *)safe
+                 initialCache:(NSData *)initialCache
+          initialCacheModDate:(NSDate *)initialCacheModDate
+                        error:(NSError**)error {
+    return [self addWithDuplicateCheck:safe
+                          initialCache:initialCache
+                   initialCacheModDate:initialCacheModDate
+                         duplicateUuid:nil
+                                 error:error];
+}
+
+- (BOOL)addWithDuplicateCheck:(SafeMetaData *)safe
+                 initialCache:(NSData *)initialCache
+          initialCacheModDate:(NSDate *)initialCacheModDate
+                duplicateUuid:(NSString **)duplicateUuid
+                        error:(NSError**)error {
+    return [self addWithMaybeDuplicateCheck:safe
+                          checkForDuplicate:YES
+                               initialCache:initialCache
+                        initialCacheModDate:initialCacheModDate
+                              duplicateUuid:duplicateUuid
+                                      error:error];
+}
+
+- (BOOL)addWithMaybeDuplicateCheck:(SafeMetaData *)safe
+                 checkForDuplicate:(BOOL)checkForDuplicate
                       initialCache:(NSData *)initialCache
-               initialCacheModDate:(NSDate *)initialCacheModDate {
-    __block NSString* result;
-
+               initialCacheModDate:(NSDate *)initialCacheModDate
+                     duplicateUuid:(NSString **)duplicateUuid
+                             error:(NSError**)error {
+    __block NSString* duplicateResult = nil;
+    __block BOOL addedDatabase = NO;
+    __block NSError* blockError = nil;
+    
     dispatch_sync(self.dataQueue, ^{
-        SafeMetaData* dupe = [self.databasesList firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-            BOOL storage = obj.storageProvider == safe.storageProvider;
-            
-            NSString* name1 = obj.fileName;
-            NSString* name2 = safe.fileName;
-            BOOL names = [name1 compare:name2] == NSOrderedSame; 
-
-            NSString* id1 = obj.fileIdentifier;
-            NSString* id2 = safe.fileIdentifier;
-            BOOL ids = [id1 compare:id2] == NSOrderedSame;  
-
-            return storage && names && ids;
-        }];
+        SafeMetaData* dupe = nil;
+        
+        if ( checkForDuplicate ) {
+            dupe = [self.databasesList firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+                return [self databasesAreDuplicates:safe other:obj];
+            }];
+        }
         
         if( dupe == nil ) {
-            [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate];
-            result = nil;
+            addedDatabase = [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate error:&blockError];
         }
         else {
             NSLog(@"🔴 Found duplicate... Not Adding - [%@]", dupe.uuid);
-            result = dupe.uuid;
+            duplicateResult = dupe.uuid;
         }
     });
     
-    return result;
-}
-
-- (void)_internalAdd:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
-    if (initialCache) {
-        NSError* error;
-        NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe.uuid error:&error];
-
-        safe.lastSyncRemoteModDate = initialCacheModDate; 
-        
-        if (error || !url) {
-            NSLog(@"🔴 ERROR: Error adding database - setWorkingCacheWithData: [%@]", error);
-        }
-        else {
-            NSLog(@"✅ Added Database [%@]", safe.uuid);
-            [self.databasesList addObject:safe];
-            [self serialize:YES];
+    if ( duplicateUuid ) {
+        *duplicateUuid = duplicateResult;
+        if ( error ) {
+            *error = [Utils createNSError:@"Duplicate Database Found. Cannot Add." errorCode:-1];
         }
     }
     else {
-        NSLog(@"✅ Added Database [%@]", safe.uuid);
-        [self.databasesList addObject:safe];
-        [self serialize:YES];
+        if ( error ) {
+            *error = blockError;
+        }
     }
+    
+    return addedDatabase;
+}
+
+- (BOOL)databasesAreDuplicates:(SafeMetaData*)safe other:(SafeMetaData*)obj {
+    if ( obj.storageProvider != safe.storageProvider ) {
+        return NO;
+    }
+    
+    NSString* name1 = obj.fileName;
+    NSString* name2 = safe.fileName;
+    BOOL names = [name1 compare:name2] == NSOrderedSame; 
+    if ( !names ) {
+        return NO;
+    }
+    
+    if ( safe.storageProvider != kiCloud ) { 
+        NSString* id1 = obj.fileIdentifier;
+        NSString* id2 = safe.fileIdentifier;
+        
+        return [id1 compare:id2] == NSOrderedSame;  
+    }
+    else {
+        return YES;
+    }
+    
+    return NO;
+}
+
+- (BOOL)_internalAdd:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate error:(NSError**)error {
+    if (initialCache) {
+        NSError* setWorkingCacheError;
+        NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe.uuid error:&setWorkingCacheError];
+        
+        if ( !url ) {
+            NSLog(@"🔴 ERROR: Error adding database - setWorkingCacheWithData: [%@]", setWorkingCacheError);
+            
+            if ( error ) {
+                *error = setWorkingCacheError ? setWorkingCacheError : [Utils createNSError:@"Unknown Error Adding Database!" errorCode:-1];
+            }
+            
+            return NO;
+        }
+        
+        safe.lastSyncRemoteModDate = initialCacheModDate; 
+    }
+    
+    NSLog(@"✅ Added Database [%@]", safe.uuid);
+    [self.databasesList addObject:safe];
+    [self serialize:YES];
+    
+    return YES;
 }
 
 - (void)remove:(NSString*_Nonnull)uuid {

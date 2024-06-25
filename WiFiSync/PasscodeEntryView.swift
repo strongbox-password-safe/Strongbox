@@ -47,7 +47,7 @@ struct PasscodeEntryView: View {
     var presentationMode
 
     var server: WiFiSyncServerConfig
-    var onDone: (_ server: WiFiSyncServerConfig, _ passcode: String) -> Void
+    var onDone: (_ server: WiFiSyncServerConfig?, _ passcode: String?) -> Void
 
     @State
     var advancedPasscode = false
@@ -129,6 +129,7 @@ struct PasscodeEntryView: View {
 
             Button("generic_cancel") {
                 presentationMode.wrappedValue.dismiss()
+                onDone(nil, nil)
             }
 
             VStack(alignment: .leading, spacing: 20) {

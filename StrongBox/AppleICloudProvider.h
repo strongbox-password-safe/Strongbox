@@ -14,14 +14,6 @@
 
 + (instancetype)sharedInstance;
 
-- (void)    create:(NSString *)nickName
-         extension:(NSString *)extension
-              data:(NSData *)data
- suggestedFilename:(NSString*)suggestedFilename
-      parentFolder:(NSObject *)parentFolder
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(DatabasePreferences *metadata, NSError *error))completion;
-
 @property (nonatomic, readonly) StorageProvider storageId;
 @property (nonatomic, readonly) BOOL providesIcons;
 @property (nonatomic, readonly) BOOL browsableNew;

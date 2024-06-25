@@ -35,7 +35,6 @@ interactiveVC:(NSViewController *_Nullable)interactiveVC
 - (void)backgroundSyncDatabase:(MacDatabasePreferences*)database key:(CompositeKeyFactors * _Nullable)key completion:(SyncAndMergeCompletionBlock _Nullable)completion;
 
 - (void)pollForChanges:(MacDatabasePreferences*)database completion:(SyncAndMergeCompletionBlock)completion;
-- (void)removeDatabaseAndLocalCopies:(MacDatabasePreferences*)database;
 
 @property (readonly) BOOL syncInProgress;
 - (BOOL)syncInProgressForDatabase:(NSString*)databaseId;

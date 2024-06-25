@@ -41,14 +41,18 @@
 
 @implementation DebugHelper
 
-+ (NSString*)getAboutDebugString {
-    NSArray* lines = [self getDebugLines];
-    return [lines componentsJoinedByString:@"\n"];
++ (void)getAboutDebugString:(void(^)(NSString*))completion {
+    [self getDebugLines:^(NSArray<NSString *> *lines) {
+        NSString* str =  [lines componentsJoinedByString:@"\n"];
+        
+        completion(str);
+    }];
 }
 
-+ (NSString*)getCrashEmailDebugString {
-    NSArray* lines = [self getDebugLines];
-    return [lines componentsJoinedByString:@"\n"];
++ (void)getCrashEmailDebugString:(void(^)(NSString*))completion {
+    [self getDebugLines:^(NSArray<NSString *> *lines) {
+        completion ( [lines componentsJoinedByString:@"\n"] );
+    }];
 }
 
 #if !TARGET_OS_IPHONE
@@ -138,34 +142,34 @@ int OPParentIDForProcessID(int pid)
     return proStatus;
 }
 
-+ (NSArray<NSString*>*)getDebugLines {
++ (void)getDebugLines:(void (^)(NSArray<NSString*>* lines))completion {
     NSMutableArray<NSString*>* debugLines = [NSMutableArray array];
     
 #if TARGET_OS_IPHONE
-    NSString* model = UIDevice.modelName;
+
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
 #else
-    NSString* model = ModelIdentifier();
+
     NSString* systemName = @"MacOS";
     NSString* systemVersion = [DebugHelper systemVersion];
 #endif
 
-
+    
     
     if ( StrongboxProductBundle.isBusinessBundle ) {
         [debugLines addObject:@"-------------------- MDM Config Settings -----------------------"];
         
-
+        
         
         if ( !MDMConfigManager.sharedInstance.configIsPresent ) {
             [debugLines addObject:@"No MDM Settings Found."];
         }
         else {
-
-
-
-
+            
+            
+            
+            
             
             [debugLines addObject:[NSString stringWithFormat:@"OrganizationKey = %@", MDMConfigManager.sharedInstance.organizationKey]];
             [debugLines addObject:[NSString stringWithFormat:@"ReadOnly = %hhd", MDMConfigManager.sharedInstance.readOnly]];
@@ -174,7 +178,7 @@ int OPParentIDForProcessID(int pid)
         }
     }
     
-
+    
     
     
     
@@ -187,7 +191,7 @@ int OPParentIDForProcessID(int pid)
     [debugLines addObject:[NSString stringWithFormat:@"App SKU: %@%@", StrongboxProductBundle.displayName, StrongboxProductBundle.isTestFlightBuild ? @" (TestFlight)" : @""]];
     [debugLines addObject:[NSString stringWithFormat:@"Pro Status: %@", proStatus]];
     [debugLines addObject:[NSString stringWithFormat:@"Platform: %@ %@", systemName, systemVersion]];
-        
+    
     [debugLines addObject:@"\n-------------------- Databases Summary -----------------------"];
     
     int i = 0;
@@ -250,18 +254,55 @@ int OPParentIDForProcessID(int pid)
         
         [debugLines addObject:[NSString stringWithFormat:@"%d. %@", ++i, syncState]];
     }
-
+    
     [debugLines addObject:@"--------------------------------------------------------------\n"];
     [debugLines addObject:[NSString stringWithFormat:@"Strongbox %@ Debug Information at %@", [Utils getAppVersion], NSDate.date.friendlyDateTimeStringBothPrecise]];
     [debugLines addObject:@"--------------------"];
     AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
     [debugLines addObject:[NSString stringWithFormat:@"Launched as Login Item: %@", localizedYesOrNoFromBool(appDelegate.isWasLaunchedAsLoginItem)]];
-
+    
     [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)-%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], pro]];
     [debugLines addObject:[NSString stringWithFormat:@"NECF: %ld", Settings.sharedInstance.numberOfEntitlementCheckFails]];
     [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", Settings.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
 #endif
+    
+#ifndef NO_NETWORKING
+    [CloudKitDatabasesInteractor.shared getInstrumentsWithCompletionHandler:^(Instrumentation * _Nonnull instrumentation) {
+        [debugLines addObject:@"--------------------"];
+        [debugLines addObject:@"Strongbox Sync Status"];
+        [debugLines addObject:@"--------------------"];
 
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.initialized: %hhd", instrumentation.isInitialized]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.subscribed: %hhd", instrumentation.subscribedToDatabaseChanges]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.accountStat: %ld", instrumentation.cloudKitAccountStatus]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.regNotif: %hhd", instrumentation.registeredForNotifications]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.userNotif: %ld", (long)instrumentation.userNotificationAuthStatus]];
+        
+        if ( instrumentation.cloudKitAccountStatusError ) {
+            [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.cloudKitAccountStatusError: %@", instrumentation.cloudKitAccountStatusError]];
+        }
+        if ( instrumentation.registeredForNotificationError ) {
+            [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.registeredForNotificationError: %@", instrumentation.registeredForNotificationError]];
+        }
+        
+        for ( NSError *error in instrumentation.cloudKitInstruments.recentErrors.allObjects ) {
+            [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.ckError: %@", error]];
+        }
+        
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.last: %0.2f", instrumentation.cloudKitInstruments.lastOperationDuration]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.n: %ld", instrumentation.cloudKitInstruments.operationCount]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.avg: %0.2f", instrumentation.cloudKitInstruments.averageDuration]];
+        
+        [debugLines addObject:@"--------------------"];
+
+        [DebugHelper continueAddingDebugInfo:debugLines completion:completion];
+    }];
+#else
+    [DebugHelper continueAddingDebugInfo:debugLines completion:completion];
+#endif
+}
+
++ (void)continueAddingDebugInfo:(NSMutableArray<NSString*>*)debugLines completion:(void (^)(NSArray<NSString*>* lines))completion {
     [debugLines addObject:[NSString stringWithFormat:@"LLIAPP: %hhd", ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro]];
     [debugLines addObject:[NSString stringWithFormat:@"AMS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription]];
     [debugLines addObject:[NSString stringWithFormat:@"AYS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription]];
@@ -275,6 +316,16 @@ int OPParentIDForProcessID(int pid)
 
     const NXArchInfo *info = NXGetLocalArchInfo();
     NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
+
+#if TARGET_OS_IPHONE
+    NSString* model = UIDevice.modelName;
+    NSString* systemName = [[UIDevice currentDevice] systemName];
+    NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
+#else
+    NSString* model = ModelIdentifier();
+    NSString* systemName = @"MacOS";
+    NSString* systemVersion = [DebugHelper systemVersion];
+#endif
 
     [debugLines addObject:[NSString stringWithFormat:@"Model: %@", model]];
     [debugLines addObject:[NSString stringWithFormat:@"CPU: %@", typeOfCpu]];
@@ -326,6 +377,7 @@ int OPParentIDForProcessID(int pid)
     }
 
 #if TARGET_OS_IPHONE
+    NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
     long epoch = (long)AppPreferences.sharedInstance.installDate.timeIntervalSince1970;
     [debugLines addObject:[NSString stringWithFormat:@"Ep: %ld", epoch]];
     [debugLines addObject:[NSString stringWithFormat:@"Flags: %@%@", pro, [AppPreferences.sharedInstance getFlagsStringForDiagnostics]]];
@@ -352,117 +404,117 @@ int OPParentIDForProcessID(int pid)
     for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
         SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
 #else
-    for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
-        SyncStatus *syncStatus = [MacSyncManager.sharedInstance getSyncStatus:safe];
+        for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
+            SyncStatus *syncStatus = [MacSyncManager.sharedInstance getSyncStatus:safe];
 #endif
-        NSMutableArray<NSArray*>* mutableSyncs = NSMutableArray.array;
-        NSMutableSet<NSUUID*>* set = NSMutableSet.set;
-        NSMutableArray *currentSync;
-        for (SyncStatusLogEntry* entry in syncStatus.changeLog) {
-            if (![set containsObject:entry.syncId]) {
-                currentSync = NSMutableArray.array;
-                [mutableSyncs addObject:currentSync];
-                [set addObject:entry.syncId];
+            NSMutableArray<NSArray*>* mutableSyncs = NSMutableArray.array;
+            NSMutableSet<NSUUID*>* set = NSMutableSet.set;
+            NSMutableArray *currentSync;
+            for (SyncStatusLogEntry* entry in syncStatus.changeLog) {
+                if (![set containsObject:entry.syncId]) {
+                    currentSync = NSMutableArray.array;
+                    [mutableSyncs addObject:currentSync];
+                    [set addObject:entry.syncId];
+                }
+                
+                [currentSync addObject:entry];
             }
             
-            [currentSync addObject:entry];
-        }
-        
-        NSArray<NSArray<SyncStatusLogEntry*>*> *syncs = [[mutableSyncs reverseObjectEnumerator] allObjects];
-        
-        
-        
-        NSArray* failedSyncs = [syncs filter:^BOOL(NSArray<SyncStatusLogEntry *> * _Nonnull sync) {
-            return [sync anyMatch:^BOOL(SyncStatusLogEntry * _Nonnull status) {
-                return status.state == kSyncOperationStateError || status.state == kSyncOperationStateBackgroundButUserInteractionRequired || status.state == kSyncOperationStateUserCancelled;
+            NSArray<NSArray<SyncStatusLogEntry*>*> *syncs = [[mutableSyncs reverseObjectEnumerator] allObjects];
+            
+            
+            
+            NSArray* failedSyncs = [syncs filter:^BOOL(NSArray<SyncStatusLogEntry *> * _Nonnull sync) {
+                return [sync anyMatch:^BOOL(SyncStatusLogEntry * _Nonnull status) {
+                    return status.state == kSyncOperationStateError || status.state == kSyncOperationStateBackgroundButUserInteractionRequired || status.state == kSyncOperationStateUserCancelled;
+                }];
             }];
-        }];
-        
-        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
-        
-        for (NSArray* failed in failedSyncs) {
-            [debugLines addObject:[NSString stringWithFormat:@"============== [%@] Failed Sync to [%@] ===============", safe.nickName, spName]];
-            [debugLines addObjectsFromArray:failed];
-            [debugLines addObject:@"=========================================="];
+            
+            NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+            
+            for (NSArray* failed in failedSyncs) {
+                [debugLines addObject:[NSString stringWithFormat:@"============== [%@] Failed Sync to [%@] ===============", safe.nickName, spName]];
+                [debugLines addObjectsFromArray:failed];
+                [debugLines addObject:@"=========================================="];
+            }
+            
+            
+            
+            NSDate* mod;
+            unsigned long long fileSize;
+            NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid modified:&mod fileSize:&fileSize];
+            
+            NSString* syncState;
+            if (url) {
+                syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => %@ (%@)", safe.nickName, spName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
+            }
+            else {
+                syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => Unknown", safe.nickName, spName];
+            }
+            
+            [debugLines addObject:syncState];
         }
         
+        [debugLines addObject:@"--------------------"];
         
         
-        NSDate* mod;
-        unsigned long long fileSize;
-        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid modified:&mod fileSize:&fileSize];
         
-        NSString* syncState;
-        if (url) {
-            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => %@ (%@)", safe.nickName, spName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
-        }
-        else {
-            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => Unknown", safe.nickName, spName];
-        }
-        
-        [debugLines addObject:syncState];
-    }
-
-    [debugLines addObject:@"--------------------"];
-
-    
-
 #if TARGET_OS_IPHONE
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.appSupportDirectory]];
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.documentsDirectory]];
-
-
+        [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.appSupportDirectory]];
+        [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.documentsDirectory]];
+        
+        
 #endif
         
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory]];
-
-    
-
-    [debugLines addObject:@"--------------------"];
-
+        [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory]];
+        
+        
+        
+        [debugLines addObject:@"--------------------"];
+        
         
 #if TARGET_OS_IPHONE
-    for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
-        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
-        [debugLines addObject:@"================================================================="];
-        [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
-        [debugLines addObject:@"================================================================="];
-
-        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
-        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
-        jsonDict[@"keyFileFileName"] = jsonDict[@"keyFileFileName"] ? @"<redacted>" : @"<Not Set>";
-        
-        jsonDict[@"databaseCreated"] = jsonDict[@"databaseCreated"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"databaseCreated"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
-        jsonDict[@"lastSyncAttempt"] = jsonDict[@"lastSyncAttempt"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"lastSyncAttempt"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
-        jsonDict[@"lastSyncRemoteModDate"] = jsonDict[@"lastSyncRemoteModDate"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"lastSyncRemoteModDate"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
-        
-        NSString *thisSafe = [jsonDict description];
-        [debugLines addObject:thisSafe];
-    }
+        for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
+            NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+            [debugLines addObject:@"================================================================="];
+            [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
+            [debugLines addObject:@"================================================================="];
+            
+            NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
+            jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
+            jsonDict[@"keyFileFileName"] = jsonDict[@"keyFileFileName"] ? @"<redacted>" : @"<Not Set>";
+            
+            jsonDict[@"databaseCreated"] = jsonDict[@"databaseCreated"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"databaseCreated"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
+            jsonDict[@"lastSyncAttempt"] = jsonDict[@"lastSyncAttempt"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"lastSyncAttempt"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
+            jsonDict[@"lastSyncRemoteModDate"] = jsonDict[@"lastSyncRemoteModDate"] ? ([NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)jsonDict[@"lastSyncRemoteModDate"]).doubleValue].friendlyDateTimeStringBothPrecise) : @"<Not Set>";
+            
+            NSString *thisSafe = [jsonDict description];
+            [debugLines addObject:thisSafe];
+        }
 #else
-    for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
-        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
-        [debugLines addObject:@"================================================================="];
-        [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
-        [debugLines addObject:@"================================================================="];
-
-        NSMutableDictionary<NSString*, NSString*>* mut = safe.debugInfoLines.mutableCopy;
-        
-        [mut removeObjectForKey:@"_storageInfo"]; 
-        
-        for ( NSString* key in mut.allKeys ) {
-            NSString* val = mut[key];
-            [debugLines addObject:[NSString stringWithFormat:@"%@ = %@", key, val]];
+        for(MacDatabasePreferences *safe in MacDatabasePreferences.allDatabases ) {
+            NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+            [debugLines addObject:@"================================================================="];
+            [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
+            [debugLines addObject:@"================================================================="];
+            
+            NSMutableDictionary<NSString*, NSString*>* mut = safe.debugInfoLines.mutableCopy;
+            
+            [mut removeObjectForKey:@"_storageInfo"]; 
+            
+            for ( NSString* key in mut.allKeys ) {
+                NSString* val = mut[key];
+                [debugLines addObject:[NSString stringWithFormat:@"%@ = %@", key, val]];
+            }
+            
+            [debugLines addObject:@"================================================================="];
         }
-        
-        [debugLines addObject:@"================================================================="];
-    }
 #endif
-
-    [debugLines addObject:@"--------------------"];
-    
-    return debugLines;
-}
+        
+        [debugLines addObject:@"--------------------"];
+        
+        completion (debugLines);
+    }
 
 + (NSArray<NSString*>*)listDirectoryRecursive:(NSURL*)URL {
     return [DebugHelper listDirectoryRecursive:URL listRelativeToURL:URL];

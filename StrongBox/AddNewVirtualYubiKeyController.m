@@ -43,7 +43,7 @@
 - (IBAction)onAdd:(id)sender {
     NSData* yubikeySecretData = self.textFieldSecret.text.dataFromHex;
     
-    NSString* hexSecret = [NSString stringWithFormat:@"%@%@", self.switchFixedLengthOnly.on ? @"P" : @"", yubikeySecretData.hexString];
+    NSString* hexSecret = [NSString stringWithFormat:@"%@%@", self.switchFixedLengthOnly.on ? @"P" : @"", yubikeySecretData.upperHexString];
     VirtualYubiKey *key = [VirtualYubiKey keyWithName:self.textFieldName.text secret:hexSecret autoFillOnly:self.switchAutoFillOnly.on];
     
     [VirtualYubiKeys.sharedInstance addKey:key];

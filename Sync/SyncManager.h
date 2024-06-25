@@ -34,7 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (NSString*)getPrimaryStorageDisplayName:(DatabasePreferences*)database;
-- (void)removeDatabaseAndLocalCopies:(DatabasePreferences*)database;
 
 - (void)startMonitoringDocumentsDirectory;
 - (void)startMonitoringWorkingCacheDirectory;

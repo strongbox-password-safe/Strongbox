@@ -12,7 +12,6 @@
 #import "SelectStorageProviderController.h"
 #import "DatabaseCell.h"
 #import "VersionConflictController.h"
-#import "AppleICloudProvider.h"
 #import "SafeStorageProviderFactory.h"
 #import "UnlockDatabaseSequenceHelper.h"
 #import "SelectDatabaseFormatTableViewController.h"
@@ -120,6 +119,12 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 @property (nonatomic, strong) NSDate *unlockedDatabaseWentIntoBackgroundAt;
 
+@property SelectStorageSwiftHelper* selectStorageSwiftHelper;
+
+#ifndef NO_NETWORKING
+@property CloudKitSharingUIHelper* cloudKitSharingUIHelper;
+#endif
+
 @end
 
 @implementation SafesViewController
@@ -149,7 +154,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     
     AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO; 
     
-    NSLog(@"SafesViewController::viewDidLoad");
+
     
     self.tableView.hidden = YES;
     
@@ -175,12 +180,12 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         [self listenToNotifications];
         
         if ( ![self isAppLocked] ) {
-            NSLog(@"SafesViewController::viewDidLoad -> Initial Activation/Load - App is not Locked...");
+
             
             [self doAppActivationTasks:NO];
         }
         else {
-            NSLog(@"SafesViewController::viewDidLoad -> App Is Locked");
+
         }
     });
 }
@@ -219,7 +224,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    NSLog(@"SafesViewController::viewWillAppear");
+
     
     [self setupTips];
     
@@ -233,12 +238,6 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     [self bindToolbar];
     
     [CustomAppIconObjCHelper downgradeProIconIfInUse];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    
-    NSLog(@"SafesViewController::viewDidAppear");
 }
 
 - (void)setupTips {
@@ -257,7 +256,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)internalRefresh {
-
+    
     
     self.debugLines = [DebugLogger.snapshot reverseObjectEnumerator].allObjects;
     
@@ -272,7 +271,33 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     [self bindToolbar];
     
     [CustomAppIconObjCHelper downgradeProIconIfInUse];
+
+#ifndef NO_NETWORKING
+    [self maybeWarnAboutCloudKitUnavailability];
+#endif
 }
+
+#ifndef NO_NETWORKING
+- (void)maybeWarnAboutCloudKitUnavailability {
+    if ( CloudKitDatabasesInteractor.shared.fastIsAvailable ) {
+        AppPreferences.sharedInstance.hasWarnedAboutCloudKitUnavailability = NO;
+    }
+    else {
+        BOOL hasCloudKitDbs = [self.collection anyMatch:^BOOL(DatabasePreferences * _Nonnull obj) {
+            return obj.storageProvider == kCloudKit;
+        }];
+        
+        if ( hasCloudKitDbs && !AppPreferences.sharedInstance.hasWarnedAboutCloudKitUnavailability && [self isVisibleViewController] ) {
+            AppPreferences.sharedInstance.hasWarnedAboutCloudKitUnavailability = YES;
+            
+            [Alerts info:self
+                   title:NSLocalizedString(@"strongbox_sync_unavailable_title", @"Strongbox Sync Unavailable")
+                 message:NSLocalizedString(@"strongbox_sync_unavailable_msg", @"Strongbox Sync has become unavailable. Please check you are signed in to your Apple account in System Settings.")
+              completion:nil];
+        }
+    }
+}
+#endif
 
 - (void)updateDynamicAppIconShortcuts {
     NSMutableArray<UIApplicationShortcutIcon*>* shortcuts = [[NSMutableArray alloc] init];
@@ -318,10 +343,8 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_settings", @"Settings")];
     [self.buttonCustomizeView setAccessibilityLabel:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")];
     [self.buttonAddSafe setAccessibilityLabel:NSLocalizedString(@"casg_add_action", @"Add")];
-    
-    if (@available(iOS 15.0, *)) {
-        self.barButtonDice.image = [UIImage systemImageNamed:@"dice"];
-    }
+
+    self.barButtonDice.image = [UIImage systemImageNamed:@"dice"];
     
     self.collection = [NSArray array];
     
@@ -439,9 +462,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
     [self refreshICloudFolderDatabases];
- 
-    [self refreshCloudKitDatabases]; 
-    
+     
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     
     
@@ -453,26 +474,10 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 - (void)refreshICloudFolderDatabases {
     if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest ) {
-        NSLog(@"✅ refreshICloudFolderDatabases");
+
         
         [[iCloudSafesCoordinator sharedInstance] startQuery];
     }
-}
-
-- (void)refreshCloudKitDatabases {
-    return;
-    
-#ifndef NO_NETWORKING
-    NSLog(@"✅ refreshCloudKitDatabases"); 
-    
-    
-    
-    if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        if (@available(iOS 15.0, *)) {
-            [CloudKitDatabasesInteractor.shared refreshAndMerge];
-        }
-    }
-#endif
 }
 
 - (void)doAppOnboarding:(BOOL)userJustCompletedBiometricAuthentication quickLaunchWhenDone:(BOOL)quickLaunchWhenDone {
@@ -556,7 +561,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     }
     
     if ( !AppPreferences.sharedInstance.wiFiSyncHasRequestedNetworkPermissions ) {
-        NSLog(@"⚠️ WiFi Sync Browser cannot start because it has not yet been granted permissions...");
+
         return;
     }
     
@@ -1175,7 +1180,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)showUnlockedDatabase:(Model*)model {
-    [AppModel.shared unlockDatabase:model]; 
+    [AppModel.shared unlockDatabase:model];
     
     [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
 }
@@ -1323,22 +1328,15 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     DatabasePreferences *safe = self.collection[indexPath.row];
-
+    
     if ( safe.storageProvider == kCloudKit ) {
-        if (@available(iOS 15.0, *)) {
-            
-            
-            [ma addObject:[self getContextualMenuCloudKitShareAction:indexPath]];
-        }
-    }
-
-    [ma addObject:[self getContextualMenuRenameAction:indexPath]];
-
-    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
-    if (url) {
-        [ma addObject:[self getContextualMenuCreateLocalCopyAction:indexPath]];
+        [ma addObject:[self getContextualMenuCloudKitShareAction:indexPath]];
     }
     
+    [ma addObject:[self getContextualMenuRenameAction:indexPath]];
+    
+    [ma addObject:[self getContextualMenuCopyToStorageAction:indexPath]];
+
     if (self.collection.count > 1) {
         [ma addObject:[self getContextualMenuMergeAction:indexPath]];
     }
@@ -1366,13 +1364,14 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
-    NSString* localDeviceActionTitle = shared ?
-        NSLocalizedString(@"safes_vc_show_in_files", @"Button Title to Show in iOS Files Browser") :
-        NSLocalizedString(@"safes_vc_make_autofillable", @"Button Title to Hide from iOS Files Browser");
+    
+    NSString* title = !shared ?
+        NSLocalizedString(@"safes_vc_show_in_files", @"Visible in Files app") :
+        NSLocalizedString(@"safes_vc_make_autofillable", @"Hidden from Files app");
 
-    UIAction* ret = [ContextMenuHelper getItem:localDeviceActionTitle
-                                    systemImage:shared ? @"eye" : @"eye.slash"
-                                    
+    UIAction* ret = [ContextMenuHelper getItem:title
+                                       checked:!shared
+                                   systemImage:@"folder" 
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self promptAboutToggleLocalStorage:indexPath shared:shared];
     }];
@@ -1484,27 +1483,6 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }];
 }
     
-- (UIAction*)getContextualMenuCreateLocalCopyAction:(NSIndexPath*)indexPath {
-    UIImage* img = [UIImage systemImageNamed:@"doc.on.doc"];
-
-    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
-
-    UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy")
-                                 image:img
-                           
-                               handler:^(__kindof UIAction * _Nonnull action) {
-        [self createLocalCopyDatabase:safe];
-    }];
-
-    
-
-
-
-
-    
-    return ret;
-}
-
 - (UIAction*)getContextualMenuMergeAction:(NSIndexPath*)indexPath  {
     UIImage* img = [UIImage systemImageNamed:@"arrow.triangle.merge"];
 
@@ -1546,16 +1524,33 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }];
 }
 
-- (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath  {
-    return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"generic_remove", @"Remove")
-                                     systemImage:@"trash.fill"
-                                         handler:^(__kindof UIAction * _Nonnull action) {
-        [self removeSafe:indexPath];
+- (UIAction*)getContextualMenuCopyToStorageAction:(NSIndexPath*)indexPath  {
+    DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
+
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
+
+    return [ContextMenuHelper getItem:NSLocalizedString(@"database_option_copy_to_ellipsis", @"Copy To...")
+                          systemImage:@"arrow.triangle.branch" 
+                              enabled:url != nil  
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [self onCopyToNewStorageLocation:database];
     }];
 }
 
-- (UIAction*)getContextualMenuCloudKitShareAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(15.0)) {
-    return [ContextMenuHelper getItem:NSLocalizedString(@"generic_share_action_ellipsis", @"Share...")
+- (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath  {
+    return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"generic_remove", @"Remove")
+                                     systemImage:@"trash"
+                                         handler:^(__kindof UIAction * _Nonnull action) {
+        [self onRemoveDatabase:indexPath];
+    }];
+}
+
+- (UIAction*)getContextualMenuCloudKitShareAction:(NSIndexPath*)indexPath {
+    DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
+
+    return [ContextMenuHelper getItem:database.isSharedInCloudKit ?
+            NSLocalizedString(@"generic_manage_sharing_action_ellipsis", @"Manage Sharing...") :
+            NSLocalizedString(@"generic_share_action_ellipsis", @"Share...")
                           systemImage:@"person.3"
                               handler:^(__kindof UIAction * _Nonnull action) {
         [self onCloudKitShare:indexPath];
@@ -1595,137 +1590,138 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive
                                                                             title:NSLocalizedString(@"safes_vc_slide_left_remove_database_action", @"Remove this database table action")
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self removeSafe:indexPath];
+        [self onRemoveDatabase:indexPath];
     }];
 
     
 
-    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
-    
-    UITableViewRowAction *onOrOfflineAction = nil;
-    if ( safe.forceOpenOffline ) {
-        if (safe.storageProvider != kLocalDevice) {
-            onOrOfflineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                   title:NSLocalizedString(@"safes_vc_slide_left_open_online_action", @"Open this database online action")
-                                                                 handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-                [self explicitRequestOpenOnline:indexPath];
-            }];
-            onOrOfflineAction.backgroundColor = [UIColor systemGreenColor];
-        }
-    }
-    else {
-        BOOL offlineOption = safe.storageProvider != kLocalDevice && [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe.uuid modified:nil];
-        if ( offlineOption ) {
-            onOrOfflineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                   title:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open this database offline table action")
-                                                                 handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-                [self explicitRequestOpenOffline:indexPath];
-            }];
-            onOrOfflineAction.backgroundColor = [UIColor darkGrayColor];
-        }
-    }
-    
-    
-    
-    UITableViewRowAction *moreActions = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                           title:NSLocalizedString(@"safes_vc_slide_left_more_actions", @"View more actions table action")
-                                                                         handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self showDatabaseMoreActions:indexPath];
-    }];
-    moreActions.backgroundColor = [UIColor systemBlueColor];
 
-    return onOrOfflineAction ? @[removeAction, onOrOfflineAction, moreActions] : @[removeAction, moreActions];
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    return @[removeAction]; 
 }
 
-- (void)showDatabaseMoreActions:(NSIndexPath*)indexPath {
-    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
-
-    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"safes_vc_database_actions_sheet_title", @"Title of the 'More Actions' alert/action sheet")
-                                                                             message:nil
-                                                                      preferredStyle:UIAlertControllerStyleAlert];
-    
-    
-    
-    UIAlertAction *renameAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_rename_database", @"Button to Rename the Database")
-                                                           style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction *a) {
-                                                             [self renameSafe:indexPath];
-                                                         } ];
-    [alertController addAction:renameAction];
-    
-    
-
-    BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
-    UIAlertAction *quickLaunchAction = [UIAlertAction actionWithTitle:isAlreadyQuickLaunch ?
-                                        NSLocalizedString(@"safes_vc_action_unset_as_quick_launch", @"Button Title to Unset Quick Launch") :
-                                        NSLocalizedString(@"safes_vc_action_set_as_quick_launch", @"Button Title to Set Quick Launch")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-                                                              [self toggleQuickLaunch:safe];
-                                                          } ];
-    [alertController addAction:quickLaunchAction];
-
-    
-
-    if (self.collection.count > 1) {
-        UIAlertAction *mergeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_action_compare_and_merge_ellipsis", @"Compare & Merge...")
-                                                              style:UIAlertActionStyleDefault
-                                                            handler:^(UIAlertAction *a) {
-            [self beginMergeWizard:safe];
-        }];
-
-        [alertController addAction:mergeAction];
-    }
-    
-    
-    
-    BOOL localDeviceOption = safe.storageProvider == kLocalDevice;
-    if(localDeviceOption) {
-        BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
-        NSString* localDeviceActionTitle = shared ? NSLocalizedString(@"safes_vc_show_in_files", @"Button Title to Show in iOS Files Browser") : NSLocalizedString(@"safes_vc_make_autofillable", @"Button Title to Hide from iOS Files Browser");
-
-        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:localDeviceActionTitle
-                                                               style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction *a) {
-                                                                 [self promptAboutToggleLocalStorage:indexPath shared:shared];
-                                                             }];
-        [alertController addAction:secondAction];
-    }
-    
-    
-    
-    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
-    if (url) {
-        UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy")
-                                                                 style:UIAlertActionStyleDefault
-                                                               handler:^(UIAlertAction *a) {
-            [self createLocalCopyDatabase:safe];
-        }];
-        [alertController addAction:action];
-    }
-    
-    
-    
-    UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"browse_vc_action_properties", @"Properties")
-                                                     style:UIAlertActionStyleDefault
-                                                   handler:^(UIAlertAction *a) {
-        [self showDatabaseProperties:safe];
-    }];
-    [alertController addAction:action];
-        
-    
-    
-    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel Button")
-                                                           style:UIAlertActionStyleCancel
-                                                         handler:nil];
-    
-    [alertController addAction:cancelAction];
-    
 
 
-    
-    [self presentViewController:alertController animated:YES completion:nil];
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (void)toggleAutoFillQuickLaunch:(DatabasePreferences*)database {
     if([AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:database.uuid]) {
@@ -1789,21 +1785,29 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     [self performSegueWithIdentifier:@"segueToRenameDatabase" sender:database];
 }
 
-- (void)removeSafe:(NSIndexPath * _Nonnull)indexPath {
-    DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
+- (void)onRemoveDatabase:(NSIndexPath * _Nonnull)indexPath {
+    DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
     
     NSString *message;
     
-    if ( safe.storageProvider == kiCloud && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        message = NSLocalizedString(@"safes_vc_remove_icloud_databases_warning", @"warning message about removing database from icloud");
-    }
-    else if ( safe.storageProvider == kCloudKit && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        
-        message = @"Are you sure you want to delete this database? It will be removed from all of your devices and cannot be undone.\n\nPlease consider taking a backup local copy first."; 
+    if ( database.storageProvider == kCloudKit && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        if ( database.isOwnedByMeCloudKit ) {
+            message = NSLocalizedString(@"ays_remove_database_permanent_all_devices_delete_please_take_backup", @"Are you sure you want to remove this database? It will be permanently deleted across all devices.\n\nPlease consider taking a backup local copy first.");
+        }
+        else {
+            [self promptUserToRemoveThemselvesFromCloudKitSharing:database indexPath:indexPath];
+            return;
+        }
     }
     else {
-        message = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_are_you_sure_remove_database_fmt", @"are you sure you want to remove database prompt with format string on end"),
-                         (safe.storageProvider == kiCloud || safe.storageProvider == kLocalDevice)  ? @"" : NSLocalizedString(@"safes_vc_extra_info_underlying_database", @"extra info appended to string about the underlying storage type")];
+        if (database.storageProvider == kiCloud ||
+            database.storageProvider == kCloudKit ||
+            database.storageProvider == kLocalDevice) {
+            message = NSLocalizedString(@"ays_remove_database_permanent_delete", @"Are you sure you want to remove this database from Strongbox?\n\n(NB: The underlying database file will be permanently deleted)");
+        }
+        else {
+            message = NSLocalizedString(@"ays_remove_database_underlying_not_deleted", @"Are you sure you want to remove this database from Strongbox? (NB: The underlying database file will not be deleted)");
+        }
     }
     
     [Alerts yesNo:self
@@ -1811,46 +1815,37 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
           message:message
            action:^(BOOL response) {
                if (response) {
-                   [self removeAndCleanupSafe:safe];
+                   [self removeAndCleanupSafe:database];
                }
            }];
 }
 
-- (void)removeAndCleanupSafe:(DatabasePreferences *)safe {
-    if (safe.storageProvider == kLocalDevice) {
-        [[LocalDeviceStorageProvider sharedInstance] delete:safe
-                                                 completion:^(NSError *error) {
-            if (error != nil) {
-                NSLog(@"Error removing local file: %@", error);
-            }
-            else {
-                NSLog(@"Removed Local File Successfully.");
-                [DatabaseNuker nuke:safe];
-            }
-        }];
-    }
-    else if (safe.storageProvider == kiCloud) {
-        [[AppleICloudProvider sharedInstance] delete:safe completion:^(NSError *error) {
-            if(error) {
-                NSLog(@"%@", error);
-                [Alerts error:self title:NSLocalizedString(@"safes_vc_error_delete_icloud_database", @"Error message - could not delete iCloud database") error:error];
-                return;
-            }
-            else {
-                NSLog(@"iCloud file removed");
-                [DatabaseNuker nuke:safe];
-            }
-        }];
-    }
-    else if (safe.storageProvider == kCloudKit) {
-        if (@available(iOS 15.0, *)) {
-            [self deleteCloudKitDatabase:safe];
+- (void)promptUserToRemoveThemselvesFromCloudKitSharing:(DatabasePreferences*)database indexPath:(NSIndexPath*)indexPath {
+    CGRect rect = [self.tableView rectForRowAtIndexPath:indexPath];
+    
+    [Alerts okCancel:self
+               title:NSLocalizedString(@"strongbox_sync_shared_database_title", @"Shared Database")
+             message:NSLocalizedString(@"strongbox_sync_shared_database_msg", @"This database is shared with you by someone else who owns it. To remove this database from your list, tap OK to manage sharing and remove yourself.")
+              action:^(BOOL response) {
+        if ( response ) {
+            [self onCloudKitCreateOrManageSharing:database rect:rect];
         }
-    }
-    else {
-        [DatabaseNuker nuke:safe];
-        NSLog(@"Database removed");
-    }
+    }];
+}
+
+- (void)removeAndCleanupSafe:(DatabasePreferences *)safe {
+    [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_deleting_ellipsis", @"Deleting...")
+                                        viewController:self];
+    
+    [DatabaseNuker nuke:safe 
+     deleteUnderlyingIfSupported:YES
+             completion:^(NSError * _Nullable error) {
+        [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+
+        if ( error ) {
+            [Alerts error:self error:error];
+        }
+    }];
 }
 
 
@@ -1870,11 +1865,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         }
     }
     
-    if (@available(iOS 15.0, *)) {
-        if ( database.storageProvider == kCloudKit ) {
-            
-            [self renameCloudKitDatabase:database nick:name];
-        }
+    if ( database.storageProvider == kCloudKit ) {
+        [self renameCloudKitDatabase:database nick:name];
     }
 }
 
@@ -2162,7 +2154,10 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                  message:NSLocalizedString(@"safes_vc_unknown_error_while_adding_database", @"Error Message- unknown error while adding")];
         }
         else {
-            [database add:storageParams.data initialCacheModDate:storageParams.initialDateModified];
+            NSError* error;
+            if ( ![database add:storageParams.data initialCacheModDate:storageParams.initialDateModified error:&error] ) {
+                [Alerts error:self error:error];
+            }
         }
     }
 }
@@ -2267,30 +2262,27 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         }
     }
     
-    [metadata add:initialCache initialCacheModDate:initialCacheModDate];
+    NSError* error;
+    if ( ![metadata add:initialCache initialCacheModDate:initialCacheModDate error:&error] ) {
+        [Alerts error:self error:error];
+    }
     
     return metadata;
 }
 
 - (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName modDate:(NSDate*)modDate data:(NSData *)data {
-    [self addManualDownloadUrl:NO data:data modDate:modDate nickName:nickName];
+    [self addManualDownloadUrl:data modDate:modDate nickName:nickName];
 }
 
-- (void)addManualDownloadUrl:(BOOL)iCloud data:(NSData*)data modDate:(NSDate*)modDate nickName:(NSString *)nickName {
-    id<SafeStorageProvider> provider;
+- (void)addManualDownloadUrl:(NSData*)data modDate:(NSDate*)modDate nickName:(NSString *)nickName {
+    id<SafeStorageProvider> provider = LocalDeviceStorageProvider.sharedInstance;
 
-    if(iCloud) {
-        provider = AppleICloudProvider.sharedInstance;
-    }
-    else {
-        provider = LocalDeviceStorageProvider.sharedInstance;
-    }
-
-    NSString* extension = [Serializator getLikelyFileExtension:data];
     DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];  
     
+    NSString* filename = [NSString stringWithFormat:@"%@.%@", nickName, [Serializator getDefaultFileExtensionForFormat:format]];
+    
     [provider create:nickName
-           extension:extension
+            fileName:filename
                 data:data
         parentFolder:nil
       viewController:self
@@ -2298,7 +2290,10 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
          dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (error == nil) {
                 metadata.likelyFormat = format;
-                [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
+                NSError* error;
+                if ( ![metadata addWithDuplicateCheck:data initialCacheModDate:modDate error:&error] ) {
+                    [Alerts error:self error:error];
+                }
             }
             else {
                 [Alerts error:self title:NSLocalizedString(@"safes_vc_error_importing_database", @"Error Title Error Importing Datavase") error:error];
@@ -2381,8 +2376,6 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)showSaleScreen {
-
-
 
     
     BOOL existingSubscriber = ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription;
@@ -2798,7 +2791,11 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace modDate:(NSDate*)modDate {
     if(editInPlace == NO) {
         NSString* filename = url.lastPathComponent;
-        if ( [LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] ) {
+        
+        BOOL existsInDefault = [LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename];
+        BOOL existsInDocuments = [LocalDeviceStorageProvider.sharedInstance fileNameExistsInDocumentsFolder:filename];
+        
+        if ( existsInDefault || existsInDocuments ) {
             [Alerts twoOptionsWithCancel:self
                                    title:NSLocalizedString(@"safesvc_update_existing_database_title", @"Update Existing Database?")
                                  message:NSLocalizedString(@"safesvc_update_existing_question", @"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?")
@@ -2807,7 +2804,15 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                   action:^(int response) {
                                       if(response == 0) {
                                           NSString *suggestedFilename = url.lastPathComponent;
-                                          BOOL updated = [LocalDeviceStorageProvider.sharedInstance writeToDefaultStorageWithFilename:suggestedFilename overwrite:YES data:data modDate:modDate];
+                                          
+                                          BOOL updated;
+
+                                          if ( existsInDefault ) {
+                                              updated = [LocalDeviceStorageProvider.sharedInstance writeToDefaultStorageWithFilename:suggestedFilename overwrite:YES data:data modDate:modDate];
+                                          }
+                                          else {
+                                              updated = [LocalDeviceStorageProvider.sharedInstance writeToDocumentsWithFilename:suggestedFilename overwrite:YES data:data modDate:modDate];
+                                          }
                                           
                                           if(!updated) {
                                               [Alerts warn:self
@@ -2849,35 +2854,46 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     self.enqueuedImportCanOpenInPlace = canOpenInPlace;
 }
 
-- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url modDate:(NSDate*)modDate {
+- (void)copyAndAddImportedSafe:(NSString *)nickName 
+                          data:(NSData *)data
+                           url:(NSURL*)url
+                       modDate:(NSDate*)modDate {
     NSString* extension = [Serializator getLikelyFileExtension:data];
     DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];
     
     [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
 }
 
-- (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
+- (void)importToLocalDevice:(NSURL*)url 
+                     format:(DatabaseFormat)format
+                   nickName:(NSString*)nickName
+                  extension:(NSString*)extension
+                       data:(NSData*)data
+                    modDate:(NSDate*)modDate {
     
     
     NSString *suggestedFilename = url.lastPathComponent;
         
-    [LocalDeviceStorageProvider.sharedInstance create:nickName
-                                            extension:extension
+    [LocalDeviceStorageProvider.sharedInstance create:nickName 
+                                             fileName:suggestedFilename
                                                  data:data
                                               modDate:modDate
-                                    suggestedFilename:suggestedFilename
-                                           completion:^(DatabasePreferences *metadata, NSError *error) {
-       dispatch_async(dispatch_get_main_queue(), ^(void) {
-           if (error == nil) {
-               metadata.likelyFormat = format;
-               [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
-           }
-           else {
-               [Alerts error:self
-                       title:NSLocalizedString(@"safesvc_error_importing_title", @"Error Importing Database")
-                       error:error];
-           }
-       });
+                                           completion:^(METADATA_PTR  _Nullable metadata, const NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            if (error == nil) {
+                metadata.likelyFormat = format;
+                
+                NSError* error;
+                if( ![metadata addWithDuplicateCheck:data initialCacheModDate:modDate error:&error] ) {
+                    [Alerts error:self error:error];
+                }
+            }
+            else {
+                [Alerts error:self
+                        title:NSLocalizedString(@"safesvc_error_importing_title", @"Error Importing Database")
+                        error:error];
+            }
+        });
     }];
 }
 
@@ -2899,54 +2915,9 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];
     metadata.likelyFormat = format;
     
-    [metadata addWithDuplicateCheck:data initialCacheModDate:dateModified];
-}
-
-
-
-- (void)createLocalCopyDatabase:(DatabasePreferences*)database {
-    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
-    
-    NSError* error;
-    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
-    if (!data) {
-        [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
-        return;
+    if (! [metadata addWithDuplicateCheck:data initialCacheModDate:dateModified error:&error] ) {
+        [Alerts error:self error:error];
     }
-    
-    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-    if (!attr || error) {
-        [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
-        return;
-    }
-    
-    NSDate* modDate = attr.fileModificationDate;
-    
-
-    
-    NSString* nickName = [NSString stringWithFormat:@"Local Copy of %@", database.nickName];
-    NSString* extension = [Serializator getLikelyFileExtension:data];
-    
-    [LocalDeviceStorageProvider.sharedInstance create:nickName
-                                            extension:extension
-                                                 data:data
-                                              modDate:modDate
-                                    suggestedFilename:database.fileName
-                                           completion:^(DatabasePreferences * _Nonnull metadata, NSError * _Nonnull error) {
-        if(error || !metadata) {
-            [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
-            return;
-        } 
-        
-        [metadata addWithDuplicateCheck:data initialCacheModDate:modDate];
-
-        [Alerts info:self
-               title:NSLocalizedString(@"generic_done", @"Done")
-             message:NSLocalizedString(@"safes_vc_created_local_copy_done", @"Local Copy Created.")
-          completion:^{
-            [self.navigationController popToRootViewControllerAnimated:YES];
-        }];
-    }];
 }
 
 - (void)beginMergeWizard:(DatabasePreferences*)destinationDatabase {
@@ -3190,8 +3161,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)continueImportFileSelection:(NSString*)importFormat {
-    UTType* type = [UTType typeWithIdentifier:(NSString*)kUTTypeItem];
-    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[type]];
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[UTTypeItem]];
     vc.delegate = self;
     vc.modalPresentationStyle = UIModalPresentationFormSheet;
     self.importFormat = importFormat;
@@ -3372,7 +3342,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                 CompositeKeyFactors *ckf = [[CompositeKeyFactors alloc] initWithPassword:creds.password];
                 if ( ckf ) {
                     database.ckfs = ckf;
-                    [self addImportedDatabase:database name:creds.name];
+                    [self addImportedDatabase:database 
+                                         name:creds.name];
                 }
                 else {
                     [self importFailedNotification];
@@ -3382,15 +3353,6 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     };
 
     [self presentViewController:nav animated:YES completion:nil];
-}
-
-- (void)addImportedDatabase:(DatabaseModel*)database name:(NSString*)name {
-    [AddNewSafeHelper createNewExpressDatabase:self
-                                          name:name
-                                         model:database
-                                    completion:^(BOOL userCancelled, DatabasePreferences * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
-        [metadata addWithDuplicateCheck:initialSnapshot initialCacheModDate:NSDate.date];
-    }];
 }
 
 - (void)importFailedNotification {
@@ -3410,25 +3372,39 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 
 
-- (void)onCloudKitShare:(NSIndexPath*)indexPath API_AVAILABLE(ios(15.0)) {
-#ifndef NO_NETWORKING
+- (void)onCloudKitShare:(NSIndexPath*)indexPath {
     DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
     
-    CloudKitSharingUIHelper* helper = [[CloudKitSharingUIHelper alloc] initWithDatabase:database 
-                                                                   parentViewController:self];
-                                                                                
     CGRect rect = [self.tableView rectForRowAtIndexPath:indexPath];
-    
-    [helper presentWithRect:rect 
-                 sourceView:self.tableView
-              fooCompletion:^{
-        NSLog(@"Helper has been captured! [%@]", helper);
+
+    [self onCloudKitCreateOrManageSharing:database rect:rect];
+}
+
+- (void)onCloudKitCreateOrManageSharing:(DatabasePreferences*)database rect:(CGRect)rect {
+#ifndef NO_NETWORKING
+    self.cloudKitSharingUIHelper = [[CloudKitSharingUIHelper alloc] initWithDatabase:database
+                                                                parentViewController:self
+                                                                          completion:^(NSError * _Nullable error ) {
+        if ( error ) {
+            NSLog(@"🔴 Error CloudKitSharingUIHelper [%@]", error);
+            [Alerts error:self error:error];
+        }
+        
+        [CloudKitDatabasesInteractor.shared refreshAndMergeWithCompletionHandler:^(NSError * _Nullable error) {
+            if ( error ) {
+                NSLog(@"🔴 Error refreshing after sharing. [%@]", error);
+            }
+        }];
+        
+        self.cloudKitSharingUIHelper = nil;
     }];
+    
+    [self.cloudKitSharingUIHelper presentWithRect:rect sourceView:self.tableView];
 #endif
 }
 
-
--(void)renameCloudKitDatabase:(DatabasePreferences*)database nick:(NSString*)nick API_AVAILABLE(ios(15.0)) {
+-(void)renameCloudKitDatabase:(DatabasePreferences*)database 
+                         nick:(NSString*)nick {
 #ifndef NO_NETWORKING
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
                                         viewController:self];
@@ -3439,68 +3415,66 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                 [CrossPlatformDependencies.defaults.spinnerUi dismiss];
                 NSLog(@"🔴 Error renaming Cloudkit Database [%@]", error);
                 [Alerts error:self error:error];
-                [self refreshCloudKitDatabases]; 
             }
             else {
                 [CrossPlatformDependencies.defaults.spinnerUi dismiss];
-                
-
             }
         });
     }];
 #endif
 }
 
--(void)deleteCloudKitDatabase:(DatabasePreferences*)database API_AVAILABLE(ios(15.0)) {
-#ifndef NO_NETWORKING
-    [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_deleting_ellipsis", @"Deleting...")
-                                        viewController:self];
-    
-    [CloudKitDatabasesInteractor.shared deleteWithDatabase:database completionHandler:^(NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ( error ) {
-                [CrossPlatformDependencies.defaults.spinnerUi dismiss];
-                NSLog(@"🔴 Error deleting Cloudkit Database [%@]", error);
-                [Alerts error:self error:error];
+
+
+- (void)addImportedDatabase:(DatabaseModel*)importModel name:(NSString*)name {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self createDatabaseForCreateOrImportOrCopy:name importModel:importModel databaseToCopy:nil];
+    });
+}
+
+- (void)onCopyToNewStorageLocation:(DatabasePreferences*)databaseToCopy {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self createDatabaseForCreateOrImportOrCopy:nil importModel:nil databaseToCopy:databaseToCopy];
+    });
+}
+
+- (void)createDatabaseForCreateOrImportOrCopy:(NSString*)name importModel:(DatabaseModel*)importModel databaseToCopy:(DatabasePreferences*)databaseToCopy {
+    self.selectStorageSwiftHelper = [[SelectStorageSwiftHelper alloc] initWithParentViewController:self
+                                                        completion:^(DatabasePreferences * _Nullable maybeNewDatabase, BOOL userCancelled, NSError * _Nullable maybeError) {
+        if ( maybeNewDatabase ) {
+            [Alerts info:self title:NSLocalizedString(@"database_created_title", @"Database Created")
+                 message:NSLocalizedString(@"database_created_msg", @"Your new database is now added and ready to be unlocked.")]; 
+        }
+        else if (maybeError) {
+            if ( maybeError.code == StrongboxErrorCodes.couldNotCreateICloudFile ) {
+                [Alerts oneOptionsWithCancel:self
+                                       title:NSLocalizedString(@"icloud_create_issue_title", @"iCloud Create Database Error")
+                                     message:NSLocalizedString(@"icloud_create_issue_message", @"Strongbox could not create a new iCloud Database for you, most likely because the Strongbox iCloud folder has been deleted.\n\nYou can find out how to fix this issue below.")
+                                  buttonText:NSLocalizedString(@"icloud_create_issue_fix", @"How do I fix this?")
+                                      action:^(BOOL response) {
+                    if ( response ) {
+                        NSURL* url = [NSURL URLWithString:@"https:
+                        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+                    }
+                }];
             }
             else {
-                [CrossPlatformDependencies.defaults.spinnerUi dismiss];
-                
-                [self refreshCloudKitDatabases]; 
+                [Alerts error:self error:maybeError];
             }
-        });
+        }
+        
+        self.selectStorageSwiftHelper = nil;
     }];
-#endif
+    
+    if ( databaseToCopy ) {
+        [self.selectStorageSwiftHelper beginCopyToStorageInteractionWithDatabaseToCopy:databaseToCopy];
+    }
+    else {
+        [self.selectStorageSwiftHelper beginCreateOnStorageInteractionWithNickName:name databaseModel:importModel];
+    }
 }
 
 @end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -202,6 +202,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;
 
 @property BOOL isSharedInCloudKit; 
+@property BOOL isOwnedByMeCloudKit; 
 
 @end
 

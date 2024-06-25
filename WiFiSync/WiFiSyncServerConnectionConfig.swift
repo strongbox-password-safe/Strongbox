@@ -13,13 +13,22 @@ class WiFiSyncServerConnectionConfig: NSObject, Codable {
 
     var passcodeSEUuid: String
 
-    var passcode: String {
-        guard let passcode = SecretStore.sharedInstance().getSecureString(keychainIdentifier) else {
-            NSLog("🔴 Could not get Passcode in the SE for [%@]", keychainIdentifier)
-            return "0000"
-        }
+    var passcode: String? {
+        get {
+            guard let passcode = SecretStore.sharedInstance().getSecureString(keychainIdentifier) else {
+                NSLog("🔴 Could not get Passcode in the SE for [%@]", keychainIdentifier)
+                return nil
+            }
 
-        return passcode
+            return passcode
+        }
+        set {
+            if let newPasscode = newValue {
+                SecretStore.sharedInstance().setSecureString(newValue, forIdentifier: keychainIdentifier)
+            } else {
+                SecretStore.sharedInstance().deleteSecureItem(keychainIdentifier)
+            }
+        }
     }
 
     var keychainIdentifier: String {

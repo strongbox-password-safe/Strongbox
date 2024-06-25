@@ -40,6 +40,7 @@
 
 
 
+@property (weak) IBOutlet NSImageView *imageViewCloudKitShared;
 @property (weak) IBOutlet NSImageView *imageViewQuickLaunch;
 @property (weak) IBOutlet NSImageView *imageViewOutstandingUpdate;
 @property (weak) IBOutlet NSImageView *imageViewReadOnly;
@@ -145,7 +146,8 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     self.labelStatus.stringValue = @"";
 }
 
-- (void)bindIndicatorsAndStatus:(MacDatabasePreferences*)metadata wormholeUnlocked:(BOOL)wormholeUnlocked {
+- (void)bindIndicatorsAndStatus:(MacDatabasePreferences*)metadata 
+               wormholeUnlocked:(BOOL)wormholeUnlocked {
     self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
     self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
     self.imageViewReadOnly.hidden = !metadata.readOnly;
@@ -157,6 +159,23 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     
     self.labelStatus.stringValue = [self getStatusText:metadata unlocked:unlocked];
     self.labelStatus.textColor = unlocked ? NSColor.systemGreenColor : NSColor.secondaryLabelColor;
+    
+    self.imageViewCloudKitShared.hidden = metadata.storageProvider != kCloudKit || !metadata.isSharedInCloudKit;
+    
+    if ( metadata.isSharedInCloudKit ) {
+        BOOL iOwn = metadata.isOwnedByMeCloudKit;
+        NSImage* cloudkitSharedIndicator = [NSImage imageWithSystemSymbolName:@"person.2.fill" accessibilityDescription:nil];
+        NSArray<NSColor*>* colors = iOwn ?  @[NSColor.systemGreenColor, NSColor.systemBlueColor] : @[NSColor.systemBlueColor, NSColor.systemGreenColor];
+
+        NSImageSymbolConfiguration* config = [NSImageSymbolConfiguration configurationWithPaletteColors:colors];
+        NSImage* coloured = [cloudkitSharedIndicator imageWithSymbolConfiguration:config];
+
+        self.imageViewCloudKitShared.image = coloured;
+        
+        self.imageViewCloudKitShared.toolTip = iOwn ? 
+        NSLocalizedString(@"shared_by_you", @"Shared by you") :
+                          NSLocalizedString(@"shared_with_you", @"Shared with you"); 
+    }
 }
 
 - (BOOL)isDatabaseUnlocked:(NSString*)uuid {
@@ -290,7 +309,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     }
 }
 
-- (void)onChangeNickname {
+- (void)onBeginRenameEdit {
     [self onNicknameClick];
 }
 
@@ -347,11 +366,8 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     NSString* raw = self.textFieldName.stringValue;
     NSString* trimmed = [MacDatabasePreferences trimDatabaseNickName:raw];
 
-    if ( ![self.originalNickName isEqualToString:trimmed] &&
-        [MacDatabasePreferences isValid:trimmed] &&
-        [MacDatabasePreferences isUnique:trimmed] ) {
-        
-        [MacDatabasePreferences getById:self.uuid].nickName = trimmed;
+    if ( ![self.originalNickName isEqualToString:trimmed] && [MacDatabasePreferences isValid:trimmed] && [MacDatabasePreferences isUnique:trimmed] ) {
+        self.onUserRenamedDatabase(trimmed);
     }
     else {
         [self restoreOriginalNickname];

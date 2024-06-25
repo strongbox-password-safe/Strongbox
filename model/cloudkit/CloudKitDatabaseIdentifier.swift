@@ -9,7 +9,6 @@
 import CloudKit
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, *)
 struct CloudKitDatabaseIdentifier: Codable, Equatable, Identifiable, Hashable {
     var id: String {
         if let sharedWithMeOwnerName {

@@ -18,6 +18,10 @@
     return [ContextMenuHelper getItem:title systemImage:nil enabled:YES checked:checked handler:handler];
 }
 
++ (UIAction *)getItem:(NSString *)title checked:(BOOL)checked systemImage:(NSString*)systemImage handler:(UIActionHandler)handler  {
+    return [ContextMenuHelper getItem:title systemImage:systemImage enabled:YES checked:checked handler:handler];
+}
+
 + (UIAction*)getItem:(NSString*)title systemImage:(NSString*)systemImage handler:(UIActionHandler)handler   {
     return [ContextMenuHelper getItem:title systemImage:systemImage enabled:YES handler:handler];
 }
@@ -68,31 +72,28 @@
          destructive:(BOOL)destructive
              enabled:(BOOL)enabled
              checked:(BOOL)checked
-             handler:(UIActionHandler)handler
-   {
-       UIImage* image = nil;
-       if ( systemImage ) {
-           image = [UIImage systemImageNamed:systemImage];
-           
-           if ( colour ) {
-               if (@available(iOS 15.0, *)) {
-                   UIImageSymbolConfiguration* colourConfig = [UIImageSymbolConfiguration configurationWithHierarchicalColor:colour];
-                   
-                   if ( large ) {
-                       colourConfig = [colourConfig configurationByApplyingConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
-                   }
-                   
-                   image = [image imageByApplyingSymbolConfiguration:colourConfig];
-               }
-           }
-       }
-       
+             handler:(UIActionHandler)handler {
+    UIImage* image = nil;
+    if ( systemImage ) {
+        image = [UIImage systemImageNamed:systemImage];
+        
+        if ( colour ) {
+            UIImageSymbolConfiguration* colourConfig = [UIImageSymbolConfiguration configurationWithHierarchicalColor:colour];
+            
+            if ( large ) {
+                colourConfig = [colourConfig configurationByApplyingConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
+            }
+            
+            image = [image imageByApplyingSymbolConfiguration:colourConfig];
+        }
+    }
+    
     return [ContextMenuHelper getItem:title
                                 image:image
-                           destructive:destructive
-                               enabled:enabled
-                               checked:checked
-                               handler:handler];
+                          destructive:destructive
+                              enabled:enabled
+                              checked:checked
+                              handler:handler];
 }
 
 + (UIAction *)getItem:(NSString *)title image:(UIImage *)image handler:(UIActionHandler)handler  {

@@ -98,15 +98,19 @@
 }
 
 - (void)create:(NSString *)nickName
-     extension:(NSString *)extension
+      fileName:(NSString *)fileName
           data:(NSData *)data
   parentFolder:(NSObject *)parentFolder
-viewController:(VIEW_CONTROLLER_PTR )viewController
-    completion:(void (^)(METADATA_PTR , const NSError *))completion {
+viewController:(VIEW_CONTROLLER_PTR)viewController
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion {
     if(self.maintainSessionForListing && self.maintainedSessionForListing) { 
-        [self createWithSession:nickName extension:extension data:data
-                   parentFolder:parentFolder sftp:self.maintainedSessionForListing
-                  configuration:self.maintainedConfigurationForFastListing completion:completion];
+        [self createWithSession:nickName 
+                       fileName:fileName
+                           data:data
+                   parentFolder:parentFolder 
+                           sftp:self.maintainedSessionForListing
+                  configuration:self.maintainedConfigurationForFastListing 
+                     completion:completion];
     }
     else {
         [self connectAndAuthenticate:nil
@@ -117,21 +121,26 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                 return;
             }
             
-            [self createWithSession:nickName extension:extension data:data parentFolder:parentFolder sftp:sftp configuration:configuration completion:completion];
+            [self createWithSession:nickName 
+                           fileName:fileName
+                               data:data
+                       parentFolder:parentFolder
+                               sftp:sftp
+                      configuration:configuration
+                         completion:completion];
         }];
     }
 }
 
 -(void)createWithSession:(NSString *)nickName
-               extension:(NSString *)extension
+                fileName:(NSString *)fileName
                     data:(NSData *)data
             parentFolder:(NSObject *)parentFolder
                     sftp:(NMSFTP*)sftp
            configuration:(SFTPSessionConfiguration*)configuration
               completion:(void (^)(METADATA_PTR , NSError *))completion {
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
     NSString *dir = [self getDirectoryFromParentFolderObject:parentFolder sessionConfig:configuration];
-    NSString *path = [NSString pathWithComponents:@[dir, desiredFilename]];
+    NSString *path = [NSString pathWithComponents:@[dir, fileName]];
     
     if(![sftp writeContents:data toFileAtPath:path progress:nil]) {
         NSError* error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_create", @"Could not create file") errorCode:-3];

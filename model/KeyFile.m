@@ -59,7 +59,7 @@ static const NSUInteger KeyFileRandomDataLength = 32;
 }
 
 - (NSString *)hashString {
-    return [self.data.sha256.hexString substringToIndex:8];
+    return [self.data.sha256.upperHexString substringToIndex:8];
 }
 
 - (NSString *)formattedHex {
@@ -71,7 +71,7 @@ static const NSUInteger KeyFileRandomDataLength = 32;
 }
 
 - (NSString*)formattedHex:(BOOL)extraFormattingForXml {
-    NSString* randHex = self.data.hexString;
+    NSString* randHex = self.data.upperHexString;
     NSMutableString* formattedHex = NSMutableString.string;
     
     for ( int i=0;i<randHex.length;i++ ) {

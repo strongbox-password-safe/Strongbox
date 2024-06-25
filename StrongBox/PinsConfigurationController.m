@@ -119,6 +119,12 @@
         self.labelRemoveDatabaseWarning2.text = NSLocalizedString(@"pins_config_vc_label_delete_database_icloud_permanent", @"iCloud database will be permanently deleted from iCloud.");
         self.labelRemoveDatabaseWarning2.textColor = [UIColor systemRedColor];
     }
+    else if(self.viewModel.metadata.storageProvider == kCloudKit ) {
+        self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_delete_database_strongbox_sync_permanent", @"Database will be permanently deleted from Strongbox Sync and all devices.");
+        self.labelRemoveDatabaseWarning.textColor = [UIColor systemRedColor];
+        self.labelRemoveDatabaseWarning2.text = NSLocalizedString(@"pins_config_vc_label_delete_database_strongbox_sync_permanent", @"Database will be permanently deleted from Strongbox Sync and all devices.");
+        self.labelRemoveDatabaseWarning2.textColor = [UIColor systemRedColor];
+    }
     else {
         self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_remove_database_warning", @"NB: Database file will remain on remote storage.");
         self.labelRemoveDatabaseWarning.textColor = [UIColor systemOrangeColor];
@@ -250,7 +256,9 @@
             self.viewModel.metadata.duressAction = kPresentError;
         }
         else if ( indexPath.row == 2 || indexPath.row == 3 ) {
-            BOOL delete = self.viewModel.metadata.storageProvider == kLocalDevice || self.viewModel.metadata.storageProvider == kiCloud;
+            BOOL delete =   self.viewModel.metadata.storageProvider == kLocalDevice ||
+                            self.viewModel.metadata.storageProvider == kCloudKit ||
+                            self.viewModel.metadata.storageProvider == kiCloud;
             
             [Alerts warn:self
                    title:NSLocalizedString(@"pins_config_vc_warn_remove_database_title", @"Warning")

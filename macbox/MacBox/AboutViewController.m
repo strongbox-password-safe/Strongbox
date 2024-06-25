@@ -55,8 +55,11 @@ static AboutViewController* sharedInstance;
 }
 
 - (void)bindUi {
-    NSString* debug = [DebugHelper getAboutDebugString];
-    [self.textView setString:debug];
+    [DebugHelper getAboutDebugString:^(NSString * _Nonnull debug) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.textView setString:debug];
+        });
+    }];
 }
 
 - (void)doInitialSetup {
@@ -148,17 +151,11 @@ static AboutViewController* sharedInstance;
     
     NSImageSymbolConfiguration* scaleConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
     
-    if (@available(macOS 12.0, *)) {
-        NSImageSymbolConfiguration* proConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemGreenColor, NSColor.systemBlueColor]];
-        NSImageSymbolConfiguration* noneProConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemRedColor, NSColor.systemOrangeColor]];
-        NSImageSymbolConfiguration* imageConfig = licensed ? proConfig : noneProConfig;
-        
-        self.imageViewLicense.symbolConfiguration = [scaleConfig configurationByApplyingConfiguration:imageConfig];
-        
-    } else {
-        self.imageViewLicense.symbolConfiguration = scaleConfig;
-        self.imageViewLicense.contentTintColor = licensed ? NSColor.systemBlueColor : NSColor.systemOrangeColor;
-    }
+    NSImageSymbolConfiguration* proConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemGreenColor, NSColor.systemBlueColor]];
+    NSImageSymbolConfiguration* noneProConfig = [NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemRedColor, NSColor.systemOrangeColor]];
+    NSImageSymbolConfiguration* imageConfig = licensed ? proConfig : noneProConfig;
+    
+    self.imageViewLicense.symbolConfiguration = [scaleConfig configurationByApplyingConfiguration:imageConfig];
 }
 
 - (void)showUpgradeScreen {

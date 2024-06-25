@@ -23,10 +23,6 @@ class MacWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
         return ret
     }
 
-    func isSyncInProgress(id: String) -> Bool {
-        MacSyncManager.sharedInstance().syncInProgress(forDatabase: id)
-    }
-
     func getDatabaseSummaries(id: String?, _ completion: @escaping (([WiFiSyncDatabaseSummary]) -> Void)) {
         if let id {
             guard let database = MacDatabasePreferences.getById(id) else {

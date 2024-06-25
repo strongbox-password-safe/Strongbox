@@ -6,7 +6,7 @@
 //  Copyright © 2017 Mark McGuill. All rights reserved.
 //
 
-#import "CreateFormatAndSetCredentialsWizard.h"
+#import "CreateDatabaseOrSetCredentialsWizard.h"
 #import "Settings.h"
 #import "MacAlerts.h"
 #import "Utils.h"
@@ -20,12 +20,10 @@
 #import "KeyFileManagement.h"
 #import "Strongbox-Swift.h"
 
-@interface CreateFormatAndSetCredentialsWizard () <NSTabViewDelegate>
+@interface CreateDatabaseOrSetCredentialsWizard () <NSTextFieldDelegate>
 
-@property (weak) IBOutlet NSButtonCell *checkboxUseYubiKey;
-@property (weak) IBOutlet NSPopUpButtonCell *popupYubiKey;
-
-@property (weak) IBOutlet NSTabView *tabView;
+@property (weak) IBOutlet NSButton *checkboxUseYubiKey;
+@property (weak) IBOutlet NSPopUpButton *popupYubiKey;
 
 @property (weak) IBOutlet KSPasswordField *textFieldNew;
 @property (weak) IBOutlet KSPasswordField *textFieldConfirm;
@@ -41,60 +39,66 @@
 @property (weak) IBOutlet NSButton *buttonCreateNewKeyFile;
 @property (weak) IBOutlet NSTextField *labelKeyFilePath;
 
-@property (weak) IBOutlet NSButton *formatPasswordSafe;
-@property (weak) IBOutlet NSButton *formatKeePass2Advanced;
-@property (weak) IBOutlet NSButton *formatKeePass2Standard;
-@property (weak) IBOutlet NSButton *formatKeePass1;
+@property (weak) IBOutlet NSStackView *stackFormat;
+@property (weak) IBOutlet NSPopUpButton *popupFormat;
 
-@property BOOL useAKeyFile;
-@property BOOL useAYubiKey;
-
-@property BOOL slot1IsBlocking;
-@property BOOL slot2IsBlocking;
-@property NSString* currentYubiKeySerial;
 @property (weak) IBOutlet NSProgressIndicator *progressStrength;
 @property (weak) IBOutlet NSTextField *labelStrength;
 @property (weak) IBOutlet NSStackView *stackStrength;
-
 @property (weak) IBOutlet NSButton *buttonRevealConceal;
-@property BOOL concealed;
 @property (weak) IBOutlet NSButton *acceptEmptyPassword;
-
 @property (weak) IBOutlet NSStackView *stackHeader;
 @property (weak) IBOutlet NSStackView *stackOuterContainer;
 @property (weak) IBOutlet NSStackView *stackViewKeyFile;
 @property (weak) IBOutlet NSStackView *stackViewYubiKey;
-
 @property (weak) IBOutlet NSButton *checkboxShowAdvanced;
+
+@property (weak) IBOutlet NSStackView *stackNickname;
+@property (weak) IBOutlet NSTextField *textFieldNickName;
+@property (weak) IBOutlet NSTextField *textFieldSubtitle;
+
 @property BOOL showAdvanced;
+@property BOOL useAKeyFile;
+@property BOOL useAYubiKey;
+@property BOOL slot1IsBlocking;
+@property BOOL slot2IsBlocking;
+@property NSString* currentYubiKeySerial;
+@property BOOL concealed;
+
+@property BOOL createMode;
+
+@property DatabaseFormat initialDatabaseFormat;
+@property NSString* initialKeyFileBookmark;
+@property YubiKeyConfiguration *initialYubiKeyConfiguration;
 
 @end
 
-@implementation CreateFormatAndSetCredentialsWizard
+@implementation CreateDatabaseOrSetCredentialsWizard
 
-- (IBAction)onToggleShowAdvanced:(id)sender {
-    self.showAdvanced = !self.showAdvanced;
-    [self bindUi];
-}
-
-- (IBAction)onRevealConceal:(id)sender {
-    self.concealed = !self.concealed;
-    [self bindConcealed];
-}
-
-- (IBAction)toggleAcceptEmpty:(id)sender {
-    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = !Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
++ (instancetype)newCreateDatabaseWizard {
+    CreateDatabaseOrSetCredentialsWizard* wizard = [[CreateDatabaseOrSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
     
-    [self bindUi];
+    wizard.initialDatabaseFormat = kKeePass4;
+    wizard.createMode = YES;
+    
+    return wizard;
 }
 
-- (void)bindAcceptEmpty {
-    [self.acceptEmptyPassword setState:Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSControlStateValueOn : NSControlStateValueOff];
++ (instancetype)newSetCredentialsWizard:(DatabaseFormat)format keyFileBookmark:(NSString *)keyFileBookmark yubiKeyConfig:(YubiKeyConfiguration *)yubiKeyConfig {
+    CreateDatabaseOrSetCredentialsWizard* wizard = [[CreateDatabaseOrSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
+
+    wizard.initialDatabaseFormat = format;
+    wizard.initialKeyFileBookmark = keyFileBookmark;
+    wizard.initialYubiKeyConfiguration = yubiKeyConfig;
+    
+    wizard.createMode = NO;
+    
+    return wizard;
 }
 
 - (void)windowDidLoad {
     [super windowDidLoad];
-    
+
     _selectedDatabaseFormat = self.initialDatabaseFormat;
     _selectedKeyFileBookmark = self.initialKeyFileBookmark;
     _selectedYubiKeyConfiguration = self.initialYubiKeyConfiguration;
@@ -112,31 +116,193 @@
     [self updateYubiKeyUi];
 }
 
+
+
 - (void)setupUi {
-    self.tabView.delegate = self;
-    [self.tabView selectTabViewItem:self.tabView.tabViewItems[self.createSafeWizardMode ? 0 : 1]];
-    
-    NSString* loc = self.createSafeWizardMode ?
-    NSLocalizedString(@"mac_create_new_database_title", @"Create New Password Database") :
-    NSLocalizedString(@"mac_enter_database_master_credentials", @"Enter Database Master Credentials");
+    NSString* loc = self.createMode ?
+        NSLocalizedString(@"mac_create_new_database_title", @"Create New Password Database") :
+        NSLocalizedString(@"mac_enter_database_master_credentials", @"Enter Database Master Credentials");
     
     self.window.title = loc;
     
     [self.stackOuterContainer setCustomSpacing:8.f afterView:self.stackHeader];
     
-    [self setUIFromFormat];
-}
+    self.stackFormat.hidden = !self.createMode;
+    
+    [self bindUIBasedOnDatabaseFormat];
 
-- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem {
-    if(tabViewItem == self.tabView.tabViewItems[1]) {
+    self.textFieldNickName.delegate = self;
+    
+    if ( self.createMode ) {
+        self.textFieldTitle.stringValue = NSLocalizedString(@"new_database_setup", @"New Database Setup");
+        self.textFieldSubtitle.stringValue = NSLocalizedString(@"enter_creds_and_nickname", @"Enter a nickname for your new database and the master credentials to protect it.");
+        
+        self.textFieldNickName.stringValue = [MacDatabasePreferences getSuggestedNewDatabaseName];
+        
+        [self.window makeFirstResponder:self.textFieldNickName];
+        [self.textFieldNickName becomeFirstResponder];
+    }
+    else {
         [self.window makeFirstResponder:self.textFieldNew];
         [self.textFieldNew becomeFirstResponder];
     }
+
 }
 
-- (IBAction)onNext:(id)sender {
-    [self.tabView selectTabViewItem:self.tabView.tabViewItems[1]];
+- (void)bindUi {
+    BOOL noneKp2 = ( self.selectedDatabaseFormat == kPasswordSafe || self.selectedDatabaseFormat == kKeePass1 );
+    
+    self.stackViewKeyFile.hidden = !self.showAdvanced || noneKp2;
+    self.stackViewYubiKey.hidden = !self.showAdvanced || noneKp2;
+    self.stackFormat.hidden = !self.showAdvanced || !self.createMode || !self.allowFormatSelection;
+    self.stackNickname.hidden = !self.createMode;
+    
+    self.acceptEmptyPassword.hidden = !self.showAdvanced || noneKp2;
+    self.checkboxShowAdvanced.state = self.showAdvanced ? NSControlStateValueOn : NSControlStateValueOff;
+
+    self.checkboxShowAdvanced.enabled = !(noneKp2 && !self.createMode);
+    self.checkboxShowAdvanced.alphaValue = (noneKp2 && !self.createMode) ? 0.0 : 1.0;
+    
+    
+    
+    if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
+        self.textFieldNew.enabled = YES;
+        self.textFieldConfirm.enabled = YES;
+    }
+    else {
+        self.textFieldNew.enabled = NO;
+        self.textFieldConfirm.enabled = NO;
+    }
+    
+    [self bindConcealed];
+    [self bindAcceptEmpty];
+    
+    
+    
+    [self bindPasswordStrength];
+    
+    
+    
+    self.checkboxUseAKeyFile.state = self.useAKeyFile ? NSControlStateValueOn : NSControlStateValueOff;
+    self.buttonBrowse.enabled = self.useAKeyFile;
+    self.buttonCreateNewKeyFile.enabled = self.useAKeyFile;
+    self.labelKeyFilePath.enabled = self.useAKeyFile;
+    
+    NSURL* url = self.selectedKeyFileBookmark ? [BookmarksHelper getExpressUrlFromBookmark:self.selectedKeyFileBookmark] : nil;
+    
+    self.labelKeyFilePath.stringValue = self.useAKeyFile && url ? url.path : @"";
+    self.labelKeyFilePath.placeholderString = !self.useAKeyFile ? @"" : NSLocalizedString(@"mac_click_browse_select_key_file", @"Click Browse to Select a Key File");
+    
+    self.labelKeyFilePath.hidden = self.labelKeyFilePath.stringValue.length == 0;
+    
+    
+    
+    self.checkboxUseYubiKey.state = self.useAYubiKey ? NSControlStateValueOn : NSControlStateValueOff;
+    self.popupYubiKey.enabled = self.useAYubiKey;
+    
+    
+    
+    [self validateUi];
 }
+
+- (void)bindUIBasedOnDatabaseFormat {
+    if ( self.selectedDatabaseFormat == kPasswordSafe || self.selectedDatabaseFormat == kKeePass1 ) {
+        self.checkboxUseAKeyFile.state = NSControlStateValueOff;
+        self.checkboxUseAKeyFile.enabled = NO;
+        
+        self.checkboxUseAPassword.state = NSControlStateValueOn;
+        self.checkboxUseAPassword.enabled = NO;
+        
+        self.checkboxUseYubiKey.state = NSControlStateValueOff;
+        self.checkboxUseYubiKey.enabled = NO;
+        
+        self.acceptEmptyPassword.state = NSControlStateValueOff;
+        self.acceptEmptyPassword.enabled = NO;
+    }
+    else {
+        self.checkboxUseAPassword.state = NSControlStateValueOn;
+        self.checkboxUseAPassword.enabled = YES;
+        self.checkboxUseAKeyFile.state = NSControlStateValueOff;
+        self.checkboxUseAKeyFile.enabled = YES;
+        self.checkboxUseYubiKey.state = NSControlStateValueOff;
+        
+
+        self.acceptEmptyPassword.enabled = YES;
+        [self bindAcceptEmpty];
+        
+        BOOL isPro = Settings.sharedInstance.isPro;
+        self.checkboxUseYubiKey.enabled = isPro && self.selectedDatabaseFormat != kKeePass1;
+        
+        if (!isPro) {
+            NSString* loc = NSLocalizedString(@"mac_lock_screen_yubikey_popup_menu_yubico_pro_only", @"YubiKey (Pro Only)");
+            [self.checkboxUseYubiKey setTitle:loc];
+        }
+    }
+        
+    switch (self.selectedDatabaseFormat) {
+        case kPasswordSafe:
+            [self.popupFormat selectItemAtIndex:3];
+            break;
+        case kKeePass4:
+            [self.popupFormat selectItemAtIndex:0];
+            break;
+        case kKeePass:
+            [self.popupFormat selectItemAtIndex:1];
+            break;
+        case kKeePass1:
+            [self.popupFormat selectItemAtIndex:2];
+            break;
+        default:
+            break;
+    }
+}
+
+- (void)bindConcealed {
+    self.textFieldNew.showsText = !self.concealed;
+    
+    [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
+}
+
+- (void)bindAcceptEmpty {
+    [self.acceptEmptyPassword setState:Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSControlStateValueOn : NSControlStateValueOff];
+}
+
+
+
+- (void)onChangedFormat {
+
+    
+    [self bindUIBasedOnDatabaseFormat];
+    [self bindUi];
+}
+
+- (IBAction)onChangeFormatToKDBX4:(id)sender {
+    _selectedDatabaseFormat = kKeePass4;
+    
+    [self onChangedFormat];
+}
+
+- (IBAction)onChangeFormatToKDBX31:(id)sender {
+    _selectedDatabaseFormat = kKeePass;
+    
+    [self onChangedFormat];
+
+}
+
+- (IBAction)onChangeFormatToKDB:(id)sender {
+    _selectedDatabaseFormat = kKeePass1;
+    
+    [self onChangedFormat];
+
+}
+
+- (IBAction)onChangeFormatToPSafe:(id)sender {
+    _selectedDatabaseFormat = kPasswordSafe;
+    
+    [self onChangedFormat];
+}
+
+
 
 - (IBAction)onCancel:(id)sender {
     _selectedPassword = nil;
@@ -153,13 +319,18 @@
 }
 
 - (void)controlTextDidChange:(NSNotification *)obj {
-    [self bindPasswordStrength];
-    
-    [self validateUi];
+    if ( obj.object == self.textFieldNickName ) {
+        [self validateUi];
+    }
+    else {
+        [self bindPasswordStrength];
+        
+        [self validateUi];
+    }
 }
 
 - (IBAction)onCreateNew:(id)sender {
-    __weak CreateFormatAndSetCredentialsWizard* weakSelf = self;
+    __weak CreateDatabaseOrSetCredentialsWizard* weakSelf = self;
     
     KeyFile* keyFile = [KeyFileManagement generateNewV2];
     
@@ -254,83 +425,6 @@
     [self bindUi];
 }
 
-- (void)setUIFromFormat {
-    if(self.selectedDatabaseFormat == kPasswordSafe || self.selectedDatabaseFormat == kKeePass1 ) {
-        self.checkboxUseAKeyFile.state = NSControlStateValueOff;
-        self.checkboxUseAKeyFile.enabled = NO;
-        
-        self.checkboxUseAPassword.state = NSControlStateValueOn;
-        self.checkboxUseAPassword.enabled = NO;
-        
-        self.checkboxUseYubiKey.state = NSControlStateValueOff;
-        self.checkboxUseYubiKey.enabled = NO;
-
-        self.acceptEmptyPassword.state = NSControlStateValueOff;
-        self.acceptEmptyPassword.enabled = NO;
-        
-        self.stackViewKeyFile.hidden = YES;
-        self.stackViewYubiKey.hidden = YES;
-        self.checkboxUseAPassword.hidden = YES;
-        self.acceptEmptyPassword.hidden = YES;
-    }
-    else {
-        self.checkboxUseAPassword.state = NSControlStateValueOn;
-        self.checkboxUseAPassword.enabled = YES;
-        self.checkboxUseAKeyFile.state = NSControlStateValueOff;
-        self.checkboxUseAKeyFile.enabled = YES;
-        self.checkboxUseYubiKey.state = NSControlStateValueOff;
-        
-        BOOL isPro = Settings.sharedInstance.isPro;
-        self.checkboxUseYubiKey.enabled = isPro && self.selectedDatabaseFormat != kKeePass1;
-        
-        if (!isPro) {
-            NSString* loc = NSLocalizedString(@"mac_lock_screen_yubikey_popup_menu_yubico_pro_only", @"YubiKey (Pro Only)");
-            [self.checkboxUseYubiKey setTitle:loc];
-        }
-    }
-
-    switch (self.selectedDatabaseFormat) {
-        case kPasswordSafe:
-            self.formatPasswordSafe.state = NSControlStateValueOn;
-            break;
-        case kKeePass4:
-            self.formatKeePass2Advanced.state = NSControlStateValueOn;
-            break;
-        case kKeePass:
-            self.formatKeePass2Standard.state = NSControlStateValueOn;
-            break;
-        case kKeePass1:
-            self.formatKeePass1.state = NSControlStateValueOn;
-            break;
-        default:
-            break;
-    }
-}
-
-- (void)setFormatFromUI {
-    if(self.formatPasswordSafe.state == NSControlStateValueOn) {
-        _selectedDatabaseFormat = kPasswordSafe;
-    }
-    else if(self.formatKeePass2Advanced.state == NSControlStateValueOn) {
-        _selectedDatabaseFormat = kKeePass4;
-    }
-    else if(self.formatKeePass2Standard.state == NSControlStateValueOn) {
-        _selectedDatabaseFormat = kKeePass;
-    }
-    else if(self.formatKeePass1.state == NSControlStateValueOn) {
-        _selectedDatabaseFormat = kKeePass1;
-    }
-}
-
-- (IBAction)onChangeDatabaseFormat:(id)sender {
-    [self setFormatFromUI];
-    
-    NSLog(@"Format = %ld", (long)self.selectedDatabaseFormat);
-    
-    [self setUIFromFormat];
-    [self bindUi];
-}
-
 - (IBAction)onUseAYubiKey:(id)sender {
     self.useAYubiKey = self.checkboxUseYubiKey.state == NSControlStateValueOn;
     
@@ -339,62 +433,6 @@
     }
 
     [self bindUi];
-}
-
-
-
-- (void)bindUi {
-    self.checkboxShowAdvanced.state = self.showAdvanced ? NSControlStateValueOn : NSControlStateValueOff;
-    self.acceptEmptyPassword.hidden = !self.showAdvanced;
-    self.stackViewKeyFile.hidden = !self.showAdvanced;
-    self.stackViewYubiKey.hidden = !self.showAdvanced;
-    
-    
-    
-    if(self.checkboxUseAPassword.state == NSControlStateValueOn) {
-        self.textFieldNew.enabled = YES;
-        self.textFieldConfirm.enabled = YES;
-    }
-    else {
-        self.textFieldNew.enabled = NO;
-        self.textFieldConfirm.enabled = NO;
-    }
-    
-    [self bindConcealed];
-    [self bindAcceptEmpty];
-    
-    
-    
-    [self bindPasswordStrength];
-    
-    
-    
-    self.checkboxUseAKeyFile.state = self.useAKeyFile ? NSControlStateValueOn : NSControlStateValueOff;
-    self.buttonBrowse.enabled = self.useAKeyFile;
-    self.buttonCreateNewKeyFile.enabled = self.useAKeyFile;
-    self.labelKeyFilePath.enabled = self.useAKeyFile;
-    
-    NSURL* url = self.selectedKeyFileBookmark ? [BookmarksHelper getExpressUrlFromBookmark:self.selectedKeyFileBookmark] : nil;
-    
-    self.labelKeyFilePath.stringValue = self.useAKeyFile && url ? url.path : @"";
-    self.labelKeyFilePath.placeholderString = !self.useAKeyFile ? @"" : NSLocalizedString(@"mac_click_browse_select_key_file", @"Click Browse to Select a Key File");
-    
-    self.labelKeyFilePath.hidden = self.labelKeyFilePath.stringValue.length == 0;
-    
-    
-    
-    self.checkboxUseYubiKey.state = self.useAYubiKey ? NSControlStateValueOn : NSControlStateValueOff;
-    self.popupYubiKey.enabled = self.useAYubiKey;
-    
-    
-    
-    [self validateUi];
-}
-
-- (void)bindConcealed {
-    self.textFieldNew.showsText = !self.concealed;
-    
-    [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
 }
 
 - (void)updateYubiKeyUi {
@@ -518,6 +556,26 @@
 }
 
 - (void)validateUi {
+    if ( self.createMode ) {
+        NSString* trimmed = trim(self.textFieldNickName.stringValue);
+        
+        if ( ![MacDatabasePreferences isValid:trimmed] ) {
+            NSString* loc = @"Invalid Nickname";
+            self.labelPasswordsMatch.stringValue = loc; 
+            
+            self.buttonOk.enabled = NO;
+            return;
+        }
+        
+        if ( ![MacDatabasePreferences isUnique:trimmed] ) {
+            NSString* loc = NSLocalizedString(@"nickname_already_in_use", @"Nickname already in use"); 
+            self.labelPasswordsMatch.stringValue = loc;
+            
+            self.buttonOk.enabled = NO;
+            return;
+        }
+    }
+        
     self.labelPasswordsMatch.stringValue = @" ";
     self.labelPasswordsMatch.textColor = [NSColor redColor];
     
@@ -600,6 +658,13 @@
 }
 
 - (IBAction)onOk:(id)sender {
+    
+    
+    if ( self.createMode ) {
+        NSString* trimmed = trim(self.textFieldNickName.stringValue);
+        _selectedNickname = trimmed;
+    }
+    
     
     
     _selectedPassword = nil;
@@ -688,6 +753,22 @@
     [PasswordStrengthUIHelper bindPasswordStrength:pw
                                      labelStrength:self.labelStrength
                                           progress:self.progressStrength];
+}
+
+- (IBAction)onToggleShowAdvanced:(id)sender {
+    self.showAdvanced = !self.showAdvanced;
+    [self bindUi];
+}
+
+- (IBAction)onRevealConceal:(id)sender {
+    self.concealed = !self.concealed;
+    [self bindConcealed];
+}
+
+- (IBAction)toggleAcceptEmpty:(id)sender {
+    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = !Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    
+    [self bindUi];
 }
 
 @end

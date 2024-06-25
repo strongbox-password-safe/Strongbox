@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIAction *)getItem:(NSString *)title checked:(BOOL)checked handler:(UIActionHandler)handler ;
 
++ (UIAction *)getItem:(NSString *)title checked:(BOOL)checked systemImage:(NSString*)systemImage handler:(UIActionHandler)handler;
+
 + (UIAction*)getItem:(NSString*)title image:(UIImage*_Nullable)image handler:(UIActionHandler)handler ;
 
 + (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage handler:(UIActionHandler)handler ;

@@ -23,15 +23,14 @@
 - (BOOL)shouldDisplay {
     if( AppPreferences.sharedInstance.isPro ) {
         return NO;
-
     }
     
     if ( ![self userHasAlreadyTriedAppForMoreThan90Days] ) {
         return NO;
     }
     
-    const NSUInteger percentageChanceOfShowing = 1; 
-    NSInteger random = arc4random_uniform(100);
+    const NSUInteger percentageChanceOfShowing = 15;
+    NSInteger random = arc4random_uniform(1000);
 
     return (random < percentageChanceOfShowing);
 }

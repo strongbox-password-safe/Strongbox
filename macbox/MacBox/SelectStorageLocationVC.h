@@ -12,11 +12,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AddDatabaseSelectStorageVC : NSViewController
+@interface SelectStorageLocationVC : NSViewController
 
 + (instancetype)newViewController;
 
 @property id<SafeStorageProvider> provider;
+@property BOOL createMode;
+
 @property (nonatomic, copy) void (^onDone)(BOOL success, StorageBrowserItem*_Nullable selectedItem);
 
 

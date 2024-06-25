@@ -55,11 +55,17 @@ public class BrowserAutoFillManager: NSObject {
 
         var equivs = ApplePasswordManagerQuirks.shared.getEquivalentDomains(domain)
 
+
+
         
 
         if let u = URL(string: url), let host = u.host, equivs.contains(host.lowercased()) {
             equivs.remove(host)
         }
+
+        
+
+        equivs.remove(domain)
 
         return equivs
     }

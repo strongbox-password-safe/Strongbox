@@ -12,7 +12,6 @@
 #import "AppPreferences.h"
 #import <MessageUI/MessageUI.h>
 #import "DatabasePreferences.h"
-#import "PinEntryController.h"
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
 #import "SelectItemTableViewController.h"
@@ -115,21 +114,9 @@
     self.imageViewAppIcon.image = [UIImage systemImageNamed:@"photo"];
     self.imageViewShowTips.image = [UIImage systemImageNamed:@"text.bubble"];
 
-    if (@available(iOS 15.0, *)) {
-        self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"checkerboard.shield"];
-    }
-    else {
-        self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"shield"];
-    }
-
+    self.imageViewPrivacyShield.image = [UIImage systemImageNamed:@"checkerboard.shield"];
     self.imageViewAppLock.image = [UIImage systemImageNamed:@"lock.circle"];
-
-    if (@available(iOS 15.0, *)) {
-        self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear.circle"];
-    }
-    else {
-        self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear"];
-    }
+    self.imageViewAdvanced.image = [UIImage systemImageNamed:@"gear.circle"];
 
     BOOL licensed = AppPreferences.sharedInstance.isPro;
     NSString* license = licensed ? @"person.fill.checkmark" : @"person.fill.xmark";
@@ -352,7 +339,14 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
 
 
 - (void)composeEmail {
-    NSString* debugInfo = [DebugHelper getAboutDebugString];
+    [DebugHelper getAboutDebugString:^(NSString * _Nonnull debugInfo) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self composeEmailWithDebugInfo:debugInfo];
+        });
+    }];
+}
+
+- (void)composeEmailWithDebugInfo:(NSString*)debugInfo {
     NSString* subject = @"Support Request";
     
     if(![MFMailComposeViewController canSendMail]) {

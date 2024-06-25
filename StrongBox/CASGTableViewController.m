@@ -603,9 +603,9 @@
 
 - (void)toggleShowHidePasswordText:(UIButton*)sender {
     if ( sender.selected ){
-        [sender setSelected:FALSE];
+        [sender setSelected:NO];
     } else {
-        [sender setSelected:TRUE];
+        [sender setSelected:YES];
     }
     
     if(sender.tag == 1) {

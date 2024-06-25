@@ -205,8 +205,4 @@ interactiveVC:(NSViewController *)interactiveVC
     return status.state == kSyncOperationStateInProgress;
 }
 
-- (void)removeDatabaseAndLocalCopies:(MacDatabasePreferences*)database {
-    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database.uuid];
-}
-
 @end

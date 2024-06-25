@@ -13,7 +13,7 @@
 #import "SVProgressHUD.h"
 #import "Utils.h"
 #import "AutoFillManager.h"
-#import "AddNewSafeHelper.h"
+
 #import "StrongboxiOSFilesManager.h"
 #import "StrongboxUIDocument.h"
 #import <MobileCoreServices/MobileCoreServices.h>

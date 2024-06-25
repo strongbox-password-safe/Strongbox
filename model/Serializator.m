@@ -69,7 +69,7 @@
         
         NSString* errorSummary = @"Invalid Database. Debug Info:\n";
         
-        NSString* prefix = prefixBytes.hexString;
+        NSString* prefix = prefixBytes.upperHexString;
         NSString* utf8Prefix = [[NSString alloc] initWithData:prefixBytes encoding:NSUTF8StringEncoding];
         
         if([prefix hasPrefix:@"004D534D414D415250435259"]) { 
@@ -151,7 +151,7 @@
         return [Kdb1Database fileExtension];
     }
     
-    return @"dat";
+    return [Kdbx4Database fileExtension];
 }
 
 + (id)getAdaptor:(DatabaseFormat)format {

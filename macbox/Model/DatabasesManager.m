@@ -17,9 +17,6 @@
 
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
 
-
-
-
 @property MutableOrderedDictionary<NSString*, DatabaseMetadata*>* backingDatabases;
 @property (readonly) MutableOrderedDictionary<NSString*, DatabaseMetadata*>* databases;
 
@@ -210,18 +207,13 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     }];
 }
 
-- (DatabaseMetadata*)addOrGet:(NSURL *)url {
-    DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
+- (DatabaseMetadata*)addOrGet:(NSURL *)maybeManagedUrl {
+    DatabaseMetadata *safe = [self getDatabaseByFileUrl:maybeManagedUrl];
     if(safe) {
         return safe;
     }
     
-    NSURL* effectiveFileUrl = url;
-    if ( [url.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-        NSURLComponents* components =  [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
-        components.scheme = kStrongboxFileUrlScheme;
-        effectiveFileUrl = components.URL;
-    }
+    NSURL* effectiveFileUrl = fileUrlFromManagedUrl(maybeManagedUrl);
     
     NSError* error;
     NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:effectiveFileUrl readOnly:NO error:&error];
@@ -229,9 +221,9 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
         NSLog(@"Could not get Bookmark for this database will continue without... [%@]", error);
     }
 
-    StorageProvider provider = storageProviderFromUrl(url);
+    StorageProvider provider = storageProviderFromUrl(maybeManagedUrl);
      
-    NSString* nickName = [url.lastPathComponent stringByDeletingPathExtension];
+    NSString* nickName = [maybeManagedUrl.lastPathComponent stringByDeletingPathExtension];
     
     nickName = nickName ? nickName : NSLocalizedString(@"generic_unknown", @"Unknown");
     
@@ -239,7 +231,7 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     
     safe = [[DatabaseMetadata alloc] initWithNickName:nickName
                                       storageProvider:provider
-                                              fileUrl:url
+                                              fileUrl:maybeManagedUrl
                                           storageInfo:fileIdentifier];
 
     [DatabasesManager.sharedInstance add:safe];

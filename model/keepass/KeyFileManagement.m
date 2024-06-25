@@ -248,16 +248,19 @@ BOOL isAll64CharactersAreHex(NSData* data) {
                 NSData* key = str.dataFromHex;
                 
                 if ( key ) {
+                    NSString* actualHash = key.sha256.upperHexString;
+                    NSString* actualPrefix = [actualHash substringToIndex:8];
+
                     NSXMLElement* elem = (NSXMLElement*)data;
                     NSXMLNode* expectedHash = [elem.attributes firstOrDefault:^BOOL(NSXMLNode * _Nonnull obj) {
                         return [obj.name isEqualToString:kHashAttributeName];
                     }];
                     
+                    NSString* expected = expectedHash ? expectedHash.stringValue : nil;
+                    NSString* expectedPrefix = expectedHash ? expected.uppercaseString : nil;
                     
-
-                    NSString* actualHash = key.sha256.hexString;
-                    if ( expectedHash && expectedHash.stringValue.length && ![[actualHash substringToIndex:8] isEqualToString:expectedHash.stringValue] ) {
-                        NSLog(@"WARNWARN: Hash check failed for V2 Key File");
+                    if ( !actualPrefix || !expectedPrefix || ![actualPrefix isEqualToString:expectedPrefix] ) {
+                        NSLog(@"🔴 WARNWARN: Hash check failed for V2 Key File");
                         return nil;
                     }
 

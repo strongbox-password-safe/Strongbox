@@ -24,6 +24,7 @@
 #import "NSDate+Extensions.h"
 #import "macOSSpinnerUI.h"
 #import "StrongboxMacFilesManager.h"
+#import "AboutViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -38,7 +39,7 @@
 @property (readonly) ViewModel*_Nullable viewModel;
 @property (readonly) MacDatabasePreferences*_Nullable databaseMetadata;
 
-@property (weak) IBOutlet NSTextField *textFieldVersion;
+@property (weak) IBOutlet ClickableTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
 @property (weak) IBOutlet KSPasswordField *textFieldMasterPassword;
 @property (weak) IBOutlet NSButton *checkboxShowAdvanced;
@@ -104,7 +105,10 @@
     
     NSString* about = [NSString stringWithFormat:fmt2, [Utils getAppVersion]];
     self.textFieldVersion.stringValue = about;
-    
+    self.textFieldVersion.onClick = ^{
+        [AboutViewController show];
+    };
+
     [self customizeLockStackViewSpacing];
     
     NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch");
@@ -876,6 +880,10 @@
     self.viewModel.showAdvancedUnlockOptions = !self.viewModel.showAdvancedUnlockOptions;
     
     [self bindShowAdvancedOnUnlockScreen];
+}
+
+- (IBAction)onShowPasswordGenerator:(id)sender {
+    [PasswordGenerator.sharedInstance show];
 }
 
 

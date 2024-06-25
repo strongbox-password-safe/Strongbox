@@ -10,11 +10,17 @@
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "SelectedStorageParameters.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 typedef void (^SelectStorageCompletion)(SelectedStorageParameters *params);
 
 @interface SelectStorageProviderController : UITableViewController
+
++ (UINavigationController*)navControllerFromStoryboard;
 
 @property (nonatomic) BOOL existing;
 @property (nonatomic, copy) SelectStorageCompletion onDone;
 
 @end
+
+NS_ASSUME_NONNULL_END

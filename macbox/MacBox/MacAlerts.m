@@ -129,7 +129,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
         [alert setMessageText:message];
         
         if(error && error.localizedDescription) {
-            [alert setInformativeText:error.localizedDescription];
+            [alert setInformativeText: [NSString stringWithFormat:@"[%ld] %@", error.code, error.localizedDescription]];
         }
         
         [alert setAlertStyle:NSAlertStyleWarning];

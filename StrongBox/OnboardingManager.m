@@ -34,6 +34,7 @@
 #import "SaleScheduleManager.h"
 #import "GenericOnboardingViewController.h"
 #import "ExportHelper.h"
+#import <UserNotifications/UserNotifications.h>
 
 @interface OnboardingManager ()
 
@@ -70,6 +71,7 @@
 
     id<OnboardingModule> businessActivation = [self getBusinessActivationModule];
     id<OnboardingModule> welcomeToStrongbox = [self getFirstRunWelcomeToStrongboxModule];
+
     id<OnboardingModule> freeTrial = [self getFreeTrialOnboardingModule];
     
     id<OnboardingModule> autoFill = [self getAutoFillOnboardingModule];
@@ -133,14 +135,22 @@
     id<OnboardingModule> scheduledExportOnboardingModule = [self getScheduledExportOnboardingModule:model];
     id<OnboardingModule> scheduledExportModule = [self getScheduledExportModule:model];
     id<OnboardingModule> quickLaunchAppLockWarning = [self getQuickLaunchAppLockWarningModule:model];
+
+#ifndef NO_NETWORKING
+    id<OnboardingModule> notifications = [self getRequestNotificationPermissionModule:model];
+#endif
     
     id<OnboardingModule> argon2MemReduction = [self getArgon2ReductionOnboardingModule:model];
     id<OnboardingModule> kdbxUpgrade = [self getKdbxUpgradeOnboardingModule:model];
     
     id<OnboardingModule> allDoneWelcomeModule = [self getAllDoneWelcomeModule:model];
     
+
     NSArray<id<OnboardingModule>> *onboardingItems = @[firstUnlock,
                                                        convenienceUnlock,
+#ifndef NO_NETWORKING
+                                                       notifications,
+#endif
                                                        expiry,
                                                        autoFill,
                                                        scheduledExportOnboardingModule,
@@ -149,7 +159,7 @@
                                                        argon2MemReduction,
                                                        kdbxUpgrade,
                                                        allDoneWelcomeModule];
-
+    
     
     
     if ( model.isDuressDummyDatabase ) {
@@ -517,6 +527,89 @@
 
     return module;
 }
+
+#ifndef NO_NETWORKING
+- (id<OnboardingModule>)getRequestNotificationPermissionModule:(Model*)model {
+    GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];
+    module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
+        if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+            return NO;
+        }
+        if ( model.metadata.storageProvider != kCloudKit ) {
+            return NO;
+        }
+        if ( AppPreferences.sharedInstance.hasGotUserNotificationsPermissions ) {
+            return NO;
+        }
+        if ( AppPreferences.sharedInstance.lastAskToEnableNotifications != nil &&
+            ![AppPreferences.sharedInstance.lastAskToEnableNotifications isMoreThanXDaysAgo:7] ) {
+            return NO;
+        }
+        
+        return [self isUserNotificationsNotDetermined];
+    };
+    
+    if (@available(iOS 17.0, *)) {
+        module.symbolEffect = [[[[NSSymbolVariableColorEffect effect] effectWithIterative] effectWithDimInactiveLayers] effectWithNonReversing];
+    }
+
+    module.image = [UIImage systemImageNamed:@"iphone.radiowaves.left.and.right"];
+    
+    module.imageSize = 120;
+    
+    module.header = NSLocalizedString(@"enable_notifications_onboarding_title", @"Stay In Sync");
+    
+    NSString* msg = NSLocalizedString(@"enable_notifications_onboarding_message", @"To stay current and keep your databases up to date, please allow Strongbox to receive notifications.");
+    module.message = msg;
+
+    module.button1 = NSLocalizedString(@"enable_notifications_onboarding_sounds_good_allow", @"Sounds Good, Allow");
+    module.button2 = NSLocalizedString(@"generic_not_right_now", @"Not Right Now");
+    
+    module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
+        AppPreferences.sharedInstance.lastAskToEnableNotifications = NSDate.date;
+        
+        if ( buttonIdCancelIsZero == 0 ) {
+            onDone(NO, YES); 
+            return;
+        }
+        else if ( buttonIdCancelIsZero == 1 ) {
+            [CloudKitDatabasesInteractor.shared requestUserNotificationPermissionsWithCompletionHandler:^(BOOL granted, NSError * _Nullable error) {
+                if ( error ) {
+                    NSLog(@"🔴 Error request permissions [%@]", error);
+
+                    [Alerts error:viewController error:error];
+                }
+                else {
+                    AppPreferences.sharedInstance.hasGotUserNotificationsPermissions = granted;
+                    onDone(NO, NO);
+                }
+            }];
+        }
+        else {
+            onDone(NO, NO);
+        }
+    };
+
+    return module;
+}
+#endif
+
+- (BOOL)isUserNotificationsNotDetermined {
+    __block BOOL ret = NO;
+    
+    dispatch_group_t g = dispatch_group_create();
+    dispatch_group_enter(g);
+    
+    [UNUserNotificationCenter.currentNotificationCenter getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        ret = settings.authorizationStatus == UNAuthorizationStatusNotDetermined;
+        dispatch_group_leave(g);
+    }];
+    
+    dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+    
+    return ret;
+}
+
 
 - (id<OnboardingModule>)getScheduledExportModule:(Model*)model {
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];

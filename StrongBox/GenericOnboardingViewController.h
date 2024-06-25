@@ -31,6 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) UIColor* button3Color;
 
 @property UIImage* image;
+@property (nullable) NSSymbolEffect* symbolEffect API_AVAILABLE(ios(17.0));
+
 @property OnButtonClicked onButtonClicked;
 @property BOOL hideDismiss;
 @property NSUInteger imageSize;

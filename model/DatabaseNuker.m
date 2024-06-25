@@ -9,11 +9,17 @@
 #import "DatabaseNuker.h"
 #import "AutoFillManager.h"
 #import "BackupsManager.h"
+#import "WorkingCopyManager.h"
 
 #if TARGET_OS_IPHONE
 
+#import "LocalDeviceStorageProvider.h"
+#import "AppleICloudProvider.h"
+
 #import "SyncManager.h"
 #import "AppPreferences.h"
+
+#import "Strongbox-Swift.h"
 
 #else
 
@@ -24,19 +30,83 @@
 
 @implementation DatabaseNuker
 
-+ (void)nuke:(METADATA_PTR)database {
-    NSLog(@"☢️ Nuking Database: [%@]... ⚛", database);
++ (void)nuke:(METADATA_PTR)database deleteUnderlyingIfSupported:(BOOL)deleteUnderlyingIfSupported completion:(void (^)(NSError * _Nullable))completion {
+    NSLog(@"☢️ Nuking Database: [%@]... ⚛ - Delete Underlying = [%hhd]", database, deleteUnderlyingIfSupported);
+    
+    if ( !deleteUnderlyingIfSupported ) {
+        return [DatabaseNuker completeDatabaseNuke:database partialError:nil completion:completion];
+    }
+    
+    
+    
+    if (database.storageProvider == kCloudKit) {
+#ifndef NO_NETWORKING
+        [CloudKitDatabasesInteractor.shared deleteWithDatabase:database
+                                             completionHandler:^(NSError * _Nullable error) {
+            if ( error ) {
+                NSLog(@"🔴 Error deleting cloudkit - will continue trying to remove: %@", error);
+            }
+            else {
+                NSLog(@"🟢 CloudKit Database successfully deleted from cloud");
+            }
 
+            [DatabaseNuker completeDatabaseNuke:database partialError:error completion:completion];
+        }];
+#else
+        [DatabaseNuker completeDatabaseNuke:database partialError:nil completion:completion];
+#endif
+    }
+#if TARGET_OS_IPHONE
+    else if (database.storageProvider == kLocalDevice) {
+        [[LocalDeviceStorageProvider sharedInstance] delete:database
+                                                 completion:^(NSError *error) {
+            if (error != nil) {
+                NSLog(@"🔴 Error deleting local file - will continue trying to remove: %@", error);
+            }
+            else {
+                NSLog(@"Removed Local File Successfully.");
+            }
+            
+            [DatabaseNuker completeDatabaseNuke:database partialError:error completion:completion];
+        }];
+    }
+    else if (database.storageProvider == kiCloud) {
+        [[AppleICloudProvider sharedInstance] delete:database
+                                          completion:^(NSError *error) {
+            if(error) {
+                NSLog(@"Error deleting iCloud file - will continue trying to remove: %@", error);
+            }
+            else {
+                NSLog(@"iCloud file removed");
+            }
+            
+            [DatabaseNuker completeDatabaseNuke:database partialError:error completion:completion];
+        }];
+    }
+#endif
+    else {
+        [DatabaseNuker completeDatabaseNuke:database partialError:nil completion:completion];
+    }
+}
+
++ (void)completeDatabaseNuke:(METADATA_PTR)database 
+                partialError:(NSError* _Nullable)partialError
+                  completion:(void(^)(NSError* _Nullable error))completion {
     if ( database.autoFillEnabled ) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     }
+    
+    
 
     [BackupsManager.sharedInstance deleteAllBackups:database];
 
-#if TARGET_OS_IPHONE
-    [SyncManager.sharedInstance removeDatabaseAndLocalCopies:database];
-    [database clearKeychainItems];
     
+    
+    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database.uuid];
+
+#if TARGET_OS_IPHONE
+    [database clearKeychainItems];
+
     
     
     if([AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
@@ -47,11 +117,8 @@
         AppPreferences.sharedInstance.autoFillQuickLaunchUuid = nil;
     }
     
-    
-    
     [database removeFromDatabasesList];
 #else
-    [MacSyncManager.sharedInstance removeDatabaseAndLocalCopies:database];
     [database clearSecureItems];
     
     [SSHAgentRequestHandler.shared clearAllOfflinePublicKeys];
@@ -60,6 +127,8 @@
 #endif
 
     NSLog(@"☢️ Database Nuked. ⚛");
+    
+    completion(partialError);
 }
 
 @end

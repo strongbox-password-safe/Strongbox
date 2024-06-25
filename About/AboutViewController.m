@@ -47,7 +47,11 @@
 
     self.aboutTextView.layer.borderWidth = 0.5f;
 
-    self.debugTextView.text = [DebugHelper getAboutDebugString];
+    [DebugHelper getAboutDebugString:^(NSString * _Nonnull debug) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.debugTextView.text = debug;
+        });
+    }];
     
     NSURL* rtfPath = [NSBundle.mainBundle URLForResource:@"" withExtension:@"rtf"];
     
@@ -66,9 +70,13 @@
 }
 
 - (IBAction)onCopy:(id)sender {
-    [ClipboardManager.sharedInstance copyStringWithNoExpiration:[DebugHelper getAboutDebugString]];
-    
-    [Alerts info:self title:@"Done" message:@"Debug Info copied to clipboard"];
+    [DebugHelper getAboutDebugString:^(NSString * _Nonnull debug) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ClipboardManager.sharedInstance copyStringWithNoExpiration:debug];
+            
+            [Alerts info:self title:@"Done" message:@"Debug Info copied to clipboard"];
+        });
+    }];
 }
 
 - (IBAction)onUpgradeOptions:(id)sender {

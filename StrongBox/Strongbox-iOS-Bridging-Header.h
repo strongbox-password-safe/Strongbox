@@ -65,4 +65,6 @@
 #import "KeyFile.h"
 #import "ClipboardManager.h"
 #import "DatabaseNuker.h"
+#import "SelectStorageProviderController.h"
 
+#import "Serializator.h"

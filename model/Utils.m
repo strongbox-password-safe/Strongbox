@@ -223,7 +223,7 @@ NSString* keePassStringIdFromUuid(NSUUID* uuid) {
     uuid_t uid;
     [uuid getUUIDBytes:(uint8_t*)&uid];
     
-    return [NSData dataWithBytes:uid length:sizeof(uuid_t)].hexString;
+    return [NSData dataWithBytes:uid length:sizeof(uuid_t)].upperHexString;
 }
 
 NSUUID* uuidFromKeePassStringId(NSString* foo) {
@@ -649,6 +649,15 @@ NSString* localizedOnOrOffFromBool(BOOL george) {
 }
 
 #if TARGET_OS_IPHONE
+
+#ifndef IS_APP_EXTENSION
++ (BOOL)isAppInForeground {
+    UIApplicationState state = UIApplication.sharedApplication.applicationState;
+    return state == UIApplicationStateActive;
+
+}
+#endif
+
 #else
 BOOL checkForScreenRecordingPermissionsOnMac(void) {
     

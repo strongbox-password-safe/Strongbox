@@ -6,13 +6,13 @@
 //  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-#import "AddDatabaseSelectStorageVC.h"
+#import "SelectStorageLocationVC.h"
 #import "SafeStorageProvider.h"
 #import "MacAlerts.h"
 #import "SafeStorageProviderFactory.h"
 #import "Utils.h"
 
-@interface AddDatabaseSelectStorageVC () <NSOutlineViewDelegate, NSOutlineViewDataSource>
+@interface SelectStorageLocationVC () <NSOutlineViewDelegate, NSOutlineViewDataSource>
 
 @property (weak) IBOutlet NSOutlineView *outlineView;
 @property (weak) IBOutlet NSButton *buttonSelect;
@@ -20,17 +20,21 @@
 @property BOOL hasLoaded;
 @property NSMutableDictionary<NSString*, NSArray<StorageBrowserItem*>*>* itemsCache;
 
+@property (weak) IBOutlet NSTextField *labelTitle;
+@property (weak) IBOutlet NSTextField *labelSubtitle;
+@property (weak) IBOutlet NSButton *buttonSelectRoot;
+
 @end
 
 static NSString * const kRootItemCacheKey = @"AddDatabaseSelectStorageVC-Root-Item-Cache-Key-MMcG";
 static NSString * const kLoadingItemIdentifier = @"AddDatabaseSelectStorageVC-Loading-Item-Key-MMcG";
 static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorageVC-Loading-Item-ERROR-MMcG";
 
-@implementation AddDatabaseSelectStorageVC
+@implementation SelectStorageLocationVC
 
 + (instancetype)newViewController {
     NSStoryboard* storyboard = [NSStoryboard storyboardWithName:@"AddDatabaseSelectStorageProvider" bundle:nil];
-    AddDatabaseSelectStorageVC* sharedInstance = [storyboard instantiateInitialController];
+    SelectStorageLocationVC* sharedInstance = [storyboard instantiateInitialController];
     return sharedInstance;
 }
 
@@ -52,47 +56,66 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
     self.outlineView.delegate = self;
     
     self.outlineView.doubleAction = @selector(onSelect:);
+    
+    if ( self.createMode ) {
+        self.labelTitle.stringValue = NSLocalizedString(@"choose_storage_loc", @"Choose Storage Location");
+        self.labelSubtitle.stringValue = NSLocalizedString(@"nav_to_storage_and_select", @"Please navigate to where you would like to store your database and click 'Select'.");
+    }
+    
+    self.buttonSelectRoot.hidden = !self.createMode;
+}
+
+- (void)bindUi {
+    self.buttonSelect.enabled = [self isValidItemSelected];
 }
 
 - (void)loadItems:(StorageBrowserItem*)sbi {
-
+    
+    
+    __weak SelectStorageLocationVC* weakSelf = self;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        [self.provider list:sbi.providerData
-             viewController:self
-                 completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> * _Nonnull items, const NSError * _Nonnull error) {
+        [weakSelf.provider list:sbi.providerData
+                 viewController:weakSelf
+                     completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> * _Nonnull items, const NSError * _Nonnull error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if ( userCancelled ) {
-                    [self onCancel:nil];
-                }
-                else {
-                    NSString* key = [self getCacheKey:sbi];
-                    if ( error ) {
-                        NSLog(@"error %@", error);
-                        self.itemsCache[key] = @[[StorageBrowserItem itemWithName:error.description identifier:kLoadingItemErrorIdentifier folder:NO providerData:nil]];
-                    }
-                    else {
-                        
-                        
-                        NSArray<StorageBrowserItem*>* sorted = [items sortedArrayUsingComparator:^NSComparisonResult(StorageBrowserItem*  _Nonnull obj1, StorageBrowserItem*  _Nonnull obj2) {
-                            if(obj1.folder && !obj2.folder) {
-                                return NSOrderedAscending;
-                            }
-                            else if(!obj1.folder && obj2.folder) {
-                                return NSOrderedDescending;
-                            }
-                            else {
-                                return finderStringCompare(obj1.name, obj2.name);
-                            }
-                        }];
-                        
-                        self.itemsCache[key] = sorted;
-                    }
-                    [self.outlineView reloadItem:sbi reloadChildren:YES];
-                }
+                [weakSelf onListComplete:sbi userCancelled:userCancelled items:items error:error];
             });
         }];
     });
+}
+
+- (void)onListComplete:(StorageBrowserItem*)sbi userCancelled:(BOOL)userCancelled items:(NSArray<StorageBrowserItem *> * _Nonnull)items error:(const NSError * _Nonnull)error {
+    if ( userCancelled ) {
+        [self onCancel:nil];
+    }
+    else {
+        NSString* key = [self getCacheKey:sbi];
+        
+        if ( error ) {
+            NSLog(@"error %@", error);
+            self.itemsCache[key] = @[[StorageBrowserItem itemWithName:error.description identifier:kLoadingItemErrorIdentifier folder:NO providerData:nil]];
+        }
+        else {
+            
+            
+            NSArray<StorageBrowserItem*>* sorted = [items sortedArrayUsingComparator:^NSComparisonResult(StorageBrowserItem*  _Nonnull obj1, StorageBrowserItem*  _Nonnull obj2) {
+                if(obj1.folder && !obj2.folder) {
+                    return NSOrderedAscending;
+                }
+                else if(!obj1.folder && obj2.folder) {
+                    return NSOrderedDescending;
+                }
+                else {
+                    return finderStringCompare(obj1.name, obj2.name);
+                }
+            }];
+            
+            self.itemsCache[key] = sorted;
+        }
+        
+        [self.outlineView reloadItem:sbi reloadChildren:YES];
+    }
 }
 
 - (NSString*)getCacheKey:(StorageBrowserItem*)sbi {
@@ -171,7 +194,8 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
         cell.alphaValue = 0.7f;
     }
     
-    BOOL enabled = !sbi.disabled;
+    BOOL isFile = !sbi.folder;
+    BOOL enabled = !sbi.disabled && ((!self.createMode) || (!isFile && self.createMode));
     
     cell.textField.enabled = enabled;
     cell.textField.textColor = enabled ? nil : NSColor.secondaryLabelColor;
@@ -183,15 +207,14 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
 - (BOOL)outlineView:(NSOutlineView *)outlineView shouldSelectItem:(id)item {
     StorageBrowserItem* sbi = item;
 
-    return !sbi.disabled;
+    BOOL isFile = !sbi.folder;
+    BOOL shouldSelect = !sbi.disabled && ((!self.createMode) || (!isFile && self.createMode));
+
+    return shouldSelect;
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
     [self bindUi];
-}
-
-- (void)bindUi {
-    self.buttonSelect.enabled = [self isValidItemSelected];
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -205,17 +228,27 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
     }
     
     StorageBrowserItem* item = [self.outlineView itemAtRow:self.outlineView.selectedRow];
+    
+    return [self isValidItem:item];
+}
 
+- (BOOL)isValidItem:(StorageBrowserItem*)item {
     if ( [item.identifier isEqualToString:kLoadingItemIdentifier] ||
          [item.identifier isEqualToString:kLoadingItemErrorIdentifier]) {
         return NO;
     }
-    
+        
     if ( item.folder ) {
-        return NO;
+        return self.createMode;
     }
-    
-    return YES;
+    else {
+        return !self.createMode;
+    }
+}
+
+- (IBAction)onSelectRoot:(id)sender {
+    self.onDone(YES, nil);
+    [self.presentingViewController dismissViewController:self];
 }
 
 - (IBAction)onSelect:(id)sender {

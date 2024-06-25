@@ -13,7 +13,6 @@
 #import "OfflineDetector.h"
 #import "LocalDeviceStorageProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
-#import "AppleICloudProvider.h"
 #import "StrongboxiOSFilesManager.h"
 #import "LocalDatabaseIdentifier.h"
 #import "DatabaseModel.h"
@@ -176,17 +175,6 @@ interactiveVC:(UIViewController *)interactiveVC
     return [SafeStorageProviderFactory getStorageDisplayName:database];
 }
 
-- (void)removeDatabaseAndLocalCopies:(DatabasePreferences*)database {
-    if (database.storageProvider == kLocalDevice) {
-        [[LocalDeviceStorageProvider sharedInstance] delete:database completion:nil];
-    }
-    else if (database.storageProvider == kiCloud) {
-        [[AppleICloudProvider sharedInstance] delete:database completion:nil];
-    }
-
-    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database.uuid];
-}
-
 
 
 
@@ -338,7 +326,10 @@ interactiveVC:(UIViewController *)interactiveVC
         NSError* error;
         NSDictionary *att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
         
-        [safe addWithDuplicateCheck:snapshot initialCacheModDate:att.fileModificationDate];
+        NSError* addError;
+        if ( ![safe addWithDuplicateCheck:snapshot initialCacheModDate:att.fileModificationDate error:&addError] ) {
+            NSLog(@"Error adding database - error = [%@]", error);
+        }
     }
     
     

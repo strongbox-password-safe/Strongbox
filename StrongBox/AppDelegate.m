@@ -38,7 +38,7 @@
 
 #endif
 
-#import "AutoFillDarwinNotification.h"
+
 
 #import "Strongbox-Swift.h"
 
@@ -101,38 +101,22 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     }
     
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
-            
-
         
+#ifndef NO_NETWORKING
+    [self initializeCloudKit];
+#endif
+    
     return YES;
 }
-
-
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)application:(UIApplication *)application userDidAcceptCloudKitShareWithMetadata:(CKShareMetadata *)cloudKitShareMetadata {
 #ifndef NO_NETWORKING
     NSLog(@"userDidAcceptCloudKitShareWithMetadata: [%@]", cloudKitShareMetadata);
-    
-    if (@available(iOS 15.0, *)) {
-        [CloudKitDatabasesInteractor.shared acceptShareWithMetadata:cloudKitShareMetadata 
-                                                  completionHandler:^(NSError * _Nullable error) {
-            NSLog(@"acceptShareWithMetadata done with [%@]", error);
-        }];
-    }
+ 
+    [CloudKitDatabasesInteractor.shared acceptShareWithMetadata:cloudKitShareMetadata
+                                              completionHandler:^(NSError * _Nullable error) {
+        NSLog(@"acceptShareWithMetadata done with [%@]", error);
+    }];
 #endif
 }
 
@@ -153,7 +137,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
 - (void)markDirectoriesForBackupInclusion {
     [StrongboxFilesManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
-                                               importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
+                                                         importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
 }
 
 - (void)performEarlyBasicICloudInitialization {
@@ -165,17 +149,43 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     
     [iCloudSafesCoordinator.sharedInstance initializeiCloudAccess];
-
-
-
-
-
-
-
-
-
-
 }
+
+
+
+#ifndef NO_NETWORKING
+- (void)initializeCloudKit {
+    [CloudKitDatabasesInteractor.shared initializeWithCompletionHandler:^(NSError * _Nullable error ) {
+        if ( error ) {
+            NSLog(@"🔴 Error initializing CloudKit: [%@]", error); 
+        }
+        else {
+            NSLog(@"🟢 CloudKit successfully initialized.");
+        }
+    }];
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSLog(@"🟢 didRegisterForRemoteNotificationsWithDeviceToken [%@]", deviceToken.base64String);
+    
+    [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:YES error:nil];
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"🔴 didFailToRegisterForRemoteNotificationsWithError - [%@]", error);
+    
+    [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:NO error:error];
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo 
+fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler {
+    [CloudKitDatabasesInteractor.shared onCloudKitDatabaseChangeNotification];
+    
+    completionHandler(UIBackgroundFetchResultNoData);
+}
+#endif
+
+
 
 - (void)cleanupWorkingDirectories:(NSDictionary *)launchOptions {
     if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
@@ -188,6 +198,8 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 }
 
 - (void)initializeInstallSettingsAndLaunchCount {
+    UIApplication.sharedApplication.applicationIconBadgeNumber = 0;
+    
     [AppPreferences.sharedInstance incrementLaunchCount];
     
     if(AppPreferences.sharedInstance.installDate == nil) {
@@ -281,9 +293,11 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     [self performedScheduledEntitlementsCheck];
 
-    
-    
-    [self startOrStopWiFiSyncServer];
+#ifndef NO_NETWORKING
+    if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        [self startOrStopWiFiSyncServer];
+    }
+#endif
     
     
     
@@ -292,24 +306,23 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     self.enterBackgroundTime = nil;
 }
 
+#ifndef NO_NETWORKING
 - (void)startOrStopWiFiSyncServer {
-#ifndef NO_NETWORKING 
     NSError* error;
     if (! [WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
         NSLog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
     }
-#endif
 }
 
 - (void)stopWiFiSyncServer {
-#ifndef NO_NETWORKING 
-    NSError* error;
     [WiFiSyncServer.shared stopWith:nil]; 
-#endif
 }
+#endif
 
 - (void)applicationWillResignActive:(UIApplication *)application {
+#ifndef NO_NETWORKING
     [self stopWiFiSyncServer];
+#endif
     
     self.appLockSuppressedForBiometricAuth = NO;
     if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
@@ -384,7 +397,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 
 
 - (void)showPrivacyShieldView {
-    NSLog(@"showPrivacyShieldView - [%@]", self.privacyScreen);
+
 
     if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeNone ) {
         return;
@@ -427,7 +440,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (void)hidePrivacyShield:(NSInteger)identifier {
-    NSLog(@"hidePrivacyShield - [%ld]-[%ld]", (long)self.privacyScreenPresentationIdentifier, (long)identifier);
+
 
     if ( self.privacyScreen && identifier == self.privacyScreenPresentationIdentifier ) {
         UIView* tmp = self.privacyScreen;
@@ -436,10 +449,10 @@ void uncaughtExceptionHandler(NSException *exception) {
     }
     else {
         if ( identifier == self.privacyScreenPresentationIdentifier ) {
-            NSLog(@"hidePrivacyShield - Privacy Screen not around to hide... NOP");
+
         }
         else {
-            NSLog(@"hidePrivacyShield- Privacy Screen - Will Not Hide because presentation id mismatch [%ld]-[%ld]", (long)self.privacyScreenPresentationIdentifier, (long)identifier);
+
         }
     }
 }

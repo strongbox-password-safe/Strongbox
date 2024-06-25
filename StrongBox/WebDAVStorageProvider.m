@@ -118,15 +118,15 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 
 
 
-- (void)create:(NSString *)nickName
-     extension:(NSString *)extension
+- (void)create:(NSString *)nickName 
+      fileName:(NSString *)fileName
           data:(NSData *)data
   parentFolder:(NSObject *)parentFolder
 viewController:(VIEW_CONTROLLER_PTR)viewController
-    completion:(void (^)(METADATA_PTR, const NSError *))completion {
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion {
     if(self.maintainSessionForListing && self.maintainedSessionForListings) { 
         [self createWithSession:nickName
-                      extension:extension
+                       fileName:fileName
                            data:data
                    parentFolder:parentFolder
                         session:self.maintainedSessionForListings
@@ -143,7 +143,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
             }
             
             [self createWithSession:nickName
-                          extension:extension
+                           fileName:fileName
                                data:data
                        parentFolder:parentFolder
                             session:session
@@ -155,15 +155,13 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 }
 
 - (void)createWithSession:(NSString *)nickName
-                extension:(NSString *)extension
+                 fileName:(NSString *)fileName
                      data:(NSData *)data
              parentFolder:(NSObject *)parentFolder
                   session:(DAVSession*)session
             configuration:(WebDAVSessionConfiguration*)configuration
            viewController:(VIEW_CONTROLLER_PTR)viewController
                completion:(void (^)(METADATA_PTR, NSError *))completion {
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
-    
     WebDAVProviderData* providerData = (WebDAVProviderData*)parentFolder;
     
     NSString* path;
@@ -171,14 +169,14 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSURL* ur = root.urlExtendedParse;
     
     if (ur == nil || ur.scheme == nil) {
-        path = [root stringByAppendingPathComponent:desiredFilename];
+        path = [root stringByAppendingPathComponent:fileName];
     }
     else {
         
         
         
 
-        path = [ur URLByAppendingPathComponent:desiredFilename].absoluteString; 
+        path = [ur URLByAppendingPathComponent:fileName].absoluteString; 
     }
         
     DAVPutRequest *request = [[DAVPutRequest alloc] initWithPath:path];

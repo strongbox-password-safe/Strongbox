@@ -60,6 +60,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
 + (BOOL)isUnique:(NSString *)nickName;
 + (BOOL)isValid:(NSString *)nickName;
+
++ (NSString*)getSuggestedNewDatabaseName;
 + (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested;
 
 + (MacDatabasePreferences*)addOrGet:(NSURL *)url;
@@ -186,6 +188,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property BOOL isSharedInCloudKit; 
+@property BOOL isOwnedByMeCloudKit;
 
 @end
 

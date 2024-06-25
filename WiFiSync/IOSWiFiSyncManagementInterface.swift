@@ -25,10 +25,6 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
         AppModel.shared.isEditing(id)
     }
 
-    func isSyncInProgress(id: String) -> Bool {
-        SyncManager.sharedInstance().syncInProgress(forDatabase: id)
-    }
-
     func getDatabaseSummaries(id: String?, _ completion: @escaping (([WiFiSyncDatabaseSummary]) -> Void)) {
         if let id {
             guard let database = DatabasePreferences.fromUuid(id) else {

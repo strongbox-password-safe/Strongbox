@@ -39,8 +39,38 @@
     return self;
 }
 
-- (void)create:(nonnull NSString *)nickName extension:(nonnull NSString *)extension data:(nonnull NSData *)data parentFolder:(NSObject * _Nullable)parentFolder viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController completion:(nonnull void (^)(METADATA_PTR _Nonnull, const NSError * _Nonnull))completion {
+- (void)create:(NSString *)nickName 
+      fileName:(NSString *)fileName 
+          data:(NSData *)data
+  parentFolder:(NSObject *)parentFolder
+viewController:(VIEW_CONTROLLER_PTR)viewController
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion {
+    NSURL* userSelectedSaveUrl = (NSURL*)parentFolder;
     
+    NSError* error = nil;
+    BOOL success = [data writeToURL:userSelectedSaveUrl options:kNilOptions error:&error];
+    if ( !success ) {
+        NSLog(@"🔴 MacFileBasedBookmarkStorageProvider - Error Saving New Database: [%@]", error);
+        completion ( nil, error );
+        return;
+    }
+    
+    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:userSelectedSaveUrl readOnly:NO error:&error];
+    
+    if (!fileIdentifier) {
+        NSLog(@"🔴 MacFileBasedBookmarkStorageProvider - Could not get Bookmark for this database at [%@]... [%@]", userSelectedSaveUrl, error);
+        completion(nil, error);
+        return;
+    }
+    
+    NSURL* managedSyncUrl = managedUrlFromFileUrl(userSelectedSaveUrl);
+
+    MacDatabasePreferences *ret = [MacDatabasePreferences templateDummyWithNickName:nickName
+                                                                    storageProvider:kLocalDevice
+                                                                            fileUrl:managedSyncUrl
+                                                                        storageInfo:fileIdentifier];
+    
+    completion(ret, nil);
 }
 
 - (void)delete:(nonnull METADATA_PTR)safeMetaData completion:(nonnull void (^)(const NSError * _Nullable))completion {

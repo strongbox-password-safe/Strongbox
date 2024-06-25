@@ -42,19 +42,11 @@ class WiFiSyncSettings: NSViewController {
         onOff.state = running ? .on : .off
         onOff.isEnabled = WiFiSyncServer.shared.wiFiSyncIsPossible
 
-        textFieldPasscode.stringValue = Settings.sharedInstance().wiFiSyncPasscode
-        if #available(macOS 12.0, *) {
-            textFieldPasscode.textColor = running ? .systemCyan : .secondaryLabelColor
-        } else {
-            textFieldPasscode.textColor = running ? .systemBlue : .secondaryLabelColor
-        }
+        textFieldPasscode.stringValue = Settings.sharedInstance().wiFiSyncPasscode ?? NSLocalizedString("generic_error", comment: "Error") 
+        textFieldPasscode.textColor = running ? .systemCyan : .secondaryLabelColor
 
         serviceName.stringValue = resolvedServiceName
-        if #available(macOS 12.0, *) {
-            serviceName.textColor = running ? .systemCyan : .secondaryLabelColor
-        } else {
-            serviceName.textColor = running ? .systemBlue : .secondaryLabelColor
-        }
+        serviceName.textColor = running ? .systemCyan : .secondaryLabelColor
 
         changePasscode.isEnabled = running
         changePasscode.isHidden = !running
@@ -80,7 +72,7 @@ class WiFiSyncSettings: NSViewController {
 
             let alert = MacAlerts()
             let newPasscode = alert.input(NSLocalizedString("wifi_sync_enter_new_passcode", comment: "Enter New Passcode"),
-                                          defaultValue: Settings.sharedInstance().wiFiSyncPasscode,
+                                          defaultValue: Settings.sharedInstance().wiFiSyncPasscode ?? "",
                                           allowEmpty: false)
 
             if let newPasscode {

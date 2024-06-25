@@ -103,7 +103,6 @@ import SwiftUI
 
 #else
 
-    @available(macOS 12.0, *)
     struct PasskeyWizardCreateNew: View {
         @Environment(\.dismiss) private var dismiss
 

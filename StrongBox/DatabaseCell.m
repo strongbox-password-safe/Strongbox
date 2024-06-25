@@ -168,6 +168,12 @@ rotateLastImage:(BOOL)rotateLastImage
 - (void)populateCell:(DatabasePreferences *)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill {
     SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [SyncManager.sharedInstance getSyncStatus:database].state;
     
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        if ( database.storageProvider != kLocalDevice && database.storageProvider != kFilesAppUrlBookmark ) {
+            disabled = YES;
+        }
+    }
+    
     NSArray* tints;
     NSArray<UIImage*>* statusImages =  [self getStatusImages:database syncState:syncState tints:&tints];
         
@@ -177,7 +183,7 @@ rotateLastImage:(BOOL)rotateLastImage
     
     UIImage* databaseIcon = AppPreferences.sharedInstance.showDatabaseIcon ? [SafeStorageProviderFactory getImageForProvider:database.storageProvider database:database] : nil;
 
-    if (disabled) {
+    if ( disabled ) {
         databaseIcon = AppPreferences.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel"] : nil;
         
         if (autoFill) {
@@ -219,17 +225,14 @@ rotateLastImage:(BOOL)rotateLastImage
         if ( shared ) {
             UIImage* cloudkitSharedIndicator = [UIImage systemImageNamed:@"person.2.fill"];
             
-            if (@available(iOS 15.0, *)) {
-                NSArray<UIColor*>* colors = @[UIColor.systemBlueColor, UIColor.systemGreenColor];
-                UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:colors];
-                UIImage* coloured = [cloudkitSharedIndicator imageByApplyingSymbolConfiguration:config];
-                
-                [ret addObject:coloured];
-            }
-            else {
-                [ret addObject:cloudkitSharedIndicator];
-            }
+            BOOL iOwn = database.isOwnedByMeCloudKit;
             
+            NSArray<UIColor*>* colors = iOwn ?  @[UIColor.systemGreenColor, UIColor.systemBlueColor] : @[UIColor.systemBlueColor, UIColor.systemGreenColor];
+            
+            UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:colors];
+            UIImage* coloured = [cloudkitSharedIndicator imageByApplyingSymbolConfiguration:config];
+            
+            [ret addObject:coloured];
             [tnts addObject:NSNull.null];
         }
     }

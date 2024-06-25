@@ -68,16 +68,11 @@ enum Icon {
         case .viewFinderCircleFill:
             return NSImage(systemSymbolName: "viewfinder.circle.fill", accessibilityDescription: nil)!
         case .sshKey:
-            if #available(macOS 12.0, *) {
-                return NSImage(systemSymbolName: "network.badge.shield.half.filled", accessibilityDescription: nil)!
-            }
-
-            return NSImage(systemSymbolName: "key", accessibilityDescription: nil)!
+            return NSImage(systemSymbolName: "network.badge.shield.half.filled", accessibilityDescription: nil)!
         case .passkey:
             if #available(macOS 12.3, *) {
                 return NSImage(systemSymbolName: "person.badge.key.fill", accessibilityDescription: nil)!
             }
-
             return NSImage(systemSymbolName: "key.fill", accessibilityDescription: nil)!
         case .algorithm:
             return NSImage(systemSymbolName: "function", accessibilityDescription: nil)!

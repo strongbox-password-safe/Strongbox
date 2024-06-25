@@ -42,7 +42,7 @@ typedef void (^StorageProviderGetModDateCompletionBlock)(BOOL storageIsAvailable
 @property (nonatomic, readonly) BOOL privacyOptInRequired;
 
 - (void)    create:(NSString *)nickName
-         extension:(NSString *)extension
+          fileName:(NSString *)fileName
               data:(NSData *)data
       parentFolder:(NSObject * _Nullable)parentFolder
     viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController

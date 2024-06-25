@@ -1305,6 +1305,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         present(vc, asPopoverRelativeTo: NSZeroRect, of: buttonPasswordPreferences, preferredEdge: .minY, behavior: .transient)
     }
 
+    @IBAction func onShowGenerator(_: Any) {
+        PasswordGenerator.sharedInstance.show()
+    }
+
     fileprivate func refreshSuggestionsMenu(_ menu: NSMenu, suggestions: [String], colorize: Bool, easyReadFont: Bool, image: NSImage? = nil) {
         while menu.items.count > 1 {
             menu.items.removeLast()

@@ -72,10 +72,7 @@ class BrowseTabViewController: UITabBarController {
         appearance.configureWithOpaqueBackground()
 
         tabBar.standardAppearance = appearance
-
-        if #available(iOS 15.0, *) {
-            tabBar.scrollEdgeAppearance = appearance
-        }
+        tabBar.scrollEdgeAppearance = appearance
     }
 
     override func viewDidLoad() {

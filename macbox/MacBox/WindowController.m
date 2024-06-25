@@ -26,7 +26,7 @@
 #import "Constants.h"
 #import "SelectPredefinedIconController.h"
 #import <WebKit/WebKit.h>
-#import "CreateFormatAndSetCredentialsWizard.h"
+#import "CreateDatabaseOrSetCredentialsWizard.h"
 #import "macOSSpinnerUI.h"
 #import "BiometricIdHelper.h"
 #import "DatabaseOnboardingTabViewController.h"
@@ -55,7 +55,7 @@
 
 @interface WindowController () <NSWindowDelegate>
 
-@property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
+@property (strong, nonatomic) CreateDatabaseOrSetCredentialsWizard *changeMasterPassword;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController; 
 @property (readonly, nullable) ViewModel* viewModel;
 @property (readonly) BOOL databaseIsLocked;
@@ -634,16 +634,14 @@ static NSString* getFreeTrialSuffix(void) {
                     return NO;
                 }
                 
-                if (@available(macOS 12.0, *)) {
-                    NSImageSymbolConfiguration* imageColour = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.systemRedColor];
-                    
-                    NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
-                    
-                    NSImage* image = [NSImage imageWithSystemSymbolName:@"trash.fill" accessibilityDescription:nil];
-                    NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
-                    
-                    menuItem.image = image2;
-                }
+                NSImageSymbolConfiguration* imageColour = [NSImageSymbolConfiguration configurationWithHierarchicalColor:NSColor.systemRedColor];
+                
+                NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
+                
+                NSImage* image = [NSImage imageWithSystemSymbolName:@"trash.fill" accessibilityDescription:nil];
+                NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
+                
+                menuItem.image = image2;
                 
                 if ( nodeSelected ) {
                     BOOL deleteWillOccur = ![self.viewModel canRecycle:item];
@@ -651,16 +649,14 @@ static NSString* getFreeTrialSuffix(void) {
                     NSString* loc = !deleteWillOccur ? NSLocalizedString(@"generic_recycle_item", @"Recycle Item") : NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
                     [menuItem setTitle:loc];
                     
-                    if (@available(macOS 12.0, *)) {
-                        NSImageSymbolConfiguration* imageColour = [NSImageSymbolConfiguration configurationWithHierarchicalColor:deleteWillOccur ? NSColor.systemRedColor : NSColor.systemGreenColor];
-                        
-                        NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
-                        
-                        NSImage* image = [NSImage imageWithSystemSymbolName:@"trash.fill" accessibilityDescription:nil];
-                        NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
-                        
-                        menuItem.image = image2;
-                    }
+                    NSImageSymbolConfiguration* imageColour = [NSImageSymbolConfiguration configurationWithHierarchicalColor:deleteWillOccur ? NSColor.systemRedColor : NSColor.systemGreenColor];
+                    
+                    NSImageSymbolConfiguration* imageLargeConfig = [imageColour configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge]];
+                    
+                    NSImage* image = [NSImage imageWithSystemSymbolName:@"trash.fill" accessibilityDescription:nil];
+                    NSImage* image2 = [image imageWithSymbolConfiguration:imageLargeConfig];
+                    
+                    menuItem.image = image2;
                     
                     return YES;
                 }
@@ -1539,11 +1535,9 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)promptToChangeMasterCredentials:(void (^)(BOOL okCancel))completion {
-    self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-    
-    self.changeMasterPassword.initialDatabaseFormat = self.viewModel.format;
-    self.changeMasterPassword.initialYubiKeyConfiguration = self.databaseMetadata.yubiKeyConfiguration;
-    self.changeMasterPassword.initialKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
+    self.changeMasterPassword = [CreateDatabaseOrSetCredentialsWizard newSetCredentialsWizard:self.viewModel.format 
+                                                                              keyFileBookmark:self.databaseMetadata.keyFileBookmark
+                                                                                yubiKeyConfig:self.databaseMetadata.yubiKeyConfiguration];
     
     [self.window beginSheet:self.changeMasterPassword.window
           completionHandler:^(NSModalResponse returnCode) {

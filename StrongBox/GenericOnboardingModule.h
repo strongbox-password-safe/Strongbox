@@ -30,6 +30,8 @@ typedef BOOL (^ShouldDisplayBlock)(Model* model);
 @property (nullable) NSNumber* buttonWidth;
 
 @property UIImage* image;
+@property NSSymbolEffect* symbolEffect API_AVAILABLE(ios(17.0));
+
 @property OnButtonClicked onButtonClicked;
 @property ShouldDisplayBlock onShouldDisplay;
 @property BOOL hideDismiss;

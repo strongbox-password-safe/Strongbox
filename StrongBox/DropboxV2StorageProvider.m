@@ -135,20 +135,18 @@
 
 }
 
-- (void)    create:(NSString *)nickName
-         extension:(NSString *)extension
-              data:(NSData *)data
-      parentFolder:(NSObject *)parentFolder
-    viewController:(VIEW_CONTROLLER_PTR)viewController
-        completion:(void (^)(METADATA_PTR metadata, const NSError *error))completion {
+- (void)create:(NSString *)nickName
+      fileName:(NSString *)fileName
+          data:(NSData *)data
+  parentFolder:(NSObject *)parentFolder
+viewController:(VIEW_CONTROLLER_PTR)viewController
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion {
     [self showProgressSpinner:@"" viewController:viewController];
-
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
 
     NSString *parentFolderPath = parentFolder ? ((DBFILESFolderMetadata *)parentFolder).pathLower : @"/";
 
     NSString *path = [NSString pathWithComponents:
-                      @[parentFolderPath, desiredFilename]];
+                      @[parentFolderPath, fileName]];
 
     [self createOrUpdate:viewController
                     path:path
@@ -157,7 +155,7 @@
         [self dismissProgressSpinner];
 
         if (error == nil) {
-            METADATA_PTR metadata = [self getDatabaseMetadata:desiredFilename parentPath:parentFolderPath nickName:nickName];
+            METADATA_PTR metadata = [self getDatabaseMetadata:fileName parentPath:parentFolderPath nickName:nickName];
             
             completion(metadata, nil);
         }

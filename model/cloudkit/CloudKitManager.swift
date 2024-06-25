@@ -9,8 +9,20 @@
 import CloudKit
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, *)
-@objc final class CloudKitManager: NSObject { 
+@objc
+class CloudKitManagerInstrumentation: NSObject {
+    @objc let recentErrors = ConcurrentCircularBuffer<NSError>(capacity: 16)
+    @objc var lastOperationDuration = 0.0
+    @objc var totalOperationDuration = 0.0
+    @objc var operationCount = 0
+
+    @objc
+    var averageDuration: Double {
+        totalOperationDuration / Double(operationCount)
+    }
+}
+
+class CloudKitManager {
     enum CloudKitManagerError: Error {
         case invalidParameters
         case invalidRemoteShare
@@ -20,56 +32,40 @@ import Foundation
         case generic(detail: String)
     }
 
-    enum State {
-        case loading
-        case loaded(private: [CloudKitHostedDatabase], shared: [CloudKitHostedDatabase]) 
-        case error(Error)
-    }
-
-    private(set) var state: State = .loading
-
     private static let ContainerIdentifier = "iCloud.com.strongbox"
     private static let DatabaseRecordType = "Database"
-    static let RecordZoneName = "Databases"
+    public static let RecordZoneName = "Databases"
 
     private lazy var cloudKitContainer = CKContainer(identifier: Self.ContainerIdentifier)
     private lazy var cloudKitPrivateDatabase = cloudKitContainer.privateCloudDatabase
     private let privateRecordZone = CKRecordZone(zoneName: CloudKitManager.RecordZoneName)
 
-    @objc static let shared = CloudKitManager()
+    var instrumentation: CloudKitManagerInstrumentation = .init()
 
-    override private init() {}
+    static let shared = CloudKitManager()
 
-    func refreshDatabases() async throws {
+    func initialize() async throws {
+        NSLog("Initializing CloudKit...")
+
+        try await createZoneIfNeeded()
+    }
+
+    func getCloudKitStatus() async throws -> CKAccountStatus {
+        try await CKContainer.default().accountStatus()
+    }
+
+    func getDatabases() async throws -> [CloudKitHostedDatabase] {
         NSLog("🟢 \(#function)...")
 
-        state = .loading
-
         do {
-            NSLog("Initializing CloudKit - Creating Zone if Needed...")
-
-            try await createZoneIfNeeded()
-
-            NSLog("Initializing CloudKit - Zone Creation Done")
-
             let (privateDatabases, sharedDatabases) = try await fetchPrivateAndShared()
 
-            state = .loaded(private: privateDatabases, shared: sharedDatabases)
-
-
-
-
-
-
-
+            return privateDatabases + sharedDatabases
         } catch {
             NSLog("🔴 Error in \(#function) = [\(error)]")
-            state = .error(error)
             throw error
         }
     }
-
-    
 
     func createDatabase(nickname: String, filename: String, modDate: Date, dataBlob: Data) async throws -> CloudKitHostedDatabase {
         let id = CKRecord.ID(zoneID: privateRecordZone.zoneID)
@@ -77,27 +73,26 @@ import Foundation
 
         ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.filename] = filename
 
-        return try await saveOrUpdate(ckRecord, sharedWithMe: false, nickName: nickname, modDate: modDate, dataBlob: dataBlob)
+        let ret = try await saveOrUpdate(ckRecord, sharedWithMe: false, nickName: nickname, modDate: modDate, dataBlob: dataBlob)
+
+        NSLog("🐞 Create New Database = [\(ret)]")
+
+        return ret
     }
 
     func getDatabase(id: CloudKitDatabaseIdentifier, includeDataBlob: Bool) async throws -> CloudKitHostedDatabase {
-        NSLog("🐞 \(#function) for \(id)")
+        let baseKeys = [
+            CloudKitHostedDatabase.RecordKeys.nickname,
+            CloudKitHostedDatabase.RecordKeys.filename,
+            CloudKitHostedDatabase.RecordKeys.modDate,
+            CKRecord.SystemFieldKey.share,
+        ]
+
+        let desiredKeys = includeDataBlob ? (baseKeys + [CloudKitHostedDatabase.RecordKeys.dataBlob]) : baseKeys
 
         let cloudKitDatabase = cloudKitContainer.database(with: id.sharedWithMe ? .shared : .private)
-        let config = CKOperation.Configuration()
-        config.qualityOfService = .userInitiated 
 
-        return try await cloudKitDatabase.configuredWith(configuration: config) { database in
-            var desiredKeys = [
-                CloudKitHostedDatabase.RecordKeys.nickname,
-                CloudKitHostedDatabase.RecordKeys.filename,
-                CloudKitHostedDatabase.RecordKeys.modDate,
-            ]
-
-            if includeDataBlob {
-                desiredKeys.append(CloudKitHostedDatabase.RecordKeys.dataBlob)
-            }
-
+        return try await executeCloudKitOperation(theDatabase: cloudKitDatabase) { database in
             let records = try await database.records(for: [CKRecord.ID(recordName: id.recordName, zoneID: id.zoneID)], desiredKeys: desiredKeys)
 
             guard let match = records.first else {
@@ -115,20 +110,18 @@ import Foundation
         }
     }
 
-    class func list(_ cloudKitDatabase: CKDatabase, _ zone: CKRecordZone) async throws -> [CloudKitHostedDatabase] {
+    func list(_ cloudKitDatabase: CKDatabase, _ zone: CKRecordZone) async throws -> [CloudKitHostedDatabase] {
         let query = CKQuery(recordType: Self.DatabaseRecordType, predicate: NSPredicate(value: true))
 
-        let desiredKeys = [
+        let desiredKeys: [CKRecord.FieldKey] = [
             CloudKitHostedDatabase.RecordKeys.nickname,
             CloudKitHostedDatabase.RecordKeys.filename,
             CloudKitHostedDatabase.RecordKeys.modDate,
+            CKRecord.SystemFieldKey.share,
             
         ]
 
-        let config = CKOperation.Configuration()
-        config.qualityOfService = .userInitiated 
-
-        return try await cloudKitDatabase.configuredWith(configuration: config) { database in
+        return try await executeCloudKitOperation(theDatabase: cloudKitDatabase) { database in
             var all: [CloudKitHostedDatabase] = []
 
             let (results, initialQueryCursor) = try await database.records(matching: query, inZoneWith: zone.zoneID, desiredKeys: desiredKeys)
@@ -148,9 +141,9 @@ import Foundation
                 currentQueryCursor = newQueryCursor
             }
 
-            for db in all {
-                NSLog("🐞 fetched: \(db.id) - \(db.nickname) in zone \(zone)")
-            }
+
+
+
 
             return all
         }
@@ -159,7 +152,9 @@ import Foundation
     func updateDatabase(_ id: CloudKitDatabaseIdentifier, dataBlob: Data) async throws -> CloudKitHostedDatabase {
         let existing = try await getDatabase(id: id, includeDataBlob: false) 
 
-        return try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, modDate: Date.now, dataBlob: dataBlob) 
+        
+
+        return try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, modDate: Date.now, dataBlob: dataBlob)
     }
 
     func rename(id: CloudKitDatabaseIdentifier, nickName: String) async throws -> CloudKitHostedDatabase {
@@ -169,13 +164,14 @@ import Foundation
     }
 
     func delete(id: CloudKitDatabaseIdentifier) async throws {
-        let cloudKitDatabase = cloudKitContainer.database(with: id.sharedWithMe ? .shared : .private) 
-        let config = CKOperation.Configuration()
-        config.qualityOfService = .userInitiated 
+        guard !id.sharedWithMe else {
+            NSLog("🔴 Cannot delete a database we don't own")
+            throw CloudKitManagerError.invalidParameters
+        }
 
         let existing = try await getDatabase(id: id, includeDataBlob: false) 
 
-        try await cloudKitDatabase.configuredWith(configuration: config) { database in
+        try await executeCloudKitOperation(theDatabase: cloudKitPrivateDatabase) { database in
             try await database.deleteRecord(withID: existing.associatedCkRecord.recordID)
         }
     }
@@ -185,30 +181,36 @@ import Foundation
             ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.nickname] = nickName
         }
 
+        var tmpAssetUrlToDelete: URL? = nil
+
+        defer {
+            if let tmpAssetUrlToDelete {
+                do {
+                    try FileManager.default.removeItem(at: tmpAssetUrlToDelete)
+                } catch {
+                    NSLog("🔴 CloudKitManager - Could not delete tmp file after update.")
+                }
+            }
+        }
+
         if let dataBlob {
             guard let modDate else {
                 NSLog("🔴 Datablob sent in for update without mod date?!")
                 throw CloudKitManagerError.invalidParameters
             }
 
-            let tmpUrl = try getTempAssetUrl(dataBlob) 
-            let dataBlobAsset = CKAsset(fileURL: tmpUrl)
-            ckRecord[CloudKitHostedDatabase.RecordKeys.dataBlob] = dataBlobAsset
+            let url = try getTempAssetUrl(dataBlob)
+            tmpAssetUrlToDelete = url
 
+            let dataBlobAsset = CKAsset(fileURL: url)
+            ckRecord[CloudKitHostedDatabase.RecordKeys.dataBlob] = dataBlobAsset
             ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.modDate] = modDate
         }
 
-        let start = CFAbsoluteTimeGetCurrent()
-
         let cloudKitDatabase = cloudKitContainer.database(with: sharedWithMe ? .shared : .private)
-        let config = CKOperation.Configuration()
-        config.qualityOfService = .userInitiated 
 
-        return try await cloudKitDatabase.configuredWith(configuration: config) { database in
+        return try await executeCloudKitOperation(theDatabase: cloudKitDatabase) { database in
             let ret = try await database.save(ckRecord)
-
-            let diff = CFAbsoluteTimeGetCurrent() - start
-            NSLog("🟢 Database updated \(ret) in \(diff) seconds")
 
             guard let db = CloudKitHostedDatabase(record: ret, sharedWithMe: false) else {
                 NSLog("🔴 Could not convert return CKRecord to a database object!")
@@ -219,19 +221,42 @@ import Foundation
         }
     }
 
+    func getShareRecord(database: CloudKitHostedDatabase) async throws -> (share: CKShare?, container: CKContainer) {
+        NSLog("🟢 \(#function) ENTER")
+        defer {
+            NSLog("🟢 \(#function) EXIT")
+        }
+
+        guard let existingShare = database.associatedCkRecord.share else {
+            return (nil, cloudKitContainer)
+        }
+
+        let cloudKitDatabase = cloudKitContainer.database(with: database.id.sharedWithMe ? .shared : .private)
+
+        return try await executeCloudKitOperation(theDatabase: cloudKitDatabase) { ckConfiguredDb in
+            guard let share = try await ckConfiguredDb.record(for: existingShare.recordID) as? CKShare else {
+                throw CloudKitManagerError.invalidRemoteShare
+            }
+
+            return (share, cloudKitContainer)
+        }
+    }
+
     func createShare(database: CloudKitHostedDatabase) async throws -> (share: CKShare, container: CKContainer) {
         NSLog("🟢 \(#function) ENTER")
         defer {
             NSLog("🟢 \(#function) EXIT")
         }
 
+        guard !database.id.sharedWithMe else {
+            NSLog("🔴 Cannot create share for a database we don't own!")
+            throw CloudKitManagerError.invalidParameters
+        }
+
         if let existingShare = database.associatedCkRecord.share {
             NSLog("🟢 \(#function) Found existing share, returning that...")
 
-            let config = CKOperation.Configuration()
-            config.qualityOfService = .userInitiated 
-
-            return try await cloudKitPrivateDatabase.configuredWith(configuration: config) { ckConfiguredDb in
+            return try await executeCloudKitOperation(theDatabase: cloudKitPrivateDatabase) { ckConfiguredDb in
                 guard let share = try await ckConfiguredDb.record(for: existingShare.recordID) as? CKShare else {
                     throw CloudKitManagerError.invalidRemoteShare
                 }
@@ -242,13 +267,10 @@ import Foundation
             NSLog("🟢 \(#function) No existing share found, creating...")
 
             let share = CKShare(rootRecord: database.associatedCkRecord)
-            share[CKShare.SystemFieldKey.title] = "Strongbox Database: \(database.nickname)" 
+            share[CKShare.SystemFieldKey.title] = "Strongbox Database: \(database.nickname)"
 
-            let config = CKOperation.Configuration()
-            config.qualityOfService = .userInitiated 
-
-            return try await cloudKitPrivateDatabase.configuredWith(configuration: config) { ckConfiguredDb in
-                _ = try await ckConfiguredDb.modifyRecords(saving: [database.associatedCkRecord, share], deleting: []) 
+            return try await executeCloudKitOperation(theDatabase: cloudKitPrivateDatabase) { ckConfiguredDb in
+                _ = try await ckConfiguredDb.modifyRecords(saving: [database.associatedCkRecord, share], deleting: [])
 
                 return (share, cloudKitContainer)
             }
@@ -259,6 +281,66 @@ import Foundation
         let container = CKContainer(identifier: metadata.containerIdentifier)
 
         try await container.accept(metadata)
+    }
+
+    
+
+    func subscribeToChangeNotifications() async throws {
+
+
+
+
+
+        let privateDb = cloudKitContainer.database(with: .private)
+
+        try await subscribeToChangeNotifications(theDatabase: privateDb)
+
+        let shared = cloudKitContainer.database(with: .shared)
+
+        try await subscribeToChangeNotifications(theDatabase: shared)
+    }
+
+    func subscribeToChangeNotifications(theDatabase: CKDatabase) async throws {
+        await clearAllSubscriptions(theDatabase)
+
+        let subId = UUID().uuidString
+
+        
+
+        let subscription = CKDatabaseSubscription(subscriptionID: subId)
+        subscription.recordType = CloudKitManager.DatabaseRecordType
+
+        let ni = CKSubscription.NotificationInfo()
+        ni.shouldSendContentAvailable = true
+        ni.shouldBadge = false
+
+        subscription.notificationInfo = ni
+
+        try await executeCloudKitOperation(theDatabase: theDatabase) { database in
+            let ret = try await database.save(subscription)
+
+            NSLog("🐞 watchForChanges: Successfully Created Subscription [\(ret)]")
+        }
+    }
+
+    func clearAllSubscriptions(_ database: CKDatabase) async {
+        do {
+            let subs = try await database.allSubscriptions()
+
+            for sub in subs {
+                do {
+                    try await executeCloudKitOperation(theDatabase: database) { database in
+                        try await database.deleteSubscription(withID: sub.subscriptionID)
+                    }
+
+                    NSLog("Successfully delete subscription: [\(sub)]")
+                } catch {
+                    NSLog("⚠️ Error deleting subscription: [\(sub)]: [\(error)]")
+                }
+            }
+        } catch {
+            NSLog("⚠️ Error in clearAllSubscriptions: \(error)")
+        }
     }
 
     
@@ -278,7 +360,7 @@ import Foundation
     }
 
     private func fetchShared() async throws -> [CloudKitHostedDatabase] {
-        let sharedZones = try await cloudKitContainer.sharedCloudDatabase.allRecordZones() 
+        let sharedZones = try await cloudKitContainer.sharedCloudDatabase.allRecordZones()
         guard !sharedZones.isEmpty else {
             return []
         }
@@ -291,15 +373,17 @@ import Foundation
 
         var allDatabases: [CloudKitHostedDatabase] = []
 
-        try await withThrowingTaskGroup(of: [CloudKitHostedDatabase].self) { group in
+        try await withThrowingTaskGroup(of: [CloudKitHostedDatabase]?.self) { group in
             for zone in zones {
-                group.addTask {
-                    try await CloudKitManager.list(database, zone)
+                group.addTask { [weak self] in
+                    try await self?.list(database, zone)
                 }
             }
 
             for try await result in group {
-                allDatabases.append(contentsOf: result)
+                if let result {
+                    allDatabases.append(contentsOf: result)
+                }
             }
         }
 
@@ -307,18 +391,16 @@ import Foundation
     }
 
     private func createZoneIfNeeded() async throws {
-        
-
         guard !CrossPlatformDependencies.defaults().applicationPreferences.cloudKitZoneCreated else {
             return
         }
 
         do {
-            let result = try await cloudKitPrivateDatabase.modifyRecordZones(saving: [privateRecordZone], deleting: []) 
+            let result = try await cloudKitPrivateDatabase.modifyRecordZones(saving: [privateRecordZone], deleting: [])
 
             NSLog("🐞 DEBUG: modifyRecordZones done: \(result)")
         } catch {
-            print("ERROR: Failed to create custom zone: \(error.localizedDescription)")
+            NSLog("🔴 ERROR: Failed to create custom zone: \(error)")
             throw error
         }
 
@@ -336,7 +418,7 @@ import Foundation
         return url
     }
 
-    class func mapFetchResultsToDatabases(_ results: [(CKRecord.ID, Result<CKRecord, any Error>)], sharedWithMe: Bool) -> [CloudKitHostedDatabase] {
+    static func mapFetchResultsToDatabases(_ results: [(CKRecord.ID, Result<CKRecord, any Error>)], sharedWithMe: Bool) -> [CloudKitHostedDatabase] {
         let records = results.compactMap { recordId, result in
             do {
                 return try result.get()
@@ -347,5 +429,41 @@ import Foundation
         }
 
         return records.compactMap { CloudKitHostedDatabase(record: $0, sharedWithMe: sharedWithMe) }
+    }
+
+    
+
+    func logError(_ error: Error) {
+        NSLog("🔴 CloudKitManager - Error = [\(error)]")
+        instrumentation.recentErrors.add(error as NSError)
+    }
+
+    @discardableResult
+    func executeCloudKitOperation<R>(theDatabase: CKDatabase, action: (CKDatabase) async throws -> R) async rethrows -> R {
+        let start = CFAbsoluteTimeGetCurrent()
+
+        defer {
+            let diff = CFAbsoluteTimeGetCurrent() - start
+
+            instrumentation.lastOperationDuration = diff
+            instrumentation.totalOperationDuration += diff
+            instrumentation.operationCount += 1
+
+            #if DEBUG
+                NSLog("🐞 CloudKit Operation Done in \(diff) seconds. Avg = [\(instrumentation.averageDuration)s] n=\(instrumentation.operationCount)")
+            #endif
+        }
+
+        let config = CKOperation.Configuration()
+        config.qualityOfService = .userInitiated 
+
+        return try await theDatabase.configuredWith(configuration: config) { database in
+            do {
+                return try await action(database)
+            } catch {
+                logError(error)
+                throw error
+            }
+        }
     }
 }

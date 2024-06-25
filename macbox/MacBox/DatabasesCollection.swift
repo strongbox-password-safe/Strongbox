@@ -51,6 +51,17 @@ class DatabasesCollection: NSObject {
             NSLog("🐞 DEBUG - DatabasesCollection - Received AutoLockInBackgroundTimeout notification - Attempting Lock")
             self?.onAutoLockTimeout(background: true)
         }
+
+        let note = Notification.Name("cloudKitDatabaseUpdateAvailable") 
+
+        NotificationCenter.default.addObserver(forName: note, object: nil, queue: nil) { [weak self] notification in
+            guard let uuid = notification.object as? String else {
+                NSLog("🔴 Couldn't read cloudkit update notification...")
+                return
+            }
+
+            self?.onDatabaseRemoteChanged(uuid: uuid)
+        }
     }
 
     private func watchForIdle() {

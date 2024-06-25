@@ -14,8 +14,11 @@
 #import "StorageBrowserTableViewController.h"
 
 #ifndef NO_NETWORKING
+
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
+#import "iCloudSafesCoordinator.h"
+
 #endif
 
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -36,7 +39,6 @@
 
 #endif
 
-#import "AppleICloudProvider.h"
 #import "Strongbox-Swift.h"
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import "NSArray+Extensions.h"
@@ -44,6 +46,7 @@
 NSString *const kSectionThirdParty = @"3rd_party";
 NSString *const kSectionOwnServer = @"own_servers";
 NSString *const kSectioniOSNative = @"native";
+NSString *const kSectioniOSNativeDeprecated = @"native-deprecated";
 NSString *const kSectionStrongboxWifiSync = @"wifi-sync";
 NSString *const kSectionMiscellaneous = @"misc";
 
@@ -57,6 +60,12 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 @end
 
 @implementation SelectStorageProviderController
+
++ (UINavigationController*)navControllerFromStoryboard {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectStorage" bundle:nil];
+
+    return [storyboard instantiateInitialViewController];
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -118,14 +127,11 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 
 
-
     self.providersForSectionMap = [[MutableOrderedDictionary alloc] init];
     
     
     
     if ( self.existing ) {
-        self.providersForSectionMap[kSectioniOSNative] = @[@(kFilesAppUrlBookmark)];
-
         if ( !AppPreferences.sharedInstance.disableWiFiSyncClientMode && StrongboxProductBundle.supportsWiFiSync ) {
             [self loadWiFiSyncDevices];
             [self observeWiFiSyncDevices];
@@ -134,7 +140,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         }
     }
     else {
-        self.providersForSectionMap[kSectioniOSNative] = AppPreferences.sharedInstance.disableNetworkBasedFeatures ? @[@(kFilesAppUrlBookmark), @(kLocalDevice)] : @[@(kLocalDevice), @(kFilesAppUrlBookmark), @(kiCloud)];
+        self.providersForSectionMap[kSectioniOSNative] = AppPreferences.sharedInstance.disableNetworkBasedFeatures ? @[@(kLocalDevice)] : @[@(kCloudKit), @(kLocalDevice)];
     }
     
     
@@ -156,6 +162,30 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         ];
     }
     
+    
+    
+    if ( self.existing ) {
+        self.providersForSectionMap[kSectioniOSNativeDeprecated] = @[@(kFilesAppUrlBookmark)];
+    }
+    else {
+        if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+            self.providersForSectionMap[kSectioniOSNativeDeprecated] = @[@(kFilesAppUrlBookmark)];
+
+        }
+        else {
+#ifndef NO_NETWORKING
+            if ( iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest ) {
+                self.providersForSectionMap[kSectioniOSNativeDeprecated] = @[@(kFilesAppUrlBookmark), @(kiCloud)];
+            }
+            else {
+                self.providersForSectionMap[kSectioniOSNativeDeprecated] = @[@(kFilesAppUrlBookmark)];
+            }
+#else
+            self.providersForSectionMap[kSectioniOSNativeDeprecated] = @[@(kFilesAppUrlBookmark)];
+#endif
+        }
+    }
+
     
     
     if ( self.existing && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
@@ -207,11 +237,9 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
                 UIImage* image = [UIImage systemImageNamed:@"externaldrive.fill.badge.wifi"];
                 
-                if (@available(iOS 15.0, *)) {
-                    UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[UIColor.systemRedColor, UIColor.systemOrangeColor]];
-                    image = [image imageByApplyingSymbolConfiguration:config];
-                }
-                
+                UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[UIColor.systemRedColor, UIColor.systemOrangeColor]];
+                image = [image imageByApplyingSymbolConfiguration:config];
+            
                 cell.image.image = image;
             }
         }
@@ -243,10 +271,8 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         
         UIImage* image = [UIImage systemImageNamed:@"externaldrive.fill.badge.wifi"];
         
-        if (@available(iOS 15.0, *)) {
-            UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[UIColor.systemGreenColor, UIColor.systemBlueColor]];
-            image = [image imageByApplyingSymbolConfiguration:config];
-        }
+        UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[UIColor.systemGreenColor, UIColor.systemBlueColor]];
+        image = [image imageByApplyingSymbolConfiguration:config];
         
         cell.image.image = image;
         cell.userInteractionEnabled = YES;
@@ -258,11 +284,14 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
     NSString* sectionName = self.providersForSectionMap.keys[indexPath.section];
     NSArray<NSNumber*>* providers = self.providersForSectionMap[sectionName];
+    NSNumber* providerId = providers[indexPath.row];
+    StorageProvider provider = (StorageProvider)providerId.intValue;
     
     cell.text.textColor = UIColor.labelColor;
     cell.userInteractionEnabled = YES;
     cell.image.tintColor = nil;
     cell.text.font = FontManager.sharedInstance.headlineFont;
+    cell.labelSubTitle.hidden = YES;
     
     if ( sectionName == kSectionMiscellaneous ) {
         cell.text.font = FontManager.sharedInstance.regularFont;
@@ -280,11 +309,32 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         [self getWifiSyncCell:cell indexPath:indexPath];
     }
     else {
-        NSNumber* providerId = providers[indexPath.row];
-
-        cell.text.text = providerId.intValue == kFilesAppUrlBookmark ? NSLocalizedString(@"sspc_ios_files_storage_location", @"Files") : [SafeStorageProviderFactory getStorageDisplayNameForProvider:providerId.intValue];
-        cell.image.image = providerId.intValue == kFilesAppUrlBookmark ? [UIImage systemImageNamed:@"folder.circle"] : [SafeStorageProviderFactory getImageForProvider:providerId.intValue];
+        cell.text.text = provider == kFilesAppUrlBookmark ? NSLocalizedString(@"sspc_ios_files_storage_location", @"Files") : [SafeStorageProviderFactory getStorageDisplayNameForProvider:providerId.intValue];
+        cell.image.image = provider == kFilesAppUrlBookmark ? [UIImage systemImageNamed:@"folder.circle"] : [SafeStorageProviderFactory getImageForProvider:providerId.intValue];
     }
+    
+#ifndef NO_NETWORKING
+    if ( provider == kCloudKit && !CloudKitDatabasesInteractor.shared.fastIsAvailable ) {
+        cell.labelSubTitle.hidden = NO;
+        
+        if ( CloudKitDatabasesInteractor.shared.cachedAccountStatusError ) {
+            cell.labelSubTitle.text = [NSString stringWithFormat:@"%@", CloudKitDatabasesInteractor.shared.cachedAccountStatusError];
+            
+            cell.labelSubTitle.textColor = UIColor.systemRedColor;
+        }
+        else {
+            cell.labelSubTitle.text = [NSString stringWithFormat:@"%@", [CloudKitDatabasesInteractor getAccountStatusStringWithStatus:CloudKitDatabasesInteractor.shared.cachedAccountStatus]];
+            
+            cell.labelSubTitle.textColor = UIColor.systemOrangeColor;
+        }
+        
+        cell.text.enabled = NO;
+        cell.userInteractionEnabled = NO;
+    }
+    else {
+        cell.labelSubTitle.hidden = YES;
+    }
+#endif
     
     return cell;
 }
@@ -339,12 +389,10 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         NSNumber* providerId = providers[indexPath.row];
         
         if (providerId.intValue == kFilesAppUrlBookmark) {
-            if (self.existing) {
-                [self onAddThroughFilesApp];
-            }
-            else {
-                [self onCreateThroughFilesApp];
-            }
+            [self presentFilesAppWarning];
+        }
+        else if ( providerId.intValue == kiCloud ) {
+            [self presentICloudWarning];
         }
 #ifndef NO_NETWORKING
         else if ( providerId.intValue == kWebDAV ) {
@@ -374,6 +422,36 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
+- (void)presentFilesAppWarning {
+    [Alerts yesNo:self 
+            title:NSLocalizedString(@"deprecated_storage_method", @"Deprecated Storage Method")
+          message:NSLocalizedString(@"cannot_recommend_storage_msg", @"We cannot recommend storing your database using this method. Strongbox does not have end to end control over the sync process, and so we cannot guarantee data integrity.\n\nDo you want to continue anyway?")
+           action:^(BOOL response) {
+        if ( response ) {
+            if (self.existing) {
+                [self onAddThroughFilesApp];
+            }
+            else {
+                [self onCreateThroughFilesApp];
+            }
+        }
+    }];
+}
+
+- (void)presentICloudWarning {
+    [Alerts yesNo:self
+            title:NSLocalizedString(@"deprecated_storage_method", @"Deprecated Storage Method")
+          message:NSLocalizedString(@"cannot_recommend_storage_msg", @"We cannot recommend storing your database using this method. Strongbox does not have end to end control over the sync process, and so we cannot guarantee data integrity.\n\nDo you want to continue anyway?")
+           action:^(BOOL response) {
+        if ( response ) {
+            
+            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:kiCloud];
+            
+            [self segueToBrowserOrAdd:provider];
+        }
+    }];
+}
+
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     NSString* sectionName = self.providersForSectionMap.keys[section];
 
@@ -386,6 +464,9 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     }
     else if ( [sectionName isEqualToString:kSectioniOSNative] ) {
         return NSLocalizedString(@"select_storage_header_built_in", @"Built-In");
+    }
+    else if ( [sectionName isEqualToString:kSectioniOSNativeDeprecated] ) {
+        return NSLocalizedString(@"storage_provider_built_in_not_recommended_header", @"Built-In (Not Recommended)");
     }
     else if ( [sectionName isEqualToString:kSectionStrongboxWifiSync] ) {
         return NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync");
@@ -415,7 +496,19 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         return NSLocalizedString(@"select_storage_footer_wifi", @"Use Strongbox's advanced 'Wi-Fi Sync' to stay up to date without the use of a server via Wi-Fi (or any LAN connection). This is a Pro feature.");
     }
     else if ( [sectionName isEqualToString:kSectioniOSNative] ) {
-        return self.existing ? NSLocalizedString(@"select_storage_footer_files_only", @"Connect to your database via the Files app.") : NSLocalizedString(@"select_storage_footer_files_or_local_device", @"Connect to your database via the Files app or store your database on this device (don't forget to backup though).");
+        if ( self.existing ) {
+            return nil;
+        }
+
+        if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+            return NSLocalizedString(@"blurb_about_native_local_only", @"Store your database locally only.");
+        }
+        else {
+            return NSLocalizedString(@"blurb_about_strongbox_sync_native_cloud", @"Our native Sync makes your databases available across all of your devices. Sharing with others is also supported. Alternatively, store your database on this device only.");
+        }
+    }
+    else if ( [sectionName isEqualToString:kSectioniOSNativeDeprecated] ) {
+        return NSLocalizedString(@"deprecated_storage_footer_text", @"These method(s) are no longer advised. Your mileage may vary depending on the quality of the third party Files provider, how reliable your connection is and other factors. Ultimately, Strongbox does not have full control over the sync process, and so we cannot guarantee data integrity or offer sync support.");
     }
     else if ( [sectionName isEqualToString:kSectionMiscellaneous] ) {
         return NSLocalizedString(@"select_storage_footer_one_time_copy", @"Use these methods to transfer a database into Strongbox as a local copy. This does not maintain a connection with any server or sync anywhere after the initial transfer.");
@@ -454,9 +547,10 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 }
 
 - (void)onAddThroughFilesApp {
-    UTType* type = [UTType typeWithIdentifier:(NSString*)kUTTypeItem];
-    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[type]];
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[UTTypeItem]];
+    
     vc.delegate = self;
+    
     [self presentViewController:vc animated:YES completion:nil];
 }
 

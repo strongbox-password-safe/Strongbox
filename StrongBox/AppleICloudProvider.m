@@ -54,55 +54,22 @@
     return [[iCloudSafesCoordinator sharedInstance] getUniqueICloudFilename:prefix extension:extension];
 }
 
-- (void)    create:(NSString *)nickName
-         extension:(NSString *)extension
-              data:(NSData *)data
-      parentFolder:(NSObject *)parentFolder
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(DatabasePreferences *metadata, const NSError *error))completion {
-    [self create:nickName
-       extension:extension
-            data:data
-suggestedFilename:nil
-    parentFolder:parentFolder
-  viewController:viewController
-      completion:completion];
-}
-
-- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
-    NSLog(@"🔴 AppleiCloudProvider::getModDate not impl!");
-
+- (void)create:(NSString *)nickName 
+      fileName:(NSString *)fileName
+          data:(NSData *)data
+  parentFolder:(NSObject *)parentFolder
+viewController:(VIEW_CONTROLLER_PTR)viewController
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion {
+    NSString* extension = fileName.pathExtension;
+    NSString* fileNameOnly = fileName.stringByDeletingPathExtension;
     
-}
-
-- (void)    create:(NSString *)nickName
-         extension:(NSString *)extension
-              data:(NSData *)data
- suggestedFilename:(NSString*)suggestedFilename
-      parentFolder:(NSObject *)parentFolder
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(DatabasePreferences *metadata, NSError *error))completion {
-    NSURL * fileURL = nil;
-    
-    if(suggestedFilename) {
-        NSString* filename = [[suggestedFilename lastPathComponent] stringByDeletingPathExtension];
-        NSString* extension = [suggestedFilename pathExtension];
-        
-        NSString* uniqueFilename = [self getUniqueICloudFilename:filename extension:extension];
-        fileURL = [self getFullICloudURLWithFileName:uniqueFilename];
-    }
-    
-    if(!fileURL) {
-        fileURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:nickName extension:extension]];
-    }
+    NSURL * fileURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:fileNameOnly extension:extension]];
 
     if(!fileURL || fileURL.absoluteString.length == 0) {
         
         completion(nil, [Utils createNSError:@"Could not create an iCloud database because could not find a good path for it!" errorCode:-1]);
         return;
     }
-    
-    NSLog(@"Want to create file at %@", fileURL);
     
     dispatch_async(dispatch_get_main_queue(), ^{ 
         [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_saving_ellipsis", @"Saving...")];
@@ -137,6 +104,13 @@ suggestedFilename:nil
             completion(metadata, nil);
         }];
     });
+}
+
+
+- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    NSLog(@"🔴 AppleiCloudProvider::getModDate not impl!");
+    
+    
 }
 
 - (void)pullDatabase:(DatabasePreferences *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {

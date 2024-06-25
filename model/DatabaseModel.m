@@ -125,7 +125,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 
 
 
-- (Node*)initializeRoot {
+- (Node*)   initializeRoot {
     Node* rootGroup = [[Node alloc] initAsRoot:nil childRecordsAllowed:self.format != kKeePass1];
     
     if (self.format != kPasswordSafe) {

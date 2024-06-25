@@ -194,7 +194,7 @@
         return NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync");
     }
     else if ( provider == kCloudKit ) {
-        return @"Strongbox Cloud"; 
+        return NSLocalizedString(@"storage_provider_cloudkit_display_name", @"Strongbox Sync");
     }
     else {
         _displayName = @"SafeStorageProviderFactory::getDisplayName Unknown";
@@ -248,24 +248,19 @@
     if (provider == kWiFiSync) {
         UIImage* image = [UIImage systemImageNamed:@"externaldrive.fill.badge.wifi"];
         
-        if (@available(iOS 15.0, *)) {
-            BOOL isLive = NO;
-            if ( database ) {
+        BOOL isLive = NO;
+        if ( database ) {
 #ifndef IS_APP_EXTENSION
-                NSString* serverName = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:database];
-                if ( serverName ) {
-                    isLive = [WiFiSyncBrowser.shared serverIsPresent:serverName];
-                }
-#endif
+            NSString* serverName = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:database];
+            if ( serverName ) {
+                isLive = [WiFiSyncBrowser.shared serverIsPresent:serverName];
             }
-            
-            UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[isLive ? UIColor.systemGreenColor : UIColor.systemGrayColor, UIColor.systemBlueColor]];
-            
-            return [image imageByApplyingSymbolConfiguration:config];
+#endif
         }
-
         
-        return image;
+        UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[isLive ? UIColor.systemGreenColor : UIColor.systemGrayColor, UIColor.systemBlueColor]];
+        
+        return [image imageByApplyingSymbolConfiguration:config];
     }
     else if ( provider == kCloudKit ) {
         if (@available(iOS 16.0, *)) {
@@ -290,11 +285,7 @@
         return [NSImage imageWithSystemSymbolName:@"icloud.fill" accessibilityDescription:nil];
     }
     else if (provider == kLocalDevice) {
-        if (@available(macOS 12.0, *)) {
-            return [NSImage imageWithSystemSymbolName:@"lock.laptopcomputer" accessibilityDescription:nil];
-        } else {
-            return [NSImage imageNamed:@"lock"];
-        }
+        return [NSImage imageWithSystemSymbolName:@"lock.laptopcomputer" accessibilityDescription:nil];
     }
     else if (provider == kGoogleDrive) {
         return [NSImage imageNamed:@"google-drive-2021"];
@@ -317,24 +308,21 @@
     else if (provider == kWiFiSync) {
         NSImage* image = [NSImage imageWithSystemSymbolName:@"externaldrive.fill.badge.wifi" accessibilityDescription:nil];
         
-        if (@available(macOS 12.0, *)) {
-            BOOL isLive = NO;
-            if ( database ) {
-                
+        BOOL isLive = NO;
+        if ( database ) {
+            
 #ifndef IS_APP_EXTENSION
-                NSString* serverName = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:database];
-                if ( serverName ) {
-                    isLive = [WiFiSyncBrowser.shared serverIsPresent:serverName];
-                }
-#endif
+            NSString* serverName = [WiFiSyncStorageProvider.sharedInstance getWifiSyncServerNameFromDatabaseMetadata:database];
+            if ( serverName ) {
+                isLive = [WiFiSyncBrowser.shared serverIsPresent:serverName];
             }
-            
-            NSImageSymbolConfiguration* config = [NSImageSymbolConfiguration configurationWithPaletteColors:@[isLive ? NSColor.systemGreenColor : NSColor.systemGrayColor, NSColor.systemBlueColor]];
-            
-            image = [image imageWithSymbolConfiguration:config];
-            
+#endif
         }
         
+        NSImageSymbolConfiguration* config = [NSImageSymbolConfiguration configurationWithPaletteColors:@[isLive ? NSColor.systemGreenColor : NSColor.systemGrayColor, NSColor.systemBlueColor]];
+        
+        image = [image imageWithSymbolConfiguration:config];
+    
         return image;
     }
     else if (provider == kCloudKit ) {
@@ -406,7 +394,7 @@
         }
     }
     else if ( metadata.storageProvider == kCloudKit ) {
-        return @"Strongbox Cloud";
+        return NSLocalizedString(@"storage_provider_cloudkit_display_name", @"Strongbox Sync");
     }
 #endif
     else {
@@ -473,7 +461,7 @@
 #endif
         
         if ( metadata.storageProvider == kCloudKit ) {
-            return @"Strongbox Cloud";
+            return NSLocalizedString(@"storage_provider_cloudkit_display_name", @"Strongbox Sync");
         }
         
         return subtitle;

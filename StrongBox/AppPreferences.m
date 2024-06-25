@@ -163,6 +163,10 @@ static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
 static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
 static NSString* const kCloudKitZoneCreated = @"cloudKitZoneCreated";
 static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppShortcutMenu";
+static NSString* const kHasWarnedAboutCloudKitUnavailability = @"hasWarnedAboutCloudKitUnavailability";
+static NSString* const kHasGotUserNotificationsPermissions = @"hasGotUserNotificationsPermissions";
+static NSString* const kLastAskToEnableNotifications = @"lastAskToEnableNotifications";
+static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPasscodeSSKeyHasBeenInitialized";
 
 @implementation AppPreferences
 
@@ -205,8 +209,28 @@ static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppSho
 
 
 
+- (BOOL)hasGotUserNotificationsPermissions {
+    return [self getBool:kHasGotUserNotificationsPermissions];
+}
+
+- (void)setHasGotUserNotificationsPermissions:(BOOL)hasGotUserNotificationsPermissions {
+    [self setBool:kHasGotUserNotificationsPermissions value:hasGotUserNotificationsPermissions];
+}
+
+- (BOOL)hasWarnedAboutCloudKitUnavailability {
+    return [self getBool:kHasWarnedAboutCloudKitUnavailability];
+}
+
+- (void)setHasWarnedAboutCloudKitUnavailability:(BOOL)hasWarnedAboutCloudKitUnavailability {
+    [self setBool:kHasWarnedAboutCloudKitUnavailability value:hasWarnedAboutCloudKitUnavailability];
+}
+
 - (BOOL)showDatabasesOnAppShortcutMenu {
+#ifndef NO_NETWORKING
     return [self getBool:kShowDatabasesOnAppShortcutMenu fallback:YES];
+#else
+    return [self getBool:kShowDatabasesOnAppShortcutMenu fallback:NO];
+#endif
 }
 
 - (void)setShowDatabasesOnAppShortcutMenu:(BOOL)showDatabasesOnAppShortcutMenu {
@@ -237,15 +261,27 @@ static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppSho
     [self setBool:kWiFiSyncOn value:wiFiSyncOn];
 }
 
+- (BOOL)wiFiSyncPasscodeSSKeyHasBeenInitialized {
+    return [self getBool:kWiFiSyncPasscodeSSKeyHasBeenInitialized];
+}
+
+- (void)setWiFiSyncPasscodeSSKeyHasBeenInitialized:(BOOL)wiFiSyncPasscodeSSKeyHasBeenInitialized {
+    [self setBool:kWiFiSyncPasscodeSSKeyHasBeenInitialized value:wiFiSyncPasscodeSSKeyHasBeenInitialized];
+}
+
 - (NSString *)wiFiSyncPasscode {
-    NSString* passcode = [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
-    
-    if (!passcode) {
-        passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
-        [self setWiFiSyncPasscode:passcode];
+    if ( self.wiFiSyncPasscodeSSKeyHasBeenInitialized ) {
+        return [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
     }
-    
-    return passcode;
+    else {
+        NSString* passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
+        
+        [self setWiFiSyncPasscode:passcode];
+        
+        self.wiFiSyncPasscodeSSKeyHasBeenInitialized = YES;
+        
+        return passcode;
+    }
 }
 
 - (void)setWiFiSyncPasscode:(NSString *)wiFiSyncPasscode {
@@ -552,6 +588,14 @@ static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppSho
 
 - (void)setPromptToEnableAutoFill:(BOOL)promptToEnableAutoFill {
     return [self setBool:kPromptToEnableAutoFill value:promptToEnableAutoFill];
+}
+
+- (NSDate *)lastAskToEnableNotifications {
+    return [self getDate:kLastAskToEnableNotifications];
+}
+
+- (void)setLastAskToEnableNotifications:(NSDate *)lastAskToEnableNotifications {
+    [self setDate:kLastAskToEnableNotifications value:lastAskToEnableNotifications];
 }
 
 - (NSDate *)lastAskToEnableAutoFill {
@@ -1206,7 +1250,7 @@ static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppSho
     
     launchCount++;
     
-    NSLog(@"Application has been launched %ld times", (long)launchCount);
+
     
     NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     [userDefaults setInteger:launchCount forKey:kLaunchCountKey];
@@ -1469,5 +1513,5 @@ static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppSho
     [self.sharedAppGroupDefaults setObject:value forKey:key];
     [self.sharedAppGroupDefaults synchronize];
 }
-    
+
 @end

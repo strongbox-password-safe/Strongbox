@@ -54,7 +54,7 @@ class SwiftUIViewFactory: NSObject {
                                                 return false
                                             }
 
-                                            return keyFile.hashString == hash
+                                            return keyFile.hashString.uppercased() == hash.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
                                         },
                                         validateCodes: { codes in
                                             KeyFile.fromHexCodes(codes) != nil
@@ -89,7 +89,7 @@ class SwiftUIViewFactory: NSObject {
         return hostingController
     }
 
-    @objc static func makeWiFiSyncPassCodeEntryViewController(server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig?, _ passcode: String?) -> Void)) -> NSViewController {
+    @objc static func makeWiFiSyncPassCodeEntryViewController(_ server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig?, _ pinCode: String?) -> Void)) -> NSViewController {
         let hostingController = NSHostingController(rootView: MacWiFiSyncPasscodeEntryView(server: server, onDone: onDone))
 
         hostingController.preferredContentSize = NSSize(width: 350, height: 400)
@@ -120,5 +120,15 @@ class SwiftUIViewFactory: NSObject {
         hostingController.title = NSLocalizedString("sale_view_regular_title", comment: "Sale Now On")
 
         return hostingController
+    }
+
+    @objc static func makeStorageSelector(createMode: Bool,
+                                          isImporting: Bool,
+                                          isPro: Bool,
+                                          cloudKitUnavailableReason: String?,
+                                          initialSelection: StorageProvider,
+                                          completion: @escaping ((_ userCancelled: Bool, _ selected: StorageProvider, _ selectedWiFiSyncDevice: WiFiSyncServerConfig?) -> Void)) -> NSViewController
+    {
+        NSHostingController(rootView: StorageSelectorView(createMode: createMode, isImporting: isImporting, isPro: isPro, cloudKitUnavailableReason: cloudKitUnavailableReason, initialSelection: initialSelection, completion: completion))
     }
 }

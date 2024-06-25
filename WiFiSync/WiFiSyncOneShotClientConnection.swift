@@ -19,13 +19,17 @@ class WiFiSyncOneShotClientConnection {
 
     var onConnected: (WiFiSyncOneShotClientConnection) -> Void
     var onError: (Error) -> Void
+    var onIncorrectPasscode: () -> Void
     var onReceived: (Data?, NWProtocolFramer.Message) -> Void
 
     var errorHasOccurred = false
     var hasSent = false
 
-    init(endpoint: NWEndpoint, passcode: String, onConnected: @escaping ((WiFiSyncOneShotClientConnection) -> Void),
+    init(endpoint: NWEndpoint,
+         passcode: String,
+         onConnected: @escaping ((WiFiSyncOneShotClientConnection) -> Void),
          onReceived: @escaping ((Data?, NWProtocolFramer.Message) -> Void),
+         onIncorrectPasscode: @escaping (() -> Void),
          onError: @escaping ((Error) -> Void))
     {
         self.endpoint = endpoint
@@ -33,6 +37,7 @@ class WiFiSyncOneShotClientConnection {
         resolver = BonjourResolver()
         self.onConnected = onConnected
         self.onError = onError
+        self.onIncorrectPasscode = onIncorrectPasscode
         self.onReceived = onReceived
     }
 
@@ -94,7 +99,7 @@ class WiFiSyncOneShotClientConnection {
                 NSLog("🔴 Sender has detected an Incorrect PIN")
                 errorHasOccurred = true
                 connection.forceCancel()
-                onError(Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
+                onIncorrectPasscode()
             } else {
                 NSLog("🔴 WiFiSyncOneShotClientConnection::onStateChanged - WAITING SERVER ERROR: \(error)\n")
                 errorHasOccurred = true

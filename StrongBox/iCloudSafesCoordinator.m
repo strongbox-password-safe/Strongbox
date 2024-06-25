@@ -7,7 +7,6 @@
 //
 
 #import "iCloudSafesCoordinator.h"
-#import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "Strongbox.h"
 #import "DatabasePreferences.h"
@@ -60,7 +59,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         BOOL available = (_iCloudRoot != nil);
         
-        NSLog(@"iCloud Initialization Done: Available = [%d]", available);
+
     });
 }
 
@@ -167,7 +166,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         extension = extension ? extension : @"";
         
         [[LocalDeviceStorageProvider sharedInstance] create:safe.nickName
-                                                  extension:extension
+                                                   fileName:safe.fileName
                                                        data:data
                                                parentFolder:nil
                                              viewController:nil
@@ -386,9 +385,13 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
       
         
         
-        [newSafe addWithDuplicateCheck:nil initialCacheModDate:nil];
-
-        added = YES;
+        NSError* error;
+        if ( [newSafe addWithDuplicateCheck:nil initialCacheModDate:nil error:&error] ) {
+            added = YES;
+        }
+        else {
+            NSLog(@"Did not add iCloud database - error = [%@]", error);
+        }
     }
     
     return added;
@@ -467,7 +470,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSArray* changed = [notification.userInfo objectForKey:NSMetadataQueryUpdateChangedItemsKey];
     NSArray* removed = [notification.userInfo objectForKey:NSMetadataQueryUpdateRemovedItemsKey];
 
-    NSLog(@"iCloud Update Notification Received: added = %lu / updated = %lu - removed = %lu", (unsigned long)added.count, (unsigned long)changed.count, (unsigned long)removed.count);
+
 
 
 

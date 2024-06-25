@@ -15,7 +15,7 @@
 #import "CustomBackgroundTableView.h"
 #import "AutoFillManager.h"
 #import "SafeStorageProviderFactory.h"
-#import "AddDatabaseSelectStorageVC.h"
+#import "SelectStorageLocationVC.h"
 #import "SyncLogViewController.h"
 #import "MacSyncManager.h"
 #import "Document.h"
@@ -43,6 +43,7 @@
 
 #import "Strongbox-Swift.h"
 #import "DatabaseNuker.h"
+#import "MacFileBasedBookmarkStorageProvider.h"
 
 
 
@@ -59,14 +60,17 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 @interface DatabasesManagerVC () <NSTableViewDelegate, NSTableViewDataSource>
 
-@property (nonatomic, strong) NSArray<NSString*>* databaseIds;
-@property (weak) IBOutlet CustomBackgroundTableView *tableView;
-@property NSTimer* timerRefresh;
-@property BOOL hasLoaded;
 @property (weak) IBOutlet ClickableTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonProperties;
-@property (strong) IBOutlet NSMenu *dummyStrongReferenceToMenuToPreventCrash;
-@property (weak) IBOutlet NSPopUpButton *buttonAdd;
+@property (weak) IBOutlet CustomBackgroundTableView *tableView;
+
+@property NSArray<NSString*>* databaseIds;
+@property NSTimer* timerRefresh;
+@property BOOL hasLoaded;
+
+#ifndef NO_NETWORKING
+@property CocoaCloudKitSharingHelper* cloudKitSharingHelper;
+#endif
 
 @end
 
@@ -90,7 +94,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     
     
-    self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refreshVisibleRows) userInfo:nil repeats:YES];
+    self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refresh) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
 }
 
@@ -132,8 +136,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     self.tableView.headerView = nil;
     [self.tableView sizeLastColumnToFit];
     
-    [self loadDatabases];
-    [self.tableView reloadData];
+    [self refresh];
     
     
     
@@ -141,7 +144,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     }
     
-    [self customizeAddDatabaseSubMenu];
+    
     
     [self listenToEvents];
     
@@ -151,13 +154,13 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)listenToEvents {
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListChangedNotification object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotification object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesCollectionLockStateChangedNotification object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kWifiBrowserResultsUpdatedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kDatabasesListChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kDatabasesListViewForceRefreshNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kProStatusChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kDatabasesCollectionLockStateChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kWifiBrowserResultsUpdatedNotification object:nil];
 }
 
 - (void)bindVersionSubtitle {
@@ -178,14 +181,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     });
 }
 
-- (void)loadDatabases {
-    self.databaseIds = [MacDatabasePreferences.allDatabases map:^id _Nonnull(MacDatabasePreferences * _Nonnull obj, NSUInteger idx) {
-        return obj.uuid;
-    }];
-}
-
 - (void)bindUi {
-    self.buttonProperties.enabled = self.tableView.selectedRowIndexes.count == 1;
+    self.buttonProperties.enabled = self.tableView.selectedRowIndexes.count > 0;
 }
 
 - (IBAction)onRemove:(id)sender {
@@ -213,11 +210,30 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     
     
-    NSString* single = NSLocalizedString(@"are_you_sure_delete_database_single", @"Are you sure you want to remove this database from Strongbox?\n\nNB: The underlying database file will not be deleted. Just Strongbox's settings for this database.");
+    BOOL willDeleteFromCloudKit = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+        return obj.storageProvider == kCloudKit && obj.isOwnedByMeCloudKit;
+    }];
+
+    BOOL deleteAttemptOnUnownedCloudKitDatabase = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+        return obj.storageProvider == kCloudKit && !obj.isOwnedByMeCloudKit;
+    }];
     
-    NSString* multiple = NSLocalizedString(@"are_you_sure_delete_database_multiple", @"Are you sure you want to remove these databases from Strongbox?\n\nNB: The underlying database files will not be deleted. Just Strongbox's settings for these databases.");
+    NSString *message;
     
-    NSString *message = selected.count > 1 ? multiple : single;
+    if ( willDeleteFromCloudKit ) {
+        message = NSLocalizedString(@"ays_remove_databases_strongbox_sync_delete", @"Are you sure you want to remove these database(s) from Strongbox?\n\nNB: Strongbox Sync databases will be permanently deleted across all devices.");
+    }
+    else if ( deleteAttemptOnUnownedCloudKitDatabase && selected.count == 1) {
+        [self promptUserToRemoveThemselvesFromCloudKitSharing:selected.anyObject];
+        return;
+    }
+    else {
+        NSString* single = NSLocalizedString(@"are_you_sure_delete_database_single", @"Are you sure you want to remove this database from Strongbox?\n\nNB: The underlying database file will not be deleted. Just Strongbox's settings for this database.");
+        
+        NSString* multiple = NSLocalizedString(@"are_you_sure_delete_database_multiple", @"Are you sure you want to remove these databases from Strongbox?\n\nNB: The underlying database files will not be deleted. Just Strongbox's settings for these databases.");
+        
+        message = selected.count > 1 ? multiple : single;
+    }
     
     [MacAlerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
      informativeText:message
@@ -232,48 +248,74 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 [DatabasesCollection.shared closeAnyDocumentWindowsWithUuid:database.uuid];
                 
                 [self removeDatabase:database];
-            }            
+            }
+        }
+    }];
+}
+
+- (void)promptUserToRemoveThemselvesFromCloudKitSharing:(MacDatabasePreferences*)database {
+    [MacAlerts yesNo:NSLocalizedString(@"strongbox_sync_shared_database_title", @"Shared Database")
+     informativeText:NSLocalizedString(@"strongbox_sync_shared_database_msg", @"This database is shared with you by someone else who owns it. To remove this database from your list, tap OK to manage sharing and remove yourself.")
+              window:self.view.window
+          completion:^(BOOL yesNo) {
+        if ( yesNo ) {
+            [self onCreateOrManageCloudKitSharing:database];
         }
     }];
 }
 
 - (void)removeDatabase:(MacDatabasePreferences*)safe {
-    [DatabaseNuker nuke:safe];
+    [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_deleting_ellipsis", @"Deleting...")
+                                        viewController:self];
+    
+    [DatabaseNuker nuke:safe deleteUnderlyingIfSupported:YES completion:^(NSError * _Nullable error) {
+        [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                NSLog(@"🔴 Error Nuking Database [%@]", error);
+                [MacAlerts error:error window:self.view.window];
+            }
+        });
+    }];
 }
 
-- (void)refreshVisibleRows {
+- (void)refresh {
     
     
-    NSIndexSet* set = self.tableView.selectedRowIndexes;
-    
-    NSMutableSet<NSString*>* selected = NSMutableSet.set;
-    [set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-        [selected addObject:self.databaseIds[idx]];
+    NSArray<NSString*> *allDatabaseIds = [MacDatabasePreferences.allDatabases map:^id _Nonnull(MacDatabasePreferences * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
     }];
     
-    [self loadDatabases];
-    
-    NSScrollView* scrollView = [self.tableView enclosingScrollView];
-    CGPoint originalScrollPos = scrollView.documentVisibleRect.origin;
-    
-    
-    
-    
-    
-    
-    
-    [self.tableView reloadData];
-    
-    NSMutableIndexSet* selectedSet = NSMutableIndexSet.indexSet;
-    [self.databaseIds enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if ([selected containsObject:obj]) {
-            [selectedSet addIndex:idx];
-        }
-    }];
-    
-    [self.tableView selectRowIndexes:selectedSet byExtendingSelection:NO];
-    
-    [scrollView.documentView scrollPoint:originalScrollPos];
+    if ( [allDatabaseIds.set isEqualToSet:self.databaseIds.set] ) {
+        self.databaseIds = allDatabaseIds;
+        
+        NSIndexSet* set = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, allDatabaseIds.count)];
+        
+        [self.tableView reloadDataForRowIndexes:set columnIndexes:[NSIndexSet indexSetWithIndex:0]];
+    }
+    else {
+        
+        
+        NSIndexSet* set = self.tableView.selectedRowIndexes;
+        NSMutableSet<NSString*>* selectedDatabaseUuids = NSMutableSet.set;
+        [set enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+            [selectedDatabaseUuids addObject:self.databaseIds[idx]];
+        }];
+        
+        self.databaseIds = allDatabaseIds;
+        
+        [self.tableView reloadData];
+        
+        NSMutableIndexSet* selectedSet = NSMutableIndexSet.indexSet;
+        [self.databaseIds enumerateObjectsUsingBlock:^(NSString * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([selectedDatabaseUuids containsObject:obj]) {
+                [selectedSet addIndex:idx];
+            }
+        }];
+        
+        [self.tableView selectRowIndexes:selectedSet byExtendingSelection:NO];
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
@@ -291,7 +333,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
-    DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
+    DatabaseCellView *view = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
     
     
     
@@ -301,11 +343,15 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     BOOL filesOnly = !StrongboxProductBundle.supports3rdPartyStorageProviders && !StrongboxProductBundle.supportsSftpWebDAV && !StrongboxProductBundle.supportsWiFiSync;
     BOOL disabled = database.storageProvider != kLocalDevice && filesOnly;
     
-    [result setWithDatabase:database disabled:disabled];
+    [view setWithDatabase:database disabled:disabled];
     
     __weak DatabasesManagerVC* weakSelf = self;
     
-    result.onBeginEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
+    view.onUserRenamedDatabase = ^(NSString * _Nonnull name) {
+        [weakSelf onUserRenamedDatabase:database name:name];
+    };
+    
+    view.onBeginEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
         NSInteger row = [weakSelf.tableView rowForView:cell];
         if ( row != -1 && weakSelf.tableView.selectedRow != row ) {
             NSLog(@"Extending Selection after nickname click");
@@ -315,12 +361,40 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [weakSelf killRefreshTimer];
     };
     
-    result.onEndEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
-        [weakSelf refreshVisibleRows];
+    view.onEndEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
+        [weakSelf refresh];
         [weakSelf startRefreshTimer];
     };
     
-    return result;
+    return view;
+}
+
+- (IBAction)onRename:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        DatabaseCellView *view = [self.tableView viewAtColumn:0 row:self.tableView.selectedRow makeIfNecessary:NO];
+        
+        [view onBeginRenameEdit];
+    }
+}
+
+- (void)onUserRenamedDatabase:(MacDatabasePreferences*)database name:(NSString*)name {
+    database.nickName = name;
+    
+    if ( database.storageProvider == kCloudKit ) {
+        [self renameCloudKitDatabase:database nick:name]; 
+    }
+}
+
+- (void)renameCloudKitDatabase:(MacDatabasePreferences*)database
+                          nick:(NSString*)nick {
+#ifndef NO_NETWORKING
+    [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
+                                        viewController:self];
+        
+    [CloudKitDatabasesInteractor.shared renameWithDatabase:database nickName:nick completionHandler:^(NSError * _Nullable error) {
+        [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+    }];
+#endif
 }
 
 - (void)showHideColumn:(NSString*)identifier show:(BOOL)show {
@@ -403,117 +477,6 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [macOSSpinnerUI.sharedInstance dismiss];
 }
 
-- (void)onOpenFromFiles:(id)sender {
-    DocumentController* dc = (DocumentController*)NSDocumentController.sharedDocumentController;
-    [dc originalOpenDocument:nil];
-}
-
-- (void)onNewDatabase:(id)sender {
-    [NSDocumentController.sharedDocumentController newDocument:nil];
-}
-
-- (IBAction)onAddGoogleDriveDatabase:(id)sender {
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    GoogleDriveStorageProvider* storageProvider = GoogleDriveStorageProvider.sharedInstance;
-    [self showStorageBrowserForProvider:storageProvider];
-#endif
-}
-
-- (IBAction)onAddDropboxDatabase:(id)sender {
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    DropboxV2StorageProvider* storageProvider = DropboxV2StorageProvider.sharedInstance;
-    
-    [self showStorageBrowserForProvider:storageProvider];
-#endif
-}
-
-- (IBAction)onAddOneDriveDatabase:(id)sender {
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    TwoDriveStorageProvider* storageProvider = TwoDriveStorageProvider.sharedInstance;
-    [self showStorageBrowserForProvider:storageProvider];
-#endif
-}
-
-- (void)onAddSFTPDatabase:(id)sender {
-#ifndef NO_NETWORKING
-    SFTPConnectionsManager* vc = [SFTPConnectionsManager instantiateFromStoryboard];
-    
-    __weak DatabasesManagerVC* weakSelf = self;
-    vc.onSelected = ^(SFTPSessionConfiguration * _Nonnull connection) {
-        SFTPStorageProvider* provider = [[SFTPStorageProvider alloc] init];
-        provider.explicitConnection = connection;
-        provider.maintainSessionForListing = YES;
-        
-        [weakSelf showStorageBrowserForProvider:provider];
-    };
-    
-    [self presentViewControllerAsSheet:vc];
-#endif
-}
-
-- (IBAction)onAddWebDav:(id)sender {
-#ifndef NO_NETWORKING
-    WebDAVConnectionsManager* vc = [WebDAVConnectionsManager instantiateFromStoryboard];
-    
-    __weak DatabasesManagerVC* weakSelf = self;
-    vc.onSelected = ^(WebDAVSessionConfiguration * _Nonnull connection) {
-        WebDAVStorageProvider* provider = [[WebDAVStorageProvider alloc] init];
-        provider.explicitConnection = connection;
-        provider.maintainSessionForListing = YES;
-        
-        [weakSelf showStorageBrowserForProvider:provider];
-    };
-    
-    [self presentViewControllerAsSheet:vc];
-#endif
-}
-
-- (void)onAddWifiSyncDatabase:(WiFiSyncServerConfig*)server
-                     passcode:(NSString*)passcode {
-    WiFiSyncStorageProvider *sp = [[WiFiSyncStorageProvider alloc] init];
-    
-    server.passcode = passcode;
-    sp.explicitConnectionConfig = server;
-    
-    [self showStorageBrowserForProvider:sp];
-}
-
-
-
-- (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider {
-    AddDatabaseSelectStorageVC* vc = [AddDatabaseSelectStorageVC newViewController];
-    vc.provider = provider;
-    
-    vc.onDone = ^(BOOL success, StorageBrowserItem * _Nonnull selectedItem) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (success) {
-                
-                
-                NSString* suggestedName = [selectedItem.name stringByDeletingPathExtension];
-                
-                suggestedName = [DatabasesManager.sharedInstance getUniqueNameFromSuggestedName:suggestedName];
-                
-                MacDatabasePreferences *newDatabase = [provider getDatabasePreferences:suggestedName providerData:selectedItem.providerData];
-                
-                if (!newDatabase) {
-                    [MacAlerts error:nil window:self.view.window];
-                }
-                else {
-                    
-                    
-                    [newDatabase add];
-                    [self openDatabase:newDatabase];
-                }
-            }
-        });
-    };
-    
-    [self presentViewControllerAsSheet:vc];
-}
-
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-#endif
-
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
     [self bindUi];
 }
@@ -590,290 +553,118 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     return YES;
 }
 
-- (NSMenuItem*)createHeaderMenuItem:(NSString*)title {
-    NSMenuItem* item = [[NSMenuItem alloc] init];
-    
-    item.attributedTitle = [[NSAttributedString alloc] initWithString:title
-                                                           attributes:@{
-        NSFontAttributeName : FontManager.shared.boldCaption1Font,
-        NSForegroundColorAttributeName : NSColor.secondaryLabelColor
-    }];
-    item.enabled = NO;
-    return item;
-}
-
 - (void)menuNeedsUpdate:(NSMenu *)menu {
 
-    
-    [self populateWifiSyncMenu];
-}
 
-- (void)customizeAddDatabaseSubMenu {
-    NSMenu* menu = self.buttonAdd.menu;
+    MacDatabasePreferences* singleSelectedDatabase = nil;
+    if ( self.tableView.selectedRowIndexes.count == 1 ) {
+        NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        singleSelectedDatabase = [MacDatabasePreferences fromUuid:databaseId];
+    }
     
     
     
-    NSMenuItem* itemFilesHeader = [self createHeaderMenuItem:NSLocalizedString(@"add_database_on_my_mac", @"On My Mac")];
-    [menu insertItem:itemFilesHeader atIndex:1];
+    NSMenuItem* item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
+        return obj.action == @selector(onShareCloudKit:);
+    }];
     
-    
-    
-    NSUInteger currentIdxForSection = 4;
-    
-    if ( StrongboxProductBundle.supportsWiFiSync && !Settings.sharedInstance.disableWiFiSyncClientMode ) {
-        NSMenuItem* itemWiFiSyncHeader = [self createHeaderMenuItem:NSLocalizedString(@"storage_provider_name_wifi_sync", @"Wi-Fi Sync")];
-        itemWiFiSyncHeader.action = @selector(onDummyWiFiSyncParentMenuAction:);
-    
-        [menu insertItem:NSMenuItem.separatorItem atIndex:currentIdxForSection++];
-        [menu insertItem:itemWiFiSyncHeader atIndex:currentIdxForSection++];
+    if ( item ) {
+        [menu removeItem:item];
+    }
 
-        currentIdxForSection += 2; 
-    }
-    else {
-        [menu removeItemAtIndex:currentIdxForSection];
-    }
     
     
-    
-    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddGoogleDriveDatabase:)];
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddDropboxDatabase:)];
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddOneDriveDatabase:)];
-    }
-    else {
-        NSMenuItem* itemThirdPartyHeader = [self createHeaderMenuItem:NSLocalizedString(@"select_storage_header_third_party", @"Third Party Integrations")];
-        [menu insertItem:itemThirdPartyHeader atIndex:currentIdxForSection];
-        
-        currentIdxForSection += 5;
-    }
-    
-    
-    
-    if ( !StrongboxProductBundle.supports3rdPartyStorageProviders ) {
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddSFTPDatabase:)];
-        [self removeMenuItemFromAddButtonMenu:@selector(onAddWebDav:)];
-    }
-    else {
-        NSMenuItem* itemServersHeader = [self createHeaderMenuItem:NSLocalizedString(@"select_storage_header_servers", @"Servers")];
-        [menu insertItem:itemServersHeader atIndex:currentIdxForSection];
-        
-        currentIdxForSection++;
-        
-        if ( !Settings.sharedInstance.isPro ) {
-            NSMenuItem* menuItem = [menu itemAtIndex:currentIdxForSection];
+    if ( singleSelectedDatabase ) {
+        if( singleSelectedDatabase.storageProvider == kCloudKit ) {
+            NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:singleSelectedDatabase.isSharedInCloudKit ? 
+                                NSLocalizedString(@"generic_manage_sharing_action_ellipsis", @"Manage Sharing...") :
+                                NSLocalizedString(@"generic_share_action_ellipsis", @"Share...")
+                                                          action:@selector(onShareCloudKit:)
+                                                   keyEquivalent:@""];
             
-            menuItem.enabled = NO;
-            if (@available(macOS 14.0, *)) {
-                menuItem.badge = [[NSMenuItemBadge alloc] initWithString:NSLocalizedString(@"pro_badge_text_all_caps", @"PRO")];
-            }
-            else {
-                menuItem.title = NSLocalizedString(@"mac_add_sftp_pro_only", @"Add SFTP Database... (Pro)");
-            }
-            currentIdxForSection++;
-            
-            menuItem = [menu itemAtIndex:currentIdxForSection];
-            
-            if (@available(macOS 14.0, *)) {
-                menuItem.badge = [[NSMenuItemBadge alloc] initWithString:NSLocalizedString(@"pro_badge_text_all_caps", @"PRO")];
-            }
-            else {
-                menuItem.title = NSLocalizedString(@"mac_add_webdav_pro_only",  @"Add WebDAV Database... (Pro)");
-            }
-            
-            menuItem.enabled = NO;
+            [menu insertItem:item atIndex:5];
         }
-    }
-}
-
-- (void)populateWifiSyncMenu {
-    NSMenu* menu = self.buttonAdd.menu;
-    
-    if ( !StrongboxProductBundle.supportsWiFiSync || Settings.sharedInstance.disableWiFiSyncClientMode ) {
-        return;
-    }
-    
-    
-    
-    [self removeAllMenuItemFromAddButtonMenu:@selector(onSelectWiFiSyncDatabase:)];
-    
-    
-    
-    NSArray<NSMenuItem*>* subItems;
-    NSArray<WiFiSyncServerConfig*>* wiFiSyncDevices = [self getWiFiSyncDevices];
-    if ( wiFiSyncDevices.count > 0 ) {
-        subItems = [wiFiSyncDevices map:^id _Nonnull(WiFiSyncServerConfig * _Nonnull obj, NSUInteger idx) {
-            NSMenuItem* server = [[NSMenuItem alloc] initWithTitle:obj.name action:@selector(onSelectWiFiSyncDatabase:) keyEquivalent:@""];
-            server.image = [self getWiFiSyncMenuItemImage:Settings.sharedInstance.isPro];
-            return server;
-        }];
-    }
-    else {
-        NSMenuItem* server = [[NSMenuItem alloc] initWithTitle:@"No Devices Found" action:@selector(onSelectWiFiSyncDatabase:)  keyEquivalent:@""]; 
-        server.enabled = NO;
-        server.image = [self getWiFiSyncMenuItemImage:NO];
-        subItems = @[server];
-    }
-    
-    NSUInteger idx = [self getAddButtonItemIndex:@selector(onDummyWiFiSyncParentMenuAction:)] + 1;
-    
-    for ( NSMenuItem* item in subItems ) {
-        if ( !Settings.sharedInstance.isPro ) {
-            item.enabled = NO;
-            if (@available(macOS 14.0, *)) {
-                item.badge = [[NSMenuItemBadge alloc] initWithString:NSLocalizedString(@"pro_badge_text_all_caps", @"PRO")];
-            }
-            else {
-                item.title = [NSString stringWithFormat:@"%@ (%@)", item.title, NSLocalizedString(@"pro_badge_text", @"Pro")];
-            }
-        }
-        
-        [menu insertItem:item atIndex:idx++];
+            
     }
 }
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
-    NSLog(@"🚀 validateUserInterfaceItem: [%@]", anItem);
+
     
     SEL theAction = [anItem action];
     
     
-    MacDatabasePreferences* database = nil;
-    if(self.tableView.selectedRow != -1) {
+    MacDatabasePreferences* singleSelectedDatabase = nil;
+    if ( self.tableView.selectedRowIndexes.count == 1 ) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
-        database = [MacDatabasePreferences fromUuid:databaseId];
+        singleSelectedDatabase = [MacDatabasePreferences fromUuid:databaseId];
     }
     
-    if (theAction == @selector(onViewSyncLog:)) {
-        if(self.tableView.selectedRow != -1) {
+    if ( singleSelectedDatabase ) {
+        if (theAction == @selector(onViewSyncLog:) ||
+            theAction == @selector(onViewBackups:) ||
+            theAction == @selector(onExportDatabase:) ||
+            theAction == @selector(onCopyTo:) ||
+            theAction == @selector(onSync:) ||
+            theAction == @selector(onRename:)) {
             return YES;
         }
-    }
-    else if (theAction == @selector(onViewBackups:)) {
-        if(self.tableView.selectedRow != -1) {
-            return YES;
+        else if (theAction == @selector(onShareCloudKit:)) {
+            if( singleSelectedDatabase.storageProvider == kCloudKit ) {
+                NSMenuItem* item = (NSMenuItem*)anItem;
+                
+                [item setTitle:singleSelectedDatabase.isSharedInCloudKit ? 
+                 NSLocalizedString(@"generic_manage_sharing_action_ellipsis", @"Manage Sharing...") :
+                 NSLocalizedString(@"generic_share_action_ellipsis", @"Share...")];
+
+                return YES;
+            }
         }
-    }
-    else if (theAction == @selector(onChangeNickname:)) {
-        if(self.tableView.selectedRow != -1) {
-            return YES;
-        }
-    }
-    else if (theAction == @selector(onExportDatabase:)) {
-        if(self.tableView.selectedRow != -1) {
-            return YES;
-        }
-    }
-    else if (theAction == @selector(onOpenInOfflineMode:)) {
-        if( database != nil ) {
-            BOOL isOpen = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
+        else if (theAction == @selector(onOpenInOfflineMode:)) {
+            BOOL isOpen = [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
+            
             return !isOpen;
         }
-    }
-    else if (theAction == @selector(onToggleAlwaysOpenOffline:)) {
-        if(self.tableView.selectedRow != -1) {
+        else if (theAction == @selector(onToggleAlwaysOpenOffline:)) {
             NSMenuItem* item = (NSMenuItem*)anItem;
-            [item setState:database.alwaysOpenOffline ? NSControlStateValueOn : NSControlStateValueOff];
+            [item setState:singleSelectedDatabase.alwaysOpenOffline ? NSControlStateValueOn : NSControlStateValueOff];
             return YES;
         }
-    }
-    else if (theAction == @selector(onToggleReadOnly:)) {
-        if( database != nil ) {
-            Model* model = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
-            BOOL isReadOnly = model ? model.isReadOnly : database.readOnly;
+        else if (theAction == @selector(onToggleReadOnly:)) {
+            Model* model = [DatabasesCollection.shared getUnlockedWithUuid:singleSelectedDatabase.uuid];
+            BOOL isReadOnly = model ? model.isReadOnly : singleSelectedDatabase.readOnly;
             
             NSMenuItem* item = (NSMenuItem*)anItem;
             [item setState:isReadOnly ? NSControlStateValueOn : NSControlStateValueOff];
             return YES;
         }
-    }
-    else if (theAction == @selector(onSync:)) {
-        if(self.tableView.selectedRow != -1) {
+        else if ( theAction == @selector(onLock:)) {
+            BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
+            
+            return isUnlocked;
+        }
+        else if ( theAction == @selector(onLockOrUnlock:)) {
+            BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
+            
+            NSMenuItem* item = (NSMenuItem*)anItem;
+            
+            [item setTitle:isUnlocked ? NSLocalizedString(@"generic_verb_lock_action", @"Lock") : NSLocalizedString(@"casg_unlock_action", @"unlock")];
+            
+            return YES;
+        }
+        else if (theAction == @selector(onToggleLaunchAtStartup:)) {
+            NSMenuItem* item = (NSMenuItem*)anItem;
+            [item setState:singleSelectedDatabase.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff];
+            
             return YES;
         }
     }
-    else if (theAction == @selector(onRemove:)) {
-        return self.tableView.selectedRowIndexes.count;
+
+    if (theAction == @selector(onRemove:)) { 
+        return self.tableView.selectedRowIndexes.count > 0;
     }
-    else if ( theAction == @selector(onLock:)) {
-        BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
-        
-        return self.tableView.selectedRowIndexes.count == 1 && database && isUnlocked;
-    }
-    else if ( theAction == @selector(onLockOrUnlock:)) {
-        BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:database.uuid];
-        
-        NSMenuItem* item = (NSMenuItem*)anItem;
-        
-        [item setTitle:isUnlocked ? NSLocalizedString(@"generic_verb_lock_action", @"Lock") : NSLocalizedString(@"casg_unlock_action", @"unlock")];
-        
-        return self.tableView.selectedRowIndexes.count == 1 && database;
-    }
-    else if (theAction == @selector(onToggleLaunchAtStartup:)) {
-        if(self.tableView.selectedRow != -1) {
-            NSMenuItem* item = (NSMenuItem*)anItem;
-            [item setState:database.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff];
-        }
-        
-        return self.tableView.selectedRow != -1;
-    }
-    
+
     return NO;
-}
-
-- (NSArray<WiFiSyncServerConfig*>*)getWiFiSyncDevices {
-    NSMutableArray<WiFiSyncServerConfig*>* allWiFiSyncDevices = [WiFiSyncBrowser.shared.availableServers mutableCopy];
-    NSArray<WiFiSyncServerConfig*>* wiFiSyncDevices = allWiFiSyncDevices;
-    
-    if ( WiFiSyncServer.shared.isRunning ) { 
-        NSString* myName = WiFiSyncServer.shared.lastRegisteredServiceName;
-
-        if ( myName.length ) {
-            wiFiSyncDevices = [allWiFiSyncDevices filter:^BOOL(WiFiSyncServerConfig * _Nonnull obj) {
-                return ![obj.name isEqualToString:myName];
-            }];
-        }
-    }
-    
-    return wiFiSyncDevices;
-}
-
-- (NSImage*)getWiFiSyncMenuItemImage:(BOOL)live {
-    NSImage* image = [NSImage imageWithSystemSymbolName:@"externaldrive.fill.badge.wifi" accessibilityDescription:nil];
-    
-    if (@available(macOS 12.0, *)) {
-        NSImageSymbolConfiguration* config = [NSImageSymbolConfiguration configurationWithPaletteColors:live ? @[NSColor.systemGreenColor, NSColor.systemBlueColor] : @[NSColor.systemGrayColor]];
-        
-        image = [image imageWithSymbolConfiguration:config];
-    }
-    
-    return image;
-}
-
-- (IBAction)onDummyWiFiSyncParentMenuAction:(id)sender {
-    
-}
-
-- (IBAction)onSelectWiFiSyncDatabase:(id)sender {
-    NSMenuItem* item = sender;
-        
-    WiFiSyncServerConfig* server = [WiFiSyncBrowser.shared getServerConfig:item.title];
-    
-    if ( server ) {
-        NSViewController* vc = [SwiftUIViewFactory makeWiFiSyncPassCodeEntryViewControllerWithServer:server
-                                                                                              onDone:^(WiFiSyncServerConfig * server, NSString *passcode) {
-            NSViewController* sheet = self.presentedViewControllers.firstObject;
-            [Utils dismissViewControllerCorrectly:sheet];
-            
-            if ( server && passcode && passcode.length ) {
-                [self onAddWifiSyncDatabase:server passcode:passcode];
-            }
-        }];
-        
-        [self presentViewControllerAsSheet:vc];
-    }
-    else {
-        [MacAlerts error:nil window:self.view.window];
-    }
 }
 
 - (IBAction)onViewSyncLog:(id)sender {
@@ -1098,14 +889,6 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 }
 
-- (IBAction)onChangeNickname:(id)sender {
-    if(self.tableView.selectedRow != -1) {
-        DatabaseCellView *view = [self.tableView viewAtColumn:0 row:self.tableView.selectedRow makeIfNecessary:NO];
-        
-        [view onChangeNickname];
-    }
-}
-
 - (void)publishDatabasePreferencesChangedNotification:(NSString*)databaseUuid {
     
     
@@ -1116,36 +899,366 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     });
 }
 
-- (NSUInteger)getAddButtonItemIndex:(SEL)action {
-    NSMenu* topLevelMenuItem = self.buttonAdd.menu;
-    
-    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        return obj.action == action;
-    }];
-    
-    return index;
+- (IBAction)onSettings:(id)sender {
+    [AppSettingsWindowController.sharedInstance showGeneralTab];
 }
 
-- (void)removeAllMenuItemFromAddButtonMenu:(SEL)action {
-    while ( [self removeMenuItemFromAddButtonMenu:action] ) ;
+
+
+- (IBAction)onCreateNew:(id)sender {
+    
+    
+    
+    DocumentController* dc = DocumentController.sharedDocumentController;
+    
+    [dc newDocument:nil];
 }
 
-- (BOOL)removeMenuItemFromAddButtonMenu:(SEL)action {
-    NSMenu* topLevelMenuItem = self.buttonAdd.menu;
+- (IBAction)onAddExisting:(id)sender {
     
-    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        return obj.action == action;
-    }];
     
-    if( topLevelMenuItem &&  index != NSNotFound) {
+    
+    DocumentController* dc = DocumentController.sharedDocumentController;
+    
+    [dc originalOpenDocument:nil];
+}
+
+- (IBAction)onCopyTo:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
         
-        [topLevelMenuItem removeItemAtIndex:index];
-        return YES;
+        [self copyDatabaseToStorage:database];
+    }
+}
+
+- (void)copyDatabaseToStorage:(MacDatabasePreferences*)database {
+    [self beginAddDatabaseSequence:YES newModel:nil existingDatabaseToCopy:database];
+}
+
+
+
+- (void)beginAddDatabaseSequence:(BOOL)createMode
+                        newModel:(DatabaseModel* _Nullable)newModel
+          existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    if ( Settings.sharedInstance.disableNetworkBasedFeatures ) {
+        [self onAddDatabaseUserChoseStorage:kLocalDevice wiFiSyncDevice:nil createMode:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy]; 
+        return;
+    }
+    
+    __weak DatabasesManagerVC *weakSelf = self;
+    [DBManagerPanel.sharedInstance show];
+    
+    
+    
+    for ( NSViewController* vc in self.presentedViewControllers ) {
+        [Utils dismissViewControllerCorrectly:vc];
+    }
+
+    
+
+    NSString* cloudKitUnavailableReason = nil;
+    
+#ifndef NO_NETWORKING
+    if ( !CloudKitDatabasesInteractor.shared.fastIsAvailable ) {
+        if ( CloudKitDatabasesInteractor.shared.cachedAccountStatusError ) {
+            cloudKitUnavailableReason = [NSString stringWithFormat:@"%@", CloudKitDatabasesInteractor.shared.cachedAccountStatusError];
+        }
+        else {
+            cloudKitUnavailableReason = [NSString stringWithFormat:@"%@", [CloudKitDatabasesInteractor getAccountStatusStringWithStatus:CloudKitDatabasesInteractor.shared.cachedAccountStatus]];
+        }
+    }
+#endif
+    
+    NSViewController* vc = [SwiftUIViewFactory makeStorageSelectorWithCreateMode:createMode
+                                                                     isImporting:newModel != nil
+                                                                           isPro:Settings.sharedInstance.isPro
+                                                       cloudKitUnavailableReason:cloudKitUnavailableReason
+                                                                initialSelection:(createMode && cloudKitUnavailableReason == nil) ? kCloudKit : kLocalDevice
+                                                                      completion:^(BOOL userCancelled, StorageProvider storageProvider, WiFiSyncServerConfig * selectedWiFiSyncDevice) {
+        NSViewController* toDismiss = weakSelf.presentedViewControllers.firstObject;
+        
+        if ( toDismiss ) {
+            NSViewController* sheet = self.presentedViewControllers.firstObject;
+            [Utils dismissViewControllerCorrectly:sheet];
+            
+            if ( !userCancelled ) {
+                [weakSelf onAddDatabaseUserChoseStorage:storageProvider 
+                                         wiFiSyncDevice:selectedWiFiSyncDevice
+                                             createMode:createMode
+                                               newModel:newModel
+                                 existingDatabaseToCopy:existingDatabaseToCopy];
+            }
+        }
+    }];
+    
+    [self presentViewControllerAsSheet:vc];
+}
+
+- (void)onAddDatabaseUserChoseStorage:(StorageProvider)storageProvider
+                       wiFiSyncDevice:(WiFiSyncServerConfig*)wiFiSyncDevice
+                           createMode:(BOOL)createMode 
+                             newModel:(DatabaseModel* _Nullable)newModel
+               existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    if ( createMode ) {
+        if ( storageProvider == kLocalDevice ) {
+            [self onSelectedNewDatabaseLocation:MacFileBasedBookmarkStorageProvider.sharedInstance providerLocationParam:nil newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
+        else if ( storageProvider == kSFTP ) {
+            [self createOrAddSFTPDatabase:YES newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
+        else if ( storageProvider == kWebDAV ) {
+            [self createOrAddWebDAVDatabase:YES newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
+        else if ( storageProvider == kCloudKit ) {
+#ifndef NO_NETWORKING
+            [self onSelectedNewDatabaseLocation:CloudKitStorageProvider.sharedInstance providerLocationParam:nil newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+#endif
+        }
+        else {
+            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:storageProvider];
+            [self showStorageBrowserForProvider:provider createMode:YES newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
     }
     else {
-        return NO;
-        
+        if ( storageProvider == kLocalDevice ) {
+            DocumentController* dc = (DocumentController*)NSDocumentController.sharedDocumentController;
+            [dc originalOpenDocumentWithFileSelection];
+        }
+        else if ( storageProvider == kSFTP ) {
+            [self createOrAddSFTPDatabase:NO newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
+        else if ( storageProvider == kWebDAV ) {
+            [self createOrAddWebDAVDatabase:NO newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
+        else if ( storageProvider == kWiFiSync ) {
+            [self onAddDatabaseSelectedWiFiSyncDevice:wiFiSyncDevice newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy]; 
+        }
+        else {
+            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:storageProvider];
+            [self showStorageBrowserForProvider:provider createMode:NO newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
     }
+}
+
+- (void)onAddDatabaseSelectedWiFiSyncDevice:(WiFiSyncServerConfig*)server 
+                                   newModel:(DatabaseModel* _Nullable)newModel existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    NSViewController* vc = [SwiftUIViewFactory makeWiFiSyncPassCodeEntryViewController:server
+                                                                                onDone:^(WiFiSyncServerConfig * server, NSString *passcode) {
+        NSViewController* sheet = self.presentedViewControllers.firstObject;
+        [Utils dismissViewControllerCorrectly:sheet];
+        
+        if ( server && passcode && passcode.length ) {
+            [self onAddWifiSyncDatabase:server passcode:passcode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
+    }];
+    
+    [self presentViewControllerAsSheet:vc];
+}
+
+- (void)onAddWifiSyncDatabase:(WiFiSyncServerConfig*)server
+                     passcode:(NSString*)passcode 
+                     newModel:(DatabaseModel* _Nullable)newModel existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    WiFiSyncStorageProvider *sp = [[WiFiSyncStorageProvider alloc] init];
+    
+    server.passcode = passcode;
+    sp.explicitConnectionConfig = server;
+    
+    [self showStorageBrowserForProvider:sp newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+}
+
+- (void)createOrAddSFTPDatabase:(BOOL)createMode newModel:(DatabaseModel* _Nullable)newModel existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+#ifndef NO_NETWORKING
+    SFTPConnectionsManager* vc = [SFTPConnectionsManager instantiateFromStoryboard];
+    
+    __weak DatabasesManagerVC* weakSelf = self;
+    vc.onSelected = ^(SFTPSessionConfiguration * _Nonnull connection) {
+        SFTPStorageProvider* provider = [[SFTPStorageProvider alloc] init];
+        provider.explicitConnection = connection;
+        provider.maintainSessionForListing = YES;
+        
+        [weakSelf showStorageBrowserForProvider:provider createMode:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+    };
+    
+    [self presentViewControllerAsSheet:vc];
+#endif
+}
+
+- (void)createOrAddWebDAVDatabase:(BOOL)createMode newModel:(DatabaseModel* _Nullable)newModel existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+#ifndef NO_NETWORKING
+    WebDAVConnectionsManager* vc = [WebDAVConnectionsManager instantiateFromStoryboard];
+    
+    __weak DatabasesManagerVC* weakSelf = self;
+    vc.onSelected = ^(WebDAVSessionConfiguration * _Nonnull connection) {
+        WebDAVStorageProvider* provider = [[WebDAVStorageProvider alloc] init];
+        provider.explicitConnection = connection;
+        provider.maintainSessionForListing = YES;
+        
+        [weakSelf showStorageBrowserForProvider:provider createMode:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+    };
+    
+    [self presentViewControllerAsSheet:vc];
+#endif
+}
+
+- (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider newModel:(DatabaseModel* _Nullable)newModel existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    [self showStorageBrowserForProvider:provider createMode:NO newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+}
+
+- (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider 
+                           createMode:(BOOL)createMode
+                             newModel:(DatabaseModel* _Nullable)newModel
+               existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    SelectStorageLocationVC* vc = [SelectStorageLocationVC newViewController];
+    vc.provider = provider;
+    vc.createMode = createMode;
+    
+    vc.onDone = ^(BOOL success, StorageBrowserItem * _Nonnull selectedItem) {
+        if (success) {
+            [self onSelectedStorageLocationSuccess:provider selectedItem:selectedItem createMode:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
+        }
+    };
+    
+    [self presentViewControllerAsSheet:vc];
+}
+
+- (void)onSelectedStorageLocationSuccess:(id<SafeStorageProvider>)provider
+                            selectedItem:(StorageBrowserItem*)selectedItem
+                              createMode:(BOOL)createMode
+                                newModel:(DatabaseModel* _Nullable)newModel 
+                  existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    if ( createMode ) {
+        [self onSelectedNewDatabaseLocation:provider 
+                      providerLocationParam:selectedItem
+                                   newModel:newModel 
+                     existingDatabaseToCopy:existingDatabaseToCopy];
+    }
+    else {
+        [self onSelectedExistingDatabase:provider selectedItem:selectedItem];
+    }
+}
+
+- (void)onSelectedExistingDatabase:(id<SafeStorageProvider>)provider
+                      selectedItem:(StorageBrowserItem*)selectedItem {
+    NSString* suggestedName = [selectedItem.name stringByDeletingPathExtension];
+    
+    suggestedName = [DatabasesManager.sharedInstance getUniqueNameFromSuggestedName:suggestedName];
+    
+    MacDatabasePreferences *newDatabase = [provider getDatabasePreferences:suggestedName providerData:selectedItem.providerData];
+    
+    if (!newDatabase) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [MacAlerts error:nil window:self.view.window];
+        });
+    }
+    else {
+        [newDatabase add];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self openDatabase:newDatabase];
+        });
+    }
+}
+
+- (void)onSelectedNewDatabaseLocation:(id<SafeStorageProvider>)provider
+                providerLocationParam:(id _Nullable)providerLocationParam
+                             newModel:(DatabaseModel* _Nullable)newModel
+               existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy
+{
+    __weak DatabasesManagerVC* weakSelf = self;
+    
+    __block NewDatabaseSwiftHelper * helper = [[NewDatabaseSwiftHelper alloc] initWithParentViewController:self
+                                                                                                  provider:provider
+                                                                                     providerLocationParam:providerLocationParam
+                                                                                                completion:^(MacDatabasePreferences * _Nullable database, BOOL userCancelled, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [weakSelf onCreateNewDatabaseDone:database userCancelled:userCancelled error:error];
+        });
+        
+        helper = nil;
+    }];
+    
+    NSError* error = nil;
+    
+    if ( newModel ) {
+        if ( ![helper beginImportNewDatabaseSequenceWithImportedModel:newModel error:&error] ) {
+            NSLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            [MacAlerts error:error window:self.view.window];
+        }
+    }
+    else if ( existingDatabaseToCopy ) {
+        if (! [helper beginCopyToNewDatabaseSequenceWithSourceDatabase:existingDatabaseToCopy error:&error] ) {
+            NSLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            [MacAlerts error:error window:self.view.window];
+        }
+    }
+    else {
+        if ( ![helper beginBrandNewDatabaseSequenceAndReturnError:&error] ) {
+            NSLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            [MacAlerts error:error window:self.view.window];
+        }
+    }
+}
+
+- (void)onCreateNewDatabaseDone:(MacDatabasePreferences*)database
+                  userCancelled:(BOOL)userCancelled
+                          error:(NSError*)error {
+    if ( userCancelled ) {
+        return; 
+    }
+    
+    if ( error || !database ) {
+        NSLog(@"🔴 Error in onNewImportedDatabaseCreatedDone: [%@]", error);
+        [MacAlerts error:error window:self.view.window];
+        return;
+    }
+    
+    [database add];
+    
+    [self openDatabase:database];
+}
+
+
+
+- (IBAction)onShareCloudKit:(id)sender {
+    if(self.tableView.selectedRow == -1) {
+        return;
+    }
+    
+    NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+    MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
+    
+    [self onCreateOrManageCloudKitSharing:database];
+}
+
+- (void)onCreateOrManageCloudKitSharing:(MacDatabasePreferences*)database {
+#ifndef NO_NETWORKING    
+    self.cloudKitSharingHelper = [[CocoaCloudKitSharingHelper alloc] initWithDatabase:database
+                                                                window:self.view.window
+                                                            completion:^(NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                [MacAlerts error:error window:self.view.window];
+            }
+            
+            
+            
+            [CloudKitDatabasesInteractor.shared refreshAndMergeWithCompletionHandler:^(NSError * _Nullable error) {
+                if ( error ) {
+                    NSLog(@"🔴 Error refreshing... [%@]", error);
+                }
+            }];
+        });
+    }];
+    
+    [self.cloudKitSharingHelper beginNewShare];
+#endif
+}
+
+- (IBAction)onShowPasswordGenerator:(id)sender {
+    [PasswordGenerator.sharedInstance show];
 }
 
 @end
+
+

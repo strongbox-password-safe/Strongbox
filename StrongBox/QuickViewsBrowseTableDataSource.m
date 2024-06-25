@@ -76,13 +76,7 @@ static NSUInteger const kQuickViewSectionIdx = 0;
 
         NSString *loc6 = NSLocalizedString(@"quick_view_title_nearly_expired_entries_subtitle", @"View all nearly expired entries");
 
-        UIImage* image;
-        if (@available(iOS 14.2, *)) {
-            image = [UIImage systemImageNamed:@"clock.arrow.2.circlepath"];
-        }
-        else {
-            image = [UIImage imageNamed:@"timer"];
-        }
+        UIImage* image = [UIImage systemImageNamed:@"clock.arrow.2.circlepath"];
         
         QuickViewConfig *entries = [QuickViewConfig title:title subtitle:loc6 image:image searchTerm:kSpecialSearchTermNearlyExpiredEntries];
         

@@ -52,8 +52,13 @@
 }
 
 + (void)removeOrDeleteSafe:(DatabasePreferences*)database {
-    
-    [DatabaseNuker nuke:database];
+#ifndef IS_APP_EXTENSION
+    [DatabaseNuker nuke:database deleteUnderlyingIfSupported:YES completion:^(NSError * _Nullable error) {
+        if ( error ) {
+            NSLog(@"🔴 Error nuking: [%@]", error);
+        }
+    }];
+#endif
 }
 
 @end

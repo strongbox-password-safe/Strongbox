@@ -110,6 +110,26 @@ double calculateCrackingTime(double entropy, NSUInteger guessesPerSecond) {
 }
 
 - (NSString *)category {
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     if (self.entropy < 28.0f) {
         return NSLocalizedString(@"password_strength_category_very_weak", @"Very Weak");
     }

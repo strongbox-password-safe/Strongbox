@@ -4,9 +4,8 @@ use_frameworks!
 
 abstract_target 'common-mac' do
   project 'macbox/MacBox.xcodeproj'
-  platform :osx, '11.0'
+  platform :osx, '12.0'
   
-  pod 'libsodium'
   pod 'SwiftCBOR'
   
   target 'Mac-Freemium' do
@@ -74,9 +73,8 @@ end
 
 abstract_target 'common-ios' do
     project 'Strongbox.xcodeproj'
-    platform :ios, '14.0'
+    platform :ios, '15.0'
     
-    pod 'libsodium'    
     pod 'SwiftCBOR'
     
     target 'Strongbox-iOS' do

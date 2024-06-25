@@ -53,7 +53,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
 
 + (void)initialize {
     if(self == [KeePassAttachmentAbstractionLayer class]) {
-        kEmptyDataDigest = NSData.data.sha256.hexString; 
+        kEmptyDataDigest = NSData.data.sha256.upperHexString; 
     }
 }
 
@@ -254,7 +254,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
     
     
     self.attachmentLength = self.digested ? self.digested.length : 0;
-    _sha256Hex = self.digested ? self.digested.digest.hexString : kEmptyDataDigest;
+    _sha256Hex = self.digested ? self.digested.digest.upperHexString : kEmptyDataDigest;
 }
 
 - (NSInputStream *)getPlainTextInputStream {

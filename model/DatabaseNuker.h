@@ -13,7 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseNuker : NSObject
 
-+ (void)nuke:(METADATA_PTR)database;
++ (void)nuke:(METADATA_PTR)database 
+deleteUnderlyingIfSupported:(BOOL)deleteUnderlyingIfSupported
+  completion:(void(^)(NSError* _Nullable error))completion;
 
 @end
 

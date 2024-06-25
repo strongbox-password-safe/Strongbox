@@ -187,7 +187,7 @@
     
     [StrongboxFilesManager.sharedInstance deleteAllLocalAndAppGroupFiles]; 
 
-    [DatabasePreferences nukeAll]; 
+    [DatabasePreferences nukeAllDeleteUnderlyingIfPossible]; 
 }
 
 - (void)onDone:(BOOL)userJustCompletedBiometricAuthentication {

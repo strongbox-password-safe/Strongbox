@@ -57,8 +57,9 @@ class WiFiSyncServer: NSObject {
 
     @objc
     func startOrStopWiFiSyncServerAccordingToSettings() throws {
-        if settings.runAsWiFiSyncSourceDevice, wiFiSyncIsPossible {
-            try WiFiSyncServer.shared.start(name: settings.wiFiSyncServiceName, passcode: settings.wiFiSyncPasscode)
+        if settings.runAsWiFiSyncSourceDevice, wiFiSyncIsPossible, let passcode = settings.wiFiSyncPasscode {
+            try WiFiSyncServer.shared.start(name: settings.wiFiSyncServiceName,
+                                            passcode: passcode)
         } else {
             WiFiSyncServer.shared.stop()
         }

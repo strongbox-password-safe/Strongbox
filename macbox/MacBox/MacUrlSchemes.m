@@ -50,14 +50,13 @@ StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
     return kLocalDevice;
 }
 
-
 NSURL* fileUrlFromManagedUrl(NSURL* managedUrl) {
     if ( [managedUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
         NSURLComponents* components =  [NSURLComponents componentsWithURL:managedUrl resolvingAgainstBaseURL:NO];
         components.scheme = kStrongboxFileUrlScheme;
         return components.URL;
     }
-    
+
     return managedUrl;
 }
 

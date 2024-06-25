@@ -8,7 +8,6 @@
 
 import SwiftUI
 
-@available(macOS 12.0, *)
 struct PasswordConcealRevealTextField: View {
     @Binding var text: String
     @Binding var isSecure: Bool

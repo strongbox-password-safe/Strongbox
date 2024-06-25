@@ -10,7 +10,10 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "BrowseSortConfiguration.h"
+
+#ifndef IS_APP_EXTENSION
 #import "DatabaseNuker.h"
+#endif
 
 @interface DatabasePreferences ()
 
@@ -94,29 +97,49 @@
     return [SafesList.sharedInstance getSuggestedNewDatabaseName];
 }
 
-- (void)add:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
+- (BOOL)add:(NSError * _Nullable __autoreleasing *)error {
+    return [self add:nil initialCacheModDate:nil error:error];
+}
+
+- (BOOL)add:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate error:(NSError * _Nullable __autoreleasing *)error {
     if ( self.templateDummy ) {
-        [SafesList.sharedInstance add:self.templateDummy initialCache:initialCache initialCacheModDate:initialCacheModDate];
+        return [SafesList.sharedInstance add:self.templateDummy initialCache:initialCache initialCacheModDate:initialCacheModDate error:error];
     }
     else {
         NSLog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
+        return NO;
     }
 }
 
-- (void)addWithDuplicateCheck:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
+- (BOOL)addWithDuplicateCheck:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate error:(NSError **)error {
+    return [self addWithDuplicateCheck:initialCache initialCacheModDate:initialCacheModDate duplicateFound:nil error:error];
+}
+
+- (BOOL)addWithDuplicateCheck:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate duplicateFound:(BOOL *)duplicateFound error:(NSError **)error {
+    NSString* duplicateUuid = nil;
+    BOOL addedDatabase = NO;
+    
     if ( self.templateDummy ) {
-        NSString* newUuid = [SafesList.sharedInstance addWithDuplicateCheck:self.templateDummy
-                                                               initialCache:initialCache
-                                                        initialCacheModDate:initialCacheModDate];
-        
-        if ( newUuid ) {
+        addedDatabase = [SafesList.sharedInstance addWithDuplicateCheck:self.templateDummy
+                                                           initialCache:initialCache
+                                                    initialCacheModDate:initialCacheModDate
+                                                          duplicateUuid:&duplicateUuid
+                                                                  error:error];
+    
+        if ( duplicateUuid ) {
             NSLog(@"✅ Duplicate found - changing UUID of this database to match...");
-            _uuid = newUuid;
+            _uuid = duplicateUuid;
         }
     }
     else {
         NSLog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
     }
+    
+    if ( duplicateFound ) {
+        *duplicateFound = duplicateUuid != nil;
+    }
+    
+    return addedDatabase;
 }
 
 
@@ -149,10 +172,19 @@
     return [SafesList.sharedInstance reloadIfChangedByOtherComponent];
 }
 
-+ (void)nukeAll {
++ (void)nukeAllDeleteUnderlyingIfPossible {
+#ifndef IS_APP_EXTENSION
     for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
-        [DatabaseNuker nuke:database];
+        [DatabaseNuker nuke:database deleteUnderlyingIfSupported:YES completion:^(NSError * _Nullable error) {
+            if ( error ) {
+                NSLog(@"🔴 error nuking database = [%@]", error);
+            }
+            else {
+                NSLog(@"🟢 database nuked... [%@]", database);
+            }
+        }];
     }
+#endif
 }
 
 - (NSDictionary *)getJsonSerializationDictionary {
@@ -1394,6 +1426,16 @@
 - (void)setIsSharedInCloudKit:(BOOL)isSharedInCloudKit {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.isSharedInCloudKit = isSharedInCloudKit;
+    }];
+}
+
+- (BOOL)isOwnedByMeCloudKit {
+    return self.metadata.isOwnedByMeCloudKit;
+}
+
+- (void)setIsOwnedByMeCloudKit:(BOOL)isOwnedByMeCloudKit {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.isOwnedByMeCloudKit = isOwnedByMeCloudKit;
     }];
 }
 

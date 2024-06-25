@@ -159,14 +159,19 @@
 }
 
 - (void)bindAdvanced {
-    BOOL advanced = self.database.showAdvancedUnlockOptions;
+    DatabaseFormat format = [self getDatabaseFormat];
+    
+    BOOL advanced = self.database.showAdvancedUnlockOptions && !( format == kKeePass1 || format == kPasswordSafe );
+    
+    self.checkboxShowAdvanced.enabled = !( format == kKeePass1 || format == kPasswordSafe );
+    self.checkboxShowAdvanced.hidden = ( format == kKeePass1 || format == kPasswordSafe );
     
     self.acceptEmptyPassword.hidden = !advanced;
     self.labelKeyFile.hidden = !advanced;
     self.popupKeyFile.hidden = !advanced;
     self.stackHardwareKey.hidden = !advanced;
     self.yubiKeyPopup.hidden = !advanced;
-
+    
     [self.checkboxShowAdvanced setState:advanced ? NSControlStateValueOn : NSControlStateValueOff];
 }
 
@@ -189,12 +194,12 @@
 }
 
 - (BOOL)manualCredentialsAreValid {
-    DatabaseFormat heuristicFormat = [self getHeuristicFormat];
+    DatabaseFormat format = [self getDatabaseFormat];
 
-    BOOL formatAllowsEmptyOrNone =  heuristicFormat == kKeePass4 ||
-                                    heuristicFormat == kKeePass ||
-                                    heuristicFormat == kFormatUnknown ||
-                                    (heuristicFormat == kKeePass1 && [self keyFileIsSet]);
+    BOOL formatAllowsEmptyOrNone =  format == kKeePass4 ||
+        format == kKeePass ||
+        format == kFormatUnknown ||
+        (format == kKeePass1 && [self keyFileIsSet]);
 
     return self.textFieldPassword.stringValue.length || (formatAllowsEmptyOrNone && Settings.sharedInstance.allowEmptyOrNoPasswordEntry);
 }
@@ -380,10 +385,23 @@
     return self.selectedKeyFileBookmark != nil;
 }
 
-- (DatabaseFormat)getHeuristicFormat {
-    BOOL probablyPasswordSafe = [self.database.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
-    DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; 
-    return heuristicFormat;
+- (DatabaseFormat)getDatabaseFormat {
+    if ( self.database.likelyFormat == kFormatUnknown ) {
+        BOOL probablyPasswordSafe = [self.database.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
+        
+        if ( probablyPasswordSafe ) {
+            return kPasswordSafe;
+        }
+        
+        BOOL probablyKp1 = [self.database.fileUrl.pathExtension caseInsensitiveCompare:@"kdb"] == NSOrderedSame;
+        if ( probablyKp1 ) {
+            return kKeePass1;
+        }
+        
+        return kKeePass; 
+    }
+    
+    return self.database.likelyFormat;
 }
 
 - (IBAction)onRefreshHardwareKey:(id)sender {

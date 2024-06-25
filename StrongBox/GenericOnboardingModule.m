@@ -50,7 +50,12 @@
     
     vc.header = self.header;
     vc.message = self.message;
+    
     vc.image = self.image;
+    if (@available(iOS 17.0, *)) {
+        vc.symbolEffect = self.symbolEffect;
+    }
+    
     vc.onButtonClicked = self.onButtonClicked;
     vc.hideDismiss = self.hideDismiss;
     vc.imageSize = self.imageSize;

@@ -40,11 +40,6 @@ public class AppSettingsWindowController: NSWindowController {
         showTab(GeneralPreferencesViewController.self)
     }
 
-    @objc
-    public func showPasswordGenerationTab() {
-        showTab(PasswordGenerationPreferences.self)
-    }
-
     public func showTab(_ type: (some NSViewController).Type) {
         guard let tabVc = contentViewController as? NSTabViewController,
               let idx = getChildVcIndex(type)

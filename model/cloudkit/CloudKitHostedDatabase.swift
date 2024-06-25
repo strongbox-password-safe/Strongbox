@@ -9,7 +9,15 @@
 import CloudKit
 import Foundation
 
-@available(iOS 15.0, macOS 12.0, *)
+extension CloudKitHostedDatabase {
+    enum RecordKeys {
+        static let nickname = "nickname"
+        static let filename = "filename"
+        static let dataBlob = "dataBlob"
+        static let modDate = "modDate"
+    }
+}
+
 struct CloudKitHostedDatabase: Identifiable {
     let id: CloudKitDatabaseIdentifier
 
@@ -18,11 +26,11 @@ struct CloudKitHostedDatabase: Identifiable {
     let modDate: Date
     let dataBlob: Data? 
     let associatedCkRecord: CKRecord
-}
+    let sharedWithMe: Bool
 
-@available(iOS 15.0, macOS 12.0, *)
-extension CloudKitHostedDatabase {
     init?(record: CKRecord, sharedWithMe: Bool) {
+        self.sharedWithMe = sharedWithMe
+
         if sharedWithMe {
             guard let ownerName = record.share?.recordID.zoneID.ownerName else {
                 NSLog("🔴 Database CKRecord marked as sharedWithMe but share is nil or ownerName on CKShare is nil")
@@ -52,8 +60,13 @@ extension CloudKitHostedDatabase {
         self.modDate = modDate
 
         if let asset = record[RecordKeys.dataBlob] as? CKAsset {
-            if let url = asset.fileURL 
-            {
+            
+
+            
+            
+            
+
+            if let url = asset.fileURL {
                 do {
                     dataBlob = try Data(contentsOf: url)
                 } catch {
@@ -69,15 +82,5 @@ extension CloudKitHostedDatabase {
         }
 
         associatedCkRecord = record
-    }
-}
-
-@available(iOS 15.0, macOS 12.0, *)
-extension CloudKitHostedDatabase {
-    enum RecordKeys {
-        static let nickname = "nickname"
-        static let filename = "filename"
-        static let dataBlob = "dataBlob"
-        static let modDate = "modDate"
     }
 }

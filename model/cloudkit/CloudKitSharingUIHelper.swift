@@ -9,35 +9,61 @@
 import CloudKit
 import UIKit
 
-@available(iOS 15.0, *)
 @objc
 class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
-    var database: DatabasePreferences
-    var parentViewController: UIViewController 
-    var fooCompletion: (() -> Void)? = nil
+    let database: DatabasePreferences
+    let parentViewController: UIViewController
+    let completion: (_ error: Error?) -> Void
 
-    deinit {
-        NSLog("🔴 RUHG ROH!") 
+    enum StrongboxSyncSharingError: Error {
+        case couldNotGetExistingCloudKitShare
     }
 
     @objc
-    init(database: DatabasePreferences, parentViewController: UIViewController) {
+    init(database: DatabasePreferences, parentViewController: UIViewController, completion: @escaping (_: Error?) -> Void) {
         self.database = database
         self.parentViewController = parentViewController
+        self.completion = completion
     }
 
     @objc
-    func present(rect: CGRect, sourceView: UIView, fooCompletion: @escaping (() -> Void)) {
-        self.fooCompletion = fooCompletion
+    func present(rect: CGRect, sourceView: UIView) {
+        if database.isSharedInCloudKit {
+            Task { [weak self] in
+                guard let self else { return }
 
-        let cloudSharingController = UICloudSharingController { [weak self] (_, completion: @escaping (CKShare?, CKContainer?, Error?) -> Void) in
-            guard let self else { return }
+                do {
+                    let (share, container) = try await CloudKitDatabasesInteractor.shared.getCurrentCKShare(for: database)
 
-            share(completion: completion)
+                    guard let share else {
+                        throw StrongboxSyncSharingError.couldNotGetExistingCloudKitShare
+                    }
+
+                    createExistingShareControllerAndPresent(share, container, rect: rect, sourceView: sourceView)
+                } catch {
+                    completion(error)
+                }
+            }
+        } else {
+            let cloudSharingController = UICloudSharingController { [weak self] (_, completion: @escaping (CKShare?, CKContainer?, Error?) -> Void) in
+                guard let self else { return }
+
+                share(completion: completion)
+            }
+
+            presentCloudSharingController(cloudSharingController, rect: rect, sourceView: sourceView)
         }
+    }
 
-        
+    @MainActor
+    func createExistingShareControllerAndPresent(_ share: CKShare, _ container: CKContainer, rect: CGRect, sourceView: UIView) {
+        let cloudSharingController = UICloudSharingController(share: share, container: container)
 
+        presentCloudSharingController(cloudSharingController, rect: rect, sourceView: sourceView)
+    }
+
+    @MainActor
+    func presentCloudSharingController(_ cloudSharingController: UICloudSharingController, rect: CGRect, sourceView: UIView) {
         cloudSharingController.delegate = self
 
         if let popover = cloudSharingController.popoverPresentationController {
@@ -46,13 +72,13 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
             popover.permittedArrowDirections = .any
         }
 
-        parentViewController.present(cloudSharingController, animated: true) {
-            NSLog("Yo! TODO: ")
-        }
+        parentViewController.present(cloudSharingController, animated: true)
     }
 
     func cloudSharingController(_: UICloudSharingController, failedToSaveShareWithError error: any Error) {
         NSLog("🔴 failedToSaveShareWithError: \(error)")
+
+        completion(error)
     }
 
     func itemTitle(for _: UICloudSharingController) -> String? {
@@ -61,10 +87,12 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
 
     func cloudSharingControllerDidSaveShare(_: UICloudSharingController) {
         NSLog("🟢 \(#function)")
+        completion(nil) 
     }
 
     func cloudSharingControllerDidStopSharing(_: UICloudSharingController) {
-        NSLog("🟢 \(#function)") 
+        NSLog("🟢 \(#function)")
+        completion(nil)
     }
 
     func itemThumbnailData(for _: UICloudSharingController) -> Data? {
@@ -79,7 +107,7 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
 
         guard let icon = UIImage(systemName: imageName),
               let tinted = icon.withTintColor(.systemBlue, renderingMode: .alwaysTemplate).applyingSymbolConfiguration(config)
-        else { 
+        else {
             return nil
         }
 
@@ -93,12 +121,15 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
     func share(completion: @escaping (CKShare?, CKContainer?, Error?) -> Void) {
         NSLog("Share Called!")
 
-        Task { 
+        Task { [weak self] in
+            guard let self else { return }
+
             do {
                 let result = try await CloudKitDatabasesInteractor.shared.beginSharing(for: database)
 
                 completion(result.share, result.container, nil)
             } catch {
+                NSLog("🔴 \(error)")
                 completion(nil, nil, error)
             }
         }

@@ -77,18 +77,18 @@
 }
 
 
-- (void)    create:(NSString *)nickName
-         extension:(NSString *)extension
-              data:(NSData *)data
-      parentFolder:(NSObject *)parentFolder
-    viewController:(VIEW_CONTROLLER_PTR)viewController
-        completion:(void (^)(METADATA_PTR metadata, const NSError *error))completion {
-    [self showProgressSpinner:@"" viewController:viewController];
 
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
+- (void)create:(NSString *)nickName
+      fileName:(NSString *)fileName 
+          data:(NSData *)data
+  parentFolder:(NSObject *)parentFolder
+viewController:(VIEW_CONTROLLER_PTR)viewController
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion {
+    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_creating", @"Creating...")
+               viewController:viewController]; 
 
     [[GoogleDriveManager sharedInstance] create:viewController
-                                      withTitle:desiredFilename
+                                      withTitle:fileName
                                        withData:data
                                    parentFolder:parentFolder
                                      completion:^(GTLRDrive_File *file, NSError *error)

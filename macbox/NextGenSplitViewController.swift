@@ -200,10 +200,6 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
 
 
-
-
-
-
         } else if status.state == .backgroundButUserInteractionRequired {}
         else if status.state == .inProgress {}
         else {
@@ -405,11 +401,13 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
 
     @objc func onRollTheDice(_: Any?) {
-        let vc = PasswordGenerationPreferences.fromStoryboard()
 
-        if let diceToolbarItem, let view = diceToolbarItem.view {
-            present(vc, asPopoverRelativeTo: NSZeroRect, of: view, preferredEdge: .maxY, behavior: .transient)
-        }
+
+
+
+
+
+        PasswordGenerator.sharedInstance.show()
     }
 
     func createOrEdit(_ createNew: Bool = true) {
@@ -906,17 +904,9 @@ extension NextGenSplitViewController: NSToolbarDelegate {
     func getDiceToolbarItem() -> NSToolbarItem {
         let toolbarItem = NSToolbarItem(itemIdentifier: ToolbarItemIdentifiers.diceButton)
 
-        let image: NSImage
-
-        if #available(macOS 12.0, *) {
-            let smallimage = NSImage(systemSymbolName: "dice", accessibilityDescription: nil)!
-            let config = NSImage.SymbolConfiguration(scale: .large)
-            image = smallimage.withSymbolConfiguration(config) ?? smallimage
-        } else {
-            let smallimage = NSImage(systemSymbolName: "die.face.6", accessibilityDescription: nil)!
-            let config = NSImage.SymbolConfiguration(scale: .large)
-            image = smallimage.withSymbolConfiguration(config) ?? smallimage
-        }
+        let smallimage = NSImage(systemSymbolName: "dice", accessibilityDescription: nil)!
+        let config = NSImage.SymbolConfiguration(scale: .large)
+        let image = smallimage.withSymbolConfiguration(config) ?? smallimage
 
         let button = NSButton(image: image, target: self, action: #selector(onRollTheDice))
         button.isBordered = false
@@ -1105,7 +1095,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
 
     func validateAction(_ action: Selector) -> Bool {
         var singleSelectedNode: Node? = nil
-        var atLeastOneSelected = database.nextGenSelectedItems.count != 0
+        let atLeastOneSelected = database.nextGenSelectedItems.count != 0
 
         if !database.locked, database.nextGenSelectedItems.count == 1, let node = database.getItemBy(database.nextGenSelectedItems.first!) {
             singleSelectedNode = node

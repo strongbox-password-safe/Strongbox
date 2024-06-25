@@ -30,8 +30,6 @@
     self.navigationController.toolbarHidden = YES;
     self.navigationController.navigationBar.prefersLargeTitles = NO;
 
-    self.tableView.tableFooterView = [UIView new];
-    
     self.rows = @[NSLocalizedString(@"cloud_sessions_clear_google", @"Clear Google Drive Session"),
                   NSLocalizedString(@"cloud_sessions_unlink_dropbox", @"Unlink Dropbox"),
                   NSLocalizedString(@"cloud_sessions_clear_onedrive", @"Clear OneDrive Session")];
@@ -41,8 +39,20 @@
     self.onDone();
 }
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.rows.count;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    return NSLocalizedString(@"cloud_sessions_header", @"3rd Party Options");
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    return NSLocalizedString(@"cloud_sessions_footer_text_info", @"The above options are always present. They are not indicative of any existing session. Detecting whether you have an session would require Strongbox to call into 3rd party code which we always try to minimize for security reasons.");
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

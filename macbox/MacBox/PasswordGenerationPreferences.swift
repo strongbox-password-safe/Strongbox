@@ -275,20 +275,45 @@ class PasswordGenerationPreferences: NSViewController {
         refreshSample()
     }
 
-    @IBAction func onCharacterCountTextFieldChanged(_: Any) {
-
-
-        characterCountSlider.integerValue = characterCountTextField.integerValue
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @IBAction func onEditBasicCharacterCount(_: Any) {
         let config = Settings.sharedInstance().passwordGenerationConfig
+
+        guard let ret = MacAlerts().input(NSLocalizedString("password_gen_vc_prompt_excluded_characters", comment: "Excluded Characters"),
+                                          defaultValue: String(config.basicLength),
+                                          allowEmpty: false)
+        else {
+            return
+        }
+
+        guard let integer = Int(ret) else {
+            return
+        }
+
+        characterCountSlider.integerValue = integer
 
         config.basicLength = characterCountSlider.integerValue
 
         Settings.sharedInstance().passwordGenerationConfig = config
 
         bindUI()
+
+        refreshSample()
     }
 
     @IBAction func onCharacterGroups(_: Any) {

@@ -15,18 +15,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DocumentController : NSDocumentController
 
-- (void)originalOpenDocument:(id _Nullable)sender;
+- (IBAction)originalOpenDocument:(id _Nullable)sender;
+- (void)originalOpenDocumentWithFileSelection;
+
 - (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^_Nullable)(NSError* error))completion;
 
 - (Document*_Nullable)documentForDatabase:(NSString*)uuid;
 
 - (void)onAppStartup;
 - (void)launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable;
-
-- (void)serializeAndAddDatabase:(DatabaseModel*)db
-                         format:(DatabaseFormat)format
-                keyFileBookmark:(NSString*)keyFileBookmark
-                  yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig;
 
 @end
 

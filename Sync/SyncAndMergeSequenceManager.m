@@ -296,27 +296,39 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     
     
-            
-    if ( database.outstandingUpdateId != nil ) {
-        if ( database.lastSyncRemoteModDate != nil ) {
-            opts.onlyIfModifiedDifferentFrom = database.lastSyncRemoteModDate; 
-        }
-        else {
-            opts.onlyIfModifiedDifferentFrom = nil; 
-        }
+    
+        
+    BOOL localCopyInitialized = ( database.lastSyncRemoteModDate != nil && localModDate != nil );
+    if ( !forcePull && ( database.outstandingUpdateId || localCopyInitialized )) {
+        opts.onlyIfModifiedDifferentFrom = database.lastSyncRemoteModDate;
     }
-    else {
-        opts.onlyIfModifiedDifferentFrom = forcePull ? nil : database.lastSyncRemoteModDate;
-    }
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     NSString* providerDisplayName = [SafeStorageProviderFactory getStorageDisplayName:database];
 
-    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, provider=%@, workingCacheMod=%@, lastCheckedSourceMod=%@]",
+    NSString* initialLog = [NSString stringWithFormat:@"Begin Sync [Interactive=%@, outstandingUpdate=%@, forcePull=%d, provider=%@, localModDate=%@, onlyIfModifiedDifferentFrom=%@, lastCheckedSourceMod=%@]",
                             (parameters.interactiveVC ? @"YES" : @"NO"),
                             (database.outstandingUpdateId != nil ? @"YES" : @"NO"),
                             forcePull,
                             providerDisplayName,
                             localModDate.friendlyDateTimeStringBothPrecise,
+                            opts.onlyIfModifiedDifferentFrom.friendlyDateTimeStringBothPrecise,
                             database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise];
     
     [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateInProgress message:initialLog];
@@ -341,7 +353,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 [self handleOutstandingUpdate:databaseUuid syncId:syncId expressUpdateMode:YES remoteData:nil remoteModified:opts.onlyIfModifiedDifferentFrom parameters:parameters completion:completion];
             }
             else {
-                [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Source Mod same as Working Copy Mod"]];
+                [self logMessage:databaseUuid syncId:syncId message:@"Pull Database - Source Mod same as Working Copy Mod"];
                 [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:error];
                 completion(kSyncAndMergeSuccess, NO, nil);
             }

@@ -580,10 +580,8 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     [self.tableView registerNib:[UINib nibWithNibName:kSshKeyViewCellId bundle:nil] forCellReuseIdentifier:kSshKeyViewCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kPasskeyTableCellViewId bundle:nil] forCellReuseIdentifier:kPasskeyTableCellViewId];
     [self.tableView registerNib:[UINib nibWithNibName:kMarkdownUIKitTableCellViewId bundle:nil] forCellReuseIdentifier:kMarkdownUIKitTableCellViewId];
-    
-    if (@available(iOS 15.0, *)) {
-        [self.tableView setSectionHeaderTopPadding:0.0f];
-    }
+
+    [self.tableView setSectionHeaderTopPadding:0.0f];
     
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;

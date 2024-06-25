@@ -55,11 +55,11 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
 
     
 
-    func create(_: String, extension _: String, data _: Data, parentFolder _: NSObject?, viewController _: VIEW_CONTROLLER_PTR?, completion _: @escaping (METADATA_PTR?, Error?) -> Void) {
+    func create(_: String, fileName _: String, data _: Data, parentFolder _: NSObject?, viewController _: VIEW_CONTROLLER_PTR?, completion _: @escaping (METADATA_PTR?, Error?) -> Void) {
         
     }
 
-    func pullDatabase(_ database: METADATA_PTR, interactiveVC _: VIEW_CONTROLLER_PTR?, options: StorageProviderReadOptions, completion: @escaping StorageProviderReadCompletionBlock) {
+    func pullDatabase(_ database: METADATA_PTR, interactiveVC: VIEW_CONTROLLER_PTR?, options: StorageProviderReadOptions, completion: @escaping StorageProviderReadCompletionBlock) {
         NSLog("🟢 WiFiSyncStorageProvider::pullDatabase...")
 
         guard WiFiSyncStorageProvider.wiFiSyncIsPossible else {
@@ -70,6 +70,26 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         guard let config = getServerConfigFromDatabase(database) else {
             NSLog("🔴 WiFiSyncStorageProvider::pullDatabase - Could not read config for WiFi Sync Server")
             completion(.readResultError, nil, nil, Utils.createNSError("Could not read config for WiFi Sync Server", errorCode: -123))
+            return
+        }
+
+        if config.passcode == nil {
+            if let interactiveVC {
+                requestPasscode(interactiveVC, config) { [weak self] _ in
+                    self?.continuePull(database, config: config, options: options, completion: completion)
+                }
+            } else {
+                completion(.readResultBackgroundReadButUserInteractionRequired, nil, nil, nil)
+                return
+            }
+        } else {
+            continuePull(database, config: config, options: options, completion: completion)
+        }
+    }
+
+    func continuePull(_ database: METADATA_PTR, config: WiFiSyncServerConnectionConfig, options: StorageProviderReadOptions, completion: @escaping StorageProviderReadCompletionBlock) {
+        guard let passcode = config.passcode else {
+            completion(.readResultError, nil, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
             return
         }
 
@@ -99,20 +119,22 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
                     completion(.readResultModifiedIsSameAsLocal, nil, nil, nil)
                 } else {
                     readDatabase(databaseId: config.databaseId,
+                                 serverConfig: config,
                                  endpoint: endpoint,
-                                 passcode: config.passcode,
+                                 passcode: passcode,
                                  completion: completion)
                 }
             }
         } else {
             readDatabase(databaseId: config.databaseId,
+                         serverConfig: config,
                          endpoint: endpoint,
-                         passcode: config.passcode,
+                         passcode: passcode,
                          completion: completion)
         }
     }
 
-    func pushDatabase(_ database: METADATA_PTR, interactiveVC _: VIEW_CONTROLLER_PTR?, data: Data, completion: @escaping StorageProviderUpdateCompletionBlock) {
+    func pushDatabase(_ database: METADATA_PTR, interactiveVC: VIEW_CONTROLLER_PTR?, data: Data, completion: @escaping StorageProviderUpdateCompletionBlock) {
         NSLog("🟢 WiFiSyncStorageProvider::pushDatabase...")
 
         guard WiFiSyncStorageProvider.wiFiSyncIsPossible else {
@@ -126,15 +148,38 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
+        if config.passcode == nil {
+            if let interactiveVC {
+                requestPasscode(interactiveVC, config) { [weak self] _ in
+                    self?.continuePush(database, config: config, data: data, completion: completion)
+                }
+            } else {
+                completion(.updateResultUserInteractionRequired, nil, nil)
+                return
+            }
+        } else {
+            continuePush(database, config: config, data: data, completion: completion)
+        }
+    }
+
+    func continuePush(_: METADATA_PTR, config: WiFiSyncServerConnectionConfig, data: Data, completion: @escaping StorageProviderUpdateCompletionBlock) {
+        guard let passcode = config.passcode else {
+            completion(.updateResultError, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
+            return
+        }
+
         if let endpoint = getEndpointForServer(config) {
-            let connection = WiFiSyncClientConnection(endpoint: endpoint, passcode: config.passcode)
+            let connection = WiFiSyncClientConnection(endpoint: endpoint, passcode: passcode)
 
             
 
             let databaseId = config.databaseId
 
-            connection.pushDatabase(databaseId, data) { mod, error in
-                if let mod {
+            connection.pushDatabase(databaseId, data) { mod, incorrectPasscode, error in
+                if incorrectPasscode {
+                    config.passcode = nil
+                    completion(.updateResultError, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
+                } else if let mod {
                     NSLog("🟢 Pushed Database [\(databaseId)] successfully. New Mod = \(mod.iso8601withFractionalSeconds)")
                     completion(.updateResultSuccess, mod, nil)
                 } else {
@@ -219,8 +264,12 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
     func listWithEndpoint(_ endpoint: NWEndpoint, _ passcode: String, _ completion: @escaping (Bool, [WiFiSyncDatabaseSummary]?, Error?) -> Void) {
         let connection = WiFiSyncClientConnection(endpoint: endpoint, passcode: passcode)
 
-        connection.listDatabases(nil) { databases, error in
-            completion(databases != nil, databases, error)
+        connection.listDatabases(nil) { databases, incorrectPasscode, error in
+            if incorrectPasscode {
+                completion(false, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
+            } else {
+                completion(databases != nil, databases, error)
+            }
         }
     }
 
@@ -240,7 +289,10 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
-        readDatabase(databaseId: databaseId, endpoint: connectionConfig.endpoint, passcode: passcode, completion: completion)
+        readDatabase(databaseId: databaseId,
+                     serverConfig: nil,
+                     endpoint: connectionConfig.endpoint,
+                     passcode: passcode, completion: completion)
     }
 
     @objc class var wiFiSyncIsPossible: Bool {
@@ -249,7 +301,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         return StrongboxProductBundle.supportsWiFiSync && !prefs.disableWiFiSyncClientMode && prefs.isPro
     }
 
-    func readDatabase(databaseId: String, endpoint: NWEndpoint, passcode: String, completion: @escaping StorageProviderReadCompletionBlock) {
+    func readDatabase(databaseId: String, serverConfig: WiFiSyncServerConnectionConfig?, endpoint: NWEndpoint, passcode: String, completion: @escaping StorageProviderReadCompletionBlock) {
         guard WiFiSyncStorageProvider.wiFiSyncIsPossible else {
             completion(.readResultError, nil, nil, Utils.createNSError("WiFi Sync is not available. Pro Only, not available on Zero.", errorCode: -1234))
             return
@@ -259,8 +311,14 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
 
         
 
-        connection.getDatabase(databaseId) { mod, data, error in
-            if let mod, let data {
+        connection.getDatabase(databaseId) { mod, data, incorrectPasscode, error in
+            if incorrectPasscode {
+                if let serverConfig {
+                    serverConfig.passcode = nil
+                }
+
+                completion(.readResultError, nil, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
+            } else if let mod, let data {
                 NSLog("🟢 Got Database [\(databaseId)] with Mod = \(mod)")
                 completion(.readResultSuccess, data, mod, nil)
             } else {
@@ -288,11 +346,19 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
-        if let endpoint = getEndpointForServer(config) {
-            let connection = WiFiSyncClientConnection(endpoint: endpoint, passcode: config.passcode)
+        guard let passcode = config.passcode else {
+            completion(true, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
+            return
+        }
 
-            connection.listDatabases(config.databaseId) { items, error in
-                if items != nil {
+        if let endpoint = getEndpointForServer(config) {
+            let connection = WiFiSyncClientConnection(endpoint: endpoint, passcode: passcode)
+
+            connection.listDatabases(config.databaseId) { items, incorrectPasscode, error in
+                if incorrectPasscode {
+                    config.passcode = nil
+                    completion(true, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
+                } else if items != nil {
                     guard let items, let database = items.first(where: { database in database.uuid == config.databaseId }) else {
                         NSLog("🔴 WiFiSyncStorageProvider::getModDate - Could not get databases or match database for server!")
                         completion(true, nil, Utils.createNSError("Could not get databases or match database for server!", errorCode: -1))
@@ -321,21 +387,13 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         #if os(iOS)
             let baseImage = UIImage(systemName: "externaldrive.fill.badge.wifi")!
 
-            if #available(iOS 15.0, *) {
-                let config = UIImage.SymbolConfiguration(paletteColors: [.systemGreen, .systemBlue])
-                completion(baseImage.applyingSymbolConfiguration(config)!)
-            } else {
-                completion(baseImage)
-            }
+            let config = UIImage.SymbolConfiguration(paletteColors: [.systemGreen, .systemBlue])
+            completion(baseImage.applyingSymbolConfiguration(config)!)
         #else
             let baseImage = NSImage(systemSymbolName: "externaldrive.fill.badge.wifi", accessibilityDescription: nil)!
 
-            if #available(macOS 12.0, *) {
-                let config = NSImage.SymbolConfiguration(paletteColors: [.systemGreen, .systemBlue])
-                completion(baseImage.withSymbolConfiguration(config)!)
-            } else {
-                completion(baseImage)
-            }
+            let config = NSImage.SymbolConfiguration(paletteColors: [.systemGreen, .systemBlue])
+            completion(baseImage.withSymbolConfiguration(config)!)
         #endif
     }
 
@@ -402,5 +460,38 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         #endif
 
         return ret
+    }
+
+    func requestPasscode(_ viewController: VIEW_CONTROLLER_PTR, _ config: WiFiSyncServerConnectionConfig, completion: @escaping (_ success: Bool) -> Void) {
+        DispatchQueue.main.async {
+            let co = WiFiSyncServerConfig(name: config.serverName)
+            #if os(iOS)
+                let vc = SwiftUIViewFactory.makeWiFiSyncPasscodeViewController(co) { _, pinCode in
+                    if let pinCode {
+                        config.passcode = pinCode
+                        completion(true)
+                    } else {
+                        completion(false)
+                    }
+                }
+
+                viewController.present(vc, animated: true)
+            #else
+                let vc = SwiftUIViewFactory.makeWiFiSyncPassCodeEntryViewController(co) { _, pinCode in
+                    if let pinCode {
+                        config.passcode = pinCode
+                        completion(true)
+                    } else {
+                        completion(false)
+                    }
+
+                    if let sheet = viewController.presentedViewControllers?.first {
+                        Utils.dismissViewControllerCorrectly(sheet)
+                    }
+                }
+
+                viewController.presentAsSheet(vc)
+            #endif
+        }
     }
 }

@@ -126,16 +126,25 @@ static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcon
 static NSString* const kWiFiSyncOn = @"wiFiSyncOn";
 static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
 static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
+static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPasscodeSSKeyHasBeenInitialized";
 
 static NSString* const kDisableWiFiSyncClientMode = @"disableWiFiSyncClientMode";
 static NSString* const kCloudKitZoneCreated = @"cloudKitZoneCreated";
 static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetworkStorageOptions";
+static NSString* const kHasWarnedAboutCloudKitUnavailability = @"hasWarnedAboutCloudKitUnavailability";
+static NSString* const kPasswordGeneratorFloatOnTop = @"passwordGeneratorFloatOnTop";
 
 
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
+
+@interface Settings ()
+
+@property BOOL wiFiSyncPasscodeSSKeyHasBeenInitialized;
+
+@end
 
 @implementation Settings
 
@@ -253,13 +262,28 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
     
     
-    
     [self clearAllDefaults];
 }
 
 #endif
 
 
+
+- (BOOL)passwordGeneratorFloatOnTop {
+    return [self getBool:kPasswordGeneratorFloatOnTop];
+}
+
+- (void)setPasswordGeneratorFloatOnTop:(BOOL)passwordGeneratorFloatOnTop {
+    [self setBool:kPasswordGeneratorFloatOnTop value:passwordGeneratorFloatOnTop];
+}
+
+- (BOOL)hasWarnedAboutCloudKitUnavailability {
+    return [self getBool:kHasWarnedAboutCloudKitUnavailability];
+}
+
+- (void)setHasWarnedAboutCloudKitUnavailability:(BOOL)hasWarnedAboutCloudKitUnavailability {
+    [self setBool:kHasWarnedAboutCloudKitUnavailability value:hasWarnedAboutCloudKitUnavailability];
+}
 
 - (BOOL)disableNetworkBasedFeatures {
     return [self getBool:kDisableNativeNetworkStorageOptions];
@@ -293,15 +317,27 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kWiFiSyncOn value:wiFiSyncOn];
 }
 
+- (BOOL)wiFiSyncPasscodeSSKeyHasBeenInitialized {
+    return [self getBool:kWiFiSyncPasscodeSSKeyHasBeenInitialized];
+}
+
+- (void)setWiFiSyncPasscodeSSKeyHasBeenInitialized:(BOOL)wiFiSyncPasscodeSSKeyHasBeenInitialized {
+    [self setBool:kWiFiSyncPasscodeSSKeyHasBeenInitialized value:wiFiSyncPasscodeSSKeyHasBeenInitialized];
+}
+
 - (NSString *)wiFiSyncPasscode {
-    NSString* passcode = [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
-    
-    if (!passcode) {
-        passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
-        [self setWiFiSyncPasscode:passcode];
+    if ( self.wiFiSyncPasscodeSSKeyHasBeenInitialized ) {
+        return [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
     }
-    
-    return passcode;
+    else {
+        NSString* passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
+        
+        [self setWiFiSyncPasscode:passcode];
+        
+        self.wiFiSyncPasscodeSSKeyHasBeenInitialized = YES;
+        
+        return passcode;
+    }
 }
 
 - (void)setWiFiSyncPasscode:(NSString *)wiFiSyncPasscode {

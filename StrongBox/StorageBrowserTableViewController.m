@@ -73,10 +73,7 @@
     self.tableView.sectionHeaderHeight = 0.1f;
     self.tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.tableView.bounds.size.width, 0.01f)];
     
-    if (@available(iOS 15.0, *)) {
-        self.tableView.sectionHeaderTopPadding = 0.1f;
-    }
-
+    self.tableView.sectionHeaderTopPadding = 0.1f;
     
     self.navigationItem.prompt = self.existing ?
     NSLocalizedString(@"sbtvc_select_database_file", @"Please Select Database File") :

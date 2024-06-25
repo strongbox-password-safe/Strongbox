@@ -39,6 +39,10 @@ class AppModel: NSObject {
 
     @objc
     func unlockDatabase(_ database: Model) {
+        if theUnlockedDatabase != nil {
+            NSLog("🔴 Overwriting current unlocked database! Should have been marked as locked previously...")
+        }
+
         theUnlockedDatabase = database
     }
 

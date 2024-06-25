@@ -38,7 +38,7 @@
     return [NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
 }
 
-- (NSString *)hexString {
+- (NSString *)upperHexString {
     const unsigned char *dataBuffer = (const unsigned char *)self.bytes;
     
     if (!dataBuffer) {
@@ -52,7 +52,9 @@
         [hexString appendString:[NSString stringWithFormat:@"%02lX", (unsigned long)dataBuffer[i]]];
     }
     
-    return [NSString stringWithString:hexString];
+    NSString* ret = hexString.uppercaseString;
+    
+    return ret; 
 }
 
 - (NSString *)base64String {

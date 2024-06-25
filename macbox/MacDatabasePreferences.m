@@ -143,6 +143,10 @@
     return [DatabasesManager.sharedInstance isValid:nickName];
 }
 
++ (NSString *)getSuggestedNewDatabaseName {
+    return [DatabasesManager.sharedInstance getSuggestedNewDatabaseName];
+}
+
 + (NSString *)getUniqueNameFromSuggestedName:(NSString *)suggested {
     return [DatabasesManager.sharedInstance getUniqueNameFromSuggestedName:suggested];
 }
@@ -158,6 +162,17 @@
         metadata.isSharedInCloudKit = isSharedInCloudKit;
     }];
 }
+
+- (BOOL)isOwnedByMeCloudKit {
+    return self.metadata.isOwnedByMeCloudKit;
+}
+
+- (void)setIsOwnedByMeCloudKit:(BOOL)isOwnedByMeCloudKit {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.isOwnedByMeCloudKit = isOwnedByMeCloudKit;
+    }];
+}
+
 
 
 

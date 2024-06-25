@@ -12,8 +12,6 @@ import OSLog
 protocol WiFiSyncManagementInterface {
     func isEditsAreInProgress(id: String) -> Bool
 
-    func isSyncInProgress(id: String) -> Bool
-
     func getDatabaseSummaries(id: String?, _ completion: @escaping (([WiFiSyncDatabaseSummary]) -> Void))
 
     func pullDatabase(id: String, _ completion: @escaping (((Date, Data)?) -> Void))

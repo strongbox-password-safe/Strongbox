@@ -70,7 +70,10 @@ struct ImportResultView: View {
                     importMessagesList(messages: messages)
                 }
 
-                okCancelButtons
+                HStack {
+                    Spacer()
+                    okCancelButtons
+                }
             }
             .frame(maxWidth: 450, maxHeight: 400)
             .padding(20)
@@ -97,39 +100,24 @@ struct ImportResultView: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 #if os(macOS)
-                    if #available(macOS 12.0, *) {
-                        scroller
-                            .border(.tertiary)
-                            .frame(minHeight: 200)
+                    scroller
+                        .border(.tertiary)
+                        .frame(minHeight: 200)
 
-                        support.textSelection(.enabled)
-                    } else {
-                        scroller
-                            .border(.gray)
-                            .frame(minHeight: 200)
-
-                        support
-                    }
+                    support.textSelection(.enabled)
                 #else
-                    if #available(iOS 15.0, *) {
-                        scroller
-                            .border(.tertiary)
-                            .frame(minHeight: 200)
+                    scroller
+                        .border(.tertiary)
+                        .frame(minHeight: 200)
 
-                        support.textSelection(.enabled)
-                    } else {
-                        scroller
-                            .frame(minHeight: 400)
-
-                        support
-                    }
+                    support.textSelection(.enabled)
                 #endif
             }
         }
     }
 
     var okCancelButtons: some View {
-        HStack(spacing: 20) {
+        HStack(spacing: 8) {
             let cancelButton = Button(action: {
                 dismiss(true)
             }, label: {
@@ -141,9 +129,9 @@ struct ImportResultView: View {
                     dismiss(false)
                 }, label: {
                     HStack {
-                        Text("import_next_step_set_password")
+                        Text("generic_lets_go").frame(minWidth: 100)
 
-                        Image(systemName: "chevron.forward.2")
+
                     }
                 })
 
@@ -166,60 +154,47 @@ struct ImportResultView: View {
                     .padding(12)
                 })
 
-                if #available(iOS 15.0, *) {
-                    defaultButton
-                        .controlSize(.large)
-                        .keyboardShortcut(.defaultAction)
-                        .foregroundColor(Color.white)
-                        .background(Color.blue)
-                        .cornerRadius(5)
-                } else {
-                    defaultButton
-                        .keyboardShortcut(.defaultAction)
-                        .foregroundColor(Color.white)
-                        .background(Color.blue)
-                        .cornerRadius(5)
-                }
+                defaultButton
+                    .controlSize(.large)
+                    .keyboardShortcut(.defaultAction)
+                    .foregroundColor(Color.white)
+                    .background(Color.blue)
+                    .cornerRadius(5)
             #endif
         }
     }
 
     func importMessageItem(message: ImportMessage) -> some View {
         HStack(spacing: 8) {
-            if #available(macOS 12.0, *) {
-                let severity = message.severity
+            let severity = message.severity
 
-                switch severity {
-                case .info:
-                    Image(systemName: "info.circle")
-                        .imageScale(.large)
-                        .scaledToFit()
-                        .foregroundColor(.blue)
-                case .warning:
-                    Image(systemName: "exclamationmark.triangle")
-                        .imageScale(.large)
-                        .scaledToFit()
-                        .foregroundColor(.orange)
+            switch severity {
+            case .info:
+                Image(systemName: "info.circle")
+                    .imageScale(.large)
+                    .scaledToFit()
+                    .foregroundColor(.blue)
+            case .warning:
+                Image(systemName: "exclamationmark.triangle")
+                    .imageScale(.large)
+                    .scaledToFit()
+                    .foregroundColor(.orange)
 
-                case .error:
-                    Image(systemName: "exclamationmark.circle")
-                        .imageScale(.large)
-                        .scaledToFit()
-                        .foregroundColor(.red)
-                }
+            case .error:
+                Image(systemName: "exclamationmark.circle")
+                    .imageScale(.large)
+                    .scaledToFit()
+                    .foregroundColor(.red)
+            }
 
-                #if os(macOS)
-                    Text(message.message)
-                        .font(.body)
-                        .textSelection(.enabled)
-                #else
-                    Text(message.message)
-                        .font(.caption2)
-                #endif
-            } else {
+            #if os(macOS)
                 Text(message.message)
                     .font(.body)
-            }
+                    .textSelection(.enabled)
+            #else
+                Text(message.message)
+                    .font(.caption2)
+            #endif
         }
     }
 }

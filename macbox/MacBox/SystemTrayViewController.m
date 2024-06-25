@@ -161,8 +161,10 @@
         }
     }
     
-    BOOL showPasswordGen = Settings.sharedInstance.showPasswordGenInTray;
-    self.miniPasswordGenerator.hidden = showPasswordGen;
+    BOOL showPasswordGen = NO; 
+    
+    self.miniPasswordGenerator.hidden = !showPasswordGen;
+    
     self.horizontRuleAfterPasswordGen.hidden = showPasswordGen;
     self.constraintGapDatabasesAndPasswordGen.constant = showPasswordGen ? 0 : 4;
 }
@@ -376,11 +378,13 @@
 }
 
 - (IBAction)onShowPasswordGenerator:(id)sender {
-    Settings.sharedInstance.showPasswordGenInTray = !Settings.sharedInstance.showPasswordGenInTray;
+
+
+
+
+
     
-    [self bindUI];
-    
-    [self sizeAndPositionPopoverToFit];
+    [self onPasswordPreferences:nil];
 }
 
 - (IBAction)onPasswordPreferences:(id)sender {
@@ -388,7 +392,9 @@
         self.onShowClicked( nil );
     }
 
-    [AppSettingsWindowController.sharedInstance showPasswordGenerationTab];
+
+    
+    [PasswordGenerator.sharedInstance show];
 }
 
 - (IBAction)onShowPreferences:(id)sender {

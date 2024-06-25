@@ -74,28 +74,24 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         sync()
     }
 
-    func unListenToNotifications() {
-        NotificationCenter.default.removeObserver(self)
-    }
-
     func listenToNotifications() {
         unListenToNotifications()
 
         NSLog("MainSplitViewController: listenToNotifications")
-
-
-
-
-
-
-
-
 
         NotificationCenter.default.addObserver(self, selector: #selector(onAutoFillChangedConfig(object:)), name: .autoFillChangedConfig, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(onWiFiSyncUpdatedWorkingCopy(object:)),
                                                name: Notification.Name("wiFiSyncServiceNameDidChange"), 
                                                object: nil)
+
+        NotificationCenter.default.addObserver(self, selector: #selector(onCloudKitUpdateAvailableNotification(object:)),
+                                               name: Notification.Name("cloudKitDatabaseUpdateAvailable"), 
+                                               object: nil)
+    }
+
+    func unListenToNotifications() {
+        NotificationCenter.default.removeObserver(self)
     }
 
     @objc func onAutoFillChangedConfig(object _: Any?) {
@@ -117,6 +113,26 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         
 
         reloadModelFromWorkingCache()
+    }
+
+    @objc func onCloudKitUpdateAvailableNotification(object: Any?) {
+        NSLog("🟢 MainSplitViewController::onCloudKitUpdateAvailableNotification")
+
+        guard let notification = object as? NSNotification, let uuid = notification.object as? String else {
+            NSLog("🔴 Could not read onCloudKitUpdateAvailableNotification!")
+            return
+        }
+
+        guard uuid == model.databaseUuid else {
+            return
+        }
+
+        guard !AppModel.shared.isEditing(uuid) else {
+            NSLog("Received change available notification for database \(uuid) but edits in progress, not initiating a sync")
+            return
+        }
+
+        sync()
     }
 
     func splitViewController(_: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {

@@ -44,8 +44,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (class, nullable, readonly) NSString* suggestedNewDatabaseName;
 
-- (void)addWithDuplicateCheck:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
-- (void)add:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
+- (BOOL)add:(NSError* _Nullable * _Nullable )error;
+
+- (BOOL)add:(NSData * _Nullable )initialCache
+initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
+      error:(NSError* _Nullable * _Nullable )error;
+
+- (BOOL)addWithDuplicateCheck:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate error:(NSError**)error;
 
 
 
@@ -59,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)reloadIfChangedByOtherComponent;
 
-+ (void)nukeAll;
++ (void)nukeAllDeleteUnderlyingIfPossible;
 
 @property (class, readonly) NSArray<DatabasePreferences*>* iCloudDatabases;
 @property (class, readonly) NSArray<DatabasePreferences*>* localDeviceDatabases;
@@ -205,6 +210,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL allowPulldownRefreshSyncInOfflineMode;
 
 @property BOOL isSharedInCloudKit; 
+@property BOOL isOwnedByMeCloudKit; 
 
 @end
 

@@ -9,7 +9,6 @@
 #import "AddNewSafeHelper.h"
 #import "Alerts.h"
 #import "KeyFileManagement.h"
-#import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
@@ -17,12 +16,11 @@
 #import "SVProgressHUD.h"
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
-#import "iCloudSafesCoordinator.h"
 #import "Strongbox-Swift.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 
-@implementation AddNewSafeHelper
+@implementation AddNewSafeHelper 
 
 + (void)createNewExpressDatabase:(UIViewController*)vc
                             name:(NSString *)name
@@ -59,13 +57,14 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                            model:(DatabaseModel *)model
                       forceLocal:(BOOL)forceLocal
                       completion:(void (^)(BOOL userCancelled, DatabasePreferences* metadata, NSData* initialSnapshot, NSError* error))completion {
-    BOOL iCloud = !forceLocal && !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
     
-    
-    id<SafeStorageProvider> provider = iCloud ? AppleICloudProvider.sharedInstance : LocalDeviceStorageProvider.sharedInstance;
-    
-    
+#ifndef NO_NETWORKING
+    BOOL useCloudKitForStorage = !forceLocal && !AppPreferences.sharedInstance.disableNetworkBasedFeatures && CloudKitDatabasesInteractor.shared.fastIsAvailable;
 
+    id<SafeStorageProvider> provider = useCloudKitForStorage ? CloudKitStorageProvider.sharedInstance : LocalDeviceStorageProvider.sharedInstance;
+#else
+    id<SafeStorageProvider> provider = LocalDeviceStorageProvider.sharedInstance;
+#endif
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name
@@ -140,8 +139,10 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 
                 [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_saving_ellipsis", @"Saving...")];
                 
+                NSString* filename = [NSString stringWithFormat:@"%@.%@", name, [Serializator getDefaultFileExtensionForFormat:format]];
+                                
                 [provider create:name
-                       extension:[Serializator getDefaultFileExtensionForFormat:format]
+                        fileName:filename
                             data:data
                     parentFolder:parentFolder
                   viewController:vc

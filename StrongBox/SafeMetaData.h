@@ -243,6 +243,7 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property BOOL allowPulldownRefreshSyncInOfflineMode;
 
 @property BOOL isSharedInCloudKit; 
+@property BOOL isOwnedByMeCloudKit; 
 
 @end
 

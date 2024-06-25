@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL runAsWiFiSyncSourceDevice;
 @property (nullable) NSString* wiFiSyncServiceName;
-@property NSString* wiFiSyncPasscode;
+@property (nullable) NSString* wiFiSyncPasscode;
 
 @property BOOL disableWiFiSyncClientMode;
 @property BOOL disableNetworkBasedFeatures;

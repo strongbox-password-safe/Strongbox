@@ -150,7 +150,6 @@ extern NSString* const kCustomFieldsColumn;
 
 @property (nullable) NSDate* lastQuickTypeMultiDbRegularClear;
 
-
 @property (nonatomic) NSInteger sshAgentApprovalDefaultExpiryMinutes;
 
 @property BOOL sshAgentRequestDatabaseUnlockAllowed;
@@ -161,12 +160,14 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL runAsWiFiSyncSourceDevice;
 @property (nullable) NSString* wiFiSyncServiceName;
-@property NSString* wiFiSyncPasscode;
+@property (nullable) NSString* wiFiSyncPasscode; 
 
 @property BOOL disableWiFiSyncClientMode;
 @property BOOL disableNetworkBasedFeatures;
 
 @property BOOL cloudKitZoneCreated;
+@property BOOL hasWarnedAboutCloudKitUnavailability;
+@property BOOL passwordGeneratorFloatOnTop;
 
 @end
 

@@ -9,7 +9,6 @@
 import Foundation
 import SwiftUI
 
-@available(iOS 15.0, *)
 private struct TextFieldFocused: ViewModifier {
     @FocusState private var focused: Bool
 
@@ -29,10 +28,6 @@ private struct TextFieldFocused: ViewModifier {
 extension View {
     @ViewBuilder
     func focused() -> some View {
-        if #available(iOS 15.0, *) {
-            self.modifier(TextFieldFocused())
-        } else {
-            self
-        }
+        modifier(TextFieldFocused())
     }
 }

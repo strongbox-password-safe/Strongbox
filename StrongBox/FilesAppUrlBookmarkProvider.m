@@ -52,29 +52,36 @@ typedef void (^CreateCompletionBlock)(DatabasePreferences *metadata, const NSErr
     return self;
 }
 
-- (void)create:(NSString *)nickName
-     extension:(NSString *)extension
+- (void)create:(NSString *)nickName 
+      fileName:(NSString *)fileName
           data:(NSData *)data
   parentFolder:(NSObject *)parentFolder
-viewController:(UIViewController *)viewController completion:(CreateCompletionBlock)completion {
-    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
+viewController:(VIEW_CONTROLLER_PTR)viewController
+    completion:(void (^)(METADATA_PTR _Nullable, const NSError * _Nullable))completion {
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
 
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:desiredFilename];
-
-    NSError* error;
-    if (![NSFileManager.defaultManager removeItemAtPath:f error:&error] ) {
-        completion(nil, error);
+    if ( [NSFileManager.defaultManager fileExistsAtPath:f] ) {
+        NSError* error;
+        if ( ![NSFileManager.defaultManager removeItemAtPath:f error:&error] ) {
+            completion(nil, error);
+            return;
+        }
     }
 
+    NSError* error;
+    
     if (![data writeToFile:f options:kNilOptions error:&error]) {
         completion(nil, error);
+        return;
     }
     
     self.createTemporaryDatabaseUrl = [NSURL fileURLWithPath:f];
     self.createCompletion = completion;
     self.createNickName = nickName;
     
-    UIDocumentPickerViewController* vc = [[UIDocumentPickerViewController alloc] initWithURL:self.createTemporaryDatabaseUrl inMode:UIDocumentPickerModeExportToService];
+    UIDocumentPickerViewController* vc = [[UIDocumentPickerViewController alloc] initForExportingURLs:@[self.createTemporaryDatabaseUrl] asCopy:YES];
+
+    
     vc.delegate = self;
     
     [viewController presentViewController:vc animated:YES completion:nil];

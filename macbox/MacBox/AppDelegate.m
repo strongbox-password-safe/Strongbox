@@ -26,7 +26,7 @@
 #import "CsvImporter.h"
 #import "Csv.h"
 #import "NSArray+Extensions.h"
-#import "CreateFormatAndSetCredentialsWizard.h"
+#import "CreateDatabaseOrSetCredentialsWizard.h"
 #import "MacSyncManager.h"
 #import "macOSSpinnerUI.h"
 #import "Constants.h"
@@ -52,6 +52,9 @@
     #import "SFTPConnections.h"
     #import "SFTPConnectionsManager.h"
 #endif
+
+#import "MacFileBasedBookmarkStorageProvider.h"
+#import <UserNotifications/UserNotifications.h>
 
 NSString* const kUpdateNotificationQuickRevealStateChanged = @"kUpdateNotificationQuickRevealStateChanged";
 static NSString* const kAutoLockIfInBackgroundNotification = @"autoLockAppInBackgroundTimeout";
@@ -146,7 +149,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [self startOrStopWiFiSyncServer];
     
-    [self refreshCloudKitDatabases]; 
+#ifndef NO_NETWORKING
+    [self initializeCloudKit];
+#endif
     
     [MacOnboardingManager beginAppOnboardingWithCompletion:^{
         
@@ -162,19 +167,61 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
 }
 
-- (void)refreshCloudKitDatabases {
-    return;
-    
+
+
 #ifndef NO_NETWORKING
-    NSLog(@"🏴‍☠️ refreshCloudKitDatabases"); 
-    
-    if ( !Settings.sharedInstance.disableNetworkBasedFeatures ) { 
-        if (@available(macOS 12.0, *)) {
-            [CloudKitDatabasesInteractor.shared refreshAndMerge];
+- (void)initializeCloudKit {
+    [CloudKitDatabasesInteractor.shared initializeWithCompletionHandler:^(NSError * _Nullable error ) {
+        if ( error ) {
+            NSLog(@"🔴 Error initializing CloudKit: [%@]", error);
         }
-    }
-#endif 
+        else {
+            NSLog(@"🟢 CloudKit successfully initialized.");
+        }
+    }];
 }
+
+- (void)application:(NSApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+    NSLog(@"🟢 didRegisterForRemoteNotificationsWithDeviceToken");
+    
+    [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:YES error:nil];
+}
+
+- (void)application:(NSApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    NSLog(@"🔴 didFailToRegisterForRemoteNotificationsWithError - [%@]", error);
+    
+    [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:NO error:error];
+}
+
+- (void)application:(NSApplication *)application didReceiveRemoteNotification:(NSDictionary<NSString *,id> *)userInfo {
+    [CloudKitDatabasesInteractor.shared onCloudKitDatabaseChangeNotification];
+}
+
+- (void)application:(NSApplication *)application userDidAcceptCloudKitShareWithMetadata:(CKShareMetadata *)metadata {
+    NSLog(@"userDidAcceptCloudKitShareWithMetadata: [%@]", metadata);
+    
+    [DBManagerPanel.sharedInstance show]; 
+    
+    
+    
+    [CloudKitDatabasesInteractor.shared acceptShareWithMetadata:metadata
+                                              completionHandler:^(NSError * _Nullable error) {
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                NSLog(@"🔴 acceptShareWithMetadata done with [%@]", error);
+                
+                [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
+            }
+            else {
+                NSLog(@"acceptShareWithMetadata done with [%@]", error);
+            }
+        });
+    }];
+
+}
+
+
 
 - (void)startWiFiSyncObservation {
     if ( !StrongboxProductBundle.supportsWiFiSync || Settings.sharedInstance.disableWiFiSyncClientMode ) {
@@ -193,6 +240,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         }
     }];
 }
+
+#endif
 
 - (void)startOrStopSSHAgent {
     if ( Settings.sharedInstance.runSshAgent && Settings.sharedInstance.isPro ) {
@@ -745,7 +794,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
     
     
+#ifndef NO_NETWORKING
     [self startWiFiSyncObservation];
+    
+    [self maybeWarnAboutCloudKitUnavailability];
+#endif
     
     self.suppressQuickLaunchForNextAppActivation = NO; 
 }
@@ -766,21 +819,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
     NSLog(@"✅ AppDelegate::applicationShouldOpenUntitledFile");
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     return NO;
 }
@@ -1212,7 +1250,7 @@ static NSInteger clipboardChangeCount;
     [panel setCanChooseFiles:YES];
     [panel setFloatingPanel:NO];
     panel.allowedFileTypes = importer.allowedFileTypes;
-    
+
     NSInteger result = [panel runModal];
     if(result == NSModalResponseOK) {
         NSURL* url = panel.URLs.firstObject;
@@ -1263,45 +1301,15 @@ static NSInteger clipboardChangeCount;
         [presenter dismissViewController:presenter.presentedViewControllers.firstObject];
 
         if ( !cancel ) {
-            [self setNewCkfsForImportedDatabase:database];
+            [self createNewImportedDatabase:database];
         }
     }];
     
     [DBManagerPanel.sharedInstance.contentViewController presentViewControllerAsSheet:vc];
 }
 
-- (void)setNewCkfsForImportedDatabase:(DatabaseModel*)database {
-    CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-
-    wizard.initialDatabaseFormat = kKeePass4;
-    wizard.createSafeWizardMode = NO;
-        
-    [DBManagerPanel.sharedInstance.window beginSheet:wizard.window
-                                   completionHandler:^(NSModalResponse returnCode) {
-        if (returnCode == NSModalResponseOK) {
-            [self onWizardDoneWithNewCkfs:wizard database:database];
-        }
-    }];
-}
-
-- (void)onWizardDoneWithNewCkfs:(CreateFormatAndSetCredentialsWizard*)wizard database:(DatabaseModel*)database {
-    NSError* error;
-    
-    CompositeKeyFactors* ckf = [wizard generateCkfFromSelectedFactors:DBManagerPanel.sharedInstance.contentViewController
-                                                                error:&error];
-    
-    if ( ckf ) {
-        database.ckfs = ckf;
-        
-        DocumentController* dc = DocumentController.sharedDocumentController;
-        [dc serializeAndAddDatabase:database
-                             format:database.originalFormat
-                    keyFileBookmark:wizard.selectedKeyFileBookmark
-                      yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
-    }
-    else {
-        [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
-    }
+- (void)createNewImportedDatabase:(DatabaseModel*)databaseModel {
+    [DBManagerPanel.sharedInstance showAndBeginAddDatabaseSequenceWithCreateMode:YES newModel:databaseModel];
 }
 
 - (BOOL)shouldWaitForUpdatesOrSyncsToFinish {
@@ -1591,5 +1599,34 @@ static NSInteger clipboardChangeCount;
 - (void)onPrintKeyFileRecoverySheet:(KeyFile*)keyFile {
     [keyFile printRecoverySheet];
 }
+
+#ifndef NO_NETWORKING
+- (void)maybeWarnAboutCloudKitUnavailability {
+    if ( CloudKitDatabasesInteractor.shared.fastIsAvailable ) {
+        Settings.sharedInstance.hasWarnedAboutCloudKitUnavailability = NO;
+    }
+    else {
+        BOOL hasCloudKitDbs = [MacDatabasePreferences.allDatabases anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+            return obj.storageProvider == kCloudKit;
+        }];
+        
+        if ( hasCloudKitDbs && !Settings.sharedInstance.hasWarnedAboutCloudKitUnavailability ) {
+            Settings.sharedInstance.hasWarnedAboutCloudKitUnavailability = YES;
+            
+            [DBManagerPanel.sharedInstance show];
+            
+            [MacAlerts info:NSLocalizedString(@"strongbox_sync_unavailable_title", @"Strongbox Sync Unavailable")
+            informativeText:NSLocalizedString(@"strongbox_sync_unavailable_msg", @"Strongbox Sync has become unavailable. Please check you are signed in to your Apple account in System Settings.")
+                     window:DBManagerPanel.sharedInstance.window
+                 completion:nil];
+        }
+    }
+}
+#endif
+
+- (IBAction)onShowPasswordGenerator:(id)sender {
+    [PasswordGenerator.sharedInstance show];
+}
+
 
 @end

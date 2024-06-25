@@ -12,7 +12,9 @@ import MSGraphClientSDK
 class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     typealias AuthenticateCompletionHandler = (_ client: MSHTTPClient?, _ accountIdentifier: String?, _ username: String?, _ userInteractionRequired: Bool, _ userCancelled: Bool, _ error: Error?) -> Void
 
-    static let uploadChunkSize = 10 * 320 * 1024 
+
+    static let SmallUploadFileSize = 10 * 320 * 1024 
+
 
     @objc
     static let sharedInstance = TwoDriveStorageProvider()
@@ -148,7 +150,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         return json
     }
 
-    func create(_ nickName: String, extension: String, data: Data, parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (METADATA_PTR?, Error?) -> Void) {
+    func create(_ nickName: String, fileName: String, data: Data, parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (METADATA_PTR?, Error?) -> Void) {
         let driveItem = parentFolder as? DriveItem
 
         
@@ -174,16 +176,14 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 return
             }
 
-            self.create2(driveItem, nickName, `extension`, accountIdentifier, username, client, data, viewController, completion: completion)
+            self.create2(driveItem, nickName, fileName, accountIdentifier, username, client, data, viewController, completion: completion)
         }
     }
 
-    func create2(_ parentDriveItem: DriveItem?, _ nickName: String, _ fileExtension: String, _ accountIdentifier: String?, _ username: String?, _ client: MSHTTPClient, _ data: Data, _ viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (METADATA_PTR?, Error?) -> Void) {
-        let desiredFilename = String(format: "%@.%@", nickName, fileExtension)
-
+    func create2(_ parentDriveItem: DriveItem?, _ nickName: String, _ fileName: String, _ accountIdentifier: String?, _ username: String?, _ client: MSHTTPClient, _ data: Data, _ viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (METADATA_PTR?, Error?) -> Void) {
         spinnerUI.show("", viewController: viewController)
 
-        uploadNewFile(accountIdentifier, username, parentDriveItem: parentDriveItem, filename: desiredFilename, data: data, client: client) { [weak self] driveItem, error in
+        uploadNewFile(accountIdentifier, username, parentDriveItem: parentDriveItem, filename: fileName, data: data, client: client) { [weak self] driveItem, error in
             guard let self else {
                 return
             }
@@ -423,7 +423,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func upload(driveItem: DriveItem, data: Data, client: MSHTTPClient, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        if data.count <= TwoDriveStorageProvider.uploadChunkSize {
+        if data.count <= TwoDriveStorageProvider.SmallUploadFileSize {
             uploadSmall(driveItem: driveItem, data: data, client: client, viewController: viewController, completion: completion)
         } else {
             uploadLarge(driveItem: driveItem, data: data, client: client, viewController: viewController, completion: completion)
@@ -790,7 +790,13 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             interactiveParameters.promptType = .selectAccount
         }
 
-        DispatchQueue.main.async {
+        #if os(iOS)
+            let delay = Utils.isAppInForeground ? 0.1 : 1 
+        #else
+            let delay = 0.0
+        #endif
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             application.acquireToken(with: interactiveParameters, completionBlock: { result, error in
                 if let error, (error as NSError).code == MSALError.userCanceled.rawValue {
                     completion(nil, nil, nil, false, true, nil)
@@ -1017,7 +1023,10 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 if let data = data as? Data,
                    let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
                 {
-                    let task = MSGraphOneDriveLargeFileUploadTask(client: httpClient, fileData: fileData, uploadSessionDictionary: dictionary, andChunkSize: TwoDriveStorageProvider.uploadChunkSize)
+                    let task = MSGraphOneDriveLargeFileUploadTask(client: httpClient,
+                                                                  fileData: fileData,
+                                                                  uploadSessionDictionary: dictionary,
+                                                                  andChunkSize: fileData.count) 
 
                     completionHandler(task, data, response, error)
                 } else {

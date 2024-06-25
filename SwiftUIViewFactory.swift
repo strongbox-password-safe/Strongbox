@@ -29,7 +29,7 @@ class SwiftUIViewFactory: NSObject {
         return hostingController
     }
 
-    @objc static func makeWiFiSyncPasscodeViewController(_ server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig, _ pinCode: String?) -> Void)) -> UIViewController {
+    @objc static func makeWiFiSyncPasscodeViewController(_ server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig?, _ pinCode: String?) -> Void)) -> UIViewController {
         let hostingController = UIHostingController(rootView: PasscodeEntryView(server: server, onDone: onDone))
 
         return hostingController
@@ -57,7 +57,7 @@ class SwiftUIViewFactory: NSObject {
                                                 return false
                                             }
 
-                                            return keyFile.hashString == hash
+                                            return keyFile.hashString.uppercased() == hash.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
                                         },
                                         validateCodes: { codes in
                                             KeyFile.fromHexCodes(codes) != nil

@@ -9,7 +9,7 @@
 #import "DocumentController.h"
 #import "Document.h"
 #import "AbstractDatabaseFormatAdaptor.h"
-#import "CreateFormatAndSetCredentialsWizard.h"
+#import "CreateDatabaseOrSetCredentialsWizard.h"
 #import "DatabaseModel.h"
 #import "Settings.h"
 #import "MacAlerts.h"
@@ -39,7 +39,7 @@ static BOOL didRestoreAWindowAtStartup;
 @property BOOL hasDoneAppStartupTasks;
 @property (readonly) NSArray<MacDatabasePreferences*>* startupDatabases;
 
-@end
+@end    
 
 @implementation DocumentController
 
@@ -51,141 +51,15 @@ static BOOL didRestoreAWindowAtStartup;
 }
 
 - (void)newDocument:(id)sender {
-    NSLog(@"newDocument");
-    
-    
-
-    [DBManagerPanel.sharedInstance show];
-    
-    CreateFormatAndSetCredentialsWizard* wizard = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
-    
-    wizard.initialDatabaseFormat = kKeePass4;
-    wizard.createSafeWizardMode = YES;
-    
-    [DBManagerPanel.sharedInstance.window beginSheet:wizard.window
-                                   completionHandler:^(NSModalResponse returnCode) {
-        if(returnCode != NSModalResponseOK) {
-            return;
-        }
-        
-        NSError* error;
-        
-        CompositeKeyFactors* ckf = [wizard generateCkfFromSelectedFactors:DBManagerPanel.sharedInstance.contentViewController error:&error];
-        
-        if ( ckf ) {
-            [self createNewDatabase:ckf format:wizard.selectedDatabaseFormat
-                    keyFileBookmark:wizard.selectedKeyFileBookmark
-                      yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
-        }
-        else {
-            [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
-        }
-    }];
+    [DBManagerPanel.sharedInstance showAndBeginAddDatabaseSequenceWithCreateMode:YES newModel:nil];
 }
 
-- (void)createNewDatabase:(CompositeKeyFactors*)ckf
-                   format:(DatabaseFormat)format
-          keyFileBookmark:(NSString*)keyFileBookmark
-            yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
-    DatabaseModel* db = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:ckf];
-    
-    [SampleItemsGenerator addSampleGroupAndRecordToRoot:db passwordConfig:Settings.sharedInstance.passwordGenerationConfig];
-    
-    [self serializeAndAddDatabase:db format:format keyFileBookmark:keyFileBookmark yubiKeyConfig:yubiKeyConfig];
+- (IBAction)originalOpenDocument:(id)sender {
+    [DBManagerPanel.sharedInstance showAndBeginAddDatabaseSequenceWithCreateMode:NO newModel:nil];
 }
 
-- (void)serializeAndAddDatabase:(DatabaseModel*)db
-                         format:(DatabaseFormat)format
-                keyFileBookmark:(NSString*)keyFileBookmark
-                  yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
-    NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory];
-    [outputStream open];
-    
-    [Serializator getAsData:db
-                     format:db.originalFormat
-               outputStream:outputStream completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        [outputStream close];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ( !userCancelled && !error ) {
-                NSData* data = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-                
-                [self saveNewFileBasedDatabase:format database:db data:data keyFileBookmark:keyFileBookmark yubiKeyConfig:yubiKeyConfig];
-            }
-            else if (! userCancelled ) {
-                NSLog(@"Error Saving New Database: [%@]", error);
-                
-                if (NSApplication.sharedApplication.keyWindow) {
-                    [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
-                }
-            }
-        });
-    }];
-}
-
-- (void)saveNewFileBasedDatabase:(DatabaseFormat)format
-                        database:(DatabaseModel*)database
-                            data:(NSData*)data
-                 keyFileBookmark:(NSString*)keyFileBookmark
-                   yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
-    NSSavePanel *panel = [NSSavePanel savePanel];
-    NSString* loc2 = NSLocalizedString(@"mac_save_new_database",  @"Save New Password Database...");
-    panel.title = loc2;
-    NSString* loc3 = NSLocalizedString(@"mac_save_action",  @"Save");
-    panel.prompt = loc3;
-    NSString* loc4 = NSLocalizedString(@"mac_save_new_db_message",  @"You must save this new database before you can use it");
-    panel.message = loc4;
-    NSString* ext = [Serializator getDefaultFileExtensionForFormat:format];
-    NSString* loc5 = NSLocalizedString(@"mac_untitled_database_filename_fmt", @"Untitled.%@");
-    panel.nameFieldStringValue = [NSString stringWithFormat:loc5, ext ];
-    
-    NSInteger modalCode = [panel runModal];
-    
-    if (modalCode != NSModalResponseOK) {
-        return;
-    }
-    
-    NSURL *URL = [panel URL];
-    
-    NSError* error;
-    BOOL success = [data writeToURL:URL options:kNilOptions error:&error];
-    if ( !success ) {
-        NSLog(@"Error Saving New Database: [%@]", error);
-        
-        if (NSApplication.sharedApplication.keyWindow) {
-            [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
-        }
-        
-        return;
-    }
-    
-    NSURL* maybeManagedSyncUrl = managedUrlFromFileUrl(URL);
-    
-    MacDatabasePreferences* dbm = [MacDatabasePreferences addOrGet:maybeManagedSyncUrl];
-    
-    if ( !Settings.sharedInstance.doNotRememberKeyFile ) {
-        dbm.keyFileBookmark = keyFileBookmark;
-    }
-    
-    dbm.yubiKeyConfiguration = yubiKeyConfig;
-    dbm.showAdvancedUnlockOptions = keyFileBookmark != nil || yubiKeyConfig != nil;
-    
-    BOOL rememberKeyFile = !Settings.sharedInstance.doNotRememberKeyFile;
-    
-    if ( rememberKeyFile ) {
-        dbm.keyFileBookmark = keyFileBookmark;
-    }
-    
-    dbm.yubiKeyConfiguration = yubiKeyConfig;
-    dbm.showAdvancedUnlockOptions = keyFileBookmark != nil || yubiKeyConfig != nil;
-    
-    [self openDatabase:dbm completion:^(NSError * _Nonnull error) {
-        if ( error ) {
-            if (NSApplication.sharedApplication.keyWindow) {
-                [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
-            }
-        }
-    }];
+- (void)originalOpenDocumentWithFileSelection {
+    return [super openDocument:nil];
 }
 
 - (void)openDocumentWithContentsOfURL:(NSURL *)url
@@ -229,9 +103,6 @@ static BOOL didRestoreAWindowAtStartup;
     }];
 }
 
-- (IBAction)originalOpenDocument:(id)sender {
-    return [super openDocument:sender];
-}
 
 - (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^)(NSError* error))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
@@ -276,7 +147,7 @@ static BOOL didRestoreAWindowAtStartup;
 }
 
 - (void)openDocument:(id)sender {
-    NSLog(@"openDocument");
+    NSLog(@"🔴 openDocument");
     
     
     

@@ -109,7 +109,7 @@
         
         BOOL modsEqual =  !((self.modified == nil && other.modified != nil) || (self.modified != nil && ![self.modified isEqualToDateWithinEpsilon:other.modified] ));
         
-        BOOL dataEqual = [self.custom.sha1.hexString isEqualToString:other.custom.sha1.hexString];
+        BOOL dataEqual = [self.custom.sha1.upperHexString isEqualToString:other.custom.sha1.upperHexString];
         
         if ( namesEqual && modsEqual && dataEqual ) {
             return YES;

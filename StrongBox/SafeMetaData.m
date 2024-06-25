@@ -388,7 +388,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.autoFillScanCustomFields = ((NSNumber*)jsonDictionary[@"autoFillScanCustomFields"]).boolValue;
     }
     else {
-        ret.autoFillScanCustomFields = YES; 
+        ret.autoFillScanCustomFields = YES;
     }
 
     
@@ -544,6 +544,13 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.isSharedInCloudKit = NO;
     }
 
+    if ( jsonDictionary[@"isOwnedByMeCloudKit"] != nil ) {
+        ret.isOwnedByMeCloudKit = ((NSNumber*)jsonDictionary[@"isOwnedByMeCloudKit"]).boolValue;
+    }
+    else {
+        ret.isOwnedByMeCloudKit = NO;
+    }
+
     
     
     return ret;
@@ -635,6 +642,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"hideTabBarIfOnlySingleTab" : @(self.hideTabBarIfOnlySingleTab),
         @"allowPulldownRefreshSyncInOfflineMode" : @(self.allowPulldownRefreshSyncInOfflineMode),
         @"isSharedInCloudKit" : @(self.isSharedInCloudKit),
+        @"isOwnedByMeCloudKit" : @(self.isOwnedByMeCloudKit),
     }];
     
     if (self.nickName != nil) {

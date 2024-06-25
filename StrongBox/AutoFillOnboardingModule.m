@@ -28,9 +28,9 @@
 }
 
 - (BOOL)shouldDisplay {
-    NSUInteger databasesUsingQuickType = [CommonDatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
-        return obj.autoFillEnabled && obj.quickTypeEnabled;
-    }].count;
+
+
+
 
     NSDate* cutoff = [NSDate fromYYYY_MM_DD_London_Noon_Time_String:@"2024-01-08"];
     BOOL newish = [self.model.metadata.databaseCreated isLaterThan:cutoff]; 

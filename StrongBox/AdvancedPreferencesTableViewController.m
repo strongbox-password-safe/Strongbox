@@ -106,6 +106,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelWiFiSyncSwitch;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowDatabasesOnAppShortcutsMenu;
+@property (weak, nonatomic) IBOutlet UILabel *labelStrongboxSyncStatus;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellStrongboxSyncStatus;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewStrongboxSyncStatus;
 
 @end
 
@@ -140,14 +143,17 @@
         [self cell:self.cellDropboxAppFolder setHidden:YES];
         [self cell:self.cellAtomicSftpWrites setHidden:YES];
         
+        [self cell:self.cellForcePull setHidden:YES];
+        [self cell:self.cellSyncForcePush setHidden:YES];
+
         [self cell:self.cellWiFiSyncSwitch setHidden:YES];
         [self cell:self.cellWiFiSyncPasscode setHidden:YES];
         [self cell:self.cellWiFiSyncServiceName setHidden:YES];
+        
+        [self cell:self.cellStrongboxSyncStatus setHidden:YES];
     }
     
-    if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions && AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        [self cell:self.cellForcePull setHidden:YES];
-        [self cell:self.cellSyncForcePush setHidden:YES];
+    if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
         [self cell:self.cellDropboxAppFolder setHidden:YES];
     }
     
@@ -258,10 +264,13 @@
         }];
     }
     else if ( cell == self.cellWiFiSyncPasscode ) {
+        NSString* passcode = AppPreferences.sharedInstance.wiFiSyncPasscode;
+        passcode = passcode.length ? passcode : NSLocalizedString(@"generic_error", @"Error");
+        
         [Alerts OkCancelWithTextField:self
                       secureTextField:NO
                  textFieldPlaceHolder:NSLocalizedString(@"wifi_sync_passcode_noun", @"Passcode")
-                        textFieldText:AppPreferences.sharedInstance.wiFiSyncPasscode
+                        textFieldText:passcode
                                 title:NSLocalizedString(@"wifi_sync_passcode_noun", @"Passcode")
                               message:NSLocalizedString(@"wifi_sync_change_passcode_message", @"Passcode is required on other devices to connect to this device.")
                            completion:^(NSString *text, BOOL response) {
@@ -402,7 +411,38 @@
     
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
     self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
+    
+#ifndef NO_NETWORKING
+    [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateStrongboxSyncStatus:status error:error];
+        });
+    }];
+#endif
 }
+
+#ifndef NO_NETWORKING
+- (void)updateStrongboxSyncStatus:(CKAccountStatus)status
+                            error:(NSError* _Nullable)error {
+    if ( error ) {
+        self.labelStrongboxSyncStatus.textColor = UIColor.systemRedColor;
+        self.labelStrongboxSyncStatus.text = [NSString stringWithFormat:@"[%ld] - %@", error.code, error.localizedDescription];
+        
+        self.imageViewStrongboxSyncStatus.image = [UIImage systemImageNamed:@"exclamationmark.triangle" withConfiguration:[UIImageSymbolConfiguration configurationWithHierarchicalColor:UIColor.systemRedColor]];
+    }
+    else {
+        self.labelStrongboxSyncStatus.textColor = status == CKAccountStatusAvailable ? UIColor.secondaryLabelColor : UIColor.systemOrangeColor;
+        self.labelStrongboxSyncStatus.text = [CloudKitDatabasesInteractor getAccountStatusStringWithStatus:status];
+        
+        if ( status == CKAccountStatusAvailable ) {
+            self.imageViewStrongboxSyncStatus.image = [UIImage systemImageNamed:@"checkmark.circle" withConfiguration:[UIImageSymbolConfiguration configurationWithHierarchicalColor:UIColor.systemGreenColor]];
+        }
+        else {
+            self.imageViewStrongboxSyncStatus.image = [UIImage systemImageNamed:@"exclamationmark.triangle" withConfiguration:[UIImageSymbolConfiguration configurationWithHierarchicalColor:UIColor.systemOrangeColor]];
+        }
+    }
+}
+#endif
 
 - (void)bindCloudSessions {
     if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
@@ -461,7 +501,9 @@
     [self cell:self.cellWiFiSyncLastError setHidden:WiFiSyncServer.shared.lastError == nil];
 #endif
 
-    self.labelPasscode.text = AppPreferences.sharedInstance.wiFiSyncPasscode;
+    NSString* passcode = AppPreferences.sharedInstance.wiFiSyncPasscode;
+    passcode = passcode.length ? passcode : NSLocalizedString(@"generic_error", @"Error");
+    self.labelPasscode.text = passcode;
     
     [self cell:self.cellWiFiSyncPasscode setHidden:!isOn];
     [self cell:self.cellWiFiSyncServiceName setHidden:!isOn];

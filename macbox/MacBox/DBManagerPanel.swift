@@ -26,6 +26,20 @@ class DBManagerPanel: NSWindowController {
     }
 
     @objc
+    public func showAndBeginAddDatabaseSequence(createMode: Bool, newModel: DatabaseModel? = nil) {
+        
+
+        showWindow(nil)
+
+        guard let vc = contentViewController as? DatabasesManagerVC else {
+            NSLog("🔴 Could not get contentviewcontroller?! for DBManager")
+            return
+        }
+
+        vc.beginAddDatabaseSequence(createMode, newModel: newModel, existingDatabaseToCopy: nil)
+    }
+
+    @objc
     public func hide() {
         
 

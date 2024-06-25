@@ -107,12 +107,13 @@ struct MacWiFiSyncPasscodeEntryView: View {
                     onDone(nil, nil)
                 }
                 .controlSize(.large)
+                .keyboardShortcut(.cancelAction)
 
                 Button {
                     onDone(server, passcode)
                 } label: {
                     HStack(spacing: 2) {
-                        Image(systemName: "bolt.fill")
+
                         Text("generic_connect_verb")
                             .foregroundColor(passcode.count == 0 ? .secondary : .white)
                             .font(.headline)

@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-@available(iOS 15.0, macOS 14.0, *)
+@available(macOS 14.0, *)
 struct EntryListItemView: View {
     var title: String
     var username: String
