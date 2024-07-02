@@ -508,23 +508,23 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             
             
 
-            do {
-                try ObjCExceptionCatcherForSwift.catchException {
-                    task.upload(completion: { [weak self] data, _, error in
-                        if viewController != nil {
-                            self?.spinnerUI.dismiss()
-                        }
 
-                        self?.handleUploadResponse(accountIdentifier, username, data as? Data, error, completion)
-                    })
-                }
-            } catch {
+
+            task.upload(completion: { [weak self] data, _, error in
                 if viewController != nil {
                     self?.spinnerUI.dismiss()
                 }
 
-                self?.handleUploadResponse(accountIdentifier, username, nil, error, completion)
-            }
+                self?.handleUploadResponse(accountIdentifier, username, data as? Data, error, completion)
+            })
+
+
+
+
+
+
+
+
         }
     }
 
@@ -1018,11 +1018,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             MSGraphOneDriveLargeFileUploadTask.createUploadSession(from: createSessionRequest, andHTTPClient: httpClient) { data, response, error in
                 if let error {
                     completionHandler(nil, nil, response, error)
-                }
-
-                if let data = data as? Data,
-                   let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject]
-                {
+                } else if let data = data as? Data, let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject] {
                     let task = MSGraphOneDriveLargeFileUploadTask(client: httpClient,
                                                                   fileData: fileData,
                                                                   uploadSessionDictionary: dictionary,

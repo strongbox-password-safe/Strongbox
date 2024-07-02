@@ -330,13 +330,20 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
         return [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
     }
     else {
-        NSString* passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
-        
-        [self setWiFiSyncPasscode:passcode];
-        
-        self.wiFiSyncPasscodeSSKeyHasBeenInitialized = YES;
-        
-        return passcode;
+        NSString* originalPasscode = [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
+        if ( originalPasscode != nil ) {
+            self.wiFiSyncPasscodeSSKeyHasBeenInitialized = YES;
+            return originalPasscode;
+        }
+        else {
+            NSString* passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];
+            
+            [self setWiFiSyncPasscode:passcode];
+            
+            self.wiFiSyncPasscodeSSKeyHasBeenInitialized = YES;
+            
+            return passcode;
+        }
     }
 }
 
