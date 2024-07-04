@@ -1864,8 +1864,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
             }
         }
     }
-    
-    if ( database.storageProvider == kCloudKit ) {
+    else if ( database.storageProvider == kCloudKit ) {
         [self renameCloudKitDatabase:database nick:name];
     }
 }
@@ -3409,7 +3408,12 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
                                         viewController:self];
     
-    [CloudKitDatabasesInteractor.shared renameWithDatabase:database nickName:nick completionHandler:^(NSError * _Nullable error) {
+    NSString* fileName = [nick stringByAppendingPathExtension:database.fileName.pathExtension];
+    
+    [CloudKitDatabasesInteractor.shared renameWithDatabase:database
+                                                  nickName:nick
+                                                  fileName:fileName
+                                         completionHandler:^(NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
                 [CrossPlatformDependencies.defaults.spinnerUi dismiss];

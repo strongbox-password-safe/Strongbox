@@ -347,6 +347,20 @@ class CloudKitDatabasesInteractor: NSObject {
             existing.nickName = nick
         }
 
+        #if os(iOS)
+            if existing.fileName != database.filename {
+                NSLog("🟢 Updating CloudKit Database. Database filename has changed.")
+                existing.fileName = database.filename
+            }
+        #else
+            if let newUrl = CloudKitStorageProvider.getCloudKitPKUrl(filename: database.filename, uuid: existing.uuid) {
+                if newUrl != existing.fileUrl {
+                    NSLog("🟢 Updating CloudKit Database. Database filename has changed.")
+                    existing.fileUrl = newUrl
+                }
+            }
+        #endif
+
         let shared = database.sharedWithMe || database.associatedCkRecord.share != nil 
         let ownedByMe = !database.sharedWithMe
 
@@ -495,7 +509,7 @@ class CloudKitDatabasesInteractor: NSObject {
     }
 
     @objc
-    func rename(database: METADATA_PTR, nickName: String) async throws {
+    func rename(database: METADATA_PTR, nickName: String, fileName: String) async throws {
         guard database.storageProvider == .kCloudKit else {
             NSLog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
             throw CloudKitDatabasesInteractorError.invalidParameter
@@ -506,7 +520,7 @@ class CloudKitDatabasesInteractor: NSObject {
             throw CloudKitDatabasesInteractorError.couldNotParseCloudKitId
         }
 
-        _ = try await CloudKitManager.shared.rename(id: cloudKitDatabaseId, nickName: nickName)
+        _ = try await CloudKitManager.shared.rename(id: cloudKitDatabaseId, nickName: nickName, fileName: fileName)
 
         try await refreshAndMerge()
     }
@@ -596,7 +610,7 @@ class CloudKitDatabasesInteractor: NSObject {
     class Instrumentation: NSObject {
         @objc let isInitialized: Bool
         @objc let subscribedToDatabaseChanges: Bool
-        @objc let cloudKitAccountStatus: CKAccountStatus = .couldNotDetermine
+        @objc let cloudKitAccountStatus: CKAccountStatus
         @objc let cloudKitAccountStatusError: Error?
         @objc let registeredForNotifications: Bool
         @objc let registeredForNotificationError: Error?
@@ -605,6 +619,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
         init(isInitialized: Bool,
              subscribedToDatabaseChanges: Bool,
+             cloudKitAccountStatus: CKAccountStatus,
              cloudKitAccountStatusError: Error?,
              registeredForNotifications: Bool,
              registeredForNotificationError: Error?,
@@ -613,6 +628,7 @@ class CloudKitDatabasesInteractor: NSObject {
         {
             self.isInitialized = isInitialized
             self.subscribedToDatabaseChanges = subscribedToDatabaseChanges
+            self.cloudKitAccountStatus = cloudKitAccountStatus
             self.cloudKitAccountStatusError = cloudKitAccountStatusError
             self.registeredForNotifications = registeredForNotifications
             self.registeredForNotificationError = registeredForNotificationError
@@ -629,6 +645,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
         return Instrumentation(isInitialized: isInitialized,
                                subscribedToDatabaseChanges: subscribedToDatabaseChanges,
+                               cloudKitAccountStatus: cachedAccountStatus,
                                cloudKitAccountStatusError: cachedAccountStatusError,
                                registeredForNotifications: registeredForNotifications,
                                registeredForNotificationError: registeredForNotificationError,

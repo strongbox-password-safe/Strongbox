@@ -30,9 +30,10 @@ int main(int argc, const char * argv[]) {
             
             NSLog(@"Sending... [%@]", request);
             
-            NSString* response = sendMessageOverSocket(request, YES);
+            NSError* error;
+            NSString* response = sendMessageOverSocket(request, YES, &error);
             
-            NSLog(@"Got response => \n%@\n", response);
+            NSLog(@"Got response => \n%@\nError = [%@]", response, error);
 
             int ch = getchar();
             

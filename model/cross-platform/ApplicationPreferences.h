@@ -48,12 +48,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL runAsWiFiSyncSourceDevice;
 @property (nullable) NSString* wiFiSyncServiceName;
+
+@property (nullable) NSString* lastWiFiSyncPasscodeError;
 @property (nullable) NSString* wiFiSyncPasscode;
 
 @property BOOL disableWiFiSyncClientMode;
 @property BOOL disableNetworkBasedFeatures;
 
 @property BOOL cloudKitZoneCreated;
+@property BOOL changeNotificationsSubscriptionCreated;
+
+@property BOOL useNextGenOneDriveAPI;
 
 @end
 

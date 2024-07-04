@@ -10,7 +10,7 @@ import MSAL
 import MSGraphClientSDK
 
 class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
-    typealias AuthenticateCompletionHandler = (_ client: MSHTTPClient?, _ accountIdentifier: String?, _ username: String?, _ userInteractionRequired: Bool, _ userCancelled: Bool, _ error: Error?) -> Void
+    typealias AuthenticateCompletionHandler = (_ client: MSHTTPClient?, _ msalResult: MSALResult?, _ accountIdentifier: String?, _ username: String?, _ userInteractionRequired: Bool, _ userCancelled: Bool, _ error: Error?) -> Void
 
 
     static let SmallUploadFileSize = 10 * 320 * 1024 
@@ -24,7 +24,24 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     var application: MSALPublicClientApplication?
 
+    private let nextGenURLSession: URLSession
+
+    static let NextGenRequestTimeout = 20.0 
+    static let NextGenResourceTimeout = 10 * 60.0 
+
     override private init() {
+        let sessionConfig = URLSessionConfiguration.ephemeral
+
+        sessionConfig.allowsCellularAccess = true
+        sessionConfig.waitsForConnectivity = false
+        sessionConfig.timeoutIntervalForRequest = TwoDriveStorageProvider.NextGenRequestTimeout
+        sessionConfig.timeoutIntervalForResource = TwoDriveStorageProvider.NextGenResourceTimeout
+        #if os(iOS)
+            sessionConfig.multipathServiceType = .none
+        #endif
+
+        nextGenURLSession = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: TwoDriveStorageProvider.NextGenOperationQueue)
+
         super.init()
 
         let config = MSALPublicClientApplicationConfig(clientId: TwoDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
@@ -70,6 +87,10 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     var spinnerUI: SpinnerUI {
         CrossPlatformDependencies.defaults().spinnerUi
+    }
+
+    var appPreferences: ApplicationPreferences {
+        CrossPlatformDependencies.defaults().applicationPreferences
     }
 
     func delete(_: METADATA_PTR, completion _: @escaping (Error?) -> Void) {
@@ -155,7 +176,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         
 
-        authenticate(accountIdentifier: driveItem?.accountIdentifier, viewController: viewController) { [weak self] client, accountIdentifier, username, _, userCancelled, error in
+        authenticate(accountIdentifier: driveItem?.accountIdentifier, viewController: viewController) { [weak self] client, _, accountIdentifier, username, _, userCancelled, error in
             guard let self else {
                 return
             }
@@ -294,7 +315,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
-        authenticate(accountIdentifier: driveItem.accountIdentifier, viewController: viewController) { [weak self] client, _, _, userInteractionRequired, userCancelled, error in
+        authenticate(accountIdentifier: driveItem.accountIdentifier, viewController: viewController) { [weak self] client, _, _, _, userInteractionRequired, userCancelled, error in
             guard let self else {
                 return
             }
@@ -393,7 +414,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
-        authenticate(accountIdentifier: driveItem.accountIdentifier, viewController: viewController) { [weak self] client, _, _, userInteractionRequired, userCancelled, error in
+        authenticate(accountIdentifier: driveItem.accountIdentifier, viewController: viewController) { [weak self] client, msalResult, _, _, userInteractionRequired, userCancelled, error in
             guard let self else {
                 return
             }
@@ -413,20 +434,30 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 return
             }
 
-            guard let client else {
+            guard let msalResult else {
                 completion(.updateResultError, nil, nil)
                 return
             }
 
-            self.upload(driveItem: driveItem, data: data, client: client, viewController: viewController, completion: completion)
+            if !appPreferences.useNextGenOneDriveAPI {
+                guard let client else {
+                    completion(.updateResultError, nil, nil)
+                    return
+                }
+
+                self.upload(driveItem: driveItem, msalResult: msalResult, data: data, client: client, viewController: viewController, completion: completion)
+            } else {
+                self.uploadNextGeneration(driveItem: driveItem, msalResult: msalResult, data: data, viewController: viewController, completion: completion)
+            }
         }
     }
 
-    func upload(driveItem: DriveItem, data: Data, client: MSHTTPClient, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
+    func upload(driveItem: DriveItem, msalResult: MSALResult, data: Data, client: MSHTTPClient, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
         if data.count <= TwoDriveStorageProvider.SmallUploadFileSize {
-            uploadSmall(driveItem: driveItem, data: data, client: client, viewController: viewController, completion: completion)
+            uploadSmall(driveItem: driveItem, data: data, client: client, viewController: viewController, completion: completion) 
         } else {
-            uploadLarge(driveItem: driveItem, data: data, client: client, viewController: viewController, completion: completion)
+            uploadNextGeneration(driveItem: driveItem, msalResult: msalResult, data: data, viewController: viewController, completion: completion)
+
         }
     }
 
@@ -462,61 +493,6 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         task?.execute()
     }
 
-    func uploadLarge(driveItem: DriveItem, data: Data, client: MSHTTPClient, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        if let viewController {
-            spinnerUI.show(NSLocalizedString("storage_provider_status_syncing", comment: "Syncing..."), viewController: viewController)
-        }
-
-        guard let driveId = driveItem.driveId,
-              let itemId = driveItem.itemId
-        else {
-            NSLog("🔴 Could not convert provider data to Listing State")
-            completion(.updateResultError, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
-            return
-        }
-
-        let accountIdentifier = driveItem.accountIdentifier
-        let username = driveItem.username
-
-        StrongboxGraphOneDriveLargeFileUploadTask.create(driveId: driveId, itemId: itemId, fileData: data, httpClient: client) { [weak self] task, data, _, error in
-            if let error {
-                if viewController != nil {
-                    self?.spinnerUI.dismiss()
-                }
-
-                NSLog("Error creating large upload session", String(describing: error))
-                completion(.updateResultError, nil, error)
-                return
-            }
-
-            guard let task else {
-                if viewController != nil {
-                    self?.spinnerUI.dismiss()
-                }
-
-                NSLog("Error creating large upload session. Task nil.", String(describing: error))
-                completion(.updateResultError, nil, nil)
-                return
-            }
-
-            
-            
-
-            
-            
-            
-            
-            
-
-
-
-            task.upload(completion: { [weak self] data, _, error in
-                if viewController != nil {
-                    self?.spinnerUI.dismiss()
-                }
-
-                self?.handleUploadResponse(accountIdentifier, username, data as? Data, error, completion)
-            })
 
 
 
@@ -525,8 +501,63 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
 
 
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+
+
 
     func handleUploadResponse(_ accountIdentifier: String?, _ username: String?, _ data: Data?, _ error: Error?, _ completion: @escaping StorageProviderUpdateCompletionBlock) {
         if let error {
@@ -563,7 +594,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     func list(_ parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (Bool, [StorageBrowserItem], Error?) -> Void) {
         let driveItem = parentFolder as? DriveItem
 
-        authenticate(accountIdentifier: driveItem?.accountIdentifier, viewController: viewController) { [weak self] client, accountIdentifier, username, userInteractionRequired, userCancelled, error in
+        authenticate(accountIdentifier: driveItem?.accountIdentifier, viewController: viewController) { [weak self] client, _, accountIdentifier, username, userInteractionRequired, userCancelled, error in
             guard let self else {
                 return
             }
@@ -698,7 +729,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     func authenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping AuthenticateCompletionHandler) {
         guard let application else {
             NSLog("🔴 Could not load or find Application!")
-            completion(nil, nil, nil, false, false, Utils.createNSError("🔴 Could not load or find Application!", errorCode: 346))
+            completion(nil, nil, nil, nil, false, false, Utils.createNSError("🔴 Could not load or find Application!", errorCode: 346))
             return
         }
 
@@ -739,7 +770,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                     if nsError.domain == MSALErrorDomain, nsError.code == MSALError.interactionRequired.rawValue {
                         self.interactiveAuthenticate(accountIdentifier: accountIdentifier, viewController: viewController, completion: completion)
                     } else {
-                        completion(nil, nil, nil, false, false, error)
+                        completion(nil, nil, nil, nil, false, false, error)
                     }
 
                     return
@@ -749,11 +780,11 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                       let client = MSClientFactory.createHTTPClient(with: SimpleAccessTokenAuthProvider(accessToken: result.accessToken))
                 else {
                     NSLog("🔴 Error in Interactive Logon - OneDrive")
-                    completion(nil, nil, nil, false, false, Utils.createNSError("🔴 Error in Logon", errorCode: 346))
+                    completion(nil, nil, nil, nil, false, false, Utils.createNSError("🔴 Error in Logon", errorCode: 346))
                     return
                 }
 
-                completion(client, result.account.identifier, result.account.username, false, false, nil)
+                completion(client, result, result.account.identifier, result.account.username, false, false, nil)
             }
         } else {
             interactiveAuthenticate(accountIdentifier: accountIdentifier, viewController: viewController, completion: completion)
@@ -763,13 +794,13 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     func interactiveAuthenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping AuthenticateCompletionHandler) {
         guard let application else {
             NSLog("🔴 Could not load or find Application!")
-            completion(nil, nil, nil, false, false, Utils.createNSError("🔴 Could not load or find Application!", errorCode: 346))
+            completion(nil, nil, nil, nil, false, false, Utils.createNSError("🔴 Could not load or find Application!", errorCode: 346))
             return
         }
 
         guard let viewController else {
             NSLog("⚠️ Interactive Logon required but Background Call...")
-            completion(nil, nil, nil, true, false, nil)
+            completion(nil, nil, nil, nil, true, false, nil)
             return
         }
 
@@ -799,7 +830,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
             application.acquireToken(with: interactiveParameters, completionBlock: { result, error in
                 if let error, (error as NSError).code == MSALError.userCanceled.rawValue {
-                    completion(nil, nil, nil, false, true, nil)
+                    completion(nil, nil, nil, nil, false, true, nil)
                     return
                 }
 
@@ -809,11 +840,11 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 else {
                     let err = error == nil ? Utils.createNSError("🔴 Error in Interactive Logon", errorCode: 346) : error
                     NSLog("🔴 Error in Interactive Logon - OneDrive [%@]", String(describing: err))
-                    completion(nil, nil, nil, false, false, err)
+                    completion(nil, nil, nil, nil, false, false, err)
                     return
                 }
 
-                completion(client, result.account.identifier, result.account.username, false, false, nil)
+                completion(client, nil, result.account.identifier, result.account.username, false, false, nil)
             })
         }
     }
@@ -882,7 +913,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         let accountIdentifier = obj["accountIdentifier"] as? String
         let url = getListingRequestUrlFromDriveItem(driveId: driveId, folderId: parentFolderId)
 
-        authenticate(accountIdentifier: accountIdentifier, viewController: viewController, completion: { [weak self] client, accountIdentifier, username, userInteractionRequired, userCancelled, error in
+        authenticate(accountIdentifier: accountIdentifier, viewController: viewController, completion: { [weak self] client, _, accountIdentifier, username, userInteractionRequired, userCancelled, error in
             if let error {
                 NSLog("🔴 Could not authenticate [%@]", String(describing: error))
                 completion(nil, userInteractionRequired, error)
@@ -1039,5 +1070,186 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
             return urlRequest
         }
+    }
+}
+
+extension TwoDriveStorageProvider {
+    private static let NextGenOperationQueue: OperationQueue = {
+        let queue = OperationQueue()
+
+        queue.name = "com.markmcguill.strongbox.OneDriveStorageProvider"
+        queue.qualityOfService = .userInitiated
+        queue.maxConcurrentOperationCount = 4
+
+        return queue
+    }()
+
+    enum TwoDriveStorageProviderError: Error {
+        case invalidUploadUrl(detail: String)
+        case unexpectedResponse(detail: String)
+        case unexpectedResponseCode(code: Int, detail: String)
+        case couldNotGetDriveItemUrl
+        case couldNotConvertOdataDriveItem
+        case couldNotGetModDateAfterUpload
+    }
+
+    enum OneDriveAPIHTTPParams {
+        static let authorization = "Authorization"
+        static let contentLength = "Content-Length"
+        static let contentRange = "Content-Range"
+        static let contentType = "Content-Type"
+    }
+
+    private struct CreateUploadSessionResponse: Codable {
+        let uploadUrl: String
+    }
+
+    func uploadNextGeneration(driveItem: DriveItem, msalResult: MSALResult, data: Data, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
+        if let viewController {
+            spinnerUI.show(NSLocalizedString("storage_provider_status_syncing", comment: "Syncing..."), viewController: viewController)
+        }
+
+        Task {
+            defer {
+                if viewController != nil {
+                    spinnerUI.dismiss()
+                }
+            }
+
+            do {
+                let modDate = try await createUploadSessionAndUpload(driveItem: driveItem, msalResult: msalResult, data: data)
+
+                completion(.updateResultSuccess, modDate, nil)
+            } catch {
+                NSLog("🔴 Error in uploadNextGeneration [%@]", String(describing: error))
+
+                completion(.updateResultError, nil, error)
+            }
+        }
+    }
+
+    func createUploadSessionAndUpload(driveItem: DriveItem, msalResult: MSALResult, data: Data) async throws -> Date {
+        
+
+        guard let createSessionURL = getGraphRequestURLForItem(driveItem: driveItem) else {
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        var urlRequest = URLRequest(url: createSessionURL)
+
+        urlRequest.timeoutInterval = TwoDriveStorageProvider.NextGenRequestTimeout
+
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("Bearer \(msalResult.accessToken)", forHTTPHeaderField: OneDriveAPIHTTPParams.authorization)
+        urlRequest.setValue("application/json; charset=UTF-8", forHTTPHeaderField: OneDriveAPIHTTPParams.contentType)
+
+        
+
+
+
+
+
+
+
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        #if DEBUG
+            NSLog("🐞 createUploadSessionAndUpload DONE: \(String(describing: (response as? HTTPURLResponse)?.statusCode))")
+            NSLog("🐞 createUploadSessionAndUpload DONE: \(response)")
+            NSLog("🐞 createUploadSessionAndUpload DONE: \(String(describing: String(data: jsonData, encoding: .utf8)))")
+        #endif
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw TwoDriveStorageProviderError.unexpectedResponse(detail: String(describing: response))
+        }
+
+        guard httpResponse.statusCode == 200 else { 
+            NSLog("🔴 createUploadSessionAndUpload - Unexpected Response Code \(httpResponse.statusCode) ")
+            throw TwoDriveStorageProviderError.unexpectedResponseCode(code: httpResponse.statusCode, detail: String(describing: response))
+        }
+
+        let answer = try JSONDecoder().decode(CreateUploadSessionResponse.self, from: jsonData)
+
+        #if DEBUG
+            NSLog("🐞 createUploadSessionAndUpload DONE: \(answer)")
+        #endif
+
+        guard let uploadURL = URL(string: answer.uploadUrl) else {
+            NSLog("🔴 Could not convert uploadURL to a URL proper [%@]", answer.uploadUrl)
+            throw TwoDriveStorageProviderError.invalidUploadUrl(detail: "Couldn't convert uploadURL to a URL!")
+        }
+
+        return try await uploadUsingSessionUrl(driveItem: driveItem, uploadUrl: uploadURL, msalResult: msalResult, data: data)
+    }
+
+    func uploadUsingSessionUrl(driveItem: DriveItem, uploadUrl: URL, msalResult _: MSALResult, data: Data) async throws -> Date {
+        var urlRequest = URLRequest(url: uploadUrl)
+
+        urlRequest.timeoutInterval = TwoDriveStorageProvider.NextGenRequestTimeout
+        urlRequest.httpMethod = "PUT"
+        urlRequest.setValue(String(data.count), forHTTPHeaderField: OneDriveAPIHTTPParams.contentLength)
+        urlRequest.setValue("bytes 0-\(data.count - 1)/\(data.count)", forHTTPHeaderField: OneDriveAPIHTTPParams.contentRange)
+
+        urlRequest.httpBody = data
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        #if DEBUG
+            NSLog("🐞 uploadUsingSessionUrl DONE: \(String(describing: (response as? HTTPURLResponse)?.statusCode))")
+            NSLog("🐞 uploadUsingSessionUrl DONE: \(response)")
+            NSLog("🐞 uploadUsingSessionUrl DONE: \(String(describing: String(data: jsonData, encoding: .utf8)))")
+        #endif
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw TwoDriveStorageProviderError.unexpectedResponse(detail: String(describing: response))
+        }
+
+        guard httpResponse.statusCode == 200 else { 
+            NSLog("🔴 Unexpected Response Code \(httpResponse.statusCode) ")
+            throw TwoDriveStorageProviderError.unexpectedResponseCode(code: httpResponse.statusCode, detail: String(describing: response))
+        }
+
+        let accountIdentifier = driveItem.accountIdentifier
+        let username = driveItem.username
+
+        guard let dictionary = try? JSONSerialization.jsonObject(with: jsonData, options: []) as AnyObject,
+              let item = TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(accountIdentifier, username, dictionary),
+              let driveItem = item.providerData as? DriveItem
+        else {
+            throw TwoDriveStorageProviderError.couldNotConvertOdataDriveItem
+        }
+
+        guard let mod = driveItem.lastModifiedDateTime else {
+            throw TwoDriveStorageProviderError.couldNotGetModDateAfterUpload
+        }
+
+        #if DEBUG
+            NSLog("🐞 uploadUsingSessionUrl DONE: \(mod.iso8601withFractionalSeconds)")
+        #endif
+
+        return mod
+    }
+
+    static let GraphBaseURL = "https:
+
+    func getGraphRequestURLForItem(driveItem: DriveItem) -> URL? {
+        
+        
+        
+        
+        
+        
+
+        guard let driveId = driveItem.driveId,
+              let itemId = driveItem.itemId
+        else {
+            NSLog("🔴 Could not convert provider data to Listing State")
+            return nil
+        }
+
+        let oneDriveUrlString = String(format: "%@/drives/%@/items/%@/createUploadSession", TwoDriveStorageProvider.GraphBaseURL, driveId, itemId)
+
+        return URL(string: oneDriveUrlString)
     }
 }

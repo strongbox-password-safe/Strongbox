@@ -15,6 +15,7 @@
 
 #import "SecretStore.h"
 #import "ConcurrentMutableDictionary.h"
+#import "Utils.h"
 
 
 
@@ -59,22 +60,37 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
 
 
 - (id)getSecureObject:(NSString *)identifier {
-    return [self getSecureObject:identifier expired:nil];
+    return [self getSecureObject:identifier error:nil];
 }
 
 - (NSString *)getSecureString:(NSString *)identifier {
-    return [self getSecureObject:identifier];
+    return [self getSecureObject:identifier error:nil];
+}
+
+- (NSString *)getSecureString:(NSString *)identifier error:(NSError**)error {
+    return [self getSecureObject:identifier error:error];
+}
+
+- (id)getSecureObject:(NSString *)identifier error:(NSError**)error {
+    return [self getSecureObject:identifier expired:nil error:error];
 }
 
 - (id)getSecureObject:(NSString *)identifier expired:(BOOL*)expired {
+    return [self getSecureObject:identifier expired:expired error:nil];
+}
+
+- (id)getSecureObject:(NSString *)identifier expired:(BOOL*)expired error:(NSError**)error {
     
 
     if(expired) {
         *expired = NO;
     }
     
-    NSDictionary* wrapped = [self getWrappedObject:identifier];
+    NSDictionary* wrapped = [self getWrappedObject:identifier error:error];
     if(wrapped == nil) {
+        if ( error ) {
+             NSLog(@"🔴 Could not get wrapped object. [%@]. Error = [%@]", identifier, *error);
+        }
         
         return nil;
     }
@@ -309,7 +325,8 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
 
 
 - (SecretExpiryMode)getSecureObjectExpiryMode:(NSString *)identifier {
-    NSDictionary* wrapped = [self getWrappedObject:identifier];
+    NSError* error;
+    NSDictionary* wrapped = [self getWrappedObject:identifier error:&error];
     if(wrapped == nil) {
         return kUnknown;
     }
@@ -319,7 +336,8 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
 }
 
 - (NSDate *)getSecureObjectExpiryDate:(NSString *)identifier {
-    NSDictionary* wrapped = [self getWrappedObject:identifier];
+    NSError* error;
+    NSDictionary* wrapped = [self getWrappedObject:identifier error:&error];
     if(wrapped == nil) {
         return nil;
     }
@@ -456,16 +474,23 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     return ret;
 }
 
-- (NSDictionary*)getWrappedObject:(NSString *)identifier {
+- (NSDictionary*)getWrappedObject:(NSString *)identifier error:(NSError**)error {
     BOOL itemNotFound;
-    NSData* keychainBlob = [self getKeychainBlob:identifier itemNotFound:&itemNotFound];
+
+    NSData* keychainBlob = [self getKeychainBlob:identifier itemNotFound:&itemNotFound error:error];
     
     if ( !keychainBlob ) {
         if ( itemNotFound ) {
             return nil;
         }
         else {
-            NSLog(@"Could not get encrypted blob but it appears to be present [%@]", identifier);
+            if ( error ) {
+                NSLog(@"🔴 Could not get encrypted blob but it appears to be present [%@] - Error = [%@]", identifier, *error);
+            }
+            else {
+                NSLog(@"🔴 Could not get encrypted blob but it appears to be present [%@]", identifier);
+            }
+            
             return nil;
         }
     }
@@ -619,7 +644,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     return (status == errSecSuccess);
 }
 
-- (NSData*)getKeychainBlob:(NSString*)identifier itemNotFound:(BOOL*)itemNotFound {
+- (NSData*)getKeychainBlob:(NSString*)identifier itemNotFound:(BOOL*)itemNotFound error:(NSError**)error {
     NSTimeInterval startDecryptTime = NSDate.timeIntervalSinceReferenceDate;
         
     NSMutableDictionary *query = [self getBlobQuery:identifier];
@@ -646,11 +671,21 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     }
     else if (status == errSecItemNotFound) {
         *itemNotFound = YES;
+        
+
+
+
+        
         return nil;
     }
     else {
         *itemNotFound = NO;
         NSLog(@"getKeychainBlob: Could not get: %d", (int)status);
+        
+        if ( error ) {
+            *error = [Utils createNSError:[NSString stringWithFormat:@"Could not getKeychainBlob - Error = [%d]", (int)status] errorCode:status];
+        }
+
         return nil;
     }
 }

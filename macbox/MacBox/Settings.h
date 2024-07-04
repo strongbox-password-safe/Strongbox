@@ -160,6 +160,8 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL runAsWiFiSyncSourceDevice;
 @property (nullable) NSString* wiFiSyncServiceName;
+
+@property (nullable) NSString* lastWiFiSyncPasscodeError;
 @property (nullable) NSString* wiFiSyncPasscode; 
 
 @property BOOL disableWiFiSyncClientMode;

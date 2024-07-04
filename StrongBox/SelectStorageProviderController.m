@@ -284,9 +284,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
     NSString* sectionName = self.providersForSectionMap.keys[indexPath.section];
     NSArray<NSNumber*>* providers = self.providersForSectionMap[sectionName];
-    NSNumber* providerId = providers[indexPath.row];
-    StorageProvider provider = (StorageProvider)providerId.intValue;
-    
+            
     cell.text.textColor = UIColor.labelColor;
     cell.userInteractionEnabled = YES;
     cell.image.tintColor = nil;
@@ -309,30 +307,38 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         [self getWifiSyncCell:cell indexPath:indexPath];
     }
     else {
+        NSNumber* providerId = providers[indexPath.row]; 
+        StorageProvider provider = (StorageProvider)providerId.intValue;
+        
         cell.text.text = provider == kFilesAppUrlBookmark ? NSLocalizedString(@"sspc_ios_files_storage_location", @"Files") : [SafeStorageProviderFactory getStorageDisplayNameForProvider:providerId.intValue];
         cell.image.image = provider == kFilesAppUrlBookmark ? [UIImage systemImageNamed:@"folder.circle"] : [SafeStorageProviderFactory getImageForProvider:providerId.intValue];
     }
     
 #ifndef NO_NETWORKING
-    if ( provider == kCloudKit && !CloudKitDatabasesInteractor.shared.fastIsAvailable ) {
-        cell.labelSubTitle.hidden = NO;
+    if ( [sectionName isEqualToString:kSectioniOSNative] ) {
+        NSNumber* providerId = providers[indexPath.row]; 
+        StorageProvider provider = (StorageProvider)providerId.intValue;
         
-        if ( CloudKitDatabasesInteractor.shared.cachedAccountStatusError ) {
-            cell.labelSubTitle.text = [NSString stringWithFormat:@"%@", CloudKitDatabasesInteractor.shared.cachedAccountStatusError];
+        if ( provider == kCloudKit && !CloudKitDatabasesInteractor.shared.fastIsAvailable ) {
+            cell.labelSubTitle.hidden = NO;
             
-            cell.labelSubTitle.textColor = UIColor.systemRedColor;
+            if ( CloudKitDatabasesInteractor.shared.cachedAccountStatusError ) {
+                cell.labelSubTitle.text = [NSString stringWithFormat:@"%@", CloudKitDatabasesInteractor.shared.cachedAccountStatusError];
+                
+                cell.labelSubTitle.textColor = UIColor.systemRedColor;
+            }
+            else {
+                cell.labelSubTitle.text = [NSString stringWithFormat:@"%@", [CloudKitDatabasesInteractor getAccountStatusStringWithStatus:CloudKitDatabasesInteractor.shared.cachedAccountStatus]];
+                
+                cell.labelSubTitle.textColor = UIColor.systemOrangeColor;
+            }
+            
+            cell.text.enabled = NO;
+            cell.userInteractionEnabled = NO;
         }
         else {
-            cell.labelSubTitle.text = [NSString stringWithFormat:@"%@", [CloudKitDatabasesInteractor getAccountStatusStringWithStatus:CloudKitDatabasesInteractor.shared.cachedAccountStatus]];
-            
-            cell.labelSubTitle.textColor = UIColor.systemOrangeColor;
+            cell.labelSubTitle.hidden = YES;
         }
-        
-        cell.text.enabled = NO;
-        cell.userInteractionEnabled = NO;
-    }
-    else {
-        cell.labelSubTitle.hidden = YES;
     }
 #endif
     

@@ -12,6 +12,8 @@ import Foundation
     var keyPair: BoxKeyPair = CryptoBoxHelper.createKeyPair()
 
     static let MaxFieldLength = 8192
+    static let MaxIconBase64LengthMultipleItems = 10 * 1024
+    static let MaxIconBase64LengthExplicitRequest = 20 * 1024
 
     @objc static let shared = AutoFillRequestHandler()
 
@@ -288,7 +290,7 @@ import Foundation
 
         let results: [AutoFillCredential] = window.enumerated().map { idx, item in
             let (model, node) = item
-            let includeNIcons = 3 
+            let includeNIcons = 2 
             return convertNodeToAutoFillCredential(model, node, includeIcon: idx < includeNIcons)
         }
 
@@ -415,7 +417,7 @@ import Foundation
         }
 
         #if DEBUG
-            NSLog("✅ getCredentialsForUrl - URL = [%@] - skip %d, take %d, with Result Count %d", url, skip, take, collected.count)
+
         #endif
 
         let credentials = getResultsWindow(collected, skip, take)
@@ -574,13 +576,13 @@ import Foundation
             return AutoFillEncryptedResponse.error(message: "Can't decode GetIconRequest from message JSON")
         }
 
-
+        
 
         guard let prefs = MacDatabasePreferences.getById(request.databaseId),
               prefs.autoFillEnabled,
               let model = DatabasesCollection.shared.getUnlocked(uuid: request.databaseId),
               let node = model.getItemBy(request.nodeId),
-              let b64 = getNodeIconPngData(model, node)
+              let b64 = getNodeIconPngBase64String(model, node, maxLength: AutoFillRequestHandler.MaxIconBase64LengthExplicitRequest)
         else {
             NSLog("🔴 Can't find AutoFillEnabled database to get Icon for, or this database is not unlocked or could not find node")
             return AutoFillEncryptedResponse.error(message: "This database is not unlocked or error getting document")
@@ -600,10 +602,8 @@ import Foundation
     func convertNodeToAutoFillCredential(_ model: Model, _ node: Node, includeIcon: Bool = true) -> AutoFillCredential {
         var iconBase64Encoded = ""
 
-        if includeIcon {
-            if let b64 = getNodeIconPngData(model, node) {
-                iconBase64Encoded = String(format: "data:image/png;base64,%@", b64)
-            }
+        if includeIcon, let b64 = getNodeIconPngBase64String(model, node, maxLength: AutoFillRequestHandler.MaxIconBase64LengthMultipleItems) {
+            iconBase64Encoded = String(format: "data:image/png;base64,%@", b64)
         }
 
 
@@ -639,15 +639,15 @@ import Foundation
 
     let iconCache = ConcurrentMutableDictionary<NSString, NSString>()
 
-    func getNodeIconPngData(_ model: Model, _ node: Node) -> String? {
+    func getNodeIconPngBase64String(_ model: Model, _ node: Node, maxLength: Int = AutoFillRequestHandler.MaxIconBase64LengthMultipleItems) -> String? {
         let key = String(format: "%@-%@-%ld", model.databaseUuid, node.uuid.uuidString, node.fields.modified?.timeIntervalSinceReferenceDate ?? 0)
 
+        
 
-
-
+        
 
         if let cached = iconCache.object(forKey: key as NSString) {
-
+            
             return cached as String
         }
 
@@ -659,6 +659,10 @@ import Foundation
             }
         }
 
+        return getPngBase64StringForImage(model: model, image: image, cacheKey: key, maxLength: maxLength)
+    }
+
+    func getPngBase64StringForImage(model: Model, image: NSImage, cacheKey: String, maxLength: Int) -> String? {
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             NSLog("🔴 Could not get cgimage for node icon")
             return nil
@@ -674,7 +678,16 @@ import Foundation
 
         let ret = pngData.base64EncodedString()
 
-        iconCache.setObject(ret as NSString, forKey: key as NSString)
+        if ret.count > maxLength {
+            NSLog("⚠️ Icon is too large to return. Size=\(ret.count)bytes.")
+
+            var image = NodeIconHelper.getNodeIcon(nil, predefinedIconSet: model.metadata.iconSet) 
+            image = Utils.imageTinted(withColor: image, tint: .systemBlue) 
+
+            return getPngBase64StringForImage(model: model, image: image, cacheKey: cacheKey, maxLength: maxLength)
+        }
+
+        iconCache.setObject(ret as NSString, forKey: cacheKey as NSString)
 
 
 

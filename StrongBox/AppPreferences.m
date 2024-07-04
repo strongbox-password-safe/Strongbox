@@ -162,11 +162,14 @@ static NSString* const kWiFiSyncOn = @"wiFiSyncOn";
 static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
 static NSString* const kWiFiSyncPasscodeSSKey = @"wiFiSyncPasscodeSSKey";
 static NSString* const kCloudKitZoneCreated = @"cloudKitZoneCreated";
+static NSString* const kChangeNotificationsSubscriptionCreated = @"changeNotificationsSubscriptionCreated";
 static NSString* const kShowDatabasesOnAppShortcutMenu = @"showDatabasesOnAppShortcutMenu";
 static NSString* const kHasWarnedAboutCloudKitUnavailability = @"hasWarnedAboutCloudKitUnavailability";
 static NSString* const kHasGotUserNotificationsPermissions = @"hasGotUserNotificationsPermissions";
 static NSString* const kLastAskToEnableNotifications = @"lastAskToEnableNotifications";
 static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPasscodeSSKeyHasBeenInitialized";
+static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError";
+static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI";
 
 @implementation AppPreferences
 
@@ -209,6 +212,14 @@ static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPass
 
 
 
+- (BOOL)useNextGenOneDriveAPI {
+    return [self getBool:kUseNextGenOneDriveAPI];
+}
+
+- (void)setUseNextGenOneDriveAPI:(BOOL)useNextGenOneDriveAPI {
+    [self setBool:kUseNextGenOneDriveAPI value:useNextGenOneDriveAPI];
+}
+
 - (BOOL)hasGotUserNotificationsPermissions {
     return [self getBool:kHasGotUserNotificationsPermissions];
 }
@@ -235,6 +246,14 @@ static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPass
 
 - (void)setShowDatabasesOnAppShortcutMenu:(BOOL)showDatabasesOnAppShortcutMenu {
     [self setBool:kShowDatabasesOnAppShortcutMenu value:showDatabasesOnAppShortcutMenu];
+}
+
+- (BOOL)changeNotificationsSubscriptionCreated {
+    return [self getBool:kChangeNotificationsSubscriptionCreated];
+}
+
+- (void)setChangeNotificationsSubscriptionCreated:(BOOL)changeNotificationsSubscriptionCreated {
+    [self setBool:kChangeNotificationsSubscriptionCreated value:changeNotificationsSubscriptionCreated];
 }
 
 - (BOOL)cloudKitZoneCreated {
@@ -269,15 +288,31 @@ static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPass
     [self setBool:kWiFiSyncPasscodeSSKeyHasBeenInitialized value:wiFiSyncPasscodeSSKeyHasBeenInitialized];
 }
 
+- (NSString *)lastWiFiSyncPasscodeError {
+    return [self getString:kLastWiFiSyncPasscodeError fallback:nil];
+}
+
+- (void)setLastWiFiSyncPasscodeError:(NSString *)lastWiFiSyncPasscodeError {
+    [self setString:kLastWiFiSyncPasscodeError value:lastWiFiSyncPasscodeError];
+}
+
 - (NSString *)wiFiSyncPasscode {
+    NSError* error;
+    NSString* thePasscode = [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey error:&error];
+    
+    [self setLastWiFiSyncPasscodeError:error ? [NSString stringWithFormat:@"%@", error] : nil];
+    
     if ( self.wiFiSyncPasscodeSSKeyHasBeenInitialized ) {
-        return [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
+        if ( thePasscode == nil ) {
+            NSLog(@"🔴 WiFiSync Passcode nil but has already been initialized. Something very wrong... [%@]", error);
+        }
+        
+        return thePasscode;
     }
     else {
-        NSString* originalPasscode = [SecretStore.sharedInstance getSecureString:kWiFiSyncPasscodeSSKey];
-        if ( originalPasscode != nil ) {
+        if (  thePasscode != nil ) {
             self.wiFiSyncPasscodeSSKeyHasBeenInitialized = YES;
-            return originalPasscode;
+            return thePasscode;
         }
         else {
             NSString* passcode = [NSString stringWithFormat:@"%0.6d", arc4random_uniform(1000000)];

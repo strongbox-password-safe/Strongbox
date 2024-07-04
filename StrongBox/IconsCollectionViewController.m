@@ -81,7 +81,7 @@
 
     if([self hasCustomIcons] && indexPath.section == 0) {
         NodeIcon* icon = self.customIcons[indexPath.row];
-        UIImage* image = [NodeIconHelper getNodeIcon:icon];
+        UIImage* image = [NodeIconHelper getNodeIcon:icon predefinedIconSet:self.predefinedKeePassIconSet];
         
         if(image) {
             cell.imageView.image = image;

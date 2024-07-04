@@ -1310,7 +1310,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSString* searchTerm = @"<REDACTED>";
 #endif
     
-    NSLog(@"✅ SEARCH for [%@] done in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
+
 
     return ret;
 }

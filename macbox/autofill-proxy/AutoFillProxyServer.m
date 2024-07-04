@@ -154,9 +154,11 @@
 
 - (void)handleNewConnection:(int)socket {
     
-    
 
-    
+#ifdef DEBUG
+    NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
+#endif
+
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
     CFStreamCreatePairWithSocket (kCFAllocatorDefault, socket, &readStream, &writeStream);
@@ -200,10 +202,11 @@
     shutdown(socket, SHUT_RDWR);
     close(socket);
     
-
-
-
-    
+#ifdef DEBUG
+    if ( len > 10 * 1024 ) {
+        NSLog(@"🐞 Writing LARGE JSON Response of length [%lu] in %f seconds", len, NSDate.timeIntervalSinceReferenceDate - startTime);
+    }
+#endif
     
 }
 

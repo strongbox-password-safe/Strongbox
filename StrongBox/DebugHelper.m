@@ -292,6 +292,10 @@ int OPParentIDForProcessID(int pid)
         [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.last: %0.2f", instrumentation.cloudKitInstruments.lastOperationDuration]];
         [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.n: %ld", instrumentation.cloudKitInstruments.operationCount]];
         [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.avg: %0.2f", instrumentation.cloudKitInstruments.averageDuration]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.min: %0.2f", instrumentation.cloudKitInstruments.minOperationDuration]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.max: %0.2f", instrumentation.cloudKitInstruments.maxOperationDuration]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.up: %@", friendlyFileSizeString(instrumentation.cloudKitInstruments.uploadTotal)]];
+        [debugLines addObject:[NSString stringWithFormat:@"StrongboxSync.down: %@", friendlyFileSizeString(instrumentation.cloudKitInstruments.downloadTotal)]];
         
         [debugLines addObject:@"--------------------"];
 

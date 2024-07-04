@@ -110,6 +110,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStrongboxSyncStatus;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchUseNextGenOneDrive;
+
 @end
 
 @implementation AdvancedPreferencesTableViewController
@@ -371,6 +373,8 @@
         [[UIApplication sharedApplication] setShortcutItems:@[]]; 
     }
     
+    AppPreferences.sharedInstance.useNextGenOneDriveAPI = self.switchUseNextGenOneDrive.on;
+    
     [self bindPreferences];
 }
 
@@ -411,6 +415,8 @@
     
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
     self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
+    
+    self.switchUseNextGenOneDrive.on = AppPreferences.sharedInstance.useNextGenOneDriveAPI;
     
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {

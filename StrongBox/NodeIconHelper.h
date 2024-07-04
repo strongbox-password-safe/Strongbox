@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (IMAGE_TYPE_PTR)getIconForNode:(Node *)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format;
 + (IMAGE_TYPE_PTR)getIconForNode:(Node *)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format large:(BOOL)large;
 
-+ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*_Nullable)icon;
+
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*_Nullable)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet;
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*_Nullable)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format;
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*_Nullable)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format isGroup:(BOOL)isGroup;

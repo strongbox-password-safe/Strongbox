@@ -391,7 +391,12 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
                                         viewController:self];
         
-    [CloudKitDatabasesInteractor.shared renameWithDatabase:database nickName:nick completionHandler:^(NSError * _Nullable error) {
+    NSString* fileName = [nick stringByAppendingPathExtension:database.fileUrl.pathExtension];
+    
+    [CloudKitDatabasesInteractor.shared renameWithDatabase:database 
+                                                  nickName:nick
+                                                  fileName:fileName
+                                         completionHandler:^(NSError * _Nullable error) {
         [CrossPlatformDependencies.defaults.spinnerUi dismiss];
     }];
 #endif

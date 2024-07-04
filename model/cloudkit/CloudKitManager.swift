@@ -12,7 +12,12 @@ import Foundation
 @objc
 class CloudKitManagerInstrumentation: NSObject {
     @objc let recentErrors = ConcurrentCircularBuffer<NSError>(capacity: 16)
+
     @objc var lastOperationDuration = 0.0
+    @objc var minOperationDuration = Float.greatestFiniteMagnitude
+    @objc var maxOperationDuration = 0.0
+    @objc var uploadTotal = 0
+    @objc var downloadTotal = 0
     @objc var totalOperationDuration = 0.0
     @objc var operationCount = 0
 
@@ -106,6 +111,10 @@ class CloudKitManager {
                 throw CloudKitManagerError.corruptRecord
             }
 
+            if includeDataBlob, let dataBlob = ret.dataBlob {
+                instrumentation.downloadTotal += dataBlob.count
+            }
+
             return ret
         }
     }
@@ -157,10 +166,10 @@ class CloudKitManager {
         return try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, modDate: Date.now, dataBlob: dataBlob)
     }
 
-    func rename(id: CloudKitDatabaseIdentifier, nickName: String) async throws -> CloudKitHostedDatabase {
+    func rename(id: CloudKitDatabaseIdentifier, nickName: String, fileName: String) async throws -> CloudKitHostedDatabase {
         let existing = try await getDatabase(id: id, includeDataBlob: false) 
 
-        return try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, nickName: nickName)
+        return try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, nickName: nickName, fileName: fileName)
     }
 
     func delete(id: CloudKitDatabaseIdentifier) async throws {
@@ -176,9 +185,12 @@ class CloudKitManager {
         }
     }
 
-    private func saveOrUpdate(_ ckRecord: CKRecord, sharedWithMe: Bool, nickName: String? = nil, modDate: Date? = nil, dataBlob: Data? = nil) async throws -> CloudKitHostedDatabase {
+    private func saveOrUpdate(_ ckRecord: CKRecord, sharedWithMe: Bool, nickName: String? = nil, fileName: String? = nil, modDate: Date? = nil, dataBlob: Data? = nil) async throws -> CloudKitHostedDatabase {
         if let nickName {
             ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.nickname] = nickName
+        }
+        if let fileName {
+            ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.filename] = fileName
         }
 
         var tmpAssetUrlToDelete: URL? = nil
@@ -215,6 +227,10 @@ class CloudKitManager {
             guard let db = CloudKitHostedDatabase(record: ret, sharedWithMe: false) else {
                 NSLog("🔴 Could not convert return CKRecord to a database object!")
                 throw CloudKitManagerError.saveError(detail: "Could not convert return CKRecord to a database object!")
+            }
+
+            if let dataBlob {
+                instrumentation.uploadTotal += dataBlob.count
             }
 
             return db
@@ -286,10 +302,14 @@ class CloudKitManager {
     
 
     func subscribeToChangeNotifications() async throws {
+        guard !CrossPlatformDependencies.defaults().applicationPreferences.changeNotificationsSubscriptionCreated, CrossPlatformDependencies.defaults().applicationPreferences.cloudKitZoneCreated else {
+            return
+        }
 
-
-
-
+        NSLog("🟢 \(#function) ENTER")
+        defer {
+            NSLog("🟢 \(#function) EXIT")
+        }
 
         let privateDb = cloudKitContainer.database(with: .private)
 
@@ -298,6 +318,8 @@ class CloudKitManager {
         let shared = cloudKitContainer.database(with: .shared)
 
         try await subscribeToChangeNotifications(theDatabase: shared)
+
+        CrossPlatformDependencies.defaults().applicationPreferences.changeNotificationsSubscriptionCreated = true
     }
 
     func subscribeToChangeNotifications(theDatabase: CKDatabase) async throws {
@@ -317,9 +339,11 @@ class CloudKitManager {
         subscription.notificationInfo = ni
 
         try await executeCloudKitOperation(theDatabase: theDatabase) { database in
-            let ret = try await database.save(subscription)
 
-            NSLog("🐞 watchForChanges: Successfully Created Subscription [\(ret)]")
+
+            try await database.save(subscription)
+
+
         }
     }
 
@@ -396,7 +420,9 @@ class CloudKitManager {
         }
 
         do {
-            let result = try await cloudKitPrivateDatabase.modifyRecordZones(saving: [privateRecordZone], deleting: [])
+            let result = try await executeCloudKitOperation(theDatabase: cloudKitPrivateDatabase) { db in
+                try await db.modifyRecordZones(saving: [privateRecordZone], deleting: [])
+            }
 
             NSLog("🐞 DEBUG: modifyRecordZones done: \(result)")
         } catch {
@@ -449,8 +475,16 @@ class CloudKitManager {
             instrumentation.totalOperationDuration += diff
             instrumentation.operationCount += 1
 
+            if instrumentation.minOperationDuration > Float(diff) {
+                instrumentation.minOperationDuration = Float(diff)
+            }
+
+            if instrumentation.maxOperationDuration < diff {
+                instrumentation.maxOperationDuration = diff
+            }
+
             #if DEBUG
-                NSLog("🐞 CloudKit Operation Done in \(diff) seconds. Avg = [\(instrumentation.averageDuration)s] n=\(instrumentation.operationCount)")
+
             #endif
         }
 

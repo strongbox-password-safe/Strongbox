@@ -58,6 +58,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.autoLockTimeoutSeconds = @180;
         self.showQuickViewFavourites = NO;
         self.showQuickViewNearlyExpired = YES;
+        self.showQuickViewExpired = YES;
 
         
         

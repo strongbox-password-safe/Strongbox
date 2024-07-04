@@ -18,6 +18,8 @@ class WiFiSyncSettings: NSViewController {
     @IBOutlet var changePasscode: ClickableTextField!
     @IBOutlet var changeServiceName: ClickableTextField!
 
+    @IBOutlet var textFieldPasscodeLastError: NSTextField!
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -56,12 +58,38 @@ class WiFiSyncSettings: NSViewController {
 
         textFieldLastError.stringValue = WiFiSyncServer.shared.lastError ?? ""
         textFieldLastError.isHidden = WiFiSyncServer.shared.lastError == nil
+
+        textFieldPasscodeLastError.stringValue = Settings.sharedInstance().lastWiFiSyncPasscodeError ?? ""
+        textFieldPasscodeLastError.isHidden = Settings.sharedInstance().lastWiFiSyncPasscodeError == nil
     }
 
     @IBAction func onSwitchToggleOnOff(_: Any) {
         Settings.sharedInstance().runAsWiFiSyncSourceDevice = onOff.state == .on
 
-        restartWiFiSyncServerAndBindUI()
+        if let _ = Settings.sharedInstance().wiFiSyncPasscode {
+            restartWiFiSyncServerAndBindUI()
+        } else {
+            requestNewPasscodeAndRestart()
+        }
+    }
+
+    func requestNewPasscodeAndRestart() {
+        let alert = MacAlerts()
+        let newPasscode = alert.input(NSLocalizedString("wifi_sync_enter_new_passcode", comment: "Enter New Passcode"),
+                                      defaultValue: Settings.sharedInstance().wiFiSyncPasscode ?? "",
+                                      allowEmpty: false)
+
+        if let newPasscode {
+            
+            if newPasscode.count > 3 {
+                Settings.sharedInstance().wiFiSyncPasscode = newPasscode
+
+                restartWiFiSyncServerAndBindUI()
+            } else {
+                MacAlerts.info(NSLocalizedString("wifi_sync_invalid_passcode", comment: "Invalid Passcode"),
+                               window: view.window)
+            }
+        }
     }
 
     func onChangePasscode(_: Any?) {
@@ -70,22 +98,7 @@ class WiFiSyncSettings: NSViewController {
         { [weak self] go in
             guard let self, go else { return }
 
-            let alert = MacAlerts()
-            let newPasscode = alert.input(NSLocalizedString("wifi_sync_enter_new_passcode", comment: "Enter New Passcode"),
-                                          defaultValue: Settings.sharedInstance().wiFiSyncPasscode ?? "",
-                                          allowEmpty: false)
-
-            if let newPasscode {
-
-                if newPasscode.count > 3 {
-                    Settings.sharedInstance().wiFiSyncPasscode = newPasscode
-
-                    restartWiFiSyncServerAndBindUI()
-                } else {
-                    MacAlerts.info(NSLocalizedString("wifi_sync_invalid_passcode", comment: "Invalid Passcode"),
-                                   window: view.window)
-                }
-            }
+            requestNewPasscodeAndRestart()
         }
     }
 

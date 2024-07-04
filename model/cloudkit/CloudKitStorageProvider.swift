@@ -28,16 +28,14 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
     var defaultForImmediatelyOfferOfflineCache: Bool { true }
     var privacyOptInRequired: Bool { false }
 
-    func create(_ nickName: String, fileName _: String, data: Data, parentFolder _: NSObject?, viewController _: VIEW_CONTROLLER_PTR?) async throws -> METADATA_PTR {
+    func create(_ nickName: String, fileName: String, data: Data, parentFolder _: NSObject?, viewController _: VIEW_CONTROLLER_PTR?) async throws -> METADATA_PTR {
         #if os(iOS)
             let nick = DatabasePreferences.getUniqueName(fromSuggestedName: nickName) 
         #else
             let nick = MacDatabasePreferences.getUniqueName(fromSuggestedName: nickName) 
         #endif
 
-        let filename = "Database.kdbx"
-
-        let newDatabase = try await CloudKitDatabasesInteractor.shared.createDatabase(nickname: nick, filename: filename, modDate: Date.now, dataBlob: data)
+        let newDatabase = try await CloudKitDatabasesInteractor.shared.createDatabase(nickname: nick, filename: fileName, modDate: Date.now, dataBlob: data)
 
         return try CloudKitStorageProvider.generateNewDatabaseMetadata(database: newDatabase)
     }
@@ -172,6 +170,9 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
 
             newDatabasePrefs.lazySyncMode = true 
         #else
+
+            
+
             var components = URLComponents()
             components.scheme = kStrongboxCloudUrlScheme
             components.path = String(format: "/%@", database.filename)
@@ -184,15 +185,13 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
             let nick = MacDatabasePreferences.getUniqueName(fromSuggestedName: database.nickname) 
             let newDatabasePrefs = MacDatabasePreferences.templateDummy(withNickName: nick, storageProvider: .kCloudKit, fileUrl: url, storageInfo: database.id.json)
 
-            let queryItem = URLQueryItem(name: "uuid", value: newDatabasePrefs.uuid)
-            components.queryItems = [queryItem] 
-
-            guard let url2 = components.url else {
+            guard let url3 = getCloudKitPKUrl(filename: database.filename, uuid: newDatabasePrefs.uuid) else {
                 NSLog("🔴 Could not generate URL - CloudKit Sync")
                 throw CloudKitStorageProviderError.couldNotGenerateMacOSURL
             }
 
-            newDatabasePrefs.fileUrl = url2
+            newDatabasePrefs.fileUrl = url3
+
         #endif
 
         let shared = database.sharedWithMe || database.associatedCkRecord.share != nil 
@@ -208,6 +207,30 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
 
         return newDatabasePrefs
     }
+
+    #if os(macOS)
+        class func getCloudKitPKUrl(filename: String, uuid: String) -> URL? {
+            var components = URLComponents()
+            components.scheme = kStrongboxCloudUrlScheme
+            components.path = String(format: "/%@", filename)
+
+            guard let url = components.url else {
+                NSLog("🔴 Could not generate URL - CloudKit Sync")
+                
+                return nil
+            }
+
+            let queryItem = URLQueryItem(name: "uuid", value: uuid)
+            components.queryItems = [queryItem] 
+
+            guard let url2 = components.url else {
+                NSLog("🔴 Could not generate URL - CloudKit Sync")
+                return nil
+            }
+
+            return url2
+        }
+    #endif
 
     func cloudKitIdentifierFromStrongboxDatabase(_ db: METADATA_PTR) -> CloudKitDatabaseIdentifier? {
         #if os(iOS)

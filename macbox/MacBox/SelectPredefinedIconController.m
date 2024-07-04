@@ -67,7 +67,7 @@
     
     if([self hasCustomIcons] && indexPath.section == 0) {
         NodeIcon* icon = self.customIcons[indexPath.item];
-        item.icon.image = [NodeIconHelper getNodeIcon:icon];
+        item.icon.image = [NodeIconHelper getNodeIcon:icon predefinedIconSet:self.iconSet];
     }
     else {
         item.icon.image = self.predefinedIcons[indexPath.item];
