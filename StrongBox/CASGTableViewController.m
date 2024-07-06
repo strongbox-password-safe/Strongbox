@@ -146,6 +146,8 @@
     self.textFieldPassword.delegate = self;
     self.textFieldPassword.enablesReturnKeyAutomatically = !self.allowEmptyOrNoPasswordEntry;
     
+
+    
     self.textFieldConfirmPassword.delegate = self;
     
     self.textFieldName.delegate = self;

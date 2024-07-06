@@ -165,15 +165,19 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     
     self.progress(0.0);
 
+    NSTimeInterval start = NSDate.timeIntervalSinceReferenceDate;
+            
     [self performAudits];
     
+    NSTimeInterval auditDuration = NSDate.timeIntervalSinceReferenceDate - start;
+
     self.progress(1.0);
 
     if (self.state == kAuditStateRunning) { 
         self.state = kAuditStateDone;
     }
     
-    self.completion(self.state == kAuditStateStoppedIncomplete);
+    self.completion(self.state == kAuditStateStoppedIncomplete, auditDuration);
 }
 
 - (void)stop {

@@ -430,7 +430,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 - (void)presentFilesAppWarning {
     [Alerts yesNo:self 
-            title:NSLocalizedString(@"deprecated_storage_method", @"Deprecated Storage Method")
+            title:NSLocalizedString(@"deprecated_storage_method", @"Storage Method Not Recommended")
           message:NSLocalizedString(@"cannot_recommend_storage_msg", @"We cannot recommend storing your database using this method. Strongbox does not have end to end control over the sync process, and so we cannot guarantee data integrity.\n\nDo you want to continue anyway?")
            action:^(BOOL response) {
         if ( response ) {

@@ -79,6 +79,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     if (jsonDictionary[@"lowEntropyThreshold"] != nil ) ret.lowEntropyThreshold = ((NSNumber*)(jsonDictionary[@"lowEntropyThreshold"])).unsignedIntegerValue;
     if (jsonDictionary[@"checkForTwoFactorAvailable"] != nil ) ret.checkForTwoFactorAvailable = ((NSNumber*)(jsonDictionary[@"checkForTwoFactorAvailable"])).boolValue;
     if (jsonDictionary[@"excludeShortNumericPINCodes"] != nil ) ret.excludeShortNumericPINCodes = ((NSNumber*)(jsonDictionary[@"excludeShortNumericPINCodes"])).boolValue;
+    if (jsonDictionary[@"lastDuration"] != nil ) ret.lastDuration = ((NSNumber*)(jsonDictionary[@"lastDuration"])).doubleValue;
 
     return ret;
 }
@@ -103,6 +104,7 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         @"lowEntropyThreshold" : @(self.lowEntropyThreshold),
         @"checkForTwoFactorAvailable" : @(self.checkForTwoFactorAvailable),
         @"excludeShortNumericPINCodes" : @(self.excludeShortNumericPINCodes),
+        @"lastDuration" : @(self.lastDuration),
     }];
 
     if( self.lastHibpOnlineCheck != nil) {
@@ -151,6 +153,10 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
         else {
             self.excludeShortNumericPINCodes = YES;
         }
+
+        if ( [coder containsValueForKey:@"lastDuration"] ) {
+            self.lastDuration = ((NSNumber*)[coder decodeObjectForKey:@"lastDuration"]).doubleValue;
+        }
     }
     
     return self;
@@ -175,8 +181,17 @@ const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
     [coder encodeBool:self.checkForTwoFactorAvailable forKey:@"checkForTwoFactorAvailable"];
     [coder encodeObject:self.lastHibpOnlineCheck forKey:@"lastHibpOnlineCheck"];
     [coder encodeObject:self.lastKnownAuditIssueCount forKey:@"lastKnownAuditIssueCount"];
-    
     [coder encodeBool:self.excludeShortNumericPINCodes forKey:@"excludeShortNumericPINCodes"];
+    
+    [coder encodeObject:@(self.lastDuration) forKey:@"lastDuration"];
+}
+
+- (NSString *)debugDescription {
+    return [NSString stringWithFormat:@"<%@: %p> %@", [self class], self, [self getJsonSerializationDictionary]];
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@",  [self getJsonSerializationDictionary]];
 }
 
 @end

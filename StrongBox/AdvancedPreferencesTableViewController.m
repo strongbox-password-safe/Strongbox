@@ -108,9 +108,11 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowDatabasesOnAppShortcutsMenu;
 @property (weak, nonatomic) IBOutlet UILabel *labelStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStrongboxSyncStatus;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellUseNextGenOneDrive;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStrongboxSyncStatus;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseNextGenOneDrive;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowDatabaseNameInTitleBar;
 
 @end
 
@@ -153,10 +155,12 @@
         [self cell:self.cellWiFiSyncServiceName setHidden:YES];
         
         [self cell:self.cellStrongboxSyncStatus setHidden:YES];
+        [self cell:self.cellUseNextGenOneDrive setHidden:YES];
     }
     
     if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
         [self cell:self.cellDropboxAppFolder setHidden:YES];
+        [self cell:self.cellUseNextGenOneDrive setHidden:YES];
     }
     
     [self cell:self.cellNewEntryDefaults setHidden:YES];
@@ -374,7 +378,8 @@
     }
     
     AppPreferences.sharedInstance.useNextGenOneDriveAPI = self.switchUseNextGenOneDrive.on;
-    
+    AppPreferences.sharedInstance.showDatabaseNamesInBrowse = self.switchShowDatabaseNameInTitleBar.on;
+
     [self bindPreferences];
 }
 
@@ -417,6 +422,8 @@
     self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
     
     self.switchUseNextGenOneDrive.on = AppPreferences.sharedInstance.useNextGenOneDriveAPI;
+    
+    self.switchShowDatabaseNameInTitleBar.on = AppPreferences.sharedInstance.showDatabaseNamesInBrowse;
     
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {

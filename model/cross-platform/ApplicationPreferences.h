@@ -14,6 +14,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef enum : NSUInteger {
+    kAppAppearanceSystem,
+    kAppAppearanceLight,
+    kAppAppearanceDark,
+} AppAppearance;
+
 @protocol ApplicationPreferences <NSObject>
 
 @property (nullable) NSData* duressDummyData;
@@ -59,6 +65,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL changeNotificationsSubscriptionCreated;
 
 @property BOOL useNextGenOneDriveAPI;
+
+@property AppAppearance appAppearance; 
 
 @end
 

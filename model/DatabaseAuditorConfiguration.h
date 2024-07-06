@@ -39,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hibpCaveatAccepted;
 
 @property NSUInteger hibpCheckForNewBreachesIntervalSeconds;
+@property NSTimeInterval lastDuration;
+
 @property (nullable) NSDate* lastHibpOnlineCheck;
 @property (readonly) BOOL showCachedHibpHits;
 

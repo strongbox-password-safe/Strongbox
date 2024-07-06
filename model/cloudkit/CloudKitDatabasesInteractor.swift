@@ -509,7 +509,7 @@ class CloudKitDatabasesInteractor: NSObject {
     }
 
     @objc
-    func rename(database: METADATA_PTR, nickName: String, fileName: String) async throws {
+    func rename(database: METADATA_PTR, nickName: String, fileName: String?) async throws {
         guard database.storageProvider == .kCloudKit else {
             NSLog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
             throw CloudKitDatabasesInteractorError.invalidParameter

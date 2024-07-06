@@ -1055,12 +1055,41 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)setupTips {
-    if(AppPreferences.sharedInstance.hideTips) {
-        self.navigationItem.prompt = nil;
+    if ( AppPreferences.sharedInstance.showDatabaseNamesInBrowse ) {
+        NSString* fullTitle = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.nickName, [self getStatusSuffix]];
+        
+        self.navigationItem.prompt = fullTitle;
     }
     else {
-        self.navigationItem.prompt = NSLocalizedString(@"hint_tap_and_hold_to_see_options", @"TIP: Tap and hold item to see options");
+        self.navigationItem.prompt = nil;
     }
+}
+
+- (NSArray *)getStatusSuffixii {
+    NSMutableArray* statusii = NSMutableArray.array;
+    
+    if ( self.viewModel.isReadOnly ) {
+        [statusii addObject:NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read-Only")];
+    }
+    
+    if ( self.viewModel.isInOfflineMode ) {
+        [statusii addObject:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")];
+    }
+    
+    return statusii;
+}
+
+- (NSString*)getStatusSuffix {
+    NSString* statusSuffix = @"";
+    
+    NSArray* statusii = [self getStatusSuffixii];
+    
+    if ( statusii.firstObject ) {
+        NSString* statusiiStrings = [statusii componentsJoinedByString:@", "];
+        statusSuffix = [NSString stringWithFormat:@" (%@)", statusiiStrings];
+    }
+    
+    return statusSuffix;
 }
 
 - (void)setupTableview {
@@ -1743,10 +1772,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         tint = self.viewModel.database.recycleBinNode == currentGroup ? Constants.recycleBinTintColor : nil;
     }
     
-    NSString* suffix = self.viewModel.isInOfflineMode ? NSLocalizedString(@"browse_vc_offline_suffix", @" (Offline)") : (self.viewModel.isReadOnly ? NSLocalizedString(@"browse_vc_read_only_suffix", @" (Read Only)") : @"" );
-    NSString* fullTitle = [NSString stringWithFormat:@"%@%@", title, suffix];
+
+
     
-    UIView* view = [MMcGSwiftUtils navTitleWithImageAndTextWithTitleText:fullTitle
+    UIView* view = [MMcGSwiftUtils navTitleWithImageAndTextWithTitleText:title
                                                                    image:image
                                                                     tint:tint];
     

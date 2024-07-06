@@ -535,6 +535,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( jsonDictionary[@"lastKnownEncryptionSettings"] != nil ) {
         ret.lastKnownEncryptionSettings = jsonDictionary[@"lastKnownEncryptionSettings"];
     }
+    
+    if ( jsonDictionary[@"serializationPerf"] != nil ) {
+        ret.serializationPerf = jsonDictionary[@"serializationPerf"];
+    }
 
     
 
@@ -745,6 +749,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
     if ( self.lastKnownEncryptionSettings ) {
         ret[@"lastKnownEncryptionSettings"] = self.lastKnownEncryptionSettings;
+    }
+
+    if ( self.serializationPerf ) {
+        ret[@"serializationPerf"] = self.serializationPerf;
     }
     
     return ret;

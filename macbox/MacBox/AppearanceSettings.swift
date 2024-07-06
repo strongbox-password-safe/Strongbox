@@ -15,6 +15,7 @@ class AppearanceSettings: NSViewController {
     @IBOutlet var showManagerOnAllClosed: NSButton!
     @IBOutlet var hideManagerAfterLaunching: NSButton!
     @IBOutlet var showManagerOnAppLaunch: NSButton!
+    @IBOutlet var popupAppearance: NSPopUpButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,6 +36,11 @@ class AppearanceSettings: NSViewController {
         showManagerOnAllClosed.state = settings.showDatabasesManagerOnCloseAllWindows ? .on : .off
         hideManagerAfterLaunching.state = settings.closeManagerOnLaunch ? .on : .off
         showManagerOnAppLaunch.state = settings.showDatabasesManagerOnAppLaunch ? .on : .off
+
+        let index = Int(settings.appAppearance.rawValue)
+        let item = popupAppearance.item(at: index)
+
+        popupAppearance.select(item)
     }
 
     @IBAction func onChanged(_: Any) {
@@ -44,6 +50,19 @@ class AppearanceSettings: NSViewController {
         Settings.sharedInstance().showDatabasesManagerOnCloseAllWindows = showManagerOnAllClosed.state == .on
         Settings.sharedInstance().closeManagerOnLaunch = hideManagerAfterLaunching.state == .on
         Settings.sharedInstance().showDatabasesManagerOnAppLaunch = showManagerOnAppLaunch.state == .on
+
+        let index = UInt(popupAppearance.indexOfSelectedItem)
+        let appearance = AppAppearance(rawValue: index)
+
+        if Settings.sharedInstance().appAppearance != appearance {
+            Settings.sharedInstance().appAppearance = appearance
+
+            if appearance == kAppAppearanceSystem {
+                NSApp.appearance = nil
+            } else {
+                NSApp.appearance = appearance == kAppAppearanceLight ? NSAppearance(named: .aqua) : NSAppearance(named: .darkAqua)
+            }
+        }
 
         bindUI()
 

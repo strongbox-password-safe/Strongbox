@@ -676,15 +676,19 @@ import Foundation
             return nil
         }
 
-        let ret = pngData.base64EncodedString()
+        var ret = pngData.base64EncodedString()
 
         if ret.count > maxLength {
             NSLog("⚠️ Icon is too large to return. Size=\(ret.count)bytes.")
 
-            var image = NodeIconHelper.getNodeIcon(nil, predefinedIconSet: model.metadata.iconSet) 
+            var image = NodeIconHelper.getNodeIcon(nil, predefinedIconSet: .sfSymbols) 
             image = Utils.imageTinted(withColor: image, tint: .systemBlue) 
 
-            return getPngBase64StringForImage(model: model, image: image, cacheKey: cacheKey, maxLength: maxLength)
+            
+
+            let smallFallbackVisible = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX
+
+            ret = getPngBase64StringForImage(model: model, image: image, cacheKey: cacheKey, maxLength: maxLength) ?? smallFallbackVisible
         }
 
         iconCache.setObject(ret as NSString, forKey: cacheKey as NSString)

@@ -99,6 +99,7 @@ initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
 @property BrowseTapAction tapAction;
 
 @property NSString* lastKnownEncryptionSettings;
+@property NSString* serializationPerf;
 
 @property BrowseItemSubtitleField browseItemSubtitleField;
 @property BOOL immediateSearchOnBrowse;

@@ -1586,142 +1586,15 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     [self presentViewController:activityViewController animated:YES completion:nil];
 }
 
-- (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
-    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive
-                                                                            title:NSLocalizedString(@"safes_vc_slide_left_remove_database_action", @"Remove this database table action")
-                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UIContextualAction* removeAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive
+                                                                               title:NSLocalizedString(@"safes_vc_slide_left_remove_database_action", @"Remove this database table action") 
+                                                                             handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         [self onRemoveDatabase:indexPath];
     }];
-
     
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-    return @[removeAction]; 
+    return [UISwipeActionsConfiguration configurationWithActions:@[removeAction]];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)toggleAutoFillQuickLaunch:(DatabasePreferences*)database {
     if([AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:database.uuid]) {
@@ -1853,8 +1726,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (void)renameDatabase:(DatabasePreferences*)database name:(NSString*)name renameFile:(BOOL)renameFile {
     database.nickName = name;
     
-    BOOL allowFileRename = database.storageProvider == kLocalDevice;
-    if ( renameFile &&  allowFileRename ) {
+    if ( renameFile && database.storageProvider == kLocalDevice ) {
         NSError* error;
         if ( ![LocalDeviceStorageProvider.sharedInstance renameFilename:database filename:name error:&error] ) {
             NSLog(@"🔴 Error Renaming... [%@]", error);
@@ -1865,7 +1737,9 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         }
     }
     else if ( database.storageProvider == kCloudKit ) {
-        [self renameCloudKitDatabase:database nick:name];
+        NSString* fileName = renameFile ? [name stringByAppendingPathExtension:database.fileName.pathExtension] : nil;
+
+        [self renameCloudKitDatabase:database nick:name fileName:fileName];
     }
 }
 
@@ -1912,7 +1786,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         scVc.mode = kCASGModeRenameDatabase;
         scVc.initialName = database.nickName;
         
-        BOOL allowFileRename = database.storageProvider == kLocalDevice;
+        BOOL allowFileRename = database.storageProvider == kLocalDevice || database.storageProvider == kCloudKit;
         scVc.showFileRenameOption = allowFileRename;
         
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
@@ -3403,13 +3277,12 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 -(void)renameCloudKitDatabase:(DatabasePreferences*)database 
-                         nick:(NSString*)nick {
+                         nick:(NSString*)nick
+                     fileName:(NSString*_Nullable)fileName {
 #ifndef NO_NETWORKING
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
                                         viewController:self];
-    
-    NSString* fileName = [nick stringByAppendingPathExtension:database.fileName.pathExtension];
-    
+        
     [CloudKitDatabasesInteractor.shared renameWithDatabase:database
                                                   nickName:nick
                                                   fileName:fileName

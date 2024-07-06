@@ -135,7 +135,8 @@ static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetw
 static NSString* const kHasWarnedAboutCloudKitUnavailability = @"hasWarnedAboutCloudKitUnavailability";
 static NSString* const kPasswordGeneratorFloatOnTop = @"passwordGeneratorFloatOnTop";
 static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError";
-static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI";
+static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI-2";
+static NSString* const kAppAppearance = @"appAppearance2";
 
 
 
@@ -191,6 +192,15 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setBool:(NSString*)key value:(BOOL)value {
     [self.userDefaults setBool:value forKey:key];
+    [self.userDefaults synchronize];
+}
+
+- (NSInteger)getInteger:(NSString*)key {
+    return [self.userDefaults integerForKey:key];
+}
+
+- (void)setInteger:(NSString*)key value:(NSInteger)value {
+    [self.userDefaults setInteger:value forKey:key];
     [self.userDefaults synchronize];
 }
 
@@ -272,8 +282,16 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+- (AppAppearance)appAppearance {
+    return [self getInteger:kAppAppearance];
+}
+
+- (void)setAppAppearance:(AppAppearance)appAppearance {
+    [self setInteger:kAppAppearance value:appAppearance];
+}
+
 - (BOOL)useNextGenOneDriveAPI {
-    return [self getBool:kUseNextGenOneDriveAPI];
+    return [self getBool:kUseNextGenOneDriveAPI fallback:YES];
 }
 
 - (void)setUseNextGenOneDriveAPI:(BOOL)useNextGenOneDriveAPI {

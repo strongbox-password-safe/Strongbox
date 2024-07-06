@@ -645,7 +645,10 @@ userInteractionRequired:(BOOL)userInteractionRequired
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
         });
-    } completion:^(BOOL userStopped) {
+    } completion:^(BOOL userStopped, NSTimeInterval duration) {
+        
+        
+        self.metadata.auditConfig.lastDuration = duration;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( weakSelf ) {

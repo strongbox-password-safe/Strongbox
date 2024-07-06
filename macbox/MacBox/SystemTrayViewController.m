@@ -67,7 +67,7 @@
     [self.buttonPasswordPreferences setImage:[NSImage imageWithSystemSymbolName:@"gear" accessibilityDescription:nil]];
     [self.buttonPasswordPreferences setControlSize:NSControlSizeLarge];
     
-    [self.barButtonDice setImage:[NSImage imageWithSystemSymbolName:@"die.face.6" accessibilityDescription:nil]];
+    [self.barButtonDice setImage:[NSImage imageWithSystemSymbolName:@"dice" accessibilityDescription:nil]];
     [self.barButtonDice setControlSize:NSControlSizeLarge];
     
     [self.barButtonPreferences setImage:[NSImage imageWithSystemSymbolName:@"gear" accessibilityDescription:nil]];

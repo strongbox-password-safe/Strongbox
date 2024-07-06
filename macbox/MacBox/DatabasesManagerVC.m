@@ -377,22 +377,46 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 }
 
+- (IBAction)onChangeFilename:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
+        MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
+
+        if ( database.storageProvider == kCloudKit ) {
+            MacAlerts* alert = [[MacAlerts alloc] init];
+            
+            NSString* newFilename = [alert input:NSLocalizedString(@"databases_manager_pls_enter_new_filename", @"Please enter a new filename for this database")
+                                    defaultValue:database.fileUrl.lastPathComponent
+                                      allowEmpty:NO];
+            
+            if ( newFilename ) {
+                NSString* trimmed = [MacDatabasePreferences trimDatabaseNickName:newFilename];
+                
+                if ( trimmed.length ) {
+                    [self renameCloudKitDatabase:database nick:database.nickName fileName:trimmed];
+                }
+            }
+        }
+    }
+}
+
 - (void)onUserRenamedDatabase:(MacDatabasePreferences*)database name:(NSString*)name {
     database.nickName = name;
     
     if ( database.storageProvider == kCloudKit ) {
-        [self renameCloudKitDatabase:database nick:name]; 
+        NSString* fileName = [name stringByAppendingPathExtension:database.fileUrl.pathExtension];
+
+        [self renameCloudKitDatabase:database nick:name fileName:fileName];
     }
 }
 
 - (void)renameCloudKitDatabase:(MacDatabasePreferences*)database
-                          nick:(NSString*)nick {
+                          nick:(NSString*)nick
+                      fileName:(NSString*)fileName {
 #ifndef NO_NETWORKING
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
                                         viewController:self];
-        
-    NSString* fileName = [nick stringByAppendingPathExtension:database.fileUrl.pathExtension];
-    
+            
     [CloudKitDatabasesInteractor.shared renameWithDatabase:database 
                                                   nickName:nick
                                                   fileName:fileName
@@ -577,6 +601,14 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [menu removeItem:item];
     }
 
+    item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
+        return obj.action == @selector(onChangeFilename:);
+    }];
+    
+    if ( item ) {
+        [menu removeItem:item];
+    }
+
     
     
     if ( singleSelectedDatabase ) {
@@ -588,6 +620,12 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                                                    keyEquivalent:@""];
             
             [menu insertItem:item atIndex:5];
+
+            item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"generic_change_filename_ellipsis_action", @"Change Filename...")
+                                              action:@selector(onChangeFilename:)
+                                       keyEquivalent:@""];
+            
+            [menu insertItem:item atIndex:7];
         }
             
     }
@@ -613,6 +651,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             theAction == @selector(onSync:) ||
             theAction == @selector(onRename:)) {
             return YES;
+        }
+        else if (theAction == @selector(onChangeFilename:)) {
+            if( singleSelectedDatabase.storageProvider == kCloudKit ) {
+                return YES;
+            }
         }
         else if (theAction == @selector(onShareCloudKit:)) {
             if( singleSelectedDatabase.storageProvider == kCloudKit ) {

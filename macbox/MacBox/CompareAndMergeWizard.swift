@@ -52,7 +52,7 @@ class CompareAndMergeWizard: NSViewController {
                                   ckfs: CompositeKeyFactors,
                                   completion: @escaping (_ model: DatabaseModel?, _ error: Error?) -> Void)
     {
-        Serializator.fromUrl(url, ckf: ckfs) { userCancelled, model, error in
+        Serializator.fromUrl(url, ckf: ckfs) { userCancelled, model, _, error in
             if error != nil {
                 completion(nil, error)
             } else if !userCancelled, let model {

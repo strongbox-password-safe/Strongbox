@@ -33,7 +33,7 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
     kAuditFlagTwoFactorAvailable,
 };
 
-typedef void (^AuditCompletionBlock)(BOOL userStopped);
+typedef void (^AuditCompletionBlock)(BOOL userStopped, NSTimeInterval duration);
 typedef void (^AuditProgressBlock)(double progress);
 typedef void (^AuditNodesChangedBlock)(void);
 typedef void (^SaveConfigurationBlock)(DatabaseAuditorConfiguration* config);

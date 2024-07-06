@@ -120,3 +120,4 @@
 #import "SampleItemsGenerator.h"
 
 #import "SafeStorageProviderFactory.h"
+#import "ApplicationPreferences.h"

@@ -358,7 +358,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     id<AbstractDatabaseFormatAdaptor> adaptor = [Serializator getAdaptor:format];
 
     if (adaptor == nil) {
-        completion(NO, nil, nil);
+        completion(NO, nil, 0, nil);
         return;
     }
     
@@ -373,15 +373,17 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
        completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         [stream close];
         
+        NSTimeInterval decryptTime = NSDate.timeIntervalSinceReferenceDate - startDecryptTime;
+        
 
-        NSLog(@"🐞 Serializator::DESERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startDecryptTime);
+        NSLog(@"🐞 Serializator::DESERIALIZE [%f] seconds", decryptTime);
 
 
         if(userCancelled || database == nil || error || innerStreamError ) {
-            completion(userCancelled, nil, error ? error : innerStreamError);
+            completion(userCancelled, nil, decryptTime, error ? error : innerStreamError);
         }
         else {
-            completion(NO, database, nil);
+            completion(NO, database, decryptTime, nil);
         }
     }];
 }

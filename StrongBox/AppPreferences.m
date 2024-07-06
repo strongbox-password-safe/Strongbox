@@ -169,7 +169,9 @@ static NSString* const kHasGotUserNotificationsPermissions = @"hasGotUserNotific
 static NSString* const kLastAskToEnableNotifications = @"lastAskToEnableNotifications";
 static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPasscodeSSKeyHasBeenInitialized";
 static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError";
-static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI";
+static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI-2";
+static NSString* const kAppAppearance = @"appAppearance";
+static NSString* const kShowDatabaseNamesInBrowse = @"showDatabaseNamesInBrowse";
 
 @implementation AppPreferences
 
@@ -212,8 +214,24 @@ static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI";
 
 
 
+- (BOOL)showDatabaseNamesInBrowse {
+    return [self getBool:kShowDatabaseNamesInBrowse fallback:YES];
+}
+
+- (void)setShowDatabaseNamesInBrowse:(BOOL)showDatabaseNamesInBrowse {
+    [self setBool:kShowDatabaseNamesInBrowse value:showDatabaseNamesInBrowse];
+}
+
+- (AppAppearance)appAppearance {
+    return [self getInteger:kAppAppearance];
+}
+
+- (void)setAppAppearance:(AppAppearance)appAppearance {
+    [self setInteger:kAppAppearance value:appAppearance];
+}
+
 - (BOOL)useNextGenOneDriveAPI {
-    return [self getBool:kUseNextGenOneDriveAPI];
+    return [self getBool:kUseNextGenOneDriveAPI fallback:YES];
 }
 
 - (void)setUseNextGenOneDriveAPI:(BOOL)useNextGenOneDriveAPI {

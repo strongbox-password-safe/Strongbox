@@ -151,7 +151,7 @@
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
 
-    [Serializator fromUrl:localCopyUrl ckf:key completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+    [Serializator fromUrl:localCopyUrl ckf:key completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
         if (!(userCancelled || error || !model) ) {
             ret = model;
         }
@@ -193,7 +193,7 @@
     NSError* error;
     BOOL valid = [Serializator isValidDatabase:url error:&error];
     if (!valid) {
-        [self openSafeWithDataDone:nil key:key error:error];
+        [self openSafeWithDataDone:nil key:key decryptTime:0.0 error:error];
         return;
     }
 
@@ -207,8 +207,8 @@
         else {
             [Serializator fromUrl:url
                               ckf:key
-                       completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                [self onGotDatabaseModelFromData:userCancelled model:model key:key error:error];
+                       completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
+                [self onGotDatabaseModelFromData:userCancelled model:model key:key decryptTime:decryptTime error:error];
             }];
         }
     });
@@ -217,6 +217,7 @@
 - (void)onGotDatabaseModelFromData:(BOOL)userCancelled
                              model:(DatabaseModel*)model
                                key:(CompositeKeyFactors*)key
+                       decryptTime:(NSTimeInterval)decryptTime
                              error:(NSError*)error {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [self dismissSpinner];
@@ -225,13 +226,14 @@
             self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
         else {
-            [self openSafeWithDataDone:model key:key error:error];
+            [self openSafeWithDataDone:model key:key decryptTime:decryptTime error:error];
         }
     });
 }
 
 - (void)openSafeWithDataDone:(DatabaseModel*)dbModel
                          key:(CompositeKeyFactors*)key
+                 decryptTime:(NSTimeInterval)decryptTime
                        error:(NSError*)error {
     [self dismissSpinner];
     
@@ -256,11 +258,11 @@
         }
     }
     else {
-        [self onSuccessfulSafeOpen:dbModel];
+        [self onSuccessfulSafeOpen:dbModel decryptTime:decryptTime];
     }
 }
 
-- (void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe {
+- (void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe decryptTime:(NSTimeInterval)decryptTime {
     [self doHapticFeedback:YES];
     
 
@@ -270,7 +272,7 @@
 
 
             
-    [self updateUnlockCountAndLikelyFormat:openedSafe];
+    [self updateUnlockCountAndLikelyFormat:openedSafe decryptTime:decryptTime];
 
     [self refreshConvenienceUnlockIfNecessary:openedSafe];
     
@@ -363,7 +365,7 @@
     
     [Serializator fromUrl:url
                       ckf:firstCheck
-               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
         if(model == nil && error && error.code == StrongboxErrorCodes.incorrectCredentials) {
             NSLog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
             
@@ -386,21 +388,21 @@
                            completion:^{
                     [Serializator fromUrl:url
                                       ckf:secondCheck
-                               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                        [self onGotDatabaseModelFromData:userCancelled model:model key:secondCheck error:error];
+                               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
+                        [self onGotDatabaseModelFromData:userCancelled model:model key:secondCheck decryptTime:decryptTime error:error];
                     }];
                 }];
             }
             else {
                 [Serializator fromUrl:url
                                   ckf:secondCheck
-                           completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                    [self onGotDatabaseModelFromData:userCancelled model:model key:secondCheck error:error];
+                           completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
+                    [self onGotDatabaseModelFromData:userCancelled model:model key:secondCheck decryptTime:decryptTime error:error];
                 }];
             }
         }
         else {
-            [self onGotDatabaseModelFromData:userCancelled model:model key:firstCheck error:error];
+            [self onGotDatabaseModelFromData:userCancelled model:model key:firstCheck decryptTime:decryptTime error:error];
         }
     }];
 }
@@ -433,7 +435,7 @@
     }
 }
 
-- (void)updateUnlockCountAndLikelyFormat:(DatabaseModel*)openedSafe {
+- (void)updateUnlockCountAndLikelyFormat:(DatabaseModel*)openedSafe decryptTime:(NSTimeInterval)decryptTime {
     if ( !self.isNativeAutoFillAppExtensionOpen ) { 
         
         
@@ -442,6 +444,8 @@
         EncryptionSettingsViewModel* enc = [EncryptionSettingsViewModel fromDatabaseModel:openedSafe];
         
         self.database.lastKnownEncryptionSettings = enc.debugString; 
+        
+        self.database.serializationPerf = [NSString stringWithFormat:@"%f", decryptTime];
         
         self.database.unlockCount++;
     }

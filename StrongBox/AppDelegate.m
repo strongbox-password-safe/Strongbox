@@ -106,6 +106,11 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     [self initializeCloudKit];
 #endif
     
+    AppAppearance appearance = AppPreferences.sharedInstance.appAppearance;
+    if ( appearance != kAppAppearanceSystem ) {
+        self.window.overrideUserInterfaceStyle = appearance == kAppAppearanceLight ? UIUserInterfaceStyleLight : UIUserInterfaceStyleDark;
+    }
+    
     return YES;
 }
 

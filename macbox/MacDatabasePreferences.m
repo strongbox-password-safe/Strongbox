@@ -830,6 +830,16 @@
 
 }
 
+- (NSString *)serializationPerf {
+    return self.metadata.serializationPerf;
+}
+
+- (void)setSerializationPerf:(NSString *)serializationPerf {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.serializationPerf = serializationPerf;
+    }];
+}
+
 - (NSString *)lastKnownEncryptionSettings {
     return self.metadata.lastKnownEncryptionSettings;
 }

@@ -335,6 +335,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         [encoder encodeObject:self.lastKnownEncryptionSettings forKey:@"lastKnownEncryptionSettings"];
     }
     
+    if ( self.serializationPerf ) {
+        [encoder encodeObject:self.serializationPerf forKey:@"serializationPerf"];
+    }
+    
     [encoder encodeBool:self.isSharedInCloudKit forKey:@"isSharedInCloudKit"];
     [encoder encodeBool:self.isOwnedByMeCloudKit forKey:@"isOwnedByMeCloudKit"];
 }
@@ -753,6 +757,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         if ( [decoder containsValueForKey:@"lastKnownEncryptionSettings"] ) {
             self.lastKnownEncryptionSettings = [decoder decodeObjectForKey:@"lastKnownEncryptionSettings"];
+        }
+
+        if ( [decoder containsValueForKey:@"serializationPerf"] ) {
+            self.serializationPerf = [decoder decodeObjectForKey:@"serializationPerf"];
         }
         
         if ( [decoder containsValueForKey:@"isSharedInCloudKit"] ) {

@@ -126,6 +126,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property NSUInteger unlockCount;
 @property DatabaseFormat likelyFormat;
 @property NSString* lastKnownEncryptionSettings;
+@property NSString* serializationPerf;
 @property BOOL emptyOrNilPwPreferNilCheckFirst; 
 
 

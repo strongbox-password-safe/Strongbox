@@ -166,7 +166,7 @@ class CloudKitManager {
         return try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, modDate: Date.now, dataBlob: dataBlob)
     }
 
-    func rename(id: CloudKitDatabaseIdentifier, nickName: String, fileName: String) async throws -> CloudKitHostedDatabase {
+    func rename(id: CloudKitDatabaseIdentifier, nickName: String, fileName: String?) async throws -> CloudKitHostedDatabase {
         let existing = try await getDatabase(id: id, includeDataBlob: false) 
 
         return try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, nickName: nickName, fileName: fileName)

@@ -137,6 +137,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
     [self listenToEvents];
     
+    if ( Settings.sharedInstance.appAppearance != kAppAppearanceSystem ) {
+        NSApp.appearance = Settings.sharedInstance.appAppearance == kAppAppearanceLight ?
+            [NSAppearance appearanceNamed:NSAppearanceNameAqua] : [NSAppearance appearanceNamed:NSAppearanceNameDarkAqua];
+    }
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self doDeferredAppLaunchTasks]; 
     });

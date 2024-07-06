@@ -207,6 +207,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hasWarnedAboutCloudKitUnavailability;
 @property BOOL hasGotUserNotificationsPermissions; 
 @property (nullable) NSDate* lastAskToEnableNotifications;
+@property BOOL showDatabaseNamesInBrowse;
 
 @end
 

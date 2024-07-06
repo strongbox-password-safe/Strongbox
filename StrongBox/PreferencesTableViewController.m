@@ -53,6 +53,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellProStatus;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNoneCommercialUse;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAppAppearance;
+@property (weak, nonatomic) IBOutlet UILabel *labelAppAppearance;
 
 
 @end
@@ -72,6 +74,8 @@
     
     [self bindVersionAndProStatus];
     [self bindHideTips];
+
+    [self bindUI];
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onProStatusChanged:)
@@ -81,6 +85,11 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self maybeRequestReview];
     });
+}
+
+- (void)bindUI {
+    AppPreferences* prefs = AppPreferences.sharedInstance;
+    self.labelAppAppearance.text = stringForAppAppearanceMode(prefs.appAppearance);
 }
 
 - (void)onProStatusChanged:(id)param {
@@ -166,6 +175,37 @@
                    completion:^(BOOL success, NSInteger selectedIndex) {
             if ( success ) {
                 AppPreferences.sharedInstance.appPrivacyShieldMode = selectedIndex;
+            }
+        }];
+    }
+    else if ( cell == self.cellAppAppearance ) {
+        NSArray<NSNumber*>* options = @[@(kAppAppearanceSystem),
+                                        @(kAppAppearanceLight),
+                                        @(kAppAppearanceDark)];
+        
+        NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+            return stringForAppAppearanceMode(obj.integerValue);
+        }];
+        
+        [self promptForChoice:NSLocalizedString(@"prefs_vc_app_appearance", @"App Appearance")
+                      options:optionStrings
+         currentlySelectIndex:AppPreferences.sharedInstance.appAppearance
+                   completion:^(BOOL success, NSInteger selectedIndex) {
+            if ( success ) {
+                if ( selectedIndex != AppPreferences.sharedInstance.appAppearance ) {
+                    AppPreferences.sharedInstance.appAppearance = selectedIndex;
+                    
+                    AppAppearance appearance = selectedIndex;
+                    
+                    if ( appearance == kAppAppearanceSystem ) {
+                        UIApplication.sharedApplication.delegate.window.overrideUserInterfaceStyle = UIUserInterfaceStyleUnspecified;
+                    }
+                    else {
+                        UIApplication.sharedApplication.delegate.window.overrideUserInterfaceStyle = appearance == kAppAppearanceLight ? UIUserInterfaceStyleLight : UIUserInterfaceStyleDark;
+                    }
+                    
+                    [self bindUI];
+                }
             }
         }];
     }
@@ -298,6 +338,18 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
     }
     else {
         return NSLocalizedString(@"app_privacy_shield_mode_blue_screen", @"Blue Screen");
+    }
+}
+
+static NSString* stringForAppAppearanceMode(AppAppearance mode ){
+    if ( mode == kAppAppearanceSystem ) {
+        return NSLocalizedString(@"app_appearance_mode_system", @"System");
+    }
+    else if (mode == kAppAppearanceLight ) {
+        return NSLocalizedString(@"app_appearance_mode_light", @"Light");
+    }
+    else {
+        return NSLocalizedString(@"app_appearance_mode_dark", @"Dark");
     }
 }
 

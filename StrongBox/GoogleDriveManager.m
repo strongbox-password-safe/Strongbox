@@ -211,7 +211,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@""];
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet illegalCharacterSet]] componentsJoinedByString:@""];
-    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet nonBaseCharacterSet]] componentsJoinedByString:@""];
+
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"'±|/\\`~@<>:;£$%^&()=+{}[]!\"|?*"]] componentsJoinedByString:@""];
     
     return trimmed;
@@ -654,7 +654,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSDictionary* dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
     
     if ( !dict ) {
-        NSLog(@"🔴 Error creating JSONObjectWithData Google Drive database: [%@]", error);
+
         return nil;
     }
     

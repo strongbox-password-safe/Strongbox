@@ -75,6 +75,7 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 
 @property DatabaseFormat likelyFormat;
 @property NSString* lastKnownEncryptionSettings;
+@property NSString* serializationPerf;
 
 @property (nonatomic) BOOL readOnly;
 @property BrowseViewType browseViewType;
