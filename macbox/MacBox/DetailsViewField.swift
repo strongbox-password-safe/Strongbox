@@ -36,6 +36,7 @@ class DetailsViewField {
     var showStrength: Bool = false
     var showHistory: Bool = false
     var showShare: Bool = false
+    var showLargeTextView: Bool = false
     var singleLineMode: Bool = false
     var params: [String: String]
     var leftImage: NSImage?

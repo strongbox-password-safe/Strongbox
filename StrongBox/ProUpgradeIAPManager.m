@@ -115,6 +115,8 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
 }
 
 - (void)performScheduledProEntitlementsCheckIfAppropriate {
+    NSLog(@"🐞 performScheduledProEntitlementsCheckIfAppropriate");
+    
     if ( self.preferences.lastEntitlementCheckAttempt != nil ) {
         NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
         
@@ -125,27 +127,27 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
         
         NSInteger days = [components day];
         
-
+        NSLog(@"🐞 %ld days since last entitlement check... [%@]", (long)days, self.preferences.lastEntitlementCheckAttempt);
         
         if ( days == 0 ) { 
-
+            NSLog(@"🐞 Already checked entitlements today... not rechecking...");
             return;
         }
         
-        if ( self.preferences.numberOfEntitlementCheckFails == 0 && days < 5 ) {
+        if ( self.preferences.numberOfEntitlementCheckFails == 0 && days < 3 ) {
             
             
-            NSLog(@"We had a successful check recently, not rechecking...");
+            NSLog(@"🐞 We had a successful check recently, not rechecking...");
             return;
         }
         else {
-            NSLog(@"Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)self.preferences.numberOfEntitlementCheckFails, (long)days);
+            NSLog(@"🐞 Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)self.preferences.numberOfEntitlementCheckFails, (long)days);
         }
     }
     
-    NSLog(@"Performing Scheduled Check of Entitlements...");
+    NSLog(@"🐞 Performing Scheduled Check of Entitlements...");
      
-    if ( self.preferences.numberOfEntitlementCheckFails < 3 ) {
+    if ( self.preferences.numberOfEntitlementCheckFails < 2 ) {
         [self checkReceiptForTrialAndProEntitlements];
     }
     else {

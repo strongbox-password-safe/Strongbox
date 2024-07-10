@@ -357,7 +357,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
     double minutes = timeDifference / 60;
 
-    if( minutes > 30 ) {
+    if( ( Settings.sharedInstance.launchCount > 30 && minutes > 2 ) || minutes > 20 ) { 
         [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
     }
 }

@@ -134,6 +134,7 @@ static NSString* const kChangeNotificationsSubscriptionCreated = @"changeNotific
 static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetworkStorageOptions";
 static NSString* const kHasWarnedAboutCloudKitUnavailability = @"hasWarnedAboutCloudKitUnavailability";
 static NSString* const kPasswordGeneratorFloatOnTop = @"passwordGeneratorFloatOnTop";
+static NSString* const kLargeTextViewFloatOnTop = @"largeTextViewFloatOnTop";
 static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError";
 static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI-2";
 static NSString* const kAppAppearance = @"appAppearance2";
@@ -296,6 +297,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setUseNextGenOneDriveAPI:(BOOL)useNextGenOneDriveAPI {
     [self setBool:kUseNextGenOneDriveAPI value:useNextGenOneDriveAPI];
+}
+
+- (BOOL)largeTextViewFloatOnTop {
+    return [self getBool:kLargeTextViewFloatOnTop];
+}
+
+- (void)setLargeTextViewFloatOnTop:(BOOL)largeTextViewFloatOnTop {
+    [self setBool:kLargeTextViewFloatOnTop value:largeTextViewFloatOnTop];
 }
 
 - (BOOL)passwordGeneratorFloatOnTop {

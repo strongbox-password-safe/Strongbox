@@ -662,13 +662,14 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         popOutDetails()
     }
 
-    func popOutDetails(pin _: Bool = false) {
+    func popOutDetails(pin: Bool = false) {
         guard database.nextGenSelectedItems.count == 1, let uuid = database.nextGenSelectedItems.first else {
             NSLog("✅ onPopOutDetails - Selection invalid")
             return
         }
 
         if let existing = popouts[uuid] {
+            existing.floatOnTop = pin
             existing.showWindow(nil)
         } else {
             let popout = PopOutDetailsWindowController.fromStoryboard()
@@ -676,6 +677,8 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             popout.load(model: database, uuid: uuid)
 
             popouts[uuid] = popout
+
+            popout.floatOnTop = pin
 
             popout.showWindow(nil)
         }
@@ -1120,7 +1123,23 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
         } else if action == #selector(onCreateGroup) {
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onPopOutDetails(_:)) {
-            return !database.locked
+            guard !database.locked, database.nextGenSelectedItems.count == 1,
+                  let uuid = database.nextGenSelectedItems.first
+            else {
+                NSLog("✅ onPopOutDetails - Selection invalid")
+                return false
+            }
+
+            return true
+        } else if action == #selector(onPopOutDetailsAndPin(_:)) {
+            guard !database.locked, database.nextGenSelectedItems.count == 1,
+                  let uuid = database.nextGenSelectedItems.first
+            else {
+                NSLog("✅ onPopOutDetailsAndPin - Selection invalid")
+                return false
+            }
+
+            return true
         } else if action == #selector(onLockDatabase) {
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onCreateRecord) {

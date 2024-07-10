@@ -170,6 +170,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL cloudKitZoneCreated;
 @property BOOL hasWarnedAboutCloudKitUnavailability;
 @property BOOL passwordGeneratorFloatOnTop;
+@property BOOL largeTextViewFloatOnTop;
 
 @end
 

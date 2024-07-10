@@ -8,9 +8,16 @@
 
 import Foundation
 
-enum DarkMode {
+enum DarkMode { // TODO: iOS also needs the appearance?
     static var isOn: Bool {
+        if Settings.sharedInstance().appAppearance == kAppAppearanceDark {
+            return true
+        } else if Settings.sharedInstance().appAppearance == kAppAppearanceLight {
+            return false
+        }
+
         let osxMode: String? = UserDefaults.standard.string(forKey: "AppleInterfaceStyle")
+
         return osxMode != nil && osxMode == "Dark"
     }
 }

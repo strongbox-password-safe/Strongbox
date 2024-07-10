@@ -2358,14 +2358,30 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - (id)supplementalTargetForAction:(SEL)action sender:(id)sender {
-    NSString* str = NSStringFromSelector(action);
+
     
     
     
-    if ( [str isEqualToString:@"onShowHideQuickView:"] ) {
-        NSLog(@"supplementalTargetForAction: [%@]", str);
-    }
+
+
+
     
     
     

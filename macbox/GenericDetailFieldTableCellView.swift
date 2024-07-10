@@ -22,6 +22,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     @IBOutlet var copyButton: NSButton!
     @IBOutlet var buttonHistory: NSPopUpButton!
     @IBOutlet var shareButton: NSButton!
+    @IBOutlet var showLargeTextView: NSButton!
 
     deinit {
         NotificationCenter.default.removeObserver(self)
@@ -68,6 +69,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
     var popupMenuUpdater: ((NSMenu, DetailsViewField) -> Void)?
     var onCopyButton: ((DetailsViewField?) -> Void)?
     var onShareButton: ((DetailsViewField?) -> Void)?
+    var onShowLargeTextViewButton: ((DetailsViewField?) -> Void)?
 
     var field: DetailsViewField?
     var concealable: Bool = false
@@ -122,6 +124,7 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
                     image: NSImage? = nil,
                     onCopyButton: ((DetailsViewField?) -> Void)? = nil,
                     onShareButton: ((DetailsViewField?) -> Void)? = nil,
+                    onShowLargeTextViewButton: ((DetailsViewField?) -> Void)? = nil,
                     containingWindow: NSWindow? = nil,
                     singleLineMode: Bool = false)
     {
@@ -173,6 +176,9 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
         self.onShareButton = onShareButton
         shareButton.isHidden = onShareButton == nil
 
+        self.onShowLargeTextViewButton = onShowLargeTextViewButton
+        showLargeTextView.isHidden = onShowLargeTextViewButton == nil
+
         self.value = value
         self.concealed = concealable && concealed
         self.containingWindow = containingWindow
@@ -180,6 +186,10 @@ class GenericDetailFieldTableCellView: NSTableCellView, DetailTableCellViewPopup
 
     @IBAction func onToggleConcealReveal(_: Any?) {
         concealed = !concealed
+    }
+
+    @IBAction func onShowLargeTextView(_: Any) {
+        onShowLargeTextViewButton?(field)
     }
 
     func showPopupButtonMenu() {

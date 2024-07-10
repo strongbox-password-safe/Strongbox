@@ -58,6 +58,7 @@
 @property (weak) IBOutlet NSStackView *stackHardwareKey;
 @property (weak) IBOutlet NSTextField *textFIeldHeadline;
 @property (weak) IBOutlet NSTextField *textFieldSubheadline;
+@property (weak) IBOutlet NSTextField *textFieldDatabaseName;
 
 @end
 
@@ -69,6 +70,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    self.textFieldDatabaseName.stringValue = self.database.nickName;
     
     self.textFieldPassword.delegate = self;
     [self fixStackViewSpacing];

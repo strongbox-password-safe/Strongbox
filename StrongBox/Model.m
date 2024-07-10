@@ -1278,8 +1278,10 @@ userInteractionRequired:(BOOL)userInteractionRequired
           browseSortField:(BrowseSortField)browseSortField
                descending:(BOOL)descending
         foldersSeparately:(BOOL)foldersSeparately {
+#ifdef DEBUG
     NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
-        
+#endif
+
     NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRootIncludingRecycled : self.database.allSearchableIncludingRecycled;
     
     NSMutableArray* results = [nodes mutableCopy]; 
@@ -1292,10 +1294,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
                       scope:scope
                 dereference:dereference];
     }
-    
-    NSTimeInterval searchTime = NSDate.timeIntervalSinceReferenceDate - startTime;
 
+#ifdef DEBUG
+    NSTimeInterval searchTime = NSDate.timeIntervalSinceReferenceDate - startTime;
     NSTimeInterval startBrowseFilterTime = NSDate.timeIntervalSinceReferenceDate;
+#endif
 
     NSArray<Node*>* ret = [self filterAndSortForBrowse:results
                                  includeKeePass1Backup:includeKeePass1Backup
@@ -1309,11 +1312,8 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
 #ifdef DEBUG
     NSString* searchTerm = searchText;
-#else
-    NSString* searchTerm = @"<REDACTED>";
+    NSLog(@"✅ SEARCH for [%@] done in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
 #endif
-    
-
 
     return ret;
 }
@@ -1417,7 +1417,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+        return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains];
     }];
 }
 
@@ -1429,7 +1429,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains];
     }];
 }
 

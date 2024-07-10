@@ -12,8 +12,8 @@ import Foundation
     var keyPair: BoxKeyPair = CryptoBoxHelper.createKeyPair()
 
     static let MaxFieldLength = 8192
-    static let MaxIconBase64LengthMultipleItems = 10 * 1024
-    static let MaxIconBase64LengthExplicitRequest = 20 * 1024
+    static let MaxIconBase64LengthMultipleItems = 100 * 1024
+    static let MaxIconBase64LengthExplicitRequest = 500 * 1024
 
     @objc static let shared = AutoFillRequestHandler()
 
@@ -662,7 +662,7 @@ import Foundation
         return getPngBase64StringForImage(model: model, image: image, cacheKey: key, maxLength: maxLength)
     }
 
-    func getPngBase64StringForImage(model: Model, image: NSImage, cacheKey: String, maxLength: Int) -> String? {
+    func getPngBase64StringForImage(model _: Model, image: NSImage, cacheKey: String, maxLength: Int) -> String? {
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             NSLog("🔴 Could not get cgimage for node icon")
             return nil
@@ -681,14 +681,11 @@ import Foundation
         if ret.count > maxLength {
             NSLog("⚠️ Icon is too large to return. Size=\(ret.count)bytes.")
 
-            var image = NodeIconHelper.getNodeIcon(nil, predefinedIconSet: .sfSymbols) 
-            image = Utils.imageTinted(withColor: image, tint: .systemBlue) 
-
             
 
             let smallFallbackVisible = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX
 
-            ret = getPngBase64StringForImage(model: model, image: image, cacheKey: cacheKey, maxLength: maxLength) ?? smallFallbackVisible
+            ret = smallFallbackVisible
         }
 
         iconCache.setObject(ret as NSString, forKey: cacheKey as NSString)

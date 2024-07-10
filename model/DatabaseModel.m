@@ -20,6 +20,12 @@
 #import "KissXML.h" 
 #endif
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 static NSString* const kKeePass1BackupGroupName = @"Backup";
 static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
@@ -892,23 +898,18 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 - (BOOL)isUrlMatches:(NSString*)searchText
                 node:(Node*)node
          dereference:(BOOL)dereference
-         checkPinYin:(BOOL)checkPinYin {
+         checkPinYin:(BOOL)checkPinYin
+includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
-    
-    if ( [foo.lowercaseString hasPrefix:kOtpAuthScheme] ) {
-        
-        
-        
-        return NO;
-    }
-    
-    if ( [foo containsSearchString:searchText checkPinYin:checkPinYin] ) {
+
+    if ( [self isDiscreteUrlMatch:foo searchText:searchText checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains] ) {
         return YES;
     }
-    
+        
     for (NSString* altUrl in node.fields.alternativeUrls) {
         NSString* foo = [self maybeDeref:altUrl node:node maybe:dereference];
-        if([foo containsSearchString:searchText checkPinYin:checkPinYin]) {
+        
+        if ( [self isDiscreteUrlMatch:foo searchText:searchText checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains] ) {
             return YES;
         }
     }
@@ -916,7 +917,31 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     return NO;
 }
 
-- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+- (BOOL)isDiscreteUrlMatch:(NSString*)url searchText:(NSString*)searchText checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains {
+    if ( [url.lowercaseString hasPrefix:kOtpAuthScheme] ) {
+        
+        
+
+        return NO;
+    }
+    
+    if ( [url containsSearchString:searchText checkPinYin:checkPinYin] ) {
+        return YES;
+    }
+        
+    if ( includeAssociatedDomains ) {
+        NSSet<NSString*>* associateds = [BrowserAutoFillManager getAssociatedDomainsWithUrl:url];
+        for ( NSString* associated in associateds ) {
+            if ( [associated containsSearchString:searchText checkPinYin:checkPinYin] ) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
+- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     if ( [self isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
         return YES;
     }
@@ -929,7 +954,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     if ( [self isEmailMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
         return YES;
     }
-    if ( [self isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
+    if ( [self isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains] ) {
         return YES;
     }
     if ( [self isNotesMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {

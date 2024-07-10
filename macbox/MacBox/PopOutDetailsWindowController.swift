@@ -12,6 +12,12 @@ class PopOutDetailsWindowController: NSWindowController {
     var database: ViewModel!
     var uuid: UUID!
 
+    var floatOnTop: Bool = false {
+        didSet {
+            bindFloatOnTop()
+        }
+    }
+
     @objc
     class func fromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("PopOutDetails"), bundle: nil)
@@ -24,6 +30,8 @@ class PopOutDetailsWindowController: NSWindowController {
         setupToolbar()
 
         bindScreenCaptureBlock()
+
+        bindFloatOnTop()
     }
 
     func bindScreenCaptureBlock() {
@@ -51,7 +59,6 @@ class PopOutDetailsWindowController: NSWindowController {
         let title = model.dereference(node.title, node: node)
 
         window?.title = title
-
         window?.toolbar?.validateVisibleItems()
     }
 
@@ -69,11 +76,11 @@ class PopOutDetailsWindowController: NSWindowController {
         viewController.presentAsSheet(vc)
     }
 
-    var floatOnTop: Bool = false
-
     @objc func onToggleFloatOnTop(_: Any?) {
-        floatOnTop = !floatOnTop
+        floatOnTop = !floatOnTop 
+    }
 
+    func bindFloatOnTop() {
         window?.level = floatOnTop ? .floating : .normal
 
         guard let floatOnTopItem = window?.toolbar?.items.first(where: { item in

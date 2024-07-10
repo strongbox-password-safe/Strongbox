@@ -230,6 +230,7 @@ class DetailViewController: NSViewController {
                                        showStrength: true)
 
             ret.showHistory = true
+            ret.showLargeTextView = true
 
             return [ret]
         } else {
@@ -1142,22 +1143,24 @@ class DetailViewController: NSViewController {
         }
     }
 
+    var wc: LargeTextViewPopoutWindowController? = nil
     func showLargeTextView(_ field: DetailsViewField) {
-        let vc = LargeTextViewAndQrCode.instantiateFromStoryboard()
-        vc.fieldName = field.name
+        if let wc {
+            wc.close()
+        }
+        wc = LargeTextViewPopoutWindowController.instantiateFromStoryboard()
+
+        guard let wc else { return }
 
         if field.fieldType == .totp {
             guard let token = field.object as? OTPToken, let url = token.url(true) else { return }
-            vc.string = token.secretBase32
-            vc.largeText = false
-            vc.subtext = url.absoluteString
+
+            wc.setContent(fieldName: field.name, string: token.secretBase32, largeText: false, subtext: url.absoluteString)
         } else {
-            vc.string = field.value
+            wc.setContent(fieldName: field.name, string: field.value)
         }
 
-        guard let view = rowViewForField(field) else { return }
-
-        present(vc, asPopoverRelativeTo: .zero, of: view, preferredEdge: NSRectEdge.minY, behavior: .semitransient)
+        wc.showWindow(nil)
     }
 
     func previewAttachment(_ field: DetailsViewField) {
@@ -1715,7 +1718,15 @@ extension DetailViewController: NSTableViewDelegate {
                             onShareButton: field.showShare ? { [weak self] field in
                                 self?.onShareField(field: field, cell.shareButton)
                             } : nil,
-                            containingWindow: view.window, singleLineMode: field.singleLineMode)
+                            onShowLargeTextViewButton: field.showLargeTextView ? { [weak self] field in
+                                guard let field, let self else {
+                                    return
+                                }
+
+                                showLargeTextView(field)
+                            } : nil,
+                            containingWindow: view.window,
+                            singleLineMode: field.singleLineMode)
 
             if field.showHistory {
                 cell.history = getPasswordHistoryMenu()

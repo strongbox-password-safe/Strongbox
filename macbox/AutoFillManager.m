@@ -466,7 +466,8 @@
 
 - (void)removeItemsFromQuickType:(const NSArray<Node *> *)items database:(Model *)database {
     for ( Node* node in items ) {
-        NSLog(@"   Removing [%@]", node.title);
+
+        
         NSArray<ASPasswordCredentialIdentity*>* identities = [self getPasswordCredentialIdentities:node database:database];
         
         [ASCredentialIdentityStore.sharedStore removeCredentialIdentities:identities
