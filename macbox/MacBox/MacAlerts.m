@@ -353,6 +353,48 @@ disableEscapeKey:(BOOL)disableEscapeKey
     });
 }
 
++ (void)threeOptionsWithCancel:(NSString *)messageText
+               informativeText:(NSString *)informativeText
+             option1AndDefault:(NSString *)option1AndDefault
+                       option2:(NSString *)option2
+                       option3:(NSString *)option3
+                        window:(NSWindow *)window
+                    completion:(void (^)(NSUInteger))completion {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        
+        if (informativeText) [alert setInformativeText:informativeText];
+        if (messageText) [alert setMessageText:messageText];
+        
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        [alert addButtonWithTitle:option1AndDefault];
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+        
+        [alert addButtonWithTitle:option2];
+        [alert addButtonWithTitle:option3];
+
+        NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
+        [alert addButtonWithTitle:localizedCancel];
+        [[[alert buttons] objectAtIndex:3] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
+
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            if(returnCode == NSAlertFirstButtonReturn) {
+                completion(1);
+            }
+            else if ( returnCode == NSAlertSecondButtonReturn ) {
+                completion(2);
+            }
+            else if ( returnCode == NSAlertThirdButtonReturn ) {
+                completion(3);
+            }
+            else {
+                completion(0);
+            }
+        }];
+    });
+}
+
 + (void)twoOptionsWithCancel:(NSString *)messageText
              informativeText:(NSString*)informativeText
            option1AndDefault:(NSString*)option1AndDefault

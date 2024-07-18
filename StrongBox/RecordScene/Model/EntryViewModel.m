@@ -344,14 +344,19 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
 
 
 
-- (void)resetTags:(NSSet<NSString*>*)tags {
-    [self.mutableTags removeAllObjects];
-    
+- (BOOL)resetTags:(NSSet<NSString*>*)tags {
     NSArray<NSString*>* splitByDelimiter = [tags.allObjects flatMap:^NSArray * _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
         return [Utils getTagsFromTagString:obj];
     }];
+
+    if ( [self.mutableTags isEqualToSet:splitByDelimiter.set] ) {
+        return NO;
+    }
     
+    [self.mutableTags removeAllObjects];
     [self.mutableTags addObjectsFromArray:splitByDelimiter];
+    
+    return YES;
 }
 
 - (void)addTag:(NSString*)tag {

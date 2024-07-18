@@ -47,7 +47,10 @@ typedef enum : NSUInteger {
 
 @property BOOL databasesAreAlwaysReadOnly;
 @property BOOL disableExport;
+@property BOOL disableCopyTo;
+@property BOOL disableMakeVisibleInFiles;
 @property BOOL disablePrinting;
+
 @property (nullable) NSString* businessOrganisationName;
 
 @property BOOL autoFillWroteCleanly;

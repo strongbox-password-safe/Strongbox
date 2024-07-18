@@ -135,8 +135,9 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                                       options:options
                                    completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
         if (result == kReadResultError) {
-            NSLog(@"%@", error);
-            [[GoogleDriveManager sharedInstance] signout];
+            if ( [self shouldSignOutOnError:error]) {
+                [[GoogleDriveManager sharedInstance] signout];
+            }
         }
         
         completion(result, data, dateModified, error);
@@ -166,8 +167,9 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         }
         
         if(error) {
-            NSLog(@"Error in Google Drive Push call... Signing Out...");
-            [[GoogleDriveManager sharedInstance] signout];
+            if ( [self shouldSignOutOnError:error]) {
+                [[GoogleDriveManager sharedInstance] signout];
+            }
         }
 
         completion(result, newRemoteModDate, error);
@@ -209,7 +211,9 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
             completion(NO, [self mapToStorageBrowserItems:driveFiles], nil);
         }
         else {
-            [[GoogleDriveManager sharedInstance] signout];
+            if ( [self shouldSignOutOnError:error]) {
+                [[GoogleDriveManager sharedInstance] signout];
+            }
             completion(userCancelled, nil, error);
         }
     }];
@@ -231,13 +235,27 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         }
         
         if ( error ) {
-            [[GoogleDriveManager sharedInstance] signout];
+            if ( [self shouldSignOutOnError:error]) {
+                [[GoogleDriveManager sharedInstance] signout];
+            }
+            
             completionHandler(kReadResultError, nil, nil, error);
         }
         else {
             completionHandler(kReadResultSuccess, data, dateModified, nil);
         }
     }];
+}
+
+- (BOOL)shouldSignOutOnError:(const NSError*)error {
+    if ( error && error.domain == NSURLErrorDomain ) {
+        if (    error.code == NSURLErrorNotConnectedToInternet ||
+                error.code == NSURLErrorTimedOut ) {
+            return NO;
+        }
+    }
+    
+    return YES;
 }
 
 - (NSArray<StorageBrowserItem *> *)mapToStorageBrowserItems:(NSArray<GTLRDrive_File *> *)items {

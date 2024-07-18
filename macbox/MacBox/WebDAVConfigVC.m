@@ -23,6 +23,8 @@
 @property (weak) IBOutlet NSButton *buttonAllowUntrustedCert;
 @property (weak) IBOutlet NSButton *buttonConnect;
 @property (weak) IBOutlet NSTextField *labelValidation;
+@property WebDAVSessionConfiguration *draftConfiguration;
+@property NSString* originalConnectTitle;
 
 @end
 
@@ -46,6 +48,9 @@
 - (void)doInitialSetup {
     self.view.window.delegate = self;
     
+    self.originalConnectTitle = self.buttonConnect.title;
+    [self.buttonConnect setTitle:NSLocalizedString(@"mac_save_action", @"Save")];
+
     if ( self.initialConfiguration != nil ) { 
         self.textFieldName.stringValue = self.initialConfiguration.name ? self.initialConfiguration.name : @"";
         self.textFieldRootURL.stringValue = self.initialConfiguration.host.absoluteString;
@@ -57,14 +62,14 @@
         [self.textFieldName becomeFirstResponder];
     }
     
-    [self bindUi];
+    [self validateConnect];
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification {
-    [self bindUi];
+    [self validateConnect];
 }
 
-- (void)bindUi {
+- (IBAction)onAllowTrustedChanged:(id)sender {
     [self validateConnect];
 }
 
@@ -73,27 +78,43 @@
     NSString* host = trim(self.textFieldRootURL.stringValue);
     NSURL *urlHost = host.urlExtendedParse;
 
+    BOOL valid = YES;
+    
     if ( name.length == 0 ) {
         self.labelValidation.stringValue = NSLocalizedString(@"connection_vc_name_invalid", @"Please enter a valid name.");
         self.labelValidation.textColor = [NSColor systemRedColor];
-        self.buttonConnect.enabled = NO;
+        valid = NO;
     }
     else if(!(urlHost && urlHost.scheme && urlHost.host)) {
         self.labelValidation.stringValue = NSLocalizedString(@"webdav_vc_validation_url_invalid", @"URL Invalid");
         self.labelValidation.textColor = [NSColor systemRedColor];
-        self.buttonConnect.enabled = NO;
+        valid = NO;
     }
     else if (urlHost.lastPathComponent.pathExtension.length != 0) {
         self.labelValidation.stringValue = NSLocalizedString(@"webdav_vc_validation_url_are_you_sure", @"Are you sure the URL is correct? It should be a URL to a parent folder. Not the database file.");
         self.labelValidation.textColor = [NSColor systemOrangeColor];
-        self.buttonConnect.enabled = YES;
     }
     else {
         self.labelValidation.stringValue = @"";
-        self.buttonConnect.enabled = YES;
     }
     
-    return;
+    [self.buttonConnect setTitle:NSLocalizedString(@"mac_save_action", @"Save")];
+    
+    if ( self.initialConfiguration ) {
+        [self updateDraftConfiguration];
+        
+        BOOL hasEdits = ![self.initialConfiguration isTheSameConnection:self.draftConfiguration];
+        
+        self.buttonConnect.enabled = valid && hasEdits;
+        
+        if ( ![self.initialConfiguration isNetworkingFieldsAreSame:self.draftConfiguration] ) {
+            [self.buttonConnect setTitle:self.originalConnectTitle];
+        }
+    }
+    else {
+        [self.buttonConnect setTitle:self.originalConnectTitle];
+        self.buttonConnect.enabled = valid;
+    }
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -124,41 +145,53 @@
     }
 }
 
-- (void)testConnectionAndFinish {
+- (void)updateDraftConfiguration {
     NSString* name = trim(self.textFieldName.stringValue);
     NSString* hostStr = trim(self.textFieldRootURL.stringValue);
-
+    
     
     
     if([hostStr hasSuffix:@"/"]) {
         hostStr = [hostStr substringToIndex:hostStr.length - 1];
     }
-
+    
     NSURL *urlHost = hostStr.urlExtendedParse;
     
-    WebDAVSessionConfiguration* configuration = [[WebDAVSessionConfiguration alloc] init];
-        
-    if ( self.initialConfiguration ) {
-        configuration.identifier = self.initialConfiguration.identifier;
+    if ( self.draftConfiguration == nil ) {
+        self.draftConfiguration = [[WebDAVSessionConfiguration alloc] init];
     }
     
-    configuration.name = name;
-    configuration.host = urlHost;
-    configuration.username = self.textFieldUsername.stringValue;
-    configuration.password = self.textFieldPassword.stringValue;
-    configuration.allowUntrustedCertificate = self.buttonAllowUntrustedCert.state == NSControlStateValueOn;
+    if ( self.initialConfiguration ) {
+        self.draftConfiguration.identifier = self.initialConfiguration.identifier;
+    }
+    
+    self.draftConfiguration.name = name;
+    self.draftConfiguration.host = urlHost;
+    self.draftConfiguration.username = self.textFieldUsername.stringValue;
+    self.draftConfiguration.password = self.textFieldPassword.stringValue;
+    self.draftConfiguration.allowUntrustedCertificate = self.buttonAllowUntrustedCert.state == NSControlStateValueOn;
+}
 
-    [WebDAVStorageProvider.sharedInstance testConnection:configuration viewController:self completion:^(NSError * _Nonnull error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ( error ) {
-                [MacAlerts error:error window:self.view.window];
-            }
-            else {
-                self.onDone(YES, configuration);
-                [self.presentingViewController dismissViewController:self];
-            }
-        });
-    }];
+- (void)testConnectionAndFinish {
+    [self updateDraftConfiguration];
+    
+    if ( ![self.initialConfiguration isNetworkingFieldsAreSame:self.draftConfiguration] ) {
+        [WebDAVStorageProvider.sharedInstance testConnection:self.draftConfiguration viewController:self completion:^(NSError * _Nonnull error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( error ) {
+                    [MacAlerts error:error window:self.view.window];
+                }
+                else {
+                    self.onDone(YES, self.draftConfiguration);
+                    [self.presentingViewController dismissViewController:self];
+                }
+            });
+        }];
+    }
+    else {
+        self.onDone(YES, self.draftConfiguration);
+        [self.presentingViewController dismissViewController:self];
+    }
 }
 
 @end

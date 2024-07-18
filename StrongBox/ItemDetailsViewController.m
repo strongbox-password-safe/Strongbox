@@ -281,41 +281,6 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     [self unListenToNotifications];
 }
 
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
 - (void)listenToNotifications {
     [self unListenToNotifications];
     
@@ -639,7 +604,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)onModelEdited {
     if(!self.editing) {
-        NSLog(@"EEEEEEEKKKKK on Model edited while not editing!");
+        NSLog(@"🔴 EEEEEEEKKKKK on Model edited while not editing!");
         return;
     }
     
@@ -1906,6 +1871,9 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
                     [self onSetTotp];
                 }
             }
+            else if ( indexPath.row == kRowTags ) {
+                [self showTagsEditor];
+            }
             else if ( indexPath.row == kRowSshKey ) {
                 if ( !self.model.keeAgentSshKey ) {
                     [self promptToAddSshKey];
@@ -2016,29 +1984,15 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
 - (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
     TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
     
-    __weak ItemDetailsViewController* weakSelf = self;
+
     
-    [cell setModel:!self.editing
+    [cell setModel:YES
               tags:self.model.tags
-   useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
-             onAdd:^(NSString * _Nonnull tag) {
-        [weakSelf.model addTag:trim(tag)];
-        [weakSelf onModelEdited];
-    }
-          onRemove:^(NSString * _Nonnull tag) {
-        [weakSelf.model removeTag:trim(tag)];
-        [weakSelf onModelEdited];
-    }];
+   useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    cell.selectionStyle = self.isEditing ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
+    cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+
     return cell;
 }
 
@@ -2078,7 +2032,8 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
                       concealed:self.passwordConcealedInUi
                        colorize:self.databaseModel.metadata.colorizePasswords
                           audit:audit
-                   showStrength:YES];
+                   showStrength:YES 
+              showLargeTextView:YES];
         
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
@@ -2091,6 +2046,10 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         };
         
         cell.historyMenu = [self getPasswordHistoryMenu];
+        
+        cell.onShowLargeTextView = ^{
+            [weakSelf showLargeText:weakSelf.model.password colorize:weakSelf.databaseModel.metadata.colorizePasswords];
+        };
         
         return cell;
     }
@@ -2852,6 +2811,34 @@ suggestionProvider:^NSString*(NSString *text) {
                       identifier:nil
                          options:UIMenuOptionsDisplayInline
                         children:mut];
+}
+
+- (void)showTagsEditor {
+    __weak ItemDetailsViewController* weakSelf = self;
+    
+    UIViewController* vc = [SwiftUIViewFactory getTagsEditorViewWithExistingTags:self.model.tags.set
+                                                                         allTags:self.databaseModel.database.tagSet
+                                                                      completion:^(BOOL cancelled, NSSet<NSString *> * _Nullable tags) {
+        [weakSelf.presentedViewController dismissViewControllerAnimated:YES completion:^{
+            if ( cancelled ) {
+                return;
+            }
+
+            [weakSelf onTagsEdited:tags];
+        }];
+    }];
+    
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)onTagsEdited:(NSSet<NSString*>*)tags {
+    if ( [self.model resetTags:tags] ) { 
+        [self onModelEdited];
+        
+        [self.tableView reloadData];
+    }
 }
 
 @end

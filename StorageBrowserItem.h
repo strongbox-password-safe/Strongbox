@@ -13,8 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface StorageBrowserItem : NSObject
 
 + (instancetype)itemWithName:(NSString*)name identifier:(NSString*_Nullable)identifier folder:(BOOL)folder providerData:(id _Nullable)providerData;
++ (instancetype)itemWithName:(NSString*)name identifier:(NSString*_Nullable)identifier folder:(BOOL)folder canNotCreateDatabaseInThisFolder:(BOOL)canCreateDatabaseInThisFolder providerData:(id _Nullable)providerData;
 
 @property (nonatomic) BOOL folder;
+@property (nonatomic) BOOL canNotCreateDatabaseInThisFolder;
 @property (nonatomic) NSString *name;
 @property (nonatomic) NSString *identifier; 
 @property (nonatomic, nullable) NSObject *providerData;

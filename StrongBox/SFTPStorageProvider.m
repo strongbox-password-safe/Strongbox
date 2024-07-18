@@ -723,7 +723,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
         
         
         if(sessionConfiguration.authenticationMode == kPrivateKey) {
-            [session authenticateByInMemoryPublicKey:sessionConfiguration.publicKey
+            [session authenticateByInMemoryPublicKey:nil
                                           privateKey:sessionConfiguration.privateKey
                                          andPassword:sessionConfiguration.password];
         }

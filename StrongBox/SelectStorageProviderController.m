@@ -63,7 +63,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 + (UINavigationController*)navControllerFromStoryboard {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectStorage" bundle:nil];
-
+    
     return [storyboard instantiateInitialViewController];
 }
 
@@ -76,7 +76,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     else {
         [self.navigationItem setPrompt:NSLocalizedString(@"sspc_select_where_store_new", @"Select where you would like to store your new database")];
     }
-
+    
     self.navigationController.toolbar.hidden = YES;
     self.navigationController.toolbarHidden = YES;
 }
@@ -96,7 +96,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
             }];
         }
     }
-
+    
     self.wiFiSyncDevices = wiFiSyncDevices;
 #else
     self.wiFiSyncDevices = @[];
@@ -104,7 +104,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 }
 
 - (void)observeWiFiSyncDevices {
-    [NSNotificationCenter.defaultCenter addObserver:self 
+    [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onWiFiDevicesChanged)
                                                name:kWifiBrowserResultsUpdatedNotification
                                              object:nil];
@@ -123,10 +123,10 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-
-
-
-
+    
+    
+    
+    
     self.providersForSectionMap = [[MutableOrderedDictionary alloc] init];
     
     
@@ -170,7 +170,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     else {
         if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
             self.providersForSectionMap[kSectioniOSNativeDeprecated] = @[@(kFilesAppUrlBookmark)];
-
+            
         }
         else {
 #ifndef NO_NETWORKING
@@ -185,7 +185,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 #endif
         }
     }
-
+    
     
     
     if ( self.existing && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
@@ -210,7 +210,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     }
 }
 
-- (void)getWifiSyncCell:(CustomStorageProviderTableViewCell *)cell 
+- (void)getWifiSyncCell:(CustomStorageProviderTableViewCell *)cell
               indexPath:(NSIndexPath * _Nonnull)indexPath {
     if ( self.wiFiSyncDevices.count == 0 ) {
         if ( AppPreferences.sharedInstance.wiFiSyncHasRequestedNetworkPermissions ) {
@@ -234,12 +234,12 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
                 
                 cell.text.font = FontManager.sharedInstance.regularFont;
                 cell.text.textColor = UIColor.systemOrangeColor;
-
+                
                 UIImage* image = [UIImage systemImageNamed:@"externaldrive.fill.badge.wifi"];
                 
                 UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[UIColor.systemRedColor, UIColor.systemOrangeColor]];
                 image = [image imageByApplyingSymbolConfiguration:config];
-            
+                
                 cell.image.image = image;
             }
         }
@@ -252,7 +252,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
                 
                 UIImageSymbolConfiguration* config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[UIColor.systemOrangeColor, UIColor.secondaryLabelColor]];
                 image = [image imageByApplyingSymbolConfiguration:config];
-            
+                
                 cell.image.tintColor = nil;
                 cell.image.image = image;
             }
@@ -281,10 +281,10 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CustomStorageProviderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"storageProviderReuseIdentifier" forIndexPath:indexPath];
-
+    
     NSString* sectionName = self.providersForSectionMap.keys[indexPath.section];
     NSArray<NSNumber*>* providers = self.providersForSectionMap[sectionName];
-            
+    
     cell.text.textColor = UIColor.labelColor;
     cell.userInteractionEnabled = YES;
     cell.image.tintColor = nil;
@@ -407,17 +407,34 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         else if ( providerId.intValue == kSFTP ) {
             [self getSFTPConnection];
         }
+        else if ( providerId.intValue == kTwoDrive ) {
+            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
+            [self beginOneDriveNavigation:provider];
+        }
 #endif
         else if ( providerId.intValue == kLocalDevice ) {
-            [Alerts yesNo:self
-                    title:NSLocalizedString(@"sspc_local_device_storage_warning_title", @"Local Device Database Caveat")
-                  message:NSLocalizedString(@"sspc_local_device_storage_warning_message", @"Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database?")
-                   action:^(BOOL response) {
-                if (response) {
-                    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
-                    [self segueToBrowserOrAdd:provider];
-                }
-            }];
+            if ( AppPreferences.sharedInstance.warnAboutLocalDeviceDatabases ) {
+                [Alerts threeOptions:self
+                               title:NSLocalizedString(@"sspc_local_device_storage_warning_title", @"Local Device Database Caveat")
+                             message:NSLocalizedString(@"sspc_local_device_storage_warning_message", @"Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database?")
+                   defaultButtonText:NSLocalizedString(@"alerts_yes", @"Yes")
+                    secondButtonText:NSLocalizedString(@"generic_yes_dont_ask_again", @"Yes, don't ask again")
+                     thirdButtonText:NSLocalizedString(@"alerts_no", @"No")
+                              action:^(int response) {
+                    if ( response == 0 || response == 1 ) {
+                        if ( response == 1 ) {
+                            AppPreferences.sharedInstance.warnAboutLocalDeviceDatabases = NO;
+                        }
+                        
+                        id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
+                        [self segueToBrowserOrAdd:provider];
+                    }
+                }];
+            }
+            else {
+                id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
+                [self segueToBrowserOrAdd:provider];
+            }
         }
         else {
             id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
@@ -429,7 +446,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 }
 
 - (void)presentFilesAppWarning {
-    [Alerts yesNo:self 
+    [Alerts yesNo:self
             title:NSLocalizedString(@"deprecated_storage_method", @"Storage Method Not Recommended")
           message:NSLocalizedString(@"cannot_recommend_storage_msg", @"We cannot recommend storing your database using this method. Strongbox does not have end to end control over the sync process, and so we cannot guarantee data integrity.\n\nDo you want to continue anyway?")
            action:^(BOOL response) {
@@ -460,7 +477,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     NSString* sectionName = self.providersForSectionMap.keys[section];
-
+    
     if ( self.providersForSectionMap[sectionName].count == 0 ) {
         return nil;
     }
@@ -505,7 +522,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         if ( self.existing ) {
             return nil;
         }
-
+        
         if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
             return NSLocalizedString(@"blurb_about_native_local_only", @"Store your database locally only.");
         }
@@ -537,15 +554,15 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
                             title:NSLocalizedString(@"sspc_manual_import_enter_url_title", @"Enter URL")
                           message:NSLocalizedString(@"sspc_manual_import_enter_url_message", @"Please Enter the URL of the Database File.")
                        completion:^(NSString *text, BOOL response) {
-                           if (response) {
-                               NSURL *url = text.urlExtendedParse;
-                               NSLog(@"URL: %@", url);
-                               
-                               if (url) {
-                                   [self importFromManualUiUrl:url];
-                               }
-                           }
-                       }];
+        if (response) {
+            NSURL *url = text.urlExtendedParse;
+            NSLog(@"URL: %@", url);
+            
+            if (url) {
+                [self importFromManualUiUrl:url];
+            }
+        }
+    }];
 }
 
 - (void)onCreateThroughFilesApp {
@@ -594,16 +611,16 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 - (void)getWiFiSyncConnectionPassCodeAndBrowse:(WiFiSyncServerConfig*)config {
     __weak SelectStorageProviderController* weakSelf = self;
     
-    UIViewController* vc = [SwiftUIViewFactory makeWiFiSyncPasscodeViewController:config 
-                                                                          onDone:^(WiFiSyncServerConfig * _Nonnull config, NSString * _Nullable passcode) {
+    UIViewController* vc = [SwiftUIViewFactory makeWiFiSyncPasscodeViewController:config
+                                                                           onDone:^(WiFiSyncServerConfig * _Nonnull config, NSString * _Nullable passcode) {
         WiFiSyncStorageProvider *sp = [[WiFiSyncStorageProvider alloc] init];
-            
+        
         config.passcode = passcode;
         sp.explicitConnectionConfig = config;
-            
+        
         [weakSelf segueToBrowserOrAdd:sp];
     }];
-
+    
     [self presentViewController:vc animated:YES completion:nil];
 }
 
@@ -614,7 +631,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
-
+    
     self.onDone([SelectedStorageParameters parametersForFilesApp:url withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
 }
 
@@ -641,21 +658,27 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 }
 
 - (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
+    [self maybeWarnThirdParty:provider completion:^{
+        [self continueSegueToBrowserOrAdd:provider];
+    }];
+}
+
+- (void)maybeWarnThirdParty:(id<SafeStorageProvider>)provider completion:( void (^) (void))completion {
     if ( provider.privacyOptInRequired ) {
         [Alerts checkThirdPartyLibOptInOK:self completion:^(BOOL optInOK) {
             if (optInOK) {
-                [self continueSegueToBrowserOrAdd:provider];
+                completion();
             }
         }];
     }
     else {
-        [self continueSegueToBrowserOrAdd:provider];
+        completion();
     }
 }
 
 - (void)continueSegueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
     BOOL storageBrowseRequired = (self.existing && provider.browsableExisting) || (!self.existing && provider.browsableNew);
-
+    
     if (storageBrowseRequired) {
         [self performSegueWithIdentifier:@"SegueToBrowser" sender:provider];
     }
@@ -688,5 +711,54 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 - (IBAction)onCancel:(id)sender {
     self.onDone([SelectedStorageParameters userCancelled]);
 }
+
+#ifndef NO_NETWORKING
+- (void)beginOneDriveNavigation:(id<SafeStorageProvider>)provider {
+    [self maybeWarnThirdParty:provider completion:^{
+        [self continueOneDriveNavigation:provider];
+    }];
+}
+
+- (void)continueOneDriveNavigation:(id<SafeStorageProvider>)provider  {
+    UIViewController* vc = [SwiftUIViewFactory getOneDriveRootNavigatorViewWithExisting:self.existing
+                                                                             completion:^(BOOL userCancelled, OneDriveNavigationContextMode mode) {
+        [self dismissViewControllerAnimated:self.presentedViewController completion:nil];
+        
+        if ( !userCancelled ) {
+            [self navigateToOneDriveMode:provider mode:mode];
+        }
+    }];
+
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)navigateToOneDriveMode:(id<SafeStorageProvider>)provider mode:(OneDriveNavigationContextMode)mode {    
+    StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
+    UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+        
+    OneDriveNavigationContext * context = [[OneDriveNavigationContext alloc] initWithMode:mode msalResult:nil driveItem:nil];
+    
+    vc.existing = self.existing;
+    vc.safeStorageProvider = provider;
+    vc.canNotCreateInThisFolder = YES;
+    vc.parentFolder = context;
+    
+    __weak SelectStorageProviderController* weakSelf = self;
+    
+    vc.onDone = ^(SelectedStorageParameters *params) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [nav.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                weakSelf.onDone(params);
+            }];
+        });
+    };
+    
+    nav.modalPresentationStyle = UIModalPresentationFormSheet;
+    
+    [self presentViewController:nav animated:YES completion:nil];
+}
+#endif
 
 @end

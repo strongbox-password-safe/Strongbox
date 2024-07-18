@@ -83,7 +83,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 
 - (void)addTag:(NSString*)tag;
 - (void)removeTag:(NSString*)tag;
-- (void)resetTags:(NSSet<NSString*>*)tags;
+- (BOOL)resetTags:(NSSet<NSString*>*)tags; 
 @property (readonly) NSArray<NSString*> *tags;
 
 

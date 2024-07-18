@@ -11,9 +11,7 @@ import Cocoa
 class AdvancedDatabasePreferences: NSViewController {
     @IBOutlet var checkboxConcealEmptyProtected: NSButton!
     @IBOutlet var checkboxTitleIsEditable: NSButton!
-    @IBOutlet var checkboxShowRecycleBinInBrowse: NSButton!
     @IBOutlet var checkboxShowRecycleBinInSearch: NSButton!
-    @IBOutlet var checkboxKeePassSortItems: NSButton!
     @IBOutlet var checkboxShowAutoCompleteSuggestions: NSButton!
     @IBOutlet var checkboxSortCustomFields: NSButton!
     @IBOutlet var checkboxAlwaysAutoMerge: NSButton!
@@ -25,8 +23,6 @@ class AdvancedDatabasePreferences: NSViewController {
         super.viewDidLoad()
 
         if model.format == .passwordSafe {
-            checkboxShowRecycleBinInBrowse.isHidden = true
-            checkboxKeePassSortItems.isHidden = true
             checkboxShowRecycleBinInSearch.isHidden = true
             checkboxSortCustomFields.isHidden = true
         }
@@ -35,8 +31,6 @@ class AdvancedDatabasePreferences: NSViewController {
     }
 
     func bindUI() {
-        checkboxKeePassSortItems.state = model.sortKeePassNodes ? .on : .off
-        checkboxShowRecycleBinInBrowse.state = !model.showRecycleBinInBrowse ? .off : .on
         checkboxShowRecycleBinInSearch.state = model.showRecycleBinInSearchResults ? .on : .off
         checkboxShowAutoCompleteSuggestions.state = !model.showAutoCompleteSuggestions ? .off : .on
         checkboxTitleIsEditable.state = !model.outlineViewTitleIsReadonly ? .on : .off
@@ -51,8 +45,6 @@ class AdvancedDatabasePreferences: NSViewController {
 
     @IBAction func onChanged(_: Any) {
         model.concealEmptyProtectedFields = checkboxConcealEmptyProtected.state == .on
-        model.sortKeePassNodes = checkboxKeePassSortItems.state == .on
-        model.showRecycleBinInBrowse = checkboxShowRecycleBinInBrowse.state == .on
         model.showRecycleBinInSearchResults = checkboxShowRecycleBinInSearch.state == .on
         model.showAutoCompleteSuggestions = checkboxShowAutoCompleteSuggestions.state == .on
         model.outlineViewTitleIsReadonly = checkboxTitleIsEditable.state == .off

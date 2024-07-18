@@ -9,6 +9,7 @@
 import AppKit
 import Cocoa
 import CoreMedia
+import LocalAuthenticationEmbeddedUI
 import QuickLookUI
 import UniformTypeIdentifiers
 
@@ -91,6 +92,63 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     @IBOutlet var buttonNewEntryDefaults: NSButton!
     @IBOutlet var buttonHistory: NSPopUpButton!
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId), !node.isGroup else {
+            NSLog("🔴 Could not load initial node or node is a group!")
+            return
+        }
+
+        guard let dbModel = database.commonModel else {
+            NSLog("🔴 Could not load common model!")
+            return
+        }
+
+        model = EntryViewModel.fromNode(node, model: dbModel)
+        preEditModelClone = model.clone()
+
+        setupUI()
+
+        bindUiToModel()
+
+        bindActionButtonStatesAndTitles()
+    }
 
     
 
@@ -339,29 +397,6 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         window.initialFirstResponder = textFieldTitle
 
         bindScreenCaptureBlock()
-    }
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId), !node.isGroup else {
-            NSLog("🔴 Could not load initial node or node is a group!")
-            return
-        }
-
-        guard let dbModel = database.commonModel else {
-            NSLog("🔴 Could not load common model!")
-            return
-        }
-
-        model = EntryViewModel.fromNode(node, model: dbModel)
-        preEditModelClone = model.clone()
-
-        setupUI()
-
-        bindUiToModel()
-
-        bindActionButtonStatesAndTitles()
     }
 
     func bindScreenCaptureBlock() {

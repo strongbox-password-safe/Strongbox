@@ -1256,7 +1256,9 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
     
     BOOL conveniencePossible = safe.isConvenienceUnlockEnabled && safe.conveniencePasswordHasBeenStored && AppPreferences.sharedInstance.isPro;
-    if (conveniencePossible) [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
+    if (conveniencePossible) {
+        [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
+    }
 
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
 
@@ -1269,14 +1271,19 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }
     else if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         BOOL localCopyAvailable = safe.storageProvider != kLocalDevice && localCopyUrl != nil && !safe.forceOpenOffline;
-        if (localCopyAvailable) [ma addObject:[self getContextualMenuOpenOfflineAction:indexPath]];
+     
+        if (localCopyAvailable) {
+            [ma addObject:[self getContextualMenuOpenOfflineAction:indexPath]];
+        }
     }
     
     
     
     BOOL exportAllowed = !AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil && !AppPreferences.sharedInstance.disableExport;
-    if (exportAllowed) [ma addObject:[self getContextualExportAction:indexPath]];
-
+    if (exportAllowed) {
+        [ma addObject:[self getContextualExportAction:indexPath]];
+    }
+    
     if (self.collection.count > 1) {
         [ma addObject:[self getContextualReOrderDatabasesAction:indexPath]];
     }
@@ -1305,7 +1312,14 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     DatabasePreferences *safe = [self.collection objectAtIndex:indexPath.row];
 
     BOOL makeVisible = safe.storageProvider == kLocalDevice;
-    if (makeVisible) [ma addObject:[self getContextualMenuMakeVisibleAction:indexPath]];
+    
+    if (makeVisible) {
+        BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
+
+        if ( !AppPreferences.sharedInstance.disableMakeVisibleInFiles || !shared ) {
+            [ma addObject:[self getContextualMenuMakeVisibleAction:indexPath]];
+        }
+    }
 
     [ma addObject:[self getContextualMenuQuickLaunchAction:indexPath]];
     
@@ -1335,7 +1349,9 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     
     [ma addObject:[self getContextualMenuRenameAction:indexPath]];
     
-    [ma addObject:[self getContextualMenuCopyToStorageAction:indexPath]];
+    if ( !AppPreferences.sharedInstance.disableCopyTo ) {
+        [ma addObject:[self getContextualMenuCopyToStorageAction:indexPath]];
+    }
 
     if (self.collection.count > 1) {
         [ma addObject:[self getContextualMenuMergeAction:indexPath]];

@@ -17,6 +17,8 @@ typedef void (^SelectSFTPConnectionCompletionBlock)(SFTPSessionConfiguration* co
 
 + (instancetype)instantiateFromStoryboard;
 
+@property BOOL manageMode;
+
 @property (copy) SelectSFTPConnectionCompletionBlock onSelected;
 
 @end

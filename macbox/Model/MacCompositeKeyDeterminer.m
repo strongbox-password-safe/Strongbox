@@ -284,11 +284,7 @@
             }
             
             if(success) {
-                [self getCkfsWithPassword:self.database.conveniencePassword
-                          keyFileBookmark:keyFileBookmark
-                     yubiKeyConfiguration:yubiKeyConfiguration
-                          fromConvenience:YES
-                               completion:completion];
+                [self getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark yubiKeyConfiguration:yubiKeyConfiguration completion:completion];
             }
             else {
                 if( allowFallback && error && error.code == LAErrorUserFallback ) {
@@ -307,6 +303,16 @@
             }
         });
     }];
+}
+
+- (void)getCkfsAfterSuccessfulBiometricAuth:(NSString *)keyFileBookmark
+                       yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
+                                 completion:(CompositeKeyDeterminedBlock)completion {
+    [self getCkfsWithPassword:self.database.conveniencePassword
+              keyFileBookmark:keyFileBookmark
+         yubiKeyConfiguration:yubiKeyConfiguration
+              fromConvenience:YES
+                   completion:completion];
 }
 
 - (void)getCkfsWithExplicitPassword:(NSString *)password

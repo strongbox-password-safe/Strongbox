@@ -208,6 +208,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hasGotUserNotificationsPermissions; 
 @property (nullable) NSDate* lastAskToEnableNotifications;
 @property BOOL showDatabaseNamesInBrowse;
+@property BOOL warnAboutLocalDeviceDatabases;
+
+@property BOOL disableCopyTo;
+@property BOOL disableMakeVisibleInFiles;
 
 @end
 

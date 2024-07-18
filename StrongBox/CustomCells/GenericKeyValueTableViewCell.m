@@ -44,6 +44,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonHistory;
+@property (weak, nonatomic) IBOutlet UIButton *buttonLargeTextView;
 
 @property (weak, nonatomic) IBOutlet UIStackView *stackAssociatedWebsites;
 @property (weak, nonatomic) IBOutlet UILabel *labelAssociatedWebsites;
@@ -197,7 +198,8 @@ rightButtonImage:rightButtonImage
    colorizeValue:NO
            audit:nil
     showStrength:NO
-associatedWebsites:associatedWebsites];
+associatedWebsites:associatedWebsites
+showLargeTextView:NO];
 }
 
 - (void)setConcealableKey:(NSString *)key
@@ -205,7 +207,17 @@ associatedWebsites:associatedWebsites];
                  concealed:(BOOL)concealed
                   colorize:(BOOL)colorize
                      audit:(NSString *)audit
-              showStrength:(BOOL)showStrength {
+             showStrength:(BOOL)showStrength {
+    [self setConcealableKey:key value:value concealed:concealed colorize:colorize audit:audit showStrength:showStrength showLargeTextView:NO];
+}
+
+- (void)setConcealableKey:(NSString *)key 
+                    value:(NSString *)value
+                concealed:(BOOL)concealed
+                 colorize:(BOOL)colorize
+                    audit:(NSString *)audit
+             showStrength:(BOOL)showStrength
+        showLargeTextView:(BOOL)showLargeTextView {
     
         
     UIImage *image = [UIImage systemImageNamed:concealed ? @"eye" : @"eye.slash"];
@@ -222,7 +234,8 @@ rightButtonImage:image
    colorizeValue:colorize
            audit:audit
     showStrength:showStrength 
-associatedWebsites:@[]];
+associatedWebsites:@[] 
+showLargeTextView:showLargeTextView];
 }
 
 
@@ -249,7 +262,8 @@ rightButtonImage:rightButtonImage
    colorizeValue:colorizeValue
            audit:nil
     showStrength:NO
-associatedWebsites:@[]];
+associatedWebsites:@[]
+showLargeTextView:NO];
 }
 
 - (void)setKey:(NSString*)key
@@ -264,7 +278,8 @@ rightButtonImage:(UIImage*)rightButtonImage
  colorizeValue:(BOOL)colorizeValue
          audit:(NSString*_Nullable)audit
   showStrength:(BOOL)showStrength
-associatedWebsites:(NSArray<NSString*>*)associatedWebsites {
+associatedWebsites:(NSArray<NSString*>*)associatedWebsites 
+showLargeTextView:(BOOL)showLargeTextView {
     [self bindKey:key];
         
     self.selectAllOnEdit = selectAllOnEdit;
@@ -288,6 +303,8 @@ associatedWebsites:(NSArray<NSString*>*)associatedWebsites {
     [self bindAudit:audit];
     [self bindRightButton];
     [self bindStrength:showStrength];
+    
+    self.buttonLargeTextView.hidden = !showLargeTextView;
     
     [self bindAssociatedWebsites:associatedWebsites];
 }
@@ -490,6 +507,12 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 - (void)setHistoryMenu:(UIMenu *)historyMenu {
     self.buttonHistory.menu = historyMenu;
     self.buttonHistory.hidden = historyMenu == nil;
+}
+
+- (IBAction)onShowLargeTextView:(id)sender {
+    if ( self.onShowLargeTextView ) {
+        self.onShowLargeTextView();
+    }
 }
 
 @end

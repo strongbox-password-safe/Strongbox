@@ -39,6 +39,7 @@
 #import "SSHAgentServer.h"
 #import "DatabasesManager.h"
 #import "KeyFileManagement.h"
+#import "WebDAVConnectionsManager.h"
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     #import "GoogleDriveStorageProvider.h"
@@ -358,7 +359,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     double minutes = timeDifference / 60;
 
     if( ( Settings.sharedInstance.launchCount > 30 && minutes > 2 ) || minutes > 20 ) { 
-        [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
+        if ( StrongboxProductBundle.isBusinessBundle ) {
+            [BusinessActivation regularEntitlementCheckWithCompletionHandler:^(NSError * _Nullable error) { }];
+        }
+        else {
+            [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
+        }
     }
 }
 
@@ -941,6 +947,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         NSInteger idx = [fileMenu indexOfItemWithTag:24121980];
         [fileMenu removeItemAtIndex:idx];
+    }
+    
+    if ( !StrongboxProductBundle.supportsSftpWebDAV ) {
+        [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(onWebDAVConnectionsManager:)];
+        [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(onSftpConnectionsManager:)];
     }
     
 #ifndef DEBUG
@@ -1633,5 +1644,26 @@ static NSInteger clipboardChangeCount;
     [PasswordGenerator.sharedInstance show];
 }
 
+- (IBAction)onSftpConnectionsManager:(id)sender {
+#ifndef NO_NETWORKING
+    [DBManagerPanel.sharedInstance show];
+    
+    SFTPConnectionsManager* vc = [SFTPConnectionsManager instantiateFromStoryboard];
+    vc.manageMode = YES;
+        
+    [DBManagerPanel.sharedInstance.contentViewController presentViewControllerAsSheet:vc];
+#endif
+}
+
+- (IBAction)onWebDAVConnectionsManager:(id)sender {
+#ifndef NO_NETWORKING
+    [DBManagerPanel.sharedInstance show];
+    
+    WebDAVConnectionsManager* vc = [WebDAVConnectionsManager instantiateFromStoryboard];
+    vc.manageMode = YES;
+
+    [DBManagerPanel.sharedInstance.contentViewController presentViewControllerAsSheet:vc];
+#endif
+}
 
 @end

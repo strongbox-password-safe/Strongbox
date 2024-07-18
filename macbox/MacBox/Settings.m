@@ -138,6 +138,8 @@ static NSString* const kLargeTextViewFloatOnTop = @"largeTextViewFloatOnTop";
 static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError";
 static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI-2";
 static NSString* const kAppAppearance = @"appAppearance2";
+static NSString* const kDisableCopyTo = @"disableCopyTo";
+static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 
 
 
@@ -282,6 +284,22 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 #endif
 
 
+
+- (BOOL)disableCopyTo {
+    return [self getBool:kDisableCopyTo fallback:self.disableExport];
+}
+
+- (void)setDisableCopyTo:(BOOL)disableCopyTo {
+    [self setBool:kDisableCopyTo value:disableCopyTo];
+}
+
+- (BOOL)disableMakeVisibleInFiles {
+    return [self getBool:kDisableMakeVisibleInFiles fallback:self.disableExport];
+}
+
+- (void)setDisableMakeVisibleInFiles:(BOOL)disableMakeVisibleInFiles {
+    [self setBool:kDisableMakeVisibleInFiles value:disableMakeVisibleInFiles];
+}
 
 - (AppAppearance)appAppearance {
     return [self getInteger:kAppAppearance];

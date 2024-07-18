@@ -14,6 +14,7 @@
 #import "MacAlerts.h"
 #import "SFTPConfigurationVC.h"
 #import "ConnectionCellView.h"
+#import "CustomBackgroundTableView.h"
 
 static NSString* const kConnectionCellView = @"ConnectionCellView";
 
@@ -56,6 +57,12 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
 
     [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kConnectionCellView bundle:nil]
                   forIdentifier:kConnectionCellView];
+        
+
+
+    if ( self.manageMode ) {
+        [self.buttonSelect setTitle:NSLocalizedString(@"generic_done", @"Done")];
+    }
     
     [self refresh];
     
@@ -94,19 +101,26 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
 }
 
 - (IBAction)onSelect:(id)sender {
-    NSInteger row = self.tableView.selectedRow;
-    if(row == -1) {
-        return;
+    if ( self.manageMode ) {
+        [self onDismiss:nil];
     }
-
-    [self selectConnection:self.tableView.selectedRow];
+    else {
+        NSInteger row = self.tableView.selectedRow;
+        if(row == -1) {
+            return;
+        }
+        
+        [self selectConnection:self.tableView.selectedRow];
+    }
 }
 
 - (void)selectConnection:(NSUInteger)row {
-    [self onDismiss:nil];
-
-    SFTPSessionConfiguration* connection = self.collection[row];
-    self.onSelected(connection);
+    if ( !self.manageMode ){
+        [self onDismiss:nil];
+        
+        SFTPSessionConfiguration* connection = self.collection[row];
+        self.onSelected(connection);
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
@@ -169,7 +183,7 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
     self.buttonRemove.enabled = connection != nil && using.count == 0;
     self.buttonEdit.enabled = connection != nil;
     self.buttonDuplicate.enabled = connection != nil;
-    self.buttonSelect.enabled = connection != nil;
+    self.buttonSelect.enabled = self.manageMode || connection != nil;
 }
 
 - (IBAction)onDuplicate:(id)sender {

@@ -336,7 +336,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.definesPresentationContext = YES;
     
     [self setupTableview];
-    [self setupTips];
+    [self updateNavigationPrompt];
     [self setupNavBar];
     [self setupSearchBar];
     
@@ -464,6 +464,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.navigationController.toolbar.hidden = !(exportEnabled || moveAndDeleteEnabled); 
     self.navigationController.toolbarHidden = !(exportEnabled || moveAndDeleteEnabled); 
 
+    [self updateNavigationPrompt];
+    
     self.buttonMove.enabled = moveAndDeleteEnabled;
     self.buttonDelete.enabled = moveAndDeleteEnabled;
     self.exportItemsBarButton.enabled = exportEnabled;
@@ -478,6 +480,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     UIBarButtonItem* flexibleSpace4 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     
     NSArray *toolbarButtons = @[flexibleSpace1, self.buttonMove, flexibleSpace2, self.exportItemsBarButton, flexibleSpace3, self.buttonDelete, flexibleSpace4];
+    
+    [self.exportItemsBarButton setTitle:NSLocalizedString(@"generic_export_ellipsis", @"Export")];
+    [self.buttonMove setTitle:NSLocalizedString(@"generic_move_ellipsis", @"Move...")];
+    [self.buttonDelete setTintColor:UIColor.systemRedColor];
     
     [self setToolbarItems:toolbarButtons animated:NO];
 }
@@ -1054,14 +1060,22 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.navigationItem.hidesSearchBarWhenScrolling = !self.isDisplayingRoot;
 }
 
-- (void)setupTips {
-    if ( AppPreferences.sharedInstance.showDatabaseNamesInBrowse ) {
-        NSString* fullTitle = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.nickName, [self getStatusSuffix]];
+- (void)updateNavigationPrompt {
+    if ( self.isEditing ) {
+        NSArray* selected = [self getSelectedItems];
         
-        self.navigationItem.prompt = fullTitle;
+        self.navigationItem.prompt = [NSString stringWithFormat:NSLocalizedString(@"detail_view_no_multiple_items_selected_message_fmt", @"%@ Items Selected"),
+                                                                                  @(selected.count)];
     }
     else {
-        self.navigationItem.prompt = nil;
+        if ( AppPreferences.sharedInstance.showDatabaseNamesInBrowse ) {
+            NSString* fullTitle = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.nickName, [self getStatusSuffix]];
+            
+            self.navigationItem.prompt = fullTitle;
+        }
+        else {
+            self.navigationItem.prompt = nil;
+        }
     }
 }
 
@@ -2419,6 +2433,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 
+
+- (NSArray<Node*> *)getSelectedItems {
+    NSArray<Node *> *items = [self getSelectedItems:self.tableView.indexPathsForSelectedRows];
+    
+    return items;
+}
+
 - (NSArray<Node*> *)getSelectedItems:(NSArray<NSIndexPath *> *)selectedRows {
     NSMutableArray<Node*>* ret = [NSMutableArray array];
 
@@ -2426,7 +2447,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         Node* node = [self getNodeFromIndexPath:selectionIndex];
         
         if(node) {
-            [ret addObject:node];
+            [ret addObject:node]; 
         }
     }
     

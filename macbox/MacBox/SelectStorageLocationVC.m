@@ -62,7 +62,7 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
         self.labelSubtitle.stringValue = NSLocalizedString(@"nav_to_storage_and_select", @"Please navigate to where you would like to store your database and click 'Select'.");
     }
     
-    self.buttonSelectRoot.hidden = !self.createMode;
+    self.buttonSelectRoot.hidden = !self.createMode || self.disallowCreateAtRoot;
 }
 
 - (void)bindUi {
@@ -74,8 +74,9 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
     
     __weak SelectStorageLocationVC* weakSelf = self;
     
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        [weakSelf.provider list:sbi.providerData
+        [weakSelf.provider list:sbi ? sbi.providerData : self.rootBrowserItem.providerData
                  viewController:weakSelf
                      completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> * _Nonnull items, const NSError * _Nonnull error) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -127,6 +128,8 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
     
     return key;
 }
+
+
 
 - (NSArray<StorageBrowserItem*>*)getChildItems:(StorageBrowserItem*)sbi {
     NSString* key = [self getCacheKey:sbi];

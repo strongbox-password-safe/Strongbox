@@ -144,8 +144,8 @@ struct StorageSelectorView: View {
                     .minimumScaleFactor(0.8)
 
                 let subtitle: LocalizedStringKey = createMode ?
-                    (isImporting ? "Where you would like to store your newly imported database?" : "Where would you like to store your new database?") :
-                    "Where is your existing database is located?"
+                    (isImporting ? "storage_selector_where_store_new_import" : "storage_selector_where_store_new") :
+                    "storage_selector_where_existing_located"
 
                 Text(subtitle)
                     .font(.body)

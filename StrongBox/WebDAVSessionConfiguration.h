@@ -27,6 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clearKeychainItems;
 
+- (BOOL)isTheSameConnection:(WebDAVSessionConfiguration*)other;
+- (BOOL)isNetworkingFieldsAreSame:(WebDAVSessionConfiguration *)other;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -67,22 +67,28 @@ class MacOnboardingManager: NSObject {
                 window = OnboardingWindow.createOnboardingWindow(vc: vc, onboardingDoneCompletion: onboardingDoneCompletion)
             }
 
+            guard let window else {
+                return
+            }
+
             module.window = window
 
             if module.isAppModal {
-                window?.titleVisibility = .hidden
-                window?.titlebarAppearsTransparent = true
+                window.titleVisibility = .hidden
+                window.titlebarAppearsTransparent = true
 
-                window?.styleMask.insert(.fullSizeContentView)
-                window?.styleMask.remove(.closable)
-                window?.allowEscapeToClose = false
+                window.styleMask.insert(.fullSizeContentView)
+                window.styleMask.remove(.closable)
+                window.allowEscapeToClose = false
+
+
             } else {
-                window?.titleVisibility = .visible
-                window?.titlebarAppearsTransparent = false
+                window.titleVisibility = .visible
+                window.titlebarAppearsTransparent = false
 
-                window?.styleMask.remove(.fullSizeContentView)
-                window?.styleMask.insert(.closable)
-                window?.allowEscapeToClose = true
+                window.styleMask.remove(.fullSizeContentView)
+                window.styleMask.insert(.closable)
+                window.allowEscapeToClose = true
             }
 
             

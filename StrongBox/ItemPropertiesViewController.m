@@ -424,16 +424,12 @@ const static NSUInteger kSectionUuidIdx = 6;
 - (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
     TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
 
-
-    
     NSArray<NSString*>* tags = [self.item.fields.tags.allObjects sortedArrayUsingComparator:finderStringComparator];
 
     [cell setModel:YES
               tags:tags
-   useEasyReadFont:self.model.metadata.easyReadFontForAll
-             onAdd:nil
-          onRemove:nil];
-
+   useEasyReadFont:self.model.metadata.easyReadFontForAll];
+    
     return cell;
 }
 

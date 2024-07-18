@@ -248,7 +248,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
         let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
 
-        NSLog("🐞 requestAuthorizationWithOptions completion with granted = [%hhd], error = [%@]", granted)
+        NSLog("🐞 requestAuthorizationWithOptions completion with granted = [%hhd]", granted)
 
         registerForRemoteNotifications()
 

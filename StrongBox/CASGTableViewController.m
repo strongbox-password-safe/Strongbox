@@ -179,12 +179,8 @@
     [super viewDidAppear:animated];
     
     if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
-        if([self nameIsValid]) {
-            [self.textFieldPassword becomeFirstResponder];
-        }
-        else {
-            [self.textFieldName becomeFirstResponder];
-        }
+        [self.textFieldName becomeFirstResponder];
+        [self.textFieldName selectAll:nil];
     }
     else if (self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
         [self.textFieldName becomeFirstResponder];

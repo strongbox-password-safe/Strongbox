@@ -17,7 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)newViewController;
 
 @property id<SafeStorageProvider> provider;
+@property (nullable) StorageBrowserItem* rootBrowserItem;
 @property BOOL createMode;
+@property BOOL disallowCreateAtRoot;
 
 @property (nonatomic, copy) void (^onDone)(BOOL success, StorageBrowserItem*_Nullable selectedItem);
 

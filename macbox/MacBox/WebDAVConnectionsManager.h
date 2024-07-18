@@ -18,6 +18,7 @@ typedef void (^SelectWebDAVConnectionCompletionBlock)(WebDAVSessionConfiguration
 + (instancetype)instantiateFromStoryboard;
 
 @property (copy) SelectWebDAVConnectionCompletionBlock onSelected;
+@property BOOL manageMode;
 
 @end
 

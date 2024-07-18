@@ -14,9 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setModel:(BOOL)readOnly
             tags:(NSArray<NSString*>*)tags
- useEasyReadFont:(BOOL)useEasyReadFont
-           onAdd:(void(^_Nullable)(NSString* tag))onAdd
-        onRemove:(void(^_Nullable)(NSString* tag))onRemove;
+ useEasyReadFont:(BOOL)useEasyReadFont;
 
 @end
 

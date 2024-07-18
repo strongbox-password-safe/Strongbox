@@ -54,8 +54,9 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
     self.tableView.headerView = nil;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    
     self.tableView.doubleAction = @selector(onDoubleClick:);
-
+    
     [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kConnectionCellView bundle:nil]
                   forIdentifier:kConnectionCellView];
     
@@ -63,6 +64,10 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
     
     if ( self.collection.count ) {
         [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+    }
+    
+    if ( self.manageMode ) {
+        [self.buttonSelect setTitle:NSLocalizedString(@"generic_done", @"Done")];
     }
 }
 
@@ -96,19 +101,25 @@ static NSString* const kConnectionCellView = @"ConnectionCellView";
 }
 
 - (IBAction)onSelect:(id)sender {
-    NSInteger row = self.tableView.selectedRow;
-    if(row == -1) {
-        return;
+    if ( self.manageMode ) {
+        [self onDismiss:nil];
     }
-
-    [self selectConnection:self.tableView.selectedRow];
+    else {
+        NSInteger row = self.tableView.selectedRow;
+        if(row == -1) {
+            return;
+        }
+        
+        [self selectConnection:self.tableView.selectedRow];
+    }
 }
 
 - (void)selectConnection:(NSUInteger)row {
-    [self onDismiss:nil];
-
-    WebDAVSessionConfiguration* connection = self.collection[row];
-    self.onSelected(connection);
+    if ( !self.manageMode ) {
+        [self onDismiss:nil];
+        WebDAVSessionConfiguration* connection = self.collection[row];
+        self.onSelected(connection);
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {

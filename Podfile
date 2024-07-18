@@ -9,32 +9,24 @@ abstract_target 'common-mac' do
   pod 'SwiftCBOR'
   
   target 'Mac-Freemium' do
-    pod 'MSAL'
-    pod 'MSGraphClientSDK'
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
   end
   
   target 'Mac-Pro' do
-    pod 'MSAL'
-    pod 'MSGraphClientSDK'
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
   end
   
   target 'Mac-Unified-Freemium' do
-    pod 'MSAL'
-    pod 'MSGraphClientSDK'
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
   end
   
   target 'Mac-Unified-Pro' do
-    pod 'MSAL'
-    pod 'MSGraphClientSDK'
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
@@ -45,8 +37,6 @@ abstract_target 'common-mac' do
   end
   
   target 'Mac-Business' do
-    pod 'MSAL'
-    pod 'MSGraphClientSDK'
     pod 'GoogleAPIClientForREST/Drive'
     pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
@@ -82,8 +72,6 @@ abstract_target 'common-ios' do
         pod 'ObjectiveDropboxOfficial'
         pod 'GoogleAPIClientForREST/Drive'
         pod 'GoogleSignIn'
-        pod 'MSAL'
-        pod 'MSGraphClientSDK'
     end
 
     target 'Strongbox-iOS-Pro' do
@@ -91,8 +79,6 @@ abstract_target 'common-ios' do
         pod 'ObjectiveDropboxOfficial'
         pod 'GoogleAPIClientForREST/Drive'
         pod 'GoogleSignIn'
-        pod 'MSAL'
-        pod 'MSGraphClientSDK'
     end
 
     target 'Strongbox-iOS-Business' do
@@ -100,8 +86,6 @@ abstract_target 'common-ios' do
       pod 'ObjectiveDropboxOfficial'
       pod 'GoogleAPIClientForREST/Drive'
       pod 'GoogleSignIn'
-      pod 'MSAL'
-      pod 'MSGraphClientSDK'
     end
 
     target 'Strongbox-iOS-SCOTUS' do

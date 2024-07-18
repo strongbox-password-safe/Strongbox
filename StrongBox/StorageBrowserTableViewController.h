@@ -17,6 +17,7 @@
 
 @property (nonatomic) NSObject *parentFolder;
 @property (nonatomic) BOOL existing;
+@property (nonatomic) BOOL canNotCreateInThisFolder;
 @property (nonatomic) id<SafeStorageProvider> safeStorageProvider;
 @property (nonatomic, copy) SelectStorageCompletion onDone;
 

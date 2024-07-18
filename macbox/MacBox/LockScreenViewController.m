@@ -26,11 +26,15 @@
 #import "StrongboxMacFilesManager.h"
 #import "AboutViewController.h"
 
+#import "LocalAuthentication/LocalAuthentication.h"
+#import "LocalAuthenticationEmbeddedUI/LocalAuthenticationEmbeddedUI.h"
+
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
+
 
 @interface LockScreenViewController () < NSTextFieldDelegate >
 
@@ -72,6 +76,8 @@
 
 @property (weak) IBOutlet NSTextField *labelPricing;
 @property (weak) IBOutlet NSButton *buttonFreeTrialOrUpgrade;
+
+@property LAContext* laContext; 
 
 @end
 
@@ -149,6 +155,8 @@
     };
     
     [self bindProOrFreeTrial];
+    
+    [self embedTouchIDIfAvailable];
 }
 
 - (void)customizeLockStackViewSpacing {
@@ -182,8 +190,80 @@
 
 - (void)viewDidAppear {
     [super viewDidAppear];
-        
+    
     [self setInitialFocus];
+    
+    [self enableEmbeddedTouchIDOrWatchUnlock];
+}
+
+- (void)enableEmbeddedTouchIDOrWatchUnlock {
+    return;
+    
+    
+    
+    [self.laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch
+                   localizedReason:@"Blah!" 
+                             reply:^(BOOL success, NSError * _Nullable error) {
+        NSLog(@"🚀 %hhd - %@", success, error); 
+        
+        if ( success ) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self onTouchIDOrWatchUnlockEmbeddedSuccess];
+            });
+        }
+        else {
+            NSLog(@"🔴 %hhd - %@", success, error); 
+        }
+    }];
+}
+
+
+- (void)embedTouchIDIfAvailable {
+    return;
+    
+    
+    self.laContext = [[LAContext alloc] init];
+    
+    LAAuthenticationView* laView = [[LAAuthenticationView alloc] initWithContext:self.laContext controlSize:NSControlSizeSmall];
+    
+    laView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [self.stackViewUnlockButtons addArrangedSubview:laView];
+    
+}
+
+- (void)onTouchIDOrWatchUnlockEmbeddedSuccess {
+    
+
+    
+    NSString* uuid = self.databaseMetadata.uuid;
+    
+    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
+                                                             isNativeAutoFillAppExtensionOpen:NO
+                                                                      isAutoFillQuickTypeOpen:NO
+                                                                           onDemandUiProvider:^NSViewController * {
+        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
+    }];
+    
+    
+    
+    if ( !determiner.bioOrWatchUnlockIsPossible ) {
+        NSLog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
+        [self bindUI];
+        return;
+    }
+    
+    NSString* keyFileBookmark = self.selectedKeyFileBookmark;
+    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+    
+    [determiner getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark 
+                               yubiKeyConfiguration:yubiKeyConfiguration
+                                         completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        
+        
+        
+        [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
+    }];
 }
 
 - (void)setInitialFocus {

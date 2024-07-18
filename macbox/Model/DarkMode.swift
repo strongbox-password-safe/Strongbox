@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum DarkMode { // TODO: iOS also needs the appearance?
+enum DarkMode {
     static var isOn: Bool {
         if Settings.sharedInstance().appAppearance == kAppAppearanceDark {
             return true

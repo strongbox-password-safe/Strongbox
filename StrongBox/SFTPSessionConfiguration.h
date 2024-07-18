@@ -18,14 +18,13 @@ typedef NS_ENUM (NSUInteger, SFTPAuthenticationMode) {
 @interface SFTPSessionConfiguration : NSObject
 
 @property NSString* identifier;
-@property (nullable) NSString* name;
 
+@property (nullable) NSString* name;
 @property NSString* host;
 @property SFTPAuthenticationMode authenticationMode;
 @property (nullable) NSString* username;
 @property (nullable) NSString* password;
 @property (nullable) NSString* privateKey;
-@property (nullable) NSString* publicKey;
 @property (nullable) NSString* initialDirectory;
 @property (nullable) NSString* sha256FingerPrint;
 
@@ -37,6 +36,9 @@ typedef NS_ENUM (NSUInteger, SFTPAuthenticationMode) {
 -(NSString*)getKeyChainKey:(NSString*)propertyName;
 
 - (void)clearKeychainItems;
+
+- (BOOL)isTheSameConnection:(SFTPSessionConfiguration*)other;
+- (BOOL)isNetworkingFieldsAreSame:(SFTPSessionConfiguration*)other;
 
 @end
 

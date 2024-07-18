@@ -1740,7 +1740,8 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            let image = NodeIconHelper.getNodeIcon(field.icon, predefinedIconSet: database!.iconSet)
+            let image = NodeIconHelper.getNodeIcon(field.icon, predefinedIconSet: database!.iconSet, format: database!.format)
+
             let fav = field.object as? Bool ?? false
 
             cell.setContent(field.value, image, fav, !database.isEffectivelyReadOnly) {

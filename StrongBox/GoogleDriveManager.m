@@ -159,7 +159,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
                 completion:(Authenticationcompletion)completion
             backgroundSync:(BOOL)backgroundSync
                  withError:(NSError *)error {
-    if (error != nil) {
+    if ( error != nil ) {
         NSLog(@"🔴 Google Sign In Error: %@", error);
         self.driveService.authorizer = nil;
     }

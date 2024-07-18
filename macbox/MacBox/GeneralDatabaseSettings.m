@@ -16,12 +16,16 @@
 
 @property (weak) IBOutlet NSButton *checkboxMonitor;
 @property (weak) IBOutlet NSTextField *textboxMonitorInterval;
-@property (weak) IBOutlet NSStepper *stepperMonitorInterval;
 @property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
 @property (weak) IBOutlet NSButton *checkboxAutoDownloadFavIcon;
 @property (weak) IBOutlet NSButton *closeButton;
 @property (weak) IBOutlet NSPopUpButton *popupIconSet;
-@property (weak) IBOutlet NSView *iconSetView;
+@property (weak) IBOutlet NSButton *helpButton;
+
+
+@property (weak) IBOutlet NSButton *checkboxShowRecycleBin;
+@property (weak) IBOutlet NSButton *checkboxManualItemOrdering;
+@property (weak) IBOutlet NSStepper *stepperMonitorInterval;
 
 @end
 
@@ -36,8 +40,20 @@
     [self.popupIconSet.menu addItemWithTitle:getIconSetName(kKeePassIconSetSfSymbols) action:nil keyEquivalent:@""];
     [self.popupIconSet.menu addItemWithTitle:getIconSetName(kKeePassIconSetKeePassXC) action:nil keyEquivalent:@""];
 
-    self.iconSetView.hidden = NO;
-
+    if ( self.model.format == kPasswordSafe ) {
+        self.popupIconSet.enabled = NO;
+        self.helpButton.hidden = YES;
+        self.checkboxShowRecycleBin.hidden = YES;
+        self.checkboxAutoDownloadFavIcon.hidden = YES;
+        self.checkboxManualItemOrdering.hidden = YES;
+    }
+    else if ( self.model.format == kKeePass1 ) {
+        self.helpButton.hidden = YES;
+        self.checkboxShowRecycleBin.hidden = YES;
+        self.checkboxAutoDownloadFavIcon.hidden = YES;
+        self.checkboxManualItemOrdering.hidden = YES;
+    }
+        
     [self bindUI];
     
     [self.textboxMonitorInterval resignFirstResponder];
@@ -71,14 +87,18 @@
     }
     
     [self.popupIconSet selectItemAtIndex:self.model.iconSet];
+    
+    self.checkboxManualItemOrdering.state = !self.model.sortKeePassNodes ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkboxShowRecycleBin.state = !self.model.showRecycleBinInBrowse ? NSControlStateValueOff : NSControlStateValueOn;
 }
 
 - (IBAction)onSettingChanged:(id)sender {
     self.model.monitorForExternalChanges = self.checkboxMonitor.state == NSControlStateValueOn;
     self.model.monitorForExternalChangesInterval = self.stepperMonitorInterval.integerValue;
     self.model.autoReloadAfterExternalChanges = self.checkboxReloadForeignChanges.state == NSControlStateValueOn;
-    
     self.model.downloadFavIconOnChange = self.checkboxAutoDownloadFavIcon.state == NSControlStateValueOn;
+    self.model.sortKeePassNodes = self.checkboxManualItemOrdering.state == NSControlStateValueOff;
+    self.model.showRecycleBinInBrowse = self.checkboxShowRecycleBin.state == NSControlStateValueOn;
 
     [self bindUI];
     
@@ -88,8 +108,6 @@
 }
 
 - (IBAction)onTextBoxMonitorIntervalChanged:(id)sender {
-    NSLog(@"Text changed");
-
     self.stepperMonitorInterval.integerValue = self.textboxMonitorInterval.integerValue;
         
     [self onSettingChanged:nil];

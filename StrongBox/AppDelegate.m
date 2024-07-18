@@ -348,8 +348,13 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
     double minutes = timeDifference / 60;
 
     if( minutes > 30 ) {
-        [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
-    }    
+        if ( StrongboxProductBundle.isBusinessBundle ) {
+            [BusinessActivation regularEntitlementCheckWithCompletionHandler:^(NSError * _Nullable error) { }];
+        }
+        else {
+            [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
+        }
+    }
 }
 
 - (void)initializeDropbox {

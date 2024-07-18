@@ -24,6 +24,14 @@ NS_ASSUME_NONNULL_BEGIN
                 concealed:(BOOL)concealed
                  colorize:(BOOL)colorize
                     audit:(NSString*_Nullable)audit
+             showStrength:(BOOL)showStrength
+        showLargeTextView:(BOOL)showLargeTextView;
+
+- (void)setConcealableKey:(NSString*)key
+                    value:(NSString*)value
+                concealed:(BOOL)concealed
+                 colorize:(BOOL)colorize
+                    audit:(NSString*_Nullable)audit
              showStrength:(BOOL)showStrength;
 
 - (void)setForUrlOrCustomFieldUrl:(NSString*)key 
@@ -39,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) SuggestionProvider suggestionProvider;
 
 @property (nonatomic, copy, nullable) void (^onRightButton)(void);
+@property (nonatomic, copy, nullable) void (^onShowLargeTextView)(void);
 
 @property (nonatomic, copy, nullable) void (^onAuditTap)(void);
 

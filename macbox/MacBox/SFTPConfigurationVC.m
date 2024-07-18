@@ -27,7 +27,9 @@
 @property (weak) IBOutlet NSTextField *textFieldPrivateKey;
 
 @property NSString* privateKey;
+@property SFTPSessionConfiguration* draftConfiguration; 
 
+@property NSString* originalConnectTitle;
 @end
 
 @implementation SFTPConfigurationVC
@@ -50,6 +52,8 @@
 - (void)doInitialSetup {
     self.view.window.delegate = self;
     self.buttonPrivateKey.state = NSControlStateValueOff;
+    self.originalConnectTitle = self.buttonConnect.title;
+    [self.buttonConnect setTitle:NSLocalizedString(@"mac_save_action", @"Save")];
     
     if ( self.initialConfiguration ) {
         self.textFieldName.stringValue = self.initialConfiguration.name ? self.initialConfiguration.name : @"";
@@ -167,7 +171,28 @@
         ok = YES;
     }
     
-    self.buttonConnect.enabled = ok;
+    [self.buttonConnect setTitle:NSLocalizedString(@"mac_save_action", @"Save")];
+    
+    if ( self.initialConfiguration && ok ) {
+        [self updateDraftConfiguration];
+        
+        BOOL configHasEdits = ![self.initialConfiguration isTheSameConnection:self.draftConfiguration];
+        
+        self.buttonConnect.enabled = ok && configHasEdits;
+        
+        if ( configHasEdits ) {
+            if ( [self.initialConfiguration isNetworkingFieldsAreSame:self.draftConfiguration] ) {
+                [self.buttonConnect setTitle:NSLocalizedString(@"mac_save_action", @"Save")];
+            }
+            else {
+                [self.buttonConnect setTitle:self.originalConnectTitle];
+            }
+        }
+    }
+    else {
+        [self.buttonConnect setTitle:self.originalConnectTitle];
+        self.buttonConnect.enabled = ok;
+    }
 }
 
 - (IBAction)onConnect:(id)sender {
@@ -188,36 +213,50 @@
     }
 }
 
-- (void)testConnectionAndFinish {
-    SFTPSessionConfiguration* configuration = [[SFTPSessionConfiguration alloc] init];
-
-    if ( self.initialConfiguration ) {
-        configuration.identifier = self.initialConfiguration.identifier;
+- (void)updateDraftConfiguration { 
+    if ( self.draftConfiguration == nil ) {
+        self.draftConfiguration = [[SFTPSessionConfiguration alloc] init];
     }
-
+    
+    if ( self.initialConfiguration ) {
+        self.draftConfiguration.identifier = self.initialConfiguration.identifier;
+    }
+    
     NSString* name = trim(self.textFieldName.stringValue);
-    configuration.name = name;
-
+    self.draftConfiguration.name = name;
+    
     NSString* host = [self.textFieldHost.stringValue stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
     
-    configuration.host = host;
-    configuration.username = self.textFieldUsername.stringValue;
-    configuration.password = self.textFieldPassword.stringValue;
-    configuration.authenticationMode = (self.buttonPrivateKey.state == NSControlStateValueOn) ? kPrivateKey : kUsernamePassword;
-    configuration.privateKey = self.privateKey;
-    configuration.initialDirectory = self.textFieldPath.stringValue;
+    self.draftConfiguration.host = host;
+    self.draftConfiguration.username = self.textFieldUsername.stringValue;
+    self.draftConfiguration.password = self.textFieldPassword.stringValue;
+    self.draftConfiguration.authenticationMode = (self.buttonPrivateKey.state == NSControlStateValueOn) ? kPrivateKey : kUsernamePassword;
+    self.draftConfiguration.privateKey = self.privateKey;
+    self.draftConfiguration.initialDirectory = self.textFieldPath.stringValue;
+}
 
-    [SFTPStorageProvider.sharedInstance testConnection:configuration viewController:self completion:^(NSError * _Nonnull error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if ( error ) {
-                [MacAlerts error:error window:self.view.window];
-            }
-            else {
-                [self.presentingViewController dismissViewController:self];
-                self.onDone(YES, configuration);
-            }
-        });
-    }];
+- (void)testConnectionAndFinish {
+    [self updateDraftConfiguration];
+    
+    if ( [self.initialConfiguration isNetworkingFieldsAreSame:self.draftConfiguration] ) {
+        [self.presentingViewController dismissViewController:self];
+        self.onDone(YES, self.draftConfiguration);
+    }
+    else {
+        [SFTPStorageProvider.sharedInstance testConnection:self.draftConfiguration
+                                            viewController:self
+                                                completion:^(NSError * _Nonnull error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( error ) {
+                    [MacAlerts error:error window:self.view.window];
+                }
+                else {
+                    [self.presentingViewController dismissViewController:self];
+                    self.onDone(YES, self.draftConfiguration);
+                }
+            });
+        }];
+    }
 }
 
 - (IBAction)onCancel:(id)sender {

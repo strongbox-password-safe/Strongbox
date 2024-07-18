@@ -46,6 +46,14 @@ disableEscapeKey:(BOOL)disableEscapeKey
               window:(NSWindow*)window
           completion:(void (^)(NSUInteger option))completion;
 
++ (void)threeOptionsWithCancel:(NSString *)messageText
+               informativeText:(NSString *)informativeText
+             option1AndDefault:(NSString *)option1AndDefault
+                       option2:(NSString *)option2
+                       option3:(NSString *)option3
+                        window:(NSWindow *)window
+                    completion:(void (^)(NSUInteger))completion;
+
 + (void)twoOptionsWithCancel:(NSString *)messageText
              informativeText:(NSString*)informativeText
            option1AndDefault:(NSString*)option1AndDefault

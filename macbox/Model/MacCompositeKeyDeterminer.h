@@ -47,6 +47,10 @@ typedef NSViewController* _Nonnull (^MacCompositeKeyDeterminerOnDemandUIProvider
          yubiKeyConfiguration:(YubiKeyConfiguration*_Nullable)yubiKeyConfiguration
                    completion:(CompositeKeyDeterminedBlock)completion;
 
+- (void)getCkfsAfterSuccessfulBiometricAuth:(NSString *)keyFileBookmark
+                       yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
+                                 completion:(CompositeKeyDeterminedBlock)completion;
+
 - (void)getCkfsWithExplicitPassword:(NSString*_Nullable)password
                     keyFileBookmark:(NSString*_Nullable)keyFileBookmark
                yubiKeyConfiguration:(YubiKeyConfiguration*_Nullable)yubiKeyConfiguration

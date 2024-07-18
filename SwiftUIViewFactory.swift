@@ -90,4 +90,25 @@ class SwiftUIViewFactory: NSObject {
 
         return hostingController
     }
+
+    @objc static func getTagsEditorView(existingTags: Set<String>,
+                                        allTags: Set<String>,
+                                        completion: @escaping ((_ cancelled: Bool, _ selectedTags: Set<String>?) -> Void)) -> UIViewController
+    {
+        let view = TagsEditorView(currentItemTags: existingTags, allTags: allTags, completion: completion)
+
+        let hostingController = UIHostingController(rootView: view)
+
+        return hostingController
+    }
+
+    #if !IS_APP_EXTENSION && !NO_NETWORKING
+        @objc static func getOneDriveRootNavigatorView(existing: Bool, completion: @escaping ((_ cancelled: Bool, _ selectedMode: OneDriveNavigationContextMode) -> Void)) -> UIViewController {
+            let view = OneDriveRootNavigator(selectExisting: existing, appIsPro: AppPreferences.sharedInstance().isPro, completion: completion)
+
+            let hostingController = UIHostingController(rootView: view)
+
+            return hostingController
+        }
+    #endif
 }

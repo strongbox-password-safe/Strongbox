@@ -7,27 +7,120 @@
 //
 
 import MSAL
-import MSGraphClientSDK // TODO: Remove dependency soon
 
-class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
-    typealias AuthenticateCompletionHandler = (_ client: MSHTTPClient?, _ msalResult: MSALResult?, _ userInteractionRequired: Bool, _ userCancelled: Bool, _ error: Error?) -> Void
+@objc
+enum OneDriveNavigationContextMode: Int {
+    case initial
+    case sharedWithMe
+    case myDrives
+    case groupDrives
+    case driveRoot
+    case regularDriveNavigation
+}
 
+@objc
+class OneDriveNavigationContext: NSObject {
+    let mode: OneDriveNavigationContextMode
+    let msalResult: MSALResult?
+    let driveItem: OneDriveDriveItem?
 
-    static let SmallUploadFileSize = 10 * 320 * 1024 
+    @objc
+    init(mode: OneDriveNavigationContextMode, msalResult: MSALResult? = nil, driveItem: OneDriveDriveItem? = nil) {
+        self.mode = mode
+        self.msalResult = msalResult
+        self.driveItem = driveItem
+    }
+}
 
+class OneDriveDriveItem: NSObject {
+    let parentItemId: String? 
+    let driveId: String? 
+    let name: String? 
+    let itemId: String?
+    let lastModifiedDateTime: Date?
+    let driveType: String?
+    let siteId: String?
 
+    init(parentItemId: String?,
+         driveId: String?,
+         name: String?,
+         itemId: String?,
+         lastModifiedDateTime: Date?,
+         driveType: String?,
+         siteId: String?)
+    {
+        self.parentItemId = parentItemId
+        self.driveId = driveId
+        self.name = name
+        self.itemId = itemId
+        self.lastModifiedDateTime = lastModifiedDateTime
+        self.driveType = driveType
+        self.siteId = siteId
+    }
+}
+
+class TwoDriveStorageProvider: NSObject, SafeStorageProvider { 
     @objc
     static let sharedInstance = TwoDriveStorageProvider()
 
-    static let scopes: [String] = ["Files.ReadWrite.All"]
+    static let RegularScopes: [String] = ["Files.ReadWrite.All"]
+
+    static let ExtendedScopes: [String] = ["Files.ReadWrite.All",
+                                           "Sites.Read.All"]
+
     static let clientID = "1ac62c81-8569-4a96-9874-6e2941a00d17"
 
-    var application: MSALPublicClientApplication?
+    private static let NextGenOperationQueue: OperationQueue = {
+        let queue = OperationQueue()
 
-    private let nextGenURLSession: URLSession
+        queue.name = "com.markmcguill.strongbox.OneDriveStorageProvider"
+        queue.qualityOfService = .userInitiated
+        queue.maxConcurrentOperationCount = 4
 
-    static let NextGenRequestTimeout = 20.0 
+        return queue
+    }()
+
+    enum TwoDriveStorageProviderError: Error {
+        case invalidUploadUrl(detail: String)
+        case unexpectedResponse(detail: String)
+        case unexpectedResponseCode(code: Int, detail: String)
+        case couldNotGetDriveItemUrl
+        case couldNotReadNextUrlForListing
+        case couldNotBuildEscapedFilename
+        case couldNotConvertOdataDriveItem
+        case couldNotGetModDateAfterUpload
+        case couldNotReadDriveOrParentItemId
+        case couldNotDeserializeExpectedJson
+        case couldNotAuthenticate(innerError: (any Error)?)
+        case couldNotFindApplication
+        case interactiveSessionRequired
+        case userCancelledAuthentication
+        case couldNotGetDriveFields
+    }
+
+    enum OneDriveAPIHTTPParams {
+        static let authorization = "Authorization"
+        static let contentLength = "Content-Length"
+        static let contentRange = "Content-Range"
+        static let contentType = "Content-Type"
+    }
+
+    static let NextGenRequestTimeout = 30.0 
     static let NextGenResourceTimeout = 10 * 60.0 
+
+    var storageId: StorageProvider { .kTwoDrive }
+    var providesIcons: Bool { false }
+    var browsableNew: Bool { true }
+    var browsableExisting: Bool { true }
+    var rootFolderOnly: Bool { false }
+    var supportsConcurrentRequests: Bool { false }
+    var defaultForImmediatelyOfferOfflineCache: Bool { false }
+    var privacyOptInRequired: Bool { true }
+    var spinnerUI: SpinnerUI { CrossPlatformDependencies.defaults().spinnerUi }
+    var appPreferences: ApplicationPreferences { CrossPlatformDependencies.defaults().applicationPreferences }
+
+    private var application: MSALPublicClientApplication?
+    private let nextGenURLSession: URLSession
 
     override private init() {
         let sessionConfig = URLSessionConfiguration.ephemeral
@@ -36,6 +129,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         sessionConfig.waitsForConnectivity = false
         sessionConfig.timeoutIntervalForRequest = TwoDriveStorageProvider.NextGenRequestTimeout
         sessionConfig.timeoutIntervalForResource = TwoDriveStorageProvider.NextGenResourceTimeout
+
         #if os(iOS)
             sessionConfig.multipathServiceType = .none
         #endif
@@ -51,59 +145,20 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         } catch {
             NSLog("🔴 Could not load application OneDrive: [%@]", String(describing: error))
         }
-    }
 
-    var storageId: StorageProvider {
-        .kTwoDrive
-    }
+        #if DEBUG
 
-    var providesIcons: Bool {
-        false
-    }
 
-    var browsableNew: Bool {
-        true
-    }
 
-    var browsableExisting: Bool {
-        true
-    }
 
-    var rootFolderOnly: Bool {
-        false
-    }
-
-    var supportsConcurrentRequests: Bool {
-        false
-    }
-
-    var defaultForImmediatelyOfferOfflineCache: Bool {
-        false
-    }
-
-    var privacyOptInRequired: Bool {
-        true
-    }
-
-    var spinnerUI: SpinnerUI {
-        CrossPlatformDependencies.defaults().spinnerUi
-    }
-
-    var appPreferences: ApplicationPreferences {
-        CrossPlatformDependencies.defaults().applicationPreferences
-    }
-
-    func delete(_: METADATA_PTR, completion _: @escaping (Error?) -> Void) {
-        
-    }
-
-    func loadIcon(_: NSObject, viewController _: VIEW_CONTROLLER_PTR, completion _: @escaping (IMAGE_TYPE_PTR) -> Void) {
-        
+        #endif
     }
 
     func getDatabasePreferences(_ nickName: String, providerData: NSObject) -> METADATA_PTR? {
-        guard let dItem = providerData as? DriveItem,
-              let json = getJsonFileIdentifier(driveItem: dItem)
+        guard let navContext = providerData as? OneDriveNavigationContext,
+              let msalResult = navContext.msalResult,
+              let dItem = navContext.driveItem,
+              let json = getJsonFileIdentifier(msalResult: msalResult, driveItem: dItem)
         else {
             NSLog("🔴 Not a proper provider data for OneDrive.")
             return nil
@@ -144,7 +199,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         #endif
     }
 
-    func getJsonFileIdentifier(driveItem: DriveItem) -> String? {
+    func getJsonFileIdentifier(msalResult: MSALResult, driveItem: OneDriveDriveItem) -> String? {
         guard let driveId = driveItem.driveId, let parentItemId = driveItem.parentItemId else {
             NSLog("🔴 Missing required driveId or parentItemId in getJsonFileIdentifier")
             return nil
@@ -153,12 +208,20 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         var dp = ["driveId": driveId,
                   "parentFolderId": parentItemId]
 
-        if let accountIdentifier = driveItem.accountIdentifier {
+        if let accountIdentifier = msalResult.account.identifier {
             dp["accountIdentifier"] = accountIdentifier
         }
 
-        if let username = driveItem.username {
+        if let username = msalResult.account.username {
             dp["username"] = username
+        }
+
+        if let driveType = driveItem.driveType {
+            dp["driveType"] = driveType
+        }
+
+        if let siteId = driveItem.siteId {
+            dp["siteId"] = siteId
         }
 
         guard let data = try? JSONSerialization.data(withJSONObject: dp, options: []),
@@ -171,37 +234,78 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         return json
     }
 
-    func create(_ nickName: String, fileName: String, data: Data, parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (METADATA_PTR?, Error?) -> Void) {
-        let driveItem = parentFolder as? DriveItem
+    
 
-        
-
-        authenticate(accountIdentifier: driveItem?.accountIdentifier, viewController: viewController) { [weak self] _, msalResult, _, userCancelled, error in
-            guard let self else {
-                return
-            }
-
-            if userCancelled { 
-                completion(nil, nil)
-                return
-            }
-
-            if let error {
-                NSLog("🔴 Could not authenticate: [%@]", String(describing: error))
-                completion(nil, error)
-                return
-            }
-
-            guard let msalResult else {
-                completion(nil, Utils.createNSError("nil MSHTTPClient returned", errorCode: 346))
-                return
-            }
-
-            self.createWithMSALResult(driveItem, nickName, fileName, msalResult: msalResult, data, viewController, completion: completion)
+    class func convertOdataDriveItemToBrowserItem(msalResult: MSALResult, item: AnyObject) -> StorageBrowserItem? {
+        guard let item = item as? [String: AnyObject],
+              let name = item["name"] as? String,
+              let lastModifiedDateTimeString = item["lastModifiedDateTime"] as? String,
+              let lastModifiedDateTime = NSDate.microsoftGraphDate(from: lastModifiedDateTimeString)
+        else {
+            NSLog("🔴 Could not get required fields...")
+            return nil
         }
+
+        let isFolder: Bool
+        let driveId: String
+        let itemId: String
+        let driveType: String?
+        let siteId: String?
+        let parentId: String
+
+        if let remoteItem = item["remoteItem"] as? [String: AnyObject] {
+            guard let pr = remoteItem["parentReference"] as? [String: AnyObject],
+                  let prId = pr["id"] as? String,
+                  let dId = pr["driveId"] as? String,
+                  let id = remoteItem["id"] as? String
+            else {
+                NSLog("🔴 Could not get required fields...")
+                return nil
+            }
+
+            driveType = pr["driveType"] as? String
+            siteId = pr["siteId"] as? String
+            isFolder = remoteItem["folder"] != nil
+            driveId = dId
+            itemId = id
+            parentId = prId
+        } else {
+            guard let parentReference = item["parentReference"] as? [String: AnyObject],
+                  let prId = parentReference["id"] as? String,
+                  let id = item["id"] as? String,
+                  let dId = parentReference["driveId"] as? String
+            else {
+                NSLog("🔴 Could not get required fields...")
+                return nil
+            }
+
+            driveType = parentReference["driveType"] as? String
+            siteId = parentReference["siteId"] as? String
+            isFolder = item["folder"] != nil
+            driveId = dId
+            itemId = id
+            parentId = prId
+        }
+
+        let theDriveItem = OneDriveDriveItem(parentItemId: parentId, driveId: driveId, name: name, itemId: itemId, lastModifiedDateTime: lastModifiedDateTime as Date, driveType: driveType, siteId: siteId)
+
+        let navContext = OneDriveNavigationContext(mode: .regularDriveNavigation, msalResult: msalResult, driveItem: theDriveItem)
+
+        return StorageBrowserItem(name: name, identifier: itemId, folder: isFolder, providerData: navContext)
     }
 
-    func createWithMSALResult(_ parentDriveItem: DriveItem?, _ nickName: String, _ fileName: String, msalResult: MSALResult, _ data: Data, _ viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (METADATA_PTR?, Error?) -> Void) {
+    
+
+    func create(_ nickName: String, fileName: String, data: Data, parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (METADATA_PTR?, Error?) -> Void) {
+        guard let navContext = parentFolder as? OneDriveNavigationContext,
+              let msalResult = navContext.msalResult,
+              let parentDriveItem = navContext.driveItem
+        else {
+            NSLog("🔴 Could not get parentItem!")
+            completion(nil, nil)
+            return
+        }
+
         if let viewController {
             spinnerUI.show(NSLocalizedString("storage_provider_status_authenticating_creating", comment: "Creating..."), viewController: viewController)
         }
@@ -214,11 +318,19 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             }
 
             do {
-                let driveItem = try await uploadNewFile(parentDriveItem: parentDriveItem, filename: fileName, data: data, msalResult: msalResult)
+                let driveItem = try await uploadNewFile(accountIdentifier: msalResult.account.identifier,
+                                                        viewController: viewController,
+                                                        parentDriveItem: parentDriveItem,
+                                                        filename: fileName,
+                                                        data: data)
 
-                let metadata = self.getDatabasePreferences(nickName, providerData: driveItem)
+                let navContext = OneDriveNavigationContext(mode: .regularDriveNavigation, msalResult: msalResult, driveItem: driveItem)
+
+                let metadata = self.getDatabasePreferences(nickName, providerData: navContext)
 
                 completion(metadata, nil)
+            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+                completion(nil, nil)
             } catch {
                 NSLog("🔴 OneDrive create error: [%@]", String(describing: error))
                 completion(nil, error)
@@ -232,7 +344,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             spinnerUI.show(NSLocalizedString("generic_status_sp_locating_ellipsis", comment: "Locating..."), viewController: viewController)
         }
 
-        findDriveItemFromMetadata(metadata: safeMetaData, viewController: viewController) { [weak self] driveItem, userInteractionRequired, error in
+        findDriveItemFromMetadata(metadata: safeMetaData, viewController: viewController) { [weak self] navContext, userInteractionRequired, error in
             guard let self else {
                 return
             }
@@ -245,87 +357,64 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 completion(.readResultError, nil, nil, error)
             } else if userInteractionRequired {
                 completion(.readResultBackgroundReadButUserInteractionRequired, nil, nil, nil)
-            } else if driveItem == nil {
+            } else if navContext?.driveItem == nil {
                 completion(.readResultError, nil, nil, Utils.createNSError("🔴 Drive Item is nil!", errorCode: 453))
             } else {
-                self.read(withProviderData: driveItem, viewController: viewController, options: options, completion: completion)
+                self.read(withProviderData: navContext, viewController: viewController, options: options, completion: completion)
             }
         }
     }
 
-    func read(withProviderData providerData: NSObject?, viewController: VIEW_CONTROLLER_PTR?, options: StorageProviderReadOptions, completion completionHandler: @escaping StorageProviderReadCompletionBlock) {
-        guard let driveItem = providerData as? DriveItem,
-              let driveId = driveItem.driveId,
-              let parentFolderId = driveItem.itemId
+    func read(withProviderData providerData: NSObject?, viewController: VIEW_CONTROLLER_PTR?, options: StorageProviderReadOptions, completion: @escaping StorageProviderReadCompletionBlock) {
+        guard let navContext = providerData as? OneDriveNavigationContext,
+              let msalResult = navContext.msalResult,
+              let driveItem = navContext.driveItem
         else {
             NSLog("🔴 Could not convert provider data to Listing State")
-            completionHandler(.readResultError, nil, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
+            completion(.readResultError, nil, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
             return
         }
 
-        authenticate(accountIdentifier: driveItem.accountIdentifier, viewController: viewController) { [weak self] client, _, userInteractionRequired, userCancelled, error in
-            guard let self else {
+        if let dtMod2 = options.onlyIfModifiedDifferentFrom,
+           let dtMod = driveItem.lastModifiedDateTime as NSDate?
+        {
+            if dtMod.isEqualToDate(withinEpsilon: dtMod2) {
+                completion(.readResultModifiedIsSameAsLocal, nil, nil, nil)
                 return
             }
+        }
 
-            if let error {
-                completionHandler(.readResultError, nil, nil, error)
-                return
-            }
+        guard let driveId = driveItem.driveId,
+              let itemId = driveItem.itemId
+        else {
+            NSLog("🔴 Could not convert provider data to Listing State")
+            completion(.readResultError, nil, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
+            return
+        }
 
-            if userCancelled {
-                completionHandler(.readResultError, nil, nil, nil)
-                return
-            }
+        if let viewController {
+            spinnerUI.show(NSLocalizedString("storage_provider_status_reading", comment: "Reading..."), viewController: viewController)
+        }
 
-            if userInteractionRequired {
-                completionHandler(.readResultBackgroundReadButUserInteractionRequired, nil, nil, nil)
-                return
-            }
-
-            if let dtMod2 = options.onlyIfModifiedDifferentFrom,
-               let dtMod = driveItem.lastModifiedDateTime as NSDate?
-            {
-                if dtMod.isEqualToDate(withinEpsilon: dtMod2) {
-                    completionHandler(.readResultModifiedIsSameAsLocal, nil, nil, nil)
-                    return
-                }
-            }
-
-            if let viewController {
-                self.spinnerUI.show(NSLocalizedString("storage_provider_status_reading", comment: "A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading..."), viewController: viewController)
-            }
-
-            let request = String(format: "/drives/%@/items/%@/content", driveId, parentFolderId)
-            let url = URL(string: "\(MSGraphBaseURL)\(request)")!
-
-            let dataTask = MSURLSessionDownloadTask(request: NSMutableURLRequest(url: url), client: client) { [weak self] url, _, graphError in
-                guard let self else {
-                    return
-                }
-
+        Task {
+            defer {
                 if viewController != nil {
                     self.spinnerUI.dismiss()
                 }
-
-                if let graphError {
-                    NSLog("🔴 Read Error: [%@]", String(describing: graphError))
-                    completionHandler(.readResultError, nil, nil, graphError)
-                    return
-                }
-
-                guard let url else {
-                    NSLog("🔴 Read Error")
-                    completionHandler(.readResultError, nil, nil, nil)
-                    return
-                }
-
-                let data = FileManager.default.contents(atPath: url.path)
-
-                completionHandler(.readResultSuccess, data, driveItem.lastModifiedDateTime, nil)
             }
 
-            dataTask?.execute()
+            do {
+                let data = try await readFile(accountIdentifier: msalResult.account.identifier, viewController: viewController, driveId: driveId, itemId: itemId)
+                completion(.readResultSuccess, data, driveItem.lastModifiedDateTime, nil)
+            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+                completion(.readResultError, nil, nil, nil)
+            } catch TwoDriveStorageProviderError.interactiveSessionRequired {
+                completion(.readResultBackgroundReadButUserInteractionRequired, nil, nil, nil)
+            } catch {
+                NSLog("🔴 OneDrive upload error: [%@]", String(describing: error))
+                completion(.readResultError, nil, nil, error)
+                return
+            }
         }
     }
 
@@ -334,7 +423,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             spinnerUI.show(NSLocalizedString("generic_status_sp_locating_ellipsis", comment: "Locating..."), viewController: viewController)
         }
 
-        findDriveItemFromMetadata(metadata: safeMetaData, viewController: viewController) { [weak self] driveItem, userInteractionRequired, error in
+        findDriveItemFromMetadata(metadata: safeMetaData, viewController: viewController) { [weak self] navContext, userInteractionRequired, error in
             guard let self else {
                 return
             }
@@ -347,66 +436,23 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 completion(.updateResultError, nil, error)
             } else if userInteractionRequired {
                 completion(.updateResultUserInteractionRequired, nil, nil)
-            } else if driveItem == nil {
+            } else if navContext?.driveItem == nil {
                 completion(.updateResultError, nil, Utils.createNSError("🔴 Drive Item is nil!", errorCode: 453))
             } else {
-                self.write(withProviderData: driveItem, viewController: viewController, data: data, completion: completion)
+                self.write(withProviderData: navContext, viewController: viewController, data: data, completion: completion)
             }
         }
     }
 
     func write(withProviderData providerData: NSObject?, viewController: VIEW_CONTROLLER_PTR?, data: Data, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        guard let driveItem = providerData as? DriveItem else {
+        guard let navContext = providerData as? OneDriveNavigationContext,
+              let msalResult = navContext.msalResult,
+              let driveItem = navContext.driveItem
+        else {
             NSLog("🔴 Could not convert provider data to Listing State")
             completion(.updateResultError, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
             return
         }
-
-        authenticate(accountIdentifier: driveItem.accountIdentifier, viewController: viewController) { [weak self] client, msalResult, userInteractionRequired, userCancelled, error in
-            guard let self else {
-                return
-            }
-
-            if let error {
-                completion(.updateResultError, nil, error)
-                return
-            }
-
-            if userCancelled {
-                completion(.updateResultError, nil, nil)
-                return
-            }
-
-            if userInteractionRequired {
-                completion(.updateResultUserInteractionRequired, nil, nil)
-                return
-            }
-
-            guard let msalResult else {
-                completion(.updateResultError, nil, nil)
-                return
-            }
-
-            writeWithMSALResult(client: client, msalResult: msalResult, driveItem: driveItem, data: data, viewController: viewController, completion: completion)
-        }
-    }
-
-    func writeWithMSALResult(client: MSHTTPClient?, msalResult: MSALResult, driveItem: DriveItem, data: Data, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        if !appPreferences.useNextGenOneDriveAPI {
-            guard let client else {
-                completion(.updateResultError, nil, nil)
-                return
-            }
-
-            upload(driveItem: driveItem, msalResult: msalResult, data: data, client: client, viewController: viewController, completion: completion)
-        } else {
-            uploadNewOrder(driveItem: driveItem, msalResult: msalResult, data: data, viewController: viewController, completion: completion)
-        }
-    }
-
-    func uploadNewOrder(driveItem: DriveItem, msalResult: MSALResult, data: Data, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        
-        
 
         if let viewController {
             spinnerUI.show(NSLocalizedString("storage_provider_status_syncing", comment: "Syncing..."), viewController: viewController)
@@ -420,9 +466,13 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             }
 
             do {
-                let driveItem = try await self.uploadToExistingFile(driveItem: driveItem, data: data, msalResult: msalResult)
+                let driveItem = try await self.uploadToExistingFile(accountIdentifier: msalResult.account.identifier, viewController: viewController, driveItem: driveItem, data: data)
 
                 completion(.updateResultSuccess, driveItem.lastModifiedDateTime, nil)
+            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+                completion(.updateResultError, nil, nil)
+            } catch TwoDriveStorageProviderError.interactiveSessionRequired {
+                completion(.updateResultUserInteractionRequired, nil, nil)
             } catch {
                 NSLog("🔴 OneDrive upload error: [%@]", String(describing: error))
                 completion(.updateResultError, nil, error)
@@ -431,386 +481,88 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         }
     }
 
-    func upload(driveItem: DriveItem, msalResult: MSALResult, data: Data, client: MSHTTPClient, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        if data.count <= TwoDriveStorageProvider.SmallUploadFileSize {
-            uploadSmall(driveItem: driveItem, data: data, client: client, viewController: viewController, completion: completion) 
-        } else {
-
-
-
-            uploadNewOrder(driveItem: driveItem, msalResult: msalResult, data: data, viewController: viewController, completion: completion)
-        }
-    }
-
-    func uploadSmall(driveItem: DriveItem, data: Data, client: MSHTTPClient, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        if let viewController {
-            spinnerUI.show(NSLocalizedString("storage_provider_status_syncing", comment: "Syncing..."), viewController: viewController)
-        }
-
-        guard let driveId = driveItem.driveId,
-              let itemId = driveItem.itemId
-        else {
-            NSLog("🔴 Could not convert provider data to Listing State")
-            completion(.updateResultError, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
-            return
-        }
-
-        let accountIdentifier = driveItem.accountIdentifier
-        let username = driveItem.username
-        let request = String(format: "/drives/%@/items/%@/content", driveId, itemId)
-        let url = URL(string: "\(MSGraphBaseURL)\(request)")!
-
-        let mutableRequest = NSMutableURLRequest(url: url)
-        mutableRequest.httpMethod = "PUT" 
-
-        let task = MSURLSessionUploadTask(request: mutableRequest, data: data, client: client) { [weak self] data, _, error in
-            if viewController != nil {
-                self?.spinnerUI.dismiss()
-            }
-
-            self?.handleUploadResponse(accountIdentifier, username, data, error, completion)
-        }
-
-        task?.execute()
-    }
-
-    func handleUploadResponse(_ accountIdentifier: String?, _ username: String?, _ data: Data?, _ error: Error?, _ completion: @escaping StorageProviderUpdateCompletionBlock) {
-        if let error {
-            NSLog("🔴 Error uploading [%@]", String(describing: error))
-            completion(.updateResultError, nil, error)
-            return
-        }
-
-        guard let data,
-              let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as AnyObject,
-              let item = TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(accountIdentifier, username, dictionary),
-              let driveItem = item.providerData as? DriveItem
-        else {
-            NSLog("🔴 Error uploading - Could not read Upload response")
-            completion(.updateResultError, nil, Utils.createNSError("", errorCode: 346))
-            return
-        }
-
-        completion(.updateResultSuccess, driveItem.lastModifiedDateTime, nil)
-    }
-
     func getModDate(_ safeMetaData: METADATA_PTR, completion: @escaping StorageProviderGetModDateCompletionBlock) {
-        findDriveItemFromMetadata(metadata: safeMetaData, viewController: nil) { driveItem, userInteractionRequired, error in
-            NSLog("driveItem = %@, error = %@", String(describing: driveItem?.lastModifiedDateTime), String(describing: error))
+        findDriveItemFromMetadata(metadata: safeMetaData, viewController: nil) { navContext, userInteractionRequired, error in
+
 
             if userInteractionRequired {
                 completion(true, nil, Utils.createNSError("User Interaction Required from getModDate", errorCode: 346))
             } else {
-                completion(true, driveItem?.lastModifiedDateTime, error)
+                completion(true, navContext?.driveItem?.lastModifiedDateTime, error)
             }
         }
-    }
-
-    func list(_ parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (Bool, [StorageBrowserItem], Error?) -> Void) {
-        let driveItem = parentFolder as? DriveItem
-
-        authenticate(accountIdentifier: driveItem?.accountIdentifier, viewController: viewController) { [weak self] client, msalResult, userInteractionRequired, userCancelled, error in
-            guard let self else {
-                return
-            }
-
-            if userCancelled || userInteractionRequired {
-                completion(true, [], nil)
-                return
-            }
-
-            if let error {
-                NSLog("🔴 List error: [%@]", String(describing: error))
-                completion(false, [], error)
-                return
-            }
-
-            guard let client, let msalResult else {
-                NSLog("🔴 List error: [%@]", String(describing: error))
-                completion(false, [], Utils.createNSError("Nil MSHTTPClient", errorCode: 346))
-                return
-            }
-
-            let authenticatedDriveItem: DriveItem
-            if let driveItem {
-                authenticatedDriveItem = driveItem
-            } else {
-                authenticatedDriveItem = DriveItem(accountIdentifier: msalResult.account.identifier, username: msalResult.account.username, name: nil, itemId: nil, parentItemId: nil, driveId: nil, lastModifiedDateTime: nil, path: nil)
-            }
-
-            let url = self.getListingRequestUrlFromDriveItem(driveItem: authenticatedDriveItem)
-
-            self.listItemsRecursive(url: url, client: client, driveItem: authenticatedDriveItem, itemsSoFar: [], completion: completion)
-        }
-    }
-
-    func listItemsRecursive(url: URL, client: MSHTTPClient, driveItem: DriveItem, itemsSoFar: [StorageBrowserItem], completion: @escaping (Bool, [StorageBrowserItem], Error?) -> Void) {
-        let task = MSURLSessionDataTask(request: NSMutableURLRequest(url: url), client: client) { [weak self] (data: Data?, _: URLResponse?, graphError: Error?) in
-            guard let self else {
-                return
-            }
-
-            if let graphError {
-                NSLog("🔴 error listing: [%@]", String(describing: graphError))
-                completion(false, [], graphError)
-                return
-            }
-
-            guard let data,
-                  let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject],
-                  let items = json["value"] as? [AnyObject]
-            else {
-                NSLog("🔴 error listing - could not read response...")
-                completion(false, [], Utils.createNSError("🔴 error listing - could not read response...", errorCode: 346))
-                return
-            }
-
-            let nextLink = json["@odata.nextLink"] as? String
-
-            self.processListingItems(items: items, nextLink: nextLink, client: client, driveItem: driveItem, itemsSoFar: itemsSoFar, completion: completion)
-        }
-
-        task?.execute()
-    }
-
-    func processListingItems(items: [AnyObject], nextLink: String?, client: MSHTTPClient, driveItem: DriveItem, itemsSoFar: [StorageBrowserItem], completion: @escaping (Bool, [StorageBrowserItem], Error?) -> Void) {
-        let browserItems = items.compactMap { TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(driveItem.accountIdentifier, driveItem.username, $0) }
-
-        var accumulated = itemsSoFar
-        accumulated.append(contentsOf: browserItems)
-
-        if let nextLink {
-
-            listItemsRecursive(url: URL(string: nextLink)!, client: client, driveItem: driveItem, itemsSoFar: accumulated, completion: completion)
-        } else {
-            completion(false, accumulated, nil)
-        }
-    }
-
-    class func convertOdataDriveItemToBrowserItem(_ accountIdentifier: String?, _ username: String?, _ item: AnyObject) -> StorageBrowserItem? {
-        guard let item = item as? [String: AnyObject],
-              let name = item["name"] as? String,
-              let lastModifiedDateTimeString = item["lastModifiedDateTime"] as? String,
-              let lastModifiedDateTime = NSDate.microsoftGraphDate(from: lastModifiedDateTimeString),
-              let parentReference = item["parentReference"] as? [String: AnyObject],
-              let parentId = parentReference["id"] as? String,
-              let path = parentReference["path"] as? String
-        else {
-            NSLog("🔴 Could not get required fields...")
-            return nil
-        }
-
-        let isFolder: Bool
-        let fooDriveId: String
-        let fooId: String
-
-        if let remoteItem = item["remoteItem"] as? [String: AnyObject] {
-            guard let pr = remoteItem["parentReference"] as? [String: AnyObject],
-                  let driveId = pr["driveId"] as? String,
-                  let id = remoteItem["id"] as? String
-            else {
-                NSLog("🔴 Could not get required fields...")
-                return nil
-            }
-
-            isFolder = remoteItem["folder"] != nil
-            fooDriveId = driveId
-            fooId = id
-        } else {
-            guard let id = item["id"] as? String,
-                  let driveId = parentReference["driveId"] as? String
-            else {
-                NSLog("🔴 Could not get required fields...")
-                return nil
-            }
-
-            isFolder = item["folder"] != nil
-            fooDriveId = driveId
-            fooId = id
-        }
-
-        let parentFolder = DriveItem(accountIdentifier: accountIdentifier,
-                                     username: username,
-                                     name: name,
-                                     itemId: fooId,
-                                     parentItemId: parentId,
-                                     driveId: fooDriveId,
-                                     lastModifiedDateTime: lastModifiedDateTime as Date,
-                                     path: path)
-
-        return StorageBrowserItem(name: name, identifier: fooId, folder: isFolder, providerData: parentFolder)
     }
 
     
 
-    func authenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping AuthenticateCompletionHandler) {
-        guard let application else {
-            NSLog("🔴 Could not load or find Application!")
-            completion(nil, nil, false, false, Utils.createNSError("🔴 Could not load or find Application!", errorCode: 346))
+    func list(_ parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (Bool, [StorageBrowserItem], Error?) -> Void) {
+        guard let navContext = parentFolder as? OneDriveNavigationContext else {
+            NSLog("🔴 nil passed to list!")
+            completion(false, [], nil)
             return
         }
 
-        
-        
+        let accountIdentifier = navContext.msalResult?.account.identifier
 
+        if let viewController {
+            spinnerUI.show(NSLocalizedString("storage_provider_status_authenticating_listing", comment: "Listing..."), viewController: viewController)
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        if let accountIdentifier,
-           let account = try? application.account(forIdentifier: accountIdentifier)
-        {
-            application.acquireTokenSilent(with: MSALSilentTokenParameters(scopes: TwoDriveStorageProvider.scopes, account: account)) { [weak self] result, error in
-                guard let self else {
-                    return
+        Task {
+            defer {
+                if viewController != nil {
+                    self.spinnerUI.dismiss()
                 }
-
-                if let error {
-                    let nsError = error as NSError
-                    if nsError.domain == MSALErrorDomain, nsError.code == MSALError.interactionRequired.rawValue {
-                        self.interactiveAuthenticate(accountIdentifier: accountIdentifier, viewController: viewController, completion: completion)
-                    } else {
-                        completion(nil, nil, false, false, error)
-                    }
-
-                    return
-                }
-
-                guard let result,
-                      let client = MSClientFactory.createHTTPClient(with: SimpleAccessTokenAuthProvider(accessToken: result.accessToken))
-                else {
-                    NSLog("🔴 Error in Interactive Logon - OneDrive")
-                    completion(nil, nil, false, false, Utils.createNSError("🔴 Error in Logon", errorCode: 346))
-                    return
-                }
-
-                completion(client, result, false, false, nil)
             }
-        } else {
-            interactiveAuthenticate(accountIdentifier: accountIdentifier, viewController: viewController, completion: completion)
-        }
-    }
 
-    func interactiveAuthenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping AuthenticateCompletionHandler) {
-        guard let application else {
-            NSLog("🔴 Could not load or find Application!")
-            completion(nil, nil, false, false, Utils.createNSError("🔴 Could not load or find Application!", errorCode: 346))
-            return
-        }
+            let driveItem = navContext.driveItem
 
-        guard let viewController else {
-            NSLog("⚠️ Interactive Logon required but Background Call...")
-            completion(nil, nil, true, false, nil)
-            return
-        }
-
-        #if os(iOS)
-            let webviewParameters = MSALWebviewParameters(authPresentationViewController: viewController)
-        #else
-            let webviewParameters = MSALWebviewParameters()
-        #endif
-
-        let interactiveParameters = MSALInteractiveTokenParameters(scopes: TwoDriveStorageProvider.scopes, webviewParameters: webviewParameters)
-
-        if let accountIdentifier {
-            interactiveParameters.account = try? application.account(forIdentifier: accountIdentifier)
-            
-        }
-
-        if interactiveParameters.account == nil {
-            interactiveParameters.promptType = .selectAccount
-        }
-
-        #if os(iOS)
-            let delay = Utils.isAppInForeground ? 0.1 : 1 
-        #else
-            let delay = 0.0
-        #endif
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-            application.acquireToken(with: interactiveParameters, completionBlock: { result, error in
-                if let error, (error as NSError).code == MSALError.userCanceled.rawValue {
-                    completion(nil, nil, false, true, nil)
-                    return
+            do {
+                switch navContext.mode {
+                case .sharedWithMe:
+                    let items = try await self.getSharedWithMeFiles(viewController: viewController)
+                    completion(false, items, nil)
+                case .myDrives:
+                    let items = try await self.getMyDrives(viewController: viewController)
+                    completion(false, items, nil)
+                case .groupDrives:
+                    let items = try await self.getSharedLibraryDrives(accountIdentifier: accountIdentifier, viewController: viewController)
+                    completion(false, items, nil)
+                case .driveRoot, .regularDriveNavigation:
+                    let items = try await self.listFolder(accountIdentifier: accountIdentifier, viewController: viewController, driveId: driveItem?.driveId, folderId: driveItem?.itemId)
+                    completion(false, items, nil)
+                case .initial:
+                    completion(false, [], nil)
                 }
-
-                guard error == nil,
-                      let result,
-                      let client = MSClientFactory.createHTTPClient(with: SimpleAccessTokenAuthProvider(accessToken: result.accessToken))
-                else {
-                    let err = error == nil ? Utils.createNSError("🔴 Error in Interactive Logon", errorCode: 346) : error
-                    NSLog("🔴 Error in Interactive Logon - OneDrive [%@]", String(describing: err))
-                    completion(nil, nil, false, false, err)
-                    return
-                }
-
-                completion(client, result, false, false, nil)
-            })
+            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+                completion(true, [], nil)
+            } catch {
+                NSLog("🔴 error listing: [%@]", String(describing: error))
+                completion(false, [], error)
+            }
         }
     }
 
     @objc
-    func signOutAll() {
-        guard let application else {
-            NSLog("🔴 Could not load or find Application!")
-            return
+    func isBusinessDrive(metadata: METADATA_PTR) -> Bool {
+        #if os(iOS)
+            let json = metadata.fileIdentifier
+        #else
+            let json = metadata.storageInfo ?? "{}"
+        #endif
+
+        guard let data = json.data(using: .utf8),
+              let obj = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject],
+              let driveType = obj["driveType"] as? String
+        else {
+            NSLog("🔴 Could not decode the fileIdentifier")
+            return false
         }
 
-        application.accountsFromDevice(for: MSALAccountEnumerationParameters()) { accounts, error in
-            guard let accounts else {
-                return
-            }
-
-            for account in accounts {
-
-
-                application.signout(with: account, signoutParameters: MSALSignoutParameters()) { _, error in
-                    if let error {
-                        NSLog("🔴 Error Signing out [%@]", String(describing: error))
-                    }
-                }
-            }
-        }
+        return driveType == "business" || driveType == "documentLibrary"
     }
 
-    func getListingRequestUrlFromDriveItem(driveItem: DriveItem) -> URL {
-        getListingRequestUrlFromDriveItem(driveId: driveItem.driveId, folderId: driveItem.itemId)
-    }
-
-    func getListingRequestUrlFromDriveItem(driveId: String?, folderId: String?) -> URL {
-        let request: String
-
-        if let driveId, let parentFolderId = folderId {
-            request = String(format: "/drives/%@/items/%@/children", driveId, parentFolderId)
-        } else if let parentFolderId = folderId {
-            request = String(format: "/me/drive/items/%@/children", parentFolderId)
-        } else {
-            request = "/me/drive/root/children"
-        }
-
-
-
-        return URL(string: "\(MSGraphBaseURL)\(request)")!
-    }
-
-    func findDriveItemFromMetadata(metadata: METADATA_PTR, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (_ driveItem: DriveItem?, _ userInteractionRequired: Bool, _ error: Error?) -> Void) {
+    func findDriveItemFromMetadata(metadata: METADATA_PTR, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (_ driveItem: OneDriveNavigationContext?, _ userInteractionRequired: Bool, _ error: Error?) -> Void) {
         #if os(iOS)
             let json = metadata.fileIdentifier
         #else
@@ -827,205 +579,138 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             return
         }
 
+        #if os(iOS)
+            let filename = metadata.fileName
+        #else
+            let filename = metadata.fileUrl.lastPathComponent
+        #endif
+
         let accountIdentifier = obj["accountIdentifier"] as? String
-        let url = getListingRequestUrlFromDriveItem(driveId: driveId, folderId: parentFolderId)
 
-        authenticate(accountIdentifier: accountIdentifier, viewController: viewController, completion: { [weak self] client, msalResult, userInteractionRequired, userCancelled, error in
-            if let error {
-                NSLog("🔴 Could not authenticate [%@]", String(describing: error))
-                completion(nil, userInteractionRequired, error)
-                return
-            }
+        Task {
+            do {
+                let maybeFound = try await getFileByFilename(accountIdentifier: accountIdentifier, driveId: driveId, parentFolderId: parentFolderId, fileName: filename, viewController: viewController)
 
-            if userCancelled {
-                completion(nil, false, nil)
-                return
-            }
+                if let found = maybeFound {
+                    let navContext = found.providerData as? OneDriveNavigationContext
 
-            if userInteractionRequired {
-                completion(nil, userInteractionRequired, error)
-                return
-            }
-
-            guard let client, let msalResult else {
-                completion(nil, false, Utils.createNSError("nil MSHTTPClient returned", errorCode: 346))
-                return
-            }
-
-            self?.findDriveItemFromMetadata2(metadata: metadata,
-                                             viewController: viewController,
-                                             accountIdentifier: accountIdentifier,
-                                             username: msalResult.account.username,
-                                             url: url,
-                                             client: client,
-                                             completion: completion)
-        })
-    }
-
-    func findDriveItemFromMetadata2(metadata: METADATA_PTR,
-                                    viewController: VIEW_CONTROLLER_PTR?,
-                                    accountIdentifier: String?,
-                                    username: String?,
-                                    url: URL,
-                                    client: MSHTTPClient,
-                                    completion: @escaping (_ driveItem: DriveItem?, _ userInteractionRequired: Bool, _ error: Error?) -> Void)
-    {
-        let task = MSURLSessionDataTask(request: NSMutableURLRequest(url: url), client: client) { [weak self] data, _, graphError in
-            if let graphError {
-                NSLog("🔴 Error making graph request: [%@]", String(describing: graphError))
-                completion(nil, false, graphError)
-                return
-            }
-
-            guard let data,
-                  let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject],
-                  let items = json["value"] as? [AnyObject]
-            else {
-
-
-
-
-                NSLog("🔴 Could not decode json, or get expected value object, from response in findDriveItem.")
-                completion(nil, false, Utils.createNSError("🔴 Could not decode json, or get expected value object, from response in findDriveItem.", errorCode: 321_334))
-                return
-            }
-
-            let browserItems = items.compactMap { TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(accountIdentifier, username, $0) }
-
-            #if os(iOS)
-                let filename = metadata.fileName
-            #else
-                let filename = metadata.fileUrl.lastPathComponent
-            #endif
-
-            if let found = browserItems.first(where: { $0.name.compare(filename) == .orderedSame }) {
-                guard let driveItem = found.providerData as? DriveItem else {
-                    NSLog("🔴 Could not get DriveItem from provider data.")
-                    completion(nil, false, Utils.createNSError("🔴 Could not get DriveItem from provider data.", errorCode: 321_334))
-                    return
-                }
-
-                completion(driveItem, false, nil)
-            } else if let nextLink = json["@odata.nextLink"] as? String,
-                      let nextLinkUrl = URL(string: nextLink)
-            {
-                self?.findDriveItemFromMetadata2(metadata: metadata,
-                                                 viewController: viewController,
-                                                 accountIdentifier: accountIdentifier,
-                                                 username: username,
-                                                 url: nextLinkUrl,
-                                                 client: client,
-                                                 completion: completion)
-            } else {
-                NSLog("Could not locate the database file. Has it been renamed or moved")
-                completion(nil, false, Utils.createNSError("Could not locate the database file. Has it been renamed or moved?", errorCode: 45))
-            }
-        }
-
-        task?.execute()
-    }
-
-    class DriveItem: NSObject {
-        var accountIdentifier: String?
-        var username: String?
-        let parentItemId: String?
-        let itemId: String?
-        let driveId: String?
-        let name: String?
-        let lastModifiedDateTime: Date?
-        let path: String?
-
-        init(accountIdentifier: String?, username: String?, name: String?, itemId: String?, parentItemId: String?, driveId: String?, lastModifiedDateTime: Date?, path: String?) {
-            self.accountIdentifier = accountIdentifier
-            self.username = username
-            self.name = name
-            self.itemId = itemId
-            self.parentItemId = parentItemId
-            self.driveId = driveId
-            self.lastModifiedDateTime = lastModifiedDateTime
-            self.path = path
-        }
-    }
-
-    class SimpleAccessTokenAuthProvider: NSObject, MSAuthenticationProvider {
-        private var currentAccessToken: String
-
-        init(accessToken: String) {
-            currentAccessToken = accessToken
-        }
-
-        func getAccessToken(for _: MSAuthenticationProviderOptions!, andCompletion completion: ((String?, Error?) -> Void)!) {
-            completion(currentAccessToken, nil)
-        }
-    }
-
-    enum StrongboxGraphOneDriveLargeFileUploadTask {
-        static func create(driveId: String, itemId: String, fileData: Data, httpClient: MSHTTPClient, completionHandler: @escaping OneDriveLargeFileUploadTaskInitCompletionHandler) {
-            let createSessionRequest = createUploadSessionRequest(driveId: driveId, itemId: itemId)
-
-            MSGraphOneDriveLargeFileUploadTask.createUploadSession(from: createSessionRequest, andHTTPClient: httpClient) { data, response, error in
-                if let error {
-                    completionHandler(nil, nil, response, error)
-                } else if let data = data as? Data, let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject] {
-                    let task = MSGraphOneDriveLargeFileUploadTask(client: httpClient,
-                                                                  fileData: fileData,
-                                                                  uploadSessionDictionary: dictionary,
-                                                                  andChunkSize: fileData.count) 
-
-                    completionHandler(task, data, response, error)
+                    completion(navContext, false, nil)
                 } else {
-                    completionHandler(nil, nil, response, error)
+                    
+                    
+                    
+                    
+
+                    let listing = try await listFolder(accountIdentifier: accountIdentifier, viewController: viewController, driveId: driveId, folderId: parentFolderId)
+
+                    if let found = listing.first(where: { $0.name.compare(filename) == .orderedSame }) {
+                        let navContext = found.providerData as? OneDriveNavigationContext
+
+                        completion(navContext, false, nil)
+                    } else {
+                        completion(nil, false, Utils.createNSError("Could not locate the database file. Has it been renamed or moved?", errorCode: 45))
+                    }
                 }
+            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+                completion(nil, false, nil)
+            } catch TwoDriveStorageProviderError.interactiveSessionRequired {
+                completion(nil, true, nil)
+            } catch {
+                NSLog("🔴 Error in findDriveItemFromMetadata: [%@]", String(describing: error))
+                completion(nil, false, error)
             }
         }
-
-        static func createUploadSessionRequest(driveId: String, itemId: String) -> NSMutableURLRequest {
-            let oneDriveUrlString = String(format: "%@/drives/%@/items/%@/createUploadSession", MSGraphBaseURL, driveId, itemId)
-
-            let urlRequest = NSMutableURLRequest(url: URL(string: oneDriveUrlString)!)
-            urlRequest.httpMethod = "POST"
-
-            return urlRequest
-        }
-    }
-}
-
-extension TwoDriveStorageProvider {
-    private static let NextGenOperationQueue: OperationQueue = {
-        let queue = OperationQueue()
-
-        queue.name = "com.markmcguill.strongbox.OneDriveStorageProvider"
-        queue.qualityOfService = .userInitiated
-        queue.maxConcurrentOperationCount = 4
-
-        return queue
-    }()
-
-    enum TwoDriveStorageProviderError: Error {
-        case invalidUploadUrl(detail: String)
-        case unexpectedResponse(detail: String)
-        case unexpectedResponseCode(code: Int, detail: String)
-        case couldNotGetDriveItemUrl
-        case couldNotBuildEscapedFilename
-        case couldNotConvertOdataDriveItem
-        case couldNotGetModDateAfterUpload
-        case couldNotReadDriveOrParentItemId
     }
 
-    enum OneDriveAPIHTTPParams {
-        static let authorization = "Authorization"
-        static let contentLength = "Content-Length"
-        static let contentRange = "Content-Range"
-        static let contentType = "Content-Type"
-    }
-
-    private struct CreateUploadSessionResponse: Codable {
-        let uploadUrl: String
-    }
+    
 
     static let GraphBaseURL = "https:
 
-    func getFileUploadRequestUrl(driveItem: DriveItem) -> URL? {
+    func getSharedWithMeFilesUrl() -> URL? {
+        
+
+        let request = "/me/drive/sharedWithMe?allowExternal=true"
+
+        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+    }
+
+    func getFileByFilenameUrl(driveId: String, parentFolderId: String, fileName: String) -> URL? {
+        let escapedFilename = fileName.replacingOccurrences(of: "'", with: "''")
+
+        let ret: URL?
+        if #available(iOS 17.0, macOS 14.0, *) {
+            let request = String(format: "/drives/%@/items/%@/children?$filter=name eq '%@'", driveId, parentFolderId, escapedFilename)
+
+            ret = URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+        } else {
+            
+            
+
+            
+
+            var components = URLComponents(string: TwoDriveStorageProvider.GraphBaseURL)
+
+            let path = String(format: "/v1.0/drives/%@/items/%@/children", driveId, parentFolderId)
+            let query = String(format: "$filter=name eq '%@'", escapedFilename)
+
+            components?.path = path
+            components?.query = query
+
+            ret = components?.url
+        }
+
+        return ret
+    }
+
+    func getMyDrivesUrl() -> URL? {
+        let request = "/me/drives"
+
+        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+    }
+
+    func getPrimaryDriveUrl() -> URL? {
+        let request = "/me/drive"
+
+        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+    }
+
+    func getSharedLibrariesUrl() -> URL? {
+        let request = "/sites?search=*&$select=id,displayName"
+
+        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+    }
+
+    func getDrivesForSiteUrl(siteId: String) -> URL? {
+        let request = "/sites/\(siteId)/drives?$select=id,name,driveType"
+
+        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+    }
+
+    func getListingRequestUrlFromDriveItem(driveId: String?, folderId: String?) -> URL? {
+        
+        
+        
+        
+        
+        
+        
+
+        let request: String
+
+        if let driveId {
+            if let folderId {
+                request = String(format: "/drives/%@/items/%@/children", driveId, folderId)
+            } else {
+                request = String(format: "/drives/%@/root/children", driveId)
+            }
+        } else {
+            request = "/me/drive/root/children"
+        }
+
+        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+    }
+
+    func getFileUploadRequestUrl(driveItem: OneDriveDriveItem) -> URL? {
         
         
         
@@ -1044,72 +729,377 @@ extension TwoDriveStorageProvider {
         return URL(string: oneDriveUrlString)
     }
 
-    func getNewFileUploadRequestUrl(parentDriveItem: DriveItem?, escapedFileName: String) -> URL? {
+    func getFileContentRequestUrl(driveId: String, itemId: String) -> URL? {
+        
         
         
         
         
         
 
-        let path: String
-
-        if let parentDriveItem {
-            guard let driveId = parentDriveItem.driveId,
-                  let parentItemId = parentDriveItem.itemId
-            else {
-                NSLog("🔴 Could not get driveId or parentItemId")
-                return nil
-            }
-
-            path = String(format: "/drives/%@/items/%@:/%@:/content", driveId, parentItemId, escapedFileName)
-        } else {
-            path = String(format: "/me/drive/items/root:/%@:/content", escapedFileName)
-        }
-
-        let oneDriveUrlString = String(format: "%@/%@", TwoDriveStorageProvider.GraphBaseURL, path)
+        let oneDriveUrlString = String(format: "%@/drives/%@/items/%@/content", TwoDriveStorageProvider.GraphBaseURL, driveId, itemId)
 
         return URL(string: oneDriveUrlString)
     }
 
-    func uploadToExistingFile(driveItem: DriveItem, data: Data, msalResult: MSALResult) async throws -> DriveItem {
+    func getNewFileUploadRequestUrl(parentDriveItem: OneDriveDriveItem, fileName: String) -> URL? {
+        
+        
+        
+        
+        
+
+        guard let driveId = parentDriveItem.driveId else {
+            NSLog("🔴 Could not get driveId or parentItemId")
+            return nil
+        }
+
+        let path: String
+
+        if let parentItemId = parentDriveItem.itemId {
+            path = String(format: "/drives/%@/items/%@:/%@:/content", driveId, parentItemId, fileName)
+        } else {
+            path = String(format: "/drives/%@/items/root:/%@:/content", driveId, fileName)
+        }
+
+        let oneDriveUrlString = String(format: "%@/%@", TwoDriveStorageProvider.GraphBaseURL, path)
+
+
+
+        let ret = URL(string: oneDriveUrlString)
+
+
+
+        return ret
+    }
+
+    
+
+    
+
+    func getFileByFilename(accountIdentifier: String?, driveId: String, parentFolderId: String, fileName: String, viewController: VIEW_CONTROLLER_PTR?) async throws -> StorageBrowserItem? {
+        guard let url = getFileByFilenameUrl(driveId: driveId, parentFolderId: parentFolderId, fileName: fileName) else {
+            NSLog("🔴 getFileByFilename - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
+              let items = json["value"] as? [AnyObject]
+        else {
+            NSLog("🔴 error listing - could not read response...")
+            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+
+        guard let match = items.first else {
+            return nil
+        }
+
+        return TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: match)
+    }
+
+    
+
+    func getSharedWithMeFiles(viewController: VIEW_CONTROLLER_PTR?) async throws -> [StorageBrowserItem] {
+        guard let url = getSharedWithMeFilesUrl() else {
+            NSLog("🔴 getAllDrives - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: nil, viewController: viewController, url: url)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
+              let items = json["value"] as? [AnyObject]
+        else {
+            NSLog("🔴 error listing - could not read response...")
+            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+
+        return items.compactMap { TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
+    }
+
+    func getPrimaryDrive(viewController: VIEW_CONTROLLER_PTR?) async throws -> (StorageBrowserItem, MSALResult) {
+        guard let url = getPrimaryDriveUrl() else {
+            NSLog("🔴 getAllDrives - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: nil, viewController: viewController, url: url)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject] else {
+            NSLog("🔴 error listing - could not read response...")
+            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+
+        guard let id = json["id"] as? String,
+              let driveType = json["driveType"] as? String
+        else {
+            NSLog("🔴 Could not get required fields...")
+            throw TwoDriveStorageProviderError.couldNotGetDriveFields
+        }
+
+        let name = json["name"] as? String ?? "OneDrive"
+
+        let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: name, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil)
+
+        let navContext = OneDriveNavigationContext(mode: .driveRoot, msalResult: msalResult, driveItem: driveItem)
+
+        return (StorageBrowserItem(name: name, identifier: id, folder: true, canNotCreateDatabaseInThisFolder: false, providerData: navContext), msalResult)
+    }
+
+    func getMyDrives(viewController: VIEW_CONTROLLER_PTR?) async throws -> [StorageBrowserItem] {
+        let (primary, msalResultPrimary) = try await getPrimaryDrive(viewController: viewController)
+
+        guard let url = getMyDrivesUrl() else {
+            NSLog("🔴 getAllDrives - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResultAllDrives) = try await getAuthenticatedUrlRequest(accountIdentifier: msalResultPrimary.account.identifier, viewController: viewController, url: url)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
+              let items = json["value"] as? [AnyObject]
+        else {
+            NSLog("🔴 error listing - could not read response...")
+            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+
+        let extraDrives = try items.compactMap { item in
+            guard let item = item as? [String: AnyObject],
+                  let id = item["id"] as? String,
+                  let driveType = item["driveType"] as? String
+            else {
+                NSLog("🔴 Could not get required fields...")
+                throw TwoDriveStorageProviderError.couldNotGetDriveFields
+            }
+
+            let name = item["name"] as? String ?? "OneDrive"
+
+            let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: name, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil)
+
+            let navContext = OneDriveNavigationContext(mode: .driveRoot, msalResult: msalResultAllDrives, driveItem: driveItem)
+
+            let displayName = String(format: "%@ (%@)", name, driveType)
+
+            return StorageBrowserItem(name: displayName, identifier: id, folder: true, canNotCreateDatabaseInThisFolder: false, providerData: navContext)
+        }
+
+        var drives = extraDrives.filter { theDrive in
+            theDrive.identifier != primary.identifier
+        }
+
+        if drives.isEmpty {
+            return [primary]
+        } else {
+            primary.name = String(format: "%@ (primary)", primary.name) 
+            drives.insert(primary, at: 0)
+
+            
+
+            var i = 1
+            for drive in drives {
+                drive.name = String(format: "%d. %@", i, drive.name)
+                i += 1
+            }
+
+            return drives
+        }
+    }
+
+    func getSharedLibraryDrives(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?) async throws -> [StorageBrowserItem] {
+        guard let url = getSharedLibrariesUrl() else {
+            NSLog("🔴 getAllDrives - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url, extendedScope: true)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
+              let items = json["value"] as? [AnyObject]
+        else {
+            NSLog("🔴 error listing - could not read response...")
+            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+
+        let sites = try items.reduce(into: [String: String]()) { result, key in
+            guard let siteId = key["id"] as? String,
+                  let displayName = key["displayName"] as? String
+            else {
+                NSLog("🔴 required fields id, displayName are not present")
+                throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            }
+
+            result[siteId] = displayName
+        }
+
+        var combined: [StorageBrowserItem] = []
+
+        try await withThrowingTaskGroup(of: [StorageBrowserItem]?.self) { taskGroup in
+            for site in sites {
+                taskGroup.addTask { [weak self] in
+                    let siteId = site.key
+                    let siteName = site.value
+                    return try await self?.getAllDrivesForSite(accountIdentifier: msalResult.account.identifier, viewController: viewController, siteId: siteId, siteName: siteName)
+                }
+            }
+
+            for try await result in taskGroup {
+                if let result {
+                    combined.append(contentsOf: result)
+                }
+            }
+        }
+
+        return combined
+    }
+
+    func getAllDrivesForSite(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, siteId: String, siteName: String) async throws -> [StorageBrowserItem] {
+        guard let url = getDrivesForSiteUrl(siteId: siteId) else {
+            NSLog("🔴 getAllDrivesForGroup - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url, extendedScope: true)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
+              let items = json["value"] as? [AnyObject]
+        else {
+            NSLog("🔴 error listing - could not read response...")
+            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+
+        return mapDriveItemsResponseToSBI(msalResult: msalResult, siteName: siteName, items: items)
+    }
+
+    func mapDriveItemsResponseToSBI(msalResult: MSALResult, siteName: String, items: [AnyObject]) -> [StorageBrowserItem] {
+        let moreThanOne = items.count > 1
+
+        let converted = items.map { item in
+            let name = item["name"] as? String
+            let id = item["id"] as? String
+            let driveType = item["driveType"] as? String
+
+            let displayName = moreThanOne ? String(format: "%@/%@", siteName, name ?? NSLocalizedString("generic_unknown", comment: "Unknown")) : siteName
+
+            let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: displayName, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil)
+
+            let navContext = OneDriveNavigationContext(mode: .driveRoot, msalResult: msalResult, driveItem: driveItem)
+
+            return StorageBrowserItem(name: displayName, identifier: id, folder: true, canNotCreateDatabaseInThisFolder: true, providerData: navContext)
+        }
+
+        return converted
+    }
+
+    func listFolder(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, driveId: String?, folderId: String?, searchingForFilename: String? = nil) async throws -> [StorageBrowserItem] {
+        
+        
+
+        guard let url = getListingRequestUrlFromDriveItem(driveId: driveId, folderId: folderId) else {
+            NSLog("🔴 updateExistingFile - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        return try await internalListRecursive(url: url, accountIdentifier: accountIdentifier, viewController: viewController, searchingForFilename: searchingForFilename)
+    }
+
+    func internalListRecursive(url: URL, accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, itemsSoFar: [StorageBrowserItem] = [], searchingForFilename: String?) async throws -> [StorageBrowserItem] {
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
+              let items = json["value"] as? [AnyObject]
+        else {
+            NSLog("🔴 error listing - could not read response...")
+            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+
+        let browserItems = items.compactMap { TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
+
+        
+
+        var accumulated = itemsSoFar
+
+        if let searchingForFilename {
+            if let found = browserItems.first(where: { $0.name.compare(searchingForFilename) == .orderedSame }) {
+                return [found]
+            }
+        } else {
+            accumulated.append(contentsOf: browserItems)
+        }
+
+        if let nextLink = json["@odata.nextLink"] as? String {
+            guard let nextUrl = URL(string: nextLink) else {
+                NSLog("🔴 Next URL is invalid!")
+                throw TwoDriveStorageProviderError.couldNotReadNextUrlForListing
+            }
+
+            return try await internalListRecursive(url: nextUrl, accountIdentifier: accountIdentifier, viewController: viewController, itemsSoFar: accumulated, searchingForFilename: searchingForFilename)
+        } else {
+            return accumulated
+        }
+    }
+
+    
+
+    func uploadToExistingFile(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, driveItem: OneDriveDriveItem, data: Data) async throws -> OneDriveDriveItem {
         guard let requestUrl = getFileUploadRequestUrl(driveItem: driveItem) else {
             NSLog("🔴 updateExistingFile - Could not get request URL")
             throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
-        let urlRequest = getAuthenticatedUrlRequest(msalResult: msalResult, url: requestUrl, method: "PUT", contentType: "text/plain")
-
-        return try await uploadWithRequest(accountIdentifier: driveItem.accountIdentifier, username: driveItem.username, urlRequest: urlRequest, data: data)
-    }
-
-    func uploadNewFile(parentDriveItem: DriveItem?, filename: String, data: Data, msalResult: MSALResult) async throws -> DriveItem {
-        guard let escapedFileName = (filename as NSString).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) else {
-            NSLog("🔴 Could not build/escape filename")
-            throw TwoDriveStorageProviderError.couldNotBuildEscapedFilename
-        }
-
-        guard let requestUrl = getNewFileUploadRequestUrl(parentDriveItem: parentDriveItem, escapedFileName: escapedFileName) else {
-            NSLog("🔴 uploadNewFile - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
-        }
-
-        let urlRequest = getAuthenticatedUrlRequest(msalResult: msalResult, url: requestUrl, method: "PUT", contentType: "text/plain")
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: requestUrl, method: "PUT", contentType: "text/plain")
 
         return try await uploadWithRequest(msalResult: msalResult, urlRequest: urlRequest, data: data)
     }
 
-    func uploadWithRequest(msalResult: MSALResult, urlRequest: URLRequest, data: Data) async throws -> DriveItem {
-        try await uploadWithRequest(accountIdentifier: msalResult.account.identifier, username: msalResult.account.username, urlRequest: urlRequest, data: data)
+    func uploadNewFile(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, parentDriveItem: OneDriveDriveItem, filename: String, data: Data) async throws -> OneDriveDriveItem {
+        guard let requestUrl = getNewFileUploadRequestUrl(parentDriveItem: parentDriveItem, fileName: filename) else {
+            NSLog("🔴 uploadNewFile - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: requestUrl, method: "PUT", contentType: "text/plain")
+
+        return try await uploadWithRequest(msalResult: msalResult, urlRequest: urlRequest, data: data)
     }
 
-    func uploadWithRequest(accountIdentifier: String?, username: String?, urlRequest: URLRequest, data: Data) async throws -> DriveItem {
+    func uploadWithRequest(msalResult: MSALResult, urlRequest: URLRequest, data: Data) async throws -> OneDriveDriveItem {
         var mutableRequest = urlRequest
 
         mutableRequest.httpBody = data
 
         let (jsonData, response) = try await nextGenURLSession.data(for: mutableRequest)
 
-        let driveItem = try validateResponseAndDeserializeDriveItem(accountIdentifier, username, data: jsonData, response: response)
+        let driveItem = try validateResponseAndDeserializeDriveItem(msalResult: msalResult, data: jsonData, response: response)
 
         #if DEBUG
             NSLog("🐞 Upload Content DONE: \(driveItem)")
@@ -1118,14 +1108,34 @@ extension TwoDriveStorageProvider {
         return driveItem
     }
 
+    
+
+    func readFile(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, driveId: String, itemId: String) async throws -> Data {
+        guard let url = getFileContentRequestUrl(driveId: driveId, itemId: itemId) else {
+            NSLog("🔴 readFile - Could not get request URL")
+            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, _) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url)
+
+        let (data, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: data, response: response)
+
+        return data
+    }
+
+    
+
     func validateResponse(data: Data, response: URLResponse) throws {
         #if DEBUG
             if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
-               let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted)
+               let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
+               let jsonPrettyStr = String(data: jsonData, encoding: .utf8)
             {
-                NSLog("🐞 verifyHttpResponse (HTTP \(String(describing: (response as? HTTPURLResponse)?.statusCode))): \(String(decoding: jsonData, as: UTF8.self))")
+                NSLog("🐞 verifyHttpResponse (HTTP \(String(describing: (response as? HTTPURLResponse)?.statusCode))): %@", String(jsonPrettyStr.prefix(4096)))
             } else {
-                NSLog("🐞 verifyHttpResponse (HTTP \(String(describing: (response as? HTTPURLResponse)?.statusCode))): BODY NOT JSON!")
+                NSLog("🐞 verifyHttpResponse (HTTP \(String(describing: (response as? HTTPURLResponse)?.statusCode))): %@ (BODY NOT JSON!)", (Data(data.prefix(24)) as NSData).upperHexString)
             }
         #endif
 
@@ -1139,12 +1149,13 @@ extension TwoDriveStorageProvider {
         }
     }
 
-    func validateResponseAndDeserializeDriveItem(_ accountIdentifier: String?, _ username: String?, data: Data, response: URLResponse) throws -> DriveItem {
+    func validateResponseAndDeserializeDriveItem(msalResult: MSALResult, data: Data, response: URLResponse) throws -> OneDriveDriveItem {
         try validateResponse(data: data, response: response)
 
         guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as AnyObject,
-              let item = TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(accountIdentifier, username, dictionary),
-              let driveItem = item.providerData as? DriveItem
+              let item = TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: dictionary),
+              let navContext = item.providerData as? OneDriveNavigationContext,
+              let driveItem = navContext.driveItem
         else {
             throw TwoDriveStorageProviderError.couldNotConvertOdataDriveItem
         }
@@ -1152,7 +1163,11 @@ extension TwoDriveStorageProvider {
         return driveItem
     }
 
-    func getAuthenticatedUrlRequest(msalResult: MSALResult, url: URL, method: String, contentType: String) -> URLRequest {
+    
+
+    func getAuthenticatedUrlRequest(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, url: URL, method: String = "GET", extendedScope: Bool = false, contentType: String? = nil) async throws -> (URLRequest, MSALResult) {
+        let msalResult = try await authenticate(accountIdentifier: accountIdentifier, viewController: viewController, extendedScope: extendedScope)
+
         var urlRequest = URLRequest(url: url)
 
         urlRequest.timeoutInterval = TwoDriveStorageProvider.NextGenRequestTimeout
@@ -1161,169 +1176,109 @@ extension TwoDriveStorageProvider {
         urlRequest.setValue("Bearer \(msalResult.accessToken)", forHTTPHeaderField: OneDriveAPIHTTPParams.authorization)
         urlRequest.setValue(contentType, forHTTPHeaderField: OneDriveAPIHTTPParams.contentType)
 
-        return urlRequest
+        return (urlRequest, msalResult)
+    }
+
+    func authenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, extendedScope: Bool) async throws -> MSALResult {
+        guard let application else {
+            throw TwoDriveStorageProviderError.couldNotFindApplication
+        }
+
+        let scopes = extendedScope ? TwoDriveStorageProvider.ExtendedScopes : TwoDriveStorageProvider.RegularScopes
+
+        if let accountIdentifier, let account = try? application.account(forIdentifier: accountIdentifier) {
+            do {
+                return try await application.acquireTokenSilent(with: MSALSilentTokenParameters(scopes: scopes, account: account))
+            } catch {
+                if (error as NSError).code == MSALError.interactionRequired.rawValue {
+                    return try await attemptInteractiveAuth(accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
+                } else {
+                    throw error
+                }
+            }
+        } else {
+            return try await attemptInteractiveAuth(accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
+        }
+    }
+
+    private func attemptInteractiveAuth(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, scopes: [String]) async throws -> MSALResult {
+        guard let viewController else {
+            NSLog("Interactive Logon required but Background Call...")
+            throw TwoDriveStorageProviderError.interactiveSessionRequired
+        }
+
+        return try await interactiveAuthenticate(accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
+    }
+
+    @MainActor
+    private func interactiveAuthenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR, scopes: [String]) async throws -> MSALResult {
+        guard let application else {
+            throw TwoDriveStorageProviderError.couldNotFindApplication
+        }
+
+        #if os(iOS)
+            let webviewParameters = MSALWebviewParameters(authPresentationViewController: viewController)
+        #else
+            let webviewParameters = MSALWebviewParameters()
+        #endif
+
+        let interactiveParameters = MSALInteractiveTokenParameters(scopes: scopes, webviewParameters: webviewParameters)
+
+        if let accountIdentifier {
+            interactiveParameters.account = try? application.account(forIdentifier: accountIdentifier)
+            
+        }
+
+        if interactiveParameters.account == nil {
+            interactiveParameters.promptType = .selectAccount
+        }
+
+        #if os(iOS)
+            if !Utils.isAppInForeground {
+                try? await Task.sleep(nanoseconds: 1_000_000_000) 
+            }
+        #endif
+
+        do {
+            return try await application.acquireToken(with: interactiveParameters)
+        } catch {
+            if (error as NSError).code == MSALError.userCanceled.rawValue {
+                throw TwoDriveStorageProviderError.userCancelledAuthentication
+            } else {
+                throw error
+            }
+        }
+    }
+
+    @objc
+    func signOutAll() {
+        guard let application else {
+            NSLog("🔴 Could not load or find Application!")
+            return
+        }
+
+        application.accountsFromDevice(for: MSALAccountEnumerationParameters()) { accounts, error in
+            guard let accounts else {
+                return
+            }
+
+            for account in accounts {
+                application.signout(with: account, signoutParameters: MSALSignoutParameters()) { _, error in
+                    if let error {
+                        NSLog("🔴 Error Signing out [%@]", String(describing: error))
+                    }
+                }
+            }
+        }
+    }
+
+    
+
+    func delete(_: METADATA_PTR, completion _: @escaping (Error?) -> Void) {
+        
+    }
+
+    func loadIcon(_: NSObject, viewController _: VIEW_CONTROLLER_PTR, completion _: @escaping (IMAGE_TYPE_PTR) -> Void) {
+        
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

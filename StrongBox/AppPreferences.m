@@ -172,6 +172,10 @@ static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError"
 static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI-2";
 static NSString* const kAppAppearance = @"appAppearance";
 static NSString* const kShowDatabaseNamesInBrowse = @"showDatabaseNamesInBrowse";
+static NSString* const kWarnAboutLocalDeviceDatabases = @"warnAboutLocalDeviceDatabases";
+
+static NSString* const kDisableCopyTo = @"disableCopyTo";
+static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 
 @implementation AppPreferences
 
@@ -213,6 +217,30 @@ static NSString* const kShowDatabaseNamesInBrowse = @"showDatabaseNamesInBrowse"
 }
 
 
+
+- (BOOL)disableCopyTo {
+    return [self getBool:kDisableCopyTo fallback:self.disableExport];
+}
+
+- (void)setDisableCopyTo:(BOOL)disableCopyTo {
+    [self setBool:kDisableCopyTo value:disableCopyTo];
+}
+
+- (BOOL)disableMakeVisibleInFiles {
+    return [self getBool:kDisableMakeVisibleInFiles fallback:self.disableExport];
+}
+
+- (void)setDisableMakeVisibleInFiles:(BOOL)disableMakeVisibleInFiles {
+    [self setBool:kDisableMakeVisibleInFiles value:disableMakeVisibleInFiles];
+}
+
+- (BOOL)warnAboutLocalDeviceDatabases {
+    return [self getBool:kWarnAboutLocalDeviceDatabases fallback:YES];
+}
+
+- (void)setWarnAboutLocalDeviceDatabases:(BOOL)warnAboutLocalDeviceDatabases {
+    [self setBool:kWarnAboutLocalDeviceDatabases value:warnAboutLocalDeviceDatabases];
+}
 
 - (BOOL)showDatabaseNamesInBrowse {
     return [self getBool:kShowDatabaseNamesInBrowse fallback:YES];

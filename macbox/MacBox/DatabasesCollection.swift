@@ -495,6 +495,16 @@ class DatabasesCollection: NSObject {
 
     
 
+    func checkEntitlements() -> Bool {
+        if StrongboxProductBundle.isBusinessBundle {
+            guard Settings.sharedInstance().businessOrganisationName != nil else {
+                return false
+            }
+        }
+
+        return true
+    }
+
     @objc public func unlockModelFromLocalWorkingCopy(database: MacDatabasePreferences,
                                                       ckfs: CompositeKeyFactors,
                                                       fromConvenience: Bool,
@@ -507,6 +517,11 @@ class DatabasesCollection: NSObject {
                                                       completion: UnlockDatabaseCompletionBlock? = nil)
     {
 
+
+        guard checkEntitlements() else {
+            completion?(.error, nil, Utils.createNSError(NSLocalizedString("pro_status_unlicensed", comment: "Unlicensed"), errorCode: 1))
+            return
+        }
 
         let openOffline = database.alwaysOpenOffline || offlineUnlockRequested
 

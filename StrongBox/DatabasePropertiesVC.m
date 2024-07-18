@@ -330,11 +330,7 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
          indexPath.row == kRowWiFiSyncServiceName
         ) {
         if ( self.database.storageProvider == kLocalDevice || AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-#ifdef DEBUG
-            return [super tableView:tableView heightForRowAtIndexPath:indexPath];
-#else
             return 0.0f;
-#endif
         }
     }
         

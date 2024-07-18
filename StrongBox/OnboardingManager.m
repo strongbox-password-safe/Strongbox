@@ -138,6 +138,7 @@
 
 #ifndef NO_NETWORKING
     id<OnboardingModule> notifications = [self getRequestNotificationPermissionModule:model];
+    id<OnboardingModule> oneDrivePro = [self getWarnBusinessOneDriveNoneProModule:model];
 #endif
     
     id<OnboardingModule> argon2MemReduction = [self getArgon2ReductionOnboardingModule:model];
@@ -150,6 +151,7 @@
                                                        convenienceUnlock,
 #ifndef NO_NETWORKING
                                                        notifications,
+                                                       oneDrivePro,
 #endif
                                                        expiry,
                                                        autoFill,
@@ -709,6 +711,58 @@
 
     return quickLaunchAppLockWarning;
 }
+
+#ifndef NO_NETWORKING
+- (id<OnboardingModule>)getWarnBusinessOneDriveNoneProModule:(Model*)model {
+    GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];
+    
+    module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
+        if ( AppPreferences.sharedInstance.isPro ) { 
+            return NO;
+        }
+        
+        if ( model.metadata.storageProvider != kTwoDrive ) {
+            return NO;
+        }
+        
+        if (! [TwoDriveStorageProvider.sharedInstance isBusinessDriveWithMetadata:model.metadata] ) {
+            return NO;
+        }
+        
+        BOOL showRandomly = arc4random_uniform(100) < 5;
+        
+        return model.metadata.unlockCount < 2 || showRandomly || [model.metadata.databaseCreated isMoreThanXDaysAgo:90]; 
+    };
+    
+    
+    module.header = NSLocalizedString(@"unlicensed_commercial_use_title", @"Unlicensed Commercial Use");
+    NSString* msg = NSLocalizedString(@"unlicensed_commercial_use_message", @"Well, this is awkward. It looks like you're using Strongbox for commercial purposes without a license.\n\nWe're a small business and we need to ask you to license Strongbox. This is so that we can keep making it great and get out of your way. Continued unlicensed use may lead to loss of functionality.\n\nGet in touch\nbusiness@phoebecode.com");
+    
+    module.message = msg;
+
+    if (@available(iOS 17.0, *)) {
+        module.symbolEffect = [[NSSymbolPulseEffect effect] effectWithByLayer];
+    }
+    
+    UIImage* image = [UIImage systemImageNamed:@"briefcase.circle"];
+    
+    UIImageSymbolConfiguration *config = [UIImageSymbolConfiguration configurationWithPaletteColors:@[UIColor.systemBlueColor, UIColor.systemRedColor]];
+    UIImage* coloured = [image imageByApplyingSymbolConfiguration:config];
+    
+    module.image = coloured;
+
+    module.button1 = NSLocalizedString(@"generic_lets_go", @"Let's Go");
+    
+    module.hideDismiss = YES;
+    
+    module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
+        model.metadata.onboardingDoneHasBeenShown = YES;
+        onDone(NO, YES); 
+    };
+
+    return module;
+}
+#endif
 
 - (id<OnboardingModule>)getAllDoneWelcomeModule:(Model*)model {
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];

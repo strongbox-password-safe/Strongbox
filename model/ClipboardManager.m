@@ -47,7 +47,6 @@
     [self unobserveClipboardChangeNotifications];
 #endif
     
-    
     [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
                  options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
     

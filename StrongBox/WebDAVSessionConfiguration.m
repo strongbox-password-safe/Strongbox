@@ -90,4 +90,29 @@
     [SecretStore.sharedInstance deleteSecureItem:[self getKeyChainKey:@"password"]];
 }
 
+- (BOOL)isTheSameConnection:(WebDAVSessionConfiguration *)other {
+    return [self isTheSameConnection:other checkNetworkingFieldsOnly:NO];
+}
+
+- (BOOL)isNetworkingFieldsAreSame:(WebDAVSessionConfiguration *)other {
+    return [self isTheSameConnection:other checkNetworkingFieldsOnly:YES];
+}
+
+- (BOOL)isTheSameConnection:(WebDAVSessionConfiguration*)other checkNetworkingFieldsOnly:(BOOL)checkNetworkingFieldsOnly {
+    if (other == self) {
+        return YES;
+    }
+    
+    BOOL nameChanged = !checkNetworkingFieldsOnly && ![self.name isEqualToString:other.name];
+    
+    BOOL userChanged = ![self.username isEqualToString:other.username];
+    BOOL pwChanged = self.password != nil ? ![self.password isEqualToString:other.password] : YES;
+    BOOL hostChanged = ![self.host.absoluteString isEqualToString:other.host.absoluteString];
+    BOOL certChanged = self.allowUntrustedCertificate != other.allowUntrustedCertificate;
+    
+    NSLog(@"🐞 isTheSameConnection: %hhd, %hhd, %hhd, %hhd, %hhd", nameChanged, hostChanged, userChanged, pwChanged, certChanged);
+    
+    return !(nameChanged || hostChanged || userChanged || pwChanged || certChanged);
+}
+
 @end

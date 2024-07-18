@@ -32,8 +32,8 @@
         [self notifyCellHeightChanged];
     };
     
-    self.labelTags.text = 
-    self.tagsField.placeholder = NSLocalizedString(@"item_details_username_field_tags", @"Tags");
+    self.labelTags.text = NSLocalizedString(@"item_details_username_field_tags", @"Tags");
+    self.tagsField.placeholder = NSLocalizedString(@"item_details_tap_to_add_tags", @"Tap to add tags...");
 
     self.tagsField.numberOfLines = 0;
     self.tagsField.spaceBetweenLines = 8.0f;
@@ -66,27 +66,23 @@
 
 - (void)setModel:(BOOL)readOnly
             tags:(NSArray<NSString*>*)tags
- useEasyReadFont:(BOOL)useEasyReadFont
-           onAdd:(void(^)(NSString* tag))onAdd
-           onRemove:(void(^)(NSString* tag))onRemove {
+ useEasyReadFont:(BOOL)useEasyReadFont {
     self.tagsField.readOnly = readOnly;
-    self.tagsField.font = useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;    
+    self.tagsField.font = useEasyReadFont ? FontManager.sharedInstance.easyReadFont : FontManager.sharedInstance.regularFont;
     self.tagsField.fieldTextColor = UIColor.labelColor;
     
     [self.tagsField addTags:tags];
+    
 
-    self.tagsField.onDidAddTag = ^(WSTagsField * _Nonnull field, NSString * _Nonnull text) {
-        NSLog(@"Added Tag: %@", text);
-        if ( onAdd ) {
-            onAdd(text);
-        }
-    };
-    self.tagsField.onDidRemoveTag = ^(WSTagsField * _Nonnull field, NSString * _Nonnull text) {
-        NSLog(@"Removed Tag: %@", text);
-        if ( onRemove ) {
-            onRemove(text);
-        }
-    };
+
+
+
+
+
+
+
+
+
 }
 
 @end

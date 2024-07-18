@@ -33,12 +33,7 @@
 
         NSData* data = [NSData dataWithContentsOfURL:StrongboxFilesManager.sharedInstance.archivedCrashFile];
         NSString* crashStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        
-        if ( [crashStr containsString:@"MSLargeFileUploadTask uploadNextSegmentWithCompletion"]) {
-            NSLog(@"⚠️ Ignoring well known Microsoft OneDrive crash until we find a fix.");
-            return NO;
-        }
-        
+                
         return YES;
     }
     
