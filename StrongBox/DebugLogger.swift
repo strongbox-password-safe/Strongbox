@@ -41,7 +41,7 @@ class DebugLogger: NSObject {
     @objc
     static func debug(_ line: String) {
         #if DEBUG
-            NSLog("🐞 [DebugLogger] - DEBUG - \(line)")
+            NSLog("🐞 [DebugLogger] - DEBUG - %@", line)
             lines.add(DebugLine(date: Date(), line: line, category: .debug))
             NotificationCenter.default.post(name: .debugLoggerLinesUpdated, object: nil)
         #endif
@@ -50,7 +50,7 @@ class DebugLogger: NSObject {
     @objc
     static func info(_ line: String) {
         #if DEBUG
-            NSLog("🟢 [DebugLogger] - INFO - \(line)")
+            NSLog("🟢 [DebugLogger] - INFO - %@", line)
             lines.add(DebugLine(date: Date(), line: line, category: .info))
             NotificationCenter.default.post(name: .debugLoggerLinesUpdated, object: nil)
         #endif
@@ -59,7 +59,7 @@ class DebugLogger: NSObject {
     @objc
     static func warn(_ line: String) {
         #if DEBUG
-            NSLog("⚠️ [DebugLogger] - WARN - \(line)")
+            NSLog("⚠️ [DebugLogger] - WARN - %@", line)
             lines.add(DebugLine(date: Date(), line: line, category: .warn))
             NotificationCenter.default.post(name: .debugLoggerLinesUpdated, object: nil)
         #endif
@@ -68,7 +68,7 @@ class DebugLogger: NSObject {
     @objc
     static func error(_ line: String) {
         #if DEBUG
-            NSLog("🔴 [DebugLogger] - ERROR - \(line)")
+            NSLog("🔴 [DebugLogger] - ERROR - %@", line)
             lines.add(DebugLine(date: Date(), line: line, category: .error))
             NotificationCenter.default.post(name: .debugLoggerLinesUpdated, object: nil)
         #endif

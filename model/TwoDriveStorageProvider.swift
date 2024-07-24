@@ -13,7 +13,7 @@ enum OneDriveNavigationContextMode: Int {
     case initial
     case sharedWithMe
     case myDrives
-    case groupDrives
+    case sharepointSharedLibraries
     case driveRoot
     case regularDriveNavigation
 }
@@ -138,6 +138,10 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         super.init()
 
+        
+        
+        
+
         let config = MSALPublicClientApplicationConfig(clientId: TwoDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
 
         do {
@@ -147,10 +151,10 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         }
 
         #if DEBUG
-
-
-
-
+            
+            
+            
+            
         #endif
     }
 
@@ -483,7 +487,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func getModDate(_ safeMetaData: METADATA_PTR, completion: @escaping StorageProviderGetModDateCompletionBlock) {
         findDriveItemFromMetadata(metadata: safeMetaData, viewController: nil) { navContext, userInteractionRequired, error in
-
+            
 
             if userInteractionRequired {
                 completion(true, nil, Utils.createNSError("User Interaction Required from getModDate", errorCode: 346))
@@ -525,7 +529,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 case .myDrives:
                     let items = try await self.getMyDrives(viewController: viewController)
                     completion(false, items, nil)
-                case .groupDrives:
+                case .sharepointSharedLibraries:
                     let items = try await self.getSharedLibraryDrives(accountIdentifier: accountIdentifier, viewController: viewController)
                     completion(false, items, nil)
                 case .driveRoot, .regularDriveNavigation:
@@ -638,26 +642,36 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         let escapedFilename = fileName.replacingOccurrences(of: "'", with: "''")
 
         let ret: URL?
-        if #available(iOS 17.0, macOS 14.0, *) {
-            let request = String(format: "/drives/%@/items/%@/children?$filter=name eq '%@'", driveId, parentFolderId, escapedFilename)
 
-            ret = URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
-        } else {
-            
-            
 
-            
 
-            var components = URLComponents(string: TwoDriveStorageProvider.GraphBaseURL)
 
-            let path = String(format: "/v1.0/drives/%@/items/%@/children", driveId, parentFolderId)
-            let query = String(format: "$filter=name eq '%@'", escapedFilename)
+        
+        
 
-            components?.path = path
-            components?.query = query
 
-            ret = components?.url
-        }
+        
+        
+
+        
+
+        var components = URLComponents(string: TwoDriveStorageProvider.GraphBaseURL)
+
+        let path = String(format: "/v1.0/drives/%@/items/%@/children", driveId, parentFolderId)
+        let queryVal = String(format: "name eq '%@'", escapedFilename)
+        let queryItems: [URLQueryItem] = [.init(name: "$filter", value: queryVal)]
+
+        components?.path = path
+        components?.queryItems = queryItems
+
+        ret = components?.url
+
+
+
+
+
+
+
 
         return ret
     }
@@ -764,11 +778,11 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         let oneDriveUrlString = String(format: "%@/%@", TwoDriveStorageProvider.GraphBaseURL, path)
 
-
+        
 
         let ret = URL(string: oneDriveUrlString)
 
-
+        
 
         return ret
     }
@@ -908,7 +922,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         if drives.isEmpty {
             return [primary]
         } else {
-            primary.name = String(format: "%@ (primary)", primary.name) 
+            primary.name = String(format: NSLocalizedString("adjective_primary_in_parenthesis_fmt", comment: "%@ (Primary)"), primary.name)
             drives.insert(primary, at: 0)
 
             

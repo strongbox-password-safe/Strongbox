@@ -895,6 +895,19 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     }];
 }
 
+- (BOOL)isPathMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin {
+    Node* current = node;
+    while (current != nil && current != self.effectiveRootGroup) {
+        if ( [current.title containsSearchString:searchText checkPinYin:checkPinYin] ) {
+            return YES;
+        }
+        
+        current = current.parent;
+    }
+
+    return NO;
+}
+
 - (BOOL)isUrlMatches:(NSString*)searchText
                 node:(Node*)node
          dereference:(BOOL)dereference
@@ -991,6 +1004,10 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     }
     
     
+    
+    if ( [self isPathMatches:searchText node:node checkPinYin:checkPinYin] ) {
+        return YES;
+    }
     
     return NO;
 }
@@ -1548,7 +1565,7 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
 }
 
 - (NSString *)getPathDisplayString:(Node *)vm {
-    return [self getPathDisplayString:vm includeRootGroup:NO rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
+    return [self getPathDisplayString:vm includeRootGroup:NO rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@" ▸ "];
 }
 
 - (NSString *)getPathDisplayString:(Node *)vm

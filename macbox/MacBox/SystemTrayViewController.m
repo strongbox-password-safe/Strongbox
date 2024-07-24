@@ -24,7 +24,7 @@
 
 #import "MacDatabasePreferences.h"
 
-@interface SystemTrayViewController ()
+@interface SystemTrayViewController () 
 
 @property (weak) IBOutlet ClickableTextField *basic;
 @property (weak) IBOutlet ClickableTextField *diceWare;

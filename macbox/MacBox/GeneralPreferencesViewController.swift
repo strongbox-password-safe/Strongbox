@@ -15,14 +15,18 @@ class GeneralPreferencesViewController: NSViewController {
     @IBOutlet var buttonStartAtLogin: NSButton!
     @IBOutlet var showInSystemTray: NSButton!
     @IBOutlet var shortcutView: MASShortcutView!
+    @IBOutlet var commandPaletteShortcutView: MASShortcutView!
     @IBOutlet var quitWhenAllClosed: NSButton!
     @IBOutlet var checkboxAlwaysShowDockIcon: NSButton!
     @IBOutlet var stackAlwaysShowDockIcon: NSStackView!
+    @IBOutlet var passwordGenShortcut: MASShortcutView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         shortcutView.associatedUserDefaultsKey = NSNotification.Name.preferenceGlobalShowShortcut.rawValue
+        commandPaletteShortcutView.associatedUserDefaultsKey = kPreferenceLaunchQuickSearchShortcut
+        passwordGenShortcut.associatedUserDefaultsKey = kPreferencePasswordGeneratorShortcut
 
         bindUI()
     }

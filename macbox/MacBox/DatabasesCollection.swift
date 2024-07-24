@@ -192,6 +192,37 @@ class DatabasesCollection: NSObject {
         return doc.hasUnautosavedChanges || doc.isDocumentEdited || doc.isEditsInProgress 
     }
 
+    @objc public func selectEntryInUI(uuid: String, nodeId: UUID) -> Bool {
+        
+
+        guard let doc = documentForDatabase(uuid: uuid) else {
+            NSLog("🔴 Couldn't get document for this db!")
+            return false
+        }
+
+        setModelNavigationContextWithViewNode(doc.viewModel, .special(.allEntries))
+
+        doc.viewModel.nextGenSelectedItems = [nodeId]
+
+        return true
+    }
+
+    @objc public func popAndPinEntryInUI(uuid: String, nodeId: UUID) -> Bool {
+        
+
+        guard let doc = documentForDatabase(uuid: uuid) else {
+            NSLog("🔴 Couldn't get document for this db!")
+            return false
+        }
+
+        setModelNavigationContextWithViewNode(doc.viewModel, .special(.allEntries))
+        doc.viewModel.nextGenSelectedItems = [nodeId]
+
+        NSApplication.shared.sendAction(#selector(NextGenSplitViewController.onPopOutDetailsAndPin(_:)), to: nil, from: self)
+
+        return true
+    }
+
     @objc public func closeAnyDocumentWindows(uuid: String) {
         if isUnlocked(uuid: uuid) {
             NSLog("🔴 This database is unlocked. Cannot close! NOP")
@@ -276,11 +307,11 @@ class DatabasesCollection: NSObject {
         }
     }
 
-    func initiateDatabaseUnlockInternal(prefs: MacDatabasePreferences,
-                                        uuid: String,
-                                        syncAfterUnlock: Bool,
-                                        message: String? = nil,
-                                        completion: ((_: Bool) -> Void)? = nil)
+    private func initiateDatabaseUnlockInternal(prefs: MacDatabasePreferences,
+                                                uuid: String,
+                                                syncAfterUnlock: Bool,
+                                                message: String? = nil,
+                                                completion: ((_: Bool) -> Void)? = nil)
     {
         let determiner = MacCompositeKeyDeterminer(database: prefs,
                                                    isNativeAutoFillAppExtensionOpen: false,

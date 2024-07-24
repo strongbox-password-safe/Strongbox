@@ -121,3 +121,4 @@
 
 #import "SafeStorageProviderFactory.h"
 #import "ApplicationPreferences.h"
+#import "EntryTableCellView.h"

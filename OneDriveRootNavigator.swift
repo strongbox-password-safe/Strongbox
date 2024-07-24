@@ -40,7 +40,7 @@ struct OneDriveRootNavigator: View {
     let allItems = [
         NavigationItem(id: .myDrives, name: "onedrive_browser_my_drives", image: "externaldrive.fill", header: "onedrive_browser_all_drives", footer: "onedrive_browser_your_onedrive_desc"),
         NavigationItem(id: .sharedWithMe, name: "onedrive_browser_shared_with_me", image: "externaldrive.fill.badge.person.crop", header: "onedrive_browser_shared", footer: "onedrive_browser_shared_desc"),
-        NavigationItem(id: .groupDrives, name: "onedrive_browser_shared_libraries", image: "externaldrive.connected.to.line.below.fill", header: "onedrive_browser_sharepoint_sites", footer: "onedrive_browser_sharepoint_desc", pro: true),
+        NavigationItem(id: .sharepointSharedLibraries, name: "onedrive_browser_shared_libraries", image: "externaldrive.connected.to.line.below.fill", header: "onedrive_browser_sharepoint_sites", footer: "onedrive_browser_sharepoint_desc", pro: true),
     ]
 
     var filteredItems: [NavigationItem] {

@@ -61,7 +61,9 @@ class NewDatabaseSwiftHelper: NSObject {
 
         let nickName = MacDatabasePreferences.getUniqueName(fromSuggestedName: String(format: NSLocalizedString("copy_of_fmt", comment: "Copy of %@"), sourceDatabase.nickName))
 
-        createDatabaseWithSerializedData(nickName: nickName, fileName: sourceDatabase.fileUrl.lastPathComponent, data: data)
+        let fileName = sourceDatabase.fileUrl.lastPathComponent
+
+        createDatabaseWithSerializedData(nickName: nickName, fileName: fileName, data: data)
     }
 
     
@@ -158,7 +160,7 @@ class NewDatabaseSwiftHelper: NSObject {
 
     func createDatabaseWithSerializedData(nickName: String, fileName: String, data: Data) {
         if provider.storageId == .kLocalDevice {
-            guard let url = getLocalDeviceFileSaveURL() else {
+            guard let url = getLocalDeviceFileSaveURL(fileName: fileName) else {
                 completion(nil, true, nil) 
                 return
             }
@@ -169,7 +171,7 @@ class NewDatabaseSwiftHelper: NSObject {
         }
     }
 
-    func getLocalDeviceFileSaveURL() -> URL? {
+    func getLocalDeviceFileSaveURL(fileName: String) -> URL? {
         let panel = NSSavePanel()
         panel.title = NSLocalizedString("mac_save_new_database", comment: "Save New Password Database...")
 
@@ -179,9 +181,7 @@ class NewDatabaseSwiftHelper: NSObject {
         let loc4 = NSLocalizedString("mac_save_new_db_message", comment: "You must save this new database before you can use it")
         panel.message = loc4
 
-        let ext = Serializator.getDefaultFileExtension(for: wizard.selectedDatabaseFormat)
-
-        panel.nameFieldStringValue = String(format: "%@.%@", wizard.selectedNickname, ext)
+        panel.nameFieldStringValue = fileName
 
         if panel.runModal() != .OK {
             return nil

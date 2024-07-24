@@ -471,6 +471,10 @@ class BrowseViewController: NSViewController {
         } else {
 
             outlineView.selectRowIndexes(selectedIndices, byExtendingSelection: false)
+
+            if let foo = selectedIndices.first {
+                outlineView.scrollRowToVisible(foo) 
+            }
         }
     }
 

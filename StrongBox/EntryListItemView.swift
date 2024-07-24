@@ -8,7 +8,6 @@
 
 import SwiftUI
 
-@available(macOS 14.0, *)
 struct EntryListItemView: View {
     var title: String
     var username: String

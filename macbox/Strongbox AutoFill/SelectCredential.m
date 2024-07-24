@@ -9,7 +9,7 @@
 #import "SelectCredential.h"
 #import "DatabaseSearchAndSorter.h"
 #import "NodeIconHelper.h"
-#import "AutoFillCredentialCell.h"
+#import "EntryTableCellView.h"
 #import "NSString+Extensions.h"
 #import "CustomBackgroundTableView.h"
 #import "OTPToken+Generation.h"
@@ -19,9 +19,6 @@
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
-
-
-static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 
 @interface SelectCredential () <NSTableViewDelegate, NSTableViewDataSource, NSSearchFieldDelegate>
 
@@ -39,6 +36,8 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 @property BOOL doneSmartInit;
 @property (weak) IBOutlet NSButton *buttonCreateNew;
 
+@property (nullable) NSTimer* otpTimer;
+
 @end
 
 @implementation SelectCredential
@@ -47,53 +46,95 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     [super viewWillAppear];
     
     if ( !self.viewWillAppearFirstTimeDone ) {
-        self.viewWillAppearFirstTimeDone = YES;
-        
-        NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
-        [self.searchField setPlaceholderString:loc];
-        self.searchField.enabled = YES;
-        self.searchField.delegate = self;
-        self.tableView.dataSource = self;
-        self.tableView.delegate = self;
-        self.tableView.doubleAction = @selector(onSelect:);
-
-        [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kAutoFillCredentialCell bundle:nil]
-                      forIdentifier:kAutoFillCredentialCell];
-
-        [self bindSelectButton];
-        
-        [self loadItems];
-        
-        NSString *text = self.items.count ?
-            NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Entries") :
-            NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
-        
-        self.tableView.emptyString = text;
-        self.cautionImpreciseWarning.hidden = YES;
-        
-        if (@available(macOS 13.0, *)) {
-            self.buttonCreateNew.hidden = self.model.isReadOnly;
-        }
-        else {
-            self.buttonCreateNew.hidden = YES;
-        }
+        [self setupUI];
     }
 }
 
 - (void)viewDidAppear {
     [super viewDidAppear];
-
-    if ( !self.doneFirstAppearanceTasks ) { 
+    
+    if ( !self.doneFirstAppearanceTasks ) {
         self.doneFirstAppearanceTasks = YES;
         self.view.window.frameAutosaveName = @"SelectCredential-AutoSave";
-
+        
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self smartInitializeSearch];
-
+            
             [self.view.window makeFirstResponder:self.searchField];
             
             [self onSearch:nil];
         });
+    }
+    
+    [self startOtpRefreshTimer];
+}
+
+- (void)viewDidDisappear {
+    [super viewDidDisappear];
+    
+    [self stopOtpRefreshTimer];
+}
+
+- (void)setupUI {
+    self.viewWillAppearFirstTimeDone = YES;
+    
+    NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
+    [self.searchField setPlaceholderString:loc];
+    self.searchField.enabled = YES;
+    self.searchField.delegate = self;
+    self.tableView.dataSource = self;
+    self.tableView.delegate = self;
+    self.tableView.doubleAction = @selector(onSelect:);
+    
+    [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kEntryTableCellViewIdentifier bundle:nil]
+                  forIdentifier:kEntryTableCellViewIdentifier];
+    
+    [self.tableView sizeLastColumnToFit];
+    
+    [self bindSelectButton];
+    
+    [self loadItems];
+    
+    NSString *text = self.items.count ?
+    NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Entries") :
+    NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
+    
+    self.tableView.emptyString = text;
+    self.cautionImpreciseWarning.hidden = YES;
+    
+    if (@available(macOS 13.0, *)) {
+        self.buttonCreateNew.hidden = self.model.isReadOnly;
+    }
+    else {
+        self.buttonCreateNew.hidden = YES;
+    }
+}
+
+- (void)stopOtpRefreshTimer {
+    if ( self.otpTimer ) {
+        [self.otpTimer invalidate];
+        self.otpTimer = nil;
+    }
+}
+
+- (void)startOtpRefreshTimer {
+    [self stopOtpRefreshTimer];
+    
+    self.otpTimer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                     target:self
+                                                   selector:@selector(refreshOtpCodes)
+                                                   userInfo:nil
+                                                    repeats:YES];
+}
+
+- (void)refreshOtpCodes {
+    NSScrollView* scrollView = self.tableView.enclosingScrollView;
+    CGRect visibleRect = scrollView.contentView.visibleRect;
+    NSRange rowRange = [self.tableView rowsInRect:visibleRect];
+
+    if ( rowRange.length > 0 ) {
+        NSIndexSet* indexSet = [[NSIndexSet alloc] initWithIndexesInRange:rowRange];
+        [self.tableView reloadDataForRowIndexes:indexSet columnIndexes:[NSIndexSet indexSetWithIndex:0]];
     }
 }
 
@@ -317,15 +358,11 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     
     NSImage* icon = [NodeIconHelper getIconForNode:node predefinedIconSet:kKeePassIconSetClassic format:self.model.originalFormat large:NO];
 
-    AutoFillCredentialCell *result = [tableView makeViewWithIdentifier:kAutoFillCredentialCell owner:self];
+    EntryTableCellView *result = [tableView makeViewWithIdentifier:kEntryTableCellViewIdentifier owner:self];
 
-    result.textFieldTitle.stringValue = title ? title : @"";
-    result.textFieldSubtitle.stringValue = username ? username : @"";
-    result.textFieldTopRight.stringValue = @"";
-    result.textFieldBottomRight.stringValue = @"";
+    NSString* path = [self.model.database getPathDisplayString:node];
+    [result setContent:title username:username totp:node.fields.otpToken image:icon path:path database:self.model.metadata.nickName];
     
-    result.image.image = icon;
-
     return result;
 }
 

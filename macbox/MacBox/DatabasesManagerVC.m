@@ -34,20 +34,21 @@
 #import "WebDAVConfigVC.h"
 
 #ifndef NO_NETWORKING
-    #import "SFTPStorageProvider.h"
-    #import "SFTPConnectionsManager.h"
-    #import "WebDAVConnectionsManager.h"
-    #import "WebDAVStorageProvider.h"
+#import "SFTPStorageProvider.h"
+#import "SFTPConnectionsManager.h"
+#import "WebDAVConnectionsManager.h"
+#import "WebDAVStorageProvider.h"
 #endif
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    #import "GoogleDriveStorageProvider.h"
-    #import "DropboxV2StorageProvider.h"
+#import "GoogleDriveStorageProvider.h"
+#import "DropboxV2StorageProvider.h"
 #endif
 
 #import "Strongbox-Swift.h"
 #import "DatabaseNuker.h"
 #import "MacFileBasedBookmarkStorageProvider.h"
+#import "SBLog.h"
 
 
 
@@ -178,7 +179,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)onProStatusChanged:(id)param {
-    NSLog(@"✅ DatabasesManagerVC: Pro Status Changed!");
+    SBLog(@"✅ DatabasesManagerVC: Pro Status Changed!");
     
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self bindVersionSubtitle];
@@ -217,7 +218,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     BOOL willDeleteFromCloudKit = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         return obj.storageProvider == kCloudKit && obj.isOwnedByMeCloudKit;
     }];
-
+    
     BOOL deleteAttemptOnUnownedCloudKitDatabase = [selected.allObjects anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         return obj.storageProvider == kCloudKit && !obj.isOwnedByMeCloudKit;
     }];
@@ -281,7 +282,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
-                NSLog(@"🔴 Error Nuking Database [%@]", error);
+                SBLog(@"🔴 Error Nuking Database [%@]", error);
                 [MacAlerts error:error window:self.view.window];
             }
         });
@@ -362,7 +363,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     view.onBeginEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
         NSInteger row = [weakSelf.tableView rowForView:cell];
         if ( row != -1 && weakSelf.tableView.selectedRow != row ) {
-            NSLog(@"Extending Selection after nickname click");
+            SBLog(@"Extending Selection after nickname click");
             [weakSelf.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         }
         
@@ -389,7 +390,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:databaseId];
-
+        
         if ( database.storageProvider == kCloudKit ) {
             MacAlerts* alert = [[MacAlerts alloc] init];
             
@@ -413,7 +414,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     if ( database.storageProvider == kCloudKit ) {
         NSString* fileName = [name stringByAppendingPathExtension:database.fileUrl.pathExtension];
-
+        
         [self renameCloudKitDatabase:database nick:name fileName:fileName];
     }
 }
@@ -424,8 +425,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 #ifndef NO_NETWORKING
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_renaming_ellipsis", @"Renaming...")
                                         viewController:self];
-            
-    [CloudKitDatabasesInteractor.shared renameWithDatabase:database 
+    
+    [CloudKitDatabasesInteractor.shared renameWithDatabase:database
                                                   nickName:nick
                                                   fileName:fileName
                                          completionHandler:^(NSError * _Nullable error) {
@@ -437,7 +438,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)showHideColumn:(NSString*)identifier show:(BOOL)show {
     NSInteger colIdx = [self.tableView columnWithIdentifier:identifier];
     if(colIdx == -1) {
-        NSLog(@"WARN WARN WARN: Could not find column: %@", identifier);
+        SBLog(@"WARN WARN WARN: Could not find column: %@", identifier);
         return;
     }
     
@@ -471,7 +472,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     BOOL disabled = database.storageProvider != kLocalDevice && filesOnly;
     
     if ( disabled ) {
-        NSLog(@"🔴 Attempt to unlock unsupported Database Storage Provider");
+        SBLog(@"🔴 Attempt to unlock unsupported Database Storage Provider");
         return;
     }
     
@@ -481,7 +482,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         database.userRequestOfflineOpenEphemeralFlagForDocument = offline;
     }
     else if ( existing.isInOfflineMode != offline ) {
-        NSLog(@"⚠️ Ignoring request to open in different Offline Mode as database is already unlocked...");
+        SBLog(@"⚠️ Ignoring request to open in different Offline Mode as database is already unlocked...");
     }
     
     [self showProgressModal:NSLocalizedString(@"generic_loading", "Loading...")];
@@ -526,7 +527,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [self onRemove:nil];
     }
     else if ( (aChar == NSEnterCharacter) || (aChar == NSCarriageReturnCharacter) ) {
-        NSLog(@"DatabasesManagerVC::keyDown - OPEN");
+        SBLog(@"DatabasesManagerVC::keyDown - OPEN");
         [self performActionOnSelected:^(MacDatabasePreferences* database) {
             [self openDatabase:database];
         }];
@@ -591,8 +592,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
-
-
+    
+    
     MacDatabasePreferences* singleSelectedDatabase = nil;
     if ( self.tableView.selectedRowIndexes.count == 1 ) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
@@ -609,7 +610,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if ( item ) {
         [menu removeItem:item];
     }
-
+    
     item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
         return obj.action == @selector(onChangeFilename:);
     }];
@@ -617,7 +618,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if ( item ) {
         [menu removeItem:item];
     }
-
+    
     item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
         return obj.action == @selector(onEditSFTPConnection:);
     }];
@@ -625,7 +626,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if ( item ) {
         [menu removeItem:item];
     }
-
+    
     item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
         return obj.action == @selector(onEditWebDAVConnection:);
     }];
@@ -633,19 +634,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if ( item ) {
         [menu removeItem:item];
     }
-
+    
     
     
     if ( singleSelectedDatabase ) {
         if( singleSelectedDatabase.storageProvider == kCloudKit ) {
-            NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:singleSelectedDatabase.isSharedInCloudKit ? 
+            NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:singleSelectedDatabase.isSharedInCloudKit ?
                                 NSLocalizedString(@"generic_manage_sharing_action_ellipsis", @"Manage Sharing...") :
                                 NSLocalizedString(@"generic_share_action_ellipsis", @"Share...")
                                                           action:@selector(onShareCloudKit:)
                                                    keyEquivalent:@""];
             
             [menu insertItem:item atIndex:5];
-
+            
             item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"generic_change_filename_ellipsis_action", @"Change Filename...")
                                               action:@selector(onChangeFilename:)
                                        keyEquivalent:@""];
@@ -658,7 +659,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                                                    keyEquivalent:@""];
             
             [menu insertItem:item atIndex:5];
-        }        
+        }
         else if( singleSelectedDatabase.storageProvider == kWebDAV ) {
             NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString(@"generic_action_edit_webdav_connection_ellipsis", @"WebDAV Connection...")
                                                           action:@selector(onEditWebDAVConnection:)
@@ -671,7 +672,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
-
+    
     
     SEL theAction = [anItem action];
     
@@ -711,10 +712,10 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             if( singleSelectedDatabase.storageProvider == kCloudKit ) {
                 NSMenuItem* item = (NSMenuItem*)anItem;
                 
-                [item setTitle:singleSelectedDatabase.isSharedInCloudKit ? 
+                [item setTitle:singleSelectedDatabase.isSharedInCloudKit ?
                  NSLocalizedString(@"generic_manage_sharing_action_ellipsis", @"Manage Sharing...") :
                  NSLocalizedString(@"generic_share_action_ellipsis", @"Share...")];
-
+                
                 return YES;
             }
         }
@@ -758,11 +759,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             return YES;
         }
     }
-
+    
     if (theAction == @selector(onRemove:)) { 
         return self.tableView.selectedRowIndexes.count > 0;
     }
-
+    
     return NO;
 }
 
@@ -904,7 +905,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)export:(MacDatabasePreferences *)database
           dest:(NSURL*)dest {
     NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
-    NSLog(@"Export [%@] => [%@]", src, dest);
+    SBLog(@"Export [%@] => [%@]", src, dest);
     
     if ( !src ) {
         [MacAlerts info:NSLocalizedString(@"open_sequence_couldnt_open_local_message", "Could not open Strongbox's local copy of this database. A online sync is required.")
@@ -1053,9 +1054,9 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     for ( NSViewController* vc in self.presentedViewControllers ) {
         [Utils dismissViewControllerCorrectly:vc];
     }
-
     
-
+    
+    
     NSString* cloudKitUnavailableReason = nil;
     
 #ifndef NO_NETWORKING
@@ -1082,7 +1083,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             [Utils dismissViewControllerCorrectly:sheet];
             
             if ( !userCancelled ) {
-                [weakSelf onAddDatabaseUserChoseStorage:storageProvider 
+                [weakSelf onAddDatabaseUserChoseStorage:storageProvider
                                          wiFiSyncDevice:selectedWiFiSyncDevice
                                              createMode:createMode
                                                newModel:newModel
@@ -1096,7 +1097,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 - (void)onAddDatabaseUserChoseStorage:(StorageProvider)storageProvider
                        wiFiSyncDevice:(WiFiSyncServerConfig*)wiFiSyncDevice
-                           createMode:(BOOL)createMode 
+                           createMode:(BOOL)createMode
                              newModel:(DatabaseModel* _Nullable)newModel
                existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
     if ( createMode ) {
@@ -1151,7 +1152,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
 }
 
-- (void)onAddDatabaseSelectedWiFiSyncDevice:(WiFiSyncServerConfig*)server 
+- (void)onAddDatabaseSelectedWiFiSyncDevice:(WiFiSyncServerConfig*)server
                                    newModel:(DatabaseModel* _Nullable)newModel existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
     NSViewController* vc = [SwiftUIViewFactory makeWiFiSyncPassCodeEntryViewController:server
                                                                                 onDone:^(WiFiSyncServerConfig * server, NSString *passcode) {
@@ -1167,7 +1168,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)onAddWifiSyncDatabase:(WiFiSyncServerConfig*)server
-                     passcode:(NSString*)passcode 
+                     passcode:(NSString*)passcode
                      newModel:(DatabaseModel* _Nullable)newModel existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
     WiFiSyncStorageProvider *sp = [[WiFiSyncStorageProvider alloc] init];
     
@@ -1215,7 +1216,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [self showStorageBrowserForProvider:provider createMode:NO newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
 }
 
-- (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider 
+- (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider
                            createMode:(BOOL)createMode
                              newModel:(DatabaseModel* _Nullable)newModel
                existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
@@ -1235,12 +1236,12 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)onSelectedStorageLocationSuccess:(id<SafeStorageProvider>)provider
                             selectedItem:(StorageBrowserItem*)selectedItem
                               createMode:(BOOL)createMode
-                                newModel:(DatabaseModel* _Nullable)newModel 
+                                newModel:(DatabaseModel* _Nullable)newModel
                   existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
     if ( createMode ) {
-        [self onSelectedNewDatabaseLocation:provider 
+        [self onSelectedNewDatabaseLocation:provider
                       providerLocationParam:selectedItem
-                                   newModel:newModel 
+                                   newModel:newModel
                      existingDatabaseToCopy:existingDatabaseToCopy];
     }
     else {
@@ -1292,19 +1293,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     if ( newModel ) {
         if ( ![helper beginImportNewDatabaseSequenceWithImportedModel:newModel error:&error] ) {
-            NSLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            SBLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
             [MacAlerts error:error window:self.view.window];
         }
     }
     else if ( existingDatabaseToCopy ) {
         if (! [helper beginCopyToNewDatabaseSequenceWithSourceDatabase:existingDatabaseToCopy error:&error] ) {
-            NSLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            SBLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
             [MacAlerts error:error window:self.view.window];
         }
     }
     else {
         if ( ![helper beginBrandNewDatabaseSequenceAndReturnError:&error] ) {
-            NSLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            SBLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
             [MacAlerts error:error window:self.view.window];
         }
     }
@@ -1318,7 +1319,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     
     if ( error || !database ) {
-        NSLog(@"🔴 Error in onNewImportedDatabaseCreatedDone: [%@]", error);
+        SBLog(@"🔴 Error in onNewImportedDatabaseCreatedDone: [%@]", error);
         [MacAlerts error:error window:self.view.window];
         return;
     }
@@ -1331,6 +1332,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 
 #ifndef NO_NETWORKING
+
 - (IBAction)onShareCloudKit:(id)sender {
     if(self.tableView.selectedRow == -1) {
         return;
@@ -1391,8 +1393,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 - (void)onCreateOrManageCloudKitSharing:(MacDatabasePreferences*)database {
     self.cloudKitSharingHelper = [[CocoaCloudKitSharingHelper alloc] initWithDatabase:database
-                                                                window:self.view.window
-                                                            completion:^(NSError * _Nullable error) {
+                                                                               window:self.view.window
+                                                                           completion:^(NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
                 [MacAlerts error:error window:self.view.window];
@@ -1402,7 +1404,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             
             [CloudKitDatabasesInteractor.shared refreshAndMergeWithCompletionHandler:^(NSError * _Nullable error) {
                 if ( error ) {
-                    NSLog(@"🔴 Error refreshing... [%@]", error);
+                    SBLog(@"🔴 Error refreshing... [%@]", error);
                 }
             }];
         });
@@ -1428,7 +1430,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 mode = OneDriveNavigationContextModeMyDrives;
             }
             else {
-                mode = OneDriveNavigationContextModeGroupDrives;
+                mode = OneDriveNavigationContextModeSharepointSharedLibraries;
             }
             
             [self launchOneDriveBrowser:mode createMode:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
@@ -1454,7 +1456,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 mode = OneDriveNavigationContextModeSharedWithMe;
             }
             else {
-                mode = OneDriveNavigationContextModeGroupDrives;
+                mode = OneDriveNavigationContextModeSharepointSharedLibraries;
             }
             
             [self launchOneDriveBrowser:mode createMode:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
@@ -1464,8 +1466,17 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 - (void)launchOneDriveBrowser:(OneDriveNavigationContextMode)mode
                    createMode:(BOOL)createMode
-                     newModel:(DatabaseModel* _Nullable)newModel 
+                     newModel:(DatabaseModel* _Nullable)newModel
        existingDatabaseToCopy:(MacDatabasePreferences* _Nullable)existingDatabaseToCopy {
+    if ( mode == OneDriveNavigationContextModeSharepointSharedLibraries && !Settings.sharedInstance.isPro ) {
+        [MacAlerts info:NSLocalizedString(@"mac_autofill_pro_feature_title", @"Pro Feature")
+        informativeText:NSLocalizedString(@"sharepoint_pro_feature_message", @"Sharepoint Shared Libraries are a Pro feature. Please upgrade to enjoy full access.")
+                 window:self.view.window
+             completion:nil];
+        
+        return;
+    }
+    
     OneDriveNavigationContext * context = [[OneDriveNavigationContext alloc] initWithMode:mode msalResult:nil driveItem:nil];
     
     SelectStorageLocationVC* vc = [SelectStorageLocationVC newViewController];
@@ -1485,6 +1496,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     [self presentViewControllerAsSheet:vc];
 }
+
 #endif
 
 - (IBAction)onShowPasswordGenerator:(id)sender {
@@ -1492,5 +1504,3 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 @end
-
-

@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString* const kDatabasesCollectionLockStateChangedNotification;
 
 extern NSString *const kPreferenceGlobalShowShortcutNotification;
+extern NSString *const kPreferenceLaunchQuickSearchShortcut;
+extern NSString *const kPreferencePasswordGeneratorShortcut;
 extern NSString *const kSettingsChangedNotification;
 extern NSString *const kTotpUpdateNotification;
 extern NSString* const kProStatusChangedNotification;
