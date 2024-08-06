@@ -55,7 +55,7 @@
 
     
     if ( wrote < 0 ) {
-        NSLog(@"WARNWARN: Could not write XML data to output stream...");
+        slog(@"WARNWARN: Could not write XML data to output stream...");
         self.error = self.outputStream.streamError ? self.outputStream.streamError : [Utils createNSError:@"There was an error writing to output stream from XmlOutputStreamWriter." errorCode:-1];
     }
 }

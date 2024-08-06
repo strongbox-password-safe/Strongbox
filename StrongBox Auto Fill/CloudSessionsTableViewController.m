@@ -153,7 +153,7 @@
                   message:NSLocalizedString(@"cloud_sessions_prompt_signout_onedrive_message", @"Are you sure you want to sign out of OneDrive?")
                    action:^(BOOL response) {
                        if (response) {
-                           [TwoDriveStorageProvider.sharedInstance signOutAll];
+                           [OneDriveStorageProvider.sharedInstance signOutAll];
                        }
                    }];
         }

@@ -16,7 +16,7 @@ class WiFiSyncServerConnectionConfig: NSObject, Codable {
     var passcode: String? {
         get {
             guard let passcode = SecretStore.sharedInstance().getSecureString(keychainIdentifier) else {
-                NSLog("🔴 Could not get Passcode in the SE for [%@]", keychainIdentifier)
+                swlog("🔴 Could not get Passcode in the SE for [%@]", keychainIdentifier)
                 return nil
             }
 
@@ -53,7 +53,7 @@ class WiFiSyncServerConnectionConfig: NSObject, Codable {
         let data = try? JSONEncoder().encode(self)
 
         guard let data, let str = String(data: data, encoding: .utf8) else {
-            NSLog("🔴 Could not encode WiFiSyncServerConnectionConfig to JSON")
+            swlog("🔴 Could not encode WiFiSyncServerConnectionConfig to JSON")
             return "{}"
         }
 
@@ -64,7 +64,7 @@ class WiFiSyncServerConnectionConfig: NSObject, Codable {
         guard let data = json.data(using: .utf8),
               let obj = try? JSONDecoder().decode(WiFiSyncServerConnectionConfig.self, from: data)
         else {
-            NSLog("🔴 Could not convert JSON string to object")
+            swlog("🔴 Could not convert JSON string to object")
             return nil
         }
 

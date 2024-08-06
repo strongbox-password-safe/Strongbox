@@ -23,12 +23,12 @@
 
 + (void)applyCustomizations {
     if ( [self isAProBundle] ) {
-        NSLog(@"Pro Bundle... customizing...");
+        slog(@"Pro Bundle... customizing...");
         [AppPreferences.sharedInstance setPro:YES];
     }
     
     if ( [self isScotusEdition] ) {
-        NSLog(@"SCOTUS Edition... customizing...");
+        slog(@"SCOTUS Edition... customizing...");
         
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
         AppPreferences.sharedInstance.disableWiFiSyncClientMode = YES;
@@ -41,7 +41,7 @@
         AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
     }
     else if ( self.isGrapheneEdition ) {
-        NSLog(@"Graphene Edition... customizing...");
+        slog(@"Graphene Edition... customizing...");
         
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
         AppPreferences.sharedInstance.disableWiFiSyncClientMode = YES;

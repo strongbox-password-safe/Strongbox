@@ -94,7 +94,7 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
         NSString* key = [self getCacheKey:sbi];
         
         if ( error ) {
-            NSLog(@"error %@", error);
+            slog(@"error %@", error);
             self.itemsCache[key] = @[[StorageBrowserItem itemWithName:error.description identifier:kLoadingItemErrorIdentifier folder:NO providerData:nil]];
         }
         else {
@@ -123,7 +123,7 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
     NSString* key = sbi ? sbi.identifier : kRootItemCacheKey;
     
     if ( key == nil ) {
-        NSLog(@"🔴 getCacheKey nil key!!");
+        slog(@"🔴 getCacheKey nil key!!");
     }
     
     return key;

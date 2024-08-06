@@ -69,7 +69,7 @@
 
 - (void)appBecameActive {
     if (AutoFillManager.sharedInstance.isOnForStrongbox) {
-        NSLog(@"AutoFill has been switched on!");
+        slog(@"AutoFill has been switched on!");
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter removeObserver:self];            
@@ -78,7 +78,7 @@
         });
     }
     else {
-        NSLog(@"AutoFill has not been switched on!");
+        slog(@"AutoFill has not been switched on!");
     }
 }
 

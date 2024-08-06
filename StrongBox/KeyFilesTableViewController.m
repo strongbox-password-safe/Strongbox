@@ -157,7 +157,7 @@
         NSError *error;
         NSNumber *isDirectory = nil;
         if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
-            NSLog(@"%@", error);
+            slog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
             if(AppPreferences.sharedInstance.showAllFilesInLocalKeyFiles || ![self isUnlikelyKeyFile:url]) {
@@ -189,7 +189,7 @@
         NSError *error;
         NSNumber *isDirectory = nil;
         if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
-            NSLog(@"%@", error);
+            slog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
             [files addObject:url];
@@ -267,13 +267,13 @@
         NSData* data = [Utils getImageDataFromPickedImage:info error:&error];
         
         if(!data) {
-            NSLog(@"Error: %@", error);
+            slog(@"Error: %@", error);
             [Alerts error:self
                     title:NSLocalizedString(@"key_files_vc_error_reading", @"Error Reading")
                     error:error];
         }
         else {
-            NSLog(@"info = [%@]", info);
+            slog(@"info = [%@]", info);
             
             if(self.onDone) {
                 self.onDone(YES, nil, data);
@@ -299,7 +299,7 @@
         
         
         if (! [url startAccessingSecurityScopedResource] ) {
-            NSLog(@"🔴 Could not securely access URL!");
+            slog(@"🔴 Could not securely access URL!");
         }
         
         __block NSData *data;
@@ -314,7 +314,7 @@
         [url stopAccessingSecurityScopedResource];
         
         if(!data) {
-            NSLog(@"Error: %@", err);
+            slog(@"Error: %@", err);
             [Alerts error:self
                     title:NSLocalizedString(@"key_files_vc_error_reading", @"There was an error reading the Key File")
                     error:err
@@ -349,7 +349,7 @@
     NSURL* localUrl = [self importToLocal:url.lastPathComponent data:data error:&error];
     
     if(!localUrl) {
-        NSLog(@"Error: %@", error);
+        slog(@"Error: %@", error);
         [Alerts error:self
                 title:NSLocalizedString(@"key_files_vc_error_importing", @"There was an importing the Key File (does it already exist?)")
                 error:error
@@ -680,7 +680,7 @@
 - (NSURL*)saveKeyFileToTemp:(KeyFile*)keyFile {
     NSData* data = [keyFile.xml dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     if ( !data ) {
-        NSLog(@"🔴 Could not get key file data");
+        slog(@"🔴 Could not get key file data");
         return nil;
     }
 
@@ -691,7 +691,7 @@
 
     NSError* error;
     if ( ![data writeToURL:url options:NSDataWritingWithoutOverwriting error:&error] ) {
-        NSLog(@"🔴 Error in saveKeyFileToTemp %@", error);
+        slog(@"🔴 Error in saveKeyFileToTemp %@", error);
         return nil;
     }
 
@@ -725,7 +725,7 @@
 - (void)onImportNewKeyFile:(KeyFile*)keyFile filename:(NSString*)filename {
     NSData* data = [keyFile.xml dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES];
     if ( !data ) {
-        NSLog(@"🔴 Could not get key file data");
+        slog(@"🔴 Could not get key file data");
         return;
     }
     
@@ -735,7 +735,7 @@
     [self importToLocal:uniq data:data error:&error];
     
     if ( error ) {
-        NSLog(@"🔴 Could not write key file... [%@]", error);
+        slog(@"🔴 Could not write key file... [%@]", error);
         [Alerts error:self error:error];
     }
     else {

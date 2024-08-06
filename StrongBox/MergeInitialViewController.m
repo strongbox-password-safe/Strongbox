@@ -67,7 +67,7 @@
     }
     else if (result == kUnlockDatabaseResultIncorrectCredentials) {
         
-        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+        slog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
     }
     else if (result == kUnlockDatabaseResultError) {
         [self displayError:error];

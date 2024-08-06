@@ -44,9 +44,26 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStartWithLastViewedEntry;
 
+@property (readonly) DatabaseFormat format;
+@property (readonly) DatabasePreferences* databaseMetaData;
+
 @end
 
 @implementation BrowsePreferencesTableViewController
+
++ (instancetype)fromStoryboard {
+    UIStoryboard *sb = [UIStoryboard storyboardWithName:@"CustomizeView" bundle:nil];
+    BrowsePreferencesTableViewController* ret = [sb instantiateInitialViewController];
+    return ret;
+}
+
+- (DatabaseFormat)format {
+    return self.model.originalFormat;
+}
+
+- (DatabasePreferences *)databaseMetaData {
+    return self.model.metadata;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -154,7 +171,7 @@
             return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_notes", @"Copy Notes");
             break;
         case kBrowseTapActionCopyTotp:
-            return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_totp", @"Copy TOTP");
+            return NSLocalizedString(@"browse_prefs_tap_action_copy_copy_totp", @"Copy 2FA");
             break;
         case kBrowseTapActionEdit:
             return NSLocalizedString(@"browse_prefs_tap_action_edit", @"Edit Item");

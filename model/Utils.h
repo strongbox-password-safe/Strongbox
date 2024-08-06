@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SBLog.h"
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>

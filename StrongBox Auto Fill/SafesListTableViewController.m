@@ -62,7 +62,7 @@
         }];
      
         if( database && [self autoFillIsPossibleWithSafe:database]) {
-            NSLog(@"AutoFill - Quick Launch configured and possible... launching db");
+            slog(@"AutoFill - Quick Launch configured and possible... launching db");
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self openDatabase:database];

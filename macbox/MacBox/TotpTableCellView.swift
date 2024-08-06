@@ -10,10 +10,11 @@ import Foundation
 
 class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenuDelegate {
     deinit {
-        NSLog("😎 DEINIT [TotpTableCellView]")
+        swlog("😎 DEINIT [TotpTableCellView]")
         NotificationCenter.default.removeObserver(self)
     }
 
+    @IBOutlet var labelOtpAuthURLIssuer: NSTextField!
     @IBOutlet var labelFieldName: NSTextField!
     @IBOutlet var progressTotp: NSProgressIndicator!
     @IBOutlet var labelTotp: NSTextField!
@@ -24,7 +25,7 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
         super.awakeFromNib()
 
         NotificationCenter.default.addObserver(forName: .totpUpdate, object: nil, queue: nil) { [weak self] _ in
-            self?.bindTOTP()
+            self?.bind2FACode()
         }
     }
 
@@ -59,11 +60,11 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
 
     var token: OTPToken? {
         didSet {
-            bindTOTP()
+            bind2FACode()
         }
     }
 
-    @objc func bindTOTP() {
+    @objc func bind2FACode() {
         if let totp = token {
             let current = NSDate().timeIntervalSince1970
             let period = totp.period
@@ -76,14 +77,31 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
             progressTotp.minValue = 0
             progressTotp.maxValue = totp.period
             progressTotp.doubleValue = remainingSeconds
+
+            if let issuer = totp.issuer, !issuer.isEmpty, issuer != "<Unknown>", issuer != "Strongbox" {
+                if let name = totp.name, !name.isEmpty, name != "<Unknown>", name != "Strongbox" {
+                    labelOtpAuthURLIssuer.stringValue = String(format: "%@: %@", issuer, name)
+                } else {
+                    labelOtpAuthURLIssuer.stringValue = issuer
+                }
+                labelOtpAuthURLIssuer.isHidden = false
+            } else if let name = totp.name, !name.isEmpty, name != "<Unknown>", name != "Strongbox" {
+                labelOtpAuthURLIssuer.stringValue = name
+                labelOtpAuthURLIssuer.isHidden = false
+            } else {
+                labelOtpAuthURLIssuer.stringValue = ""
+                labelOtpAuthURLIssuer.isHidden = true
+            }
         } else {
             labelTotp.stringValue = "000000"
             labelTotp.textColor = nil
+            labelOtpAuthURLIssuer.stringValue = ""
+            labelOtpAuthURLIssuer.isHidden = true
         }
     }
 
     func showPopupButtonMenu() {
-        NSLog("✅ showPopupButton")
+        swlog("✅ showPopupButton")
 
         popupButton.performClick(nil)
     }

@@ -29,6 +29,8 @@ class MMcGSwiftUtils: NSObject {
         imageView.image = image
         imageView.tintColor = tint
         imageView.contentMode = .scaleAspectFit
+        imageView.layer.cornerRadius = 3
+        imageView.layer.masksToBounds = true
 
         let label = UILabel()
         label.text = titleText

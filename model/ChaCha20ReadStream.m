@@ -125,7 +125,7 @@ static const uint32_t kBlockSize = 64;
     self.readFromStreamTotal += bytesRead;
     
     if (bytesRead < 0) {
-        NSLog(@"ChaCha20ReadStream Could not read input stream");
+        slog(@"ChaCha20ReadStream Could not read input stream");
         self.error = self.inputStream.streamError; 
         self.workChunk = nil;
         self.workChunkLength = 0;

@@ -10,6 +10,7 @@
 #import "tomcrypt.h"
 #import "TwoFishReadStream.h"
 #import "TwoFishOutputStream.h"
+#import "SBLog.h"
 
 static const uint32_t kKeySize = 32;
 static const uint32_t kBlockSize = 16;
@@ -22,7 +23,7 @@ static const uint32_t kIvSize = kBlockSize;
     symmetric_key skey;
     
     if ((twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
-        NSLog(@"Invalid Key");
+        slog(@"Invalid Key");
         return nil;
     }
     
@@ -58,13 +59,13 @@ static const uint32_t kIvSize = kBlockSize;
     BOOL padding = YES;
     int paddingLength = pt[kBlockSize-1];
     if(paddingLength <= 0 || paddingLength > kBlockSize)  {
-        NSLog(@"TWOFISH: Padding Byte Out of Range! Assuming Not Padded...");
+        slog(@"TWOFISH: Padding Byte Out of Range! Assuming Not Padded...");
         padding = NO;
     }
     
     for(int i = kBlockSize - paddingLength; i < kBlockSize; i++) {
         if(pt[i] != paddingLength) {
-            NSLog(@"TWOFISH: Padding byte not equal expected! Assuming Not Padded...");
+            slog(@"TWOFISH: Padding byte not equal expected! Assuming Not Padded...");
             padding = NO;
         }
     }
@@ -84,7 +85,7 @@ static const uint32_t kIvSize = kBlockSize;
     symmetric_key skey;
     
     if ((twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
-        NSLog(@"Invalid Key");
+        slog(@"Invalid Key");
         return nil;
     }
     
@@ -131,7 +132,7 @@ static const uint32_t kIvSize = kBlockSize;
     
     if(SecRandomCopyBytes(kSecRandomDefault, kIvSize, newKey.mutableBytes))
     {
-        NSLog(@"Could not securely copy new bytes");
+        slog(@"Could not securely copy new bytes");
         return nil;
     }
     

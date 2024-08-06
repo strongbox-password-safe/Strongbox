@@ -359,7 +359,7 @@
     [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(1481853033) }
                   completionBlock:^(BOOL result, NSError * _Nullable error) {
         if ( !result ) {
-            NSLog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
+            slog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
         }
     }];
     
@@ -507,7 +507,7 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
                                      options:@{}
                            completionHandler:^(BOOL success) {
         if (!success) {
-            NSLog(@"Couldn't launch this URL!");
+            slog(@"Couldn't launch this URL!");
         }
     }];
 }

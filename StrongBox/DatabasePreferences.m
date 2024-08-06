@@ -106,7 +106,7 @@
         return [SafesList.sharedInstance add:self.templateDummy initialCache:initialCache initialCacheModDate:initialCacheModDate error:error];
     }
     else {
-        NSLog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
+        slog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
         return NO;
     }
 }
@@ -125,14 +125,14 @@
                                                     initialCacheModDate:initialCacheModDate
                                                           duplicateUuid:&duplicateUuid
                                                                   error:error];
-    
+        
         if ( duplicateUuid ) {
-            NSLog(@"✅ Duplicate found - changing UUID of this database to match...");
+            slog(@"✅ Duplicate found - changing UUID of this database to match...");
             _uuid = duplicateUuid;
         }
     }
     else {
-        NSLog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
+        slog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
     }
     
     if ( duplicateFound ) {
@@ -177,10 +177,10 @@
     for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
         [DatabaseNuker nuke:database deleteUnderlyingIfSupported:YES completion:^(NSError * _Nullable error) {
             if ( error ) {
-                NSLog(@"🔴 error nuking database = [%@]", error);
+                slog(@"🔴 error nuking database = [%@]", error);
             }
             else {
-                NSLog(@"🟢 database nuked... [%@]", database);
+                slog(@"🟢 database nuked... [%@]", database);
             }
         }];
     }
@@ -1446,6 +1446,26 @@
 - (void)setIsOwnedByMeCloudKit:(BOOL)isOwnedByMeCloudKit {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.isOwnedByMeCloudKit = isOwnedByMeCloudKit;
+    }];
+}
+
+- (BOOL)hasInitializedHomeTab {
+    return self.metadata.hasInitializedHomeTab;
+}
+
+- (void)setHasInitializedHomeTab:(BOOL)hasInitializedHomeTab {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.hasInitializedHomeTab = hasInitializedHomeTab;
+    }];
+}
+
+- (NSArray<NSNumber *> *)visibleHomeSections {
+    return self.metadata.visibleHomeSections;
+}
+
+- (void)setVisibleHomeSections:(NSArray<NSNumber *> *)visibleHomeSections {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.visibleHomeSections = visibleHomeSections;
     }];
 }
 

@@ -51,7 +51,7 @@
             *error = [Utils createNSError:@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache" errorCode:-1];
         }
         
-        NSLog(@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache [%@][%@]", data, dateModified);
+        slog(@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache [%@][%@]", data, dateModified);
         return nil;
     }
     
@@ -64,7 +64,7 @@
     
         BOOL success = [NSFileManager.defaultManager replaceItemAtURL:localWorkingCacheUrl withItemAtURL:fileUrl backupItemName:nil options:kNilOptions resultingItemURL:nil error:error];
         if ( !success ) {
-            NSLog(@"SyncManager::replaceItemAtURL - failed with %@", error ? *error : nil);
+            slog(@"SyncManager::replaceItemAtURL - failed with %@", error ? *error : nil);
             return nil;
         }
     }
@@ -101,7 +101,7 @@
         [NSFileManager.defaultManager removeItemAtURL:localCache error:&error];
         
         if (error) {
-            NSLog(@"Error delete local working cache: [%@]", error);
+            slog(@"Error delete local working cache: [%@]", error);
         }
     }
 }
@@ -112,7 +112,7 @@
 
 - (NSURL*)getLocalWorkingCacheUrlForDatabase:(NSString*)databaseUuid {
     if ( databaseUuid == nil ) {
-        NSLog(@"🔴 databaseUuid is nil in WorkingCopyManager::getLocalWorkingCacheUrlForDatabase?!");
+        slog(@"🔴 databaseUuid is nil in WorkingCopyManager::getLocalWorkingCacheUrlForDatabase?!");
         return nil;
     }
     

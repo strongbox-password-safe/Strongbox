@@ -21,7 +21,7 @@ class KeeAgentSshCellView: NSTableCellView {
 
     func setContent(_ field: DetailsViewField) {
         guard let key = field.object as? KeeAgentSshKeyViewModel else {
-            NSLog("Could not convert field into KeeAgentSshKeyViewModel")
+            swlog("Could not convert field into KeeAgentSshKeyViewModel")
             return
         }
 

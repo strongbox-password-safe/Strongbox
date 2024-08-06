@@ -43,7 +43,7 @@ class SelectStorageSwiftHelper: NSObject {
         let nav = SelectStorageProviderController.navControllerFromStoryboard()
 
         guard let vc = nav.topViewController as? SelectStorageProviderController else {
-            NSLog("🔴 Couldnt convert nav top vc to selectspvc")
+            swlog("🔴 Couldnt convert nav top vc to selectspvc")
             completion(nil, false, Utils.createNSError("Could not create the Select Storage view!", errorCode: -1))
             return
         }
@@ -71,9 +71,9 @@ class SelectStorageSwiftHelper: NSObject {
         case .storageMethodFilesAppUrl, .storageMethodNativeStorageProvider:
             onSelectedNewStorageLocation(selectedStorageParameters)
         case .storageMethodManualUrlDownloadedData:
-            NSLog("🔴 storageMethodManualUrlDownloadedData returned from onSelectStorageLocationCompleted")
+            swlog("🔴 storageMethodManualUrlDownloadedData returned from onSelectStorageLocationCompleted")
         @unknown default:
-            NSLog("🔴 Unknown Result returned from onSelectStorageLocationCompleted")
+            swlog("🔴 Unknown Result returned from onSelectStorageLocationCompleted")
         }
     }
 
@@ -116,7 +116,7 @@ class SelectStorageSwiftHelper: NSObject {
         outputStream.close()
 
         if let error = maybeError {
-            NSLog("🔴 Error Serializing new database: \(error)")
+            swlog("🔴 Error Serializing new database: \(error)")
             completion(nil, false, error)
         } else if userCancelled {
             completion(nil, true, nil) 
@@ -124,7 +124,7 @@ class SelectStorageSwiftHelper: NSObject {
         } else {
             guard let data = outputStream.property(forKey: .dataWrittenToMemoryStreamKey) as? Data else {
                 let error = Utils.createNSError("Could not get data parameter from output stream", errorCode: -1)
-                NSLog("🔴 Error Serializing new database: \(error)")
+                swlog("🔴 Error Serializing new database: \(error)")
                 completion(nil, false, error)
                 return
             }
@@ -143,7 +143,7 @@ class SelectStorageSwiftHelper: NSObject {
         guard let url = WorkingCopyManager.sharedInstance().getLocalWorkingCache(database.uuid),
               let modDate = WorkingCopyManager.sharedInstance().getModDate(database.uuid)
         else {
-            NSLog("🔴 Could not read local working cache.")
+            swlog("🔴 Could not read local working cache.")
             completion(nil, false, Utils.createNSError("Could not read working cache, an online sync is required.", errorCode: -1))
             return
         }
@@ -152,7 +152,7 @@ class SelectStorageSwiftHelper: NSObject {
         do {
             data = try Data(contentsOf: url)
         } catch {
-            NSLog("🔴 \(error)")
+            swlog("🔴 \(error)")
             completion(nil, false, error)
             return
         }

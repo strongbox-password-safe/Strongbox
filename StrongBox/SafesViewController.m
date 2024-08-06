@@ -141,8 +141,8 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
             if (
                 
                 
-                database.storageProvider == kTwoDrive ) { 
-                    NSLog(@"Migrating OneDrive Database [%@] to non lazy sync", database.nickName);
+                database.storageProvider == kOneDrive ) { 
+                    slog(@"Migrating OneDrive Database [%@] to non lazy sync", database.nickName);
                     database.lazySyncMode = NO;
                 }
         }
@@ -195,7 +195,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     
     for ( VirtualYubiKey* key in VirtualYubiKeys.sharedInstance.snapshot ) {
         if ( key.secretIsNoLongerPresent ) {
-            NSLog(@"🔴 Found broken Virtual Hardware Key [%@]", key.identifier);
+            slog(@"🔴 Found broken Virtual Hardware Key [%@]", key.identifier);
             [broken addObject:key.identifier];
         }
     }
@@ -204,19 +204,19 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         YubiKeyHardwareConfiguration* yubiConfig = database.yubiKeyConfig;
         
         if ( yubiConfig && yubiConfig.mode == kVirtual && [broken containsObject:yubiConfig.virtualKeyIdentifier] ) {
-            NSLog(@"🔴 Found database using broken Virtual Hardware Key [%@] - fixing", database.nickName);
+            slog(@"🔴 Found database using broken Virtual Hardware Key [%@] - fixing", database.nickName);
             database.yubiKeyConfig = nil;
         }
         
         yubiConfig = database.autoFillYubiKeyConfig;
         if ( yubiConfig && yubiConfig.mode == kVirtual && [broken containsObject:yubiConfig.virtualKeyIdentifier] ) {
-            NSLog(@"🔴 Found database using broken Virtual Hardware Key for AutoFill [%@] - fixing", database.nickName);
+            slog(@"🔴 Found database using broken Virtual Hardware Key for AutoFill [%@] - fixing", database.nickName);
             database.autoFillYubiKeyConfig = nil;
         }
     }
     
     for ( NSString* ident in broken ) {
-        NSLog(@"🔴 Deleting broken Virtual Hardware Key [%@]", ident);
+        slog(@"🔴 Deleting broken Virtual Hardware Key [%@]", ident);
         [VirtualYubiKeys.sharedInstance deleteKey:ident];
     }
 }
@@ -319,7 +319,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem {
-    NSLog(@"✅ performActionForShortcutItem: [%@]", shortcutItem.type);
+    slog(@"✅ performActionForShortcutItem: [%@]", shortcutItem.type);
     
     if ( [shortcutItem.type isEqualToString:@"quick-launch"] ) {
         NSString* uuid = (NSString*)shortcutItem.userInfo[@"uuid"];
@@ -327,7 +327,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         if ( uuid ) {
             DatabasePreferences* database = [DatabasePreferences fromUuid:uuid];
             if ( database ) {
-                NSLog(@"Quick Launching database from App Shortcut = [%@]", database.nickName);
+                slog(@"Quick Launching database from App Shortcut = [%@]", database.nickName);
                 self.overrideQuickLaunchWithAppShortcutQuickLaunchUuid = uuid;
             }
         }
@@ -482,7 +482,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 - (void)doAppOnboarding:(BOOL)userJustCompletedBiometricAuthentication quickLaunchWhenDone:(BOOL)quickLaunchWhenDone {
     if ( ![self isVisibleViewController] ) {
-        NSLog(@"We're not the visible view controller - not doing Onboarding");
+        slog(@"We're not the visible view controller - not doing Onboarding");
         return;
     }
     
@@ -503,11 +503,11 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 
 - (void)appResignActive {
-    NSLog(@"SafesViewController::appResignActive");
+    slog(@"SafesViewController::appResignActive");
     
     self.appLockSuppressedForBiometricAuth = NO;
     if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
-        NSLog(@"appResignActive... suppressAppBackgroundTriggers");
+        slog(@"appResignActive... suppressAppBackgroundTriggers");
         self.appLockSuppressedForBiometricAuth = YES;
         return;
     }
@@ -516,10 +516,10 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)appBecameActive {
-    NSLog(@"SafesViewController::appBecameActive");
+    slog(@"SafesViewController::appBecameActive");
     
     if( self.appLockSuppressedForBiometricAuth ) {
-        NSLog(@"App Active but Lock Screen Suppressed... Nothing to do");
+        slog(@"App Active but Lock Screen Suppressed... Nothing to do");
         self.appLockSuppressedForBiometricAuth = NO;
         return;
     }
@@ -536,14 +536,14 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     if ( [self shouldLockUnlockedDatabase] ) {
         [self lockUnlockedDatabase:^{
             if ( ![self isAppLocked] ) {
-                NSLog(@"SafesViewController::appBecameActive - Just Locked Database - App is not locked - Doing App Activation Tasks.");
+                slog(@"SafesViewController::appBecameActive - Just Locked Database - App is not locked - Doing App Activation Tasks.");
                 [self doAppActivationTasks:NO];
             }
         }];
     }
     else {
         if ( ![self isAppLocked] ) {
-            NSLog(@"SafesViewController::appBecameActive - App is not locked - Doing App Activation Tasks.");
+            slog(@"SafesViewController::appBecameActive - App is not locked - Doing App Activation Tasks.");
             [self doAppActivationTasks:NO];
         }
     }
@@ -565,15 +565,15 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         return;
     }
     
-    [DebugLogger info:@"SafesViewController::startWiFiSyncObservation..."];
+    slog(@"SafesViewController::startWiFiSyncObservation...");
     
     [WiFiSyncBrowser.shared startBrowsing:NO
                                completion:^(BOOL success) {
         if ( !success ) {
-            NSLog(@"🔴 Could not start WiFi Browser! error = [%@]", WiFiSyncBrowser.shared.lastError);
+            slog(@"🔴 Could not start WiFi Browser! error = [%@]", WiFiSyncBrowser.shared.lastError);
         }
         else {
-            NSLog(@"🟢 WiFiBrowser Started");
+            slog(@"🟢 WiFiBrowser Started");
         }
     }];
 }
@@ -581,18 +581,18 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 - (void)notifyUnlockedDatabaseAutoFillChangesMade {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( AppModel.shared.unlockedDatabase ) {
-            NSLog(@"AutoFill Changes were made and unlocked database open, notify to reload");
+            slog(@"AutoFill Changes were made and unlocked database open, notify to reload");
             [NSNotificationCenter.defaultCenter postNotificationName:kAutoFillChangedConfigNotification object:nil];
         }
         else {
-            NSLog(@"AutoFill Changes were made and no unlocked database open doing a background sync on all");
+            slog(@"AutoFill Changes were made and no unlocked database open doing a background sync on all");
             [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
         }
     });
 }
 
 - (void)onAppLockScreenWillBeDismissed:(void (^)(void))completion {
-    NSLog(@"SafesViewController::onAppLockWillBeDismissed");
+    slog(@"SafesViewController::onAppLockWillBeDismissed");
 
     if ( [self shouldLockUnlockedDatabase] ) {
         [self lockUnlockedDatabase:completion];
@@ -605,7 +605,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)onAppLockScreenWasDismissed:(BOOL)userJustCompletedBiometricAuthentication {
-    NSLog(@"SafesViewController::onAppLockWasDismissed [%hhd]", userJustCompletedBiometricAuthentication);
+    slog(@"SafesViewController::onAppLockWasDismissed [%hhd]", userJustCompletedBiometricAuthentication);
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
@@ -622,7 +622,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         BOOL dontLockIfEditing = !prefs.lockEvenIfEditing;
         
         if ( isEditing && dontLockIfEditing ) {
-            NSLog(@"Not locking database because user is currently editing.");
+            slog(@"Not locking database because user is currently editing.");
             return NO;
         }
         
@@ -630,11 +630,11 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         
         NSNumber *seconds = prefs.autoLockTimeoutSeconds;
         
-        NSLog(@"Autolock Time [%@s] - background Time: [%f].", seconds, secondsBetween);
+        slog(@"Autolock Time [%@s] - background Time: [%f].", seconds, secondsBetween);
         
         if (seconds.longValue != -1  && secondsBetween > seconds.longValue) 
         {
-            NSLog(@"Should Lock Database [YES]");
+            slog(@"Should Lock Database [YES]");
             return YES;
         }
     }
@@ -652,26 +652,26 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     NSNotification* notification = param;
     NSString* databaseId = notification.object;
 
-    NSLog(@"onMainSplitViewControllerClosed [%@]", databaseId);
+    slog(@"onMainSplitViewControllerClosed [%@]", databaseId);
 
     if ( AppModel.shared.unlockedDatabase ) {
-        NSLog(@"onMainSplitViewControllerClosed - Matching unlock db - clearing unlocked state.");
+        slog(@"onMainSplitViewControllerClosed - Matching unlock db - clearing unlocked state.");
 
         if ( [AppModel.shared isUnlocked:databaseId] ) {
             [AppModel.shared closeDatabase];
             self.unlockedDatabaseWentIntoBackgroundAt = nil;
         }
         else {
-            NSLog(@"WARNWARN: Received closed but Unlocked Database ID doesn't match!");
+            slog(@"WARNWARN: Received closed but Unlocked Database ID doesn't match!");
         }
     }
     else {
-        NSLog(@"WARNWARN: Received closed but no Unlocked Database state available!");
+        slog(@"WARNWARN: Received closed but no Unlocked Database state available!");
     }
 }
 
 - (void)onDeviceLocked {
-    NSLog(@"onDeviceLocked - Device Lock detected - locking open database if so configured...");
+    slog(@"onDeviceLocked - Device Lock detected - locking open database if so configured...");
     Model* model = AppModel.shared.unlockedDatabase;
 
     if ( model && model.metadata.autoLockOnDeviceLock ) {
@@ -681,7 +681,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         BOOL dontLockIfEditing = !prefs.lockEvenIfEditing;
         
         if ( isEditing && dontLockIfEditing ) {
-            NSLog(@"Not locking database because user is currently editing.");
+            slog(@"Not locking database because user is currently editing.");
         }
         else {
             [self lockUnlockedDatabase:nil];
@@ -697,10 +697,10 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 - (void)lockUnlockedDatabase:(void (^ __nullable)(void))completion {
     if ( AppModel.shared.unlockedDatabase ) {
-        NSLog(@"Locking Unlocked Database...");
+        slog(@"Locking Unlocked Database...");
                 
         if ( ![self isAppLocked] ) {
-            NSLog(@"lockUnlockedDatabase: App is not locked... we can lock");
+            slog(@"lockUnlockedDatabase: App is not locked... we can lock");
             
             
             
@@ -717,14 +717,14 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
             self.unlockedDatabaseWentIntoBackgroundAt = nil;
         }
         else {
-            NSLog(@"lockUnlockedDatabase: Cannot lock unlocked database because App is locked");
+            slog(@"lockUnlockedDatabase: Cannot lock unlocked database because App is locked");
             if ( completion ) {
                 completion();
             }
         }
     }
     else {
-        NSLog(@"lockUnlockedDatabase: No unlocked database to lock");
+        slog(@"lockUnlockedDatabase: No unlocked database to lock");
 
         if ( completion ) {
             completion();
@@ -802,7 +802,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseUpdated:)
-                                               name:kSyncManagerDatabaseSyncStatusChanged
+                                               name:kSyncManagerDatabaseSyncStatusChangedNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -843,7 +843,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         }];
 
         if (index == NSNotFound) {
-            NSLog(@"WARNWARN: Database Update for DB [%@] but DB not found in Collection!", databaseId);
+            slog(@"WARNWARN: Database Update for DB [%@] but DB not found in Collection!", databaseId);
         }
         else {
 
@@ -945,7 +945,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     if(![sourceIndexPath isEqual:destinationIndexPath]) {
-        NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
+        slog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
         
         [DatabasePreferences move:sourceIndexPath.row to:destinationIndexPath.row];
     }
@@ -1122,7 +1122,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 explicitManualUnlock:(BOOL)explicitManualUnlock
  biometricPreCleared:(BOOL)biometricPreCleared
       explicitOnline:(BOOL)explicitOnline {
-    NSLog(@"======================== OPEN DATABASE: %@ [EON: %hhd, EOFF: %hhd, MAN: %hhd, BPC: %hhd] ============================",
+    slog(@"======================== OPEN DATABASE: %@ [EON: %hhd, EOFF: %hhd, MAN: %hhd, BPC: %hhd] ============================",
           safe.nickName, explicitOnline, explicitOffline, explicitManualUnlock, biometricPreCleared);
         
     biometricPreCleared = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics && biometricPreCleared;
@@ -1132,7 +1132,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }
     else {
         if ( self.openingDatabaseInProgress ) {
-            NSLog(@"Another Database is in the process of being opened. Will not open this one.");
+            slog(@"Another Database is in the process of being opened. Will not open this one.");
             return;
         }
         self.openingDatabaseInProgress = YES;
@@ -1157,7 +1157,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
             }
             else if (result == kUnlockDatabaseResultIncorrectCredentials) {
                 
-                NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+                slog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
             }
             else if (result == kUnlockDatabaseResultError) {
                 [Alerts error:self
@@ -1723,6 +1723,28 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)removeAndCleanupSafe:(DatabasePreferences *)safe {
+    BOOL requiresTripleCheck = safe.storageProvider == kCloudKit;
+    
+    if ( requiresTripleCheck ) {
+        NSString* codeword = NSLocalizedString(@"delete_triple_confirm_code_word", @"delete");
+        NSString* locFmt = [NSString stringWithFormat:NSLocalizedString(@"delete_triple_confirm_message_fmt", @"Please enter the word '%@' below to confirm."), codeword];
+        
+        [Alerts OkCancelWithTextField:self
+                        textFieldText:@""
+                                title:NSLocalizedString(@"generic_are_you_sure", @"Are you sure?")
+                              message:locFmt
+                           completion:^(NSString *confirm, BOOL response) {
+            if ( response && confirm != nil && [confirm localizedCaseInsensitiveCompare:codeword] == NSOrderedSame ) {
+                [self removeAndCleanupSafeConfirmed:safe];
+            }
+        }];
+    }
+    else {
+        [self removeAndCleanupSafeConfirmed:safe];
+    }
+}
+
+- (void)removeAndCleanupSafeConfirmed:(DatabasePreferences*)safe {
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_deleting_ellipsis", @"Deleting...")
                                         viewController:self];
     
@@ -1745,7 +1767,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     if ( renameFile && database.storageProvider == kLocalDevice ) {
         NSError* error;
         if ( ![LocalDeviceStorageProvider.sharedInstance renameFilename:database filename:name error:&error] ) {
-            NSLog(@"🔴 Error Renaming... [%@]", error);
+            slog(@"🔴 Error Renaming... [%@]", error);
             
             if ( error ) {
                 [Alerts error:self error:error];
@@ -1997,10 +2019,10 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)onSelectedStorageLocation:(SelectedStorageParameters*)params {
-    NSLog(@"onSelectedStorageLocation: [%@] - [%@]", params.createMode ? @"Create" : @"Add", params);
+    slog(@"onSelectedStorageLocation: [%@] - [%@]", params.createMode ? @"Create" : @"Add", params);
     
     if(params.method == kStorageMethodUserCancelled) {
-        NSLog(@"onSelectedStorageLocation: User Cancelled");
+        slog(@"onSelectedStorageLocation: User Cancelled");
         [self dismissViewControllerAnimated:YES completion:nil];
     }
     else if (params.method == kStorageMethodErrorOccurred) {
@@ -2010,7 +2032,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }
     else if (params.method == kStorageMethodFilesAppUrl) {
         [self dismissViewControllerAnimated:YES completion:^{
-            NSLog(@"Files App: [%@] - Create: %d", params.url, params.createMode);
+            slog(@"Files App: [%@] - Create: %d", params.url, params.createMode);
 
             if (params.createMode) {
                 [self performSegueWithIdentifier:@"segueToCreateDatabase" sender:params];
@@ -2146,7 +2168,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         }];
         
         if(existing) { 
-            NSLog(@"Not Adding as this iCloud filename is already present. Probably picked up by Watch Thread.");
+            slog(@"Not Adding as this iCloud filename is already present. Probably picked up by Watch Thread.");
             return existing;
         }
     }
@@ -2256,7 +2278,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)onProStatusChanged:(id)param {
-    NSLog(@"Pro Status Changed!");
+    slog(@"Pro Status Changed!");
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self bindToolbar];
         
@@ -2291,7 +2313,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         [self presentViewController:vc animated:YES completion:nil];
     }
     else {
-        NSLog(@"🔴 Can't show sale screen - no sale on!");
+        slog(@"🔴 Can't show sale screen - no sale on!");
     }
 }
 
@@ -2301,7 +2323,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(1481853033) }
                   completionBlock:^(BOOL result, NSError * _Nullable error) {
         if ( !result ) {
-            NSLog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
+            slog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
         }
     }];
     
@@ -2501,7 +2523,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }
 
     if(![self isVisibleViewController]) {
-        NSLog(@"Not opening Quick Launch database as not at top of the Nav Stack");
+        slog(@"Not opening Quick Launch database as not at top of the Nav Stack");
         return;
     }
     
@@ -2510,7 +2532,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     DatabasePreferences* safe = [DatabasePreferences fromUuid:uuid];
         
     if(!safe) {
-        NSLog(@"Not opening Quick Launch database as configured database not found");
+        slog(@"Not opening Quick Launch database as configured database not found");
         return;
     }
     
@@ -2544,7 +2566,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
 
         if(!document) {
-            NSLog(@"Invalid URL to Import [%@]", url);
+            slog(@"Invalid URL to Import [%@]", url);
             [self onReadImportedFile:NO data:nil url:url canOpenInPlace:NO forceOpenInPlace:NO modDate:nil];
             return;
         }
@@ -2586,7 +2608,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     if(!success || !data) {
         if ([url.absoluteString isEqualToString:@"auth:
             
-            NSLog(@"IGNORE - sent by Launcher app for some reason - just ignore...");
+            slog(@"IGNORE - sent by Launcher app for some reason - just ignore...");
         }
         else {
             [Alerts warn:self
@@ -2709,7 +2731,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                                    message:NSLocalizedString(@"safesvc_error_updating_message", @"Could not update local file.")];
                                           }
                                           else {
-                                              NSLog(@"Updated...");
+                                              slog(@"Updated...");
                                               [SyncManager.sharedInstance backgroundSyncLocalDeviceDatabasesOnly];
                                           }
                                       }
@@ -2961,7 +2983,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                    message:NSLocalizedString(@"are_you_sure_use_this_file_this_database", @"Are you want to use this file for this database?")
                     action:^(BOOL response) {
             if ( response ) {
-                NSLog(@"Done [%@]", params.file.providerData);
+                slog(@"Done [%@]", params.file.providerData);
                 if ( database.storageProvider == kWebDAV ) {
                     [self changeWebDAVFilePath:database providerData:(WebDAVProviderData*)params.file.providerData];
                 }
@@ -3066,7 +3088,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     
     
     if (! [url startAccessingSecurityScopedResource] ) {
-        NSLog(@"🔴 Could not securely access URL!");
+        slog(@"🔴 Could not securely access URL!");
     }
 
 
@@ -3275,13 +3297,13 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                                                 parentViewController:self
                                                                           completion:^(NSError * _Nullable error ) {
         if ( error ) {
-            NSLog(@"🔴 Error CloudKitSharingUIHelper [%@]", error);
+            slog(@"🔴 Error CloudKitSharingUIHelper [%@]", error);
             [Alerts error:self error:error];
         }
         
         [CloudKitDatabasesInteractor.shared refreshAndMergeWithCompletionHandler:^(NSError * _Nullable error) {
             if ( error ) {
-                NSLog(@"🔴 Error refreshing after sharing. [%@]", error);
+                slog(@"🔴 Error refreshing after sharing. [%@]", error);
             }
         }];
         
@@ -3306,7 +3328,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
                 [CrossPlatformDependencies.defaults.spinnerUi dismiss];
-                NSLog(@"🔴 Error renaming Cloudkit Database [%@]", error);
+                slog(@"🔴 Error renaming Cloudkit Database [%@]", error);
                 [Alerts error:self error:error];
             }
             else {

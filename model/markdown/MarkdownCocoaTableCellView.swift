@@ -17,7 +17,7 @@ class MarkdownCocoaTableCellView: NSTableCellView, WKNavigationDelegate {
         let resourcesUrl = Bundle.main.resourceURL
 
         if resourcesUrl == nil {
-            NSLog("🔴 Could not get Bundle Resources URL in MarkdownCocoaTableCellView")
+            swlog("🔴 Could not get Bundle Resources URL in MarkdownCocoaTableCellView")
         }
 
         return resourcesUrl!
@@ -55,7 +55,7 @@ class MarkdownCocoaTableCellView: NSTableCellView, WKNavigationDelegate {
             if complete != nil {
                 self.webView.evaluateJavaScript("document.body.scrollHeight", completionHandler: { [weak self] maybeHeight, error in
                     if error != nil {
-                        NSLog("🔴 Javascript height measure failed: [%@]", String(describing: error))
+                        swlog("🔴 Javascript height measure failed: [%@]", String(describing: error))
                         return
                     }
 
@@ -70,7 +70,7 @@ class MarkdownCocoaTableCellView: NSTableCellView, WKNavigationDelegate {
                     }
                 })
             } else {
-                NSLog("🔴 Javascript did not complete: [%@]", String(describing: error))
+                swlog("🔴 Javascript did not complete: [%@]", String(describing: error))
             }
         })
     }

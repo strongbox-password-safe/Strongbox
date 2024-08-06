@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SBLog.h"
 
 static const uint8_t kVariantTypeUint32 = 0x04;
 static const uint8_t kVariantTypeUint64 = 0x05;

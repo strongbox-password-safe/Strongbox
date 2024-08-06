@@ -128,7 +128,7 @@ static NSString* const kMailToScheme = @"mailto";
         }
     }
     else {
-        NSLog(@"Error finding Urls: %@", error);
+        slog(@"Error finding Urls: %@", error);
     }
     
     return urls;

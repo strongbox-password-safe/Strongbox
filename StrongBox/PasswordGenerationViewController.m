@@ -117,7 +117,7 @@
         return;
     }
     
-    NSLog(@"onSampleLongPress");
+    slog(@"onSampleLongPress");
     UITableViewCell* cell = (UITableViewCell*)gr.view;
     [self copyToClipboard:cell.textLabel.text message:NSLocalizedString(@"password_gen_vc_sample_password_copied", @"Sample Password Copied")];
 }
@@ -580,7 +580,7 @@
         int i = 0;
         for (WordList* wordList in obj) {
             if([self.config.wordLists containsObject:wordList.key]) {
-                NSLog(@"Selecting: %@", wordList.key);
+                slog(@"Selecting: %@", wordList.key);
                 [indexSet addIndex:i];
             }
             

@@ -71,7 +71,7 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
 }
 
 - (void)onFontSizeChanged:(NSNotificationCenter*)center {
-    NSLog(@"Content Size did change notification... rebuilding fonts...");
+    slog(@"Content Size did change notification... rebuilding fonts...");
     [self buildFonts];
 }
 

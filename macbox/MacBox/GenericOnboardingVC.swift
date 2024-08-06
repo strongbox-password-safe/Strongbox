@@ -179,7 +179,7 @@ class GenericOnboardingVC: NSViewController {
         if let button1Func = module.onButton1Func {
             button1Func(self, completion)
         } else {
-            NSLog("🔴 No Button1 Func Set!")
+            swlog("🔴 No Button1 Func Set!")
         }
     }
 
@@ -187,7 +187,7 @@ class GenericOnboardingVC: NSViewController {
         if let button2Func = module.onButton2Func {
             button2Func(self, completion)
         } else {
-            NSLog("🔴 No Button2 Func Set!")
+            swlog("🔴 No Button2 Func Set!")
         }
     }
 

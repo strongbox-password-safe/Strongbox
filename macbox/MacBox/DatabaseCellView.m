@@ -125,7 +125,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
         [self bindSyncState:metadata showSyncState:showSyncState];
     }
     @catch (NSException *exception) {
-        NSLog(@"Exception getting display attributes for database: %@", exception);
+        slog(@"Exception getting display attributes for database: %@", exception);
     }
 }
 
@@ -317,7 +317,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
 
     
     if ( self.textFieldName.isEditable ) {
-        NSLog(@"Ignoring onNicknameClick - because isEditable");
+        slog(@"Ignoring onNicknameClick - because isEditable");
         return;
     }
     

@@ -207,7 +207,7 @@
 
 - (void)killOtpTimer {
     if(self.timerRefreshOtp) {
-        NSLog(@"Kill Preview OTP Timer");
+        slog(@"Kill Preview OTP Timer");
         [self.timerRefreshOtp invalidate];
         self.timerRefreshOtp = nil;
     }
@@ -218,7 +218,7 @@
         return;
     }
     
-    NSLog(@"Starting Preview OTP Timer");
+    slog(@"Starting Preview OTP Timer");
 
     self.timerRefreshOtp =  [NSTimer scheduledTimerWithTimeInterval:1.0f repeats:YES block:^(NSTimer * _Nonnull timer) {
         [self updateTotpLabel];

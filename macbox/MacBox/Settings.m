@@ -136,10 +136,12 @@ static NSString* const kHasWarnedAboutCloudKitUnavailability = @"hasWarnedAboutC
 static NSString* const kPasswordGeneratorFloatOnTop = @"passwordGeneratorFloatOnTop";
 static NSString* const kLargeTextViewFloatOnTop = @"largeTextViewFloatOnTop";
 static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError";
-static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI-2";
+static NSString* const kUseUSGovAuthority = @"useUSGovAuthority";
 static NSString* const kAppAppearance = @"appAppearance2";
 static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
+static NSString* const kSystemMenuClickAction = @"systemMenuClickAction";
+static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
 
 
 
@@ -173,7 +175,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kDefaultAppGroupName];
     
     if(defaults == nil) {
-        NSLog(@"🔴 ERROR: Could not get NSUserDefaults for Suite Name: [%@]", kDefaultAppGroupName);
+        slog(@"🔴 ERROR: Could not get NSUserDefaults for Suite Name: [%@]", kDefaultAppGroupName);
     }
     
     return defaults;
@@ -222,14 +224,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)clearAllDefaults {
     for (NSString* key in self.sharedAppGroupDefaults.dictionaryRepresentation.allKeys) {
-        NSLog(@"✅ Deleting from Shared App Group: [%@]", key);
+        slog(@"✅ Deleting from Shared App Group: [%@]", key);
         [self.sharedAppGroupDefaults removeObjectForKey:key];
     }
     
     [self.sharedAppGroupDefaults synchronize];
     
     for ( NSString* key in NSUserDefaults.standardUserDefaults.dictionaryRepresentation.allKeys ) {
-        NSLog(@"✅ Deleting from Standard: [%@]", key);
+        slog(@"✅ Deleting from Standard: [%@]", key);
         [NSUserDefaults.standardUserDefaults removeObjectForKey:key];
         [self.sharedAppGroupDefaults removeObjectForKey:key];
     }
@@ -247,20 +249,20 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     NSError *error;
     [NSFileManager.defaultManager removeItemAtURL:fileUrl error:&error];
     if ( error ) {
-        NSLog(@"🔴 Error Deleting SFTP Connections File [%@]", error);
+        slog(@"🔴 Error Deleting SFTP Connections File [%@]", error);
     }
     
     fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:@"webdav-connections.json"];
     [NSFileManager.defaultManager removeItemAtURL:fileUrl error:&error];
     if ( error ) {
-        NSLog(@"🔴 Error Deleting WebDAV Connections File [%@]", error);
+        slog(@"🔴 Error Deleting WebDAV Connections File [%@]", error);
     }
 
     
     
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [GoogleDriveManager.sharedInstance signout];
-    [TwoDriveStorageProvider.sharedInstance signOutAll];
+    [OneDriveStorageProvider.sharedInstance signOutAll];
     [DropboxV2StorageProvider.sharedInstance signOut];
 #endif
     
@@ -284,6 +286,28 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 #endif
 
 
+
+- (NSDate *)lastCloudKitRefresh {
+    NSUserDefaults *userDefaults = Settings.sharedInstance.sharedAppGroupDefaults;
+    return [userDefaults objectForKey:kLastCloudKitRefresh];
+
+}
+
+- (void)setLastCloudKitRefresh:(NSDate *)lastCloudKitRefresh {
+    NSUserDefaults *userDefaults = Settings.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults setObject:lastCloudKitRefresh forKey:kLastCloudKitRefresh];
+    
+    [userDefaults synchronize];
+}
+
+- (SystemMenuClickAction)systemMenuClickAction {
+    return [self getInteger:kSystemMenuClickAction];
+}
+
+- (void)setSystemMenuClickAction:(SystemMenuClickAction)systemMenuClickAction {
+    [self setInteger:kSystemMenuClickAction value:systemMenuClickAction];
+}
 
 - (BOOL)disableCopyTo {
     return [self getBool:kDisableCopyTo fallback:self.disableExport];
@@ -309,12 +333,13 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setInteger:kAppAppearance value:appAppearance];
 }
 
-- (BOOL)useNextGenOneDriveAPI {
-    return [self getBool:kUseNextGenOneDriveAPI fallback:YES];
+- (BOOL)useOneDriveUSGovCloudInstance {
+
+    return NO;
 }
 
-- (void)setUseNextGenOneDriveAPI:(BOOL)useNextGenOneDriveAPI {
-    [self setBool:kUseNextGenOneDriveAPI value:useNextGenOneDriveAPI];
+- (void)setUseOneDriveUSGovCloudInstance:(BOOL)useOneDriveUSGovCloudInstance {
+
 }
 
 - (BOOL)largeTextViewFloatOnTop {
@@ -405,7 +430,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
     if ( self.wiFiSyncPasscodeSSKeyHasBeenInitialized ) {
         if ( thePasscode == nil ) {
-            NSLog(@"🔴 WiFiSync Passcode nil but has already been initialized. Something very wrong... [%@]", error);
+            slog(@"🔴 WiFiSync Passcode nil but has already been initialized. Something very wrong... [%@]", error);
         }
         
         return thePasscode;
@@ -1141,12 +1166,12 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 - (NSData *)duressDummyData {
-    NSLog(@"🔴 NOTIMPL: duressDummyData");
+    slog(@"🔴 NOTIMPL: duressDummyData");
     return nil;
 }
 
 - (void)setDuressDummyData:(NSData *)duressDummyData {
-    NSLog(@"🔴 NOTIMPL: setDuressDummyData");
+    slog(@"🔴 NOTIMPL: setDuressDummyData");
 }
 
 - (PasswordStrengthConfig *)passwordStrengthConfig {
@@ -1154,7 +1179,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (void)setPasswordStrengthConfig:(PasswordStrengthConfig *)passwordStrengthConfig {
-    NSLog(@"🔴 NOTIMPL: setPasswordStrengthConfig");
+    slog(@"🔴 NOTIMPL: setPasswordStrengthConfig");
 }
 
 - (BOOL)hasShownFirstRunWelcome {

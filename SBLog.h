@@ -13,9 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 void SBLogActual(NSString* fmt, ... );
 
 #ifdef DEBUG
-#define SBLog(...) SBLogActual(__VA_ARGS__)
+//#warning LOGGING ENABLED
+#define slog(...) SBLogActual(__VA_ARGS__)
 #else
-#define SBLog(...)
+#define slog(...)
 #endif
 
 NS_ASSUME_NONNULL_END

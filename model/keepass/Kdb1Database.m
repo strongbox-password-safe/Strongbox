@@ -45,20 +45,20 @@ static const BOOL kLogVerbose = NO;
                                                                     ppError:&error];
     
     if(serializationData == nil) {
-        NSLog(@"Error getting Decrypting KDB binary: [%@]", error);
+        slog(@"Error getting Decrypting KDB binary: [%@]", error);
         completion(NO, nil, nil, error);
         return;
     }
 
     if(kLogVerbose) {
-        NSLog(@"KdbSerializationData = [%@]", serializationData);
+        slog(@"KdbSerializationData = [%@]", serializationData);
     }
 
     NSArray<KeePassAttachmentAbstractionLayer*>* attachments;
     Node* rootGroup = [Kdb1Database buildStrongboxModel:serializationData attachments:&attachments];
 
     if(kLogVerbose) {
-        NSLog(@"Attachments: %@", attachments);
+        slog(@"Attachments: %@", attachments);
     }
 
     
@@ -124,7 +124,7 @@ static const BOOL kLogVerbose = NO;
                                                group:database.rootNode
                                    serializationData:serializationData
                                     existingGroupIds:[NSMutableSet<NSNumber*> set]] ) {
-        NSLog(@"WARNWARN: Could not convert to KDB.");
+        slog(@"WARNWARN: Could not convert to KDB.");
         NSError* error = [Utils createNSError:@"Could not convert to KDB." errorCode:-3];
         completion(NO, nil, error);
         return;
@@ -146,7 +146,7 @@ static const BOOL kLogVerbose = NO;
                                ppError:&error];
     
     if(!ret) {
-        NSLog(@"Could not serialize Document to KDB");
+        slog(@"Could not serialize Document to KDB");
         completion(NO, nil, error);
         return;
     }
@@ -191,7 +191,7 @@ static const BOOL kLogVerbose = NO;
         for ( Node* obj in subGroup.childRecords ) {
             KdbEntry* entry = [Kdb1Database recordToKdbEntry:obj kdbGroup:kdbGroup];
             if ( !entry ) {
-                NSLog(@"WARNWARN: Could not get KDBEntry for Node.");
+                slog(@"WARNWARN: Could not get KDBEntry for Node.");
                 return NO;
             }
             [entries addObject:entry];

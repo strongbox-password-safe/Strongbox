@@ -29,7 +29,7 @@ class LastPassImporter: NSObject, Importer {
                                      root: Node.rootWithDefaultKeePassEffectiveRootGroup())
 
         guard let rows = NSArray(contentsOfCSVURL: url, options: [.sanitizesFields, .usesFirstLineAsKeys]) as? [CHCSVOrderedDictionary] else {
-            NSLog("🔴 Error parsing CSV file...")
+            swlog("🔴 Error parsing CSV file...")
             throw CsvGenericImporterError.errorParsing(details: "Could not read any rows from file")
         }
 
@@ -119,7 +119,7 @@ class LastPassImporter: NSObject, Importer {
 
         for component in pathComponents {
             guard !component.isEmpty else {
-                NSLog("⚠️ Empty Path Component?!")
+                swlog("⚠️ Empty Path Component?!")
                 return ret
             }
 

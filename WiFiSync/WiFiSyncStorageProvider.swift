@@ -60,7 +60,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func pullDatabase(_ database: METADATA_PTR, interactiveVC: VIEW_CONTROLLER_PTR?, options: StorageProviderReadOptions, completion: @escaping StorageProviderReadCompletionBlock) {
-        NSLog("🟢 WiFiSyncStorageProvider::pullDatabase...")
+        swlog("🟢 WiFiSyncStorageProvider::pullDatabase...")
 
         guard WiFiSyncStorageProvider.wiFiSyncIsPossible else {
             completion(.readResultError, nil, nil, Utils.createNSError("WiFi Sync is not available. Pro Only, not available on Zero.", errorCode: -1234))
@@ -68,7 +68,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         }
 
         guard let config = getServerConfigFromDatabase(database) else {
-            NSLog("🔴 WiFiSyncStorageProvider::pullDatabase - Could not read config for WiFi Sync Server")
+            swlog("🔴 WiFiSyncStorageProvider::pullDatabase - Could not read config for WiFi Sync Server")
             completion(.readResultError, nil, nil, Utils.createNSError("Could not read config for WiFi Sync Server", errorCode: -123))
             return
         }
@@ -94,7 +94,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         }
 
         guard let endpoint = getEndpointForServer(config) else {
-            NSLog("⚠️ WiFiSyncStorageProvider::pullDatabase - Could not get endpoint for WiFi Sync Server. Unavailable Result")
+            swlog("⚠️ WiFiSyncStorageProvider::pullDatabase - Could not get endpoint for WiFi Sync Server. Unavailable Result")
             completion(.readResultUnavailable, nil, nil, Utils.createNSError("Endpoint not available.", errorCode: -123))
             return
         }
@@ -109,13 +109,13 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
                 }
 
                 guard error == nil else {
-                    NSLog("🔴 Error while getting mod date! [%@] - will continue to try pull anyway", String(describing: error))
+                    swlog("🔴 Error while getting mod date! [%@] - will continue to try pull anyway", String(describing: error))
                     completion(.readResultError, nil, nil, error ?? Utils.createNSError("Could not read (getModDate failed)", errorCode: -1))
                     return
                 }
 
                 if let modDate, modDate.isEqualToDateWithinEpsilon(currentMod) {
-                    NSLog("🟢 WiFiSyncStorageProvider::pullDatabase - Modified is the same as local - not pulling entire DB")
+                    swlog("🟢 WiFiSyncStorageProvider::pullDatabase - Modified is the same as local - not pulling entire DB")
                     completion(.readResultModifiedIsSameAsLocal, nil, nil, nil)
                 } else {
                     readDatabase(databaseId: config.databaseId,
@@ -135,7 +135,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func pushDatabase(_ database: METADATA_PTR, interactiveVC: VIEW_CONTROLLER_PTR?, data: Data, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        NSLog("🟢 WiFiSyncStorageProvider::pushDatabase...")
+        swlog("🟢 WiFiSyncStorageProvider::pushDatabase...")
 
         guard WiFiSyncStorageProvider.wiFiSyncIsPossible else {
             completion(.updateResultError, nil, Utils.createNSError("WiFi Sync is not available. Pro Only, not available on Zero.", errorCode: -1234))
@@ -143,7 +143,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         }
 
         guard let config = getServerConfigFromDatabase(database) else {
-            NSLog("🔴 Could not read config for WiFi Sync Server")
+            swlog("🔴 Could not read config for WiFi Sync Server")
             completion(.updateResultError, nil, Utils.createNSError("Could not read config for WiFi Sync Server", errorCode: -123))
             return
         }
@@ -180,33 +180,33 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
                     config.passcode = nil
                     completion(.updateResultError, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
                 } else if let mod {
-                    NSLog("🟢 Pushed Database [\(databaseId)] successfully. New Mod = \(mod.iso8601withFractionalSeconds)")
+                    swlog("🟢 Pushed Database [\(databaseId)] successfully. New Mod = \(mod.iso8601withFractionalSeconds)")
                     completion(.updateResultSuccess, mod, nil)
                 } else {
-                    NSLog("🔴 Got Database => [\(String(describing: error))]")
+                    swlog("🔴 Got Database => [\(String(describing: error))]")
                     completion(.updateResultError, nil, error)
                 }
             }
         } else {
-            NSLog("⚠️ Could not get endpoint for WiFi Sync Server - Unavailable Result")
+            swlog("⚠️ Could not get endpoint for WiFi Sync Server - Unavailable Result")
             completion(.updateResultUnavailable, nil, Utils.createNSError("Endpoint Unavailable.", errorCode: -123))
         }
     }
 
     func list(_: NSObject?, viewController _: VIEW_CONTROLLER_PTR?, completion: @escaping (Bool, [StorageBrowserItem], Error?) -> Void) {
         guard let connectionConfig = explicitConnectionConfig else {
-            NSLog("🔴 Explicit server not set but LIST called without a parameterized!")
+            swlog("🔴 Explicit server not set but LIST called without a parameterized!")
             completion(false, [], Utils.createNSError("Explicit server not set but LIST called without a parameterized!", errorCode: -1))
             return
         }
 
         guard let passcode = connectionConfig.passcode else {
-            NSLog("🔴 Passcode not set but LIST called?!")
+            swlog("🔴 Passcode not set but LIST called?!")
             completion(false, [], Utils.createNSError("Passcode not set but LIST called!", errorCode: -1))
             return
         }
 
-        NSLog("🟢 Connecting to \(connectionConfig.name)")
+        swlog("🟢 Connecting to \(connectionConfig.name)")
 
         listWithEndpoint(connectionConfig.endpoint, passcode) { _, databases, error in
             if let databases {
@@ -218,10 +218,10 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
 
                 completion(false, mapped, nil)
             } else if let error {
-                NSLog("🔴 WiFiSync::List Error = \(error)")
+                swlog("🔴 WiFiSync::List Error = \(error)")
                 completion(false, [], error)
             } else {
-                NSLog("🔴 Unknown Error in WiFiSync List")
+                swlog("🔴 Unknown Error in WiFiSync List")
                 completion(false, [], Utils.createNSError("Unknown Error in WiFiSync List!", errorCode: 123))
             }
         }
@@ -278,14 +278,14 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
               options _: StorageProviderReadOptions,
               completion: @escaping StorageProviderReadCompletionBlock)
     {
-        NSLog("🟢 WiFiSyncStorageProvider::read...")
+        swlog("🟢 WiFiSyncStorageProvider::read...")
 
         guard let dict = providerData as? [String: String],
               let databaseId = dict["databaseId"],
               let connectionConfig = explicitConnectionConfig,
               let passcode = connectionConfig.passcode
         else {
-            NSLog("🔴 Could not get UUID to Read Database or Explicit server and Passcode not set but READ called?!")
+            swlog("🔴 Could not get UUID to Read Database or Explicit server and Passcode not set but READ called?!")
             return
         }
 
@@ -319,10 +319,10 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
 
                 completion(.readResultError, nil, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
             } else if let mod, let data {
-                NSLog("🟢 Got Database [\(databaseId)] with Mod = \(mod)")
+                swlog("🟢 Got Database [\(databaseId)] with Mod = \(mod)")
                 completion(.readResultSuccess, data, mod, nil)
             } else {
-                NSLog("🔴 Got Database => [\(String(describing: error))]")
+                swlog("🔴 Got Database => [\(String(describing: error))]")
                 completion(.readResultError, nil, nil, error)
             }
         }
@@ -341,7 +341,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
         }
 
         guard let config = getServerConfigFromDatabase(database) else {
-            NSLog("🔴 WiFiSyncStorageProvider::pullDatabase - Could not read config for WiFi Sync Server")
+            swlog("🔴 WiFiSyncStorageProvider::pullDatabase - Could not read config for WiFi Sync Server")
             completion(true, nil, Utils.createNSError("Could not read config for WiFi Sync Server", errorCode: -123))
             return
         }
@@ -360,16 +360,16 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
                     completion(true, nil, Utils.createNSError(NSLocalizedString("wifi_sync_incorrect_passcode", comment: "Incorrect Passcode"), errorCode: -1))
                 } else if items != nil {
                     guard let items, let database = items.first(where: { database in database.uuid == config.databaseId }) else {
-                        NSLog("🔴 WiFiSyncStorageProvider::getModDate - Could not get databases or match database for server!")
+                        swlog("🔴 WiFiSyncStorageProvider::getModDate - Could not get databases or match database for server!")
                         completion(true, nil, Utils.createNSError("Could not get databases or match database for server!", errorCode: -1))
                         return
                     }
 
-                    NSLog("🟢 Got Mod Date: [%@]", database.modDate.iso8601withFractionalSeconds)
+                    swlog("🟢 Got Mod Date: [%@]", database.modDate.iso8601withFractionalSeconds)
 
                     completion(true, database.modDate, nil)
                 } else {
-                    NSLog("🔴 Failed with [%@]", String(describing: error))
+                    swlog("🔴 Failed with [%@]", String(describing: error))
                     completion(true, nil, error)
                 }
             }
@@ -411,7 +411,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             return WiFiSyncServerConnectionConfig.fromJson(metaData.fileIdentifier)
         #else
             guard let storageInfo = metaData.storageInfo else {
-                NSLog("🔴 Could not read storage info Wi-Fi Sync in database.")
+                swlog("🔴 Could not read storage info Wi-Fi Sync in database.")
                 return nil
             }
 
@@ -426,7 +426,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
               let connectionConfig = explicitConnectionConfig,
               let passcode = connectionConfig.passcode
         else {
-            NSLog("🔴 Could not get UUID to Read Database or Explicit server and Passcode not set but READ called?!")
+            swlog("🔴 Could not get UUID to Read Database or Explicit server and Passcode not set but READ called?!")
             return nil
         }
 
@@ -442,7 +442,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             components.path = filename.hasPrefix("/") ? filename : String(format: "/%@", filename)
 
             guard let url = components.url else {
-                NSLog("🔴 Could not generate URL - WiFi Sync")
+                swlog("🔴 Could not generate URL - WiFi Sync")
                 return nil
             }
 
@@ -452,7 +452,7 @@ class WiFiSyncStorageProvider: NSObject, SafeStorageProvider {
             components.queryItems = [queryItem] 
 
             guard let url2 = components.url else {
-                NSLog("🔴 Could not generate URL - WiFi Sync")
+                swlog("🔴 Could not generate URL - WiFi Sync")
                 return nil
             }
 

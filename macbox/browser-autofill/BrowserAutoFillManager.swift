@@ -15,7 +15,7 @@ public class BrowserAutoFillManager: NSObject {
         do {
             return try DomainParser()
         } catch {
-            NSLog("🔴 Error initializing Domain Parser in BrowserAutoFillManager: [%@]", String(describing: error))
+            swlog("🔴 Error initializing Domain Parser in BrowserAutoFillManager: [%@]", String(describing: error))
             return nil
         }
     }
@@ -105,7 +105,7 @@ public class BrowserAutoFillManager: NSObject {
 
         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
-        NSLog("🐞 ⏱ loadDomainNodeMap: Loaded \(mutableRet.count) domains from \(all.count) entries in \(timeElapsed) s.")
+        swlog("🐞 ⏱ loadDomainNodeMap: Loaded \(mutableRet.count) domains from \(all.count) entries in \(timeElapsed) s.")
 
         return mutableRet
     }

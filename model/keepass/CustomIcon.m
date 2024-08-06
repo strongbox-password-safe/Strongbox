@@ -13,7 +13,7 @@
 @implementation CustomIcon
 
 - (void)dealloc {
-//    NSLog(@"DEALLOC - CustomIcon");
+//    slog(@"DEALLOC - CustomIcon");
 }
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context {

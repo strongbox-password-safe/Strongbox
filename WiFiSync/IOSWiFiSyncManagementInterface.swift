@@ -28,7 +28,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
     func getDatabaseSummaries(id: String?, _ completion: @escaping (([WiFiSyncDatabaseSummary]) -> Void)) {
         if let id {
             guard let database = DatabasePreferences.fromUuid(id) else {
-                NSLog("⚠️ Wi-Fi Sync Source: List -> Could not find database: [%@]", id)
+                swlog("⚠️ Wi-Fi Sync Source: List -> Could not find database: [%@]", id)
                 completion([]) 
                 return
             }
@@ -41,7 +41,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
                 }
 
                 if !success { 
-                    NSLog("⚠️ Wi-Fi Sync Source: List -> Sync was unsuccessful for database: [%@] - %@", id, String(describing: error))
+                    swlog("⚠️ Wi-Fi Sync Source: List -> Sync was unsuccessful for database: [%@] - %@", id, String(describing: error))
                 }
 
                 guard let summary = getSummaryForDatabase(database) else {
@@ -68,7 +68,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
         guard WorkingCopyManager.sharedInstance().getLocalWorkingCache(database.uuid, modified: &nsmod, fileSize: &fsize) != nil,
               let mod = nsmod as? Date
         else {
-            NSLog("⚠️ Could not get working cache or mod date for database: [%@] - Skipping...", database.nickName)
+            swlog("⚠️ Could not get working cache or mod date for database: [%@] - Skipping...", database.nickName)
             return nil
         }
 
@@ -80,7 +80,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
     }
 
     func pullDatabase(id: String, _ completion: @escaping (((Date, Data)?) -> Void)) {
-        NSLog("Wi-Fi Sync Source: Pull Database...")
+        swlog("Wi-Fi Sync Source: Pull Database...")
 
         sync(id) { [weak self] success, localWasChanged, error in
             guard let self else { return }
@@ -96,7 +96,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
                   let workingCopy = try? Data(contentsOf: url),
                   let mod = nsmod as? Date
             else {
-                NSLog("🔴 Wi-Fi Sync Source: Pull Database - Pre Sync Failed: [%@]", String(describing: error))
+                swlog("🔴 Wi-Fi Sync Source: Pull Database - Pre Sync Failed: [%@]", String(describing: error))
                 completion(nil)
                 return
             }
@@ -106,10 +106,10 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
     }
 
     func pushDatabase(id: String, _ data: Data, _ completion: @escaping ((Bool, Date?, String?) -> Void)) throws {
-        NSLog("Wi-Fi Sync Source: Push Database...")
+        swlog("Wi-Fi Sync Source: Push Database...")
 
         guard let database = DatabasePreferences.fromUuid(id) else {
-            NSLog("🔴 handlePushDatabaseRequest - Could not find database to push to!")
+            swlog("🔴 handlePushDatabaseRequest - Could not find database to push to!")
             throw IOSWiFiSyncManagementError.error(details: "🔴 handlePushDatabaseRequest - Could not find database to push to!")
         }
 
@@ -128,7 +128,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
 
             if success, !localWasChanged { 
                 guard let mod = WorkingCopyManager.sharedInstance().getModDate(id) else {
-                    NSLog("🔴 handlePushDatabaseRequest - Could not read current mod date of working cache")
+                    swlog("🔴 handlePushDatabaseRequest - Could not read current mod date of working cache")
                     completion(false, nil, "Could not read current mod date of working cache")
                     return
                 }
@@ -139,7 +139,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
                     notifyWiFiSyncUpdatedWorkingCopy()
                 }
 
-                NSLog("🔴 Wi-Fi Sync Source: Push Database - Sync Failed: [%@] - Sync localWasChanged = %hhd", String(describing: error), localWasChanged)
+                swlog("🔴 Wi-Fi Sync Source: Push Database - Sync Failed: [%@] - Sync localWasChanged = %hhd", String(describing: error), localWasChanged)
 
                 completion(false, nil, error?.localizedDescription ?? "< No Error / Local Changed >")
             }
@@ -159,7 +159,7 @@ class IOSWiFiSyncManagementInterface: NSObject, WiFiSyncManagementInterface {
         }
 
         SyncManager.sharedInstance().backgroundSyncDatabase(database, join: false, key: nil) { result, localWasChanged, error in
-            NSLog("🐞 Wi-Fi Sync Source: Sync Complete with %@ - %@, %hhd", String(describing: result), String(describing: error), localWasChanged)
+            swlog("🐞 Wi-Fi Sync Source: Sync Complete with %@ - %@, %hhd", String(describing: result), String(describing: error), localWasChanged)
             completion(result == .success, localWasChanged, error)
         }
     }

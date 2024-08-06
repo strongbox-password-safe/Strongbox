@@ -122,19 +122,19 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             break;
         case CIPHERID:
             if(length != 16) {
-                NSLog(@"WARN: CIPHERID entry length != 4. Unexpected. Skipping.");
+                slog(@"WARN: CIPHERID entry length != 4. Unexpected. Skipping.");
                 return nil;
             }
             else {
                 if(kLogVerbose) {
-                    NSLog(@"CIPHERID UUIDString: [%@]", [[NSUUID alloc] initWithUUIDBytes:data.bytes].UUIDString);
+                    slog(@"CIPHERID UUIDString: [%@]", [[NSUUID alloc] initWithUUIDBytes:data.bytes].UUIDString);
                 }
                 return data;
             }
             break;
         case COMPRESSIONFLAGS:
             if(length != 4) {
-                NSLog(@"WARN: COMPRESSIONFLAGS entry length != 4. Unexpected. Skipping.");
+                slog(@"WARN: COMPRESSIONFLAGS entry length != 4. Unexpected. Skipping.");
                 return nil;
             }
             else {
@@ -144,7 +144,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             break;
         case MASTERSEED:
             if(length != kMasterSeedLength) {
-                NSLog(@"WARN: MASTERSEED entry length != 32. Unexpected. Skipping. Almost certainly lead to issues.");
+                slog(@"WARN: MASTERSEED entry length != 32. Unexpected. Skipping. Almost certainly lead to issues.");
                 return nil;
             }
             else {
@@ -153,7 +153,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             break;
         case TRANSFORMROUNDS:
             if(length != 8) {
-                NSLog(@"WARN: TRANSFORMROUNDS entry length != 8. Unexpected. Skipping.");
+                slog(@"WARN: TRANSFORMROUNDS entry length != 8. Unexpected. Skipping.");
                 return nil;
             }
             else {
@@ -163,7 +163,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             break;
         case INNERRANDOMSTREAMID:
             if(length != 4) {
-                NSLog(@"WARN: INNERRANDOMSTREAMID entry length != 4. Unexpected. Skipping.");
+                slog(@"WARN: INNERRANDOMSTREAMID entry length != 4. Unexpected. Skipping.");
                 return nil;
             }
             else {
@@ -176,7 +176,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             return [VariantDictionary fromData:data];
             break;
         default:
-            NSLog(@"Found unknown header entry type: [%d] of length [%zu]", identifier, length);
+            slog(@"Found unknown header entry type: [%d] of length [%zu]", identifier, length);
             return data;
             break;
     }
@@ -184,7 +184,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
 
 void dumpHeaderEntries(NSDictionary *headerEntries) {
     for (NSNumber* identifier in headerEntries.allKeys) {
-        NSLog(@"HDR: [%@] => [%@]", headerEntryIdentifierString(identifier.integerValue), [headerEntries objectForKey:identifier]);
+        slog(@"HDR: [%@] => [%@]", headerEntryIdentifierString(identifier.integerValue), [headerEntries objectForKey:identifier]);
     }
 }
 
@@ -275,7 +275,7 @@ NSData *getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t
     NSData *transformKey = [NSData dataWithBytes:hash length:CC_SHA256_DIGEST_LENGTH];
     
     if(kLogVerbose) {
-        NSLog(@"TRANSFORM KEY: %@", transformKey);
+        slog(@"TRANSFORM KEY: %@", transformKey);
     }
     
     return transformKey;
@@ -291,7 +291,7 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey) {
     CC_SHA256_Final(masterKey.mutableBytes, &context);
     
     if(kLogVerbose) {
-        NSLog(@"MASTER KEY: %@", [masterKey base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"MASTER KEY: %@", [masterKey base64EncodedStringWithOptions:kNilOptions]);
     }
     
     return [masterKey copy];
@@ -317,7 +317,7 @@ void dumpXml(NSInputStream* lib) {
     
     [xml writeToFile:file atomically:YES encoding:NSUTF8StringEncoding error:&error];
     
-    NSLog(@"XML Dumped: [%@]", error);
+    slog(@"XML Dumped: [%@]", error);
 }
 
 RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
@@ -356,7 +356,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     NSInteger read = [stream read:chnk maxLength:kChunkSize];
     if(read <= 0) {
-        NSLog(@"Could not read stream");
+        slog(@"Could not read stream");
         if (error) {
             *error = stream.streamError ? stream.streamError : [Utils createNSError:@"Could not read stream" errorCode:-1];
         }
@@ -368,7 +368,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     NSInteger xmlMarker = findXmlMarker(chnk, read);
     if(xmlMarker != 0) {
-        NSLog(@"WARN: Found XML marker starting at offset: %ld", (long)xmlMarker);
+        slog(@"WARN: Found XML marker starting at offset: %ld", (long)xmlMarker);
     }
 
     if(xmlMarker > 0) {
@@ -381,7 +381,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         memcpy(chnk, tmp, read);
     }
     else if (xmlMarker < 0) {
-        NSLog(@"Could not find start of XML! Will try parse anyway...");
+        slog(@"Could not find start of XML! Will try parse anyway...");
         
     }
     
@@ -391,7 +391,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     int err = XML_ERR_OK;
     do {
         if(read < 0) {
-            NSLog(@"Error reading stream: %ld - [%@]", (long)read, stream.streamError);
+            slog(@"Error reading stream: %ld - [%@]", (long)read, stream.streamError);
             if (error) {
                 *error = stream.streamError ? stream.streamError : [Utils createNSError:@"Error reading XML from Stream" errorCode:err];
             }
@@ -419,7 +419,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     } while((read = [stream read:chnk maxLength:kChunkSize]));
     
     if(err != XML_ERR_OK || parser.error) {
-        NSLog(@"XML Error: %d", err);
+        slog(@"XML Error: %d", err);
         if (error) {
             *error = parser.error ? parser.error : [Utils createNSError:@"Error reading XML" errorCode:err];
         }
@@ -431,7 +431,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     err = xmlParseChunk(ctxt, NULL, 0, 1);
     if(err != XML_ERR_OK || parser.error) {
-        NSLog(@"XML Error: %d", err);
+        slog(@"XML Error: %d", err);
         if (error) {
             NSData* foo = [NSData dataWithBytes:chnk length:20];
             NSString* hex = foo.upperHexString;

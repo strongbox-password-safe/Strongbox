@@ -39,8 +39,14 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 
 @implementation AuditDrillDownController
 
++ (UINavigationController*)fromStoryboard {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"AuditDrillDown" bundle:nil];
+    
+    return [sb instantiateInitialViewController];
+}
+
 - (void)dealloc {
-    NSLog(@"DEALLOC [%@]", self);
+    slog(@"DEALLOC [%@]", self);
     [self unListenToNotifications];
 }
 
@@ -91,7 +97,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 - (void)listenToNotifications {
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(refreshItems)
-                                               name:kNotificationNameItemDetailsEditDone
+                                               name:kModelEditedNotification
                                              object:nil];
 
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -101,17 +107,17 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(refreshItems)
-                                               name:kAuditCompletedNotificationKey
+                                               name:kAuditCompletedNotification
                                              object:nil];
 
 }
 
 - (void)unListenToNotifications {
-        [NSNotificationCenter.defaultCenter removeObserver:self name:kNotificationNameItemDetailsEditDone object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (IBAction)onDone:(id)sender {
-    self.onDone(NO, self);
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Table view data source
@@ -122,7 +128,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section == kSectionSettingsIdx) {
-        return 2 + (self.model.auditIssueCount.intValue == 0 || self.hideShowAllAuditIssues ? 0 : 1);
+        return 2;
     }
     else if (section == kSectionBasicIdx) {
         return self.flags.count == 0 ? 1 : self.basicRows.count;
@@ -155,21 +161,11 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
             
             return cell;
         }
-        else if (indexPath.row == 1) {
+        else {
             UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"auditDrillDownBasicCellId" forIndexPath:indexPath];
             cell.imageView.image = nil;
             cell.selectionStyle = UITableViewCellSelectionStyleDefault;
             cell.textLabel.text = NSLocalizedString(@"audit_drill_down_go_to_database_audit_preferences", @"Database Audit Settings");
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-        
-            return cell;
-        }
-        else {
-            UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"auditDrillDownBasicCellId" forIndexPath:indexPath];
-            
-            cell.imageView.image = nil;
-            cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-            cell.textLabel.text = NSLocalizedString(@"audit_drill_down_view_all_audit_issues", @"View All Audit Issues");
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
             return cell;
@@ -227,9 +223,6 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     else if (indexPath.section == kSectionSettingsIdx) {
         if ( indexPath.row == 1) {
             [self performSegueWithIdentifier:@"segueToDatabaseAuditPreferences" sender:nil];
-        }
-        else if (indexPath.row == 2) {
-            self.onDone(YES, self);
         }
     }
     else if (indexPath.section == kSectionActionsIdx) {
@@ -364,7 +357,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     
     Node* item = [self.model.database getItemById:self.itemId];
     if ( !item ) {
-        NSLog(@"WARNWARN: Could not find item to check for HIBP");
+        slog(@"WARNWARN: Could not find item to check for HIBP");
         return;
     }
 
@@ -440,14 +433,14 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     
     Node* item = [self.model.database getItemById:self.itemId];
     if ( !item ) {
-        NSLog(@"WARNWARN: Could not find item to check for HIBP");
+        slog(@"WARNWARN: Could not find item to check for HIBP");
         return;
     }
     
     NSString* password = item.fields.password;
     
     [self.model oneTimeHibpCheck:password completion:^(BOOL pwned, NSError * _Nonnull error) {
-        NSLog(@"HIBP: %hhd - %@", pwned, error);
+        slog(@"HIBP: %hhd - %@", pwned, error);
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
 
@@ -489,8 +482,6 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
         AuditConfigurationVcTableViewController *vc = segue.destinationViewController;
         vc.model = self.model;
         vc.updateDatabase = self.updateDatabase;
-        vc.onDone = self.onDone;
-        vc.hideShowAllAuditIssues = self.hideShowAllAuditIssues;
     }
 }
 

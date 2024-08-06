@@ -63,7 +63,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     OTPToken* token;
     NSData* secretData = [NSData secretWithString:@"The Present King of France"];
     if(secretData) {
-        token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secretData name:@"<Unknown>" issuer:@"<Unknown>"];
+        token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secretData name:@"Demo" issuer:@"Strongbox"];
         token = [token validate] ? token : nil;
     }
 
@@ -411,7 +411,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     NSArray* filtered = self.customFieldsFiltered;
     
     if ( ! ( index >= 0 && index < filtered.count ) ) {
-        NSLog(@"🔴 removeCustomFieldAtIndex with invalid indices %ld", index);
+        slog(@"🔴 removeCustomFieldAtIndex with invalid indices %ld", index);
         return;
     }
     
@@ -429,7 +429,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     
     if ( self.sortCustomFields ) { 
         if ( atIndex != -1 ) {
-            NSLog(@"🔴 WARN: Attempt to add custom field at a specific index when in sort custom fields mode. Ignoring and inserting in sorted position.");
+            slog(@"🔴 WARN: Attempt to add custom field at a specific index when in sort custom fields mode. Ignoring and inserting in sorted position.");
         }
         
         idx = [self.mutableCustomFields indexOfObject:field
@@ -455,14 +455,14 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
 
 - (void)moveCustomFieldAtIndex:(NSUInteger)sourceIdx to:(NSUInteger)destinationIdx {
     if ( self.sortCustomFields ) {
-        NSLog(@"🔴 moveCustomFieldAtIndex called while sortCustomFields ON");
+        slog(@"🔴 moveCustomFieldAtIndex called while sortCustomFields ON");
         return;
     }
     
     NSArray* filtered = self.customFieldsFiltered;
     
     if ( ! ( sourceIdx >= 0 && sourceIdx < filtered.count && destinationIdx >= 0 && destinationIdx < filtered.count && sourceIdx != destinationIdx ) ) {
-        NSLog(@"🔴 moveCustomFieldAtIndex with invalid indices %ld -> %ld", sourceIdx, destinationIdx);
+        slog(@"🔴 moveCustomFieldAtIndex with invalid indices %ld -> %ld", sourceIdx, destinationIdx);
         return;
     }
     
@@ -490,7 +490,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     NSArray* filtered = self.customFieldsFiltered;
     
     if ( ! ( atIndex >= 0 && atIndex < filtered.count ) ) {
-        NSLog(@"🔴 addCustomField with invalid indices %ld", atIndex);
+        slog(@"🔴 addCustomField with invalid indices %ld", atIndex);
         return fallbackIdx;
     }
     
@@ -499,7 +499,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     NSUInteger found = [self.mutableCustomFields indexOfObject:field];
     
     if ( found == NSNotFound ) {
-        NSLog(@"🔴 addCustomField filter custom fields -> could not find field in unfiltered %ld", atIndex);
+        slog(@"🔴 addCustomField filter custom fields -> could not find field in unfiltered %ld", atIndex);
         return fallbackIdx;
     }
     else {
@@ -756,7 +756,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
         }
     }
     else {
-        NSLog(@"🔴 setKeeAgentSshKeyEnabled when no key is set!");
+        slog(@"🔴 setKeeAgentSshKeyEnabled when no key is set!");
     }
 }
 

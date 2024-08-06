@@ -126,7 +126,7 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         }
 
         guard let idx = popupFormat.menu?.index(of: sender) else {
-            NSLog("🔴 Could not find this menu item in the menu?!")
+            swlog("🔴 Could not find this menu item in the menu?!")
             return
         }
 
@@ -182,7 +182,7 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
             if let idx = EditableEncryption.firstIndex(of: currentSettings.encryptionAlgorithm) {
                 popupEncryption.selectItem(at: idx)
             } else {
-                NSLog("🔴 Couldn't find Encryption Algo!")
+                swlog("🔴 Couldn't find Encryption Algo!")
             }
 
             popupEncryption.isHidden = false
@@ -212,7 +212,7 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
             if let idx = EditableKdfs.firstIndex(of: currentSettings.kdfAlgorithm) {
                 popupKdf.selectItem(at: idx)
             } else {
-                NSLog("🔴 Couldn't find KDF!")
+                swlog("🔴 Couldn't find KDF!")
             }
 
             popupKdf.isHidden = false
@@ -281,7 +281,7 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         }
 
         guard let idx = popupCompression.menu?.index(of: sender) else {
-            NSLog("🔴 Could not find this menu item in the menu?!")
+            swlog("🔴 Could not find this menu item in the menu?!")
             return
         }
 
@@ -296,7 +296,7 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         }
 
         guard let idx = popupEncryption.menu?.index(of: sender), let algo = EditableEncryption[safe: idx] else {
-            NSLog("🔴 Could not find this menu item in the menu?!")
+            swlog("🔴 Could not find this menu item in the menu?!")
             return
         }
 
@@ -312,7 +312,7 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
     }
 
     @IBAction func onParallelismEdited(_: Any) {
-        NSLog("✅ onParallelismEdited = textField = [%ld]", textFieldParallelism.integerValue)
+        swlog("✅ onParallelismEdited = textField = [%ld]", textFieldParallelism.integerValue)
 
         stepperParallelism.integerValue = textFieldParallelism.integerValue
 
@@ -327,7 +327,7 @@ class EncryptionSettings: NSViewController, NSMenuDelegate {
         }
 
         guard let idx = popupKdf.menu?.index(of: sender), let kdf = EditableKdfs[safe: idx] else {
-            NSLog("🔴 Could not find this menu item in the menu?!")
+            swlog("🔴 Could not find this menu item in the menu?!")
             return
         }
 

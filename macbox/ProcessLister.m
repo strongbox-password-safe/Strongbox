@@ -9,6 +9,7 @@
 #import "ProcessLister.h"
 #include <sys/sysctl.h>
 #include <pwd.h>
+#import "SBLog.h"
 
 typedef struct kinfo_proc kinfo_proc;
 
@@ -134,7 +135,7 @@ static int GetBSDProcessList(kinfo_proc **procList, size_t *procCount) {
             entry.processName = processName;
         }
         else {
-            NSLog(@"⚠️ ProcessLister::getBSDProcessList - Couldn't get Process Name...");
+            slog(@"⚠️ ProcessLister::getBSDProcessList - Couldn't get Process Name...");
         }
 
 

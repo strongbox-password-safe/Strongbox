@@ -13,14 +13,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AuditDrillDownController : UITableViewController
 
++ (UINavigationController*)fromStoryboard;
+
 @property Model* model;
 @property NSUUID* itemId;
 
-@property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues, __weak UIViewController* viewControllerToDismiss);
-
 @property (nonatomic, copy) void (^updateDatabase)(void);
-
-@property BOOL hideShowAllAuditIssues;
 
 @end
 

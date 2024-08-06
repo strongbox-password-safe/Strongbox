@@ -34,7 +34,7 @@ enum StorageOption: Equatable, Hashable, Identifiable {
         case .localDevice:
             .kLocalDevice
         case .onedrive:
-            .kTwoDrive
+            .kOneDrive
         case .dropbox:
             .kDropbox
         case .googledrive:

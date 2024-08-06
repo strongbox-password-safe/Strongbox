@@ -36,13 +36,56 @@ class QuickSearchViewModel {
 
     func search(searchText: String) -> [SearchResult] {
         if searchText.isEmpty {
-            return getDatabasesResults()
+            let locked = getLockedDatabases()
+            if locked.isEmpty {
+                return []
+            } else {
+                var ret = [SearchResult(headerTitle: NSLocalizedString("locked_databases_heading", comment: "Locked Databases"), icon: NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)!)]
+
+                ret.append(contentsOf: locked)
+
+                return ret
+            }
         }
 
-        return searchUnlockedDatabases(searchText: searchText)
+        var results = searchUnlockedDatabases(searchText: searchText)
+
+        if results.isEmpty {
+            let locked = getLockedDatabases()
+
+            if locked.isEmpty {
+                let loc = NSLocalizedString("quick_search_no_results_found", comment: "No Results Found.")
+                let header = SearchResult(headerTitle: loc, icon: NSImage(systemSymbolName: "magnifyingglass", accessibilityDescription: nil)!)
+                results.insert(header, at: 0)
+                return results
+            } else {
+                let loc = NSLocalizedString("no_results_found_some_locked", comment: "No results found. Some databases are locked.")
+
+                let header = SearchResult(headerTitle: loc,
+                                          icon: NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)!)
+
+                results = locked
+                results.insert(header, at: 0)
+
+                return results
+            }
+        } else {
+            if results.count == 1 {
+                let loc = NSLocalizedString("search_results_summary_1_match_found", comment: "1 Match Found.")
+                let header = SearchResult(headerTitle: loc, icon: NSImage(systemSymbolName: "magnifyingglass", accessibilityDescription: nil)!)
+                results.insert(header, at: 0)
+            } else {
+                let locFmt = NSLocalizedString("search_results_summary_n_match_found_fmt", comment: "%@ Matches Found.")
+                let loc = String(format: locFmt, String(results.count))
+                let header = SearchResult(headerTitle: loc, icon: NSImage(systemSymbolName: "magnifyingglass", accessibilityDescription: nil)!)
+                results.insert(header, at: 0)
+            }
+
+            return results
+        }
     }
 
-    func getDatabasesResults() -> [SearchResult] {
+    func getLockedDatabases() -> [SearchResult] {
         let all = MacDatabasePreferences.allDatabases
             .filter { database in
                 !DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
@@ -51,18 +94,10 @@ class QuickSearchViewModel {
                 SearchResult(database: database)
             }
 
-        if all.isEmpty {
-            return []
-        }
-
-        var ret = [SearchResult(headerTitle: NSLocalizedString("locked_databases_heading", comment: "Locked Databases"), icon: NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)!)]
-
-        ret.append(contentsOf: all)
-
-        return ret
+        return all
     }
 
-    func searchUnlockedDatabases(searchText: String) -> [SearchResult] {
+    private func searchUnlockedDatabases(searchText: String) -> [SearchResult] {
         let unlockedDatabases = MacDatabasePreferences.allDatabases.filter { database in
             DatabasesCollection.shared.isUnlocked(uuid: database.uuid)
         }
@@ -73,37 +108,16 @@ class QuickSearchViewModel {
                 continue
             }
 
-            let nodes = model.search(searchText,
-                                     scope: .all,
-                                     dereference: true,
-                                     includeKeePass1Backup: false,
-                                     includeRecycleBin: false,
-                                     includeExpired: false,
-                                     includeGroups: false,
-                                     browseSortField: .title,
-                                     descending: false,
-                                     foldersSeparately: false)
+            let nodes = model.searchAutoBestMatch(searchText, scope: .all)
 
-            NSLog("🐞 Search - Got [%d] results in [%@]", nodes.count, model.metadata.nickName)
+            swlog("🐞 Search - Got [%d] results in [%@]", nodes.count, model.metadata.nickName)
 
             collected += nodes.map { node in
                 (model, node)
             }
         }
 
-        var ret = collected.map { mapNodeToSearchResult(model: $0.0, node: $0.1) }
-
-        let headerTitleKey = unlockedDatabases.isEmpty ? "quick_search_all_databases_locked" : (ret.isEmpty ? "quick_search_no_results_found" : "quick_view_title_no_matches_title")
-
-        let loc = NSLocalizedString(headerTitleKey, comment: "")
-
-        let symbolName = unlockedDatabases.isEmpty ? "lock" : "magnifyingglass"
-
-        let header = SearchResult(headerTitle: loc, icon: NSImage(systemSymbolName: symbolName, accessibilityDescription: nil)!)
-
-        ret.insert(header, at: 0)
-
-        return ret
+        return collected.map { mapNodeToSearchResult(model: $0.0, node: $0.1) }
     }
 
     func mapNodeToSearchResult(model: Model, node: Node) -> SearchResult {

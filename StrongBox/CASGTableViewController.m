@@ -262,7 +262,7 @@
             NSString* option2 = NSLocalizedString(@"casg_key_file_correct_no_no_key_file", @"No, I don't use a key file");
                                 
             [Alerts twoOptionsWithCancel:self title:title message:message defaultButtonText:option1 secondButtonText:option2 action:^(int response) {
-                NSLog(@"%d", response);
+                slog(@"%d", response);
                 
                 if (response == 0) {
                     [self moveToDoneOrNext];
@@ -292,7 +292,7 @@
         NSError* error;
         NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.selectedKeyFileUrl readOnly:YES error:&error];
         if (error) {
-            NSLog(@"Error: Getting bookmark for Key File = [%@]", error);
+            slog(@"Error: Getting bookmark for Key File = [%@]", error);
             self.onDone(NO, nil);
             return;
         }

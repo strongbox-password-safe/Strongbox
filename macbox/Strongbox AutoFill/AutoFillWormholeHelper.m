@@ -57,10 +57,10 @@ static const CGFloat kWormholeWaitTimeout = 0.4f;
 }
 
 - (void)cleanupWormhole {
-    NSLog(@"✅ cleanupWormhole");
+    slog(@"✅ cleanupWormhole");
     
     if ( self.wormhole ) {
-        NSLog(@"Cleaning up wormhole...");
+        slog(@"Cleaning up wormhole...");
         [self.wormhole clearAllMessageContents];
         self.wormhole = nil; 
     }
@@ -101,7 +101,7 @@ static const CGFloat kWormholeWaitTimeout = 0.4f;
             [self.wormhole clearMessageContentsForIdentifier:responseId];
         }
         else {
-            NSLog(@"🔴 Ignoring Duplicated Response from Wormhole"); 
+            slog(@"🔴 Ignoring Duplicated Response from Wormhole"); 
             return;
         }
         
@@ -124,7 +124,7 @@ static const CGFloat kWormholeWaitTimeout = 0.4f;
         NSTimeInterval interval = NSDate.timeIntervalSinceReferenceDate - start;
         
         if ( !gotResponse ) {
-            NSLog(@"🟢 ⚠️ AUTOFILL-WORMHOLE - Did Not Get Response in [%f] seconds - disp = %ld", interval, disp);
+            slog(@"🟢 ⚠️ AUTOFILL-WORMHOLE - Did Not Get Response in [%f] seconds - disp = %ld", interval, disp);
             
             [self.wormhole stopListeningForMessageWithIdentifier:responseId];
             [self.wormhole clearMessageContentsForIdentifier:responseId];

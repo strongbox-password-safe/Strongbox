@@ -95,7 +95,7 @@
             }
         }
         else {
-            NSLog(@"WARNWARN: Diff could not find item! [%@]", uuid);
+            slog(@"WARNWARN: Diff could not find item! [%@]", uuid);
         }
     }
     

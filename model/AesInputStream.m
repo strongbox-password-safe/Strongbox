@@ -39,7 +39,7 @@
         
         CCCryptorStatus status = CCCryptorCreate(kCCDecrypt, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, kCCKeySizeAES256, iv.bytes, _cryptor);
         if (status != kCCSuccess) {
-            NSLog(@"Crypto Error: %d", status);
+            slog(@"Crypto Error: %d", status);
             return nil;
         }
         self.workingChunkOffset = 0;
@@ -135,7 +135,7 @@
         CCCryptorStatus status = CCCryptorUpdate(*self.cryptor, block, bytesRead, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
         
         if (status != kCCSuccess) {
-            NSLog(@"Crypto Error: %d", status);
+            slog(@"Crypto Error: %d", status);
             self.error = [Utils createNSError:@"AES: Crypto Error" errorCode:status];
             self.workChunk = nil;
             self.workChunkLength = 0;
@@ -157,7 +157,7 @@
 
             }
             else {
-                NSLog(@"Crypto Error: %d-%zu", status, req);
+                slog(@"Crypto Error: %d-%zu", status, req);
                 self.error = [Utils createNSError:@"AES: Crypto Error" errorCode:status];
                 self.workChunk = nil;
                 self.workChunkLength = 0;

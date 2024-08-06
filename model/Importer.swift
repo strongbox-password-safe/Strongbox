@@ -117,7 +117,7 @@ class BaseImporter {
 
     class func addTotpOrCustom(node: Node, name: String?, value: String?) {
         if let value, !value.isEmpty {
-            if let token = NodeFields.getOtpToken(from: value, forceSteam: false, issuer: "", username: "") {
+            if let token = NodeFields.getOtpToken(from: value, forceSteam: false) {
                 if node.fields.otpToken == nil {
                     let prefs = CrossPlatformDependencies.defaults().applicationPreferences
 

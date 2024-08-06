@@ -14,6 +14,7 @@
 #import "ColoredStringHelper.h"
 #import "Strongbox-Swift.h"
 #import "MacAlerts.h"
+#import "SBLog.h"
 
 @interface EditCustomFieldController () <NSTextViewDelegate, NSTextFieldDelegate, NSMenuDelegate>
 
@@ -71,7 +72,7 @@
 }
 
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector {
-    NSLog(@"doCommandBySelector-%@", NSStringFromSelector(aSelector));
+    slog(@"doCommandBySelector-%@", NSStringFromSelector(aSelector));
     
     if (aSelector == @selector(insertTab:)) {
         [self.view.window makeFirstResponder:self.checkboxConcealable];

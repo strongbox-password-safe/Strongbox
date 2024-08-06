@@ -16,8 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)fromStoryboard;
 
 @property Model* model;
-@property BOOL hideShowAllAuditIssues;
-@property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues, UIViewController* viewControllerToDismiss);
 @property (nonatomic, copy) void (^updateDatabase)(void);
 
 @end

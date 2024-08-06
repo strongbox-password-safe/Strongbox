@@ -58,7 +58,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 - (void)dealloc {
 
-    NSLog(@"😎 ViewModel DEALLOC...");
+    slog(@"😎 ViewModel DEALLOC...");
 
 }
 
@@ -114,7 +114,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 - (DatabaseModel *)database {
     if ( self.locked ) {
-        NSLog(@"🔴 database called but ViewModel is locked!");
+        slog(@"🔴 database called but ViewModel is locked!");
         return nil;
     }
     
@@ -127,7 +127,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel getItemById:uuid];
     }
     else {
-        NSLog(@"🔴 getItemById - Model Locked cannot get item.");
+        slog(@"🔴 getItemById - Model Locked cannot get item.");
         return nil;
     }
 }
@@ -137,7 +137,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel getItemsById:uuids];
     }
     else {
-        NSLog(@"🔴 getItemsById - Model Locked cannot get item.");
+        slog(@"🔴 getItemsById - Model Locked cannot get item.");
         return nil;
     }
 }
@@ -177,7 +177,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.expiredEntries;
     }
     else {
-        NSLog(@"🔴 expiredEntries - Model Locked cannot get item.");
+        slog(@"🔴 expiredEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -187,7 +187,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.nearlyExpiredEntries;
     }
     else {
-        NSLog(@"🔴 nearlyExpiredEntries - Model Locked cannot get item.");
+        slog(@"🔴 nearlyExpiredEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -197,7 +197,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.innerModel.excludedFromAuditItems;
     }
     else {
-        NSLog(@"🔴 excludedFromAuditEntries - Model Locked cannot get item.");
+        slog(@"🔴 excludedFromAuditEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -207,7 +207,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.totpEntries;
     }
     else {
-        NSLog(@"🔴 totpEntries - Model Locked cannot get item.");
+        slog(@"🔴 totpEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -217,7 +217,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.attachmentEntries;
     }
     else {
-        NSLog(@"🔴 attachmentEntries - Model Locked cannot get item.");
+        slog(@"🔴 attachmentEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -227,7 +227,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.keeAgentSSHKeyEntries;
     }
     else {
-        NSLog(@"🔴 keeAgentSSHKeyEntries - Model Locked cannot get item.");
+        slog(@"🔴 keeAgentSSHKeyEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -237,7 +237,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.passkeyEntries;
     }
     else {
-        NSLog(@"🔴 passkeyEntries - Model Locked cannot get item.");
+        slog(@"🔴 passkeyEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -247,7 +247,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allSearchable;
     }
     else {
-        NSLog(@"🔴 allSearchable - Model Locked cannot get item.");
+        slog(@"🔴 allSearchable - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -257,7 +257,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allSearchableTrueRoot;
     }
     else {
-        NSLog(@"🔴 allSearchableTrueRoot - Model Locked cannot get item.");
+        slog(@"🔴 allSearchableTrueRoot - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -267,7 +267,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allSearchableNoneExpiredEntries;
     }
     else {
-        NSLog(@"🔴 allSearchableNoneExpiredEntries - Model Locked cannot get item.");
+        slog(@"🔴 allSearchableNoneExpiredEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -277,7 +277,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allSearchableEntries;
     }
     else {
-        NSLog(@"🔴 allSearchableEntries - Model Locked cannot get item.");
+        slog(@"🔴 allSearchableEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -287,7 +287,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allActiveEntries;
     }
     else {
-        NSLog(@"🔴 allActiveEntries - Model Locked cannot get item.");
+        slog(@"🔴 allActiveEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -297,7 +297,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allActiveGroups;
     }
     else {
-        NSLog(@"🔴 expiredEntries - Model Locked cannot get item.");
+        slog(@"🔴 expiredEntries - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -307,7 +307,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allSearchableGroups;
     }
     else {
-        NSLog(@"🔴 allSearchableGroups - Model Locked cannot get item.");
+        slog(@"🔴 allSearchableGroups - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -317,7 +317,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.database.allActive;
     }
     else {
-        NSLog(@"🔴 allActive - Model Locked cannot get item.");
+        slog(@"🔴 allActive - Model Locked cannot get item.");
         return @[];
     }
 }
@@ -349,7 +349,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel restartBackgroundAudit];
     }
     else {
-        NSLog(@"🔴 restartBackgroundAudit - Model Locked.");
+        slog(@"🔴 restartBackgroundAudit - Model Locked.");
     }
 }
 
@@ -358,7 +358,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.innerModel.auditIssueCount;
     }
     else {
-        NSLog(@"🔴 auditIssueCount - Model Locked.");
+        slog(@"🔴 auditIssueCount - Model Locked.");
         return nil;
     }
 }
@@ -368,7 +368,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel isFlaggedByAudit:item];
     }
     else {
-        NSLog(@"🔴 isFlaggedByAudit - Model Locked.");
+        slog(@"🔴 isFlaggedByAudit - Model Locked.");
         return NO;
     }
 }
@@ -378,7 +378,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel getQuickAuditAllIssuesVeryBriefSummaryForNode:item];
     }
     else {
-        NSLog(@"🔴 getQuickAuditAllIssuesVeryBriefSummaryForNode - Model Locked.");
+        slog(@"🔴 getQuickAuditAllIssuesVeryBriefSummaryForNode - Model Locked.");
         return @[];
     }
 }
@@ -388,7 +388,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel getQuickAuditAllIssuesSummaryForNode:item];
     }
     else {
-        NSLog(@"🔴 getQuickAuditAllIssuesSummaryForNode - Model Locked.");
+        slog(@"🔴 getQuickAuditAllIssuesSummaryForNode - Model Locked.");
         return @[];
     }
 }
@@ -398,7 +398,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel getDuplicatedPasswordNodeSet:node];
     }
     else {
-        NSLog(@"🔴 getDuplicatedPasswordNodeSet - Model Locked.");
+        slog(@"🔴 getDuplicatedPasswordNodeSet - Model Locked.");
         return NSSet.set;
     }
 }
@@ -408,7 +408,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel getSimilarPasswordNodeSet:node];
     }
     else {
-        NSLog(@"🔴 getSimilarPasswordNodeSet - Model Locked.");
+        slog(@"🔴 getSimilarPasswordNodeSet - Model Locked.");
         return NSSet.set;
     }
 }
@@ -426,7 +426,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.innerModel.auditState;
     }
     else {
-        NSLog(@"🔴 auditState - Model Locked.");
+        slog(@"🔴 auditState - Model Locked.");
         return kAuditStateInitial;
     }
 }
@@ -436,7 +436,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.innerModel.auditHibpErrorCount;
     }
     else {
-        NSLog(@"🔴 auditState - Model Locked.");
+        slog(@"🔴 auditState - Model Locked.");
         return 0;
     }
 }
@@ -446,7 +446,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.innerModel.auditIssueNodeCount;
     }
     else {
-        NSLog(@"🔴 auditState - Model Locked.");
+        slog(@"🔴 auditState - Model Locked.");
         return 0;
     }
 }
@@ -461,12 +461,12 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setItemAuditExclusion - Model is RO!");
+        slog(@"🔴 setItemAuditExclusion - Model is RO!");
         return;
     }
     
     if ( [self isExcludedFromAudit:node.uuid] == exclude ) {
-        NSLog(@"✅ NOP - setItemAuditExclusion");
+        slog(@"✅ NOP - setItemAuditExclusion");
         return;
     }
     
@@ -504,7 +504,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 batchExcludeItemsFromAudit - Model is RO!");
+        slog(@"🔴 batchExcludeItemsFromAudit - Model is RO!");
         return;
     }
     
@@ -525,7 +525,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel isExcludedFromAudit:item];
     }
     else {
-        NSLog(@"🔴 isExcludedFromAudit - Model Locked.");
+        slog(@"🔴 isExcludedFromAudit - Model Locked.");
         return NO;
     }
 }
@@ -535,7 +535,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return self.innerModel.auditReport;
     }
     else {
-        NSLog(@"🔴 auditReport - Model Locked.");
+        slog(@"🔴 auditReport - Model Locked.");
         return nil;
     }
 }
@@ -545,7 +545,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [self.innerModel oneTimeHibpCheck:password completion:completion];
     }
     else {
-        NSLog(@"🔴 oneTimeHibpCheck - Model Locked.");
+        slog(@"🔴 oneTimeHibpCheck - Model Locked.");
     }
 }
 
@@ -605,7 +605,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setItemTitle - Model is RO!");
+        slog(@"🔴 setItemTitle - Model is RO!");
         return NO;
     }
     
@@ -663,7 +663,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setItemNotes - Model is RO!");
+        slog(@"🔴 setItemNotes - Model is RO!");
         return;
     }
 
@@ -704,7 +704,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setSearchableState - Model is RO!");
+        slog(@"🔴 setSearchableState - Model is RO!");
         return;
     }
     
@@ -720,7 +720,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setGroupExpandedState - Model is RO!");
+        slog(@"🔴 setGroupExpandedState - Model is RO!");
         return;
     }
     
@@ -728,7 +728,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     item.fields.isExpanded = expanded;
     [self touchAndModify:item modDate:NSDate.date];
-    [self.document updateChangeCount:NSChangeDone];
+
 }
 
 - (BOOL)applyModelEditsAndMoves:(EntryViewModel *)editModel toNode:(NSUUID*)nodeId {
@@ -736,13 +736,13 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 applyModelEditsAndMoves - Model is RO!");
+        slog(@"🔴 applyModelEditsAndMoves - Model is RO!");
         return NO;
     }
     
     Node* node = [self getItemById:nodeId];
     if ( node == nil ) {
-        NSLog(@"🔴 Could not find destination node!");
+        slog(@"🔴 Could not find destination node!");
         return NO;
     }
     
@@ -759,7 +759,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     if ( ![self editNodeFieldsUsingSourceNode:cloneForApplication destination:nodeId] ) {
         [self.document.undoManager endUndoGrouping];
-        NSLog(@"🔴 Could not edit node fields using source node!");
+        slog(@"🔴 Could not edit node fields using source node!");
         return NO;
     }
     
@@ -771,13 +771,13 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         Node* parent = [self getItemById:editModel.parentGroupUuid];
         if ( parent == nil || !parent.isGroup ) {
             [self.document.undoManager endUndoGrouping];
-            NSLog(@"🔴 Could not find destination node!");
+            slog(@"🔴 Could not find destination node!");
             return NO;
         }
         
         if (! [self move:@[node] destination:parent] ) {
             [self.document.undoManager endUndoGrouping];
-            NSLog(@"🔴 Could not move node!");
+            slog(@"🔴 Could not move node!");
             return NO;
         }
     }
@@ -797,13 +797,13 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 editNodeFieldsUsingSourceNode - Model is RO!");
+        slog(@"🔴 editNodeFieldsUsingSourceNode - Model is RO!");
         return NO;
     }
     
     Node* destinationNode = [self getItemById:destination];
     if ( destinationNode == nil ) {
-        NSLog(@"🔴 Could not find destination node!");
+        slog(@"🔴 Could not find destination node!");
         return NO;
     }
     
@@ -844,7 +844,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 batchSetIcons - Model is RO!");
+        slog(@"🔴 batchSetIcons - Model is RO!");
         return;
     }
     
@@ -867,7 +867,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 batchSetIcons - Model is RO!");
+        slog(@"🔴 batchSetIcons - Model is RO!");
         return;
     }
     
@@ -906,7 +906,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setItemIcon - Model is RO!");
+        slog(@"🔴 setItemIcon - Model is RO!");
         return;
     }
     
@@ -950,7 +950,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 deleteHistoryItem - Model is RO!");
+        slog(@"🔴 deleteHistoryItem - Model is RO!");
         return;
     }
     
@@ -986,7 +986,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 deleteHistoryItem - Model is RO!");
+        slog(@"🔴 deleteHistoryItem - Model is RO!");
         return;
     }
     
@@ -1022,7 +1022,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 - (BOOL)isFavourite:(NSUUID *)itemId {
     if ( self.locked ) {
-        NSLog(@"🔴 Model is locked. isFavourite");
+        slog(@"🔴 Model is locked. isFavourite");
         return NO;
     }
     else {
@@ -1039,7 +1039,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 toggleFavourite - Model is RO!");
+        slog(@"🔴 toggleFavourite - Model is RO!");
         return;
     }
     
@@ -1071,7 +1071,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 - (NSArray<Node *> *)favourites {
     if ( self.locked ) {
-        NSLog(@"🔴 Model is locked. Favourites");
+        slog(@"🔴 Model is locked. Favourites");
         return @[];
     }
     else {
@@ -1127,12 +1127,12 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setItemAutoFillExclusion - Model is RO!");
+        slog(@"🔴 setItemAutoFillExclusion - Model is RO!");
         return;
     }
     
     if ( [self isExcludedFromAutoFill:node.uuid] == exclude ) {
-        NSLog(@"✅ NOP - setItemAutoFillExclusion");
+        slog(@"✅ NOP - setItemAutoFillExclusion");
         return;
     }
     
@@ -1166,7 +1166,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 batchExcludeItemsFromAudit - Model is RO!");
+        slog(@"🔴 batchExcludeItemsFromAudit - Model is RO!");
         return;
     }
     
@@ -1186,7 +1186,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return [self.innerModel isExcludedFromAutoFill:item];
     }
     else {
-        NSLog(@"🔴 isExcludedFromAutoFill - Model Locked.");
+        slog(@"🔴 isExcludedFromAutoFill - Model Locked.");
         return NO;
     }
 }
@@ -1206,7 +1206,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 addTagToItems - Model is RO!");
+        slog(@"🔴 addTagToItems - Model is RO!");
         return;
     }
     
@@ -1263,7 +1263,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 removeTagFromItems - Model is RO!");
+        slog(@"🔴 removeTagFromItems - Model is RO!");
         return;
     }
     
@@ -1316,12 +1316,12 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 addTagToItems - Model is RO!");
+        slog(@"🔴 addTagToItems - Model is RO!");
         return;
     }
     
     if ( to.length == 0 || from.length == 0 || [from isEqualToString:to] ) {
-        NSLog(@"🔴 renameTag - invalid to or from");
+        slog(@"🔴 renameTag - invalid to or from");
         return;
     }
     
@@ -1396,12 +1396,12 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 addChildren - Model is RO!");
+        slog(@"🔴 addChildren - Model is RO!");
         return NO;
     }
     
     if ( parent == nil ) {
-        NSLog(@"🔴 Failed to add child to NIL parent");
+        slog(@"🔴 Failed to add child to NIL parent");
         return NO;
     }
     
@@ -1428,7 +1428,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 unAddChildren - Model is RO!");
+        slog(@"🔴 unAddChildren - Model is RO!");
         return;
     }
     
@@ -1463,7 +1463,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 deleteItems - Model is RO!");
+        slog(@"🔴 deleteItems - Model is RO!");
         return;
     }
     
@@ -1487,7 +1487,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 unDeleteItems - Model is RO!");
+        slog(@"🔴 unDeleteItems - Model is RO!");
         return;
     }
     
@@ -1516,7 +1516,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 recycleItems - Model is RO!");
+        slog(@"🔴 recycleItems - Model is RO!");
         return NO;
     }
     
@@ -1543,7 +1543,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 unRecycleItems - Model is RO!");
+        slog(@"🔴 unRecycleItems - Model is RO!");
         return;
     }
     
@@ -1581,7 +1581,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 move - Model is RO!");
+        slog(@"🔴 move - Model is RO!");
         return NO;
     }
     
@@ -1609,7 +1609,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 unMove - Model is RO!");
+        slog(@"🔴 unMove - Model is RO!");
         return;
     }
     
@@ -1636,7 +1636,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 moveItemsIntoNewGroup: MODEL is READ-ONLY!");
+        slog(@"🔴 moveItemsIntoNewGroup: MODEL is READ-ONLY!");
         return NO;
     }
     
@@ -1657,12 +1657,12 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     Node* newGroup = [self getNewGroupWithSafeName:parentGroup title:title];
     if ( ![self.innerModel addChildren:@[newGroup] destination:parentGroup] ) {
-        NSLog(@"🔴 Failed to add child");
+        slog(@"🔴 Failed to add child");
         return NO;
     }
     
     if ( ![self move:items destination:newGroup] ) {
-        NSLog(@"🔴 Cannot move these items into this new group");
+        slog(@"🔴 Cannot move these items into this new group");
         return NO;
     }
     
@@ -1679,7 +1679,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
     
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 move - Model is RO!");
+        slog(@"🔴 move - Model is RO!");
         return NO;
     }
     
@@ -1703,7 +1703,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     if ( self.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 setGroupExpandedState - Model is RO!");
+        slog(@"🔴 setGroupExpandedState - Model is RO!");
         return;
     }
     
@@ -2071,12 +2071,12 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 
 
 
-- (KeePassIconSet)iconSet {
-    return self.databaseMetadata.iconSet;
+- (KeePassIconSet)keePassIconSet {
+    return self.databaseMetadata.keePassIconSet;
 }
 
-- (void)setIconSet:(KeePassIconSet)iconSet {
-    self.databaseMetadata.iconSet = iconSet;
+- (void)setKeePassIconSet:(KeePassIconSet)keePassIconSet {
+    self.databaseMetadata.keePassIconSet = keePassIconSet;
     
     [self publishDatabasePreferencesChangedNotification];
 }
@@ -2392,7 +2392,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         return nil;
     }].set;
     
-    [SSHAgentRequestHandler.shared updateOffilnePublicKeysForDatabaseWithPublicKeyBlobs:pkBlobs.allObjects
+    [SSHAgentRequestHandler.shared updateOfflinePublicKeysForDatabaseWithPublicKeyBlobs:pkBlobs.allObjects
                                                                            databaseUuid:self.databaseUuid];
 }
 

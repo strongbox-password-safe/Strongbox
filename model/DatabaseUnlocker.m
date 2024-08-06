@@ -241,7 +241,7 @@
         [self doHapticFeedback:NO];
 
         if (!error) {
-            NSLog(@"WARNWARN - No database but error not set?!");
+            slog(@"WARNWARN - No database but error not set?!");
             error = [Utils createNSError:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") errorCode:-1];
         }
 
@@ -293,7 +293,7 @@
         BOOL secretUnavailable = !self.database.conveniencePasswordHasBeenStored;
   
         if ( expired || secretUnavailable ) {
-            NSLog(@"Convenience Unlock enabled, successful open, and password expired (%hhd) or unavailble (%hhd). refreshing stored secret.", expired, secretUnavailable);
+            slog(@"Convenience Unlock enabled, successful open, and password expired (%hhd) or unavailble (%hhd). refreshing stored secret.", expired, secretUnavailable);
             
             self.database.conveniencePasswordHasBeenStored = YES;
             self.database.convenienceMasterPassword = openedSafe.ckfs.password;
@@ -367,7 +367,7 @@
                       ckf:firstCheck
                completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
         if(model == nil && error && error.code == StrongboxErrorCodes.incorrectCredentials) {
-            NSLog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
+            slog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
             
             self.database.emptyOrNilPwPreferNilCheckFirst = !self.database.emptyOrNilPwPreferNilCheckFirst;
                         

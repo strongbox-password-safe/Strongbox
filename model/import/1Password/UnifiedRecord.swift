@@ -46,7 +46,7 @@ class UnifiedRecord: Decodable {
     var type: RecordType {
         let maybeRecordType: RecordType? = typeName == nil ? .Unknown : recordTypeByTypeName[typeName!]
         if maybeRecordType == nil {
-            NSLog("⚠️ Unknown Record Type: \(String(describing: typeName))")
+            swlog("⚠️ Unknown Record Type: \(String(describing: typeName))")
         }
         return maybeRecordType ?? .Unknown
     }
@@ -236,9 +236,9 @@ class UnifiedRecord: Decodable {
                     let secretData = NSData.secret(with: stringValue)
 
                     var token: OTPToken?
-                    if secretData != nil {
+                    if let secretData {
                         let tmp = OTPToken(type: OTPTokenType.timer, secret: secretData, name: "TOTP", issuer: "TOTP")
-                        if tmp != nil, tmp!.validate() {
+                        if tmp.validate() {
                             token = tmp
                         } else {
                             token = nil
@@ -284,7 +284,7 @@ class UnifiedRecord: Decodable {
                 addDateStringField(epoch!, title, entry, sectionLabel: sectionLabel)
 
             } else {
-                NSLog("🔴 Unknown Date format value: [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
+                swlog("🔴 Unknown Date format value: [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
             }
 
 

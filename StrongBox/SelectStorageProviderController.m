@@ -147,7 +147,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     
     if ( !AppPreferences.sharedInstance.disableThirdPartyStorageOptions && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         self.providersForSectionMap[kSectionThirdParty] = @[
-            @(kTwoDrive),
+            @(kOneDrive),
             @(kDropbox),
             @(kGoogleDrive),
         ];
@@ -407,7 +407,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         else if ( providerId.intValue == kSFTP ) {
             [self getSFTPConnection];
         }
-        else if ( providerId.intValue == kTwoDrive ) {
+        else if ( providerId.intValue == kOneDrive ) {
             id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
             [self beginOneDriveNavigation:provider];
         }
@@ -556,7 +556,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
                        completion:^(NSString *text, BOOL response) {
         if (response) {
             NSURL *url = text.urlExtendedParse;
-            NSLog(@"URL: %@", url);
+            slog(@"URL: %@", url);
             
             if (url) {
                 [self importFromManualUiUrl:url];
@@ -628,7 +628,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    slog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
     

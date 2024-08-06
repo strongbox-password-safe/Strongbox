@@ -87,7 +87,7 @@ class WiFiSyncServer: NSObject {
         stop()
 
         if !wiFiSyncIsPossible || !settings.runAsWiFiSyncSourceDevice {
-            NSLog("⚠️ Not starting WiFi Sync Service as not Pro or enabled")
+            swlog("⚠️ Not starting WiFi Sync Service as not Pro or enabled")
         }
 
         do {
@@ -105,9 +105,9 @@ class WiFiSyncServer: NSObject {
 
             self.listener = listener
 
-            NSLog("🟢 WiFiSync Server Started")
+            swlog("🟢 WiFiSync Server Started")
         } catch {
-            NSLog("🔴 \(error)")
+            swlog("🔴 \(error)")
             throw error
         }
     }
@@ -117,22 +117,22 @@ class WiFiSyncServer: NSObject {
     func listenerStateChanged(newState: NWListener.State) {
         switch newState {
         case .ready:
-            NSLog("listenerStateChanged: Listener ready on \(String(describing: listener?.port))")
+            swlog("listenerStateChanged: Listener ready on \(String(describing: listener?.port))")
         case let .failed(error):
             lastError = String(describing: error)
 
             if error == NWError.dns(DNSServiceErrorType(kDNSServiceErr_DefunctConnection)) {
-                NSLog("listenerStateChanged: Listener failed with \(error), restarting")
+                swlog("listenerStateChanged: Listener failed with \(error), restarting")
                 
             } else {
-                NSLog("listenerStateChanged: Listener failed with \(error), stopping")
+                swlog("listenerStateChanged: Listener failed with \(error), stopping")
                 stop()
             }
         case .cancelled:
-            NSLog("listenerStateChanged: Cancelled")
+            swlog("listenerStateChanged: Cancelled")
             listener = nil
         default:
-            NSLog("listenerStateChanged: %@", String(describing: newState))
+            swlog("listenerStateChanged: %@", String(describing: newState))
         }
 
         postChangeNotification()
@@ -160,7 +160,7 @@ class WiFiSyncServer: NSObject {
         let incoming = WiFiSyncInboundConnection(connection: connection, managementInterface: managementInterface) { [weak self] connection, error in
             guard let self else { return }
 
-            NSLog("onErrorOrClose for connection: [\(String(describing: connection))], Error = [\(String(describing: error))]")
+            swlog("onErrorOrClose for connection: [\(String(describing: connection))], Error = [\(String(describing: error))]")
 
             
             
@@ -170,12 +170,12 @@ class WiFiSyncServer: NSObject {
 
             connections.remove(connection)
 
-            NSLog("Removing Connection: [\(connections.count()) current connections]")
+            swlog("Removing Connection: [\(connections.count()) current connections]")
         }
 
         connections.add(incoming)
 
-        NSLog("newConnection: [\(connections.count()) current connections]")
+        swlog("newConnection: [\(connections.count()) current connections]")
     }
 
     

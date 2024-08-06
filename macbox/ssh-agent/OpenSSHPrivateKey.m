@@ -48,7 +48,7 @@ static const u_int kDefaultEd25519Bits = 256;
         
         struct sshbuf *blob = sshbuf_from(data.bytes, data.length);
         if ( blob == nil ) {
-            NSLog(@"🔴 Could not alloc blob from Key...");
+            slog(@"🔴 Could not alloc blob from Key...");
             return nil;
         }
 
@@ -62,7 +62,7 @@ static const u_int kDefaultEd25519Bits = 256;
                 _isPassphraseProtected = YES;
             }
             else {
-                NSLog(@"🔴 Could not parse key from blob... %s", ssh_err(ret));
+                slog(@"🔴 Could not parse key from blob... %s", ssh_err(ret));
                 sshbuf_free(blob);
                 return nil;
             }
@@ -75,7 +75,7 @@ static const u_int kDefaultEd25519Bits = 256;
         sshbuf_free(blob);
         
         if ( ret != SSH_ERR_SUCCESS ) {
-            NSLog(@"🔴 Could not get public key from private Key... %s", ssh_err(ret));
+            slog(@"🔴 Could not get public key from private Key... %s", ssh_err(ret));
             return nil;
         }
 
@@ -83,7 +83,7 @@ static const u_int kDefaultEd25519Bits = 256;
         
         char* fp = sshkey_fingerprint(public, SSH_DIGEST_SHA256, SSH_FP_BASE64);
         if ( fp == nil ) {
-            NSLog(@"🔴 Could not get public key from private Key... %s", ssh_err(ret));
+            slog(@"🔴 Could not get public key from private Key... %s", ssh_err(ret));
             sshkey_free(public);
             return nil;
         }
@@ -95,14 +95,14 @@ static const u_int kDefaultEd25519Bits = 256;
         
         struct sshbuf *b = sshbuf_new();
         if (b == nil) {
-            NSLog(@"🔴 Could not allocate buffer for public key text");
+            slog(@"🔴 Could not allocate buffer for public key text");
             sshkey_free(public);
             return nil;
         }
         
         int r = sshkey_format_text(public, b);
         if ( r != SSH_ERR_SUCCESS ) {
-            NSLog(@"🔴 Could not sshkey_format_text... %s", ssh_err(ret));
+            slog(@"🔴 Could not sshkey_format_text... %s", ssh_err(ret));
             sshkey_free(public);
             return nil;
         }
@@ -123,7 +123,7 @@ static const u_int kDefaultEd25519Bits = 256;
         size_t bloopLen;
         r = sshkey_plain_to_blob(public, &bloop, &bloopLen);
         if ( r != SSH_ERR_SUCCESS ) {
-            NSLog(@"🔴 Could not sshkey_plain_to_blob... %s", ssh_err(ret));
+            slog(@"🔴 Could not sshkey_plain_to_blob... %s", ssh_err(ret));
             sshkey_free(public);
             return nil;
         }
@@ -143,20 +143,20 @@ static const u_int kDefaultEd25519Bits = 256;
     struct sshkey* key;
     int ret = sshkey_generate(type, bits, &key);
     if ( ret != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 %s", ssh_err(ret));
+        slog(@"🔴 %s", ssh_err(ret));
         return nil;
     }
     
     struct sshbuf *keyblob = NULL;
     if ((keyblob = sshbuf_new()) == NULL) {
-        NSLog(@"🔴 Could not allocate");
+        slog(@"🔴 Could not allocate");
         sshkey_free(key);
         return nil;
     }
     
     ret = sshkey_private_to_fileblob(key, keyblob, "", "", SSHKEY_PRIVATE_OPENSSH, NULL, 0);
     if ( ret != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 %s", ssh_err(ret));
+        slog(@"🔴 %s", ssh_err(ret));
         sshkey_free(key);
         sshbuf_free(keyblob);
         return nil;
@@ -165,7 +165,7 @@ static const u_int kDefaultEd25519Bits = 256;
     NSMutableData* data = [NSMutableData dataWithLength:sshbuf_len(keyblob)];
     ret = sshbuf_get(keyblob, data.mutableBytes, data.length);
     if ( ret != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 %s", ssh_err(ret));
+        slog(@"🔴 %s", ssh_err(ret));
         sshbuf_free(keyblob);
         sshkey_free(key);
         return nil;
@@ -182,13 +182,13 @@ static const u_int kDefaultEd25519Bits = 256;
     const char* cExportPassphrase = [exportPassphrase cStringUsingEncoding:NSUTF8StringEncoding];
 
     if ( cOriginalPassphrase == nil || cExportPassphrase == nil ) {
-        NSLog(@"🔴 sign: Could not get s String passphrase");
+        slog(@"🔴 sign: Could not get s String passphrase");
         return nil;
     }
     
     struct sshbuf *blob = sshbuf_from(self.fileBlobData.bytes, self.fileBlobData.length);
     if ( blob == nil ) {
-        NSLog(@"🔴 Could not alloc blob from Key...");
+        slog(@"🔴 Could not alloc blob from Key...");
         return nil;
     }
     
@@ -197,7 +197,7 @@ static const u_int kDefaultEd25519Bits = 256;
     sshbuf_free(blob);
     
     if ( ret != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 %s", ssh_err(ret));
+        slog(@"🔴 %s", ssh_err(ret));
         return nil;
     }
     
@@ -205,7 +205,7 @@ static const u_int kDefaultEd25519Bits = 256;
     
     struct sshbuf *keyblob = NULL;
     if ((keyblob = sshbuf_new()) == NULL) {
-        NSLog(@"🔴 Could not allocate");
+        slog(@"🔴 Could not allocate");
         sshkey_free(thePrivateKey);
         return nil;
     }
@@ -215,7 +215,7 @@ static const u_int kDefaultEd25519Bits = 256;
     
     if ( ret != SSH_ERR_SUCCESS ) {
         sshbuf_free(keyblob);
-        NSLog(@"🔴 %s", ssh_err(ret));
+        slog(@"🔴 %s", ssh_err(ret));
         return nil;
     }
     
@@ -224,7 +224,7 @@ static const u_int kDefaultEd25519Bits = 256;
     sshbuf_free(keyblob);
     
     if ( ret != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 %s", ssh_err(ret));
+        slog(@"🔴 %s", ssh_err(ret));
         return nil;
     }
     
@@ -246,13 +246,13 @@ static const u_int kDefaultEd25519Bits = 256;
 - (NSData*)sign:(NSData*)challenge passphrase:(NSString*)passphrase flags:(u_int)flags {
     const char* cPassphrase = [passphrase cStringUsingEncoding:NSUTF8StringEncoding];
     if ( cPassphrase == nil ) {
-        NSLog(@"🔴 sign: Could not get s String passphrase");
+        slog(@"🔴 sign: Could not get s String passphrase");
         return nil;
     }
     
     struct sshbuf *blob = sshbuf_from(self.fileBlobData.bytes, self.fileBlobData.length);
     if ( blob == NULL ) {
-        NSLog(@"🔴 sign: Could not allocate blob for private key.");
+        slog(@"🔴 sign: Could not allocate blob for private key.");
         return nil;
     }
     
@@ -261,7 +261,7 @@ static const u_int kDefaultEd25519Bits = 256;
     sshbuf_free(blob);
     
     if ( ret != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 Could not parse Private Key...");
+        slog(@"🔴 Could not parse Private Key...");
         return nil;
     }
     
@@ -270,7 +270,7 @@ static const u_int kDefaultEd25519Bits = 256;
     u_char *signature = NULL;
     size_t slen = 0;
     if (sshkey_sign(thePrivateKey, &signature, &slen, challenge.bytes, challenge.length, agent_decode_alg(thePrivateKey, flags), NULL, NULL, 0) != 0) {
-        NSLog(@"🔴 Could not sign the challenge");
+        slog(@"🔴 Could not sign the challenge");
         sshkey_free(thePrivateKey);
         return nil;
     }
@@ -312,13 +312,13 @@ static const u_int kDefaultEd25519Bits = 256;
 - (BOOL)validatePassphrase:(nonnull NSString *)passphrase {
     const char* cPassphrase = [passphrase cStringUsingEncoding:NSUTF8StringEncoding];
     if ( cPassphrase == nil ) {
-        NSLog(@"🔴 vaildatePassphrase: Could not get c String passphrase");
+        slog(@"🔴 vaildatePassphrase: Could not get c String passphrase");
         return NO;
     }
     
     struct sshbuf *blob = sshbuf_from(self.fileBlobData.bytes, self.fileBlobData.length);
     if ( blob == nil ) {
-        NSLog(@"🔴 Could not alloc blob from Key...");
+        slog(@"🔴 Could not alloc blob from Key...");
         return NO;
     }
     
@@ -330,7 +330,7 @@ static const u_int kDefaultEd25519Bits = 256;
             return NO;
         }
         else {
-            NSLog(@"🔴 Could not parse key from blob... %s", ssh_err(ret));
+            slog(@"🔴 Could not parse key from blob... %s", ssh_err(ret));
             return NO;
         }
     }

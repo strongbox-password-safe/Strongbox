@@ -39,7 +39,7 @@ class SwiftUIAutoFillHelper: NSObject {
                                            parentViewController: parentViewController)
             { cancelled, node, error in
                 if let error {
-                    NSLog("🔴 Could not save new entry to database...")
+                    swlog("🔴 Could not save new entry to database...")
                     completion(false, node, error)
                 } else if cancelled {
                     completion(true, node, nil)
@@ -91,7 +91,7 @@ class SwiftUIAutoFillHelper: NSObject {
     }
 
     func handleCreateNewDialogResponse(_ model: Model, _ sortedGroups: [Node], _ cancel: Bool, _ title: String, _ username: String, _ password: String, _ url: String, _ selectedGroupIdx: Int?, _ completion: @escaping ((_ cancelled: Bool, _ node: Node?, _ error: Error?) -> Void)) {
-        NSLog("🟢 handleCreateNewDialogResponse")
+        swlog("🟢 handleCreateNewDialogResponse")
 
         if cancel {
             completion(true, nil, nil)
@@ -181,7 +181,7 @@ class SwiftUIAutoFillHelper: NSObject {
         do {
             try savePasskeyToDatabase(passkey, model, parentViewController) { cancelled, error in
                 if let error {
-                    NSLog("🔴 Could not save Passkey to database...")
+                    swlog("🔴 Could not save Passkey to database...")
                     completion(false, nil, error)
                 } else if cancelled {
                     completion(true, nil, nil)
@@ -324,7 +324,7 @@ class SwiftUIAutoFillHelper: NSObject {
         prefs.autoFillWroteCleanly = false
 
         model.asyncUpdate { result in
-            NSLog("🐞 AutoFill Async Update Done: [%@]", String(describing: result))
+            swlog("🐞 AutoFill Async Update Done: [%@]", String(describing: result))
             prefs.autoFillWroteCleanly = true
 
             
@@ -346,7 +346,7 @@ class SwiftUIAutoFillHelper: NSObject {
     @available(macOS 14.0, iOS 17.0, *)
     @objc
     func getAutoFillAssertion(request: ASPasskeyCredentialRequest, passkey: Passkey) throws -> ASPasskeyAssertionCredential {
-        NSLog("🟢 getAutoFillAssertion = [%@]", request)
+        swlog("🟢 getAutoFillAssertion = [%@]", request)
 
         guard let authenticatorData = passkey.getAuthenticatorData(includeAttestedCredentialData: false) else {
             throw SwiftUIAutoFillHelperError.Assertion(detail: "🔴 Could not generate Authenticator Data")
@@ -365,7 +365,7 @@ class SwiftUIAutoFillHelper: NSObject {
     @available(macOS 14.0, iOS 17.0, *)
     @objc
     public func getAutoFillAssertionSignatureDer(clientDataHash: Data, authenticatorData: Data, passkey: Passkey) throws -> Data {
-        NSLog("🟢 getAutoFillAssertionSignatureDer = [%@]", clientDataHash.base64EncodedString())
+        swlog("🟢 getAutoFillAssertionSignatureDer = [%@]", clientDataHash.base64EncodedString())
 
         var concatenation = Data(authenticatorData)
         concatenation.append(clientDataHash)

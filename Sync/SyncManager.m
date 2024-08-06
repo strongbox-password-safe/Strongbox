@@ -85,12 +85,12 @@
     params.syncPullEvenIfModifiedDateSame = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
     params.key = key;
     
-    NSLog(@"🟢 BACKGROUND SYNC Start: [%@]", database.nickName);
+    slog(@"🟢 BACKGROUND SYNC Start: [%@]", database.nickName);
 
     [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"🟢 BACKGROUND SYNC DONE: [%@] - [%@] - workingCacheWasChanged = %hhd - [%@]", database.nickName, syncResultToString(result), localWasChanged, error);
+        slog(@"🟢 BACKGROUND SYNC DONE: [%@] - [%@] - workingCacheWasChanged = %hhd - [%@]", database.nickName, syncResultToString(result), localWasChanged, error);
         completion(result, localWasChanged, error);
     }];
 }
@@ -109,7 +109,7 @@ interactiveVC:(UIViewController *)interactiveVC
     [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"INTERACTIVE SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
+        slog(@"INTERACTIVE SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
         completion(result, localWasChanged, error);
     }];
 }
@@ -129,7 +129,7 @@ interactiveVC:(UIViewController *)interactiveVC
     if (localWorkingCache) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
-            NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
+            slog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
             NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
             
             if(error) {
@@ -196,7 +196,7 @@ interactiveVC:(UIViewController *)interactiveVC
     
     dispatch_source_set_event_handler(self.wcSource, ^(){
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            NSLog(@"🚀 Working Cache File Change Detected!");
+            slog(@"🚀 Working Cache File Change Detected!");
             
 
 
@@ -223,7 +223,7 @@ interactiveVC:(UIViewController *)interactiveVC
     
     dispatch_source_set_event_handler(_source, ^(){
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            NSLog(@"File Change Detected! Scanning for New Safes");
+            slog(@"File Change Detected! Scanning for New Safes");
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                 [self syncLocalSafesWithFileSystem];
             });
@@ -263,7 +263,7 @@ interactiveVC:(UIViewController *)interactiveVC
                 NSURL *url = [StrongboxFilesManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
 
                 if([Serializator isValidDatabase:url error:&error]) {
-                    NSLog(@"New File: [%@] is a valid database", item.name);
+                    slog(@"New File: [%@] is a valid database", item.name);
                     [newSafes addObject:item];
                 }
                 else {
@@ -273,7 +273,7 @@ interactiveVC:(UIViewController *)interactiveVC
         }
     }
     else {
-        NSLog(@"Error Scanning for New Files. List Root: %@", error);
+        slog(@"Error Scanning for New Files. List Root: %@", error);
     }
     
     return newSafes;
@@ -328,7 +328,7 @@ interactiveVC:(UIViewController *)interactiveVC
         
         NSError* addError;
         if ( ![safe addWithDuplicateCheck:snapshot initialCacheModDate:att.fileModificationDate error:&addError] ) {
-            NSLog(@"Error adding database - error = [%@]", error);
+            slog(@"Error adding database - error = [%@]", error);
         }
     }
     
@@ -339,7 +339,7 @@ interactiveVC:(UIViewController *)interactiveVC
     for (DatabasePreferences* localSafe in localSafes) {
         NSURL* url = [self getLegacyLocalDatabaseFileUrl:localSafe];
         if(![NSFileManager.defaultManager fileExistsAtPath:url.path]) {
-            NSLog(@"WARNWARN: Database [%@] underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
+            slog(@"WARNWARN: Database [%@] underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
             
             
             
@@ -371,16 +371,16 @@ interactiveVC:(UIViewController *)interactiveVC
         
         dest = [self getLegacyLocalDatabaseFileUrl:!identifier.sharedStorage filename:identifier.filename];
         
-        NSLog(@"File exists at destination... Trying: [%@]", dest);
+        slog(@"File exists at destination... Trying: [%@]", dest);
     }
     
     if(![NSFileManager.defaultManager moveItemAtURL:src toURL:dest error:error]) {
-        NSLog(@"Error moving local file: [%@]", *error);
+        slog(@"Error moving local file: [%@]", *error);
         [self startMonitoringDocumentsDirectory];
         return NO;
     }
     else {
-        NSLog(@"OK - Moved local file: [%@] -> [%@]", src, dest);
+        slog(@"OK - Moved local file: [%@] -> [%@]", src, dest);
     }
     
     identifier.sharedStorage = !identifier.sharedStorage;

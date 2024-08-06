@@ -19,6 +19,7 @@
 #import "NextNavigationConstants.h"
 #import "SearchScope.h"
 #import "SideBarChildCountFormat.h"
+#import "SBLog.h"
 
 @class HeaderNodeState;
 
@@ -148,8 +149,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSString* exportFileName;
 @property (readonly) NSDictionary<NSString*, NSString *>* debugInfoLines;
-@property KeePassIconSet iconSet;
 
+@property KeePassIconSet keePassIconSet;
 
 
 

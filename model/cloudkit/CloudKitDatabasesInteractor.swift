@@ -63,9 +63,20 @@ class CloudKitDatabasesInteractor: NSObject {
 
     override private init() {}
 
+    private func doRegularCloudKitRefreshOfZonesAndSubs() async throws {
+        let lastCloudKitRefresh = CrossPlatformDependencies.defaults().applicationPreferences.lastCloudKitRefresh
+        if (lastCloudKitRefresh as NSDate?)?.isMoreThanXDaysAgo(7) ?? true {
+            CrossPlatformDependencies.defaults().applicationPreferences.lastCloudKitRefresh = Date.now
+            CrossPlatformDependencies.defaults().applicationPreferences.cloudKitZoneCreated = false
+            CrossPlatformDependencies.defaults().applicationPreferences.changeNotificationsSubscriptionCreated = false
+
+            try await CloudKitManager.shared.createZoneIfNeeded()
+        }
+    }
+
     @objc
     func initialize() async throws {
-        NSLog("CloudKitDatabasesInteractor::initialize...")
+        swlog("CloudKitDatabasesInteractor::initialize...")
 
         isInitialized = false
 
@@ -83,7 +94,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
         isInitialized = true
 
-        NSLog("CloudKitDatabasesInteractor::initialized... Refreshing databases and subscription...")
+        swlog("CloudKitDatabasesInteractor::initialized... Refreshing databases and subscription...")
 
         
 
@@ -118,7 +129,7 @@ class CloudKitDatabasesInteractor: NSObject {
         NotificationCenter.default.addObserver(forName: .CKAccountChanged, object: nil, queue: nil) { [weak self] _ in
             guard let self else { return }
 
-            NSLog("🐞 Got CloudKit Account Change Notification...")
+            swlog("🐞 Got CloudKit Account Change Notification...")
 
             guard !gotRecentAccountChangeNotification else {
                 return
@@ -132,11 +143,14 @@ class CloudKitDatabasesInteractor: NSObject {
     }
 
     func onCloudKitAccountChanged() async throws {
-        NSLog("🐞 onCloudKitAccountChanged...")
+        swlog("🐞 onCloudKitAccountChanged...")
 
         try await Task.sleep(nanoseconds: 2 * 1_000_000_000)
 
         gotRecentAccountChangeNotification = false
+
+        CrossPlatformDependencies.defaults().applicationPreferences.cloudKitZoneCreated = false 
+        CrossPlatformDependencies.defaults().applicationPreferences.changeNotificationsSubscriptionCreated = false 
 
         try await initialize()
     }
@@ -145,7 +159,7 @@ class CloudKitDatabasesInteractor: NSObject {
         do {
             return try await getCloudKitAccountStatus() == .available
         } catch {
-            NSLog("🔴 isCloudKitAccountAvailable \(error)")
+            swlog("🔴 isCloudKitAccountAvailable \(error)")
             return false
         }
     }
@@ -166,11 +180,11 @@ class CloudKitDatabasesInteractor: NSObject {
             cachedAccountStatus = ret
             cachedAccountStatusError = nil
 
-            NSLog("⏲ got CloudKit status = [\(ret)] in \(diff) seconds")
+            swlog("⏲ got CloudKit status = [\(ret)] in \(diff) seconds")
 
             return ret
         } catch {
-            NSLog("🔴 getCloudKitAccountStatus \(error)")
+            swlog("🔴 getCloudKitAccountStatus \(error)")
 
             cachedAccountStatus = .couldNotDetermine
             cachedAccountStatusError = error
@@ -220,7 +234,7 @@ class CloudKitDatabasesInteractor: NSObject {
             return
         }
 
-        NSLog("🐞 CloudKitDatabasesInteractor::\(#function) Registering for CloudKit Updates...")
+        swlog("🐞 CloudKitDatabasesInteractor::\(#function) Registering for CloudKit Updates...")
 
         #if os(macOS)
             NSApplication.shared.registerForRemoteNotifications()
@@ -231,7 +245,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
     @objc
     func onRegisteredForRemoteNotifications(_ success: Bool, error: Error?) {
-        NSLog("🐞 CloudKitDatabasesInteractor::onRegisteredForRemoteNotifications - \(success) - \(String(describing: error))")
+        swlog("🐞 CloudKitDatabasesInteractor::onRegisteredForRemoteNotifications - \(success) - \(String(describing: error))")
 
         registeredForNotifications = success
         registeredForNotificationError = error
@@ -248,7 +262,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
         let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
 
-        NSLog("🐞 requestAuthorizationWithOptions completion with granted = [%hhd]", granted)
+        swlog("🐞 requestAuthorizationWithOptions completion with granted = [%hhd]", granted)
 
         registerForRemoteNotifications()
 
@@ -265,7 +279,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
     @objc
     func onCloudKitDatabaseChangeNotification() {
-        NSLog("🟢 didReceiveRemoteNotification / onChangeNotification")
+        swlog("🟢 didReceiveRemoteNotification / onChangeNotification")
 
         Task {
             try await refreshAndMerge() 
@@ -312,17 +326,19 @@ class CloudKitDatabasesInteractor: NSObject {
 
 
         guard isInitialized else {
-            NSLog("🐞 refreshAndMerge - CloudKit is not initialized. NOP")
+            swlog("🐞 refreshAndMerge - CloudKit is not initialized. NOP")
             return
         }
 
         do {
+            try await doRegularCloudKitRefreshOfZonesAndSubs()
+
             let ckDbs = try await CloudKitManager.shared.getDatabases()
 
             try await mergeOrUpdateDatabases(ckDbs)
 
         } catch {
-            NSLog("🔴 Error caught in \(#function) - [\(error)]")
+            swlog("🔴 Error caught in \(#function) - [\(error)]")
         }
     }
 
@@ -338,7 +354,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
     func updateExisting(_ existing: METADATA_PTR, _ database: CloudKitHostedDatabase) {
         if existing.nickName != database.nickname {
-            NSLog("🟢 Updating CloudKit Database. Database nickname has changed.")
+            swlog("🟢 Updating CloudKit Database. Database nickname has changed.")
             #if os(iOS)
                 let nick = DatabasePreferences.getUniqueName(fromSuggestedName: database.nickname) 
             #else
@@ -349,13 +365,13 @@ class CloudKitDatabasesInteractor: NSObject {
 
         #if os(iOS)
             if existing.fileName != database.filename {
-                NSLog("🟢 Updating CloudKit Database. Database filename has changed.")
+                swlog("🟢 Updating CloudKit Database. Database filename has changed.")
                 existing.fileName = database.filename
             }
         #else
             if let newUrl = CloudKitStorageProvider.getCloudKitPKUrl(filename: database.filename, uuid: existing.uuid) {
                 if newUrl != existing.fileUrl {
-                    NSLog("🟢 Updating CloudKit Database. Database filename has changed.")
+                    swlog("🟢 Updating CloudKit Database. Database filename has changed.")
                     existing.fileUrl = newUrl
                 }
             }
@@ -365,12 +381,12 @@ class CloudKitDatabasesInteractor: NSObject {
         let ownedByMe = !database.sharedWithMe
 
         if existing.isSharedInCloudKit != shared {
-            NSLog("🟢 Updating CloudKit Database. Shared has changed.")
+            swlog("🟢 Updating CloudKit Database. Shared has changed.")
             existing.isSharedInCloudKit = shared
         }
 
         if existing.isOwnedByMeCloudKit != ownedByMe {
-            NSLog("🟢 Updating CloudKit Database. ownedByMe has changed.")
+            swlog("🟢 Updating CloudKit Database. ownedByMe has changed.")
             existing.isOwnedByMeCloudKit = ownedByMe
         }
 
@@ -396,7 +412,7 @@ class CloudKitDatabasesInteractor: NSObject {
 
         let toRemove = existingCloudKitDatabases.filter { db in
             guard let cloudKitDatabaseId = cloudKitIdentifierFromStrongboxDatabase(db) else {
-                NSLog("🔴 ERROR: Could not read fileId! \(#function)!!")
+                swlog("🔴 ERROR: Could not read fileId! \(#function)!!")
                 return true 
             }
 
@@ -405,15 +421,15 @@ class CloudKitDatabasesInteractor: NSObject {
 
         for removeMe in toRemove {
             guard !databaseIsUnlocked(databaseId: removeMe.uuid), !databaseHasEditsOrIsBeingEdited(databaseId: removeMe.uuid) else {
-                NSLog("⚠️ \(removeMe.uuid) scheduled for removal but is unlocked or is being edited, will not remove at this point.")
+                swlog("⚠️ \(removeMe.uuid) scheduled for removal but is unlocked or is being edited, will not remove at this point.")
                 continue
             }
 
-            NSLog("⚠️ Removing no longer present on CloudKit database: \(removeMe.nickName) from databases list")
+            swlog("⚠️ Removing no longer present on CloudKit database: \(removeMe.nickName) from databases list")
 
             DatabaseNuker.nuke(removeMe, deleteUnderlyingIfSupported: false) { error in
                 if let error {
-                    NSLog("🔴 DatabaseNuker.nuke - Error removing CloudKit Database. \(error)")
+                    swlog("🔴 DatabaseNuker.nuke - Error removing CloudKit Database. \(error)")
                 }
             }
         }
@@ -442,13 +458,13 @@ class CloudKitDatabasesInteractor: NSObject {
         let updateAvailable = wcmod == nil ? true : !(wcmod!).isEqualToDateWithinEpsilon(database.modDate)
 
         if updateAvailable {
-            NSLog("🐞 Update is available for database [\(existing.uuid)]... working = [\(String(describing: wcmod))] =?= \(database.modDate)")
+            swlog("🐞 Update is available for database [\(existing.uuid)]... working = [\(String(describing: wcmod))] =?= \(database.modDate)")
 
             if databaseIsUnlocked(databaseId: existing.uuid) {
-                NSLog("🐞 Database [\(existing.uuid)] is unlocked notifying App to request a sync if appropriate... ")
+                swlog("🐞 Database [\(existing.uuid)] is unlocked notifying App to request a sync if appropriate... ")
                 notifyDatabaseUpdateAvailable(existing.uuid)
             } else {
-                NSLog("🐞 Database [\(existing.uuid)] is not unlocked performing a background sync... ")
+                swlog("🐞 Database [\(existing.uuid)] is not unlocked performing a background sync... ")
 
                 Task.detached {
                     #if os(iOS)
@@ -494,12 +510,12 @@ class CloudKitDatabasesInteractor: NSObject {
     @objc
     func delete(database: METADATA_PTR) async throws {
         guard database.storageProvider == .kCloudKit else {
-            NSLog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
+            swlog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
             throw CloudKitDatabasesInteractorError.invalidParameter
         }
 
         guard let cloudKitDatabaseId = cloudKitIdentifierFromStrongboxDatabase(database) else {
-            NSLog("🔴 ERROR: Could not read fileId! \(#function)!!")
+            swlog("🔴 ERROR: Could not read fileId! \(#function)!!")
             throw CloudKitDatabasesInteractorError.couldNotParseCloudKitId
         }
 
@@ -511,12 +527,12 @@ class CloudKitDatabasesInteractor: NSObject {
     @objc
     func rename(database: METADATA_PTR, nickName: String, fileName: String?) async throws {
         guard database.storageProvider == .kCloudKit else {
-            NSLog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
+            swlog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
             throw CloudKitDatabasesInteractorError.invalidParameter
         }
 
         guard let cloudKitDatabaseId = cloudKitIdentifierFromStrongboxDatabase(database) else {
-            NSLog("🔴 ERROR: Could not read fileId! \(#function)!!")
+            swlog("🔴 ERROR: Could not read fileId! \(#function)!!")
             throw CloudKitDatabasesInteractorError.couldNotParseCloudKitId
         }
 
@@ -568,7 +584,7 @@ class CloudKitDatabasesInteractor: NSObject {
     func findStrongboxDatabaseForCloudKitDatabase(cloudKitIdentifier: CloudKitDatabaseIdentifier) -> METADATA_PTR? {
         existingCloudKitDatabases.first(where: { existingDb in
             guard let cloudKitDatabaseId = cloudKitIdentifierFromStrongboxDatabase(existingDb) else {
-                NSLog("🔴 Could not read file identifier for cloudkit database")
+                swlog("🔴 Could not read file identifier for cloudkit database")
                 return false
             }
 
@@ -578,12 +594,12 @@ class CloudKitDatabasesInteractor: NSObject {
 
     func findCloudKitDatabaseForStrongboxDatabase(database: METADATA_PTR) async throws -> CloudKitHostedDatabase {
         guard database.storageProvider == .kCloudKit else {
-            NSLog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
+            swlog("🔴 ERROR: Non CloudKit database sent to \(#function)!!")
             throw CloudKitDatabasesInteractorError.invalidParameter
         }
 
         guard let cloudKitDatabaseId = cloudKitIdentifierFromStrongboxDatabase(database) else {
-            NSLog("🔴 ERROR: Could not read fileId! \(#function)!!")
+            swlog("🔴 ERROR: Could not read fileId! \(#function)!!")
             throw CloudKitDatabasesInteractorError.couldNotParseCloudKitId
         }
 

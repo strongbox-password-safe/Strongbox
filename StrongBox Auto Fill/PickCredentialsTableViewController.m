@@ -255,7 +255,7 @@ static NSString* const kGroupAllItems = @"all-items";
         return;
     }
     else {
-        NSLog(@"No matches in URLs for Domain: %@", domain);
+        slog(@"No matches in URLs for Domain: %@", domain);
     }
     
     
@@ -267,7 +267,7 @@ static NSString* const kGroupAllItems = @"all-items";
         return;
     }
     else {
-        NSLog(@"No matches across all fields for Domain: %@", domain);
+        slog(@"No matches across all fields for Domain: %@", domain);
     }
 
     
@@ -494,7 +494,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             [self proceedWithItem:item];
         }
         else {
-            NSLog(@"WARN: DidSelectRow with no Record?!");
+            slog(@"WARN: DidSelectRow with no Record?!");
         }
     }
 }
@@ -703,7 +703,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         
         
         
-        NSLog(@"segueToPreferences");
+        slog(@"segueToPreferences");
         [self.searchController.searchBar resignFirstResponder];
         
         UINavigationController* nav = segue.destinationViewController;
@@ -711,7 +711,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         vc.viewModel = sender;
     }
     else {
-        NSLog(@"Unknown SEGUE!");
+        slog(@"Unknown SEGUE!");
     }
 }
 

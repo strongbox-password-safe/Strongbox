@@ -27,7 +27,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
 
 @property BOOL hasCachedOtpToken;
 @property OTPToken* cachedOtpToken;
-@property MutableOrderedDictionary<NSString*, StringValue*> *mutablCustomFields;
+@property MutableOrderedDictionary<NSString*, StringValue*> *mutableCustomFields;
 @property BOOL usingLegacyKeeOtpStyle;
 
 @end
@@ -90,7 +90,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
         
         self.passwordModified = date;
         self.attachments = [NSMutableDictionary dictionary];
-        self.mutablCustomFields = [[MutableOrderedDictionary alloc] init];
+        self.mutableCustomFields = [[MutableOrderedDictionary alloc] init];
         self.keePassHistory = [NSMutableArray array];
         self.tags = [NSMutableSet set];
         self.customData = @{}.mutableCopy;
@@ -538,34 +538,47 @@ NSString* const kOtpAuthScheme = @"otpauth";
 }
 
 - (MutableOrderedDictionary<NSString *,StringValue *> *)customFieldsNoEmail {
-    MutableOrderedDictionary* ret = [self.mutablCustomFields clone];
+    MutableOrderedDictionary* ret = [self.mutableCustomFields clone];
     
     [ret removeObjectForKey:kCanonicalEmailFieldName];
     
     return [ret copy];
 }
 
+- (MutableOrderedDictionary<NSString *,StringValue *> *)customFieldsFiltered {
+    MutableOrderedDictionary* copy = [self.mutableCustomFields clone];
+    MutableOrderedDictionary* ret = [[MutableOrderedDictionary alloc] init];
+    
+    for (NSString* key in copy.keys ) {
+        if ( ![NodeFields isTotpCustomFieldKey:key] && ![NodeFields isPasskeyCustomFieldKey:key] && ![key isEqualToString:kCanonicalEmailFieldName]) {
+            [ret addKey:key andValue:copy[key]];
+        }
+    }
+    
+    return [ret copy];
+}
+
 - (MutableOrderedDictionary<NSString *,StringValue *> *)customFields {
-    return [self.mutablCustomFields clone];
+    return [self.mutableCustomFields clone];
 }
 
 - (void)setCustomFields:(MutableOrderedDictionary<NSString*, StringValue*>*)customFields {
-    self.mutablCustomFields = [customFields clone];
+    self.mutableCustomFields = [customFields clone];
     self.hasCachedOtpToken = NO; 
 }
 
 - (void)removeAllCustomFields {
-    [self.mutablCustomFields removeAllObjects];
+    [self.mutableCustomFields removeAllObjects];
     self.hasCachedOtpToken = NO; 
 }
 
 - (void)removeCustomField:(NSString*)key {
-    [self.mutablCustomFields removeObjectForKey:key];
+    [self.mutableCustomFields removeObjectForKey:key];
     self.hasCachedOtpToken = NO; 
 }
 
 - (void)setCustomField:(NSString*)key value:(StringValue*)value {
-    self.mutablCustomFields[key] = value;
+    self.mutableCustomFields[key] = value;
     self.hasCachedOtpToken = NO; 
 }
 
@@ -625,10 +638,14 @@ NSString* const kOtpAuthScheme = @"otpauth";
     return self.cachedOtpToken;
 }
 
++ (OTPToken *)getOtpTokenFromString:(NSString *)string forceSteam:(BOOL)forceSteam {
+    return [NodeFields getOtpTokenFromString:string forceSteam:forceSteam issuer:nil username:nil];
+}
+
 + (OTPToken*)getOtpTokenFromString:(NSString * _Nonnull)string
                         forceSteam:(BOOL)forceSteam
-                            issuer:(NSString*)issuer
-                          username:(NSString*)username {
+                            issuer:(NSString*_Nullable)issuer
+                          username:(NSString*_Nullable)username {
     OTPToken *token = nil;
     NSURL *url = [NodeFields findOtpUrlInString:string];
     
@@ -659,6 +676,65 @@ NSString* const kOtpAuthScheme = @"otpauth";
     return token;
 }
 
+- (void)setLegacyTotpFields:(NSString *)base32Secret token:(OTPToken * _Nonnull)token {
+    self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:base32Secret protected:YES];
+    
+    if ( token.algorithm == OTPAlgorithmSteam ) {
+        NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
+        self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
+    }
+    else {
+        NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+        self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    if ( self.usingLegacyKeeOtpStyle ) {
+        NSURLComponents *components = [NSURLComponents componentsWithString:@"http:
+        NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret mmcg_base32String]];
+        
+        if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
+            NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
+            NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
+            components.queryItems = @[key, step, size];
+        }
+        else {
+            components.queryItems = @[key];
+        }
+        self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:components.query protected:YES];
+    }
+}
+
+- (void)setWindowsKeePassTotpFields:(NSString *)base32Secret token:(OTPToken * _Nonnull)token {
+    if ( token.algorithm != OTPAlgorithmSteam && token.algorithm != OTPAlgorithmYandex ) {
+        self.mutableCustomFields[kOriginalWindowsSecretBase32Key] = [StringValue valueWithString:base32Secret protected:YES];
+        
+        if(token.period != OTPToken.defaultPeriod) {
+            self.mutableCustomFields[kOriginalWindowsOtpPeriodKey] = [StringValue valueWithString:@(token.period).stringValue protected:YES];
+        }
+        
+        if(token.digits != OTPToken.defaultDigits) {
+            self.mutableCustomFields[kOriginalWindowsOtpLengthKey] = [StringValue valueWithString:@(token.digits).stringValue protected:YES];
+        }
+        
+        if(token.algorithm != OTPToken.defaultAlgorithm) {
+            if ( token.algorithm == OTPAlgorithmSHA256 ) {
+                self.mutableCustomFields[kOriginalWindowsOtpAlgoKey] = [StringValue valueWithString:kOriginalWindowsOtpAlgoValueSha256 protected:YES];
+            }
+            else if ( token.algorithm == OTPAlgorithmSHA512 ) {
+                self.mutableCustomFields[kOriginalWindowsOtpAlgoKey] = [StringValue valueWithString:kOriginalWindowsOtpAlgoValueSha512 protected:YES];
+            }
+        }
+    }
+}
+
 - (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes addLegacyFields:(BOOL)addLegacyFields addOtpAuthUrl:(BOOL)addOtpAuthUrl {
     if ( appendUrlToNotes ) {     
         self.notes = [self.notes stringByAppendingFormat:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: [%@]", [token url:YES]];
@@ -667,71 +743,19 @@ NSString* const kOtpAuthScheme = @"otpauth";
         NSString* base32Secret = token.secret.mmcg_base32String;
 
         if ( addLegacyFields ) {
-            
-            
-            
-            self.mutablCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:base32Secret protected:YES];
-            
-            if ( token.algorithm == OTPAlgorithmSteam ) {
-                NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
-                self.mutablCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
-            }
-            else {
-                NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
-                self.mutablCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
-            }
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            if ( self.usingLegacyKeeOtpStyle ) {
-                NSURLComponents *components = [NSURLComponents componentsWithString:@"http:
-                NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret mmcg_base32String]];
-                
-                if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-                    NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
-                    NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
-                    components.queryItems = @[key, step, size];
-                }
-                else {
-                    components.queryItems = @[key];
-                }
-                self.mutablCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:components.query protected:YES];
-            }
+            [self setLegacyTotpFields:base32Secret token:token];
         }
 
+        
+        
         if ( addOtpAuthUrl ) { 
             NSURL* otpauthUrl = [token url:YES];
-            self.mutablCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:otpauthUrl.absoluteString protected:YES];
+            self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:otpauthUrl.absoluteString protected:YES];
         }
 
         
-        
-        if ( token.algorithm != OTPAlgorithmSteam && token.algorithm != OTPAlgorithmYandex ) {
-            self.mutablCustomFields[kOriginalWindowsSecretBase32Key] = [StringValue valueWithString:base32Secret protected:YES];
 
-            if(token.period != OTPToken.defaultPeriod) {
-                self.mutablCustomFields[kOriginalWindowsOtpPeriodKey] = [StringValue valueWithString:@(token.period).stringValue protected:YES];
-            }
-
-            if(token.digits != OTPToken.defaultDigits) {
-                self.mutablCustomFields[kOriginalWindowsOtpLengthKey] = [StringValue valueWithString:@(token.digits).stringValue protected:YES];
-            }
-            
-            if(token.algorithm != OTPToken.defaultAlgorithm) {
-                if ( token.algorithm == OTPAlgorithmSHA256 ) {
-                    self.mutablCustomFields[kOriginalWindowsOtpAlgoKey] = [StringValue valueWithString:kOriginalWindowsOtpAlgoValueSha256 protected:YES];
-                }
-                else if ( token.algorithm == OTPAlgorithmSHA512 ) {
-                    self.mutablCustomFields[kOriginalWindowsOtpAlgoKey] = [StringValue valueWithString:kOriginalWindowsOtpAlgoValueSha512 protected:YES];
-                }
-            }
-        }
+        [self setWindowsKeePassTotpFields:base32Secret token:token];
     }
     
     self.hasCachedOtpToken = NO; 
@@ -742,30 +766,30 @@ NSString* const kOtpAuthScheme = @"otpauth";
     
     
     
-    self.mutablCustomFields[kOriginalWindowsSecretKey] = nil;
-    self.mutablCustomFields[kOriginalWindowsSecretHexKey] = nil;
-    self.mutablCustomFields[kOriginalWindowsSecretBase64Key] = nil;
-    self.mutablCustomFields[kOriginalWindowsSecretBase32Key] = nil;
-    self.mutablCustomFields[kOriginalWindowsOtpPeriodKey] = nil;
-    self.mutablCustomFields[kOriginalWindowsOtpLengthKey] = nil;
-    self.mutablCustomFields[kOriginalWindowsOtpAlgoKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsSecretKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsSecretHexKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsSecretBase64Key] = nil;
+    self.mutableCustomFields[kOriginalWindowsSecretBase32Key] = nil;
+    self.mutableCustomFields[kOriginalWindowsOtpPeriodKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsOtpLengthKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsOtpAlgoKey] = nil;
     
     
     
-    self.mutablCustomFields[kKeePassXcTotpSeedKey] = nil;
-    self.mutablCustomFields[kKeePassXcTotpSettingsKey] = nil;
+    self.mutableCustomFields[kKeePassXcTotpSeedKey] = nil;
+    self.mutableCustomFields[kKeePassXcTotpSettingsKey] = nil;
     
     
     
     
-    self.mutablCustomFields[kKeeOtpPluginKey] = nil;
+    self.mutableCustomFields[kKeeOtpPluginKey] = nil;
     
     
     
     NSTextCheckingResult *result = [[NodeFields totpNotesRegex] firstMatchInString:self.notes options:kNilOptions range:NSMakeRange(0, self.notes.length)];
     
     if(result) {
-        NSLog(@"Found matching OTP in Notes: [%@]", [self.notes substringWithRange:result.range]);
+        slog(@"Found matching OTP in Notes: [%@]", [self.notes substringWithRange:result.range]);
         self.notes = [self.notes stringByReplacingCharactersInRange:result.range withString:@""];
     }
     
@@ -798,7 +822,14 @@ NSString* const kOtpAuthScheme = @"otpauth";
             usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
     
     
-    OTPToken* ret = [NodeFields getOriginalWindowsKeePassOTPToken:fields];
+    
+    
+    OTPToken* ret;
+    
+    
+    
+    NSURL *otpUrl = [NSURL URLWithString:password];
+    ret = [NodeFields getOtpTokenFromUrl:otpUrl];
     if(ret) {
         return ret;
     }
@@ -812,8 +843,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
     
     
     
-    NSURL *otpUrl = [NSURL URLWithString:password];
-    ret = [NodeFields getOtpTokenFromUrl:otpUrl];
+    ret = [NodeFields getOriginalWindowsKeePassOTPToken:fields];
     if(ret) {
         return ret;
     }
@@ -876,8 +906,8 @@ NSString* const kOtpAuthScheme = @"otpauth";
     else {
         return nil;
     }
-    
-    OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secret name:@"<Unknown>" issuer:@"<Unknown>"];
+
+    OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secret];
 
     StringValue* length = fields[kOriginalWindowsOtpLengthKey];
     if (length && length.value.length) {
@@ -920,7 +950,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
     if(keePassXcOtpSecretEntry) {
         NSString* keePassXcOtpSecret = keePassXcOtpSecretEntry.value;
         if(keePassXcOtpSecret) {
-            OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:keePassXcOtpSecret] name:@"<Unknown>" issuer:@"<Unknown>"];
+            OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:keePassXcOtpSecret]];
             
             StringValue* keePassXcOtpParamsEntry = fields[kKeePassXcTotpSettingsKey];
             
@@ -969,65 +999,64 @@ NSString* const kOtpAuthScheme = @"otpauth";
     
     StringValue* keeOtpSecretEntry = fields[kKeeOtpPluginKey];
     
-    if(keeOtpSecretEntry) {
+    if(!keeOtpSecretEntry) {
+        return nil;
+    }
+    
+    
+    
+    NSURL *url = [NSURL URLWithString:keeOtpSecretEntry.value];
+    OTPToken* t = [NodeFields getOtpTokenFromUrl:url];
+    if(t) {
+        *usingLegacyKeeOtpStyle = NO;
+        return t;
+    }
+    
+    
+    
+    NSString* keeOtpSecret = keeOtpSecretEntry.value;
+    if(!keeOtpSecret) {
+        return nil;
+    }
+    
+    NSDictionary *params = [NodeFields getQueryParams:keeOtpSecret];
+    NSString* secret = params[@"key"];
+    
+    if(secret.length) {
+        *usingLegacyKeeOtpStyle = YES; 
         
         
-        NSURL *url = [NSURL URLWithString:keeOtpSecretEntry.value];
-        OTPToken* t = [NodeFields getOtpTokenFromUrl:url];
-        if(t) {
-            *usingLegacyKeeOtpStyle = NO;
-            return t;
+        
+        if([secret containsString:@"%3d"]) {
+            secret = [secret stringByRemovingPercentEncoding];
         }
-
         
+        OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:secret]];
         
-        NSString* keeOtpSecret = keeOtpSecretEntry.value;
-        if(keeOtpSecret) {
-            NSDictionary *params = [NodeFields getQueryParams:keeOtpSecret];
-            NSString* secret = params[@"key"];
-            
-            if(secret.length) {
-                *usingLegacyKeeOtpStyle = YES; 
-                
-                
-                
-                if([secret containsString:@"%3d"]) {
-                    secret = [secret stringByRemovingPercentEncoding];
-                }
-                
-                OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:[NSData secretWithString:secret] name:@"<Unknown>" issuer:@"<Unknown>"];
-                
-                if(params[@"step"]) {
-                    token.period = [params[@"step"] integerValue];
-                }
-                
-                if(params[@"size"]) {
-                    token.digits = [params[@"size"] integerValue];
-                }
-                
-                if([token validate]) {
-                    return token;
-                }
-            }
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-
-            OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer
-                                               secret:[NSData secretWithString:keeOtpSecret]
-                                                 name:@"<Unknown>" issuer:@"<Unknown>"];
-
-            if([token validate]) {
-                return token;
-            }
+        if(params[@"step"]) {
+            token.period = [params[@"step"] integerValue];
         }
+        
+        if(params[@"size"]) {
+            token.digits = [params[@"size"] integerValue];
+        }
+        
+        if([token validate]) {
+            return token;
+        }
+    }
+    
+    
+    
+    
+    
+    
+    
+    OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer
+                                       secret:[NSData secretWithString:keeOtpSecret]];
+    
+    if([token validate]) {
+        return token;
     }
     
     return nil;
@@ -1058,7 +1087,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
         }
     }
     else {
-        NSLog(@"Error creating data detector: %@", error);
+        slog(@"Error creating data detector: %@", error);
     }
     
     return nil;
@@ -1097,7 +1126,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
 
 
 - (NSArray<NSString *> *)alternativeUrls {
-    NSDictionary<NSString*, StringValue*> *filtered = [self.mutablCustomFields.dictionary filter:^BOOL(NSString * _Nonnull key, StringValue * _Nonnull value) {
+    NSDictionary<NSString*, StringValue*> *filtered = [self.mutableCustomFields.dictionary filter:^BOOL(NSString * _Nonnull key, StringValue * _Nonnull value) {
         return [NodeFields isAlternativeURLCustomFieldKey:key];
     }];
     
@@ -1110,7 +1139,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
 
 - (void)addSecondaryUrl:(NSString*)url optionalCustomFieldSuffixLabel:(NSString*_Nullable)optionalCustomFieldSuffixLabel {
     if ( url.length == 0 ) {
-        NSLog(@"🔴 Nil or empty URL sent to addSecondaryURL");
+        slog(@"🔴 Nil or empty URL sent to addSecondaryURL");
         return;
     }
     
@@ -1119,8 +1148,8 @@ NSString* const kOtpAuthScheme = @"otpauth";
         customFieldDesiredName = [NSString stringWithFormat:@"URL-%@", optionalCustomFieldSuffixLabel];
     }
     
-    if ( self.mutablCustomFields[customFieldDesiredName] == nil ) {
-        self.mutablCustomFields[customFieldDesiredName] = [StringValue valueWithString:url];
+    if ( self.mutableCustomFields[customFieldDesiredName] == nil ) {
+        self.mutableCustomFields[customFieldDesiredName] = [StringValue valueWithString:url];
         return;
     }
     
@@ -1135,8 +1164,8 @@ NSString* const kOtpAuthScheme = @"otpauth";
     for ( int i = 2;i < INT_MAX;i++) {
         suffixed = [NSString stringWithFormat:@"%@%d", customFieldDesiredName, i];
         
-        if ( self.mutablCustomFields[suffixed] == nil ) {
-            self.mutablCustomFields[suffixed] = [StringValue valueWithString:url];
+        if ( self.mutableCustomFields[suffixed] == nil ) {
+            self.mutableCustomFields[suffixed] = [StringValue valueWithString:url];
             return;
         }
         

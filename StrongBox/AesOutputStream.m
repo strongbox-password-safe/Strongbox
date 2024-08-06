@@ -35,7 +35,7 @@
         CCCryptorStatus status = CCCryptorCreate(encrypt ? kCCEncrypt : kCCDecrypt, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, kCCKeySizeAES256, iv.bytes, _cryptor);
         
         if (status != kCCSuccess) {
-            NSLog(@"Crypto Error: %d", status);
+            slog(@"Crypto Error: %d", status);
             return nil;
         }
 
@@ -69,7 +69,7 @@
 
     CCCryptorStatus status = CCCryptorFinal(*_cryptor, encBlock, encRequired, &encWritten);
     if (status != kCCSuccess) {
-        NSLog(@"Crypto Error: %d", status);
+        slog(@"Crypto Error: %d", status);
         self.error = [Utils createNSError:[NSString stringWithFormat:@"Crypto Error: %d", status] errorCode:status];
         free(encBlock);
         return;
@@ -78,7 +78,7 @@
     if (encWritten > 0) {
         NSInteger wrote = [self.outputStream write:encBlock maxLength:encWritten];
         if ( wrote < 0 ) {
-            NSLog(@"Error Writing final AES Block");
+            slog(@"Error Writing final AES Block");
             return;
         }
     }
@@ -99,7 +99,7 @@
 
 - (NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
     if ( !self.opened || self.closed ) {
-        NSLog(@"WARNWARN: Unopen or not closed. AES Output Stream");
+        slog(@"WARNWARN: Unopen or not closed. AES Output Stream");
         return -1;
     }
 
@@ -110,7 +110,7 @@
 
     CCCryptorStatus status = CCCryptorUpdate(*_cryptor, buffer, len, encBlock, encRequired, &encWritten);
     if (status != kCCSuccess) {
-        NSLog(@"Crypto Error: %d", status);
+        slog(@"Crypto Error: %d", status);
         self.error = [Utils createNSError:[NSString stringWithFormat:@"Crypto Error: %d", status] errorCode:status];
         free(encBlock);
         return - 1;

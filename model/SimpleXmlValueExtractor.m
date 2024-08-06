@@ -10,6 +10,7 @@
 #import "KeePassConstants.h"
 #import "Utils.h"
 #import "NSString+Extensions.h"
+#import "SBLog.h"
 
 // 2018-10-17T19:28:42Z
 
@@ -77,7 +78,7 @@ static NSDate* dotNetBaseEpochDate;
         NSData* dateData = [[NSData alloc] initWithBase64EncodedString:text options:NSDataBase64DecodingIgnoreUnknownCharacters];
         
         if(dateData.length != 8) {
-            NSLog(@"DateData != 8!!");
+            slog(@"🔴 DateData != 8!!");
             return nil;
         }
         

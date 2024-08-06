@@ -108,7 +108,7 @@ class GroupPropertiesViewController: NSViewController, NSTextViewDelegate {
 
     func notesHaveBeenChanged() -> Bool {
         guard let newNotes = textViewNotes.textStorage?.string else {
-            NSLog("🔴 Problem getting text from textViewNotes")
+            swlog("🔴 Problem getting text from textViewNotes")
             return false
         }
 
@@ -168,7 +168,7 @@ class GroupPropertiesViewController: NSViewController, NSTextViewDelegate {
         if textViewNotes.isEditable {
             if notesHaveBeenChanged() {
                 guard let newNotes = textViewNotes.textStorage?.string else {
-                    NSLog("🔴 Problem getting text from textViewNotes")
+                    swlog("🔴 Problem getting text from textViewNotes")
                     return
                 }
 

@@ -103,7 +103,7 @@ class SshAgentSettings: NSViewController {
         settings.runSshAgent = checkboxRunSshAgent.state == .on
         if settings.runSshAgent, settings.isPro {
             if !SSHAgentServer.sharedInstance().start() {
-                NSLog("🔴 Could not start SSH Agent")
+                swlog("🔴 Could not start SSH Agent")
             }
         } else {
             SSHAgentServer.sharedInstance().stop()

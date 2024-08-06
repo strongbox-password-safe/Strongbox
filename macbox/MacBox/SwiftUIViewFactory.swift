@@ -61,7 +61,7 @@ class SwiftUIViewFactory: NSObject {
                                         },
                                         onRecover: { codes in
                                             guard let keyFile = KeyFile.fromHexCodes(codes) else {
-                                                NSLog("🔴 ERROR: Invalid Hex Codes for Key File, should never happen!")
+                                                swlog("🔴 ERROR: Invalid Hex Codes for Key File, should never happen!")
                                                 return
                                             }
 

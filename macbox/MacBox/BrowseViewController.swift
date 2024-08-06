@@ -16,7 +16,7 @@ import Cocoa
 
 class BrowseViewController: NSViewController {
     deinit {
-        NSLog("😎 DEINIT [BrowseViewController]")
+        swlog("😎 DEINIT [BrowseViewController]")
         NotificationCenter.default.removeObserver(self)
     }
 
@@ -75,7 +75,7 @@ class BrowseViewController: NSViewController {
     }
 
     @objc func onRulesRowsDidChange(_: NSMenuItem) {
-        NSLog("onRulesRowsDidChange: %f", predicateEditor.intrinsicContentSize.height)
+        swlog("onRulesRowsDidChange: %f", predicateEditor.intrinsicContentSize.height)
 
         adjustHeightConstraintsWithAnimation()
     }
@@ -199,7 +199,7 @@ class BrowseViewController: NSViewController {
         case .tags:
             scopeTags.selectedSegment = 0
         @unknown default:
-            NSLog("🔴 Unknown Scope!")
+            swlog("🔴 Unknown Scope!")
         }
 
         checkboxIncludeGroupsInSearch.state = database.nextGenSearchIncludeGroups ? .on : .off
@@ -251,11 +251,11 @@ class BrowseViewController: NSViewController {
         }
 
         
-
+        let note = NSNotification.Name.auditCompleted
         let auditNotificationsOfInterest: [String] = [
             
             kAuditNewSwitchedOffNotificationKey,
-            kAuditCompletedNotificationKey,
+            note.rawValue,
         ]
 
         for ofInterest in auditNotificationsOfInterest {
@@ -322,7 +322,7 @@ class BrowseViewController: NSViewController {
     func onAuditUpdateNotification(_ notification: Notification) {
         
         guard let dict = notification.object as? [String: Any], let model = dict["model"] as? Model else {
-            NSLog("🔴 Couldn't real model from notification")
+            swlog("🔴 Couldn't real model from notification")
             return
         }
 
@@ -331,13 +331,13 @@ class BrowseViewController: NSViewController {
         }
 
         if notification.name.rawValue == kAuditNewSwitchedOffNotificationKey {
-            NSLog("✅ Browse::onAuditUpdateNotification [%@] - Audit Cleared Just switch off", String(describing: notification.name))
+            swlog("✅ Browse::onAuditUpdateNotification [%@] - Audit Cleared Just switch off", String(describing: notification.name))
             refresh()
             return
         }
 
         if case .auditIssues = navigationContext {
-            NSLog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+            swlog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
 
             refresh()
             return
@@ -348,18 +348,18 @@ class BrowseViewController: NSViewController {
         }
 
         if column.isHidden {
-            NSLog("✅ Ignoring Audit Update Notificatoin Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+            swlog("✅ Ignoring Audit Update Notificatoin Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
             return
         }
 
         if let _ = items.first(where: { node in
             database.isFlagged(byAudit: node.uuid)
         }) {
-            NSLog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+            swlog("✅ Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
 
             refresh()
         } else {
-            NSLog("✅ Ignoring Audit Update Notificatoin Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
+            swlog("✅ Ignoring Audit Update Notificatoin Browse::onAuditUpdateNotification [%@]", String(describing: notification.name))
         }
     }
 
@@ -483,7 +483,7 @@ class BrowseViewController: NSViewController {
         case OGNavigationSpecialAllItems:
             return .allEntries
         default:
-            NSLog("🔴 Unhandled case of special")
+            swlog("🔴 Unhandled case of special")
             return .allEntries
         }
     }
@@ -495,7 +495,7 @@ class BrowseViewController: NSViewController {
 
         let sorted = objcItems.sortedArray(options: .stable) { obj1, obj2 in
             guard let node1 = obj1 as? Node, let node2 = obj2 as? Node else {
-                NSLog("🔴 Node conversion issue")
+                swlog("🔴 Node conversion issue")
                 return .orderedSame
             }
 
@@ -681,7 +681,7 @@ class BrowseViewController: NSViewController {
             if let node {
                 deref = self.dereference(text: text, node: node)
             } else {
-                NSLog("🔴 Dereferencing Requested but no Node provided.")
+                swlog("🔴 Dereferencing Requested but no Node provided.")
             }
         }
 
@@ -706,7 +706,7 @@ class BrowseViewController: NSViewController {
     }
 
     func getIconForNode(_ node: Node) -> IMAGE_TYPE_PTR {
-        NodeIconHelper.getIconFor(node, predefinedIconSet: database!.iconSet, format: database!.format, large: false)
+        NodeIconHelper.getIconFor(node, predefinedIconSet: database!.keePassIconSet, format: database!.format, large: false)
     }
 
     func selectFirstItemIfAvailableForSearchResult() -> Bool {
@@ -724,7 +724,7 @@ class BrowseViewController: NSViewController {
 
     func editSelectedOrJumpToGroup() {
         guard let uuid = database.nextGenSelectedItems.first, let node = database.getItemBy(uuid) else {
-            NSLog("⚠️ Could get selected item to edit")
+            swlog("⚠️ Could get selected item to edit")
             return
         }
 
@@ -823,7 +823,7 @@ extension BrowseViewController: NSMenuItemValidation, NSMenuDelegate {
 
             return true
         } else {
-            NSLog("🔴 BrowseViewController::validateMenuItem Unknown Item - [%@] - %@", menuItem, String(describing: menuItem.action))
+            swlog("🔴 BrowseViewController::validateMenuItem Unknown Item - [%@] - %@", menuItem, String(describing: menuItem.action))
             return false
         }
     }
@@ -838,7 +838,7 @@ extension BrowseViewController: DocumentViewController {
 
     fileprivate func setupInitialSortingConfiguration() {
         if outlineView.sortDescriptors.isEmpty { 
-            NSLog("🐞 BrowseViewController::setupInitialSortingConfiguration - Configuring initial sort mode as none currently set")
+            swlog("🐞 BrowseViewController::setupInitialSortingConfiguration - Configuring initial sort mode as none currently set")
             outlineView.sortDescriptors.append(NSSortDescriptor(key: BrowseViewColumn.modified.rawValue, ascending: false))
         }
     }
@@ -849,7 +849,7 @@ extension BrowseViewController: DocumentViewController {
         }
 
         guard let doc = view.window?.windowController?.document as? Document else {
-            NSLog("MasterViewController::load Document not set!")
+            swlog("MasterViewController::load Document not set!")
             return
         }
 
@@ -1020,7 +1020,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
                 return []
             }
         } else {
-            NSLog("validateDrop: External Source -%d", index)
+            swlog("validateDrop: External Source -%d", index)
 
             guard let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)) else { return [] }
 
@@ -1068,7 +1068,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
                 guard let sourceIdx = sourceItem.parent?.children.firstIndex(of: sourceItem) else { return false }
                 let adjustedIdx = sourceIdx < index ? (index - 1) : index
 
-                NSLog("Browse validateDrop: REORDER of item - Source [%@] => index = [%d]", sourceItem.title, adjustedIdx)
+                swlog("Browse validateDrop: REORDER of item - Source [%@] => index = [%d]", sourceItem.title, adjustedIdx)
 
                 if database.reorderItem(sourceItem.uuid, idx: adjustedIdx) != -1 {
                     info.draggingPasteboard.clearContents()
@@ -1088,11 +1088,11 @@ extension BrowseViewController: NSOutlineViewDelegate {
                 case .allEntries:
                     destinationItemId = database.rootGroup.uuid
                 default:
-                    NSLog("🔴 Invalid Drop Destination - Navigation Context")
+                    swlog("🔴 Invalid Drop Destination - Navigation Context")
                     return false
                 }
             default:
-                NSLog("🔴 Invalid Drop Destination - Navigation Context")
+                swlog("🔴 Invalid Drop Destination - Navigation Context")
                 return false
             }
 
@@ -1115,7 +1115,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
         }
 
         guard let uuid = database.nextGenSelectedItems.first, let node = database.getItemBy(uuid) else {
-            NSLog("⚠️ Could get selected item to edit")
+            swlog("⚠️ Could get selected item to edit")
             return
         }
 
@@ -1145,7 +1145,7 @@ extension BrowseViewController: NSOutlineViewDelegate {
 extension BrowseViewController: NSOutlineViewDataSource {
     var items: [Node] {
         if sortedItemsCache == nil {
-            NSLog("🔴 BrowseViewController::Cache MISS!")
+            swlog("🔴 BrowseViewController::Cache MISS!")
             loadAndSortItems()
         }
 
@@ -1216,7 +1216,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
 
     func loadFavourites(_ nodeId: NodeIdentifier) -> [Node] {
         guard let node = database.getItemBy(nodeId) else {
-            NSLog("🔴 could not find favourite: [%@]", String(describing: nodeId))
+            swlog("🔴 could not find favourite: [%@]", String(describing: nodeId))
             return []
         }
 
@@ -1267,7 +1267,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
 
     func loadAuditIssues(_ category: NavigationContext.AuditNavigationCategory) -> [Node] {
         guard let report = database.auditReport else {
-            NSLog("🔴 No Audit Report available - cannot load audit issues")
+            swlog("🔴 No Audit Report available - cannot load audit issues")
             return []
         }
 
@@ -1329,12 +1329,12 @@ extension BrowseViewController: NSOutlineViewDataSource {
 
     func loadHierarchyChildEntries(_ parentGroup: UUID) -> [Node] {
         guard let group = database.getItemBy(parentGroup) else {
-            NSLog("🔴 Could not get regular hierarchy group in model [%@]", parentGroup.description)
+            swlog("🔴 Could not get regular hierarchy group in model [%@]", parentGroup.description)
             return []
         }
 
         if !group.isGroup {
-            NSLog("🔴 Regular hierarchy group is not a group!! [%@]", group)
+            swlog("🔴 Regular hierarchy group is not a group!! [%@]", group)
             return []
         }
 
@@ -1387,7 +1387,7 @@ extension BrowseViewController: NSOutlineViewDataSource {
             if let prevFirstDes = oldDescriptors.first,
                firstDes.key == prevFirstDes.key
             {
-                NSLog("✅ Title column sort clicked again")
+                swlog("✅ Title column sort clicked again")
 
                 MacAlerts.info(NSLocalizedString("browse_cannot_sort_by_title_title", comment: "Cannot Sort"),
                                informativeText: NSLocalizedString("browse_cannot_sort_by_title_message", comment: "You cannot sort by Title here because you have disabled sorting in Database Settings."),

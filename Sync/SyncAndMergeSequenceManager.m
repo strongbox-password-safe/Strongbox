@@ -52,7 +52,7 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
-NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
+NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManagerDatabaseSyncStatusChanged";
 
 @interface SyncAndMergeSequenceManager ()
 
@@ -114,7 +114,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                           @(kFilesAppUrlBookmark),
                                           @(kSFTP),
                                           @(kWebDAV),
-                                          @(kTwoDrive),
+                                          @(kOneDrive),
                                           @(kWiFiSync),
                                           @(kCloudKit),
         ];
@@ -122,7 +122,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         NSArray<NSNumber*> *supported = @[@(kSFTP),
                                           @(kWebDAV),
                                           @(kLocalDevice),
-                                          @(kTwoDrive),
+                                          @(kOneDrive),
                                           @(kGoogleDrive),
                                           @(kDropbox),
                                           @(kWiFiSync),
@@ -145,7 +145,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
 - (DatabaseSyncOperationalData*)getOperationData:(NSString*)databaseUuid {
     if ( databaseUuid == nil ) {
-        NSLog(@"🔴 getOperationData called with NIL!");
+        slog(@"🔴 getOperationData called with NIL!");
         return [[DatabaseSyncOperationalData alloc] initWithDatabaseId:databaseUuid];
     }
     DatabaseSyncOperationalData *ret = [self.operationalStateForDatabase objectForKey:databaseUuid];
@@ -196,7 +196,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         dispatch_queue_t storageProviderQueue = self.storageProviderSerializedQueues[@(database.storageProvider)];
         
         if ( storageProviderQueue == nil ) {
-            NSLog(@"🔴 No Storage Provider Queue for this Provider!");
+            slog(@"🔴 No Storage Provider Queue for this Provider!");
             request.completion(kSyncAndMergeError, NO, [Utils createNSError:@"No Storage Provider Queue for this Provider!" errorCode:-1]);
             return;
         }
@@ -206,14 +206,14 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             
             [self syncOrPoll:databaseUuid syncId:syncId parameters:request.parameters completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
                 if ( done ) {
-                    NSLog(@"🔴 WARNWARN: Completion Called when already completed! - NOP - WARNWARN");
+                    slog(@"🔴 WARNWARN: Completion Called when already completed! - NOP - WARNWARN");
                     return;
                 }
                 done = YES;
                 
                 NSArray<SyncDatabaseRequest*>* alsoWaiting = [opData dequeueAllJoinRequests];
                 if (alsoWaiting.count) {
-                    NSLog(@"SYNC: Also found %@ requests waiting on sync for this DB - Completing those also now...", @(alsoWaiting.count));
+                    slog(@"SYNC: Also found %@ requests waiting on sync for this DB - Completing those also now...", @(alsoWaiting.count));
                 }
                 
                 NSMutableArray<SyncDatabaseRequest*> *allRequestsFulfilledByThisSync = [NSMutableArray arrayWithObject:request];
@@ -247,7 +247,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 - (void)poll:(NSString*)databaseUuid syncId:(NSUUID*)syncId parameters:(SyncParameters*)parameters completion:(SyncAndMergeCompletionBlock)completion {
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
     if ( !database ) {
-        NSLog(@"Could not get Database for id [%@].", databaseUuid);
+        slog(@"Could not get Database for id [%@].", databaseUuid);
         completion(kSyncAndMergeError, NO, nil);
         return;
     }
@@ -276,7 +276,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 - (void)sync:(NSString*)databaseUuid syncId:(NSUUID*)syncId parameters:(SyncParameters*)parameters completion:(SyncAndMergeCompletionBlock)completion {
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
     if ( !database ) {
-        NSLog(@"Could not get Database for id [%@].", databaseUuid);
+        slog(@"Could not get Database for id [%@].", databaseUuid);
         completion(kSyncAndMergeError, NO, nil);
         return;
     }
@@ -458,7 +458,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
               remoteModified:(NSDate*)remoteModified
                   parameters:(SyncParameters*)parameters
                   completion:(SyncAndMergeCompletionBlock)completion {
-    NSLog(@"⚠️ Sync - Conflict Resolution Begin...");
+    slog(@"⚠️ Sync - Conflict Resolution Begin...");
     
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
 
@@ -508,7 +508,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                          completion:completion];
     }
     else {
-        NSLog(@"WARNWARN: doConflictResolution - Unknown Conflict Resolution Strategy");
+        slog(@"WARNWARN: doConflictResolution - Unknown Conflict Resolution Strategy");
     }
 }
 
@@ -689,7 +689,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                      remoteData:(NSData*)remoteData
                    compareFirst:(BOOL)compareFirst
                      completion:(SyncAndMergeCompletionBlock)completion {
-    NSLog(@"⚠️ Sync - conflictResolutionMerge...");
+    slog(@"⚠️ Sync - conflictResolutionMerge...");
 
     [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Source DB has also changed. Conflict. Auto Merging..."];
 
@@ -1234,7 +1234,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Outstanding Update successfully pushed to Source DB. [New Source DB Mod Date=%@]. Making Working Copy Match Source...", newRemoteModDate.friendlyDateTimeStringBothPrecise]];
 
             if (!newRemoteModDate) {
-                NSLog(@"WARNWARN: No new remote mod date returned from storage provider! Setting to NOW.");
+                slog(@"WARNWARN: No new remote mod date returned from storage provider! Setting to NOW.");
                 newRemoteModDate = NSDate.date;
             }
             
@@ -1321,7 +1321,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
 - (void)publishSyncStatusChangeNotification:(SyncStatus*)info {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kSyncManagerDatabaseSyncStatusChanged object:info.databaseId];
+        [NSNotificationCenter.defaultCenter postNotificationName:kSyncManagerDatabaseSyncStatusChangedNotification object:info.databaseId];
     });
 }
 

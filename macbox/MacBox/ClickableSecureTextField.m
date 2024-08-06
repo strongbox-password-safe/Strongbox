@@ -11,7 +11,7 @@
 @implementation ClickableSecureTextField
 
 - (void)mouseDown:(NSEvent *)event {
-//    NSLog(@"mouseDown"); 
+//    slog(@"mouseDown"); 
 }
 
 - (void)mouseUp:(NSEvent *)event {

@@ -46,7 +46,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
         
         self.skey = malloc(sizeof(symmetric_key));
         if ((twofish_setup(key.bytes, kKeySize, 0, _skey)) != CRYPT_OK) {
-            NSLog(@"Invalid Key");
+            slog(@"Invalid Key");
             return nil;
         }
 
@@ -135,7 +135,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
     
     NSInteger bytesRead = [self.inputStream read:block maxLength:kWorkingChunkSize];
     if (bytesRead < 0) {
-        NSLog(@"TwoFishReadStream Could not read input stream");
+        slog(@"TwoFishReadStream Could not read input stream");
         self.error = self.inputStream.streamError; 
         self.workChunkLength = 0;
         return;
@@ -204,7 +204,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
         if ( self.lastBlock.length != kBlockSize ) {
             
 
-            NSLog(@"Last Block not equal to Block Size! Assuming UnPADDED! WARNWARN");
+            slog(@"Last Block not equal to Block Size! Assuming UnPADDED! WARNWARN");
             
             memcpy(self.workChunk, pt, self.lastBlock.length);
             self.workChunkLength = self.lastBlock.length;
@@ -214,13 +214,13 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
             
             int paddingLength = pt[kBlockSize-1];
             if(paddingLength <= 0 || paddingLength > kBlockSize)  {
-                NSLog(@"TWOFISH: Padding Byte Out of Range! Assuming Not Padded...");
+                slog(@"TWOFISH: Padding Byte Out of Range! Assuming Not Padded...");
                 padding = NO;
             }
         
             for(int i = kBlockSize - paddingLength; i < kBlockSize; i++) {
                 if(pt[i] != paddingLength) {
-                    NSLog(@"TWOFISH: Padding byte not equal expected! Assuming Not Padded...");
+                    slog(@"TWOFISH: Padding byte not equal expected! Assuming Not Padded...");
                     padding = NO;
                 }
             }
@@ -234,7 +234,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
                 }
             }
             else {
-                NSLog(@"Last Block not padded! WARNWARN");
+                slog(@"Last Block not padded! WARNWARN");
                 memcpy(self.workChunk, pt, self.lastBlock.length);
                 self.workChunkLength = self.lastBlock.length;
             }

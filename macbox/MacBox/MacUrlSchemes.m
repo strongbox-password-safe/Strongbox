@@ -32,7 +32,7 @@ StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
         return kWebDAV;
     }
     else if ( [scheme isEqualToString:kStrongboxOneDriveUrlScheme] ) {
-        return kTwoDrive;
+        return kOneDrive;
     }
     else if ( [scheme isEqualToString:kStrongboxGoogleDriveUrlScheme ] ) {
         return kGoogleDrive;

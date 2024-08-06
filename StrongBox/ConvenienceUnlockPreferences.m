@@ -34,6 +34,16 @@
 
 @implementation ConvenienceUnlockPreferences
 
++ (UINavigationController*)fromStoryboardWithModel:(Model *)model {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"ConvenienceUnlockPreferences" bundle:nil];
+    UINavigationController* nav = [sb instantiateInitialViewController];
+    
+    ConvenienceUnlockPreferences* vc = (ConvenienceUnlockPreferences*)nav.topViewController;
+    vc.viewModel = model;
+    
+    return nav;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -54,7 +64,7 @@
     [super viewWillDisappear:animated];
 
     if (self.isMovingFromParentViewController || self.isBeingDismissed) {
-        NSLog(@"viewWillDisappear");
+        slog(@"viewWillDisappear");
 
         [NSNotificationCenter.defaultCenter removeObserver:self];
     }

@@ -21,19 +21,19 @@
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
-        NSLog(@"✅ Strongbox AutoFill Test Client is Alive...");
-        NSLog(@"%s", argv[0]);
+        slog(@"✅ Strongbox AutoFill Test Client is Alive...");
+        slog(@"%s", argv[0]);
 
         while ( YES ) {
 
             NSString* request = @"{\"clientPublicKey\":\"foo\",\"messageSymmetricKey\":\"bar\",\"message\":\"message\",\"messageType\":1}";
             
-            NSLog(@"Sending... [%@]", request);
+            slog(@"Sending... [%@]", request);
             
             NSError* error;
             NSString* response = sendMessageOverSocket(request, YES, &error);
             
-            NSLog(@"Got response => \n%@\nError = [%@]", response, error);
+            slog(@"Got response => \n%@\nError = [%@]", response, error);
 
             int ch = getchar();
             
@@ -41,11 +41,11 @@ int main(int argc, const char * argv[]) {
                 break;
             }
             else {
-                NSLog(@"Got Char = %d", ch);
+                slog(@"Got Char = %d", ch);
             }
         }
         
-        NSLog(@"✅ Strongbox AutoFill Proxy is Exiting...");
+        slog(@"✅ Strongbox AutoFill Proxy is Exiting...");
 
         return 0;
     }

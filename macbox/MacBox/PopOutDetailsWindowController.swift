@@ -52,7 +52,7 @@ class PopOutDetailsWindowController: NSWindowController {
         viewController.load(explicitDocument: model.document, explicitItemUuid: uuid)
 
         guard let node = model.getItemBy(uuid) else {
-            NSLog("🔴 PopOutDetailsWindowController - Could not find Item")
+            swlog("🔴 PopOutDetailsWindowController - Could not find Item")
             return
         }
 
@@ -64,7 +64,7 @@ class PopOutDetailsWindowController: NSWindowController {
 
     @objc func onEditEntry2(_: Any?) {
         if database.locked || database.isEffectivelyReadOnly {
-            NSLog("🔴 Cannot edit locked or read-only database")
+            swlog("🔴 Cannot edit locked or read-only database")
             return
         }
 
@@ -86,7 +86,7 @@ class PopOutDetailsWindowController: NSWindowController {
         guard let floatOnTopItem = window?.toolbar?.items.first(where: { item in
             item.itemIdentifier == ToolbarItemIdentifiers.floatOnTop
         }) else {
-            NSLog("🔴 Couldn't find the floatOnTop toolbar item")
+            swlog("🔴 Couldn't find the floatOnTop toolbar item")
             return
         }
 
@@ -128,7 +128,7 @@ extension PopOutDetailsWindowController: NSToolbarDelegate {
         toolbar.displayMode = .iconOnly
 
         guard let window else {
-            NSLog("🔴 Window not ready")
+            swlog("🔴 Window not ready")
             return
         }
 
@@ -200,7 +200,7 @@ extension PopOutDetailsWindowController: NSToolbarItemValidation {
             return true
         }
 
-        NSLog("🔴 validateAction - not handled: [%@]", String(describing: action))
+        swlog("🔴 validateAction - not handled: [%@]", String(describing: action))
 
         return false
     }

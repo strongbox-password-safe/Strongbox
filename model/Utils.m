@@ -357,7 +357,7 @@ uint16_t littleEndian2BytesToUInt16(uint8_t *bytes) {
 
 int64_t littleEndianNBytesToInt64(uint8_t* bytes, int n)  {
     if(n > 8) {
-        NSLog(@"n > 8 passed to littleEndianNBytesToInt64");
+        slog(@"n > 8 passed to littleEndianNBytesToInt64");
         return -1;
     }
     
@@ -424,7 +424,7 @@ uint32_t getRandomUint32(void) {
     uint32_t ret;
     if(SecRandomCopyBytes(kSecRandomDefault, sizeof(uint32_t), &ret))
     {
-        NSLog(@"Could not securely copy new random bytes");
+        slog(@"Could not securely copy new random bytes");
         return -1;
     }
     
@@ -435,7 +435,7 @@ NSData* getRandomData(uint32_t length) {
     NSMutableData *start = [NSMutableData dataWithLength:length];
     if(SecRandomCopyBytes(kSecRandomDefault, length, start.mutableBytes))
     {
-        NSLog(@"Could not securely copy new random bytes");
+        slog(@"Could not securely copy new random bytes");
         return nil;
     }
     
@@ -541,7 +541,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
             return ret;
         }
     } @catch (NSException *exception) {
-        NSLog(@"Exception in scaleImage: [%@]", exception);
+        slog(@"Exception in scaleImage: [%@]", exception);
         return image;
     } @finally { }
 }

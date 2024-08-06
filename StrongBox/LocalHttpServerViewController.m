@@ -29,7 +29,7 @@
     if(!self.webUploader.isRunning) {
         [self.webUploader startWithPort:80 bonjourName:@"Strongbox_Salut"];
 
-        NSLog(@"Visit %@ in your web browser", self.webUploader.serverURL);
+        slog(@"Visit %@ in your web browser", self.webUploader.serverURL);
         
         if ( self.webUploader.serverURL ) {
             self.helpfulInfo.hidden = NO;

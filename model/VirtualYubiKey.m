@@ -88,7 +88,7 @@
 
 + (NSData*)getDummyYubiKeyResponse:(NSData*)challenge secret:(NSString*)secret {
     if (challenge == nil || secret == nil) {
-        NSLog(@"WARNWARN: NIL Secret or Challenge to Dummy YubiKey: Challenge = [%@] - Secret = [%@]", challenge, secret);
+        slog(@"WARNWARN: NIL Secret or Challenge to Dummy YubiKey: Challenge = [%@] - Secret = [%@]", challenge, secret);
         return nil;
     }
     

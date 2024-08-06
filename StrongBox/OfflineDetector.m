@@ -31,7 +31,7 @@
 }
 
 - (void) stopMonitoringConnectivitity {
-    NSLog(@"STOP monitoring Internet Connectivity...");
+    slog(@"STOP monitoring Internet Connectivity...");
     
     
     
@@ -44,7 +44,7 @@
     
 - (void) startMonitoringConnectivitity {
     if (!AppPreferences.sharedInstance.monitorInternetConnectivity) {
-        NSLog(@"Not monitoring connectivity as configured OFF");
+        slog(@"Not monitoring connectivity as configured OFF");
         return;
     }
    
@@ -65,7 +65,7 @@
     
     
     self.internetReachabilityDetector.unreachableBlock = ^(Reachabil1ty *reach) {
-        NSLog(@"OfflineDetector: We Are Offline :(");
+        slog(@"OfflineDetector: We Are Offline :(");
         weakSelf.offline = YES;
     };
 

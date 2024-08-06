@@ -141,7 +141,7 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
     func setTheIcon(_ icon: CustomAppIcon? = nil) {
         UIApplication.shared.setAlternateIconName(icon?.plistKey) { [weak self] error in
             if let error {
-                NSLog("🔴 Error setting alternate app icon [%@]", String(describing: error))
+                swlog("🔴 Error setting alternate app icon [%@]", String(describing: error))
                 Alerts.error(self, error: error)
             } else {
                 self?.dismiss(animated: true, completion: nil)

@@ -45,7 +45,7 @@
                         completion:^(BOOL userCancelled, SerializationData * _Nullable serializationData, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         if(userCancelled || serializationData == nil || error) {
             if(error) {
-                NSLog(@"Error getting Decrypting KDBX3.1 binary: [%@]", error);
+                slog(@"Error getting Decrypting KDBX3.1 binary: [%@]", error);
             }
 
             completion(userCancelled, nil, innerStreamError, error);
@@ -65,7 +65,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
     BOOL ignoreHeaderHash = NO;
     if(!ignoreHeaderHash && meta && meta.headerHash) {
         if(![meta.headerHash isEqualToString:serializationData.headerHash]) {
-            NSLog(@"Header Hash mismatch. Document has been corrupted or interfered with: [%@] != [%@]",
+            slog(@"Header Hash mismatch. Document has been corrupted or interfered with: [%@] != [%@]",
                   serializationData.headerHash,
                   meta.headerHash);
             
@@ -85,7 +85,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
     NSError* error;
     Node* rootGroup = [KeePassXmlModelAdaptor toStrongboxModel:xmlRoot attachments:attachments customIconPool:customIconPool error:&error];
     if(rootGroup == nil) {
-        NSLog(@"Error converting Xml model to Strongbox model: [%@]", error);
+        slog(@"Error converting Xml model to Strongbox model: [%@]", error);
         completion(NO, nil, innerStreamError, error);
         return;
     }
@@ -146,7 +146,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
                                                                 error:&err];
         
     if(!rootXmlDocument) {
-        NSLog(@"Could not convert Database to Xml Model.");
+        slog(@"Could not convert Database to Xml Model.");
         NSError *error = [Utils createNSError:@"Could not convert Database to Xml Model." errorCode:-4];
         completion(NO, nil, error);
         return;
@@ -194,7 +194,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
                          completion:^(BOOL userCancelled, NSString * _Nullable hash, NSError * _Nullable error) {
         if (userCancelled || !hash || error) {
             if (!userCancelled) {
-                NSLog(@"Could not serialize Document to KDBX. Stage 1");
+                slog(@"Could not serialize Document to KDBX. Stage 1");
                 error = [Utils createNSError:@"Could not serialize Document to KDBX. Stage 1." errorCode:-6]; 
             }
             completion(userCancelled, nil, error);
@@ -230,7 +230,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
     [xmlSerializer endDocument];
     NSString *xml = xmlSerializer.xml;
     if(!xml || !writeXmlOk) {
-        NSLog(@"Could not serialize Xml to Document.");
+        slog(@"Could not serialize Xml to Document.");
         NSError *error = [Utils createNSError:@"Could not serialize Xml to Document." errorCode:-5];
         completion(NO, nil, error);
         return;
@@ -241,7 +241,7 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
     NSError* err3;
     NSData *data = [kdbxSerializer stage2Serialize:xml error:&err3]; 
     if(!data) {
-        NSLog(@"Could not serialize Document to KDBX.");
+        slog(@"Could not serialize Document to KDBX.");
         completion(NO, nil, err3);
         return;
     }

@@ -42,11 +42,11 @@ class WiFiSyncOneShotClientConnection {
     }
 
     func connect() {
-        DebugLogger.info("Starting resolve for endpoint...")
+        swlog("Starting resolve for endpoint...")
 
         do {
             try resolver.start(endpoint: endpoint) { result in
-                DebugLogger.info("Resolve done for endpoint with \(result)")
+                swlog("Resolve done for endpoint with \(result)")
 
                 WiFiSyncOneShotClientConnection.connectionQ.async {
                     self.onResolved(result)
@@ -83,10 +83,10 @@ class WiFiSyncOneShotClientConnection {
     
 
     func onStateChanged(_ newState: NWConnection.State) {
-        NSLog("🐞 WiFiSyncOneShotClientConnection::onStateChanged \(String(describing: newState))")
+        swlog("🐞 WiFiSyncOneShotClientConnection::onStateChanged \(String(describing: newState))")
 
         guard let connection else {
-            NSLog("🔴 WiFiSyncOneShotClientConnection::onStateChanged - connection nil!")
+            swlog("🔴 WiFiSyncOneShotClientConnection::onStateChanged - connection nil!")
             return
         }
 
@@ -96,30 +96,30 @@ class WiFiSyncOneShotClientConnection {
             receiveMessage()
         case let .waiting(error):
             if case let .tls(os) = error, os == errSSLPeerBadRecordMac { 
-                NSLog("🔴 Sender has detected an Incorrect PIN")
+                swlog("🔴 Sender has detected an Incorrect PIN")
                 errorHasOccurred = true
                 connection.forceCancel()
                 onIncorrectPasscode()
             } else {
-                NSLog("🔴 WiFiSyncOneShotClientConnection::onStateChanged - WAITING SERVER ERROR: \(error)\n")
+                swlog("🔴 WiFiSyncOneShotClientConnection::onStateChanged - WAITING SERVER ERROR: \(error)\n")
                 errorHasOccurred = true
                 connection.cancel()
                 onError(error)
             }
         case let .failed(error):
-            NSLog("🔴 WiFiSyncOneShotClientConnection::onStateChanged - Failed with \(error)")
+            swlog("🔴 WiFiSyncOneShotClientConnection::onStateChanged - Failed with \(error)")
 
             errorHasOccurred = true
             connection.cancel()
             onError(error)
         default:
-            NSLog("WiFiSyncOneShotClientConnection::onStateChanged \(String(describing: newState))")
+            swlog("WiFiSyncOneShotClientConnection::onStateChanged \(String(describing: newState))")
         }
     }
 
     func send(_ data: Data? = nil, _ messageType: WiFiSyncMessageType) -> Bool {
         guard let connection, !errorHasOccurred, !hasSent else {
-            NSLog("🔴 Strange scenario, WiFiSyncOneShotClientConnection::send() - connection is invalid.")
+            swlog("🔴 Strange scenario, WiFiSyncOneShotClientConnection::send() - connection is invalid.")
             return false
         }
 
@@ -134,7 +134,7 @@ class WiFiSyncOneShotClientConnection {
                             guard let self else { return }
 
                             if let error {
-                                NSLog("🔴 WiFiSyncOneShotClientConnection::sendGetDatabaseRequest - Send Completed: \(String(describing: error)) - encoded data length: \(String(describing: data?.count))")
+                                swlog("🔴 WiFiSyncOneShotClientConnection::sendGetDatabaseRequest - Send Completed: \(String(describing: error)) - encoded data length: \(String(describing: data?.count))")
                                 onError(error)
                             } else {
                                 
@@ -148,7 +148,7 @@ class WiFiSyncOneShotClientConnection {
 
     func receiveMessage() {
         guard let connection, !errorHasOccurred, hasSent else {
-            NSLog("🔴 Strange scenario, WiFiSyncOneShotClientConnection::receive() - connection is invalid.")
+            swlog("🔴 Strange scenario, WiFiSyncOneShotClientConnection::receive() - connection is invalid.")
             return
         }
 
@@ -160,7 +160,7 @@ class WiFiSyncOneShotClientConnection {
             } else if let error {
                 onError(error)
             } else {
-                NSLog("🔴 Unknown Error occurred in receiveMessage completion - probably connection closed")
+                swlog("🔴 Unknown Error occurred in receiveMessage completion - probably connection closed")
                 onError(Utils.createNSError("Unknown error in WiFiSyncOneShotClientConnection::receive()", errorCode: -1))
             }
 

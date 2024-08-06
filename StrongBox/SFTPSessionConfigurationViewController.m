@@ -168,14 +168,14 @@
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    slog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
     
     
     
     if (! [url startAccessingSecurityScopedResource] ) {
-        NSLog(@"🔴 Could not securely access URL!");
+        slog(@"🔴 Could not securely access URL!");
     }
     
     NSError* error;

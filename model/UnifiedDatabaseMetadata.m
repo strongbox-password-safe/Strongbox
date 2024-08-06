@@ -87,7 +87,7 @@ const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
             self.recycleBinEnabled = NO;
         }
         else {
-            NSLog(@"WARNWARN: No DEFAULTS set for this format! WARNWARN");
+            slog(@"WARNWARN: No DEFAULTS set for this format! WARNWARN");
         }
     }
     
@@ -160,7 +160,7 @@ const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
         return [self kvpForUiKp];
     }
     else {
-        NSLog(@"WARNWARN: No kvpForUi set for this format! WARNWARN");
+        slog(@"WARNWARN: No kvpForUi set for this format! WARNWARN");
         return [[MutableOrderedDictionary alloc] init];
     }
 }

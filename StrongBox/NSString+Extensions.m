@@ -9,6 +9,7 @@
 #import "NSString+Extensions.h"
 #import "NSData+Extensions.h"
 #import "MMcG_MF_Base32Additions.h"
+#import "SBLog.h"
 
 static NSString* const kDefaultScheme = @"https";
 static NSString* const kDefaultSchemeWithSlashes = @"https://";
@@ -33,7 +34,7 @@ static NSString* const kLowerCaseNull = @"null";
                                                              error:&error];
 
         if(error) {
-            NSLog(@"Error compiling Regex: %@", error);
+            slog(@"Error compiling Regex: %@", error);
         }
     });
     
@@ -52,7 +53,7 @@ static NSString* const kLowerCaseNull = @"null";
                                                              error:&error];
 
         if(error) {
-            NSLog(@"Error compiling Regex: %@", error);
+            slog(@"Error compiling Regex: %@", error);
         }
     });
     
@@ -71,7 +72,7 @@ static NSString* const kLowerCaseNull = @"null";
                                                              error:&error];
 
         if(error) {
-            NSLog(@"Error compiling host Regex: %@", error);
+            slog(@"Error compiling host Regex: %@", error);
         }
     });
     
@@ -88,7 +89,7 @@ static NSString* const kLowerCaseNull = @"null";
         hanChineseRegex = [NSRegularExpression regularExpressionWithPattern:@"\\p{Script=Han}" options:NSRegularExpressionCaseInsensitive error:&error];
 
         if(error) {
-            NSLog(@"Error compiling hanChineseRegex: %@", error);
+            slog(@"Error compiling hanChineseRegex: %@", error);
         }
     });
     
@@ -204,7 +205,7 @@ static NSString* const kLowerCaseNull = @"null";
         components.password = password;
         components.port = port ? @(port.integerValue) : nil;
     } @catch (NSException *exception) {
-        NSLog(@"Exception while building URL: [%@]", exception);
+        slog(@"Exception while building URL: [%@]", exception);
         return nil;
     } @finally {
         
@@ -268,6 +269,25 @@ static NSString* const kLowerCaseNull = @"null";
 
 - (NSData *)utf8Data {
     return [self dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+- (StringSearchMatchType)isSearchMatch:(NSString*)searchText checkPinYin:(BOOL)checkPinYin {
+    if ( self.length == 0 || searchText.length == 0) {
+        return kStringSearchMatchTypeNoMatch;
+    }
+
+    if ( self == searchText || ( [self localizedCaseInsensitiveCompare:searchText] == NSOrderedSame ) ) {
+        return kStringSearchMatchTypeExact;
+    }
+    
+    NSRange range = [self rangeOfString:searchText options:NSCaseInsensitiveSearch | NSAnchoredSearch | NSDiacriticInsensitiveSearch];
+    if ( range.location != NSNotFound ) {
+        return kStringSearchMatchTypeStartsWith;
+    }
+    
+    BOOL contains = [self containsSearchString:searchText checkPinYin:checkPinYin];
+    
+    return contains ? kStringSearchMatchTypeContains : kStringSearchMatchTypeNoMatch;
 }
 
 - (BOOL)containsSearchString:(NSString*)searchText checkPinYin:(BOOL)checkPinYin {

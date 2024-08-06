@@ -86,7 +86,7 @@
     }
 
 #ifdef DEBUG_MEMORY_ALLOCATION_LOGGING
-    NSLog(@"serializeField => Allocating: %lu bytes", (unsigned long)length);
+    slog(@"serializeField => Allocating: %lu bytes", (unsigned long)length);
 #endif
     unsigned char *buf = malloc(length);
     if(!buf)
@@ -113,7 +113,7 @@
     symmetric_key cbckey;
 
     if ((twofish_setup(K.bytes, TWOFISH_KEYSIZE_BYTES, 0, &cbckey)) != CRYPT_OK) {
-        NSLog(@"Invalid K Key");
+        slog(@"Invalid K Key");
         return nil;
     }
 
@@ -161,7 +161,7 @@
     
 
     if (SecRandomCopyBytes(kSecRandomDefault, SIZE_OF_PASSWORD_SAFE_3_HEADER_SALT, hdr.salt)) {
-        NSLog(@"Could not securely copy header salt bytes");
+        slog(@"Could not securely copy header salt bytes");
         [Utils createNSError:@"Could not securely copy header salt bytes" errorCode:-1];
     }
 
@@ -204,7 +204,7 @@
         SecRandomCopyBytes(kSecRandomDefault, TWOFISH_BLOCK_SIZE, k2) ||
         SecRandomCopyBytes(kSecRandomDefault, TWOFISH_BLOCK_SIZE, l1) ||
         SecRandomCopyBytes(kSecRandomDefault, TWOFISH_BLOCK_SIZE, l2)) {
-        NSLog(@"Could not securely copy K or L bytes");
+        slog(@"Could not securely copy K or L bytes");
         [Utils createNSError:@"Could not securely copy K or L bytes" errorCode:-1];
     }
 
@@ -221,7 +221,7 @@
     symmetric_key skey;
 
     if ((err = twofish_setup(pBarData.bytes, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
-        NSLog(@"Could not do twofish_setup ok: %d", err);
+        slog(@"Could not do twofish_setup ok: %d", err);
         [Utils createNSError:@"Could not do twofish_setup ok" errorCode:err];
     }
 
@@ -244,7 +244,7 @@
     
 
     if (SecRandomCopyBytes(kSecRandomDefault, SIZE_OF_PASSWORD_SAFE_3_HEADER_IV, hdr.iv)) {
-        NSLog(@"Could not do securely copy password safe header ok");
+        slog(@"Could not do securely copy password safe header ok");
         [Utils createNSError:@"Could not do securely copy Password Safe 3 header ok" errorCode:-1];
     }
 
@@ -305,13 +305,13 @@
     NSUInteger endOfData = [PwSafeSerialization getEofFileOffset:candidate];
     
     if (endOfData == NSNotFound) {
-        NSLog(@"No End of File marker magic");
+        slog(@"No End of File marker magic");
         return NO;
     }
     
     NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
     if (recordsLength <= 0) {
-        NSLog(@"Negative or zero record length");
+        slog(@"Negative or zero record length");
         return NO;
     }
     
@@ -360,7 +360,7 @@
     unsigned char *key = (unsigned char *)pBar.bytes;
 
     if ((twofish_setup(key, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
-        NSLog(@"Crypto Problem");
+        slog(@"Crypto Problem");
         return NO;
     }
 
@@ -417,7 +417,7 @@
     unsigned char *key = (unsigned char *)K.bytes;
 
     if ((twofish_setup(key, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
-        NSLog(@"Invalid K Key");
+        slog(@"Invalid K Key");
         return nil;
     }
 
@@ -441,7 +441,7 @@
 + (void)dumpDbHeaderAndRecords:(NSMutableArray *)headerFields records:(NSMutableArray *)records {
     
 
-    NSLog(@"-------------------------- HEADER -------------------------------");
+    slog(@"-------------------------- HEADER -------------------------------");
 
     for (Field *field in headerFields) {
         
@@ -449,12 +449,12 @@
         NSString *keyStr = field.prettyTypeString;
 
         
-        NSLog(@"%@ => %@", keyStr, valueStr);
+        slog(@"%@ => %@", keyStr, valueStr);
     }
 
-    NSLog(@"----------------------------------------------------------------");
+    slog(@"----------------------------------------------------------------");
 
-    NSLog(@"------------------------- RECORDS ------------------------------");
+    slog(@"------------------------- RECORDS ------------------------------");
 
     for (Record *record in records) {
         for (Field *field in [record getAllFields]) {
@@ -463,10 +463,10 @@
             NSString *keyStr = field.prettyTypeString;
 
             
-            NSLog(@"%@ => %@", keyStr, valueStr);
+            slog(@"%@ => %@", keyStr, valueStr);
         }
 
-        NSLog(@"----------------------------------------------------------------");
+        slog(@"----------------------------------------------------------------");
     }
 }
 
@@ -476,7 +476,7 @@
     NSMutableData *dataForHmac = [[NSMutableData alloc] init];
 
 #ifdef DEBUG_MEMORY_ALLOCATION_LOGGING
-    NSLog(@"extractDbHeaderAndRecords => Allocating: %lu bytes", (unsigned long)decData.length);
+    slog(@"extractDbHeaderAndRecords => Allocating: %lu bytes", (unsigned long)decData.length);
 #endif
     unsigned char *raw = malloc(decData.length);
     if (!raw)

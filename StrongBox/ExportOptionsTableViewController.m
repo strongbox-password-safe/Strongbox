@@ -369,7 +369,7 @@
 }
 
 - (void)onDismissed:(BOOL)didExport {
-    NSLog(@"Dismissing Export: %hhd successful", didExport);
+    slog(@"Dismissing Export: %hhd successful", didExport);
     
     if ( self.onDone ) {
         self.onDone();

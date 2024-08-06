@@ -53,7 +53,7 @@
     KeeAgentSettings* settings = [self getValidatedKeeAgentSettings:nil];
     
     if ( !settings ) {
-        NSLog(@"🔴 Node::keeAgentSshPrivateKeyData: Could not get KeeAgentSettings");
+        slog(@"🔴 Node::keeAgentSshPrivateKeyData: Could not get KeeAgentSettings");
         return nil;
     }
     
@@ -63,7 +63,7 @@
     
     KeePassAttachmentAbstractionLayer *attachment = self.fields.attachments[settings.attachmentName];
     if ( attachment == nil ) {
-        NSLog(@"🔴 Node::keeAgentSshPrivateKeyData: Could not get KeeAgentSettings");
+        slog(@"🔴 Node::keeAgentSshPrivateKeyData: Could not get KeeAgentSettings");
         return nil;
     }
 
@@ -78,7 +78,7 @@
     
     NSData* data = attachment.nonPerformantFullData;
     if ( !data ) {
-        NSLog(@"🔴 Could not get KeeAgent.settings attachment data!");
+        slog(@"🔴 Could not get KeeAgent.settings attachment data!");
         return nil;
     }
     
@@ -86,7 +86,7 @@
     KeeAgentSettings* settings = [KeeAgentSettings fromData:data error:&err];
     
     if ( settings == nil || err != nil ) {
-        NSLog(@"🔴 Could not parse KeeAgent.settings! [%@]", err);
+        slog(@"🔴 Could not parse KeeAgent.settings! [%@]", err);
         
         if ( error ) {
             *error = err;
@@ -96,13 +96,13 @@
     }
     
     if ( settings.attachmentName.length == 0 ) {
-        NSLog(@"⚠️ KeeAgent.settings attachment name null or empty. Invalid for Strongbox.");
+        slog(@"⚠️ KeeAgent.settings attachment name null or empty. Invalid for Strongbox.");
         return nil;
     }
     
     KeePassAttachmentAbstractionLayer *theKey = self.fields.attachments[settings.attachmentName];
     if ( theKey == nil ) {
-        NSLog(@"🔴 Could not find the referenced private key in attachments! Invalid..");
+        slog(@"🔴 Could not find the referenced private key in attachments! Invalid..");
         return nil;
     }
     
@@ -121,7 +121,7 @@
    keyFileBlob:(NSData *)keyFileBlob
        enabled:(BOOL)enabled {
     if ( self.fields.attachments[filename] ) { 
-        NSLog(@"⚠️ Could not add key - attachment with this name already exists!");
+        slog(@"⚠️ Could not add key - attachment with this name already exists!");
         return;
     }
     
@@ -140,12 +140,12 @@
 
 - (void)setKeeAgentSshPrivateKeyEnabled:(BOOL)enabled {
     if ( !self.hasKeeAgentSshPrivateKey ) {
-        NSLog(@"🔴 setKeeAgentSshPrivateKeyEnabled called with NO key set!");
+        slog(@"🔴 setKeeAgentSshPrivateKeyEnabled called with NO key set!");
         return;
     }
     
     if ( self.hasEnabledKeeAgentSshPrivateKey == enabled ) {
-        NSLog(@"⚠️ setKeeAgentSshPrivateKeyEnabled called with same enabled state. NOP.");
+        slog(@"⚠️ setKeeAgentSshPrivateKeyEnabled called with same enabled state. NOP.");
         return;
     }
     
@@ -171,7 +171,7 @@
         }
     }
     else {
-        NSLog(@"🔴 setKeeAgentSshKeyEnabled when no key is set!");
+        slog(@"🔴 setKeeAgentSshKeyEnabled when no key is set!");
     }
 }
 
@@ -209,7 +209,7 @@
     if ( item.hasKeeAgentSshPrivateKey ) {
         OpenSSHPrivateKey* key = [OpenSSHPrivateKey fromData:item.keeAgentSshPrivateKeyData];
         if ( key == nil ) {
-            NSLog(@"🔴 could not read KeeAgent SSH Key Data into OpenSSHPrivateKey!");
+            slog(@"🔴 could not read KeeAgent SSH Key Data into OpenSSHPrivateKey!");
         }
         else {
             keeAgentSshKey = [KeeAgentSshKeyViewModel withKey:key

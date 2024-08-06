@@ -15,7 +15,7 @@ protocol DetailTableCellViewPopupButton {
 
 class DetailViewController: NSViewController {
     deinit {
-        NSLog("😎 DEINIT [DetailViewController]")
+        swlog("😎 DEINIT [DetailViewController]")
     }
 
     @IBOutlet var tableView: TableViewWithKeyDownEvents!
@@ -49,7 +49,7 @@ class DetailViewController: NSViewController {
         guard let idx = tableView.selectedRowIndexes.first,
               let field = fields[safe: idx]
         else {
-            NSLog("🔴 selectedField couldn't get a selected field?!")
+            swlog("🔴 selectedField couldn't get a selected field?!")
             return nil
         }
 
@@ -107,7 +107,7 @@ class DetailViewController: NSViewController {
         if selectedField.fieldType == .notes {
             if let cellView = cellViewForField(selectedField) as? NotesTableCellView {
                 if cellView.isSomeTextSelected {
-                    NSLog("Some Notes Text Selected not copying")
+                    swlog("Some Notes Text Selected not copying")
                     cellView.copySelectedText()
                     let loc = NSLocalizedString("mac_notes_partially_copied_to_clipboard", comment: "Notes (Partially) Copied")
 
@@ -118,7 +118,7 @@ class DetailViewController: NSViewController {
             }
         }
 
-        NSLog("There is a field selected... copying")
+        swlog("There is a field selected... copying")
 
         copyFieldToClipboard(selectedField)
 
@@ -135,7 +135,7 @@ class DetailViewController: NSViewController {
 
         if let fixedItemUuid {
             guard let node = database.getItemBy(fixedItemUuid) else {
-                NSLog("✅ DetailViewController::load - fixedItemUuid empty")
+                swlog("✅ DetailViewController::load - fixedItemUuid empty")
                 return nil
             }
 
@@ -149,7 +149,7 @@ class DetailViewController: NSViewController {
                   let uuid = database.nextGenSelectedItems.first,
                   let node = database.getItemBy(uuid)
             else {
-                NSLog("✅ DetailViewController::load - database.nextGenSelectedItems could not find")
+                swlog("✅ DetailViewController::load - database.nextGenSelectedItems could not find")
                 return nil
             }
 
@@ -161,7 +161,7 @@ class DetailViewController: NSViewController {
 
     func loadFields() -> [DetailsViewField] {
         guard let selectedNode = getNode() else {
-            NSLog("Could not get node from Model Selected or Fixed UUID")
+            swlog("Could not get node from Model Selected or Fixed UUID")
             return []
         }
 
@@ -264,7 +264,7 @@ class DetailViewController: NSViewController {
 
     func getTotpFields(_ model: EntryViewModel) -> [DetailsViewField] {
         if model.totp != nil {
-            return [DetailsViewField(name: NSLocalizedString("generic_fieldname_totp", comment: "TOTP"), value: "", fieldType: .totp, object: model.totp!)]
+            return [DetailsViewField(name: NSLocalizedString("generic_fieldname_totp", comment: "2FA"), value: "", fieldType: .totp, object: model.totp!)]
         } else {
             return []
         }
@@ -623,7 +623,7 @@ class DetailViewController: NSViewController {
         guard let selectedFieldRow = tableView.selectedRowIndexes.first,
               let cellView = tableView.view(atColumn: 0, row: selectedFieldRow, makeIfNecessary: false) as? DetailTableCellViewPopupButton
         else {
-            NSLog("🔴 could not get select field as popup button")
+            swlog("🔴 could not get select field as popup button")
             return
         }
 
@@ -860,7 +860,7 @@ class DetailViewController: NSViewController {
                 if let notesField = fields.first(where: { $0.fieldType == .notes }) {
                     field = notesField
                 } else {
-                    NSLog("🔴 Could not find Notes Field!")
+                    swlog("🔴 Could not find Notes Field!")
                 }
             } else if field.object as? DetailsViewField.FieldType == .some(.customField) {
                 let itemAscending = NSMenuItem(title: NSLocalizedString("generic_sort_order_ascending", comment: "Ascending"), action: #selector(onToggleCustomFieldsSortOrder(sender:)), keyEquivalent: "")
@@ -962,7 +962,7 @@ class DetailViewController: NSViewController {
             return
         }
 
-        NSLog("onToggleCustomFieldsSortOrder: %hhd", sort.boolValue)
+        swlog("onToggleCustomFieldsSortOrder: %hhd", sort.boolValue)
 
         database.customSortOrderForFields = sort.boolValue
         refresh()
@@ -1054,7 +1054,7 @@ class DetailViewController: NSViewController {
     func shareField(_ field: DetailsViewField, _: NSButton) {
         if field.fieldType == .keeAgentKey {
             guard field.object is KeeAgentSshKeyViewModel else {
-                NSLog("🔴 Couldn't get SSH key from field.")
+                swlog("🔴 Couldn't get SSH key from field.")
                 return
             }
 
@@ -1088,16 +1088,16 @@ class DetailViewController: NSViewController {
             }
         } else if field.fieldType == .customField {
             guard let data = field.value.data(using: .utf8) else {
-                NSLog("🔴 Could not get utf8 data for field to share")
+                swlog("🔴 Could not get utf8 data for field to share")
                 return
             }
             guard let filename = field.params["share_filename"] else {
-                NSLog("🔴 Could not get share_filename for field to share")
+                swlog("🔴 Could not get share_filename for field to share")
                 return
             }
             share(filename, data)
         } else {
-            NSLog("🔴 Unknown field type for sharing")
+            swlog("🔴 Unknown field type for sharing")
         }
     }
 
@@ -1153,9 +1153,9 @@ class DetailViewController: NSViewController {
         guard let wc else { return }
 
         if field.fieldType == .totp {
-            guard let token = field.object as? OTPToken, let url = token.url(true) else { return }
+            guard let token = field.object as? OTPToken, let url = token.url(true), let b32 = token.secretBase32 else { return }
 
-            wc.setContent(fieldName: field.name, string: token.secretBase32, largeText: false, subtext: url.absoluteString)
+            wc.setContent(fieldName: field.name, string: b32, largeText: false, subtext: url.absoluteString, qrCodeString: url.absoluteString)
         } else {
             wc.setContent(fieldName: field.name, string: field.value)
         }
@@ -1171,7 +1171,7 @@ class DetailViewController: NSViewController {
         guard let idx = attachmentFields.firstIndex(where: { f in
             f.name == field.name
         }) else {
-            NSLog("🔴 Ruh Roh - Could not find the attachment in our attachments fields")
+            swlog("🔴 Ruh Roh - Could not find the attachment in our attachments fields")
             return
         }
 
@@ -1186,7 +1186,7 @@ class DetailViewController: NSViewController {
 
     func exportAttachment(_ field: DetailsViewField) {
         guard let attachment = field.object as? KeePassAttachmentAbstractionLayer else {
-            NSLog("🔴 Couldn't get attachment from field")
+            swlog("🔴 Couldn't get attachment from field")
             return
         }
 
@@ -1211,7 +1211,7 @@ class DetailViewController: NSViewController {
         guard let key = field.object as? KeeAgentSshKeyViewModel,
               let password = field.params["password"]
         else {
-            NSLog("🔴 Couldn't get attachment from field")
+            swlog("🔴 Couldn't get attachment from field")
             return
         }
 
@@ -1253,7 +1253,7 @@ class DetailViewController: NSViewController {
 
     func onExportPublicKeyFromSshKey(_ field: DetailsViewField) {
         guard let key = field.object as? KeeAgentSshKeyViewModel else {
-            NSLog("🔴 Couldn't get attachment from field")
+            swlog("🔴 Couldn't get attachment from field")
             return
         }
 
@@ -1329,7 +1329,7 @@ extension DetailViewController: DocumentViewController {
             fixedItemUuid = explicitItemUuid
         } else {
             guard let doc = view.window?.windowController?.document as? Document else {
-                NSLog("🔴 DetailViewController::load Document not set!")
+                swlog("🔴 DetailViewController::load Document not set!")
                 return
             }
             document = doc
@@ -1370,10 +1370,11 @@ extension DetailViewController: DocumentViewController {
     func listenToNotifications() {
         
 
+        let note = NSNotification.Name.auditCompleted
         let auditNotificationsOfInterest: [String] = [
             
             kAuditNewSwitchedOffNotificationKey,
-            kAuditCompletedNotificationKey,
+            note.rawValue,
         ]
 
         for ofInterest in auditNotificationsOfInterest {
@@ -1554,7 +1555,7 @@ extension DetailViewController: DocumentViewController {
     func onAuditUpdateNotification(_ notification: Notification) {
         
         guard let dict = notification.object as? [String: Any], let model = dict["model"] as? Model else {
-            NSLog("🔴 Couldn't real model from notification")
+            swlog("🔴 Couldn't real model from notification")
             return
         }
 
@@ -1567,13 +1568,13 @@ extension DetailViewController: DocumentViewController {
         } != nil
 
         if notification.name.rawValue == kAuditNewSwitchedOffNotificationKey, currentlyDisplayingAuditIssue {
-            NSLog("✅ Browse::onAuditUpdateNotification [%@] - Audit Cleared Just switch off", String(describing: notification.name))
+            swlog("✅ Browse::onAuditUpdateNotification [%@] - Audit Cleared Just switch off", String(describing: notification.name))
             refresh()
             return
         }
 
         if let node = getNode(), database.isFlagged(byAudit: node.uuid) || currentlyDisplayingAuditIssue {
-            NSLog("✅ DetailViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
+            swlog("✅ DetailViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
             refresh()
         }
     }
@@ -1610,7 +1611,7 @@ extension DetailViewController: NSTableViewDataSource {
 extension DetailViewController: NSTableViewDelegate {
     func onTitleClicked() {
         guard let node = getNode() else {
-            NSLog("🔴 couldn't get node!")
+            swlog("🔴 couldn't get node!")
             return
         }
 
@@ -1656,7 +1657,7 @@ extension DetailViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, viewFor _: NSTableColumn?, row: Int) -> NSView? {
         guard let field = fields[safe: row] else {
-            NSLog("🔴 TableViewDelegate (viewFor:) called with out of range row = [%d]", row)
+            swlog("🔴 TableViewDelegate (viewFor:) called with out of range row = [%d]", row)
             return nil
         }
 
@@ -1740,20 +1741,20 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            let image = NodeIconHelper.getNodeIcon(field.icon, predefinedIconSet: database!.iconSet, format: database!.format)
+            let image = NodeIconHelper.getNodeIcon(field.icon, predefinedIconSet: database!.keePassIconSet, format: database!.format)
 
             let fav = field.object as? Bool ?? false
 
             cell.setContent(field.value, image, fav, !database.isEffectivelyReadOnly) {
                 [weak self] in
                 guard let node = self?.getNode() else {
-                    NSLog("🔴 Could not get node to toggleFavourite!")
+                    swlog("🔴 Could not get node to toggleFavourite!")
                     return
                 }
 
                 self?.database.toggleFavourite(node.uuid)
             } _: { [weak self] in
-                NSLog("🚀 Title Click!")
+                swlog("🚀 Title Click!")
                 self?.onTitleClicked()
             }
 
@@ -1856,7 +1857,7 @@ extension DetailViewController: NSTableViewDelegate {
 
     func tableView(_ tableView: NSTableView, isGroupRow row: Int) -> Bool {
         guard let field = fields[safe: row] else {
-            NSLog("🔴 isGroupRow: called with out of range row = [%d], %@, equals = %hhd", row, tableView, tableView == self.tableView)
+            swlog("🔴 isGroupRow: called with out of range row = [%d], %@, equals = %hhd", row, tableView, tableView == self.tableView)
             return false
         }
 
@@ -1865,7 +1866,7 @@ extension DetailViewController: NSTableViewDelegate {
 
     func tableView(_: NSTableView, shouldSelectRow row: Int) -> Bool {
         guard let field = fields[safe: row] else {
-            NSLog("🔴 shouldSelectRow: called with out of range row = [%d]", row)
+            swlog("🔴 shouldSelectRow: called with out of range row = [%d]", row)
             return false
         }
 
@@ -1898,7 +1899,7 @@ extension DetailViewController: NSFilePromiseProviderDelegate {
     }
 
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, fileNameForType fileType: String) -> String {
-        NSLog("filePromiseProvider::fileNameForType called with [%@]", fileType)
+        swlog("filePromiseProvider::fileNameForType called with [%@]", fileType)
 
         if let userInfo = filePromiseProvider.userInfo as? [String: Any],
            let filename = userInfo[CreateEditViewController.FilePromiseProviderUserInfoKeys.filename] as? String
@@ -1910,7 +1911,7 @@ extension DetailViewController: NSFilePromiseProviderDelegate {
     }
 
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
-        NSLog("filePromiseProvider - writePromiseTo: [%@]", String(describing: url))
+        swlog("filePromiseProvider - writePromiseTo: [%@]", String(describing: url))
 
         do {
             if let userInfo = filePromiseProvider.userInfo as? [String: Any],
@@ -1926,7 +1927,7 @@ extension DetailViewController: NSFilePromiseProviderDelegate {
             }
             completionHandler(nil)
         } catch {
-            NSLog("🔴 Error dragging and dropping to external: [%@]", String(describing: error))
+            swlog("🔴 Error dragging and dropping to external: [%@]", String(describing: error))
 
             completionHandler(error)
         }

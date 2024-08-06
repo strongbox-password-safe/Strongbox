@@ -8,7 +8,7 @@
 
 #import <XCTest/XCTest.h>
 #import "PasswordMaker.h"
-
+#import "SBLog.h"
 @interface PasswordMakerTests : XCTestCase
 
 @end
@@ -18,7 +18,7 @@
 - (void)testDefaults {
     NSString* password = [PasswordMaker.sharedInstance generateForConfig:[PasswordGenerationConfig defaults]];
     
-    NSLog(@"Generated: [%@]", password);
+    slog(@"Generated: [%@]", password);
     
     XCTAssertNotNil(password);
 }
@@ -33,7 +33,7 @@
 
     NSString* password = [PasswordMaker.sharedInstance generateForConfig:config];
     
-    NSLog(@"Generated: [%@]", password);
+    slog(@"Generated: [%@]", password);
     
     XCTAssertNotNil(password);
 }
@@ -45,7 +45,7 @@
     
     NSString* password = [PasswordMaker.sharedInstance generateForConfig:config];
     
-    NSLog(@"Generated: [%@]", password);
+    slog(@"Generated: [%@]", password);
     
     XCTAssertNotNil(password);
 }

@@ -183,7 +183,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     if(self.autoFillConvenienceAutoUnlockTimeout > 0 && autoFillConvenienceAutoUnlockPassword) {
         NSDate* expiry = [NSDate.date dateByAddingTimeInterval:self.autoFillConvenienceAutoUnlockTimeout];
         
-        NSLog(@"Setting AutoFIll convenience auto unlock expiry to: [%@]", expiry);
+        slog(@"Setting AutoFIll convenience auto unlock expiry to: [%@]", expiry);
         
         [SecretStore.sharedInstance setSecureObject:autoFillConvenienceAutoUnlockPassword forIdentifier:key expiresAt:expiry];
     }

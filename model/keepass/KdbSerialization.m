@@ -114,7 +114,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
 
 + (KdbSerializationData*)deserialize:(NSData*)data password:(NSString*)password keyFileDigest:(NSData *)keyFileDigest ppError:(NSError**)error {
     if(data.length < SIZE_OF_KDB_HEADER) {
-        NSLog(@"Not a valid KDB file. Not long enough.");
+        slog(@"Not a valid KDB file. Not long enough.");
         if(error) {
             *error = [Utils createNSError:@"Not a valid KDB file. Not long enough" errorCode:-1];
         }
@@ -134,20 +134,20 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     uint32_t transformRounds = littleEndian4BytesToUInt32(header->transformRounds);
 
     if(kLogVerbose) {
-        NSLog(@"DESERIALIZE");
-        NSLog(@"flags = %0.8X", flags);
-        NSLog(@"version = %0.8X", version);
-        NSLog(@"masterSeed = %@", [masterSeed base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"encryptionIv = %@", [encryptionIv base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"cGroups = %d", cGroups);
-        NSLog(@"cEntries = %d", cEntries);
-        NSLog(@"contentsSha256 = %@", [contentsSha256 base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"transformSeed = %@", [transformSeed base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"transformRounds = %d", transformRounds);
+        slog(@"DESERIALIZE");
+        slog(@"flags = %0.8X", flags);
+        slog(@"version = %0.8X", version);
+        slog(@"masterSeed = %@", [masterSeed base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"encryptionIv = %@", [encryptionIv base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"cGroups = %d", cGroups);
+        slog(@"cEntries = %d", cEntries);
+        slog(@"contentsSha256 = %@", [contentsSha256 base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"transformSeed = %@", [transformSeed base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"transformRounds = %d", transformRounds);
     }
     
     if(cGroups == 0) {
-        NSLog(@"Not a valid KDB file. Zero Groups.");
+        slog(@"Not a valid KDB file. Zero Groups.");
         if(error) {
             *error = [Utils createNSError:@"Not a valid KDB file. Zero Groups." errorCode:-2];
         }
@@ -160,7 +160,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     size_t length = data.length - SIZE_OF_KDB_HEADER;
     
     if((length % kBlockSize) != 0) {
-        NSLog(@"Database Length is not a multiple of the blocksize. This file is likely corrupt.");
+        slog(@"Database Length is not a multiple of the blocksize. This file is likely corrupt.");
         if(error) {
             *error = [Utils createNSError:@"Database Length is not a multiple of the blocksize. This file is likely corrupt." errorCode:-4];
         }
@@ -178,7 +178,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     
     id<Cipher> cipher = getCipher(flags);
     if(cipher == nil) {
-        NSLog(@"Unknown Cipher. Cannot open this file.");
+        slog(@"Unknown Cipher. Cannot open this file.");
         if(error) {
             *error = [Utils createNSError:@"Unknown Cipher. Cannot open this file." errorCode:-3];
         }
@@ -190,7 +190,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     
 
     if(![pt.sha256 isEqualToData:contentsSha256]) {
-        NSLog(@"Actual Database Contents Hash does not match expected. This file is corrupt or the password is incorect.");
+        slog(@"Actual Database Contents Hash does not match expected. This file is corrupt or the password is incorect.");
         if(error) {
             *error = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key) or Corrupt File." errorCode:StrongboxErrorCodes.incorrectCredentials];
         }
@@ -205,7 +205,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     for(int i=0;i<cGroups;i++) {
         KdbGroup* group = readGroup(&position, eof);
         if(!group) {
-            NSLog(@"Could not read group.");
+            slog(@"Could not read group.");
             if(error) {
                 *error = [Utils createNSError:@"Could not read group." errorCode:-6];
             }
@@ -217,7 +217,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     for(int i=0;i<cEntries;i++) {
         KdbEntry* entry = readEntry(&position, eof);
         if(!entry) {
-            NSLog(@"Could not read entry.");
+            slog(@"Could not read entry.");
             if(error) {
                 *error = [Utils createNSError:@"Could not read entry." errorCode:-7];
             }
@@ -241,11 +241,11 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
 
 + (NSData*)serialize:(KdbSerializationData*)serializationData password:(NSString*)password keyFileDigest:(NSData *)keyFileDigest ppError:(NSError**)error {
     if(kLogVerbose) {
-        NSLog(@"SERIALIZE: %@", serializationData);
+        slog(@"SERIALIZE: %@", serializationData);
     }
     
     if(serializationData.groups.count == 0) {
-        NSLog(@"Not a valid KDB file. Zero Groups.");
+        slog(@"Not a valid KDB file. Zero Groups.");
         if(error) {
             *error = [Utils createNSError:@"Not a valid database. Zero Groups." errorCode:-1];
         }
@@ -286,16 +286,16 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     
 
     if(kLogVerbose) {
-        NSLog(@"SERIALIZE");
-        NSLog(@"flags = %0.8X", serializationData.flags);
-        NSLog(@"version = %0.8X", serializationData.version);
-        NSLog(@"masterSeed = %@", [masterSeed base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"encryptionIv = %@", [encryptionIv base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"cGroups = %lu", (unsigned long)serializationData.groups.count);
-        NSLog(@"cEntries = %lu", (unsigned long)serializationData.entries.count + (unsigned long)serializationData.metaEntries.count);
-        NSLog(@"contentsSha256 = %@", [contentsHash base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"transformSeed = %@", [transformSeed base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"transformRounds = %d", serializationData.transformRounds);
+        slog(@"SERIALIZE");
+        slog(@"flags = %0.8X", serializationData.flags);
+        slog(@"version = %0.8X", serializationData.version);
+        slog(@"masterSeed = %@", [masterSeed base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"encryptionIv = %@", [encryptionIv base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"cGroups = %lu", (unsigned long)serializationData.groups.count);
+        slog(@"cEntries = %lu", (unsigned long)serializationData.entries.count + (unsigned long)serializationData.metaEntries.count);
+        slog(@"contentsSha256 = %@", [contentsHash base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"transformSeed = %@", [transformSeed base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"transformRounds = %d", serializationData.transformRounds);
     }
     
     KdbHeader header;

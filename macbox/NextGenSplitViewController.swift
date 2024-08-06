@@ -10,7 +10,7 @@ import Cocoa
 
 class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     deinit {
-        NSLog("😎 DEINIT [NextGenSplitViewController]")
+        swlog("😎 DEINIT [NextGenSplitViewController]")
     }
 
     private var loadedDocument: Bool = false
@@ -46,7 +46,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         }
 
         guard let doc = view.window?.windowController?.document as? Document else {
-            NSLog("🔴 NextGenSplitViewController::load Document not set!")
+            swlog("🔴 NextGenSplitViewController::load Document not set!")
             return
         }
 
@@ -79,7 +79,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         }
 
         if !database.databaseMetadata.hasSetInitialUnlockedFrame {
-            NSLog("🐞 First Launch of Database! Making reasonable size and centering...")
+            swlog("🐞 First Launch of Database! Making reasonable size and centering...")
 
             view.window?.setFrame(NSMakeRect(0, 0, 1250, 750), display: true, animate: false)
             view.window?.center()
@@ -97,7 +97,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         let nanoTime = end.uptimeNanoseconds - start.uptimeNanoseconds 
         let timeInterval = Double(nanoTime) / 1_000_000_000 
 
-        NSLog("⏱ ✅ Initial Document UI Load Time: %0.2f seconds", timeInterval)
+        swlog("⏱ ✅ Initial Document UI Load Time: %0.2f seconds", timeInterval)
     }
 
     var firstAppearance = true
@@ -125,15 +125,15 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             }
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(kAsyncUpdateStarting), object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: .asyncUpdateStarting, object: nil, queue: nil) { [weak self] notification in
             self?.onAsyncUpdateStarting(notification: notification)
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(kAsyncUpdateDone), object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: .asyncUpdateDone, object: nil, queue: nil) { [weak self] notification in
             self?.onAsyncUpdateDone(notification: notification)
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(kSyncManagerDatabaseSyncStatusChanged), object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: .syncManagerDatabaseSyncStatusChanged, object: nil, queue: nil) { [weak self] notification in
             self?.onSyncStatusChanged(notification: notification)
         }
     }
@@ -160,9 +160,9 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         if asyncResult.success {
             if !database.isInOfflineMode {
                 
-                NSLog("✅ NextGenSplitViewController::onAsyncUpdateDone Received Indication of Successful Save/Update")
+                swlog("✅ NextGenSplitViewController::onAsyncUpdateDone Received Indication of Successful Save/Update")
             } else {
-                NSLog("✅ Async Update Done and in offline mode so displaying a toast to indicate success")
+                swlog("✅ Async Update Done and in offline mode so displaying a toast to indicate success")
 
                 showToastNotification(message: NSLocalizedString("generic_save_was_successful", comment: "Save Successful"))
             }
@@ -227,7 +227,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     func showToastNotification(message: String, error: Bool = false) {
         if view.window?.isMiniaturized ?? true {
-            NSLog("Not Showing Popup Change notification because window is miniaturized")
+            swlog("Not Showing Popup Change notification because window is miniaturized")
             return
         }
 
@@ -244,7 +244,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             let errorColor = NSColor(deviceRed: 1, green: 0.55, blue: 0.05, alpha: 0.9)
 
             guard let hud = MBProgressHUD.showAdded(to: self?.view, animated: true) else {
-                NSLog("🔴 Couldn't create Toast!")
+                swlog("🔴 Couldn't create Toast!")
                 return
             }
 
@@ -268,7 +268,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         guard let syncToolbarItem = view.window?.toolbar?.visibleItems?.first(where: { item in
             item.itemIdentifier == ToolbarItemIdentifiers.syncButton
         }), let button = syncToolbarItem.view as? NSButton else {
-            NSLog("🔴 Couldn't find Sync Toolbar Item")
+            swlog("🔴 Couldn't find Sync Toolbar Item")
             return
         }
 
@@ -279,7 +279,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     func runSpinAnimationOnView(view: NSView, spin: Bool) {
         guard let layer = view.layer else {
-            NSLog("COuldn't get layer!")
+            swlog("COuldn't get layer!")
             return
         }
 
@@ -311,7 +311,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         }
 
         if notification.name == NSNotification.Name(kModelUpdateNotificationNextGenNavigationChanged) {
-            NSLog("NextGenSplitView: Nav Changed")
+            swlog("NextGenSplitView: Nav Changed")
 
             searchField?.stringValue = ""
         }
@@ -331,7 +331,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     @objc func onCreateGroup(_: Any?) {
         if database.locked || database.isEffectivelyReadOnly {
-            NSLog("🔴 Cannot edit locked or read-only database")
+            swlog("🔴 Cannot edit locked or read-only database")
             return
         }
 
@@ -346,7 +346,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             }
 
             guard let node = database.getItemBy(parentGroup) else {
-                NSLog("🔴 Selected Group not set for Editing!")
+                swlog("🔴 Selected Group not set for Editing!")
                 return
             }
 
@@ -386,15 +386,15 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
 
         guard let doc = view.window?.windowController?.document as? Document else {
-            NSLog("🔴 NextGenSplitViewController::load Document not set!")
+            swlog("🔴 NextGenSplitViewController::load Document not set!")
             return
         }
 
         if doc.hasUnautosavedChanges || doc.isDocumentEdited {
-            NSLog("NextGenSplitViewController::onSync: Sync called but there are unsaved changes. Saving then syncing...")
+            swlog("NextGenSplitViewController::onSync: Sync called but there are unsaved changes. Saving then syncing...")
             NSApplication.shared.sendAction(#selector(NSDocument.save(_:)), to: nil, from: self)
         } else {
-            NSLog("NextGenSplitViewController::onSync: Sync called and NO unsaved changes. Syncing...")
+            swlog("NextGenSplitViewController::onSync: Sync called and NO unsaved changes. Syncing...")
             DatabasesCollection.shared.sync(uuid: database.databaseUuid, allowInteractive: true)
         }
 
@@ -412,7 +412,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     func createOrEdit(_ createNew: Bool = true) {
         if database.locked || database.isEffectivelyReadOnly {
-            NSLog("🔴 Cannot edit locked or read-only database")
+            swlog("🔴 Cannot edit locked or read-only database")
             return
         }
 
@@ -426,12 +426,12 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             }
 
             guard vc.initialParentNodeId != nil else {
-                NSLog("🔴 Could not get initial parent node id!")
+                swlog("🔴 Could not get initial parent node id!")
                 return
             }
         } else {
             guard let selectedItem = database.nextGenSelectedItems.first, database.nextGenSelectedItems.count == 1 else {
-                NSLog("🔴 Selected Item not set for Editing!")
+                swlog("🔴 Selected Item not set for Editing!")
                 return
             }
 
@@ -449,7 +449,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     @objc func toggleDetailsView() {
         guard let panel = splitViewItems.last else {
-            NSLog("🔴 Couldn't find last panel!")
+            swlog("🔴 Couldn't find last panel!")
             return
         }
 
@@ -490,7 +490,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         guard let searchFieldItem = view.window?.toolbar?.visibleItems?.first(where: { item in
             item.itemIdentifier == ToolbarItemIdentifiers.searchField
         }) else {
-            NSLog("🔴 Couldn't find Search Toolbar Item")
+            swlog("🔴 Couldn't find Search Toolbar Item")
             return
         }
 
@@ -558,7 +558,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     @objc
     func onSearchAction(param: Any?) {
         guard let searchField = param as? NSSearchField else {
-            NSLog("🔴 searchField not good")
+            swlog("🔴 searchField not good")
             return
         }
 
@@ -582,7 +582,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         
 
         guard let event = control.window?.currentEvent else {
-            NSLog("🔴 Could not get current event")
+            swlog("🔴 Could not get current event")
             return false
         }
 
@@ -613,7 +613,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
 
     func selectFirstItemInMasterAndMakeFirstResponderForSearchResult() -> Bool {
-        NSLog("✅ selectFirstItemInMasterAndMakeFirstResponderForSearchResult")
+        swlog("✅ selectFirstItemInMasterAndMakeFirstResponderForSearchResult")
 
         let selected = masterListView.selectFirstItemIfAvailableForSearchResult()
 
@@ -664,7 +664,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     func popOutDetails(pin: Bool = false) {
         guard database.nextGenSelectedItems.count == 1, let uuid = database.nextGenSelectedItems.first else {
-            NSLog("✅ onPopOutDetails - Selection invalid")
+            swlog("✅ onPopOutDetails - Selection invalid")
             return
         }
 
@@ -751,7 +751,7 @@ extension NextGenSplitViewController: NSToolbarDelegate {
         toolbar.displayMode = .iconOnly
 
         guard let window = view.window else {
-            NSLog("🔴 Window not ready")
+            swlog("🔴 Window not ready")
             return
         }
 
@@ -1080,7 +1080,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
 
         if action == #selector(onShowHideQuickView(_:)) {
             guard let panel = splitViewItems.last else {
-                NSLog("🔴 Couldn't find last panel!")
+                swlog("🔴 Couldn't find last panel!")
                 return false
             }
 
@@ -1126,7 +1126,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
             guard !database.locked, database.nextGenSelectedItems.count == 1,
                   let uuid = database.nextGenSelectedItems.first
             else {
-                NSLog("✅ onPopOutDetails - Selection invalid")
+                swlog("✅ onPopOutDetails - Selection invalid")
                 return false
             }
 
@@ -1135,7 +1135,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
             guard !database.locked, database.nextGenSelectedItems.count == 1,
                   let uuid = database.nextGenSelectedItems.first
             else {
-                NSLog("✅ onPopOutDetailsAndPin - Selection invalid")
+                swlog("✅ onPopOutDetailsAndPin - Selection invalid")
                 return false
             }
 
@@ -1164,7 +1164,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
             return !database.locked
         }
 
-        NSLog("🔴 validateAction - not handled: [%@]", String(describing: action))
+        swlog("🔴 validateAction - not handled: [%@]", String(describing: action))
 
         return false
     }

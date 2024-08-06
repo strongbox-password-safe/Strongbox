@@ -66,17 +66,17 @@
                 if ( clearFirst ) {
                     [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:^(BOOL success, NSError * _Nullable error) {
                         if ( error ) {
-                            NSLog(@"🔴 Cleared Quick Type AutoFill Database with error = [%@]...", error);
+                            slog(@"🔴 Cleared Quick Type AutoFill Database with error = [%@]...", error);
                         }
                         else {
-                            NSLog(@"🟢 Cleared Quick Type AutoFill Database");
+                            slog(@"🟢 Cleared Quick Type AutoFill Database");
                         }
                         
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
                             [self loadIdentitiesFromDb:database];
                         });
                     }];
-                    NSLog(@"Cleared Quick Type AutoFill Database...");
+                    slog(@"Cleared Quick Type AutoFill Database...");
                 }
                 else {
                     [self loadIdentitiesFromDb:database];
@@ -118,7 +118,7 @@
     
     [self setQuickTypeSuggestions:identities];
     
-    NSLog(@"🟢 ⏱️ Updated Quick Type AutoFill Database in [%f] seconds", NSDate.timeIntervalSinceReferenceDate - start);
+    slog(@"🟢 ⏱️ Updated Quick Type AutoFill Database in [%f] seconds", NSDate.timeIntervalSinceReferenceDate - start);
 }
 
 - (NSArray<Node*>*)getFilteredSortedNodes:(Model*)database {
@@ -355,7 +355,7 @@
     if(databasesUsingQuickType < 2) { 
         if ( identities.count == 0 ) { 
             [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:^(BOOL success, NSError * _Nullable error) {
-                NSLog(@"✅ removeAllCredentialIdentities because zero passed in... [%d] - [%@]", success, error);
+                slog(@"✅ removeAllCredentialIdentities because zero passed in... [%d] - [%@]", success, error);
             }];
             return;
         }
@@ -372,10 +372,10 @@
         
         
         if ( lastFullClear == nil || [lastFullClear isMoreThanXDaysAgo:7] ) { 
-            NSLog(@"✅ Doing a full clear of the QuickType AutoFill database because the last clear was on [%@]", lastFullClear.friendlyDateString);
+            slog(@"✅ Doing a full clear of the QuickType AutoFill database because the last clear was on [%@]", lastFullClear.friendlyDateString);
             
             [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:^(BOOL success, NSError * _Nullable error) {
-                NSLog(@"lastQuickTypeMultiDbRegularClear - Clear Done");
+                slog(@"lastQuickTypeMultiDbRegularClear - Clear Done");
                 
                 [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities
                                                                      completion:^(BOOL success, NSError * _Nullable error) {
@@ -427,15 +427,15 @@
 }
 
 - (void)clearAutoFillQuickTypeDatabase {
-    NSLog(@"Clearing Quick Type AutoFill Database...");
+    slog(@"Clearing Quick Type AutoFill Database...");
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
         [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:^(BOOL success, NSError * _Nullable error) {
             if ( error ) {
-                NSLog(@"🔴 Cleared Quick Type AutoFill Database with error = [%@]...", error);
+                slog(@"🔴 Cleared Quick Type AutoFill Database with error = [%@]...", error);
             }
             else {
-                NSLog(@"🟢 Cleared Quick Type AutoFill Database");
+                slog(@"🟢 Cleared Quick Type AutoFill Database");
             }
         }];
     });
@@ -448,7 +448,7 @@
             
             [ASCredentialIdentityStore.sharedStore saveCredentialIdentityEntries:@[pkid]
                                                                       completion:^(BOOL success, NSError * _Nullable error) {
-                NSLog(@"refreshQuickTypeAfterAutoFillAddition Passkey Done: %hhd - %@", success, error);
+                slog(@"refreshQuickTypeAfterAutoFillAddition Passkey Done: %hhd - %@", success, error);
             }];
         }
     }
@@ -458,7 +458,7 @@
         if ( aspcid ) {
             [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:@[aspcid]
                                                                  completion:^(BOOL success, NSError * _Nullable error) {
-                NSLog(@"refreshQuickTypeAfterAutoFillAddition Done: %hhd - %@", success, error);
+                slog(@"refreshQuickTypeAfterAutoFillAddition Done: %hhd - %@", success, error);
             }];
         }
     }
@@ -472,7 +472,7 @@
         
         [ASCredentialIdentityStore.sharedStore removeCredentialIdentities:identities
                                                                completion:^(BOOL success, NSError * _Nullable error) {
-            NSLog(@"🟢 removeCredentialIdentities done with %hhd - %@", success, error);
+            slog(@"🟢 removeCredentialIdentities done with %hhd - %@", success, error);
         }];
         
         if (@available(iOS 17.0, macOS 14.0, *)) {
@@ -481,7 +481,7 @@
                 
                 [ASCredentialIdentityStore.sharedStore removeCredentialIdentityEntries:@[pkid]
                                                                             completion:^(BOOL success, NSError * _Nullable error) {
-                    NSLog(@"🟢 removeCredentialIdentityEntries done with %hhd - %@", success, error);
+                    slog(@"🟢 removeCredentialIdentityEntries done with %hhd - %@", success, error);
                 }];
             }
         }

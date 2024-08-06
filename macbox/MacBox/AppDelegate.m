@@ -67,16 +67,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 
-@interface AppDelegate () < NSMenuDelegate >
-
-
-@property NSMenu *systemTrayNewMenu;
-@property NSStatusItem* statusItem;
+@interface AppDelegate () < NSMenuDelegate, NSPopoverDelegate >
 
 @property NSTimer* clipboardChangeWatcher;
 @property NSInteger currentClipboardVersion;
-@property NSPopover* systemTrayPopover;
-
 @property NSTimer* timerRefreshOtp;
 @property NSDate* appLaunchTime;
 
@@ -87,8 +81,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 @property (readonly) BOOL quitsToSystemTrayInsteadOfTerminates;
 @property (readonly) BOOL isQuitFromDockEvent;
 
-
-
+@property NSMenu *systemTrayNewMenu;
+@property NSStatusItem* statusItem;
+@property NSPopover* systemTrayPopover;
+@property NSDate* systemTrayPopoverClosedAt;
 
 @end
 
@@ -119,7 +115,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     NSAppleEventDescriptor* event = NSAppleEventManager.sharedAppleEventManager.currentAppleEvent;
     if ( event.eventID == kAEOpenApplication &&
         [[event paramDescriptorForKeyword:keyAEPropData] enumCodeValue] == keyAELaunchedAsLogInItem) {
-        SBLog(@"Strongbox was launched as a login item!");
+        slog(@"Strongbox was launched as a login item!");
         self.wasLaunchedAsLoginItem = YES;
     }
     else {
@@ -184,22 +180,22 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)initializeCloudKit {
     [CloudKitDatabasesInteractor.shared initializeWithCompletionHandler:^(NSError * _Nullable error ) {
         if ( error ) {
-            SBLog(@"🔴 Error initializing CloudKit: [%@]", error);
+            slog(@"🔴 Error initializing CloudKit: [%@]", error);
         }
         else {
-            SBLog(@"🟢 CloudKit successfully initialized.");
+            slog(@"🟢 CloudKit successfully initialized.");
         }
     }];
 }
 
 - (void)application:(NSApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    SBLog(@"🟢 didRegisterForRemoteNotificationsWithDeviceToken");
+    slog(@"🟢 didRegisterForRemoteNotificationsWithDeviceToken");
     
     [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:YES error:nil];
 }
 
 - (void)application:(NSApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-    SBLog(@"🔴 didFailToRegisterForRemoteNotificationsWithError - [%@]", error);
+    slog(@"🔴 didFailToRegisterForRemoteNotificationsWithError - [%@]", error);
     
     [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:NO error:error];
 }
@@ -209,7 +205,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)application:(NSApplication *)application userDidAcceptCloudKitShareWithMetadata:(CKShareMetadata *)metadata {
-    SBLog(@"userDidAcceptCloudKitShareWithMetadata: [%@]", metadata);
+    slog(@"userDidAcceptCloudKitShareWithMetadata: [%@]", metadata);
     
     [DBManagerPanel.sharedInstance show]; 
     
@@ -220,12 +216,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
-                SBLog(@"🔴 acceptShareWithMetadata done with [%@]", error);
+                slog(@"🔴 acceptShareWithMetadata done with [%@]", error);
                 
                 [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
             }
             else {
-                SBLog(@"acceptShareWithMetadata done with [%@]", error);
+                slog(@"acceptShareWithMetadata done with [%@]", error);
             }
         });
     }];
@@ -239,15 +235,15 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         return;
     }
     
-    SBLog(@"AppDelegate::startWiFiSyncObservation...");
+    slog(@"AppDelegate::startWiFiSyncObservation...");
     
     [WiFiSyncBrowser.shared startBrowsing:NO
                                completion:^(BOOL success) {
         if ( !success ) {
-            SBLog(@"🔴 Could not start WiFi Browser! error = [%@]", WiFiSyncBrowser.shared.lastError);
+            slog(@"🔴 Could not start WiFi Browser! error = [%@]", WiFiSyncBrowser.shared.lastError);
         }
         else {
-            SBLog(@"🟢 WiFiBrowser Started");
+            slog(@"🟢 WiFiBrowser Started");
         }
     }];
 }
@@ -257,7 +253,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)startOrStopSSHAgent {
     if ( Settings.sharedInstance.runSshAgent && Settings.sharedInstance.isPro ) {
         if ( ![SSHAgentServer.sharedInstance start] ) {
-            SBLog(@"🔴 Failed to start SSH Agent.");
+            slog(@"🔴 Failed to start SSH Agent.");
         }
         else {
             
@@ -266,7 +262,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     else {
         if ( SSHAgentServer.sharedInstance.isRunning ) {
             [SSHAgentServer.sharedInstance stop];
-            SBLog(@"🔴 Stopped SSH Agent");
+            slog(@"🔴 Stopped SSH Agent");
         }
     }
 }
@@ -276,10 +272,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         [NativeMessagingManifestInstallHelper installNativeMessagingHostsFiles];
         
         if ( ![AutoFillProxyServer.sharedInstance start] ) {
-            SBLog(@"🔴 Failed to start AutoFillProxyServer.");
+            slog(@"🔴 Failed to start AutoFillProxyServer.");
         }
         else {
-            SBLog(@"✅ Started AutoFill Proxy");
+            slog(@"✅ Started AutoFill Proxy");
         }
     }
     else {
@@ -287,7 +283,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         if ( AutoFillProxyServer.sharedInstance.isRunning ) {
             [AutoFillProxyServer.sharedInstance stop];
-            SBLog(@"🔴 Stopped AutoFill Proxy");
+            slog(@"🔴 Stopped AutoFill Proxy");
         }
     }
 }
@@ -295,7 +291,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)startOrStopWiFiSyncServer {
     NSError* error;
     if (! [WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
-        SBLog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
+        slog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
     }
 }
 
@@ -324,7 +320,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [self installGlobalHotKeys];
     
     [self removeUnwantedMenuItems];
-    
+
+    [self setupSystemTrayPopover];
+
     [self showHideSystemStatusBarIcon];
     
     [self clearAsyncUpdateIdsAndEphemeralOfflineFlags]; 
@@ -482,7 +480,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)checkForAllWindowsClosedScenario:(NSWindow*)windowAboutToBeClosed appIsLaunching:(BOOL)appIsLaunching {
-    SBLog(@"✅ AppDelegate::checkForAllWindowsClosedScenario - currentEvent = [%@]", NSApp.currentEvent);
+    slog(@"✅ AppDelegate::checkForAllWindowsClosedScenario - currentEvent = [%@]", NSApp.currentEvent);
     
     NSArray* docs = DocumentController.sharedDocumentController.documents;
     NSMutableArray* mainWindows = [docs map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
@@ -519,24 +517,24 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)onAllWindowsClosed:(NSWindow*)windowAboutToBeClosed appIsLaunching:(BOOL)appIsLaunching {
-    SBLog(@"🐞 onAllWindowsClosed");
+    slog(@"🐞 onAllWindowsClosed");
     
     if ( appIsLaunching ) {
         if ( Settings.sharedInstance.showDatabasesManagerOnAppLaunch ) {
             if ( self.isWasLaunchedAsLoginItem && Settings.sharedInstance.showSystemTrayIcon ) {
-                SBLog(@"🐞 AppDelegate::onAllWindowsClosed -> App Launching and no windows visible but was launched as a login item so NOP - Silent Launch - Hiding Dock Icon");
+                slog(@"🐞 AppDelegate::onAllWindowsClosed -> App Launching and no windows visible but was launched as a login item so NOP - Silent Launch - Hiding Dock Icon");
                 
                 [self showHideDockIcon:NO];
             }
             else {
-                SBLog(@"🐞 AppDelegate::onAllWindowsClosed -> App Launching and no windows visible - Showing Databases Manager because so configured");
+                slog(@"🐞 AppDelegate::onAllWindowsClosed -> App Launching and no windows visible - Showing Databases Manager because so configured");
                 
                 [DBManagerPanel.sharedInstance show];
             }
         }
         else if ( Settings.sharedInstance.configuredAsAMenuBarApp ) {
             
-            SBLog(@"🐞 AppDelegate::onAllWindowsClosed -> App Launching and no windows visible - Running as a tray app so NOT showing Databases Manager");
+            slog(@"🐞 AppDelegate::onAllWindowsClosed -> App Launching and no windows visible - Running as a tray app so NOT showing Databases Manager");
             
             [self showHideDockIcon:NO];
         }
@@ -553,23 +551,23 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         
         if ( Settings.sharedInstance.configuredAsAMenuBarApp ) {
-            SBLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... running as a tray app - hiding dock icon.");
+            slog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... running as a tray app - hiding dock icon.");
             
             [self showHideDockIcon:NO];
         }
         else {
-            SBLog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... but configured to do nothing special.");
+            slog(@"✅ AppDelegate::onAllWindowsClosed -> all windows have either just been miniaturized or closed... but configured to do nothing special.");
         }
         
     }
 }
 
 - (void)showHideDockIcon:(BOOL)show {
-    SBLog(@"🚀 AppDelegate::showHideDockIcon: [%@] - [%@]", (long)show ? @"SHOW" : @"HIDE", NSThread.currentThread);
+    slog(@"🚀 AppDelegate::showHideDockIcon: [%@] - [%@]", (long)show ? @"SHOW" : @"HIDE", NSThread.currentThread);
     
     if ( show ) {
         if ( NSApp.activationPolicy != NSApplicationActivationPolicyAccessory ) {
-            SBLog(@"Dock Icon already visible - NOP"); 
+            slog(@"Dock Icon already visible - NOP"); 
             return;
         }
         
@@ -584,11 +582,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         
         BOOL ret = [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
-        SBLog(@"🚀 AppDelegate::NSApplicationActivationPolicyProhibited: %@", localizedYesOrNoFromBool(ret));
+        slog(@"🚀 AppDelegate::NSApplicationActivationPolicyProhibited: %@", localizedYesOrNoFromBool(ret));
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             BOOL ret = [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-            SBLog(@"🚀 AppDelegate::NSApplicationActivationPolicyRegular: %@", localizedYesOrNoFromBool(ret));
+            slog(@"🚀 AppDelegate::NSApplicationActivationPolicyRegular: %@", localizedYesOrNoFromBool(ret));
             
             
             
@@ -597,7 +595,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             
             [NSApp arrangeInFront:nil];
             
-            SBLog(@"🚀 AppDelegate::showHideDockIcon: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
+            slog(@"🚀 AppDelegate::showHideDockIcon: mainWindow = [%@]", NSApplication.sharedApplication.mainWindow);
             
             [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
         });
@@ -608,9 +606,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         
         
         BOOL ret = [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
-        SBLog(@"🚀 AppDelegate::NSApplicationActivationPolicyAccessory: %@", localizedYesOrNoFromBool(ret));
+        slog(@"🚀 AppDelegate::NSApplicationActivationPolicyAccessory: %@", localizedYesOrNoFromBool(ret));
     }
 }
+
+
 
 - (BOOL)isHiddenToTray {
     BOOL ret = NSApp.activationPolicy != NSApplicationActivationPolicyRegular;
@@ -629,7 +629,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             statusImage.size = NSMakeSize(18.0, 18.0);
             self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
             self.statusItem.button.image = statusImage;
-            self.statusItem.button.cell.highlighted = YES;
+
+            self.statusItem.highlightMode = YES;
             self.statusItem.button.enabled = YES;
                         
             self.systemTrayNewMenu = [[NSMenu alloc] init];
@@ -648,6 +649,23 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             self.statusItem = nil;
         }
     }
+}
+
+- (NSMenuItem*)createClickActionMenuItem:(NSString*)title action:(SystemMenuClickAction)action {
+    NSMenuItem* foo = [[NSMenuItem alloc] init];
+    
+    foo.title = title;
+    foo.state = Settings.sharedInstance.systemMenuClickAction == action ? NSControlStateValueOn : NSControlStateValueOff;
+    foo.tag = action;
+    foo.action = @selector(onClickSystemTrayClickAction:);
+    
+    return foo;
+}
+
+- (void)onClickSystemTrayClickAction:(id)sender {
+    NSMenuItem* m = sender;
+    SystemMenuClickAction action = m.tag;
+    Settings.sharedInstance.systemMenuClickAction = action;
 }
 
 - (void)refreshSystemTrayNewMenu {
@@ -705,6 +723,24 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self.systemTrayNewMenu addItem:NSMenuItem.separatorItem];
     
+    NSMenuItem* clickAction = [[NSMenuItem alloc] init];
+    
+    clickAction.title = NSLocalizedString(@"configure_click_action", @"Configure Click Action");
+    [self.systemTrayNewMenu addItem:clickAction];
+    
+    NSMenu* sub = [[NSMenu alloc] init];
+    
+    [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"quick_search", @"Quick Search") action:kSystemMenuClickActionQuickSearch]];
+    [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"system_tray_menu_item_show", @"Show Strongbox") action:kSystemMenuClickActionShowStrongbox]];
+    [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"popout_password_generator", @"Password Generator") action:kSystemMenuClickActionPasswordGenerator]];
+    [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"show_this_menu", @"Show this Menu") action:kSystemMenuClickActionShowMenu]]; 
+    
+    clickAction.submenu = sub;
+    
+    [self.systemTrayNewMenu addItem:NSMenuItem.separatorItem];
+    
+    
+    
     NSImage * locked = [NSImage imageWithSystemSymbolName:@"lock" accessibilityDescription:nil];
     NSImage * locked2 = [locked imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
 
@@ -737,13 +773,76 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [DatabasesCollection.shared tryToLockAll];
 }
 
+- (void)setupSystemTrayPopover {
+    self.systemTrayPopover = [[NSPopover alloc] init];
+    self.systemTrayPopover.behavior = NSPopoverBehaviorTransient ;
+    self.systemTrayPopover.animates = YES;
+    
+    PasswordGenerationPreferences* vc =  [PasswordGenerationPreferences fromStoryboard];
+        
+    self.systemTrayPopover.contentViewController = vc;
+    self.systemTrayPopover.delegate = self;
+}
+
+- (void)popoverDidClose:(NSNotification *)notification {
+    
+    
+    
+    
+    
+    
+    self.systemTrayPopoverClosedAt = NSDate.date;
+}
+
 - (void)onSystemTrayIconClicked:(id)sender {
     
     
-    if ( NSApp.currentEvent.type == NSEventTypeLeftMouseUp ) {
-        [self showQuickSearchPalette:sender];
-    } else {
-        [self showSystemTrayNewMenu:sender];
+    if ( YES ) {
+        if ( NSApp.currentEvent.type == NSEventTypeLeftMouseUp ) {
+            switch (Settings.sharedInstance.systemMenuClickAction ) {
+                case kSystemMenuClickActionQuickSearch:
+                    [self showQuickSearchPalette:sender];
+                    break;
+                case kSystemMenuClickActionPasswordGenerator:
+                    [self showPasswordGeneratorTrayMenuBarPopover:sender];
+                    break;
+                case kSystemMenuClickActionShowStrongbox:
+                    [self onSystemTrayShow:sender];
+                    break;
+                default:
+                    [self showSystemTrayNewMenu:sender];
+                    break;
+            }
+        } else {
+            [self showSystemTrayNewMenu:sender];
+        }
+    }
+}
+
+- (void)showPasswordGeneratorTrayMenuBarPopover:(id)sender {
+    NSTimeInterval interval = [NSDate.date timeIntervalSinceDate:self.systemTrayPopoverClosedAt];
+    
+    
+    
+    
+    if ( self.systemTrayPopoverClosedAt == nil || interval > 0.2f ) {
+        
+        NSView* statusBarItem = sender;
+        [self.systemTrayPopover showRelativeToRect:statusBarItem.bounds ofView:sender preferredEdge:NSMaxYEdge];
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        [self.systemTrayPopover.contentViewController.view.window makeKeyWindow]; 
     }
 }
 
@@ -769,6 +868,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [self showAndActivateStrongbox:databaseUuid];
 }
 
+
+
 - (void)showAndActivateStrongbox:(NSString*_Nullable)databaseUuid {
     [self showAndActivateStrongbox:databaseUuid completion:nil];
 }
@@ -776,11 +877,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)showAndActivateStrongbox:(NSString*_Nullable)databaseUuid completion:(void (^_Nullable)(void))completion {
     [self showAndActivateStrongbox:databaseUuid suppressEmptyLaunchBehaviour:NO suppressWindowUnminimization:NO completion:completion];
 }
+
 - (void)showAndActivateStrongbox:(NSString*_Nullable)databaseUuid
     suppressEmptyLaunchBehaviour:(BOOL)suppressEmptyLaunchBehaviour
     suppressWindowUnminimization:(BOOL)suppressWindowUnminimization
                       completion:(void (^_Nullable)(void))completion {
-    SBLog(@"🚀 showAndActivateStrongbox: [%@] - BEGIN", databaseUuid);
+    slog(@"🚀 showAndActivateStrongbox: [%@] - BEGIN", databaseUuid);
     
     [self showHideDockIcon:YES];
     
@@ -802,20 +904,20 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             }];
         }
         else {
-            SBLog(@"🔴 Unknown databaseUuid sent to showAndActivateStrongbox");
+            slog(@"🔴 Unknown databaseUuid sent to showAndActivateStrongbox");
             
             [self showAndActivateStrongboxStage2:completion];
         }
     }
     else {
-        SBLog(@"ℹ️ showAndActivateStrongbox - No Special Database Indicated");
+        slog(@"ℹ️ showAndActivateStrongbox - No Special Database Indicated");
         
         if ( !self.suppressQuickLaunchForNextAppActivation && !suppressEmptyLaunchBehaviour ) {
-            SBLog(@"ℹ️ showAndActivateStrongbox - Quick Launch not suppressed...");
+            slog(@"ℹ️ showAndActivateStrongbox - Quick Launch not suppressed...");
             [dc launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable];
         }
         else {
-            SBLog(@"ℹ️ showAndActivateStrongbox - Suppressed Quick Launch");
+            slog(@"ℹ️ showAndActivateStrongbox - Suppressed Quick Launch");
             self.suppressQuickLaunchForNextAppActivation = NO; 
         }
         
@@ -836,7 +938,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         completion();
     }
     
-    SBLog(@"🚀 showAndActivateStrongbox: END");
+    slog(@"🚀 showAndActivateStrongbox: END");
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -850,7 +952,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-    SBLog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
+    slog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
 
     [self cancelAutoLockTimer];
     
@@ -867,7 +969,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
         
     if ( [self isHiddenToTray] ) {
-        SBLog(@"✅ applicationDidBecomeActive - isHiddenToTray - showing dock icon and and activating");
+        slog(@"✅ applicationDidBecomeActive - isHiddenToTray - showing dock icon and and activating");
         
         
         
@@ -905,7 +1007,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)hasVisibleWindows {
-    SBLog(@"✅ AppDelegate::applicationShouldHandleReopen: hasVisibleWindows = [%@]", localizedYesOrNoFromBool(hasVisibleWindows));
+    slog(@"✅ AppDelegate::applicationShouldHandleReopen: hasVisibleWindows = [%@]", localizedYesOrNoFromBool(hasVisibleWindows));
 
     
     
@@ -919,7 +1021,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
-    SBLog(@"✅ AppDelegate::applicationShouldOpenUntitledFile");
+    slog(@"✅ AppDelegate::applicationShouldOpenUntitledFile");
     
     return NO;
 }
@@ -932,7 +1034,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)cancelAutoLockTimer {
     if(self.autoLockWorkBlock) {
-        SBLog(@"🐞 DEBUG - Cancelling Background Auto-Lock work block");
+        slog(@"🐞 DEBUG - Cancelling Background Auto-Lock work block");
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
     }
@@ -944,10 +1046,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if(timeout != 0) {
         [self cancelAutoLockTimer];
         
-        SBLog(@"🐞 DEBUG - [startAutoLockForAppInBackgroundTimer] Creating Background Auto-Lock work block... [timeout = %ld secs]", timeout);
+        slog(@"🐞 DEBUG - [startAutoLockForAppInBackgroundTimer] Creating Background Auto-Lock work block... [timeout = %ld secs]", timeout);
 
         self.autoLockWorkBlock = dispatch_block_create(0, ^{
-            SBLog(@"🐞 DEBUG - App in Background timeout exceeded -> Sending Notification...");
+            slog(@"🐞 DEBUG - App in Background timeout exceeded -> Sending Notification...");
             
             [[NSNotificationCenter defaultCenter] postNotificationName:kAutoLockIfInBackgroundNotification object:nil];
             self.autoLockWorkBlock = nil;
@@ -974,9 +1076,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         [item setState:Settings.sharedInstance.floatOnTop ? NSControlStateValueOn : NSControlStateValueOff];
     }
     else if (theAction == @selector(signOutOfOneDrive:)) {
-
-
-
         return YES;
     }
     else if (theAction == @selector(signOutOfDropbox:)) {
@@ -997,7 +1096,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (IBAction)signOutOfOneDrive:(id)sender {
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    [TwoDriveStorageProvider.sharedInstance signOutAll];
+    [OneDriveStorageProvider.sharedInstance signOutAll];
 #endif
 }
 
@@ -1063,7 +1162,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)obj change:(NSDictionary *)change context:(void *)ctx {
     if (ctx == kPreferenceGlobalShowShortcutNotification || ctx == kPreferenceLaunchQuickSearchShortcut || ctx == kPreferencePasswordGeneratorShortcut) {
-        SBLog(@"🐞 MASShortcut Changed...");
+        slog(@"🐞 MASShortcut Changed...");
         [NSNotificationCenter.defaultCenter postNotificationName:kSettingsChangedNotification object:nil];
     }
     else {
@@ -1151,7 +1250,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         }
     }
     else {
-        SBLog(@"WARN: Menu Item %@ not found to remove.", NSStringFromSelector(action));
+        slog(@"WARN: Menu Item %@ not found to remove.", NSStringFromSelector(action));
     }
 }
 
@@ -1185,7 +1284,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 - (void)onSettingsChanged:(NSNotification*)notification {
-    SBLog(@"AppDelegate::Settings Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
+    slog(@"AppDelegate::Settings Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
 
     [self initializeClipboardWatchingTask];
     [self showHideSystemStatusBarIcon];
@@ -1279,7 +1378,7 @@ static NSInteger clipboardChangeCount;
 
 - (void)clearClipboardWhereAppropriate {
     if ( clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount ) {
-        SBLog(@"General Clipboard change count matches after time delay... Clearing Clipboard");
+        slog(@"General Clipboard change count matches after time delay... Clearing Clipboard");
         [NSPasteboard.generalPasteboard clearContents];
     }
     else {
@@ -1295,7 +1394,7 @@ static NSInteger clipboardChangeCount;
     @synchronized (self) {
         if([appCustomPasteboard canReadItemWithDataConformingToTypes:@[kDragAndDropExternalUti]]) {
             [appCustomPasteboard clearContents];
-            SBLog(@"Clearing Custom App Clipboard!");
+            slog(@"Clearing Custom App Clipboard!");
         }
     }
 }
@@ -1433,7 +1532,7 @@ static NSInteger clipboardChangeCount;
     }
     
     if ( error ) {
-        SBLog(@"🔴 %@", error.localizedDescription);
+        slog(@"🔴 %@", error.localizedDescription);
         [MacAlerts error:error window:DBManagerPanel.sharedInstance.window];
     }
     else {
@@ -1491,15 +1590,15 @@ static NSInteger clipboardChangeCount;
 }
 
 - (IBAction)onStrongboxQuit:(id)sender {
-    SBLog(@"✅ onStrongboxQuit...");
+    slog(@"✅ onStrongboxQuit...");
 
     if ( self.quitsToSystemTrayInsteadOfTerminates ) {
-        SBLog(@"✅ onStrongboxQuit => Should we actually? No -> Closing all windows instead");
+        slog(@"✅ onStrongboxQuit => Should we actually? No -> Closing all windows instead");
         
         [self quitToSystemTrayInsteadOfTerminate];
     }
     else {
-        SBLog(@"✅ onStrongboxQuit... Should we actually? YES terminating process");
+        slog(@"✅ onStrongboxQuit... Should we actually? YES terminating process");
         [NSApplication.sharedApplication terminate:nil];
     }
 }
@@ -1533,7 +1632,7 @@ static NSInteger clipboardChangeCount;
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
     if ( self.isQuitFromDockEvent && self.quitsToSystemTrayInsteadOfTerminates ) {
-        SBLog(@"✅ Quit from Dock => Should we actually? No -> Closing all windows instead");
+        slog(@"✅ Quit from Dock => Should we actually? No -> Closing all windows instead");
         
         [self quitToSystemTrayInsteadOfTerminate];
         
@@ -1554,12 +1653,12 @@ static NSInteger clipboardChangeCount;
             [self waitForAllSyncToFinishThenTerminate];
         });
     
-        SBLog(@"✅ applicationShouldTerminate? => Yes, but later finish sync first");
+        slog(@"✅ applicationShouldTerminate? => Yes, but later finish sync first");
 
         return NSTerminateLater;
     }
     else {
-        SBLog(@"✅ applicationShouldTerminate? => Yes, immediately");
+        slog(@"✅ applicationShouldTerminate? => Yes, immediately");
 
         [DatabasesManager.sharedInstance forceSerialize];
         
@@ -1579,7 +1678,7 @@ static NSInteger clipboardChangeCount;
 
         [DatabasesManager.sharedInstance forceSerialize];
         
-        SBLog(@"waitForAllSyncToFinishThenTerminate - All Syncs Done - Quitting app.");
+        slog(@"waitForAllSyncToFinishThenTerminate - All Syncs Done - Quitting app.");
         [NSApplication.sharedApplication replyToApplicationShouldTerminate:NSTerminateNow];
     }
 }
@@ -1591,7 +1690,7 @@ static NSInteger clipboardChangeCount;
                              configuration:NSWorkspaceOpenConfiguration.configuration
                          completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
         if ( error ) {
-            SBLog(@"Launch URL done. Error = [%@]", error);
+            slog(@"Launch URL done. Error = [%@]", error);
         }
     }];
 }
@@ -1617,7 +1716,7 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)stopRefreshOtpTimer {
-    SBLog(@"stopRefreshOtpTimer");
+    slog(@"stopRefreshOtpTimer");
     
     if(self.timerRefreshOtp) {
         [self.timerRefreshOtp invalidate];
@@ -1643,12 +1742,12 @@ static NSInteger clipboardChangeCount;
 
         NSString* xml = [Serializator expressToXml:data password:password];
         
-        SBLog(@"XML Dump: \n%@", xml);
+        slog(@"XML Dump: \n%@", xml);
     }
 }
 
 - (void)onProStatusChanged:(id)param {
-    SBLog(@"✅ AppDelegate: Pro Status Changed!");
+    slog(@"✅ AppDelegate: Pro Status Changed!");
 
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self bindFreeOrProStatus];

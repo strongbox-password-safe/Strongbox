@@ -90,7 +90,7 @@ class BitwardenImporter: NSObject, Importer {
             }
         } else if item.folderId != nil {
             messages.append(ImportMessage("Could not read folderID for item", .warning))
-            NSLog("⚠️ Could not read folderID for item")
+            swlog("⚠️ Could not read folderID for item")
         }
 
         let node = Node(asRecord: title, parent: parentGroup, fields: NodeFields(), uuid: uuid)

@@ -74,7 +74,7 @@
         ret.encryptionAlgorithm = kEncryptionAlgorithmTwoFish256;
     }
     else {
-        NSLog(@"🔴 EERROR Unknown Format in defaultsForFormat");
+        slog(@"🔴 EERROR Unknown Format in defaultsForFormat");
     }
     
     return ret;
@@ -96,7 +96,7 @@
             return [EncryptionSettingsViewModel processKP1:databaseModel];
             break;
         case kFormatUnknown:
-            NSLog(@"WARNWARN - Unknown Datavase format");
+            slog(@"WARNWARN - Unknown Datavase format");
             break;
     }
     
@@ -474,7 +474,7 @@
             break;
     }
 
-    NSLog(@"WARNWARN: Unknown Inner Stream Algo");
+    slog(@"WARNWARN: Unknown Inner Stream Algo");
 
     return -1;
 }
@@ -494,7 +494,7 @@
             break;
     }
     
-    NSLog(@"WARNWARN: Unknown Inner Stream ID");
+    slog(@"WARNWARN: Unknown Inner Stream ID");
     
     return kInnerStreamAlgorithmUnknown;
 }
@@ -552,7 +552,7 @@
             newKdfParams = foo.kdfParameters;
         }
         else {
-            NSLog(@"WARNWARN: Unknown KDF");
+            slog(@"WARNWARN: Unknown KDF");
             return;
         }
         

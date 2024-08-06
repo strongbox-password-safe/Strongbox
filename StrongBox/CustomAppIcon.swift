@@ -165,7 +165,7 @@ public class CustomAppIconObjCHelper: NSObject {
         if icon.isPro {
             UIApplication.shared.setAlternateIconName(nil) { error in
                 if let error {
-                    NSLog("🔴 Error = [%@]", String(describing: error))
+                    swlog("🔴 Error = [%@]", String(describing: error))
                 }
             }
         }

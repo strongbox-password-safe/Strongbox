@@ -32,7 +32,7 @@ class DBManagerPanel: NSWindowController {
         showWindow(nil)
 
         guard let vc = contentViewController as? DatabasesManagerVC else {
-            NSLog("🔴 Could not get contentviewcontroller?! for DBManager")
+            swlog("🔴 Could not get contentviewcontroller?! for DBManager")
             return
         }
 

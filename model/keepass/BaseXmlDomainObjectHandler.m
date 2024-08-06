@@ -31,7 +31,7 @@
 - (instancetype)initWithXmlElementName:(NSString*)xmlElementName context:(nonnull XmlProcessingContext *)context {
     if(self = [super init]) {
         if(!context) {
-            NSLog(@"Parsing Context cannot be nil.");
+            slog(@"Parsing Context cannot be nil.");
             [NSException raise:NSInternalInconsistencyException
                         format:@"Parsing Context cannot be nil %@ in a subclass", NSStringFromSelector(_cmd)];
             return nil;
@@ -84,7 +84,7 @@
 }
 
 - (void)addUnknownChildObject:(id<XmlParsingDomainObject>)xmlItem {
-    NSLog(@"WARNWARN - Found Unknown Element: [%@]", xmlItem.originalElementName);
+    slog(@"WARNWARN - Found Unknown Element: [%@]", xmlItem.originalElementName);
     
     if(!self.lazyUnmanagedChildElements) {
         self.lazyUnmanagedChildElements = [NSMutableArray arrayWithCapacity:32];

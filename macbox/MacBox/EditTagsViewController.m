@@ -8,6 +8,7 @@
 
 #import "EditTagsViewController.h"
 #import "MacAlerts.h"
+#import "SBLog.h"
 
 @interface EditTagsViewController () <NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource>
 
@@ -65,7 +66,7 @@
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
-    NSLog(@"tableViewSelectionDidChange");
+    slog(@"tableViewSelectionDidChange");
     [self toggleRemoveButtonEnableState];
 }
 

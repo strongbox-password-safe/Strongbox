@@ -81,13 +81,11 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node* node = self.items[indexPath.row];
     
-    NSString *groupLocation = [self.df stringFromDate:node.fields.modified];
-    
     return [self.cellHelper getBrowseCellForNode:node
                                        indexPath:indexPath
                                showLargeTotpCell:NO
                                showGroupLocation:NO
-                           groupLocationOverride:groupLocation
+                           groupLocationOverride:nil
                                    accessoryType:UITableViewCellAccessoryDisclosureIndicator
                                          noFlags:NO
                              showGroupChildCount:NO

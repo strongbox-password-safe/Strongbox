@@ -98,7 +98,7 @@
     if ( newIndex != self.model.databaseMetadata.quickTypeDisplayFormat ) {
         self.model.databaseMetadata.quickTypeDisplayFormat = newIndex;
         
-        NSLog(@"AutoFill QuickType Format was changed - Populating Database....");
+        slog(@"AutoFill QuickType Format was changed - Populating Database....");
         
         [self updateAutoFillDatabases];
         

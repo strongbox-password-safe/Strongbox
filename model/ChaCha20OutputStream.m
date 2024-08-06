@@ -74,7 +74,7 @@ static const uint32_t kBlockSize = 64;
         
         NSInteger wroteThisTime = [self.outputStream write:self.workChunk maxLength:self.workChunkLength]; 
         if ( wroteThisTime < 0 ) {
-            NSLog(@"ChaCha20: Error writing to outputstream");
+            slog(@"ChaCha20: Error writing to outputstream");
             return;
         }
 
@@ -88,7 +88,7 @@ static const uint32_t kBlockSize = 64;
 
 - (NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
     if ( !self.opened || self.closed ) {
-        NSLog(@"WARNWARN: Unopen or not closed. AES Output Stream");
+        slog(@"WARNWARN: Unopen or not closed. AES Output Stream");
         return -1;
     }
 
@@ -110,7 +110,7 @@ static const uint32_t kBlockSize = 64;
         
         NSInteger wroteThisTime = [self.outputStream write:self.workChunk maxLength:self.workChunkLength];
         if ( wroteThisTime < 0 ) {
-            NSLog(@"ChaCha20: Error writing to outputstream");
+            slog(@"ChaCha20: Error writing to outputstream");
             return wroteThisTime;
         }
         

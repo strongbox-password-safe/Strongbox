@@ -128,7 +128,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
         guard let vaults = account.vaults else {
             let msg = String(format: "⚠️ No vaults found for account = [%@]", String(describing: account.attrs?.name))
-            NSLog(msg)
+            swlog(msg)
             intermediateResult.messages.append(ImportMessage(msg, .warning))
             return
         }
@@ -150,7 +150,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
         guard let items = vault.items else {
             let msg = String(format: "⚠️ No items found for vault = [%@]", String(describing: vault.attrs?.name))
-            NSLog(msg)
+            swlog(msg)
             intermediateResult.messages.append(ImportMessage(msg, .warning))
             return
         }
@@ -374,7 +374,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
 
         guard let fieldValue = field.value, let key = fieldValue.keys.first, let value = fieldValue[key] else {
             let msg = String(format: "🔴 No value or key found for Section Field!", String(describing: field.value))
-            NSLog(msg)
+            swlog(msg)
             intermediateResult.messages.append(ImportMessage(msg, .error))
             return
         }
@@ -415,7 +415,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
         
 
         if key == "totp", let str = value.value as? String {
-            if let token = NodeFields.getOtpToken(from: str, forceSteam: false, issuer: "", username: "") {
+            if let token = NodeFields.getOtpToken(from: str, forceSteam: false) {
                 if node.fields.otpToken == nil {
                     let prefs = CrossPlatformDependencies.defaults().applicationPreferences
 
@@ -467,7 +467,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
                     return
                 } else {
                     let msg = String(format: "Could not properly parse SSH Key: [%@] - [%@] - [%@]", String(describing: value.value), node.title, String(describing: node.uuid))
-                    NSLog(msg)
+                    swlog(msg)
                     intermediateResult.messages.append(ImportMessage(msg, .warning))
 
                     addCustomField(node: node, name: "UNK-SSH-KEY", value: String(describing: value.value), protected: false)
@@ -568,7 +568,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
             addCustomField(node: node, name: fieldName, value: String(num), protected: field.guarded ?? false)
         } else {
             let msg = String(format: "Could not properly import structured field: [%@] - [%@] - [%@]", String(describing: value.value), node.title, String(describing: node.uuid))
-            NSLog(msg)
+            swlog(msg)
             intermediateResult.messages.append(ImportMessage(msg, .warning))
 
             addCustomField(node: node, name: "UNK", value: String(describing: value.value), protected: false)
@@ -611,7 +611,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
         guard let documentId = attachment.documentId,
               let filename = attachment.fileName
         else {
-            NSLog("🔴 No Document ID or Filename for file Attachment!")
+            swlog("🔴 No Document ID or Filename for file Attachment!")
             return [ImportMessage("No Document ID or Filename for file Attachment!", .error)]
         }
 
@@ -651,7 +651,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
     func createOrGetCategoryGroup(categoryId: String, vaultGroup: Node, item _: OnePuxVaultItem) -> (Node, [ImportMessage]) {
         guard let category = OnePuxCategory(rawValue: categoryId) else {
             let msg = String(format: "Couldn't get category for item: [%@] - Moved to root group", categoryId)
-            NSLog(msg)
+            swlog(msg)
             return (vaultGroup, [ImportMessage(msg, .warning)])
         }
 

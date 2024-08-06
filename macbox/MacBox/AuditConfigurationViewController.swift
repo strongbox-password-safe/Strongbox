@@ -81,7 +81,7 @@ class AuditConfigurationViewController: NSViewController {
             self?.bindAuditStatus(notification)
         }
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(kAuditCompletedNotificationKey), object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: .auditCompleted, object: nil, queue: nil) { [weak self] notification in
             self?.bindAuditStatus(notification)
         }
     }
@@ -117,7 +117,7 @@ class AuditConfigurationViewController: NSViewController {
             labelStatus.stringValue = NSLocalizedString("audit_status_stopped", comment: "Audit Stopped")
             labelSubStatus.isHidden = true
         @unknown default:
-            NSLog("🔴 Unknown Audit State!")
+            swlog("🔴 Unknown Audit State!")
         }
     }
 
@@ -247,7 +247,7 @@ class AuditConfigurationViewController: NSViewController {
         case kHibpOnceEvery30Days:
             popupHibpInterval.selectItem(at: 3)
         default:
-            NSLog("🔴 Unknown/unusual Jibp Interval: [%@]", String(describing: config.hibpCheckForNewBreachesIntervalSeconds))
+            swlog("🔴 Unknown/unusual Jibp Interval: [%@]", String(describing: config.hibpCheckForNewBreachesIntervalSeconds))
             popupHibpInterval.selectItem(at: 0)
         }
     }

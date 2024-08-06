@@ -56,10 +56,10 @@
 }
 
 - (void)cleanupWormhole {
-    NSLog(@"✅ cleanupWormhole");
+    slog(@"✅ cleanupWormhole");
     
     if ( self.wormhole ) {
-        NSLog(@"Cleaning up wormhole...");
+        slog(@"Cleaning up wormhole...");
         [self.wormhole clearAllMessageContents];
         self.wormhole = nil; 
     }
@@ -125,7 +125,7 @@
 
 
 - (void)onAutoFillPingWormholeRequest {
-    NSLog(@"✅ onAutoFillPingWormholeRequest");
+    slog(@"✅ onAutoFillPingWormholeRequest");
     
     NSArray<Model*>* unlocked = [DatabasesCollection.shared getUnlockedDatabases];
     
@@ -135,7 +135,7 @@
         return obj.metadata.uuid;
     }];
     
-    NSLog(@"Responding to onAutoFillPingWormholeRequest  => %@", ret);
+    slog(@"Responding to onAutoFillPingWormholeRequest  => %@", ret);
     
     [self.wormhole passMessageObject:@{ @"success" : @(YES),
                                         @"unlockedDatabases" : ret }
@@ -143,7 +143,7 @@
 }
 
 - (void)onAutoFillExitedNotify {
-    NSLog(@"✅ onAutoFillExitedNotify");
+    slog(@"✅ onAutoFillExitedNotify");
     
     [DatabasesManager.sharedInstance forceReload];
     
@@ -151,7 +151,7 @@
 }
 
 - (void)onAutoFillPasskeyAssertionRequest:(id)messageObject API_AVAILABLE(macos(14.0)) {
-    NSLog(@"✅ onAutoFillPasskeyAssertionRequest");
+    slog(@"✅ onAutoFillPasskeyAssertionRequest");
     
     NSDictionary *dict = (NSDictionary*)messageObject;
     
@@ -163,14 +163,14 @@
 
     
     if ( !json || !clientDataHash ) {
-        NSLog(@"🔴 No clientDataHash or QuickTypeIdentifier");
+        slog(@"🔴 No clientDataHash or QuickTypeIdentifier");
         [self.wormhole passMessageObject:@{ @"success" : @(NO) } identifier:kAutoFillWormholePasskeyAssertionResponseId];
         return;
     }
     
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
     if ( !identifier ) {
-        NSLog(@"🔴 Could not decode json for onQuickTypeAutoFillWormholeRequest");
+        slog(@"🔴 Could not decode json for onQuickTypeAutoFillWormholeRequest");
         [self.wormhole passMessageObject:@{ @"success" : @(NO) } identifier:kAutoFillWormholePasskeyAssertionResponseId];
         return;
     }
@@ -180,7 +180,7 @@
     Model* model = [DatabasesCollection.shared getUnlockedWithUuid:identifier.databaseId];
     
     if ( !model || !model.metadata.autoFillEnabled ) {
-        NSLog(@"🔴 database is not AutoFillEnabled- %@ - or not unlocked - cannot perform passkey assetion", identifier);
+        slog(@"🔴 database is not AutoFillEnabled- %@ - or not unlocked - cannot perform passkey assetion", identifier);
         [self.wormhole passMessageObject:@{ @"success" : @(NO) } identifier:kAutoFillWormholePasskeyAssertionResponseId];
         return;
     }
@@ -191,7 +191,7 @@
     Node* node = [model getItemById:uuid];
     
     if ( !node || node.isGroup || !node.passkey ) {
-        NSLog(@"[%@] - AutoFill could not find matching node with passkey - returning", model.metadata.nickName);
+        slog(@"[%@] - AutoFill could not find matching node with passkey - returning", model.metadata.nickName);
         [self.wormhole passMessageObject:@{ @"success" : @(NO) } identifier:kAutoFillWormholePasskeyAssertionResponseId];
         return;
     }
@@ -202,7 +202,7 @@
     
     NSData* authenticatorData = [passkey getAuthenticatorDataWithIncludeAttestedCredentialData:NO];
     if ( !authenticatorData ) {
-        NSLog(@"🔴 Error getting authenticator data");
+        slog(@"🔴 Error getting authenticator data");
         [self.wormhole passMessageObject:@{ @"success" : @(NO) } identifier:kAutoFillWormholePasskeyAssertionResponseId];
         return;
     }
@@ -214,7 +214,7 @@
                                                                                                       error:&error];
     
     if ( !signatureDer ) {
-        NSLog(@"🔴 Error getting signature [%@]", error);
+        slog(@"🔴 Error getting signature [%@]", error);
         [self.wormhole passMessageObject:@{ @"success" : @(NO) } identifier:kAutoFillWormholePasskeyAssertionResponseId];
         return;
     }
@@ -224,7 +224,7 @@
     NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
 
     if ( totp.length && model.metadata.autoFillCopyTotp ) {
-        NSLog(@"🟢 Copy TOTP to clipboard for AutoFill after wormhole request...");
+        slog(@"🟢 Copy TOTP to clipboard for AutoFill after wormhole request...");
         [ClipboardManager.sharedInstance copyConcealedString:totp];
     }
 
@@ -239,13 +239,13 @@
 }
 
 - (void)onAutoFillReloadAndSyncDatabase:(NSString*)databaseId {
-    NSLog(@"✅ onAutoFillReloadAndSyncDatabase - %@", databaseId);
+    slog(@"✅ onAutoFillReloadAndSyncDatabase - %@", databaseId);
 
     [DatabasesManager.sharedInstance forceReload]; 
 
     MacDatabasePreferences* database = [MacDatabasePreferences getById:databaseId];
     if ( !database.autoFillEnabled ) {
-        NSLog(@"🔴 database is not AutoFillEnabled- %@-%@", database.nickName, databaseId);
+        slog(@"🔴 database is not AutoFillEnabled- %@-%@", database.nickName, databaseId);
         [self.wormhole passMessageObject:@{ @"success" : @(NO) } identifier:kAutoFillWormholeSyncResponseId];
         return;
     }
@@ -259,7 +259,7 @@
 }
 
 - (void)onAutoFillWormholeMasterCredentialsRequest:(NSString*)databaseId {
-    NSLog(@"✅ onAutoFillWormholeMasterCredentialsRequest: [%@]", databaseId );
+    slog(@"✅ onAutoFillWormholeMasterCredentialsRequest: [%@]", databaseId );
     
     Model* model = [DatabasesCollection.shared getUnlockedWithUuid:databaseId];
     
@@ -269,7 +269,7 @@
         return;
     }
     
-    NSLog(@"Responding to onAutoFillWormholeMasterCredentialsRequest for Database - %@ ", databaseId);
+    slog(@"Responding to onAutoFillWormholeMasterCredentialsRequest for Database - %@ ", databaseId);
     
     NSString* secretStoreId = NSUUID.UUID.UUIDString;
     NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
@@ -283,12 +283,12 @@
 }
 
 - (void)onQuickTypeAutoFillWormholeRequest:(NSString*)json {
-    NSLog(@"✅ onQuickTypeAutoFillWormholeRequest");
+    slog(@"✅ onQuickTypeAutoFillWormholeRequest");
     
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
     
     if ( !identifier ) {
-        NSLog(@"🔴 Could not decode json for onQuickTypeAutoFillWormholeRequest");
+        slog(@"🔴 Could not decode json for onQuickTypeAutoFillWormholeRequest");
         [self.wormhole passMessageObject:@{ @"success" : @(NO) }
                               identifier:kAutoFillWormholeQuickTypeResponseId];
 
@@ -298,7 +298,7 @@
     Model* model = [DatabasesCollection.shared getUnlockedWithUuid:identifier.databaseId];
     
     if (!model || !model.metadata.autoFillEnabled || !model.metadata.quickTypeEnabled ) {
-        NSLog(@"No such database unlocked, or enabled for quick type");
+        slog(@"No such database unlocked, or enabled for quick type");
         [self.wormhole passMessageObject:@{ @"success" : @(NO) }
                               identifier:kAutoFillWormholeQuickTypeResponseId];
 
@@ -311,7 +311,7 @@
     Node* node = [model getItemById:uuid];
             
     if ( !node || node.isGroup  ) {
-        NSLog(@"[%@] - AutoFill could not find matching node - returning", model.metadata.nickName);
+        slog(@"[%@] - AutoFill could not find matching node - returning", model.metadata.nickName);
         [self.wormhole passMessageObject:@{ @"success" : @(NO) }
                               identifier:kAutoFillWormholeQuickTypeResponseId];
 
@@ -344,13 +344,13 @@
     
     
     if ( totp.length && model.metadata.autoFillCopyTotp ) {
-        NSLog(@"🟢 Copy TOTP to clipboard for AutoFill after wormhole request...");
+        slog(@"🟢 Copy TOTP to clipboard for AutoFill after wormhole request...");
         [ClipboardManager.sharedInstance copyConcealedString:totp];
     }
     
     
     
-    NSLog(@"[%@] - AutoFill found matching node - returning", model.metadata.nickName);
+    slog(@"[%@] - AutoFill found matching node - returning", model.metadata.nickName);
     
     NSDictionary* securePayload = @{
         @"user" : user,

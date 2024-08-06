@@ -24,7 +24,7 @@ struct KeyboardShortcutView: View {
             .background {
                 RoundedRectangle(cornerSize: CGSize(width: 5, height: 5))
                     .foregroundColor(.blue)
-                    .shadow(radius: 3)
+                    .shadow(radius: 1)
             }
 
             Text(title)

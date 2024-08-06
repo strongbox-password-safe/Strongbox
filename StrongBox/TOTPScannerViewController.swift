@@ -46,7 +46,7 @@ class TOTPScannerViewController: UIViewController, AVCaptureMetadataOutputObject
         do {
             videoInput = try AVCaptureDeviceInput(device: videoCaptureDevice)
         } catch {
-            NSLog("🔴 AVCaptureDeviceInput - Error = \(error)")
+            swlog("🔴 AVCaptureDeviceInput - Error = \(error)")
             failed()
             return
         }
@@ -54,7 +54,7 @@ class TOTPScannerViewController: UIViewController, AVCaptureMetadataOutputObject
         if captureSession.canAddInput(videoInput) {
             captureSession.addInput(videoInput)
         } else {
-            NSLog("🔴 captureSession.canAddInput")
+            swlog("🔴 captureSession.canAddInput")
             failed()
             return
         }
@@ -67,7 +67,7 @@ class TOTPScannerViewController: UIViewController, AVCaptureMetadataOutputObject
             metadataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
             metadataOutput.metadataObjectTypes = [.qr]
         } else {
-            NSLog("🔴 captureSession.canAddOutput")
+            swlog("🔴 captureSession.canAddOutput")
             failed()
             return
         }
@@ -147,7 +147,7 @@ class TOTPScannerViewController: UIViewController, AVCaptureMetadataOutputObject
                   let scheme = url.scheme,
                   scheme.lowercased() == kOtpAuthScheme
             else {
-                NSLog("Not a proper OTPAUTH TOTP URL... Ignoring")
+                swlog("Not a proper OTPAUTH TOTP URL... Ignoring")
                 return
             }
 
@@ -184,13 +184,13 @@ class TOTPScannerViewController: UIViewController, AVCaptureMetadataOutputObject
                 }
             }
         case .restricted:
-            NSLog("🔴 Camera Access restricted")
+            swlog("🔴 Camera Access restricted")
             completion(false)
         case .denied:
-            NSLog("🔴 Camera Access denied")
+            swlog("🔴 Camera Access denied")
             completion(false)
         @unknown default:
-            NSLog("🔴 Unknown return from AVCaptureDevice.authorizationStatus")
+            swlog("🔴 Unknown return from AVCaptureDevice.authorizationStatus")
             completion(false)
         }
     }

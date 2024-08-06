@@ -168,7 +168,7 @@
         return [Kdb1Database class];
     }
     
-    NSLog(@"WARN: No such adaptor for format!");
+    slog(@"WARN: No such adaptor for format!");
     return nil;
 }
 
@@ -190,7 +190,7 @@
         [memStream close];
 
         if (userCancelled || error) {
-            NSLog(@"Error: expressToData [%@]", error);
+            slog(@"Error: expressToData [%@]", error);
         }
         else {
             ret = [memStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
@@ -217,7 +217,7 @@
      outputStream:outputStream
        completion:^(BOOL userCancelled, NSString*_Nullable debugXml, NSError*_Nullable error){
 
-        NSLog(@"🐞 Serializator::SERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startTime);
+        slog(@"🐞 Serializator::SERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startTime);
 
         
         completion(userCancelled, nil, error);
@@ -260,7 +260,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         [stream close];
       
         if( userCancelled || database == nil || error || innerStreamError ) {
-            NSLog(@"Error: expressFromData = [%@]", error);
+            slog(@"Error: expressFromData = [%@]", error);
             model = nil;
         }
         else {
@@ -376,7 +376,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         NSTimeInterval decryptTime = NSDate.timeIntervalSinceReferenceDate - startDecryptTime;
         
 
-        NSLog(@"🐞 Serializator::DESERIALIZE [%f] seconds", decryptTime);
+        slog(@"🐞 Serializator::DESERIALIZE [%f] seconds", decryptTime);
 
 
         if(userCancelled || database == nil || error || innerStreamError ) {

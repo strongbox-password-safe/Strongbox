@@ -582,7 +582,7 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     NSData* data = [NSJSONSerialization dataWithJSONObject:[foo serializationDictionary] options:0 error:&error];
     
     if(error) {
-        NSLog(@"%@", error);
+        slog(@"%@", error);
         return nil;
     }
     

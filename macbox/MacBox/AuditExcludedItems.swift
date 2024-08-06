@@ -49,7 +49,7 @@ extension AuditExcludedItems: NSTableViewDataSource, NSTableViewDelegate {
     }
 
     func getIconForNode(_ node: Node) -> IMAGE_TYPE_PTR {
-        NodeIconHelper.getIconFor(node, predefinedIconSet: database!.iconSet, format: database!.format, large: false)
+        NodeIconHelper.getIconFor(node, predefinedIconSet: database!.keePassIconSet, format: database!.format, large: false)
     }
 
     func dereference(text: String, node: Node) -> String {

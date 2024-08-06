@@ -65,7 +65,7 @@
             subGroupFullSuffix = [subGroupFullSuffix substringFromIndex:range.location + range.length];
         }
         else {
-            NSLog(@"Do not know how to process this group name/path. Skipping.");
+            slog(@"Do not know how to process this group name/path. Skipping.");
         }
     }
     

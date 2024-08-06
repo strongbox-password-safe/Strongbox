@@ -443,7 +443,7 @@ const static NSUInteger kSectionUuidIdx = 6;
              currentIndex:idx
                completion:^(BOOL success, NSInteger selectedIdx) {
         if ( success ) {
-            NSLog(@"set Searchable = %ld", (long)selectedIdx);
+            slog(@"set Searchable = %ld", (long)selectedIdx);
             
             if ( selectedIdx == 0 ) {
                 self.item.fields.enableSearching = @(NO);

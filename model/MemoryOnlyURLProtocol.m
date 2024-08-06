@@ -27,7 +27,7 @@
 
 
 + (BOOL)canInitWithRequest:(NSURLRequest *)theRequest {
-    NSLog(@"%@ received %@ with url='%@' and scheme='%@'",
+    slog(@"%@ received %@ with url='%@' and scheme='%@'",
             self, NSStringFromSelector(_cmd),
             [[theRequest URL] absoluteString], [[theRequest URL] scheme]);
 
@@ -37,13 +37,13 @@
 }
 
 + (NSURLRequest *)canonicalRequestForRequest:(NSURLRequest *)request {
-    NSLog(@"%@ received %@", self, NSStringFromSelector(_cmd));
+    slog(@"%@ received %@", self, NSStringFromSelector(_cmd));
 
     return request;
 }
 
 - (void)startLoading {
-    NSLog(@"%@ received %@ - start", self, NSStringFromSelector(_cmd));
+    slog(@"%@ received %@ - start", self, NSStringFromSelector(_cmd));
 
     NSURLRequest *request = [self request];
 
@@ -82,11 +82,11 @@
 
     [client URLProtocolDidFinishLoading:self];
 
-    NSLog(@"%@ received %@ - end", self, NSStringFromSelector(_cmd));
+    slog(@"%@ received %@ - end", self, NSStringFromSelector(_cmd));
 }
 
 - (void)stopLoading {
-    NSLog(@"%@ received %@", self, NSStringFromSelector(_cmd));
+    slog(@"%@ received %@", self, NSStringFromSelector(_cmd));
 }
 
 @end

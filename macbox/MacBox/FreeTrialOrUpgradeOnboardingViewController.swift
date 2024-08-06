@@ -38,7 +38,7 @@ class FreeTrialOrUpgradeOnboardingModule: OnboardingModule {
             return false
         }
 
-        NSLog("Free Trial or Upgrade Nudge Due: [%@] - Nudge Count: [%lu]", String(describing: dueDate), Settings.sharedInstance().freeTrialOrUpgradeNudgeCount)
+        swlog("Free Trial or Upgrade Nudge Due: [%@] - Nudge Count: [%lu]", String(describing: dueDate), Settings.sharedInstance().freeTrialOrUpgradeNudgeCount)
 
         let nudgeDue = dueDate.timeIntervalSinceNow < 0 
 
@@ -124,7 +124,7 @@ class FreeTrialOrUpgradeOnboardingViewController: NSViewController {
 
                     if let error {
                         if (error as NSError).code != SKError.paymentCancelled.rawValue {
-                            NSLog("⚠️ Purchase done with error = [%@]", String(describing: error))
+                            swlog("⚠️ Purchase done with error = [%@]", String(describing: error))
                             MacAlerts.error(error, window: self?.view.window)
                         }
                     } else {
@@ -159,7 +159,7 @@ class FreeTrialOrUpgradeOnboardingViewController: NSViewController {
     }
 
     func dismissAndContinueOnboarding() {
-        NSLog("dismissAndContinueOnboarding")
+        swlog("dismissAndContinueOnboarding")
 
         completion()
     }

@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* initialKeyFileBookmark;
 @property BOOL initialReadOnly;
 @property BOOL showFileRenameOption;
-@property YubiKeyHardwareConfiguration* initialYubiKeyConfig;
+@property (nullable) YubiKeyHardwareConfiguration* initialYubiKeyConfig;
 @property BOOL validateCommonKeyFileMistakes;
 
 @property BOOL autoDetectedKeyFile;

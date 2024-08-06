@@ -43,7 +43,7 @@
                                                 createNewKeyIfAbsent:NO];
         
         if (!self.innerRandomStream) {
-            NSLog(@"WARNWARNWARN: Could not create inner stream cipher: [%d]-[%lu]-[%@]", innerRandomStreamId, (unsigned long)protectedStreamKey.length, protectedStreamKey);
+            slog(@"WARNWARNWARN: Could not create inner stream cipher: [%d]-[%lu]-[%@]", innerRandomStreamId, (unsigned long)protectedStreamKey.length, protectedStreamKey);
             return nil;
         }
         
@@ -146,7 +146,7 @@
                 NSString* decrypted = [self decryptProtectedToString:string];
             
                 if (self.sanityCheckStreamDecryption && !decrypted) {
-                    NSLog(@"🔴 WARN: Could not decrypt CipherText...");
+                    slog(@"🔴 WARN: Could not decrypt CipherText...");
                     
                     NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt protected text. This field is likely corrupt."];
                     self.problemDecrypting = [Utils createNSError:msg errorCode:-1];
@@ -173,7 +173,7 @@
         
         if(!knownObjectType) {
             if(![completedObject isKindOfClass:[BaseXmlDomainObjectHandler class]]) {
-                NSLog(@"WARN: Unknown Object Type but not BaseDictionaryHandler?!");
+                slog(@"WARN: Unknown Object Type but not BaseDictionaryHandler?!");
                 self.errorParse = [Utils createNSError:@"Unknown Object Type but not BaseDictionaryHandler." errorCode:-1];
             }
             else {
@@ -183,7 +183,7 @@
         }
     }
     else {
-        NSLog(@"WARN: No Handler on stack available for element! Unbalanced XML?");
+        slog(@"WARN: No Handler on stack available for element! Unbalanced XML?");
         self.errorParse = [Utils createNSError:@"No Handler on stack available for element! Unbalanced XML." errorCode:-1];
     }
 }
@@ -207,7 +207,7 @@
     
     if (self.sanityCheckStreamDecryption) {
         if (ct.length && ret.length == 0) {
-            NSLog(@"WARNWARN - Decrypting Ciphertext led to null or empty string - likely incorrect key: [%@] => [%@]", ct, ret);
+            slog(@"WARNWARN - Decrypting Ciphertext led to null or empty string - likely incorrect key: [%@] => [%@]", ct, ret);
             return nil;
         }
     }

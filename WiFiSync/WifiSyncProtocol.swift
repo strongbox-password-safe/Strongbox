@@ -40,7 +40,7 @@ class WifiSyncProtocol: NWProtocolFramerImplementation {
         do {
             try framer.writeOutputNoCopy(length: messageLength)
         } catch {
-            NSLog("🔴 error writing \(error)")
+            swlog("🔴 error writing \(error)")
         }
     }
 

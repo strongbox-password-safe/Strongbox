@@ -53,7 +53,7 @@
 
     __weak id weakSelf = self;
     vc.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
-        NSLog(@"onButtonClicked: %ld", (long)buttonIdCancelIsZero);
+        slog(@"onButtonClicked: %ld", (long)buttonIdCancelIsZero);
         
         if ( buttonIdCancelIsZero == 1 ) {
             [weakSelf sharePreviousCrash:viewController onDone:onDone];

@@ -76,7 +76,7 @@
         ret = self.validateDestination ( group );
     }
     else {
-        NSLog(@"WARNWARN: No Validation block set...");
+        slog(@"WARNWARN: No Validation block set...");
         ret = NO;
     }
 

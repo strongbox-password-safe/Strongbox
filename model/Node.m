@@ -91,14 +91,14 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     }
     else {
         if(![title length]) {
-            NSLog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
+            slog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
             return nil;
         }
     }
     
     for (Node* child in parent.children) {
         if (child.isGroup && !keePassGroupTitleRules && [child.title compare:title] == NSOrderedSame) {
-            NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
+            slog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
             return nil;
         }
     }
@@ -312,7 +312,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                    includeHistory:(BOOL)includeHistory
            keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     if (self.isGroup != mergeNode.isGroup) {
-        NSLog(@"WARNWARN: mergePropertiesInFromNode - group not group");
+        slog(@"WARNWARN: mergePropertiesInFromNode - group not group");
         return NO;
     }
 
@@ -457,7 +457,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
     else if (self.isGroup) {
         if(![title length]) {
-            NSLog(@"setTitle: Cannot have empty group title in non KeePass database.");
+            slog(@"setTitle: Cannot have empty group title in non KeePass database.");
             return NO;
         }
     }
@@ -465,7 +465,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if(self.isGroup) {
         for (Node* child in self.parent.children) {
             if (child.isGroup && !keePassGroupTitleRules && [child.title compare:title] == NSOrderedSame) {
-                NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", self.parent.title, title);
+                slog(@"Cannot create group as parent already has a group with this title. [%@-%@]", self.parent.title, title);
                 return NO;
             }
         }
@@ -478,7 +478,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
 - (BOOL)validateAddChild:(Node *)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     if ( !node ) {
-        NSLog(@"🔴 Cannot Add: Node is nil.");
+        slog(@"🔴 Cannot Add: Node is nil.");
         return NO;
     }
         
@@ -500,7 +500,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if ( !keePassGroupTitleRules) {
         for (Node* child in self.children) {
             if (child.isGroup && [child.title compare:node.title] == NSOrderedSame) {
-                NSLog(@"🔴 Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
+                slog(@"🔴 Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
                 return NO;
             }
         }
@@ -519,7 +519,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
 
     if ( node.parent != self ) {
-        NSLog(@"🔴 Node parent field is not correctly set to this node. Patching parent, please fix whatever broken code led here...");
+        slog(@"🔴 Node parent field is not correctly set to this node. Patching parent, please fix whatever broken code led here...");
         [node internalPatchParent:self];
     }
     
@@ -865,9 +865,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
           addLegacyFields:(BOOL)addLegacyFields
             addOtpAuthUrl:(BOOL)addOtpAuthUrl {
     OTPToken* token = [NodeFields getOtpTokenFromString:string
-                                             forceSteam:forceSteam
-                                                 issuer:self.title
-                                               username:self.fields.username];
+                                             forceSteam:forceSteam];
     
     if(token) {
         [self.fields setTotp:token appendUrlToNotes:appendUrlToNotes addLegacyFields:addLegacyFields addOtpAuthUrl:addOtpAuthUrl];

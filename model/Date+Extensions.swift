@@ -8,7 +8,7 @@
 
 // iso8601withFractionalSeconds always at 'Zulu' i.e. GMT+00:00 and always fixed string length of 24
 
-extension ISO8601DateFormatter {
+public extension ISO8601DateFormatter {
     static let Iso8601withFractionalSecondsCharacterCount = 24
 
     convenience init(_ formatOptions: Options) {
@@ -17,19 +17,19 @@ extension ISO8601DateFormatter {
     }
 }
 
-extension Formatter {
+public extension Formatter {
     static let iso8601withFractionalSeconds = ISO8601DateFormatter([.withInternetDateTime, .withFractionalSeconds])
 }
 
-extension Date {
+public extension Date {
     var iso8601withFractionalSeconds: String { Formatter.iso8601withFractionalSeconds.string(from: self) }
 }
 
-extension String {
+public extension String {
     var iso8601withFractionalSeconds: Date? { Formatter.iso8601withFractionalSeconds.date(from: self) }
 }
 
-extension JSONDecoder.DateDecodingStrategy {
+public extension JSONDecoder.DateDecodingStrategy {
     static let iso8601withFractionalSeconds = custom {
         let container = try $0.singleValueContainer()
         let string = try container.decode(String.self)
@@ -41,7 +41,7 @@ extension JSONDecoder.DateDecodingStrategy {
     }
 }
 
-extension JSONEncoder.DateEncodingStrategy {
+public extension JSONEncoder.DateEncodingStrategy {
     static let iso8601withFractionalSeconds = custom {
         var container = $1.singleValueContainer()
         try container.encode(Formatter.iso8601withFractionalSeconds.string(from: $0))

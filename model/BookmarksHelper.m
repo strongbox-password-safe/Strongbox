@@ -48,7 +48,7 @@
                                   relativeToURL:nil
                                           error:error];
     } @catch (NSException *exception) {
-        NSLog(@"🔴 Exception getBookmarkDataFromUrl [%@]", exception);
+        slog(@"🔴 Exception getBookmarkDataFromUrl [%@]", exception);
         if ( error ) {
             *error = [Utils createNSError:exception.reason errorCode:-1234];
         }
@@ -60,7 +60,7 @@
     }
 
     if (!bookmark) {
-        NSLog(@"Error while creating bookmark for URL (%@): %@", url, *error);
+        slog(@"Error while creating bookmark for URL (%@): %@", url, *error);
         return nil;
     }
 
@@ -122,7 +122,7 @@
                                         bookmarkDataIsStale:&bookmarkDataIsStale
                                                       error:error];
     } @catch (NSException *exception) {
-        NSLog(@"🔴 Exception getUrlFromBookmarkData [%@]", exception);
+        slog(@"🔴 Exception getUrlFromBookmarkData [%@]", exception);
         if ( error ) {
             *error = [Utils createNSError:exception.reason errorCode:-1234];
         }
@@ -146,7 +146,7 @@
         }
 
         if(!fileIdentifier) {
-            NSLog(@"Error regenerating: [%@]", *error);
+            slog(@"Error regenerating: [%@]", *error);
             return nil;
         }
 
@@ -171,7 +171,7 @@
         return ret;
     }
     else {
-        NSLog(@"Could not read file... [%@]", *error);
+        slog(@"Could not read file... [%@]", *error);
     }
     
     return nil;

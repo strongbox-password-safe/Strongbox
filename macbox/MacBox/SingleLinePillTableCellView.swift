@@ -37,7 +37,7 @@ class SingleLinePillTableCellView: NSTableCellView {
 
         for item in items {
             guard let view = createPill(item, color: color, backgroundColor: backgroundColor, icon: icon) else {
-                NSLog("🔴Couldn't load nib view")
+                swlog("🔴Couldn't load nib view")
                 return
             }
 

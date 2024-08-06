@@ -127,6 +127,7 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
         } else {
             img = [UIImage systemImageNamed:obj];
         }
+        
         return img ? [img imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate] : [[UIImage systemImageNamed:@"lock.fill"] imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate];
 #else
         IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
@@ -297,6 +298,10 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
     }];
 }
 
++ (IMAGE_TYPE_PTR)defaultIcon {
+    return [NodeIconHelper getNodeIcon:NodeIcon.defaultNodeIcon];
+}
+
 + (IMAGE_TYPE_PTR)getIconForNode:(Node*)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format {
     return [self getIconForNode:vm predefinedIconSet:predefinedIconSet format:format large:NO];
 }
@@ -306,7 +311,7 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
 }
 
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon {
-    return [self getNodeIcon:icon predefinedIconSet:kKeePassIconSetKeePassXC format:kKeePass4 isGroup:NO];
+    return [self getNodeIcon:icon predefinedIconSet:kKeePassIconSetSfSymbols format:kKeePass4 isGroup:NO];
 }
 
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet {
@@ -344,7 +349,7 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
 
         if(icon.isCustom) {
             if( icon.customIconWidth != icon.customIconHeight && MIN(icon.customIconWidth, icon.customIconHeight) > 512 ) {
-                NSLog(@"🔴 Down Sampling icon...");
+                slog(@"🔴 Down Sampling icon...");
                 return scaleImage(icon.customIcon, CGSizeMake(192, 192));
             }
             else {

@@ -44,7 +44,7 @@
                                                             toDate:AppPreferences.sharedInstance.lastFreeTrialNudge
                                                            options:kNilOptions];
     
-    NSLog(@"Nudge Due: [%@] - Nudge Count: [%lu]", dueDate, (unsigned long)AppPreferences.sharedInstance.freeTrialNudgeCount);
+    slog(@"Nudge Due: [%@] - Nudge Count: [%lu]", dueDate, (unsigned long)AppPreferences.sharedInstance.freeTrialNudgeCount);
     
     BOOL nudgeDue = dueDate.timeIntervalSinceNow < 0; 
 

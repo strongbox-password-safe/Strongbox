@@ -7,7 +7,7 @@
 //
 
 #import "XmlComparisonElement.h"
-
+#import "SBLog.h"
 @implementation XmlComparisonElement
 
 - (instancetype)initWithElementName:(NSString*)elementName attributes:(NSDictionary*)attributes {
@@ -46,7 +46,7 @@
     
     if(![self.attributes isEqualToDictionary:other.attributes]) {
         if(!probe) {
-            NSLog(@"Different Attributes on [%@]", other);
+            slog(@"Different Attributes on [%@]", other);
         }
         return NO;
     }
@@ -56,7 +56,7 @@
     
     if (![removeWsSelf isEqualToString:removeWsOther]) {
         if(!probe) {
-            NSLog(@"Different Text on [%@]", other);
+            slog(@"Different Text on [%@]", other);
         }
         return NO;
     }
@@ -75,7 +75,7 @@
         
         if (!foundMatchingChild) {
             if(!probe) {
-                NSLog(@"Different at [%@]", child);
+                slog(@"Different at [%@]", child);
             }
             return NO;
         }

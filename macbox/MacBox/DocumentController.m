@@ -113,7 +113,7 @@ static BOOL didRestoreAWindowAtStartup;
 - (void)openDatabaseWorker:(MacDatabasePreferences*)database completion:(void (^)(NSError* error))completion {
     NSURL* url = database.fileUrl;
     
-    NSLog(@"Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
+    slog(@"Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( url ) {
@@ -121,7 +121,7 @@ static BOOL didRestoreAWindowAtStartup;
                                                     display:YES
                                           completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
                 if(error) {
-                    NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
+                    slog(@"openDocumentWithContentsOfURL Error = [%@]", error);
                 }
                 
                 if ( completion ) {
@@ -147,7 +147,7 @@ static BOOL didRestoreAWindowAtStartup;
 }
 
 - (void)openDocument:(id)sender {
-    NSLog(@"🔴 openDocument");
+    slog(@"🔴 openDocument");
     
     
     
@@ -219,7 +219,7 @@ static BOOL didRestoreAWindowAtStartup;
         [self doAppStartupTasksOnceOnly2];
     }
     else {
-        NSLog(@"doAppStartupTasksOnceOnly - Tasks Already Done - NOP");
+        slog(@"doAppStartupTasksOnceOnly - Tasks Already Done - NOP");
     }
 }
 
@@ -230,7 +230,7 @@ static BOOL didRestoreAWindowAtStartup;
     
     AppDelegate* appDelegate = NSApplication.sharedApplication.delegate;
     if ( appDelegate.isWasLaunchedAsLoginItem && Settings.sharedInstance.showSystemTrayIcon ) {
-        NSLog(@"DocumentController::doAppStartupTasksOnceOnly2 -> Strongbox was launched as a Login Item && running as menu bar app - Silent Mode not launching databases or any UI...");
+        slog(@"DocumentController::doAppStartupTasksOnceOnly2 -> Strongbox was launched as a Login Item && running as menu bar app - Silent Mode not launching databases or any UI...");
     }
     else {
         if( self.startupDatabases.count ) {
@@ -266,16 +266,16 @@ static BOOL didRestoreAWindowAtStartup;
 }
 
 - (void)launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable {
-    NSLog(@"✅ DocumentController::launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable...");
+    slog(@"✅ DocumentController::launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable...");
 
     if( self.documents.count == 0 ) { 
-        NSLog(@"launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable: document count = [%ld]", self.documents.count);
+        slog(@"launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable: document count = [%ld]", self.documents.count);
         
         if( self.startupDatabases.count ) {
             [self launchStartupDatabases];
         }
         else {
-            NSLog(@"launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable - No Startup DBs - Showing Manager...");
+            slog(@"launchStartupDatabasesOrShowManagerIfNoDocumentsAvailable - No Startup DBs - Showing Manager...");
             
             [DBManagerPanel.sharedInstance show];
         }
@@ -293,7 +293,7 @@ static BOOL didRestoreAWindowAtStartup;
 - (void)launchStartupDatabases {
     NSArray<MacDatabasePreferences*>* startupDatabases = self.startupDatabases;
     
-    NSLog(@"Found %ld startup databases. Launching...", startupDatabases.count);
+    slog(@"Found %ld startup databases. Launching...", startupDatabases.count);
     
     for ( MacDatabasePreferences* db in startupDatabases ) {
         [self openDatabase:db completion:^(NSError *error) { }];
@@ -315,7 +315,7 @@ static BOOL didRestoreAWindowAtStartup;
             
             NSURL* url = [NSURL URLWithString:nonFileRestorationStateURL];
             if (!url ) {
-                NSLog(@"🔴 restoreWindowWithIdentifier... could not cast string to URL: [%@]", nonFileRestorationStateURL);
+                slog(@"🔴 restoreWindowWithIdentifier... could not cast string to URL: [%@]", nonFileRestorationStateURL);
                 return;
             }
             

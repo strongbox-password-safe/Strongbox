@@ -49,7 +49,7 @@
     NSMutableData* ct = [NSMutableData dataWithLength:cipherTextLength];
     
     if (crypto_box_easy(ct.mutableBytes, messageData.bytes, messageData.length, nonceBytes, publickey, secretkey) != 0) {
-        NSLog(@"🔴 crypto_box_easy failed");
+        slog(@"🔴 crypto_box_easy failed");
         return nil;
     }
     
@@ -68,7 +68,7 @@
 
     if (crypto_box_open_easy(plaintext.mutableBytes, cipherTextData.bytes, cipherTextData.length, nonceBytes,
                              publickey, secretkey) != 0) {
-        NSLog(@"🔴 crypto_box_open_easy failed");
+        slog(@"🔴 crypto_box_open_easy failed");
         return nil;
     }
 

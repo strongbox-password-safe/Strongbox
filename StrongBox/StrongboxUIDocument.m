@@ -15,7 +15,7 @@
         return [super initWithFileURL:url];
     }
     else {
-        NSLog(@"Invalid File URL: [%@]", url);
+        slog(@"Invalid File URL: [%@]", url);
         return nil;
     }
 }
@@ -39,7 +39,7 @@
 }
 
 - (void)handleError:(NSError *)error userInteractionPermitted:(BOOL)userInteractionPermitted {
-    NSLog(@"UIDocument: error = %@", error);
+    slog(@"UIDocument: error = %@", error);
     [super handleError:error userInteractionPermitted:userInteractionPermitted];
 }
 

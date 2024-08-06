@@ -117,7 +117,7 @@
         [DatabasesManager.sharedInstance add:self.templateDummy];
     }
     else {
-        NSLog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
+        slog(@"🔴 WARNWARN: Attempt to add an existing database to the list");
     }
 }
 
@@ -1099,7 +1099,7 @@
     
     NSString* ret = [newFileName stringByAppendingPathExtension:extension];
     
-    NSLog(@"Export Filename: [%@]", ret);
+    slog(@"Export Filename: [%@]", ret);
     
     return  ret;
 }
@@ -1167,7 +1167,7 @@
     debugLines[@"autoFillUnConcealedFieldsAsCreds"] = [NSString stringWithFormat:@"%hhd", self.autoFillUnConcealedFieldsAsCreds]; 
     debugLines[@"asyncUpdateId"] = [NSString stringWithFormat:@"%@", self.asyncUpdateId]; 
     debugLines[@"promptedForAutoFetchFavIcon"] = [NSString stringWithFormat:@"%hhd", self.promptedForAutoFetchFavIcon]; 
-    debugLines[@"iconSet"] = [NSString stringWithFormat:@"%ld", self.iconSet]; 
+    debugLines[@"iconSet"] = [NSString stringWithFormat:@"%ld", self.keePassIconSet]; 
     debugLines[@"sideBarNavigationContext"] = [NSString stringWithFormat:@"%ld", self.sideBarNavigationContext]; 
     debugLines[@"sideBarSelectedSpecial"] = [NSString stringWithFormat:@"%ld", self.sideBarSelectedSpecial]; 
     debugLines[@"sideBarSelectedAuditCategory"] = [NSString stringWithFormat:@"%ld", self.sideBarSelectedAuditCategory]; 
@@ -1230,7 +1230,7 @@
                 debugLines[key] = strValue;
             }
             else {
-                NSLog(@"WARNWARN Unknown iVar Type: %s - %s", type, name);
+                slog(@"WARNWARN Unknown iVar Type: %s - %s", type, name);
             }
         }
         free(ivars);
@@ -1241,13 +1241,13 @@
 
 
 
-- (KeePassIconSet)iconSet {
+- (KeePassIconSet)keePassIconSet {
     return self.metadata.iconSet;
 }
 
-- (void)setIconSet:(KeePassIconSet)iconSet {
+- (void)setKeePassIconSet:(KeePassIconSet)keePassIconSet {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.iconSet = iconSet;
+        metadata.iconSet = keePassIconSet;
     }];
 }
 

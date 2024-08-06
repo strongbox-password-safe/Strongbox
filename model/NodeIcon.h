@@ -29,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
+@property (class, readonly) NodeIcon* defaultNodeIcon;
+
 @property (readonly) BOOL isCustom;
 @property (readonly) NSInteger preset;
 @property (readonly) NSData* custom;

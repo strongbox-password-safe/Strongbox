@@ -26,7 +26,7 @@ class CompareAndMergeWizard: NSViewController {
         let openPanel = NSOpenPanel()
 
         if openPanel.runModal() == .OK {
-            NSLog("%@", String(describing: openPanel.url))
+            swlog("%@", String(describing: openPanel.url))
 
             guard let url = openPanel.url else {
                 return
@@ -124,7 +124,7 @@ class CompareAndMergeWizard: NSViewController {
     }
 
     func onSelectedDatabaseModel(secondModel: DatabaseModel, secondModelMetadata: MacDatabasePreferences?, secondModelFileUrl: URL?) {
-        NSLog("✅ Second Database Loaded")
+        swlog("✅ Second Database Loaded")
 
         dismiss(nil)
 

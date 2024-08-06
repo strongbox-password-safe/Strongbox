@@ -30,9 +30,19 @@ class BrowseTabViewController: UITabBarController {
         case .list:
             return NSLocalizedString("browse_prefs_view_as_flat_list", comment: "Entries")
         case .totpList:
-            return NSLocalizedString("browse_prefs_view_as_totp_list", comment: "TOTPs")
+            return NSLocalizedString("browse_prefs_view_as_totp_list", comment: "2FA")
         case .favourites:
             return NSLocalizedString("browse_vc_section_title_pinned", comment: "Favourites")
+        case .home:
+            return NSLocalizedString("navigation_tab_home", comment: "Favourites")
+        case .passkeys:
+            return NSLocalizedString("generic_noun_plural_passkeys", comment: "Passkeys")
+        case .sshKeys:
+            return NSLocalizedString("sidebar_quick_view_keeagent_ssh_keys_title", comment: "SSH Keys")
+        case .attachments:
+            return NSLocalizedString("item_details_section_header_attachments", comment: "Attachments")
+        case .expiredAndExpiring:
+            return NSLocalizedString("quick_view_title_expired_and_expiring", comment: "Expired & Expiring")
         @unknown default:
             return "🔴 UNKNOWN"
         }
@@ -52,6 +62,20 @@ class BrowseTabViewController: UITabBarController {
             imageName = "timer"
         case .favourites:
             imageName = "star.fill"
+        case .home:
+            imageName = "house.fill"
+        case .passkeys:
+            imageName = "person.badge.key.fill"
+        case .sshKeys:
+            var img = "network"
+            if #available(iOS 17.0, *) {
+                img = "apple.terminal.fill"
+            }
+            imageName = img
+        case .attachments:
+            imageName = "doc.richtext.fill"
+        case .expiredAndExpiring:
+            imageName = "calendar"
         @unknown default:
             imageName = "questionmark.circle.fill"
         }
@@ -62,6 +86,21 @@ class BrowseTabViewController: UITabBarController {
     var currentVisibleTabs: [BrowseViewType] = []
 
     var configuredVisibleTabs: [BrowseViewType] {
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
         model.metadata.visibleTabs.compactMap { num in
             BrowseViewType(rawValue: num.uintValue)
         }
@@ -78,7 +117,7 @@ class BrowseTabViewController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        NSLog("BrowseTabViewController::viewDidLoad")
+        swlog("BrowseTabViewController::viewDidLoad")
 
         customizeUI()
 
@@ -126,6 +165,10 @@ class BrowseTabViewController: UITabBarController {
                 continue
             }
 
+            if tab == .home, AppPreferences.sharedInstance().disableHomeTab {
+                continue
+            }
+
             ret.append(tab)
         }
 
@@ -147,7 +190,7 @@ class BrowseTabViewController: UITabBarController {
         
 
         if newEffectivelyVisible.count == 0 {
-            NSLog("⚠️ WARNWARN - Cannot display configured tab because there are no relevant items defaulting to hierarchy view...")
+            swlog("⚠️ WARNWARN - Cannot display configured tab because there are no relevant items defaulting to heirarchy view...")
             newEffectivelyVisible = [.hierarchy]
             model.metadata.hideTabBarIfOnlySingleTab = false
         }
@@ -185,21 +228,39 @@ class BrowseTabViewController: UITabBarController {
             } else {
                 
 
-                let vc = BrowseSafeView.fromStoryboard(tab, model: model)
-                let nav = UINavigationController(rootViewController: vc)
+                if tab == .home {
+                    let actionsInterface = UIKitDatabaseActionsInterface(viewModel: model)
+                    let database = SwiftDatabaseModel(model: model)
 
-                newVcs.append(nav)
+                    let homeViewModel = DatabaseHomeViewModel(database: database, externalWorldAdaptor: actionsInterface)
+                    let vc = SwiftUIViewFactory.getDatabaseHomeView(model: homeViewModel)
+                    let nav = UINavigationController(rootViewController: vc)
+                    nav.delegate = self
+
+                    actionsInterface.navController = nav
+
+                    newVcs.append(nav)
+                } else {
+                    let vc = BrowseSafeView.fromStoryboard(tab, model: model)
+                    let nav = UINavigationController(rootViewController: vc)
+                    nav.delegate = self
+                    newVcs.append(nav)
+                }
             }
         }
 
         setViewControllers(newVcs, animated: true)
 
-        let showLabels = newVcs.count < 4
         for vc in newVcs {
-            let nav = vc as! UINavigationController
-            let browse = nav.viewControllers[0] as! BrowseSafeView
-
-            browse.tabBarItem = UITabBarItem(title: showLabels ? getTabTitle(tab: browse.viewType) : "", image: getTabImage(tab: browse.viewType, large: !showLabels), tag: 0)
+            if let nav = vc as? UINavigationController, let browse = nav.viewControllers[0] as? BrowseSafeView {
+                vc.tabBarItem = UITabBarItem(title: getTabTitle(tab: browse.viewType),
+                                             image: getTabImage(tab: browse.viewType, large: true),
+                                             tag: 0)
+            } else {
+                vc.tabBarItem = UITabBarItem(title: getTabTitle(tab: .home),
+                                             image: getTabImage(tab: .home, large: true),
+                                             tag: 0)
+            }
         }
 
         currentVisibleTabs = newEffectivelyVisible
@@ -208,10 +269,10 @@ class BrowseTabViewController: UITabBarController {
 
         let selected = model.metadata.browseViewType
         if let idx = currentVisibleTabs.firstIndex(of: selected) {
-            NSLog("Found selected view type => making sure tab is selected")
+            swlog("Found selected view type => making sure tab is selected")
             selectedIndex = idx
         } else {
-            NSLog("Could not find selected view type => updating selected to current selection")
+            swlog("Could not find selected view type => updating selected to current selection")
             model.metadata.browseViewType = currentVisibleTabs[selectedIndex]
         }
 
@@ -220,6 +281,7 @@ class BrowseTabViewController: UITabBarController {
         }
     }
 
+    @objc
     func bindShowHideBar() {
         let hideTabBar = viewControllers?.count == 1 && model.metadata.hideTabBarIfOnlySingleTab
 
@@ -234,5 +296,12 @@ class BrowseTabViewController: UITabBarController {
         if let idx = tabBar.items?.firstIndex(of: item), let viewType = currentVisibleTabs[safe: idx] {
             model.metadata.browseViewType = viewType
         }
+    }
+}
+
+extension BrowseTabViewController: UINavigationControllerDelegate {
+    func navigationController(_: UINavigationController, willShow _: UIViewController, animated _: Bool) {
+        swlog("🐞 BrowseTabViewController : UINavigationControllerDelegate didShow")
+        bindShowHideBar()
     }
 }

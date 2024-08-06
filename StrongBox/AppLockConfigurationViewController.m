@@ -134,7 +134,7 @@
     self.appLockOnPreferences.enabled = effectiveMode != kNoLock;
     self.appLockPasscodeFallback.enabled = effectiveMode == kBiometric || effectiveMode == kBoth;
 
-    NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
+    slog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
     
     BOOL deleteOnOff = AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
     BOOL deleteEnabled = (effectiveMode == kPinCode || effectiveMode == kBoth);
@@ -174,7 +174,7 @@
 }
 
 - (IBAction)onAppLock2PreferencesChanged:(id)sender {
-    NSLog(@"Generic Preference Changed: [%@]", sender);
+    slog(@"Generic Preference Changed: [%@]", sender);
 
     AppPreferences.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
     AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;

@@ -74,7 +74,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     NSDictionary<NSFileAttributeKey, id> * attrs = [NSFileManager.defaultManager attributesOfItemAtPath:self.symlinkFullPath error:&error];
     
     if ( error ) {
-        NSLog(@"⚠️ Could not get attributes of SymLink! [%@]", error);
+        slog(@"⚠️ Could not get attributes of SymLink! [%@]", error);
         return NO;
     }
     
@@ -84,7 +84,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 - (BOOL)createSymLink {
     NSString* str = [self getSocketPath];
     if ( str.length == 0 ) {
-        NSLog(@"⚠️ Could not getSocketPath");
+        slog(@"⚠️ Could not getSocketPath");
         return NO;
     }
     
@@ -93,7 +93,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
         BOOL success = [NSFileManager.defaultManager removeItemAtPath:self.symlinkFullPath error:&error];
         
         if ( !success || error ) {
-            NSLog(@"⚠️ Error removing SymLnk [%@]", error);
+            slog(@"⚠️ Error removing SymLnk [%@]", error);
             return NO;
         }
     }
@@ -111,7 +111,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
                                                                error:&error];
     
     if ( !mkDir || error ) {
-        NSLog(@"⚠️ Error creating .strongbox directory for SymLnk [%@]", error);
+        slog(@"⚠️ Error creating .strongbox directory for SymLnk [%@]", error);
         return NO;
     }
     
@@ -130,11 +130,11 @@ static NSString* const kSymlinkDirectory = @".strongbox";
                                                                     error:&error];
     
     if ( !success || error ) {
-        NSLog(@"⚠️ Error Creating SymLnk [%@]", error);
+        slog(@"⚠️ Error Creating SymLnk [%@]", error);
         return NO;
     }
     
-    NSLog(@"SymLink Create OK");
+    slog(@"SymLink Create OK");
     
     return YES;
 }
@@ -173,7 +173,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     
     if ( path.length > MAX_PATH ) {
-        NSLog(@"🔴 Could not create socket, socket path > %d chars [%@] = %ld chars", MAX_PATH, path, path.length);
+        slog(@"🔴 Could not create socket, socket path > %d chars [%@] = %ld chars", MAX_PATH, path, path.length);
         return nil;
     }
     
@@ -183,7 +183,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
                                                                error:nil];
     
     if ( !mkDir ) {
-        NSLog(@"🔴 Couldn't create directory for local socket");
+        slog(@"🔴 Couldn't create directory for local socket");
     }
     
     return path;
@@ -221,7 +221,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     NSString* path = [self getSocketPath];
     if ( !path ) {
-        NSLog(@"🔴 Path too long for getSocketPath - Check users home dir");
+        slog(@"🔴 Path too long for getSocketPath - Check users home dir");
         return NO;
     }
     
@@ -232,23 +232,23 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     if (unlink(sun.sun_path) == -1) {
         if ( errno != ENOENT ) {
-            NSLog(@"⚠️ SSHAgentServer unlink: %s\n,%d", strerror(errno), errno);
+            slog(@"⚠️ SSHAgentServer unlink: %s\n,%d", strerror(errno), errno);
         }
     }
     
     self.server_sock = socket (AF_UNIX, SOCK_STREAM, 0);
     if ( self.server_sock == -1 ) {
-        NSLog(@"🔴 Error creating socket: %s\n", strerror(errno));
+        slog(@"🔴 Error creating socket: %s\n", strerror(errno));
         return NO;
     }
     
     const int kBufferSize = 2 * 1024 * 1024;
     if (setsockopt(self.server_sock, SOL_SOCKET, SO_RCVBUF, &kBufferSize, sizeof(int)) == -1) {
-        NSLog(@"🔴 Error setting socket SO_RCVBUF opts: %s\n", strerror(errno));
+        slog(@"🔴 Error setting socket SO_RCVBUF opts: %s\n", strerror(errno));
         return NO;
     }
     if (setsockopt(self.server_sock, SOL_SOCKET, SO_SNDBUF, &kBufferSize, sizeof(int)) == -1) {
-        NSLog(@"🔴 Error setting socket SO_SNDBUF opts: %s\n", strerror(errno));
+        slog(@"🔴 Error setting socket SO_SNDBUF opts: %s\n", strerror(errno));
         return NO;
     }
     
@@ -257,19 +257,19 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     if (unlink(sun.sun_path) == -1) {
         if ( errno != ENOENT) {
-            NSLog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
+            slog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
         }
     }
     
     int ret = bind (self.server_sock, (struct sockaddr *)&sun, sun.sun_len);
     if ( ret < 0 ) {
-        NSLog(@"🔴 bind failed. %s", strerror(errno));
+        slog(@"🔴 bind failed. %s", strerror(errno));
         return NO;
     }
     
     int listenResult = listen (self.server_sock, 48);
     if ( listenResult == -1 ) {
-        NSLog(@"🔴 Error listening on socket: %s\n", strerror(errno));
+        slog(@"🔴 Error listening on socket: %s\n", strerror(errno));
         return NO;
     }
     
@@ -290,7 +290,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
         int socket = accept (self.server_sock, NULL, NULL);
         
         if ( socket == -1 ) {
-            NSLog(@"⚠️ SSHAgentServer failed to accept new connection (possibly due to shutdown...)");
+            slog(@"⚠️ SSHAgentServer failed to accept new connection (possibly due to shutdown...)");
             break;
         }
         
@@ -342,7 +342,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     pid_t pid;
     socklen_t pid_size = sizeof(pid);
     if ( getsockopt(socket, SOL_LOCAL, LOCAL_PEERPID, &pid, &pid_size) == -1 ) { 
-        NSLog(@"🔴 Could not getsockopt LOCAL_PEERPID");
+        slog(@"🔴 Could not getsockopt LOCAL_PEERPID");
         return -1;
     }
  
@@ -364,7 +364,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     pid_t pid;
     socklen_t pid_size = sizeof(pid);
     if ( getsockopt(socket, SOL_LOCAL, LOCAL_PEERPID, &pid, &pid_size) == -1 ) { 
-        NSLog(@"🔴 Could not getsockopt LOCAL_PEERPID");
+        slog(@"🔴 Could not getsockopt LOCAL_PEERPID");
         return nil;
     }
     
@@ -429,7 +429,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     uint8_t requestId;
     if ( [inputStream read:&requestId maxLength:sizeof(uint8_t)] != sizeof(uint8_t)) {
-        NSLog(@"🔴 read error - could not read request id!");
+        slog(@"🔴 read error - could not read request id!");
         return NO;
     }
 
@@ -440,7 +440,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     
     if ( messageLength > 0 ) {
         if ( [inputStream read:message.mutableBytes maxLength:messageLength] != messageLength) {
-            NSLog(@"🔴 read error - could not message after length and id...");
+            slog(@"🔴 read error - could not message after length and id...");
             return NO;
         }
         
@@ -468,7 +468,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 - (NSData*)getRequestIdentitiesResponse {
     struct sshbuf *msg, *keys;
     if ((msg = sshbuf_new()) == NULL || (keys = sshbuf_new()) == NULL) {
-        NSLog(@"🔴 Could not create buffers");
+        slog(@"🔴 Could not create buffers");
         return nil;
     }
 
@@ -479,14 +479,14 @@ static NSString* const kSymlinkDirectory = @".strongbox";
         struct sshkey *public = nil;
         int ret = sshkey_from_blob(publicKeyBlob.bytes, publicKeyBlob.length, &public);
         if ( ret != SSH_ERR_SUCCESS ) {
-            NSLog(@"🔴 Could not get public key from private Key...");
+            slog(@"🔴 Could not get public key from private Key...");
             continue;
         }
 
         const char* comment = "";
         if (sshkey_puts_opts(public, keys, SSHKEY_SERIALIZE_INFO) != 0 || sshbuf_put_cstring(keys, comment) != 0) {
             sshkey_free(public);
-            NSLog(@"🔴 Could not add key or comment");
+            slog(@"🔴 Could not add key or comment");
             continue;
         }
         
@@ -497,7 +497,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     if (sshbuf_put_u8(msg, SSH2_AGENT_IDENTITIES_ANSWER) != 0 ||
         sshbuf_put_u32(msg, nentries) != 0 ||
         sshbuf_putb(msg, keys) != 0) {
-        NSLog(@"🔴 Could not fill in reply");
+        slog(@"🔴 Could not fill in reply");
         sshbuf_free(keys);
         sshbuf_free(msg);
         return nil;
@@ -508,7 +508,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     NSMutableData* data = [NSMutableData dataWithLength:length];
     int err = sshbuf_get(msg, data.mutableBytes, length);
     if ( err != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 Could not copy buf");
+        slog(@"🔴 Could not copy buf");
         sshbuf_free(msg);
         return nil;
     }
@@ -523,12 +523,12 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     if ((msg = sshbuf_new()) == NULL ||
         (eRequest = sshbuf_new()) == NULL ||
         (challenge = sshbuf_new()) == NULL) {
-        NSLog(@"🔴 Error - Could not allocate buffers for sign request");
+        slog(@"🔴 Error - Could not allocate buffers for sign request");
         return nil;
     }
         
     if ( sshbuf_put(eRequest, message.bytes, message.length) != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 getSignRequestResponse - Error Allocating Buffer");
+        slog(@"🔴 getSignRequestResponse - Error Allocating Buffer");
         sshbuf_free(msg);
         sshbuf_free(challenge);
         sshbuf_free(eRequest);
@@ -541,7 +541,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     if (sshkey_froms(eRequest, &requestedKey) != SSH_ERR_SUCCESS ||
         sshbuf_get_stringb(eRequest, challenge) != SSH_ERR_SUCCESS ||
         sshbuf_get_u32(eRequest, &flags) != SSH_ERR_SUCCESS) {
-        NSLog(@"🔴 Error - Could not fill buffers for sign request.");
+        slog(@"🔴 Error - Could not fill buffers for sign request.");
         sshbuf_free(msg);
         sshbuf_free(challenge);
         sshbuf_free(eRequest);
@@ -557,7 +557,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     size_t bloopLen;
     int r = sshkey_plain_to_blob(requestedKey, &bloop, &bloopLen);
     if ( r != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 Sign Request: Could not convert requested key to blob");
+        slog(@"🔴 Sign Request: Could not convert requested key to blob");
         sshbuf_free(msg);
         return nil;
     }
@@ -584,7 +584,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 
     if ((r = sshbuf_put_u8(msg, SSH2_AGENT_SIGN_RESPONSE)) != 0 ||
         (r = sshbuf_put_string(msg, signatureData.bytes, signatureData.length)) != 0) {
-        NSLog(@"🔴 Error Could not write signature to msg buffer - SIGN");
+        slog(@"🔴 Error Could not write signature to msg buffer - SIGN");
         sshbuf_free(msg);
         return nil;
     }
@@ -595,7 +595,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
     sshbuf_free(msg);
     
     if ( err != SSH_ERR_SUCCESS ) {
-        NSLog(@"🔴 Could not store message to NSData");
+        slog(@"🔴 Could not store message to NSData");
         return nil;
     }
         

@@ -326,7 +326,7 @@ const static NSArray<NSString*> *kEmailDomains;
         
     }
     else {
-        NSLog(@"All Words Cache Miss! Boo");
+        slog(@"All Words Cache Miss! Boo");
         self.allWordsCacheKey = currentWordListsCacheKey;
         
 
@@ -334,14 +334,14 @@ const static NSArray<NSString*> *kEmailDomains;
             return [self getWordsForList:obj];
         }];
 
-        NSLog(@"Diceware Total Words: %lu", (unsigned long)all.count);
+        slog(@"Diceware Total Words: %lu", (unsigned long)all.count);
         self.allWordsCache = [[NSSet setWithArray:all] allObjects];
-        NSLog(@"Diceware Total Unique Words: %lu", (unsigned long)self.allWordsCache.count);
+        slog(@"Diceware Total Unique Words: %lu", (unsigned long)self.allWordsCache.count);
     }
     NSArray<NSString*>* allWords = self.allWordsCache;
     
     if(allWords.count < 128) { 
-        NSLog(@"Not enough words in word list(s) to generate a reasonable passphrase");
+        slog(@"Not enough words in word list(s) to generate a reasonable passphrase");
         return nil;
     }
     
@@ -511,7 +511,7 @@ const static NSArray<NSString*> *kEmailDomains;
     NSString* fileRoot = [[NSBundle mainBundle] pathForResource:wordList ofType:@"txt"];
 
     if(fileRoot == nil) {
-        NSLog(@"WARNWARN: Could not load wordlist: %@", wordList);
+        slog(@"WARNWARN: Could not load wordlist: %@", wordList);
         return @[];
     }
     
@@ -519,7 +519,7 @@ const static NSArray<NSString*> *kEmailDomains;
     NSString* fileContents = [NSString stringWithContentsOfFile:fileRoot encoding:NSUTF8StringEncoding error:&error];
 
     if(!fileContents) {
-        NSLog(@"WARNWARN: Could not load wordlist: %@ - %@", wordList, error);
+        slog(@"WARNWARN: Could not load wordlist: %@ - %@", wordList, error);
         return @[];
     }
     
@@ -566,7 +566,7 @@ const static NSArray<NSString*> *kEmailDomains;
     
     
     if(![allCharacters length]) {
-        NSLog(@"WARN: Could not generate password using config. Empty Character Pool.");
+        slog(@"WARN: Could not generate password using config. Empty Character Pool.");
         return nil;
     }
     
@@ -574,12 +574,12 @@ const static NSArray<NSString*> *kEmailDomains;
     
     if(config.pickFromEveryGroup) {
         if ( ![self containsCharactersFromEveryGroup:allCharacters config:config] ) {
-            NSLog(@"WARN: Could not generate password using config. Not possible to pick from every group.");
+            slog(@"WARN: Could not generate password using config. Not possible to pick from every group.");
             return nil;
         }
         
         if ( config.basicLength < config.useCharacterGroups.count ) {
-            NSLog(@"WARN: Could not generate password using config. Not possible to pick from every group because the length is too short.");
+            slog(@"WARN: Could not generate password using config. Not possible to pick from every group because the length is too short.");
             return nil;
         }
     }
@@ -601,7 +601,7 @@ const static NSArray<NSString*> *kEmailDomains;
     } while(iterationCount < kMaxIterations && config.pickFromEveryGroup && ![self containsCharactersFromEveryGroup:ret config:config]);
     
     if ( iterationCount >= kMaxIterations ) {
-        NSLog(@"WARN: Hit max iterations trying to create a password to match constraints... bailing");
+        slog(@"WARN: Hit max iterations trying to create a password to match constraints... bailing");
         return nil;
     }
     

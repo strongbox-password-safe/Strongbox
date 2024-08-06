@@ -116,7 +116,7 @@
             NSData* key = [NSData dataWithContentsOfURL:openPanel.URL options:kNilOptions error:&error];
             
             if ( key == nil ) {
-                NSLog(@"Error: [%@]", error);
+                slog(@"Error: [%@]", error);
                 [MacAlerts error:error window:self.view.window];
             }
             else {

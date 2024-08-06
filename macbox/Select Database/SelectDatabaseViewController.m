@@ -64,7 +64,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         }].count;
         
         if ( self.autoFillMode && count == 1 ) {
-            NSLog(@"Single Database Launching...");
+            slog(@"Single Database Launching...");
             
             MacDatabasePreferences* database = self.databases.firstObject;
             
@@ -110,7 +110,7 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
         MacDatabasePreferences* database = self.databases[row];
         
         if ( [self isDisabled:database] ) {
-            NSLog(@"🔴 Database is disabled! Cannot select");
+            slog(@"🔴 Database is disabled! Cannot select");
             return;
         }
         

@@ -53,7 +53,7 @@
 
         if (self.workingBlock == nil || workingAvailable == 0)  {
             if (! [self loadNextBlock] ) {
-                NSLog(@"KP31HashedBlockStream: Error Reading next working Block");
+                slog(@"KP31HashedBlockStream: Error Reading next working Block");
                 return -1;
             }
             
@@ -83,7 +83,7 @@
     NSInteger read = [self.inputStream read:(uint8_t*)&block maxLength:SIZE_OF_BLOCK_HEADER];
     
     if (read < 0) {
-        NSLog(@"Error reading Block Header... [%zu]", read);
+        slog(@"Error reading Block Header... [%zu]", read);
         self.error = [Utils createNSError:@"Error reading Block Header" errorCode:-1];
         [self cleanupWorkingBlock];
         return NO;
@@ -96,7 +96,7 @@
     
     if (read != SIZE_OF_BLOCK_HEADER) {
         [self cleanupWorkingBlock];
-        NSLog(@"Couldn't read all of Block Header... [%zu]", read);
+        slog(@"Couldn't read all of Block Header... [%zu]", read);
         self.error = [Utils createNSError:@"Couldn't read all of Block Header..." errorCode:-1];
         return NO;
     }
@@ -110,7 +110,7 @@
         read = [self.inputStream read:self.workingBlock maxLength:blockLength];
         if (read != blockLength) {
             [self cleanupWorkingBlock];
-            NSLog(@"Couldn't read all of Block... [%zu] but wanted [%zu]", read, blockLength);
+            slog(@"Couldn't read all of Block... [%zu] but wanted [%zu]", read, blockLength);
             self.error = [Utils createNSError:@"Couldn't read all of Block..." errorCode:-1];
             return NO;
         }
@@ -118,7 +118,7 @@
         uint8_t actualHashBytes[CC_SHA256_DIGEST_LENGTH];
         CC_SHA256(self.workingBlock, (uint32_t)self.workingBlockLength, actualHashBytes);
         if (memcmp(actualHashBytes, block.hash, CC_SHA256_DIGEST_LENGTH) != 0) {
-            NSLog(@"Block Header Hash does not match content. This safe is possibly corrupt.");
+            slog(@"Block Header Hash does not match content. This safe is possibly corrupt.");
             self.error = [Utils createNSError:@"Block Header Hash does not match content. This safe is possibly corrupt." errorCode:-1];
             [self cleanupWorkingBlock];
             return NO;

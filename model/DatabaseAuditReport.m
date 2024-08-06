@@ -14,7 +14,7 @@
 @property NSSet<NSUUID*>* noPasswords;
 @property NSDictionary<NSString*, NSSet<NSUUID *>*>* duplicatedPasswords;
 @property NSSet<NSUUID*>* commonPasswords;
-@property NSDictionary<NSString*, NSSet<NSUUID *>*>* similarPasswords;
+@property NSDictionary<NSUUID*, NSSet<NSUUID *>*>* similarPasswords;
 @property NSSet<NSUUID*>* tooShort;
 @property NSSet<NSUUID*>* pwned;
 @property NSSet<NSUUID*>* lowEntropy;
@@ -23,6 +23,17 @@
 @end
 
 @implementation DatabaseAuditReport
+
+- (instancetype)init {
+    return [self initWithNoPasswordEntries:NSSet.set
+                       duplicatedPasswords:NSDictionary.dictionary
+                           commonPasswords:NSSet.set
+                                   similar:NSDictionary.dictionary
+                                  tooShort:NSSet.set
+                                     pwned:NSSet.set
+                                lowEntropy:NSSet.set
+                        twoFactorAvailable:NSSet.set];
+}
 
 - (instancetype)initWithNoPasswordEntries:(NSSet<NSUUID *> *)noPasswords
                       duplicatedPasswords:(NSDictionary<NSString *,NSSet<NSUUID *> *> *)duplicatedPasswords
@@ -58,6 +69,14 @@
     }];
     
     return [NSSet setWithArray:flattened];
+}
+
+- (NSDictionary<NSString *,NSSet<NSUUID *> *> *)duplicatedDictionary {
+    return self.duplicatedPasswords;
+}
+
+- (NSDictionary<NSUUID *,NSSet<NSUUID *> *> *)similarDictionary {
+    return self.similarPasswords;
 }
 
 - (NSSet<NSUUID *> *)entriesWithCommonPasswords {

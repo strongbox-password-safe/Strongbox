@@ -20,7 +20,7 @@ class ApplePasswordManagerQuirks {
               let data = try? Data(contentsOf: url),
               let equivs = try? decoder.decode([[String]].self, from: data)
         else {
-            NSLog("🔴 Could not load file 'websites-with-shared-credential-backends.json' from Bundle!")
+            swlog("🔴 Could not load file 'websites-with-shared-credential-backends.json' from Bundle!")
             return
         }
 

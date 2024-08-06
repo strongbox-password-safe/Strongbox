@@ -128,7 +128,7 @@
                                    
         bytesRead = [self.innerStream read:self.workingBlock maxLength:blockLength];
         if(bytesRead < 0 || bytesRead < blockLength) {
-            NSLog(@"Not enough data to decrypt Block! [%@]", self.innerStream.streamError);
+            slog(@"Not enough data to decrypt Block! [%@]", self.innerStream.streamError);
             self.error = self.innerStream.streamError ? self.innerStream.streamError : [Utils createNSError:@"Error: HmacBlocStream - Could not read enough from inner stream to decrypt block." errorCode:-1];
             free(self.workingBlock);
             self.workingBlock = nil;
@@ -143,7 +143,7 @@
         NSData *expectedHmac = [NSData dataWithBytes:blockHeader.hmacSha256 length:CC_SHA256_DIGEST_LENGTH];
 
         if(![actualHmac isEqualToData:expectedHmac]) {
-            NSLog(@"Actual Block HMAC does not match expected. Block has been corrupted.");
+            slog(@"Actual Block HMAC does not match expected. Block has been corrupted.");
             self.error = [Utils createNSError:@"Actual Block HMAC does not match expected. Block has been corrupted." errorCode:-1];
             self.workingBlock = nil;
             self.finished = YES;

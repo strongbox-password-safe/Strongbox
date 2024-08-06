@@ -33,7 +33,7 @@ struct CloudKitHostedDatabase: Identifiable {
 
         if sharedWithMe {
             guard let ownerName = record.share?.recordID.zoneID.ownerName else {
-                NSLog("🔴 Database CKRecord marked as sharedWithMe but share is nil or ownerName on CKShare is nil")
+                swlog("🔴 Database CKRecord marked as sharedWithMe but share is nil or ownerName on CKShare is nil")
                 return nil
             }
 
@@ -43,15 +43,15 @@ struct CloudKitHostedDatabase: Identifiable {
         }
 
         guard let nickname = record.encryptedValues[RecordKeys.nickname] as? String else {
-            NSLog("🔴 Could not read required field [\(RecordKeys.nickname)] from CKRecord - Invalid Database. \(id)")
+            swlog("🔴 Could not read required field [\(RecordKeys.nickname)] from CKRecord - Invalid Database. \(id)")
             return nil
         }
         guard let filename = record.encryptedValues[RecordKeys.filename] as? String else {
-            NSLog("🔴 Could not read required field [\(RecordKeys.filename)] from CKRecord - Invalid Database. \(nickname) \(id)")
+            swlog("🔴 Could not read required field [\(RecordKeys.filename)] from CKRecord - Invalid Database. \(nickname) \(id)")
             return nil
         }
         guard let modDate = record.encryptedValues[RecordKeys.modDate] as? Date else {
-            NSLog("🔴 Could not read required field [\(RecordKeys.modDate)] from CKRecord - Invalid Database.  \(nickname) \(id)")
+            swlog("🔴 Could not read required field [\(RecordKeys.modDate)] from CKRecord - Invalid Database.  \(nickname) \(id)")
             return nil
         }
 
@@ -70,11 +70,11 @@ struct CloudKitHostedDatabase: Identifiable {
                 do {
                     dataBlob = try Data(contentsOf: url)
                 } catch {
-                    NSLog("🔴 Could not read contents of URL for datablob asset [\(error)] id = \(id)")
+                    swlog("🔴 Could not read contents of URL for datablob asset [\(error)] id = \(id)")
                     return nil
                 }
             } else {
-                NSLog("🔴 Could not read asset or fileUrl. url = \(String(describing: asset))")
+                swlog("🔴 Could not read asset or fileUrl. url = \(String(describing: asset))")
                 return nil
             }
         } else {

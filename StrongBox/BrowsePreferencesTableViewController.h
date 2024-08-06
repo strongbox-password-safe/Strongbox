@@ -16,8 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BrowsePreferencesTableViewController : StaticDataTableViewController
 
-@property DatabaseFormat format;
-@property DatabasePreferences* databaseMetaData;
++ (instancetype)fromStoryboard;
+
 @property Model* model;
 @property (nonatomic, copy) void (^onDone)(void);
 

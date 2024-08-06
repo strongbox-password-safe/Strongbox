@@ -10,6 +10,7 @@
 #import "sodium.h"
 #import "ChaCha20ReadStream.h"
 #import "ChaCha20OutputStream.h"
+#import "SBLog.h"
 
 static const uint32_t kIvSize = 12;
 static const uint32_t kKeySize = 32;
@@ -25,7 +26,7 @@ static const BOOL kLogVerbose = NO;
         int sodium_initialization = sodium_init();
         
         if (sodium_initialization == -1) {
-            NSLog(@"Sodium Initialization Failed.");
+            slog(@"Sodium Initialization Failed.");
             return nil;
         }
     }
@@ -34,13 +35,13 @@ static const BOOL kLogVerbose = NO;
 
 - (NSMutableData *)decrypt:(NSData *)data iv:(NSData *)iv key:(NSData *)key {
     if(kLogVerbose) {
-        NSLog(@"IV12: %@", [iv base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"KEY32: %@", [key base64EncodedStringWithOptions:kNilOptions]);
-        NSLog(@"ChaCha Data In: %@", [data base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"IV12: %@", [iv base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"KEY32: %@", [key base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"ChaCha Data In: %@", [data base64EncodedStringWithOptions:kNilOptions]);
     }
  
     if(iv.length != kIvSize || key.length != kKeySize) {
-        NSLog(@"IV or Key not of the expected length.");
+        slog(@"IV or Key not of the expected length.");
         return nil;
     }
     
@@ -61,7 +62,7 @@ static const BOOL kLogVerbose = NO;
     
     if(SecRandomCopyBytes(kSecRandomDefault, kIvSize, newKey.mutableBytes))
     {
-        NSLog(@"Could not securely copy new bytes");
+        slog(@"Could not securely copy new bytes");
         return nil;
     }
     

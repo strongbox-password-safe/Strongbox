@@ -8,6 +8,7 @@
 
 #import "StrongboxMacFilesManager.h"
 #include <pwd.h>
+#import "SBLog.h"
 
 static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
@@ -73,7 +74,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     
     NSError* error;
     if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+        slog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
     }
     
     
@@ -84,14 +85,14 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 - (void)createIfNecessary:(NSURL*)url {
     NSError* error;
     if (![[NSFileManager defaultManager] createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", url, error.localizedDescription);
+        slog(@"Error Creating Directory: %@ => [%@]", url, error.localizedDescription);
     }
 }
 
 - (NSURL *)sharedAppGroupDirectory {
     NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:kDefaultAppGroupName];
     if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", kDefaultAppGroupName);
+        slog(@"Could not get container URL for App Group: [%@]", kDefaultAppGroupName);
         return nil;
     }
     
@@ -147,7 +148,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 }
 
 - (void)deleteAllNukeFromOrbit {
-    NSLog(@"🔴 WARNWARN: NUKE FROM ORBIT...");
+    slog(@"🔴 WARNWARN: NUKE FROM ORBIT...");
     [self deleteAllContentsOfDirectory:self.sharedAppGroupDirectory.path];
 }
 
@@ -173,7 +174,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     NSError* error;
     
     if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+        slog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
     }
 
     return ret;

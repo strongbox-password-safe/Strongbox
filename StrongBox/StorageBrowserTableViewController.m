@@ -368,7 +368,7 @@
         }
     }
     else {
-        NSLog(@"%@", error);
+        slog(@"%@", error);
         [Alerts error:self
                 title:NSLocalizedString(@"sbtvc_error_reading_database", @"Error Reading Database File")
                 error:error];

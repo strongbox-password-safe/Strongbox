@@ -11,6 +11,7 @@
 
 #import "PasswordGenerationConfig.h"
 #import "PasswordStrengthConfig.h"
+#import "SBLog.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -66,10 +67,11 @@ typedef enum : NSUInteger {
 
 @property BOOL cloudKitZoneCreated;
 @property BOOL changeNotificationsSubscriptionCreated;
-
-@property BOOL useNextGenOneDriveAPI;
+@property (nullable) NSDate* lastCloudKitRefresh;
 
 @property AppAppearance appAppearance; 
+
+@property BOOL useOneDriveUSGovCloudInstance;
 
 @end
 

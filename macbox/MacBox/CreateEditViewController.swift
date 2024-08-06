@@ -131,12 +131,12 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         super.viewDidLoad()
 
         guard let node = getExistingOrNewEntry(newEntryParentGroupId: initialParentNodeId), !node.isGroup else {
-            NSLog("🔴 Could not load initial node or node is a group!")
+            swlog("🔴 Could not load initial node or node is a group!")
             return
         }
 
         guard let dbModel = database.commonModel else {
-            NSLog("🔴 Could not load common model!")
+            swlog("🔴 Could not load common model!")
             return
         }
 
@@ -374,7 +374,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     deinit {
-        NSLog("😎 DEINIT [CreateEditViewController]")
+        swlog("😎 DEINIT [CreateEditViewController]")
     }
 
     override func viewWillAppear() {
@@ -431,11 +431,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             let item = NSMenuItem(title: title, action: #selector(onChangeLocation(sender:)), keyEquivalent: "")
 
-            var icon = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
+            var icon = NodeIconHelper.getIconFor(group, predefinedIconSet: database.keePassIconSet, format: database.format)
 
             let isCustom = group.icon?.isCustom ?? false
 
-            if isCustom || database.iconSet != .sfSymbols {
+            if isCustom || database.keePassIconSet != .sfSymbols {
                 icon = scaleImage(icon, CGSize(width: 16, height: 16))
             }
             item.image = icon
@@ -457,11 +457,11 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             
 
-            var icon = database.rootGroup.isUsingKeePassDefaultIcon ? Icon.house.image() : NodeIconHelper.getIconFor(database.rootGroup, predefinedIconSet: database.iconSet, format: database.format)
+            var icon = database.rootGroup.isUsingKeePassDefaultIcon ? Icon.house.image() : NodeIconHelper.getIconFor(database.rootGroup, predefinedIconSet: database.keePassIconSet, format: database.format)
 
             let isCustom = database.rootGroup.icon?.isCustom ?? false
 
-            if isCustom || database.iconSet != .sfSymbols {
+            if isCustom || database.keePassIconSet != .sfSymbols {
                 icon = scaleImage(icon, CGSize(width: 16, height: 16))
             }
 
@@ -653,7 +653,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
 
         guard let idx = popupLocation.menu?.index(of: sender) else {
-            NSLog("🔴 Could not find this menu item in the menu?!")
+            swlog("🔴 Could not find this menu item in the menu?!")
             return
         }
 
@@ -677,7 +677,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             }
         })
         else {
-            NSLog("🔴 Could not find this items parent group in the sorted groups list!")
+            swlog("🔴 Could not find this items parent group in the sorted groups list!")
             return
         }
 
@@ -686,7 +686,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func bindUiToModel() {
         textFieldTitle.stringValue = model.title
-        imageViewIcon.image = NodeIconHelper.getNodeIcon(model.icon, predefinedIconSet: database.iconSet)
+        imageViewIcon.image = NodeIconHelper.getNodeIcon(model.icon, predefinedIconSet: database.keePassIconSet)
         textFieldUsername.stringValue = model.username
         textFieldUrl.stringValue = model.url
         textFieldEmail.stringValue = model.email
@@ -713,7 +713,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         if initialNodeId != nil {
             guard let found = database.getItemBy(initialNodeId!) else {
-                NSLog("🔴 Could not load node")
+                swlog("🔴 Could not load node")
                 return nil
             }
 
@@ -726,7 +726,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             }
 
             if parentGroup == nil {
-                NSLog("🔴 Could not load parent node! Trying Root Group")
+                swlog("🔴 Could not load parent node! Trying Root Group")
 
                 if database.format == .keePass1 {
                     parentGroup = database.rootGroup.childGroups.first
@@ -738,7 +738,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             if let parentGroup {
                 node = createNewEntryNode(parentGroup)
             } else {
-                NSLog("🔴 Could not load parent node!")
+                swlog("🔴 Could not load parent node!")
                 return nil
             }
         }
@@ -912,13 +912,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         if initialNodeId == nil {
             guard let node = getExistingOrNewEntry(newEntryParentGroupId: model.parentGroupUuid) else {
-                NSLog("🔴 Could not load node for save!")
+                swlog("🔴 Could not load node for save!")
                 messageProblemSaving()
                 return
             }
 
             guard let dbModel = database.commonModel else {
-                NSLog("🔴 Could not load common model!")
+                swlog("🔴 Could not load common model!")
                 return
             }
 
@@ -928,13 +928,13 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                       addOtpAuthUrl: Settings.sharedInstance().addOtpAuthUrl)
 
             if !success {
-                NSLog("🔴 Could not apply model changes")
+                swlog("🔴 Could not apply model changes")
                 messageProblemSaving()
                 return
             }
 
             guard let parent = node.parent else {
-                NSLog("🔴 Could not apply model changes")
+                swlog("🔴 Could not apply model changes")
                 messageProblemSaving()
                 return
             }
@@ -942,7 +942,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             let added = database.addItem(node, parent: parent)
 
             if !added {
-                NSLog("🔴 Could not add child")
+                swlog("🔴 Could not add child")
                 messageProblemSaving()
                 return
             }
@@ -950,7 +950,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             nodeId = node.uuid
         } else {
             if !database.applyEditsAndMoves(model, toNode: initialNodeId!) {
-                NSLog("🔴 Could not apply model changes")
+                swlog("🔴 Could not apply model changes")
                 messageProblemSaving()
                 return
             }
@@ -965,7 +965,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func setIconAndSave(_ nodeId: UUID, dismissAfterSave: Bool) {
         guard let node = database.getItemBy(nodeId) else {
-            NSLog("🔴 Could not load node for setIconAndExit")
+            swlog("🔴 Could not load node for setIconAndExit")
             messageProblemSaving()
             return
         }
@@ -1068,7 +1068,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             dismiss(nil)
         } else {
             guard let dbModel = database.commonModel else {
-                NSLog("🔴 Could not load common model!")
+                swlog("🔴 Could not load common model!")
                 messageProblemSaving()
                 return
             }
@@ -1184,7 +1184,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self else { return }
             self.onIconSelected(icon: icon, showFindFavIcons: showFindFavIcons)
         }
-        selectPredefinedIconController.iconSet = database.iconSet
+        selectPredefinedIconController.iconSet = database.keePassIconSet
 
         view.window?.beginSheet(selectPredefinedIconController.window!, completionHandler: nil)
     }
@@ -1204,12 +1204,12 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             
 
             guard let dbModel = database.commonModel else {
-                NSLog("🔴 Could not load common model!")
+                swlog("🔴 Could not load common model!")
                 return
             }
 
             guard let dummyNode = getExistingOrNewEntry(newEntryParentGroupId: database.rootGroup.uuid) else {
-                NSLog("🔴 Could not load existing or new entry node")
+                swlog("🔴 Could not load existing or new entry node")
                 return
             }
 
@@ -1225,17 +1225,17 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
                 if go {
                     guard let selectedFavIcons else {
-                        NSLog("🔴 Select FavIcons null!")
+                        swlog("🔴 Select FavIcons null!")
                         return
                     }
 
                     guard let single = selectedFavIcons.first else {
-                        NSLog("🔴 More than 1 FavIcons returned!")
+                        swlog("🔴 More than 1 FavIcons returned!")
                         return
                     }
 
                     if single.key != dummyNode.uuid {
-                        NSLog("🔴 single.key != dummyNode.uuid")
+                        swlog("🔴 single.key != dummyNode.uuid")
                         return
                     }
 
@@ -1252,7 +1252,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self else { return }
 
             self.model.icon = icon
-            self.imageViewIcon.image = NodeIconHelper.getNodeIcon(self.model.icon, predefinedIconSet: self.database.iconSet)
+            self.imageViewIcon.image = NodeIconHelper.getNodeIcon(self.model.icon, predefinedIconSet: self.database.keePassIconSet)
             self.iconExplicitlyChanged = true
             self.onModelEdited()
         }
@@ -1510,7 +1510,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             
 
             guard let newNotes = textView.textStorage?.string else {
-                NSLog("🔴 Problem getting text from textViewNotes")
+                swlog("🔴 Problem getting text from textViewNotes")
                 return
             }
 
@@ -1612,7 +1612,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     func handlePasteImageIntoField() {
         if canAddAttachment {
             guard let image = NSImage(pasteboard: NSPasteboard.general) else {
-                NSLog("🔴 Could not get clipboard image")
+                swlog("🔴 Could not get clipboard image")
                 return
             }
 
@@ -1635,7 +1635,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
               let bmpRep = NSBitmapImageRep(data: imageData),
               let pngData = bmpRep.representation(using: .png, properties: [:])
         else {
-            NSLog("🔴 Could not get PNG representation of image")
+            swlog("🔴 Could not get PNG representation of image")
             MacAlerts.info(NSLocalizedString("generic_error", comment: "Error"), window: view.window)
             return
         }
@@ -1742,7 +1742,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func setTotpWithString(string: String, steam: Bool) {
-        if let token = NodeFields.getOtpToken(from: string, forceSteam: steam, issuer: model.title, username: model.username) {
+        if let token = NodeFields.getOtpToken(from: string, forceSteam: steam) {
             model.totp = token
 
             bindTOTP()
@@ -1868,7 +1868,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func tokenField(_: NSTokenField, shouldAdd tokens: [Any], at _: Int) -> [Any] {
         guard let tokens = tokens as? [String] else {
-            NSLog("🔴 Couldn't get tagsFields as array")
+            swlog("🔴 Couldn't get tagsFields as array")
             return []
         }
 
@@ -2077,7 +2077,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func handleNonePromisedDrops(_ tableView: NSTableView, draggingInfo: NSDraggingInfo, toRow: Int) -> Bool {
-        NSLog("handleNonePromisedDrops...")
+        swlog("handleNonePromisedDrops...")
 
         var failed = false
 
@@ -2099,7 +2099,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func handlePromisedDrops(draggingInfo: NSDraggingInfo, toRow: Int) -> Bool {
-        NSLog("handlePromisedDrops...")
+        swlog("handlePromisedDrops...")
 
         guard let promises = draggingInfo.draggingPasteboard.readObjects(forClasses: [NSFilePromiseReceiver.self], options: nil), !promises.isEmpty else {
             return false
@@ -2112,7 +2112,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 promiseReceiver.receivePromisedFiles(atDestination: dragAndDropDestinationURL, options: [:], operationQueue: dragAndDropPromiseQueue) { fileURL, error in
                     OperationQueue.main.addOperation {
                         if error != nil {
-                            NSLog("🔴 Error Handling Promise: [%@]", String(describing: error))
+                            swlog("🔴 Error Handling Promise: [%@]", String(describing: error))
                             failed = true
                         } else {
                             if !self.insertURLAsAttachment(fileURL, toRow: toRow) {
@@ -2227,7 +2227,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func control(_ control: NSControl, textView _: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         guard let event = control.window?.currentEvent else {
-            NSLog("🔴 Could not get current event")
+            swlog("🔴 Could not get current event")
             return false
         }
 
@@ -2383,7 +2383,7 @@ extension CreateEditViewController: NSTableViewDelegate {
                 }
 
                 if sourceRow != insertAtIndex {
-                    NSLog("Custom Field Drop: [%d insert at %d]", sourceRow, insertAtIndex)
+                    swlog("Custom Field Drop: [%d insert at %d]", sourceRow, insertAtIndex)
 
                     model.moveCustomField(at: sourceRow, to: insertAtIndex)
 
@@ -2500,7 +2500,7 @@ extension CreateEditViewController: QLPreviewPanelDelegate {
 
 extension CreateEditViewController: NSFilePromiseProviderDelegate {
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, fileNameForType fileType: String) -> String {
-        NSLog("filePromiseProvider::fileNameForType called with [%@]", fileType)
+        swlog("filePromiseProvider::fileNameForType called with [%@]", fileType)
 
         if let userInfo = filePromiseProvider.userInfo as? [String: Any],
            let filename = userInfo[FilePromiseProviderUserInfoKeys.filename] as? String
@@ -2512,7 +2512,7 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
     }
 
     func filePromiseProvider(_ filePromiseProvider: NSFilePromiseProvider, writePromiseTo url: URL, completionHandler: @escaping (Error?) -> Void) {
-        NSLog("filePromiseProvider - writePromiseTo: [%@]", String(describing: url))
+        swlog("filePromiseProvider - writePromiseTo: [%@]", String(describing: url))
 
         do {
             if let userInfo = filePromiseProvider.userInfo as? [String: Any],
@@ -2525,7 +2525,7 @@ extension CreateEditViewController: NSFilePromiseProviderDelegate {
             }
             completionHandler(nil)
         } catch {
-            NSLog("🔴 Error dragging and dropping to external: [%@]", String(describing: error))
+            swlog("🔴 Error dragging and dropping to external: [%@]", String(describing: error))
 
             completionHandler(error)
         }

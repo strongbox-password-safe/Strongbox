@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SBLog.h"
 
 @interface StrongboxUIDocument : UIDocument
 

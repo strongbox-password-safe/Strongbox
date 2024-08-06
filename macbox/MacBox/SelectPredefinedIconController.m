@@ -78,7 +78,7 @@
 
 - (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths {
     if(indexPaths.count == 1) {
-        NSLog(@"Selected: [%@]", indexPaths.anyObject);
+        slog(@"Selected: [%@]", indexPaths.anyObject);
         NSIndexPath *indexPath = indexPaths.anyObject;
         
         [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
@@ -107,13 +107,13 @@
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     [openPanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
-            NSLog(@"%@", openPanel.URL.path);
+            slog(@"%@", openPanel.URL.path);
             
             NSError* error;
             NSData* data = [NSData dataWithContentsOfFile:openPanel.URL.path options:kNilOptions error:&error];
             
             if(!data) {
-                NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
+                slog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
                 
                 NSString* loc = NSLocalizedString(@"mac_could_not_open_this_file", @"Could not open this file.");
                 [MacAlerts error:loc error:error window:self.window];

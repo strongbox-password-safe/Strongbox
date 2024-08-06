@@ -11,6 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import "XMLWriter.h"
+#import "SBLog.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

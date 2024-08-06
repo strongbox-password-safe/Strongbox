@@ -53,7 +53,7 @@ class NewDatabaseSwiftHelper: NSObject {
     @objc
     func beginCopyToNewDatabaseSequence(sourceDatabase: MacDatabasePreferences) throws {
         guard let url = WorkingCopyManager.sharedInstance().getLocalWorkingCache(sourceDatabase.uuid) else {
-            NSLog("🔴 Could not open Strongbox's local copy of this database. A online sync is required")
+            swlog("🔴 Could not open Strongbox's local copy of this database. A online sync is required")
             throw NewDatabaseWizardError.cannotCopyNoLocal
         }
 
@@ -72,7 +72,7 @@ class NewDatabaseSwiftHelper: NSObject {
         guard let window = wizard.window,
               let parentWindow = parentViewController.view.window
         else {
-            NSLog("🔴 Could not get wizard or parent window, cannot present wizard sheet")
+            swlog("🔴 Could not get wizard or parent window, cannot present wizard sheet")
             throw NewDatabaseWizardError.invalidParameter
         }
 
@@ -140,14 +140,14 @@ class NewDatabaseSwiftHelper: NSObject {
         outputStream.close()
 
         if let error = maybeError {
-            NSLog("🔴 Error Serializing new database: \(error)")
+            swlog("🔴 Error Serializing new database: \(error)")
             completion(nil, false, error)
         } else if userCancelled {
             completion(nil, true, nil) 
         } else {
             guard let data = outputStream.property(forKey: .dataWrittenToMemoryStreamKey) as? Data else {
                 let error = Utils.createNSError("Could not get data parameter from output stream", errorCode: -1)
-                NSLog("🔴 Error Serializing new database: \(error)")
+                swlog("🔴 Error Serializing new database: \(error)")
                 completion(nil, false, error)
                 return
             }
@@ -220,12 +220,12 @@ class NewDatabaseSwiftHelper: NSObject {
 
     func onDatabaseCreationDone(database: MacDatabasePreferences?, error: Error?) {
         if let error {
-            NSLog("🔴 Error Creating Database on Storage [\(provider.storageId)] => [\(error)]")
+            swlog("🔴 Error Creating Database on Storage [\(provider.storageId)] => [\(error)]")
             completion(nil, false, error)
         } else {
             guard let database else {
                 let error = Utils.createNSError("🔴 Unknown Error Creating Database on Storage", errorCode: -1)
-                NSLog("🔴 Unknown Error Creating Database on Storage [\(provider.storageId)] => [\(error)]")
+                swlog("🔴 Unknown Error Creating Database on Storage [\(provider.storageId)] => [\(error)]")
                 completion(nil, false, error)
                 return
             }

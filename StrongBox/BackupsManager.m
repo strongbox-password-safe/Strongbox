@@ -47,7 +47,7 @@
 
         NSURL* dir = metadata.backupsDirectory; 
         if(!dir) {
-            NSLog(@"Error saving backup");
+            slog(@"Error saving backup");
             return NO;
         }
 
@@ -58,7 +58,7 @@
         NSError* error;
         BOOL success = [NSFileManager.defaultManager copyItemAtURL:snapshot toURL:url error:&error];
         if(!success) {
-            NSLog(@"Error saving backup: [%@]-[%@]", error, url);
+            slog(@"Error saving backup: [%@]-[%@]", error, url);
             return NO;
         }
         
@@ -67,7 +67,7 @@
         
         [NSFileManager.defaultManager setAttributes:@{ NSFileCreationDate : now } ofItemAtPath:url.path error:&error];
         if(!success) {
-            NSLog(@"Error saving backup: [%@]", error);
+            slog(@"Error saving backup: [%@]", error);
             return NO;
         }
     }
@@ -89,7 +89,7 @@
     NSError* error;
     
     if(![NSFileManager.defaultManager removeItemAtURL:item.url error:&error]) {
-        NSLog(@"Error Deleting Backup: [%@]", error);
+        slog(@"Error Deleting Backup: [%@]", error);
     }
 }
 
@@ -172,7 +172,7 @@
             }
         }
         else {
-            NSLog(@"Error getting attributes for file: [%@]", url);
+            slog(@"Error getting attributes for file: [%@]", url);
         }
     }
 
@@ -184,7 +184,7 @@
 - (NSArray<BackupItem*> *)getAvailableBackupsForDatabase:(METADATA_PTR)metadata {
     NSURL* dir = metadata.backupsDirectory; 
     if(!dir) {
-        NSLog(@"Could not get backup directory");
+        slog(@"Could not get backup directory");
 
         return @[];
     }
@@ -198,7 +198,7 @@
                                                                               error:&error];
 
     if(!files) {
-        NSLog(@"Could not get files at backup path");
+        slog(@"Could not get files at backup path");
         return @[];
     }
     
@@ -219,7 +219,7 @@
             }
         }
         else {
-            NSLog(@"Error getting attributes for file: [%@]", file);
+            slog(@"Error getting attributes for file: [%@]", file);
         }
     }
     

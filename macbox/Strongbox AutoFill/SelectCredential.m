@@ -157,7 +157,7 @@
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
     if(control == self.searchField) { 
         if (commandSelector == @selector(moveDown:)) {
-            NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
+            slog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
             if (self.tableView.numberOfRows > 0) {
                 [self.view.window makeFirstResponder:self.tableView];
                 [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
@@ -263,7 +263,7 @@
         return;
     }
     else {
-        NSLog(@"No matches across all fields for Domain: %@", domain);
+        slog(@"No matches across all fields for Domain: %@", domain);
     }
 
     

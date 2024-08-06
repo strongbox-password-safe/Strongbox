@@ -106,7 +106,7 @@
   manualSubhead:(NSString *)manualSubhead
      completion:(CompositeKeyDeterminedBlock)completion {
     if ( self.bioOrWatchUnlockIsPossible ) {
-        NSLog(@"MacCompositeKeyDeterminer::getCkfs. Convenience Possible...");
+        slog(@"MacCompositeKeyDeterminer::getCkfs. Convenience Possible...");
         [self getCkfsWithBiometrics:message
              manualFallbackHeadline:manualHeadline
           manualFallbackSubHeadline:manualSubhead
@@ -116,7 +116,7 @@
                          completion:completion];
     }
     else {
-        NSLog(@"MacCompositeKeyDeterminer::getCkfs. Convenience Possible...");
+        slog(@"MacCompositeKeyDeterminer::getCkfs. Convenience Possible...");
         [self getCkfsManually:manualHeadline subheadline:manualSubhead completion:completion];
     }
 }
@@ -126,7 +126,7 @@
 }
 
 - (void)getCkfsManually:(NSString *)headline subheadline:(NSString *)subheadline completion:(CompositeKeyDeterminedBlock)completion {
-    NSLog(@"MacCompositeKeyDeterminer::getCkfsManually...");
+    slog(@"MacCompositeKeyDeterminer::getCkfsManually...");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self _getCkfsWithManualUnlock:headline
@@ -241,10 +241,10 @@
                  allowFallback:(BOOL)allowFallback
                     completion:(CompositeKeyDeterminedBlock)completion {
     if ( !self.bioOrWatchUnlockIsPossible ) { 
-        NSLog(@"Biometrics/Watch not possible...");
+        slog(@"Biometrics/Watch not possible...");
         
         if ( allowFallback ) {
-            NSLog(@"Falling back to manual unlock...");
+            slog(@"Falling back to manual unlock...");
             [self getCkfsManually:manualFallbackHeadline
                       subheadline:manualFallbackSubHeadline
                        completion:completion];
@@ -288,7 +288,7 @@
             }
             else {
                 if( allowFallback && error && error.code == LAErrorUserFallback ) {
-                    NSLog(@"User requested fallback. Falling back to manual unlock...");
+                    slog(@"User requested fallback. Falling back to manual unlock...");
                     [self getCkfsManually:manualFallbackHeadline
                               subheadline:manualFallbackSubHeadline
                                completion:completion];
@@ -364,7 +364,7 @@
     
     
     if ( ret == nil && fromConvenience ) {
-        NSLog(@"Could not get CKFs with Convenience Unlock. Clearing Secure Convenience Items");
+        slog(@"Could not get CKFs with Convenience Unlock. Clearing Secure Convenience Items");
 
         self.database.conveniencePassword = nil;
         self.database.autoFillConvenienceAutoUnlockPassword = nil;
@@ -428,7 +428,7 @@
                                                        error:&keyFileParseError];
                 
         if( keyFileDigest == nil ) {
-            NSLog(@"WARNWARN: Could not read Key File [%@]", keyFileParseError);
+            slog(@"WARNWARN: Could not read Key File [%@]", keyFileParseError);
             
             if (outError) {
                 *outError = keyFileParseError;
@@ -478,7 +478,7 @@
     }
     else {
         
-        NSLog(@"🔴 WARNWARN: Could not read working copy to check Key File Format");
+        slog(@"🔴 WARNWARN: Could not read working copy to check Key File Format");
     }
     return format;
 }

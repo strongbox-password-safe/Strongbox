@@ -57,7 +57,7 @@
     NSArray<Node*>* dataSource = self.searchResults;
     
     if(!dataSource || indexPath.row >= dataSource.count) {
-        NSLog(@"EEEEEK: WARNWARN - Should never happen but unknown node for indexpath: [%@]", indexPath);
+        slog(@"EEEEEK: WARNWARN - Should never happen but unknown node for indexpath: [%@]", indexPath);
         return nil;
     }
     

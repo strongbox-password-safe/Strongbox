@@ -165,7 +165,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 - (NSDictionary<NSUUID *,NodeIcon *> *)iconPool {
     const BOOL stripUnusedIcons = self.preferences.stripUnusedIconsOnSave;
     const BOOL stripUnusedHistoricalIcons = self.preferences.stripUnusedIconsOnSave;
-
+    
     NSArray<Node*>* allNodes = [self getAllNodesReferencingCustomIcons:self.rootNode includeHistorical:!stripUnusedHistoricalIcons];
     
     
@@ -183,7 +183,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         }
     }
     
-
+    
     
     self.backingIconPool = newIconPool.copy;
     
@@ -261,7 +261,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     return [self launchableUrlForUrlString:urlString];
 }
 
-- (NSURL *)launchableUrlForUrlString:(NSString*)urlString { 
+- (NSURL *)launchableUrlForUrlString:(NSString*)urlString {
     if (!urlString.length) {
         return nil;
     }
@@ -436,7 +436,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         
         if(![itemToMove changeParent:destination keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules]) {
             rollback = YES;
-            NSLog(@"Error Changing Parents. [%@]", itemToMove);
+            slog(@"Error Changing Parents. [%@]", itemToMove);
             break;
         }
     }
@@ -471,7 +471,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         }
         else {
             
-            NSLog(@"WARNWARN: Could not find original moved item! [%@]", reconItem);
+            slog(@"WARNWARN: Could not find original moved item! [%@]", reconItem);
         }
     }
     
@@ -529,7 +529,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     
     for ( Node* item in items ) {
         if ( ![destination insertChild:item keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules atPosition:position] ) {
-            NSLog(@"🔴 Error inserting child item!");
+            slog(@"🔴 Error inserting child item!");
         }
     }
     
@@ -551,7 +551,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
             [item.parent removeChild:item];
         }
         else {
-            NSLog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", item, item.parent);
+            slog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", item, item.parent);
         }
     }
     
@@ -567,7 +567,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         return [self reorderItem:node to:idx];
     }
     
-    NSLog(@"🔴 reorderItem - failed could not find item");
+    slog(@"🔴 reorderItem - failed could not find item");
     
     return -1;
 }
@@ -593,13 +593,13 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     
     
     if (item.parent == nil) {
-        NSLog(@"WARNWARN: Cannot change order of item, parent is nil");
+        slog(@"WARNWARN: Cannot change order of item, parent is nil");
         return -1;
     }
     
     NSInteger currentIndex = [item.parent.children indexOfObject:item];
     if (currentIndex == NSNotFound) {
-        NSLog(@"WARNWARN: Cannot change order of item, item not found in parent!");
+        slog(@"WARNWARN: Cannot change order of item, item not found in parent!");
         return -1;
     }
     
@@ -642,7 +642,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
         NSUInteger currentIndex = parent.children.count - 1;
         if (currentIndex != recon.index) {
             if (! [parent reorderChildAt:currentIndex to:recon.index keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules] ) {
-                NSLog(@"WARNWARN: Could not reorder child from %lu to %lu during reconstruction.", (unsigned long)currentIndex, (unsigned long)recon.index);
+                slog(@"WARNWARN: Could not reorder child from %lu to %lu during reconstruction.", (unsigned long)currentIndex, (unsigned long)recon.index);
             }
         }
     }
@@ -674,7 +674,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
             self.mutableDeletedObjects[entry.uuid] = deletionDate;
         }
         else {
-            NSLog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", entry, entry.parent);
+            slog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", entry, entry.parent);
         }
     }
     
@@ -705,7 +705,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     
     for (Node* item in minimalNodeSet) {
         if (item.parent == nil || ![item.parent contains:item]) { 
-            NSLog(@"WARNWARN: Attempt to delete item with no parent");
+            slog(@"WARNWARN: Attempt to delete item with no parent");
             return;
         }
         
@@ -720,7 +720,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
             deletedSomething = YES;
         }
         else {
-            NSLog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", item, item.parent);
+            slog(@"🔴 WARN: Not removing Node from Parent (at least one is nil) [node=%@, parent=%@]", item, item.parent);
         }
         
         self.mutableDeletedObjects[item.uuid] = now;
@@ -737,7 +737,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
 
 - (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
     if (!self.recycleBinEnabled) {
-        NSLog(@"🔴 WARNWARN: Attempt to recycle item when recycle bin disabled!");
+        slog(@"🔴 WARNWARN: Attempt to recycle item when recycle bin disabled!");
         return NO;
     }
     
@@ -859,122 +859,183 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     }];
 }
 
-- (BOOL)isTitleMatches:(NSString*)searchText
-                  node:(Node*)node
-           dereference:(BOOL)dereference
-           checkPinYin:(BOOL)checkPinYin {
+- (StringSearchMatchType)isTitleMatches:(NSString*)searchText
+                                   node:(Node*)node
+                            dereference:(BOOL)dereference
+                            checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
-    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
+    return [foo isSearchMatch:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference  checkPinYin:(BOOL)checkPinYin {
+- (StringSearchMatchType)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference  checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.username node:node maybe:dereference];
-    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
+    return [foo isSearchMatch:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+- (StringSearchMatchType)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.password node:node maybe:dereference];
-    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
+    return [foo isSearchMatch:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isEmailMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+- (StringSearchMatchType)isEmailMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* email = node.fields.email;
     
     NSString* foo = [self maybeDeref:email node:node maybe:dereference];
-    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
+    return [foo isSearchMatch:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isNotesMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+- (StringSearchMatchType)isNotesMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.notes node:node maybe:dereference];
-    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
+    return [foo isSearchMatch:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin {
-    return [node.fields.tags.allObjects anyMatch:^BOOL(NSString * _Nonnull obj) {
-        return [obj containsSearchString:searchText checkPinYin:checkPinYin];
-    }];
+- (StringSearchMatchType)isTagsMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin {
+    for ( NSString* tag in node.fields.tags ) {
+        StringSearchMatchType matchType = [tag isSearchMatch:searchText checkPinYin:checkPinYin];
+        if ( matchType != kStringSearchMatchTypeNoMatch ) {
+            return matchType;
+        }
+    }
+    
+    return kStringSearchMatchTypeNoMatch;
 }
 
-- (BOOL)isPathMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin {
+- (StringSearchMatchType)isPathMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin {
     Node* current = node;
     while (current != nil && current != self.effectiveRootGroup) {
-        if ( [current.title containsSearchString:searchText checkPinYin:checkPinYin] ) {
-            return YES;
+        StringSearchMatchType matchType = [current.title isSearchMatch:searchText checkPinYin:checkPinYin];
+        
+        if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+            return matchType;
         }
         
         current = current.parent;
     }
-
+    
     return NO;
 }
 
-- (BOOL)isUrlMatches:(NSString*)searchText
-                node:(Node*)node
-         dereference:(BOOL)dereference
-         checkPinYin:(BOOL)checkPinYin
-includeAssociatedDomains:(BOOL)includeAssociatedDomains {
+- (StringSearchMatchType)isUrlMatches:(NSString*)searchText
+                                 node:(Node*)node
+                          dereference:(BOOL)dereference
+                          checkPinYin:(BOOL)checkPinYin
+             includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
-
-    if ( [self isDiscreteUrlMatch:foo searchText:searchText checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains] ) {
-        return YES;
+    
+    StringSearchMatchType matchType = [self isDiscreteUrlMatch:foo searchText:searchText checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains];
+    
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        return matchType;
     }
-        
+    
     for (NSString* altUrl in node.fields.alternativeUrls) {
         NSString* foo = [self maybeDeref:altUrl node:node maybe:dereference];
         
-        if ( [self isDiscreteUrlMatch:foo searchText:searchText checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains] ) {
-            return YES;
+        StringSearchMatchType matchType = [self isDiscreteUrlMatch:foo searchText:searchText checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains];
+        
+        if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+            return matchType;
         }
+        
     }
     
-    return NO;
+    return kStringSearchMatchTypeNoMatch;
 }
 
-- (BOOL)isDiscreteUrlMatch:(NSString*)url searchText:(NSString*)searchText checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains {
+- (StringSearchMatchType)isDiscreteUrlMatch:(NSString*)url searchText:(NSString*)searchText checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     if ( [url.lowercaseString hasPrefix:kOtpAuthScheme] ) {
         
         
-
-        return NO;
+        
+        return kStringSearchMatchTypeNoMatch;
     }
     
-    if ( [url containsSearchString:searchText checkPinYin:checkPinYin] ) {
-        return YES;
+    StringSearchMatchType matchType = [url isSearchMatch:searchText checkPinYin:checkPinYin];
+    
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        return matchType;
     }
-        
+    
     if ( includeAssociatedDomains ) {
         NSSet<NSString*>* associateds = [BrowserAutoFillManager getAssociatedDomainsWithUrl:url];
         for ( NSString* associated in associateds ) {
-            if ( [associated containsSearchString:searchText checkPinYin:checkPinYin] ) {
-                return YES;
+            StringSearchMatchType matchType = [associated isSearchMatch:searchText checkPinYin:checkPinYin];
+            if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+                return matchType;
             }
         }
     }
     
-    return NO;
+    return kStringSearchMatchTypeNoMatch;
 }
 
-- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains {
-    if ( [self isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
-        return YES;
+- (StringSearchMatchType)isAllFieldsMatches:(NSString*)searchText
+                                       node:(Node*)node
+                                dereference:(BOOL)dereference
+                                checkPinYin:(BOOL)checkPinYin
+                   includeAssociatedDomains:(BOOL)includeAssociatedDomains {
+    return [self isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains matchField:nil];
+}
+
+- (StringSearchMatchType)isAllFieldsMatches:(NSString *)searchText
+                                       node:(Node *)node
+                                dereference:(BOOL)dereference
+                                checkPinYin:(BOOL)checkPinYin
+                   includeAssociatedDomains:(BOOL)includeAssociatedDomains
+                                 matchField:(DatabaseSearchMatchField *)matchField {
+    StringSearchMatchType matchType = [self isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldTitle;
+        }
+        return matchType;
     }
-    if ( [self isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
-        return YES;
+    matchType = [self isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldUsername;
+        }
+        return matchType;
     }
-    if ( [self isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
-        return YES;
+    matchType = [self isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldPassword;
+        }
+        
+        return matchType;
     }
-    if ( [self isEmailMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
-        return YES;
+    matchType = [self isEmailMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldEmail;
+        }
+        
+        return matchType;
     }
-    if ( [self isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains] ) {
-        return YES;
+    matchType = [self isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldUrl;
+        }
+        
+        return matchType;
     }
-    if ( [self isNotesMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ) {
-        return YES;
+    matchType = [self isNotesMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldNotes;
+        }
+        
+        return matchType;
     }
-    if ( [self isTagsMatches:searchText node:node checkPinYin:checkPinYin] ) {
-        return YES;
+    matchType = [self isTagsMatches:searchText node:node checkPinYin:checkPinYin];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldTag;
+        }
+        
+        return matchType;
     }
     
     if (self.format == kKeePass4 || self.format == kKeePass) {
@@ -986,30 +1047,55 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
                 NSString* value = node.fields.customFields[key].value;
                 NSString* derefed = [self maybeDeref:value node:node maybe:dereference];
                 
-                if ([key containsSearchString:searchText checkPinYin:checkPinYin] || [derefed containsSearchString:searchText checkPinYin:checkPinYin]) {
-                    return YES;
+                
+                StringSearchMatchType matchType = [key isSearchMatch:searchText checkPinYin:checkPinYin];
+                
+                if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+                    if ( matchField ) {
+                        *matchField = kDatabaseSearchMatchFieldCustomField;
+                    }
+                    
+                    return matchType;
                 }
+                
+                matchType = [derefed isSearchMatch:searchText checkPinYin:checkPinYin];
+                if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+                    if ( matchField ) {
+                        *matchField = kDatabaseSearchMatchFieldCustomField;
+                    }
+                    
+                    return matchType;
+                }
+                
             }
         }
     }
     
     if (self.format != kPasswordSafe) {
-        BOOL attachmentMatch = [node.fields.attachments.allKeys anyMatch:^BOOL(NSString * _Nonnull obj) {
-            return [obj containsSearchString:searchText checkPinYin:checkPinYin];
-        }];
-        
-        if (attachmentMatch) {
-            return YES;
+        for ( NSString* obj in node.fields.attachments.allKeys ) {
+            StringSearchMatchType matchType = [obj isSearchMatch:searchText checkPinYin:checkPinYin];
+            if ( matchType != kStringSearchMatchTypeNoMatch ) {
+                if ( matchField ) {
+                    *matchField = kDatabaseSearchMatchFieldAttachment;
+                }
+                
+                return matchType;
+            }
         }
     }
     
     
     
-    if ( [self isPathMatches:searchText node:node checkPinYin:checkPinYin] ) {
-        return YES;
+    matchType = [self isPathMatches:searchText node:node checkPinYin:checkPinYin];
+    if ( matchType != kStringSearchMatchTypeNoMatch  ) {
+        if ( matchField ) {
+            *matchField = kDatabaseSearchMatchFieldPath;
+        }
+        
+        return matchType;
     }
     
-    return NO;
+    return kStringSearchMatchTypeNoMatch;
 }
 
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
@@ -1032,8 +1118,8 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
 
 
 - (void)rebuildFastMaps {
-
-              
+    
+    
     NSMutableDictionary<NSUUID*, Node*>* uuidMap = NSMutableDictionary.dictionary;
     
     NSMutableSet<NSUUID*> *expirySet = NSMutableSet.set;
@@ -1060,7 +1146,7 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
             Node* existing = uuidMap[node.uuid];
             
             if ( existing ) {
-                NSLog(@"🔴 WARNWARN: Duplicate ID in database => [%@] - [%@] - [%@]", existing, node, node.uuid);
+                slog(@"🔴 WARNWARN: Duplicate ID in database => [%@] - [%@] - [%@]", existing, node, node.uuid);
             }
             else {
                 uuidMap[node.uuid] = node;
@@ -1204,8 +1290,8 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     
     _fastMaps = newMaps;
     
-
-
+    
+    
 }
 
 - (NSArray<NSUUID *> *)getItemIdsForTag:(NSString *)tag {
@@ -1220,7 +1306,7 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
         return ret ? ret.firstObject : nil;
     }
     else {
-        NSLog(@"🔴 getItemById called with nil!");
+        slog(@"🔴 getItemById called with nil!");
         return nil;
     }
 }
@@ -1356,60 +1442,36 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     return sorted;
 }
 
+- (NSArray<Node *> *)expirySetEntries {
+    return [self getItemsById:self.fastMaps.withExpiryDates.allObjects];
+}
+
 - (NSArray<Node *> *)expiredEntries {
-    __weak DatabaseModel* weakSelf = self;
-    
-    NSArray<Node *> * withExpiries = [self.fastMaps.withExpiryDates.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [weakSelf getItemById:obj];
-    }];
-    
-    return [withExpiries filter:^BOOL(Node * _Nonnull obj) {
+    return [self.expirySetEntries filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.expired;
     }];
 }
 
 - (NSArray<Node *> *)nearlyExpiredEntries {
-    __weak DatabaseModel* weakSelf = self;
-    
-    NSArray<Node *> * withExpiries = [self.fastMaps.withExpiryDates.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [weakSelf getItemById:obj];
-    }];
-    
-    return [withExpiries filter:^BOOL(Node * _Nonnull obj) {
+    return [self.expirySetEntries filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.nearlyExpired;
     }];
 }
 
 - (NSArray<Node *> *)totpEntries {
-    __weak DatabaseModel* weakSelf = self;
-    
-    return [self.fastMaps.withTotps.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [weakSelf getItemById:obj];
-    }];
+    return [self getItemsById:self.fastMaps.withTotps.allObjects];
 }
 
 - (NSArray<Node *> *)attachmentEntries {
-    __weak DatabaseModel* weakSelf = self;
-    
-    return [self.fastMaps.withAttachments.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [weakSelf getItemById:obj];
-    }];
+    return [self getItemsById:self.fastMaps.withAttachments.allObjects];
 }
 
 - (NSArray<Node *> *)keeAgentSSHKeyEntries {
-    __weak DatabaseModel* weakSelf = self;
-    
-    return [self.fastMaps.withKeeAgentSshKeys.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [weakSelf getItemById:obj];
-    }];
+    return [self getItemsById:self.fastMaps.withKeeAgentSshKeys.allObjects];
 }
 
 - (NSArray<Node *> *)passkeyEntries {
-    __weak DatabaseModel* weakSelf = self;
-    
-    return [self.fastMaps.withPasskeys.allObjects map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
-        return [weakSelf getItemById:obj];
-    }];
+    return [self getItemsById:self.fastMaps.withPasskeys.allObjects];
 }
 
 - (void)excludeFromAudit:(NSUUID *)nodeId exclude:(BOOL)exclude {
@@ -1423,7 +1485,7 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
         [self rebuildFastMaps];
     }
     else {
-        NSLog(@"⚠️ Could not find item or item is already in this audit exclusion state. WARNWARN");
+        slog(@"⚠️ Could not find item or item is already in this audit exclusion state. WARNWARN");
     }
 }
 
@@ -1554,7 +1616,7 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
     NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node database:self error:&error] : text;
     
     if(error) {
-        NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
+        slog(@"WARN: SPR Compilation ERROR: [%@]", error);
     }
     
     return compiled ? compiled : @""; 
@@ -1836,7 +1898,7 @@ includeAssociatedDomains:(BOOL)includeAssociatedDomains {
         StringValue *usernameSv = node.fields.customFields[@"KPXC_PASSKEY_USERNAME"];
         
         if ( usernameSv == nil ) {
-            NSLog(@"🟢 Migrate older Passkey format for node %@", node.uuid);
+            slog(@"🟢 Migrate older Passkey format for node %@", node.uuid);
             [node.fields setCustomField:@"KPXC_PASSKEY_USERNAME" value:[StringValue valueWithString:node.fields.username protected:NO]];
         }
     }

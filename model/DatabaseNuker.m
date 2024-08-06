@@ -31,7 +31,7 @@
 @implementation DatabaseNuker
 
 + (void)nuke:(METADATA_PTR)database deleteUnderlyingIfSupported:(BOOL)deleteUnderlyingIfSupported completion:(void (^)(NSError * _Nullable))completion {
-    NSLog(@"☢️ Nuking Database: [%@]... ⚛ - Delete Underlying = [%hhd]", database, deleteUnderlyingIfSupported);
+    slog(@"☢️ Nuking Database: [%@]... ⚛ - Delete Underlying = [%hhd]", database, deleteUnderlyingIfSupported);
     
     if ( !deleteUnderlyingIfSupported ) {
         return [DatabaseNuker completeDatabaseNuke:database partialError:nil completion:completion];
@@ -44,10 +44,10 @@
         [CloudKitDatabasesInteractor.shared deleteWithDatabase:database
                                              completionHandler:^(NSError * _Nullable error) {
             if ( error ) {
-                NSLog(@"🔴 Error deleting cloudkit - will continue trying to remove: %@", error);
+                slog(@"🔴 Error deleting cloudkit - will continue trying to remove: %@", error);
             }
             else {
-                NSLog(@"🟢 CloudKit Database successfully deleted from cloud");
+                slog(@"🟢 CloudKit Database successfully deleted from cloud");
             }
 
             [DatabaseNuker completeDatabaseNuke:database partialError:error completion:completion];
@@ -61,10 +61,10 @@
         [[LocalDeviceStorageProvider sharedInstance] delete:database
                                                  completion:^(NSError *error) {
             if (error != nil) {
-                NSLog(@"🔴 Error deleting local file - will continue trying to remove: %@", error);
+                slog(@"🔴 Error deleting local file - will continue trying to remove: %@", error);
             }
             else {
-                NSLog(@"Removed Local File Successfully.");
+                slog(@"Removed Local File Successfully.");
             }
             
             [DatabaseNuker completeDatabaseNuke:database partialError:error completion:completion];
@@ -74,10 +74,10 @@
         [[AppleICloudProvider sharedInstance] delete:database
                                           completion:^(NSError *error) {
             if(error) {
-                NSLog(@"Error deleting iCloud file - will continue trying to remove: %@", error);
+                slog(@"Error deleting iCloud file - will continue trying to remove: %@", error);
             }
             else {
-                NSLog(@"iCloud file removed");
+                slog(@"iCloud file removed");
             }
             
             [DatabaseNuker completeDatabaseNuke:database partialError:error completion:completion];
@@ -126,7 +126,7 @@
     [database remove];
 #endif
 
-    NSLog(@"☢️ Database Nuked. ⚛");
+    slog(@"☢️ Database Nuked. ⚛");
     
     completion(partialError);
 }

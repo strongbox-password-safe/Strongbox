@@ -22,7 +22,7 @@
         self.iv = (NSData*)[headerEntries objectForKey:@(ENCRYPTIONIV)];
         
         if(!self.kdfParameters || !self.masterSeed || !self.iv) {
-            NSLog(@"Required Headers (KDFPARAMETERS, MASTERSEED, ENCRYPTIONIV) not Present: [%@]", headerEntries);
+            slog(@"Required Headers (KDFPARAMETERS, MASTERSEED, ENCRYPTIONIV) not Present: [%@]", headerEntries);
             return nil;
         }
         

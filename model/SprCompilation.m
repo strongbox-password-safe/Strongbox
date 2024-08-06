@@ -69,7 +69,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
                                                            options:NSRegularExpressionCaseInsensitive
                                                              error:&error];
         if(error) {
-            NSLog(@"Error compiling Regex: %@", error);
+            slog(@"Error compiling Regex: %@", error);
         }
     });
     
@@ -99,7 +99,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 
             if(!compiled) {
 #ifdef DEBUG
-                NSLog(@"Failed to compile Error: [%@]", matchError);
+                slog(@"Failed to compile Error: [%@]", matchError);
 
 #endif
                 if(error) {
@@ -113,12 +113,12 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
                     ret = [self sprCompile:ret node:node database:database depth:depth+1 noRecurse:noRecurse error:error];
                 }
                 else {
-                    NSLog(@"Depth/Recurse Limit Exceeded in SPR Compile... Will not attempt Further.");
+                    slog(@"Depth/Recurse Limit Exceeded in SPR Compile... Will not attempt Further.");
                 }
             }
         }
         else {
-            NSLog(@"Depth/Recurse Limit Exceeded in SPR Compile... Will not attempt Further.");
+            slog(@"Depth/Recurse Limit Exceeded in SPR Compile... Will not attempt Further.");
         }
     }
     

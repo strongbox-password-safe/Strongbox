@@ -258,7 +258,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (void)applyEncryptionSettingsViewModelChanges:(EncryptionSettingsViewModel*)encryptionSettings;
 
-@property KeePassIconSet iconSet;
+@property KeePassIconSet keePassIconSet;
 
 
 

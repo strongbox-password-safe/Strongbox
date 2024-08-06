@@ -76,7 +76,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
 
     @IBAction func onChangedAutoCommit(_: Any) {
         if checkboxAutoCommit.state == .off {
-            MacAlerts.areYouSure(NSLocalizedString("are_you_sure_auto_commit_totp_msg", comment: "Disabling Auto-Commit could mean you lose this TOTP if you forget to commit later. Are you sure?"),
+            MacAlerts.areYouSure(NSLocalizedString("are_you_sure_auto_commit_totp_msg", comment: "Disabling Auto-Commit could mean you lose this 2FA Code if you forget to commit later. Are you sure?"),
                                  window: view.window)
             { [weak self] response in
                 if response {
@@ -101,7 +101,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
             imageView.image = result.image
             labelTotpUrl.stringValue = result.totpString
 
-            let locString = NSLocalizedString("found_totp_code_in_x_window_fmt", comment: "Found TOTP Code in '%@' Window")
+            let locString = NSLocalizedString("found_totp_code_in_x_window_fmt", comment: "Found 2FA Code in '%@' Window")
             labelFoundInWindow.stringValue = String(format: locString, result.ownerWindow)
             bindTotpCode()
             startTotpRefreshTimer()
@@ -187,13 +187,13 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
         DispatchQueue.global().async { [weak self] in
             self?.scanWindows(qrDetector: qrDetector, infoList: infoList) { result in
                 DispatchQueue.main.async { [weak self] in
-                    self?.onFinishedScanningForTOTPCode(result: result)
+                    self?.onFinishedScanningFor2FACode(result: result)
                 }
             }
         }
     }
 
-    func onFinishedScanningForTOTPCode(result: ScanResult?) {
+    func onFinishedScanningFor2FACode(result: ScanResult?) {
         progressIndicator.stopAnimation(nil)
         isScanning = false
 

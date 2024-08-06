@@ -21,7 +21,7 @@ class WiFiSyncClientConnection {
         let connection = WiFiSyncOneShotClientConnection(endpoint: endpoint,
                                                          passcode: passcode,
                                                          onConnected: { connection in
-                                                             NSLog("🟢 WiFiSyncClientConnection::getDatabase Connected...")
+                                                             swlog("🟢 WiFiSyncClientConnection::getDatabase Connected...")
 
                                                              guard let data = databaseId.data(using: .utf8), connection.send(data, .getDatabaseRequest) else {
                                                                  completion(nil, nil, false, Utils.createNSError("WiFiSyncClientConnection::getDatabase - Could not begin send!", errorCode: -1))
@@ -30,7 +30,7 @@ class WiFiSyncClientConnection {
                                                          },
                                                          onReceived: { data, _ in
                                                              guard let data else {
-                                                                 NSLog("🔴 WiFiSyncClientConnection::getDatabase - Data nil")
+                                                                 swlog("🔴 WiFiSyncClientConnection::getDatabase - Data nil")
                                                                  completion(nil, nil, false, Utils.createNSError("Data Nil from Server", errorCode: -1))
                                                                  return
                                                              }
@@ -40,7 +40,7 @@ class WiFiSyncClientConnection {
                                                              guard let modDateIso8601 = String(data: modData, encoding: .utf8),
                                                                    let date = modDateIso8601.iso8601withFractionalSeconds
                                                              else {
-                                                                 NSLog("🔴 WiFiSyncClientConnection::getDatabase - Could not read Mod Date")
+                                                                 swlog("🔴 WiFiSyncClientConnection::getDatabase - Could not read Mod Date")
                                                                  completion(nil, nil, false, Utils.createNSError("Could not read Mod Date", errorCode: -1))
                                                                  return
                                                              }
@@ -52,7 +52,7 @@ class WiFiSyncClientConnection {
                                                              completion(nil, nil, true, nil)
                                                          },
                                                          onError: { error in
-                                                             NSLog("🔴 WiFiSyncClientConnection::getDatabase - Error = \(error)")
+                                                             swlog("🔴 WiFiSyncClientConnection::getDatabase - Error = \(error)")
                                                              completion(nil, nil, false, error)
                                                          })
 
@@ -63,10 +63,10 @@ class WiFiSyncClientConnection {
         let connection = WiFiSyncOneShotClientConnection(endpoint: endpoint,
                                                          passcode: passcode,
                                                          onConnected: { connection in
-                                                             NSLog("🟢 WiFiSyncClientConnection::pushDatabase Connected...")
+                                                             swlog("🟢 WiFiSyncClientConnection::pushDatabase Connected...")
 
                                                              guard var data = databaseId.data(using: .utf8) else {
-                                                                 NSLog("🔴 WiFiSyncOneShotClientConnection::sendPushDatabaseRequest - Could not convert database id to data!")
+                                                                 swlog("🔴 WiFiSyncOneShotClientConnection::sendPushDatabaseRequest - Could not convert database id to data!")
                                                                  completion(nil, false, Utils.createNSError("WiFiSyncClientConnection::pushDatabase - Could not convert database id to data!", errorCode: -1))
                                                                  return
                                                              }
@@ -74,7 +74,7 @@ class WiFiSyncClientConnection {
                                                              data.append(updatedDatabase) 
 
                                                              guard connection.send(data, .pushDatabaseRequest) else {
-                                                                 NSLog("🔴 WiFiSyncOneShotClientConnection::sendPushDatabaseRequest - Could not begin send!")
+                                                                 swlog("🔴 WiFiSyncOneShotClientConnection::sendPushDatabaseRequest - Could not begin send!")
                                                                  completion(nil, false, Utils.createNSError("WiFiSyncClientConnection::pushDatabase - Could not begin send!", errorCode: -1))
                                                                  return
                                                              }
@@ -83,7 +83,7 @@ class WiFiSyncClientConnection {
                                                              
 
                                                              guard let data else {
-                                                                 NSLog("🔴 WiFiSyncClientConnection::pushDatabase - Data nil")
+                                                                 swlog("🔴 WiFiSyncClientConnection::pushDatabase - Data nil")
                                                                  completion(nil, false, Utils.createNSError("WiFiSyncClientConnection::pushDatabase could not read data or convert to json string", errorCode: -1))
                                                                  return
                                                              }
@@ -92,7 +92,7 @@ class WiFiSyncClientConnection {
                                                              decoder.dateDecodingStrategy = .iso8601withFractionalSeconds
 
                                                              guard let result = try? decoder.decode(WiFiSyncPushDatabaseResult.self, from: data) else {
-                                                                 NSLog("🔴 WiFiSyncClientConnection::listDatabases - could not decode JSON")
+                                                                 swlog("🔴 WiFiSyncClientConnection::listDatabases - could not decode JSON")
                                                                  completion(nil, false, Utils.createNSError("WiFiSyncClientConnection::listDatabases - could not decode JSON", errorCode: -1))
                                                                  return
                                                              }
@@ -102,7 +102,7 @@ class WiFiSyncClientConnection {
                                                              completion(nil, true, nil)
                                                          },
                                                          onError: { error in
-                                                             NSLog("🔴 WiFiSyncClientConnection::pushDatabase - Error = \(error)")
+                                                             swlog("🔴 WiFiSyncClientConnection::pushDatabase - Error = \(error)")
                                                              completion(nil, false, error)
                                                          })
 
@@ -124,7 +124,7 @@ class WiFiSyncClientConnection {
                                                          },
                                                          onReceived: { data, _ in
                                                              guard let data else {
-                                                                 NSLog("🔴 WiFiSyncClientConnection::listDatabases - could not read data or convert to json string")
+                                                                 swlog("🔴 WiFiSyncClientConnection::listDatabases - could not read data or convert to json string")
                                                                  completion(nil, false, Utils.createNSError("WiFiSyncClientConnection::listDatabases - could not read data or convert to json string", errorCode: -1))
                                                                  return
                                                              }
@@ -133,7 +133,7 @@ class WiFiSyncClientConnection {
                                                              decoder.dateDecodingStrategy = .iso8601withFractionalSeconds
 
                                                              guard let databases = try? decoder.decode([WiFiSyncDatabaseSummary].self, from: data) else {
-                                                                 NSLog("🔴 WiFiSyncClientConnection::listDatabases - could not decode JSON")
+                                                                 swlog("🔴 WiFiSyncClientConnection::listDatabases - could not decode JSON")
                                                                  completion(nil, false, Utils.createNSError("WiFiSyncClientConnection::listDatabases - could not decode JSON", errorCode: -1))
                                                                  return
                                                              }
@@ -144,7 +144,7 @@ class WiFiSyncClientConnection {
                                                              completion(nil, true, nil)
                                                          },
                                                          onError: { error in
-                                                             NSLog("🔴 WiFiSyncClientConnection::listDatabases - Error = \(error)")
+                                                             swlog("🔴 WiFiSyncClientConnection::listDatabases - Error = \(error)")
                                                              completion(nil, false, error)
                                                          })
 

@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* string;
 @property NSString* subtext;
 @property BOOL colorize;
+@property BOOL hideLargeTextGrid; 
 
 @end
 

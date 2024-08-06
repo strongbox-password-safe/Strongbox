@@ -10,7 +10,7 @@ import Cocoa
 
 class SideBarViewController: NSViewController, DocumentViewController {
     deinit {
-        NSLog("😎 DEINIT [SideBarViewController]")
+        swlog("😎 DEINIT [SideBarViewController]")
     }
 
     private var headerNodeStates: [HeaderNodeState] = []
@@ -38,7 +38,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         }
 
         guard let doc = view.window?.windowController?.document as? Document else {
-            NSLog("SideBarViewController::load Document not set!")
+            swlog("SideBarViewController::load Document not set!")
             return
         }
 
@@ -79,10 +79,11 @@ class SideBarViewController: NSViewController, DocumentViewController {
 
         
 
+        let note = NSNotification.Name.auditCompleted
         let auditNotificationsOfInterest: [String] = [
             
             kAuditNewSwitchedOffNotificationKey,
-            kAuditCompletedNotificationKey,
+            note.rawValue,
         ]
 
         for ofInterest in auditNotificationsOfInterest {
@@ -156,7 +157,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
     func onAuditUpdateNotification(_ notification: Notification) {
         
         guard let dict = notification.object as? [String: Any], let model = dict["model"] as? Model else {
-            NSLog("🔴 Couldn't real model from notification")
+            swlog("🔴 Couldn't real model from notification")
             return
         }
 
@@ -164,7 +165,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
             return
         }
 
-        NSLog("✅ SideBarViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
+        swlog("✅ SideBarViewController::onAuditUpdateNotification [%@]", String(describing: notification.name))
 
         refresh()
     }
@@ -206,7 +207,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         case kHeaderNodeSpecial:
             return loadQuickViewSideBarNodes()
         default:
-            NSLog("🔴 Unknown HEader")
+            swlog("🔴 Unknown HEader")
             return nil
         }
     }
@@ -215,10 +216,10 @@ class SideBarViewController: NSViewController, DocumentViewController {
         let headerTitle: String
 
         if database.sideBarShowTotalCountOnHierarchy {
-            let fmt = NSLocalizedString("side_bar_hierarchy_folder_structure_summary_count_fmt", comment: "Hierarchy (%@ Groups, %@ Entries)")
+            let fmt = NSLocalizedString("side_bar_hierarchy_folder_structure_summary_count_fmt", comment: "Groups (%@ Groups, %@ Entries)")
             headerTitle = String(format: fmt, String(database.fastGroupTotalCount), String(database.fastEntryTotalCount))
         } else {
-            headerTitle = NSLocalizedString("side_bar_hierarchy_folder_structure", comment: "Hierarchy")
+            headerTitle = NSLocalizedString("side_bar_hierarchy_folder_structure", comment: "Groups")
         }
 
         let hierarchyHeader = SideBarViewNode(context: .none, title: headerTitle, image: Icon.houseFill.image(), parent: nil, children: [], headerNode: kHeaderNodeRegularHierarchy)
@@ -243,7 +244,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
                                                    headerNode: kHeaderNodeFavourites)
 
             for favourite in favourites {
-                let image = NodeIconHelper.getIconFor(favourite, predefinedIconSet: database.iconSet, format: database.format)
+                let image = NodeIconHelper.getIconFor(favourite, predefinedIconSet: database.keePassIconSet, format: database.format)
                 let ret = SideBarViewNode(context: .favourites(favourite.uuid), title: favourite.title, image: image, parent: favouritesHeader, children: [])
                 favouritesHeader.children.append(ret)
             }
@@ -347,7 +348,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         if totp {
             let childCount = database.showChildCountOnFolderInSidebar ? String(format: "(%ld)", database.totpEntries.count) : ""
 
-            let entry = SideBarViewNode(context: .special(.totpItems), title: NSLocalizedString("generic_fieldname_totp", comment: "TOTP"),
+            let entry = SideBarViewNode(context: .special(.totpItems), title: NSLocalizedString("quick_view_title_totp_entries_title", comment: "2FA Codes"),
                                         image: Icon.totp.image(), parent: specialsHeader, databaseNodeChildCount: childCount)
 
             specialNodes.append(entry)
@@ -413,7 +414,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         }
 
         guard let report = database.auditReport else {
-            NSLog("🔴 No Audit Report available - cannot load audit issues")
+            swlog("🔴 No Audit Report available - cannot load audit issues")
             return nil
         }
 
@@ -704,7 +705,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         if rootGroupForDisplay.uuid == group.uuid, group.isUsingKeePassDefaultIcon {
             image = Icon.house.image()
         } else {
-            image = NodeIconHelper.getIconFor(group, predefinedIconSet: database.iconSet, format: database.format)
+            image = NodeIconHelper.getIconFor(group, predefinedIconSet: database.keePassIconSet, format: database.format)
         }
 
         
@@ -798,7 +799,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
             return
         }
 
-        NSLog("🔴 SideBarViewController::bindSelectionToModelNavigationContext: Could not find this Nav Context!")
+        swlog("🔴 SideBarViewController::bindSelectionToModelNavigationContext: Could not find this Nav Context!")
 
         outlineView.selectRowIndexes(IndexSet(), byExtendingSelection: false)
     }
@@ -1100,7 +1101,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
         if case let .favourites(uuid) = clickedNode.context {
             if database.locked || database.isEffectivelyReadOnly {
-                NSLog("🔴 Cannot edit locked or read-only database")
+                swlog("🔴 Cannot edit locked or read-only database")
                 return
             }
 
@@ -1117,7 +1118,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
 
         guard let selected = outlineView.item(atRow: outlineView.selectedRow) as? SideBarViewNode else {
-            NSLog("🔴 outlineViewSelectionDidChange::Could not get selected.")
+            swlog("🔴 outlineViewSelectionDidChange::Could not get selected.")
             return
         }
 
@@ -1205,7 +1206,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
                     
                     else {
                         if database.isKeePass2Format, !database.sortKeePassNodes {
-                            NSLog("✅ SideBarViewController::validateDrop: Internal Source - REORDER - %d", index)
+                            swlog("✅ SideBarViewController::validateDrop: Internal Source - REORDER - %d", index)
                             return [.move]
                         }
                     }
@@ -1219,7 +1220,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
                   let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)),
                   index == NSOutlineViewDropOnItemIndex else { return [] }
 
-            NSLog("SideBar validateDrop: External Source - %d", index)
+            swlog("SideBar validateDrop: External Source - %d", index)
             return [.copy]
         }
 
@@ -1293,7 +1294,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
                 let adjustedIdx = sourceIdx < index ? (index - 1) : index
 
-                NSLog("SideBar acceptDrop: REORDER of item - Source [%@] => Dest [%@] index = [%d]", sourceItem.title, destination.title, adjustedIdx)
+                swlog("SideBar acceptDrop: REORDER of item - Source [%@] => Dest [%@] index = [%d]", sourceItem.title, destination.title, adjustedIdx)
 
                 if database.reorderItem(sourceItem.uuid, idx: adjustedIdx) != -1 {
                     info.draggingPasteboard.clearContents()
@@ -1319,7 +1320,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
         guard !isPerformingProgrammaticExpandCollapse, let item = notification.userInfo?.values.first as? SideBarViewNode else { return }
 
         if let header = item.headerNode {
-            NSLog("outlineViewItemDidExpand = [%@]", String(describing: item.title))
+            swlog("outlineViewItemDidExpand = [%@]", String(describing: item.title))
 
             if let idx = headerNodeStates.firstIndex(where: { $0.header == header }) {
                 headerNodeStates[idx].expanded = true
@@ -1337,7 +1338,7 @@ extension SideBarViewController: NSOutlineViewDelegate {
         guard !isPerformingProgrammaticExpandCollapse, let item = notification.userInfo?.values.first as? SideBarViewNode else { return }
 
         if let header = item.headerNode {
-            NSLog("outlineViewItemDidCollapse = [%@]", String(describing: item.title))
+            swlog("outlineViewItemDidCollapse = [%@]", String(describing: item.title))
 
             if let idx = headerNodeStates.firstIndex(where: { $0.header == header }) {
                 headerNodeStates[idx].expanded = false

@@ -20,7 +20,7 @@ public class StrongboxCMarkGFMHelper: NSObject {
         if ext != nil {
             cmark_parser_attach_syntax_extension(parser, ext)
         } else {
-            NSLog("🔴 Could not add extension: [%@]", extensionName)
+            swlog("🔴 Could not add extension: [%@]", extensionName)
             return false
         }
 
@@ -36,7 +36,7 @@ public class StrongboxCMarkGFMHelper: NSObject {
         let options = CMARK_OPT_FOOTNOTES | CMARK_OPT_HARDBREAKS | CMARK_OPT_VALIDATE_UTF8 | CMARK_OPT_SMART
 
         guard let parser = cmark_parser_new(options) else {
-            NSLog("🔴 Error creating cmark parser")
+            swlog("🔴 Error creating cmark parser")
             throw CmarkGFMError.generic(description: " Error creating cmark parser")
         }
 
@@ -49,19 +49,19 @@ public class StrongboxCMarkGFMHelper: NSObject {
               addExtension(parser: parser, extensionName: "autolink"),
               addExtension(parser: parser, extensionName: "tasklist")
         else {
-            NSLog("🔴 Could not add all GFM markdown extensions")
+            swlog("🔴 Could not add all GFM markdown extensions")
             throw CmarkGFMError.generic(description: "Could not add all GFM markdown extensions")
         }
 
         guard let arr = markdown.cString(using: .utf8) else {
-            NSLog("🔴 Could not convert markdown to UTF8 string")
+            swlog("🔴 Could not convert markdown to UTF8 string")
             throw CmarkGFMError.generic(description: "Could not convert markdown to UTF8 string")
         }
 
         cmark_parser_feed(parser, arr, arr.count - 1)
 
         guard let doc = cmark_parser_finish(parser) else {
-            NSLog("🔴 error in cmark_parser_finish")
+            swlog("🔴 error in cmark_parser_finish")
             throw CmarkGFMError.generic(description: "error in cmark_parser_finish")
         }
 
@@ -69,7 +69,7 @@ public class StrongboxCMarkGFMHelper: NSObject {
 
         guard let cStrHtml = cmark_render_html(doc, options, nil) else {
             cmark_node_free(doc)
-            NSLog("🔴 cmark_render_html error")
+            swlog("🔴 cmark_render_html error")
             throw CmarkGFMError.generic(description: "error in cmark_render_html")
         }
 
@@ -85,7 +85,7 @@ public class StrongboxCMarkGFMHelper: NSObject {
         let markdownHtmlFragment = try convertToHtmlFragment(markdown: markdown)
 
         guard let url = Bundle.main.url(forResource: "markdown-index", withExtension: "html") else {
-            NSLog("🔴 Could not load markdown-index.html")
+            swlog("🔴 Could not load markdown-index.html")
             throw CmarkGFMError.generic(description: "Could not load markdown-index.html")
         }
 

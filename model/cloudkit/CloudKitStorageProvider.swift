@@ -44,7 +44,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
 
 
         guard let cloudKitId = cloudKitIdentifierFromStrongboxDatabase(database) else {
-            NSLog("🔴 Error getting cloudKitIdentifier from database!")
+            swlog("🔴 Error getting cloudKitIdentifier from database!")
             completion(.readResultError, nil, nil, Utils.createNSError("Error getting cloudKitIdentifier from database!", errorCode: -1))
             return
         }
@@ -54,7 +54,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
                 guard let self else { return }
 
                 guard error == nil else {
-                    NSLog("🔴 Error while getting mod date! [%@] - will continue to try pull anyway", String(describing: error))
+                    swlog("🔴 Error while getting mod date! [%@] - will continue to try pull anyway", String(describing: error))
                     completion(.readResultError, nil, nil, error ?? Utils.createNSError("Could not read (getModDate failed)", errorCode: -1))
                     return
                 }
@@ -72,10 +72,10 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func pushDatabase(_ database: METADATA_PTR, interactiveVC _: VIEW_CONTROLLER_PTR?, data: Data, completion: @escaping StorageProviderUpdateCompletionBlock) {
-        NSLog("🟢 CloudKitStorageProvider::pushDatabase...")
+        swlog("🟢 CloudKitStorageProvider::pushDatabase...")
 
         guard let cloudKitId = cloudKitIdentifierFromStrongboxDatabase(database) else {
-            NSLog("🔴 Error getting cloudKitIdentifier from database!")
+            swlog("🔴 Error getting cloudKitIdentifier from database!")
             completion(.updateResultError, nil, Utils.createNSError("Error getting cloudKitIdentifier from database!", errorCode: -1))
             return
         }
@@ -84,30 +84,30 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
             do {
                 let foo = try await CloudKitDatabasesInteractor.shared.updateDatabase(cloudKitId, dataBlob: data)
 
-                NSLog("🟢 CloudKitStorageProvider::Push Success - \(foo) with modDate = \(foo.modDate)")
+                swlog("🟢 CloudKitStorageProvider::Push Success - \(foo) with modDate = \(foo.modDate)")
 
                 completion(.updateResultSuccess, foo.modDate, nil)
             } catch {
-                NSLog("🔴 CloudKit::Push - Error => [\(String(describing: error))]")
+                swlog("🔴 CloudKit::Push - Error => [\(String(describing: error))]")
                 completion(.updateResultError, nil, error)
             }
         }
     }
 
     func delete(_: METADATA_PTR, completion _: @escaping ((any Error)?) -> Void) {
-        NSLog("🐞 CloudKitStorageProvider::delete called - NOTIMPL")
+        swlog("🐞 CloudKitStorageProvider::delete called - NOTIMPL")
     }
 
     func list(_: NSObject?, viewController _: VIEW_CONTROLLER_PTR?, completion _: @escaping (Bool, [StorageBrowserItem], (any Error)?) -> Void) {}
 
     func read(withProviderData _: NSObject?, viewController _: VIEW_CONTROLLER_PTR?, options _: StorageProviderReadOptions, completion _: @escaping StorageProviderReadCompletionBlock) {
-        NSLog("🐞 CloudKitStorageProvider::read called NOTIMPL")
+        swlog("🐞 CloudKitStorageProvider::read called NOTIMPL")
     }
 
     func loadIcon(_: NSObject, viewController _: VIEW_CONTROLLER_PTR, completion _: @escaping (IMAGE_TYPE_PTR) -> Void) {}
 
     func getDatabasePreferences(_: String, providerData _: NSObject) -> METADATA_PTR? {
-        NSLog("🔴 WARNWARN: CloudKitStorageProviderError::getDatabasePreferences called - this is not implemented, something is very wrong")
+        swlog("🔴 WARNWARN: CloudKitStorageProviderError::getDatabasePreferences called - this is not implemented, something is very wrong")
 
         return nil
     }
@@ -116,7 +116,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
 
 
         guard let cloudKitId = cloudKitIdentifierFromStrongboxDatabase(database) else {
-            NSLog("🔴 CloudKitStorageProvider::getModDate Error getting cloudKitIdentifier from database!")
+            swlog("🔴 CloudKitStorageProvider::getModDate Error getting cloudKitIdentifier from database!")
             completion(true, nil, Utils.createNSError("Error getting cloudKitIdentifier from database!", errorCode: -1))
             return
         }
@@ -125,11 +125,11 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
             do {
                 let foo = try await CloudKitDatabasesInteractor.shared.getDatabase(id: cloudKitId, includeDataBlob: false)
 
-                NSLog("🟢 CloudKitStorageProvider::getModDate Success - Got modDate = \(foo.modDate)")
+                swlog("🟢 CloudKitStorageProvider::getModDate Success - Got modDate = \(foo.modDate)")
 
                 completion(true, foo.modDate, nil)
             } catch {
-                NSLog("🔴 CloudKitStorageProvider::getModDate - Error => [\(String(describing: error))]")
+                swlog("🔴 CloudKitStorageProvider::getModDate - Error => [\(String(describing: error))]")
                 completion(true, nil, error)
             }
         }
@@ -143,7 +143,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
                 let foo = try await CloudKitDatabasesInteractor.shared.getDatabase(id: databaseId, includeDataBlob: true)
 
                 guard let dataBlob = foo.dataBlob else {
-                    NSLog("🔴 CloudKit::Read - nil data returned")
+                    swlog("🔴 CloudKit::Read - nil data returned")
                     completion(.readResultError, nil, nil, Utils.createNSError("🔴 CloudKit::Read - nil data returned!", errorCode: -1))
                     return
                 }
@@ -152,7 +152,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
 
                 completion(.readResultSuccess, dataBlob, foo.modDate, nil)
             } catch {
-                NSLog("🔴 CloudKit::Read - Error => [\(String(describing: error))]")
+                swlog("🔴 CloudKit::Read - Error => [\(String(describing: error))]")
                 completion(.readResultError, nil, nil, error)
             }
         }
@@ -178,7 +178,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
             components.path = String(format: "/%@", database.filename)
 
             guard let url = components.url else {
-                NSLog("🔴 Could not generate URL - CloudKit Sync")
+                swlog("🔴 Could not generate URL - CloudKit Sync")
                 throw CloudKitStorageProviderError.couldNotGenerateMacOSURL
             }
 
@@ -186,7 +186,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
             let newDatabasePrefs = MacDatabasePreferences.templateDummy(withNickName: nick, storageProvider: .kCloudKit, fileUrl: url, storageInfo: database.id.json)
 
             guard let url3 = getCloudKitPKUrl(filename: database.filename, uuid: newDatabasePrefs.uuid) else {
-                NSLog("🔴 Could not generate URL - CloudKit Sync")
+                swlog("🔴 Could not generate URL - CloudKit Sync")
                 throw CloudKitStorageProviderError.couldNotGenerateMacOSURL
             }
 
@@ -215,7 +215,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
             components.path = String(format: "/%@", filename)
 
             guard let url = components.url else {
-                NSLog("🔴 Could not generate URL - CloudKit Sync")
+                swlog("🔴 Could not generate URL - CloudKit Sync")
                 
                 return nil
             }
@@ -224,7 +224,7 @@ class CloudKitStorageProvider: NSObject, SafeStorageProvider {
             components.queryItems = [queryItem] 
 
             guard let url2 = components.url else {
-                NSLog("🔴 Could not generate URL - CloudKit Sync")
+                swlog("🔴 Could not generate URL - CloudKit Sync")
                 return nil
             }
 

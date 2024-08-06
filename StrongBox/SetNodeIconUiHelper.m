@@ -42,7 +42,7 @@
     self.completionBlock = completion;
     
     if(format == kPasswordSafe) {
-        NSLog(@"Should not be calling this if safe is Password Safe!!");
+        slog(@"Should not be calling this if safe is Password Safe!!");
         self.completionBlock(NO, NO, nil);
         return;
     }
@@ -206,7 +206,7 @@
     if (url) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_downloading_favicon", @"Downloading FavIcon")];
-            NSLog(@"attempting to download favicon for: [%@]", url);
+            slog(@"attempting to download favicon for: [%@]", url);
 
             [FavIconManager.sharedInstance downloadPreferred:url
                                                      options:FavIconDownloadOptions.express
@@ -228,7 +228,7 @@
     
     if(urlHint.length > 0) {
         NSURLComponents *components = [NSURLComponents componentsWithString:urlHint];
-        NSLog(@"scheme = [%@],user = [%@],password = [%@],host = [%@],port = [%@],path = [%@],query = [%@],fragment = [%@]",
+        slog(@"scheme = [%@],user = [%@],password = [%@],host = [%@],port = [%@],path = [%@],query = [%@],fragment = [%@]",
               components.scheme,
               components.user,
               components.password,
@@ -337,7 +337,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
             if(!data) {
-                NSLog(@"Error: %@", error);
+                slog(@"Error: %@", error);
                 [Alerts error:self.viewController
                         title:NSLocalizedString(@"set_icon_vc_error_reading_image", @"Error Reading Image")
                         error:error];
@@ -413,14 +413,14 @@ static const int kMaxRecommendedCustomIconDimension = 256;
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    slog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
 
     
 
     if (! [url startAccessingSecurityScopedResource] ) {
-        NSLog(@"🔴 Could not securely access URL!");
+        slog(@"🔴 Could not securely access URL!");
     }
     
     NSError* error;
@@ -434,7 +434,7 @@ static const int kMaxRecommendedCustomIconDimension = 256;
     [url stopAccessingSecurityScopedResource];
         
     if(!data) {
-        NSLog(@"Error: %@", error);
+        slog(@"Error: %@", error);
         
         [Alerts error:self.viewController
                 title:NSLocalizedString(@"set_icon_vc_error_reading_image", @"Error Reading Image")

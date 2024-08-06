@@ -26,7 +26,7 @@
 #import "ConfiguredBrowseTableDatasource.h"
 #import "SearchResultsBrowseTableDatasource.h"
 #import "BrowseTableViewCellHelper.h"
-#import "QuickViewsBrowseTableDataSource.h"
+
 #import <ISMessages/ISMessages.h>
 #import "BiometricsManager.h"
 #import "AuditDrillDownController.h"
@@ -64,6 +64,7 @@
 
 #import "Strongbox-Swift.h"
 #import "ExportHelper.h"
+#import "BrowseActionsHelper.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -90,9 +91,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property ConfiguredBrowseTableDatasource* configuredDataSource;
 @property SearchResultsBrowseTableDatasource* searchDataSource;
 
-
-@property QuickViewsBrowseTableDataSource* quickViewsDataSource;
-
 @property NSString *pwSafeRefreshSerializationId;
 @property (readonly) BOOL isItemsCanBeExported;
 
@@ -101,6 +99,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 @property (readonly) MainSplitViewController* parentSplitViewController;
 @property BrowseSortConfiguration* sortConfiguration;
+
+@property BrowseActionsHelper* browseActionsHelper;
 
 @end
 
@@ -121,15 +121,19 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     BrowseSafeView* vc = (BrowseSafeView*)[sb instantiateInitialViewController];
     
     vc.viewModel = model;
-    vc.currentGroupId = viewType == kBrowseViewTypeTags ? nil : model.database.effectiveRootGroup.uuid;
+    vc.currentGroupId = nil;
     vc.currentTag = nil;
     vc.viewType = viewType;
+    
+    if ( viewType == kBrowseViewTypeHierarchy ) {
+        vc.currentGroupId = model.database.effectiveRootGroup.uuid;
+    }
     
     return vc;
 }
 
 - (void)dealloc {
-    NSLog(@"DEALLOC [%@]", self);
+    slog(@"DEALLOC [%@]", self);
     
     [self onClosed];
 }
@@ -157,12 +161,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf
                                            selector:@selector(refresh)
-                                               name:kNotificationNameItemDetailsEditDone
+                                               name:kModelEditedNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf
                                            selector:@selector(onAuditCompleted:)
-                                               name:kAuditCompletedNotificationKey
+                                               name:kAuditCompletedNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf
@@ -172,22 +176,22 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf
                                            selector:@selector(onDatabaseReloaded:)
-                                               name:kDatabaseReloadedNotificationKey
+                                               name:kDatabaseReloadedNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf
                                            selector:@selector(onSyncOrUpdateStatusChanged:)
-                                               name:kAsyncUpdateStarting
+                                               name:kAsyncUpdateStartingNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf
                                            selector:@selector(onSyncOrUpdateStatusChanged:)
-                                               name:kAsyncUpdateDone
+                                               name:kAsyncUpdateDoneNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onSyncOrUpdateStatusChanged:)
-                                               name:kSyncManagerDatabaseSyncStatusChanged
+                                               name:kSyncManagerDatabaseSyncStatusChangedNotification
                                              object:nil];
 }
 
@@ -259,7 +263,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)displayLastViewedEntryIfAppropriate {
     if ( self.isDisplayingRoot && self.viewModel.metadata.showLastViewedEntryOnUnlock && self.viewModel.metadata.lastViewedEntry ) {
         if ( self.viewModel.metadata.immediateSearchOnBrowse && self.splitViewController.isCollapsed ) {
-            NSLog(@"Not showing last viewed entry because Start with Search and Split View collapsed");
+            slog(@"Not showing last viewed entry because Start with Search and Split View collapsed");
         }
         else {
             Node* item = [self.viewModel getItemById:self.viewModel.metadata.lastViewedEntry];
@@ -277,6 +281,13 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     if ( self.viewModel.originalFormat == kPasswordSafe && self.currentGroupId ) {
         self.pwSafeRefreshSerializationId = [self.viewModel.database getCrossSerializationFriendlyIdId:self.currentGroupId]; 
     }
+    
+    __weak BrowseSafeView* weakSelf = self;
+    self.browseActionsHelper = [[BrowseActionsHelper alloc] initWithModel:self.viewModel
+                                                           viewController:self
+                                                     updateDatabaseAction:^(BOOL clearSelectedDetailItem, void (^ _Nullable completion)(BOOL)) {
+        [weakSelf updateAndRefresh:clearSelectedDetailItem completion:completion];
+    }];
     
     [self setupDatasources];
     
@@ -298,13 +309,13 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         
         if ( enc ) {
             if ( self.viewModel.onboardingDatabaseChangeRequests.updateDatabaseToV4OnLoad ) {
-                NSLog(@"Updating Database to V4 after Onboard Request...");
+                slog(@"Updating Database to V4 after Onboard Request...");
                 enc.format = kKeePass4;
                 changed = YES;
             }
             
             if ( self.viewModel.onboardingDatabaseChangeRequests.reduceArgon2MemoryOnLoad ) {
-                NSLog(@"Reducing Argon2 Memory after Onboard Request...");
+                slog(@"Reducing Argon2 Memory after Onboard Request...");
                 const int kReducedArgonMemory = 32 * 1024 * 1024;
                 enc.argonMemory = kReducedArgonMemory;
                 changed = YES;
@@ -320,14 +331,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (void)setupDatasources {
     self.configuredDataSource = [[ConfiguredBrowseTableDatasource alloc] initWithModel:self.viewModel
-                                                                 isDisplayingRootGroup:[self isDisplayingRoot]
                                                                              tableView:self.tableView
                                                                               viewType:self.viewType
                                                                         currentGroupId:self.currentGroupId
                                                                             currentTag:self.currentTag];
     
     self.searchDataSource = [[SearchResultsBrowseTableDatasource alloc] initWithModel:self.viewModel tableView:self.tableView];
-    self.quickViewsDataSource = [[QuickViewsBrowseTableDataSource alloc] initWithModel:self.viewModel tableView:self.tableView];
 }
 
 - (void)customizeUi {
@@ -372,17 +381,17 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     if ( [self isDisplayingRoot] ) {
         [leftBarButtons addObject:self.closeBarButton];
     }
-
+    
     UIImage* image = [UIImage systemImageNamed:@"gear"];
     self.preferencesBarButton = [[UIBarButtonItem alloc] initWithImage:image menu:nil];
-
+    
     [leftBarButtons addObject:self.preferencesBarButton];
-
-
+    
+    
     [self.navigationItem.backBarButtonItem setTitle:@""];
     
     [self refreshSettingsMenu];
-        
+    
     self.navigationItem.leftBarButtonItems = leftBarButtons;
 }
 
@@ -405,7 +414,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     self.sortiOS14Button = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"arrow.up.arrow.down" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleSmall]] menu:nil];
     
-    if ( !self.isDisplayingRootTagsList ) { 
+    if ( !self.isDisplayingRootTagsList ) {
         [rightBarButtons insertObject:self.sortiOS14Button atIndex:1];
     }
     [self refreshSortMenu];
@@ -424,7 +433,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     
     
-        
+    
     
     
     
@@ -463,7 +472,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     self.navigationController.toolbar.hidden = !(exportEnabled || moveAndDeleteEnabled); 
     self.navigationController.toolbarHidden = !(exportEnabled || moveAndDeleteEnabled); 
-
+    
     [self updateNavigationPrompt];
     
     self.buttonMove.enabled = moveAndDeleteEnabled;
@@ -517,7 +526,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     __weak BrowseSafeView* weakSelf = self;
     
     BOOL newEntryPossible = self.viewType != kBrowseViewTypeHierarchy || ( [self.viewModel.database getItemById:self.currentGroupId].childRecordsAllowed );
-
+    
     [ma0 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_new_entry", @"New Entry")
                                   systemImage:@"doc.badge.plus"
                                       enabled:!ro && newEntryPossible
@@ -530,7 +539,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                       systemImage:@"folder.badge.plus" enabled:!ro
                                           handler:^(__kindof UIAction * _Nonnull action) { [weakSelf onAddGroup]; }]];
     }
-        
+    
     UIMenu* menu0 = [UIMenu menuWithTitle:@""
                                     image:nil
                                identifier:nil
@@ -561,7 +570,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     if ( self.viewType == kBrowseViewTypeHierarchy ) {
         BOOL rearrangingEnabled = (!ro && self.viewType == kBrowseViewTypeHierarchy && weakSelf.viewModel.database.originalFormat != kPasswordSafe && self.sortConfiguration.field == kBrowseSortFieldNone);
-
+        
         if ( rearrangingEnabled ) {
             [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_rearrange", @"Rearrange")
                                           systemImage:@"arrow.up.arrow.down.square.fill"
@@ -589,7 +598,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_set_master_credentials", @"Set Master Credentials")
                                   systemImage:@"ellipsis.rectangle"
                                       enabled:!ro
-                                      handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf performSegueWithIdentifier:@"segueToChangeMasterCredentials" sender:nil]; }]];
+                                      handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf.browseActionsHelper presentSetCredentials];
+    }]];
     
     if ( !AppPreferences.sharedInstance.disableExport ) {
         [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_export_database", @"Export Database")
@@ -630,29 +641,19 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_start_with_search", @"Start with Search") systemImage:@"magnifyingglass" enabled:YES checked:self.viewModel.metadata.immediateSearchOnBrowse handler:^(__kindof UIAction * _Nonnull action) { [weakSelf toggleStartWithSearch]; }]];
     
     
+    [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"configure_tabs", @"Configure Tabs")
+                                  systemImage:@"list.bullet.below.rectangle"
+                                      handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf performSegueWithIdentifier:@"segueToConfigureTabs" sender:nil];
+    }]];
     
-
-
-
-
-
-
-
-    
-    if ( self.tabBarController.tabBar.isHidden ) {
-        [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"configure_tabs", @"Configure Tabs")
-                                      systemImage:@"list.bullet.below.rectangle"
-                                          handler:^(__kindof UIAction * _Nonnull action) {
-            [weakSelf performSegueWithIdentifier:@"segueToConfigureTabs" sender:nil];
-        }]];
-    }
     
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")
                                   systemImage:@"slider.horizontal.3"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToCustomizeView" sender:nil];
     }]];
-
+    
     UIMenu* menu1 = [UIMenu menuWithTitle:@""
                                     image:nil
                                identifier:nil
@@ -671,36 +672,38 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToConvenienceUnlock" sender:nil];
     }]];
-
+    
     [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_autofill_settings", @"AutoFill")
                                   systemImage:@"rectangle.and.pencil.and.ellipsis"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf showAutoFillSettings];
     }]];
-
+    
     [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_vc_action_audit", @"Audit")
                                   systemImage:@"checkmark.shield"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf showAuditSettings];
     }]];
-
+    
     [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_auto_lock_settings", @"Automatic Locking")
                                   systemImage:@"lock.rotation.open"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf showAutoLockSettings];
     }]];
-
+    
     [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_encryption_settings", @"Encryption")
                                   systemImage:@"function"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf showEncryptionSettings];
     }]];
-
+    
     if ( !ro ) {
         [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_set_master_credentials", @"Set Master Credentials")
                                       systemImage:@"ellipsis.rectangle"
                                           enabled:YES
-                                          handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf performSegueWithIdentifier:@"segueToChangeMasterCredentials" sender:nil]; }]];
+                                          handler:^(__kindof UIAction * _Nonnull action) {
+            [weakSelf.browseActionsHelper presentSetCredentials];
+        }]];
     }
     
     UIMenu* menu2 = [UIMenu menuWithTitle:@""
@@ -710,20 +713,20 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                  children:ma2];
     
     NSMutableArray<UIMenuElement*>* ma3 = [NSMutableArray array];
-
+    
     [ma3 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_advanced_noun", @"Advanced")
                                   systemImage:@"gear"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf showAdvancedSettings:nil];
     }]];
-        
+    
     UIMenu* menu3 = [UIMenu menuWithTitle:@""
                                     image:nil
                                identifier:nil
                                   options:UIMenuOptionsDisplayInline
                                  children:ma3];
     
-   
+    
     UIMenu* menu = [UIMenu menuWithTitle:NSLocalizedString(@"generic_settings", @"Settings")
                                    image:nil
                               identifier:nil
@@ -742,10 +745,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     AuditConfigurationVcTableViewController* vc = [AuditConfigurationVcTableViewController fromStoryboard];
     
     vc.model = self.viewModel;
-    vc.hideShowAllAuditIssues = NO;
-    vc.onDone = ^(BOOL showAllAuditIssues, UIViewController * _Nonnull viewControllerToDismiss) {
-        [viewControllerToDismiss dismissViewControllerAnimated:YES completion:nil];
-    };
     
     __weak BrowseSafeView* weakSelf = self;
     vc.updateDatabase = ^{
@@ -779,13 +778,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onDatabaseBulkIconUpdate:(NSDictionary<NSUUID *,NodeIcon *> * _Nullable)selectedFavIcons {
-    for(Node* node in self.viewModel.database.allActiveEntries) {
-        NodeIcon* icon = selectedFavIcons[node.uuid];
-        if( icon ) {
-            node.icon = icon;
-        }
-    }
-    [self updateAndRefresh];
+    [self.browseActionsHelper onDatabaseBulkIconUpdate:selectedFavIcons];
 }
 
 - (void)showEncryptionSettings {
@@ -798,7 +791,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     };
     
     vc.model = self.viewModel;
-
+    
     [self presentViewController:nav animated:YES completion:nil];
 }
 
@@ -819,24 +812,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onShare {
-    DatabasePreferences* database = self.viewModel.metadata;
-    NSError* error;
-    NSURL* url = [ExportHelper getExportFile:database error:&error];
-    if ( !url || error ) {
-        [Alerts error:self error:error];
-        return;
-    }
-
-    NSArray *activityItems = @[url];
-    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
-    
-    activityViewController.popoverPresentationController.barButtonItem = self.moreiOS14Button;
-        
-    [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-        [ExportHelper cleanupExportFiles:url];
-    }];
-    
-    [self presentViewController:activityViewController animated:YES completion:nil];
+    [self.browseActionsHelper exportDatabase];
 }
 
 - (void)onAuditNodesChanged:(id)param {
@@ -853,24 +829,24 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
     
     NSNumber* numNote = dict[@"userStopped"];
-    NSLog(@"✅ Audit Completed... [%@]- userStopped = [%@]", self, numNote);
-  
+    slog(@"✅ Audit Completed... [%@]- userStopped = [%@]", self, numNote);
     
     
-
-
-
-
+    
+    
+    
+    
+    
     if ( self.isDisplayingRoot && self.viewModel.metadata.auditConfig.auditInBackground ) {
         NSNumber* issueCount = self.viewModel.auditIssueCount;
         if (issueCount == nil) {
-            NSLog(@"WARNWARN: Invalid Audit Issue Count but Audit Completed Notification Received. Stale BrowseView... ignore");
+            slog(@"WARNWARN: Invalid Audit Issue Count but Audit Completed Notification Received. Stale BrowseView... ignore");
             return;
         }
         
         NSNumber* lastKnownAuditIssueCount = self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount;
         
-        NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", issueCount.unsignedLongValue, lastKnownAuditIssueCount);
+        slog(@"Audit Complete: Issues = %lu - Last Known = %@", issueCount.unsignedLongValue, lastKnownAuditIssueCount);
         
         DatabaseAuditorConfiguration* config = self.viewModel.metadata.auditConfig;
         config.lastKnownAuditIssueCount = issueCount;
@@ -930,7 +906,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)setEditing:(BOOL)editing animated:(BOOL)animate {
     [super setEditing:editing animated:animate];
     
-    NSLog(@"setEditing: %d", editing);
+    slog(@"setEditing: %d", editing);
     
     [self updateNavAndToolbarButtonsState];
     
@@ -952,7 +928,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     if(![sourceIndexPath isEqual:destinationIndexPath]) {
-        NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
+        slog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
         
         if(self.reorderItemOperations == nil) {
             self.reorderItemOperations = [NSMutableArray array];
@@ -966,7 +942,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (void)reorderPendingItems {
     if ( self.viewType != kBrowseViewTypeHierarchy ) {
-        NSLog(@"🔴 Cannot reorder items outside of Hierarchy view! Something v wrong to end up here.");
+        slog(@"🔴 Cannot reorder items outside of Hierarchy view! Something v wrong to end up here.");
         self.reorderItemOperations = nil;
         [self updateAndRefresh];
         return;
@@ -985,7 +961,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             Node* dest = [self getNodeFromIndexPath:moveOp.b];
             
             if ( !src || !dest ) {
-                NSLog(@"Could not find one of src or dest in reordering - aborting");
+                slog(@"Could not find one of src or dest in reordering - aborting");
                 self.reorderItemOperations = nil;
                 [self updateAndRefresh];
                 return;
@@ -1015,10 +991,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         BOOL s = [self.viewModel reorderChildFrom:srcIndex to:destIndex parentGroup:currentGroup] != -1;
         
         if (s) {
-            NSLog(@"Reordering: %lu -> %lu Successful", (unsigned long)srcIndex, (unsigned long)destIndex);
+            slog(@"Reordering: %lu -> %lu Successful", (unsigned long)srcIndex, (unsigned long)destIndex);
         }
         else {
-            NSLog(@"WARNWARN: Move Unsucessful!: %lu -> %lu - Terminating further re-ordering", (unsigned long)srcIndex, (unsigned long)destIndex);
+            slog(@"WARNWARN: Move Unsucessful!: %lu -> %lu - Terminating further re-ordering", (unsigned long)srcIndex, (unsigned long)destIndex);
             break;
         }
     }
@@ -1065,7 +1041,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         NSArray* selected = [self getSelectedItems];
         
         self.navigationItem.prompt = [NSString stringWithFormat:NSLocalizedString(@"detail_view_no_multiple_items_selected_message_fmt", @"%@ Items Selected"),
-                                                                                  @(selected.count)];
+                                      @(selected.count)];
     }
     else {
         if ( AppPreferences.sharedInstance.showDatabaseNamesInBrowse ) {
@@ -1118,12 +1094,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     
     
-
-        UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
-        [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
-        
-        self.tableView.refreshControl = refreshControl;
-
+    
+    UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
+    
+    self.tableView.refreshControl = refreshControl;
+    
 }
 
 - (CGFloat)cellHeight {
@@ -1137,10 +1113,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
     else {
         [self.parentSplitViewController onClose];
-        
-        if (self.viewModel) {
-            [self.viewModel closeAndCleanup];
-        }
     }
 }
 
@@ -1164,7 +1136,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     Node *item = [self getNodeFromIndexPath:indexPath];
     
     if ( !item ) {
-        NSLog(@"⚠️ Could not find item at indexpath! Bailing");
+        slog(@"⚠️ Could not find item at indexpath! Bailing");
         return;
     }
     
@@ -1174,8 +1146,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                           message:NSLocalizedString(@"browse_vc_rename_item_enter_title", @"Please enter a new title for this item")
                        completion:^(NSString *text, BOOL response) {
         if(response) {
-            if ([self.viewModel.database setItemTitle:item title:text]) {
-                [self updateAndRefresh];
+            if ( [self.viewModel setItemTitle:item.uuid title:text]) {
+                [self updateAndSave];
             }
         }
         
@@ -1197,7 +1169,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             
             [self.viewModel renameTag:tag to:trimmed];
             
-            [self updateAndRefresh];
+            [self updateAndSave];
         }
         
         if(completion) {
@@ -1212,7 +1184,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         if(response) {
             [self.viewModel deleteTag:tag];
             
-            [self updateAndRefresh];
+            [self updateAndSave];
         }
         
         if(completion) {
@@ -1222,14 +1194,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onEmptyRecycleBin:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
-    [Alerts areYouSure:self message:NSLocalizedString(@"browse_vc_action_empty_recycle_bin_are_you_sure", @"This will permanently delete all items contained within the Recycle Bin.") action:^(BOOL response) {
-        if ( response ) {
-            [self.viewModel emptyRecycleBin];
-            [self updateAndRefresh];
-        }
-        
+    [self.browseActionsHelper emptyRecycleBin:^(BOOL actionPerformed) {
         if(completion) {
-            completion(response);
+            completion(actionPerformed);
         }
     }];
 }
@@ -1245,13 +1212,13 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)onSetIconForItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
     Node *item = [self getNodeFromIndexPath:indexPath];
     if ( !item ) {
-        NSLog(@"⚠️ Could not find item at indexpath! Bailing");
+        slog(@"⚠️ Could not find item at indexpath! Bailing");
         if ( completion ) {
             completion(NO);
         }
         return;
     }
-
+    
     if ( !self.sni ) {
         self.sni = [[SetNodeIconUiHelper alloc] init];
     }
@@ -1306,7 +1273,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (UIContextualAction*)getRemoveAction:(NSIndexPath *)indexPath {
     Node *item = [self getNodeFromIndexPath:indexPath];
-
+    
     BOOL willRecycle = item ? [self.viewModel canRecycle:item.uuid] : NO;
     NSString* title = willRecycle ? NSLocalizedString(@"generic_action_verb_recycle", @"Recycle") : NSLocalizedString(@"browse_vc_action_delete", @"Delete");
     
@@ -1316,7 +1283,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [self onDeleteSingleItem:indexPath completion:completionHandler];
     }];
     
-    removeAction.image = [UIImage systemImageNamed:@"trash.fill"];
+    removeAction.image = [UIImage systemImageNamed:@"trash"];
     removeAction.backgroundColor = UIColor.systemRedColor;
     
     return removeAction;
@@ -1359,7 +1326,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                                     handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         [self duplicateItem:item completion:completionHandler];
     }];
-        
+    
     duplicateItemAction.image = [UIImage systemImageNamed:@"plus.square.on.square"];
     duplicateItemAction.backgroundColor = UIColor.systemPurpleColor;
     
@@ -1397,7 +1364,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }];
     
     UIImage* auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
-
+    
     pinAction.image = auditImage;
     pinAction.backgroundColor = UIColor.systemOrangeColor;
     
@@ -1415,14 +1382,14 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     Node *item = [self getNodeFromIndexPath:indexPath];
     if (!item) {
-        NSLog(@"⚠️ Could not find item at IndexPath... bailing");
+        slog(@"⚠️ Could not find item at IndexPath... bailing");
         return [UISwipeActionsConfiguration configurationWithActions:@[]];
     }
     
     if(!self.viewModel.isReadOnly) {
-            return self.viewModel.database.originalFormat != kPasswordSafe ?
-            [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, setIconAction]] :
-            [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction]];
+        return self.viewModel.database.originalFormat != kPasswordSafe ?
+        [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, setIconAction]] :
+        [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction]];
     }
     else {
         return [UISwipeActionsConfiguration configurationWithActions:@[]];
@@ -1433,7 +1400,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     if (![self getTableDataSource].supportsSlideActions) {
         return [UISwipeActionsConfiguration configurationWithActions:@[]];
     }
-
+    
     Node *item = [self getNodeFromIndexPath:indexPath];
     if (!item || item.isGroup) {
         return [UISwipeActionsConfiguration configurationWithActions:@[]];
@@ -1460,15 +1427,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     if (![self getTableDataSource].supportsSlideActions) {
         return [UISwipeActionsConfiguration configurationWithActions:@[]];
     }
-            
+    
     Node *item = [self getNodeFromIndexPath:indexPath];
-
+    
     if ( item ) {
         UIContextualAction* copyPassword = [self getCopyPasswordSlideAction:indexPath];
         UIContextualAction* copyUsername = [self getCopyUsernameSlideAction:indexPath];
         
         NSMutableArray* actions = @[copyPassword, copyUsername].mutableCopy;
-
+        
         if (item.fields.otpToken) {
             UIContextualAction* copyTotp = [self getCopyTotpSlideAction:indexPath];
             [actions addObject:copyTotp];
@@ -1491,7 +1458,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                          title:NSLocalizedString(@"browse_prefs_tap_action_copy_and_launch", @"Copy & Launch")
                                                                        handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         if ( !item ) {
-            NSLog(@"⚠️ Could not find item!");
+            slog(@"⚠️ Could not find item!");
             completionHandler(NO);
         }
         else {
@@ -1512,7 +1479,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                          title:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_totp", @"Copy TOTP")
                                                                        handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         if ( !item ) {
-            NSLog(@"⚠️ Could not find item!");
+            slog(@"⚠️ Could not find item!");
             completionHandler(NO);
         }
         else {
@@ -1533,7 +1500,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                          title:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_password", @"Copy Password")
                                                                        handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         if ( !item ) {
-            NSLog(@"⚠️ Could not find item!");
+            slog(@"⚠️ Could not find item!");
             completionHandler(NO);
         }
         else {
@@ -1554,7 +1521,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                          title:NSLocalizedString(@"browse_prefs_tap_action_copy_username", @"Copy Username")
                                                                        handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         if ( !item ) {
-            NSLog(@"⚠️ Could not find item!");
+            slog(@"⚠️ Could not find item!");
             completionHandler(NO);
         }
         else {
@@ -1570,11 +1537,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)showAuditDrillDown:(Node*)item {
     if ( !item ) {
-        NSLog(@"⚠️ Nil Item! Bailing");
+        slog(@"⚠️ Nil Item! Bailing");
         return;
     }
-
-    [self performSegueWithIdentifier:@"segueToAuditDrillDown" sender:item.uuid];
+    
+    [self.browseActionsHelper showAuditDrillDown:item.uuid];
 }
 
 - (void)toggleFavourite:(Node*)item {
@@ -1585,10 +1552,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     BOOL needsSave = [self.viewModel toggleFavourite:item.uuid];
     
     if ( needsSave ) {
-        [self updateAndRefresh];
+        [self updateAndSave];
     }
-    
-    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:item.uuid]; 
 }
 
 - (void)toggleAutoFillExclusion:(Node*)item {
@@ -1599,20 +1564,16 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     BOOL needsSave = [self.viewModel toggleAutoFillExclusion:item.uuid];
     
     if ( needsSave ) {
-        [self updateAndRefresh];
+        [self updateAndSave];
     }
-    
-    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:item.uuid]; 
 }
 
 - (void)toggleAuditExclusion:(Node*)item {
     [self.viewModel toggleAuditExclusion:item.uuid];
     
-    [self updateAndRefresh];
+    [self updateAndSave];
     
     [self.viewModel restartBackgroundAudit];
-
-    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:item.uuid]; 
 }
 
 - (void)duplicateItem:(Node*)item {
@@ -1621,13 +1582,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)duplicateItem:(Node*)item completion:(void (^)(BOOL actionPerformed))completion {
     if ( !item ) {
-        NSLog(@"⚠️ Could not find item at indexpath! Bailing");
+        slog(@"⚠️ Could not find item at indexpath! Bailing");
         if ( completion ) {
             completion(NO);
         }
         return;
     }
-
+    
     DuplicateOptionsViewController* vc = [DuplicateOptionsViewController instantiate];
     NSString* newTitle = [item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")];
     
@@ -1653,7 +1614,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             
             BOOL done = [self.viewModel addChildren:@[dupe] destination:item.parent];
             
-            [self updateAndRefresh];
+            [self updateAndSave];
             
             if ( done && editAfter ) {
                 [self editEntry:dupe];
@@ -1678,9 +1639,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)onDatabaseReloaded:(id)param {
     if ( !self.isEditing ) {
-        NSLog(@"Received Database Reloaded Notification from Model");
+        slog(@"Received Database Reloaded Notification from Model");
         
-        if ( self.viewModel.database.originalFormat == kPasswordSafe ) { 
+        if ( self.viewModel.database.originalFormat == kPasswordSafe && self.viewType == kBrowseViewTypeHierarchy ) { 
             Node* node = [self.viewModel.database getItemByCrossSerializationFriendlyId:self.pwSafeRefreshSerializationId];
             if ( node ) {
                 self.currentGroupId = node.uuid;
@@ -1699,11 +1660,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-
-    
     if ( searchController.searchBar.text.length == 0 ) {
-
-        [self.quickViewsDataSource refresh]; 
         [self.tableView reloadData];
     }
     else {
@@ -1724,6 +1681,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)refresh {
+    slog(@"🐞 BrowseSafeView:Refresh...");
+    
     [self refreshItems];
     
     [self refreshNavBarTitle];
@@ -1750,7 +1709,17 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     UIImage *image = nil;
     UIColor* tint = nil;
     
-    if ( self.viewType == kBrowseViewTypeTags ) {
+    if ( self.viewType == kBrowseViewTypeHierarchy ) {
+        Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+        title = (currentGroup == nil || currentGroup.parent == nil) ? self.viewModel.metadata.nickName : currentGroup.title;
+        
+        if ( currentGroup ) {
+            image = [NodeIconHelper getIconForNode:currentGroup predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat];
+        }
+        
+        tint = self.viewModel.database.recycleBinNode == currentGroup ? Constants.recycleBinTintColor : nil;
+    }
+    else if ( self.viewType == kBrowseViewTypeTags ) {
         if ( self.currentTag == nil ) {
             title = NSLocalizedString(@"browse_prefs_item_subtitle_tags", @"Tags");
             image = [UIImage systemImageNamed:@"tag.circle" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
@@ -1772,22 +1741,36 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         image = [UIImage systemImageNamed:@"list.bullet" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
     }
     else if ( self.viewType == kBrowseViewTypeTotpList ) {
-        title = NSLocalizedString(@"browse_prefs_view_as_totp_list", @"TOTPs");
+        title = NSLocalizedString(@"quick_view_title_totp_entries_title", @"2FA Codes");
         image = [UIImage systemImageNamed:@"timer" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];
     }
-    else {
-        Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
-        title = (currentGroup == nil || currentGroup.parent == nil) ? self.viewModel.metadata.nickName : currentGroup.title;
-        
-        if ( currentGroup ) {
-            image = [NodeIconHelper getIconForNode:currentGroup predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat];
+    else if ( self.viewType == kBrowseViewTypePasskeys ) {
+        title = NSLocalizedString(@"generic_noun_plural_passkeys", @"Passkeys");
+        image = [UIImage systemImageNamed:@"person.badge.key.fill" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleDefault]];
+    }
+    else if ( self.viewType == kBrowseViewTypeSshKeys ) {
+        NSString* img = @"network";
+        if ( @available(iOS 17.0, *) ) {
+            img = @"apple.terminal.fill";
         }
         
-        tint = self.viewModel.database.recycleBinNode == currentGroup ? Constants.recycleBinTintColor : nil;
+        title = NSLocalizedString(@"sidebar_quick_view_keeagent_ssh_keys_title", @"SSH Keys");
+        image = [UIImage systemImageNamed:img withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleDefault]];
+    }
+    else if ( self.viewType == kBrowseViewTypeAttachments ) {
+        title = NSLocalizedString(@"item_details_section_header_attachments", @"Attachments");
+        image = [UIImage systemImageNamed:@"doc.richtext.fill" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleDefault]];
+    }
+    else if ( self.viewType == kBrowseViewTypeExpiredAndExpiring ) {
+        title = NSLocalizedString(@"quick_view_title_expired_and_expiring", @"Expired & Expiring");
+        image = [UIImage systemImageNamed:@"calendar" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleDefault]];
+    }
+    else {
+        slog(@"🔴 Could not refreshNavBarTitle - unknown view type");
     }
     
-
-
+    
+    
     
     UIView* view = [MMcGSwiftUtils navTitleWithImageAndTextWithTitleText:title
                                                                    image:image
@@ -1799,12 +1782,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (id<BrowseTableDatasource>)getTableDataSource {
     if (self.searchController.isActive) {
-        if (self.searchController.searchBar.text.length) {
-            return self.searchDataSource;
-        }
-        else {
-            return self.quickViewsDataSource;
-        }
+        return self.searchDataSource;
     }
     else {
         return self.configuredDataSource;
@@ -1828,7 +1806,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         return ret;
     }
     
-    NSLog(@"⚠️ Could not get Node from IndexPath...");
+    slog(@"⚠️ Could not get Node from IndexPath...");
     
     return nil;
 }
@@ -1911,12 +1889,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         return;
     }
     
-    if ( [self isShowingQuickViews] ) {
-        [self.quickViewsDataSource performTapAction:indexPath searchController:self.searchController];
-    }
-    else {
-        [self handleSingleTap:indexPath];
-    }
+    [self handleSingleTap:indexPath];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -1965,27 +1938,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     __weak BrowseSafeView* weakSelf = self;
     
-    if ([segue.identifier isEqualToString:@"segueToAuditDrillDown"]) {
-        UINavigationController* nav = segue.destinationViewController;
-        AuditDrillDownController *vc = (AuditDrillDownController*)nav.topViewController;
-
-        vc.model = self.viewModel;
-        vc.itemId = sender;
-        vc.onDone = ^(BOOL showAllAuditIssues, UIViewController *__weak  _Nonnull viewControllerToDismiss) {
-            
-            
-            [viewControllerToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                if (showAllAuditIssues) {
-                    [weakSelf showAllAuditIssues];
-                }
-            }];
-        };
-        vc.updateDatabase = ^{
-            [weakSelf updateAndRefresh];
-        };
-    }
-    else if ([segue.identifier isEqualToString:@"segueMasterDetailToDetail"] || [segue.identifier isEqualToString:@"segueMasterDetailToDetail-NonAnimated"]) {
-
+    if ([segue.identifier isEqualToString:@"segueMasterDetailToDetail"] || [segue.identifier isEqualToString:@"segueMasterDetailToDetail-NonAnimated"]) {
+        
         ItemDetailsViewController *vc = (ItemDetailsViewController*)segue.destinationViewController;
         
         NSDictionary* params = (NSDictionary*)sender;
@@ -2046,42 +2000,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else if ([segue.identifier isEqualToString:@"segueToCustomizeView"]){
         UINavigationController* nav = segue.destinationViewController;
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)nav.topViewController;
-        vc.databaseMetaData = self.viewModel.metadata;
         vc.model = self.viewModel;
-        vc.format = self.viewModel.database.originalFormat;
         
         vc.onDone = ^{
             [self refreshButtonDropdownMenus];
         };
-    }
-    else if ( [segue.identifier isEqualToString:@"segueToChangeMasterCredentials"]) {
-        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
-        CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
-        
-        scVc.mode = kCASGModeSetCredentials;
-        scVc.initialFormat = self.viewModel.database.originalFormat;
-        scVc.initialKeyFileBookmark = self.viewModel.metadata.keyFileBookmark;
-        scVc.initialYubiKeyConfig = self.viewModel.metadata.contextAwareYubiKeyConfig;
-        
-        scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if(success) {
-                    [self setCredentials:creds.password
-                         keyFileBookmark:creds.keyFileBookmark
-                         keyFileFileName:creds.keyFileFileName
-                      oneTimeKeyFileData:creds.oneTimeKeyFileData
-                              yubiConfig:creds.yubiKeyConfig];
-                }
-            }];
-        };
-    }
-    else if ( [segue.identifier isEqualToString:@"segueBrowseToLargeTextView"] ) {
-        LargeTextViewController* vc = segue.destinationViewController;
-        
-        
-        NSDictionary* d = sender;
-        vc.string = d[@"text"];
-        vc.colorize = ((NSNumber*)(d[@"colorize"])).boolValue;
     }
     else if ( [segue.identifier isEqualToString:@"segueToItemProperties"] ) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
@@ -2158,21 +2081,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
 }
 
-
-
-- (void)showAllAuditIssues { 
-    [self.searchController.searchBar becomeFirstResponder];
-    
-    self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
-    self.searchController.searchBar.text = kSpecialSearchTermAuditEntries;
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.searchController.searchBar endEditing:YES]; 
-    });
-}
-
-
-
 - (void)onAddGroup {
     __weak BrowseSafeView* weakSelf = self;
     
@@ -2186,7 +2094,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                        completion:^(NSString *text, BOOL response) {
         if (response) {
             if ([weakSelf.viewModel addNewGroup:weakCurrentGroup title:text] != nil) {
-                [weakSelf updateAndRefresh];
+                [weakSelf updateAndSave];
             }
             else {
                 [Alerts warn:weakSelf
@@ -2294,48 +2202,26 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     Node *item = [self getNodeFromIndexPath:indexPath];
     
     if ( !item ) {
-        NSLog(@"🔴 Could not find item to delete!"); 
+        slog(@"🔴 Could not find item to delete!"); 
         if ( completion ) {
             completion(NO);
         }
         return;
     }
     
-    BOOL willRecycle = [self.viewModel canRecycle:item.uuid];
+    [self deleteSingle:item completion:completion];
+}
 
-    [Alerts yesNo:self.searchController.isActive ? self.searchController : self
-            title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
-          message:[NSString stringWithFormat:willRecycle ?
-                   NSLocalizedString(@"browse_vc_are_you_sure_recycle_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?") :
-                   NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"), [self dereference:item.title node:item]]
-           action:^(BOOL response) {
-                if (response) {
-                    BOOL failed = NO;
-                    if (willRecycle) {
-                        failed = ![self.viewModel recycleItems:@[item]];
-                    }
-                    else {
-                        [self.viewModel deleteItems:@[item]];
-                    }
-
-                    if (failed) {
-                        [Alerts warn:self
-                               title:NSLocalizedString(@"browse_vc_delete_failed", @"Delete Failed")
-                             message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
-                    }
-                    else {
-                        if(self.isEditing) {
-                            [self setEditing:NO animated:YES];
-                        }
-                        
-                        [self updateAndRefresh:YES];
-                    }
-                }
+- (void)deleteSingle:(Node*)item completion:(void (^)(BOOL actionPerformed))completion {
+    [self.browseActionsHelper deleteSingleItem:item.uuid completion:^(BOOL actionPerformed) {
+        if ( actionPerformed && self.isEditing) {
+            [self setEditing:NO animated:YES];
+        }
         
-                if (completion) {
-                    completion(response);
-                }
-           }];
+        if ( completion ) {
+            completion(actionPerformed);
+        }
+    }];
 }
 
 - (void)onDeleteMultipleSelected:(NSArray<NSIndexPath*>*)selected {
@@ -2345,10 +2231,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         BOOL delete = [self.viewModel canRecycle:obj.uuid];
         return @(delete);
     }];
-
+    
     const NSArray<Node*> *toBeDeleted = grouped[@(NO)];
     const NSArray<Node*> *toBeRecycled = grouped[@(YES)];
-
+    
     if ( toBeDeleted == nil ) {
         [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled];
     }
@@ -2384,6 +2270,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             if(self.isEditing) {
                 [self setEditing:NO animated:YES];
             }
+            
             [self updateAndRefresh:YES];
         }
     }];
@@ -2394,15 +2281,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
           message:NSLocalizedString(@"browse_vc_are_you_sure_delete", @"Are you sure you want to permanently delete these item(s)?")
            action:^(BOOL response) {
-               if (response) {
-                   [self.viewModel deleteItems:items];
-                   
-                   if(self.isEditing) {
-                       [self setEditing:NO animated:YES];
-                   }
-                   [self updateAndRefresh:YES];
-               }
-           }];
+        if (response) {
+            [self.viewModel deleteItems:items];
+            
+            if(self.isEditing) {
+                [self setEditing:NO animated:YES];
+            }
+            [self updateAndRefresh:YES];
+        }
+    }];
 }
 
 - (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
@@ -2410,24 +2297,24 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
           message:NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?")
            action:^(BOOL response) {
-       if (response) {
-           BOOL fail = ![self.viewModel recycleItems:items];
-           
-           if(fail) {
-               [Alerts warn:self
-                      title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
-                    message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
-               
-               [self refresh];
-           }
-           else {
-               if(self.isEditing) {
-                   [self setEditing:NO animated:YES];
-               }
-               
-               [self updateAndRefresh:YES];
-           }
-       }
+        if (response) {
+            BOOL fail = ![self.viewModel recycleItems:items];
+            
+            if(fail) {
+                [Alerts warn:self
+                       title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                     message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
+                
+                [self refresh];
+            }
+            else {
+                if(self.isEditing) {
+                    [self setEditing:NO animated:YES];
+                }
+                
+                [self updateAndRefresh:YES];
+            }
+        }
     }];
 }
 
@@ -2442,12 +2329,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (NSArray<Node*> *)getSelectedItems:(NSArray<NSIndexPath *> *)selectedRows {
     NSMutableArray<Node*>* ret = [NSMutableArray array];
-
+    
     for (NSIndexPath *selectionIndex in selectedRows) {
         Node* node = [self getNodeFromIndexPath:selectionIndex];
         
         if(node) {
-            [ret addObject:node]; 
+            [ret addObject:node];
         }
     }
     
@@ -2487,7 +2374,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             break;
         case kBrowseTapActionEdit:
             [self editEntry:item];
-       default:
+        default:
             break;
     }
 }
@@ -2506,152 +2393,39 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)copyUrl:(Node*)item {
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.url node:item]];
-
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_url_copied_fmt", @"'%@' URL Copied"),
-                                        [self dereference:item.title node:item]]
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [self.browseActionsHelper copyUrl:item.uuid];
 }
 
 - (void)copyEmail:(Node*)item {
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.email node:item]];
-    
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_email_copied_fmt", @"'%@' Email Copied"),
-                                        [self dereference:item.title node:item]]
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [self.browseActionsHelper copyEmail:item.uuid];
 }
 
 - (void)copyNotes:(Node*)item {
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.notes node:item]];
-    
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_notes_copied_fmt", @"'%@' Notes Copied"),
-                                        [self dereference:item.title node:item]]
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
-}
-
-- (void)copyUsername:(Node*)item {
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.username node:item]];
-    
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_username_copied_fmt", @"'%@' Username Copied"),
-                                        [self dereference:item.title node:item]]
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
-    
-    NSLog(@"Fast Username Copy on %@", item.title);
+    [self.browseActionsHelper copyNotes:item.uuid];
 }
 
 - (void)copyTotp:(Node*)item {
-    if(!item.fields.otpToken) {
-        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_no_totp_to_copy_fmt", @"'%@': No TOTP setup to Copy!"),
-                                            [self dereference:item.title node:item]]
-                                   message:nil
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeWarning
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
+    [self.browseActionsHelper copyTotp:item.uuid];
+}
 
-        return;
-    }
-    
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:item.fields.otpToken.password];
-    
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_totp_copied_fmt", @"'%@' TOTP Copied"),
-                                        [self dereference:item.title node:item]]
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
-    
-    NSLog(@"Fast TOTP Copy on %@", item.title);
-    
+- (void)copyUsername:(Node*)item {
+    [self.browseActionsHelper copyUsername:item.uuid];
 }
 
 - (void)copyPassword:(Node *)item {
-    BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
-    
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item]];
-    
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:copyTotp ?
-                                        NSLocalizedString(@"browse_vc_totp_copied_fmt", @"'%@' OTP Code Copied") :
-                                        NSLocalizedString(@"browse_vc_password_copied_fmt", @"'%@' Password Copied"),
-                                        [self dereference:item.title node:item]]
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [self.browseActionsHelper copyPassword:item.uuid];
+}
+
+- (void)copyCustomField:(NSString*)key item:(Node *)item {
+    [self.browseActionsHelper copyCustomField:key uuid:item.uuid];
 }
 
 - (void)copyAllFields:(Node*)item {
-    NSMutableArray<NSString*>* fields = NSMutableArray.array;
-    
-    [fields addObject:[self dereference:item.title node:item]];
-    [fields addObject:[self dereference:item.fields.username node:item]];
-    [fields addObject:[self dereference:item.fields.password node:item]];
-    [fields addObject:[self dereference:item.fields.url node:item]];
-    [fields addObject:[self dereference:item.fields.notes node:item]];
-    [fields addObject:[self dereference:item.fields.email node:item]];
-    
-    
-    
-    NSArray* sortedKeys = [item.fields.customFieldsNoEmail.allKeys sortedArrayUsingComparator:finderStringComparator];
-    for(NSString* key in sortedKeys) {
-        if ( ![NodeFields isTotpCustomFieldKey:key] ) {
-            StringValue* sv = item.fields.customFields[key];
-            NSString *val = [self dereference:sv.value node:item];
-            [fields addObject:val];
-        }
-    }
+    [self.browseActionsHelper copyAllFields:item.uuid];
+}
 
-    
-    
-    NSArray<NSString*> *all = [fields filter:^BOOL(NSString * _Nonnull obj) {
-        return obj.length != 0;
-    }];
-    
-    NSString* allString = [all componentsJoinedByString:@"\n"];
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:allString];
-    
-    [ISMessages showCardAlertWithTitle:NSLocalizedString(@"generic_copied", @"Copied")
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
-    
-
+- (void)copyAndLaunch:(Node*)item {
+    [self.browseActionsHelper copyAndLaunch:item.uuid];
 }
 
 
@@ -2684,7 +2458,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     NSString* tag = [self getTagFromIndexPath:indexPath];
     
     if ( tag.length == 0 ) {
-        NSLog(@"⚠️ Nil empty Tag?!");
+        slog(@"⚠️ Nil empty Tag?!");
         return nil;
     }
     
@@ -2727,7 +2501,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     if (self.isEditing || [self isShowingQuickViews]) {
         return nil;
     }
-
+    
     if ( self.viewType == kBrowseViewTypeTags && self.currentTag == nil ) {
         return [self getContextMenuForTagAt:indexPath];
     }
@@ -2740,7 +2514,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     Node *item = [self getNodeFromIndexPath:(NSIndexPath*)configuration.identifier];
     
     if ( !item ) {
-        NSLog(@"⚠️ Could not find item!");
+        slog(@"⚠️ Could not find item!");
     }
     else {
         [self openDetails:item];
@@ -2773,7 +2547,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"browse_vc_action_delete", @"Delete")
-                                     systemImage:@"trash.fill"
+                                     systemImage:@"trash"
                                          handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onDeleteTag:tag completion:nil];
     }];
@@ -2827,15 +2601,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"generic_item_properties_ellipsis", @"Item Properties...")
-                           systemImage:@"list.bullet"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"list.bullet"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToItemProperties" sender:item];
     }];
 }
 
 - (UIMenuElement*)getContextMenuQuickSettingsForEntrySubmenu:(NSIndexPath*)indexPath item:(Node*)item {
     NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
-
+    
     if (!self.viewModel.isReadOnly) {
         if ( !item.isGroup ) {
             if ( item.isSearchable ) {
@@ -2852,9 +2626,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             }
         }
     }
-
+    
     [ma addObject:[self getContextualMenuPropertiesAction:indexPath item:item]];
-
+    
     return [UIMenu menuWithTitle:NSLocalizedString(@"generic_settings", @"Settings")
                            image:[UIImage systemImageNamed:@"gear"]
                       identifier:nil
@@ -2866,7 +2640,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
     
     if ( !item.isGroup ) [ma addObject:[self getContextualMenuCopyToClipboardSubmenu:indexPath item:item]];
-
+    
     return [UIMenu menuWithTitle:NSLocalizedString(@"browse_context_menu_copy_other_field", @"Copy Field...")
                            image:[UIImage systemImageNamed:@"doc.on.doc"]
                       identifier:nil
@@ -2894,19 +2668,19 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         }
         
         
-
+        
         [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_password" item:item handler:^(__kindof UIAction * _Nonnull action) {
             [weakSelf copyPassword:item];
         }]];
         
         
-
+        
         if (item.fields.otpToken) {
             [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_totp" item:item handler:^(__kindof UIAction * _Nonnull action) {
                 [weakSelf copyTotp:item];
             }]];
         }
-     
+        
         
         
         NSURL* launchUrl = [self getLaunchUrlForItem:item];
@@ -2918,7 +2692,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         }
         
         
-
+        
         if ( item.fields.email.length ) {
             [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_email" item:item handler:^(__kindof UIAction * _Nonnull action) {
                 [weakSelf copyEmail:item];
@@ -2926,7 +2700,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         }
         
         
-
+        
         if ( item.fields.notes.length ) {
             [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_notes" item:item handler:^(__kindof UIAction * _Nonnull action) {
                 [weakSelf copyNotes:item];
@@ -2942,7 +2716,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                         options:UIMenuOptionsDisplayInline
                                        children:@[[self getContextualMenuLaunchAndCopyAction:indexPath item:item]]]];
         }
-
+        
         
         
         NSMutableArray* customFields = [NSMutableArray array];
@@ -2950,20 +2724,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         for(NSString* key in sortedKeys) {
             if ( ![NodeFields isTotpCustomFieldKey:key] ) {
                 [customFields addObject:[self getContextualMenuGenericCopy:key item:item handler:^(__kindof UIAction * _Nonnull action) {
-                    StringValue* sv = item.fields.customFields[key];
-                    
-                    NSString* value = [weakSelf dereference:sv.value node:item];
-                    
-                    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
-                    
-                    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), key]
-                                               message:nil
-                                              duration:3.f
-                                           hideOnSwipe:YES
-                                             hideOnTap:YES
-                                             alertType:ISAlertTypeSuccess
-                                         alertPosition:ISAlertPositionTop
-                                               didHide:nil];
+                    [weakSelf copyCustomField:key item:item];
                 }]];
             }
         }
@@ -2976,7 +2737,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                        children:customFields]];
         }
     }
-
+    
     return [UIMenu menuWithTitle:@""
                            image:nil
                       identifier:nil
@@ -2989,15 +2750,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     if (!self.viewModel.isReadOnly) {
         
-    
-        [ma addObject:[self getContextualMenuMoveAction:indexPath item:item]];
-
         
-
+        [ma addObject:[self getContextualMenuMoveAction:indexPath item:item]];
+        
+        
+        
         if(!item.isGroup) {
             [ma addObject:[self getContextualMenuDuplicateAction:indexPath item:item]];
         }
-    
+        
         
         
         if (item.isGroup) {
@@ -3005,30 +2766,28 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             if ( self.viewModel.database.originalFormat != kPasswordSafe ) {
                 [ma addObject:[self getContextualMenuSetIconAction:indexPath item:item]];
             }
-
+            
             [ma addObject:[self getContextualMenuRenameAction:indexPath item:item]];
         }
     }
     
     if ( self.isItemsCanBeExported ) { 
         [ma addObject:[self getContextualExportItemsAction:indexPath item:item]];
-    
+        
     }
-
+    
     if ( !self.viewModel.isReadOnly || self.isItemsCanBeExported ) {
         if ( self.searchController.isActive && !self.tableView.isEditing ) {
             [ma addObject:[self getContextualSelectItemsAction:indexPath item:item]];
         }
     }
-
+    
     if(!self.viewModel.isReadOnly) {    
-        
-        
-        
+                                        
         
         [ma addObject:[self getContextualMenuRemoveAction:indexPath item:item]];
     }
-
+    
     
     return [UIMenu menuWithTitle:@""
                            image:nil
@@ -3042,29 +2801,29 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (UIAction*)getContextualMenuToggleFavouriteAction:(NSIndexPath*)indexPath item:(Node*)item {
     BOOL pinned = [self.viewModel isFavourite:item.uuid];
     NSString* title = pinned ? NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") : NSLocalizedString(@"browse_vc_action_pin", @"Pin");
-
+    
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:title
-                           systemImage:pinned ? @"star.slash" : @"star.fill"
-                               colour:pinned ? UIColor.secondaryLabelColor : UIColor.systemYellowColor
-                               handler:^(__kindof UIAction * _Nonnull action) {
-         [weakSelf toggleFavourite:item];
+                          systemImage:pinned ? @"star.slash" : @"star.fill"
+            
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf toggleFavourite:item];
     }];
 }
 
 - (UIAction*)getContextualMenuExcludeFromAutoFillAction:(NSIndexPath*)indexPath item:(Node*)item {
     BOOL excluded = [self.viewModel isExcludedFromAutoFill:item.uuid];
     NSString* title = NSLocalizedString(@"suggest_in_autofill_yesno_flag", @"Suggest in AutoFill");
-
+    
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:title
-                           systemImage:@"rectangle.and.pencil.and.ellipsis"
+                          systemImage:@"rectangle.and.pencil.and.ellipsis"
                               enabled:YES
                               checked:!excluded
-                               handler:^(__kindof UIAction * _Nonnull action) {
-         [weakSelf toggleAutoFillExclusion:item];
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf toggleAutoFillExclusion:item];
     }];
 }
 
@@ -3075,7 +2834,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:title
-            systemImage:@"checkmark.shield"
+                          systemImage:@"checkmark.shield"
                                colour:UIColor.systemOrangeColor
                                 large:NO
                           destructive:NO
@@ -3087,7 +2846,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (UIAction*)getContextualMenuDisabledInfoItem:(NSIndexPath*)indexPath item:(Node*)item text:(NSString*)text {
-
+    
     
     return [ContextMenuHelper getItem:text
                           systemImage:@"info.circle"
@@ -3103,10 +2862,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"view_audit_issue_details_ellipsis", @"Audit Issue Details...")
-                           systemImage:@"checkmark.shield"
-                               colour:UIColor.systemOrangeColor
-                                large:YES
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"checkmark.shield"
+            
+            
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf showAuditDrillDown:item];
     }];
 }
@@ -3115,10 +2874,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_show_password", @"Show Password")
-                           systemImage:@"eye"
-                               handler:^(__kindof UIAction * _Nonnull action) {
-        NSString* pw = [weakSelf dereference:item.fields.password node:item];
-        [weakSelf performSegueWithIdentifier:@"segueBrowseToLargeTextView" sender:@{ @"text" : pw, @"colorize" : @(weakSelf.viewModel.metadata.colorizePasswords) }];
+                          systemImage:@"eye"
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf.browseActionsHelper showPassword:item.uuid];
     }];
 }
 
@@ -3126,8 +2884,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_username", @"Copy Username")
-                           systemImage:@"doc.on.doc"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"doc.on.doc"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf copyUsername:item];
     }];
 }
@@ -3136,8 +2894,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_password", @"Copy Password")
-                           systemImage:@"doc.on.doc"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"doc.on.doc"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf copyPassword:item];
     }];
 }
@@ -3146,8 +2904,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_totp", @"Copy TOTP")
-                           systemImage:@"doc.on.doc"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"doc.on.doc"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf copyTotp:item];
     }];
 }
@@ -3156,36 +2914,36 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:NSLocalizedString(@"browse_action_launch_url_copy_password", @"Launch URL & Copy")
-                           systemImage:@"bolt"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"bolt"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf copyAndLaunch:item];
     }];
 }
 
 - (UIAction*)getContextualMenuGenericCopy:(NSString*)locKey item:(Node*)item handler:(UIActionHandler)handler  {
     return [ContextMenuHelper getItem:NSLocalizedString(locKey, nil)
-                           systemImage:@"doc.on.doc"
-                               handler:handler];
+                          systemImage:@"doc.on.doc"
+                              handler:handler];
 }
 
 - (UIAction*)getContextualMenuSetIconAction:(NSIndexPath*)indexPath item:(Node*)item  {
     NSString* title = item.isGroup ? NSLocalizedString(@"browse_vc_action_set_icons", @"Icons...") : NSLocalizedString(@"browse_vc_action_set_icon", @"Set Icon");
     __weak BrowseSafeView* weakSelf = self;
     return [ContextMenuHelper getItem:title
-                           systemImage:@"photo"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"photo"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onSetIconForItem:indexPath completion:nil];
     }];
 }
 
 - (UIAction*)getContextualMenuDuplicateAction:(NSIndexPath*)indexPath item:(Node*)item  {
     NSString* title = NSLocalizedString(@"browse_vc_action_duplicate", @"Duplicate");
-        
+    
     __weak BrowseSafeView* weakSelf = self;
-
+    
     return [ContextMenuHelper getItem:title
-                           systemImage:@"plus.square.on.square"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"plus.square.on.square"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf duplicateItem:item completion:nil];
     }];
 }
@@ -3196,8 +2954,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:title
-                           systemImage:@"pencil"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"pencil"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onRenameItem:indexPath completion:nil];
     }];
 }
@@ -3206,13 +2964,16 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     NSString* title = NSLocalizedString(@"browse_vc_action_empty_recycle_bin", @"Empty Recycle Bin");
     
     __weak BrowseSafeView* weakSelf = self;
-    
-    return [ContextMenuHelper getItem:title
-                          systemImage:@"arrow.3.trianglepath"
-                               colour:UIColor.systemGreenColor
-                              handler:^(__kindof UIAction * _Nonnull action) {
+    return [ContextMenuHelper getDestructiveItem:title systemImage:@"arrow.3.trianglepath" handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onEmptyRecycleBin:indexPath completion:nil];
     }];
+    
+    
+    
+    
+    
+    
+    
 }
 
 - (UIAction*)getContextualMenuMoveAction:(NSIndexPath*)indexPath item:(Node*)item  {
@@ -3221,8 +2982,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:title
-                           systemImage:@"arrow.up.doc"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"arrow.up.doc"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToSelectDestination" sender:@[item]];
     }];
 }
@@ -3230,24 +2991,24 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath item:(Node*)item  {
     BOOL willRecycle = [self.viewModel canRecycle:item.uuid];
     NSString* title = willRecycle ? NSLocalizedString(@"generic_action_verb_recycle", @"Recycle") : NSLocalizedString(@"browse_vc_action_delete", @"Delete");
-
+    
     __weak BrowseSafeView* weakSelf = self;
     
-    if ( !willRecycle ) {
-        return [ContextMenuHelper getDestructiveItem:title
-                                         systemImage:@"trash.fill"
-                                             handler:^(__kindof UIAction * _Nonnull action) {
-            [weakSelf onDeleteSingleItem:indexPath completion:nil];
-        }];
-    }
-    else {
-        return [ContextMenuHelper getItem:title
-                              systemImage:@"trash.fill"
-                                   colour:UIColor.systemGreenColor
-                                  handler:^(__kindof UIAction * _Nonnull action) {
-            [weakSelf onDeleteSingleItem:indexPath completion:nil];
-        }];
-    }
+    
+    return [ContextMenuHelper getDestructiveItem:title
+                                     systemImage:@"trash"
+                                         handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onDeleteSingleItem:indexPath completion:nil];
+    }];
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
 
 - (UIAction*)getContextualExportItemsAction:(NSIndexPath*)indexPath item:(Node*)item  {
@@ -3256,8 +3017,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:title
-                           systemImage:@"square.and.arrow.up.on.square"
-                               handler:^(__kindof UIAction * _Nonnull action) {
+                          systemImage:@"square.and.arrow.up.on.square"
+                              handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onExportItemSingleItem:item];
     }];
 }
@@ -3271,7 +3032,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [weakSelf setEditing:YES animated:YES];
         
         [weakSelf.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
- 
+        
         [weakSelf updateNavAndToolbarButtonsState];
     }];
 }
@@ -3280,84 +3041,22 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (NSURL*)getLaunchUrlForItem:(Node*)item {
     NSString* urlString = [self dereference:item.fields.url node:item];
-
+    
     if (!urlString.length) {
         return nil;
     }
-        
+    
     return urlString.urlExtendedParseAddingDefaultScheme;
-}
-
-- (void)copyAndLaunch:(Node*)item {
-    if ( item.fields.url.length ) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, .25 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self copyPassword:item];
-            [self.viewModel launchUrl:item];
-        });
-    }
 }
 
 
 
 - (void)onManualPulldownRefresh {
-    NSLog(@"Browse: onManualPulldownRefresh. Syncing.");
-    
     __weak BrowseSafeView* weakSelf = self;
     
-    if ( self.viewModel.isInOfflineMode ) {
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        if ( self.viewModel.metadata.allowPulldownRefreshSyncInOfflineMode ) {
-            [self doSyncAfterPulldownRefresh:YES];
-        }
-        else {
-            [Alerts twoOptionsWithCancel:self
-                                   title:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_question_title", @"Sync in Offline Mode?")
-                                 message:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_question_message", @"Would you like to sync even though the database is in Offline mode?")
-                       defaultButtonText:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_option_sync_once", @"Sync this once")
-                        secondButtonText:NSLocalizedString(@"manual_pulldown_sync_sync_in_offline_mode_option_always", @"Always sync when I do this")
-                                  action:^(int response) {
-                if ( response == 0 ) { 
-                    [self doSyncAfterPulldownRefresh:YES];
-                }
-                else if ( response == 1 ) { 
-                    self.viewModel.metadata.allowPulldownRefreshSyncInOfflineMode = YES;
-                    [self doSyncAfterPulldownRefresh:YES];
-                }
-                else {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [weakSelf.tableView.refreshControl endRefreshing];
-                    });
-                }
-            }];
-        }
-    }
-    else {
-        [self doSyncAfterPulldownRefresh:NO];
-    }
-}
-
-- (void)doSyncAfterPulldownRefresh:(BOOL)ignoreOfflineMode {
-    __weak BrowseSafeView* weakSelf = self;
-    
-    [self.parentSplitViewController syncWithIgnoreOfflineModeAndTrySync:ignoreOfflineMode
-                                                             completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+    [self.parentSplitViewController onManualPullDownRefreshWithCompletion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [weakSelf.tableView.refreshControl endRefreshing];
-            
-            if ( localWasChanged ) {
-                [StrongboxToastMessages showSlimInfoStatusBarWithBody:NSLocalizedString(@"browse_vc_pulldown_refresh_updated_title", @"Database Updated")
-                                                                delay:1.5];
-            }
         });
     }];
 }
@@ -3384,109 +3083,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 
-- (void)setCredentials:(NSString*)password
-       keyFileBookmark:(NSString*)keyFileBookmark
-       keyFileFileName:(NSString*)keyFileFileName
-    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
-            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
-        
-    BOOL usingImportedKeyFile = keyFileBookmark || keyFileFileName;
-    BOOL keyFileInvolved = usingImportedKeyFile || oneTimeKeyFileData;
-    
-    if( keyFileInvolved ) {
-        NSError* error;
-        NSData* keyFileDigest = [KeyFileManagement getDigestFromSources:keyFileBookmark
-                                                    keyFileFileName:keyFileFileName
-                                                 onceOffKeyFileData:oneTimeKeyFileData
-                                                             format:self.viewModel.database.originalFormat
-                                                              error:&error];
-        
-        if ( keyFileDigest == nil ) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"db_management_error_title_couldnt_change_credentials", @"Could not change credentials")
-                    error:error];
-            return;
-        }
-        
-        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:keyFileDigest];
-    }
-
-    if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
-        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:newCkf.keyFileDigest yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
-            [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
-        }];
-    }
-
-    CompositeKeyFactors *rollbackCkf = [self.viewModel.database.ckfs clone];
-    self.viewModel.database.ckfs = newCkf;
-    
-    [self updateAndRefresh:NO
-                completion:^(BOOL savedWorkingCopy) {
-        if ( savedWorkingCopy ) {
-            [self onSuccessfulCredentialsChanged:keyFileBookmark
-                                 keyFileFileName:keyFileFileName
-                              oneTimeKeyFileData:oneTimeKeyFileData
-                                      yubiConfig:yubiConfig];
-        }
-        else { 
-            self.viewModel.database.ckfs = rollbackCkf;
-        }
-    }];
-    
-
-
-
-
-
-
-
-
-
-
-
-}
-
-- (void)onSuccessfulCredentialsChanged:(NSString*)keyFileBookmark
-                       keyFileFileName:(NSString*)keyFileFileName
-                    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
-                            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    if ( self.viewModel.metadata.isConvenienceUnlockEnabled ) {
-        if(!oneTimeKeyFileData) {
-            self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
-            self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
-            NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
-        }
-        else {
-            
-            self.viewModel.metadata.convenienceMasterPassword = nil;
-            self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
-            self.viewModel.metadata.conveniencePasswordHasBeenStored = NO;
-        }
-    }
-    
-    [self.viewModel.metadata setKeyFile:keyFileBookmark keyFileFileName:keyFileFileName];
-    self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [ISMessages showCardAlertWithTitle:self.viewModel.database.originalFormat == kPasswordSafe ?
-         NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
-         NSLocalizedString(@"db_management_credentials_changed", @"Master Credentials Changed")
-                                   message:nil
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeSuccess
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
-    });
-}
-
 - (void)onMoveItems:(Node*)destination items:(NSArray<Node*>*)items {
-    BOOL ret = [self.viewModel.database moveItems:items destination:destination];
-        
+    BOOL ret = [self.viewModel moveItems:items destination:destination];
+    
     if (!ret) {
-        NSLog(@"Error Moving");
         NSError* error = [Utils createNSError:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving") errorCode:-1];
         [Alerts error:self error:error];
         return;
@@ -3495,44 +3095,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     if(self.isEditing) {
         [self setEditing:NO animated:YES];
     }
-
-    [self updateAndRefresh];
+    
+    [self updateAndSave];
 };
 
 
-
-
-- (void)updateAndRefresh {
-    [self updateAndRefresh:NO];
-}
-
-- (void)updateAndRefresh:(BOOL)clearSelectedDetailItem {
-    [self updateAndRefresh:clearSelectedDetailItem completion:nil];
-}
-
-- (void)updateAndRefresh:(BOOL)clearSelectedDetailItem completion:(void (^)(BOOL savedWorkingCopy))completion {
-    
-    
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self refresh];
-        
-        if ( clearSelectedDetailItem ) {
-            [self showEntry:nil];
-        }
-    });
-
-    [self.parentSplitViewController updateAndQueueSyncWithCompletion:^(BOOL savedWorkingCopy) {
-
-
-
-
-
-        if ( completion ) {
-            completion(savedWorkingCopy);
-        }
-    }];
-}
 
 
 
@@ -3582,7 +3149,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             [SVProgressHUD dismiss];
             
             if ( expressAttempt ) {
-                NSLog(@"YAY - Express Unlocked Second DB with same CKFs! No need to re-request CKFs...");
+                slog(@"YAY - Express Unlocked Second DB with same CKFs! No need to re-request CKFs...");
                 [self onExportItemsToDatabaseUnlockDestinationDone:kUnlockDatabaseResultSuccess model:expressAttempt itemsToExport:itemsToExport error:nil];
             }
             else {
@@ -3622,7 +3189,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                        itemsToExport:(NSArray<Node*>*)itemsToExport
                                                error:(NSError * _Nullable)error {
     if(result == kUnlockDatabaseResultSuccess) {
-        NSLog(@"model = [%@]", model);
+        slog(@"model = [%@]", model);
         [self onExportItemsToUnlockedDatabase:model itemsToExport:itemsToExport];
     }
     else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
@@ -3630,7 +3197,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
     else if (result == kUnlockDatabaseResultIncorrectCredentials) {
         
-        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+        slog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
     }
     else if (result == kUnlockDatabaseResultError) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -3674,7 +3241,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                       itemsToExport:(NSArray<Node*>*)itemsToExport
                                  makeBrandNewCopies:(BOOL)makeBrandNewCopies
                                  preserveTimestamps:(BOOL)preserveTimestamps {
-    NSLog(@"makeBrandNewCopies = %hhd, preserveTimestamps = %hhd", makeBrandNewCopies, preserveTimestamps);
+    slog(@"makeBrandNewCopies = %hhd, preserveTimestamps = %hhd", makeBrandNewCopies, preserveTimestamps);
     
     
     
@@ -3743,7 +3310,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
               itemsToExport:(NSArray<Node*>*)itemsToExport
          makeBrandNewCopies:(BOOL)makeBrandNewCopies {
     if ( itemsToExport.count == 0 ) {
-        NSLog(@"No items left to export!");
+        slog(@"No items left to export!");
         return;
     }
     
@@ -3771,11 +3338,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         BOOL added = [destinationModel addChildren:@[exportItem] destination:destinationGroup];
         
         if ( !added ) {
-            NSLog(@"Failed to exportItem: [%@]", exportItem);
+            slog(@"Failed to exportItem: [%@]", exportItem);
             failOccurred = YES;
         }
         else {
-            NSLog(@"Exported Item: [%@]", exportItem);
+            slog(@"Exported Item: [%@]", exportItem);
         }
     }
 
@@ -4000,7 +3567,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [menus addObject:menuFoldersSeparate];
     }
     
-    if ( effectiveSortField == kBrowseSortFieldTitle ) {
+    if ( effectiveSortField == kBrowseSortFieldTitle && self.viewType != kBrowseViewTypeExpiredAndExpiring ) {
         [menus addObject:menuAlphaIndex];
     }
     
@@ -4064,13 +3631,50 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)onPrint {
-    NSString* htmlString = [self.viewModel.database getHtmlPrintString:self.viewModel.metadata.nickName];
+    [self.browseActionsHelper printDatabase];
+}
+
+
+
+
+- (void)updateAndRefresh {
+    [self updateAndRefresh:NO];
+}
+
+- (void)updateAndRefresh:(BOOL)clearSelectedDetailItem {
+    [self updateAndRefresh:clearSelectedDetailItem completion:nil];
+}
+
+- (void)updateAndRefresh:(BOOL)clearSelectedDetailItem completion:(void (^)(BOOL savedWorkingCopy))completion {
     
-    UIMarkupTextPrintFormatter *formatter = [[UIMarkupTextPrintFormatter alloc] initWithMarkupText:htmlString];
     
-    UIPrintInteractionController.sharedPrintController.printFormatter = formatter;
     
-    [UIPrintInteractionController.sharedPrintController presentAnimated:YES completionHandler:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self refresh]; 
+        
+        
+        
+        
+        
+        
+        if ( clearSelectedDetailItem ) {
+            [self showEntry:nil];
+        }
+    });
+    
+    [self updateAndSave:completion];
+}
+
+- (void)updateAndSave {
+    [self updateAndSave:nil];
+}
+
+- (void)updateAndSave:(void (^ _Nullable )(BOOL savedWorkingCopy))completion {
+    [self.parentSplitViewController updateAndQueueSyncWithCompletion:^(BOOL savedWorkingCopy) {
+        if ( completion ) {
+            completion(savedWorkingCopy);
+        }
+    }];
 }
 
 @end

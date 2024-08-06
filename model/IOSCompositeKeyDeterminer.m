@@ -102,7 +102,7 @@ static const int kMaxFailedPinAttempts = 3;
     self.completion = completion;
 
     if ( self.isAutoFillConvenienceAutoLockPossible ) {
-        NSLog(@"AutoFill and within convenience auto unlock timeout. Will auto open...");
+        slog(@"AutoFill and within convenience auto unlock timeout. Will auto open...");
         
         [self onGotCredentials:self.database.autoFillConvenienceAutoUnlockPassword
                keyFileBookmark:self.database.keyFileBookmark
@@ -180,7 +180,7 @@ static const int kMaxFailedPinAttempts = 3;
 }
 
 - (void)displayConvenienceExpiryMessage {
-    NSLog(@"displayConvenienceExpiryMessage");
+    slog(@"displayConvenienceExpiryMessage");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( self.database.showConvenienceExpiryMessage ) {
@@ -230,7 +230,7 @@ static const int kMaxFailedPinAttempts = 3;
 
     for (DatabasePreferences* database in databases) {
         if(database.isTouchIdEnabled) {
-            NSLog(@"Clearing Biometrics for Database: [%@]", database.nickName);
+            slog(@"Clearing Biometrics for Database: [%@]", database.nickName);
             
             database.conveniencePasswordHasBeenStored = NO;
             database.convenienceMasterPassword = nil;
@@ -321,7 +321,7 @@ static const int kMaxFailedPinAttempts = 3;
 
 - (void)showBiometricAuthentication:(NSString*)password {
     if(self.biometricPreCleared) {
-        NSLog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
+        slog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
         [self onBiometricAuthenticationDone:password success:YES error:nil];
     }
     else {
@@ -443,7 +443,7 @@ static const int kMaxFailedPinAttempts = 3;
     NSArray<NSString*>* files = [fm contentsOfDirectoryAtPath:directory.path error:&error];
     
     if(!files) {
-        NSLog(@"Error looking for auto detected key file url: %@", error);
+        slog(@"Error looking for auto detected key file url: %@", error);
         return nil;
     }
 
@@ -457,7 +457,7 @@ static const int kMaxFailedPinAttempts = 3;
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:found readOnly:YES error:&error];
             
             if (error) {
-                NSLog(@"Error while getting auto-detected bookmark -> [%@]", error);
+                slog(@"Error while getting auto-detected bookmark -> [%@]", error);
             }
             
             return bookmark;
@@ -567,7 +567,7 @@ static const int kMaxFailedPinAttempts = 3;
                                                       error:&error];
                 
         if( keyFileDigest == nil ) {
-            NSLog(@"WARNWARN: Could not read Key File [%@]", error);
+            slog(@"WARNWARN: Could not read Key File [%@]", error);
             
             
             
@@ -671,7 +671,7 @@ static const int kMaxFailedPinAttempts = 3;
             completion(NO, nil, error);
         }
         else {
-            NSLog(@"Doing Virtual Challenge Response...");
+            slog(@"Doing Virtual Challenge Response...");
             NSData* response = [key doChallengeResponse:challenge];
             completion(NO, response, nil);
         }

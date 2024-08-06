@@ -76,7 +76,7 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
     }
 
     func cloudSharingController(_: UICloudSharingController, failedToSaveShareWithError error: any Error) {
-        NSLog("🔴 failedToSaveShareWithError: \(error)")
+        swlog("🔴 failedToSaveShareWithError: \(error)")
 
         completion(error)
     }
@@ -86,12 +86,12 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
     }
 
     func cloudSharingControllerDidSaveShare(_: UICloudSharingController) {
-        NSLog("🟢 \(#function)")
+        swlog("🟢 \(#function)")
         completion(nil) 
     }
 
     func cloudSharingControllerDidStopSharing(_: UICloudSharingController) {
-        NSLog("🟢 \(#function)")
+        swlog("🟢 \(#function)")
         completion(nil)
     }
 
@@ -119,7 +119,7 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
     }
 
     func share(completion: @escaping (CKShare?, CKContainer?, Error?) -> Void) {
-        NSLog("Share Called!")
+        swlog("Share Called!")
 
         Task { [weak self] in
             guard let self else { return }
@@ -129,7 +129,7 @@ class CloudKitSharingUIHelper: NSObject, UICloudSharingControllerDelegate {
 
                 completion(result.share, result.container, nil)
             } catch {
-                NSLog("🔴 \(error)")
+                swlog("🔴 \(error)")
                 completion(nil, nil, error)
             }
         }

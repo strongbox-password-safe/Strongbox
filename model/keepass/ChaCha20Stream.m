@@ -9,6 +9,7 @@
 #import "ChaCha20Stream.h"
 #import "sodium.h"
 #import <CommonCrypto/CommonCrypto.h>
+#import "SBLog.h"
 
 static const uint32_t kBlockSize = 64;
 static const uint32_t kIvSize = 12;
@@ -29,7 +30,7 @@ static const uint32_t kKeySize = 32;
         int sodium_initialization = sodium_init();
         
         if (sodium_initialization == -1) {
-            NSLog(@"Sodium Initialization Failed.");
+            slog(@"Sodium Initialization Failed.");
         }
     }
 }
@@ -39,7 +40,7 @@ static const uint32_t kKeySize = 32;
     
     if(SecRandomCopyBytes(kSecRandomDefault, kKeySize, newKey.mutableBytes))
     {
-        NSLog(@"Could not securely copy new Key bytes");
+        slog(@"Could not securely copy new Key bytes");
         return nil;
     }
     

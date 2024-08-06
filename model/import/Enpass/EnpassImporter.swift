@@ -185,7 +185,7 @@ class EnpassImporter: NSObject, Importer {
             do {
                 try BaseImporter.addAttachment(node: node, name: attachment.name, base64Data: attachment.data)
             } catch {
-                NSLog("🔴 [\(error)]")
+                swlog("🔴 [\(error)]")
                 messages.append(ImportMessage("\(error)", .error))
             }
         }
@@ -265,7 +265,7 @@ class EnpassImporter: NSObject, Importer {
                 parentGroup = subgroup
             } else {
                 messages.append(ImportMessage(String(format: "Could not get or create group: [%@]", String(describing: components)), .warning))
-                NSLog(String(format: "Could not get or create group: [%@]"))
+                swlog(String(format: "Could not get or create group: [%@]"))
             }
         }
 

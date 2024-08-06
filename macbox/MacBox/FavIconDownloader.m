@@ -326,14 +326,14 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     FavIconResultTableCellView* cell = (FavIconResultTableCellView*)[self.tableViewResults makeViewWithIdentifier:@"FavIconResultTableCellIdentifier" owner:nil];
     
     if ( row >= self.validNodes.count ) {
-        NSLog(@"🔴 WARNWARN: row greater than validNodes.count");
+        slog(@"🔴 WARNWARN: row greater than validNodes.count");
         return cell;
     }
 
     Node* node = self.validNodes[row];
     
     if ( node == nil ) {
-        NSLog(@"🔴 WARNWARN: Could not find node?!");
+        slog(@"🔴 WARNWARN: Could not find node?!");
         return cell;
     }
         
@@ -341,7 +341,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     NSArray<NodeIcon*> *images = [self getSortedImagesForNode:node.uuid];
     
     if ( selectedIndex != nil && selectedIndex.intValue >= images.count ) {
-        NSLog(@"🔴 WARNWARN: Selected Index invalid");
+        slog(@"🔴 WARNWARN: Selected Index invalid");
         return cell;
     }
     

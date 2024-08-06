@@ -7,6 +7,7 @@
 //
 
 #import "AutoFillDarwinNotification.h"
+#import "SBLog.h"
 
 static NSString* const kAutoFillDarwinNotificationIdentifier = @"AutoFillDarwinNotification";
 
@@ -15,7 +16,7 @@ static AutoFillDarwinCompletionBlock completionBlock;
 @implementation AutoFillDarwinNotification
 
 + (void)sendNotification {
-    NSLog(@"🟢 sendNotificationForMessageWithIdentifier");
+    slog(@"🟢 sendNotificationForMessageWithIdentifier");
     
     CFNotificationCenterRef const center = CFNotificationCenterGetDarwinNotifyCenter();
     CFDictionaryRef const userInfo = NULL;
@@ -25,7 +26,7 @@ static AutoFillDarwinCompletionBlock completionBlock;
 }
 
 + (void)registerForNotifications:(AutoFillDarwinCompletionBlock)completion {
-    NSLog(@"🟢 registerForNotificationsWithIdentifier");
+    slog(@"🟢 registerForNotificationsWithIdentifier");
     
     [self unregisterForNotifications];
     
@@ -69,7 +70,7 @@ void wormholeNotificationCallback(CFNotificationCenterRef center,
 
 
     
-    NSLog(@"🟢 Got Darwin Notification object = [%@], sender = [%@]", object, sender);
+    slog(@"🟢 Got Darwin Notification object = [%@], sender = [%@]", object, sender);
     
     completionBlock();
 }

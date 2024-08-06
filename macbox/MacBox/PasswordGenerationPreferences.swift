@@ -32,6 +32,7 @@ class PasswordGenerationPreferences: NSViewController {
 
     @IBOutlet var characterCountTextField: NSTextField!
 
+    @objc
     class func fromStoryboard() -> Self {
         let storyboard = NSStoryboard(name: NSStoryboard.Name("PasswordGenerationPreferences"), bundle: nil)
         return storyboard.instantiateInitialController() as! Self
@@ -84,9 +85,9 @@ class PasswordGenerationPreferences: NSViewController {
         hud.removeFromSuperViewOnHide = true
         hud.dismissible = false
         hud.cornerRadius = 5.0
-        hud.dimBackground = true
+        hud.dimBackground = false
 
-        let when = DispatchTime.now() + 0.75
+        let when = DispatchTime.now() + 0.5
         DispatchQueue.main.asyncAfter(deadline: when) {
             hud.hide(true)
         }

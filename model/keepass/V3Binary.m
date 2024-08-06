@@ -10,6 +10,7 @@
 #import "KeePassConstants.h"
 #import "NSData+GZIP.h"
 #import "NSData+Extensions.h"
+#import "SBLog.h"
 
 @interface V3Binary ()
 
@@ -82,7 +83,7 @@
     NSData* data = self.dbAttachment.nonPerformantFullData;
     
     if (!data) {
-        NSLog(@"Could not serialize V3Binary!");
+        slog(@"Could not serialize V3Binary!");
         return NO;
     }
 

@@ -90,7 +90,7 @@
 }
 
 - (BOOL)merge {
-    NSLog(@"DatabaseMerger::merge BEGIN");
+    slog(@"DatabaseMerger::merge BEGIN");
     
     if ( ![self manageAdditionsAndEdits] ) {
         return NO;
@@ -404,7 +404,7 @@
         }
         
         if ( myNode.isGroup != theirVersion.isGroup ) {
-            NSLog(@"WARNWARN: Group / Entry Mismatch");
+            slog(@"WARNWARN: Group / Entry Mismatch");
             return NO;
         }
    
@@ -417,38 +417,38 @@
         if([theirVersion.fields.locationChanged isLaterThan:myNode.fields.locationChanged]) {
             Node* myParentGroup = myNode.parent;
             if([myParentGroup.uuid isEqual:theirParentGroup.uuid]) {
-                NSLog(@"Reordering Node [%@]...", myNode);
+                slog(@"Reordering Node [%@]...", myNode);
                 NSInteger position = [self determineBestPosition:myParentGroup theirParentGroup:theirParentGroup theirVersion:theirVersion];
                 if ( ! [myParentGroup reorderChild:myNode to:position keePassGroupTitleRules:self.keePassGroupTitleRules] ) {
-                    NSLog(@"WARNWARN: Could not reorder parent for item!!");
+                    slog(@"WARNWARN: Could not reorder parent for item!!");
                 }
             }
             else {
-                NSLog(@"Relocating Node [%@]...", myNode);
+                slog(@"Relocating Node [%@]...", myNode);
             
                 Node* myEquivalentParent = [self.mine getItemById:theirParentGroup.uuid];
                     
                 if (myEquivalentParent == nil) {
-                    NSLog(@"WARNWARN: Could not find equivalent parent group");
+                    slog(@"WARNWARN: Could not find equivalent parent group");
                     continue;
                 }
                 
                 if (group) {
                     if ([myNode contains:myEquivalentParent]) {
-                        NSLog(@"WARNWARN: myNode contains:myEquivalentParent");
+                        slog(@"WARNWARN: myNode contains:myEquivalentParent");
                         continue;
                     }
                 }
                 
                 if (![myEquivalentParent validateAddChild:myNode keePassGroupTitleRules:self.keePassGroupTitleRules]) {
-                    NSLog(@"WARNWARN: validateAddChild - Merge");
+                    slog(@"WARNWARN: validateAddChild - Merge");
                     continue;
                 }
 
                 NSInteger position = [self determineBestPosition:myEquivalentParent theirParentGroup:theirParentGroup theirVersion:theirVersion];
 
                 if ( ![myNode changeParent:myEquivalentParent position:position keePassGroupTitleRules:YES] ) {
-                    NSLog(@"WARNWARN: Could not change parent for item!!");
+                    slog(@"WARNWARN: Could not change parent for item!!");
                     return NO;
                 }
             }
@@ -512,7 +512,7 @@
                 [toBeDeleted addObject:item];
             }
             else {
-                NSLog(@"Item is not safe to delete: [%@] - Will remove from our deletedObjects pool to ensure it is not deleted later.", item);
+                slog(@"Item is not safe to delete: [%@] - Will remove from our deletedObjects pool to ensure it is not deleted later.", item);
                 [combinedDeletedObjects removeObjectForKey:item.uuid];
             }
         }

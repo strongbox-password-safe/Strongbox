@@ -65,8 +65,8 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     [[NSUserDefaults standardUserDefaults] setValue:@(NO) forKey:@"_UIConstraintBasedLayoutLogUnsatisfiable"];
 
-    NSLog(@"🚀 Documents Directory: [%@]", StrongboxFilesManager.sharedInstance.documentsDirectory);
-    NSLog(@"🚀 Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
+    slog(@"🚀 Documents Directory: [%@]", StrongboxFilesManager.sharedInstance.documentsDirectory);
+    slog(@"🚀 Shared App Group Directory: [%@]", StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory);
 #endif
 
     [self installTopLevelExceptionHandlers];
@@ -116,11 +116,11 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
 - (void)application:(UIApplication *)application userDidAcceptCloudKitShareWithMetadata:(CKShareMetadata *)cloudKitShareMetadata {
 #ifndef NO_NETWORKING
-    NSLog(@"userDidAcceptCloudKitShareWithMetadata: [%@]", cloudKitShareMetadata);
+    slog(@"userDidAcceptCloudKitShareWithMetadata: [%@]", cloudKitShareMetadata);
  
     [CloudKitDatabasesInteractor.shared acceptShareWithMetadata:cloudKitShareMetadata
                                               completionHandler:^(NSError * _Nullable error) {
-        NSLog(@"acceptShareWithMetadata done with [%@]", error);
+        slog(@"acceptShareWithMetadata done with [%@]", error);
     }];
 #endif
 }
@@ -162,22 +162,22 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 - (void)initializeCloudKit {
     [CloudKitDatabasesInteractor.shared initializeWithCompletionHandler:^(NSError * _Nullable error ) {
         if ( error ) {
-            NSLog(@"🔴 Error initializing CloudKit: [%@]", error); 
+            slog(@"🔴 Error initializing CloudKit: [%@]", error); 
         }
         else {
-            NSLog(@"🟢 CloudKit successfully initialized.");
+            slog(@"🟢 CloudKit successfully initialized.");
         }
     }];
 }
 
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-    NSLog(@"🟢 didRegisterForRemoteNotificationsWithDeviceToken [%@]", deviceToken.base64String);
+    slog(@"🟢 didRegisterForRemoteNotificationsWithDeviceToken [%@]", deviceToken.base64String);
     
     [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:YES error:nil];
 }
 
 - (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
-    NSLog(@"🔴 didFailToRegisterForRemoteNotificationsWithError - [%@]", error);
+    slog(@"🔴 didFailToRegisterForRemoteNotificationsWithError - [%@]", error);
     
     [CloudKitDatabasesInteractor.shared onRegisteredForRemoteNotifications:NO error:error];
 }
@@ -228,7 +228,7 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 - (BOOL)application:(UIApplication *)app
             openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-    NSLog(@"openURL: [%@] => [%@] - Source App: [%@]", options, url, options[UIApplicationOpenURLOptionsSourceApplicationKey]);
+    slog(@"openURL: [%@] => [%@] - Source App: [%@]", options, url, options[UIApplicationOpenURLOptionsSourceApplicationKey]);
     
     if ([url.scheme isEqualToString:@"strongbox"]) {
 
@@ -266,10 +266,10 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    NSLog(@"AppDelegate::applicationDidBecomeActive- %@]", self.window.rootViewController);
+    slog(@"AppDelegate::applicationDidBecomeActive- %@]", self.window.rootViewController);
 
     if( self.appLockSuppressedForBiometricAuth ) {
-        NSLog(@"App Active but Lock Screen Suppressed... Nothing to do");
+        slog(@"App Active but Lock Screen Suppressed... Nothing to do");
         self.appLockSuppressedForBiometricAuth = NO;
         return;
     }
@@ -315,7 +315,7 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 - (void)startOrStopWiFiSyncServer {
     NSError* error;
     if (! [WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
-        NSLog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
+        slog(@"🔴 Could not start WiFi Sync Server: [%@]", error);
     }
 }
 
@@ -331,12 +331,12 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
     
     self.appLockSuppressedForBiometricAuth = NO;
     if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
-        NSLog(@"AppDelegate::applicationWillResignActive - suppressAppBackgroundTriggers = YES");
+        slog(@"AppDelegate::applicationWillResignActive - suppressAppBackgroundTriggers = YES");
         self.appLockSuppressedForBiometricAuth = YES;
         return;
     }
 
-    NSLog(@"AppDelegate::applicationWillResignActive");
+    slog(@"AppDelegate::applicationWillResignActive");
     
     [self showPrivacyShieldView];
     
@@ -430,7 +430,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     if ( !self.privacyScreen ) {
         if ( self.lockScreenVc != nil ) {
-            NSLog(@"Lock Screen is up, privacy screen inappropriate, likely initial launch and switch back...");
+            slog(@"Lock Screen is up, privacy screen inappropriate, likely initial launch and switch back...");
             return;
         }
         
@@ -444,7 +444,7 @@ void uncaughtExceptionHandler(NSException *exception) {
         }
     }
     else {
-        NSLog(@"Privacy Screen Already in Place... NOP");
+        slog(@"Privacy Screen Already in Place... NOP");
         self.privacyScreenPresentationIdentifier++;
     }
 }
@@ -469,15 +469,15 @@ void uncaughtExceptionHandler(NSException *exception) {
 
 - (UIImage*)screenShot {
     if ( !UIApplication.sharedApplication.keyWindow ) {
-        NSLog(@"screenShot::keyWindow is nil");
+        slog(@"screenShot::keyWindow is nil");
         return [UIImage new];
     }
     if ( !UIApplication.sharedApplication.keyWindow.layer ) {
-        NSLog(@"screenShot::keyWindow.layer is nil");
+        slog(@"screenShot::keyWindow.layer is nil");
         return [UIImage new];
     }
     if ( !self.window ) {
-        NSLog(@"screenShot::window is nil");
+        slog(@"screenShot::window is nil");
         return [UIImage new];
     }
     
@@ -551,10 +551,10 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (void)showLockScreen {
-    NSLog(@"AppDelegate::showLockScreen");
+    slog(@"AppDelegate::showLockScreen");
     
     if ( self.isPresentingLockScreen ) {
-        NSLog(@"Lock Screen Already Up... No need to re show");
+        slog(@"Lock Screen Already Up... No need to re show");
         return;
     }
 
@@ -568,23 +568,23 @@ void uncaughtExceptionHandler(NSException *exception) {
     
 
     UIViewController* visible = [self getVisibleViewController];
-    NSLog(@"Presenting Lock Screen on [%@]", [visible class]);
+    slog(@"Presenting Lock Screen on [%@]", [visible class]);
     
     if ( visible ) {
         [visible presentViewController:appLockViewController animated:NO completion:^{
-            NSLog(@"Presented Lock Screen Successfully...");
+            slog(@"Presented Lock Screen Successfully...");
             self.lockScreenVc = appLockViewController; 
         }];
     }
     else {
-        NSLog(@"WARNWARN - Could not present Lock Screen [%@]", visible);
+        slog(@"WARNWARN - Could not present Lock Screen [%@]", visible);
         self.appIsLocked = NO;
         self.lockScreenVc = nil;
     }
 }
 
 - (void)onLockScreenUnlocked:(BOOL)userJustCompletedBiometricAuthentication {
-    NSLog(@"onLockScreenUnlocked: %hhd", userJustCompletedBiometricAuthentication);
+    slog(@"onLockScreenUnlocked: %hhd", userJustCompletedBiometricAuthentication);
     
     self.appIsLocked = NO;
     
@@ -592,16 +592,16 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     SafesViewController* databasesListVc = [self getInitialViewController];
     [databasesListVc onAppLockScreenWillBeDismissed:^{
-        NSLog(@"Database List onAppLockWillBeDismissed Done! - [%@]", self.lockScreenVc.presentingViewController);
+        slog(@"Database List onAppLockWillBeDismissed Done! - [%@]", self.lockScreenVc.presentingViewController);
         
         if ( self.lockScreenVc.presentingViewController ) {
             [self.lockScreenVc.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                NSLog(@"Dismissing Lock Screen Done!");
+                slog(@"Dismissing Lock Screen Done!");
                 [self onLockScreenDismissed:userJustCompletedBiometricAuthentication];
             }];
         }
         else {
-            NSLog(@"App Lock Screen is not being presented. Assumed because it was already dismissed by Database Auto Lock locking to dismiss all... Continuing dismissal process");
+            slog(@"App Lock Screen is not being presented. Assumed because it was already dismissed by Database Auto Lock locking to dismiss all... Continuing dismissal process");
             [self onLockScreenDismissed:userJustCompletedBiometricAuthentication];
         }
     }];
@@ -629,11 +629,11 @@ void uncaughtExceptionHandler(NSException *exception) {
     NSInteger seconds = AppPreferences.sharedInstance.appLockDelay;
     
     if ( seconds == 0 || secondsBetween > seconds ) {
-        NSLog(@"shouldRequireAppLock [YES] %ld - %f", (long)seconds, secondsBetween);
+        slog(@"shouldRequireAppLock [YES] %ld - %f", (long)seconds, secondsBetween);
         return YES;
     }
     
-    NSLog(@"shouldRequireAppLock [NO] %f", secondsBetween);
+    slog(@"shouldRequireAppLock [NO] %f", secondsBetween);
     
     return NO;
 }
@@ -667,7 +667,7 @@ void uncaughtExceptionHandler(NSException *exception) {
         }
     } while (--attempts); 
 
-    NSLog(@"VISIBLE: [%@]", visibleSoFar);
+    slog(@"VISIBLE: [%@]", visibleSoFar);
     
     return visibleSoFar;
 }

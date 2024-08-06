@@ -108,7 +108,7 @@
     }];
 
     if ( idx == NSNotFound ) {
-        NSLog(@"WARNWARN: No current sale to set as prompted");
+        slog(@"WARNWARN: No current sale to set as prompted");
         return;
     }
 

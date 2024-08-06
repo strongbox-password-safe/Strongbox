@@ -50,7 +50,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSError* error = nil;
     BOOL success = [data writeToURL:userSelectedSaveUrl options:kNilOptions error:&error];
     if ( !success ) {
-        NSLog(@"🔴 MacFileBasedBookmarkStorageProvider - Error Saving New Database: [%@]", error);
+        slog(@"🔴 MacFileBasedBookmarkStorageProvider - Error Saving New Database: [%@]", error);
         completion ( nil, error );
         return;
     }
@@ -58,7 +58,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:userSelectedSaveUrl readOnly:NO error:&error];
     
     if (!fileIdentifier) {
-        NSLog(@"🔴 MacFileBasedBookmarkStorageProvider - Could not get Bookmark for this database at [%@]... [%@]", userSelectedSaveUrl, error);
+        slog(@"🔴 MacFileBasedBookmarkStorageProvider - Could not get Bookmark for this database at [%@]... [%@]", userSelectedSaveUrl, error);
         completion(nil, error);
         return;
     }
@@ -95,7 +95,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSURL* url = [self directFileUrlForDatabase:safeMetaData ppError:&error];
     
     if(error || !url) {
-        NSLog(@"Error or nil URL in Files App Provider: %@", error);
+        slog(@"Error or nil URL in Files App Provider: %@", error);
         completion(kReadResultError, nil, nil, error);
         return;
     }
@@ -103,14 +103,14 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
     if (!securitySucceeded) {
         
-        NSLog(@"Could not access secure scoped resource! Will try get attributes anyway...");
+        slog(@"Could not access secure scoped resource! Will try get attributes anyway...");
     }
     
     NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     NSDate* modDate = attr ? attr.fileModificationDate : nil;
     if (error) {
         
-        NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
+        slog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
     }
     else {
         if ( options && options.onlyIfModifiedDifferentFrom && modDate && [modDate isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom] ) {
@@ -147,7 +147,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSURL* url = [self directFileUrlForDatabase:safeMetaData ppError:&error];
     
     if(error || !url) {
-        NSLog(@"Error or nil URL in Files App Provider: %@", error);
+        slog(@"Error or nil URL in Files App Provider: %@", error);
         completion(YES, nil, error);
         return;
     }
@@ -155,13 +155,13 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
     if (!securitySucceeded) {
         
-        NSLog(@"Could not access secure scoped resource! Will try get attributes anyway...");
+        slog(@"Could not access secure scoped resource! Will try get attributes anyway...");
     }
     
     NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     if (error) {
         
-        NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
+        slog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
     }
 
     if ( securitySucceeded ) {
@@ -178,13 +178,13 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSURL* url = [self directFileUrlForDatabase:safeMetaData ppError:&error];
     
     if(error) {
-        NSLog(@"Error or nil URL in Files App provider: [%@]", error);
+        slog(@"Error or nil URL in Files App provider: [%@]", error);
         completion(kUpdateResultError, nil, error);
         return;
     }
     
     if(!url || url.absoluteString.length == 0) {
-        NSLog(@"nil or empty URL in Files App provider");
+        slog(@"nil or empty URL in Files App provider");
         error = [Utils createNSError:[NSString stringWithFormat:@"Invalid URL in Files App Provider: %@", url] errorCode:-1];
         completion(kUpdateResultError, nil, error);
         return;
@@ -193,7 +193,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
     if (!securitySucceeded) {
         
-        NSLog(@"Could not access secure scoped resource! Will try get attributes anyway...");
+        slog(@"Could not access secure scoped resource! Will try get attributes anyway...");
     }
     
     BOOL success = [data writeToURL:url options:kNilOptions error:&error];
@@ -208,7 +208,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
         if (error) {
             
-            NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
+            slog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
         }
         
         if ( securitySucceeded ) {
@@ -245,19 +245,19 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                                                    error:&error];
     
         if( url == nil ) {
-            NSLog(@"WARN: Could not resolve bookmark for database... will try the saved fileUrl...");
+            slog(@"WARN: Could not resolve bookmark for database... will try the saved fileUrl...");
         }
         else {
             
     
             if ( updatedBookmark ) {
-                NSLog(@"INFO: Bookmark has changed for Database updating...");
+                slog(@"INFO: Bookmark has changed for Database updating...");
                 database.storageInfo = updatedBookmark;
             }
             
             NSURL* defaultRet = fileUrlFromManagedUrl(database.fileUrl);
             if ( ![url.absoluteString isEqualToString:defaultRet.absoluteString] ) {
-                NSLog(@"INFO: URL has changed for Database updating...");
+                slog(@"INFO: URL has changed for Database updating...");
 
                 database.fileUrl = managedUrlFromFileUrl(url);
             }

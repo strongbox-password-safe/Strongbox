@@ -12,6 +12,13 @@
 #import "FavIconDownloadOptions.h"
 #import "ApplicationPreferences.h"
 
+typedef enum : NSUInteger {
+    kSystemMenuClickActionQuickSearch,
+    kSystemMenuClickActionShowStrongbox,
+    kSystemMenuClickActionPasswordGenerator,
+    kSystemMenuClickActionShowMenu,
+} SystemMenuClickAction;
+
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kTitleColumn;
@@ -171,6 +178,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL hasWarnedAboutCloudKitUnavailability;
 @property BOOL passwordGeneratorFloatOnTop;
 @property BOOL largeTextViewFloatOnTop;
+
+@property SystemMenuClickAction systemMenuClickAction;
 
 @end
 

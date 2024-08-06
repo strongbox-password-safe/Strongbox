@@ -234,9 +234,6 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property (nullable) NSUUID* lastViewedEntry;
 @property BOOL showLastViewedEntryOnUnlock;
 
-@property NSArray<NSNumber*>* visibleTabs;
-@property BOOL hideTabBarIfOnlySingleTab;
-
 @property NSDictionary<NSString*, BrowseSortConfiguration*>* sortConfigurations;
 
 @property (readonly) NSString* exportFilename;
@@ -245,6 +242,13 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 
 @property BOOL isSharedInCloudKit; 
 @property BOOL isOwnedByMeCloudKit; 
+
+@property BOOL hasInitializedHomeTab;
+
+@property NSArray<NSNumber*>* visibleHomeSections;
+
+@property NSArray<NSNumber*>* visibleTabs;
+@property BOOL hideTabBarIfOnlySingleTab;
 
 @end
 

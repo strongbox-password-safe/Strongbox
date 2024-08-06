@@ -160,7 +160,7 @@ public class StrongboxProductBundle: NSObject {
 
             return bundle == .unifiedPro || bundle == .business
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isUnifiedProBundle()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isUnifiedProBundle()")
             return false
         }
     }
@@ -172,7 +172,7 @@ public class StrongboxProductBundle: NSObject {
 
             return bundle == .business
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isBusinessBundle()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isBusinessBundle()")
             return false
         }
     }
@@ -184,7 +184,7 @@ public class StrongboxProductBundle: NSObject {
 
             return bundle == .unifiedFreemium
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isUnifiedFreemiumBundle()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isUnifiedFreemiumBundle()")
             return false
         }
     }
@@ -196,7 +196,7 @@ public class StrongboxProductBundle: NSObject {
 
             return bundle == .scotus
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isScotusEdition()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isScotusEdition()")
             return false
         }
     }
@@ -208,7 +208,7 @@ public class StrongboxProductBundle: NSObject {
 
             return bundle == .zero
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isZeroEdition()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isZeroEdition()")
             return false
         }
     }
@@ -220,7 +220,7 @@ public class StrongboxProductBundle: NSObject {
 
             return bundle.isPro
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }
@@ -236,7 +236,7 @@ public class StrongboxProductBundle: NSObject {
 
             return bundle.displayName
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.displayName")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.displayName")
             return NSLocalizedString("generic_unknown", comment: "Unknown")
         }
     }
@@ -248,7 +248,7 @@ public class StrongboxProductBundle: NSObject {
             
             return bundle.supportsTipJar
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }
@@ -260,7 +260,7 @@ public class StrongboxProductBundle: NSObject {
             
             return bundle.supportsWiFiSync
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.supportsWiFiSync()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.supportsWiFiSync()")
             return false
         }
     }
@@ -272,7 +272,7 @@ public class StrongboxProductBundle: NSObject {
             
             return bundle.supports3rdPartyStorageProviders
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.supports3rdPartyStorageProviders()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.supports3rdPartyStorageProviders()")
             return false
         }
     }
@@ -284,7 +284,7 @@ public class StrongboxProductBundle: NSObject {
             
             return bundle.supportsSftpWebDAV
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }
@@ -296,7 +296,7 @@ public class StrongboxProductBundle: NSObject {
             
             return bundle.supportsFavIconDownloader
         } else {
-            NSLog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
             return false
         }
     }

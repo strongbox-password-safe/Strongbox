@@ -123,7 +123,7 @@
         }];
     }
     else {
-        NSLog(@"Biometrics is not available on this device");
+        slog(@"Biometrics is not available on this device");
         NSString* loc = NSLocalizedString(@"mac_biometrics_not_available", @"Biometrics is not available on this device!");
         completion(NO, [Utils createNSError:loc errorCode:24321]);
     }

@@ -64,7 +64,7 @@ class SwiftUIViewFactory: NSObject {
                                         },
                                         onRecover: { codes in
                                             guard let keyFile = KeyFile.fromHexCodes(codes) else {
-                                                NSLog("🔴 ERROR: Invalid Hex Codes for Key File, should never happen!")
+                                                swlog("🔴 ERROR: Invalid Hex Codes for Key File, should never happen!")
                                                 return
                                             }
 
@@ -105,6 +105,17 @@ class SwiftUIViewFactory: NSObject {
     #if !IS_APP_EXTENSION && !NO_NETWORKING
         @objc static func getOneDriveRootNavigatorView(existing: Bool, completion: @escaping ((_ cancelled: Bool, _ selectedMode: OneDriveNavigationContextMode) -> Void)) -> UIViewController {
             let view = OneDriveRootNavigator(selectExisting: existing, appIsPro: AppPreferences.sharedInstance().isPro, completion: completion)
+
+            let hostingController = UIHostingController(rootView: view)
+
+            return hostingController
+        }
+    #endif
+
+    #if !IS_APP_EXTENSION
+
+        static func getDatabaseHomeView(model: DatabaseHomeViewModel) -> UIViewController {
+            let view = DatabaseHomeView(model: model)
 
             let hostingController = UIHostingController(rootView: view)
 

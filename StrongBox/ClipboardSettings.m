@@ -65,7 +65,7 @@
     self.clearClipboardEnabled.on = enabled;
     self.cellClearClipboardDelay.userInteractionEnabled = enabled;
     
-    NSLog(@"clearClipboard: [%d, %ld]", enabled, (long)seconds);
+    slog(@"clearClipboard: [%d, %ld]", enabled, (long)seconds);
     
     if(!enabled) {
         self.labelClearClipboardDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");

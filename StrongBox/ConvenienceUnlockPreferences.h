@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ConvenienceUnlockPreferences : StaticDataTableViewController
 
++ (UINavigationController*)fromStoryboardWithModel:(Model*)model;
+
 @property Model* viewModel;
 
 @end

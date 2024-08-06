@@ -114,7 +114,7 @@ onDemandWindowProvider:(MacHardwareKeyManagerOnDemandUIProviderBlock)onDemandWin
 
 - (HardwareKeySlotCrStatus)fastGetStatus:(int)slot {
     if (!yk_init()) {
-        NSLog(@"YubiKey Init Failed");
+        slog(@"YubiKey Init Failed");
         return kHardwareKeySlotCrStatusUnknown;
     }
 
@@ -134,7 +134,7 @@ onDemandWindowProvider:(MacHardwareKeyManagerOnDemandUIProviderBlock)onDemandWin
 
 - (HardwareKeyData*)internalGetAvailableYubiKey {
     if (!yk_init()) {
-        NSLog(@"YubiKey Init Failed");
+        slog(@"YubiKey Init Failed");
         return nil;
     }
 
@@ -166,7 +166,7 @@ onDemandWindowProvider:(MacHardwareKeyManagerOnDemandUIProviderBlock)onDemandWin
 
 - (NSData*)cr:(NSData*)challenge slot:(NSInteger)slot error:(NSError**)error {
     if (!yk_init()) {
-        NSLog(@"YubiKey Init Failed");
+        slog(@"YubiKey Init Failed");
         return nil;
     }
 
@@ -269,11 +269,11 @@ typedef NS_ENUM(NSInteger, YubiKeyChallengeResponseResult) {
         }
         else if (yk_errno == YK_ETIMEOUT) { } 
         else if (yk_errno == YK_EUSBERR) {
-            NSLog(@"CR Error: %s", yk_strerror(yk_errno));
-            NSLog(@"Challenge Response USB Error?");
+            slog(@"CR Error: %s", yk_strerror(yk_errno));
+            slog(@"Challenge Response USB Error?");
         }
         else {
-            NSLog(@"Challenge Response Error: %s", yk_strerror(yk_errno));
+            slog(@"Challenge Response Error: %s", yk_strerror(yk_errno));
         }
     }
 

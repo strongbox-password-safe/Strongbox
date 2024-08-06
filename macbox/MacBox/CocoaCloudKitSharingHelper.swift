@@ -54,7 +54,7 @@ class CocoaCloudKitSharingHelper: NSObject, NSCloudSharingServiceDelegate {
             let item = NSItemProvider()
 
             item.registerCloudKitShare { completion in
-                NSLog("🐞 registerCloudKitShare called...")
+                swlog("🐞 registerCloudKitShare called...")
 
                 Task { [weak self] in
                     guard let self else { return }
@@ -79,7 +79,7 @@ class CocoaCloudKitSharingHelper: NSObject, NSCloudSharingServiceDelegate {
             let items = [item]
 
             guard let service = NSSharingService(named: .cloudSharing), service.canPerform(withItems: items) else {
-                NSLog("🔴 Could not create NSSharingService")
+                swlog("🔴 Could not create NSSharingService")
                 throw StrongboxSyncSharingError.couldNotCreateSharingService
             }
 
@@ -96,7 +96,7 @@ class CocoaCloudKitSharingHelper: NSObject, NSCloudSharingServiceDelegate {
     }
 
     func sharingService(_: NSSharingService, didFailToShareItems items: [Any], error: any Error) {
-        NSLog("🔴 \(#function) - \(items) - Error = \(String(describing: error))")
+        swlog("🔴 \(#function) - \(items) - Error = \(String(describing: error))")
 
         if (error as NSError).code == NSUserCancelledError {
             completion(nil) 
@@ -106,7 +106,7 @@ class CocoaCloudKitSharingHelper: NSObject, NSCloudSharingServiceDelegate {
     }
 
     func sharingService(_: NSSharingService, didShareItems _: [Any]) {
-        NSLog("🐞 \(#function)")
+        swlog("🐞 \(#function)")
 
         completion(nil)
     }
@@ -117,7 +117,7 @@ class CocoaCloudKitSharingHelper: NSObject, NSCloudSharingServiceDelegate {
     }
 
     func sharingService(_: NSSharingService, didStopSharing _: CKShare) {
-        NSLog("🐞 \(#function)")
+        swlog("🐞 \(#function)")
         completion(nil)
     }
 

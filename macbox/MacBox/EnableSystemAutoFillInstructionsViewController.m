@@ -8,6 +8,7 @@
 
 #import "EnableSystemAutoFillInstructionsViewController.h"
 #import <AuthenticationServices/AuthenticationServices.h>
+#import "SBLog.h"
 
 @interface EnableSystemAutoFillInstructionsViewController ()<NSPopoverDelegate>
 
@@ -54,7 +55,7 @@
     
     if (@available(macOS 14.0, *)) {
         [ASSettingsHelper openCredentialProviderAppSettingsWithCompletionHandler:^(NSError * _Nullable error) {
-            NSLog(@"Done opening Cred Provider - %@", error);
+            slog(@"Done opening Cred Provider - %@", error);
         }];
     } else {
         [NSWorkspace.sharedWorkspace openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Extensions.prefPane"]];

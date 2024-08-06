@@ -46,7 +46,7 @@ static const uint32_t kBlockSize = 16;
         
         self.skey = malloc(sizeof(symmetric_key));
         if ((twofish_setup(key.bytes, kKeySize, 0, _skey)) != CRYPT_OK) {
-            NSLog(@"Invalid Key");
+            slog(@"Invalid Key");
             return nil;
         }
 
@@ -80,7 +80,7 @@ static const uint32_t kBlockSize = 16;
         
         NSInteger wroteThisTime = [self.outputStream write:self.workChunk maxLength:self.workChunkLength];
         if ( wroteThisTime < 0 ) {
-            NSLog(@"TwoFish: Error writing to outputstream");
+            slog(@"TwoFish: Error writing to outputstream");
             return;
         }
     }
@@ -100,7 +100,7 @@ static const uint32_t kBlockSize = 16;
 
 - (NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
     if ( !self.opened || self.closed ) {
-        NSLog(@"WARNWARN: Unopen or not closed. AES Output Stream");
+        slog(@"WARNWARN: Unopen or not closed. AES Output Stream");
         return -1;
     }
 
@@ -122,7 +122,7 @@ static const uint32_t kBlockSize = 16;
         
         NSInteger wroteThisTime = [self.outputStream write:self.workChunk maxLength:self.workChunkLength];
         if ( wroteThisTime < 0 ) {
-            NSLog(@"TwoFish: Error writing to outputstream");
+            slog(@"TwoFish: Error writing to outputstream");
             return wroteThisTime;
         }
         

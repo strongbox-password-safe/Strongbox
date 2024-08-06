@@ -18,6 +18,12 @@
 
 #import "AppPreferences.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 const NSInteger kDefaultConvenienceExpiryPeriodHours = 2 * 168; 
 static const NSUInteger kDefaultScheduledExportIntervalDays = 28;  
 
@@ -46,7 +52,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.uuid = [[NSUUID UUID] UUIDString];
         self.failedPinAttempts = 0;
         self.likelyFormat = kFormatUnknown;
-        self.browseViewType = kBrowseViewTypeList;
+        self.browseViewType = kBrowseViewTypeHome;
 
         self.browseItemSubtitleField = kBrowseItemSubtitleUsername;
         self.showChildCountOnFolderInBrowse = YES;
@@ -91,11 +97,15 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.lazySyncMode = NO;
         self.showLastViewedEntryOnUnlock = YES;
         
-        self.visibleTabs = @[@(kBrowseViewTypeFavourites),
+        self.visibleTabs = @[@(kBrowseViewTypeHome),
                              @(kBrowseViewTypeHierarchy),
                              @(kBrowseViewTypeList),
-                             @(kBrowseViewTypeTags),
                              @(kBrowseViewTypeTotpList)];
+
+        self.visibleHomeSections = @[@(HomeViewSectionFavourites),
+                             @(HomeViewSectionNavigation),
+                             @(HomeViewSectionQuickTags),
+                             @(HomeViewSectionOtherViews)];
     
         self.sortConfigurations = @{}; 
         self.customSortOrderForFields = YES; 
@@ -110,7 +120,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
                   fileIdentifier:(NSString*)fileIdentifier {
     if(self = [self init]) {
         if(!nickName.length) {
-            NSLog(@"WARNWARN: No Nick Name set... auto generating.");
+            slog(@"WARNWARN: No Nick Name set... auto generating.");
             self.nickName = NSUUID.UUID.UUIDString;
         }
         else {
@@ -488,10 +498,9 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.visibleTabs = jsonDictionary[@"visibleTabs"];
     }
     else {
-        ret.visibleTabs = @[@(kBrowseViewTypeFavourites),
+        ret.visibleTabs = @[@(kBrowseViewTypeHome),
                             @(kBrowseViewTypeHierarchy),
                             @(kBrowseViewTypeList),
-                            @(kBrowseViewTypeTags),
                             @(kBrowseViewTypeTotpList)];
     }
 
@@ -557,6 +566,25 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     }
 
     
+    
+    if ( jsonDictionary[@"hasInitializedHomeTab"] != nil ) {
+        ret.hasInitializedHomeTab = ((NSNumber*)jsonDictionary[@"hasInitializedHomeTab"]).boolValue;
+    }
+    else {
+        ret.hasInitializedHomeTab = NO;
+    }
+
+    
+    
+    if ( jsonDictionary[@"visibleHomeSections"] != nil ) {
+        ret.visibleHomeSections = jsonDictionary[@"visibleHomeSections"];
+    }
+    else {
+        ret.visibleHomeSections = @[@(HomeViewSectionFavourites),
+                                    @(HomeViewSectionNavigation),
+                                    @(HomeViewSectionQuickTags),
+                                    @(HomeViewSectionOtherViews)];
+    }
     
     return ret;
 }
@@ -648,6 +676,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"allowPulldownRefreshSyncInOfflineMode" : @(self.allowPulldownRefreshSyncInOfflineMode),
         @"isSharedInCloudKit" : @(self.isSharedInCloudKit),
         @"isOwnedByMeCloudKit" : @(self.isOwnedByMeCloudKit),
+        @"hasInitializedHomeTab" : @(self.hasInitializedHomeTab),
     }];
     
     if (self.nickName != nil) {
@@ -753,6 +782,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
     if ( self.serializationPerf ) {
         ret[@"serializationPerf"] = self.serializationPerf;
+    }
+    
+    if (self.visibleHomeSections != nil) {
+        ret[@"visibleHomeSections"] = self.visibleHomeSections;
     }
     
     return ret;
@@ -913,7 +946,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if(self.autoFillConvenienceAutoUnlockTimeout > 0 && autoFillConvenienceAutoUnlockPassword) {
         NSDate* expiry = [NSDate.date dateByAddingTimeInterval:self.autoFillConvenienceAutoUnlockTimeout];
         
-        NSLog(@"Setting AutoFIll convenience auto unlock expiry to: [%@]", expiry);
+        slog(@"Setting AutoFIll convenience auto unlock expiry to: [%@]", expiry);
         
         [SecretStore.sharedInstance setSecureObject:autoFillConvenienceAutoUnlockPassword forIdentifier:key expiresAt:expiry];
     }

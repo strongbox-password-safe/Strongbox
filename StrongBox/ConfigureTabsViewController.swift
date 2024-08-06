@@ -15,7 +15,18 @@ extension Notification.Name {
 }
 
 class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentationControllerDelegate {
-    let allTabs: [BrowseViewType] = [.favourites, .tags, .hierarchy, .list, .totpList]
+    let allTabs: [BrowseViewType] = [
+        .home,
+        .favourites,
+        .tags,
+        .hierarchy,
+        .list,
+        .totpList,
+        .passkeys,
+        .sshKeys,
+        .attachments,
+        .expiredAndExpiring,
+    ]
 
     var visibleTabs: [BrowseViewType] = []
     var hiddenTabs: [BrowseViewType] = []
@@ -227,9 +238,19 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
         case .list:
             return NSLocalizedString("browse_prefs_view_as_flat_list", comment: "Entries")
         case .totpList:
-            return NSLocalizedString("browse_prefs_view_as_totp_list", comment: "TOTPs")
+            return NSLocalizedString("quick_view_title_totp_entries_title", comment: "2FA Codes")
         case .favourites:
             return NSLocalizedString("browse_vc_section_title_pinned", comment: "Favourites")
+        case .home:
+            return NSLocalizedString("navigation_tab_home", comment: "Favourites")
+        case .passkeys:
+            return NSLocalizedString("generic_noun_plural_passkeys", comment: "Passkeys")
+        case .sshKeys:
+            return NSLocalizedString("sidebar_quick_view_keeagent_ssh_keys_title", comment: "SSH Keys")
+        case .attachments:
+            return NSLocalizedString("item_details_section_header_attachments", comment: "Attachments")
+        case .expiredAndExpiring:
+            return NSLocalizedString("quick_view_title_expired_and_expiring", comment: "Expired & Expiring")
         @unknown default:
             return "🔴 UNKNOWN"
         }
@@ -244,7 +265,7 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
     }
 
     func imageForViewType(viewType: BrowseViewType) -> UIImage {
-        var imageName: String
+        let imageName: String
 
         switch viewType {
         case .tags:
@@ -257,6 +278,20 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
             imageName = "timer"
         case .favourites:
             imageName = "star.fill"
+        case .home:
+            imageName = "house.fill"
+        case .passkeys:
+            imageName = "person.badge.key.fill"
+        case .sshKeys:
+            var img = "network"
+            if #available(iOS 17.0, *) {
+                img = "apple.terminal.fill"
+            }
+            imageName = img
+        case .attachments:
+            imageName = "doc.richtext.fill"
+        case .expiredAndExpiring:
+            imageName = "calendar"
         @unknown default:
             imageName = "questionmark.circle.fill"
         }

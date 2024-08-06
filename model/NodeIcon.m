@@ -19,6 +19,10 @@
 
 @implementation NodeIcon
 
++ (NodeIcon *)defaultNodeIcon {
+    return [NodeIcon withPreset:0];
+}
+
 + (instancetype)withCustomImage:(IMAGE_TYPE_PTR)image {
 #if !TARGET_OS_IPHONE
     CGImageRef cgRef = [image CGImageForProposedRect:NULL context:nil hints:nil];
@@ -180,12 +184,12 @@
             self.customIconCache = image;
         }
         else {
-            NSLog(@"WARNWARN: Couldn't Load Image!");
+            slog(@"WARNWARN: Couldn't Load Image!");
         }
         
         return image;
     } @catch (NSException *exception) {
-        NSLog(@"Exception in getCustomIcon: [%@]", exception);
+        slog(@"Exception in getCustomIcon: [%@]", exception);
         return nil;
     } @finally { }
 }

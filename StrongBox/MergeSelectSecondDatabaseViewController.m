@@ -72,7 +72,7 @@
 
     Model* expressAttempt = [DatabaseUnlocker expressTryUnlockWithKey:database key:firstKey];
     if ( expressAttempt ) {
-        NSLog(@"YAY - Express Unlocked Second DB with same CKFs! No need to re-request CKFs...");
+        slog(@"YAY - Express Unlocked Second DB with same CKFs! No need to re-request CKFs...");
         [self onUnlockDone:kUnlockDatabaseResultSuccess model:expressAttempt error:nil];
     }
     else {
@@ -121,7 +121,7 @@
     }
     else if (result == kUnlockDatabaseResultIncorrectCredentials) {
         
-        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+        slog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
     }
     else if (result == kUnlockDatabaseResultError) {
         [self displayError:error];

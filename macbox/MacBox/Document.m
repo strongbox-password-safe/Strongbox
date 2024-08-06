@@ -39,7 +39,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 @implementation Document
 
 - (void)dealloc {
-    NSLog(@"😎 Document DEALLOC...");
+    slog(@"😎 Document DEALLOC...");
 }
 
 - (MacDatabasePreferences *)databaseMetadata {
@@ -50,7 +50,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
         MacDatabasePreferences* ret = [MacDatabasePreferences fromUrl:self.fileURL];
         
         if ( ret == nil ) {
-            NSLog(@"🔴 WARNWARN: NIL MacDatabasePreferences - None Found in Document::databaseMetadata for URL: [%@]", self.fileURL);
+            slog(@"🔴 WARNWARN: NIL MacDatabasePreferences - None Found in Document::databaseMetadata for URL: [%@]", self.fileURL);
             ret = [MacDatabasePreferences addOrGet:self.fileURL]; 
         }
         else {
@@ -60,7 +60,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
         return ret;
     }
     else {
-        NSLog(@"🔴 WARNWARN: NIL fileUrl in Document::databaseMetadata");
+        slog(@"🔴 WARNWARN: NIL fileUrl in Document::databaseMetadata");
         return nil;
     }
 }
@@ -92,7 +92,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 - (void)listenForNotifications {
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseReloaded:)
-                                               name:kDatabaseReloadedNotificationKey
+                                               name:kDatabaseReloadedNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -134,7 +134,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
     }
     else {
         if ( !model ) {
-            NSLog(@"✅ Document::bindToLockState => Newly Locked");
+            slog(@"✅ Document::bindToLockState => Newly Locked");
 
             _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
             [self bindWindowControllerAfterLockStatusChange];
@@ -146,7 +146,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
     NSString* databaseUuid = ((NSNotification*)notification).object;
     
     if ( [databaseUuid isEqualToString:self.databaseMetadata.uuid] ) {
-        NSLog(@"Document::onDatabaseReloaded => Notifying views to fully reload");
+        slog(@"Document::onDatabaseReloaded => Notifying views to fully reload");
         
         [self notifyFullModelReload];
     }
@@ -168,7 +168,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
-    NSLog(@"readFromFileWrapper");
+    slog(@"readFromFileWrapper");
 
     if ( fileWrapper.isDirectory ) { 
         if(outError != nil) {
@@ -182,7 +182,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
-    NSLog(@"🔴 WARNWARN: Document::readFromData called %ld - [%@]", data.length, typeName);
+    slog(@"🔴 WARNWARN: Document::readFromData called %ld - [%@]", data.length, typeName);
     return NO;
 }
 
@@ -202,10 +202,10 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 }
 
 - (IBAction)saveDocument:(id)sender {
-    NSLog(@"✅ Document::saveDocument");
+    slog(@"✅ Document::saveDocument");
 
     if(self.viewModel.locked || self.viewModel.isEffectivelyReadOnly) {
-        NSLog(@"🔴 WARNWARN: Document is Read-Only or Locked! How did you get here?");
+        slog(@"🔴 WARNWARN: Document is Read-Only or Locked! How did you get here?");
         return;
     }
 
@@ -216,12 +216,12 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
            ofType:(NSString *)typeName
  forSaveOperation:(NSSaveOperationType)saveOperation
 completionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    NSLog(@"✅ Document::saveToURL: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, url);
+    slog(@"✅ Document::saveToURL: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, url);
     
     BOOL updateQueued = [DatabasesCollection.shared updateAndQueueSyncWithUuid:self.databaseMetadata.uuid allowInteractiveSync:YES];
     
     if ( !updateQueued ) {
-        NSLog(@"🔴 Could not queue a save for this database. Is it read-only or locked?!");
+        slog(@"🔴 Could not queue a save for this database. Is it read-only or locked?!");
         completionHandler([Utils createNSError:@"🔴 Could not queue a save for this database. Is it read-only or locked?!" errorCode:-1]);
     }
     else {
@@ -309,7 +309,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)initiateLockSequence {
-    NSLog(@"✅ Document::initiateLockSequence called...");
+    slog(@"✅ Document::initiateLockSequence called...");
 
     if( !self.viewModel && self.viewModel.locked ) {
         return;
@@ -317,20 +317,20 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     
     BOOL isEditing = [self isEditsInProgress];
 
-    NSLog(@"Document::initiateLockSequence called... isEditing = %hhd", isEditing);
+    slog(@"Document::initiateLockSequence called... isEditing = %hhd", isEditing);
 
     if ( isEditing ) {
         if (!Settings.sharedInstance.lockEvenIfEditing ) {
-            NSLog(@"⚠️ NOT Locking because there is an edit in progress.");
+            slog(@"⚠️ NOT Locking because there is an edit in progress.");
             return;
         }
         else {
-            NSLog(@"⚠️ Locking even though there is an edit in progress to to configuration.");
+            slog(@"⚠️ Locking even though there is an edit in progress to to configuration.");
         }
     }
     
     if ( self.isDocumentEdited ) {
-        NSLog(@"✅ Document::initiateLockSequence isDocumentEdited = [YES]");
+        slog(@"✅ Document::initiateLockSequence isDocumentEdited = [YES]");
 
         NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
         
@@ -361,7 +361,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (IBAction)onSaveBeforeLockingCompletion:(id)sender {
-    NSLog(@"Document::onSaveBeforeLockingCompletion called...");
+    slog(@"Document::onSaveBeforeLockingCompletion called...");
     
     [macOSSpinnerUI.sharedInstance dismiss];
     
@@ -386,10 +386,10 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)forceLock {
-    NSLog(@"✅ Document::forceLock called");
+    slog(@"✅ Document::forceLock called");
     
     if( self.isDocumentEdited ) {
-        NSLog(@"⚠️ Cannot lock document with edits!");
+        slog(@"⚠️ Cannot lock document with edits!");
         return;
     }
     
@@ -430,14 +430,14 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 - (void)_onDatabaseChangedByExternalOther {
     if(self.isPromptingAboutUnderlyingFileChange) {
-        NSLog(@"Already in Use...");
+        slog(@"Already in Use...");
         return;
     }
     
     self.isPromptingAboutUnderlyingFileChange = YES;
     
     if (self.viewModel && !self.viewModel.locked) {
-        NSLog(@"ViewController::onDatabaseChangedByExternalOther - Reloading...");
+        slog(@"ViewController::onDatabaseChangedByExternalOther - Reloading...");
         
         if( !self.viewModel.document.isDocumentEdited ) { 
             if( !self.databaseMetadata.autoReloadAfterExternalChanges ) {
@@ -479,11 +479,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
             }
         }
         else {
-            NSLog(@"Local Changes Present... ignore this, we can't auto reload...");
+            slog(@"Local Changes Present... ignore this, we can't auto reload...");
         }
     }
     else {
-        NSLog(@"Ignoring File Change by Other Application because Database is locked/not set.");
+        slog(@"Ignoring File Change by Other Application because Database is locked/not set.");
     }
     
     self.isPromptingAboutUnderlyingFileChange = NO;
@@ -497,7 +497,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 - (void)showToastNotification:(NSString*)message error:(BOOL)error {
     if ( self.windowController.window.isMiniaturized ) {
-        NSLog(@"Not Showing Popup Change notification because window is miniaturized");
+        slog(@"Not Showing Popup Change notification because window is miniaturized");
         return;
     }
 

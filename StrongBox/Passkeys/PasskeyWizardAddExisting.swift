@@ -29,18 +29,8 @@ import SwiftUI
                             selectedEntry = node
                             showingConfirmation = true
                         }) {
-                            let rawPath = model.database.getSearchParentGroupPathDisplayString(node)
-                            let path = String(format: NSLocalizedString("browse_vc_group_path_string_fmt", comment: "(in %@)"), rawPath)
-
-                            let keePassIconSet = model.metadata.keePassIconSet
-                            let viewDereferencedFields = model.metadata.viewDereferencedFields
-
-                            let derefedTitle = viewDereferencedFields ? model.dereference(node.title, node: node) : node.title
-                            let derefedUsername = viewDereferencedFields ? model.dereference(node.fields.username, node: node) : node.fields.username
-
-                            let icon = NodeIconHelper.getIconFor(node, predefinedIconSet: keePassIconSet, format: model.database.originalFormat)
-
-                            EntryListItemView(title: derefedTitle, username: derefedUsername, path: path, icon: icon)
+                            let entry = SwiftEntryModel(node: node, model: model)
+                            SwiftUIEntryView(entry: entry)
                         }
                     }
                 } header: {
@@ -120,17 +110,8 @@ import SwiftUI
 
                     List(selection: $selectedItem) {
                         ForEach(searchResults, id: \.self) { node in
-                            let rawPath = model.database.getSearchParentGroupPathDisplayString(node)
-                            let path = String(format: NSLocalizedString("browse_vc_group_path_string_fmt", comment: "(in %@)"), rawPath)
-
-                            let keePassIconSet = model.metadata.iconSet
-
-                            let derefedTitle = model.dereference(node.title, node: node)
-                            let derefedUsername = model.dereference(node.fields.username, node: node)
-
-                            let icon = NodeIconHelper.getIconFor(node, predefinedIconSet: keePassIconSet, format: model.database.originalFormat)
-
-                            EntryListItemView(title: derefedTitle, username: derefedUsername, path: path, icon: icon)
+                            let entry = SwiftEntryModel(node: node, model: model)
+                            SwiftUIEntryView(entry: entry)
                                 .onDoubleClick {
                                     guard selectedItem != nil else { return }
                                     showingConfirmation = true
@@ -213,7 +194,7 @@ import SwiftUI
             if searchText.isEmpty {
                 return entries
             } else {
-                return model.search(searchText, scope: .all, includeGroups: false)
+                return model.searchAutoBestMatch(searchText, scope: .all)
             }
         }
     }

@@ -48,7 +48,7 @@ const int kChunkSize = 32 * 1024;
         self.stream->avail_out = 0;
 
         if (deflateInit2(self.stream, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 31, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
-            NSLog(@"Error initializing z_stream");
+            slog(@"Error initializing z_stream");
             free(self.stream);
             self.stream = nil;
             return nil;
@@ -81,7 +81,7 @@ const int kChunkSize = 32 * 1024;
         
         int status = deflate(self.stream, Z_FINISH);
         if (status != Z_OK && status != Z_STREAM_END ) {
-            NSLog(@"Error: %d", status);
+            slog(@"Error: %d", status);
             self.error = [Utils createNSError:[NSString stringWithFormat:@"ERROR deflateEnd Error: %d GZIP!", status] errorCode:status];
             return;
         }
@@ -93,7 +93,7 @@ const int kChunkSize = 32 * 1024;
         if ( writtenThisTime > 0 ) {
             NSInteger res = [self.outputStream write:finalBlock maxLength:writtenThisTime];
             if ( res < 0 ) {
-                NSLog(@"GZIPCompressOutputStream: Could not write to output stream.");
+                slog(@"GZIPCompressOutputStream: Could not write to output stream.");
                 return;
             }
         }
@@ -101,7 +101,7 @@ const int kChunkSize = 32 * 1024;
     
     int status;
     if ( (status = deflateEnd(self.stream)) != Z_OK ) {
-        NSLog(@"ERROR deflateEnd GZIP! %d", status);
+        slog(@"ERROR deflateEnd GZIP! %d", status);
         self.error = [Utils createNSError:@"ERROR deflateEnd GZIP!." errorCode:status];
     }
     
@@ -126,7 +126,7 @@ const int kChunkSize = 32 * 1024;
         int status = deflate(self.stream, Z_NO_FLUSH);
 
         if (status != Z_OK) {
-            NSLog(@"Error: %d", status);
+            slog(@"Error: %d", status);
             self.error = [Utils createNSError:[NSString stringWithFormat:@"ERROR deflateEnd Error: %d GZIP!", status] errorCode:status];
             return -1;
         }
@@ -138,7 +138,7 @@ const int kChunkSize = 32 * 1024;
         if ( writtenThisTime > 0 ) {
             NSInteger res = [self.outputStream write:compressed maxLength:writtenThisTime];
             if ( res < 0 ) {
-                NSLog(@"GZIPCompressOutputStream: Could not write to output stream.");
+                slog(@"GZIPCompressOutputStream: Could not write to output stream.");
                 return res;
             }
         }

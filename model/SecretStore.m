@@ -89,7 +89,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     NSDictionary* wrapped = [self getWrappedObject:identifier error:error];
     if(wrapped == nil) {
         if ( error ) {
-             NSLog(@"🔴 Could not get wrapped object. [%@]. Error = [%@]", identifier, *error);
+             slog(@"🔴 Could not get wrapped object. [%@]. Error = [%@]", identifier, *error);
         }
         
         return nil;
@@ -102,7 +102,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         id object = self.ephemeralObjectStore[identifier];
         
         if(object == nil) {
-            NSLog(@"Ephemeral Entry was present but expired... Cleaning up from secure store...");
+            slog(@"Ephemeral Entry was present but expired... Cleaning up from secure store...");
 
             if(expired) {
                 *expired = YES;
@@ -119,7 +119,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         NSDate* expiry = wrapped[kWrappedObjectExpiryKey];
         
         if ( [self entryIsExpired:expiry] ) {
-            NSLog(@"entryIsExpired [%@]... Cleaning up from secure store...", expiry);
+            slog(@"entryIsExpired [%@]... Cleaning up from secure store...", expiry);
 
             if(expired) {
                 *expired = YES;
@@ -177,7 +177,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     NSData* clearData = [NSKeyedArchiver archivedDataWithRootObject:wrapper];
 
     if(![self storeKeychainBlob:identifier encrypted:clearData]) {
-        NSLog(@"Error storing encrypted blob in Keychain...");
+        slog(@"Error storing encrypted blob in Keychain...");
         return NO;
     }
     
@@ -204,7 +204,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     if (!privateKey) {
         if (access)     { CFRelease(access);     }
         
-        NSLog(@"Error creating AccessControl: [%@]", (__bridge NSError *)cfError);
+        slog(@"Error creating AccessControl: [%@]", (__bridge NSError *)cfError);
         return NO;
     }
 
@@ -215,7 +215,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         if (privateKey) { CFRelease(privateKey); }
         if (access)     { CFRelease(access);     }
 
-        NSLog(@"Error getting match public key....");
+        slog(@"Error getting match public key....");
         return NO;
     }
 
@@ -225,7 +225,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         if (publicKey)  { CFRelease(publicKey);  }
         if (access)     { CFRelease(access);     }
 
-        NSLog(@"Error algorithm is not support....");
+        slog(@"Error algorithm is not support....");
         return NO;
     }
 
@@ -238,7 +238,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         if (publicKey)  { CFRelease(publicKey);  }
         if (access)     { CFRelease(access);     }
 
-        NSLog(@"Error encrypting.... [%@]", (__bridge NSError *)cfError);
+        slog(@"Error encrypting.... [%@]", (__bridge NSError *)cfError);
         return NO;
     }
         
@@ -248,7 +248,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         if (access)     { CFRelease(access);     }
         if (cipherText) { CFRelease(cipherText); }
 
-        NSLog(@"Error storing encrypted blob in Keychain...");
+        slog(@"Error storing encrypted blob in Keychain...");
         return NO;
     }
     
@@ -263,7 +263,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
             if (access)     { CFRelease(access);     }
             if (cipherText) { CFRelease(cipherText); }
 
-            NSLog(@"Error encrypting memory only object... [%@]", (__bridge NSError *)cfError);
+            slog(@"Error encrypting memory only object... [%@]", (__bridge NSError *)cfError);
             return NO;
         }
 
@@ -318,7 +318,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     NSDictionary* query = [SecretStore getPrivateKeyQuery:identifier limit1Match:NO];
     OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
     if ( status != errSecSuccess && status != errSecItemNotFound ) {
-        NSLog(@"Error Deleting Private Key: [%d]", (int)status);
+        slog(@"Error Deleting Private Key: [%d]", (int)status);
     }
 }
 
@@ -397,14 +397,14 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         NSDictionary* query = [SecretStore getPrivateKeyQuery:identifier limit1Match:NO];
         OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
         if ( status != errSecSuccess ) {
-            NSLog(@"Error Deleting Private Key: [%d]", (int)status);
+            slog(@"Error Deleting Private Key: [%d]", (int)status);
         }
         CFRelease(privateKey);
     }
     CFRelease(accessControl);
 
     if(!available) {
-        NSLog(@"WARNWARN: SECURE ENCLAVE NOT AVAILABLE");
+        slog(@"WARNWARN: SECURE ENCLAVE NOT AVAILABLE");
     }
     else {
 
@@ -422,7 +422,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
                                                                  &cfError);
     
     if(!access) {
-        NSLog(@"Error creating AccessControl: [%@]", (__bridge NSError *)cfError);
+        slog(@"Error creating AccessControl: [%@]", (__bridge NSError *)cfError);
         return nil;
     }
     
@@ -485,10 +485,10 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         }
         else {
             if ( error ) {
-                NSLog(@"🔴 Could not get encrypted blob but it appears to be present [%@] - Error = [%@]", identifier, *error);
+                slog(@"🔴 Could not get encrypted blob but it appears to be present [%@] - Error = [%@]", identifier, *error);
             }
             else {
-                NSLog(@"🔴 Could not get encrypted blob but it appears to be present [%@]", identifier);
+                slog(@"🔴 Could not get encrypted blob but it appears to be present [%@]", identifier);
             }
             
             return nil;
@@ -510,7 +510,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
 
 
     if( status != errSecSuccess ) {
-        NSLog(@"Error getting key.... status = [%d]", (int)status);
+        slog(@"Error getting key.... status = [%d]", (int)status);
         return nil;
     }
 
@@ -524,7 +524,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     SecKeyAlgorithm algorithm = [SecretStore algorithm];
     SecKeyRef privateKey = (SecKeyRef)pk;
     if(!SecKeyIsAlgorithmSupported(privateKey, kSecKeyOperationTypeDecrypt, algorithm)) {
-       NSLog(@"Error algorithm is not available....");
+       slog(@"Error algorithm is not available....");
        return nil;
     }
     
@@ -535,7 +535,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     }
     
     if ( !wrapped ) {
-        NSLog(@"Could not unwrap secure item. Cleaning it up.");
+        slog(@"Could not unwrap secure item. Cleaning it up.");
         [self deleteSecureItem:identifier];
         return nil;
     }
@@ -555,12 +555,12 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         wrapped = [NSKeyedUnarchiver unarchiveObjectWithData:plaintext];
     }
     @catch (NSException *e) {
-        NSLog(@"Error Ubarchiving: %@", e);
+        slog(@"Error Ubarchiving: %@", e);
     }
     @finally {}
 
     if(!wrapped) {
-        NSLog(@"Could not unwrap secure item. Cleaning it up.");
+        slog(@"Could not unwrap secure item. Cleaning it up.");
         [self deleteSecureItem:identifier];
         return nil;
     }
@@ -574,7 +574,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     CFDataRef pt = SecKeyCreateDecryptedData(privateKey, algorithm, (CFDataRef)encrypted, &cfError);
     
     if(!pt) {
-        NSLog(@"Could not decrypt...");
+        slog(@"Could not decrypt...");
         return nil;
     }
     
@@ -583,7 +583,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
         wrapped = [NSKeyedUnarchiver unarchiveObjectWithData:(__bridge NSData *)pt];
     }
     @catch (NSException *e) {
-        NSLog(@"Error Unarchiving: %@", e);
+        slog(@"Error Unarchiving: %@", e);
     }
     @finally {}
     
@@ -638,7 +638,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     }
     
     if (status != errSecSuccess) {
-        NSLog(@"Error storing encrypted blob: %d", (int)status);
+        slog(@"Error storing encrypted blob: %d", (int)status);
     }
  
     return (status == errSecSuccess);
@@ -660,9 +660,9 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     
     double perf = NSDate.timeIntervalSinceReferenceDate - startDecryptTime;
     if ( perf > 0.5f ) {
-        NSLog(@"====================================== PERF ======================================");
-        NSLog(@"getKeychainBlob (query2) [%@] [%f] seconds", identifier, perf);
-        NSLog(@"====================================== PERF ======================================");
+        slog(@"====================================== PERF ======================================");
+        slog(@"getKeychainBlob (query2) [%@] [%f] seconds", identifier, perf);
+        slog(@"====================================== PERF ======================================");
     }
     
     if ( status == errSecSuccess ) {
@@ -680,7 +680,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
     }
     else {
         *itemNotFound = NO;
-        NSLog(@"getKeychainBlob: Could not get: %d", (int)status);
+        slog(@"getKeychainBlob: Could not get: %d", (int)status);
         
         if ( error ) {
             *error = [Utils createNSError:[NSString stringWithFormat:@"Could not getKeychainBlob - Error = [%d]", (int)status] errorCode:status];
@@ -696,7 +696,7 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
 
     OSStatus status = SecItemDelete((__bridge CFDictionaryRef)query);
     if ( status != errSecSuccess && status != errSecItemNotFound ) {
-        NSLog(@"Error Deleting Keychain Blob: [%d]", (int)status);
+        slog(@"Error Deleting Keychain Blob: [%d]", (int)status);
     }
         
 

@@ -161,7 +161,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)listenToEvents {
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kDatabasesListChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kDatabasesListViewForceRefreshNotification object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kSyncManagerDatabaseSyncStatusChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kModelUpdateNotificationDatabaseUpdateStatusChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kProStatusChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refresh) name:kDatabasesCollectionLockStateChangedNotification object:nil];
@@ -179,7 +179,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)onProStatusChanged:(id)param {
-    SBLog(@"✅ DatabasesManagerVC: Pro Status Changed!");
+    slog(@"✅ DatabasesManagerVC: Pro Status Changed!");
     
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self bindVersionSubtitle];
@@ -247,17 +247,42 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
               window:self.view.window
           completion:^(BOOL yesNo) {
         if (yesNo) {
-            for (MacDatabasePreferences* database in selected) {
-                if ( [DatabasesCollection.shared isUnlockedWithUuid:database.uuid] ) {
-                    continue;
-                }
-                
-                [DatabasesCollection.shared closeAnyDocumentWindowsWithUuid:database.uuid];
-                
-                [self removeDatabase:database];
+            if ( willDeleteFromCloudKit ) {
+                [self tripleCheckCloudKitDelete:selected];
+            }
+            else {
+                [self removeDatabases:selected];
             }
         }
     }];
+}
+
+- (void)tripleCheckCloudKitDelete:(NSSet<MacDatabasePreferences*>*)selected {
+    MacAlerts* ma = [[MacAlerts alloc] init];
+    
+    NSString* codeword = NSLocalizedString(@"delete_triple_confirm_code_word", @"delete");
+    NSString* locFmt = [NSString stringWithFormat:NSLocalizedString(@"delete_triple_confirm_message_fmt", @"Please enter the word '%@' below to confirm."), codeword];
+    
+    NSString* confirm = [ma input:locFmt
+                     defaultValue:@""
+                       allowEmpty:NO
+                           secure:NO];
+    
+    if ( confirm != nil && [confirm localizedCaseInsensitiveCompare:codeword] == NSOrderedSame ) {
+        [self removeDatabases:selected];
+    }
+}
+
+- (void)removeDatabases:(NSSet<MacDatabasePreferences*>*)selected {
+    for (MacDatabasePreferences* database in selected) {
+        if ( [DatabasesCollection.shared isUnlockedWithUuid:database.uuid] ) {
+            continue;
+        }
+        
+        [DatabasesCollection.shared closeAnyDocumentWindowsWithUuid:database.uuid];
+        
+        [self removeDatabase:database];
+    }
 }
 
 #ifndef NO_NETWORKING
@@ -274,6 +299,8 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 #endif
 
 - (void)removeDatabase:(MacDatabasePreferences*)safe {
+    
+    
     [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"generic_deleting_ellipsis", @"Deleting...")
                                         viewController:self];
     
@@ -282,7 +309,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
-                SBLog(@"🔴 Error Nuking Database [%@]", error);
+                slog(@"🔴 Error Nuking Database [%@]", error);
                 [MacAlerts error:error window:self.view.window];
             }
         });
@@ -363,7 +390,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     view.onBeginEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
         NSInteger row = [weakSelf.tableView rowForView:cell];
         if ( row != -1 && weakSelf.tableView.selectedRow != row ) {
-            SBLog(@"Extending Selection after nickname click");
+            slog(@"Extending Selection after nickname click");
             [weakSelf.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         }
         
@@ -438,7 +465,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)showHideColumn:(NSString*)identifier show:(BOOL)show {
     NSInteger colIdx = [self.tableView columnWithIdentifier:identifier];
     if(colIdx == -1) {
-        SBLog(@"WARN WARN WARN: Could not find column: %@", identifier);
+        slog(@"WARN WARN WARN: Could not find column: %@", identifier);
         return;
     }
     
@@ -472,7 +499,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     BOOL disabled = database.storageProvider != kLocalDevice && filesOnly;
     
     if ( disabled ) {
-        SBLog(@"🔴 Attempt to unlock unsupported Database Storage Provider");
+        slog(@"🔴 Attempt to unlock unsupported Database Storage Provider");
         return;
     }
     
@@ -482,7 +509,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         database.userRequestOfflineOpenEphemeralFlagForDocument = offline;
     }
     else if ( existing.isInOfflineMode != offline ) {
-        SBLog(@"⚠️ Ignoring request to open in different Offline Mode as database is already unlocked...");
+        slog(@"⚠️ Ignoring request to open in different Offline Mode as database is already unlocked...");
     }
     
     [self showProgressModal:NSLocalizedString(@"generic_loading", "Loading...")];
@@ -527,7 +554,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         [self onRemove:nil];
     }
     else if ( (aChar == NSEnterCharacter) || (aChar == NSCarriageReturnCharacter) ) {
-        SBLog(@"DatabasesManagerVC::keyDown - OPEN");
+        slog(@"DatabasesManagerVC::keyDown - OPEN");
         [self performActionOnSelected:^(MacDatabasePreferences* database) {
             [self openDatabase:database];
         }];
@@ -905,7 +932,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 - (void)export:(MacDatabasePreferences *)database
           dest:(NSURL*)dest {
     NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
-    SBLog(@"Export [%@] => [%@]", src, dest);
+    slog(@"Export [%@] => [%@]", src, dest);
     
     if ( !src ) {
         [MacAlerts info:NSLocalizedString(@"open_sequence_couldnt_open_local_message", "Could not open Strongbox's local copy of this database. A online sync is required.")
@@ -1115,7 +1142,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             [self onSelectedNewDatabaseLocation:CloudKitStorageProvider.sharedInstance providerLocationParam:nil newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
 #endif
         }
-        else if ( storageProvider == kTwoDrive ) {
+        else if ( storageProvider == kOneDrive ) {
 #ifndef NO_NETWORKING
             [self onOneDriveSelected:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
 #endif
@@ -1140,7 +1167,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
         else if ( storageProvider == kWiFiSync ) {
             [self onAddDatabaseSelectedWiFiSyncDevice:wiFiSyncDevice newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy]; 
         }
-        else if ( storageProvider == kTwoDrive ) {
+        else if ( storageProvider == kOneDrive ) {
 #ifndef NO_NETWORKING
             [self onOneDriveSelected:createMode newModel:newModel existingDatabaseToCopy:existingDatabaseToCopy];
 #endif
@@ -1293,19 +1320,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     if ( newModel ) {
         if ( ![helper beginImportNewDatabaseSequenceWithImportedModel:newModel error:&error] ) {
-            SBLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            slog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
             [MacAlerts error:error window:self.view.window];
         }
     }
     else if ( existingDatabaseToCopy ) {
         if (! [helper beginCopyToNewDatabaseSequenceWithSourceDatabase:existingDatabaseToCopy error:&error] ) {
-            SBLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            slog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
             [MacAlerts error:error window:self.view.window];
         }
     }
     else {
         if ( ![helper beginBrandNewDatabaseSequenceAndReturnError:&error] ) {
-            SBLog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
+            slog(@"🔴 onSelectedNewDatabaseLocation: [%@]", error);
             [MacAlerts error:error window:self.view.window];
         }
     }
@@ -1319,7 +1346,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     }
     
     if ( error || !database ) {
-        SBLog(@"🔴 Error in onNewImportedDatabaseCreatedDone: [%@]", error);
+        slog(@"🔴 Error in onNewImportedDatabaseCreatedDone: [%@]", error);
         [MacAlerts error:error window:self.view.window];
         return;
     }
@@ -1404,7 +1431,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             
             [CloudKitDatabasesInteractor.shared refreshAndMergeWithCompletionHandler:^(NSError * _Nullable error) {
                 if ( error ) {
-                    SBLog(@"🔴 Error refreshing... [%@]", error);
+                    slog(@"🔴 Error refreshing... [%@]", error);
                 }
             }];
         });
@@ -1481,7 +1508,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     SelectStorageLocationVC* vc = [SelectStorageLocationVC newViewController];
     
-    id<SafeStorageProvider> provider = TwoDriveStorageProvider.sharedInstance;
+    id<SafeStorageProvider> provider = OneDriveStorageProvider.sharedInstance;
     vc.provider = provider;
     vc.createMode = createMode;
     vc.disallowCreateAtRoot = YES;

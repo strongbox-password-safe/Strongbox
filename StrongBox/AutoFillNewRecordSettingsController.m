@@ -245,7 +245,7 @@
             return -1;
             break;
         default:
-            NSLog(@"Ruh ROh... ");
+            slog(@"Ruh ROh... ");
             break;
     }
 }
@@ -277,7 +277,7 @@
             settings.usernameAutoFillMode = kCustom;
             break;
         default:
-            NSLog(@"Default Switch statement hit unexpected. Username.");
+            slog(@"Default Switch statement hit unexpected. Username.");
             break;
     }
     
@@ -302,7 +302,7 @@
             settings.passwordAutoFillMode = kCustom;
             break;
         default:
-            NSLog(@"Default Switch statement hit unexpected. Password.");
+            slog(@"Default Switch statement hit unexpected. Password.");
             break;
     }
     
@@ -327,7 +327,7 @@
             settings.emailAutoFillMode = kCustom;
             break;
         default:
-            NSLog(@"Default Switch statement hit unexpected. Email.");
+            slog(@"Default Switch statement hit unexpected. Email.");
             break;
     }
     
@@ -349,7 +349,7 @@
             settings.urlAutoFillMode = kCustom;
             break;
         default:
-            NSLog(@"Default Switch statement hit unexpected. URL.");
+            slog(@"Default Switch statement hit unexpected. URL.");
             break;
     }
     
@@ -371,7 +371,7 @@
             settings.notesAutoFillMode = kCustom;
             break;
         default:
-            NSLog(@"Default Switch statement hit unexpected. URL.");
+            slog(@"Default Switch statement hit unexpected. URL.");
             break;
     }
     

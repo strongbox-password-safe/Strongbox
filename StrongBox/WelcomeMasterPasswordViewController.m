@@ -118,7 +118,7 @@
         }
         else if ( error ) {
             if ( error.code == StrongboxErrorCodes.couldNotCreateICloudFile ) {
-                NSLog(@"WARNWARN: Could not create an iCloud File, switching to Local only because we are in App Onboarding.");
+                slog(@"WARNWARN: Could not create an iCloud File, switching to Local only because we are in App Onboarding.");
                 [self create:YES];
             }
             else {

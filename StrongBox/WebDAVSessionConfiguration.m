@@ -9,6 +9,7 @@
 #import "WebDAVSessionConfiguration.h"
 #import "SecretStore.h"
 #import "NSString+Extensions.h"
+#import "SBLog.h"
 
 @interface WebDAVSessionConfiguration ()
 
@@ -110,7 +111,7 @@
     BOOL hostChanged = ![self.host.absoluteString isEqualToString:other.host.absoluteString];
     BOOL certChanged = self.allowUntrustedCertificate != other.allowUntrustedCertificate;
     
-    NSLog(@"🐞 isTheSameConnection: %hhd, %hhd, %hhd, %hhd, %hhd", nameChanged, hostChanged, userChanged, pwChanged, certChanged);
+    slog(@"🐞 isTheSameConnection: %hhd, %hhd, %hhd, %hhd, %hhd", nameChanged, hostChanged, userChanged, pwChanged, certChanged);
     
     return !(nameChanged || hostChanged || userChanged || pwChanged || certChanged);
 }

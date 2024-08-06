@@ -11,7 +11,7 @@
 @implementation LocalDatabaseIdentifier
 
 + (instancetype)fromJson:(NSString *)json {
-    //NSLog(@"Deserializing from [%@]", json);
+    //slog(@"Deserializing from [%@]", json);
     
     NSError* error;
     NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]
@@ -19,7 +19,7 @@
                                                                  error:&error];
 
     if(error) {
-        NSLog(@"%@", error);
+        slog(@"%@", error);
         return nil;
     }
     
@@ -44,7 +44,7 @@
     NSData* data = [NSJSONSerialization dataWithJSONObject:dictionary options:0 error:&error];
     
     if (error) {
-        NSLog(@"%@", error);
+        slog(@"%@", error);
         return nil;
     }
     

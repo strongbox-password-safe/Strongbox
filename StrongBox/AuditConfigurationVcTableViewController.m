@@ -55,7 +55,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UILabel *labelLastOnlineCheckHeader;
 @property (weak, nonatomic) IBOutlet UIStackView *stackViewLastOnlineCheck;
 @property (weak, nonatomic) IBOutlet UILabel *labelCheckHaveIBeenPwned;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAllAuditIssues;
+
 @property (weak, nonatomic) IBOutlet UILabel *labelCaseInsensitiveDupes;
 @property (weak, nonatomic) IBOutlet UILabel *labelLengthOfMinimumLength;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewExcluded;
@@ -84,13 +84,9 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    [self cell:self.cellViewAllAuditIssues setHidden:YES]; 
     
     [self cell:self.cellCheckHibp setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
     [self cell:self.cellOnlineHibpInterval setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
-
-    
     
     [self reloadDataAnimated:NO];
     
@@ -103,7 +99,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
     [NSNotificationCenter.defaultCenter addObserver:self
                                             selector:@selector(bindAuditStatus:)
-                                                name:kAuditCompletedNotificationKey
+                                                name:kAuditCompletedNotification
                                              object:nil];
 }
 
@@ -214,9 +210,6 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     if (cell == self.cellOnlineHibpInterval) {
         [self onChangeOnlineHibpInterval];
-    }
-    else if (cell == self.cellViewAllAuditIssues) {
-        self.onDone(YES, self);
     }
     else if (cell == self.cellViewExcluded) {
         [self performSegueWithIdentifier:@"segueToExcludedItems" sender:nil];
@@ -343,7 +336,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
 
     if ( self.model ) {
-        [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey
+        [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotification
                                                           object:@{ @"userStopped" : @(NO),
                                                                     @"model" : self.model }];
     }
@@ -382,7 +375,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (IBAction)onDone:(id)sender {
-    self.onDone(NO, self);
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)promptForString:(NSString*)title

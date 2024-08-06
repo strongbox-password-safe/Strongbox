@@ -60,7 +60,7 @@
 
 - (void)startAppOnboarding:(VIEW_CONTROLLER_PTR)presentingViewController completion:(void (^ _Nullable)(void))completion {
     if ( self.appOnboardingInProcess ) {
-        NSLog(@"Onboarding Already in Progress, ignoring repeated call");
+        slog(@"Onboarding Already in Progress, ignoring repeated call");
         return;
     }
     
@@ -224,7 +224,7 @@
                 }
             }
             else {
-                NSLog(@"WARNWARN: Could not instantiate view controller for onboarding module");
+                slog(@"WARNWARN: Could not instantiate view controller for onboarding module");
                 [self showNextOnboardingModule:presentingViewController model:model onboardingItems:onboardingItems index:(index + 1) stopOnboarding:stopOnboarding nav:nav completion:completion];
             }
         }
@@ -577,7 +577,7 @@
         else if ( buttonIdCancelIsZero == 1 ) {
             [CloudKitDatabasesInteractor.shared requestUserNotificationPermissionsWithCompletionHandler:^(BOOL granted, NSError * _Nullable error) {
                 if ( error ) {
-                    NSLog(@"🔴 Error request permissions [%@]", error);
+                    slog(@"🔴 Error request permissions [%@]", error);
 
                     [Alerts error:viewController error:error];
                 }
@@ -721,11 +721,11 @@
             return NO;
         }
         
-        if ( model.metadata.storageProvider != kTwoDrive ) {
+        if ( model.metadata.storageProvider != kOneDrive ) {
             return NO;
         }
         
-        if (! [TwoDriveStorageProvider.sharedInstance isBusinessDriveWithMetadata:model.metadata] ) {
+        if (! [OneDriveStorageProvider.sharedInstance isBusinessDriveWithMetadata:model.metadata] ) {
             return NO;
         }
         
@@ -804,7 +804,7 @@
 
         if ( model.metadata.lastAskedAboutArgon2MemReduction != nil ) {
             if ( ![model.metadata.lastAskedAboutArgon2MemReduction isMoreThanXDaysAgo:1] ) {
-                NSLog(@"Not asking about Argon2 as last asked less than 1 day ago.");
+                slog(@"Not asking about Argon2 as last asked less than 1 day ago.");
                 return NO;
             }
         }
@@ -868,7 +868,7 @@
 
         if ( model.metadata.lastAskedAboutKdbx4Upgrade != nil ) {
             if ( ![model.metadata.lastAskedAboutKdbx4Upgrade isMoreThanXDaysAgo:7] ) {
-                NSLog(@"Not asking about KDBX4 as last asked less than 7 days ago.");
+                slog(@"Not asking about KDBX4 as last asked less than 7 days ago.");
                 return NO;
             }
         }

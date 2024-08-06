@@ -9,6 +9,7 @@
 
 #import "Node.h"
 #import "OTPToken+Serialization.h"
+#import "OTPToken+Generation.h"
 
 #import "RMStore.h"
 #import "CustomizationManager.h"
@@ -68,3 +69,16 @@
 #import "SelectStorageProviderController.h"
 
 #import "Serializator.h"
+#import "BrowseTableViewCellHelper.h"
+#import "BrowseActionsHelper.h"
+#import "BiometricsManager.h"
+#import "SafesList.h"
+#import "BrowsePreferencesTableViewController.h"
+#import "ConvenienceUnlockPreferences.h"
+#import "AutoFillPreferencesViewController.h"
+#import "AuditConfigurationVcTableViewController.h"
+#import "AutomaticLockingPreferences.h"
+#import "AdvancedDatabaseSettings.h"
+#import "EncryptionPreferencesViewController.h"
+#import "CASGTableViewController.h"
+#import "SyncManager.h"

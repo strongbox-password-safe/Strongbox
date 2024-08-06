@@ -62,7 +62,7 @@ class SshKeyViewCell: UITableViewCell {
 
     func bindUI() {
         guard let key else {
-            NSLog("Could not convert field into KeeAgentSshKeyViewModel")
+            swlog("Could not convert field into KeeAgentSshKeyViewModel")
 
             labelFilename.text = NSLocalizedString("generic_error", comment: "Error")
             labelFingerprint.text = NSLocalizedString("generic_error", comment: "Error")
@@ -119,7 +119,7 @@ class SshKeyViewCell: UITableViewCell {
 
     @IBAction func onExportPrivate(_: Any) {
         guard let key, let viewController else {
-            NSLog("Could not convert field into KeeAgentSshKeyViewModel")
+            swlog("Could not convert field into KeeAgentSshKeyViewModel")
             return
         }
 
@@ -158,7 +158,7 @@ class SshKeyViewCell: UITableViewCell {
 
     @IBAction func onExportPublic(_: Any) {
         guard let key, let viewController else {
-            NSLog("Could not convert field into KeeAgentSshKeyViewModel")
+            swlog("Could not convert field into KeeAgentSshKeyViewModel")
             return
         }
 

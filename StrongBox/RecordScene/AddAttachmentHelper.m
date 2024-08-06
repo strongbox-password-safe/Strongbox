@@ -117,14 +117,14 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    slog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
 
     
     
     if (! [url startAccessingSecurityScopedResource] ) {
-        NSLog(@"🔴 Could not securely access URL!");
+        slog(@"🔴 Could not securely access URL!");
     }
     
     NSError* error;
@@ -138,7 +138,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
     [url stopAccessingSecurityScopedResource];
     
     if(!data) {
-        NSLog(@"Error: %@", error);
+        slog(@"Error: %@", error);
         [Alerts warn:self.parentViewController
                title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
              message:NSLocalizedString(@"add_attachment_vc_error_reading_message", @"Could not read the data for this item.")];
@@ -150,7 +150,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
-    NSLog(@"Image Pick did finish: [%@]", info);
+    slog(@"Image Pick did finish: [%@]", info);
     NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
     BOOL isImage = UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeImage) != 0;
     
@@ -188,7 +188,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
     }
     
     if(!data) {
-        NSLog(@"Error: %@", error);
+        slog(@"Error: %@", error);
         
         [picker dismissViewControllerAnimated:YES completion:^{
             [Alerts warn:self.parentViewController
@@ -328,7 +328,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
                                           NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
                                           KeePassAttachmentAbstractionLayer *dbAttachment = [[KeePassAttachmentAbstractionLayer alloc] initWithStream:inputStream length:data.length protectedInMemory:YES compressed:YES];
                                           
-                                          NSLog(@"Adding Attachment: [%@]-[%@]", text, dbAttachment.digestHash);
+                                          slog(@"Adding Attachment: [%@]-[%@]", text, dbAttachment.digestHash);
                                           
                                           self.onAdd(text, dbAttachment);
                                       }

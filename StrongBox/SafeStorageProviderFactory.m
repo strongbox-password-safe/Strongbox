@@ -72,8 +72,8 @@
     {
         return [DropboxV2StorageProvider sharedInstance];
     }
-    else if ( providerId == kTwoDrive ) {
-        return TwoDriveStorageProvider.sharedInstance;
+    else if ( providerId == kOneDrive ) {
+        return OneDriveStorageProvider.sharedInstance;
     }
 #endif
     
@@ -92,7 +92,7 @@
         return WiFiSyncStorageProvider.sharedInstance;
     }
 
-    NSLog(@"WARNWARN: Unknown Storage Provider!");
+    slog(@"WARNWARN: Unknown Storage Provider!");
     return nil;
 }
 
@@ -165,7 +165,7 @@
         }
         return _displayName;
     }
-    else if( provider == kTwoDrive ) {
+    else if( provider == kOneDrive ) {
         _displayName = NSLocalizedString(@"storage_provider_name_onedrive", @"OneDrive");
         if([_displayName isEqualToString:@"storage_provider_name_onedrive"]) {
             _displayName = @"OneDrive";
@@ -222,7 +222,7 @@
     else if (provider == kDropbox) {
         return @"Dropbox-2021";
     }
-    else if(provider == kTwoDrive) {
+    else if(provider == kOneDrive) {
         return @"onedrive-2021";
     }
     else if(provider == kFilesAppUrlBookmark) {
@@ -293,7 +293,7 @@
     else if (provider == kDropbox) {
         return [NSImage imageNamed:@"Dropbox-2021"];
     }
-    else if(provider == kTwoDrive) {
+    else if(provider == kOneDrive) {
         return [NSImage imageNamed:@"onedrive-2021"];
     }
     else if(provider == kFilesAppUrlBookmark) {
@@ -334,7 +334,7 @@
         }
     }
     else {
-        NSLog(@"SafeStorageProviderFactory::getImageForProvider Unknown");
+        slog(@"SafeStorageProviderFactory::getImageForProvider Unknown");
         return nil;
     }
 }
@@ -379,7 +379,7 @@
     }
 #endif
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    else if ( metadata.storageProvider == kTwoDrive || metadata.storageProvider == kGoogleDrive || metadata.storageProvider == kDropbox ) {
+    else if ( metadata.storageProvider == kOneDrive || metadata.storageProvider == kGoogleDrive || metadata.storageProvider == kDropbox ) {
         path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider] ];
     }
 #endif
@@ -421,7 +421,7 @@
             NSError* error;
             [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
             if (error) {
-                NSLog(@"Error getting attributes of database file: [%@]", error);
+                slog(@"Error getting attributes of database file: [%@]", error);
                 subtitle = [NSString stringWithFormat:@"(%ld) %@", (long)error.code, error.localizedDescription];
             }
         }

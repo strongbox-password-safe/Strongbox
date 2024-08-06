@@ -252,7 +252,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
             }
             
             if ( routeError && routeError.tag == DBFILESGetMetadataErrorPath && routeError.isPath ) {
-                NSLog(@"🔴 Dropbox - Could not find file at path [%@]", path);
+                slog(@"🔴 Dropbox - Could not find file at path [%@]", path);
                 completion(kReadResultError, nil, nil, [Utils createNSError:[NSString stringWithFormat:@"Could not find file at %@", path] errorCode:-1]);
             }
             else
@@ -558,7 +558,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
             [[NSNotificationCenter defaultCenter] postNotificationName:@"isDropboxLinked" object:authResult];
         }
         else {
-            NSLog(@"🔴 Dropbox URL - No Auth Result!!");
+            slog(@"🔴 Dropbox URL - No Auth Result!!");
         }
     }];
 }
@@ -577,22 +577,22 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         DBOAuthResult *authResult = (DBOAuthResult *)note.object;
         
         if ([authResult isSuccess]) {
-            NSLog(@"✅ Success! User is logged into Dropbox.");
+            slog(@"✅ Success! User is logged into Dropbox.");
         }
         else if ([authResult isCancel]) {
-            NSLog(@"⚠️ Authorization flow was manually canceled by user!");
+            slog(@"⚠️ Authorization flow was manually canceled by user!");
         }
         else if ([authResult isError]) {
-            NSLog(@"🔴 Error: %@", authResult);
+            slog(@"🔴 Error: %@", authResult);
         }
 
         if ( DBClientsManager.authorizedClient ) {
-            NSLog(@"✅ Dropbox Linked");
+            slog(@"✅ Dropbox Linked");
             task(NO, NO, nil);
         }
         else {
-            NSLog(@"🔴 Not Linked");
-            NSLog(@"Error: %@", authResult);
+            slog(@"🔴 Not Linked");
+            slog(@"Error: %@", authResult);
             task(authResult.tag == DBAuthCancel, NO, [Utils createNSError:[NSString stringWithFormat:@"Could not create link to Dropbox: [%@]", authResult] errorCode:-1]);
         }
     }];

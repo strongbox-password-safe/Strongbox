@@ -179,7 +179,7 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
             }
         }
         else {
-            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", uuid);
+            slog(@"WARN: Attempt to update a safe not found in list... [%@]", uuid);
         }
     });
 }
@@ -218,7 +218,7 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     NSError* error;
     NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:effectiveFileUrl readOnly:NO error:&error];
     if(!fileIdentifier) {
-        NSLog(@"Could not get Bookmark for this database will continue without... [%@]", error);
+        slog(@"Could not get Bookmark for this database will continue without... [%@]", error);
     }
 
     StorageProvider provider = storageProviderFromUrl(maybeManagedUrl);

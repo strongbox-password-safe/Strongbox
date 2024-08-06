@@ -60,13 +60,13 @@ class HeaderTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMe
     }
 
     @IBAction func onCopyClicked(_: Any) {
-        NSLog("onCopyClicked")
+        swlog("onCopyClicked")
 
         onCopyClickedCallback?()
     }
 
     func showPopupButtonMenu() {
-        NSLog("✅ showPopupButton")
+        swlog("✅ showPopupButton")
 
         popupButton.performClick(nil)
     }

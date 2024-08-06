@@ -115,7 +115,7 @@ struct SearchResult: Identifiable {
 
         type = .entry(model: model, node: node)
 
-        image = NodeIconHelper.getIconFor(node, predefinedIconSet: model.metadata.iconSet, format: model.originalFormat)
+        image = NodeIconHelper.getIconFor(node, predefinedIconSet: model.metadata.keePassIconSet, format: model.originalFormat)
 
         id = node.uuid.uuidString
         title = SearchResult.dereference(model: model, node: node, string: vm.title)
@@ -194,7 +194,7 @@ struct SearchResult: Identifiable {
         }
 
         if node.fields.otpToken != nil {
-            ret.append(SearchResultAction(title: NSLocalizedString("browse_prefs_tap_action_copy_copy_totp", comment: "Copy TOTP"), actionType: .copyPassword))
+            ret.append(SearchResultAction(title: NSLocalizedString("browse_prefs_tap_action_copy_copy_totp", comment: "Copy 2FA Code"), actionType: .copyPassword))
         }
 
         if !notes.isEmpty {
@@ -445,7 +445,7 @@ struct SearchResult: Identifiable {
             throw SearchResultActionError.invalidActionForType
         }
 
-        return await withCheckedContinuation { continuation in
+        return await withCheckedContinuation { continuation in 
             DatabasesCollection.shared.initiateDatabaseUnlock(uuid: database.uuid, syncAfterUnlock: true) { _ in
                 continuation.resume(returning: .refreshResults)
             }

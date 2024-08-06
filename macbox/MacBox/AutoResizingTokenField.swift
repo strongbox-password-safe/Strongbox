@@ -38,7 +38,7 @@ class AutoResizingTokenField: OEXTokenField {
     var lastIntrinsicSize: NSSize?
     override var intrinsicContentSize: NSSize {
         if !cell!.wraps {
-            NSLog("🔴 None-Wrapping!")
+            swlog("🔴 None-Wrapping!")
             return super.intrinsicContentSize
         }
 

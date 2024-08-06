@@ -53,8 +53,8 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 - (void)loadStatistics {
     self.statistics = [[MutableOrderedDictionary alloc] init];
 
-    self.statistics[NSLocalizedString(@"mac_database_summary_number_of_folders", @"Number of Groups")] = [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.fastGroupTotalCount];
-    self.statistics[NSLocalizedString(@"mac_database_summary_number_of_entries", @"Number of Entries")] = [NSString stringWithFormat:@"%lu", (unsigned long)self.viewModel.database.fastEntryTotalCount];
+
+
     self.statistics[NSLocalizedString(@"mac_database_summary_unique_usernames", @"Unique Usernames")] = [NSString stringWithFormat:@"%lu", (unsigned long)[self.viewModel.database.usernameSet count]];
 
     

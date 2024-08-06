@@ -114,7 +114,7 @@ final class BonjourResolver: NSObject, NetServiceDelegate {
             self.completionHandler = nil
 
             if case .failure(BonjourResolverError.timeout) = result {
-                NSLog("⚠️ Bonjour Resolver Timed Out")
+                swlog("⚠️ Bonjour Resolver Timed Out")
             }
 
             completionHandler(result)

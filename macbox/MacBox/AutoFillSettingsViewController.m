@@ -144,7 +144,7 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( autoFillEnabled != oldEnabled ) { 
-            NSLog(@"AutoFill QuickType was toggles - Clearing Database....");
+            slog(@"AutoFill QuickType was toggles - Clearing Database....");
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
             
             self.model.databaseMetadata.quickTypeEnabled = autoFillEnabled; 
@@ -191,7 +191,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                              configuration:NSWorkspaceOpenConfiguration.configuration
                          completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
         if ( error ) {
-            NSLog(@"Launch URL done. Error = [%@]", error);
+            slog(@"Launch URL done. Error = [%@]", error);
         }
     }];
 }
@@ -203,7 +203,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                              configuration:NSWorkspaceOpenConfiguration.configuration
                          completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
         if ( error ) {
-            NSLog(@"Launch URL done. Error = [%@]", error);
+            slog(@"Launch URL done. Error = [%@]", error);
         }
     }];
 }

@@ -44,7 +44,7 @@ static const NSUInteger kStreamReadThreshold = 16 * 1024;
     }
     
     if ( streamLength > kStreamReadThreshold ) {
-        NSLog(@"INFO: Large Key File, will stream the digest and skip XML, Hex etc checks. Pure SHA256");
+        slog(@"INFO: Large Key File, will stream the digest and skip XML, Hex etc checks. Pure SHA256");
              
         [inStream open];
         
@@ -60,7 +60,7 @@ static const NSUInteger kStreamReadThreshold = 16 * 1024;
         }
         
         if ( len != 0 ) {
-            NSLog(@"WARNWARN: Could not read key file stream: [%ld] - [%@]", (long)len, inStream.streamError);
+            slog(@"WARNWARN: Could not read key file stream: [%ld] - [%@]", (long)len, inStream.streamError);
             [inStream close];
             free(sha256context);
             return nil;
@@ -199,14 +199,14 @@ BOOL isAll64CharactersAreHex(NSData* data) {
     
     if(!document.rootDocument || document.rootDocument.childCount != 1 ||
        (![document.rootDocument.children[0].name isEqualToString:kKeyFileRootElementName])) {
-        NSLog(@"Does not contain KeyFile root element... not an xml key file");
+        slog(@"Does not contain KeyFile root element... not an xml key file");
         return nil;
     }
     
     NSXMLNode *keyFileNode = document.rootDocument.children[0];
     
     if(keyFileNode.childCount < 2) { 
-        NSLog(@"Does not contain 2 child elements... not an xml key file");
+        slog(@"Does not contain 2 child elements... not an xml key file");
         return nil;
     }
     
@@ -260,7 +260,7 @@ BOOL isAll64CharactersAreHex(NSData* data) {
                     NSString* expectedPrefix = expectedHash ? expected.uppercaseString : nil;
                     
                     if ( !actualPrefix || !expectedPrefix || ![actualPrefix isEqualToString:expectedPrefix] ) {
-                        NSLog(@"🔴 WARNWARN: Hash check failed for V2 Key File");
+                        slog(@"🔴 WARNWARN: Hash check failed for V2 Key File");
                         return nil;
                     }
 
@@ -306,7 +306,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
             *error = attrError;
         }
         
-        NSLog(@"WARNWARN: Could not read Key File URL File Size.");
+        slog(@"WARNWARN: Could not read Key File URL File Size.");
         
         return nil;
     }
@@ -342,7 +342,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
             *error = [Utils createNSError:@"Could not read Key File Bookmark" errorCode:-123456];
         }
         
-        NSLog(@"WARNWARN: Could not read Key File Bookmark.");
+        slog(@"WARNWARN: Could not read Key File Bookmark.");
         return nil;
     }
 }
@@ -353,7 +353,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
                           format:(DatabaseFormat)format
                            error:(NSError *__autoreleasing  _Nullable *)error {
     if ( !keyFileBookmark && !onceOffKeyFileData && !keyFileFileName ) {
-        NSLog(@"WARNWARN: No Sources is nil");
+        slog(@"WARNWARN: No Sources is nil");
         
         if ( error ) {
             *error = [Utils createNSError:@"Could not read Key File from NO sources" errorCode:-123456];

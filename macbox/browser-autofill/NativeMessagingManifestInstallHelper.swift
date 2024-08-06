@@ -37,6 +37,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
     class func installNativeMessagingHostsFiles() {
         installFirefoxLikeManifestAt("Library/Application Support/Mozilla/NativeMessagingHosts")
         installFirefoxLikeManifestAt("Library/Application Support/librewolf/NativeMessagingHosts")
+        installFirefoxLikeManifestAt("Library/Application Support/TorBrowser-Data/Browser/Mozilla/NativeMessagingHosts")
 
         installForChromiumBasedBrowser("Library/Application Support/Google/Chrome/NativeMessagingHosts")
         installForChromiumBasedBrowser("Library/Application Support/Google/Chrome Beta/NativeMessagingHosts/")
@@ -51,11 +52,10 @@ class NativeMessagingManifestInstallHelper: NSObject {
         installForChromiumBasedBrowser("Library/Application Support/Arc/User Data/NativeMessagingHosts")
         installForChromiumBasedBrowser("Library/Application Support/Sidekick/NativeMessagingHosts")
         installForChromiumBasedBrowser("Library/Application Support/Thorium/NativeMessagingHosts")
+        installForChromiumBasedBrowser("Library/Application Support/Orion/NativeMessagingHosts") 
+        installForChromiumBasedBrowser("Library/Application Support/BraveSoftware/Brave-Browser/NativeMessagingHosts")
 
         
-        
-
-        installForChromiumBasedBrowser("Library/Application Support/Orion/NativeMessagingHosts")
     }
 
     @objc
@@ -76,8 +76,11 @@ class NativeMessagingManifestInstallHelper: NSObject {
         removeManifest("Library/Application Support/Arc/User Data/NativeMessagingHosts")
         removeManifest("Library/Application Support/Sidekick/NativeMessagingHosts")
         removeManifest("Library/Application Support/Thorium/NativeMessagingHosts")
+        removeManifest("Library/Application Support/Orion/NativeMessagingHosts")
 
         removeManifest("Library/Application Support/Orion/NativeMessagingHosts")
+        removeManifest("Library/Application Support/BraveSoftware/Brave-Browser/NativeMessagingHosts")
+        removeManifest("Library/Application Support/TorBrowser-Data/Browser/Mozilla/NativeMessagingHosts")
     }
 
     class func removeManifest(_ path: String) {
@@ -88,12 +91,12 @@ class NativeMessagingManifestInstallHelper: NSObject {
         do {
             try FileManager.default.removeItem(at: fullPath)
 
-            NSLog("✅ Removed Native Manifest... [%@]", path)
+            swlog("✅ Removed Native Manifest... [%@]", path)
         } catch {
             if (error as NSError).code == NSFileNoSuchFileError {
                 return
             } else {
-                NSLog("🔴 Couldn't delete Native Manifest... [%@]", String(describing: error))
+                swlog("🔴 Couldn't delete Native Manifest... [%@]", String(describing: error))
             }
         }
     }
@@ -118,7 +121,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
         guard let encodedData = try? encoder.encode(manifest),
               let jsonString = String(data: encodedData, encoding: .utf8)
         else {
-            NSLog("🔴 Could not encode to JSON")
+            swlog("🔴 Could not encode to JSON")
             return
         }
 
@@ -135,7 +138,7 @@ class NativeMessagingManifestInstallHelper: NSObject {
                 try jsonString.write(toFile: fullPath.path, atomically: true, encoding: .utf8)
 
             } catch {
-                NSLog("🔴 Couldn't write Native Manifest... [%@]", String(describing: error))
+                swlog("🔴 Couldn't write Native Manifest... [%@]", String(describing: error))
             }
         }
     }

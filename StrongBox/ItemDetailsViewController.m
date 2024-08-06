@@ -64,7 +64,6 @@
 #import "ContextMenuHelper.h"
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
-NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
 
 static NSInteger const kRowTitleAndIcon = 0;
 static NSInteger const kRowUsername = 1;
@@ -113,6 +112,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 @property BOOL inCellHeightsChangedProcess;
 
 @property BOOL urlJustChanged;
+@property BOOL justAutoCommittedTotp;
 @property BOOL iconExplicitlyChanged;
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
@@ -147,7 +147,6 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 
 
-
 + (NSArray<NSNumber*>*)defaultCollapsedSections {
     
     
@@ -163,8 +162,22 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
              @(1)];
 }
 
++ (instancetype)fromStoryboard:(Model*)model nodeUuid:(NSUUID*)nodeUuid {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"ItemDetails" bundle:nil];
+    ItemDetailsViewController* vc = (ItemDetailsViewController*)[sb instantiateInitialViewController];
+    
+    vc.databaseModel = model;
+    vc.itemId = nodeUuid;
+    vc.createNewItem = nodeUuid == nil;
+    vc.editImmediately = nodeUuid == nil;
+    vc.forcedReadOnly = model.isReadOnly;
+    vc.parentGroupId = nil;
+
+    return vc;
+}
+
 - (void)dealloc {
-    NSLog(@"ItemDetailsViewController::DEALLOC [%@]", self);
+    slog(@"ItemDetailsViewController::DEALLOC [%@]", self);
     
     [self unListenToNotifications];
 }
@@ -176,12 +189,12 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     if (!self.inCellHeightsChangedProcess) {
         self.inCellHeightsChangedProcess = YES;
-        
+
         
         [self.tableView beginUpdates];
         [self.tableView endUpdates];
         
-        
+
         self.inCellHeightsChangedProcess = NO;
     }
 }
@@ -212,7 +225,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     self.navigationController.toolbar.hidden = YES;
     self.navigationController.navigationBarHidden = NO;
     self.navigationController.navigationBar.prefersLargeTitles = NO;
-
+    
     self.hideMetadataSection = !AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
     
 #ifndef IS_APP_EXTENSION
@@ -254,7 +267,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     
     
-
+    
     
     
     
@@ -263,7 +276,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     [UIView setAnimationsEnabled:NO];
     
     [self.tableView reloadData]; 
-        
+    
     
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
@@ -303,29 +316,29 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onAuditChanged:)
-                                               name:kAuditCompletedNotificationKey
+                                               name:kAuditCompletedNotification
                                              object:nil];
     
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onSyncOrUpdateStatusChanged:)
-                                               name:kAsyncUpdateStarting
+                                               name:kAsyncUpdateStartingNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onSyncOrUpdateStatusChanged:)
-                                               name:kAsyncUpdateDone
+                                               name:kAsyncUpdateDoneNotification
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseReloaded:)
-                                               name:kDatabaseReloadedNotificationKey
+                                               name:kDatabaseReloadedNotification
                                              object:nil];
     
 #ifndef IS_APP_EXTENSION
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onSyncOrUpdateStatusChanged:)
-                                               name:kSyncManagerDatabaseSyncStatusChanged
+                                               name:kSyncManagerDatabaseSyncStatusChangedNotification
                                              object:nil];
 #endif
 }
@@ -353,7 +366,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)customizeLeftBarButtons {
     self.navigationItem.leftItemsSupplementBackButton = YES;
-        
+    
     UIImage* image = [UIImage systemImageNamed:@"slider.horizontal.3"];
     self.preferencesBarButton = [[UIBarButtonItem alloc] initWithImage:image menu:nil];
     
@@ -400,7 +413,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     }
     else {
         self.databaseModel.metadata.easyReadFontForAll = !self.databaseModel.metadata.easyReadFontForAll;
-
+        
         [self refreshCustomizeViewMenu];
         [self notifyDatabaseViewPreferencesChanged];
     }
@@ -414,13 +427,13 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     __weak ItemDetailsViewController* weakSelf = self;
     
     NSMutableArray<UIMenuElement*>* ma1 = [NSMutableArray array];
-
+    
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"new_entry_defaults", @"New Entry Defaults")
                                   systemImage:@"gear"
                                       handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onConfigureDefaults];
     }]];
-
+    
     [ma1 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"item_details_view_settings_easy_read_all", @"Easy Read Font on All Fields")
                                   systemImage:@"eyeglasses"
                                       enabled:YES
@@ -469,7 +482,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         [weakSelf notifyDatabaseViewPreferencesChanged];
         [weakSelf refreshCustomizeViewMenu];
     }]];
-
+    
     UIMenu* menu1 = [UIMenu menuWithTitle:@""
                                     image:nil
                                identifier:nil
@@ -545,7 +558,11 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     [self.tableView registerNib:[UINib nibWithNibName:kSshKeyViewCellId bundle:nil] forCellReuseIdentifier:kSshKeyViewCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kPasskeyTableCellViewId bundle:nil] forCellReuseIdentifier:kPasskeyTableCellViewId];
     [self.tableView registerNib:[UINib nibWithNibName:kMarkdownUIKitTableCellViewId bundle:nil] forCellReuseIdentifier:kMarkdownUIKitTableCellViewId];
-
+    
+    if (@available(iOS 16.0, *)) {
+        [self.tableView registerClass:TagsNGTableViewCell.class forCellReuseIdentifier:TagsNGTableViewCell.CellIdentifier];
+    }
+    
     [self.tableView setSectionHeaderTopPadding:0.0f];
     
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
@@ -604,7 +621,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)onModelEdited {
     if(!self.editing) {
-        NSLog(@"🔴 EEEEEEEKKKKK on Model edited while not editing!");
+        slog(@"🔴 EEEEEEEKKKKK on Model edited while not editing!");
         return;
     }
     
@@ -616,7 +633,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         self.navigationItem.leftItemsSupplementBackButton = NO;
         BOOL isDifferent = [self.model isDifferentFrom:self.preEditModelClone];
         BOOL saveable = isDifferent || self.createNewItem;
-        self.editButtonItem.enabled = saveable;
+        self.editButtonItem.enabled = saveable || self.justAutoCommittedTotp; 
         
         [self.cancelOrDiscardBarButton setTitle:saveable ? NSLocalizedString(@"generic_verb_discard", @"Discard") :  NSLocalizedString(@"generic_verb_close", @"Close")];
         
@@ -721,6 +738,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         [self bindNavBar];
     }
     
+    self.justAutoCommittedTotp = NO;
     [AppModel.shared markAsEditingWithId:self.databaseModel.databaseUuid editing:editing];
     
     [self.tableView performBatchUpdates:^{
@@ -850,7 +868,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     }
 }
 
-- (BOOL)hasHistory {    
+- (BOOL)hasHistory {
     if ( self.createNewItem ) {
         return NO;
     }
@@ -990,14 +1008,14 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     else if(section == kOtherSectionIdx && (self.editing || !self.hasHistory)) {
         return CGFLOAT_MIN;
     }
-#else 
+#else
     if (section == kAttachmentsSectionIdx ||
         section == kMetadataSectionIdx ||
         section == kOtherSectionIdx) {
         return CGFLOAT_MIN;
     }
 #endif
-
+    
     return UITableViewAutomaticDimension;
 }
 
@@ -1010,11 +1028,11 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         if (indexPath.row == kRowSshKey ) {
             return (self.model.keeAgentSshKey ? UITableViewCellEditingStyleDelete : UITableViewCellEditingStyleInsert);
         }
-
+        
         if (indexPath.row == kRowPasskey && self.model.passkey ) {
             return UITableViewCellEditingStyleDelete;
         }
-
+        
         if (indexPath.row >= kSimpleRowCount) { 
             return indexPath.row - kSimpleRowCount == self.model.customFieldsFiltered.count ? UITableViewCellEditingStyleInsert : UITableViewCellEditingStyleDelete;
         }
@@ -1083,7 +1101,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         NSInteger destIdx = destinationIndexPath.row - kSimpleRowCount;
         
         if ( sourceIdx >= 0 && sourceIdx < self.model.customFieldsFiltered.count && destIdx >= 0 && destIdx < self.model.customFieldsFiltered.count && sourceIdx != destIdx ) {
-            NSLog(@"Move: [%ld] -> [%ld]", (long)sourceIdx, destIdx);
+            slog(@"Move: [%ld] -> [%ld]", (long)sourceIdx, destIdx);
             [self.model moveCustomFieldAtIndex:sourceIdx to:destIdx];
             [self onModelEdited];
         }
@@ -1176,13 +1194,13 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)addNewSshKey:(BOOL)ed25519 {
     if ( self.model.keeAgentSshKey ) {
-        NSLog(@"🔴 Already an existing Key!!");
+        slog(@"🔴 Already an existing Key!!");
         return;
     }
     
     OpenSSHPrivateKey* key = ed25519 ? [OpenSSHPrivateKey newEd25519] : [OpenSSHPrivateKey newRsa];
     if ( key == nil ) {
-        NSLog(@"🔴 Could not create new key!");
+        slog(@"🔴 Could not create new key!");
         return;
     }
     
@@ -1211,7 +1229,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 }
 
 - (void)onAddAttachment:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment {
-    NSLog(@"Adding new Attachment: [%@]", attachment);
+    slog(@"Adding new Attachment: [%@]", attachment);
     
     [self.model insertAttachment:filename attachment:attachment]; 
     
@@ -1246,18 +1264,18 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     NSString* f = [StrongboxFilesManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     
-
-
-
+    
+    
+    
     NSURL* url = [NSURL fileURLWithPath:f];
-
+    
     NSError* error;
     if ( ![data writeToURL:url options:kNilOptions error:&error] ) {
-        NSLog(@"🔴 Error writing preview attachment %@", error);
+        slog(@"🔴 Error writing preview attachment %@", error);
     }
     
     if ( ![QLPreviewController canPreviewItem:url] ) {
-        NSLog(@"🔴 Won't be able to preview this item!");
+        slog(@"🔴 Won't be able to preview this item!");
     }
     
     return url;
@@ -1322,6 +1340,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         vc.string = d[@"text"];
         vc.subtext = d[@"subtext"];
         vc.colorize = ((NSNumber*)(d[@"colorize"])).boolValue;
+        vc.hideLargeTextGrid = ((NSNumber*)(d[@"hideLargeTextGrid"])).boolValue;
     }
     else if ([segue.identifier isEqualToString:@"segueToAuditDrillDown"]) {
         UINavigationController* nav = segue.destinationViewController;
@@ -1329,10 +1348,6 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         
         vc.model = self.databaseModel;
         vc.itemId = self.itemId;
-        vc.hideShowAllAuditIssues = YES;
-        vc.onDone = ^(BOOL showAllAuditIssues, UIViewController * _Nonnull viewControllerToDismiss) {
-            [viewControllerToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-        };
         
         __weak ItemDetailsViewController* weakSelf = self;
         vc.updateDatabase = ^{
@@ -1343,7 +1358,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)onCustomFieldEditedOrAdded:(CustomFieldViewModel * _Nonnull)field
                        fieldToEdit:(CustomFieldViewModel*)fieldToEdit {
-    NSLog(@"onCustomFieldEditedOrAdded: [%@] - fieldToEdit = [%@]", field, fieldToEdit);
+    slog(@"onCustomFieldEditedOrAdded: [%@] - fieldToEdit = [%@]", field, fieldToEdit);
     
     if ( fieldToEdit ) { 
         NSUInteger oldIdx = [self.model.customFieldsFiltered indexOfObject:fieldToEdit];
@@ -1366,7 +1381,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
             
             
             
-            NSLog(@"⚠️ WARNWARN - Could not find custom field to edit!!");
+            slog(@"⚠️ WARNWARN - Could not find custom field to edit!!");
             return;
         }
     }
@@ -1404,6 +1419,8 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 }
 
 - (void)onSetTotp {
+    __weak ItemDetailsViewController* weakSelf = self;
+
     [Alerts fourOptionsWithCancel:self
                             title:NSLocalizedString(@"item_details_setup_totp_how_title", @"How would you like to setup TOTP?")
                           message:NSLocalizedString(@"item_details_setup_totp_how_message", @"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL")
@@ -1414,28 +1431,27 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                            action:^(int response) {
         if(response == 0){
             TOTPScannerViewController* vc = [[TOTPScannerViewController alloc] init];
-
+            
             vc.modalPresentationStyle = UIModalPresentationFormSheet;
             
-            __weak ItemDetailsViewController* weakSelf = self;
             vc.onFoundTOTP = ^(NSURL* url) {
                 [weakSelf setTotpWithString:url.absoluteString steam:NO];
             };
             
-            [self presentViewController:vc animated:YES completion:nil];
-
+            [weakSelf presentViewController:vc animated:YES completion:nil];
+            
         }
         else if(response == 1) {
-            [self scanPhotoLibraryImageForQRCode];
+            [weakSelf scanPhotoLibraryImageForQRCode];
         }
         else if(response == 2 || response == 3) {
-            [Alerts OkCancelWithTextField:self
+            [Alerts OkCancelWithTextField:weakSelf
                      textFieldPlaceHolder:NSLocalizedString(@"item_details_setup_totp_secret_title", @"Secret or OTPAuth URL")
                                     title:NSLocalizedString(@"item_details_setup_totp_secret_message", @"Please enter the secret or an OTPAuth URL")
                                   message:@""
                                completion:^(NSString *text, BOOL success) {
                 if(success) {
-                    [self setTotpWithString:text steam:(response == 3)];
+                    [weakSelf setTotpWithString:text steam:(response == 3)];
                 }
             }];
         }
@@ -1443,10 +1459,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 }
 
 - (void)setTotpWithString:(NSString*)string steam:(BOOL)steam {
-    OTPToken* token = [NodeFields getOtpTokenFromString:string
-                                             forceSteam:steam
-                                                 issuer:self.model.title
-                                               username:self.model.username];
+    OTPToken* token = [NodeFields getOtpTokenFromString:string forceSteam:steam];
     
     if(token) {
         self.model.totp = token;
@@ -1455,7 +1468,9 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         
         [self onModelEdited];
         
-        NSLog(@"✅ Saving as just added a TOTP");
+        slog(@"✅ Saving as just added a TOTP");
+        
+        self.justAutoCommittedTotp = YES;
         
         [self applyChangesAndSave];
     }
@@ -1507,7 +1522,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             }
         }
         else {
-            NSLog(@"Couldn't find QR Code!");
+            slog(@"Couldn't find QR Code!");
             
             [Alerts warn:self
                    title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
@@ -1521,7 +1536,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         CIImage* ciImage = image.CIImage ? image.CIImage : [CIImage imageWithCGImage:image.CGImage];
         
         if ( !ciImage ) {
-            NSLog(@"WARNWARN: Could not get CIImage for QR Code");
+            slog(@"WARNWARN: Could not get CIImage for QR Code");
             return nil;
         }
         
@@ -1552,6 +1567,10 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
     
+    [self showToast:message];
+}
+
+- (void)showToast:(NSString*)message {
 #ifndef IS_APP_EXTENSION
     [ISMessages showCardAlertWithTitle:message
                                message:nil
@@ -1818,8 +1837,8 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         return nil;
     }
     
-
-
+    
+    
     
     __weak ItemDetailsViewController* weakSelf = self;
     
@@ -1982,18 +2001,36 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
 }
 
 - (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
-    TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
-    
+    if (@available(iOS 16.0, *)) {
 
-    
-    [cell setModel:YES
-              tags:self.model.tags
-   useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
-    
-    cell.selectionStyle = self.isEditing ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
-    cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            TagsNGTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:TagsNGTableViewCell.CellIdentifier];
+        [cell setContentWithTags:self.model.tags useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll isEditing:self.isEditing];
+            
+            cell.selectionStyle = self.isEditing ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
+            cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+            return cell;
 
-    return cell;
+
+
+
+
+
+
+
+
+    } else {
+        TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
+        
+        [cell setModel:YES
+                  tags:self.model.tags
+       useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+        
+        cell.selectionStyle = self.isEditing ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
+        cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        
+        return cell;
+    }
 }
 
 - (UITableViewCell*)getPasswordCell:(NSIndexPath*)indexPath {
@@ -2032,7 +2069,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
                       concealed:self.passwordConcealedInUi
                        colorize:self.databaseModel.metadata.colorizePasswords
                           audit:audit
-                   showStrength:YES 
+                   showStrength:YES
               showLargeTextView:YES];
         
         __weak GenericKeyValueTableViewCell* weakCell = cell;
@@ -2125,14 +2162,14 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         cell.editingAccessoryType = UITableViewCellAccessoryNone;
         
         cell.viewController = self;
-
+        
         cell.copyFunction = ^(NSString * _Nonnull string) {
             [self copyToClipboard:string message:NSLocalizedString(@"generic_copied", @"Copied")];
         };
         cell.launchUrlFunction = ^(NSString * _Nonnull string) {
             [self.databaseModel launchUrlString:string];
         };
-
+        
         cell.passkey = self.model.passkey;
         
         return cell;
@@ -2232,16 +2269,16 @@ suggestionProvider:^NSString*(NSString *text) {
         [cell setDate:self.model.expires];
         
         cell.onDateChanged = ^(NSDate * _Nullable date) {
-            NSLog(@"Setting Expiry Date to %@", date ? date.friendlyDateTimeString : @"");
+            slog(@"Setting Expiry Date to %@", date ? date.friendlyDateTimeString : @"");
             weakSelf.model.expires = date;
             [weakSelf onModelEdited];
         };
-
-
-
-
-
-
+        
+        
+        
+        
+        
+        
         
         return cell;
     }
@@ -2282,7 +2319,7 @@ suggestionProvider:^NSString*(NSString *text) {
     };
     
     return cell;
-
+    
 }
 
 - (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
@@ -2295,12 +2332,12 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (UITableViewCell*)getMarkdownNotesCell:(NSString*)markdown indexPath:(NSIndexPath*)indexPath {
     BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-
+    
     NSError* error;
     NSString* html = [StrongboxCMarkGFMHelper convertMarkdownWithMarkdown:markdown darkMode:dark error:&error];
     
     if ( error != nil || html.length == 0 ) {
-        NSLog(@"🔴 Could not convert notes markdown to HTML, returning standard notes cell");
+        slog(@"🔴 Could not convert notes markdown to HTML, returning standard notes cell");
         return [self getStandardNonMarkdownNotesCell:markdown indexPath:indexPath];
     }
     
@@ -2317,7 +2354,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (UITableViewCell*)getNotesCell:(NSIndexPath*)indexPath {
     NSString* notes = [self maybeDereference:self.model.notes];
-        
+    
     if ( self.editing || notes.length == 0 || self.databaseModel.metadata.easyReadFontForAll || !AppPreferences.sharedInstance.markdownNotes ) {
         return [self getStandardNonMarkdownNotesCell:notes indexPath:indexPath];
     }
@@ -2571,23 +2608,28 @@ suggestionProvider:^NSString*(NSString *text) {
 - (void)showQrCodeForTotp {
     if ( self.model.totp ) {
         NSURL* url = [self.model.totp url:YES];
-        NSString* secret = self.model.totp.secretBase32;
+
         
         if ( url ) {
-            [self showLargeText:secret subtext:url.absoluteString colorize:YES];
+            [self showLargeText:url.absoluteString subtext:url.absoluteString colorize:YES hideLargeTextGrid:YES];
         }
     }
 }
 
 - (void)showLargeText:(NSString*)text colorize:(BOOL)colorize {
-    [self showLargeText:text subtext:@"" colorize:colorize];
+    [self showLargeText:text subtext:@"" colorize:YES hideLargeTextGrid:NO];
 }
 
-- (void)showLargeText:(NSString*)text subtext:(NSString*_Nullable)subtext colorize:(BOOL)colorize {
+- (void)showLargeText:(NSString*)text colorize:(BOOL)colorize hideLargeTextGrid:(BOOL)hideLargeTextGrid {
+    [self showLargeText:text subtext:@"" colorize:colorize hideLargeTextGrid:hideLargeTextGrid];
+}
+
+- (void)showLargeText:(NSString*)text subtext:(NSString*_Nullable)subtext colorize:(BOOL)colorize hideLargeTextGrid:(BOOL)hideLargeTextGrid {
     if (text) {
         [self performSegueWithIdentifier:@"segueToLargeView"
                                   sender:@{ @"text" : text,
                                             @"colorize" : @(colorize),
+                                            @"hideLargeTextGrid" : @(hideLargeTextGrid),
                                             @"subtext" : subtext ? subtext : @"" }];
     }
 }
@@ -2637,7 +2679,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (void)applyChangesAndSave { 
     if( !self.createNewItem && ![self.model isDifferentFrom:self.preEditModelClone] ) {
-        NSLog(@"ItemDetailsViewController::applyChangesAndSave => No Changes or Edits to Save - NOP...");
+        slog(@"ItemDetailsViewController::applyChangesAndSave => No Changes or Edits to Save - NOP...");
         return;
     }
 
@@ -2704,7 +2746,9 @@ suggestionProvider:^NSString*(NSString *text) {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self performFullReload];
         
-        [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelEditedNotification object:nil];
+        
+        [self showToast:NSLocalizedString(@"generic_database_saved", @"Database Saved")];
         
         [self updateAndSync];
     });

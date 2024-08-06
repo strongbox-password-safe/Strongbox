@@ -9,6 +9,8 @@
 #ifndef Header_h
 #define Header_h
 
+#import "SBLog.h"
+
 static const uint32_t kInnerStreamPlainText = 0;
 static const uint32_t kInnerStreamArc4 = 1;
 static const uint32_t kInnerStreamSalsa20 = 2;

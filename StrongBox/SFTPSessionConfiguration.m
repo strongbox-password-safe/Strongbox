@@ -8,7 +8,7 @@
 
 #import "SFTPSessionConfiguration.h"
 #import "SecretStore.h"
-
+#import "SBLog.h"
 @interface SFTPSessionConfiguration ()
 
 @end
@@ -137,7 +137,7 @@
     
     BOOL pathChanged = self.initialDirectory != nil ? ![self.initialDirectory isEqualToString:other.initialDirectory] : YES;
     
-    NSLog(@"🐞 isTheSameConnection: %hhd, %hhd, %hhd, %hhd, %hhd, %hhd, %hhd", nameChanged, hostChanged, userChanged, pwChanged, authModeChanged, pkChanged, pathChanged);
+    slog(@"🐞 isTheSameConnection: %hhd, %hhd, %hhd, %hhd, %hhd, %hhd, %hhd", nameChanged, hostChanged, userChanged, pwChanged, authModeChanged, pkChanged, pathChanged);
     
     return !(nameChanged || hostChanged || userChanged || pwChanged || authModeChanged || pkChanged || pathChanged);
 }

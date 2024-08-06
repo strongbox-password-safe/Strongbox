@@ -31,7 +31,7 @@
         }
     }
     else if (streamId == kInnerStreamArc4) {
-        NSLog(@"ARC4 not supported = %d", streamId);
+        slog(@"ARC4 not supported = %d", streamId);
         
         return nil;
     }
@@ -47,7 +47,7 @@
         return [[PlaintextInnerStream alloc] init];
     }
     else {
-        NSLog(@"Unknown innerRandomStreamId = %d", streamId);
+        slog(@"Unknown innerRandomStreamId = %d", streamId);
         return nil;
     }
 }

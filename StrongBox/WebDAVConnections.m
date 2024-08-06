@@ -15,6 +15,8 @@
 #import "StrongboxMacFilesManager.h"
 #endif
 
+#import "SBLog.h"
+
 static NSString* const kConfigFilename = @"webdav-connections.json";
 
 @implementation WebDAVConnections
@@ -47,14 +49,14 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
     }];
     
     if (!json || error || readError) {
-        NSLog(@"Error reading file for WebDAV Connections [%@] - [%@]", error, readError);
+        slog(@"Error reading file for WebDAV Connections [%@] - [%@]", error, readError);
         return ret;
     }
 
     NSArray* jsonArray = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
 
     if (error) {
-        NSLog(@"Error getting json WebDAV Connections: [%@]", error);
+        slog(@"Error getting json WebDAV Connections: [%@]", error);
         return ret;
     }
 
@@ -80,7 +82,7 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonArray options:options error:&error];
 
     if (error) {
-        NSLog(@"Error getting json for WebDAV Connections: [%@]", error);
+        slog(@"Error getting json for WebDAV Connections: [%@]", error);
         return;
     }
 
@@ -97,7 +99,7 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
     }];
 
     if (!success || error || writeError) {
-        NSLog(@"Error writing WebDAV Connections file: [%@]-[%@]", error, writeError);
+        slog(@"Error writing WebDAV Connections file: [%@]-[%@]", error, writeError);
         return;
     }
 }

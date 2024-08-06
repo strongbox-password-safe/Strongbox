@@ -1,5 +1,5 @@
 //
-//  TwoDriveStorageProvider.swift
+//  OneDriveStorageProvider.swift
 //  Strongbox
 //
 //  Created by Strongbox on 03/03/2022.
@@ -59,9 +59,9 @@ class OneDriveDriveItem: NSObject {
     }
 }
 
-class TwoDriveStorageProvider: NSObject, SafeStorageProvider { 
+class OneDriveStorageProvider: NSObject, SafeStorageProvider {
     @objc
-    static let sharedInstance = TwoDriveStorageProvider()
+    static let sharedInstance = OneDriveStorageProvider()
 
     static let RegularScopes: [String] = ["Files.ReadWrite.All"]
 
@@ -80,7 +80,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         return queue
     }()
 
-    enum TwoDriveStorageProviderError: Error {
+    enum OneDriveStorageProviderError: Error {
         case invalidUploadUrl(detail: String)
         case unexpectedResponse(detail: String)
         case unexpectedResponseCode(code: Int, detail: String)
@@ -108,7 +108,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     static let NextGenRequestTimeout = 30.0 
     static let NextGenResourceTimeout = 10 * 60.0 
 
-    var storageId: StorageProvider { .kTwoDrive }
+    var storageId: StorageProvider { .kOneDrive }
     var providesIcons: Bool { false }
     var browsableNew: Bool { true }
     var browsableExisting: Bool { true }
@@ -119,7 +119,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     var spinnerUI: SpinnerUI { CrossPlatformDependencies.defaults().spinnerUi }
     var appPreferences: ApplicationPreferences { CrossPlatformDependencies.defaults().applicationPreferences }
 
-    private var application: MSALPublicClientApplication?
+    private var defaultApplication: MSALPublicClientApplication?
+
     private let nextGenURLSession: URLSession
 
     override private init() {
@@ -127,27 +128,23 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         sessionConfig.allowsCellularAccess = true
         sessionConfig.waitsForConnectivity = false
-        sessionConfig.timeoutIntervalForRequest = TwoDriveStorageProvider.NextGenRequestTimeout
-        sessionConfig.timeoutIntervalForResource = TwoDriveStorageProvider.NextGenResourceTimeout
+        sessionConfig.timeoutIntervalForRequest = OneDriveStorageProvider.NextGenRequestTimeout
+        sessionConfig.timeoutIntervalForResource = OneDriveStorageProvider.NextGenResourceTimeout
 
         #if os(iOS)
             sessionConfig.multipathServiceType = .none
         #endif
 
-        nextGenURLSession = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: TwoDriveStorageProvider.NextGenOperationQueue)
+        nextGenURLSession = URLSession(configuration: sessionConfig, delegate: nil, delegateQueue: OneDriveStorageProvider.NextGenOperationQueue)
 
         super.init()
 
-        
-        
-        
-
-        let config = MSALPublicClientApplicationConfig(clientId: TwoDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
+        let config = MSALPublicClientApplicationConfig(clientId: OneDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
 
         do {
-            application = try MSALPublicClientApplication(configuration: config) 
+            defaultApplication = try MSALPublicClientApplication(configuration: config) 
         } catch {
-            NSLog("🔴 Could not load application OneDrive: [%@]", String(describing: error))
+            swlog("🔴 Could not load application OneDrive: [%@]", String(describing: error))
         }
 
         #if DEBUG
@@ -164,7 +161,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
               let dItem = navContext.driveItem,
               let json = getJsonFileIdentifier(msalResult: msalResult, driveItem: dItem)
         else {
-            NSLog("🔴 Not a proper provider data for OneDrive.")
+            swlog("🔴 Not a proper provider data for OneDrive.")
             return nil
         }
 
@@ -175,7 +172,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         #else
 
             guard let filename = dItem.name else {
-                NSLog("🔴 Not a proper URL for OneDrive.")
+                swlog("🔴 Not a proper URL for OneDrive.")
                 return nil
             }
 
@@ -184,7 +181,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             components.path = String(format: "/host/%@", filename) 
 
             guard let url = components.url else {
-                NSLog("🔴 Not a proper URL for OneDrive.")
+                swlog("🔴 Not a proper URL for OneDrive.")
                 return nil
             }
 
@@ -193,7 +190,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             components.queryItems = [URLQueryItem(name: "uuid", value: metadata.uuid)]
 
             guard let url2 = components.url else {
-                NSLog("🔴 Not a proper URL for OneDrive.")
+                swlog("🔴 Not a proper URL for OneDrive.")
                 return nil
             }
 
@@ -205,7 +202,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func getJsonFileIdentifier(msalResult: MSALResult, driveItem: OneDriveDriveItem) -> String? {
         guard let driveId = driveItem.driveId, let parentItemId = driveItem.parentItemId else {
-            NSLog("🔴 Missing required driveId or parentItemId in getJsonFileIdentifier")
+            swlog("🔴 Missing required driveId or parentItemId in getJsonFileIdentifier")
             return nil
         }
 
@@ -231,7 +228,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let data = try? JSONSerialization.data(withJSONObject: dp, options: []),
               let json = String(data: data, encoding: .utf8)
         else {
-            NSLog("🔴 Could not encode file identifier for OneDrive.")
+            swlog("🔴 Could not encode file identifier for OneDrive.")
             return nil
         }
 
@@ -246,7 +243,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
               let lastModifiedDateTimeString = item["lastModifiedDateTime"] as? String,
               let lastModifiedDateTime = NSDate.microsoftGraphDate(from: lastModifiedDateTimeString)
         else {
-            NSLog("🔴 Could not get required fields...")
+            swlog("🔴 Could not get required fields...")
             return nil
         }
 
@@ -263,7 +260,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                   let dId = pr["driveId"] as? String,
                   let id = remoteItem["id"] as? String
             else {
-                NSLog("🔴 Could not get required fields...")
+                swlog("🔴 Could not get required fields...")
                 return nil
             }
 
@@ -279,7 +276,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                   let id = item["id"] as? String,
                   let dId = parentReference["driveId"] as? String
             else {
-                NSLog("🔴 Could not get required fields...")
+                swlog("🔴 Could not get required fields...")
                 return nil
             }
 
@@ -305,7 +302,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
               let msalResult = navContext.msalResult,
               let parentDriveItem = navContext.driveItem
         else {
-            NSLog("🔴 Could not get parentItem!")
+            swlog("🔴 Could not get parentItem!")
             completion(nil, nil)
             return
         }
@@ -333,10 +330,10 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 let metadata = self.getDatabasePreferences(nickName, providerData: navContext)
 
                 completion(metadata, nil)
-            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+            } catch OneDriveStorageProviderError.userCancelledAuthentication {
                 completion(nil, nil)
             } catch {
-                NSLog("🔴 OneDrive create error: [%@]", String(describing: error))
+                swlog("🔴 OneDrive create error: [%@]", String(describing: error))
                 completion(nil, error)
                 return
             }
@@ -374,7 +371,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
               let msalResult = navContext.msalResult,
               let driveItem = navContext.driveItem
         else {
-            NSLog("🔴 Could not convert provider data to Listing State")
+            swlog("🔴 Could not convert provider data to Listing State")
             completion(.readResultError, nil, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
             return
         }
@@ -391,7 +388,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let driveId = driveItem.driveId,
               let itemId = driveItem.itemId
         else {
-            NSLog("🔴 Could not convert provider data to Listing State")
+            swlog("🔴 Could not convert provider data to Listing State")
             completion(.readResultError, nil, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
             return
         }
@@ -410,12 +407,12 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             do {
                 let data = try await readFile(accountIdentifier: msalResult.account.identifier, viewController: viewController, driveId: driveId, itemId: itemId)
                 completion(.readResultSuccess, data, driveItem.lastModifiedDateTime, nil)
-            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+            } catch OneDriveStorageProviderError.userCancelledAuthentication {
                 completion(.readResultError, nil, nil, nil)
-            } catch TwoDriveStorageProviderError.interactiveSessionRequired {
+            } catch OneDriveStorageProviderError.interactiveSessionRequired {
                 completion(.readResultBackgroundReadButUserInteractionRequired, nil, nil, nil)
             } catch {
-                NSLog("🔴 OneDrive upload error: [%@]", String(describing: error))
+                swlog("🔴 OneDrive upload error: [%@]", String(describing: error))
                 completion(.readResultError, nil, nil, error)
                 return
             }
@@ -453,7 +450,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
               let msalResult = navContext.msalResult,
               let driveItem = navContext.driveItem
         else {
-            NSLog("🔴 Could not convert provider data to Listing State")
+            swlog("🔴 Could not convert provider data to Listing State")
             completion(.updateResultError, nil, Utils.createNSError("🔴 Could not convert provider data to Listing State", errorCode: -23456))
             return
         }
@@ -473,12 +470,12 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 let driveItem = try await self.uploadToExistingFile(accountIdentifier: msalResult.account.identifier, viewController: viewController, driveItem: driveItem, data: data)
 
                 completion(.updateResultSuccess, driveItem.lastModifiedDateTime, nil)
-            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+            } catch OneDriveStorageProviderError.userCancelledAuthentication {
                 completion(.updateResultError, nil, nil)
-            } catch TwoDriveStorageProviderError.interactiveSessionRequired {
+            } catch OneDriveStorageProviderError.interactiveSessionRequired {
                 completion(.updateResultUserInteractionRequired, nil, nil)
             } catch {
-                NSLog("🔴 OneDrive upload error: [%@]", String(describing: error))
+                swlog("🔴 OneDrive upload error: [%@]", String(describing: error))
                 completion(.updateResultError, nil, error)
                 return
             }
@@ -501,7 +498,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func list(_ parentFolder: NSObject?, viewController: VIEW_CONTROLLER_PTR?, completion: @escaping (Bool, [StorageBrowserItem], Error?) -> Void) {
         guard let navContext = parentFolder as? OneDriveNavigationContext else {
-            NSLog("🔴 nil passed to list!")
+            swlog("🔴 nil passed to list!")
             completion(false, [], nil)
             return
         }
@@ -538,10 +535,10 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                 case .initial:
                     completion(false, [], nil)
                 }
-            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+            } catch OneDriveStorageProviderError.userCancelledAuthentication {
                 completion(true, [], nil)
             } catch {
-                NSLog("🔴 error listing: [%@]", String(describing: error))
+                swlog("🔴 error listing: [%@]", String(describing: error))
                 completion(false, [], error)
             }
         }
@@ -559,7 +556,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
               let obj = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject],
               let driveType = obj["driveType"] as? String
         else {
-            NSLog("🔴 Could not decode the fileIdentifier")
+            swlog("🔴 Could not decode the fileIdentifier")
             return false
         }
 
@@ -578,7 +575,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
               let driveId = obj["driveId"] as? String,
               let parentFolderId = obj["parentFolderId"] as? String
         else {
-            NSLog("🔴 Could not decode the fileIdentifier")
+            swlog("🔴 Could not decode the fileIdentifier")
             completion(nil, false, Utils.createNSError("🔴 Could not decode the fileIdentifier", errorCode: 123_456))
             return
         }
@@ -615,12 +612,12 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                         completion(nil, false, Utils.createNSError("Could not locate the database file. Has it been renamed or moved?", errorCode: 45))
                     }
                 }
-            } catch TwoDriveStorageProviderError.userCancelledAuthentication {
+            } catch OneDriveStorageProviderError.userCancelledAuthentication {
                 completion(nil, false, nil)
-            } catch TwoDriveStorageProviderError.interactiveSessionRequired {
+            } catch OneDriveStorageProviderError.interactiveSessionRequired {
                 completion(nil, true, nil)
             } catch {
-                NSLog("🔴 Error in findDriveItemFromMetadata: [%@]", String(describing: error))
+                swlog("🔴 Error in findDriveItemFromMetadata: [%@]", String(describing: error))
                 completion(nil, false, error)
             }
         }
@@ -635,7 +632,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         let request = "/me/drive/sharedWithMe?allowExternal=true"
 
-        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+        return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
     func getFileByFilenameUrl(driveId: String, parentFolderId: String, fileName: String) -> URL? {
@@ -655,7 +652,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         
 
-        var components = URLComponents(string: TwoDriveStorageProvider.GraphBaseURL)
+        var components = URLComponents(string: OneDriveStorageProvider.GraphBaseURL)
 
         let path = String(format: "/v1.0/drives/%@/items/%@/children", driveId, parentFolderId)
         let queryVal = String(format: "name eq '%@'", escapedFilename)
@@ -679,25 +676,25 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     func getMyDrivesUrl() -> URL? {
         let request = "/me/drives"
 
-        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+        return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
     func getPrimaryDriveUrl() -> URL? {
         let request = "/me/drive"
 
-        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+        return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
     func getSharedLibrariesUrl() -> URL? {
         let request = "/sites?search=*&$select=id,displayName"
 
-        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+        return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
     func getDrivesForSiteUrl(siteId: String) -> URL? {
         let request = "/sites/\(siteId)/drives?$select=id,name,driveType"
 
-        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+        return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
     func getListingRequestUrlFromDriveItem(driveId: String?, folderId: String?) -> URL? {
@@ -721,7 +718,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             request = "/me/drive/root/children"
         }
 
-        return URL(string: "\(TwoDriveStorageProvider.GraphBaseURL)\(request)")
+        return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
     func getFileUploadRequestUrl(driveItem: OneDriveDriveItem) -> URL? {
@@ -734,11 +731,11 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let driveId = driveItem.driveId,
               let itemId = driveItem.itemId
         else {
-            NSLog("🔴 Could not convert provider data to Listing State")
+            swlog("🔴 Could not convert provider data to Listing State")
             return nil
         }
 
-        let oneDriveUrlString = String(format: "%@/drives/%@/items/%@/content", TwoDriveStorageProvider.GraphBaseURL, driveId, itemId)
+        let oneDriveUrlString = String(format: "%@/drives/%@/items/%@/content", OneDriveStorageProvider.GraphBaseURL, driveId, itemId)
 
         return URL(string: oneDriveUrlString)
     }
@@ -751,7 +748,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         
         
 
-        let oneDriveUrlString = String(format: "%@/drives/%@/items/%@/content", TwoDriveStorageProvider.GraphBaseURL, driveId, itemId)
+        let oneDriveUrlString = String(format: "%@/drives/%@/items/%@/content", OneDriveStorageProvider.GraphBaseURL, driveId, itemId)
 
         return URL(string: oneDriveUrlString)
     }
@@ -764,7 +761,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         
 
         guard let driveId = parentDriveItem.driveId else {
-            NSLog("🔴 Could not get driveId or parentItemId")
+            swlog("🔴 Could not get driveId or parentItemId")
             return nil
         }
 
@@ -776,7 +773,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             path = String(format: "/drives/%@/items/root:/%@:/content", driveId, fileName)
         }
 
-        let oneDriveUrlString = String(format: "%@/%@", TwoDriveStorageProvider.GraphBaseURL, path)
+        let oneDriveUrlString = String(format: "%@/%@", OneDriveStorageProvider.GraphBaseURL, path)
 
         
 
@@ -793,8 +790,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func getFileByFilename(accountIdentifier: String?, driveId: String, parentFolderId: String, fileName: String, viewController: VIEW_CONTROLLER_PTR?) async throws -> StorageBrowserItem? {
         guard let url = getFileByFilenameUrl(driveId: driveId, parentFolderId: parentFolderId, fileName: fileName) else {
-            NSLog("🔴 getFileByFilename - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 getFileByFilename - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url)
@@ -806,23 +803,23 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
               let items = json["value"] as? [AnyObject]
         else {
-            NSLog("🔴 error listing - could not read response...")
-            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
         guard let match = items.first else {
             return nil
         }
 
-        return TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: match)
+        return OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: match)
     }
 
     
 
     func getSharedWithMeFiles(viewController: VIEW_CONTROLLER_PTR?) async throws -> [StorageBrowserItem] {
         guard let url = getSharedWithMeFilesUrl() else {
-            NSLog("🔴 getAllDrives - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 getAllDrives - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: nil, viewController: viewController, url: url)
@@ -834,17 +831,17 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
               let items = json["value"] as? [AnyObject]
         else {
-            NSLog("🔴 error listing - could not read response...")
-            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
-        return items.compactMap { TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
+        return items.compactMap { OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
     }
 
     func getPrimaryDrive(viewController: VIEW_CONTROLLER_PTR?) async throws -> (StorageBrowserItem, MSALResult) {
         guard let url = getPrimaryDriveUrl() else {
-            NSLog("🔴 getAllDrives - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 getAllDrives - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: nil, viewController: viewController, url: url)
@@ -854,15 +851,15 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         try validateResponse(data: jsonData, response: response)
 
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject] else {
-            NSLog("🔴 error listing - could not read response...")
-            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
         guard let id = json["id"] as? String,
               let driveType = json["driveType"] as? String
         else {
-            NSLog("🔴 Could not get required fields...")
-            throw TwoDriveStorageProviderError.couldNotGetDriveFields
+            swlog("🔴 Could not get required fields...")
+            throw OneDriveStorageProviderError.couldNotGetDriveFields
         }
 
         let name = json["name"] as? String ?? "OneDrive"
@@ -878,8 +875,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         let (primary, msalResultPrimary) = try await getPrimaryDrive(viewController: viewController)
 
         guard let url = getMyDrivesUrl() else {
-            NSLog("🔴 getAllDrives - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 getAllDrives - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResultAllDrives) = try await getAuthenticatedUrlRequest(accountIdentifier: msalResultPrimary.account.identifier, viewController: viewController, url: url)
@@ -891,8 +888,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
               let items = json["value"] as? [AnyObject]
         else {
-            NSLog("🔴 error listing - could not read response...")
-            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
         let extraDrives = try items.compactMap { item in
@@ -900,8 +897,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
                   let id = item["id"] as? String,
                   let driveType = item["driveType"] as? String
             else {
-                NSLog("🔴 Could not get required fields...")
-                throw TwoDriveStorageProviderError.couldNotGetDriveFields
+                swlog("🔴 Could not get required fields...")
+                throw OneDriveStorageProviderError.couldNotGetDriveFields
             }
 
             let name = item["name"] as? String ?? "OneDrive"
@@ -939,8 +936,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func getSharedLibraryDrives(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?) async throws -> [StorageBrowserItem] {
         guard let url = getSharedLibrariesUrl() else {
-            NSLog("🔴 getAllDrives - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 getAllDrives - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url, extendedScope: true)
@@ -952,16 +949,16 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
               let items = json["value"] as? [AnyObject]
         else {
-            NSLog("🔴 error listing - could not read response...")
-            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
         let sites = try items.reduce(into: [String: String]()) { result, key in
             guard let siteId = key["id"] as? String,
                   let displayName = key["displayName"] as? String
             else {
-                NSLog("🔴 required fields id, displayName are not present")
-                throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+                swlog("🔴 required fields id, displayName are not present")
+                throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
             }
 
             result[siteId] = displayName
@@ -990,8 +987,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func getAllDrivesForSite(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, siteId: String, siteName: String) async throws -> [StorageBrowserItem] {
         guard let url = getDrivesForSiteUrl(siteId: siteId) else {
-            NSLog("🔴 getAllDrivesForGroup - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 getAllDrivesForGroup - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url, extendedScope: true)
@@ -1003,8 +1000,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
               let items = json["value"] as? [AnyObject]
         else {
-            NSLog("🔴 error listing - could not read response...")
-            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
         return mapDriveItemsResponseToSBI(msalResult: msalResult, siteName: siteName, items: items)
@@ -1035,8 +1032,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         
 
         guard let url = getListingRequestUrlFromDriveItem(driveId: driveId, folderId: folderId) else {
-            NSLog("🔴 updateExistingFile - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 updateExistingFile - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         return try await internalListRecursive(url: url, accountIdentifier: accountIdentifier, viewController: viewController, searchingForFilename: searchingForFilename)
@@ -1052,11 +1049,11 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as? [String: AnyObject],
               let items = json["value"] as? [AnyObject]
         else {
-            NSLog("🔴 error listing - could not read response...")
-            throw TwoDriveStorageProviderError.couldNotDeserializeExpectedJson
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
-        let browserItems = items.compactMap { TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
+        let browserItems = items.compactMap { OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
 
         
 
@@ -1072,8 +1069,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         if let nextLink = json["@odata.nextLink"] as? String {
             guard let nextUrl = URL(string: nextLink) else {
-                NSLog("🔴 Next URL is invalid!")
-                throw TwoDriveStorageProviderError.couldNotReadNextUrlForListing
+                swlog("🔴 Next URL is invalid!")
+                throw OneDriveStorageProviderError.couldNotReadNextUrlForListing
             }
 
             return try await internalListRecursive(url: nextUrl, accountIdentifier: accountIdentifier, viewController: viewController, itemsSoFar: accumulated, searchingForFilename: searchingForFilename)
@@ -1086,8 +1083,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func uploadToExistingFile(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, driveItem: OneDriveDriveItem, data: Data) async throws -> OneDriveDriveItem {
         guard let requestUrl = getFileUploadRequestUrl(driveItem: driveItem) else {
-            NSLog("🔴 updateExistingFile - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 updateExistingFile - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: requestUrl, method: "PUT", contentType: "text/plain")
@@ -1097,8 +1094,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func uploadNewFile(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, parentDriveItem: OneDriveDriveItem, filename: String, data: Data) async throws -> OneDriveDriveItem {
         guard let requestUrl = getNewFileUploadRequestUrl(parentDriveItem: parentDriveItem, fileName: filename) else {
-            NSLog("🔴 uploadNewFile - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 uploadNewFile - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: requestUrl, method: "PUT", contentType: "text/plain")
@@ -1116,7 +1113,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         let driveItem = try validateResponseAndDeserializeDriveItem(msalResult: msalResult, data: jsonData, response: response)
 
         #if DEBUG
-            NSLog("🐞 Upload Content DONE: \(driveItem)")
+            swlog("🐞 Upload Content DONE: \(driveItem)")
         #endif
 
         return driveItem
@@ -1126,8 +1123,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     func readFile(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, driveId: String, itemId: String) async throws -> Data {
         guard let url = getFileContentRequestUrl(driveId: driveId, itemId: itemId) else {
-            NSLog("🔴 readFile - Could not get request URL")
-            throw TwoDriveStorageProviderError.couldNotGetDriveItemUrl
+            swlog("🔴 readFile - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
         }
 
         let (urlRequest, _) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url)
@@ -1141,25 +1138,25 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     
 
-    func validateResponse(data: Data, response: URLResponse) throws {
+    func validateResponse(data _: Data, response: URLResponse) throws {
         #if DEBUG
-            if let json = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers),
-               let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
-               let jsonPrettyStr = String(data: jsonData, encoding: .utf8)
-            {
-                NSLog("🐞 verifyHttpResponse (HTTP \(String(describing: (response as? HTTPURLResponse)?.statusCode))): %@", String(jsonPrettyStr.prefix(4096)))
-            } else {
-                NSLog("🐞 verifyHttpResponse (HTTP \(String(describing: (response as? HTTPURLResponse)?.statusCode))): %@ (BODY NOT JSON!)", (Data(data.prefix(24)) as NSData).upperHexString)
-            }
+
+
+
+
+
+
+
+
         #endif
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw TwoDriveStorageProviderError.unexpectedResponse(detail: String(describing: response))
+            throw OneDriveStorageProviderError.unexpectedResponse(detail: String(describing: response))
         }
 
         guard httpResponse.statusCode == 200 || httpResponse.statusCode == 201 else {
-            NSLog("🔴 verifyHttpResponse - Unexpected Response Code \(httpResponse.statusCode) ")
-            throw TwoDriveStorageProviderError.unexpectedResponseCode(code: httpResponse.statusCode, detail: String(describing: response))
+            swlog("🔴 verifyHttpResponse - Unexpected Response Code \(httpResponse.statusCode) ")
+            throw OneDriveStorageProviderError.unexpectedResponseCode(code: httpResponse.statusCode, detail: String(describing: response))
         }
     }
 
@@ -1167,11 +1164,11 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
         try validateResponse(data: data, response: response)
 
         guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as AnyObject,
-              let item = TwoDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: dictionary),
+              let item = OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: dictionary),
               let navContext = item.providerData as? OneDriveNavigationContext,
               let driveItem = navContext.driveItem
         else {
-            throw TwoDriveStorageProviderError.couldNotConvertOdataDriveItem
+            throw OneDriveStorageProviderError.couldNotConvertOdataDriveItem
         }
 
         return driveItem
@@ -1184,7 +1181,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
         var urlRequest = URLRequest(url: url)
 
-        urlRequest.timeoutInterval = TwoDriveStorageProvider.NextGenRequestTimeout
+        urlRequest.timeoutInterval = OneDriveStorageProvider.NextGenRequestTimeout
 
         urlRequest.httpMethod = method
         urlRequest.setValue("Bearer \(msalResult.accessToken)", forHTTPHeaderField: OneDriveAPIHTTPParams.authorization)
@@ -1194,42 +1191,57 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func authenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, extendedScope: Bool) async throws -> MSALResult {
-        guard let application else {
-            throw TwoDriveStorageProviderError.couldNotFindApplication
+        let application: MSALPublicClientApplication
+
+        if appPreferences.useOneDriveUSGovCloudInstance {
+            
+
+            let authority = try? MSALAADAuthority(cloudInstance: .usGovernmentCloudInstance, audienceType: .azureADMultipleOrgsAudience, rawTenant: nil)
+
+            let config = MSALPublicClientApplicationConfig(clientId: OneDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
+
+            do {
+                application = try MSALPublicClientApplication(configuration: config) 
+            } catch {
+                swlog("🔴 Could not load application OneDrive: [%@]", String(describing: error))
+                throw OneDriveStorageProviderError.couldNotFindApplication
+            }
+        } else {
+            guard let defaultApplication else {
+                throw OneDriveStorageProviderError.couldNotFindApplication
+            }
+
+            application = defaultApplication
         }
 
-        let scopes = extendedScope ? TwoDriveStorageProvider.ExtendedScopes : TwoDriveStorageProvider.RegularScopes
+        let scopes = extendedScope ? OneDriveStorageProvider.ExtendedScopes : OneDriveStorageProvider.RegularScopes
 
         if let accountIdentifier, let account = try? application.account(forIdentifier: accountIdentifier) {
             do {
                 return try await application.acquireTokenSilent(with: MSALSilentTokenParameters(scopes: scopes, account: account))
             } catch {
                 if (error as NSError).code == MSALError.interactionRequired.rawValue {
-                    return try await attemptInteractiveAuth(accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
+                    return try await attemptInteractiveAuth(application: application, accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
                 } else {
                     throw error
                 }
             }
         } else {
-            return try await attemptInteractiveAuth(accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
+            return try await attemptInteractiveAuth(application: application, accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
         }
     }
 
-    private func attemptInteractiveAuth(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, scopes: [String]) async throws -> MSALResult {
+    private func attemptInteractiveAuth(application: MSALPublicClientApplication, accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR?, scopes: [String]) async throws -> MSALResult {
         guard let viewController else {
-            NSLog("Interactive Logon required but Background Call...")
-            throw TwoDriveStorageProviderError.interactiveSessionRequired
+            swlog("Interactive Logon required but Background Call...")
+            throw OneDriveStorageProviderError.interactiveSessionRequired
         }
 
-        return try await interactiveAuthenticate(accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
+        return try await interactiveAuthenticate(application: application, accountIdentifier: accountIdentifier, viewController: viewController, scopes: scopes)
     }
 
     @MainActor
-    private func interactiveAuthenticate(accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR, scopes: [String]) async throws -> MSALResult {
-        guard let application else {
-            throw TwoDriveStorageProviderError.couldNotFindApplication
-        }
-
+    private func interactiveAuthenticate(application: MSALPublicClientApplication, accountIdentifier: String?, viewController: VIEW_CONTROLLER_PTR, scopes: [String]) async throws -> MSALResult {
         #if os(iOS)
             let webviewParameters = MSALWebviewParameters(authPresentationViewController: viewController)
         #else
@@ -1257,7 +1269,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             return try await application.acquireToken(with: interactiveParameters)
         } catch {
             if (error as NSError).code == MSALError.userCanceled.rawValue {
-                throw TwoDriveStorageProviderError.userCancelledAuthentication
+                throw OneDriveStorageProviderError.userCancelledAuthentication
             } else {
                 throw error
             }
@@ -1266,8 +1278,8 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
 
     @objc
     func signOutAll() {
-        guard let application else {
-            NSLog("🔴 Could not load or find Application!")
+        guard let application = defaultApplication else { 
+            swlog("🔴 Could not load or find Application!")
             return
         }
 
@@ -1279,7 +1291,7 @@ class TwoDriveStorageProvider: NSObject, SafeStorageProvider {
             for account in accounts {
                 application.signout(with: account, signoutParameters: MSALSignoutParameters()) { _, error in
                     if let error {
-                        NSLog("🔴 Error Signing out [%@]", String(describing: error))
+                        swlog("🔴 Error Signing out [%@]", String(describing: error))
                     }
                 }
             }

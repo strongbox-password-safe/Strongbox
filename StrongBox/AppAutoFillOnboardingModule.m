@@ -28,7 +28,7 @@
     
     if ( AppPreferences.sharedInstance.lastAskToEnableAutoFill != nil ) {
         if ( ![AppPreferences.sharedInstance.lastAskToEnableAutoFill isMoreThanXDaysAgo:2] ) {
-            NSLog(@"Not asking about AutoFill as last asked less than 2 days ago.");
+            slog(@"Not asking about AutoFill as last asked less than 2 days ago.");
             return NO;
         }
     }

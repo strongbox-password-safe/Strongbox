@@ -13,6 +13,7 @@
 #import "Utils.h"
 #import "NSString+Extensions.h"
 #import "Constants.h"
+#import "NSDate+Extensions.h"
 
 const NSUInteger kSectionIdxFavourites = 0;
 const NSUInteger kSectionIdxNearlyExpired = 1;
@@ -22,8 +23,6 @@ const NSUInteger kSectionIdxLast = 3;
 @interface ConfiguredBrowseTableDatasource ()
 
 @property Model* viewModel;
-
-@property BOOL isDisplayingRootGroup;
 
 @property (strong, nonatomic) MutableOrderedDictionary<NSString*, NSArray<Node*>*>* a2zSections; 
 
@@ -40,12 +39,15 @@ const NSUInteger kSectionIdxLast = 3;
 @property (readonly) BrowseSortField effectiveSortField;
 @property (readonly) BOOL shouldShowAlphabeticIndex;
 @property (readonly) BrowseSortConfiguration* sortConfiguration;
+
+@property (readonly) BOOL isShowQuickViewSections;
+@property (readonly) NSUUID* rootGroupUuid;
+
 @end
 
 @implementation ConfiguredBrowseTableDatasource
 
 - (instancetype)initWithModel:(Model *)model
-        isDisplayingRootGroup:(BOOL)isDisplayingRootGroup
                     tableView:(UITableView *)tableView
                      viewType:(BrowseViewType)viewType
                currentGroupId:(NSUUID *)currentGroupId
@@ -53,7 +55,6 @@ const NSUInteger kSectionIdxLast = 3;
     self = [super init];
     if (self) {
         self.viewModel = model;
-        self.isDisplayingRootGroup = isDisplayingRootGroup;
         self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.viewModel tableView:tableView];
         self.viewType = viewType;
         self.currentGroupId = currentGroupId;
@@ -87,7 +88,26 @@ const NSUInteger kSectionIdxLast = 3;
         
         BOOL showTotp = self.viewType == kBrowseViewTypeTotpList;
         
-        return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showTotp showGroupLocation:NO];
+        NSString* groupLocationOverride = nil;
+        if ( self.viewType == kBrowseViewTypeExpiredAndExpiring ) {
+            if ( node.fields.expired ) {
+                NSString* loc = NSLocalizedString(@"entry_expired_on_date_subtitle_fmt", @"Expired %@");
+
+                groupLocationOverride = [NSString stringWithFormat:loc, node.fields.expires.friendlyDateString];
+            }
+            else {
+                NSString* loc = NSLocalizedString(@"entry_expires_on_date_subtitle_fmt", @"Expires %@");
+                
+                groupLocationOverride = [NSString stringWithFormat:loc, node.fields.expires.friendlyDateString];
+            }
+        }
+        
+        return [self.cellHelper getBrowseCellForNode:node
+                                           indexPath:indexPath
+                                   showLargeTotpCell:showTotp
+                                   showGroupLocation:groupLocationOverride != nil 
+                               groupLocationOverride:groupLocationOverride
+                                       accessoryType:UITableViewCellAccessoryNone];
     }
 }
 
@@ -111,7 +131,7 @@ const NSUInteger kSectionIdxLast = 3;
 }
 
 - (NSUInteger)rowsForSection:(NSUInteger)section {
-    if(!self.isDisplayingRootGroup && section < kSectionIdxLast) {
+    if(!self.isShowQuickViewSections && section < kSectionIdxLast) {
         return 0;
     }
     else {
@@ -120,26 +140,28 @@ const NSUInteger kSectionIdxLast = 3;
 }
 
 - (NSString*)titleForSection:(NSUInteger)section {
-    if(section == kSectionIdxFavourites && self.isDisplayingRootGroup && [self getDataSourceForSection:section].count) {
+    if(section == kSectionIdxFavourites && self.isShowQuickViewSections && [self getDataSourceForSection:section].count) {
         return NSLocalizedString(@"browse_vc_section_title_pinned", @"Section Header Title for Pinned Items");
     }
-    else if (section == kSectionIdxNearlyExpired && self.isDisplayingRootGroup && [self getDataSourceForSection:section].count) {
+    else if (section == kSectionIdxNearlyExpired && self.isShowQuickViewSections && [self getDataSourceForSection:section].count) {
         return NSLocalizedString(@"browse_vc_section_title_nearly_expired", @"Section Header Title for Nearly Expired Items");
     }
-    else if (section == kSectionIdxExpired && self.isDisplayingRootGroup && [self getDataSourceForSection:section].count) {
+    else if (section == kSectionIdxExpired && self.isShowQuickViewSections && [self getDataSourceForSection:section].count) {
         return NSLocalizedString(@"browse_vc_section_title_expired", @"Section Header Title for Expired Items");
     }
     else if ( section >= kSectionIdxLast ) {
         if ( self.shouldShowAlphabeticIndex ) {
             return self.a2zSections.keys[section - kSectionIdxLast];
         }
-        else if ( self.isDisplayingRootGroup ) {
-            if (self.viewModel.metadata.showQuickViewFavourites ||
-                self.viewModel.metadata.showQuickViewNearlyExpired ||
-                self.viewModel.metadata.showQuickViewExpired) {
-                NSUInteger countRows = [self getQuickViewRowCount];
-                return countRows ? NSLocalizedString(@"browse_vc_section_title_standard_view", @"Standard View Sections Header") : nil;
-            }
+        else if ( self.isShowQuickViewSections ) {
+            NSUInteger countQuickViews = [self getQuickViewRowCount];
+            NSUInteger countRegular = self.standardItemsCache.count;
+            
+            NSString* title = self.viewType == kBrowseViewTypeExpiredAndExpiring ?
+            NSLocalizedString(@"section_header_other_items_with_expiry_dates", @"Other Items with Expiry Dates") :
+                NSLocalizedString(@"browse_vc_section_title_standard_view", @"Standard View Sections Header");
+            
+            return countQuickViews > 0 && countRegular > 0 ? title : nil;
         }
     }
     
@@ -149,10 +171,19 @@ const NSUInteger kSectionIdxLast = 3;
 
 
 - (BOOL)isShowQuickViewSections {
-    return self.viewType == kBrowseViewTypeHierarchy || self.viewType == kBrowseViewTypeList;
+    BOOL isShowingRootGroup = self.currentGroupId == nil || self.currentGroupId == self.rootGroupUuid;
+    
+    BOOL showQuickViewIfAppropriate = (self.viewType == kBrowseViewTypeHierarchy ||
+                                       self.viewType == kBrowseViewTypeList) && isShowingRootGroup;
+    
+    return showQuickViewIfAppropriate || self.viewType == kBrowseViewTypeExpiredAndExpiring;
 }
 
 - (NSArray<Node*>*)loadFavouriteItems {
+    if ( self.viewType == kBrowseViewTypeExpiredAndExpiring ) {
+        return @[];
+    }
+    
     if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.favourites.count || ![self isShowQuickViewSections] ) {
         return @[];
     }
@@ -172,8 +203,10 @@ const NSUInteger kSectionIdxLast = 3;
 }
 
 - (NSArray<Node*>*)loadNearlyExpiredItems {
-    if(!self.viewModel.metadata.showQuickViewNearlyExpired || ![self isShowQuickViewSections]) {
-        return @[];
+    if ( self.viewType != kBrowseViewTypeExpiredAndExpiring ) {
+        if(!self.viewModel.metadata.showQuickViewNearlyExpired || ![self isShowQuickViewSections]) {
+            return @[];
+        }
     }
     
     NSArray<Node*>* ne = self.viewModel.database.nearlyExpiredEntries;
@@ -193,8 +226,10 @@ const NSUInteger kSectionIdxLast = 3;
 }
 
 - (NSArray<Node*>*)loadExpiredItems {
-    if(!self.viewModel.metadata.showQuickViewExpired || ![self isShowQuickViewSections] ) {
-        return @[];
+    if ( self.viewType != kBrowseViewTypeExpiredAndExpiring ) {
+        if(!self.viewModel.metadata.showQuickViewExpired || ![self isShowQuickViewSections] ) {
+            return @[];
+        }
     }
     
     NSArray<Node*>* exp = self.viewModel.database.expiredEntries;
@@ -219,6 +254,10 @@ const NSUInteger kSectionIdxLast = 3;
                                 foldersSeparately:foldersSeparately];
 }
 
+- (NSUUID*)rootGroupUuid {
+    return self.viewModel.database.effectiveRootGroup.uuid;
+}
+
 - (NSArray*)loadStandardItems  {
     NSArray<Node*>* ret = @[];
     
@@ -241,16 +280,16 @@ const NSUInteger kSectionIdxLast = 3;
         }
     }
     else {
-        NSUUID* currentGroup = self.currentGroupId;
-        
-        Node* current = [self.viewModel.database getItemById:currentGroup];
-        if (!current) {
-            return ret; 
-        }
-        
         switch ( self.viewType ) {
             case kBrowseViewTypeHierarchy:
+            {
+                NSUUID* currentGroup = self.currentGroupId == nil ? self.rootGroupUuid : self.currentGroupId;
+                Node* current = [self.viewModel.database getItemById:currentGroup];
+                if (!current) {
+                    return ret; 
+                }
                 ret = current.children;
+            }
                 break;
             case kBrowseViewTypeList:
                 ret = self.viewModel.database.allSearchableNoneExpiredEntries;
@@ -260,6 +299,18 @@ const NSUInteger kSectionIdxLast = 3;
                 break;
             case kBrowseViewTypeFavourites:
                 ret = self.viewModel.favourites;
+                break;
+            case kBrowseViewTypePasskeys:
+                ret = self.viewModel.database.passkeyEntries;
+                break;
+            case kBrowseViewTypeSshKeys:
+                ret = self.viewModel.database.keeAgentSSHKeyEntries;
+                break;
+            case kBrowseViewTypeAttachments:
+                ret = self.viewModel.database.attachmentEntries;
+                break;
+            case kBrowseViewTypeExpiredAndExpiring:
+                ret = [self loadExpirySetItems];
                 break;
             default:
                 break;
@@ -280,6 +331,12 @@ const NSUInteger kSectionIdxLast = 3;
                                foldersSeparately:foldersSeparately];
         
     return ret;
+}
+
+- (NSArray<Node*>*)loadExpirySetItems {
+    return [self.viewModel.database.expirySetEntries filter:^BOOL(Node * _Nonnull obj) {
+        return !obj.expired && !obj.nearlyExpired;
+    }];
 }
 
 - (NSString*)getSectionTitleFromItemTitle:(id)param {
@@ -341,9 +398,9 @@ const NSUInteger kSectionIdxLast = 3;
     
     
     
-    self.favouritesItemsCache = self.isDisplayingRootGroup ? [self loadFavouriteItems] : @[];
-    self.nearlyExpiredItemsCache = self.isDisplayingRootGroup ? [self loadNearlyExpiredItems] : @[];
-    self.expiredItemsCache = self.isDisplayingRootGroup ? [self loadExpiredItems] : @[];
+    self.favouritesItemsCache = self.isShowQuickViewSections ? [self loadFavouriteItems] : @[];
+    self.nearlyExpiredItemsCache = self.isShowQuickViewSections ? [self loadNearlyExpiredItems] : @[];
+    self.expiredItemsCache = self.isShowQuickViewSections ? [self loadExpiredItems] : @[];
 }
 
 
@@ -375,7 +432,7 @@ const NSUInteger kSectionIdxLast = 3;
         }
     }
     
-    NSLog(@"EEEEEEK: WARNWARN: DataSource not found for section");
+    slog(@"EEEEEEK: WARNWARN: DataSource not found for section");
     return nil;
 }
 
@@ -383,7 +440,7 @@ const NSUInteger kSectionIdxLast = 3;
     NSArray* dataSource = [self getDataSourceForSection:indexPath.section];
     
     if(!dataSource || indexPath.row >= dataSource.count) {
-        NSLog(@"🔴 EEEEEK: WARNWARN - Should never happen but unknown node for indexpath: [%@]", indexPath);
+        slog(@"🔴 EEEEEK: WARNWARN - Should never happen but unknown node for indexpath: [%@]", indexPath);
         return nil;
     }
     
@@ -424,6 +481,10 @@ const NSUInteger kSectionIdxLast = 3;
 }
 
 - (BOOL)shouldShowAlphabeticIndex {
+    if ( self.viewType == kBrowseViewTypeExpiredAndExpiring ) {
+        return NO;
+    }
+    
     if ( self.effectiveSortField == kBrowseSortFieldTitle ) {
         BOOL appropriate = self.standardItemsCache.count > 6 && self.a2zSections.count > 1;
         

@@ -8,6 +8,20 @@
 #import "UnifiedDatabaseMetadata.h"
 #import "NodeHierarchyReconstructionData.h"
 #import "CompositeKeyFactors.h"
+#import "NSString+Extensions.h"
+
+typedef enum : NSUInteger {
+    kDatabaseSearchMatchFieldTitle,
+    kDatabaseSearchMatchFieldUsername,
+    kDatabaseSearchMatchFieldEmail,
+    kDatabaseSearchMatchFieldUrl,
+    kDatabaseSearchMatchFieldTag,
+    kDatabaseSearchMatchFieldCustomField,
+    kDatabaseSearchMatchFieldNotes,
+    kDatabaseSearchMatchFieldPassword,
+    kDatabaseSearchMatchFieldAttachment,
+    kDatabaseSearchMatchFieldPath,
+} DatabaseSearchMatchField;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -135,12 +149,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm prependSlash:(BOOL)prependSlash;
 
-- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
-- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
-- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
-- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains;
-- (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin;
-- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains;
+- (StringSearchMatchType)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
+- (StringSearchMatchType)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
+- (StringSearchMatchType)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin;
+- (StringSearchMatchType)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains;
+- (StringSearchMatchType)isTagsMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin;
+- (StringSearchMatchType)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains;
+- (StringSearchMatchType)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin includeAssociatedDomains:(BOOL)includeAssociatedDomains matchField:(DatabaseSearchMatchField* _Nullable)matchField;
+
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
 - (NSString*)getHtmlPrintString:(NSString*)databaseName;
@@ -148,6 +164,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *expirySetEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *expiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *nearlyExpiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;

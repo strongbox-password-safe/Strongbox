@@ -30,14 +30,14 @@ struct CloudKitDatabaseIdentifier: Codable, Equatable, Identifiable, Hashable {
 
     static func fromJson(_ json: String?) -> Self? {
         guard let json, let data = json.data(using: .utf8) else {
-            NSLog("🔴 Could not decode CloudKitDatabaseFileIdentifier!")
+            swlog("🔴 Could not decode CloudKitDatabaseFileIdentifier!")
             return nil
         }
 
         do {
             return try JSONDecoder().decode(CloudKitDatabaseIdentifier.self, from: data)
         } catch {
-            NSLog("🔴 Could not JSON decode CloudKitDatabaseFileIdentifier! \(error)")
+            swlog("🔴 Could not JSON decode CloudKitDatabaseFileIdentifier! \(error)")
             return nil
         }
     }

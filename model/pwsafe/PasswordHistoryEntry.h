@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SBLog.h"
 
 @interface PasswordHistoryEntry : NSObject
 

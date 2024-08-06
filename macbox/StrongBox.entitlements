@@ -59,6 +59,8 @@
 		<string>/Library/Application Support/Sidekick/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Orion/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Thorium/NativeMessagingHosts/</string>
+        <string>/Library/Application Support/BraveSoftware/Brave-Browser/NativeMessagingHosts/</string>
+        <string>/Library/Application Support/TorBrowser-Data/Browser/Mozilla/NativeMessagingHosts/</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>

@@ -82,7 +82,7 @@
 
 - (BOOL)beginElement:(NSString*)elementName {
     if(!elementName.length) {
-        NSLog(@"Null/Empty Element name found at [%@]. Error.", elementName);
+        slog(@"Null/Empty Element name found at [%@]. Error.", elementName);
         return NO;
     }
 

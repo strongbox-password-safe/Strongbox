@@ -11,6 +11,7 @@
 #import "ChaCha20Cipher.h"
 #import "TwoFishCipher.h"
 #import "KeePassConstants.h"
+#import "SBLog.h"
 
 @implementation KeePassCiphers
 
@@ -241,7 +242,7 @@ id<Cipher> getCipher(NSUUID* cipherUuid) {
         return [[TwoFishCipher alloc] init];
     }
     else {
-        NSLog(@"Unknown Cipher ID, cannot create. [%@]", cipherUuid.UUIDString);
+        slog(@"Unknown Cipher ID, cannot create. [%@]", cipherUuid.UUIDString);
     }
     
     return nil;

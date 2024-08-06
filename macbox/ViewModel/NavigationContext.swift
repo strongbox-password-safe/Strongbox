@@ -160,7 +160,7 @@ func getNavContextFromModel(_ database: ViewModel) -> NavigationContext {
         case OGNavigationAuditCategoryExcludedItems:
             navContext = .auditIssues(.excludedItems)
         default:
-            NSLog("🔴 Unknown OG Nav Context")
+            swlog("🔴 Unknown OG Nav Context")
         }
     case OGNavigationContextSpecial:
         switch database.nextGenNavigationContextSpecial {
@@ -181,10 +181,10 @@ func getNavContextFromModel(_ database: ViewModel) -> NavigationContext {
         case OGNavigationSpecialAllFavourites:
             navContext = .special(.allFavourites)
         default:
-            NSLog("🔴 Unknown OG Nav Context")
+            swlog("🔴 Unknown OG Nav Context")
         }
     default:
-        NSLog("🔴 Unknown OG Nav Context")
+        swlog("🔴 Unknown OG Nav Context")
     }
 
     return navContext

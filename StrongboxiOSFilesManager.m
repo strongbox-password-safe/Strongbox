@@ -105,7 +105,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 - (NSURL *)sharedAppGroupDirectory {
     NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:AppPreferences.sharedInstance.appGroupName];
     if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", AppPreferences.sharedInstance.appGroupName);
+        slog(@"Could not get container URL for App Group: [%@]", AppPreferences.sharedInstance.appGroupName);
         return nil;
     }
     
@@ -126,7 +126,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 - (void)createIfNecessary:(NSURL*)url {
     NSError* error;
     if (![[NSFileManager defaultManager] createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", url, error.localizedDescription);
+        slog(@"Error Creating Directory: %@ => [%@]", url, error.localizedDescription);
     }
 }
 
@@ -145,7 +145,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
                                           includingPropertiesForKeys:keys
                                                              options:0
                                                         errorHandler:^BOOL(NSURL *url, NSError *error) {
-        NSLog(@"Error Traversing Directory: [%@]", error);
+        slog(@"Error Traversing Directory: [%@]", error);
         return YES; 
     }];
 
@@ -182,10 +182,10 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
     BOOL success = [URL setResourceValue:prot forKey:NSURLFileProtectionKey error:&error];
 
     if(!success){
-        NSLog(@"Error setting File Protection for %@ - %@", [URL lastPathComponent], error);
+        slog(@"Error setting File Protection for %@ - %@", [URL lastPathComponent], error);
     }
     else {
-        NSLog(@"%@ [%@] file protection set", complete ? @"Complete" : @"Default", URL.lastPathComponent);
+        slog(@"%@ [%@] file protection set", complete ? @"Complete" : @"Default", URL.lastPathComponent);
     }
 }
 
@@ -226,7 +226,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
         NSNumber *isDirectory = nil;
         if (![file getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
             
-            NSLog(@"%@", error);
+            slog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
             [self setIncludeExcludeFromBackup:file include:include];
@@ -241,7 +241,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
                                   forKey:NSURLIsExcludedFromBackupKey
                                    error:&error];
     if(!success){
-        NSLog(@"Error setting include/exclude %@ from backup %@", [URL lastPathComponent], error);
+        slog(@"Error setting include/exclude %@ from backup %@", [URL lastPathComponent], error);
     }
     else {
 
@@ -263,7 +263,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 }
 
 - (void)deleteAllInDirectory:(NSURL*)url recursive:(BOOL)recursive {
-    NSLog(@"Deleting Files at [%@]", url);
+    slog(@"Deleting Files at [%@]", url);
     
     NSFileManager *fm = [NSFileManager defaultManager];
     
@@ -272,7 +272,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
     NSArray<NSString*> *files = [fm contentsOfDirectoryAtPath:directory error:&error];
     
     if (error) {
-        NSLog(@"Error reading contents of directory [%@]", error);
+        slog(@"Error reading contents of directory [%@]", error);
         return;
     }
     
@@ -282,11 +282,11 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
         BOOL isDirectory;
         if ([NSFileManager.defaultManager fileExistsAtPath:path isDirectory:&isDirectory]) {
             if (recursive || !isDirectory) {
-                NSLog(@"Removing File: [%@]", path);
+                slog(@"Removing File: [%@]", path);
                 
                 BOOL success = [fm removeItemAtPath:path error:&error];
                 if (!success || error) {
-                    NSLog(@"Failed to remove [%@]: [%@]", file, error);
+                    slog(@"Failed to remove [%@]: [%@]", file, error);
                 }
             }
         }
@@ -303,11 +303,11 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
     for (NSString *file in [fm contentsOfDirectoryAtPath:directory error:&error]) {
         NSString* path = [NSString pathWithComponents:@[directory, file]];
         
-        NSLog(@"Removing Inbox File: [%@]", path);
+        slog(@"Removing Inbox File: [%@]", path);
         
         BOOL success = [fm removeItemAtPath:path error:&error];
         if (!success || error) {
-            NSLog(@"Failed to remove [%@]: [%@]", file, error);
+            slog(@"Failed to remove [%@]: [%@]", file, error);
         }
     }
 }
@@ -317,7 +317,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
     NSError* error;
     
     if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+        slog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
     }
 
     return ret;
@@ -328,7 +328,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 
     NSError* error;
     if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
-        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+        slog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
     }
 
 
@@ -389,7 +389,7 @@ static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
         NSNumber *isDirectory = nil;
         if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
             
-            NSLog(@"%@", error);
+            slog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
             [files addObject:url];

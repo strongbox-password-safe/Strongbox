@@ -52,28 +52,28 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
         let prefs = CrossPlatformDependencies.defaults().applicationPreferences
 
         guard StrongboxProductBundle.supportsWiFiSync, !prefs.disableWiFiSyncClientMode else {
-            NSLog("🔴 Bundle does not support WiFi sync! Do not call Browser start()")
+            swlog("🔴 Bundle does not support WiFi sync! Do not call Browser start()")
             return
         }
 
         if startInProgress {
-            DebugLogger.info("WiFiSyncBrowser::startBrowsing Start in progress so will not start...")
+            swlog("WiFiSyncBrowser::startBrowsing Start in progress so will not start...")
             completion(true) 
             return
         }
 
         if forceStopFirst {
-            DebugLogger.info("WiFiSyncBrowser::startBrowsing with Force Start - Stopping...")
+            swlog("WiFiSyncBrowser::startBrowsing with Force Start - Stopping...")
             stopBrowsing { [weak self] in
                 guard let self else { return }
 
                 startBrowsingForReal(completion: completion)
             }
         } else if browser != nil {
-            DebugLogger.info("WiFiSyncBrowser::startBrowsing - Browser already running ignoring start request")
+            swlog("WiFiSyncBrowser::startBrowsing - Browser already running ignoring start request")
             completion(true)
         } else {
-            DebugLogger.info("WiFiSyncBrowser::startBrowsing - not already running. Starting...")
+            swlog("WiFiSyncBrowser::startBrowsing - not already running. Starting...")
             startBrowsingForReal(completion: completion)
         }
     }
@@ -101,7 +101,8 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
         guard let browser else {
             startInProgress = false
 
-            DebugLogger.error("Could not create browser!")
+            swlog("🔴 Could not create browser!")
+
             completion(false)
             return
         }
@@ -111,7 +112,7 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
         browser.start(queue: WiFiSyncBrowser.browserQ)
 
-        DebugLogger.info("WiFiSyncBrowser::startBrowsing EXIT")
+        swlog("WiFiSyncBrowser::startBrowsing EXIT")
 
         completion(true)
 
@@ -120,11 +121,11 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
     @objc
     func stopBrowsing(completion: (() -> Void)? = nil) {
-        DebugLogger.info("WiFiSyncBrowser::stopBrowsing ENTER")
+        swlog("WiFiSyncBrowser::stopBrowsing ENTER")
 
         if stopInProgress {
-            DebugLogger.info("WiFiSyncBrowser::stopBrowsing Stop already in progress, ignoring duplicate request")
-            DebugLogger.info("WiFiSyncBrowser::stopBrowsing EXIT")
+            swlog("WiFiSyncBrowser::stopBrowsing Stop already in progress, ignoring duplicate request")
+            swlog("WiFiSyncBrowser::stopBrowsing EXIT")
             completion?()
             return
         }
@@ -133,13 +134,13 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
         if let browser {
             if browser.state != .cancelled {
-                DebugLogger.info("WiFiSyncBrowser::stopBrowsing - Not already cancelled or failed so cancelling and waiting a bit now.")
+                swlog("WiFiSyncBrowser::stopBrowsing - Not already cancelled or failed so cancelling and waiting a bit now.")
                 browser.cancel()
 
                 WiFiSyncBrowser.browserQ.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                     guard let self else { return }
 
-                    DebugLogger.info("WiFiSyncBrowser::stopBrowsing - Wait for cancel done... calling completion")
+                    swlog("WiFiSyncBrowser::stopBrowsing - Wait for cancel done... calling completion")
 
                     self.browser = nil
 
@@ -149,16 +150,16 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
                     stopInProgress = false
 
-                    DebugLogger.info("WiFiSyncBrowser::stopBrowsing EXIT")
+                    swlog("WiFiSyncBrowser::stopBrowsing EXIT")
                 }
 
                 return
             } else {
-                DebugLogger.info("WiFiSyncBrowser::stopBrowsing - Already cancelled so NOP.")
+                swlog("WiFiSyncBrowser::stopBrowsing - Already cancelled so NOP.")
                 self.browser = nil
             }
         } else {
-            DebugLogger.info("WiFiSyncBrowser::stopBrowsing - Already Nil so NOP.")
+            swlog("WiFiSyncBrowser::stopBrowsing - Already Nil so NOP.")
         }
 
         updateServersAndNotify()
@@ -167,7 +168,7 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
         stopInProgress = false
 
-        DebugLogger.info("WiFiSyncBrowser::stopBrowsing EXIT")
+        swlog("WiFiSyncBrowser::stopBrowsing EXIT")
     }
 
     
@@ -195,12 +196,12 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
             if error == NWError.dns(DNSServiceErrorType(kDNSServiceErr_DefunctConnection)) {
                 
-                DebugLogger.info("Browser failed with \(error), restarting")
+                swlog("Browser failed with \(error), restarting")
                 startBrowsing(true) { success in
-                    DebugLogger.info("Browser restarted with \(success) after defunct connection")
+                    swlog("Browser restarted with \(success) after defunct connection")
                 }
             } else {
-                DebugLogger.info("Browser failed with \(error), stopping")
+                swlog("Browser failed with \(error), stopping")
                 stopBrowsing()
             }
         case let .waiting(error):
@@ -213,9 +214,9 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
                 stopBrowsing() 
             }
         case .ready:
-            DebugLogger.info("🟢🟢🟢🟢 browserStateUpdateHandler initial results ready.")
+            swlog("🟢🟢🟢🟢 browserStateUpdateHandler initial results ready.")
         case .cancelled: 
-            DebugLogger.info("browserStateUpdateHandler cancelled.")
+            swlog("browserStateUpdateHandler cancelled.")
             stopBrowsing()
         default:
             break
@@ -285,7 +286,7 @@ class WiFiSyncBrowser: NSObject, ObservableObject {
 
                     return WiFiSyncServerConfig(name: name, endpoint: result.endpoint)
                 } else {
-                    NSLog("🔴 Could not add browse result: \(String(describing: result))")
+                    swlog("🔴 Could not add browse result: \(String(describing: result))")
                     return nil
                 }
             }

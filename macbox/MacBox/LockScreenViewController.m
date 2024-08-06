@@ -84,7 +84,7 @@
 @implementation LockScreenViewController
 
 - (void)dealloc {
-    NSLog(@"😎 LockScreenViewController::DEALLOC [%@]", self);
+    slog(@"😎 LockScreenViewController::DEALLOC [%@]", self);
 }
 
 - (ViewModel *)viewModel {
@@ -204,7 +204,7 @@
     [self.laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch
                    localizedReason:@"Blah!" 
                              reply:^(BOOL success, NSError * _Nullable error) {
-        NSLog(@"🚀 %hhd - %@", success, error); 
+        slog(@"🚀 %hhd - %@", success, error); 
         
         if ( success ) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -212,7 +212,7 @@
             });
         }
         else {
-            NSLog(@"🔴 %hhd - %@", success, error); 
+            slog(@"🔴 %hhd - %@", success, error); 
         }
     }];
 }
@@ -248,7 +248,7 @@
     
     
     if ( !determiner.bioOrWatchUnlockIsPossible ) {
-        NSLog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
+        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
         [self bindUI];
         return;
     }
@@ -298,7 +298,7 @@
 
     
     if ( !self.databaseMetadata.hasSetInitialWindowPosition ) {
-        NSLog(@"First Launch of Database! Making reasonable size and centering...");
+        slog(@"First Launch of Database! Making reasonable size and centering...");
         [self.view.window setFrame:NSMakeRect(0,0, 600, 550) display:YES];
         [self.view.window center];
         
@@ -345,7 +345,7 @@
 
 - (void)windowWillClose:(NSNotification*)param {
     if ( param.object == self.view.window ) {
-        NSLog(@"LockScreenViewController::windowWillClose");
+        slog(@"LockScreenViewController::windowWillClose");
         [self stopObservingModelChanges];
     }
 }
@@ -355,7 +355,7 @@
         return;
     }
 
-    NSLog(@"LockScreenViewController::onDatabasePreferencesChanged");
+    slog(@"LockScreenViewController::onDatabasePreferencesChanged");
 
     [self.view.window.windowController synchronizeWindowTitleWithDocumentName]; 
 }
@@ -465,7 +465,7 @@
                 [macOSSpinnerUI.sharedInstance dismiss];
 
                 if ( error && error.code != SKErrorPaymentCancelled ) {
-                    NSLog(@"⚠️ Purchase done with error = [%@]", error);
+                    slog(@"⚠️ Purchase done with error = [%@]", error);
                     [MacAlerts error:error window:self.view.window];
                 }
             });
@@ -842,7 +842,7 @@
                                                       error:&error];
             
         if(!configuredUrl) {
-            NSLog(@"getUrlFromBookmark Error / Nil: [%@]", error);
+            slog(@"getUrlFromBookmark Error / Nil: [%@]", error);
         }
         else {
            
@@ -992,7 +992,7 @@
     Document* doc = [dc documentForDatabase:databaseUuid];
     
     if ( doc && doc.windowControllers.firstObject.contentViewController ) {
-        NSLog(@"✅ onDemand Provider returning from document: [%@]", doc.windowControllers.firstObject.contentViewController);
+        slog(@"✅ onDemand Provider returning from document: [%@]", doc.windowControllers.firstObject.contentViewController);
 
         return doc.windowControllers.firstObject.contentViewController;
     }
@@ -1005,7 +1005,7 @@
         
         
         
-        NSLog(@"✅ onDemand Provider returning DBManagerPanel: [%@]", DBManagerPanel.sharedInstance.contentViewController);
+        slog(@"✅ onDemand Provider returning DBManagerPanel: [%@]", DBManagerPanel.sharedInstance.contentViewController);
 
         return DBManagerPanel.sharedInstance.contentViewController;
     }
@@ -1047,7 +1047,7 @@
     }];
 
     if ( !determiner.bioOrWatchUnlockIsPossible ) {
-        NSLog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
+        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
         [self bindUI];
         return;
     }
@@ -1080,7 +1080,7 @@
     }
     else {
         
-        NSLog(@"LockScreenViewController: Unlock Request Cancelled. NOP.");
+        slog(@"LockScreenViewController: Unlock Request Cancelled. NOP.");
     }
 }
 
@@ -1137,7 +1137,7 @@ viewController:(NSViewController *)viewController
                             completion:completion];
     }
     else {
-        NSLog(@"OFFLINE MODE: loadWorkingCopyAndUnlock");
+        slog(@"OFFLINE MODE: loadWorkingCopyAndUnlock");
         
         [self loadWorkingCopyAndUnlock:compositeKeyFactors
                         viewController:viewController
@@ -1189,7 +1189,7 @@ viewController:(NSViewController *)viewController
             });
         }
         else {
-            NSLog(@"🔴 WARNWARN: Unhandled Sync Result [%lu] - error = [%@]", (unsigned long)result, error);
+            slog(@"🔴 WARNWARN: Unhandled Sync Result [%lu] - error = [%@]", (unsigned long)result, error);
             dispatch_async(dispatch_get_main_queue(), ^{
                 completion(NO, NO, NO, error);
             });
@@ -1357,7 +1357,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     [panel setDirectoryURL:url]; 
 
     if ( [panel runModal] == NSModalResponseOK ) {
-        NSLog (@"Reselected URL = [%@]", panel.URL);
+        slog (@"Reselected URL = [%@]", panel.URL);
         
         NSError* err;
         NSData* data = [NSData dataWithContentsOfURL:panel.URL options:kNilOptions error:&err];
@@ -1444,7 +1444,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
         if( weAreKeyWindow && self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate && [self bioOrWatchUnlockIsPossible] ) {
             NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.biometricPromptLastDismissedAt];
             if(self.biometricPromptLastDismissedAt != nil && secondsBetween < 1.5) {
-                NSLog(@"Too many auto biometric requests too soon - ignoring...");
+                slog(@"Too many auto biometric requests too soon - ignoring...");
                 return;
             }
 
@@ -1462,7 +1462,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 - (void)showToastNotification:(NSString*)message error:(BOOL)error {
     if ( self.view.window.isMiniaturized ) {
-        NSLog(@"Not Showing Popup Change notification because window is miniaturized");
+        slog(@"Not Showing Popup Change notification because window is miniaturized");
         return;
     }
 

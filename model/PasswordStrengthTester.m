@@ -67,7 +67,7 @@ const static NSCharacterSet *kSymbolCharacterSet;
         return entropyBits;
     }
     
-    NSLog(@"WARNWARN: Could not convert password to cString");
+    slog(@"WARNWARN: Could not convert password to cString");
     
     return 0.0f;
 }

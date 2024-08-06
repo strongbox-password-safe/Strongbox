@@ -11,7 +11,7 @@
 @implementation NonFileDocument // SFTP / WebDAV and other non File Based
 
 //+ (BOOL)autosavesInPlace {
-// //   NSLog(@"NonFileDocument::autosavesInPlace");
+// //   slog(@"NonFileDocument::autosavesInPlace");
 //
 //    return YES;
 

@@ -125,7 +125,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
         if ( icon ) {
             if( icon.customIconHeight != icon.customIconWidth && MIN(icon.customIconWidth, icon.customIconHeight) > 512 ) {
-                NSLog(@"🔴 Down scaling icon...");
+                slog(@"🔴 Down scaling icon...");
                 img = scaleImage(icon.customIcon, CGSizeMake(128, 128));
             }
             else {

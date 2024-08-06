@@ -111,7 +111,7 @@ enum BrowseViewColumn: String, CaseIterable {
         case .expires:
             return NSLocalizedString("generic_fieldname_expiry_date", comment: "Expiry Date")
         case .totp:
-            return NSLocalizedString("generic_fieldname_totp", comment: "TOTP")
+            return NSLocalizedString("generic_fieldname_totp", comment: "2FA")
         case .attachmentCount:
             return NSLocalizedString("generic_fieldname_attachments", comment: "Attachments")
         case .customFieldCount:

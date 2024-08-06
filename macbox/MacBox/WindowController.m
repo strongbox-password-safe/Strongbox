@@ -65,7 +65,7 @@
 @implementation WindowController
 
 - (void)dealloc {
-    NSLog(@"😎 DEALLOC [%@]", self);
+    slog(@"😎 DEALLOC [%@]", self);
 }
 
 static NSString* getFreeTrialSuffix(void) {
@@ -138,7 +138,7 @@ static NSString* getFreeTrialSuffix(void) {
     [super setDocument:document];
     
     if ( document ) {
-        NSLog(@"WindowController::setDocument [%@] - [%@]", self.document, self.contentViewController);
+        slog(@"WindowController::setDocument [%@] - [%@]", self.document, self.contentViewController);
         
         
         
@@ -151,11 +151,11 @@ static NSString* getFreeTrialSuffix(void) {
                 });
             }
             else {
-                NSLog(@"🔴 Unknown Content View Controller in Set Document: [%@]", self.contentViewController.class);
+                slog(@"🔴 Unknown Content View Controller in Set Document: [%@]", self.contentViewController.class);
             }
         }
         else {
-            NSLog(@"🔴 WARNWARN: No Content View Controller");
+            slog(@"🔴 WARNWARN: No Content View Controller");
         }
         
         
@@ -175,7 +175,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)changeContentView {
-    NSLog(@"WindowController::changeContentView - isLocked = [%hhd]", self.databaseIsLocked);
+    slog(@"WindowController::changeContentView - isLocked = [%hhd]", self.databaseIsLocked);
     
     [self bindFloatWindowOnTop];
     
@@ -270,7 +270,7 @@ static NSString* getFreeTrialSuffix(void) {
         }];
     }
     else {
-        NSLog(@"🔴 getSelectedItems: Model is locked - cannot get selected items!");
+        slog(@"🔴 getSelectedItems: Model is locked - cannot get selected items!");
         return @[];
     }
 }
@@ -672,7 +672,7 @@ static NSString* getFreeTrialSuffix(void) {
             else if (theAction == @selector(paste:)) {
                 NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
                 NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
-                NSLog(@"Validate Paste - %d", blah != nil);
+                slog(@"Validate Paste - %d", blah != nil);
                 return blah != nil;
             }
         }
@@ -845,7 +845,7 @@ static NSString* getFreeTrialSuffix(void) {
     
     
     
-    NSLog(@"🔴 WindowController::validateMenuItem [%@] - NO", NSStringFromSelector(theAction));
+    slog(@"🔴 WindowController::validateMenuItem [%@] - NO", NSStringFromSelector(theAction));
     
     return NO;
 }
@@ -928,7 +928,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 - (IBAction)onRenameSideBarItem:(id)sender {
     if ( !self.viewModel || self.viewModel.locked || self.viewModel.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 Cannot edit locked or read-only database");
+        slog(@"🔴 Cannot edit locked or read-only database");
         return;
     }
     
@@ -950,7 +950,7 @@ static NSString* getFreeTrialSuffix(void) {
             NSString* newTitle = [Utils trim:text];
             
             if ( ![self.viewModel setItemTitle:item title:newTitle] ) {
-                NSLog(@"🔴 Could not rename item!");
+                slog(@"🔴 Could not rename item!");
             }
         }
     }
@@ -980,7 +980,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onSideBarDuplicateItem:(id)sender {
-    NSLog(@"onSideBarDuplicateItem");
+    slog(@"onSideBarDuplicateItem");
     
     Node* item = nil;
     
@@ -1010,7 +1010,7 @@ static NSString* getFreeTrialSuffix(void) {
     
     
     if ( !self.viewModel || self.viewModel.locked || self.viewModel.isEffectivelyReadOnly ) {
-        NSLog(@"🔴 Cannot edit locked or read-only database");
+        slog(@"🔴 Cannot edit locked or read-only database");
         return;
     }
     
@@ -1039,7 +1039,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (IBAction)onNewGroupWithItems:(id)sender {
-    NSLog(@"onNewGroupWithItems: [%@]", sender);
+    slog(@"onNewGroupWithItems: [%@]", sender);
     
     NSString* loc = NSLocalizedString(@"browse_vc_enter_group_name_message", "Please Enter the New Group Name:");
     NSString* groupName = [[[MacAlerts alloc] init] input:loc defaultValue:@"" allowEmpty:NO];
@@ -1053,13 +1053,13 @@ static NSString* getFreeTrialSuffix(void) {
             Node* parentGroup =  [self.viewModel getItemById:parentGroupId];
             
             if ( parentGroup == nil ) {
-                NSLog(@"🔴 Could not find Parent Group!");
+                slog(@"🔴 Could not find Parent Group!");
                 return;
             }
             
             Node* newGroup = nil;
             if ( ![self.viewModel moveItemsIntoNewGroup:items parentGroup:parentGroup title:groupName group:&newGroup] ) {
-                NSLog(@"🔴 Could not move items into new group!");
+                slog(@"🔴 Could not move items into new group!");
                 
                 [MacAlerts info:NSLocalizedString(@"browse_vc_cannot_create_group", @"Cannot create group")
                 informativeText:NSLocalizedString(@"browse_vc_cannot_create_group_message", @"Could not create a group with this name here, possibly because one with this name already exists.")
@@ -1076,7 +1076,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (IBAction)onToggleExclusionFromAudit:(id)sender {
-    NSLog(@"onToggleExclusionFromAudit: [%@]", sender);
+    slog(@"onToggleExclusionFromAudit: [%@]", sender);
     
     NSArray<Node*>* items = [self getSelectedItems];
     
@@ -1088,7 +1088,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onToggleExclusionFromAutoFill:(id)sender {
-    NSLog(@"onToggleExclusionFromAutoFill: [%@]", sender);
+    slog(@"onToggleExclusionFromAutoFill: [%@]", sender);
     
     NSArray<Node*>* items = [self getSelectedItems];
     
@@ -1216,7 +1216,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)onSettingsChanged:(NSNotification*)notification {
-    NSLog(@"WindowController::onSettingsChanged");
+    slog(@"WindowController::onSettingsChanged");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self bindFloatWindowOnTop];
@@ -1275,7 +1275,7 @@ static NSString* getFreeTrialSuffix(void) {
     self.selectPredefinedIconController.hideSelectFile = !self.viewModel.formatSupportsCustomIcons;
     self.selectPredefinedIconController.hideFavIconButton = !self.viewModel.formatSupportsCustomIcons || !StrongboxProductBundle.supportsFavIconDownloader;
     
-    self.selectPredefinedIconController.iconSet = self.viewModel.iconSet;
+    self.selectPredefinedIconController.iconSet = self.viewModel.keePassIconSet;
     
     self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
         if(showFindFavIcons) {
@@ -1396,7 +1396,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (IBAction)onChangeMasterPassword:(id)sender {
-    NSLog(@"onChangeMasterPassword: %hhd, %hhd", self.viewModel.document.isDocumentEdited, self.viewModel.document.hasUnautosavedChanges);
+    slog(@"onChangeMasterPassword: %hhd, %hhd", self.viewModel.document.isDocumentEdited, self.viewModel.document.hasUnautosavedChanges);
     
     if ( self.viewModel.document.isDocumentEdited ) {
         [MacAlerts yesNo:NSLocalizedString(@"generic_unsaved_changes", @"Unsaved Changes")
@@ -1682,7 +1682,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onDuplicateItem:(id)sender {
-    NSLog(@"onDuplicateItem");
+    slog(@"onDuplicateItem");
     
     Node* item = nil;
     
@@ -1876,7 +1876,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (id)copy:(id)sender {
-    NSLog(@"WindowController::copy - [%@]", self.window.firstResponder );
+    slog(@"WindowController::copy - [%@]", self.window.firstResponder );
     
     NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
     DetailViewController* detail = vc.childViewControllers[2];
@@ -1888,16 +1888,16 @@ static NSString* getFreeTrialSuffix(void) {
     NSArray<Node*>* selected = [self getSelectedItems];
     
     if ( selected.count == 0) {
-        NSLog(@"Nothing selected!");
+        slog(@"Nothing selected!");
         return nil;
     }
     
     if (selected.count == 1 && !selected.firstObject.isGroup ) {
-        NSLog(@"Only one selected item and non group... copying password");
+        slog(@"Only one selected item and non group... copying password");
         [self onCopyPassword:nil];
     }
     else {
-        NSLog(@"Multiple selected or group... copying items to clipboard");
+        slog(@"Multiple selected or group... copying items to clipboard");
         [self onCopySelectedItemsToClipboard:nil];
     }
     
@@ -2146,7 +2146,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onCopyCustomField:(id)sender {
-    NSLog(@"onCopyCustomField: [%@]", sender);
+    slog(@"onCopyCustomField: [%@]", sender);
     
     Node* item = [self getSingleSelectedItem];
     
@@ -2233,7 +2233,7 @@ static NSString* getFreeTrialSuffix(void) {
     [self copyConcealedAndMaybeMinimize:password];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"TOTP")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"2FA")]];
 }
 
 - (IBAction)onLaunchUrl:(id)sender {
@@ -2256,35 +2256,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)copyAllFields:(Node*)item {
-    NSMutableArray<NSString*>* fields = NSMutableArray.array;
-    
-    [fields addObject:[self dereference:item.title node:item]];
-    [fields addObject:[self dereference:item.fields.username node:item]];
-    [fields addObject:[self dereference:item.fields.password node:item]];
-    [fields addObject:[self dereference:item.fields.url node:item]];
-    [fields addObject:[self dereference:item.fields.notes node:item]];
-    [fields addObject:[self dereference:item.fields.email node:item]];
-    
-    
-    
-    NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
-    for(NSString* key in sortedKeys) {
-        if ( ![NodeFields isTotpCustomFieldKey:key] ) {
-            StringValue* sv = item.fields.customFields[key];
-            NSString *val = [self dereference:sv.value node:item];
-            [fields addObject:val];
-        }
-    }
-    
-    
-    
-    NSArray<NSString*> *all = [fields filter:^BOOL(NSString * _Nonnull obj) {
-        return obj.length != 0;
-    }];
-    
-    NSString* allString = [all componentsJoinedByString:@"\n"];
-    [ClipboardManager.sharedInstance copyConcealedString:allString];
-    
+    NSString* allString = [self.viewModel.commonModel getAllFieldsKeyValuesString:item.uuid];    
     NSString* loc = NSLocalizedString(@"generic_copied", @"Copied");
     [self showPopupChangeToastNotification:loc];
 }
@@ -2295,7 +2267,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 - (void)showToastNotification:(NSString*)message error:(BOOL)error {
     if ( self.window.isMiniaturized ) {
-        NSLog(@"Not Showing Popup Change notification because window is miniaturized");
+        slog(@"Not Showing Popup Change notification because window is miniaturized");
         return;
     }
     
@@ -2506,7 +2478,7 @@ static NSString* getFreeTrialSuffix(void) {
                                                                root:nil];
     if ( newModel == nil ) {
         [MacAlerts info:NSLocalizedString(@"generic_error", @"Error") window:self.window];
-        NSLog(@"🔴 Couldn't create model.");
+        slog(@"🔴 Couldn't create model.");
         return;
     }
     
@@ -2528,7 +2500,7 @@ static NSString* getFreeTrialSuffix(void) {
     NSData* data = [Serializator expressToData:model format:kKeePass4];
     if ( data == nil ) {
         [MacAlerts info:NSLocalizedString(@"generic_error", @"Error") window:self.window];
-        NSLog(@"🔴 Couldn't serialize.");
+        slog(@"🔴 Couldn't serialize.");
         return;
     }
 
@@ -2550,7 +2522,7 @@ static NSString* getFreeTrialSuffix(void) {
         NSError* error;
         
         if (! [data writeToURL:panel.URL options:kNilOptions error:&error] ) {
-            NSLog(@"🔴 Could not write to file: [%@]", error);
+            slog(@"🔴 Could not write to file: [%@]", error);
             [MacAlerts error:error window:self.window];
         }
         else {
@@ -2576,7 +2548,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 - (void)export:(NSURL*)dest {
     NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseMetadata.uuid];
-    NSLog(@"Export [%@] => [%@]", src, dest);
+    slog(@"Export [%@] => [%@]", src, dest);
     
     if ( !src ) {
         [MacAlerts info:NSLocalizedString(@"open_sequence_couldnt_open_local_message", "Could not open Strongbox's local copy of this database. A online sync is required.")
@@ -2727,7 +2699,7 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
     BOOL success = [syncer merge];
 
     if ( !success ) {
-        NSLog(@"🔴 Unsuccessful Merge/Synchronize");
+        slog(@"🔴 Unsuccessful Merge/Synchronize");
         
         [MacAlerts info:NSLocalizedString(@"generic_error", @"Error")
         informativeText:NSLocalizedString(@"merge_view_merge_title_error", @"There was an problem merging this database.")
@@ -2741,7 +2713,7 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
         
         
         NSUUID* updateId = NSUUID.UUID;
-        NSLog(@"WindowController::synchronizeSecondDatabase start [%@]", updateId);
+        slog(@"WindowController::synchronizeSecondDatabase start [%@]", updateId);
         self.viewModel.commonModel.metadata.asyncUpdateId = updateId;
 
         [self.viewModel.commonModel asyncUpdateAndSync:^(AsyncJobResult * _Nonnull result) {
@@ -2749,7 +2721,7 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
                 self.viewModel.commonModel.metadata.asyncUpdateId = nil;
             }
             else {
-                NSLog(@"Not clearing asyncUpdateId as not the same as expected...");
+                slog(@"Not clearing asyncUpdateId as not the same as expected...");
             }
 
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -2781,7 +2753,7 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
         
         
         NSUUID* updateId = NSUUID.UUID;
-        NSLog(@"WindowController::synchronizeSecondDatabase start [%@]", updateId);
+        slog(@"WindowController::synchronizeSecondDatabase start [%@]", updateId);
         model.metadata.asyncUpdateId = updateId;
 
         [model asyncUpdateAndSync:^(AsyncJobResult * _Nonnull result) {
@@ -2886,7 +2858,7 @@ secondModelMetadata:(MacDatabasePreferences*)secondModelMetadata
 - (void)close {
     [super close];
     
-    NSLog(@"✅ Closing WindowController!");
+    slog(@"✅ Closing WindowController!");
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {

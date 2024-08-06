@@ -275,7 +275,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                         
                         BOOL deleteTmp = [sftp removeFileAtPath:tmpFile2];
                         if (!deleteTmp) {
-                            NSLog(@"🔴 Could not cleanup temporary SFTP file!");
+                            slog(@"🔴 Could not cleanup temporary SFTP file!");
                         }
                         
                         NMSFTPFile* attr = [sftp infoForFileAtPath:providerData.filePath];
@@ -291,14 +291,14 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                         completion(kUpdateResultSuccess, attr.modificationDate, nil);
                     }
                     else {
-                        NSLog(@"🔴 SFTP: Rename 2 was not successful!");
+                        slog(@"🔴 SFTP: Rename 2 was not successful!");
                         
                         error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
                         completion(kUpdateResultError, nil, error);
                     }
                 }
                 else {
-                    NSLog(@"🔴 SFTP: Rename 1 was not successful!");
+                    slog(@"🔴 SFTP: Rename 1 was not successful!");
                     
                     error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
                     completion(kUpdateResultError, nil, error);
@@ -365,7 +365,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     NSData* data = [NSJSONSerialization dataWithJSONObject:[foo serializationDictionary] options:0 error:&error];
     
     if(error) {
-        NSLog(@"%@", error);
+        slog(@"%@", error);
         return nil;
     }
     
@@ -382,7 +382,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     NSURLComponents* components = [[NSURLComponents alloc] init];
     components.scheme = kStrongboxSFTPUrlScheme;
     components.path = [foo.filePath hasPrefix:@"/"] ? foo.filePath : [@"/" stringByAppendingString:foo.filePath]; 
-    NSLog(@"%@", components.URL);
+    slog(@"%@", components.URL);
     
     
     
@@ -577,7 +577,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
             return;
         }
     } @catch (NSException *exception) {
-        NSLog(@"WARNWARN: SSH Connect Exception: %@", exception);
+        slog(@"WARNWARN: SSH Connect Exception: %@", exception);
         error = [Utils createNSError:exception.reason errorCode:-1234];
         completion(NO, nil, error);
         return;
@@ -599,7 +599,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     if ( ![fingerprint isEqualToString:sessionConfiguration.sha256FingerPrint] ) {
         if ( viewController ) {
             if ( sessionConfiguration.sha256FingerPrint == nil ) {
-                NSLog(@"⚠️ shouldConnectToHostWithFingerprint NO EXISTING FINGERPRINT: [%@]", fingerprint);
+                slog(@"⚠️ shouldConnectToHostWithFingerprint NO EXISTING FINGERPRINT: [%@]", fingerprint);
 
                 [self promptUserOnFirstUseFingerPrint:sessionConfiguration
                                               session:session
@@ -608,7 +608,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                                            completion:completion];
             }
             else {
-                NSLog(@"🔴 WARNWARN: shouldConnectToHostWithFingerprint does NOT match: [%@]", fingerprint);
+                slog(@"🔴 WARNWARN: shouldConnectToHostWithFingerprint does NOT match: [%@]", fingerprint);
 
                 [self promptUserOnFingerPrintChange:sessionConfiguration
                                             session:session
@@ -618,7 +618,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
             }
         }
         else {
-            NSLog(@"🔴 Fingerprint Check failed but in background / non-interactive mode... Failing");
+            slog(@"🔴 Fingerprint Check failed but in background / non-interactive mode... Failing");
             [session disconnect];
             NSError* error = [Utils createNSError:@"Fingerprint Check failed but in background / non-interactive mode... Aborting Connection." errorCode:-1222333];
             completion ( YES, nil, error );

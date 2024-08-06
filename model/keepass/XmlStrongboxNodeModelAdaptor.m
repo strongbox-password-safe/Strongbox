@@ -41,7 +41,7 @@
             *error = [Utils createNSError:@"Unexpected root group. More/Less than 1 child at root or non group at root" errorCode:-1];
         }
         
-        NSLog(@"Unexpected root group. More/Less than 1 child at root or non group at root");
+        slog(@"Unexpected root group. More/Less than 1 child at root or non group at root");
         return nil;
     }
 
@@ -70,7 +70,7 @@
             if(error) {
                 *error = [Utils createNSError:@"Problem building Strongbox Node model from KeePass Xml" errorCode:-1];
             }
-            NSLog(@"ERROR: building groups.");
+            slog(@"ERROR: building groups.");
             return nil;
         }
     }
@@ -102,7 +102,7 @@
         if ( group.icon.isCustom ) {
             
             if ( group.icon.uuid == nil || !iconPool[group.icon.uuid] ) {
-                NSLog(@"WARNWARN - Custom Icon is not in pool or is custom but nil UUID - [%@]", group.icon.uuid);
+                slog(@"WARNWARN - Custom Icon is not in pool or is custom but nil UUID - [%@]", group.icon.uuid);
             }
             else {
                 ret.customIcon = group.icon.uuid;
@@ -149,7 +149,7 @@
         if ( node.icon.isCustom ) {
             
             if ( node.icon.uuid == nil || !iconPool[node.icon.uuid] ) {
-                NSLog(@"WARNWARN - Custom Icon is not in pool or is custom but nil UUID - [%@]", node.icon.uuid);
+                slog(@"WARNWARN - Custom Icon is not in pool or is custom but nil UUID - [%@]", node.icon.uuid);
             }
             else {
                 ret.customIcon = node.icon.uuid;
@@ -229,7 +229,7 @@
         KeePassAttachmentAbstractionLayer* attachment = node.fields.attachments[filename];
         NSInteger index = [self getIndexOfAttachmentInPool:attachmentsPool attachment:attachment];
         if (index == -1) {
-            NSLog(@"WARNWARN: Attachment not found in pool!");
+            slog(@"WARNWARN: Attachment not found in pool!");
             continue;
         }
         
@@ -263,7 +263,7 @@
            usedIds:(NSMutableSet<NSUUID*>*)usedIds {
     BOOL alreadyUsedId = [usedIds containsObject:group.uuid];
     if ( alreadyUsedId ) {
-        NSLog(@"WARNWARN: %@", group.uuid);
+        slog(@"WARNWARN: %@", group.uuid);
     }
     NSUUID* nodeId = ( alreadyUsedId || group.uuid == nil ) ? NSUUID.UUID : group.uuid; 
     [usedIds addObject:nodeId];
@@ -288,7 +288,7 @@
             groupNode.icon = ni;
         }
         else {
-            NSLog(@"WARNWARN: Custom Icon referenced by node not present in pool [%@]-[%@]", group.uuid, group.customIcon);
+            slog(@"WARNWARN: Custom Icon referenced by node not present in pool [%@]-[%@]", group.uuid, group.customIcon);
         }
     }
     else if ( group.icon != nil ) {
@@ -310,7 +310,7 @@
     for (id<KeePassGroupOrEntry> child in group.groupsAndEntries) {
         if (child.isGroup) {
             if(![self buildGroup:(KeePassGroup*)child parentNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool usedIds:usedIds]) {
-                NSLog(@"Error Builing Child Group: [%@]", child);
+                slog(@"Error Builing Child Group: [%@]", child);
                 return NO;
             }
         }
@@ -318,7 +318,7 @@
             Node * entryNode = [self nodeFromEntry:(Entry*)child groupNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool usedIds:usedIds historical:NO]; 
             
             if( entryNode == nil ) {
-                NSLog(@"Error building node from Entry: [%@]", child);
+                slog(@"Error building node from Entry: [%@]", child);
                 return NO;
             }
             
@@ -354,7 +354,7 @@
     for ( Binary* binary in childEntry.binaries ) {
         NSInteger index = binary.index;
         if ( index < 0 || index >= attachmentsPool.count || binary.filename == nil ) {
-            NSLog(@"WARNWARN: Node pointed to no existing attachment in attachments pool [%ld] not in %lu", (long)index, (unsigned long)attachmentsPool.count);
+            slog(@"WARNWARN: Node pointed to no existing attachment in attachments pool [%ld] not in %lu", (long)index, (unsigned long)attachmentsPool.count);
             continue;
         }
             
@@ -407,7 +407,7 @@
     
     BOOL alreadyUsedId = [usedIds containsObject:childEntry.uuid];
     if ( alreadyUsedId && !historical ) {
-        NSLog(@"WARNWARN: Duplicated ID: %@", childEntry.uuid);
+        slog(@"WARNWARN: Duplicated ID: %@", childEntry.uuid);
     }
     NSUUID* nodeId = ((alreadyUsedId && !historical) || childEntry.uuid == nil) ? NSUUID.UUID : childEntry.uuid; 
     [usedIds addObject:nodeId];
@@ -424,7 +424,7 @@
             entryNode.icon = ni;
         }
         else {
-            NSLog(@"WARNWARN: Custom Icon referenced by node not present in pool [%@]-[%@]", childEntry.uuid, childEntry.customIcon);
+            slog(@"WARNWARN: Custom Icon referenced by node not present in pool [%@]-[%@]", childEntry.uuid, childEntry.customIcon);
         }
     }
     else if ( childEntry.icon != nil ) {

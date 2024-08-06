@@ -271,7 +271,7 @@ class UnifiedUpgrade: NSViewController {
         enableButtons(false)
 
         ProUpgradeIAPManager.sharedInstance().restorePrevious { [weak self] error in
-            NSLog("✅ Restore purchases done: error = [%@]", String(describing: error))
+            swlog("✅ Restore purchases done: error = [%@]", String(describing: error))
 
             self?.enableButtons(true)
             macOSSpinnerUI.sharedInstance().dismiss()
@@ -289,7 +289,7 @@ class UnifiedUpgrade: NSViewController {
     }
 
     func tryRefreshReceiptRestore() {
-        NSLog("Restore purchases didn't work... try to refresh receipt...")
+        swlog("Restore purchases didn't work... try to refresh receipt...")
 
         macOSSpinnerUI.sharedInstance().show(NSLocalizedString("upgrade_vc_progress_restoring", comment: "Restoring..."), viewController: self)
         enableButtons(false)
@@ -299,7 +299,7 @@ class UnifiedUpgrade: NSViewController {
             macOSSpinnerUI.sharedInstance().dismiss()
 
             if !Settings.sharedInstance().isPro {
-                NSLog("Refresh didn't work either...")
+                swlog("Refresh didn't work either...")
 
                 DispatchQueue.main.async { [weak self] in
                     MacAlerts.info(NSLocalizedString("upgrade_vc_restore_unsuccessful_title", comment: "Restoration Unsuccessful"),
@@ -345,14 +345,14 @@ class UnifiedUpgrade: NSViewController {
             enableButtons(false)
 
             ProUpgradeIAPManager.sharedInstance().purchaseAndCheckReceipts(product) { [weak self] error in
-                NSLog("Purchase done => Error = [%@]", String(describing: error))
+                swlog("Purchase done => Error = [%@]", String(describing: error))
 
                 self?.enableButtons(true)
                 macOSSpinnerUI.sharedInstance().dismiss()
 
                 if let error {
                     if let error = error as? SKError, error.code == SKError.Code.paymentCancelled {
-                        NSLog("User Cancelled")
+                        swlog("User Cancelled")
                         return
                     }
 

@@ -117,7 +117,7 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    NSLog(@"collectionView::didSelectItemAtIndexPath - [%@]", indexPath);
+    slog(@"collectionView::didSelectItemAtIndexPath - [%@]", indexPath);
     
     if([self hasCustomIcons] && indexPath.section == 0) {
         NodeIcon* icon = self.customIcons[indexPath.row];

@@ -43,7 +43,6 @@ class SSHAgentRequestHandler: NSObject {
 
     private enum Constants {
         static let SecureOfflinePkMapKey = "ssh-agent-offline-public-key-db-map"
-
     }
 
     override private init() {
@@ -99,7 +98,7 @@ class SSHAgentRequestHandler: NSObject {
     }
 
     @objc
-    public func updateOffilnePublicKeysForDatabase(publicKeyBlobs: [Data], databaseUuid: String) {
+    public func updateOfflinePublicKeysForDatabase(publicKeyBlobs: [Data], databaseUuid: String) {
         var pkMap: [Data: String] = [:]
 
         if let map = SecretStore.sharedInstance().getSecureObject(Constants.SecureOfflinePkMapKey),
@@ -184,16 +183,16 @@ class SSHAgentRequestHandler: NSObject {
         if let (node, databaseUuid) = getNodeBySerializationBlobBase64(requestedKeyBlobB64) {
             return signChallengeWithNode(node, databaseUuid, challenge, requestedKeyBlobB64: requestedKeyBlobB64, processName: processName, processId: processId, flags: flags)
         } else if Settings.sharedInstance().sshAgentRequestDatabaseUnlockAllowed {
-            NSLog("Could not find requested key in Unlocked Databases to sign in with... Checking Offline Map")
+            swlog("Could not find requested key in Unlocked Databases to sign in with... Checking Offline Map")
 
             guard let (node, databaseUuid) = getNodeFromOfflinePublicKeyWithUnlock(requestedKeyBlobB64, processName: processName) else {
-                NSLog("🔴 Unsuccessful Unlock or find the request key in the unlocked database")
+                swlog("🔴 Unsuccessful Unlock or find the request key in the unlocked database")
                 return nil
             }
 
             return signChallengeWithNode(node, databaseUuid, challenge, requestedKeyBlobB64: requestedKeyBlobB64, processName: processName, processId: processId, flags: flags, preAuthorized: true)
         } else {
-            NSLog("Could not find requested key in Unlocked Databases and not allowed to request Unlock.")
+            swlog("Could not find requested key in Unlocked Databases and not allowed to request Unlock.")
             return nil
         }
     }
@@ -207,14 +206,14 @@ class SSHAgentRequestHandler: NSObject {
               let databaseUuid = offlinePks[requestKeyData],
               let database = MacDatabasePreferences.getById(databaseUuid)
         else {
-            NSLog("Could not find requested key in Offline PK Cache to sign in with... Cannot Sign.")
+            swlog("Could not find requested key in Offline PK Cache to sign in with... Cannot Sign.")
             return nil
         }
 
         if Settings.sharedInstance().sshAgentPreventRapidRepeatedUnlockRequests {
             let blockRecentFailsTimeoutSeconds = 3.0
             if let recentFailTime = recentUnlockFailure, (-recentFailTime.timeIntervalSinceNow) < blockRecentFailsTimeoutSeconds {
-                NSLog("🙅‍♂️ Auto Blocking Unlock Request since it has already been failed %f less than %f seconds ago", -recentFailTime.timeIntervalSinceNow, blockRecentFailsTimeoutSeconds)
+                swlog("🙅‍♂️ Auto Blocking Unlock Request since it has already been failed %f less than %f seconds ago", -recentFailTime.timeIntervalSinceNow, blockRecentFailsTimeoutSeconds)
                 return nil
             }
         }
@@ -246,7 +245,7 @@ class SSHAgentRequestHandler: NSObject {
         if requiresApproval(processName) {
             if !preAuthorized {
                 guard requestSignatureAuthorization(node, processName: processName) else {
-                    NSLog("⚠️ Authorization Denied - Will not sign request")
+                    swlog("⚠️ Authorization Denied - Will not sign request")
 
                     signRequests.add(SSHAgentSignRequest(processName: processName, processId: processId, databaseUuid: databaseUuid, nodeId: node.uuid, approved: false, timestamp: Date()))
 
@@ -306,7 +305,7 @@ class SSHAgentRequestHandler: NSObject {
         let context = LAContext()
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
-            NSLog(error?.localizedDescription ?? "Can't evaluate policy")
+            swlog(error?.localizedDescription ?? "Can't evaluate policy")
             return false
         }
 
@@ -321,7 +320,7 @@ class SSHAgentRequestHandler: NSObject {
 
         context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: reason) { success, error in
             if let error {
-                NSLog(error.localizedDescription)
+                swlog(error.localizedDescription)
             }
 
             go = success
@@ -334,45 +333,3 @@ class SSHAgentRequestHandler: NSObject {
         return go
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

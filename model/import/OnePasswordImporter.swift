@@ -106,7 +106,7 @@ class OnePasswordImporter: NSObject, Importer {
             let recordType = record.type
 
             if !recordTypeIsProcessable(recordType) {
-                NSLog("Unprocessable Record Type, Ignoring: \(String(describing: record.typeName))")
+                swlog("Unprocessable Record Type, Ignoring: \(String(describing: record.typeName))")
                 continue
             }
 
@@ -150,7 +150,7 @@ class OnePasswordImporter: NSObject, Importer {
                     let filename = attachmentFileWrapper.key
                     ret[filename] = data
 
-                    NSLog("Found: [%@] => %@", filename, String(describing: data))
+                    swlog("Found: [%@] => %@", filename, String(describing: data))
                 }
             }
         }

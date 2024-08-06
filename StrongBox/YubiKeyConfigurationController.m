@@ -71,7 +71,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
 - (void)reloadVirtualYubiKeys {
     self.virtualKeys = VirtualYubiKeys.sharedInstance.snapshot;
 
-    NSLog(@"Reloading Virtual Hardware Keys after changed: [%lu]", (unsigned long)self.virtualKeys.count);
+    slog(@"Reloading Virtual Hardware Keys after changed: [%lu]", (unsigned long)self.virtualKeys.count);
     
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:3] withRowAnimation:UITableViewRowAnimationAutomatic];
 }

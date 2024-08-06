@@ -50,7 +50,7 @@ class CloudKitManager {
     static let shared = CloudKitManager()
 
     func initialize() async throws {
-        NSLog("Initializing CloudKit...")
+
 
         try await createZoneIfNeeded()
     }
@@ -60,14 +60,14 @@ class CloudKitManager {
     }
 
     func getDatabases() async throws -> [CloudKitHostedDatabase] {
-        NSLog("🟢 \(#function)...")
+        swlog("🟢 \(#function)...")
 
         do {
             let (privateDatabases, sharedDatabases) = try await fetchPrivateAndShared()
 
             return privateDatabases + sharedDatabases
         } catch {
-            NSLog("🔴 Error in \(#function) = [\(error)]")
+            swlog("🔴 Error in \(#function) = [\(error)]")
             throw error
         }
     }
@@ -80,7 +80,7 @@ class CloudKitManager {
 
         let ret = try await saveOrUpdate(ckRecord, sharedWithMe: false, nickName: nickname, modDate: modDate, dataBlob: dataBlob)
 
-        NSLog("🐞 Create New Database = [\(ret)]")
+        swlog("🐞 Create New Database = [\(ret)]")
 
         return ret
     }
@@ -101,13 +101,13 @@ class CloudKitManager {
             let records = try await database.records(for: [CKRecord.ID(recordName: id.recordName, zoneID: id.zoneID)], desiredKeys: desiredKeys)
 
             guard let match = records.first else {
-                NSLog("🔴 Could not find database on CloudKit! \(id)")
+                swlog("🔴 Could not find database on CloudKit! \(id)")
                 throw CloudKitManagerError.couldNotFindRecord
             }
 
             let record = try match.value.get()
             guard let ret = CloudKitHostedDatabase(record: record, sharedWithMe: id.sharedWithMe) else {
-                NSLog("🔴 Could not read CloudKit CKRecord! \(id)")
+                swlog("🔴 Could not read CloudKit CKRecord! \(id)")
                 throw CloudKitManagerError.corruptRecord
             }
 
@@ -140,7 +140,7 @@ class CloudKitManager {
 
             var currentQueryCursor = initialQueryCursor
             while let cursor = currentQueryCursor {
-                NSLog("🐞 More results coming from server... paged...")
+                swlog("🐞 More results coming from server... paged...")
 
                 let (results, newQueryCursor) = try await database.records(continuingMatchFrom: cursor, desiredKeys: desiredKeys)
 
@@ -174,7 +174,7 @@ class CloudKitManager {
 
     func delete(id: CloudKitDatabaseIdentifier) async throws {
         guard !id.sharedWithMe else {
-            NSLog("🔴 Cannot delete a database we don't own")
+            swlog("🔴 Cannot delete a database we don't own")
             throw CloudKitManagerError.invalidParameters
         }
 
@@ -200,14 +200,14 @@ class CloudKitManager {
                 do {
                     try FileManager.default.removeItem(at: tmpAssetUrlToDelete)
                 } catch {
-                    NSLog("🔴 CloudKitManager - Could not delete tmp file after update.")
+                    swlog("🔴 CloudKitManager - Could not delete tmp file after update.")
                 }
             }
         }
 
         if let dataBlob {
             guard let modDate else {
-                NSLog("🔴 Datablob sent in for update without mod date?!")
+                swlog("🔴 Datablob sent in for update without mod date?!")
                 throw CloudKitManagerError.invalidParameters
             }
 
@@ -225,7 +225,7 @@ class CloudKitManager {
             let ret = try await database.save(ckRecord)
 
             guard let db = CloudKitHostedDatabase(record: ret, sharedWithMe: false) else {
-                NSLog("🔴 Could not convert return CKRecord to a database object!")
+                swlog("🔴 Could not convert return CKRecord to a database object!")
                 throw CloudKitManagerError.saveError(detail: "Could not convert return CKRecord to a database object!")
             }
 
@@ -238,9 +238,9 @@ class CloudKitManager {
     }
 
     func getShareRecord(database: CloudKitHostedDatabase) async throws -> (share: CKShare?, container: CKContainer) {
-        NSLog("🟢 \(#function) ENTER")
+        swlog("🟢 \(#function) ENTER")
         defer {
-            NSLog("🟢 \(#function) EXIT")
+            swlog("🟢 \(#function) EXIT")
         }
 
         guard let existingShare = database.associatedCkRecord.share else {
@@ -259,18 +259,18 @@ class CloudKitManager {
     }
 
     func createShare(database: CloudKitHostedDatabase) async throws -> (share: CKShare, container: CKContainer) {
-        NSLog("🟢 \(#function) ENTER")
+        swlog("🟢 \(#function) ENTER")
         defer {
-            NSLog("🟢 \(#function) EXIT")
+            swlog("🟢 \(#function) EXIT")
         }
 
         guard !database.id.sharedWithMe else {
-            NSLog("🔴 Cannot create share for a database we don't own!")
+            swlog("🔴 Cannot create share for a database we don't own!")
             throw CloudKitManagerError.invalidParameters
         }
 
         if let existingShare = database.associatedCkRecord.share {
-            NSLog("🟢 \(#function) Found existing share, returning that...")
+            swlog("🟢 \(#function) Found existing share, returning that...")
 
             return try await executeCloudKitOperation(theDatabase: cloudKitPrivateDatabase) { ckConfiguredDb in
                 guard let share = try await ckConfiguredDb.record(for: existingShare.recordID) as? CKShare else {
@@ -280,7 +280,7 @@ class CloudKitManager {
                 return (share, cloudKitContainer)
             }
         } else {
-            NSLog("🟢 \(#function) No existing share found, creating...")
+            swlog("🟢 \(#function) No existing share found, creating...")
 
             let share = CKShare(rootRecord: database.associatedCkRecord)
             share[CKShare.SystemFieldKey.title] = "Strongbox Database: \(database.nickname)"
@@ -306,9 +306,9 @@ class CloudKitManager {
             return
         }
 
-        NSLog("🟢 \(#function) ENTER")
+        swlog("🟢 \(#function) ENTER")
         defer {
-            NSLog("🟢 \(#function) EXIT")
+            swlog("🟢 \(#function) EXIT")
         }
 
         let privateDb = cloudKitContainer.database(with: .private)
@@ -357,13 +357,13 @@ class CloudKitManager {
                         try await database.deleteSubscription(withID: sub.subscriptionID)
                     }
 
-                    NSLog("Successfully delete subscription: [\(sub)]")
+                    swlog("Successfully delete subscription: [\(sub)]")
                 } catch {
-                    NSLog("⚠️ Error deleting subscription: [\(sub)]: [\(error)]")
+                    swlog("⚠️ Error deleting subscription: [\(sub)]: [\(error)]")
                 }
             }
         } catch {
-            NSLog("⚠️ Error in clearAllSubscriptions: \(error)")
+            swlog("⚠️ Error in clearAllSubscriptions: \(error)")
         }
     }
 
@@ -414,7 +414,7 @@ class CloudKitManager {
         return allDatabases
     }
 
-    private func createZoneIfNeeded() async throws {
+    func createZoneIfNeeded() async throws {
         guard !CrossPlatformDependencies.defaults().applicationPreferences.cloudKitZoneCreated else {
             return
         }
@@ -424,9 +424,9 @@ class CloudKitManager {
                 try await db.modifyRecordZones(saving: [privateRecordZone], deleting: [])
             }
 
-            NSLog("🐞 DEBUG: modifyRecordZones done: \(result)")
+            swlog("🐞 DEBUG: modifyRecordZones done: \(result)")
         } catch {
-            NSLog("🔴 ERROR: Failed to create custom zone: \(error)")
+            swlog("🔴 ERROR: Failed to create custom zone: \(error)")
             throw error
         }
 
@@ -449,7 +449,7 @@ class CloudKitManager {
             do {
                 return try result.get()
             } catch {
-                NSLog("🔴 Error fetching CKRecord -> [\(error)] - RecordID = [\(recordId)]")
+                swlog("🔴 Error fetching CKRecord -> [\(error)] - RecordID = [\(recordId)]")
                 return nil
             }
         }
@@ -460,7 +460,7 @@ class CloudKitManager {
     
 
     func logError(_ error: Error) {
-        NSLog("🔴 CloudKitManager - Error = [\(error)]")
+        swlog("🔴 CloudKitManager - Error = [\(error)]")
         instrumentation.recentErrors.add(error as NSError)
     }
 
@@ -495,6 +495,11 @@ class CloudKitManager {
             do {
                 return try await action(database)
             } catch {
+                if let ckErr = error as? CKError, ckErr.code == .zoneNotFound {
+                    swlog("Zone not found error, will attempt to recreate the zone on next restart.")
+                    CrossPlatformDependencies.defaults().applicationPreferences.cloudKitZoneCreated = false
+                }
+
                 logError(error)
                 throw error
             }

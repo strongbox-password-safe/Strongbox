@@ -40,7 +40,7 @@
         self.stream->avail_out = 0;
 
         if (inflateInit2(self.stream, 47) != Z_OK) {
-            NSLog(@"Error initializing z_stream");
+            slog(@"Error initializing z_stream");
             free(self.stream);
             self.stream = nil;
             return nil;
@@ -87,14 +87,14 @@
 
         if(status == Z_STREAM_END) {
             if (inflateEnd(self.stream) != Z_OK) {
-                NSLog(@"ERROR inflateEnd GZIP! %d", status);
+                slog(@"ERROR inflateEnd GZIP! %d", status);
                 self.error = [Utils createNSError:@"ERROR inflateEnd GZIP!." errorCode:status];
                 free(decompressed);
                 return -1;
             }
         }
         else if (status != Z_OK) {
-            NSLog(@"Error: %d", status);
+            slog(@"Error: %d", status);
             self.error = [Utils createNSError:[NSString stringWithFormat:@"ERROR Error: %d GZIP!", status] errorCode:status];
             free(decompressed);
             return -1;
@@ -105,7 +105,7 @@
         if ( writtenThisTime > 0 ) {
             NSInteger res = [self.outputStream write:decompressed maxLength:writtenThisTime];
             if ( res < 0 ) {
-                NSLog(@"GzipDecompressOutputStream: Could not write to output stream.");
+                slog(@"GzipDecompressOutputStream: Could not write to output stream.");
                 return res;
             } 
         }

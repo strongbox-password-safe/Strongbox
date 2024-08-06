@@ -169,13 +169,15 @@ static NSString* const kHasGotUserNotificationsPermissions = @"hasGotUserNotific
 static NSString* const kLastAskToEnableNotifications = @"lastAskToEnableNotifications";
 static NSString* const kWiFiSyncPasscodeSSKeyHasBeenInitialized = @"wiFiSyncPasscodeSSKeyHasBeenInitialized";
 static NSString* const kLastWiFiSyncPasscodeError = @"lastWiFiSyncPasscodeError";
-static NSString* const kUseNextGenOneDriveAPI = @"useNextGenOneDriveAPI-2";
+static NSString* const kUseUSGovAuthority = @"useUSGovAuthority";
 static NSString* const kAppAppearance = @"appAppearance";
 static NSString* const kShowDatabaseNamesInBrowse = @"showDatabaseNamesInBrowse";
 static NSString* const kWarnAboutLocalDeviceDatabases = @"warnAboutLocalDeviceDatabases";
 
 static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
+static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
+static NSString* const kDisableHomeTab = @"disableHomeTab";
 
 @implementation AppPreferences
 
@@ -210,13 +212,34 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
     
     if(defaults == nil) {
-        NSLog(@"ERROR: Could not get NSUserDefaults for Suite Name: [%@]", self.appGroupName);
+        slog(@"ERROR: Could not get NSUserDefaults for Suite Name: [%@]", self.appGroupName);
     }
     
     return defaults;
 }
 
 
+
+- (BOOL)disableHomeTab {
+    return [self getBool:kDisableHomeTab];
+}
+
+- (void)setDisableHomeTab:(BOOL)disableHomeTab {
+    [self setBool:kDisableHomeTab value:disableHomeTab];
+}
+
+- (NSDate *)lastCloudKitRefresh {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    return [userDefaults objectForKey:kLastCloudKitRefresh];
+}
+
+- (void)setLastCloudKitRefresh:(NSDate *)lastCloudKitRefresh {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults setObject:lastCloudKitRefresh forKey:kLastCloudKitRefresh];
+    
+    [userDefaults synchronize];
+}
 
 - (BOOL)disableCopyTo {
     return [self getBool:kDisableCopyTo fallback:self.disableExport];
@@ -258,12 +281,13 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
     [self setInteger:kAppAppearance value:appAppearance];
 }
 
-- (BOOL)useNextGenOneDriveAPI {
-    return [self getBool:kUseNextGenOneDriveAPI fallback:YES];
+- (BOOL)useOneDriveUSGovCloudInstance {
+    return NO;
+
 }
 
-- (void)setUseNextGenOneDriveAPI:(BOOL)useNextGenOneDriveAPI {
-    [self setBool:kUseNextGenOneDriveAPI value:useNextGenOneDriveAPI];
+- (void)setUseOneDriveUSGovCloudInstance:(BOOL)useOneDriveUSGovCloudInstance {
+
 }
 
 - (BOOL)hasGotUserNotificationsPermissions {
@@ -350,7 +374,7 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
     
     if ( self.wiFiSyncPasscodeSSKeyHasBeenInitialized ) {
         if ( thePasscode == nil ) {
-            NSLog(@"🔴 WiFiSync Passcode nil but has already been initialized. Something very wrong... [%@]", error);
+            slog(@"🔴 WiFiSync Passcode nil but has already been initialized. Something very wrong... [%@]", error);
         }
         
         return thePasscode;
@@ -1449,25 +1473,25 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
     NSString* profilePath = [NSBundle.mainBundle pathForResource:@"embedded" ofType:@"mobileprovision"];
     
     if (profilePath == nil) {
-        NSLog(@"INFO: getAppGroupFromProvisioningProfile - Could not find embedded.mobileprovision file");
+        slog(@"INFO: getAppGroupFromProvisioningProfile - Could not find embedded.mobileprovision file");
         return nil;
     }
     
     NSData* plistData = [NSData dataWithContentsOfFile:profilePath];
     if(!plistData) {
-        NSLog(@"Error: getAppGroupFromProvisioningProfile - dataWithContentsOfFile nil");
+        slog(@"Error: getAppGroupFromProvisioningProfile - dataWithContentsOfFile nil");
         return nil;
     }
     
     NSString* plistDataString = [NSString stringWithFormat:@"%@", plistData];
     if(plistDataString == nil) {
-        NSLog(@"Error: getAppGroupFromProvisioningProfile - plistData - stringWithFormat nil");
+        slog(@"Error: getAppGroupFromProvisioningProfile - plistData - stringWithFormat nil");
         return nil;
     }
     
     NSString* plistString = [self extractPlist:plistDataString];
     if(!plistString) {
-        NSLog(@"Error: getAppGroupFromProvisioningProfile - extractPlist nil");
+        slog(@"Error: getAppGroupFromProvisioningProfile - extractPlist nil");
         return nil;
     }
     
@@ -1476,7 +1500,7 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
                                                                              error:&error];
     
     if(error || regex == nil) {
-        NSLog(@"Error: getAppGroupFromProvisioningProfile - regularExpressionWithPattern %@", error);
+        slog(@"Error: getAppGroupFromProvisioningProfile - regularExpressionWithPattern %@", error);
         return nil;
     }
     
@@ -1488,7 +1512,7 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
         return appGroup;
     }
     else {
-        NSLog(@"INFO: getAppGroupFromProvisioningProfile - App Group Not Found - [%@]", res);
+        slog(@"INFO: getAppGroupFromProvisioningProfile - App Group Not Found - [%@]", res);
         return nil;
     }
 }
@@ -1514,13 +1538,13 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
     NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:&error];
     
     if(error) {
-        NSLog(@"hexStringToAscii Error: %@", error);
+        slog(@"hexStringToAscii Error: %@", error);
         return nil;
     }
     
     NSArray<NSTextCheckingResult*>* matches = [regex matchesInString:hexString options:kNilOptions range:NSMakeRange(0, hexString.length)];
     if(!matches) {
-        NSLog(@"hexStringToAscii Error: Matches nil");
+        slog(@"hexStringToAscii Error: Matches nil");
         return nil;
     }
     
@@ -1536,7 +1560,7 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
             return @(u32);
         }
         else {
-            NSLog(@"Do not know how to decode.");
+            slog(@"Do not know how to decode.");
             return @(32); 
         }
     }];

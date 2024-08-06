@@ -31,7 +31,7 @@
     NSArray *rows = [NSArray arrayWithContentsOfCSVURL:url options:CHCSVParserOptionsSanitizesFields | CHCSVParserOptionsUsesFirstLineAsKeys];
 
     if (rows == nil) {
-        NSLog(@"error parsing file...");
+        slog(@"error parsing file...");
         if ( error ) {
             *error = [Utils createNSError:@"Could not read any rows from file" errorCode:-1];
         }
@@ -39,7 +39,7 @@
     else if(rows.count == 0){
         NSString* loc = NSLocalizedString(@"mac_csv_file_contains_zero_rows", @"CSV File Contains Zero Rows. Cannot Import.");
         
-        NSLog(@"CSV File Contains Zero Rows. Cannot Import.");
+        slog(@"CSV File Contains Zero Rows. Cannot Import.");
         if ( error ) {
             *error = [Utils createNSError:loc errorCode:-1];
         }
@@ -61,7 +61,7 @@
         }
         else {
             NSString* loc = NSLocalizedString(@"mac_no_valid_csv_rows_found", @"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields.");
-            NSLog(@"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields.");
+            slog(@"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields.");
             if ( error ) {
                 *error = [Utils createNSError:loc errorCode:-1];
             }

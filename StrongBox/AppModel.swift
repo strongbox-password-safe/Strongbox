@@ -40,7 +40,7 @@ class AppModel: NSObject {
     @objc
     func unlockDatabase(_ database: Model) {
         if theUnlockedDatabase != nil {
-            NSLog("🔴 Overwriting current unlocked database! Should have been marked as locked previously...")
+            swlog("🔴 Overwriting current unlocked database! Should have been marked as locked previously...")
         }
 
         theUnlockedDatabase = database
@@ -53,7 +53,7 @@ class AppModel: NSObject {
 
     @objc
     func markAsEditing(id: String, editing: Bool = true) {
-        NSLog("AppModel::markAsEditing: %@ => %hhd", id, editing)
+        swlog("AppModel::markAsEditing: %@ => %hhd", id, editing)
 
         if editing {
             editingSet.add(id as NSString)

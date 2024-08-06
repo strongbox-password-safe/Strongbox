@@ -29,7 +29,7 @@
     Node* rootNode = [adaptor toStrongboxModel:rootGroup attachmentsPool:attachments customIconPool:customIconPool error:error];
     
     if(!rootNode) {
-        NSLog(@"Could not build node model from xml root document.");
+        slog(@"Could not build node model from xml root document.");
         
         if (error != nil) {
             *error = [Utils createNSError:@"Could not parse this database." errorCode:-1];
@@ -104,7 +104,7 @@
     KeePassGroup* rootXmlGroup = [adaptor toKeePassModel:rootNode context:context minimalAttachmentPool:minimalAttachmentPool iconPool:iconPool error:error];
 
     if(!rootXmlGroup) {
-        NSLog(@"Could not serialize groups/entries.");
+        slog(@"Could not serialize groups/entries.");
         return nil;
     }
 

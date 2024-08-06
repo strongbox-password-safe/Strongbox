@@ -19,6 +19,7 @@
 
 #import "Utils.h"
 #import "NSData+Extensions.h"
+#import "SBLog.h"
 
 static const int MAX_PATH = 103;
 
@@ -29,7 +30,7 @@ NSString* _Nullable getSocketPath(BOOL hardcodeSandboxTestingPath) {
 #ifdef DEBUG
     if ( hardcodeSandboxTestingPath ) {
         NSString* foo = [@"~/Library/Group Containers/group.strongbox.mac.mcguill/F" stringByExpandingTildeInPath];
-        NSLog(@"⚠️ WARN: Hardcoded Sandbox Path used for Socket. Make sure this is only used in Test mode! [%@] => %ld chars", foo, foo.length);
+        slog(@"⚠️ WARN: Hardcoded Sandbox Path used for Socket. Make sure this is only used in Test mode! [%@] => %ld chars", foo, foo.length);
         return foo;
     }
 #endif
@@ -39,14 +40,14 @@ NSString* _Nullable getSocketPath(BOOL hardcodeSandboxTestingPath) {
 
     
     if ( path.length > MAX_PATH ) {
-        NSLog(@"🔴 Could not create socket, socket path > %d chars [%@] = %ld chars", MAX_PATH, path, path.length);
+        slog(@"🔴 Could not create socket, socket path > %d chars [%@] = %ld chars", MAX_PATH, path, path.length);
         return nil;
     }
 
     BOOL mkDir = [NSFileManager.defaultManager createDirectoryAtPath:path.stringByDeletingLastPathComponent withIntermediateDirectories:YES attributes:nil error:nil];
     
     if ( !mkDir ) {
-        NSLog(@"🔴 Couldn't create directory for local socket");
+        slog(@"🔴 Couldn't create directory for local socket");
     }
     
     return path;
@@ -63,7 +64,7 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
     while ( 1 ) {
         read = [inputStream read:tmpBuffer.mutableBytes maxLength:BUFFER_LEN];
         if ( read < 0 ) {
-            NSLog(@"🔴 read error");
+            slog(@"🔴 read error");
             return nil;
         }
         
@@ -72,7 +73,7 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
             [inBuf appendBytes:tmpBuffer.bytes length:read];
         }
         else {
-            NSLog(@"🔴 Read 0 Bytes?!");
+            slog(@"🔴 Read 0 Bytes?!");
         }
         
         NSError* error;
@@ -84,13 +85,13 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
         }
         else {
 #ifdef DEBUG
-            NSLog(@"🔴 Incomplete Buffer = %@",  [[NSString alloc] initWithData:inBuf encoding:NSUTF8StringEncoding]);
-            NSLog(@"🔴 Incomplete Buffer = %@",  inBuf.upperHexString);
+            slog(@"🔴 Incomplete Buffer = %@",  [[NSString alloc] initWithData:inBuf encoding:NSUTF8StringEncoding]);
+            slog(@"🔴 Incomplete Buffer = %@",  inBuf.upperHexString);
 #endif
         }
         
         if ( read == 0 ) {
-            NSLog(@"🔴 Read entire message but couldn't get object!");
+            slog(@"🔴 Read entire message but couldn't get object!");
             break;
         }
     }
@@ -105,7 +106,7 @@ id readJsonObjectFromInputStream (NSInputStream* inputStream, BOOL returnJsonIns
 NSString* sendMessageOverSocket (NSString* request, BOOL hardcodeSandboxTestingPath, NSError** error) {
     NSString* path = getSocketPath(hardcodeSandboxTestingPath);
     if ( !path ) {
-        NSLog(@"🔴 Socket path too long to create. Check Users Home Path length");
+        slog(@"🔴 Socket path too long to create. Check Users Home Path length");
         
         if ( error ) {
             *error = [Utils createNSError:[NSString stringWithFormat:@"Socket path too long to create. > %d chars. Check Users Home Path length.", MAX_PATH] errorCode:-1];
@@ -124,16 +125,16 @@ NSString* sendMessageOverSocket (NSString* request, BOOL hardcodeSandboxTestingP
     
     const int kBufferSize = 2 * 1024 * 1024;
     if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, &kBufferSize, sizeof(int)) == -1) {
-        NSLog(@"🔴 Error setting socket SO_RCVBUF opts: %s\n", strerror(errno));
+        slog(@"🔴 Error setting socket SO_RCVBUF opts: %s\n", strerror(errno));
     }
     if (setsockopt(s, SOL_SOCKET, SO_SNDBUF, &kBufferSize, sizeof(int)) == -1) {
-        NSLog(@"🔴 Error setting socket SO_SNDBUF opts: %s\n", strerror(errno));
+        slog(@"🔴 Error setting socket SO_SNDBUF opts: %s\n", strerror(errno));
     }
     
     int connectReturn = connect (s, (struct sockaddr *)&sun, sun.sun_len);
     if ( connectReturn < 0 ) {
         NSString* errMsg = [NSString stringWithFormat:@"connect failed! [%s]", strerror(errno)];
-        NSLog(@"%@", errMsg);
+        slog(@"%@", errMsg);
         
         if ( error ) {
             *error = [Utils createNSError:errMsg errorCode:-1];

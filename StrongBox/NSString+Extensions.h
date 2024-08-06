@@ -8,6 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum : NSUInteger {
+    kStringSearchMatchTypeNoMatch,
+    kStringSearchMatchTypeExact,
+    kStringSearchMatchTypeStartsWith,
+    kStringSearchMatchTypeContains,
+} StringSearchMatchType;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSString (Extensions)
@@ -33,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL isAllDigits;
 
+- (StringSearchMatchType)isSearchMatch:(NSString*)searchText checkPinYin:(BOOL)checkPinYin;
 - (BOOL)containsSearchString:(NSString*)searchText checkPinYin:(BOOL)checkPinYin;
 
 - (NSString *)stringByTrimmingLeadingCharactersInSet:(NSCharacterSet *)characterSet;

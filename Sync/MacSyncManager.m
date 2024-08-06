@@ -26,7 +26,7 @@
 }
 
 - (void)backgroundSyncOutstandingUpdates {
-    NSLog(@"backgroundSyncOutstandingUpdates START");
+    slog(@"backgroundSyncOutstandingUpdates START");
     
     for (MacDatabasePreferences* database in MacDatabasePreferences.allDatabases) {
         if ( database.outstandingUpdateId ) {
@@ -36,7 +36,7 @@
 }
 
 - (void)backgroundSyncAll {
-    NSLog(@"backgroundSyncOutstandingUpdates START");
+    slog(@"backgroundSyncOutstandingUpdates START");
     
     for (MacDatabasePreferences* database in MacDatabasePreferences.allDatabases) {
         [self backgroundSyncDatabase:database];
@@ -54,7 +54,7 @@
 
         
     if ( database.alwaysOpenOffline ) {
-        NSLog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
+        slog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
         if (completion) {
             completion(kSyncAndMergeError, NO, nil);
         }
@@ -86,11 +86,11 @@ interactiveVC:(NSViewController *)interactiveVC
          key:(CompositeKeyFactors *)key
         join:(BOOL)join
   completion:(SyncAndMergeCompletionBlock)completion {
-    NSLog(@"Sync ENTER - [%@]", database.nickName);
+    slog(@"Sync ENTER - [%@]", database.nickName);
     
 
     if ( database.alwaysOpenOffline ) {
-        NSLog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
+        slog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
         if (completion) {
             completion(kSyncAndMergeError, NO, nil);
         }
@@ -109,7 +109,7 @@ interactiveVC:(NSViewController *)interactiveVC
     [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"SYNC DONE: [%@] [%@] - Local Changed: [%@] - [%@]", database.nickName, syncResultToString(result), localizedYesOrNoFromBool(localWasChanged), error);
+        slog(@"SYNC DONE: [%@] [%@] - Local Changed: [%@] - [%@]", database.nickName, syncResultToString(result), localizedYesOrNoFromBool(localWasChanged), error);
         completion(result, localWasChanged, error);
     }];
 }
@@ -130,7 +130,7 @@ interactiveVC:(NSViewController *)interactiveVC
         if ( error ) {
             *error = [Utils createNSError:NSLocalizedString(@"warn_database_is_ro_no_update", @"Your database is in Read Only mode and cannot be updated.") errorCode:-1];
         }
-        NSLog(@"🔴 WARNWARN: Attempt to update a Read Only database?!");
+        slog(@"🔴 WARNWARN: Attempt to update a Read Only database?!");
         return NO;
     }
 
@@ -140,7 +140,7 @@ interactiveVC:(NSViewController *)interactiveVC
     if ( localWorkingCache && Settings.sharedInstance.makeLocalRollingBackups ) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
-            NSLog(@"⚠️ WARNWARN: Could not write backup: [%@]", localWorkingCache);
+            slog(@"⚠️ WARNWARN: Could not write backup: [%@]", localWorkingCache);
             NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
             
             if(error) {

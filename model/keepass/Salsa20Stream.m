@@ -9,6 +9,7 @@
 #import "Salsa20Stream.h"
 #import "sodium.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "SBLog.h"
 
 //static const uint32_t kIvSize = 8;
 static const uint32_t kKeySize = 32;
@@ -30,7 +31,7 @@ static const uint8_t iv[] = {0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A};
         int sodium_initialization = sodium_init();
         
         if (sodium_initialization == -1) {
-            NSLog(@"Sodium Initialization Failed.");
+            slog(@"Sodium Initialization Failed.");
         }
     }
 }
@@ -40,7 +41,7 @@ static const uint8_t iv[] = {0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A};
     
     if(SecRandomCopyBytes(kSecRandomDefault, kKeySize, newKey.mutableBytes))
     {
-        NSLog(@"Could not securely copy new Salsa20 Stream Key bytes");
+        slog(@"Could not securely copy new Salsa20 Stream Key bytes");
         return nil;
     }
        

@@ -57,7 +57,7 @@ public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
         {
             viewController.present(vc, animated: true)
         } else {
-            NSLog("🔴 Could find a view controller to present on!")
+            swlog("🔴 Could find a view controller to present on!")
         }
     }
 }

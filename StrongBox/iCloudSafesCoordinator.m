@@ -97,7 +97,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 }
 
 - (void)localToiCloudImpl {
-    NSLog(@"local => iCloud impl [%lu]", (unsigned long)_iCloudFiles.count);
+    slog(@"local => iCloud impl [%lu]", (unsigned long)_iCloudFiles.count);
     
     self.showMigrationUi(YES);
     
@@ -115,7 +115,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 }
 
 - (void)iCloudToLocalImpl {
-    NSLog(@"iCloud => local impl  [%lu]", (unsigned long)_iCloudFiles.count);
+    slog(@"iCloud => local impl  [%lu]", (unsigned long)_iCloudFiles.count);
     
     self.showMigrationUi(YES);
     
@@ -145,7 +145,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     
     if (success) {
         NSString* newNickName = [self displayNameFromUrl:destURL];
-        NSLog(@"New Nickname = [%@] Moved %@ to %@", newNickName, fileURL, destURL);
+        slog(@"New Nickname = [%@] Moved %@ to %@", newNickName, fileURL, destURL);
 
         safe.nickName = newNickName;
         safe.storageProvider = kiCloud;
@@ -153,7 +153,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         safe.fileName = [destURL lastPathComponent];
     }
     else {
-        NSLog(@"Failed to move %@ to %@: %@", fileURL, destURL, error.localizedDescription);
+        slog(@"Failed to move %@ to %@: %@", fileURL, destURL, error.localizedDescription);
     }
 }
 
@@ -173,7 +173,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
                                                  completion:^(DatabasePreferences *metadata, NSError *error)
          {
              if (error == nil) {
-                 NSLog(@"Copied %@ to %@", newURL, metadata.fileIdentifier);
+                 slog(@"Copied %@ to %@", newURL, metadata.fileIdentifier);
                  
                  safe.nickName = metadata.nickName;
                  safe.storageProvider = kLocalDevice;
@@ -181,7 +181,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
                  safe.fileName = metadata.fileName;
              }
              else {
-                 NSLog(@"Failed to copy %@ to %@: %@", newURL, metadata.fileIdentifier, error.localizedDescription);
+                 slog(@"Failed to copy %@ to %@: %@", newURL, metadata.fileIdentifier, error.localizedDescription);
              }
          }];
     }];
@@ -381,7 +381,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         DatabasePreferences *newSafe = [DatabasePreferences templateDummyWithNickName:displayName storageProvider:kiCloud fileName:fileName fileIdentifier:[safeFile.fileUrl absoluteString]];
         newSafe.hasUnresolvedConflicts = safeFile.hasUnresolvedConflicts;
         
-        NSLog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
+        slog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
       
         
         
@@ -390,7 +390,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
             added = YES;
         }
         else {
-            NSLog(@"Did not add iCloud database - error = [%@]", error);
+            slog(@"Did not add iCloud database - error = [%@]", error);
         }
     }
     
@@ -408,7 +408,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     }
     
     for(DatabasePreferences* safe in safeFileNamesToBeRemoved.allValues) {
-        NSLog(@"iCloud Safe Removed: %@", safe);
+        slog(@"iCloud Safe Removed: %@", safe);
         [safe removeFromDatabasesList];
         removed = YES;
     }

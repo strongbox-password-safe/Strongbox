@@ -80,14 +80,14 @@ class WelcomeAppOnboardingViewController: NSViewController {
                     try SMAppService.mainApp.register()
                 } catch {
                     MacAlerts.error(error, window: self.view.window)
-                    NSLog("🔴 Error registering startup item: [%@]", String(describing: error))
+                    swlog("🔴 Error registering startup item: [%@]", String(describing: error))
                 }
             } else if checkboxStartAtLogin.state == .off, SMAppService.mainApp.status == .enabled {
                 do {
                     try SMAppService.mainApp.unregister()
                 } catch {
                     MacAlerts.error(error, window: self.view.window)
-                    NSLog("🔴 Error unregistering startup item: [%@]", String(describing: error))
+                    swlog("🔴 Error unregistering startup item: [%@]", String(describing: error))
                 }
             }
         }

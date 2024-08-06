@@ -57,7 +57,7 @@
 }
 
 - (void)beginUnlockSequence {
-    NSLog(@"beginUnlockSequence....");
+    slog(@"beginUnlockSequence....");
     
     if(AppPreferences.sharedInstance.appLockMode == kBiometric || AppPreferences.sharedInstance.appLockMode == kBoth) {
         if(BiometricsManager.isBiometricIdAvailable) {
@@ -95,13 +95,13 @@
         }
         else {
             if (error.code == LAErrorUserCancel) {
-                NSLog(@"User Cancelled - Not Incrementing Fail Count...");
+                slog(@"User Cancelled - Not Incrementing Fail Count...");
             }
             else  if ( error.code == LAErrorUserFallback ) {
-                NSLog(@"LAErrorUserFallback");
+                slog(@"LAErrorUserFallback");
             }
             else {
-                NSLog(@"Biometric Fail: [%@]", error);
+                slog(@"Biometric Fail: [%@]", error);
 
             }
         }}];
@@ -171,7 +171,7 @@
 - (void)incrementFailedUnlockCount {
     dispatch_async(dispatch_get_main_queue(), ^{
         AppPreferences.sharedInstance.failedUnlockAttempts = AppPreferences.sharedInstance.failedUnlockAttempts + 1;
-        NSLog(@"Failed Unlocks: %lu", (unsigned long)AppPreferences.sharedInstance.failedUnlockAttempts);
+        slog(@"Failed Unlocks: %lu", (unsigned long)AppPreferences.sharedInstance.failedUnlockAttempts);
         [self updateFailedUnlockAttemptsUI];
 
         if(AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {

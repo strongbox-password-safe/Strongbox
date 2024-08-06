@@ -57,7 +57,7 @@
     [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
     
     if (error) {
-        NSLog(@"isBiometricIdAvailable: NO -> ");
+        slog(@"isBiometricIdAvailable: NO -> ");
         [BiometricsManager logBiometricError:error];
         return NO;
     }
@@ -91,7 +91,7 @@
     [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
     
     if (error) {
-        NSLog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
+        slog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
         [BiometricsManager logBiometricError:error];
         return;
     }
@@ -124,12 +124,12 @@
     [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
     
     if (error) {
-        NSLog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
+        slog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
         [BiometricsManager logBiometricError:error];
         return NO;
     }
     
-    NSLog(@"Biometrics State: [%@] vs Last Good: [%@]",
+    slog(@"Biometrics State: [%@] vs Last Good: [%@]",
           [localAuthContext.evaluatedPolicyDomainState base64EncodedStringWithOptions:kNilOptions],
           [self.lastKnownGoodDatabaseState base64EncodedStringWithOptions:kNilOptions]);
 
@@ -138,28 +138,28 @@
 
 + (void)logBiometricError:(NSError*)error {
     if (error.code == LAErrorAuthenticationFailed) {
-        NSLog(@"BIOMETRIC: Auth Failed %@", error);
+        slog(@"BIOMETRIC: Auth Failed %@", error);
     }
     else if (error.code == LAErrorUserFallback) {
-        NSLog(@"BIOMETRIC: User Choose Fallback %@", error);
+        slog(@"BIOMETRIC: User Choose Fallback %@", error);
     }
     else if (error.code == LAErrorUserCancel) {
-        NSLog(@"BIOMETRIC: User Cancelled %@", error);
+        slog(@"BIOMETRIC: User Cancelled %@", error);
     }
     else if (error.code == LAErrorBiometryNotAvailable) {
-        NSLog(@"BIOMETRIC: LAErrorBiometryNotAvailable %@", error);
+        slog(@"BIOMETRIC: LAErrorBiometryNotAvailable %@", error);
     }
     else if (error.code == LAErrorSystemCancel) {
-        NSLog(@"BIOMETRIC: LAErrorSystemCancel %@", error);
+        slog(@"BIOMETRIC: LAErrorSystemCancel %@", error);
     }
     else if (error.code == LAErrorBiometryNotEnrolled) {
-        NSLog(@"BIOMETRIC: LAErrorBiometryNotEnrolled %@", error);
+        slog(@"BIOMETRIC: LAErrorBiometryNotEnrolled %@", error);
     }
     else if (error.code == LAErrorBiometryLockout) {
-        NSLog(@"BIOMETRIC: LAErrorBiometryLockout %@", error);
+        slog(@"BIOMETRIC: LAErrorBiometryLockout %@", error);
     }
     else {
-        NSLog(@"BIOMETRIC: Unknown Error: [%@]", error);
+        slog(@"BIOMETRIC: Unknown Error: [%@]", error);
     }
 }
 
@@ -209,7 +209,7 @@
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
     
-    NSLog(@"REQUEST-BIOMETRIC: %d", AppPreferences.sharedInstance.suppressAppBackgroundTriggers);
+    slog(@"REQUEST-BIOMETRIC: %d", AppPreferences.sharedInstance.suppressAppBackgroundTriggers);
     
     
     
@@ -218,7 +218,7 @@
     
     if ( self.requestInProgress ) {
         
-        NSLog(@"WARN: WARN: Biometric Request is already in Progress - Not launching again...");
+        slog(@"WARN: WARN: Biometric Request is already in Progress - Not launching again...");
         return NO;
     }
     
@@ -232,11 +232,11 @@
                                    AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO;
 
                                    if(!success) {
-                                       NSLog(@"requestBiometricId: NO -> ");
+                                       slog(@"requestBiometricId: NO -> ");
                                        [BiometricsManager logBiometricError:error];
                                    }
                                    else {
-                                       NSLog(@"REQUEST-BIOMETRIC DONE SUCCESS");
+                                       slog(@"REQUEST-BIOMETRIC DONE SUCCESS");
                                    }
                                    completion(success, error);
                                }];

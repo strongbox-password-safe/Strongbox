@@ -82,7 +82,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
         [self closeWriteStream];
 
         if (read < 0) {
-            NSLog(@"Error reading stream... [%ld]", (long)read);
+            slog(@"Error reading stream... [%ld]", (long)read);
             return nil;
         }
     }
@@ -106,7 +106,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
             size_t bytesToReadThisTime = remaining > kBlockSize ? kBlockSize : remaining;
             NSInteger read = [stream read:block maxLength:bytesToReadThisTime];
             if (read <= 0) {
-                NSLog(@"Not enough data to read specified length of attachment. Read = %ld, Requested = %ld", (long)read, bytesToReadThisTime);
+                slog(@"Not enough data to read specified length of attachment. Read = %ld, Requested = %ld", (long)read, bytesToReadThisTime);
                 return nil;
             }
          
@@ -166,7 +166,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
         NSError* error = nil;
         [NSFileManager.defaultManager attributesOfItemAtPath:self.encryptedSessionFilePath error:&error];
         if ( error ) {
-            NSLog(@"Could not find encrypted session file! Cannot return input stream [%@]", error);
+            slog(@"Could not find encrypted session file! Cannot return input stream [%@]", error);
             return nil;
         }
         
@@ -174,7 +174,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
     }
     else {
         if ( !self.memoryStream ) {
-            NSLog(@"🔴 Could not find memory stream! Cannot return input stream");
+            slog(@"🔴 Could not find memory stream! Cannot return input stream");
             return nil;
         }
         
@@ -231,7 +231,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
     BOOL converted = [text getBytes:ascii maxLength:len usedLength:nil encoding:NSASCIIStringEncoding options:kNilOptions range:NSMakeRange(0, len) remainingRange:nil];
     
     if (!converted) {
-        NSLog(@"Could not convert b64 text to ascii!");
+        slog(@"Could not convert b64 text to ascii!");
         free(ascii);
         return -1;
     }

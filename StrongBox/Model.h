@@ -35,35 +35,30 @@ typedef NSViewController* VIEW_CONTROLLER_PTR;
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString* const kSpecialSearchTermAllEntries;
-extern NSString* const kSpecialSearchTermAuditEntries;
-extern NSString* const kSpecialSearchTermTotpEntries;
-extern NSString* const kSpecialSearchTermExpiredEntries;
-extern NSString* const kSpecialSearchTermNearlyExpiredEntries;
-
 typedef void (^AsyncUpdateCompletion)(AsyncJobResult *result);
 
 extern NSString* const kAuditNodesChangedNotificationKey;
 extern NSString* const kAuditProgressNotificationKey;
-extern NSString* const kAuditCompletedNotificationKey;
+extern NSString* const kAuditCompletedNotification;
 extern NSString* const kAuditNewSwitchedOffNotificationKey;
 
 extern NSString* const kAppStoreSaleNotificationKey;
 extern NSString* const kCentralUpdateOtpUiNotification;
+extern NSString *const kModelEditedNotification;
 extern NSString* const kMasterDetailViewCloseNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 extern NSString* const kWormholeAutoFillUpdateMessageId;
-extern NSString* const kDatabaseReloadedNotificationKey;
+extern NSString* const kDatabaseReloadedNotification;
 extern NSString* const kTabsMayHaveChangedDueToModelEdit;
-extern NSString* const kAsyncUpdateDone;
-extern NSString* const kAsyncUpdateStarting;
+extern NSString* const kAsyncUpdateDoneNotification;
+extern NSString* const kAsyncUpdateStartingNotification;
 
 @interface Model : NSObject
 
 @property (readonly) BOOL isKeePass2Format;
 @property (nonatomic, readonly) NSString *databaseUuid;
 @property (nonatomic, readonly, nonnull) METADATA_PTR metadata;
-@property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
+@property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;
 @property (nonatomic, readonly) BOOL isReadOnly;
 @property (readonly) BOOL isInOfflineMode;
 
@@ -117,6 +112,9 @@ extern NSString* const kAsyncUpdateStarting;
 @property (readonly, nullable) NSNumber* auditIssueCount;
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditHibpErrorCount;
+
+@property (nonatomic, readonly) NSInteger fastEntryTotalCount;
+@property (nonatomic, readonly) NSInteger fastGroupTotalCount;
 
 - (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(NSUUID*)item;
 - (BOOL)isFlaggedByAudit:(NSUUID*)item;
@@ -182,8 +180,6 @@ extern NSString* const kAsyncUpdateStarting;
 - (BOOL)addFavourite:(NSUUID*)itemId;
 - (BOOL)removeFavourite:(NSUUID*)itemId;
 
-@property (readonly) NSArray<Node*>* favourites;
-
 - (BOOL)launchUrl:(Node*)item;
 - (BOOL)launchUrlString:(NSString*)urlString;
 
@@ -223,6 +219,8 @@ extern NSString* const kAsyncUpdateStarting;
 
 
 - (NSArray<Node*>*)entriesWithTag:(NSString*)tag;
+
+- (NSArray<Node*>*)searchAutoBestMatch:(NSString *)searchText scope:(SearchScope)scope;
 
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope
@@ -301,9 +299,23 @@ extern NSString* const kAsyncUpdateStarting;
 - (BOOL)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
 - (BOOL)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
 
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull tagSet;
+
 
 
 - (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item; 
+- (NSString*)getAllFieldsKeyValuesString:(NSUUID*)uuid;
+
+@property (readonly) NSInteger auditEntryCount;
+@property (readonly) NSArray<Node*>* auditEntries;
+@property (readonly) NSArray<Node*>* expiredEntries;
+@property (readonly) NSArray<Node*>* nearlyExpired;
+@property (readonly) NSArray<Node*>* favourites;
+@property (readonly) NSArray<Node*>* totpEntries;
+
+
+
+- (BOOL)setItemTitle:(NSUUID*)uuid title:(NSString*)title;
 
 @end
 

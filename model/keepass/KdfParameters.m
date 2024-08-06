@@ -19,7 +19,7 @@
         VariantObject *variant = (VariantObject*)[parameters objectForKey:kKdfParametersKeyUuid];
         
         if(!variant) {
-            NSLog(@"Missing required $UUID Entry!");
+            slog(@"Missing required $UUID Entry!");
             return nil;
         }
         

@@ -107,7 +107,7 @@ public class AutoFillEncryptedRequest: NSObject, Codable {
         guard let data = json.data(using: .utf8),
               let encryptedRequest = try? decoder.decode(AutoFillEncryptedRequest.self, from: data)
         else {
-            NSLog("🔴 Could not decode AutoFillEncryptedRequest object from JSON")
+            swlog("🔴 Could not decode AutoFillEncryptedRequest object from JSON")
             return nil
         }
 
@@ -169,7 +169,7 @@ class AutoFillEncryptedResponse: NSObject, Codable {
         guard let data = json.data(using: .utf8),
               let response = try? decoder.decode(AutoFillEncryptedResponse.self, from: data)
         else {
-            NSLog("🔴 Could not decode AutoFillEncryptedRequest object from JSON")
+            swlog("🔴 Could not decode AutoFillEncryptedRequest object from JSON")
             return nil
         }
 
@@ -202,7 +202,7 @@ class AutoFillJsonHelper {
         guard let encodedData = try? encoder.encode(object),
               let jsonString = String(data: encodedData, encoding: .utf8)
         else {
-            NSLog("🔴 Could not encode to JSON")
+            swlog("🔴 Could not encode to JSON")
             return "{ \"error\" : \"🔴 Could not encode to JSON\" }"
         }
 

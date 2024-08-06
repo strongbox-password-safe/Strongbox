@@ -35,7 +35,7 @@
 - (instancetype)initWithStream:(NSInputStream *)innerStream {
     if (self = [super init]) {
         if (!innerStream) {
-            NSLog(@"Inner Stream NIL");
+            slog(@"Inner Stream NIL");
             return nil;
         }
         
@@ -53,7 +53,7 @@
         self.stream->avail_out = 0;
         
         if (inflateInit2(self.stream, 47) != Z_OK) {
-            NSLog(@"Error initializing z_stream");
+            slog(@"Error initializing z_stream");
             free(self.stream);
             self.stream = nil;
             return nil;
@@ -68,7 +68,7 @@
 - (instancetype)initWithData:(NSData *)data {
     if (self = [super init]) {
         if (!data || data.length == 0 || !isGzippedData(data)) {
-            NSLog(@"Data empty or not GZIPed");
+            slog(@"Data empty or not GZIPed");
             return nil;
         }
         
@@ -86,7 +86,7 @@
         self.stream->avail_out = 0;
         
         if (inflateInit2(self.stream, 47) != Z_OK) {
-            NSLog(@"Error initializing z_stream");
+            slog(@"Error initializing z_stream");
             free(self.stream);
             self.stream = nil;
             return nil;
@@ -202,13 +202,13 @@
             }
         }
         else {
-            NSLog(@"ERROR inflateEnd GZIP! %d", status);
+            slog(@"ERROR inflateEnd GZIP! %d", status);
             self.error = [Utils createNSError:@"ERROR inflateEnd GZIP!." errorCode:status];
             return -1;
         }
     }
     else if (status != Z_OK) {
-        NSLog(@"ERROR Reading GZIP! %d", status);
+        slog(@"ERROR Reading GZIP! %d", status);
         self.error = [Utils createNSError:@"ERROR Reading GZIP!." errorCode:status];
         return -1;
     }
@@ -235,7 +235,7 @@
                 }
             }
             else {
-                NSLog(@"ERROR inflateEnd GZIP! %d", status);
+                slog(@"ERROR inflateEnd GZIP! %d", status);
                 return -1;
             }
         }
@@ -243,7 +243,7 @@
         return read;
     }
     else {
-        NSLog(@"ERROR Reading GZIP! %d", status);
+        slog(@"ERROR Reading GZIP! %d", status);
         return -1;
     }
     

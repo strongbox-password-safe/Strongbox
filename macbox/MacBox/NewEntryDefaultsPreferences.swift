@@ -194,7 +194,7 @@ class NewEntryDefaultsPreferences: NSViewController {
         case .custom:
             return 2
         default:
-            NSLog("Ruh Roh... ")
+            swlog("Ruh Roh... ")
             return -1
         }
     }

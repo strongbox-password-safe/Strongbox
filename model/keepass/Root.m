@@ -44,7 +44,7 @@
             return [[KeePassGroup alloc] initWithContext:self.context];
         }
         else {
-            NSLog(@"WARN: Multiple Root Groups found. Ignoring extra.");
+            slog(@"WARN: Multiple Root Groups found. Ignoring extra.");
         }
     }
     else if ([xmlElementName isEqualToString:kDeletedObjectsElementName]) {

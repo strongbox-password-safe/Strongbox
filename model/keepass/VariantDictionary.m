@@ -91,7 +91,7 @@ typedef struct _EntryHeader {
     uint8_t *eof = (uint8_t*)data.bytes + data.length;
     
     if(buffer + 1 > eof) {
-        NSLog(@"Not enough data to read Entry header.");
+        slog(@"Not enough data to read Entry header.");
         return nil;
     }
     
@@ -99,7 +99,7 @@ typedef struct _EntryHeader {
     uint8_t versionMajor = buffer[1];
     
     if(versionMajor != 1) {
-        NSLog(@"Variant Dictionary major version != 1");
+        slog(@"Variant Dictionary major version != 1");
         return nil;
     }
     
@@ -109,7 +109,7 @@ typedef struct _EntryHeader {
         size_t keyLength = littleEndian4BytesToUInt32(header->keyLength);
 
         if(header->keyData + keyLength > eof) {
-            NSLog(@"Not enough data to read Entry header Key.");
+            slog(@"Not enough data to read Entry header Key.");
             return nil;
         }
         
@@ -118,7 +118,7 @@ typedef struct _EntryHeader {
         
         
         if(!key) {
-            NSLog(@"Could not get key from Variant Dictionary.");
+            slog(@"Could not get key from Variant Dictionary.");
             return nil;
         }
         
@@ -126,7 +126,7 @@ typedef struct _EntryHeader {
         size_t valueLength = littleEndian4BytesToUInt32(value);
         
         if(value + valueLength > eof) {
-            NSLog(@"Not enough data to read Entry header value.");
+            slog(@"Not enough data to read Entry header value.");
             return nil;
         }
         
@@ -140,7 +140,7 @@ typedef struct _EntryHeader {
         uint8_t *next = value + (valueLength + 4);
         
         if(next + 1 > eof) {
-            NSLog(@"Not enough data to read next Entry header Key.");
+            slog(@"Not enough data to read next Entry header Key.");
             return nil;
         }
         
@@ -177,7 +177,7 @@ static NSData* getValueAsData(VariantObject* value) {
             return ((NSData*)value.theObject);
             break;
         default:
-            NSLog(@"WARN: Unknown Variant Dictionary Value Type = %d. returning as Data", value.type);
+            slog(@"WARN: Unknown Variant Dictionary Value Type = %d. returning as Data", value.type);
             return [NSData data];
             break;
     }
@@ -207,7 +207,7 @@ static NSObject* getObject(uint8_t type, void* data, size_t length) {
             return [NSData dataWithBytes:data length:length];
             break;
         default:
-            NSLog(@"WARN: Unknown Variant Dictionary Value Type = %d. returning as Data", type);
+            slog(@"WARN: Unknown Variant Dictionary Value Type = %d. returning as Data", type);
             return [NSData dataWithBytes:data length:length];
             break;
     }
@@ -233,7 +233,7 @@ static uint32_t getValueLength(VariantObject* value) {
             return (uint32_t)((NSData*)value.theObject).length;
             break;
         default:
-            NSLog(@"WARN: Unknown Variant Dictionary Value Type = %d. returning 0", value.type);
+            slog(@"WARN: Unknown Variant Dictionary Value Type = %d. returning 0", value.type);
             return 0;
             break;
     }

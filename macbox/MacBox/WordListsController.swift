@@ -33,7 +33,7 @@ class WordListsController: NSViewController, NSTableViewDataSource, NSTableViewD
         result.checkbox!.title = wl!.name
 
         result.onClicked = { checked in
-            NSLog("%@ - %d", wordListKey, checked)
+            swlog("%@ - %d", wordListKey, checked)
 
             let immutable = Settings.sharedInstance().passwordGenerationConfig.wordLists
             var set = immutable

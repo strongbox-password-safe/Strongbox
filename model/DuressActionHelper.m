@@ -55,7 +55,7 @@
 #ifndef IS_APP_EXTENSION
     [DatabaseNuker nuke:database deleteUnderlyingIfSupported:YES completion:^(NSError * _Nullable error) {
         if ( error ) {
-            NSLog(@"🔴 Error nuking: [%@]", error);
+            slog(@"🔴 Error nuking: [%@]", error);
         }
     }];
 #endif

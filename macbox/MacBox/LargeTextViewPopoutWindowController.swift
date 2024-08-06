@@ -33,8 +33,8 @@ class LargeTextViewPopoutWindowController: NSWindowController {
         contentViewController as! LargeTextViewAndQrCode
     }
 
-    func setContent(fieldName: String, string: String, largeText: Bool = true, subtext: String = "") {
-        theViewController.setContent(string: string, largeText: largeText, subtext: subtext)
+    func setContent(fieldName: String, string: String, largeText: Bool = true, subtext: String = "", qrCodeString: String? = nil) {
+        theViewController.setContent(string: string, largeText: largeText, subtext: subtext, qrCodeString: qrCodeString)
 
         window?.subtitle = fieldName
     }
@@ -51,7 +51,7 @@ class LargeTextViewPopoutWindowController: NSWindowController {
         guard let floatOnTopItem = window?.toolbar?.items.first(where: { item in
             item.itemIdentifier == LargeTextToolbarItemIdentifiers.floatOnTopLargeText
         }) else {
-            NSLog("🔴 Couldn't find the floatOnTop toolbar item")
+            swlog("🔴 Couldn't find the floatOnTop toolbar item")
             return
         }
 
@@ -73,7 +73,7 @@ extension LargeTextViewPopoutWindowController: NSToolbarDelegate {
         toolbar.displayMode = .iconOnly
 
         guard let window else {
-            NSLog("🔴 Window not ready")
+            swlog("🔴 Window not ready")
             return
         }
 

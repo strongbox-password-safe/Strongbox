@@ -63,7 +63,7 @@
 - (IBAction)onSetIconSet:(id)sender {
     NSInteger idx = self.popupIconSet.indexOfSelectedItem;
     
-    self.model.iconSet = idx;
+    self.model.keePassIconSet = idx;
     
     [self bindUI];
     
@@ -86,7 +86,7 @@
         self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
     }
     
-    [self.popupIconSet selectItemAtIndex:self.model.iconSet];
+    [self.popupIconSet selectItemAtIndex:self.model.keePassIconSet];
     
     self.checkboxManualItemOrdering.state = !self.model.sortKeePassNodes ? NSControlStateValueOn : NSControlStateValueOff;
     self.checkboxShowRecycleBin.state = !self.model.showRecycleBinInBrowse ? NSControlStateValueOff : NSControlStateValueOn;

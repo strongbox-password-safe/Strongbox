@@ -161,13 +161,13 @@
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
   
     if ( self.explicitOnline && self.explicitOffline ) {
-        NSLog(@"🔴 WARNWARN - Something very wrong, explicit Online and Offline Request to Unlock!");
+        slog(@"🔴 WARNWARN - Something very wrong, explicit Online and Offline Request to Unlock!");
     }
     
     BOOL offline = (self.explicitOffline || self.database.forceOpenOffline) && !self.explicitOnline;
 
     if( self.isAutoFillOpen || offline ) {
-        NSLog(@"✅ beginUnlockWithCredentials - AutoFill or Explicit Offline Request Mode... Unlocking Local if available.");
+        slog(@"✅ beginUnlockWithCredentials - AutoFill or Explicit Offline Request Mode... Unlocking Local if available.");
         
         if(localCopyUrl == nil) {
             [Alerts warn:self.viewController
@@ -199,13 +199,13 @@
 }
 
 - (void)beginLazySyncModeWithCredentials:(CompositeKeyFactors*)factors {
-    NSLog(@"✅ beginLazySyncModeWithCredentials");
+    slog(@"✅ beginLazySyncModeWithCredentials");
 
     [self unlockLocalCopy:factors forceReadOnly:NO offline:self.database.forceOpenOffline];
 }
 
 - (void)beginEagerSyncModeWithCredentials:(CompositeKeyFactors*)factors {
-    NSLog(@"✅ beginEagerSyncModeWithCredentials");
+    slog(@"✅ beginEagerSyncModeWithCredentials");
     
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
 
@@ -296,7 +296,7 @@
                 [self unlockLocalCopy:factors forceReadOnly:NO offline:NO];
             }
             else {
-                NSLog(@"WARNWARN: Unknown response from Sync: %lu", (unsigned long)result);
+                slog(@"WARNWARN: Unknown response from Sync: %lu", (unsigned long)result);
                 self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
         });
@@ -304,7 +304,7 @@
 }
 
 - (void)handleSyncAndMergeError:(CompositeKeyFactors*)factors error:(NSError*)error {
-    NSLog(@"Unlock Interactive Sync Error: [%@]", error);
+    slog(@"Unlock Interactive Sync Error: [%@]", error);
     if (self.database.storageProvider == kFilesAppUrlBookmark && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error]) {
         [self askAboutRelocatingDatabase:factors];
     }
@@ -350,7 +350,7 @@
 }
 
 - (void)unlockLocalCopy:(CompositeKeyFactors*)factors forceReadOnly:(BOOL)forceReadOnly offline:(BOOL)offline {
-    NSLog(@"✅ unlockLocalCopy");
+    slog(@"✅ unlockLocalCopy");
     
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.database
                                                         viewController:self.viewController
@@ -418,7 +418,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    slog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
 

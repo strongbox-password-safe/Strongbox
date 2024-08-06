@@ -68,7 +68,7 @@ const NSUInteger kLengthLength = 4;
 
         
         if ( wrote < 0 ) {
-            NSLog(@"WARNWARN: Error writing Last Block");
+            slog(@"WARNWARN: Error writing Last Block");
             return;
         }
     }
@@ -79,7 +79,7 @@ const NSUInteger kLengthLength = 4;
     
     NSInteger wrote = [self writeBlock:terminatorBlock.bytes blockLength:terminatorBlock.length];
     if ( wrote < 0 ) {
-        NSLog(@"WARNWARN: Error writing Terminator Block");
+        slog(@"WARNWARN: Error writing Terminator Block");
         return;
     }
 
@@ -88,7 +88,7 @@ const NSUInteger kLengthLength = 4;
 
 - (NSInteger)write:(const uint8_t *)indata maxLength:(NSUInteger)inlen {
     if ( !self.wasOpened || self.wasClosed ) {
-        NSLog(@"WARNWARN: Unopen or not closed. HMAC Block Output Stream");
+        slog(@"WARNWARN: Unopen or not closed. HMAC Block Output Stream");
         return -1;
     }
     
@@ -112,7 +112,7 @@ const NSUInteger kLengthLength = 4;
         const uint8_t *block = &self.pendingBuffer.bytes[i * kDefaultBlockifySize];
         NSInteger w = [self writeFullBlock:block];
         if ( w < 0 ) {
-            NSLog(@"Error writing full HMAC block = [%@]", self.streamError);
+            slog(@"Error writing full HMAC block = [%@]", self.streamError);
             return w;
         }
         
@@ -148,7 +148,7 @@ const NSUInteger kLengthLength = 4;
 
     NSInteger wrote = [self.outputStream write:hmac.bytes maxLength:hmac.length];
     if ( wrote < 0 ) {
-        NSLog(@"WARNWARN: Error writing HMAC for Block");
+        slog(@"WARNWARN: Error writing HMAC for Block");
         
         if ( self.outputStream.streamError == nil ) {
             self.error = [Utils createNSError:@"Could not write HMAC Block to output stream and no output stream error" errorCode:wrote];
@@ -158,7 +158,7 @@ const NSUInteger kLengthLength = 4;
     
     wrote = [self.outputStream write:lengthData.bytes maxLength:lengthData.length];
     if ( wrote < 0 ) {
-        NSLog(@"WARNWARN: Error writing Length for Block");
+        slog(@"WARNWARN: Error writing Length for Block");
         
         if ( self.outputStream.streamError == nil ) {
             self.error = [Utils createNSError:@"Could not write HMAC Block to output stream and no output stream error" errorCode:wrote];
@@ -168,7 +168,7 @@ const NSUInteger kLengthLength = 4;
 
     wrote = [self.outputStream write:buffer maxLength:blockLength];
     if ( wrote < 0 ) {
-        NSLog(@"WARNWARN: Error writing Block for Block");
+        slog(@"WARNWARN: Error writing Block for Block");
         
         if ( self.outputStream.streamError == nil ) {
             self.error = [Utils createNSError:@"Could not write HMAC Block to output stream and no output stream error" errorCode:wrote];

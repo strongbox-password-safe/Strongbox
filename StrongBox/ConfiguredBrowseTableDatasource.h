@@ -17,7 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initWithModel:(Model*)model
-        isDisplayingRootGroup:(BOOL)isDisplayingRootGroup
                     tableView:(UITableView*)tableView
                      viewType:(BrowseViewType)viewType
                currentGroupId:(NSUUID*_Nullable)currentGroupId

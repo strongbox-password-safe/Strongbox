@@ -11,6 +11,7 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import "AesInputStream.h"
 #import "AesOutputStream.h"
+#import "SBLog.h"
 
 static const uint32_t kIvSize = kCCBlockSizeAES128;
 
@@ -26,7 +27,7 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
                                      data.bytes, data.length, nil, 0, &bufferSize);
 
     if(status != kCCBufferTooSmall) {
-        NSLog(@"Could not get AES buffer size: [%d]", status);
+        slog(@"Could not get AES buffer size: [%d]", status);
         return nil;
     }
     
@@ -37,7 +38,7 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
                      data.bytes, data.length, ret.mutableBytes, ret.length, &bufferSize);
 
     if(status != kCCSuccess) {
-        NSLog(@"Could not AES crypt: [%d]", status);
+        slog(@"Could not AES crypt: [%d]", status);
         return nil;
     }
     
@@ -62,7 +63,7 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
     
     if(SecRandomCopyBytes(kSecRandomDefault, kIvSize, newKey.mutableBytes))
     {
-        NSLog(@"Could not securely copy new bytes");
+        slog(@"Could not securely copy new bytes");
         return nil;
     }
     

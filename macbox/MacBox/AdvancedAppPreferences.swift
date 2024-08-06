@@ -31,11 +31,14 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var labelStrongboxSyncStatus: NSTextField!
     @IBOutlet var imageViewStrongboxSyncStatus: NSImageView!
 
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         useIsolatedDropbox.isHidden = !StrongboxProductBundle.supports3rdPartyStorageProviders
         atomicSftpWrites.isHidden = !StrongboxProductBundle.supportsSftpWebDAV
+
 
         bindUI()
 
@@ -76,6 +79,8 @@ class AdvancedAppPreferences: NSViewController {
         useColorBindPalette.isHidden = !settings.colorizePasswords
         hideKeyFile.isHidden = settings.doNotRememberKeyFile
         enableThirdParty.isEnabled = settings.isPro
+
+
 
         
 
@@ -149,6 +154,7 @@ class AdvancedAppPreferences: NSViewController {
         settings.concealClipboardFromMonitors = concealedClipboard.state == .on
         settings.atomicSftpWrite = atomicSftpWrites.state == .on
 
+
         notifyChanged()
     }
 
@@ -183,7 +189,7 @@ class AdvancedAppPreferences: NSViewController {
     func continueFactoryResetAfterLockAllAttempt() {
         let allLocked = DatabasesCollection.shared.unlockedCollection.allKeys.isEmpty
 
-        NSLog("Factory Reset: All Locked: %hhd", allLocked)
+        swlog("Factory Reset: All Locked: %hhd", allLocked)
 
         if allLocked {
             let allDocsClosed = DocumentController.shared.documents.isEmpty

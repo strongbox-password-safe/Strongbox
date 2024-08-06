@@ -78,21 +78,21 @@ typedef enum : NSUInteger {
     if ( !self.hasDoneCommonInit ) {
         self.hasDoneCommonInit = YES;
         
-        NSLog(@"🟢 CredentialProviderViewController::commonInit"); 
+        slog(@"🟢 CredentialProviderViewController::commonInit"); 
                 
         [StrongboxFilesManager.sharedInstance deleteAllTmpDirectoryFiles];
         
         [DatabasePreferences reloadIfChangedByOtherComponent]; 
     }
     else {
-        NSLog(@"🟢 CredentialProviderViewController::commonInit already done");
+        slog(@"🟢 CredentialProviderViewController::commonInit already done");
     }
 }
 
 
 
 - (void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
-    NSLog(@"🟢 provideCredentialWithoutUserInteractionForIdentity: [%@]", credentialIdentity);
+    slog(@"🟢 provideCredentialWithoutUserInteractionForIdentity: [%@]", credentialIdentity);
     [self commonInit];
     
     self.mode = AutoFillOperationModeGetPasswordQuickType;
@@ -104,7 +104,7 @@ typedef enum : NSUInteger {
     DatabasePreferences* database = [self getDatabaseFromQuickTypeIdentifier:identifier];
     
     if ( database ) {
-        NSLog(@"🟢 provideCredentialWithoutUserInteractionForIdentity - Got DB");
+        slog(@"🟢 provideCredentialWithoutUserInteractionForIdentity - Got DB");
         
         IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self
                                                                                                   database:database
@@ -113,12 +113,12 @@ typedef enum : NSUInteger {
                                                                                        biometricPreCleared:NO
                                                                                        noConvenienceUnlock:NO];
         if ( keyDeterminer.isAutoFillConvenienceAutoLockPossible ) {
-            NSLog(@"🟢 provideCredentialWithoutUserInteractionForIdentity - Within Convenience Timeout - Filling without UI");
+            slog(@"🟢 provideCredentialWithoutUserInteractionForIdentity - Within Convenience Timeout - Filling without UI");
             [self unlockDatabase:database identifier:identifier transparentBio:YES];
             return;
         }
         else {
-            NSLog(@"🟢 provideCredentialWithoutUserInteractionForIdentity - Not Unlocked or Within Convenience Timeout - Exiting UI Required");
+            slog(@"🟢 provideCredentialWithoutUserInteractionForIdentity - Not Unlocked or Within Convenience Timeout - Exiting UI Required");
         }
     }
     
@@ -126,7 +126,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
-    NSLog(@"🟢 prepareInterfaceToProvideCredentialForIdentity = %@", credentialIdentity);
+    slog(@"🟢 prepareInterfaceToProvideCredentialForIdentity = %@", credentialIdentity);
     [self commonInit];
     
     self.mode = AutoFillOperationModeGetPasswordQuickType;
@@ -134,7 +134,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    NSLog(@"prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
+    slog(@"prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
     [self commonInit];
     
     self.mode = AutoFillOperationModeGetPasswordManualSelect;
@@ -144,7 +144,7 @@ typedef enum : NSUInteger {
 
 
 - (void)prepareInterfaceForPasskeyRegistration:(id<ASCredentialRequest>)registrationRequest {
-    NSLog(@"🟢 prepareInterfaceForPasskeyRegistration [%@]", registrationRequest);
+    slog(@"🟢 prepareInterfaceForPasskeyRegistration [%@]", registrationRequest);
     [self commonInit];
     
     self.mode = AutoFillOperationModeRegisterPasskey;
@@ -154,7 +154,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)provideCredentialWithoutUserInteractionForRequest:(id<ASCredentialRequest>)credentialRequest {
-    NSLog(@"🟢 provideCredentialWithoutUserInteractionForRequest [%@]", credentialRequest);
+    slog(@"🟢 provideCredentialWithoutUserInteractionForRequest [%@]", credentialRequest);
     [self commonInit];
     
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
@@ -167,7 +167,7 @@ typedef enum : NSUInteger {
         DatabasePreferences* database = [self getDatabaseFromQuickTypeIdentifier:identifier];
         
         if ( database ) {
-            NSLog(@"provideCredentialWithoutUserInteractionForRequest - Passkey - Got DB");
+            slog(@"provideCredentialWithoutUserInteractionForRequest - Passkey - Got DB");
             
             IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self
                                                                                                       database:database
@@ -176,7 +176,7 @@ typedef enum : NSUInteger {
                                                                                            biometricPreCleared:NO
                                                                                            noConvenienceUnlock:NO];
             if ( keyDeterminer.isAutoFillConvenienceAutoLockPossible ) {
-                NSLog(@"provideCredentialWithoutUserInteractionForRequest - Passkey - Within Timeout - Filling without UI");
+                slog(@"provideCredentialWithoutUserInteractionForRequest - Passkey - Within Timeout - Filling without UI");
                 [self unlockDatabase:database identifier:identifier transparentBio:YES];
                 return;
             }
@@ -190,7 +190,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)prepareInterfaceToProvideCredentialForRequest:(id<ASCredentialRequest>)credentialRequest {
-    NSLog(@"🟢 prepareInterfaceToProvideCredentialForRequest [%@]", credentialRequest);
+    slog(@"🟢 prepareInterfaceToProvideCredentialForRequest [%@]", credentialRequest);
     [self commonInit];
     
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
@@ -210,7 +210,7 @@ typedef enum : NSUInteger {
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSLog(@"🟢 viewDidLoad");
+    slog(@"🟢 viewDidLoad");
     
     [self delayedInitializeUI];
 }
@@ -218,7 +218,7 @@ typedef enum : NSUInteger {
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    NSLog(@"🟢 viewWillAppear");
+    slog(@"🟢 viewWillAppear");
     
     [self initializeUI:NO];
 }
@@ -233,28 +233,28 @@ typedef enum : NSUInteger {
 
 - (void)tryInitializeUI {
     if ( self.initializedUI ) {
-        NSLog(@"🟢 tryInitializeUI but already initialized Done");
+        slog(@"🟢 tryInitializeUI but already initialized Done");
         return;
     }
     
     if ( self.isViewLoaded ) {
-        NSLog(@"🟢 tryInitializeUI - UI is loaded!");
+        slog(@"🟢 tryInitializeUI - UI is loaded!");
         [self initializeUI:YES];
     }
     else {
-        NSLog(@"🟢 tryInitializeUI - UI is NOT loaded! will try again in a sec...");
+        slog(@"🟢 tryInitializeUI - UI is NOT loaded! will try again in a sec...");
         [self delayedInitializeUI];
     }
 }
 
 - (void)initializeUI:(BOOL)delayed {
     if ( self.initializedUI ) {
-        NSLog(@"🟢 initializeUI called again - Already Done");
+        slog(@"🟢 initializeUI called again - Already Done");
         return;
     }
     self.initializedUI = YES;
     
-    NSLog(@"🟢 initializeUI - delay = %hhd", delayed);
+    slog(@"🟢 initializeUI - delay = %hhd", delayed);
     
     
     
@@ -272,28 +272,28 @@ typedef enum : NSUInteger {
 
 - (void)startup {
     if ( self.mode == AutoFillOperationModeRegisterPasskey ) { 
-        NSLog(@"🟢 startup UI: Passkey Registration...");
+        slog(@"🟢 startup UI: Passkey Registration...");
         [self launchSingleOrRequestDatabaseSelection];
     }
     else if ( self.mode == AutoFillOperationModeGetPasskeyAssertionManualOrQuickTypeWithUI ) { 
         if ( self.credentialIdentity ) {
-            NSLog(@"🟢 startup UI: Passkey Assertion with QuickType ID...");
+            slog(@"🟢 startup UI: Passkey Assertion with QuickType ID...");
             [self unlockWithQuickTypeIdentifier];
         }
         else {
-            NSLog(@"🟢 startup UI: Passkey Assertion with manual select...");
+            slog(@"🟢 startup UI: Passkey Assertion with manual select...");
             [self launchSingleOrRequestDatabaseSelection];
         }
     }
     else if ( self.mode == AutoFillOperationModeGetPasskeyAssertionQuickTypeNoUI ) {
-        NSLog(@"🔴 startup UI: Passkey AssertionQuickType No UI - Shouldn't be possible..."); 
+        slog(@"🔴 startup UI: Passkey AssertionQuickType No UI - Shouldn't be possible..."); 
     }
     else if ( self.mode == AutoFillOperationModeGetPasswordQuickType ) {
-        NSLog(@"🟢 startup UI: QuickType password...");
+        slog(@"🟢 startup UI: QuickType password...");
         [self unlockWithQuickTypeIdentifier];
     }
     else { 
-        NSLog(@"🟢 startup UI: fallback but should be manual password select...");
+        slog(@"🟢 startup UI: fallback but should be manual password select...");
         [self launchSingleOrRequestDatabaseSelection];
     }
 }
@@ -302,7 +302,7 @@ typedef enum : NSUInteger {
     DatabasePreferences* database = [self getSingleEnabledDatabase]; 
     
     if ( database ) { 
-            NSLog(@"AutoFill - single enabled database and Auto Proceed switched on... launching db");
+            slog(@"AutoFill - single enabled database and Auto Proceed switched on... launching db");
             
             [self unlockDatabase:database identifier:nil transparentBio:YES];
         }
@@ -409,7 +409,7 @@ typedef enum : NSUInteger {
 - (void)onUnlockDone:(UnlockDatabaseResult)result
                model:(Model * _Nullable)model
           identifier:(QuickTypeRecordIdentifier*)identifier error:(NSError * _Nullable)error {
-    NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@] - mode = %lu", model, error, (unsigned long)self.mode);
+    slog(@"AutoFill: Open Database: Model=[%@] - Error = [%@] - mode = %lu", model, error, (unsigned long)self.mode);
     
     if(result == kUnlockDatabaseResultSuccess) {
         [self onUnlockedDatabase:model quickTypeIdentifier:identifier];
@@ -419,7 +419,7 @@ typedef enum : NSUInteger {
     }
     else if (result == kUnlockDatabaseResultIncorrectCredentials) {
         
-        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+        slog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
         [self exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
     }
     else if (result == kUnlockDatabaseResultError) {
@@ -449,31 +449,31 @@ typedef enum : NSUInteger {
     
     
     if ( self.mode == AutoFillOperationModeRegisterPasskey ) { 
-        NSLog(@"🟢 Database successfully unlocked! Saving new passkey.");
+        slog(@"🟢 Database successfully unlocked! Saving new passkey.");
         if (@available(iOS 17.0, *)) {
             [self createAndSaveNewPasskey:model];
         }
     }
     else if ( self.mode == AutoFillOperationModeGetPasskeyAssertionManualOrQuickTypeWithUI ) { 
         if ( identifier ) {
-            NSLog(@"🟢 Database successfully unlocked! Finding and returning Passkey with quicktype id.");
+            slog(@"🟢 Database successfully unlocked! Finding and returning Passkey with quicktype id.");
             [self findAndReturnQuickTypeCredential:identifier model:model];
         }
         else {
-            NSLog(@"🟢 Database successfully unlocked! Requesting passkey be manually selected for return");
+            slog(@"🟢 Database successfully unlocked! Requesting passkey be manually selected for return");
             [self promptUserToSelectCredential:model selectPasskey:YES];
         }
     }
     else if ( self.mode == AutoFillOperationModeGetPasskeyAssertionQuickTypeNoUI ) { 
-        NSLog(@"🟢 Database successfully unlocked! Finding and returning Passkey with quicktype id. (No UI mode)");
+        slog(@"🟢 Database successfully unlocked! Finding and returning Passkey with quicktype id. (No UI mode)");
         [self findAndReturnQuickTypeCredential:identifier model:model];
     }
     else if ( self.mode == AutoFillOperationModeGetPasswordQuickType ) { 
-        NSLog(@"🟢 Database successfully unlocked! Getting quicktype password");
+        slog(@"🟢 Database successfully unlocked! Getting quicktype password");
         [self findAndReturnQuickTypeCredential:identifier model:model];
     }
     else { 
-        NSLog(@"🟢 Database successfully unlocked! Requesting manual selection of password.");
+        slog(@"🟢 Database successfully unlocked! Requesting manual selection of password.");
         [self promptUserToSelectCredential:model selectPasskey:NO];
     }
 }
@@ -509,18 +509,18 @@ typedef enum : NSUInteger {
     vc.model = model;
     vc.serviceIdentifiers = self.serviceIdentifiers;
     vc.completion = ^(BOOL userCancelled, Node * _Nullable node, NSString * _Nullable username, NSString * _Nullable password) {
-        NSLog(@"🟢 User Done!");
+        slog(@"🟢 User Done!");
         
         if ( userCancelled ) {
             [self exitWithUserCancelled:model.metadata];
         }
         else if ( node ) { 
             if ( self.mode == AutoFillOperationModeGetPasskeyAssertionManualOrQuickTypeWithUI ) {
-                NSLog(@"🟢 User Selected a Node and we are in passkey assertion mode...");
+                slog(@"🟢 User Selected a Node and we are in passkey assertion mode...");
                 [self completePasskeyAssertionWithNode:model node:node];
             }
             else {
-                NSLog(@"🟢 User Selected a Node and we are in password mode... %lu", (unsigned long)self.mode);
+                slog(@"🟢 User Selected a Node and we are in password mode... %lu", (unsigned long)self.mode);
                 [self exitWithCredential:model item:node];
             }
         }
@@ -541,10 +541,10 @@ typedef enum : NSUInteger {
 }
 
 - (void)createAndSaveNewPasskey:(Model *)model  API_AVAILABLE(ios(17.0)) {
-    NSLog(@"🟢 createAndSaveNewPasskey...");
+    slog(@"🟢 createAndSaveNewPasskey...");
     
     if ( !model.isKeePass2Format ) {
-        NSLog(@"🔴 Cannot create a Passkey in none KeePass2 format.");
+        slog(@"🔴 Cannot create a Passkey in none KeePass2 format.");
         NSError* error = [Utils createNSError:@"Passkeys are unsupported this database format. Passkeys are only supported by the KeePass 2 format." errorCode:-1];
         [self exitPasskeyRegistrationRequiresKeePass2:error];
         return;
@@ -560,7 +560,7 @@ typedef enum : NSUInteger {
                                        parentViewController:self
                                                       error:&error
                                                  completion:^(BOOL userCancelled, ASPasskeyRegistrationCredential * _Nullable response, NSError * _Nullable error) {
-        NSLog(@"🟢 getAutoFillRegistrationCredential - userCancelled = [%hhd], error = [%@]", userCancelled, error);
+        slog(@"🟢 getAutoFillRegistrationCredential - userCancelled = [%hhd], error = [%@]", userCancelled, error);
         
         if ( userCancelled ) {
             [self exitWithUserCancelled:model.metadata];
@@ -569,24 +569,24 @@ typedef enum : NSUInteger {
             [self exitWithErrorOccurred:model.metadata error:error];
         }
         else {
-            NSLog(@"🟢 Got PasskeyManager response for registration = [%@]", response);
+            slog(@"🟢 Got PasskeyManager response for registration = [%@]", response);
             
             if ( response ) {
                 [self exitWithPasskeyRegistrationSuccess:model.metadata regCredential:response];
             }
             else {
-                NSLog(@"🔴 Strongbox Could not complete Passkey Registration!");
+                slog(@"🔴 Strongbox Could not complete Passkey Registration!");
                 [self exitWithErrorOccurred:model.metadata error:[Utils createNSError:@"Strongbox Could not complete Passkey Registration!" errorCode:-123]];
             }
         }
     }];
     
     if ( error ) {
-        NSLog(@"🔴 Error saving new passkey [%@]", error);
+        slog(@"🔴 Error saving new passkey [%@]", error);
         [self exitWithErrorOccurred:model.metadata error:error];
     }
     else {
-        NSLog(@"🟢 Registration begun ok, will wait for completion...");
+        slog(@"🟢 Registration begun ok, will wait for completion...");
     }
 }
 
@@ -630,7 +630,7 @@ typedef enum : NSUInteger {
 
 
 - (void)showLastRunCrashedMessage:(void (^)(void))completion {
-    NSLog(@"Exit Clean = %hhd, Wrote Clean = %hhd", AppPreferences.sharedInstance.autoFillExitedCleanly, AppPreferences.sharedInstance.autoFillWroteCleanly);
+    slog(@"Exit Clean = %hhd, Wrote Clean = %hhd", AppPreferences.sharedInstance.autoFillExitedCleanly, AppPreferences.sharedInstance.autoFillWroteCleanly);
     
     NSString* title = NSLocalizedString(@"autofill_did_not_close_cleanly_title", @"AutoFill Crash Occurred");
     NSString* message = NSLocalizedString(@"autofill_did_not_close_cleanly_message", @"It looks like the last time you used AutoFill you had a crash. This is usually due to a memory limitation. Please check your database file size and your Argon2 memory settings (should be <= 64MB).");
@@ -644,7 +644,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)exitWithUserCancelled:(DatabasePreferences*)unlockedDatabase {
-    NSLog(@"EXIT: User Cancelled");
+    slog(@"EXIT: User Cancelled");
     
     [self commonExit:unlockedDatabase];
     
@@ -652,14 +652,14 @@ typedef enum : NSUInteger {
 }
 
 - (void)exitWithUserInteractionRequired {
-    NSLog(@"EXIT: User Interaction Required");
+    slog(@"EXIT: User Interaction Required");
     [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain
                                                                       code:ASExtensionErrorCodeUserInteractionRequired
                                                                   userInfo:nil]];
 }
 
 - (void)exitPasskeyRegistrationRequiresKeePass2:(NSError*)error {
-    NSLog(@"🟢 🔴 EXIT: Error Occured [%@]", error);
+    slog(@"🟢 🔴 EXIT: Error Occured [%@]", error);
     
     [Alerts info:self.vcToPresentOn
            title:NSLocalizedString(@"passkeys_unavailable_alert_title", @"Passkeys Unavailable")
@@ -674,7 +674,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)exitWithErrorOccurred:(DatabasePreferences*_Nullable)unlockedDatabase error:(NSError*)error {
-    NSLog(@"EXIT: Error Occured [%@]", error);
+    slog(@"EXIT: Error Occured [%@]", error);
     [self commonExit:unlockedDatabase];
     
     [self.extensionContext cancelRequestWithError:error];
@@ -716,14 +716,14 @@ typedef enum : NSUInteger {
     if ( totp.length && model.metadata.autoFillCopyTotp ) {
         
         if ( self.withoutUserInteraction ) { 
-            NSLog(@"🟢 TOTP Copy Required - we must be interactive... retrying in interactive mode...");
+            slog(@"🟢 TOTP Copy Required - we must be interactive... retrying in interactive mode...");
             [self exitWithUserInteractionRequired];
             return;
         }
         
-        NSLog(@"🟢 About to copy TOTP to Pasteboard...");
+        slog(@"🟢 About to copy TOTP to Pasteboard...");
         [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:totp];
-        NSLog(@"🟢 Copied TOTP to Pasteboard...");
+        slog(@"🟢 Copied TOTP to Pasteboard...");
         
         completion();
     }
@@ -733,7 +733,7 @@ typedef enum : NSUInteger {
 }
 
 - (void)exitWithCredential:(DatabasePreferences*)database user:(NSString*)user password:(NSString*)password {
-    NSLog(@"EXIT: Success");
+    slog(@"EXIT: Success");
  
     [self commonExit:database];
     
@@ -746,7 +746,7 @@ typedef enum : NSUInteger {
 
     [self.extensionContext completeRegistrationRequestWithSelectedPasskeyCredential:regCredential
                                                                   completionHandler:^(BOOL expired) {
-        NSLog(@"🟢 Completed Passkey Registration with prepareInterfaceForPasskeyRegistration. expired = [%hhd]", expired);
+        slog(@"🟢 Completed Passkey Registration with prepareInterfaceForPasskeyRegistration. expired = [%hhd]", expired);
     }];
 }
 
@@ -758,7 +758,7 @@ typedef enum : NSUInteger {
 
         [weakSelf.extensionContext completeAssertionRequestWithSelectedPasskeyCredential:credential
                                                                    completionHandler:^(BOOL expired) {
-            NSLog(@"🟢 Finished assertion request with expired = %hhd", expired);
+            slog(@"🟢 Finished assertion request with expired = %hhd", expired);
         }];
     }];
 }
@@ -766,7 +766,7 @@ typedef enum : NSUInteger {
 
 
 - (void)commonExit:(DatabasePreferences*)database {
-    NSLog(@"🟢 commonExit");
+    slog(@"🟢 commonExit");
     
     AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
 

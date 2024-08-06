@@ -40,31 +40,31 @@ class WiFiSyncInboundConnection {
     }
 
     func stateUpdateHandler(_ newState: NWConnection.State) {
-        NSLog("🐞 WiFiSyncInboundConnection::stateUpdateHandler \(String(describing: newState))")
+        swlog("🐞 WiFiSyncInboundConnection::stateUpdateHandler \(String(describing: newState))")
 
         switch newState {
         case .ready:
-            NSLog("🐞 \(connection) established")
+            swlog("🐞 \(connection) established")
             receiveSingleMessage()
         case let .failed(error):
-            NSLog("🐞 \(connection) failed with \(error)")
+            swlog("🐞 \(connection) failed with \(error)")
             connection.cancel()
             onErrorOrClosed?(self, error)
 
             if case let .tls(oSStatus) = error, oSStatus == errSSLBadRecordMac {
                 WiFiSyncInboundConnection.badConsecutivePasscodes = WiFiSyncInboundConnection.badConsecutivePasscodes + 1
 
-                NSLog("🔴 WiFiSyncInboundConnection::receiveMessage => invalid passcode detected = [%@]", String(describing: error))
+                swlog("🔴 WiFiSyncInboundConnection::receiveMessage => invalid passcode detected = [%@]", String(describing: error))
 
                 if WiFiSyncInboundConnection.badConsecutivePasscodes > 4 {
-                    NSLog("🔴 Too many invalid passcodes detected. Shutting down Wi-Fi Sync server.")
+                    swlog("🔴 Too many invalid passcodes detected. Shutting down Wi-Fi Sync server.")
                     WiFiSyncInboundConnection.badConsecutivePasscodes = 0
 
                     WiFiSyncServer.shared.stop(with: NSLocalizedString("wifi_sync_too_many_bad_passcode_attempts", comment: "Wi-Fi Sync was stopped because there were too many incorrect passcode attempts."))
                 }
             }
         case .cancelled:
-            NSLog("🐞 \(connection) cancelled")
+            swlog("🐞 \(connection) cancelled")
             onErrorOrClosed?(self, nil)
         default:
             break
@@ -78,14 +78,14 @@ class WiFiSyncInboundConnection {
             if let wiFiSyncMessage = context?.protocolMetadata(definition: WifiSyncProtocol.definition) as? NWProtocolFramer.Message {
                 onReceivedMessage(content, wiFiSyncMessage)
             } else {
-                NSLog("🔴 WiFiSyncInboundConnection::receiveMessage => Error = [%@]", String(describing: error))
+                swlog("🔴 WiFiSyncInboundConnection::receiveMessage => Error = [%@]", String(describing: error))
                 onErrorOrClosed?(self, error ?? Utils.createNSError("WiFiSyncInboundConnection::receiveMessage - Unknown Error", errorCode: -1))
             }
         }
     }
 
     func onReceivedMessage(_ content: Data?, _ message: NWProtocolFramer.Message) {
-        NSLog("🐞 onReceivedMessage \(message)")
+        swlog("🐞 onReceivedMessage \(message)")
 
         WiFiSyncInboundConnection.badConsecutivePasscodes = 0
 
@@ -97,7 +97,7 @@ class WiFiSyncInboundConnection {
         case .pushDatabaseRequest:
             handlePushDatabaseRequest(content, message)
         case .invalid, .listDatabasesResponse, .getDatabaseResponse, .pushDatabaseResponse:
-            NSLog("🐞 Received invalid message! \(message.wifiSyncMessageType)")
+            swlog("🐞 Received invalid message! \(message.wifiSyncMessageType)")
         }
     }
 
@@ -106,7 +106,7 @@ class WiFiSyncInboundConnection {
     func handleListDatabases(_ content: Data?) {
         let databaseId = content != nil ? String(data: content!, encoding: .utf8) : nil
 
-        NSLog("🟢 handleListDatabases: \(String(describing: databaseId))")
+        swlog("🟢 handleListDatabases: \(String(describing: databaseId))")
 
         let message = NWProtocolFramer.Message(wiFiSyncMessageType: .listDatabasesResponse)
 
@@ -121,7 +121,7 @@ class WiFiSyncInboundConnection {
             encoder.dateEncodingStrategy = .iso8601withFractionalSeconds
 
             guard let encodedData = try? encoder.encode(summaries) else {
-                NSLog("🔴 WiFiSyncInboundConnection::handleListDatabases => could not encode to JSON")
+                swlog("🔴 WiFiSyncInboundConnection::handleListDatabases => could not encode to JSON")
                 connection.forceCancel()
                 return
             }
@@ -129,7 +129,7 @@ class WiFiSyncInboundConnection {
             connection.send(content: encodedData, contentContext: context, isComplete: true,
                             completion: .contentProcessed { error in
                                 if let error {
-                                    NSLog("🔴 WiFiSyncInboundConnection::handleListDatabases - Send Completed: \(String(describing: error)) - encoded data length: \(encodedData.count)")
+                                    swlog("🔴 WiFiSyncInboundConnection::handleListDatabases - Send Completed: \(String(describing: error)) - encoded data length: \(encodedData.count)")
                                 } else {
                                     
                                 }
@@ -142,12 +142,12 @@ class WiFiSyncInboundConnection {
 
     func handleGetDatabaseRequest(_ content: Data?, _: NWProtocolFramer.Message) {
         guard let data = content, let databaseId = String(data: data, encoding: .utf8) else {
-            NSLog("🔴 Could not read handleGetDatabaseRequest")
+            swlog("🔴 Could not read handleGetDatabaseRequest")
             connection.forceCancel()
             return
         }
 
-        NSLog("🟢 handleGetDatabaseRequest: \(String(describing: databaseId))")
+        swlog("🟢 handleGetDatabaseRequest: \(String(describing: databaseId))")
 
         managementInterface.pullDatabase(id: databaseId) { [weak self] modAndEncryptedData in
             guard let self else { return }
@@ -158,7 +158,7 @@ class WiFiSyncInboundConnection {
 
     func handlePullDatabaseResponse(_ databaseId: String, _ modAndEncryptedData: (Date, Data)?) {
         guard let modAndEncryptedData else {
-            NSLog("🔴 Could not getLocalWorkingCache or read it, or the mod date")
+            swlog("🔴 Could not getLocalWorkingCache or read it, or the mod date")
             connection.forceCancel()
             return
         }
@@ -167,7 +167,7 @@ class WiFiSyncInboundConnection {
         let enc = modAndEncryptedData.1
 
         guard var combined = mod.iso8601withFractionalSeconds.data(using: .utf8) else {
-            NSLog("🔴 Could not convert moddate to data")
+            swlog("🔴 Could not convert moddate to data")
             connection.forceCancel()
             return
         }
@@ -182,7 +182,7 @@ class WiFiSyncInboundConnection {
         connection.send(content: combined, contentContext: context, isComplete: true,
                         completion: .contentProcessed { error in
                             if let error {
-                                NSLog("🔴 WiFiSyncInboundConnection::handleGetDatabaseRequest - Send Completed: \(String(describing: error)) - encoded data length: \(combined.count)")
+                                swlog("🔴 WiFiSyncInboundConnection::handleGetDatabaseRequest - Send Completed: \(String(describing: error)) - encoded data length: \(combined.count)")
                             } else {
 
                             }
@@ -191,7 +191,7 @@ class WiFiSyncInboundConnection {
                             
                         })
 
-        NSLog("🟢 handleGetDatabaseRequest done: \(String(describing: databaseId))")
+        swlog("🟢 handleGetDatabaseRequest done: \(String(describing: databaseId))")
     }
 
     func handlePushDatabaseRequest(_ content: Data?, _: NWProtocolFramer.Message) {
@@ -200,19 +200,19 @@ class WiFiSyncInboundConnection {
         guard let allData = content,
               let databaseId = String(data: allData.prefix(uuidStringLength), encoding: .utf8)
         else {
-            NSLog("🔴 handlePushDatabaseRequest - Could not read content or get databaseId/database")
+            swlog("🔴 handlePushDatabaseRequest - Could not read content or get databaseId/database")
             sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false, newModDate: nil, error: "Could not read content or get databaseId/database"))
             return
         }
 
-        NSLog("🟢 handlePushDatabaseRequest: \(String(describing: databaseId))")
+        swlog("🟢 handlePushDatabaseRequest: \(String(describing: databaseId))")
 
         if managementInterface.isEditsAreInProgress(id: databaseId) {
-            NSLog("🔴 Edits are in progress, push is not possible. Save changes on remote WiFi Server before pushing.")
+            swlog("🔴 Edits are in progress, push is not possible. Save changes on remote WiFi Server before pushing.")
             sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false, newModDate: nil,
                                                                 error: NSLocalizedString("wifi_sync_edits_in_progress_try_again", comment: "Edits are in progress, so updating is not currently possible. Finish edits on destination Wi-Fi device and try again.")))
         } else if managementInterface.isEditsAreInProgress(id: databaseId) {
-            NSLog("🔴 A sync is in progress so updating is not currently possible. Allow Sync to finish on destination Wi-Fi device and try again.")
+            swlog("🔴 A sync is in progress so updating is not currently possible. Allow Sync to finish on destination Wi-Fi device and try again.")
 
             sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false,
                                                                 newModDate: nil,
@@ -227,7 +227,7 @@ class WiFiSyncInboundConnection {
                     sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: success, newModDate: mod, error: error))
                 }
             } catch {
-                NSLog("🔴 handlePushDatabaseRequest - Error Updating Local: [%@]", String(describing: error))
+                swlog("🔴 handlePushDatabaseRequest - Error Updating Local: [%@]", String(describing: error))
                 sendPushDatabaseResponse(WiFiSyncPushDatabaseResult(success: false, newModDate: nil, error: String(describing: error)))
             }
         }
@@ -240,7 +240,7 @@ class WiFiSyncInboundConnection {
         encoder.dateEncodingStrategy = .iso8601withFractionalSeconds
 
         guard let encodedData = try? encoder.encode(pushResult) else {
-            NSLog("🔴 Could not encode to JSON")
+            swlog("🔴 Could not encode to JSON")
             connection.forceCancel()
             return
         }
@@ -254,7 +254,7 @@ class WiFiSyncInboundConnection {
                         isComplete: true,
                         completion: .contentProcessed { error in
                             if let error {
-                                NSLog("🔴 WiFiSyncInboundConnection::sendPushDatabaseResponse - Send Completed: \(String(describing: error)) - encoded data length: \(encodedData.count)")
+                                swlog("🔴 WiFiSyncInboundConnection::sendPushDatabaseResponse - Send Completed: \(String(describing: error)) - encoded data length: \(encodedData.count)")
                             } else {
 
                             }

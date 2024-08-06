@@ -332,7 +332,7 @@ rotateLastImage:(BOOL)rotateLastImage
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     
     if (error) {
-        NSLog(@"Could not get local working cache at [%@]-[%@]", url, error);
+        slog(@"Could not get local working cache at [%@]-[%@]", url, error);
         return @"";
     }
 
@@ -346,7 +346,7 @@ rotateLastImage:(BOOL)rotateLastImage
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     
     if (error) {
-        NSLog(@"Could not get local working cache at [%@]-[%@]", url, error);
+        slog(@"Could not get local working cache at [%@]-[%@]", url, error);
         return @"";
     }
 

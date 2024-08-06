@@ -212,6 +212,9 @@ initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
 
 @property BOOL isSharedInCloudKit; 
 @property BOOL isOwnedByMeCloudKit; 
+@property BOOL hasInitializedHomeTab;
+
+@property NSArray<NSNumber*>* visibleHomeSections;
 
 @end
 

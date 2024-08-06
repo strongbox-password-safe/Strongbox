@@ -41,6 +41,10 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
     @IBOutlet var horizontalLine: NSBox!
 
     @IBAction func onStrongboxButton(_: Any) {
+        showStrongbox()
+    }
+
+    func showStrongbox() {
         Task {
             view.window?.close()
             try await model.showAndActivateStrongbox()
@@ -162,7 +166,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
                 return $0
             }
         } else {
-            NSLog("🔴 Try to install event monitor twice?")
+            swlog("🔴 Try to install event monitor twice?")
         }
     }
 
@@ -170,7 +174,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
         if let eventMonitor {
             NSEvent.removeMonitor(eventMonitor)
         } else {
-            NSLog("🔴 Try to remove none existing event monitor?")
+            swlog("🔴 Try to remove none existing event monitor?")
         }
         eventMonitor = nil
     }
@@ -317,9 +321,11 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
         if let selectedResult {
             if viewMode == .results {
                 if case .entry = selectedResult.type {
-                    let rootView2 = KeyboardShortcutView(shortcut: "→", title: NSLocalizedString("view_actions", comment: "View Actions"))
-                    let fun2 = NSHostingView(rootView: rootView2)
-                    stackViewHints.addArrangedSubview(fun2)
+                    if let range = searchField.currentEditor()?.selectedRange, range.length == 0, range.location == searchField.stringValue.count {
+                        let rootView2 = KeyboardShortcutView(shortcut: "→", title: NSLocalizedString("view_actions", comment: "View Actions"))
+                        let fun2 = NSHostingView(rootView: rootView2)
+                        stackViewHints.addArrangedSubview(fun2)
+                    }
                 } else if case .database = selectedResult.type {
                     let rootView2 = KeyboardShortcutView(shortcut: "↩", title: NSLocalizedString("casg_unlock_action", comment: "Unlock"))
                     let fun2 = NSHostingView(rootView: rootView2)
@@ -332,11 +338,9 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
             }
         }
 
-        if let shortcut = model.showStrongboxShortcut {
-            let rootView1 = KeyboardShortcutView(shortcut: shortcut, title: NSLocalizedString("system_tray_menu_item_show", comment: "Show Strongbox"))
-            let fun1 = NSHostingView(rootView: rootView1)
-            stackViewHints.addArrangedSubview(fun1)
-        }
+        let showStrongbox = KeyboardShortcutView(shortcut: model.showStrongboxShortcut ?? "⌘S", title: NSLocalizedString("system_tray_menu_item_show", comment: "Show Strongbox"))
+        let showStrongboxView = NSHostingView(rootView: showStrongbox)
+        stackViewHints.addArrangedSubview(showStrongboxView)
     }
 
     var selectedResult: SearchResult? {
@@ -352,18 +356,61 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
     }
 
     func onKeyboardMonitorKeyDown(with event: NSEvent) -> Bool {
+        defer {
+            DispatchQueue.main.async { [weak self] in 
+                self?.refreshBottomKeyboardHints() 
+            }
+        }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        if let presentedViewControllers, !presentedViewControllers.isEmpty {
+            
+            return false
+        }
 
         if event.modifierFlags.contains(.command) {
             if let chars = event.charactersIgnoringModifiers {
                 if chars == "f" {
                     focusSearchField()
                     return true
-                } else if chars == "w" || chars == "q" { 
+                } else if chars == "w" || chars == "q" || chars == "a" { 
+                    return false
+                } else if event.specialKey == .leftArrow || event.specialKey == .rightArrow { 
                     return false
                 } else if chars == "/" {
                     performSegue(withIdentifier: "segueToKeyboardShortcuts", sender: nil)
                     return true
+                } else if chars == "s" {
+                    showStrongbox()
                 } else if let result = selectedResult {
                     if viewMode == .actions {
                         let action = selectedActions.first { action in
@@ -399,7 +446,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
             }
 
             return true 
-        } else {
+        } else if event.modifierFlags.contains(.numericPad) || event.modifierFlags.isEmpty { 
             if event.specialKey == .downArrow {
                 if viewMode == .results {
                     onDownArrowInResults()
@@ -422,11 +469,14 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
                     return true 
                 }
             } else if event.specialKey == .rightArrow {
-                if viewMode == .results {
+                
+                if let range = searchField.currentEditor()?.selectedRange, range.length == 0, range.location == searchField.stringValue.count, viewMode == .results {
                     onRightArrowInResults()
-                    return true 
+                    return true
                 }
-            } else if event.specialKey == .enter || event.keyCode == kVK_Return {
+            }
+        } else {
+            if event.specialKey == .enter || event.keyCode == kVK_Return {
                 if viewMode == .results {
                     onEnterInResults()
                 } else {
@@ -571,7 +621,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
         {
             performAction(result: result, actionType: action.actionType)
         } else {
-            NSLog("🔴 Couldn't get action!")
+            swlog("🔴 Couldn't get action!")
         }
     }
 
@@ -619,7 +669,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
                     break
                 }
             } catch {
-                NSLog("🔴 Could not perform action! \(error)")
+                swlog("🔴 Could not perform action! \(error)")
                 NSSound.beep()
             }
         }
@@ -670,7 +720,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
             let defaultColor = NSColor(deviceRed: 0.23, green: 0.5, blue: 0.82, alpha: 0.6)
 
             guard let hud = MBProgressHUD.showAdded(to: view, animated: true) else {
-                NSLog("🔴 Couldn't create Toast!")
+                swlog("🔴 Couldn't create Toast!")
                 return
             }
 
@@ -719,7 +769,7 @@ extension QuickSearchPaletteViewController: NSTableViewDelegate {
                     return getResultsHeaderCell(result: result)
                 }
             } else {
-                NSLog("🔴 row not present in results! \(row)")
+                swlog("🔴 row not present in results! \(row)")
                 return nil
             }
         } else {
@@ -763,7 +813,7 @@ extension QuickSearchPaletteViewController: NSTableViewDelegate {
             if let result = selectedResult {
                 return getEntryView(tableViewActions, result: result)
             } else {
-                NSLog("🔴 main row not present in actions! \(row)")
+                swlog("🔴 main row not present in actions! \(row)")
                 return nil
             }
         } else if row == 1 {
@@ -776,7 +826,7 @@ extension QuickSearchPaletteViewController: NSTableViewDelegate {
             return cell
         } else {
             guard let action = selectedResult?.actions[safe: row - 2] else {
-                NSLog("🔴 Couldn't find action at row \(row)")
+                swlog("🔴 Couldn't find action at row \(row)")
                 return view
             }
 

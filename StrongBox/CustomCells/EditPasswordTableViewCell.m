@@ -241,7 +241,7 @@
             self.isInShouldChangeMethod = NO;
         }
         else {
-            NSLog(@"WARNWARN - Recurse in shouldChangeTextInRange");
+            slog(@"WARNWARN - Recurse in shouldChangeTextInRange");
         }
         
         

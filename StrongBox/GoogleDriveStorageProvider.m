@@ -297,7 +297,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                }
            }
            else {
-       NSLog(@"An error occurred downloading icon: %@", error);
+       slog(@"An error occurred downloading icon: %@", error);
            }
        }];
     }
@@ -334,7 +334,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                                                      error:&error];
     
     if ( !data ) {
-        NSLog(@"🔴 Error creating JSON to Google Drive database: [%@]", error);
+        slog(@"🔴 Error creating JSON to Google Drive database: [%@]", error);
         return nil;
     }
 

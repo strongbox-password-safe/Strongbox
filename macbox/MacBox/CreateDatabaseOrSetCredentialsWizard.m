@@ -681,7 +681,7 @@
         NSData* data = [BookmarksHelper dataWithContentsOfBookmark:self.selectedKeyFileBookmark error:&error];
         
         if(!data) {
-            NSLog(@"Could not read key file. Error: %@", error);
+            slog(@"Could not read key file. Error: %@", error);
             
             NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
             [MacAlerts error:loc error:error window:self.window];
@@ -716,7 +716,7 @@
                                                                        error:&err];
 
     if ( err ) {
-        NSLog(@"🔴 Could not get CKFs! [%@]", err);
+        slog(@"🔴 Could not get CKFs! [%@]", err);
         if ( error ) {
             *error = err;
         }

@@ -81,16 +81,16 @@
             completion(best);
         }];
 #else
-        NSLog(@"WARNWARN: attempt to use FavIcon library when compiled out.");
+        slog(@"WARNWARN: attempt to use FavIcon library when compiled out.");
         completion(nil);
 #endif
         
         if (error) {
-            NSLog(@"Error: [%@]", error);
+            slog(@"Error: [%@]", error);
             completion(nil);
         }
     } @catch (NSException *exception) {
-        NSLog(@"Exception in downloadAll: [%@]", exception);
+        slog(@"Exception in downloadAll: [%@]", exception);
         completion(nil);
     } @finally { }
 }
@@ -118,16 +118,16 @@
             completion(icons);
         }];
 #else
-        NSLog(@"WARNWARN: attempt to use FavIcon library when compiled out.");
+        slog(@"WARNWARN: attempt to use FavIcon library when compiled out.");
         completion(@[]);
 #endif
         
         if (error) {
-            NSLog(@"Error: [%@]", error);
+            slog(@"Error: [%@]", error);
             completion(@[]);
         }
     } @catch (NSException *exception) {
-        NSLog(@"Exception in downloadAll: [%@]", exception);
+        slog(@"Exception in downloadAll: [%@]", exception);
         completion(@[]);
     } @finally {    }
 }
@@ -165,15 +165,15 @@
     }];
     
 #ifdef DEBUG
-    NSLog(@"=============== 🟢 Sorted ================= ");
+    slog(@"=============== 🟢 Sorted ================= ");
     for (NodeIcon* icon in sorted) {
         int fileSizeScore = abs( (int) (icon.estimatedStorageBytes - options.idealSize )) / 1024;
         int dimensionScore = abs( (int) (icon.customIconWidth - options.idealDimension));
         double cartesian = sqrt(pow(dimensionScore, 2) + pow(fileSizeScore, 2));
         
-        NSLog(@"%dx%d - %@ - (fileSizeScore=%d, dimensionScore=%d, score=%f )", (int)icon.customIconWidth, (int)icon.customIconHeight, friendlyFileSizeString(icon.estimatedStorageBytes), fileSizeScore, dimensionScore, cartesian);
+        slog(@"%dx%d - %@ - (fileSizeScore=%d, dimensionScore=%d, score=%f )", (int)icon.customIconWidth, (int)icon.customIconHeight, friendlyFileSizeString(icon.estimatedStorageBytes), fileSizeScore, dimensionScore, cartesian);
     }
-    NSLog(@"=========================================== ");
+    slog(@"=========================================== ");
 #endif
     
     return sorted;

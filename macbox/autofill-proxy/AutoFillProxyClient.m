@@ -18,6 +18,7 @@
 #include <errno.h>
 
 #import "NSString+Extensions.h"
+#import "SBLog.h"
 
 static const int kMaxResponseLength = 1024*1024; 
 
@@ -42,17 +43,17 @@ int main(int argc, const char * argv[]) {
     signal(SIGHUP, sigHandler);
 
     @autoreleasepool {
-        NSLog(@"✅ Strongbox AutoFill Proxy is Alive...");
+        slog(@"✅ Strongbox AutoFill Proxy is Alive...");
 
         for ( int i=0;i<argc;i++) {
-            NSLog(@"ARG %d: [%s]", i, argv[i]);
+            slog(@"ARG %d: [%s]", i, argv[i]);
         }
 
         
         
         decodeBrowserExtensionMessage();
 
-        NSLog(@"✅ Strongbox AutoFill Proxy is Exiting...");
+        slog(@"✅ Strongbox AutoFill Proxy is Exiting...");
     }
 }
 
@@ -63,7 +64,7 @@ void decodeBrowserExtensionMessage(void) {
     NSData * rawReqLen = [stdIn readDataUpToLength:4 error:&stdinError];
     
     if(rawReqLen == nil || stdinError != nil) {
-        NSLog(@"🔴 Could not read STDIN length: [%@]", stdinError);
+        slog(@"🔴 Could not read STDIN length: [%@]", stdinError);
         exit(1);
     }
     
@@ -74,12 +75,12 @@ void decodeBrowserExtensionMessage(void) {
     NSData * req = [stdIn readDataUpToLength:reqLen error:&stdinError];
     
     if(req == nil || stdinError != nil) {
-        NSLog(@"🔴 Could not read STDIN: [%@]", stdinError);
+        slog(@"🔴 Could not read STDIN: [%@]", stdinError);
         exit(1);
     }
     
     if ( req.length == 0 ) {
-        NSLog(@"⚠️ Zero Length STDIN Notify?");
+        slog(@"⚠️ Zero Length STDIN Notify?");
         return;
     }
     
@@ -110,12 +111,12 @@ void onGotBrowserExtensionMessage(NSData* data) {
     }
     
     NSUInteger len = message.length;
-    NSLog(@"Got Response from main Strongbox APP of length [%lu]:\n%@\n", len, message);
+    slog(@"Got Response from main Strongbox APP of length [%lu]:\n%@\n", len, message);
     
     
     
     if ( [message containsString:@"🔴"] || [message containsString:@"✅"] || [message containsString:@"⚠️"] ) {
-        NSLog(@"🔴 Response contains an emoji which will crash Chrome! Not sending.");
+        slog(@"🔴 Response contains an emoji which will crash Chrome! Not sending.");
         message = jsonErrorMessage(@"🔴 Response contains an emoji which will crash Chrome! Not sending.");
         len = message.length;
     }
@@ -123,7 +124,7 @@ void onGotBrowserExtensionMessage(NSData* data) {
     
     
     if ( len > kMaxResponseLength ) {
-        NSLog(@"🔴 Response length is greater than NativeMessaging limit of 1MB. Cannot respond.");
+        slog(@"🔴 Response length is greater than NativeMessaging limit of 1MB. Cannot respond.");
         message = jsonErrorMessage(@"Response length is greater than NativeMessaging limit of 1MB. Cannot respond.");
         len = message.length;
     }
@@ -154,7 +155,7 @@ BOOL launchStrongbox(NSString* _Nullable initiateUnlockDatabaseUuid, NSError** e
     
     NSString* pathToStrongbox =  NSBundle.mainBundle.bundlePath  ; 
 
-    NSLog(@"✅ Launch Strongbox at: [%@]", pathToStrongbox);
+    slog(@"✅ Launch Strongbox at: [%@]", pathToStrongbox);
 
     
     if ( pathToStrongbox.length ) {
@@ -188,7 +189,7 @@ BOOL launchStrongbox(NSString* _Nullable initiateUnlockDatabaseUuid, NSError** e
         
         dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
         
-        NSLog(@"✅ Launch Done! ret = [%hhd]", ret);
+        slog(@"✅ Launch Done! ret = [%hhd]", ret);
         
         return ret;
     }
@@ -214,7 +215,7 @@ NSString* jsonMessage(BOOL success, NSString* message) {
     NSError* error;
     NSData* data = [NSJSONSerialization dataWithJSONObject:dict options:kNilOptions error:&error];
     if ( !data || error ) {
-        NSLog(@"Could not create JSON for message: [%@] - error = [%@]", message, error);
+        slog(@"Could not create JSON for message: [%@] - error = [%@]", message, error);
         return @"{ \"error\" : \"unknown\" }";
     }
     

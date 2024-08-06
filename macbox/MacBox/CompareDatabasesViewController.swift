@@ -325,7 +325,7 @@ class CompareDatabasesViewController: NSViewController {
     }
 
     func getIconForNode(_ node: Node) -> IMAGE_TYPE_PTR {
-        NodeIconHelper.getIconFor(node, predefinedIconSet: firstModel.metadata.iconSet, format: firstModel.originalFormat, large: false)
+        NodeIconHelper.getIconFor(node, predefinedIconSet: firstModel.metadata.keePassIconSet, format: firstModel.originalFormat, large: false)
     }
 
     func showDrillDownForDiffPair(pair: MMcGPair<Node, Node>?, popoverView: NSView) {
@@ -356,7 +356,7 @@ class CompareDatabasesViewController: NSViewController {
                              option2: NSLocalizedString("compare_merge_merge_or_synchronize_option_synchronize", comment: "Synchronize (Update Both)"),
                              window: view.window)
         { [weak self] response in
-            NSLog("%d", response)
+            swlog("%d", response)
 
             self?.dismiss(nil)
 

@@ -11,7 +11,7 @@
 @implementation ClickableTextField
 
 - (void)mouseDown:(NSEvent *)event {
-//    NSLog(@"mouseDown");
+//    slog(@"mouseDown");
     // Must be overridden for mouseUp below to function
 }
 

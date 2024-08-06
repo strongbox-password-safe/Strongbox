@@ -13,7 +13,7 @@ class WifiAddressHelper: NSObject {
         
         var ifaddr: UnsafeMutablePointer<ifaddrs>?
         guard getifaddrs(&ifaddr) == 0, let firstAddr = ifaddr else {
-            NSLog("🔴 Could not getifaddrs or firstAddr")
+            swlog("🔴 Could not getifaddrs or firstAddr")
             return [:]
         }
 

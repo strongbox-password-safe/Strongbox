@@ -91,6 +91,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nonnull) MutableOrderedDictionary<NSString*, StringValue*> *customFields;
 @property (readonly, nonatomic, strong, nonnull) MutableOrderedDictionary<NSString*, StringValue*> *customFieldsNoEmail;
+@property (readonly, nonatomic, strong, nonnull) MutableOrderedDictionary<NSString *,StringValue *> *customFieldsFiltered;
 
 - (void)removeAllCustomFields;
 - (void)removeCustomField:(NSString*)key;
@@ -115,9 +116,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes; 
 
 + (OTPToken*_Nullable)getOtpTokenFromString:(NSString *)string
+                                 forceSteam:(BOOL)forceSteam;
+
++ (OTPToken*_Nullable)getOtpTokenFromString:(NSString *)string
                                  forceSteam:(BOOL)forceSteam
-                                     issuer:(NSString*)issuer
-                                   username:(NSString*)username;
+                                     issuer:(NSString*_Nullable)issuer
+                                   username:(NSString*_Nullable)username;
 
 - (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes addLegacyFields:(BOOL)addLegacyFields addOtpAuthUrl:(BOOL)addOtpAuthUrl;
 

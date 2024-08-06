@@ -93,9 +93,9 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 - (BOOL)reloadIfChangedByOtherComponent {
     if ( self.lastChangeByOtherComponent ) {
 #ifndef IS_APP_EXTENSION
-        NSLog(@"🟢 reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by AutoFill Extension...");
+        slog(@"🟢 reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by AutoFill Extension...");
 #else
-        NSLog(@"🟢 reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by main Strongbox App...");
+        slog(@"🟢 reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by main Strongbox App...");
 #endif
         [self clearChangedDatabaseSettings];
         
@@ -107,7 +107,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
             return YES;
         }
         else {
-            NSLog(@"🔴 reloadIfChangedByOtherComponent => Error deserializing: [%@]", error);
+            slog(@"🔴 reloadIfChangedByOtherComponent => Error deserializing: [%@]", error);
             return NO;
         }
     }
@@ -143,7 +143,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     
     if (!json || coorderror || readError) {
         if ( readError.code != NSFileReadNoSuchFileError ) {
-            NSLog(@"🔴 Error reading file for databases: [%@] - [%@]", coorderror, readError);
+            slog(@"🔴 Error reading file for databases: [%@] - [%@]", coorderror, readError);
             AppPreferences.sharedInstance.databasesSerializationError = [NSString stringWithFormat:@"Read Error: [%@]", *error];
             
             
@@ -162,7 +162,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&coorderror];
     
     if (coorderror) {
-        NSLog(@"Error getting json dictionaries for databases: [%@]", coorderror);
+        slog(@"Error getting json dictionaries for databases: [%@]", coorderror);
         *error = coorderror;
         AppPreferences.sharedInstance.databasesSerializationError = [NSString stringWithFormat:@"JSON Error: [%@]", *error];
         
@@ -193,7 +193,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     
     
     if ( self.lastChangeByOtherComponent ) {
-        NSLog(@"🔴 🔴 🔴 🔴 WARNWARN - Serialize called but changed by other component flag set! 🔴 🔴 🔴 🔴 ");
+        slog(@"🔴 🔴 🔴 🔴 WARNWARN - Serialize called but changed by other component flag set! 🔴 🔴 🔴 🔴 ");
     }
     
     NSMutableArray<NSDictionary*>* jsonDatabases = NSMutableArray.array;
@@ -210,7 +210,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonDatabases options:options error:&error];
     
     if (error) {
-        NSLog(@"Error getting json for databases: [%@]", error);
+        slog(@"Error getting json for databases: [%@]", error);
         return;
     }
     
@@ -227,7 +227,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     }];
     
     if (!success || error || writeError) {
-        NSLog(@"Error writing Databases file: [%@]-[%@]", error, writeError);
+        slog(@"Error writing Databases file: [%@]-[%@]", error, writeError);
         return;
     }
     
@@ -268,7 +268,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
             }
         }
         else {
-            NSLog(@"🔴 WARN: Attempt to update a safe not found in list... [%@]", uuid);
+            slog(@"🔴 WARN: Attempt to update a safe not found in list... [%@]", uuid);
         }
     });
 }
@@ -354,7 +354,7 @@ initialCacheModDate:(NSDate *)initialCacheModDate
             addedDatabase = [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate error:&blockError];
         }
         else {
-            NSLog(@"🔴 Found duplicate... Not Adding - [%@]", dupe.uuid);
+            slog(@"🔴 Found duplicate... Not Adding - [%@]", dupe.uuid);
             duplicateResult = dupe.uuid;
         }
     });
@@ -405,7 +405,7 @@ initialCacheModDate:(NSDate *)initialCacheModDate
         NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe.uuid error:&setWorkingCacheError];
         
         if ( !url ) {
-            NSLog(@"🔴 ERROR: Error adding database - setWorkingCacheWithData: [%@]", setWorkingCacheError);
+            slog(@"🔴 ERROR: Error adding database - setWorkingCacheWithData: [%@]", setWorkingCacheError);
             
             if ( error ) {
                 *error = setWorkingCacheError ? setWorkingCacheError : [Utils createNSError:@"Unknown Error Adding Database!" errorCode:-1];
@@ -417,7 +417,7 @@ initialCacheModDate:(NSDate *)initialCacheModDate
         safe.lastSyncRemoteModDate = initialCacheModDate; 
     }
     
-    NSLog(@"✅ Added Database [%@]", safe.uuid);
+    slog(@"✅ Added Database [%@]", safe.uuid);
     [self.databasesList addObject:safe];
     [self serialize:YES];
     
@@ -435,7 +435,7 @@ initialCacheModDate:(NSDate *)initialCacheModDate
             [self serialize:YES];
         }
         else {
-            NSLog(@"WARN: Attempt to remove a safe not found in list... [%@]", uuid);
+            slog(@"WARN: Attempt to remove a safe not found in list... [%@]", uuid);
         }
     });
 }

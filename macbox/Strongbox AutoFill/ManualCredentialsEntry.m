@@ -116,7 +116,7 @@
     NSString* databaseUuid = notification.object;
     
     if ( [databaseUuid isEqualToString:self.databaseUuid] ) {
-        NSLog(@"✅ ManualCredentialsEntry::onDatabaseLockStatusChanged: [%@]", notification);
+        slog(@"✅ ManualCredentialsEntry::onDatabaseLockStatusChanged: [%@]", notification);
         
         [self onCancel:nil];
     }
@@ -284,7 +284,7 @@
                                                       error:&error];
 
         if(!configuredUrl) {
-            NSLog(@"getUrlFromBookmark: [%@]", error);
+            slog(@"getUrlFromBookmark: [%@]", error);
         }
         else {
            
@@ -354,7 +354,7 @@
 
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSModalResponseOK) {
-            NSLog(@"Open Key File: %@", openPanel.URL);
+            slog(@"Open Key File: %@", openPanel.URL);
 
             NSError* error;
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];

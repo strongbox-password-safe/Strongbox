@@ -46,7 +46,7 @@
 - (instancetype)initWithData:(NSData *)data {
     if (self = [self init]) {
         if (data.length < SIZE_OF_HEADER) {
-            NSLog(@"Invalid data for pwhist. Needs to be minimum 5 bytes for header. %@", data);
+            slog(@"Invalid data for pwhist. Needs to be minimum 5 bytes for header. %@", data);
             return nil;
         }
 
@@ -64,7 +64,7 @@
 
         for (int i = 0; i < numberOfEntries; i++) {
             if (data.length < (currentEntryStartOffset + SIZE_OF_ENTRY_HEADER)) {
-                NSLog(@"Invalid size for pwhist. %@", data);
+                slog(@"Invalid size for pwhist. %@", data);
                 return nil;
             }
 
@@ -77,7 +77,7 @@
 
             NSUInteger passwordLength = [self getIntegerFromHexCharArray:entryHeader.passwordLength length:4];
             if (data.length < (currentEntryStartOffset + SIZE_OF_ENTRY_HEADER + passwordLength)) {
-                NSLog(@"Invalid current size for pwhist. %@", data);
+                slog(@"Invalid current size for pwhist. %@", data);
                 return nil;
             }
 

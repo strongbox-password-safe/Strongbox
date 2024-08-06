@@ -44,7 +44,7 @@ class PasswordGenerator: NSWindowController {
         setupToolbar()
 
         guard let window else {
-            NSLog("🔴 Couldn't get window in WindowDidLoad?!")
+            swlog("🔴 Couldn't get window in WindowDidLoad?!")
             return
         }
 
@@ -70,7 +70,7 @@ class PasswordGenerator: NSWindowController {
         guard let floatOnTopItem = window?.toolbar?.items.first(where: { item in
             item.itemIdentifier == ToolbarItemIdentifiers.floatOnTop
         }) else {
-            NSLog("🔴 Couldn't find the floatOnTop toolbar item")
+            swlog("🔴 Couldn't find the floatOnTop toolbar item")
             return
         }
 
@@ -115,7 +115,7 @@ extension PasswordGenerator: NSToolbarDelegate {
         toolbar.displayMode = .iconOnly
 
         guard let window else {
-            NSLog("🔴 Window not ready")
+            swlog("🔴 Window not ready")
             return
         }
 

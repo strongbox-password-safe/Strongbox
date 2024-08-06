@@ -72,7 +72,7 @@ class TipJarLogic: NSObject {
                     return tip.rawValue
                 }
             } else {
-                NSLog("🔴 Tips not available on macOS standalone bundles!!")
+                swlog("🔴 Tips not available on macOS standalone bundles!!")
                 return tip.rawValue
             }
         #endif
@@ -80,7 +80,7 @@ class TipJarLogic: NSObject {
 
     private func loadTips() {
         guard StrongboxProductBundle.supportsTipJar else {
-            NSLog("🔴 Tips not available in this bundle! Don't call this from this bundle!")
+            swlog("🔴 Tips not available in this bundle! Don't call this from this bundle!")
             errorLoading = true
             return
         }
@@ -93,11 +93,11 @@ class TipJarLogic: NSObject {
             guard let self else { return }
 
             if invalidProducts != nil, !invalidProducts!.isEmpty {
-                NSLog("Got Invalid Tips = [%@]", invalidProducts ?? "nil")
+                swlog("Got Invalid Tips = [%@]", invalidProducts ?? "nil")
             }
 
             guard let ps = products else {
-                NSLog("🔴 WARNWARN: Nil Tip Products Returned from App Store")
+                swlog("🔴 WARNWARN: Nil Tip Products Returned from App Store")
                 self.errorLoading = true
                 return
             }
@@ -124,7 +124,7 @@ class TipJarLogic: NSObject {
 
             let err = error as NSError?
             if err != nil {
-                NSLog("🔴 WARNWARN: Error getting Tips Products: [%@]", err!)
+                swlog("🔴 WARNWARN: Error getting Tips Products: [%@]", err!)
             }
 
             
@@ -160,20 +160,20 @@ class TipJarLogic: NSObject {
         }
 
         RMStore.default().addPayment(getProductId(tip)) { transaction in
-            NSLog("Product purchased: [%@]", transaction!)
+            swlog("Product purchased: [%@]", transaction!)
             completion(nil)
         } failure: { transaction, error in
-            NSLog("Something went wrong: [%@] error = [%@]", transaction ?? "nil", error?.localizedDescription ?? "nil")
+            swlog("Something went wrong: [%@] error = [%@]", transaction ?? "nil", error?.localizedDescription ?? "nil")
             completion(error)
         }
     }
 
     func restorePrevious(completion: @escaping (_ error: Error?) -> Void) {
         RMStore.default().restoreTransactions { _ in
-            NSLog("Transactions Restoreed!")
+            swlog("Transactions Restoreed!")
             completion(nil)
         } failure: { error in
-            NSLog("Something went wrong: error = [%@]", error?.localizedDescription ?? "nil")
+            swlog("Something went wrong: error = [%@]", error?.localizedDescription ?? "nil")
             completion(error)
         }
     }

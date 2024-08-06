@@ -22,7 +22,7 @@
     }
     
     if ( StrongboxProductBundle.isZeroEdition ) {
-        NSLog(@"Graphene Edition... customizing...");
+        slog(@"Graphene Edition... customizing...");
         
         Settings.sharedInstance.disableWiFiSyncClientMode = YES;
         Settings.sharedInstance.disableNetworkBasedFeatures = YES;

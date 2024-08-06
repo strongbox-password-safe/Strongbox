@@ -67,7 +67,7 @@
     
     NSString* path = getSocketPath(NO);
     if ( !path ) {
-        NSLog(@"🔴 Path too long for getSocketPath - Check users home dir");
+        slog(@"🔴 Path too long for getSocketPath - Check users home dir");
         return NO;
     }
 
@@ -78,23 +78,23 @@
     
     if (unlink(sun.sun_path) == -1) {
         if ( errno != ENOENT ) {
-            NSLog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
+            slog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
         }
     }
 
     self.server_sock = socket (AF_UNIX, SOCK_STREAM, 0);
     if ( self.server_sock == -1 ) {
-        NSLog(@"🔴 Error creating socket: %s\n", strerror(errno));
+        slog(@"🔴 Error creating socket: %s\n", strerror(errno));
         return NO;
     }
     
     const int kBufferSize = 2 * 1024 * 1024; 
     if (setsockopt(self.server_sock, SOL_SOCKET, SO_RCVBUF, &kBufferSize, sizeof(int)) == -1) {
-        NSLog(@"🔴 Error setting socket SO_RCVBUF opts: %s\n", strerror(errno));
+        slog(@"🔴 Error setting socket SO_RCVBUF opts: %s\n", strerror(errno));
         return NO;
     }
     if (setsockopt(self.server_sock, SOL_SOCKET, SO_SNDBUF, &kBufferSize, sizeof(int)) == -1) {
-        NSLog(@"🔴 Error setting socket SO_SNDBUF opts: %s\n", strerror(errno));
+        slog(@"🔴 Error setting socket SO_SNDBUF opts: %s\n", strerror(errno));
         return NO;
     }
 
@@ -103,19 +103,19 @@
     
     if (unlink(sun.sun_path) == -1) {
         if ( errno != ENOENT) {
-            NSLog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
+            slog(@"⚠️ unlink: %s\n,%d", strerror(errno), errno);
         }
     }
 
     int ret = bind (self.server_sock, (struct sockaddr *)&sun, sun.sun_len);
     if ( ret < 0 ) {
-        NSLog(@"🔴 bind failed. %s", strerror(errno));
+        slog(@"🔴 bind failed. %s", strerror(errno));
         return NO;
     }
     
     int listenResult = listen (self.server_sock, SOMAXCONN);
     if ( listenResult == -1 ) {
-        NSLog(@"🔴 Error listening on socket: %s\n", strerror(errno));
+        slog(@"🔴 Error listening on socket: %s\n", strerror(errno));
         return NO;
     }
 
@@ -136,7 +136,7 @@
         int socket = accept (self.server_sock, NULL, NULL);
 
         if ( socket == -1 ) {
-            NSLog(@"⚠️ AutoFillProxyServer failed to accept new connection (possibly due to shutdown...) - %s", strerror(errno));
+            slog(@"⚠️ AutoFillProxyServer failed to accept new connection (possibly due to shutdown...) - %s", strerror(errno));
             break;
         }
         
@@ -173,7 +173,7 @@
     
     if ( !jsonRequest ) {
         
-        NSLog(@"🔴 Could not read valid JSON object! Connection done.");
+        slog(@"🔴 Could not read valid JSON object! Connection done.");
         shutdown(socket, SHUT_RDWR);
         close(socket);
         return;
@@ -204,7 +204,7 @@
     
 #ifdef DEBUG
     if ( len > 10 * 1024 ) {
-        NSLog(@"🐞 Writing LARGE JSON Response of length [%lu] in %f seconds", len, NSDate.timeIntervalSinceReferenceDate - startTime);
+        slog(@"🐞 Writing LARGE JSON Response of length [%lu] in %f seconds", len, NSDate.timeIntervalSinceReferenceDate - startTime);
     }
 #endif
     

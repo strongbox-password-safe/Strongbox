@@ -17,6 +17,7 @@
 #import "SampleItemsGenerator.h"
 #import "DatabaseUnlocker.h"
 #import "ConcurrentMutableStack.h"
+#import "MMcGPair.h"
 
 #if TARGET_OS_IPHONE
 #import "StrongboxiOSFilesManager.h"
@@ -38,26 +39,21 @@
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
-NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
+NSString* const kAuditCompletedNotification = @"kAuditCompletedNotificationKey";
 NSString* const kAuditNewSwitchedOffNotificationKey = @"kAuditNewSwitchedOffNotificationKey";
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
+NSString *const kModelEditedNotification = @"kNotificationModelEdited";
 NSString* const kMasterDetailViewCloseNotification = @"kMasterDetailViewClose";
 NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
 
 NSString* const kAppStoreSaleNotificationKey = @"appStoreSaleNotification";
 NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-id";
 
-NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificationKey";
+NSString* const kDatabaseReloadedNotification = @"kDatabaseReloadedNotificationKey";
 NSString* const kTabsMayHaveChangedDueToModelEdit = @"kTabsMayHaveChangedDueToModelEdit-iOS";
 
-NSString* const kAsyncUpdateDone = @"kAsyncUpdateDone";
-NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
-
-NSString* const kSpecialSearchTermAllEntries = @"strongbox:allEntries";
-NSString* const kSpecialSearchTermAuditEntries = @"strongbox:auditEntries";
-NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
-NSString* const kSpecialSearchTermExpiredEntries = @"strongbox:expiredEntries";
-NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpiredEntries";
+NSString* const kAsyncUpdateDoneNotification = @"kAsyncUpdateDone";
+NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
 
 @interface Model ()
 
@@ -102,12 +98,12 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 - (void)dealloc {
     
-    NSLog(@"😎 Model DEALLOC...");
+    slog(@"😎 Model DEALLOC...");
     
 }
 
 - (void)closeAndCleanup { 
-    NSLog(@"Model closeAndCleanup...");
+    slog(@"Model closeAndCleanup...");
     if (self.auditor) {
         [self.auditor stop];
         self.auditor = nil;
@@ -234,6 +230,16 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
 
 
 
+- (NSInteger)fastEntryTotalCount {
+    return self.database.fastEntryTotalCount;
+}
+
+- (NSInteger)fastGroupTotalCount {
+    return self.database.fastGroupTotalCount;
+}
+
+
+
 - (void)refreshCaches {
     [self.database rebuildFastMaps];
     
@@ -282,13 +288,13 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:nil];
+                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotification object:nil];
             });
         });
         return;
     }
     
-    NSLog(@"reloadDatabaseFromLocalWorkingCopy....");
+    slog(@"reloadDatabaseFromLocalWorkingCopy....");
     
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata
                                                          forceReadOnly:self.forcedReadOnly
@@ -300,7 +306,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         if ( result == kUnlockDatabaseResultSuccess) {
-            NSLog(@"reloadDatabaseFromLocalWorkingCopy... Success ");
+            slog(@"reloadDatabaseFromLocalWorkingCopy... Success ");
             
             self.theDatabase = model.database;
             
@@ -311,11 +317,11 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
             [self refreshCaches];
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:self.databaseUuid];
+                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotification object:self.databaseUuid];
             });
         }
         else {
-            NSLog(@"Unlocking local copy for database reload request failed: %@", error);
+            slog(@"Unlocking local copy for database reload request failed: %@", error);
             
             
             
@@ -345,7 +351,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     [self restartBackgroundAudit];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:nil];
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotification object:nil]; 
     });
 }
 
@@ -383,7 +389,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     
     if ( self.isReadOnly && jobType != kAsyncJobTypeSyncOnly ) {
-        NSLog(@"🔴 WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
+        slog(@"🔴 WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
         return NO;
     }
     
@@ -410,7 +416,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
         [self beginJobWithDatabaseClone:NSUUID.UUID job:job];
     }
     else {
-        NSLog(@"NOP - No outstanding async updates found. All Done.");
+        slog(@"NOP - No outstanding async updates found. All Done.");
     }
 }
 
@@ -419,7 +425,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     _isRunningAsyncUpdate = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateStarting object:self.databaseUuid];
+        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateStartingNotification object:self.databaseUuid];
     });
     
     dispatch_group_t mutex = dispatch_group_create();
@@ -434,7 +440,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
     
-    NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
+    slog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
 }
 
 - (void)beginAsyncUpdate:(NSUUID*)updateId updateMutex:(dispatch_group_t)mutex job:(AsyncUpdateJob*)job {
@@ -490,7 +496,7 @@ NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpir
     
     
     if ( self.offlineMode || job.jobType == kAsyncJobTypeSerializeOnly ) {
-        NSLog(@"ℹ️ Offline or Update ONLY mode - AsyncUpdateAndSync DONE");
+        slog(@"ℹ️ Offline or Update ONLY mode - AsyncUpdateAndSync DONE");
         
         [self onAsyncJobDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:nil];
         
@@ -533,7 +539,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
        localWasChanged:(BOOL)localWasChanged
            updateMutex:(dispatch_group_t)updateMutex
                  error:(NSError*)error {
-    NSLog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localWasChanged=%hhd, error=%@", updateId, success, userInteractionRequired, localWasChanged, error);
+    slog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localWasChanged=%hhd, error=%@", updateId, success, userInteractionRequired, localWasChanged, error);
     
     AsyncJobResult* result = [[AsyncJobResult alloc] init];
     
@@ -548,7 +554,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     _isRunningAsyncUpdate = NO;
     
     dispatch_async(dispatch_get_main_queue(), ^{ 
-        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:result];
+        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDoneNotification object:result];
         
         if ( job.completion ) {
             job.completion(result);
@@ -572,7 +578,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         NSURL* url = [NSFileManager.defaultManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:localWorkingCacheUrl create:YES error:&error];
         
         if ( !url ) {
-            NSLog(@"getUniqueStreamingFilename: ERROR = [%@]", error);
+            slog(@"getUniqueStreamingFilename: ERROR = [%@]", error);
             return [StrongboxFilesManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
         }
         
@@ -595,7 +601,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         [self restartAudit];
     }
     else {
-        NSLog(@"Audit not configured to run. Skipping.");
+        slog(@"Audit not configured to run. Skipping.");
         [self stopAndClearAuditor]; 
     }
 }
@@ -652,7 +658,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( weakSelf ) {
-                [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@{ @"userStopped" : @(userStopped), @"model" : weakSelf }];
+                [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotification object:@{ @"userStopped" : @(userStopped), @"model" : weakSelf }];
             }
         });
     }];
@@ -791,7 +797,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         [self excludeFromAudit:node exclude:!isExcluded];
     }
     else {
-        NSLog(@"🔴 WARNWARN Attempt to exclude none existent node from Audit?!");
+        slog(@"🔴 WARNWARN Attempt to exclude none existent node from Audit?!");
     }
 }
 
@@ -816,6 +822,8 @@ userInteractionRequired:(BOOL)userInteractionRequired
         
         self.metadata.auditExcludedItems = mutable.allObjects;
     }
+    
+    [self notifyEdited];
 }
 
 
@@ -884,6 +892,8 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     [self refreshAutoFillSuggestions];
     
+    [self notifyEdited];
+    
     return self.isKeePass2Format;
 }
 
@@ -926,7 +936,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 - (BOOL)addChildren:(NSArray<Node *> *)items destination:(Node *)destination {
-    return [self.database addChildren:items destination:destination];
+    BOOL ret = [self.database addChildren:items destination:destination];
+    
+    [self notifyEdited];
+    
+    return ret;
 }
 
 - (BOOL)validateAddChildren:(NSArray<Node *> *)items destination:(Node *)destination {
@@ -934,11 +948,19 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 - (NSInteger)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node *)parentGroup {
-    return [self.database reorderChildFrom:from to:to parentGroup:parentGroup];
+    BOOL ret = [self.database reorderChildFrom:from to:to parentGroup:parentGroup];
+    
+    [self notifyEdited];
+    
+    return ret;
 }
 
 - (NSInteger)reorderItem:(NSUUID *)nodeId idx:(NSInteger)idx {
-    return [self.database reorderItem:nodeId idx:idx];
+    BOOL ret = [self.database reorderItem:nodeId idx:idx];
+    
+    [self notifyEdited];
+    
+    return ret;
 }
 
 
@@ -956,11 +978,17 @@ userInteractionRequired:(BOOL)userInteractionRequired
         [self refreshAutoFillSuggestions];
     }
     
+    if ( ret ) {
+        [self notifyEdited];
+    }
+    
     return ret;
 }
 
 - (void)undoMove:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
     [self.database undoMove:undoData];
+    
+    [self notifyEdited];
 }
 
 
@@ -983,10 +1011,14 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if ( self.metadata.autoFillEnabled ) {
         [self removeItemsFromAutoFillQuickType:items];
     }
+    
+    [self notifyEdited];
 }
 
 - (void)unDelete:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
     [self.database unDelete:undoData];
+    
+    [self notifyEdited];
 }
 
 - (BOOL)recycleItems:(const NSArray<Node *> *)items {
@@ -1002,11 +1034,15 @@ userInteractionRequired:(BOOL)userInteractionRequired
         }
     }
     
+    [self notifyEdited];
+    
     return ret;
 }
 
 - (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
     [self.database undoRecycle:undoData];
+    
+    [self notifyEdited];
 }
 
 - (void)removeItemsFromAutoFillQuickType:(const NSArray<Node *> *)items {
@@ -1015,13 +1051,15 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)emptyRecycleBin {
     [self.database emptyRecycleBin];
+    
+    [self notifyEdited];
 }
 
 - (BOOL)launchUrl:(Node *)item {
     NSURL* launchableUrl = [self.database launchableUrlForItem:item];
-        
+    
     if ( !launchableUrl ) {
-        NSLog(@"Could not get launchable URL for item.");
+        slog(@"Could not get launchable URL for item.");
         return NO;
     }
     
@@ -1032,9 +1070,9 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BOOL)launchUrlString:(NSString*)urlString {
     NSURL* launchableUrl = [self.database launchableUrlForUrlString:urlString];
-         
+    
     if ( !launchableUrl ) {
-        NSLog(@"Could not get launchable URL for string.");
+        slog(@"Could not get launchable URL for string.");
         return NO;
     }
     
@@ -1048,14 +1086,14 @@ userInteractionRequired:(BOOL)userInteractionRequired
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [UIApplication.sharedApplication openURL:launchableUrl options:@{} completionHandler:^(BOOL success) {
             if (!success) {
-                NSLog(@"Couldn't launch this URL!");
+                slog(@"Couldn't launch this URL!");
             }
         }];
     });
 #endif
 #else
     if ( !launchableUrl ) {
-        NSLog(@"Could not get launchable URL for item.");
+        slog(@"Could not get launchable URL for item.");
         return;
     }
     
@@ -1063,7 +1101,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
                              configuration:NSWorkspaceOpenConfiguration.configuration
                          completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
         if ( error ) {
-            NSLog(@"Launch URL done. Error = [%@]", error);
+            slog(@"Launch URL done. Error = [%@]", error);
         }
     }];
 #endif
@@ -1080,7 +1118,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSArray<Node*>* filtered = [self.legacyFavourites filter:^BOOL(Node * _Nonnull obj) {
         return !obj.isGroup;
     }];
-
+    
     NSSet<NSUUID*>* legacySet = [filtered map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;
     }].set;
@@ -1117,6 +1155,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }
     else {
         [self legacyAddFavourite:itemId];
+        [self notifyEdited];
         return NO;
     }
 }
@@ -1126,9 +1165,14 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if ( self.formatSupportsTags ) {
         BOOL removed = [self removeTag:itemId tag:kCanonicalFavouriteTag];
         needsSave = removed;
+        
+        [self legacyRemoveFavourite:itemId];
+        [self notifyEdited];
     }
-
-    [self legacyRemoveFavourite:itemId];
+    else {
+        [self legacyRemoveFavourite:itemId];
+        [self notifyEdited];
+    }
     
     return needsSave;
 }
@@ -1143,7 +1187,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         [self resetLegacyFavourites:favs];
     }
     else {
-        NSLog(@"🔴 legacyAddFavourite - Could not get sid");
+        slog(@"🔴 legacyAddFavourite - Could not get sid");
     }
 }
 
@@ -1157,7 +1201,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         [self resetLegacyFavourites:favs];
     }
     else {
-        NSLog(@"🔴 legacyRemoveFavourite - Could not get sid");
+        slog(@"🔴 legacyRemoveFavourite - Could not get sid");
     }
 }
 
@@ -1281,7 +1325,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 #ifdef DEBUG
     NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
 #endif
-
+    
     NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRootIncludingRecycled : self.database.allSearchableIncludingRecycled;
     
     NSMutableArray* results = [nodes mutableCopy]; 
@@ -1294,12 +1338,12 @@ userInteractionRequired:(BOOL)userInteractionRequired
                       scope:scope
                 dereference:dereference];
     }
-
+    
 #ifdef DEBUG
     NSTimeInterval searchTime = NSDate.timeIntervalSinceReferenceDate - startTime;
     NSTimeInterval startBrowseFilterTime = NSDate.timeIntervalSinceReferenceDate;
 #endif
-
+    
     NSArray<Node*>* ret = [self filterAndSortForBrowse:results
                                  includeKeePass1Backup:includeKeePass1Backup
                                      includeRecycleBin:includeRecycleBin
@@ -1308,20 +1352,20 @@ userInteractionRequired:(BOOL)userInteractionRequired
                                        browseSortField:browseSortField
                                             descending:descending
                                      foldersSeparately:foldersSeparately];
-
+    
     
 #ifdef DEBUG
     NSString* searchTerm = searchText;
-    NSLog(@"✅ SEARCH for [%@] done in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
+    slog(@"✅ SEARCH for [%@] done in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
 #endif
-
+    
     return ret;
 }
 
 
 - (NSArray<Node *> *)filterAndSortForBrowse:(NSMutableArray<Node *> *)nodes
                               includeGroups:(BOOL)includeGroups {
-    return [self filterAndSortForBrowse:nodes 
+    return [self filterAndSortForBrowse:nodes
                   includeKeePass1Backup:self.metadata.showKeePass1BackupGroup
                       includeRecycleBin:self.metadata.showRecycleBinInSearchResults
                          includeExpired:self.metadata.showExpiredInSearch
@@ -1352,32 +1396,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
            searchText:(NSString *)searchText
                 scope:(NSInteger)scope
           dereference:(BOOL)dereference {
-    if ([searchText isEqualToString:kSpecialSearchTermAllEntries]) { 
-        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return !obj.isGroup;
-        }];
-    }
-    else if ([searchText isEqualToString:kSpecialSearchTermAuditEntries] ) { 
-        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return [self isFlaggedByAudit:obj.uuid];
-        }];
-    }
-    else if ([searchText isEqualToString:kSpecialSearchTermTotpEntries]) { 
-        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return obj.fields.otpToken != nil;
-        }];
-    }
-    else if ([searchText isEqualToString:kSpecialSearchTermExpiredEntries]) { 
-        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return obj.fields.expired;
-        }];
-    }
-    else if ([searchText isEqualToString:kSpecialSearchTermNearlyExpiredEntries]) { 
-        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
-            return obj.fields.nearlyExpired;
-        }];
-    }
-    else if (scope == kSearchScopeTitle) {
+    if (scope == kSearchScopeTitle) {
         [self searchTitle:searchNodes searchText:searchText dereference:dereference checkPinYin:self.applicationPreferences.checkPinYin];
     }
     else if (scope == kSearchScopeUsername) {
@@ -1399,37 +1418,37 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+        return [self.database isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
 - (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+        return [self.database isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
 - (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
+        return [self.database isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
 - (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains];
+        return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
 - (void)searchTags:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isTagsMatches:searchText node:node checkPinYin:checkPinYin];
+        return [self.database isTagsMatches:searchText node:node checkPinYin:checkPinYin] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
 - (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains];
+        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
@@ -1441,25 +1460,25 @@ userInteractionRequired:(BOOL)userInteractionRequired
     DatabaseFormat format = self.database.originalFormat;
     Node* backupGroup = (!includeKeePass1Backup && format == kKeePass1) ? self.database.keePass1BackupNode : nil;
     Node* recycleBin = (!includeRecycleBin && (format == kKeePass || format == kKeePass4 )) ? self.database.recycleBinNode : nil;
-
+    
     if ( !backupGroup && !recycleBin && includeExpired && includeGroups ) {
         
         return;
     }
-
+    
     [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
         if ( backupGroup ) {
             if (obj == backupGroup || [backupGroup contains:obj]) {
                 return NO;
             }
         }
-
+        
         if ( recycleBin ) {
             if (obj == recycleBin || [recycleBin contains:obj]) {
                 return NO;
             }
         }
-
+        
         if ( !includeExpired ) {
             if ( obj.expired ) {
                 return NO;
@@ -1471,7 +1490,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
                 return NO;
             }
         }
-
+        
         return YES;
     }];
 }
@@ -1493,7 +1512,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         }];
         
         
-
+        
         if ( self.database.recycleBinEnabled && self.database.recycleBinNode ) {
             NSUInteger idx = [ret indexOfObject:self.database.recycleBinNode];
             
@@ -1540,7 +1559,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (NSComparisonResult)compareGroupsForSort:(BrowseSortField)field n1:(Node *)n1 n2:(Node *)n2 {
     NSComparisonResult result = NSOrderedSame;
-
+    
     if ( field == kBrowseSortFieldCreated ) {
         result = [n1.fields.created compare:n2.fields.created];
     }
@@ -1562,7 +1581,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (NSComparisonResult)compareEntryOrGroupsForSort:(BrowseSortField)field n1:(Node *)n1 n2:(Node *)n2 {
     NSComparisonResult result = NSOrderedSame;
-
+    
     if (field == kBrowseSortFieldTitle) {
         return finderStringCompare([self dereference:n1.title node:n1], [self dereference:n2.title node:n2]);
     }
@@ -1613,7 +1632,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     Node* n1 = descending ? node2 : node1;
     Node* n2 = descending ? node1 : node2;
-
+    
     
     
     if ( n1.isGroup && n2.isGroup ) {
@@ -1638,7 +1657,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
 #ifndef IS_APP_EXTENSION 
     if ( self.metadata.autoFillEnabled ) {
-        NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString 
+        NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString
                                                                     domainNodeMap:self.domainNodeMap];
         
         NSArray<Node*> *ret2 = [self getItemsById:matches.allObjects];
@@ -1660,14 +1679,14 @@ userInteractionRequired:(BOOL)userInteractionRequired
         return @[];
     }
 #else
-    NSLog(@"🔴 getAutoFillMatchingNodesForUrl called in AutoFill mode?!");
+    slog(@"🔴 getAutoFillMatchingNodesForUrl called in AutoFill mode?!");
     return @[];
 #endif
 }
 #endif
 
 - (void)rebuildAutoFillDomainNodeMap {
-
+    
     _domainNodeMap = @{};
     
 #if !TARGET_OS_IPHONE 
@@ -1697,8 +1716,8 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BrowseSortConfiguration*)getSortConfigurationForViewType:(BrowseViewType)viewType {
     BrowseSortConfiguration* config = self.metadata.sortConfigurations[@(viewType).stringValue];
-
-    if ( config == nil ) { 
+    
+    if ( config == nil ) {
         config = [BrowseSortConfiguration defaults];
         config.showAlphaIndex = viewType == kBrowseViewTypeList || viewType == kBrowseViewTypeTotpList;
         
@@ -1716,7 +1735,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 - (void)setSortConfigurationForViewType:(BrowseViewType)viewType
                           configuration:(BrowseSortConfiguration *)configuration {
     NSMutableDictionary* mut = self.metadata.sortConfigurations.mutableCopy;
-
+    
     mut[@(viewType).stringValue] = configuration;
     
     self.metadata.sortConfigurations = mut;
@@ -1748,70 +1767,92 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 - (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag {
-    return [self.database addTag:itemId tag:tag];
+    BOOL ret = [self.database addTag:itemId tag:tag];
+    
+    if ( ret ) {
+        [self notifyEdited];
+    }
+    
+    return ret;
 }
 
 - (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag {
-    return [self.database removeTag:itemId tag:tag];
+    BOOL ret = [self.database removeTag:itemId tag:tag];
+    
+    if ( ret ) {
+        [self notifyEdited];
+    }
+    
+    return ret;
 }
 
 - (void)deleteTag:(NSString*)tag {
-    return [self.database deleteTag:tag];
+    [self.database deleteTag:tag];
+    [self notifyEdited];
 }
 
 - (void)renameTag:(NSString*)from to:(NSString*)to {
-    return [self.database renameTag:from to:to];
+    [self.database renameTag:from to:to];
+    [self notifyEdited];
 }
 
 - (BOOL)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
-    return [self.database addTagToItems:ids tag:tag];
+    BOOL ret = [self.database addTagToItems:ids tag:tag];
+    [self notifyEdited];
+    return ret;
 }
 
 - (BOOL)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag {
-    return [self.database removeTagFromItems:ids tag:tag];
+    BOOL ret = [self.database removeTagFromItems:ids tag:tag];
+    [self notifyEdited];
+    return ret;
+}
+
+- (NSSet<NSString *> *)tagSet {
+    return self.database.tagSet;
 }
 
 - (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item {
     NSMutableArray<ItemMetadataEntry*>* metadata = [NSMutableArray array];
-
+    
     [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
-
+    
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
                                                   value:item.fields.created ? item.fields.created.friendlyDateTimeStringPrecise : @""
                                                copyable:NO]];
     
-
-
-
-
+    
+    
+    
+    
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
                                                   value:item.fields.modified ? item.fields.modified.friendlyDateTimeStringPrecise : @""
                                                copyable:NO]];
-        
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     NSString* path = [self.database getPathDisplayString:item.parent includeRootGroup:YES rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
     
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_fieldname_location", @"Location")
                                                   value:path
                                                copyable:NO]];
-
+    
     
     
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"group_properties_searchable", @"Searchable")
                                                   value:localizedYesOrNoFromBool(item.isSearchable)
                                                copyable:NO]];
-
+    
     
     
     BOOL autofillable = item.isSearchable && ![self isExcludedFromAutoFill:item.uuid] && !item.expired;
@@ -1819,14 +1860,300 @@ userInteractionRequired:(BOOL)userInteractionRequired
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_autofill_suggestable", @"Suggestable in AutoFill")
                                                   value:localizedYesOrNoFromBool(autofillable)
                                                copyable:NO]];
-
+    
     
     
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"browse_vc_section_title_expired", @"Expired")
                                                   value:localizedYesOrNoFromBool(item.expired)
                                                copyable:NO]];
-
+    
     return metadata;
+}
+
+
+
+- (NSArray<Node*>*)searchAutoBestMatch:(NSString *)searchText scope:(SearchScope)scope {
+#ifdef DEBUG
+    NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
+#endif
+    
+    BOOL dereference = self.metadata.searchDereferencedFields;
+    BOOL checkPinYin = self.applicationPreferences.checkPinYin;
+    BOOL includeAssociatedDomains = self.metadata.includeAssociatedDomains;
+    
+    NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
+    
+    NSMutableDictionary<NSUUID*, NSNumber*> *results = NSMutableDictionary.dictionary;
+    NSArray<Node*>* nodes = self.database.allSearchableEntries;
+    
+    for (NSString* word in terms) {
+        for ( Node* node in nodes ) {
+            DatabaseSearchMatchField matchField;
+            StringSearchMatchType matchType = [self getWordMatchType:word
+                                                               scope:scope
+                                                                node:node
+                                                          matchField:&matchField
+                                                         dereference:dereference
+                                                         checkPinYin:checkPinYin
+                                            includeAssociatedDomains:includeAssociatedDomains];
+            
+            
+            if ( matchType != kStringSearchMatchTypeNoMatch ) {
+                NSNumber* matchWeight = @(getMatchWeight(matchType, matchField));
+                NSNumber* existingWeight = results[node.uuid];
+                
+                if ( existingWeight ) {
+                    results[node.uuid] = @(matchWeight.doubleValue + existingWeight.doubleValue); 
+                }
+                else {
+                    results[node.uuid] = matchWeight;
+                }
+            }
+            else {
+                [results removeObjectForKey:node.uuid];
+            }
+        }
+        
+        nodes = [self getItemsById:results.allKeys]; 
+    }
+    
+#ifdef DEBUG
+    NSTimeInterval searchTime = NSDate.timeIntervalSinceReferenceDate - startTime;
+    NSTimeInterval startBrowseFilterTime = NSDate.timeIntervalSinceReferenceDate;
+#endif
+    
+    NSArray<Node*>* all = [self.database getItemsById:results.allKeys];
+    
+    NSArray<Node*>* sorted = [all sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        Node* node1 = ((Node*)obj1);
+        Node* node2 = ((Node*)obj2);
+        NSNumber* weight1 = results[node1.uuid];
+        NSNumber* weight2 = results[node2.uuid];
+        
+        NSComparisonResult result = [weight2 compare:weight1];
+        if ( result != NSOrderedSame ) {
+            return result;
+        }
+        
+        result = finderStringCompare(node1.title, node2.title);
+        if ( result != NSOrderedSame ) {
+            return result;
+        }
+
+        if ( [self isFavourite:node1.uuid] ) {
+            return NSOrderedAscending;
+        }
+        else if ( [self isFavourite:node2.uuid] ) {
+            return NSOrderedDescending;
+        }
+
+        return NSOrderedSame;
+    }];
+    
+    
+    
+    NSMutableArray<Node*>* mutable = sorted.mutableCopy;
+    [self filterExcluded:mutable includeKeePass1Backup:NO includeRecycleBin:NO includeExpired:NO includeGroups:NO];
+    
+#ifdef DEBUG
+
+
+
+
+
+    
+    NSString* searchTerm = searchText;
+    slog(@"✅ SEARCH for [%@] done (%ld results) in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, mutable.count, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
+#endif
+    
+    return mutable;
+}
+
+- (StringSearchMatchType)getWordMatchType:(NSString*)word
+                                    scope:(SearchScope)scope
+                                     node:(Node*)node
+                               matchField:(DatabaseSearchMatchField *)matchField
+                              dereference:(BOOL)dereference
+                              checkPinYin:(BOOL)checkPinYin
+                 includeAssociatedDomains:(BOOL)includeAssociatedDomains {
+    DatabaseSearchMatchField field;
+    StringSearchMatchType matchType;
+    
+    if (scope == kSearchScopeTitle) {
+        field = kDatabaseSearchMatchFieldTitle;
+        matchType = [self.database isTitleMatches:word node:node dereference:dereference checkPinYin:checkPinYin];
+    }
+    else if (scope == kSearchScopeUsername) {
+        field = kDatabaseSearchMatchFieldTitle;
+        matchType = [self.database isUsernameMatches:word node:node dereference:dereference checkPinYin:checkPinYin];
+    }
+    else if (scope == kSearchScopePassword) {
+        field = kDatabaseSearchMatchFieldTitle;
+        matchType = [self.database isPasswordMatches:word node:node dereference:dereference checkPinYin:checkPinYin];
+    }
+    else if (scope == kSearchScopeUrl) {
+        field = kDatabaseSearchMatchFieldTitle;
+        matchType = [self.database isUrlMatches:word node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains];
+    }
+    else if (scope == kSearchScopeTags) {
+        field = kDatabaseSearchMatchFieldTitle;
+        matchType = [self.database isTagsMatches:word node:node checkPinYin:checkPinYin];
+    }
+    else {
+        matchType = [self.database isAllFieldsMatches:word node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:includeAssociatedDomains matchField:&field];
+    }
+    
+    if ( matchField ) {
+        *matchField = field;
+    }
+    
+    return matchType;
+}
+
+double getMatchWeight ( StringSearchMatchType type, DatabaseSearchMatchField field ) {
+    return getMatchTypeWeight(type) * getFieldWeight(field);
+}
+
+double getMatchTypeWeight(StringSearchMatchType type) {
+    switch ( type ) {
+        case kStringSearchMatchTypeExact:
+            return 3.0;
+        case kStringSearchMatchTypeStartsWith:
+            return 2.0;
+        case kStringSearchMatchTypeContains:
+            return 1.0;
+        case kStringSearchMatchTypeNoMatch:
+            return CGFLOAT_MIN;
+    }
+    
+    slog(@"🔴 New Search Field? Weight not set!");
+    
+    return CGFLOAT_MIN;
+
+}
+
+double getFieldWeight ( DatabaseSearchMatchField field ) {
+    switch ( field ) {
+    case kDatabaseSearchMatchFieldTitle:
+        return 5.0;
+    case kDatabaseSearchMatchFieldUsername:
+        return 4.0;
+    case kDatabaseSearchMatchFieldEmail:
+        return 3.0;
+    case kDatabaseSearchMatchFieldUrl:
+        return 3.0;
+    case kDatabaseSearchMatchFieldTag:
+        return 3.0;
+    case kDatabaseSearchMatchFieldCustomField:
+        return 2.0;
+    case kDatabaseSearchMatchFieldNotes:
+        return 2.0;
+    case kDatabaseSearchMatchFieldPassword:
+        return 2.0;
+    case kDatabaseSearchMatchFieldAttachment:
+        return 1.0;
+    case kDatabaseSearchMatchFieldPath:
+        return 1.0;
+    }
+    
+    slog(@"🔴 New Search Field? Weight not set!");
+    
+    return CGFLOAT_MIN;
+}
+
+- (void)notifyEdited {
+    __weak Model* weakSelf = self;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelEditedNotification object:weakSelf];
+    });
+}
+
+
+
+- (NSString*)getAllFieldsKeyValuesString:(NSUUID*)uuid {
+    Node* item = [self getItemById:uuid];
+    
+    if ( !item ) {
+        slog(@"🔴 BrowseActionsHelper - Could not find item to copy password");
+        return @"";
+    }
+
+    NSMutableArray<NSString*>* fields = NSMutableArray.array;
+    
+    if ( item.title.length ) [fields addObject:[NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"generic_fieldname_title", @""), [self dereference:item.title node:item]]];
+    if ( item.fields.username.length ) [fields addObject:[NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"generic_fieldname_username", @""), [self dereference:item.fields.username node:item]]];
+    if ( item.fields.password.length ) [fields addObject:[NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"generic_fieldname_password", @""), [self dereference:item.fields.password node:item]]];
+    if ( item.fields.email.length ) [fields addObject:[NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"generic_fieldname_email", @""), [self dereference:item.fields.email node:item]]];
+    if ( item.fields.url.length ) [fields addObject:[NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"generic_fieldname_url", @""), [self dereference:item.fields.url node:item]]];
+    if ( item.fields.notes.length ) [fields addObject:[NSString stringWithFormat:@"%@: %@", NSLocalizedString(@"generic_fieldname_notes", @""), [self dereference:item.fields.notes node:item]]];
+    
+    
+    
+    NSArray* allKeys = self.metadata.customSortOrderForFields ? item.fields.customFieldsFiltered.allKeys : [item.fields.customFieldsFiltered.allKeys sortedArrayUsingComparator:finderStringComparator];
+    
+    for(NSString* key in allKeys) {
+        StringValue* sv = item.fields.customFields[key];
+        NSString *val = [self dereference:sv.value node:item];
+        
+        if ( val.length != 0 ) {
+            [fields addObject:[NSString stringWithFormat:@"%@: %@", key, val]];
+        }
+    }
+    
+    return [fields componentsJoinedByString:@"\n"];
+}
+
+- (NSInteger)auditEntryCount {
+    if ( !self.auditReport ) {
+        return 0;
+    }
+    else {
+        return self.auditReport.allEntries.count;
+    }
+}
+
+- (NSArray<Node*>*)auditEntries {
+    if ( !self.auditReport ) {
+        return 0;
+    }
+    else {
+        return [self getItemsById:self.auditReport.allEntries.allObjects];
+    }
+}
+
+- (NSArray<Node *> *)totpEntries {
+    return self.database.totpEntries;
+}
+
+- (NSArray<Node*>*)expiredEntries {
+    return self.database.expiredEntries;
+}
+
+- (NSArray<Node*>*)nearlyExpired {
+    return self.database.nearlyExpiredEntries;
+}
+
+
+
+- (BOOL)setItemTitle:(NSUUID *)uuid title:(NSString *)title {
+    Node* node = [self getItemById:uuid];
+    
+    if ( node ) {
+        if ( ![title isEqualToString:node.title] ) {
+            BOOL ret = [self.database setItemTitle:node title:title];
+            
+            [self notifyEdited];
+            
+            return ret;
+        }
+        else {
+            return YES;
+        }
+    }
+    else {
+        return NO;
+    }
 }
 
 @end

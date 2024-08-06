@@ -108,11 +108,9 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowDatabasesOnAppShortcutsMenu;
 @property (weak, nonatomic) IBOutlet UILabel *labelStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStrongboxSyncStatus;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellUseNextGenOneDrive;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStrongboxSyncStatus;
 
-@property (weak, nonatomic) IBOutlet UISwitch *switchUseNextGenOneDrive;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowDatabaseNameInTitleBar;
+@property (weak, nonatomic) IBOutlet UISwitch *switchDisableHomeTab;
 
 @end
 
@@ -155,12 +153,10 @@
         [self cell:self.cellWiFiSyncServiceName setHidden:YES];
         
         [self cell:self.cellStrongboxSyncStatus setHidden:YES];
-        [self cell:self.cellUseNextGenOneDrive setHidden:YES];
     }
     
     if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
         [self cell:self.cellDropboxAppFolder setHidden:YES];
-        [self cell:self.cellUseNextGenOneDrive setHidden:YES];
     }
     
     [self cell:self.cellNewEntryDefaults setHidden:YES];
@@ -323,7 +319,7 @@
 }
 
 - (IBAction)onPreferencesChanged:(id)sender {
-    NSLog(@"Advanced Preference Changed: [%@]", sender);
+    slog(@"Advanced Preference Changed: [%@]", sender);
 
     AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame = self.switchSyncForcePull.on;
     AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts = self.switchSyncForcePush.on;
@@ -354,8 +350,7 @@
 
     AppPreferences.sharedInstance.pinYinSearchEnabled = self.switchPinYinSearch.on;
     
-    AppPreferences.sharedInstance.useIsolatedDropbox = self.switchDropboxFolderOnly.on;    
-
+    AppPreferences.sharedInstance.useIsolatedDropbox = self.switchDropboxFolderOnly.on;
 
     AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     AppPreferences.sharedInstance.pinCodeHapticFeedback = self.pinCodeHapticFeedback.on;
@@ -377,8 +372,7 @@
         [[UIApplication sharedApplication] setShortcutItems:@[]]; 
     }
     
-    AppPreferences.sharedInstance.useNextGenOneDriveAPI = self.switchUseNextGenOneDrive.on;
-    AppPreferences.sharedInstance.showDatabaseNamesInBrowse = self.switchShowDatabaseNameInTitleBar.on;
+    AppPreferences.sharedInstance.disableHomeTab = self.switchDisableHomeTab.on;
 
     [self bindPreferences];
 }
@@ -404,7 +398,6 @@
     
     self.switchDropboxFolderOnly.on = AppPreferences.sharedInstance.useIsolatedDropbox;
 
-    
     self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;
     self.pinCodeHapticFeedback.on = AppPreferences.sharedInstance.pinCodeHapticFeedback;
 
@@ -421,9 +414,7 @@
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
     self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
     
-    self.switchUseNextGenOneDrive.on = AppPreferences.sharedInstance.useNextGenOneDriveAPI;
-    
-    self.switchShowDatabaseNameInTitleBar.on = AppPreferences.sharedInstance.showDatabaseNamesInBrowse;
+    self.switchDisableHomeTab.on = AppPreferences.sharedInstance.disableHomeTab;
     
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {
@@ -482,7 +473,7 @@
     NSError* error;
     
     if ( ![WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {
-        NSLog(@"🔴 Error stopping/starting Wi-Fi Sync Source %@", error);
+        slog(@"🔴 Error stopping/starting Wi-Fi Sync Source %@", error);
         
         [Alerts error:self error:error];
     }

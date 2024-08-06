@@ -126,7 +126,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         return domains.set;
     }
     
-    NSLog(@"🔴 Could not load twofactorauth.json");
+    slog(@"🔴 Could not load twofactorauth.json");
     
     return NSSet.set;
 }
@@ -137,7 +137,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
      progress:(AuditProgressBlock)progress
    completion:(AuditCompletionBlock)completion {
     if ( self.state != kAuditStateInitial ) {
-        NSLog(@"Audit cannot be started as it has already been run or is running");
+        slog(@"Audit cannot be started as it has already been run or is running");
         return NO;
     }
 
@@ -161,7 +161,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 }
 
 - (void)audit {
-    NSLog(@"AUDIT: Starting Audit...");
+    slog(@"AUDIT: Starting Audit...");
     
     self.progress(0.0);
 
@@ -181,7 +181,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 }
 
 - (void)stop {
-    NSLog(@"AUDIT: Stopping Audit...");
+    slog(@"AUDIT: Stopping Audit...");
     self.stopRequested = YES;
     [self.hibpQueue cancelAllOperations];
 }
@@ -710,7 +710,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     }];
     
 
-    NSLog(@"LOW ENTROPY CHECK took [%f] seconds for %lu items", NSDate.timeIntervalSinceReferenceDate - startTime, (unsigned long)self.auditableNonEmptyPasswordNodes.count);
+    slog(@"LOW ENTROPY CHECK took [%f] seconds for %lu items", NSDate.timeIntervalSinceReferenceDate - startTime, (unsigned long)self.auditableNonEmptyPasswordNodes.count);
 
 
     return [lowEntropy map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
@@ -731,7 +731,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     int n = (int)self.auditableNonEmptyPasswordNodes.count - 1;
     int totalComparisons = (n * (n + 1)) / 2; 
     
-    NSLog(@"AUDIT: Similarity Comparisons required = %d", totalComparisons);
+    slog(@"AUDIT: Similarity Comparisons required = %d", totalComparisons);
     for (Node* entry in self.auditableNonEmptyPasswordNodes) {
         NSString* password = entry.fields.password;
 
@@ -769,11 +769,25 @@ const static NSSet<NSString*>* kTwoFactorDomains;
             if (similarity >= self.config.levenshteinSimilarityThreshold) {
                 
 
-                if(!similarGroups[entry.uuid]) {
-                    similarGroups[entry.uuid] = [NSMutableSet setWithObject:entry.uuid];
+                NSMutableSet<NSUUID*>* existingGroup = similarGroups[entry.uuid];
+                
+                if ( existingGroup == nil ) { 
+                    for ( NSUUID* groupKey in similarGroups.allKeys ) {
+                        NSMutableSet<NSUUID*>* group = similarGroups[groupKey];
+                        if ( [group containsObject:other.uuid] || [group containsObject:entry.uuid]) {
+                            
+                            existingGroup = group;
+                        }
+                    }
                 }
                 
-                [similarGroups[entry.uuid] addObject:other.uuid];
+                if ( existingGroup == nil ) {
+                    similarGroups[entry.uuid] = [NSMutableSet set];
+                    existingGroup = similarGroups[entry.uuid];
+                }
+                
+                [existingGroup addObject:entry.uuid];
+                [existingGroup addObject:other.uuid];
             }
         }
     }
@@ -812,11 +826,11 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         NSCalendar *cal = [NSCalendar currentCalendar];
         NSDate *dueDate = [cal dateByAddingUnit:NSCalendarUnitSecond value:self.config.hibpCheckForNewBreachesIntervalSeconds toDate:lastChecked options:0];
         checkForNewBreaches = dueDate.timeIntervalSinceNow < 0;
-        NSLog(@"Due Date for New Breaches: [%@]", dueDate);
+        slog(@"Due Date for New Breaches: [%@]", dueDate);
     }
     
     if (checkForNewBreaches) {
-        NSLog(@"Will Check for New Breaches....");
+        slog(@"Will Check for New Breaches....");
         self.config.lastHibpOnlineCheck = NSDate.date;
         
         if (self.saveConfig) {
@@ -882,7 +896,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
           UrlRequestOperation* op = [[UrlRequestOperation alloc] initWithRequest:request.copy
                                                        dataTaskCompletionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
               if (error) {
-                  NSLog(@"ERROR: [%@]", error);
+                  slog(@"ERROR: [%@]", error);
                   completion(NO, error);
                   return;
               }
@@ -894,7 +908,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
                    
                   if (found) {
                       NSSet<NSString*> *pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
-                      NSLog(@"Caching HIBP hit...");
+                      slog(@"Caching HIBP hit...");
                       NSMutableSet<NSString*>* mut = pwnedCache ? pwnedCache.mutableCopy : NSMutableSet.set;
                       [mut addObject:sha1HexPassword];
                       [SecretStore.sharedInstance setSecureObject:mut.copy forIdentifier:kSecretStoreHibpPwnedSetCacheKey];
@@ -903,7 +917,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
                   completion(found, nil);
               }
               else {
-                  NSLog(@"HTTP [%ld] - [%@]", (long)httpResponse.statusCode , error);
+                  slog(@"HTTP [%ld] - [%@]", (long)httpResponse.statusCode , error);
                   completion(NO, [Utils createNSError:[NSString stringWithFormat:@"response = [%@]", httpResponse] errorCode:-2345]);
               }
         }];
@@ -947,7 +961,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     
     if (error) {
         self.hibpErrorCount++;
-        NSLog(@"ERROR: [%@]", error);
+        slog(@"ERROR: [%@]", error);
         return;
     }
     
@@ -959,7 +973,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         if (found) {
             NSSet<NSString*> *pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
 
-            NSLog(@"Caching HIBP hit...");
+            slog(@"Caching HIBP hit...");
             NSMutableSet<NSString*>* mut = pwnedCache ? pwnedCache.mutableCopy : NSMutableSet.set;
             
             [mut addObject:sha1HexPassword];
@@ -974,7 +988,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         }
     }
     else {
-        NSLog(@"HTTP [%ld] - [%@]", (long)httpResponse.statusCode , error);
+        slog(@"HTTP [%ld] - [%@]", (long)httpResponse.statusCode , error);
         self.hibpErrorCount++;
     }
 }

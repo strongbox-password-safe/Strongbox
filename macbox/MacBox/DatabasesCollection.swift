@@ -48,7 +48,7 @@ class DatabasesCollection: NSObject {
         }
 
         NotificationCenter.default.addObserver(forName: .DatabasesCollection.autoLockAppInBackgroundTimeout, object: nil, queue: nil) { [weak self] _ in
-            NSLog("🐞 DEBUG - DatabasesCollection - Received AutoLockInBackgroundTimeout notification - Attempting Lock")
+            swlog("🐞 DEBUG - DatabasesCollection - Received AutoLockInBackgroundTimeout notification - Attempting Lock")
             self?.onAutoLockTimeout(background: true)
         }
 
@@ -56,7 +56,7 @@ class DatabasesCollection: NSObject {
 
         NotificationCenter.default.addObserver(forName: note, object: nil, queue: nil) { [weak self] notification in
             guard let uuid = notification.object as? String else {
-                NSLog("🔴 Couldn't read cloudkit update notification...")
+                swlog("🔴 Couldn't read cloudkit update notification...")
                 return
             }
 
@@ -109,13 +109,13 @@ class DatabasesCollection: NSObject {
     }
 
     func onAutoLockTimeout(background: Bool = false) {
-        NSLog("🐞 onAutoLockTimeout: Maybe Locking Databases... [Background = %hhd]", background)
+        swlog("🐞 onAutoLockTimeout: Maybe Locking Databases... [Background = %hhd]", background)
 
         tryToLockAll()
     }
 
     @objc func onScreenLocked() {
-        NSLog("onScreenLocked...")
+        swlog("onScreenLocked...")
 
         if Settings.sharedInstance().lockDatabasesOnScreenLock {
             tryToLockAll()
@@ -125,13 +125,13 @@ class DatabasesCollection: NSObject {
     }
 
     @objc func onSleep() {
-        NSLog("onSleep: Stopping Polling...")
+        swlog("onSleep: Stopping Polling...")
 
         stopAllPollingTimers()
     }
 
     @objc func onWake(_ notification: NSNotification) {
-        NSLog("onWake: Restarting Polling... %@", notification)
+        swlog("onWake: Restarting Polling... %@", notification)
 
         restartPollingTimers()
     }
@@ -156,7 +156,7 @@ class DatabasesCollection: NSObject {
         let existing = getUnlocked(uuid: model.databaseUuid)
 
         if let existing, model == existing {
-            NSLog("🔴 This database is already unlocked Will not add again")
+            swlog("🔴 This database is already unlocked Will not add again")
             return
         }
 
@@ -177,7 +177,7 @@ class DatabasesCollection: NSObject {
 
     @objc public func documentForDatabase(uuid: String) -> Document? {
         guard let dc = DocumentController.shared as? DocumentController else {
-            NSLog("🔴 Couldn't get shared document controller")
+            swlog("🔴 Couldn't get shared document controller")
             return nil
         }
 
@@ -196,7 +196,7 @@ class DatabasesCollection: NSObject {
         
 
         guard let doc = documentForDatabase(uuid: uuid) else {
-            NSLog("🔴 Couldn't get document for this db!")
+            swlog("🔴 Couldn't get document for this db!")
             return false
         }
 
@@ -211,7 +211,7 @@ class DatabasesCollection: NSObject {
         
 
         guard let doc = documentForDatabase(uuid: uuid) else {
-            NSLog("🔴 Couldn't get document for this db!")
+            swlog("🔴 Couldn't get document for this db!")
             return false
         }
 
@@ -225,7 +225,7 @@ class DatabasesCollection: NSObject {
 
     @objc public func closeAnyDocumentWindows(uuid: String) {
         if isUnlocked(uuid: uuid) {
-            NSLog("🔴 This database is unlocked. Cannot close! NOP")
+            swlog("🔴 This database is unlocked. Cannot close! NOP")
             return
         }
 
@@ -257,7 +257,7 @@ class DatabasesCollection: NSObject {
 
     func initiateUnlockWithSynchronousTimeout(_ databaseId: String, timeoutSeconds: CGFloat, syncAfterUnlock: Bool = true, message: String? = nil) -> Bool {
         if isUnlocked(uuid: databaseId) {
-            NSLog("⚠️ This database was already unlocked! NOP")
+            swlog("⚠️ This database was already unlocked! NOP")
             return true
         }
 
@@ -267,7 +267,7 @@ class DatabasesCollection: NSObject {
         var done = false
         DatabasesCollection.shared.initiateDatabaseUnlock(uuid: databaseId, syncAfterUnlock: syncAfterUnlock, message: message) { success in
             if done {
-                NSLog("🔴 WARNWARN: Database Unlock Completion Called more than once?! 1.59.9 issue?")
+                swlog("🔴 WARNWARN: Database Unlock Completion Called more than once?! 1.59.9 issue?")
                 return
             } else {
                 done = true
@@ -277,9 +277,9 @@ class DatabasesCollection: NSObject {
         }
 
         if semaphore.wait(timeout: .now() + timeoutSeconds) == .timedOut {
-            NSLog("⚠️ Waiting for Database Unlock, timed out.")
+            swlog("⚠️ Waiting for Database Unlock, timed out.")
         } else {
-            NSLog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
+            swlog("Waiting for Database Unlock done, result = [%@]", localizedOnOrOffFromBool(go))
         }
 
         return go
@@ -287,7 +287,7 @@ class DatabasesCollection: NSObject {
 
     public func initiateDatabaseUnlock(uuid: String, syncAfterUnlock: Bool, message: String? = nil, completion: ((_: Bool) -> Void)? = nil) {
         if isUnlocked(uuid: uuid) {
-            NSLog("⚠️ This database was already unlocked! NOP")
+            swlog("⚠️ This database was already unlocked! NOP")
             DispatchQueue.global().async {
                 completion?(true)
             }
@@ -295,7 +295,7 @@ class DatabasesCollection: NSObject {
         }
 
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
-            NSLog("🔴 No such database")
+            swlog("🔴 No such database")
             DispatchQueue.global().async {
                 completion?(false)
             }
@@ -328,7 +328,15 @@ class DatabasesCollection: NSObject {
         let appDelegate = NSApplication.shared.delegate as! AppDelegate
         appDelegate.cancelAutoLockTimer()
 
+        var ckfsCompletionCalled = false
+        
         determiner.getCkfs(message) { [weak self] result, ckfs, fromConvenience, error in
+            guard !ckfsCompletionCalled else {
+                swlog("🔴 CKFs Completion Called Multiple Times!")
+                return
+            }
+            ckfsCompletionCalled = true
+
             if !NSApplication.shared.isActive {
                 
                 
@@ -337,7 +345,17 @@ class DatabasesCollection: NSObject {
             }
 
             if let ckfs, result == .success {
+                
+                var unlockCompletionCalled = false
                 self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience) { result, _, _ in
+                    swlog("🐞 Unlock Completion Called...")
+
+                    guard !unlockCompletionCalled else {
+                        swlog("🔴 Unlock Completion Called Multiple Times!")
+                        return
+                    }
+                    unlockCompletionCalled = true
+
                     DispatchQueue.global().async {
                         if result == .success, syncAfterUnlock {
                             self?.sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true, ckfsForConflict: ckfs)
@@ -356,7 +374,7 @@ class DatabasesCollection: NSObject {
                     let unlocked = self?.isUnlocked(uuid: uuid) ?? false
 
                     if unlocked {
-                        NSLog("⚠️ MCE Cancelled - but database locked")
+                        swlog("⚠️ MCE Cancelled - but database locked")
                     }
 
                     completion?(unlocked) 
@@ -367,7 +385,7 @@ class DatabasesCollection: NSObject {
 
     @objc public func initiateLockRequest(uuid: String) {
         if !isUnlocked(uuid: uuid) {
-            NSLog("🔴 This database was not in the unlocked collection! NOP")
+            swlog("🔴 This database was not in the unlocked collection! NOP")
             return
         }
 
@@ -415,7 +433,7 @@ class DatabasesCollection: NSObject {
     
 
     func onSettingsChanged() {
-        NSLog("DatabasesCollection::onSettingsChanged() notification received")
+        swlog("DatabasesCollection::onSettingsChanged() notification received")
 
         
 
@@ -425,7 +443,7 @@ class DatabasesCollection: NSObject {
     
 
     func stopAllPollingTimers() {
-        NSLog("Stop all Polling Timers...")
+        swlog("Stop all Polling Timers...")
 
         let keys = pollingTimersC.allKeys
         for key in keys {
@@ -437,7 +455,7 @@ class DatabasesCollection: NSObject {
     }
 
     func restartPollingTimers() {
-        NSLog("Restart Polling Timers...")
+        swlog("Restart Polling Timers...")
 
         stopAllPollingTimers()
 
@@ -450,12 +468,12 @@ class DatabasesCollection: NSObject {
 
 
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
-            NSLog("🔴 No such database")
+            swlog("🔴 No such database")
             return
         }
 
         if pollingTimersC.object(forKey: uuid as NSString) != nil {
-            NSLog("🔴 Already a timer in place")
+            swlog("🔴 Already a timer in place")
             return
         }
 
@@ -466,12 +484,12 @@ class DatabasesCollection: NSObject {
 
             pollingTimersC.setObject(nTimer, forKey: uuid as NSString)
         } else {
-            NSLog("Not monitoring database external changes because OfflineMode or configured Off.")
+            swlog("Not monitoring database external changes because OfflineMode or configured Off.")
         }
     }
 
     private func stopPollForRemoteChangesTimer(uuid: String) {
-        NSLog("stopPollForRemoteChangesTimer")
+        swlog("stopPollForRemoteChangesTimer")
 
         if let timer = pollingTimersC.object(forKey: uuid as NSString) {
             timer.invalidate()
@@ -483,12 +501,12 @@ class DatabasesCollection: NSObject {
         DebugLogger.debug(String(format: "pollForDatabaseRemoteChanges: %@", uuid))
 
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
-            NSLog("🔴 No such database")
+            swlog("🔴 No such database")
             return
         }
 
         if pollingInProgressSetC.contains(uuid as NSString) {
-            NSLog("pollForDatabaseRemoteChanges - pollingInProgress - Will not queue up another Poll.")
+            swlog("pollForDatabaseRemoteChanges - pollingInProgress - Will not queue up another Poll.")
             return
         }
 
@@ -498,11 +516,11 @@ class DatabasesCollection: NSObject {
             self?.pollingInProgressSetC.remove(uuid as NSString)
 
             if let error {
-                NSLog("🔴 error polling: [%@]", String(describing: error))
+                swlog("🔴 error polling: [%@]", String(describing: error))
             }
 
             if result == .success, changesPresent {
-                NSLog("pollForDatabaseRemoteChanges - Changes Found")
+                swlog("pollForDatabaseRemoteChanges - Changes Found")
 
                 self?.onDatabaseRemoteChanged(uuid: uuid)
             }
@@ -519,7 +537,7 @@ class DatabasesCollection: NSObject {
                 sync(uuid: uuid, allowInteractive: false)
             }
         } else {
-            NSLog("⚠️ Got change notification for locked database? Shouldn't be possible. Stopping Timer")
+            swlog("⚠️ Got change notification for locked database? Shouldn't be possible. Stopping Timer")
             stopPollForRemoteChangesTimer(uuid: uuid)
         }
     }
@@ -617,7 +635,7 @@ class DatabasesCollection: NSObject {
 
     @objc public func updateAndQueueSync(uuid: String, allowInteractiveSync: Bool = false) -> Bool {
         guard let model = getUnlocked(uuid: uuid) else {
-            NSLog("🔴 Couldn't find this database unlocked to update")
+            swlog("🔴 Couldn't find this database unlocked to update")
             return false
         }
 
@@ -658,7 +676,7 @@ class DatabasesCollection: NSObject {
     }
 
     func onAsyncUpdateDone(result: AsyncJobResult, updateId: UUID, model: Model, allowInteractiveSync: Bool) {
-        NSLog("Async Update [%@] Done with [%@]", String(describing: updateId), String(describing: result.success))
+        swlog("Async Update [%@] Done with [%@]", String(describing: updateId), String(describing: result.success))
 
         if model.metadata.asyncUpdateId == updateId {
             model.metadata.asyncUpdateId = nil
@@ -673,7 +691,7 @@ class DatabasesCollection: NSObject {
                 }
             }
         } else {
-            NSLog("Not clearing asyncUpdateID as another has been queued... [%@]", String(describing: model.metadata.asyncUpdateId))
+            swlog("Not clearing asyncUpdateID as another has been queued... [%@]", String(describing: model.metadata.asyncUpdateId))
         }
 
         notifyUpdatesDatabasesList()
@@ -683,13 +701,13 @@ class DatabasesCollection: NSObject {
 
     @objc public func sync(uuid: String, allowInteractive: Bool = false, suppressErrorAlerts: Bool = false, ckfsForConflict: CompositeKeyFactors? = nil, completion: SyncAndMergeCompletionBlock? = nil) {
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
-            NSLog("🔴 No such database to sync")
+            swlog("🔴 No such database to sync")
             completion?(.error, false, Utils.createNSError("🔴 No such database to sync", errorCode: -1234))
             return
         }
 
         guard !prefs.alwaysOpenOffline else { 
-            NSLog("🔴 Database is in Offline Mode - Cannot Sync!")
+            swlog("🔴 Database is in Offline Mode - Cannot Sync!")
 
             completion?(.error, false, Utils.createNSError("🔴 Database is in Offline Mode - Cannot Sync!", errorCode: -1234))
             return
@@ -699,13 +717,13 @@ class DatabasesCollection: NSObject {
 
         if let model {
             if model.isInOfflineMode {
-                NSLog("🔴 Database is in Offline Mode - Cannot Sync!")
+                swlog("🔴 Database is in Offline Mode - Cannot Sync!")
                 completion?(.error, false, Utils.createNSError("🔴 Database is in Offline Mode - Cannot Sync!", errorCode: -1234))
                 return
             }
 
             if let document = documentForDatabase(uuid: uuid), document.hasUnautosavedChanges || document.isDocumentEdited {
-                NSLog("🔴 Cannot Sync while Document Open with Changes/Edits")
+                swlog("🔴 Cannot Sync while Document Open with Changes/Edits")
                 completion?(.error, false, Utils.createNSError("🔴 Cannot Sync while Document Open with Changes/Edits", errorCode: -1234))
                 return
             }
@@ -743,12 +761,12 @@ class DatabasesCollection: NSObject {
         } else if result == .resultUserInteractionRequired {
             onSyncUserInteractionRequired(metadata: metadata, allowInteractive: allowInteractive, suppressErrorAlerts: suppressErrorAlerts, wasInteractive: wasInteractive, ckfsForConflict: ckfsForConflict, completion: completion)
         } else {
-            NSLog("🔴 Unknown or expected Sync Result!")
+            swlog("🔴 Unknown or expected Sync Result!")
         }
     }
 
     func onSyncUserCancelled(completion: SyncAndMergeCompletionBlock?) {
-        NSLog("DatabasesCollection::onSyncUserCancelled")
+        swlog("DatabasesCollection::onSyncUserCancelled")
 
         if let completion {
             completion(.resultUserCancelled, false, nil)
@@ -756,7 +774,7 @@ class DatabasesCollection: NSObject {
     }
 
     func onSyncUserPostponed(completion: SyncAndMergeCompletionBlock?) {
-        NSLog("DatabasesCollection::onSyncUserPostponed")
+        swlog("DatabasesCollection::onSyncUserPostponed")
 
         
         
@@ -768,10 +786,10 @@ class DatabasesCollection: NSObject {
     }
 
     func onSyncUserInteractionRequired(metadata: MacDatabasePreferences, allowInteractive: Bool, suppressErrorAlerts: Bool, wasInteractive: Bool, ckfsForConflict: CompositeKeyFactors?, completion: SyncAndMergeCompletionBlock?) {
-        NSLog("DatabasesCollection::onSyncUserInteractionRequired")
+        swlog("DatabasesCollection::onSyncUserInteractionRequired")
 
         if wasInteractive {
-            NSLog("🔴 Something very wrong - User interaction required after an interactive sync? SANITY")
+            swlog("🔴 Something very wrong - User interaction required after an interactive sync? SANITY")
             if let completion {
                 completion(.error, false, Utils.createNSError("Something very wrong - User interaction required after an interactive sync? SANITY", errorCode: -1))
             }
@@ -789,13 +807,13 @@ class DatabasesCollection: NSObject {
             } else {
                 
 
-                NSLog("⚠️ Interactive Sync Required and Allowed but no unlocked database or ckfs passed for interactive Sync")
+                swlog("⚠️ Interactive Sync Required and Allowed but no unlocked database or ckfs passed for interactive Sync")
                 if let completion {
                     completion(.resultUserInteractionRequired, false, nil)
                 }
             }
         } else {
-            NSLog("Background Sync Done => User Interaction is Required but interactive sync not allowed")
+            swlog("Background Sync Done => User Interaction is Required but interactive sync not allowed")
 
             if let completion {
                 completion(.resultUserInteractionRequired, false, nil)
@@ -804,7 +822,7 @@ class DatabasesCollection: NSObject {
     }
 
     func onSyncError(metadata: MacDatabasePreferences, error: Error?, allowInteractive: Bool, wasInteractive _: Bool, suppressErrorAlerts: Bool, completion: SyncAndMergeCompletionBlock?) {
-        NSLog("🔴 DatabasesCollection::onSyncError - Error Occurred => [%@]", String(describing: error))
+        swlog("🔴 DatabasesCollection::onSyncError - Error Occurred => [%@]", String(describing: error))
 
         if let error {
             if allowInteractive, !suppressErrorAlerts {
@@ -813,7 +831,7 @@ class DatabasesCollection: NSObject {
                 
             }
         } else {
-            NSLog("🔴 Sync returned error status but no Error - Something very wrong")
+            swlog("🔴 Sync returned error status but no Error - Something very wrong")
         }
 
         if let completion {
@@ -864,11 +882,11 @@ class DatabasesCollection: NSObject {
                     
                     
 
-                    NSLog("✅ Successfully reloaded Model after Sync found changes")
+                    swlog("✅ Successfully reloaded Model after Sync found changes")
                 } else {
                     
 
-                    NSLog("🔴 Could not Unlock updated database after Sync. Key changed?! - Force Locking.")
+                    swlog("🔴 Could not Unlock updated database after Sync. Key changed?! - Force Locking.")
                     self?.forceLock(uuid: uuid)
                 }
             }
@@ -901,7 +919,7 @@ class DatabasesCollection: NSObject {
                     
                     
 
-                    NSLog("✅ Successfully reloaded Model after explicit reload request")
+                    swlog("✅ Successfully reloaded Model after explicit reload request")
 
                     if dispatchSyncAfterwards {
                         self?.sync(uuid: uuid, allowInteractive: false, suppressErrorAlerts: true) { _, _, _ in
@@ -913,7 +931,7 @@ class DatabasesCollection: NSObject {
                 } else {
                     
 
-                    NSLog("🔴 Could not Unlock updated database after explicit reload request. Key changed?! - Force Locking.")
+                    swlog("🔴 Could not Unlock updated database after explicit reload request. Key changed?! - Force Locking.")
                     self?.forceLock(uuid: uuid)
                     completion?()
                 }

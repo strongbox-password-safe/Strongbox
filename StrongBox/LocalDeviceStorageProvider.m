@@ -82,14 +82,14 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 }
 
 - (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data modDate:(NSDate*_Nullable)modDate {
-    NSLog(@"Trying to write local file with filename [%@]", filename);
+    slog(@"Trying to write local file with filename [%@]", filename);
     NSString *path = [self getDefaultStorageFileUrl:filename].path;
     
     return [self writeToPath:path overwrite:overwrite data:data modDate:modDate];
 }
 
 - (BOOL)writeToDocumentsWithFilename:(NSString *)filename overwrite:(BOOL)overwrite data:(NSData *)data modDate:(NSDate *)modDate {
-    NSLog(@"Trying to write local file with filename [%@]", filename);
+    slog(@"Trying to write local file with filename [%@]", filename);
     NSString *path = [self getDocumentsFileUrl:filename].path;
     
     return [self writeToPath:path overwrite:overwrite data:data modDate:modDate];
@@ -107,7 +107,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         }
         else {
             
-            NSLog(@"File [%@] but not allowed to overwrite...", path);
+            slog(@"File [%@] but not allowed to overwrite...", path);
             ret = NO;
         }
     }
@@ -126,7 +126,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                                            ofItemAtPath:path
                                                   error:&err2];
             if ( err2 ) {
-                NSLog(@"WARNWARN: writeToDefaultStorageWithFilename -> could not set mod date: [%@]", err2);
+                slog(@"WARNWARN: writeToDefaultStorageWithFilename -> could not set mod date: [%@]", err2);
             }
         }
         
@@ -144,7 +144,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     BOOL ret = [data writeToFile:path options:flags error:&error];
     
     if(!ret) {
-        NSLog(@"tryWrite Failed: [%@]", error);
+        slog(@"tryWrite Failed: [%@]", error);
     }
     
     return ret;
@@ -218,13 +218,13 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
           completion:(StorageProviderReadCompletionBlock)completion {
     NSURL *url = [self getFileUrl:safeMetaData];
     
-    NSLog(@"Local Reading at: %@", url);
+    slog(@"Local Reading at: %@", url);
     
     NSError* error;
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     
     if (error) {
-        NSLog(@"Error = [%@]", error);
+        slog(@"Error = [%@]", error);
         completion(kReadResultError, nil, nil, error);
     }
     else {
@@ -239,7 +239,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 }
 
 - (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
-    NSLog(@"🔴 LocalDeviceStorageProvider::getModDate not impl!"); 
+    slog(@"🔴 LocalDeviceStorageProvider::getModDate not impl!"); 
     
     
 }
@@ -302,7 +302,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     NSString* newPath = [baseDir stringByAppendingPathComponent:sanitisedFilename];
     
     if ( [NSFileManager.defaultManager fileExistsAtPath:newPath] ) {
-        NSLog(@"🔴 Problem renaming local file!");
+        slog(@"🔴 Problem renaming local file!");
         
         if ( error ) {
             *error = [Utils createNSError:NSLocalizedString(@"error_rename_file_already_exists", @"Cannot rename file as a file with that name already exists.") errorCode:-1234];
@@ -318,7 +318,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     
     NSError* err;
     if (! [NSFileManager.defaultManager moveItemAtPath:fullPath toPath:newPath error:&err] ) {
-        NSLog(@"🔴 Problem renaming local file! [%@]", err);
+        slog(@"🔴 Problem renaming local file! [%@]", err);
         
         if ( error ) {
             *error = err;

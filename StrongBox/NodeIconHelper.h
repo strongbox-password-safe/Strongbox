@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSArray<IMAGE_TYPE_PTR>*)getIconSet:(KeePassIconSet)iconSet;
 
+@property (class, readonly) IMAGE_TYPE_PTR defaultIcon;
+
 + (IMAGE_TYPE_PTR)getIconForNode:(Node *)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format;
 + (IMAGE_TYPE_PTR)getIconForNode:(Node *)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format large:(BOOL)large;
 

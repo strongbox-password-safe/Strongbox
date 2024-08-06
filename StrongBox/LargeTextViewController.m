@@ -49,7 +49,9 @@
 
     self.qrCodeImageView.hidden = YES;
 
-    [self loadSwiftUIView];
+    if ( !self.hideLargeTextGrid ) {
+        [self loadSwiftUIView];
+    }
 
     UITapGestureRecognizer *tapGestureRecognizerSubtext = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(subtextTapped)];
     tapGestureRecognizerSubtext.numberOfTapsRequired = 1;

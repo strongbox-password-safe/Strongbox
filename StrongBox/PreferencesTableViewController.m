@@ -104,7 +104,7 @@
     }
     else {
         
-        NSLog(@"Tips Loaded: [%hhd]", TipJarLogic.sharedInstance.isLoaded);
+        slog(@"Tips Loaded: [%hhd]", TipJarLogic.sharedInstance.isLoaded);
     }
     
     if ( !UIApplication.sharedApplication.supportsAlternateIcons ) {

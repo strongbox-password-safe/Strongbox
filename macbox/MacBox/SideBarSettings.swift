@@ -95,7 +95,7 @@ class SideBarSettings: NSViewController {
 
         if show {
             guard !headerNodes.contains(where: { $0.header == item }) else {
-                NSLog("🔴 Item Turned On but already on!")
+                swlog("🔴 Item Turned On but already on!")
                 return
             }
 
@@ -106,7 +106,7 @@ class SideBarSettings: NSViewController {
             }
         } else {
             guard let nodeIdx = headerNodes.firstIndex(where: { $0.header == item }) else {
-                NSLog("🔴 Item Turned Off but not found!")
+                swlog("🔴 Item Turned Off but not found!")
                 return
             }
 

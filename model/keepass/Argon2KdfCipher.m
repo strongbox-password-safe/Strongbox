@@ -163,7 +163,7 @@ static const BOOL kLogVerbose = NO;
     NSData *transformKey = [NSData dataWithBytes:ctx.out length:ctx.outlen];
 
     if(kLogVerbose) {
-        NSLog(@"ARGON2: TRANSFORM KEY: %@", [transformKey base64EncodedStringWithOptions:kNilOptions]);
+        slog(@"ARGON2: TRANSFORM KEY: %@", [transformKey base64EncodedStringWithOptions:kNilOptions]);
     }
 
     return transformKey;

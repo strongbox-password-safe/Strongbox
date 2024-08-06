@@ -36,6 +36,8 @@ class LargeTextViewAndQrCode: NSViewController {
         }
     }
 
+    private var qrCodeString: String?
+
     private var subtext: String = ""
     private var characters: [Character] = []
 
@@ -43,10 +45,11 @@ class LargeTextViewAndQrCode: NSViewController {
         super.viewDidLoad()
     }
 
-    func setContent(string: String, largeText: Bool = true, subtext: String = "") {
+    func setContent(string: String, largeText: Bool = true, subtext: String = "", qrCodeString: String? = nil) {
         self.string = string
         self.largeText = largeText
         self.subtext = subtext
+        self.qrCodeString = qrCodeString
 
         bindUI()
     }
@@ -72,7 +75,8 @@ class LargeTextViewAndQrCode: NSViewController {
         collectionView.delegate = self
         
 
-        let image = Utils.getQrCode(string, pointSize: 128)
+        let qrCodeText = qrCodeString ?? string
+        let image = Utils.getQrCode(qrCodeText, pointSize: 128)
         imageView.image = image
 
         
@@ -86,7 +90,7 @@ class LargeTextViewAndQrCode: NSViewController {
         labelSubtext.stringValue = subtext
         labelSubtext.isHidden = subtext.count == 0
 
-        labelLargeTextHeader.stringValue = NSLocalizedString("generic_totp_secret", comment: "TOTP Secret")
+        labelLargeTextHeader.stringValue = NSLocalizedString("generic_totp_secret", comment: "2FA Secret")
         labelLargeTextHeader.isHidden = subtext.count == 0
 
         

@@ -71,7 +71,7 @@ import Foundation
         let size = response.count
 
         if perf > 0.05 || size > (30 * 1024) {
-            NSLog("🐞 PERF: Processed AutoFill [%@] request in %f seconds (%d bytes)", request.messageType.description, perf, size)
+            swlog("🐞 PERF: Processed AutoFill [%@] request in %f seconds (%d bytes)", request.messageType.description, perf, size)
         }
 
         return response
@@ -84,7 +84,7 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let favRequest = try? decoder.decode(GetFavouritesRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode GetFavouritesRequest from message JSON")
+            swlog("🔴 Can't decode GetFavouritesRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode GetFavouritesRequest from message JSON")
         }
 
@@ -95,7 +95,7 @@ import Foundation
         let takeRequested = (favRequest.take ?? GetFavouritesRequest.DefaultMaxResults)
         let take = takeRequested > GetFavouritesRequest.AbsoluteMaxResults ? GetFavouritesRequest.AbsoluteMaxResults : takeRequested
         if takeRequested > GetFavouritesRequest.AbsoluteMaxResults {
-            NSLog("⚠️ WARN: GetFavourites - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, GetFavouritesRequest.AbsoluteMaxResults)
+            swlog("⚠️ WARN: GetFavourites - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, GetFavouritesRequest.AbsoluteMaxResults)
         }
 
         let skip = favRequest.skip ?? 0
@@ -126,7 +126,7 @@ import Foundation
         }
 
         #if DEBUG
-            NSLog("✅ getFavourites - skip %d, take %d, with Result Count %d", skip, take, collected.count)
+            swlog("✅ getFavourites - skip %d, take %d, with Result Count %d", skip, take, collected.count)
         #endif
 
         let credentials = getResultsWindow(collected, skip, take)
@@ -141,24 +141,24 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let copyRequest = try? decoder.decode(CopyFieldRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode CopyFieldRequest from message JSON")
+            swlog("🔴 Can't decode CopyFieldRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode CopyFieldRequest from message JSON")
         }
 
         guard let theDatabase = MacDatabasePreferences.allDatabases.first(where: { database in
             database.uuid == copyRequest.databaseId
         }) else {
-            NSLog("🔴 Could not find this database")
+            swlog("🔴 Could not find this database")
             return AutoFillEncryptedResponse.error(message: "Could not find this database!")
         }
 
         guard theDatabase.autoFillEnabled else {
-            NSLog("🔴 This database is not AutoFill enabled")
+            swlog("🔴 This database is not AutoFill enabled")
             return AutoFillEncryptedResponse.error(message: "This database is not AutoFill enabled")
         }
 
         guard let model = DatabasesCollection.shared.getUnlocked(uuid: theDatabase.uuid) else {
-            NSLog("🔴 This database is not unlocked.")
+            swlog("🔴 This database is not unlocked.")
             return AutoFillEncryptedResponse.error(message: "This database is not unlocked or error getting document")
         }
 
@@ -185,7 +185,7 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let copyRequest = try? decoder.decode(CopyStringRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode CopyFieldRequest from message JSON")
+            swlog("🔴 Can't decode CopyFieldRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode CopyFieldRequest from message JSON")
         }
 
@@ -227,7 +227,7 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let searchRequest = try? decoder.decode(SearchRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode SearchRequest from message JSON")
+            swlog("🔴 Can't decode SearchRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode SearchRequest from message JSON")
         }
 
@@ -258,13 +258,13 @@ import Foundation
         let takeRequested = (searchRequest.take ?? SearchRequest.DefaultMaxResults)
         let take = takeRequested > SearchRequest.AbsoluteMaxResults ? SearchRequest.AbsoluteMaxResults : takeRequested
         if takeRequested > SearchRequest.AbsoluteMaxResults {
-            NSLog("⚠️ WARN: Search - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, SearchRequest.AbsoluteMaxResults)
+            swlog("⚠️ WARN: Search - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, SearchRequest.AbsoluteMaxResults)
         }
 
         let skip = searchRequest.skip ?? 0
 
         #if DEBUG
-            NSLog("✅ Got Search Request - Query = [%@] - skip %d, take %d, with Result Count %d", searchRequest.query, skip, take, collected.count)
+            swlog("✅ Got Search Request - Query = [%@] - skip %d, take %d, with Result Count %d", searchRequest.query, skip, take, collected.count)
         #endif
 
         let results = getResultsWindow(collected, skip, take)
@@ -281,7 +281,7 @@ import Foundation
         var take = takeIn
 
         if skip > collected.count {
-            NSLog("⚠️ WARN: getResultsWindow - Paging: Skip (%d) greater than result count (%d) - zeroing skip and take", skip, collected.count)
+            swlog("⚠️ WARN: getResultsWindow - Paging: Skip (%d) greater than result count (%d) - zeroing skip and take", skip, collected.count)
             skip = 0
             take = 0
         }
@@ -304,14 +304,14 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(LockDatabaseRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode LockDatabaseRequest from message JSON")
+            swlog("🔴 Can't decode LockDatabaseRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode LockDatabaseRequest from message JSON")
         }
 
-        NSLog("Got LockDatabaseRequest - Database ID = [%@]", request.databaseId)
+        swlog("Got LockDatabaseRequest - Database ID = [%@]", request.databaseId)
 
         guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled else {
-            NSLog("🔴 Can't find AutoFillEnabled database to Lock")
+            swlog("🔴 Can't find AutoFillEnabled database to Lock")
             return AutoFillEncryptedResponse.error(message: "🔴 Can't find AutoFillEnabled database to Lock")
         }
 
@@ -335,14 +335,14 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(UnlockDatabaseRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode UnlockDatabaseRequest from message JSON")
+            swlog("🔴 Can't decode UnlockDatabaseRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode UnlockDatabaseRequest from message JSON")
         }
 
-        NSLog("Got UnlockDatabaseRequest - Database ID = [%@]", request.databaseId)
+        swlog("Got UnlockDatabaseRequest - Database ID = [%@]", request.databaseId)
 
         guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled else {
-            NSLog("🔴 Can't find AutoFillEnabled database to Unlock")
+            swlog("🔴 Can't find AutoFillEnabled database to Unlock")
             return AutoFillEncryptedResponse.error(message: "Can't find AutoFillEnabled database to Unlock")
         }
 
@@ -370,7 +370,7 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let gcfuRequest = try? decoder.decode(CredentialsForUrlRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode CredentialsForUrlRequest from message JSON")
+            swlog("🔴 Can't decode CredentialsForUrlRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode CredentialsForUrlRequest from message JSON")
         }
 
@@ -384,7 +384,7 @@ import Foundation
         let takeRequested = (gcfuRequest.take ?? CredentialsForUrlRequest.DefaultMaxResults)
         let take = takeRequested > CredentialsForUrlRequest.AbsoluteMaxResults ? CredentialsForUrlRequest.AbsoluteMaxResults : takeRequested
         if takeRequested > CredentialsForUrlRequest.AbsoluteMaxResults {
-            NSLog("⚠️ WARN: Get Credentials for URL - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, CredentialsForUrlRequest.AbsoluteMaxResults)
+            swlog("⚠️ WARN: Get Credentials for URL - Paging: Take (%d) greater than AbsoluteMaxResults (%d) - will truncate results", takeRequested, CredentialsForUrlRequest.AbsoluteMaxResults)
         }
 
         let skip = gcfuRequest.skip ?? 0
@@ -432,11 +432,11 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(CreateEntryRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode CreateEntryRequest from message JSON")
+            swlog("🔴 Can't decode CreateEntryRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode CreateEntryRequest from message JSON")
         }
 
-        NSLog("✅ Got CreateEntryRequest [databaseId = %@]", request.databaseId)
+        swlog("✅ Got CreateEntryRequest [databaseId = %@]", request.databaseId)
 
         let response = createEntry(request: request)
 
@@ -452,11 +452,11 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(GetGroupsRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode CreateEntryRequest from message JSON")
+            swlog("🔴 Can't decode CreateEntryRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode CreateEntryRequest from message JSON")
         }
 
-        NSLog("✅ Got CreateEntryRequest [databaseId = %@]", request.databaseId)
+        swlog("✅ Got CreateEntryRequest [databaseId = %@]", request.databaseId)
 
         let response = getGroups(request: request)
 
@@ -472,11 +472,11 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(GeneratePasswordRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode handleGeneratePasswordRequest from message JSON")
+            swlog("🔴 Can't decode handleGeneratePasswordRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode handleGeneratePasswordRequest from message JSON")
         }
 
-        NSLog("✅ Got handleGeneratePasswordRequest")
+        swlog("✅ Got handleGeneratePasswordRequest")
 
         let response = generatePassword(request: request)
 
@@ -492,11 +492,11 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(GeneratePasswordRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode handleGeneratePasswordV2Request from message JSON")
+            swlog("🔴 Can't decode handleGeneratePasswordV2Request from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode handleGeneratePasswordV2Request from message JSON")
         }
 
-        NSLog("✅ Got handleGeneratePasswordV2Request")
+        swlog("✅ Got handleGeneratePasswordV2Request")
 
         let response = generatePasswordV2(request: request)
 
@@ -512,11 +512,11 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(GetPasswordStrengthRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode handleGetPasswordStrengthRequest from message JSON")
+            swlog("🔴 Can't decode handleGetPasswordStrengthRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode handleGetPasswordStrengthRequest from message JSON")
         }
 
-        NSLog("✅ Got handleGetPasswordStrengthRequest")
+        swlog("✅ Got handleGetPasswordStrengthRequest")
 
         let response = getPasswordStrength(request)
 
@@ -532,11 +532,11 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(GetNewEntryDefaultsRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode GetNewEntryDefaultsRequest from message JSON")
+            swlog("🔴 Can't decode GetNewEntryDefaultsRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode GetNewEntryDefaultsRequest from message JSON")
         }
 
-        NSLog("✅ Got GetNewEntryDefaultsRequest [databaseId = %@]", request.databaseId)
+        swlog("✅ Got GetNewEntryDefaultsRequest [databaseId = %@]", request.databaseId)
 
         let response = getNewEntryDefaults(request: request)
 
@@ -552,11 +552,11 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(GetNewEntryDefaultsRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode GetNewEntryDefaultsRequestV2 from message JSON")
+            swlog("🔴 Can't decode GetNewEntryDefaultsRequestV2 from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode GetNewEntryDefaultsRequestV2 from message JSON")
         }
 
-        NSLog("✅ Got GetNewEntryDefaultsRequestV2 [databaseId = %@]", request.databaseId)
+        swlog("✅ Got GetNewEntryDefaultsRequestV2 [databaseId = %@]", request.databaseId)
 
         let response = getNewEntryDefaultsV2(request: request)
 
@@ -572,7 +572,7 @@ import Foundation
               let data = jsonRequest.data(using: .utf8),
               let request = try? decoder.decode(GetIconRequest.self, from: data)
         else {
-            NSLog("🔴 Can't decode GetIconRequest from message JSON")
+            swlog("🔴 Can't decode GetIconRequest from message JSON")
             return AutoFillEncryptedResponse.error(message: "Can't decode GetIconRequest from message JSON")
         }
 
@@ -584,7 +584,7 @@ import Foundation
               let node = model.getItemBy(request.nodeId),
               let b64 = getNodeIconPngBase64String(model, node, maxLength: AutoFillRequestHandler.MaxIconBase64LengthExplicitRequest)
         else {
-            NSLog("🔴 Can't find AutoFillEnabled database to get Icon for, or this database is not unlocked or could not find node")
+            swlog("🔴 Can't find AutoFillEnabled database to get Icon for, or this database is not unlocked or could not find node")
             return AutoFillEncryptedResponse.error(message: "This database is not unlocked or error getting document")
         }
 
@@ -651,10 +651,10 @@ import Foundation
             return cached as String
         }
 
-        var image = NodeIconHelper.getIconFor(node, predefinedIconSet: model.metadata.iconSet, format: model.originalFormat)
+        var image = NodeIconHelper.getIconFor(node, predefinedIconSet: model.metadata.keePassIconSet, format: model.originalFormat)
 
         if node.icon == nil || !(node.icon?.isCustom ?? false) {
-            if model.metadata.iconSet == .sfSymbols {
+            if model.metadata.keePassIconSet == .sfSymbols {
                 image = Utils.imageTinted(withColor: image, tint: .systemBlue) 
             }
         }
@@ -664,7 +664,7 @@ import Foundation
 
     func getPngBase64StringForImage(model _: Model, image: NSImage, cacheKey: String, maxLength: Int) -> String? {
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            NSLog("🔴 Could not get cgimage for node icon")
+            swlog("🔴 Could not get cgimage for node icon")
             return nil
         }
 
@@ -672,14 +672,14 @@ import Foundation
         newRep.size = image.size 
 
         guard let pngData = newRep.representation(using: .png, properties: [:]) else {
-            NSLog("🔴 Could not newRep.representation for new icon")
+            swlog("🔴 Could not newRep.representation for new icon")
             return nil
         }
 
         var ret = pngData.base64EncodedString()
 
         if ret.count > maxLength {
-            NSLog("⚠️ Icon is too large to return. Size=\(ret.count)bytes.")
+            swlog("⚠️ Icon is too large to return. Size=\(ret.count)bytes.")
 
             
 
@@ -697,7 +697,7 @@ import Foundation
 
     func copyUsername(model: Model, itemId: UUID) {
         guard let item = model.getItemBy(itemId) else {
-            NSLog("🔴 Could not find item to copy!")
+            swlog("🔴 Could not find item to copy!")
             return
         }
 
@@ -706,7 +706,7 @@ import Foundation
 
     func copyPassword(model: Model, itemId: UUID) {
         guard let item = model.getItemBy(itemId) else {
-            NSLog("🔴 Could not find item to copy!")
+            swlog("🔴 Could not find item to copy!")
             return
         }
 
@@ -715,12 +715,12 @@ import Foundation
 
     func copyTotp(model: Model, itemId: UUID, explicitRequest: Bool) {
         guard explicitRequest || model.metadata.autoFillCopyTotp else {
-            NSLog("🔴 Not copying TOTP as not configured or not an explicit request")
+            swlog("🔴 Not copying TOTP as not configured or not an explicit request")
             return
         }
 
         guard let item = model.getItemBy(itemId), let token = item.fields.otpToken else {
-            NSLog("🔴 Could not find item to copy!")
+            swlog("🔴 Could not find item to copy!")
             return
         }
 
