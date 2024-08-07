@@ -50,7 +50,7 @@ class CloudKitManager {
     static let shared = CloudKitManager()
 
     func initialize() async throws {
-
+        swlog("  Initializing CloudKit...")
 
         try await createZoneIfNeeded()
     }

@@ -7,7 +7,6 @@
 //
 
 #import "BiometricIdHelper.h"
-#import <LocalAuthentication/LocalAuthentication.h>
 #import "Utils.h"
 #import "Settings.h"
 #import "StrongboxErrorCodes.h"
@@ -78,6 +77,10 @@
     return [self authorize:fallbackTitle reason:nil database:database completion:completion];
 }
 
+- (LAPolicy)getPolicyForDatabase:(MacDatabasePreferences*)database {
+    return [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
+}
+
 - (void)authorize:(NSString *)fallbackTitle
            reason:(NSString * _Nullable)reason
          database:(MacDatabasePreferences *)database
@@ -109,7 +112,7 @@
     NSString* loc = reason.length ? reason : NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Unlock Database");
     
     NSError *authError;
-    NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
+    NSUInteger policy = [self getPolicyForDatabase:database];
     
     if([lac canEvaluatePolicy:policy error:&authError]) {
         self.inProgressLaContext = lac;

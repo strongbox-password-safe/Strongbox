@@ -73,4 +73,12 @@ class FontManager: NSObject {
         let ret = NSFontManager.shared.convert(base, toHaveTrait: .boldFontMask)
         return ret
     }()
+
+    @objc
+    let boldLargeTitleFont: NSFont = {
+        let bodyFont = NSFont.preferredFont(forTextStyle: .largeTitle)
+
+        let ret = NSFontManager.shared.convert(bodyFont, toHaveTrait: .boldFontMask)
+        return ret
+    }()
 }

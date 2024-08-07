@@ -196,7 +196,38 @@ static NSString* getFreeTrialSuffix(void) {
     
     [vc.view setFrame:self.contentViewController.view.frame];
     
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+    
     self.contentViewController = vc;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     if ( [self.contentViewController respondsToSelector:@selector(onDocumentLoaded)]) {
         [self.contentViewController performSelector:@selector(onDocumentLoaded)];
     }
@@ -2256,7 +2287,10 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)copyAllFields:(Node*)item {
-    NSString* allString = [self.viewModel.commonModel getAllFieldsKeyValuesString:item.uuid];    
+    NSString* allString = [self.viewModel.commonModel getAllFieldsKeyValuesString:item.uuid];
+    
+    [ClipboardManager.sharedInstance copyConcealedString:allString];
+    
     NSString* loc = NSLocalizedString(@"generic_copied", @"Copied");
     [self showPopupChangeToastNotification:loc];
 }

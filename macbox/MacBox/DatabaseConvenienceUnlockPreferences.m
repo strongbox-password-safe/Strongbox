@@ -25,7 +25,7 @@
 @property (weak) IBOutlet NSTextField *passwordStorageSummary;
 @property (weak) IBOutlet NSTextField *labelRequireReentry;
 @property (weak) IBOutlet NSButton *checkBoxEnableWatch;
-@property (weak) IBOutlet NSButton *checkboxAutomaticallyPrompt;
+
 
 @property NSArray<NSNumber*>* sliderNotches;
 
@@ -42,9 +42,9 @@
 }
 
 - (IBAction)onSettingChanged:(id)sender {
-    BOOL foo = self.checkboxAutomaticallyPrompt.state == NSControlStateValueOn;
-    
-    self.model.databaseMetadata.autoPromptForConvenienceUnlockOnActivate = foo;
+
+
+
     
     [self bindUi];
 }
@@ -102,8 +102,8 @@
     self.checkBoxEnableWatch.state = meta.isWatchUnlockEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     
     BOOL convenienceEnabled = meta.isConvenienceUnlockEnabled;
-    self.checkboxAutomaticallyPrompt.enabled = convenienceEnabled;
-    self.checkboxAutomaticallyPrompt.state = meta.autoPromptForConvenienceUnlockOnActivate ? NSControlStateValueOn : NSControlStateValueOff;
+
+
 
     BOOL conveniencePossible = methodAvailable && featureAvailable;
 

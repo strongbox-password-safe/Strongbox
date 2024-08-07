@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "MacDatabasePreferences.h"
+#import <LocalAuthentication/LocalAuthentication.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)invalidateCurrentRequest; 
 
+- (LAPolicy)getPolicyForDatabase:(MacDatabasePreferences*)database;
+    
 @property (readonly) BOOL isTouchIdUnlockAvailable;
 @property (readonly) BOOL isWatchUnlockAvailable;
 @property (readonly) NSString* biometricIdName;

@@ -146,7 +146,7 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
 
     override func tableView(_: UITableView, titleForHeaderInSection section: Int) -> String? {
         if section == 0 {
-            return nil
+            return NSLocalizedString("generic_visible", comment: "Visible")
         } else if section == 1 {
             return NSLocalizedString("generic_item_is_hidden", comment: "Hidden")
         } else {

@@ -42,19 +42,20 @@
 @property (weak) Document*_Nullable document;
 @property (readonly) ViewModel*_Nullable viewModel;
 @property (readonly) MacDatabasePreferences*_Nullable databaseMetadata;
+@property (weak) IBOutlet NSTextField *textFieldError;
+@property (weak) IBOutlet NSTextField *textFieldBioUnavailableWarn;
 
 @property (weak) IBOutlet ClickableTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
-@property (weak) IBOutlet KSPasswordField *textFieldMasterPassword;
+@property (weak) IBOutlet MMcGSecureTextField *textFieldMasterPassword;
 @property (weak) IBOutlet NSButton *checkboxShowAdvanced;
 @property (weak) IBOutlet NSPopUpButton *yubiKeyPopup;
 @property (weak) IBOutlet NSButton *checkboxAllowEmpty;
 @property (weak) IBOutlet NSTextField *labelUnlockKeyFileHeader;
 @property (weak) IBOutlet NSTextField *labelUnlockYubiKeyHeader;
 @property (weak) IBOutlet NSPopUpButton *keyFilePopup;
-@property (weak) IBOutlet NSButton *buttonToggleRevealMasterPasswordTip;
+
 @property (weak) IBOutlet NSStackView *stackViewUnlock;
-@property (weak) IBOutlet NSStackView *stackViewMasterPasswordHeader;
 @property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
 
 @property BOOL currentYubiKeySlot1IsBlocking;
@@ -77,7 +78,19 @@
 @property (weak) IBOutlet NSTextField *labelPricing;
 @property (weak) IBOutlet NSButton *buttonFreeTrialOrUpgrade;
 
-@property LAContext* laContext; 
+@property LAContext* embeddedTouchIdContext;
+@property (weak) IBOutlet NSStackView *masterPasswordAndEmbeddedTouchIDStack;
+@property (weak) IBOutlet NSImageView *dummyEmbeddedTouchIDImageView;
+@property (readonly) BOOL useEmbeddedTouchID;
+@property (weak) IBOutlet NSTextField *textFieldSubtitleOrPrompt;
+
+@property (readonly) BOOL bioOrWatchUnlockIsPossible;
+@property (readonly) BOOL showTouchIDUnlockOption;
+@property (nullable) LAAuthenticationView* embeddedLaAuthenticationView;
+@property (weak) IBOutlet NSButton *imageButtonUnlock;
+@property (weak) IBOutlet NSBox *boxVertLineDivider;
+
+@property (weak) IBOutlet NSTextField *textFieldDatabaseNickName;
 
 @end
 
@@ -107,6 +120,8 @@
 }
 
 - (void)customizeUi {
+    self.textFieldDatabaseNickName.font = FontManager.shared.boldLargeTitleFont;
+    
     NSString* fmt2 = Settings.sharedInstance.isPro ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
     
     NSString* about = [NSString stringWithFormat:fmt2, [Utils getAppVersion]];
@@ -157,12 +172,12 @@
     [self bindProOrFreeTrial];
     
     [self embedTouchIDIfAvailable];
+    
+
 }
 
 - (void)customizeLockStackViewSpacing {
-    [self.stackViewUnlock setCustomSpacing:3 afterView:self.stackViewMasterPasswordHeader];
     [self.stackViewUnlock setCustomSpacing:8 afterView:self.textFieldMasterPassword];
-
     [self.stackViewUnlock setCustomSpacing:6 afterView:self.labelUnlockKeyFileHeader];
     [self.stackViewUnlock setCustomSpacing:6 afterView:self.yubiKeyHeaderStack];
     
@@ -193,82 +208,14 @@
     
     [self setInitialFocus];
     
-    [self enableEmbeddedTouchIDOrWatchUnlock];
-}
 
-- (void)enableEmbeddedTouchIDOrWatchUnlock {
-    return;
-    
-    
-    
-    [self.laContext evaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch
-                   localizedReason:@"Blah!" 
-                             reply:^(BOOL success, NSError * _Nullable error) {
-        slog(@"🚀 %hhd - %@", success, error); 
-        
-        if ( success ) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self onTouchIDOrWatchUnlockEmbeddedSuccess];
-            });
-        }
-        else {
-            slog(@"🔴 %hhd - %@", success, error); 
-        }
-    }];
 }
 
 
-- (void)embedTouchIDIfAvailable {
-    return;
-    
-    
-    self.laContext = [[LAContext alloc] init];
-    
-    LAAuthenticationView* laView = [[LAAuthenticationView alloc] initWithContext:self.laContext controlSize:NSControlSizeSmall];
-    
-    laView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [self.stackViewUnlockButtons addArrangedSubview:laView];
-    
-}
-
-- (void)onTouchIDOrWatchUnlockEmbeddedSuccess {
-    
-
-    
-    NSString* uuid = self.databaseMetadata.uuid;
-    
-    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
-                                                             isNativeAutoFillAppExtensionOpen:NO
-                                                                      isAutoFillQuickTypeOpen:NO
-                                                                           onDemandUiProvider:^NSViewController * {
-        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
-    }];
-    
-    
-    
-    if ( !determiner.bioOrWatchUnlockIsPossible ) {
-        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
-        [self bindUI];
-        return;
-    }
-    
-    NSString* keyFileBookmark = self.selectedKeyFileBookmark;
-    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
-    
-    [determiner getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark 
-                               yubiKeyConfiguration:yubiKeyConfiguration
-                                         completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
-        
-        
-        
-        [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
-    }];
-}
 
 - (void)setInitialFocus {
     if(self.viewModel == nil || self.viewModel.locked) {
-        if([self bioOrWatchUnlockIsPossible]) {
+        if([self bioOrWatchUnlockIsPossible] && !self.useEmbeddedTouchID ) {
             [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
         }
         else {
@@ -285,7 +232,7 @@
     self.hasLoaded = YES;
     _document = self.view.window.windowController.document;
 
-
+    slog(@"🐞 LockScreenViewController::load - Initial Load - doc=[%@] - vm=[%@]", self.document, self.viewModel);
 
     
     
@@ -311,7 +258,7 @@
     
     
     
-    if ( !self.document.wasJustLocked ) {
+    if ( !self.document.wasJustLocked ) { 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self autoPromptForTouchIdIfDesired];
         });
@@ -363,25 +310,29 @@
 
 
 - (void)bindUI {
-    [self bindProOrFreeTrial];
+    [self bindTitlesAndBioAvailability];
     
-    [self bindUnlockButtons];
+    [self setEmbeddedBioErrorTextWithError:nil];
+        
+    [self bindProOrFreeTrial];
         
     [self refreshKeyFileDropdown];
     
     [self bindYubiKeyOnLockScreen];
     
     [self bindShowAdvancedOnUnlockScreen];
+    
+    [self bindUnlockButtons];
 }
 
-- (void)bindRevealMasterPasswordTextField {
-    NSImage* img = nil;
-    
-    img = [NSImage imageWithSystemSymbolName:!self.textFieldMasterPassword.showsText ? @"eye" : @"eye.slash" accessibilityDescription:@""];
-    
-    [self.buttonToggleRevealMasterPasswordTip setSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
-    
-    [self.buttonToggleRevealMasterPasswordTip setImage:img];
+- (void)bindRevealMasterPasswordTextField { 
+
+
+
+
+
+
+
 }
 
 - (void)bindProOrFreeTrialWrapper {
@@ -500,92 +451,59 @@
 }
 
 - (void)bindUnlockButtons {
-    [self bindManualUnlockButtonFast];
-    
+
     [self bindBiometricButtonOnLockScreen];
 
-    BOOL bioAvailable = self.buttonUnlockWithTouchId.enabled && !self.buttonUnlockWithTouchId.hidden;
-
-    BOOL enabled = [self manualCredentialsAreValid];
-    self.buttonUnlockWithPassword.hidden = !enabled && bioAvailable;
+    [self bindManualUnlockButtonFast];
 }
 
-- (void)bindManualUnlockButtonFast { 
-    BOOL enabled = [self manualCredentialsAreValid];
-    [self.buttonUnlockWithPassword setEnabled:enabled];
-    
-    BOOL bioAvailable = self.buttonUnlockWithTouchId.enabled && !self.buttonUnlockWithTouchId.hidden;
-
-    self.buttonUnlockWithPassword.hidden = !enabled && bioAvailable;
-}
-
-- (void)bindBiometricButtonOnLockScreen {
+- (void)bindTitlesAndBioAvailability {
     MacDatabasePreferences* database = self.databaseMetadata;
-        
-    BOOL passwordAvailable = database.conveniencePasswordHasBeenStored;
-    BOOL convenienceEnabled = database.isConvenienceUnlockEnabled;
     
-    if( !convenienceEnabled || !passwordAvailable) {
-        
-        self.buttonUnlockWithTouchId.hidden = YES;
-        self.checkboxAutoPromptOnActivate.hidden = YES;
+    self.textFieldDatabaseNickName.stringValue = database.nickName;
+    self.textFieldBioUnavailableWarn.stringValue = @"";
+    self.textFieldBioUnavailableWarn.hidden = YES;
+    self.textFieldSubtitleOrPrompt.stringValue = NSLocalizedString(@"mac_lock_screen_enter_pw", @"Enter password to unlock.");
+
+    if ( !database.isConvenienceUnlockEnabled ) { 
         return;
     }
 
-    
-    
-    BOOL possible = [self bioOrWatchUnlockIsPossible];
-    self.buttonUnlockWithTouchId.hidden = NO;
-    self.buttonUnlockWithTouchId.enabled = possible;
-    [self.buttonUnlockWithTouchId setKeyEquivalent:possible ? @"\r" : @""];
-
-    self.checkboxAutoPromptOnActivate.hidden = NO;
-    self.checkboxAutoPromptOnActivate.enabled = possible;
-    self.checkboxAutoPromptOnActivate.state = self.viewModel.autoPromptForConvenienceUnlockOnActivate ? NSControlStateValueOn : NSControlStateValueOff;
-
-    
-    
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
     BOOL touchEnabled = (database.isTouchIdEnabled && touchAvailable);
     BOOL watchEnabled = (database.isWatchUnlockEnabled && watchAvailable);
+    
     [database triggerPasswordExpiry];
+    
     BOOL expired = database.conveniencePasswordHasExpired;
-
-    if ( !touchEnabled && !watchEnabled ) {
-        [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_bio_unavailable", @"Biometrics/Watch Unavailable")];
-    }
-    else if ( !Settings.sharedInstance.isPro ) {
-        [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_pro_only", @"Biometrics/Watch Unlock (Pro Only)")];
-    }
-    else if( expired ) {
-        [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Convenience Unlock Expired")];
-    }
-    else {
-        NSString* convenienceTitle;
-
+    BOOL isPro = Settings.sharedInstance.isPro;
+    BOOL bioUnavailable = !touchEnabled && !watchEnabled;
+    
+    if ( !expired && isPro && !bioUnavailable ) {
         if ( touchEnabled && watchEnabled ) {
-            NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch");
-            convenienceTitle = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
+            self.textFieldSubtitleOrPrompt.stringValue = NSLocalizedString(@"mac_lock_screen_enter_pw_or_touchid_or_watch", @"Enter password or unlock with Touch ID/Watch.");
         }
         else if ( touchEnabled ) {
-            NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-            
-            [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
-            self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
-            
-            convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_id", @"Unlock with Touch ID");
+            self.textFieldSubtitleOrPrompt.stringValue = NSLocalizedString(@"mac_lock_screen_enter_pw_or_touchid", @"Enter password or unlock with Touch ID.");
         }
-        else {
-            NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-            
-            [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"lock.open.applewatch" accessibilityDescription:nil]];
-            self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
-            
-            convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_apple_watch", @"Unlock with Watch");
+        else if ( watchEnabled ) {
+            self.textFieldSubtitleOrPrompt.stringValue = NSLocalizedString(@"mac_lock_screen_enter_pw_or_watch", @"Enter password or unlock with Watch.");
         }
-
-        [self.buttonUnlockWithTouchId setTitle:convenienceTitle];
+    }
+    else {
+        if ( bioUnavailable ) {
+            self.textFieldBioUnavailableWarn.stringValue = NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_bio_unavailable", @"Touch ID/Watch Unavailable");
+            self.textFieldBioUnavailableWarn.hidden = NO;
+        }
+        else if ( !isPro ) {
+            self.textFieldBioUnavailableWarn.stringValue = NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_pro_only", @"Touch ID/Watch Unlock (Pro Only)");
+            self.textFieldBioUnavailableWarn.hidden = NO;
+        }
+        else if( expired ) {
+            self.textFieldBioUnavailableWarn.stringValue = NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Convenience Unlock Expired");
+            self.textFieldBioUnavailableWarn.hidden = NO;
+        }
     }
 }
 
@@ -944,12 +862,6 @@
     [DBManagerPanel.sharedInstance show];
 }
 
-- (IBAction)toggleRevealMasterPasswordTextField:(id)sender {
-    self.textFieldMasterPassword.showsText = !self.textFieldMasterPassword.showsText;
-
-    [self bindRevealMasterPasswordTextField];
-}
-
 - (IBAction)onAllowEmptyChanged:(id)sender {
     Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.checkboxAllowEmpty.state == NSControlStateValueOn;
     
@@ -1032,34 +944,6 @@
                             keyFileBookmark:keyFileBookmark
                        yubiKeyConfiguration:yubiKeyConfiguration
                                  completion:^(GetCompositeKeyResult result, CompositeKeyFactors* factors, BOOL fromConvenience, NSError* error) {
-        [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
-    }];
-}
-
-- (IBAction)onUnlockWithConvenience:(id)sender {
-    NSString* uuid = self.databaseMetadata.uuid;
-
-    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
-                                                             isNativeAutoFillAppExtensionOpen:NO
-                                                                      isAutoFillQuickTypeOpen:NO
-                                                                           onDemandUiProvider:^NSViewController * {
-        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
-    }];
-
-    if ( !determiner.bioOrWatchUnlockIsPossible ) {
-        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
-        [self bindUI];
-        return;
-    }
-
-    NSString* keyFileBookmark = self.selectedKeyFileBookmark;
-    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
-
-    [determiner getCkfsWithBiometrics:keyFileBookmark
-                 yubiKeyConfiguration:yubiKeyConfiguration
-                           completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
-        self.biometricPromptLastDismissedAt = NSDate.date;
-
         [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
     }];
 }
@@ -1420,7 +1304,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
-
+    slog(@"🐞 [%@] Lock Screen Became Key! [%@]", notification.object, self.databaseMetadata.nickName);
 
     if ( notification.object == self.view.window ) {
         if( self.viewModel && self.viewModel.locked ) {
@@ -1429,19 +1313,21 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
         
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self autoPromptForTouchIdIfDesired];
-        });
+        if ( !self.useEmbeddedTouchID ) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self autoPromptForTouchIdIfDesired];
+            });
+        }
     }
 }
 
 - (void)autoPromptForTouchIdIfDesired {
 
     
-    if(self.viewModel && self.viewModel.locked) {
+    if(self.viewModel && self.viewModel.locked && !self.useEmbeddedTouchID ) { 
         BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
 
-        if( weAreKeyWindow && self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate && [self bioOrWatchUnlockIsPossible] ) {
+        if( weAreKeyWindow && self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate && self.bioOrWatchUnlockIsPossible ) {
             NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.biometricPromptLastDismissedAt];
             if(self.biometricPromptLastDismissedAt != nil && secondsBetween < 1.5) {
                 slog(@"Too many auto biometric requests too soon - ignoring...");
@@ -1455,8 +1341,9 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 - (void)enableMasterCredentialsEntry:(BOOL)enable {
     [self.textFieldMasterPassword setEnabled:enable];
-    [self.buttonUnlockWithTouchId setEnabled:enable];
-    [self.buttonUnlockWithPassword setEnabled:enable];
+
+
+
     [self.keyFilePopup setEnabled:enable];
 }
 
@@ -1528,10 +1415,10 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
     if( control == self.textFieldMasterPassword ) {
         if (commandSelector == @selector(insertTab:)) {
-            if([self bioOrWatchUnlockIsPossible]) {
+            if ( self.bioOrWatchUnlockIsPossible && !self.useEmbeddedTouchID ) {
                 [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
             }
-            else {
+            else if ( [self manualCredentialsAreValid] ) {
                 [self.view.window makeFirstResponder:self.buttonUnlockWithPassword];
             }
 
@@ -1565,8 +1452,256 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     [self showToastNotification:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message", @"The credentials were incorrect for this database.") error:YES yOffset:yOffset];
 }
 
+
+
+
+- (BOOL)useEmbeddedTouchID {
+    return YES;
+}
+
 - (BOOL)bioOrWatchUnlockIsPossible {
     return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.databaseMetadata];
+}
+
+- (void)embedTouchIDIfAvailable {
+    self.dummyEmbeddedTouchIDImageView.hidden = YES; 
+
+    if ( !self.useEmbeddedTouchID ) {
+        return;
+    }
+    
+    
+    
+    self.embeddedTouchIdContext = [[LAContext alloc] init];
+    self.embeddedLaAuthenticationView = [[LAAuthenticationView alloc] initWithContext:self.embeddedTouchIdContext controlSize:NSControlSizeRegular];
+    
+    [self.embeddedLaAuthenticationView removeConstraints:self.embeddedLaAuthenticationView.constraints];
+    
+    self.embeddedLaAuthenticationView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [NSLayoutConstraint activateConstraints:@[
+        [self.embeddedLaAuthenticationView.widthAnchor constraintEqualToConstant:30],
+        [self.embeddedLaAuthenticationView.heightAnchor constraintEqualToConstant:30],
+    ]];
+
+    [self.masterPasswordAndEmbeddedTouchIDStack addArrangedSubview:self.embeddedLaAuthenticationView];
+    
+    
+    
+
+    
+
+
+
+
+
+    
+    
+
+
+
+    
+
+
+
+    
+
+
+
+
+
+    
+
+}
+
+- (void)requestEmbeddedBioUnlock {
+    if ( !self.useEmbeddedTouchID ) {
+        return;
+    }
+    
+    NSUInteger policy = [BiometricIdHelper.sharedInstance getPolicyForDatabase:self.databaseMetadata];
+    
+    NSError *authError;
+    if( ![self.embeddedTouchIdContext canEvaluatePolicy:policy error:&authError] ) {
+        [self setEmbeddedBioErrorTextWithError:authError];
+        return;
+    }
+        
+    [self setEmbeddedBioErrorTextWithError:nil];
+    
+    [self.embeddedTouchIdContext evaluatePolicy:policy
+                                localizedReason:NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Unlock Database")
+                                          reply:^(BOOL success, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( success ) {
+                [self onTouchIDOrWatchUnlockEmbeddedSuccess];
+            }
+            else {
+                [self setEmbeddedBioErrorTextWithError:error];
+            }
+        });
+    }];
+}
+
+- (IBAction)onUnlockWithConvenience:(id)sender {
+    if ( !self.bioOrWatchUnlockIsPossible ) {
+        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
+        [self bindUI];
+        return;
+    }
+    
+    NSString* uuid = self.databaseMetadata.uuid;
+    
+    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
+                                                             isNativeAutoFillAppExtensionOpen:NO
+                                                                      isAutoFillQuickTypeOpen:NO
+                                                                           onDemandUiProvider:^NSViewController * {
+        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
+    }];
+    
+    NSString* keyFileBookmark = self.selectedKeyFileBookmark;
+    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+    
+    [determiner getCkfsWithBiometrics:keyFileBookmark
+                 yubiKeyConfiguration:yubiKeyConfiguration
+                           completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        self.biometricPromptLastDismissedAt = NSDate.date;
+        
+        [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
+    }];
+}
+
+- (void)onTouchIDOrWatchUnlockEmbeddedSuccess {
+    
+    
+    if ( !self.bioOrWatchUnlockIsPossible ) {
+        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
+        [self bindUI];
+        return;
+    }
+    
+    NSString* uuid = self.databaseMetadata.uuid;
+    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
+                                                             isNativeAutoFillAppExtensionOpen:NO
+                                                                      isAutoFillQuickTypeOpen:NO
+                                                                           onDemandUiProvider:^NSViewController * {
+        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
+    }];
+    
+    NSString* keyFileBookmark = self.selectedKeyFileBookmark;
+    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+    
+    [determiner getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark
+                               yubiKeyConfiguration:yubiKeyConfiguration
+                                         completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        
+        
+        
+        [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
+    }];
+}
+
+- (NSString*)getBiometricTooltip {
+    MacDatabasePreferences* database = self.databaseMetadata;
+    
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL touchEnabled = (database.isTouchIdEnabled && touchAvailable);
+    BOOL watchEnabled = (database.isWatchUnlockEnabled && watchAvailable);
+    
+    NSString* convenienceTitle;
+    
+    if ( touchEnabled && watchEnabled ) {
+        NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch");
+        convenienceTitle = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
+    }
+    else if ( touchEnabled ) {
+        convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_id", @"Unlock with Touch ID");
+    }
+    else {
+        convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_apple_watch", @"Unlock with Watch");
+    }
+    
+    return convenienceTitle;
+}
+
+- (void)bindBiometricButtonOnLockScreen {
+    self.embeddedLaAuthenticationView.hidden = YES;
+
+    self.buttonUnlockWithTouchId.hidden = YES;
+    self.checkboxAutoPromptOnActivate.hidden = YES;
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+    BOOL isPossible = self.bioOrWatchUnlockIsPossible;
+    
+    
+    
+    
+
+        if ( isPossible ) {
+            self.embeddedLaAuthenticationView.hidden = NO;
+
+            NSString* bioPrompt = [self getBiometricTooltip];
+
+            self.embeddedLaAuthenticationView.toolTip = bioPrompt;
+
+            [self requestEmbeddedBioUnlock];
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+- (void)bindManualUnlockButtonFast { 
+    BOOL enabled = [self manualCredentialsAreValid];
+
+    
+    
+    self.buttonUnlockWithPassword.hidden = YES; 
+
+    
+    self.imageButtonUnlock.hidden = !enabled; 
+
+    
+    self.boxVertLineDivider.hidden = self.imageButtonUnlock.hidden || self.embeddedLaAuthenticationView.hidden;
+}
+
+- (void)setEmbeddedBioErrorTextWithError:(NSError*_Nullable)error {
+    if ( error ) {
+        if ( [error.domain isEqualToString:LAErrorDomain] ) {
+            if (( error.code == kLAErrorUserCancel || error.code == kLAErrorSystemCancel ) ) {
+                error = nil; 
+            }
+        }
+    }
+
+    if ( error ) {
+        slog(@"🔴 %@", error, error.code);
+    }
+    
+    self.textFieldError.stringValue = error ? error.localizedDescription : @"";
+    self.textFieldError.hidden = error == nil;
 }
 
 @end

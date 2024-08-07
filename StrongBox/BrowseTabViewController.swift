@@ -179,6 +179,32 @@ class BrowseTabViewController: UITabBarController {
         refreshVisibleTabs(isDirectConfigChange)
     }
 
+    func createNavEmbeddedVc(tab: BrowseViewType) -> UINavigationController {
+        let nav: UINavigationController
+        let vc: UIViewController
+
+        if tab == .home {
+            let actionsInterface = UIKitDatabaseActionsInterface(viewModel: model)
+            let database = SwiftDatabaseModel(model: model)
+
+            let homeViewModel = DatabaseHomeViewModel(database: database, externalWorldAdaptor: actionsInterface)
+            vc = SwiftUIViewFactory.getDatabaseHomeView(model: homeViewModel)
+
+            nav = UINavigationController(rootViewController: vc)
+
+            actionsInterface.navController = nav
+        } else {
+            vc = BrowseSafeView.fromStoryboard(tab, model: model)
+            nav = UINavigationController(rootViewController: vc)
+        }
+
+        vc.tabBarItem = UITabBarItem(title: getTabTitle(tab: tab),
+                                     image: getTabImage(tab: tab, large: true),
+                                     tag: 0)
+
+        return nav
+    }
+
     func refreshVisibleTabs(_ isDirectConfigChangeOrInitialLoad: Bool = false) {
         
         
@@ -203,65 +229,20 @@ class BrowseTabViewController: UITabBarController {
             return
         }
 
-        
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
         var newVcs: [UIViewController] = []
 
         for tab in newEffectivelyVisible {
-            if let oldIdx = currentVisibleTabs.firstIndex(of: tab), let viewControllers {
+            if let oldIdx = currentVisibleTabs.firstIndex(of: tab), let viewControllers, let previousVc = viewControllers[safe: oldIdx] {
                 
-                newVcs.append(viewControllers[oldIdx])
+                newVcs.append(previousVc)
             } else {
-                
-
-                if tab == .home {
-                    let actionsInterface = UIKitDatabaseActionsInterface(viewModel: model)
-                    let database = SwiftDatabaseModel(model: model)
-
-                    let homeViewModel = DatabaseHomeViewModel(database: database, externalWorldAdaptor: actionsInterface)
-                    let vc = SwiftUIViewFactory.getDatabaseHomeView(model: homeViewModel)
-                    let nav = UINavigationController(rootViewController: vc)
-                    nav.delegate = self
-
-                    actionsInterface.navController = nav
-
-                    newVcs.append(nav)
-                } else {
-                    let vc = BrowseSafeView.fromStoryboard(tab, model: model)
-                    let nav = UINavigationController(rootViewController: vc)
-                    nav.delegate = self
-                    newVcs.append(nav)
-                }
+                let nav = createNavEmbeddedVc(tab: tab)
+                nav.delegate = self
+                newVcs.append(nav)
             }
         }
 
         setViewControllers(newVcs, animated: true)
-
-        for vc in newVcs {
-            if let nav = vc as? UINavigationController, let browse = nav.viewControllers[0] as? BrowseSafeView {
-                vc.tabBarItem = UITabBarItem(title: getTabTitle(tab: browse.viewType),
-                                             image: getTabImage(tab: browse.viewType, large: true),
-                                             tag: 0)
-            } else {
-                vc.tabBarItem = UITabBarItem(title: getTabTitle(tab: .home),
-                                             image: getTabImage(tab: .home, large: true),
-                                             tag: 0)
-            }
-        }
 
         currentVisibleTabs = newEffectivelyVisible
 

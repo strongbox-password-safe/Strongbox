@@ -194,7 +194,7 @@ struct SearchResult: Identifiable {
         }
 
         if node.fields.otpToken != nil {
-            ret.append(SearchResultAction(title: NSLocalizedString("browse_prefs_tap_action_copy_copy_totp", comment: "Copy 2FA Code"), actionType: .copyPassword))
+            ret.append(SearchResultAction(title: NSLocalizedString("browse_prefs_tap_action_copy_copy_totp", comment: "Copy 2FA Code"), actionType: .copyTotp))
         }
 
         if !notes.isEmpty {
