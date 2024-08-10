@@ -9,6 +9,9 @@
 import Foundation
 
 struct AuditViewModel {
+    var isEnabled: Bool
+    var isInProgress: Bool
+
     var duplicated: [String: [any SwiftEntryModelInterface]]
     var noPasswords: [any SwiftEntryModelInterface]
     var common: [any SwiftEntryModelInterface]
@@ -25,7 +28,9 @@ struct AuditViewModel {
         similarEntryCount + duplicateEntryCount + common.count + noPasswords.count + tooShort.count + pwned.count + lowEntropy.count + twoFactorAvailable.count
     }
 
-    init(duplicated: [String: [any SwiftEntryModelInterface]] = [:],
+    init(isEnabled: Bool = true,
+         isInProgress: Bool = false,
+         duplicated: [String: [any SwiftEntryModelInterface]] = [:],
          noPasswords: [any SwiftEntryModelInterface] = [],
          common: [any SwiftEntryModelInterface] = [],
          similar: [String: [any SwiftEntryModelInterface]] = [:],
@@ -36,6 +41,8 @@ struct AuditViewModel {
          similarEntryCount: Int = 0,
          duplicateEntryCount: Int = 0)
     {
+        self.isEnabled = isEnabled
+        self.isInProgress = isInProgress
         self.duplicated = duplicated
         self.noPasswords = noPasswords
         self.common = common

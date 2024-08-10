@@ -113,13 +113,16 @@ class SwiftUIViewFactory: NSObject {
     #endif
 
     #if !IS_APP_EXTENSION
-
         static func getDatabaseHomeView(model: DatabaseHomeViewModel) -> UIViewController {
             let view = DatabaseHomeView(model: model)
 
             let hostingController = UIHostingController(rootView: view)
 
             return hostingController
+        }
+
+        static func getAuditIssuesView(model: DatabaseHomeViewModel) -> UIViewController {
+            UIHostingController(rootView: AuditNavigationView(model: model))
         }
     #endif
 }

@@ -29,13 +29,14 @@
     return ret;
 }
 
-+ (instancetype)parametersForFilesApp:(NSURL*)url withProvider:(id<SafeStorageProvider>)provider {
++ (instancetype)parametersForFilesApp:(NSURL*)url withProvider:(id<SafeStorageProvider>)provider makeALocalCopy:(BOOL)makeALocalCopy {
     SelectedStorageParameters* ret = [[SelectedStorageParameters alloc] init];
     
     ret.provider = provider;
     ret.method = kStorageMethodFilesAppUrl;
     ret.parentFolder = url;
     ret.url = url;
+    ret.filesAppMakeALocalCopy = makeALocalCopy;
     
     return ret;
 }

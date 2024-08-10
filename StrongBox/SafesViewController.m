@@ -106,7 +106,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 @property NSURL* enqueuedImportUrl;
 @property BOOL enqueuedImportCanOpenInPlace;
 
-@property BOOL appLockSuppressedForBiometricAuth;
+@property BOOL ignoreNextAppActiveNotification;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonDice;
 @property BOOL openingDatabaseInProgress;
@@ -129,36 +129,10 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 @implementation SafesViewController
 
-- (void)migrateToLazySync {
-    
-    
-    
-    
-    if ( !AppPreferences.sharedInstance.hasMigratedToLazySync ) {
-        AppPreferences.sharedInstance.hasMigratedToLazySync = YES;
-        
-        for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
-            if (
-                
-                
-                database.storageProvider == kOneDrive ) { 
-                    slog(@"Migrating OneDrive Database [%@] to non lazy sync", database.nickName);
-                    database.lazySyncMode = NO;
-                }
-        }
-    }
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO; 
-    
-
-    
     self.tableView.hidden = YES;
-    
-    [self migrateToLazySync];
     
     [self customizeUI];
     
@@ -502,13 +476,20 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
 
 
+- (void)onAppDidEnterBackground { 
+    slog(@"SafesViewController::onAppDidEnterBackground");
+    
+    self.ignoreNextAppActiveNotification = NO;
+    self.unlockedDatabaseWentIntoBackgroundAt = [[NSDate alloc] init];
+}
+
 - (void)appResignActive {
     slog(@"SafesViewController::appResignActive");
     
-    self.appLockSuppressedForBiometricAuth = NO;
+    self.ignoreNextAppActiveNotification = NO;
     if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
-        slog(@"appResignActive... suppressAppBackgroundTriggers");
-        self.appLockSuppressedForBiometricAuth = YES;
+        slog(@"SafesViewController::appResignActive... suppressAppBackgroundTriggers so ignoring.");
+        self.ignoreNextAppActiveNotification = YES;
         return;
     }
 
@@ -518,9 +499,9 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 - (void)appBecameActive {
     slog(@"SafesViewController::appBecameActive");
     
-    if( self.appLockSuppressedForBiometricAuth ) {
-        slog(@"App Active but Lock Screen Suppressed... Nothing to do");
-        self.appLockSuppressedForBiometricAuth = NO;
+    if( self.ignoreNextAppActiveNotification ) {
+        slog(@"SafesViewController::App Active received but ignoring likely due to in progress Biometrics... Nothing to do");
+        self.ignoreNextAppActiveNotification = NO;
         return;
     }
     
@@ -794,12 +775,17 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
                                            selector:@selector(appResignActive)
                                                name:UIApplicationWillResignActiveNotification
                                              object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onAppDidEnterBackground)
+                                               name:UIApplicationDidEnterBackgroundNotification
+                                             object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(appBecameActive)
                                                name:UIApplicationDidBecomeActiveNotification
                                              object:nil];
-    
+
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseUpdated:)
                                                name:kSyncManagerDatabaseSyncStatusChangedNotification
@@ -2038,7 +2024,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                 [self performSegueWithIdentifier:@"segueToCreateDatabase" sender:params];
             }
             else {
-                [self import:params.url canOpenInPlace:YES forceOpenInPlace:YES];
+                
+                [self import:params.url canOpenInPlace:!params.filesAppMakeALocalCopy forceOpenInPlace:!params.filesAppMakeALocalCopy];
             }
         }];
     }
@@ -2599,7 +2586,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     });
 }
 
-- (void)onReadImportedFile:(BOOL)success
+- (void)    onReadImportedFile:(BOOL)success
                       data:(NSData*)data
                        url:(NSURL*)url
             canOpenInPlace:(BOOL)canOpenInPlace
@@ -2676,8 +2663,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         return;
     }
     
-    if(canOpenInPlace) {
-        if(forceOpenInPlace) {
+    if ( canOpenInPlace ) {
+        if ( forceOpenInPlace ) {
             [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:YES modDate:modDate];
         }
         else {
@@ -2797,6 +2784,11 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                 NSError* error;
                 if( ![metadata addWithDuplicateCheck:data initialCacheModDate:modDate error:&error] ) {
                     [Alerts error:self error:error];
+                }
+                else {
+                    [Alerts info:self
+                           title:NSLocalizedString(@"import_successful_title",  @"Import Successful")
+                         message:NSLocalizedString(@"database_local_copy_done_info_msg", @"Your database was successfully imported. Note that you can now remove the original source file from the device should you wish.")];
                 }
             }
             else {

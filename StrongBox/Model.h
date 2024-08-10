@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef void (^AsyncUpdateCompletion)(AsyncJobResult *result);
 
 extern NSString* const kAuditNodesChangedNotificationKey;
-extern NSString* const kAuditProgressNotificationKey;
+extern NSString* const kAuditProgressNotification;
 extern NSString* const kAuditCompletedNotification;
 extern NSString* const kAuditNewSwitchedOffNotificationKey;
 
@@ -107,11 +107,6 @@ extern NSString* const kAsyncUpdateStartingNotification;
 
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
 - (NSArray<Node*>*)getItemsById:(NSArray<NSUUID*>*)ids;
-
-@property (readonly) AuditState auditState;
-@property (readonly, nullable) NSNumber* auditIssueCount;
-@property (readonly) NSUInteger auditIssueNodeCount;
-@property (readonly) NSUInteger auditHibpErrorCount;
 
 @property (nonatomic, readonly) NSInteger fastEntryTotalCount;
 @property (nonatomic, readonly) NSInteger fastGroupTotalCount;
@@ -316,6 +311,13 @@ extern NSString* const kAsyncUpdateStartingNotification;
 
 
 - (BOOL)setItemTitle:(NSUUID*)uuid title:(NSString*)title;
+
+@property (readonly) BOOL isAuditEnabled;
+@property (readonly) CGFloat auditProgress;
+@property (readonly) AuditState auditState;
+@property (readonly, nullable) NSNumber* auditIssueCount;
+@property (readonly) NSUInteger auditIssueNodeCount;
+@property (readonly) NSUInteger auditHibpErrorCount;
 
 @end
 

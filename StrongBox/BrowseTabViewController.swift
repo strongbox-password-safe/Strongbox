@@ -43,6 +43,8 @@ class BrowseTabViewController: UITabBarController {
             return NSLocalizedString("item_details_section_header_attachments", comment: "Attachments")
         case .expiredAndExpiring:
             return NSLocalizedString("quick_view_title_expired_and_expiring", comment: "Expired & Expiring")
+        case .auditIssues:
+            return NSLocalizedString("browse_vc_action_audit", comment: "Audit")
         @unknown default:
             return "🔴 UNKNOWN"
         }
@@ -76,6 +78,8 @@ class BrowseTabViewController: UITabBarController {
             imageName = "doc.richtext.fill"
         case .expiredAndExpiring:
             imageName = "calendar"
+        case .auditIssues:
+            imageName = "checkmark.shield.fill"
         @unknown default:
             imageName = "questionmark.circle.fill"
         }
@@ -87,21 +91,22 @@ class BrowseTabViewController: UITabBarController {
 
     var configuredVisibleTabs: [BrowseViewType] {
         
+
         
 
+        if !model.metadata.hasInitializedHomeTab {
+            model.metadata.hasInitializedHomeTab = true
 
+            var existing = model.metadata.visibleTabs
+            let homeNum = NSNumber(value: BrowseViewType.home.rawValue)
 
+            if !existing.contains(homeNum) {
+                existing.insert(homeNum, at: 0)
+                model.metadata.visibleTabs = existing
+            }
+        }
 
-
-
-
-
-
-
-
-
-
-        model.metadata.visibleTabs.compactMap { num in
+        return model.metadata.visibleTabs.compactMap { num in
             BrowseViewType(rawValue: num.uintValue)
         }
     }
@@ -193,14 +198,25 @@ class BrowseTabViewController: UITabBarController {
             nav = UINavigationController(rootViewController: vc)
 
             actionsInterface.navController = nav
+        } else if tab == .auditIssues {
+            let actionsInterface = UIKitDatabaseActionsInterface(viewModel: model)
+            let database = SwiftDatabaseModel(model: model)
+
+            let homeViewModel = DatabaseHomeViewModel(database: database, externalWorldAdaptor: actionsInterface)
+            vc = SwiftUIViewFactory.getAuditIssuesView(model: homeViewModel)
+
+            nav = UINavigationController(rootViewController: vc)
+            actionsInterface.navController = nav
         } else {
             vc = BrowseSafeView.fromStoryboard(tab, model: model)
             nav = UINavigationController(rootViewController: vc)
         }
 
-        vc.tabBarItem = UITabBarItem(title: getTabTitle(tab: tab),
-                                     image: getTabImage(tab: tab, large: true),
-                                     tag: 0)
+        let tabBarItem = UITabBarItem(title: getTabTitle(tab: tab),
+                                      image: getTabImage(tab: tab, large: true),
+                                      tag: 0)
+
+        vc.tabBarItem = tabBarItem
 
         return nav
     }
@@ -258,17 +274,17 @@ class BrowseTabViewController: UITabBarController {
         }
 
         if isDirectConfigChangeOrInitialLoad {
-            bindShowHideBar()
+            bindShowHideBar(isDirectConfigChangeOrInitialLoad: isDirectConfigChangeOrInitialLoad)
         }
     }
 
     @objc
-    func bindShowHideBar() {
+    func bindShowHideBar(isDirectConfigChangeOrInitialLoad: Bool = false) {
         let hideTabBar = viewControllers?.count == 1 && model.metadata.hideTabBarIfOnlySingleTab
 
         
 
-        if hideTabBar != tabBar.isHidden {
+        if isDirectConfigChangeOrInitialLoad || hideTabBar != tabBar.isHidden {
             tabBar.isHidden = hideTabBar
         }
     }

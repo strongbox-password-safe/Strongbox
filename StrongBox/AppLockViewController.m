@@ -15,12 +15,14 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "BiometricsManager.h"
 #import "AppPreferences.h"
+#import "Utils.h"
 
 @interface AppLockViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonUnlock;
 @property (weak, nonatomic) IBOutlet UILabel *labelUnlockAttemptsRemaining;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewLogo;
+@property BOOL manualUnlockInProgress;
 
 @end
 
@@ -30,18 +32,46 @@
     [super viewDidLoad];
     
     [self setupImageView];
-
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self beginUnlockSequence]; 
-
-        
-
-
-
-
-    });
     
     [self updateFailedUnlockAttemptsUI];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(appBecameActive)
+                                               name:UIApplicationDidBecomeActiveNotification
+                                             object:nil];
+}
+
+- (void)appBecameActive {
+    slog(@"AppLockViewController::appBecameActive");
+
+    [self attemptBeginUnlockSequence:0];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    slog(@"AppLockViewController::viewDidAppear");
+
+    [self attemptBeginUnlockSequence:0];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    self.manualUnlockInProgress = NO;
+}
+
+- (void)attemptBeginUnlockSequence:(int)attemptCount {
+    slog(@"AppLockViewController::attemptBeginUnlockSequence: %ld", attemptCount);
+    
+    if ( Utils.isAppInForeground ) {
+        [self beginUnlockSequence]; 
+    }
+    else if ( attemptCount < 4 && !self.manualUnlockInProgress) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self attemptBeginUnlockSequence:attemptCount + 1];
+        });
+    }
 }
 
 - (void)setupImageView {
@@ -52,6 +82,9 @@
 }
 
 - (IBAction)onUnlock:(id)sender {
+    
+    
+    self.manualUnlockInProgress = YES;
     
     [self beginUnlockSequence];
 }

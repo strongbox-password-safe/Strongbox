@@ -445,6 +445,10 @@ struct SearchResult: Identifiable {
             throw SearchResultActionError.invalidActionForType
         }
 
+        guard !DatabasesCollection.shared.isUnlocked(uuid: database.uuid) else {
+            return .nop
+        }
+
         return await withCheckedContinuation { continuation in 
             DatabasesCollection.shared.initiateDatabaseUnlock(uuid: database.uuid, syncAfterUnlock: true) { _ in
                 continuation.resume(returning: .refreshResults)

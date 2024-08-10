@@ -61,6 +61,14 @@ class QuickSearchPalettePanel: NSPanel {
         hidePalette()
     }
 
+    func toggleShow() {
+        if isVisible {
+            hidePalette()
+        } else {
+            showPalette()
+        }
+    }
+
     func showPalette() {
         orderFrontRegardless()
 

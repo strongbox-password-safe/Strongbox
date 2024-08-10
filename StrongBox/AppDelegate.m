@@ -47,12 +47,12 @@
 @property AppLockViewController* lockScreenVc;
 @property UIImageView* privacyScreen;
 @property NSInteger privacyScreenPresentationIdentifier; 
+
+@property (nonatomic, strong) NSDate *appLockEnteredBackgroundAtTime;
+
 @property BOOL appIsLocked;
-
-@property (nonatomic, strong) NSDate *enterBackgroundTime;
-
-@property BOOL hasDoneInitialActivation;
-@property BOOL appLockSuppressedForBiometricAuth;
+@property BOOL appLockHasDoneInitialActivation;
+@property BOOL ignoreNextAppActiveDueToBiometrics;
 
 @end
 
@@ -265,52 +265,6 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
     return ivc;
 }
 
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    slog(@"AppDelegate::applicationDidBecomeActive- %@]", self.window.rootViewController);
-
-    if( self.appLockSuppressedForBiometricAuth ) {
-        slog(@"App Active but Lock Screen Suppressed... Nothing to do");
-        self.appLockSuppressedForBiometricAuth = NO;
-        return;
-    }
-
-    
-
-    BOOL startupAppLock = !self.hasDoneInitialActivation && AppPreferences.sharedInstance.appLockMode != kNoLock;
-
-    if ( [self shouldRequireAppLockTime] || startupAppLock) {
-        self.appIsLocked = YES;
-        
-        [self showLockScreen];
-    }
-    else {
-        NSInteger foo = self.privacyScreenPresentationIdentifier;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self hidePrivacyShield:foo]; 
-        });
-    }
-
-    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccess];
-    
-#ifndef NO_OFFLINE_DETECTION
-    [OfflineDetector.sharedInstance startMonitoringConnectivitity]; 
-#endif
-    
-    [self performedScheduledEntitlementsCheck];
-
-#ifndef NO_NETWORKING
-    if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
-        [self startOrStopWiFiSyncServer];
-    }
-#endif
-    
-    
-    
-    self.hasDoneInitialActivation = YES;
-    
-    self.enterBackgroundTime = nil;
-}
-
 #ifndef NO_NETWORKING
 - (void)startOrStopWiFiSyncServer {
     NSError* error;
@@ -323,25 +277,6 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
     [WiFiSyncServer.shared stopWith:nil]; 
 }
 #endif
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-#ifndef NO_NETWORKING
-    [self stopWiFiSyncServer];
-#endif
-    
-    self.appLockSuppressedForBiometricAuth = NO;
-    if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
-        slog(@"AppDelegate::applicationWillResignActive - suppressAppBackgroundTriggers = YES");
-        self.appLockSuppressedForBiometricAuth = YES;
-        return;
-    }
-
-    slog(@"AppDelegate::applicationWillResignActive");
-    
-    [self showPrivacyShieldView];
-    
-    self.enterBackgroundTime = NSDate.date;
-}
 
 - (void)performedScheduledEntitlementsCheck {
     NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
@@ -407,7 +342,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 
 
 - (void)showPrivacyShieldView {
-
+    slog(@"showPrivacyShieldView - [%@]", self.privacyScreen);
 
     if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeNone ) {
         return;
@@ -432,6 +367,9 @@ void uncaughtExceptionHandler(NSException *exception) {
         if ( self.lockScreenVc != nil ) {
             slog(@"Lock Screen is up, privacy screen inappropriate, likely initial launch and switch back...");
             return;
+        }
+        else {
+            slog(@"No Lock Screen up [%@]", cover);
         }
         
         self.privacyScreen = tmp;
@@ -625,7 +563,7 @@ void uncaughtExceptionHandler(NSException *exception) {
         return NO;
     }
         
-    NSTimeInterval secondsBetween = [[NSDate date] timeIntervalSinceDate:self.enterBackgroundTime];
+    NSTimeInterval secondsBetween = [[NSDate date] timeIntervalSinceDate:self.appLockEnteredBackgroundAtTime];
     NSInteger seconds = AppPreferences.sharedInstance.appLockDelay;
     
     if ( seconds == 0 || secondsBetween > seconds ) {
@@ -672,4 +610,91 @@ void uncaughtExceptionHandler(NSException *exception) {
     return visibleSoFar;
 }
 
+
+
+- (void)applicationWillResignActive:(UIApplication *)application {
+    slog(@"AppDelegate::applicationWillResignActive");
+    
+    self.ignoreNextAppActiveDueToBiometrics = NO;
+    if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
+        slog(@"AppDelegate::applicationWillResignActive - suppressAppBackgroundTriggers = YES");
+        self.ignoreNextAppActiveDueToBiometrics = YES;
+        return;
+    }
+  
+    [self showPrivacyShieldView];
+    
+    self.appLockEnteredBackgroundAtTime = NSDate.date;
+    
+#ifndef NO_NETWORKING
+    [self stopWiFiSyncServer];
+#endif
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    slog(@"🐞 AppDelegate::applicationDidBecomeActive- %@]", self.window.rootViewController);
+    
+    if( self.ignoreNextAppActiveDueToBiometrics ) {
+        slog(@"applicationDidBecomeActive ignored due to biometrics request. Ignoring...");
+        self.ignoreNextAppActiveDueToBiometrics = NO;
+        return;
+    }
+    
+    BOOL startupAppLock = !self.appLockHasDoneInitialActivation && AppPreferences.sharedInstance.appLockMode != kNoLock;
+    self.appLockHasDoneInitialActivation = YES;
+    
+    if ( startupAppLock || [self shouldRequireAppLockTime] ) {
+        self.appIsLocked = YES;
+        [self showLockScreen];
+    }
+    else {
+        NSInteger foo = self.privacyScreenPresentationIdentifier;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self hidePrivacyShield:foo]; 
+        });
+    }
+    
+    
+    
+    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccess];
+    
+#ifndef NO_OFFLINE_DETECTION
+    [OfflineDetector.sharedInstance startMonitoringConnectivitity]; 
+#endif
+    
+    [self performedScheduledEntitlementsCheck];
+    
+#ifndef NO_NETWORKING
+    if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        [self startOrStopWiFiSyncServer];
+    }
+#endif
+    
+    self.appLockEnteredBackgroundAtTime = nil;
+}
+
+
+
+
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+    slog(@"AppDelegate::applicationDidEnterBackground");
+
+    [self showPrivacyShieldView];
+
+    if ( [self shouldRequireAppLockTime] ) {
+        self.appIsLocked = YES;
+        [self showLockScreen];
+    }
+
+    self.ignoreNextAppActiveDueToBiometrics = NO; 
+    
+    self.appLockEnteredBackgroundAtTime = NSDate.date;
+    
+#ifndef NO_NETWORKING
+    [self stopWiFiSyncServer];
+#endif
+}
+
 @end
+

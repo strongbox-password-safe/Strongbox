@@ -26,7 +26,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         
 
         if UIDevice.current.userInterfaceIdiom == .pad {
-            let fraction = 0.45
+            let fraction = 0.5
             preferredPrimaryColumnWidthFraction = fraction
             maximumPrimaryColumnWidth = fraction * UIScreen.main.bounds.size.width
         }
@@ -136,7 +136,8 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     }
 
     func splitViewController(_: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        swlog("splitViewController::collapseSecondaryViewController 2nd [%@] -> primary [%@]", secondaryViewController, primaryViewController)
+        swlog("splitViewController::collapseSecondaryViewController 2nd [%@]", secondaryViewController)
+        swlog("splitViewController::collapseSecondaryViewController primary [%@]", primaryViewController)
 
         guard let tabBar = viewControllers.first as? UITabBarController,
               let masterNav = tabBar.selectedViewController as? UINavigationController
@@ -286,7 +287,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     }
 
     func onAsyncUpdateDone(result: AsyncJobResult, updateId: UUID, completion: ((_: Bool) -> Void)? = nil) {
-        swlog("Async Update [%@] Done with [%@]", String(describing: updateId), String(describing: result.success))
+        swlog("Async Update [\(String(describing: updateId))] Done with [String(describing: result.success)]")
 
         if model.metadata.asyncUpdateId == updateId {
             model.metadata.asyncUpdateId = nil

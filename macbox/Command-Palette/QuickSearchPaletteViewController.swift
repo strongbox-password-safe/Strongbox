@@ -187,7 +187,11 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
         tableViewResults.register(NSNib(nibNamed: kEntryTableCellViewIdentifier, bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier(rawValue: kEntryTableCellViewIdentifier))
         tableViewResults.register(NSNib(nibNamed: ResultsHeaderCell.NibName, bundle: nil), forIdentifier: ResultsHeaderCell.Identifier)
 
+
+        tableViewResults.register(NSNib(nibNamed: kDatabaseCellView, bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier(rawValue: kDatabaseCellView))
+
         tableViewActions.register(NSNib(nibNamed: kEntryTableCellViewIdentifier, bundle: nil), forIdentifier: NSUserInterfaceItemIdentifier(rawValue: kEntryTableCellViewIdentifier))
+
         tableViewActions.register(NSNib(nibNamed: ActionGroupCell.NibName, bundle: nil), forIdentifier: ActionGroupCell.Identifier)
         tableViewActions.register(NSNib(nibNamed: ActionTableCellView.NibName, bundle: nil), forIdentifier: ActionTableCellView.Identifier)
 
@@ -362,10 +366,10 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
             }
         }
 
+        swlog("🐞 onKeyboardMonitorKeyDown \(event) - \(event.modifierFlags) - \(event.keyCode)")
 
-
-
-
+        let mod = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        swlog("🐞 onKeyboardMonitorKeyDown-Mod-deviceIndependentFlagsMask \(mod)")
 
 
 
@@ -399,12 +403,20 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
 
         if event.modifierFlags.contains(.command) {
             if let chars = event.charactersIgnoringModifiers {
-                if chars == "f" {
+                if chars == "f" || chars == "l" { 
                     focusSearchField()
                     return true
                 } else if chars == "w" || chars == "q" || chars == "a" { 
                     return false
-                } else if event.specialKey == .leftArrow || event.specialKey == .rightArrow { 
+                } else if event.specialKey == .leftArrow ||
+                    event.specialKey == .rightArrow ||
+                    event.specialKey == .delete ||
+                    event.specialKey == .deleteLine ||
+                    event.specialKey == .deleteForward ||
+                    event.specialKey == .deleteCharacter ||
+                    event.specialKey == .clearLine
+                { 
+                    swlog("\(String(describing: event.specialKey))")
                     return false
                 } else if chars == "/" {
                     performSegue(withIdentifier: "segueToKeyboardShortcuts", sender: nil)
@@ -476,7 +488,14 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
                 }
             }
         } else {
-            if event.specialKey == .enter || event.keyCode == kVK_Return {
+            if event.keyCode == kVK_Escape {
+                let fr = view.window?.firstResponder
+
+                if viewMode == .actions, fr == tableViewActions { 
+                    focusSearchField()
+                    return true
+                }
+            } else if event.specialKey == .enter || event.keyCode == kVK_Return {
                 if viewMode == .results {
                     onEnterInResults()
                 } else {
@@ -801,9 +820,13 @@ extension QuickSearchPaletteViewController: NSTableViewDelegate {
     }
 
     func getDatabaseView(_ tableView: NSTableView, result: SearchResult) -> NSView? {
-        let view = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: kEntryTableCellViewIdentifier), owner: self) as! EntryTableCellView
+        let view = tableView.makeView(withIdentifier: NSUserInterfaceItemIdentifier(rawValue: kDatabaseCellView), owner: self) as! DatabaseCellView
 
-        view.setContent(result.title, username: result.subtitle, totp: result.totp, image: result.image, path: "", database: "")
+        guard let database = MacDatabasePreferences.getById(result.id) else {
+            return nil
+        }
+
+        view.setWithDatabase(database, nickNameEditClickEnabled: false, showSyncState: false, indicateAutoFillDisabled: false, wormholeUnlocked: false, disabled: false, hideRightSideFields: true)
 
         return view
     }
@@ -842,7 +865,7 @@ extension QuickSearchPaletteViewController: NSTableViewDelegate {
                     return nil
                 }
 
-                let keyboardShortcut = action.keyboardShortcut.isEmpty ? "" : String(format: "⌘%@", action.keyboardShortcut.uppercased())
+                let keyboardShortcut = action.keyboardShortcut.isEmpty ? "" : String(format: "⌘ %@", action.keyboardShortcut.uppercased())
 
                 cell.setContent(title: action.title, subTitle: action.subtitle, keyboardShortcut: keyboardShortcut)
 
@@ -854,7 +877,7 @@ extension QuickSearchPaletteViewController: NSTableViewDelegate {
     func tableView(_ tableView: NSTableView, rowViewForRow row: Int) -> NSTableRowView? {
         if tableView == tableViewResults {
             if row == 0 {
-                return HeaderTableRowView()
+                return NSTableRowView()
             }
         }
 

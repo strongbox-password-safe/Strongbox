@@ -34,20 +34,36 @@ struct SwiftUIEntryView: View {
     var body: some View {
         HStack {
             #if os(iOS)
-                Image(uiImage: icon)
+                let img = Image(uiImage: icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 32, height: 32)
                     .foregroundColor(/*@START_MENU_TOKEN@*/ .blue/*@END_MENU_TOKEN@*/)
                     .cornerRadius(3.0)
             #else
-                Image(nsImage: icon)
+                let img = Image(nsImage: icon)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 32, height: 32)
                     .foregroundColor(/*@START_MENU_TOKEN@*/ .blue/*@END_MENU_TOKEN@*/)
                     .cornerRadius(3.0)
             #endif
+
+            img
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {

@@ -209,12 +209,12 @@
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
     
+    
+    
+    
+    
+    
     slog(@"REQUEST-BIOMETRIC: %d", AppPreferences.sharedInstance.suppressAppBackgroundTriggers);
-    
-    
-    
-    
-    
     
     if ( self.requestInProgress ) {
         
@@ -232,7 +232,7 @@
                                    AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO;
 
                                    if(!success) {
-                                       slog(@"requestBiometricId: NO -> ");
+                                       slog(@"requestBiometricId: Fail -> [%@]", error);
                                        [BiometricsManager logBiometricError:error];
                                    }
                                    else {

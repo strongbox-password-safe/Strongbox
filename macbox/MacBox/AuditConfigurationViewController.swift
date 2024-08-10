@@ -77,7 +77,7 @@ class AuditConfigurationViewController: NSViewController {
 
         bindUI()
 
-        NotificationCenter.default.addObserver(forName: NSNotification.Name(kAuditProgressNotificationKey), object: nil, queue: nil) { [weak self] notification in
+        NotificationCenter.default.addObserver(forName: .auditProgress, object: nil, queue: nil) { [weak self] notification in
             self?.bindAuditStatus(notification)
         }
 

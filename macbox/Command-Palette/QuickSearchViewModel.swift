@@ -36,16 +36,12 @@ class QuickSearchViewModel {
 
     func search(searchText: String) -> [SearchResult] {
         if searchText.isEmpty {
-            let locked = getLockedDatabases()
-            if locked.isEmpty {
-                return []
-            } else {
-                var ret = [SearchResult(headerTitle: NSLocalizedString("locked_databases_heading", comment: "Locked Databases"), icon: NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)!)]
+            let allDatabases = getAllDatabases()
 
-                ret.append(contentsOf: locked)
+            var ret = [SearchResult(headerTitle: NSLocalizedString("generic_databases_plural", comment: "Databases"), icon: NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)!)]
 
-                return ret
-            }
+            ret.append(contentsOf: allDatabases)
+            return ret
         }
 
         var results = searchUnlockedDatabases(searchText: searchText)
@@ -64,7 +60,7 @@ class QuickSearchViewModel {
                 let header = SearchResult(headerTitle: loc,
                                           icon: NSImage(systemSymbolName: "lock.fill", accessibilityDescription: nil)!)
 
-                results = locked
+                results = getAllDatabases()
                 results.insert(header, at: 0)
 
                 return results
@@ -83,6 +79,15 @@ class QuickSearchViewModel {
 
             return results
         }
+    }
+
+    func getAllDatabases() -> [SearchResult] {
+        let all = MacDatabasePreferences.allDatabases
+            .map { database in
+                SearchResult(database: database)
+            }
+
+        return all
     }
 
     func getLockedDatabases() -> [SearchResult] {

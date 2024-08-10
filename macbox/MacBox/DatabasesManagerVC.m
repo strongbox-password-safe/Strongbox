@@ -57,7 +57,7 @@ NSString* const kUpdateNotificationDatabasePreferenceChanged = @"UpdateNotificat
 NSString* const kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUpdated";
 
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
-static NSString* const kDatabaseCellView = @"DatabaseCellView";
+
 static NSString* const kDragAndDropId = @"com.markmcguill.strongbox.mac.databases.list";
 static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 

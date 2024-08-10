@@ -129,77 +129,82 @@ struct SwiftDatabaseModel: SwiftDatabaseModelInterface {
     }
 
     var auditModel: AuditViewModel {
-        if let report = model.auditReport {
-            
+        if !model.isAuditEnabled {
+            return AuditViewModel(isEnabled: false)
+        } else if model.auditState == .running || model.auditState == .initial {
+            return AuditViewModel(isEnabled: true, isInProgress: true)
+        } else {
+            if let report = model.auditReport {
+                
 
-            let sorted = model
-                .getItemsById(Array(report.entriesWithDuplicatePasswords))
-                .map { SwiftEntryModel(node: $0, model: model) }
-                .sorted()
-
-            let groupedDuplicates = Dictionary(grouping: sorted) { $0.password }
-
-            
-
-            let groupedSimilarKvps = report.similarDictionary.map { key, value in
-                let nodes = model.getItemsById(Array(value))
+                let sorted = model
+                    .getItemsById(Array(report.entriesWithDuplicatePasswords))
                     .map { SwiftEntryModel(node: $0, model: model) }
                     .sorted()
 
-                return (key.uuidString, nodes)
+                let groupedDuplicates = Dictionary(grouping: sorted) { $0.password }
+
+                
+
+                let groupedSimilarKvps = report.similarDictionary.map { key, value in
+                    let nodes = model.getItemsById(Array(value))
+                        .map { SwiftEntryModel(node: $0, model: model) }
+                        .sorted()
+
+                    return (key.uuidString, nodes)
+                }
+
+                let groupedSimilar = Dictionary(uniqueKeysWithValues: groupedSimilarKvps)
+
+                
+
+                let noPasswords = model.getItemsById(Array(report.entriesWithNoPasswords))
+                    .map { SwiftEntryModel(node: $0, model: model) }
+                    .sorted()
+
+                
+
+                let common = model.getItemsById(Array(report.entriesWithCommonPasswords))
+                    .map { SwiftEntryModel(node: $0, model: model) }
+                    .sorted()
+
+                
+
+                let tooShort = model.getItemsById(Array(report.entriesTooShort))
+                    .map { SwiftEntryModel(node: $0, model: model) }
+                    .sorted()
+
+                
+
+                let pwned = model.getItemsById(Array(report.entriesPwned))
+                    .map { SwiftEntryModel(node: $0, model: model) }
+                    .sorted()
+
+                
+
+                let lowEntropy = model.getItemsById(Array(report.entriesWithLowEntropyPasswords))
+                    .map { SwiftEntryModel(node: $0, model: model) }
+                    .sorted()
+
+                
+
+                let twoFactorAvailable = model.getItemsById(Array(report.entriesWithTwoFactorAvailable))
+                    .map { SwiftEntryModel(node: $0, model: model) }
+                    .sorted()
+
+                return AuditViewModel(duplicated: groupedDuplicates,
+                                      noPasswords: noPasswords,
+                                      common: common,
+                                      similar: groupedSimilar,
+                                      tooShort: tooShort,
+                                      pwned: pwned,
+                                      lowEntropy: lowEntropy,
+                                      twoFactorAvailable: twoFactorAvailable,
+                                      similarEntryCount: report.entriesWithSimilarPasswords.count,
+                                      duplicateEntryCount: report.entriesWithDuplicatePasswords.count)
+            } else {
+                return AuditViewModel(isEnabled: true, isInProgress: false)
             }
-
-            let groupedSimilar = Dictionary(uniqueKeysWithValues: groupedSimilarKvps)
-
-            
-
-            let noPasswords = model.getItemsById(Array(report.entriesWithNoPasswords))
-                .map { SwiftEntryModel(node: $0, model: model) }
-                .sorted()
-
-            
-
-            let common = model.getItemsById(Array(report.entriesWithCommonPasswords))
-                .map { SwiftEntryModel(node: $0, model: model) }
-                .sorted()
-
-            
-
-            let tooShort = model.getItemsById(Array(report.entriesTooShort))
-                .map { SwiftEntryModel(node: $0, model: model) }
-                .sorted()
-
-            
-
-            let pwned = model.getItemsById(Array(report.entriesPwned))
-                .map { SwiftEntryModel(node: $0, model: model) }
-                .sorted()
-
-            
-
-            let lowEntropy = model.getItemsById(Array(report.entriesWithLowEntropyPasswords))
-                .map { SwiftEntryModel(node: $0, model: model) }
-                .sorted()
-
-            
-
-            let twoFactorAvailable = model.getItemsById(Array(report.entriesWithTwoFactorAvailable))
-                .map { SwiftEntryModel(node: $0, model: model) }
-                .sorted()
-
-            return AuditViewModel(duplicated: groupedDuplicates,
-                                  noPasswords: noPasswords,
-                                  common: common,
-                                  similar: groupedSimilar,
-                                  tooShort: tooShort,
-                                  pwned: pwned,
-                                  lowEntropy: lowEntropy,
-                                  twoFactorAvailable: twoFactorAvailable,
-                                  similarEntryCount: report.entriesWithSimilarPasswords.count,
-                                  duplicateEntryCount: report.entriesWithDuplicatePasswords.count)
-
-        } else {
-            return AuditViewModel()
         }
     }
 

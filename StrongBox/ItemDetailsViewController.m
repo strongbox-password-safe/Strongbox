@@ -125,6 +125,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 #endif
 
 @property (readonly) BOOL supportsCustomFields;
+@property (readonly) BOOL supportsAttachments;
 @property BOOL hideMetadataSection;
 
 #ifndef IS_APP_EXTENSION
@@ -256,36 +257,16 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     }
     
     [self updateSyncBarButtonItemState];
-    
-    [self listenToNotifications];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    [UIView setAnimationsEnabled:NO];
-    
-    [self.tableView reloadData]; 
-    
-    
-    [self.tableView beginUpdates];
-    [self.tableView endUpdates];
-    
-    [UIView setAnimationsEnabled:YES];
+    [self refreshTableViewAnimated];
     
     [self updateSyncBarButtonItemState];
     
-    [self listenToNotifications]; 
+    [self listenToNotifications];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -341,6 +322,8 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                                                name:kSyncManagerDatabaseSyncStatusChangedNotification
                                              object:nil];
 #endif
+    
+    
 }
 
 - (void)unListenToNotifications {
@@ -529,18 +512,18 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 
 - (void)onAuditChanged:(id)param {
     if ( !self.isEditing ) {
-        [self performFullReload];
+        [self refreshAll];
     }
 }
 
 - (void)onDatabaseReloaded:(id)param {
     if ( !self.isEditing ) {
-        [self performFullReload];
+        [self refreshAll];
     }
 }
 
 - (void)onDatabaseViewPreferencesChanged:(id)param {
-    [self performFullReload];
+    [self refreshAll];
 }
 
 - (void)setupTableview {
@@ -668,28 +651,14 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
 }
 
-- (void)prepareTableViewForEditing {
-    if ( self.editing ) {
-        if (self.supportsCustomFields) {
-            NSUInteger addCustomFieldIdx = self.model.customFieldsFiltered.count + kSimpleRowCount;
-            
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx inSection:kSimpleFieldsSectionIdx]]
-                                  withRowAnimation:UITableViewRowAnimationAutomatic];
-        }
-        
-        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kAttachmentsSectionIdx]]
-                              withRowAnimation:UITableViewRowAnimationAutomatic];
-        
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, kSectionCount)]
-                      withRowAnimation:UITableViewRowAnimationAutomatic];
-    }
-    else {
-        [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kAttachmentsSectionIdx]]
-                              withRowAnimation:UITableViewRowAnimationAutomatic];
-        
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, kSectionCount)]
-                      withRowAnimation:UITableViewRowAnimationAutomatic];
-    }
+- (void)refreshTableViewAnimated {
+    
+    
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, kSectionCount)]
+                  withRowAnimation:UITableViewRowAnimationAutomatic];
+    
+    
+    return;
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
@@ -742,7 +711,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     [AppModel.shared markAsEditingWithId:self.databaseModel.databaseUuid editing:editing];
     
     [self.tableView performBatchUpdates:^{
-        [self prepareTableViewForEditing];
+        [self refreshTableViewAnimated];
     } completion:^(BOOL finished) {
         if ( self.isEditing ) {
             UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]];
@@ -845,23 +814,25 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
 - (BOOL)supportsCustomFields {
     return (self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4);
 }
+- (BOOL)supportsAttachments {
+    return self.databaseFormat != kPasswordSafe;
+}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if(section == kSimpleFieldsSectionIdx) {
-        BOOL showAddCustomFieldRow = self.editing && self.supportsCustomFields;
-        return kSimpleRowCount + (self.model.customFieldsFiltered.count + (showAddCustomFieldRow ? 1 : 0));
+        return kSimpleRowCount + self.model.customFieldsFiltered.count + 1;
     }
     else if (section == kNotesSectionIdx) {
         return 1;
     }
     else if (section == kAttachmentsSectionIdx) {
-        return self.model.filteredAttachments.count + (self.editing ? 1 : 0);
+        return self.model.filteredAttachments.count + 1;
     }
     else if (section == kMetadataSectionIdx) {
         return self.metadataRows.count;
     }
     else if (section == kOtherSectionIdx) {
-        return self.hasHistory ? 1 : 0;
+        return 1;
     }
     else {
         return 0;
@@ -952,10 +923,20 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
             }
         }
         else if(indexPath.row >= kSimpleRowCount) { 
+            if ( !self.supportsCustomFields ) {
+                return CGFLOAT_MIN;
+            }
+
             NSUInteger idx = indexPath.row - kSimpleRowCount;
+            
             if ( idx < self.model.customFieldsFiltered.count ) {
                 CustomFieldViewModel* f = self.model.customFieldsFiltered[idx];
                 if (!f.protected && !f.value.length && shouldHideEmpty) { 
+                    return CGFLOAT_MIN;
+                }
+            }
+            else {
+                if ( !self.editing ) { 
                     return CGFLOAT_MIN;
                 }
             }
@@ -967,8 +948,14 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
         }
     }
 #ifndef IS_APP_EXTENSION
-    else if(indexPath.section == kAttachmentsSectionIdx && self.databaseModel.database.originalFormat == kPasswordSafe) {
-        return CGFLOAT_MIN;
+    else if (indexPath.section == kAttachmentsSectionIdx ) {
+        if ( !self.supportsAttachments ) {
+            return CGFLOAT_MIN;
+        }
+        
+        if ( !self.editing && indexPath.row == 0 ) { 
+            return CGFLOAT_MIN;
+        }
     }
     else if(indexPath.section == kMetadataSectionIdx && (self.editing || self.hideMetadataSection)) {
         return CGFLOAT_MIN;
@@ -1144,9 +1131,12 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
             }
             else if (indexPath.row >= kSimpleRowCount) {
                 NSUInteger idx = indexPath.row - kSimpleRowCount;
-                [self.model removeCustomFieldAtIndex:idx];
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-                [self onModelEdited];
+                
+                if ( idx < self.model.customFieldsFiltered.count ) {
+                    [self.model removeCustomFieldAtIndex:idx];
+                    [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                    [self onModelEdited];
+                }
             }
         }
     }
@@ -1883,7 +1873,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             }
         }
         else if (indexPath.section == kSimpleFieldsSectionIdx) {
-            NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
+            NSInteger customFieldIdx = indexPath.row - kSimpleRowCount;
             
             if(indexPath.row == kRowTotp) {
                 if(!self.model.totp) {
@@ -1898,21 +1888,23 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
                     [self promptToAddSshKey];
                 }
             }
-            else if(virtualRow == self.model.customFieldsFiltered.count  ) { 
+            else if(customFieldIdx == self.model.customFieldsFiltered.count  ) { 
                 [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:nil];
             }
-            else if (virtualRow >= 0 && virtualRow < self.model.customFieldsFiltered.count) {
-                NSInteger idx = virtualRow;
+            else if (customFieldIdx >= 0 && customFieldIdx < self.model.customFieldsFiltered.count) {
+                NSInteger idx = customFieldIdx;
                 CustomFieldViewModel* cf = self.model.customFieldsFiltered[idx];
                 [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:cf];
             }
         }
     }
     else {
-        NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
+        NSUInteger customFieldIdx = indexPath.row - kSimpleRowCount;
         
         if(indexPath.section == kAttachmentsSectionIdx) {
-            [self launchAttachmentPreview:indexPath.row];
+            if ( indexPath.row > 0 ) { 
+                [self launchAttachmentPreview:indexPath.row - 1];
+            }
         }
         else if(indexPath.section == kSimpleFieldsSectionIdx) {
             if (indexPath.row == kRowTitleAndIcon) {
@@ -1933,8 +1925,8 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             else if (indexPath.row == kRowTotp && self.model.totp) {
                 [self copyToClipboard:self.model.totp.password message:NSLocalizedString(@"item_details_totp_copied", @"One Time Password Copied")];
             }
-            else if (virtualRow >= 0 && virtualRow < self.model.customFieldsFiltered.count) {
-                NSInteger idx = virtualRow;
+            else if (customFieldIdx >= 0 && customFieldIdx < self.model.customFieldsFiltered.count) {
+                NSInteger idx = customFieldIdx;
                 CustomFieldViewModel* cf = self.model.customFieldsFiltered[idx];
                 NSString* value = [self maybeDereference:cf.value];
                 [self copyToClipboard:value message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), cf.key]];
@@ -2093,7 +2085,9 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
 }
 
 - (UITableViewCell*)getTotpCell:(NSIndexPath*)indexPath {
-    if(self.editing && !self.model.totp) {
+    OTPToken* totp = self.model.totp;
+    
+    if ( self.editing && !totp ) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         cell.labelText.text = NSLocalizedString(@"item_details_setup_totp", @"Setup TOTP...");
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -2364,11 +2358,11 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (UITableViewCell*)getCustomFieldCell:(NSIndexPath*)indexPath {
-    NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
+    NSUInteger customFieldIdx = indexPath.row - kSimpleRowCount;
     
     __weak ItemDetailsViewController* weakSelf = self;
     
-    if(self.editing && virtualRow == self.model.customFieldsFiltered.count) {
+    if( customFieldIdx == self.model.customFieldsFiltered.count ) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         
         cell.labelText.text = NSLocalizedString(@"item_details_new_custom_field_button", @"New Custom Field...");
@@ -2380,7 +2374,7 @@ suggestionProvider:^NSString*(NSString *text) {
         GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         
         
-        NSInteger idx = virtualRow;
+        NSInteger idx = customFieldIdx;
         if (idx < 0 || idx >= self.model.customFieldsFiltered.count) {
             return cell;
         }
@@ -2434,7 +2428,7 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (UITableViewCell*)getAttachmentCell:(NSIndexPath*)indexPath {
-    if(self.editing && indexPath.row == 0) {
+    if ( indexPath.row == 0 ) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         cell.labelText.text = NSLocalizedString(@"item_details_add_attachment_button", @"Add Attachment...");
         
@@ -2444,61 +2438,79 @@ suggestionProvider:^NSString*(NSString *text) {
         return cell;
     }
     else {
-        NSInteger idx = indexPath.row - (self.editing ? 1 : 0);
+        NSInteger idx = indexPath.row - 1;
+        if ( idx >= self.model.filteredAttachments.count ) {
+            GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
+            return cell;
+        }
+        
         NSString* filename = self.model.filteredAttachments.allKeys[idx];
         KeePassAttachmentAbstractionLayer* attachment = self.model.filteredAttachments[filename];
-        
-        if(self.editing) {
-            EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];
-            cell.textField.text = filename;
-            cell.image.image = [UIImage imageNamed:@"document"];
-            
-            if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
-                NSData* data = attachment.nonPerformantFullData; 
-                UIImage* img = [UIImage imageWithData:data];
-                if(img) {
-                    @autoreleasepool { 
-                        UIGraphicsBeginImageContextWithOptions(cell.image.bounds.size, NO, 0.0);
-                        
-                        CGRect imageRect = cell.image.bounds;
-                        [img drawInRect:imageRect];
-                        cell.image.image = UIGraphicsGetImageFromCurrentImageContext();
-                        
-                        UIGraphicsEndImageContext();
-                    }
-                }
-            }
-            
+        if ( !attachment ) {
+            GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
             return cell;
+        }
+        
+        if ( self.editing ) {
+            return [self getEditAttachmentCell:filename attachment:attachment indexPath:indexPath];
         }
         else {
-            UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kViewAttachmentCellId forIndexPath:indexPath];
-            cell.textLabel.text = filename;
-            cell.imageView.image = [UIImage imageNamed:@"document"];
-            
-            NSUInteger filesize = attachment.length;
-            cell.detailTextLabel.text = friendlyFileSizeString(filesize);
-            
-            if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
-                NSData* data = attachment.nonPerformantFullData; 
-                UIImage* img = [UIImage imageWithData:data];
-                
-                if(img) { 
-                    @autoreleasepool { 
-                        UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
-                        
-                        CGRect imageRect = CGRectMake(0, 0, 48, 48);
-                        [img drawInRect:imageRect];
-                        cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-                        
-                        UIGraphicsEndImageContext();
-                    }
-                }
-            }
-            
-            return cell;
+            return [self getViewAttachmentCell:filename attachment:attachment indexPath:indexPath];
         }
     }
+    
+}
+
+- (UITableViewCell*)getEditAttachmentCell:(NSString*)filename attachment:(KeePassAttachmentAbstractionLayer*)attachment indexPath:(NSIndexPath*)indexPath {
+    EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];
+    cell.textField.text = filename;
+    cell.image.image = [UIImage imageNamed:@"document"];
+    
+    if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
+        NSData* data = attachment.nonPerformantFullData; 
+        UIImage* img = [UIImage imageWithData:data];
+        if(img) {
+            @autoreleasepool { 
+                UIGraphicsBeginImageContextWithOptions(cell.image.bounds.size, NO, 0.0);
+                
+                CGRect imageRect = cell.image.bounds;
+                [img drawInRect:imageRect];
+                cell.image.image = UIGraphicsGetImageFromCurrentImageContext();
+                
+                UIGraphicsEndImageContext();
+            }
+        }
+    }
+    
+    return cell;
+}
+
+- (UITableViewCell*)getViewAttachmentCell:(NSString*)filename  attachment:(KeePassAttachmentAbstractionLayer*)attachment indexPath:(NSIndexPath*)indexPath {
+    UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kViewAttachmentCellId forIndexPath:indexPath];
+    cell.textLabel.text = filename;
+    cell.imageView.image = [UIImage imageNamed:@"document"];
+    
+    NSUInteger filesize = attachment.length;
+    cell.detailTextLabel.text = friendlyFileSizeString(filesize);
+    
+    if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
+        NSData* data = attachment.nonPerformantFullData; 
+        UIImage* img = [UIImage imageWithData:data];
+        
+        if(img) { 
+            @autoreleasepool { 
+                UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
+                
+                CGRect imageRect = CGRectMake(0, 0, 48, 48);
+                [img drawInRect:imageRect];
+                cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+                
+                UIGraphicsEndImageContext();
+            }
+        }
+    }
+    
+    return cell;
 }
 
 - (UITableViewCell*)getMetadataCell:(NSIndexPath*)indexPath {
@@ -2704,7 +2716,7 @@ suggestionProvider:^NSString*(NSString *text) {
             [self bindNavBar];
             
             [self.tableView performBatchUpdates:^{
-                [self prepareTableViewForEditing];
+                [self refreshTableViewAnimated];
             } completion:^(BOOL finished) {
                 [self bindNavBar];
                 
@@ -2721,7 +2733,7 @@ suggestionProvider:^NSString*(NSString *text) {
         item = [self createNewEntryNode];
     }
     else {
-        item = [self.databaseModel.database getItemById:self.itemId];
+        item = [self.databaseModel.database getItemById:self.itemId]; 
         if ( self.historicalIndex != nil) {
             int index = self.historicalIndex.intValue;
             if ( index >= 0 && index < item.fields.keePassHistory.count ) {
@@ -2731,12 +2743,19 @@ suggestionProvider:^NSString*(NSString *text) {
         }
     }
     
-    self.metadataRows = [self.databaseModel getMetadataFromItem:item];
-    self.model = [EntryViewModel fromNode:item model:self.databaseModel];
+    if ( item == nil ) {
+        
+        
+        item = [self createNewEntryNode];
+    }
+    else {
+        self.metadataRows = [self.databaseModel getMetadataFromItem:item];
+        self.model = [EntryViewModel fromNode:item model:self.databaseModel];
+    }
 }
 
-- (void)performFullReload {
-    [self reloadViewModelFromNodeItem]; 
+- (void)refreshAll {
+    [self reloadViewModelFromNodeItem];
     [self.tableView reloadData];
     [self bindNavBar];
     [self updateSyncBarButtonItemState];
@@ -2744,7 +2763,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
 - (void)refreshPublishAndSyncAfterModelEdit {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self performFullReload];
+        [self refreshAll];
         
         [NSNotificationCenter.defaultCenter postNotificationName:kModelEditedNotification object:nil];
         

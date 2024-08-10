@@ -29,6 +29,7 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
+NSString* const kDatabaseCellView = @"DatabaseCellView";
 
 @interface DatabaseCellView () <NSTextFieldDelegate>
 
@@ -46,16 +47,15 @@
 @property (weak) IBOutlet NSImageView *imageViewReadOnly;
 @property (weak) IBOutlet NSImageView *imageViewSyncing;
 @property (weak) IBOutlet NSProgressIndicator *syncProgressIndicator;
-@property (weak) IBOutlet NSImageView *imageViewUnlocked;
 
 @property NSClickGestureRecognizer *gestureRecognizerClick;
 @property NSString* uuid;
 @property NSString* originalNickName;
 
 @property (weak) IBOutlet NSImageView *imageViewProvider;
-@property (weak) IBOutlet NSBox *boxUnlockedBarIndicator;
 @property (weak) IBOutlet NSStackView *masterStack;
 @property (weak) IBOutlet NSTextField *labelStatus;
+@property (weak) IBOutlet NSImageView *imageViewUnlockedIndicator;
 
 @end
 
@@ -68,11 +68,6 @@
     
     self.gestureRecognizerClick = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onNicknameClick)];
     [self.textFieldName addGestureRecognizer:self.gestureRecognizerClick];
-    
-
-
-    
-    [self.masterStack setCustomSpacing:8.0f afterView:self.boxUnlockedBarIndicator];
 }
 
 - (void)prepareForReuse {
@@ -109,6 +104,16 @@ nickNameEditClickEnabled:(BOOL)nickNameEditClickEnabled
 indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
        wormholeUnlocked:(BOOL)wormholeUnlocked
                disabled:(BOOL)disabled {
+    [self setWithDatabase:metadata nickNameEditClickEnabled:nickNameEditClickEnabled showSyncState:showSyncState indicateAutoFillDisabled:indicateAutoFillDisabled wormholeUnlocked:wormholeUnlocked disabled:disabled hideRightSideFields:NO];
+}
+
+- (void)setWithDatabase:(MacDatabasePreferences *)metadata
+nickNameEditClickEnabled:(BOOL)nickNameEditClickEnabled
+          showSyncState:(BOOL)showSyncState
+indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
+       wormholeUnlocked:(BOOL)wormholeUnlocked
+               disabled:(BOOL)disabled
+    hideRightSideFields:(BOOL)hideRightSideFields {
     [self resetUi:metadata];
     
     self.gestureRecognizerClick.enabled = nickNameEditClickEnabled;
@@ -116,7 +121,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     @try {
         self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:metadata.storageProvider database:metadata];
 
-        [self bindTextFields:metadata];
+        [self bindTextFields:metadata hideRightSideFields:hideRightSideFields];
     
         [self bindEnableDisabled:metadata disabled:disabled indicateAutoFillDisabled:indicateAutoFillDisabled];
 
@@ -142,7 +147,9 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     self.imageViewSyncing.hidden = YES;
     self.syncProgressIndicator.hidden = YES;
     [self.syncProgressIndicator stopAnimation:nil];
-    self.boxUnlockedBarIndicator.fillColor = NSColor.darkGrayColor;
+
+
+    self.imageViewUnlockedIndicator.alphaValue = 0.0;
     self.labelStatus.stringValue = @"";
 }
 
@@ -154,8 +161,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     
     BOOL unlocked = (wormholeUnlocked || [self isDatabaseUnlocked:metadata.uuid]);
     
-    self.imageViewUnlocked.hidden = !unlocked;
-    self.boxUnlockedBarIndicator.fillColor = unlocked ? NSColor.systemGreenColor : NSColor.darkGrayColor;
+    self.imageViewUnlockedIndicator.alphaValue = unlocked ? 1.0 : 0.0;
     
     self.labelStatus.stringValue = [self getStatusText:metadata unlocked:unlocked];
     self.labelStatus.textColor = unlocked ? NSColor.systemGreenColor : NSColor.secondaryLabelColor;
@@ -243,7 +249,7 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
     }
 }
 
-- (void)bindTextFields:(MacDatabasePreferences*)metadata {
+- (void)bindTextFields:(MacDatabasePreferences*)metadata hideRightSideFields:(BOOL)hideRightSideFields {
     NSString* fileSize = @"";
     NSString* fileMod = @"";
     NSString* title = metadata.nickName ? metadata.nickName : @"";
@@ -273,6 +279,9 @@ indicateAutoFillDisabled:(BOOL)indicateAutoFillDisabled
             self.imageViewProvider.image = [SafeStorageProviderFactory getImageForProvider:kiCloud];
         }
     }
+    
+    self.textFieldSubtitleTopRight.hidden = hideRightSideFields;
+    self.textFieldSubtitleBottomRight.hidden = hideRightSideFields;
 }
 
 - (void)bindSyncState:(MacDatabasePreferences *)metadata showSyncState:(BOOL)showSyncState {

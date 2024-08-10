@@ -91,7 +91,7 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
             let browse = BrowseSafeView.fromStoryboard(.expiredAndExpiring, model: viewModel)
             navController.pushViewController(browse, animated: true)
         case .auditIssues:
-            let auditNavView = UIHostingController(rootView: AuditNavigationView(model: homeModel))
+            let auditNavView = UIHostingController(rootView: AuditNavigationView(model: homeModel, showCloseButton: false))
             navController.pushViewController(auditNavView, animated: true)
         }
     }

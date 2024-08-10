@@ -23,7 +23,7 @@ class QuickSearchPalette: NSObject {
     }
 
     @objc
-    func show() {
-        panel.showPalette()
+    func toggleShow() {
+        panel.toggleShow()
     }
 }

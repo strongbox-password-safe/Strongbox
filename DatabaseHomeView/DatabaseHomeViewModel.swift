@@ -333,7 +333,7 @@ class DatabaseHomeViewModel: ObservableObject {
 
     var showOtherViews: Bool {
         let total = database.tagCount +
-            database.auditIssueEntryCount +
+            (auditModel.isEnabled ? 1 : 0) +
             database.passkeyEntryCount +
             database.sshKeyEntryCount +
             database.attachmentsEntryCount +

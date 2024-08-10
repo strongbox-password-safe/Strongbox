@@ -11,7 +11,7 @@ import Foundation
 #if !DEBUG
     func swlog(_: String, _: Any...) {}
 #else
-    public func swlog(file _: String = #file, function: String = #function, line _: Int = #line, column _: Int = #column, _ log: String, _ args: Any...) {
+    public func swlog(file _: String = #file, function: String = #function, line _: Int = #line, column _: Int = #column, _ log: String, _ args: Any?...) {
         var msg: String
         if args.isEmpty {
             msg = log

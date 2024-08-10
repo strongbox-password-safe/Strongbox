@@ -135,7 +135,7 @@ static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenc
 
 static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
 static NSString* const kDisableThirdPartyStorageOptions = @"disableThirdPartyStorageOptions";
-static NSString* const kSuppressAppBackgroundTriggers = @"suppressAppBackgroundTriggers";
+
 static NSString* const kMarkdownNotes = @"markdownNotes";
 static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
 static NSString* const kHideTipJar = @"hideTipJar";
@@ -548,14 +548,6 @@ static NSString* const kDisableHomeTab = @"disableHomeTab";
 
 - (void)setMarkdownNotes:(BOOL)markdownNotes {
     [self setBool:kMarkdownNotes value:markdownNotes];
-}
-
-- (BOOL)suppressAppBackgroundTriggers {
-    return [self getBool:kSuppressAppBackgroundTriggers];
-}
-
-- (void)setSuppressAppBackgroundTriggers:(BOOL)suppressAppBackgroundTriggers {
-    [self setBool:kSuppressAppBackgroundTriggers value:suppressAppBackgroundTriggers];
 }
 
 - (BOOL)disableThirdPartyStorageOptions {

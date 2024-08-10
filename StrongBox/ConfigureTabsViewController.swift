@@ -26,6 +26,7 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
         .sshKeys,
         .attachments,
         .expiredAndExpiring,
+        .auditIssues,
     ]
 
     var visibleTabs: [BrowseViewType] = []
@@ -251,17 +252,40 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
             return NSLocalizedString("item_details_section_header_attachments", comment: "Attachments")
         case .expiredAndExpiring:
             return NSLocalizedString("quick_view_title_expired_and_expiring", comment: "Expired & Expiring")
+        case .auditIssues:
+            return NSLocalizedString("quick_view_title_audit_issues_title", comment: "Audit Issues")
         @unknown default:
             return "🔴 UNKNOWN"
         }
     }
 
     func imageTintForViewType(viewType: BrowseViewType) -> UIColor? {
-        if viewType == .favourites {
+        switch viewType {
+        case .favourites:
             return UIColor.systemYellow
+        case .hierarchy:
+            return UIColor.systemBlue
+        case .list:
+            return UIColor.systemBlue
+        case .totpList:
+            return UIColor.systemIndigo
+        case .tags:
+            return UIColor.systemBlue
+        case .home:
+            return UIColor.systemBlue
+        case .passkeys:
+            return UIColor.systemPurple
+        case .sshKeys:
+            return UIColor.systemIndigo
+        case .attachments:
+            return UIColor.systemMint
+        case .expiredAndExpiring:
+            return UIColor.systemCyan
+        case .auditIssues:
+            return UIColor.systemOrange
+        @unknown default:
+            return nil
         }
-
-        return nil
     }
 
     func imageForViewType(viewType: BrowseViewType) -> UIImage {
@@ -292,6 +316,8 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
             imageName = "doc.richtext.fill"
         case .expiredAndExpiring:
             imageName = "calendar"
+        case .auditIssues:
+            imageName = "checkmark.shield.fill"
         @unknown default:
             imageName = "questionmark.circle.fill"
         }

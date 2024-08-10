@@ -11,116 +11,95 @@ import SwiftUI
 struct AuditNavigationView: View {
     @ObservedObject
     var model: DatabaseHomeViewModel
+    var showCloseButton: Bool = true
+
+    var isEnabled: Bool {
+        model.auditModel.isEnabled
+    }
+
+    var isInProgress: Bool {
+        model.auditModel.isInProgress
+    }
+
+    @State
+    var auditProgress: Double = 0.0
 
     var body: some View {
-        let auditModel = model.auditModel
-
         Group {
-            if model.database.auditIssueEntryCount == 0 {
-                VStack {
-                    Group {
-                        Image(systemName: "face.smiling")
-                            .font(.system(size: 100))
-                            .foregroundColor(.secondary)
-                        Text("audit_status_no_issues_found")
-                            .foregroundStyle(.secondary)
+            if isEnabled {
+                if isInProgress {
+                    AuditInProgressView(progress: $auditProgress)
+                } else {
+                    if model.database.auditIssueEntryCount == 0 {
+                        NoIssuesView()
+                    } else {
+                        SomeIssuesView(model: model)
                     }
-                    .font(.largeTitle)
                 }
             } else {
-                List {
-                    let noPasswords = auditModel.noPasswords.count
-                    if noPasswords > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_no_password_set", count: .init(String(noPasswords))) {
-                                AuditSimpleListView(model: model, title: "audit_quick_summary_very_brief_no_password_set", list: auditModel.noPasswords)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_no_password")
-                        }
-                    }
+                AuditDisabledView()
+            }
+        }
+        .animation(.easeOut, value: isInProgress)
+        .onAppear(perform: {
+            swlog("🐞 AuditNavigationView onAppear")
+            model.objectWillChange.send() 
+        })
+        .onReceive(NotificationCenter.default.publisher(for: .modelEdited, object: nil)) { _ in
+            swlog("🐞 AuditNavigationView received modelEdited")
+            model.objectWillChange.send() 
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .databaseUpdated, object: nil)) { _ in
+            swlog("🐞 AuditNavigationView received databaseUpdated")
+            model.objectWillChange.send() 
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .auditCompleted, object: nil)) { _ in
+            swlog("🐞 AuditNavigationView received auditCompleted")
+            model.objectWillChange.send() 
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .auditProgress, object: nil)) { note in
+            guard let progress = note.object as? NSNumber else {
+                return
+            }
 
-                    let dupeCount = auditModel.duplicateEntryCount
-                    if dupeCount > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_duplicated_password", count: .init(String(dupeCount))) {
-                                AuditGroupedDupesOrSimilarView(model: model, viewMode: .duplicates)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_duplicate")
-                        }
-                    }
+            swlog("🐞 AuditNavigationView received auditProgress \(progress)")
 
-                    let common = auditModel.common.count
-                    if common > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_very_common_password", count: .init(String(common))) {
-                                AuditSimpleListView(model: model, title: "audit_quick_summary_very_brief_very_common_password", list: auditModel.common)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_common")
-                        }
-                    }
+            auditProgress = progress.doubleValue
 
-                    let similar = auditModel.similarEntryCount
-                    if similar > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_password_is_similar_to_another", count: .init(String(similar))) {
-                                AuditGroupedDupesOrSimilarView(model: model, viewMode: .similar)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_similar")
-                        }
-                    }
-
-                    let tooShort = auditModel.tooShort.count
-                    if tooShort > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_password_is_too_short", count: .init(String(tooShort))) {
-                                AuditSimpleListView(model: model, title: "audit_quick_summary_very_brief_password_is_too_short", list: auditModel.tooShort)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_short")
-                        }
-                    }
-
-                    let pwned = auditModel.pwned.count
-                    if pwned > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_password_is_pwned", count: .init(String(pwned))) {
-                                AuditSimpleListView(model: model, title: "audit_quick_summary_very_brief_password_is_pwned", list: auditModel.pwned)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_hibp")
-                        }
-                    }
-
-                    let lowEntropy = auditModel.lowEntropy.count
-                    if lowEntropy > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_low_entropy", count: .init(String(lowEntropy))) {
-                                AuditSimpleListView(model: model, title: "audit_quick_summary_very_brief_low_entropy", list: auditModel.lowEntropy)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_entropy")
-                        }
-                    }
-
-                    let twoFactorAvailable = auditModel.twoFactorAvailable.count
-                    if twoFactorAvailable > 0 {
-                        Section {
-                            AuditNavigationLink(title: "audit_quick_summary_very_brief_two_factor_available", count: .init(String(twoFactorAvailable))) {
-                                AuditSimpleListView(model: model, title: "audit_quick_summary_very_brief_two_factor_available", list: auditModel.twoFactorAvailable)
-                            }
-                        } footer: {
-                            Text("audit_view_section_footer_2fa")
+            model.objectWillChange.send() 
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .databaseReloaded, object: nil)) { _ in
+            swlog("🐞 AuditNavigationView received databaseReloaded")
+            model.objectWillChange.send() 
+        }
+        .navigationTitle("quick_view_title_audit_issues_title")
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                HStack {
+                    if showCloseButton {
+                        Button(action: {
+                            model.close()
+                        }) {
+                            Text("generic_verb_close")
                         }
                     }
                 }
             }
-        }
-        .navigationTitle("quick_view_title_audit_issues_title")
-        .toolbar {
+
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 2) {
+                    let noIssues = !isInProgress && model.database.auditIssueEntryCount == 0
+
+                    Image(systemName: "checkmark.shield.fill")
+                        .foregroundColor(noIssues ? .blue : .orange)
+                        .font(.subheadline)
+
+                    Text("quick_view_title_audit_issues_title")
+                        .lineLimit(1)
+                        .font(.headline)
+                }
+            }
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: {
                     model.presentAuditSettings()

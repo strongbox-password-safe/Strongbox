@@ -11,17 +11,11 @@ import Foundation
 class HeaderTableRowView: NSTableRowView {
 
 
-    override func draw(_ dirtyRect: NSRect) {
 
 
 
 
-        NSColor.windowBackgroundColor.setFill()
 
-        dirtyRect.fill()
-    }
 
-    override func drawBackground(in _: NSRect) {
-        
-    }
+
 }

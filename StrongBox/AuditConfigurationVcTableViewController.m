@@ -94,7 +94,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(bindAuditStatus:)
-                                               name:kAuditProgressNotificationKey
+                                               name:kAuditProgressNotification
                                              object:nil];
 
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -238,7 +238,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (void)bindAuditStatus:(NSNotification*)notification {
-    if (notification.name == kAuditProgressNotificationKey ) {
+    if (notification.name == kAuditProgressNotification ) {
         [self bindAuditStatusWithProgress:notification.object];
     }
     else {

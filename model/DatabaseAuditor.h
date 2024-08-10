@@ -49,6 +49,7 @@ typedef BOOL (^IsExcludedBlock)(Node* item);
                  saveConfig:(SaveConfigurationBlock _Nullable)saveConfig NS_DESIGNATED_INITIALIZER;
 
 @property AuditState state;
+@property (readonly) CGFloat calculatedProgress;
 
 - (BOOL)start:(DatabaseModel*)database
        config:(DatabaseAuditorConfiguration*)config

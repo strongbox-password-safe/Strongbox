@@ -1040,7 +1040,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     return NO;
 }
 
-- (void)publishPartialProgress {
+- (CGFloat)calculatedProgress {
     const CGFloat hibp = 0.8; 
     const CGFloat sim = 1.0 - hibp;
     
@@ -1049,7 +1049,11 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     
     CGFloat calculatedProgress = (self.hibpProgress * hibpWeight) + (self.similarProgress * similarWeight);
     
-    self.progress(calculatedProgress);
+    return calculatedProgress;
+}
+
+- (void)publishPartialProgress {
+    self.progress(self.calculatedProgress);
 }
 
 @end

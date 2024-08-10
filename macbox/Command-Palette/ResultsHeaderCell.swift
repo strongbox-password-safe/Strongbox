@@ -12,11 +12,11 @@ class ResultsHeaderCell: NSTableCellView {
     static let NibName = "ResultsHeaderCell"
     static let Identifier = NSUserInterfaceItemIdentifier("ResultsHeaderCell")
 
-    @IBOutlet var imageViewIcon: NSImageView!
+
     @IBOutlet var textFieldHeader: NSTextField!
 
-    func setContent(title: String, icon: NSImage) {
+    func setContent(title: String, icon _: NSImage) {
         textFieldHeader.stringValue = title
-        imageViewIcon.image = icon
+
     }
 }

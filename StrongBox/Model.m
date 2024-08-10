@@ -38,7 +38,7 @@
 #endif
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
-NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
+NSString* const kAuditProgressNotification = @"kAuditProgressNotificationKey";
 NSString* const kAuditCompletedNotification = @"kAuditCompletedNotificationKey";
 NSString* const kAuditNewSwitchedOffNotificationKey = @"kAuditNewSwitchedOffNotificationKey";
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
@@ -592,6 +592,14 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 
 
+- (CGFloat)auditProgress {
+    return self.isAuditEnabled && self.auditor ? self.auditor.calculatedProgress : 0.0;
+}
+
+- (BOOL)isAuditEnabled {
+    return !self.isNativeAutoFillAppExtensionOpen && self.metadata.auditConfig.auditInBackground;
+}
+
 - (AuditState)auditState {
     return self.auditor.state;
 }
@@ -649,7 +657,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }
                progress:^(double progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
+            [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotification object:@(progress)];
         });
     } completion:^(BOOL userStopped, NSTimeInterval duration) {
         

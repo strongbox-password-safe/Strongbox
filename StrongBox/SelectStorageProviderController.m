@@ -56,6 +56,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 @property MutableOrderedDictionary<NSString*, NSArray<NSNumber*>*> *providersForSectionMap;
 @property NSArray<WiFiSyncServerConfig*> *wiFiSyncDevices;
+@property BOOL filesAppMakeALocalCopy;
 
 @end
 
@@ -132,6 +133,8 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     
     
     if ( self.existing ) {
+        self.providersForSectionMap[kSectioniOSNative] = @[@(kLocalDevice)];
+        
         if ( !AppPreferences.sharedInstance.disableWiFiSyncClientMode && StrongboxProductBundle.supportsWiFiSync ) {
             [self loadWiFiSyncDevices];
             [self observeWiFiSyncDevices];
@@ -413,27 +416,32 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         }
 #endif
         else if ( providerId.intValue == kLocalDevice ) {
-            if ( AppPreferences.sharedInstance.warnAboutLocalDeviceDatabases ) {
-                [Alerts threeOptions:self
-                               title:NSLocalizedString(@"sspc_local_device_storage_warning_title", @"Local Device Database Caveat")
-                             message:NSLocalizedString(@"sspc_local_device_storage_warning_message", @"Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database?")
-                   defaultButtonText:NSLocalizedString(@"alerts_yes", @"Yes")
-                    secondButtonText:NSLocalizedString(@"generic_yes_dont_ask_again", @"Yes, don't ask again")
-                     thirdButtonText:NSLocalizedString(@"alerts_no", @"No")
-                              action:^(int response) {
-                    if ( response == 0 || response == 1 ) {
-                        if ( response == 1 ) {
-                            AppPreferences.sharedInstance.warnAboutLocalDeviceDatabases = NO;
-                        }
-                        
-                        id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
-                        [self segueToBrowserOrAdd:provider];
-                    }
-                }];
+            if ( self.existing ) {
+                [self onAddALocalDeviceCopyViaFilesApp];
             }
             else {
-                id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
-                [self segueToBrowserOrAdd:provider];
+                if ( AppPreferences.sharedInstance.warnAboutLocalDeviceDatabases ) {
+                    [Alerts threeOptions:self
+                                   title:NSLocalizedString(@"sspc_local_device_storage_warning_title", @"Local Device Database Caveat")
+                                 message:NSLocalizedString(@"sspc_local_device_storage_warning_message", @"Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database?")
+                       defaultButtonText:NSLocalizedString(@"alerts_yes", @"Yes")
+                        secondButtonText:NSLocalizedString(@"generic_yes_dont_ask_again", @"Yes, don't ask again")
+                         thirdButtonText:NSLocalizedString(@"alerts_no", @"No")
+                                  action:^(int response) {
+                        if ( response == 0 || response == 1 ) {
+                            if ( response == 1 ) {
+                                AppPreferences.sharedInstance.warnAboutLocalDeviceDatabases = NO;
+                            }
+                            
+                            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
+                            [self segueToBrowserOrAdd:provider];
+                        }
+                    }];
+                }
+                else {
+                    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:providerId.intValue];
+                    [self segueToBrowserOrAdd:provider];
+                }
             }
         }
         else {
@@ -445,20 +453,30 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-- (void)presentFilesAppWarning {
-    [Alerts yesNo:self
-            title:NSLocalizedString(@"deprecated_storage_method", @"Storage Method Not Recommended")
-          message:NSLocalizedString(@"cannot_recommend_storage_msg", @"We cannot recommend storing your database using this method. Strongbox does not have end to end control over the sync process, and so we cannot guarantee data integrity.\n\nDo you want to continue anyway?")
-           action:^(BOOL response) {
-        if ( response ) {
-            if (self.existing) {
-                [self onAddThroughFilesApp];
-            }
-            else {
-                [self onCreateThroughFilesApp];
-            }
+- (void)presentFilesAppWarning { 
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        if (self.existing) {
+            [self onAddAFilesAppReferencedInPlaceDatabase];
         }
-    }];
+        else {
+            [self onCreateThroughFilesApp];
+        }
+    }
+    else {
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"deprecated_storage_method", @"Storage Method Not Recommended")
+              message:NSLocalizedString(@"cannot_recommend_storage_msg", @"We cannot recommend storing your database using this method. Strongbox does not have end to end control over the sync process, and so we cannot guarantee data integrity.\n\nDo you want to continue anyway?")
+               action:^(BOOL response) {
+            if ( response ) {
+                if (self.existing) {
+                    [self onAddAFilesAppReferencedInPlaceDatabase];
+                }
+                else {
+                    [self onCreateThroughFilesApp];
+                }
+            }
+        }];
+    }
 }
 
 - (void)presentICloudWarning {
@@ -520,7 +538,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     }
     else if ( [sectionName isEqualToString:kSectioniOSNative] ) {
         if ( self.existing ) {
-            return nil;
+            return NSLocalizedString(@"select_storage_locate_db_for_local_copy", @"Tap to find your database and make a local copy.\n\nNB: There are a many ways to import your database, including File Sharing via USB, AirDrop, or copying your database into the Strongbox folder.");
         }
         
         if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
@@ -531,7 +549,12 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
         }
     }
     else if ( [sectionName isEqualToString:kSectioniOSNativeDeprecated] ) {
-        return NSLocalizedString(@"deprecated_storage_footer_text", @"These method(s) are no longer advised. Your mileage may vary depending on the quality of the third party Files provider, how reliable your connection is and other factors. Ultimately, Strongbox does not have full control over the sync process, and so we cannot guarantee data integrity or offer sync support.");
+        if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+            return NSLocalizedString(@"deprecated_storage_footer_text_no_network_db", @"These method(s) are no longer advised. Strongbox does not have full control over the read, write and locate functions and so we cannot guarantee data integrity. However, typically, locally stored on-device files accessed in this way are not problematic.\n\nNB: Strongbox does not have any knowledge of where files selected in this way are located.");
+        }
+        else {
+            return NSLocalizedString(@"deprecated_storage_footer_text", @"These method(s) are no longer advised. Your mileage may vary depending on the quality of the third party Files provider, how reliable your connection is and other factors. Ultimately, Strongbox does not have full control over the sync process, and so we cannot guarantee data integrity or offer sync support.");
+        }
     }
     else if ( [sectionName isEqualToString:kSectionMiscellaneous] ) {
         return NSLocalizedString(@"select_storage_footer_one_time_copy", @"Use these methods to transfer a database into Strongbox as a local copy. This does not maintain a connection with any server or sync anywhere after the initial transfer.");
@@ -566,15 +589,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 }
 
 - (void)onCreateThroughFilesApp {
-    self.onDone([SelectedStorageParameters parametersForFilesApp:nil withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
-}
-
-- (void)onAddThroughFilesApp {
-    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[UTTypeItem]];
-    
-    vc.delegate = self;
-    
-    [self presentViewController:vc animated:YES completion:nil];
+    self.onDone([SelectedStorageParameters parametersForFilesApp:nil withProvider:FilesAppUrlBookmarkProvider.sharedInstance makeALocalCopy:NO]);
 }
 
 
@@ -626,14 +641,6 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
 
 
 
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    slog(@"didPickDocumentsAtURLs: %@", urls);
-    
-    NSURL* url = [urls objectAtIndex:0];
-    
-    self.onDone([SelectedStorageParameters parametersForFilesApp:url withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
-}
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSError* error;
@@ -760,5 +767,33 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     [self presentViewController:nav animated:YES completion:nil];
 }
 #endif
+
+- (void)onAddALocalDeviceCopyViaFilesApp {
+    self.filesAppMakeALocalCopy = YES;
+    
+    [self showFilesAppPicker];
+}
+
+- (void)onAddAFilesAppReferencedInPlaceDatabase {
+    self.filesAppMakeALocalCopy = NO;
+    
+    [self showFilesAppPicker];
+}
+
+- (void)showFilesAppPicker {
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[UTTypeItem]];
+    
+    vc.delegate = self;
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    slog(@"didPickDocumentsAtURLs: %@", urls);
+    
+    NSURL* url = [urls objectAtIndex:0];
+    
+    self.onDone([SelectedStorageParameters parametersForFilesApp:url withProvider:FilesAppUrlBookmarkProvider.sharedInstance makeALocalCopy:self.filesAppMakeALocalCopy]);
+}
 
 @end

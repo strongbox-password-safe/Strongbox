@@ -123,3 +123,4 @@
 #import "ApplicationPreferences.h"
 #import "EntryTableCellView.h"
 
+#import "DatabaseCellView.h"

@@ -23,7 +23,9 @@ typedef NS_ENUM (unsigned int, DatabaseStorageMethod) {
 
 + (instancetype)userCancelled;
 + (instancetype)error:(NSError*)error withProvider:(id<SafeStorageProvider>)provider;
-+ (instancetype)parametersForFilesApp:(NSURL*_Nullable)url withProvider:(id<SafeStorageProvider>)provider;
+
++ (instancetype)parametersForFilesApp:(NSURL*_Nullable)url withProvider:(id<SafeStorageProvider>)provider makeALocalCopy:(BOOL)makeALocalCopy;
+
 + (instancetype)parametersForManualDownload:(NSData*)data;
 + (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider file:(StorageBrowserItem* _Nullable)file likelyFormat:(DatabaseFormat)likelyFormat data:(NSData*)data initialDateModified:(NSDate*)initialDateModified;
 + (instancetype)parametersForNativeProviderCreate:(id<SafeStorageProvider>)provider folder:(NSObject* _Nullable)folder;
@@ -39,6 +41,7 @@ typedef NS_ENUM (unsigned int, DatabaseStorageMethod) {
 @property (nullable) NSError* error;
 @property BOOL createMode;
 @property DatabaseFormat likelyFormat;
+@property BOOL filesAppMakeALocalCopy;
 
 @end
 

@@ -12,7 +12,7 @@
 #import "NSArray+Extensions.h"
 #import "Settings.h"
 
-static NSString* const kDatabaseCellView = @"DatabaseCellView";
+//static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
 @interface SelectDatabaseViewController () <NSTableViewDelegate, NSTableViewDataSource>
 

@@ -21,8 +21,15 @@ struct OtherViewsView: View {
                 NavigationCapsule(model: model, title: "quick_view_title_all_tags_title", image: "tag.fill", count: String(model.database.tagCount), imageBackgroundColor: .blue, destination: .tags(tag: nil))
             }
 
-            if model.database.auditIssueEntryCount > 0 {
-                NavigationCapsule(model: model, title: "quick_view_title_audit_issues_title", image: "checkmark.shield.fill", count: String(model.database.auditIssueEntryCount), imageBackgroundColor: .orange, destination: .auditIssues)
+            let auditModel = model.database.auditModel
+            if auditModel.isEnabled {
+                let issueCount = model.database.auditIssueEntryCount
+                NavigationCapsule(model: model,
+                                  title: issueCount == 0 ? "browse_vc_action_audit" : "quick_view_title_audit_issues_title",
+                                  image: "checkmark.shield.fill",
+                                  count: issueCount == 0 ? "" : String(issueCount),
+                                  imageBackgroundColor: issueCount == 0 ? .green : .orange,
+                                  destination: .auditIssues)
             }
 
             if model.database.passkeyEntryCount > 0 {
@@ -38,7 +45,7 @@ struct OtherViewsView: View {
             }
 
             if model.database.attachmentsEntryCount > 0 {
-                NavigationCapsule(model: model, title: "item_details_section_header_attachments", image: "doc.richtext.fill", count: String(model.database.attachmentsEntryCount), imageBackgroundColor: .green, destination: .attachments)
+                NavigationCapsule(model: model, title: "item_details_section_header_attachments", image: "doc.richtext.fill", count: String(model.database.attachmentsEntryCount), imageBackgroundColor: .mint, destination: .attachments)
             }
 
             if model.expireCount > 0 {

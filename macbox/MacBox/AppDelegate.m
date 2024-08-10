@@ -1907,7 +1907,7 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)showQuickSearchPalette:(id)sender {
-    [QuickSearchPalette.shared show];
+    [QuickSearchPalette.shared toggleShow];
 }
 
 - (void)onTrayShowViewDatabases:(id)sender {
