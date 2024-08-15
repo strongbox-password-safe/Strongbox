@@ -128,7 +128,6 @@ initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
 @property NSUInteger maxBackupKeepCount;
 @property BOOL makeBackups;
 
-@property (readonly) BOOL mainAppAndAutoFillYubiKeyConfigsIncoherent;
 @property BOOL colorizePasswords;
 
 @property KeePassIconSet keePassIconSet;
@@ -183,16 +182,13 @@ initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
 
 @property NSArray<NSNumber*>* detailsViewCollapsedSections;
 @property (nullable) NSArray<NSString*>* legacyFavouritesStore;
-@property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
+
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;
 
 @property DatabaseAuditorConfiguration* auditConfig;
 
 @property BOOL customSortOrderForFields;
-
-@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
-@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
 
 @property BOOL lazySyncMode;
 @property BOOL persistLazyEvenLastSyncErrors;
@@ -215,6 +211,28 @@ initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
 @property BOOL hasInitializedHomeTab;
 
 @property NSArray<NSNumber*>* visibleHomeSections;
+
+
+
+@property BOOL hardwareKeyCRCaching;
+@property BOOL doNotRefreshChallengeInAF;
+@property BOOL hasOnboardedHardwareKeyCaching;
+@property (nullable) NSDate* lastChallengeRefreshAt;
+@property NSInteger challengeRefreshIntervalSecs;
+@property NSInteger cacheChallengeDurationSecs;
+
+- (void)addCachedChallengeResponse:(MMcGPair<NSData*, NSData*>*)challengeResponse;
+- (void)removeCachedChallenge:(NSData*)challenge;
+- (void)clearCachedChallengeResponses;
+- (NSData*)getCachedChallengeResponse:(NSData*)challenge;
+
+
+@property (readonly) BOOL mainAppAndAutoFillYubiKeyConfigsIncoherent;
+@property (nullable) YubiKeyHardwareConfiguration* nextGenPrimaryYubiKeyConfig; 
+@property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
+
+
+
 
 @end
 

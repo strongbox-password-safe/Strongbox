@@ -355,12 +355,32 @@ class CloudKitDatabasesInteractor: NSObject {
     func updateExisting(_ existing: METADATA_PTR, _ database: CloudKitHostedDatabase) {
         if existing.nickName != database.nickname {
             swlog("🟢 Updating CloudKit Database. Database nickname has changed.")
+
+            
+            
+            
+            
+
             #if os(iOS)
-                let nick = DatabasePreferences.getUniqueName(fromSuggestedName: database.nickname) 
+                var set = Set(DatabasePreferences.allDatabases)
             #else
-                let nick = MacDatabasePreferences.getUniqueName(fromSuggestedName: database.nickname) 
+                var set = Set(MacDatabasePreferences.allDatabases)
             #endif
-            existing.nickName = nick
+
+            set.remove(existing)
+            let usedNicknames = Set(set.map(\.nickName))
+            let nameInUseByOtherDatabase = usedNicknames.contains(database.nickname)
+
+            if !nameInUseByOtherDatabase {
+                #if os(iOS)
+                    let nick = DatabasePreferences.getUniqueName(fromSuggestedName: database.nickname) 
+                #else
+                    let nick = MacDatabasePreferences.getUniqueName(fromSuggestedName: database.nickname) 
+                #endif
+                existing.nickName = nick
+            } else {
+                swlog("🔴 Can't rename cloudkit database to desiredname as it is already used by another database")
+            }
         }
 
         #if os(iOS)

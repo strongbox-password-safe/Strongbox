@@ -144,6 +144,8 @@
     id<OnboardingModule> argon2MemReduction = [self getArgon2ReductionOnboardingModule:model];
     id<OnboardingModule> kdbxUpgrade = [self getKdbxUpgradeOnboardingModule:model];
     
+    id<OnboardingModule> hardwareKeyCaching = [self getHardwareKeyCachingModule:model];
+    
     id<OnboardingModule> allDoneWelcomeModule = [self getAllDoneWelcomeModule:model];
     
 
@@ -160,6 +162,7 @@
                                                        quickLaunchAppLockWarning,
                                                        argon2MemReduction,
                                                        kdbxUpgrade,
+                                                       hardwareKeyCaching,
                                                        allDoneWelcomeModule];
     
     
@@ -781,6 +784,50 @@
     module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
         model.metadata.onboardingDoneHasBeenShown = YES;
         onDone(NO, YES); 
+    };
+
+    return module;
+}
+
+- (id<OnboardingModule>)getHardwareKeyCachingModule:(Model*)model {
+    GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];
+    module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
+        return !model.metadata.hasOnboardedHardwareKeyCaching &&
+        model.originalFormat == kKeePass4 &&
+        model.ckfs.yubiKeyCR != nil &&
+        AppPreferences.sharedInstance.hardwareKeyCachingBeta &&
+        !model.metadata.hardwareKeyCRCaching;
+    };
+    
+    module.header = NSLocalizedString(@"feature_hardware_key_caching", @"Hardware Key Caching");
+    NSString* msg = NSLocalizedString(@"hardware_key_caching_onboarding_msg", @"Using a hardware key is a great security choice but it can be a little inconvenient.\n\nWould you like to enable our caching feature?\n\nWith this enabled Strongbox will do things like remember the last challenge response for a period of time. This means you don't need to use your key so often.\n\nFull configuration is available in settings. For more details see online.");
+    
+    module.message = msg;
+    module.image = [UIImage imageNamed:@"yubikey"];
+    module.imageSize = 70;
+    module.hideDismiss = YES;
+    
+    module.button1 = NSLocalizedString(@"backup_settings_prompt_option_yes_looks_good", @"Yes, Sounds Great!");
+    module.button2 = NSLocalizedString(@"generic_no_thanks", @"No Thanks");
+    
+    module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
+        if ( buttonIdCancelIsZero == 1 ){ 
+            model.metadata.hardwareKeyCRCaching = YES;
+            model.metadata.challengeRefreshIntervalSecs = 1800; 
+            model.metadata.cacheChallengeDurationSecs = 8 * 3600; 
+            model.metadata.doNotRefreshChallengeInAF = YES;
+            
+            if ( model.ckfs.lastChallengeResponse ) {
+                [model.metadata addCachedChallengeResponse:model.ckfs.lastChallengeResponse];
+                model.metadata.lastChallengeRefreshAt = NSDate.now;
+            }
+        }
+        else {
+            model.metadata.hardwareKeyCRCaching = NO;
+        }
+        
+        model.metadata.hasOnboardedHardwareKeyCaching = YES;
+        onDone(NO, NO); 
     };
 
     return module;

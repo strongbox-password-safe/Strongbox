@@ -195,44 +195,12 @@ static NSString* getFreeTrialSuffix(void) {
     
     
     [vc.view setFrame:self.contentViewController.view.frame];
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-    
+        
     self.contentViewController = vc;
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        
     if ( [self.contentViewController respondsToSelector:@selector(onDocumentLoaded)]) {
         [self.contentViewController performSelector:@selector(onDocumentLoaded)];
     }
-    
-    
     
     if ( !self.databaseIsLocked ) {
         self.window.titlebarAppearsTransparent = NO;
@@ -2351,15 +2319,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (void)maybeOnboardDatabase {
-    if ( [DatabaseOnboardingTabViewController shouldShowOnboarding:self.databaseMetadata] ) {
-        DatabaseOnboardingTabViewController *vc = [DatabaseOnboardingTabViewController fromStoryboard];
-        
-        vc.ckfs = self.viewModel.compositeKeyFactors;
-        vc.databaseUuid = self.databaseMetadata.uuid;
-        vc.viewModel = self.viewModel;
-        
-        [self.contentViewController presentViewControllerAsSheet:vc];
-    }
+    [MacOnboardingManager beginDatabaseOnboardingWithParentViewController:self.contentViewController viewModel:self.viewModel completion:^{ }];
 }
 
 

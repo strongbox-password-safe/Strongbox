@@ -127,10 +127,12 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 
 
 
-@property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
+@property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig; 
+@property (nullable) YubiKeyHardwareConfiguration* nextGenPrimaryYubiKeyConfig; 
+
 @property (readonly) BOOL mainAppAndAutoFillYubiKeyConfigsIncoherent;
-@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
-@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
+
+
 
 @property DatabaseAuditorConfiguration* auditConfig;
 
@@ -249,6 +251,14 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 
 @property NSArray<NSNumber*>* visibleTabs;
 @property BOOL hideTabBarIfOnlySingleTab;
+
+@property (nullable) NSDictionary<NSData*, NSData*> *cachedYubiKeyChallengeResponses;
+@property BOOL hardwareKeyCRCaching;
+@property BOOL doNotRefreshChallengeInAF;
+@property BOOL hasOnboardedHardwareKeyCaching;
+@property (nullable) NSDate* lastChallengeRefreshAt;
+@property NSInteger challengeRefreshIntervalSecs;
+@property NSInteger cacheChallengeDurationSecs;
 
 @end
 

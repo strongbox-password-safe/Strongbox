@@ -615,12 +615,17 @@ static const int kMaxFailedPinAttempts = 3;
     BOOL keyFileFileNameChanged = (!(self.database.keyFileFileName == nil && keyFileFileName == nil)) && (![self.database.keyFileFileName isEqual:keyFileFileName]);
     BOOL keyFileChanged = keyFileBookMarkChanged || keyFileFileNameChanged;
     
-    BOOL yubikeyChanged = (!(self.database.contextAwareYubiKeyConfig == nil && yubiKeyConfiguration == nil)) && (![self.database.contextAwareYubiKeyConfig isEqual:yubiKeyConfiguration]);
+    BOOL yubikeyChanged = (!(self.database.nextGenPrimaryYubiKeyConfig == nil && yubiKeyConfiguration == nil)) && (![self.database.nextGenPrimaryYubiKeyConfig isEqual:yubiKeyConfiguration]);
     
     if(readOnlyChanged || keyFileChanged || yubikeyChanged) {
         self.database.readOnly = readOnly;
         [self.database setKeyFile:keyFileBookmark keyFileFileName:keyFileFileName];
-        self.database.contextAwareYubiKeyConfig = yubiKeyConfiguration;
+        
+#ifndef IS_APP_EXTENSION
+        self.database.nextGenPrimaryYubiKeyConfig = yubiKeyConfiguration;
+#else
+        self.database.contextAwareYubiKeyConfig = yubiKeyConfiguration; 
+#endif
     }
     
     [self completeRequestWithCredentials:password
@@ -663,7 +668,7 @@ static const int kMaxFailedPinAttempts = 3;
         completion(NO, nil, error);
     }
 #else
-    if(yubiKeyConfiguration.mode == kVirtual) {
+    if ( yubiKeyConfiguration.mode == kVirtual ) {
         VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:yubiKeyConfiguration.virtualKeyIdentifier];
         
         if (!key) {

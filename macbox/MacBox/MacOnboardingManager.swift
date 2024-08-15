@@ -36,10 +36,19 @@ class MacOnboardingManager: NSObject {
         }
         window = nil
 
-        showNextModule(modules: modules, index: 0, onboardingDoneCompletion: completion)
+        showNextAppModule(modules: modules, index: 0, onboardingDoneCompletion: completion)
     }
 
-    class func showNextModule(modules: [OnboardingModule], index: Int, onboardingDoneCompletion: @escaping () -> Void) {
+    @objc class func beginDatabaseOnboarding(parentViewController: NSViewController, viewModel: ViewModel, completion: @escaping () -> Void) {
+        let modules: [OnboardingModule] = [
+            OnboardingModules.firstLaunchWelcome(viewModel: viewModel),
+            OnboardingModules.getHardwareKeyCaching(viewModel: viewModel),
+        ]
+
+        showNextDatabaseModule(parentViewController: parentViewController, modules: modules, index: 0, onboardingDoneCompletion: completion)
+    }
+
+    class func showNextAppModule(modules: [OnboardingModule], index: Int, onboardingDoneCompletion: @escaping () -> Void) {
         guard index < modules.count else {
             if let window {
                 window.close()
@@ -54,7 +63,7 @@ class MacOnboardingManager: NSObject {
 
         if module.shouldDisplay {
             let vc = module.instantiateViewController {
-                showNextModule(modules: modules, index: index + 1, onboardingDoneCompletion: onboardingDoneCompletion)
+                showNextAppModule(modules: modules, index: index + 1, onboardingDoneCompletion: onboardingDoneCompletion)
             }
 
             if let window {
@@ -94,7 +103,36 @@ class MacOnboardingManager: NSObject {
             
             
         } else {
-            showNextModule(modules: modules, index: index + 1, onboardingDoneCompletion: onboardingDoneCompletion)
+            showNextAppModule(modules: modules, index: index + 1, onboardingDoneCompletion: onboardingDoneCompletion)
         }
+    }
+
+    class func showNextDatabaseModule(parentViewController: NSViewController, modules: [OnboardingModule], index: Int, onboardingDoneCompletion: @escaping () -> Void) {
+        guard index < modules.count else {
+            onboardingDoneCompletion() 
+            return
+        }
+
+        let module = modules[index]
+
+        if module.shouldDisplay {
+            presentDatabaseModule(parentViewController: parentViewController, module: module, modules: modules, index: index, onboardingDoneCompletion: onboardingDoneCompletion)
+        } else {
+            showNextDatabaseModule(parentViewController: parentViewController, modules: modules, index: index + 1, onboardingDoneCompletion: onboardingDoneCompletion)
+        }
+    }
+
+    class func presentDatabaseModule(parentViewController: NSViewController, module: OnboardingModule, modules: [OnboardingModule], index: Int, onboardingDoneCompletion: @escaping () -> Void) {
+        let vc = module.instantiateViewController {
+
+
+            if let first = parentViewController.presentedViewControllers?.first {
+                Utils.dismissViewControllerCorrectly(first)
+            }
+
+            showNextDatabaseModule(parentViewController: parentViewController, modules: modules, index: index + 1, onboardingDoneCompletion: onboardingDoneCompletion)
+        }
+
+        parentViewController.presentAsSheet(vc)
     }
 }

@@ -108,6 +108,10 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
         browseActionsHelper.showAuditDrillDown(entry.uuid)
     }
 
+    func presentHardwareKeySettings() {
+        browseActionsHelper.showHardwareKeySettings()
+    }
+
     func updateAndQueueSync() async -> Bool {
         await splitViewController.updateAndQueueSync()
     }

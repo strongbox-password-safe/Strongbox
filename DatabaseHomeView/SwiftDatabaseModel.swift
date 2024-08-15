@@ -9,6 +9,22 @@
 import Foundation
 
 struct SwiftDatabaseModel: SwiftDatabaseModelInterface {
+    var showIcons: Bool {
+        #if os(iOS)
+            !model.metadata.hideIconInBrowse
+        #else
+            true
+        #endif
+    }
+
+    var format: DatabaseFormat {
+        model.originalFormat
+    }
+
+    var ckfs: CompositeKeyFactors {
+        model.ckfs
+    }
+
     #if os(iOS)
         func isHomeViewSectionVisible(section: HomeViewSection) -> Bool {
             let num = NSNumber(value: section.rawValue)

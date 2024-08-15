@@ -1839,14 +1839,6 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     self.databaseMetadata.concealEmptyProtectedFields = concealEmptyProtectedFields;
 }
 
-- (BOOL)autoPromptForConvenienceUnlockOnActivate {
-    return self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate;
-}
-
-- (void)setAutoPromptForConvenienceUnlockOnActivate:(BOOL)autoPromptForConvenienceUnlockOnActivate {
-    self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate = autoPromptForConvenienceUnlockOnActivate;
-}
-
 - (BOOL)showAdvancedUnlockOptions {
     return self.databaseMetadata.showAdvancedUnlockOptions;
 }

@@ -25,6 +25,12 @@
 #import <ISMessages/ISMessages.h>
 #endif
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 @interface BrowseActionsHelper ()
 
 @property Model* model;
@@ -78,6 +84,35 @@
     vc.updateDatabase = ^{
         weakSelf.updateDatabase(NO, nil);
     };
+    
+    [self.viewController presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)showHardwareKeySettings  {
+    __weak BrowseActionsHelper* weakSelf = self;
+    
+    UIViewController* vc = [SwiftUIViewFactory getHardwareKeySettingsViewWithMetadata:self.model.metadata onSettingsChanged:^(BOOL hardwareKeyCRCaching, NSInteger cacheChallengeDurationSecs, NSInteger challengeRefreshIntervalSecs, BOOL autoFillRefreshSuppressed) {
+        weakSelf.model.metadata.hardwareKeyCRCaching = hardwareKeyCRCaching;
+        weakSelf.model.metadata.cacheChallengeDurationSecs = cacheChallengeDurationSecs;
+        weakSelf.model.metadata.challengeRefreshIntervalSecs = challengeRefreshIntervalSecs;
+        weakSelf.model.metadata.doNotRefreshChallengeInAF = autoFillRefreshSuppressed;
+        
+        if ( hardwareKeyCRCaching ) {
+            if ( weakSelf.model.ckfs.lastChallengeResponse ) {
+                [weakSelf.model.metadata addCachedChallengeResponse:weakSelf.model.ckfs.lastChallengeResponse];
+            }
+            weakSelf.model.metadata.lastChallengeRefreshAt = NSDate.now;
+        }
+        else {
+            [weakSelf.model.metadata clearCachedChallengeResponses];
+            weakSelf.model.metadata.lastChallengeRefreshAt = nil;
+        }
+    } completion:^{
+        [weakSelf.viewController dismissViewControllerAnimated:YES completion:nil];
+    }];
+    
+    UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+    nav.modalPresentationStyle = UIModalPresentationFormSheet;
     
     [self.viewController presentViewController:nav animated:YES completion:nil];
 }
@@ -378,7 +413,7 @@
     }
     
     [self.model.metadata setKeyFile:keyFileBookmark keyFileFileName:keyFileFileName];
-    self.model.metadata.contextAwareYubiKeyConfig = yubiConfig;
+    self.model.metadata.nextGenPrimaryYubiKeyConfig = yubiConfig;
 
     __weak BrowseActionsHelper* weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{

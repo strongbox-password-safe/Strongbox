@@ -73,6 +73,8 @@ typedef enum : NSUInteger {
 
 @property BOOL useOneDriveUSGovCloudInstance;
 
+@property BOOL hardwareKeyCachingBeta;
+
 @end
 
 NS_ASSUME_NONNULL_END

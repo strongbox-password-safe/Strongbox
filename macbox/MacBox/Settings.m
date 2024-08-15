@@ -142,6 +142,7 @@ static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kSystemMenuClickAction = @"systemMenuClickAction";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
+static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta"; 
 
 
 
@@ -284,6 +285,16 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 #endif
+
+
+
+- (BOOL)hardwareKeyCachingBeta {
+    return [self getBool:kHardwareKeyCachingBeta];
+}
+
+- (void)setHardwareKeyCachingBeta:(BOOL)hardwareKeyCachingBeta {
+    [self setBool:kHardwareKeyCachingBeta value:hardwareKeyCachingBeta];
+}
 
 
 

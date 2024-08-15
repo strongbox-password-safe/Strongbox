@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) NSString* selectedPassword;
 @property (nonatomic, readonly) NSString* selectedNickname;
 @property (nonatomic, readonly, nullable) NSString* selectedKeyFileBookmark;
+
 @property (nonatomic, readonly, nullable) YubiKeyConfiguration* selectedYubiKeyConfiguration;
 
 - (CompositeKeyFactors * _Nullable)generateCkfFromSelectedFactors:(NSViewController*)yubiKeyInteractionVc error:(NSError**)error;

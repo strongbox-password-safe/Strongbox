@@ -14,7 +14,7 @@
     return NSData.data;
 }
 
-- (NSData *)xor:(NSData *)ct {
+- (NSData *)doTheXor:(NSData *)ct {
     return ct;
 }
 

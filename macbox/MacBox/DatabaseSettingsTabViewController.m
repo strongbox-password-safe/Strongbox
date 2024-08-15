@@ -129,6 +129,35 @@
     AdvancedDatabasePreferences* advancedPreferences = (AdvancedDatabasePreferences*)advanced.viewController;
     advancedPreferences.model = self.viewModel;
 
+    if ( Settings.sharedInstance.hardwareKeyCachingBeta && self.viewModel.database.originalFormat == kKeePass4 && self.viewModel.database.ckfs.yubiKeyCR != nil ) {
+        METADATA_PTR metadata = self.viewModel.databaseMetadata;
+        Model* model = self.viewModel.commonModel;
+        
+        NSViewController* hardwareKeySettings = [SwiftUIViewFactory getHardwareKeySettingsViewWithMetadata:metadata
+                                                                                         onSettingsChanged:^(BOOL hardwareKeyCRCaching, NSInteger cacheChallengeDurationSecs, NSInteger challengeRefreshIntervalSecs, BOOL autoFillRefreshSuppressed) {
+            metadata.hardwareKeyCRCaching = hardwareKeyCRCaching;
+            metadata.cacheChallengeDurationSecs = cacheChallengeDurationSecs;
+            metadata.challengeRefreshIntervalSecs = challengeRefreshIntervalSecs;
+            metadata.doNotRefreshChallengeInAF = autoFillRefreshSuppressed;
+            
+            if ( hardwareKeyCRCaching ) {
+                if ( model.ckfs.lastChallengeResponse ) {
+                    [metadata addCachedChallengeResponse:model.ckfs.lastChallengeResponse];
+                }
+                metadata.lastChallengeRefreshAt = NSDate.now;
+            }
+            else {
+                [metadata clearCachedChallengeResponses];
+                metadata.lastChallengeRefreshAt = nil;
+            }
+        }];
+        
+        NSTabViewItem* hksTab = [NSTabViewItem tabViewItemWithViewController:hardwareKeySettings];
+        [hksTab setLabel:NSLocalizedString(@"generic_hardware_key", @"Hardware Key")];
+        [hksTab setImage:[NSImage imageNamed:@"yubikey"]];
+        [self insertTabViewItem:hksTab atIndex:6];
+    }
+    
     self.selectedTabViewItemIndex = self.initialTab;
 }
 

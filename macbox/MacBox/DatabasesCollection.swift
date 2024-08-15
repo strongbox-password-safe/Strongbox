@@ -234,6 +234,16 @@ class DatabasesCollection: NSObject {
         }
     }
 
+    @objc
+    public func showDatabaseDocumentWindow(uuid: String) {
+        guard let dc = DocumentController.shared as? DocumentController, let database = MacDatabasePreferences.getById(uuid) else {
+            swlog("🔴 Couldn't get shared document controller")
+            return
+        }
+
+        dc.openDatabase(database)
+    }
+
     static func getDbManagerPanelVc() -> NSViewController {
         
         
@@ -498,7 +508,7 @@ class DatabasesCollection: NSObject {
     }
 
     private func pollForDatabaseRemoteChanges(uuid: String) {
-        DebugLogger.debug(String(format: "pollForDatabaseRemoteChanges: %@", uuid))
+
 
         guard let prefs = MacDatabasePreferences.getById(uuid) else {
             swlog("🔴 No such database")

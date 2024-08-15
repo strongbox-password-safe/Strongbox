@@ -66,15 +66,15 @@
         return obj.autoFillEnabled;
     }];
         
-    [welcomeVc setInitialState:showTouchId showAutoFill:showAutoFill enableAutoFill:!hasAutoFillDatabase];
+
 
     __weak DatabaseOnboardingTabViewController* weakSelf = self;
-    welcomeVc.onNext = ^(BOOL enableTouchID, BOOL enableAutoFill) {
-        enableTouchID = showTouchId && enableTouchID;
-        enableAutoFill = showAutoFill && enableAutoFill;
-        
-        [weakSelf onWelcomeDone:showTouchId enableTouchID:enableTouchID shouldSetAutoFill:showAutoFill enableAutoFill:enableAutoFill];
-    };
+
+
+
+
+
+
 }
 
 - (void)onWelcomeDone:(BOOL)shouldSetTouchID

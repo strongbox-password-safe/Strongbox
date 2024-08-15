@@ -23,6 +23,10 @@ typedef NS_ENUM(NSInteger, HardwareKeySlotCrStatus) {
 @property HardwareKeySlotCrStatus slot1CrStatus;
 @property HardwareKeySlotCrStatus slot2CrStatus;
 
+@property (readonly) BOOL slot1CrEnabled;
+@property (readonly) BOOL slot2CrEnabled;
+
+
 @end
 
 NS_ASSUME_NONNULL_END

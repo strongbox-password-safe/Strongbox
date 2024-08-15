@@ -25,6 +25,10 @@
 #endif
 
 const NSInteger kDefaultConvenienceExpiryPeriodHours = 2 * 168; 
+
+const NSInteger kDefaultCacheChallengeDurationSecs = 8 * 60 * 60; 
+const NSInteger kDefaultChallengeRefreshIntervalSecs = 0; 
+
 static const NSUInteger kDefaultScheduledExportIntervalDays = 28;  
 
 @interface SafeMetaData ()
@@ -33,6 +37,9 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 @property BOOL isAutoFillMemOnlyConveniencePasswordHasBeenStored; 
 @property (nullable) NSDate* convenienceExpiresAt;
 @property (readonly) BOOL isNowAfterConvenienceExpiresAt;
+
+@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
+@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
 
 @end
 
@@ -109,6 +116,9 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     
         self.sortConfigurations = @{}; 
         self.customSortOrderForFields = YES; 
+        self.cacheChallengeDurationSecs = kDefaultCacheChallengeDurationSecs;
+        self.challengeRefreshIntervalSecs = kDefaultChallengeRefreshIntervalSecs;
+        self.doNotRefreshChallengeInAF = YES;
     }
     
     return self;
@@ -586,8 +596,44 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
                                     @(HomeViewSectionOtherViews)];
     }
     
+    
+
+    if ( jsonDictionary[@"hardwareKeyCRCaching"] != nil ) { 
+        ret.hardwareKeyCRCaching = ((NSNumber*)jsonDictionary[@"hardwareKeyCRCaching"]).boolValue;
+    }
+    
+    if ( jsonDictionary[@"lastChallengeRefreshAt"] != nil ) { 
+        ret.lastChallengeRefreshAt = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastChallengeRefreshAt"])).doubleValue];
+    }
+    
+    if ( jsonDictionary[@"challengeRefreshIntervalSecs"] != nil ) { 
+        ret.challengeRefreshIntervalSecs = ((NSNumber*)jsonDictionary[@"challengeRefreshIntervalSecs"]).integerValue;
+    }
+    else {
+        ret.challengeRefreshIntervalSecs = kDefaultChallengeRefreshIntervalSecs;
+    }
+
+    if ( jsonDictionary[@"cacheChallengeDurationSecs"] != nil ) {
+        ret.cacheChallengeDurationSecs = ((NSNumber*)jsonDictionary[@"cacheChallengeDurationSecs"]).integerValue;
+    }
+    else {
+        ret.cacheChallengeDurationSecs = kDefaultCacheChallengeDurationSecs;
+    }
+
+    if ( jsonDictionary[@"doNotRefreshChallengeInAF"] != nil ) {
+        ret.doNotRefreshChallengeInAF = ((NSNumber*)jsonDictionary[@"doNotRefreshChallengeInAF"]).boolValue;
+    }
+    else {
+        ret.doNotRefreshChallengeInAF = YES;
+    }
+    
+    if ( jsonDictionary[@"doNotRefreshChallengeInAF"] != nil ) {
+        ret.hasOnboardedHardwareKeyCaching = ((NSNumber*)jsonDictionary[@"hasOnboardedHardwareKeyCaching"]).boolValue;
+    }
+
     return ret;
 }
+
 - (NSDictionary *)getJsonSerializationDictionary {
     NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithDictionary:@{
         @"uuid" : self.uuid,
@@ -677,6 +723,11 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"isSharedInCloudKit" : @(self.isSharedInCloudKit),
         @"isOwnedByMeCloudKit" : @(self.isOwnedByMeCloudKit),
         @"hasInitializedHomeTab" : @(self.hasInitializedHomeTab),
+        @"hardwareKeyCRCaching" : @(self.hardwareKeyCRCaching),
+        @"challengeRefreshIntervalSecs" : @(self.challengeRefreshIntervalSecs),
+        @"cacheChallengeDurationSecs" : @(self.cacheChallengeDurationSecs),
+        @"doNotRefreshChallengeInAF" : @(self.doNotRefreshChallengeInAF),
+        @"hasOnboardedHardwareKeyCaching" : @(self.hasOnboardedHardwareKeyCaching),
     }];
     
     if (self.nickName != nil) {
@@ -786,6 +837,12 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     
     if (self.visibleHomeSections != nil) {
         ret[@"visibleHomeSections"] = self.visibleHomeSections;
+    }
+    
+    
+    
+    if ( self.lastChallengeRefreshAt ) {
+        ret[@"lastChallengeRefreshAt"] = @(self.lastChallengeRefreshAt.timeIntervalSinceReferenceDate);
     }
     
     return ret;
@@ -995,19 +1052,19 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     return url;
 }
 
+- (BOOL)mainAppAndAutoFillYubiKeyConfigsIncoherent {
+    BOOL mainAppUsesYubiKey = self.yubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
+    BOOL autoFillUsesYubiKey = self.autoFillYubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
+
+    return !(!mainAppUsesYubiKey && !autoFillUsesYubiKey) && !(mainAppUsesYubiKey && autoFillUsesYubiKey);
+}
+
 - (YubiKeyHardwareConfiguration *)contextAwareYubiKeyConfig {
 #ifndef IS_APP_EXTENSION
     return self.yubiKeyConfig;
 #else
     return self.autoFillYubiKeyConfig;
 #endif
-}
-
-- (BOOL)mainAppAndAutoFillYubiKeyConfigsIncoherent {
-    BOOL mainAppUsesYubiKey = self.yubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
-    BOOL autoFillUsesYubiKey = self.autoFillYubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
-
-    return !(!mainAppUsesYubiKey && !autoFillUsesYubiKey) && !(mainAppUsesYubiKey && autoFillUsesYubiKey);
 }
 
 - (void)setContextAwareYubiKeyConfig:(YubiKeyHardwareConfiguration *)contextAwareYubiKeyConfig {
@@ -1017,6 +1074,19 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     self.autoFillYubiKeyConfig = contextAwareYubiKeyConfig;
 #endif
 }
+
+
+
+- (YubiKeyHardwareConfiguration *)nextGenPrimaryYubiKeyConfig {
+    return self.contextAwareYubiKeyConfig;
+}
+
+- (void)setNextGenPrimaryYubiKeyConfig:(YubiKeyHardwareConfiguration *)nextGenPrimaryYubiKeyConfig {
+    self.yubiKeyConfig = nextGenPrimaryYubiKeyConfig;
+    self.autoFillYubiKeyConfig = nextGenPrimaryYubiKeyConfig;
+}
+
+
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"%@ [%lu] - [%@-%@]", self.nickName, (unsigned long)self.storageProvider, self.fileName, self.fileIdentifier];
@@ -1098,12 +1168,46 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 
 
+- (NSDictionary<NSData *,NSData *> *)cachedYubiKeyChallengeResponses {
+    NSString *key = [NSString stringWithFormat:@"%@-cached-crs", self.uuid];
+    
+    NSDictionary<NSData *,NSData *> *ret = [SecretStore.sharedInstance getSecureObject:key];
+    
+    return ret ? ret : @{};
+}
+
+- (void)setCachedYubiKeyChallengeResponses:(NSDictionary<NSData *,NSData *> *)cachedYubiKeyChallengeResponses {
+    NSString *key = [NSString stringWithFormat:@"%@-cached-crs", self.uuid];
+    
+    if ( cachedYubiKeyChallengeResponses ) {
+        if ( self.cacheChallengeDurationSecs > 0 ) {
+            NSDate* expiry = [NSDate.now dateByAddingTimeInterval:self.cacheChallengeDurationSecs];
+            slog(@"👾 setting challenge cache with expiry = [%@]", expiry.friendlyDateTimeStringBothPrecise);
+            [SecretStore.sharedInstance setSecureObject:cachedYubiKeyChallengeResponses forIdentifier:key expiresAt:expiry];
+        }
+        else if ( self.cacheChallengeDurationSecs == 0 ) { 
+            slog(@"👾 setting challenge cache forever");
+            [SecretStore.sharedInstance setSecureObject:cachedYubiKeyChallengeResponses forIdentifier:key];
+        }
+        else {
+            slog(@"👾 setting challenge cache ephemeral");
+            [SecretStore.sharedInstance setSecureEphemeralObject:cachedYubiKeyChallengeResponses forIdentifer:key];
+        }
+    }
+    else {
+        [SecretStore.sharedInstance deleteSecureItem:key];
+    }
+}
+
+
+
 - (void)clearKeychainItems {
     self.convenienceMasterPassword = nil;
     self.autoFillConvenienceAutoUnlockPassword = nil;
     self.legacyFavouritesStore = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;
+    self.cachedYubiKeyChallengeResponses = nil;
 }
 
 @end

@@ -42,7 +42,7 @@
     
     return [Serializator isValidDatabaseWithPrefix:prefix error:error];
 }
- 
+
 + (BOOL)isValidDatabaseWithPrefix:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
     if(prefix == nil) {
         if(error) {
@@ -56,14 +56,14 @@
         }
         return NO;
     }
-
+    
     NSError *pw, *k1, *k2, *k3;
-        
+    
     BOOL ret = [PwSafeDatabase isValidDatabase:prefix error:&pw] ||
-        [KeePassDatabase isValidDatabase:prefix error:&k1] ||
-        [Kdbx4Database isValidDatabase:prefix error:&k2] ||
-        [Kdb1Database isValidDatabase:prefix error:&k3];
-
+    [KeePassDatabase isValidDatabase:prefix error:&k1] ||
+    [Kdbx4Database isValidDatabase:prefix error:&k2] ||
+    [Kdb1Database isValidDatabase:prefix error:&k3];
+    
     if(!ret && error) {
         NSData* prefixBytes = [prefix subdataWithRange:NSMakeRange(0, MIN(24, prefix.length))];
         
@@ -176,10 +176,10 @@
 
 + (NSData *)expressToData:(DatabaseModel *)database format:(DatabaseFormat)format {
     __block NSData* ret;
-
+    
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
-
+    
     NSOutputStream* memStream = [NSOutputStream outputStreamToMemory];
     [memStream open];
     
@@ -188,7 +188,7 @@
                outputStream:memStream
                  completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
         [memStream close];
-
+        
         if (userCancelled || error) {
             slog(@"Error: expressToData [%@]", error);
         }
@@ -197,9 +197,9 @@
         }
         dispatch_group_leave(group);
     }];
-
+    
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-
+    
     return ret;
 }
 
@@ -207,14 +207,23 @@
            format:(DatabaseFormat)format
      outputStream:(NSOutputStream*)outputStream
        completion:(SaveCompletionBlock)completion {
+    [Serializator getAsData:database format:format outputStream:outputStream params:nil completion:completion];
+}
+
++ (void)getAsData:(DatabaseModel *)database
+           format:(DatabaseFormat)format
+     outputStream:(NSOutputStream*)outputStream
+           params:(id _Nullable)params
+       completion:(SaveCompletionBlock)completion {
     [database preSerializationPerformMaintenanceOrMigrations]; 
 
     id<AbstractDatabaseFormatAdaptor> adaptor = [Serializator getAdaptor:format];
 
     NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
-            
+        
     [adaptor save:database
      outputStream:outputStream
+           params:params 
        completion:^(BOOL userCancelled, NSString*_Nullable debugXml, NSError*_Nullable error){
 
         slog(@"🐞 Serializator::SERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startTime);

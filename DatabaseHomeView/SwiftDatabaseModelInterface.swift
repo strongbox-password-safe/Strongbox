@@ -21,6 +21,9 @@ extension ForEach where ID == UUID, Content: View, Data.Element == any SwiftEntr
 }
 
 protocol SwiftDatabaseModelInterface {
+    var format: DatabaseFormat { get }
+    var ckfs: CompositeKeyFactors { get }
+
     var recycleBinGroup: (any SwiftGroupModelInterface)? { get }
 
     var uuid: String { get }
@@ -60,6 +63,7 @@ protocol SwiftDatabaseModelInterface {
 
     var disableExport: Bool { get }
     var disablePrinting: Bool { get }
+    var showIcons: Bool { get }
 
     #if os(iOS)
         func isHomeViewSectionVisible(section: HomeViewSection) -> Bool

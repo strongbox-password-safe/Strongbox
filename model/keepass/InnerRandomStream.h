@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSData* key;
 
-- (NSData*)xor:(NSData*)ct;
+- (NSData*)doTheXor:(NSData*)ct;
 
 @end
 

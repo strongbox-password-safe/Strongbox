@@ -8,7 +8,12 @@
 
 #import "VirtualYubiKeys.h"
 #import "NSArray+Extensions.h"
+
+#if TARGET_OS_IPHONE
 #import "StrongboxiOSFilesManager.h"
+#else
+#import "StrongboxMacFilesManager.h"
+#endif
 
 static NSString* const kConfigFilename = @"virtual-yubikeys.json";
 NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeysChangedNotification";

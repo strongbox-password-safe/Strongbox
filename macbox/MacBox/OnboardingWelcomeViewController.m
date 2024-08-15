@@ -17,6 +17,12 @@
 
 @implementation OnboardingWelcomeViewController
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    
+    [self setInitialState:self.showTouchID showAutoFill:self.showAutoFill enableAutoFill:self.enableAutoFill];
+}
+
 - (void)setInitialState:(BOOL)showTouchID
            showAutoFill:(BOOL)showAutoFill
          enableAutoFill:(BOOL)enableAutoFill
@@ -34,22 +40,14 @@
 }
 
 - (IBAction)onDismiss:(id)sender {
-    [self.view.window close];
-}
-
-- (void)viewWillAppear {
-    [super viewWillAppear];
-    
-    [self.view.window center];
+    self.onNext(NO, NO, NO);
 }
 
 - (IBAction)onNext:(id)sender {
     BOOL enableTouchID = self.checkboxTouchId.state == NSControlStateValueOn;
     BOOL enableAutoFill = self.checkboxAutoFill.state == NSControlStateValueOn;
     
-    self.onNext(enableTouchID, enableAutoFill);
-    
-    [self.view.window close];
+    self.onNext(NO, enableTouchID, enableAutoFill);
 }
 
 @end

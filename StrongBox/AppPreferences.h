@@ -205,7 +205,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL showDatabasesOnAppShortcutMenu;
 
 @property BOOL hasWarnedAboutCloudKitUnavailability;
-@property BOOL hasGotUserNotificationsPermissions; 
+@property BOOL hasGotUserNotificationsPermissions;
 @property (nullable) NSDate* lastAskToEnableNotifications;
 @property BOOL showDatabaseNamesInBrowse;
 @property BOOL warnAboutLocalDeviceDatabases;
@@ -214,6 +214,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL disableMakeVisibleInFiles;
 
 @property BOOL disableHomeTab;
+
+@property BOOL hardwareKeyCachingBeta;
+@property BOOL hasMigratedInconsistentHardwareKeysForCachingFeature;
 
 @end
 

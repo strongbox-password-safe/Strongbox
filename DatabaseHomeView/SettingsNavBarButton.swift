@@ -113,6 +113,17 @@ struct SettingsNavBarButton: View {
 
             Divider()
 
+            if model.shouldShowYubiKeySettingsOption {
+                Button(action: {
+                    model.presentHardwareKeySettings()
+                }, label: {
+                    HStack {
+                        Text("generic_hardware_key")
+                        Image(.yubikey)
+                    }
+                })
+            }
+
             Button(action: {
                 model.presentAdvancedSettings()
             }, label: {

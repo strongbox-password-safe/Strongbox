@@ -254,12 +254,14 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
     }
 
     fileprivate func setResultsHeight() {
-        let estimatedCellHeight = 50.0
+        let estimatedCellHeight = 52.0
         let totalHeight = estimatedCellHeight * Double(results.count)
         let maxHeight = 350.0
         let height = min(maxHeight, totalHeight)
 
-        resultsHeightConstraint.constant = height
+        let headerHeight = 30.0
+
+        resultsHeightConstraint.constant = height + headerHeight
     }
 
     fileprivate func setActionsHeight() {
@@ -294,7 +296,20 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
 
         if !results.isEmpty {
             setResultsHeight()
-            tableViewResults.selectRowIndexes(IndexSet(integer: 1), byExtendingSelection: false) 
+
+            let anyEntry = results.first(where: { result in
+                if case .entry = result.type {
+                    return true
+                } else {
+                    return false
+                }
+            })
+
+            if anyEntry != nil {
+                tableViewResults.selectRowIndexes(IndexSet(integer: 1), byExtendingSelection: false) 
+            } else {
+                tableViewResults.selectRowIndexes(IndexSet(), byExtendingSelection: false)
+            }
         }
     }
 
@@ -330,10 +345,16 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
                         let fun2 = NSHostingView(rootView: rootView2)
                         stackViewHints.addArrangedSubview(fun2)
                     }
-                } else if case .database = selectedResult.type {
-                    let rootView2 = KeyboardShortcutView(shortcut: "↩", title: NSLocalizedString("casg_unlock_action", comment: "Unlock"))
-                    let fun2 = NSHostingView(rootView: rootView2)
-                    stackViewHints.addArrangedSubview(fun2)
+                } else if case let .database(database) = selectedResult.type {
+                    if DatabasesCollection.shared.isUnlocked(uuid: database.uuid) {
+                        let rootView2 = KeyboardShortcutView(shortcut: "↩", title: NSLocalizedString("action_show_in_strongbox", comment: "Show in Strongbox"))
+                        let fun2 = NSHostingView(rootView: rootView2)
+                        stackViewHints.addArrangedSubview(fun2)
+                    } else {
+                        let rootView2 = KeyboardShortcutView(shortcut: "↩", title: NSLocalizedString("casg_unlock_action", comment: "Unlock"))
+                        let fun2 = NSHostingView(rootView: rootView2)
+                        stackViewHints.addArrangedSubview(fun2)
+                    }
                 }
             } else {
                 let rootView2 = KeyboardShortcutView(shortcut: "←", title: NSLocalizedString("view_results", comment: "View Results"))
@@ -525,19 +546,24 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
     }
 
     func onDownArrowInResults() {
-        if !results.isEmpty, tableViewResults.selectedRow != NSNotFound {
-            let newRow = min(tableViewResults.selectedRow + 1, results.count - 1)
+        if !results.isEmpty {
+            let sel = tableViewResults.selectedRow
+            if sel >= 0 { 
+                let newRow = min(sel + 1, results.count - 1)
 
-            tableViewResults.selectRowIndexes(IndexSet(integer: newRow), byExtendingSelection: false)
+                tableViewResults.selectRowIndexes(IndexSet(integer: newRow), byExtendingSelection: false)
 
-            let newRowSel = min(newRow + 1, results.count - 1)
+                let newRowSel = min(newRow + 1, results.count - 1)
 
-            tableViewResults.scrollRowToVisible(newRowSel)
+                tableViewResults.scrollRowToVisible(newRowSel)
+            } else {
+                tableViewResults.selectRowIndexes(IndexSet(integer: 1), byExtendingSelection: false) 
+            }
         }
     }
 
     func onUpArrowInResults() {
-        if !results.isEmpty, tableViewResults.selectedRow != NSNotFound {
+        if !results.isEmpty, tableViewResults.selectedRow != -1 {
             if tableViewResults.selectedRow == 1 {
                 focusSearchField()
             } else {
@@ -570,7 +596,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
             focusSearchField()
             tableViewActions.scroll(CGPoint.zero)
         } else {
-            if let actions = selectedResult?.actions, tableViewActions.selectedRow != NSNotFound, tableViewActions.selectedRow >= offsetRow {
+            if let actions = selectedResult?.actions, tableViewActions.selectedRow != -1, tableViewActions.selectedRow >= offsetRow {
                 let currentIdx = tableViewActions.selectedRow - offsetRow
 
                 var newIdx = currentIdx - 1
@@ -594,7 +620,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
     func onDownArrowInActions() {
         let offsetRow = 2
 
-        if let actions = selectedResult?.actions, tableViewActions.selectedRow != NSNotFound, tableViewActions.selectedRow >= offsetRow {
+        if let actions = selectedResult?.actions, tableViewActions.selectedRow != -1, tableViewActions.selectedRow >= offsetRow {
             let currentIdx = tableViewActions.selectedRow - offsetRow
             let lastActionIdx = actions.count - 1
 

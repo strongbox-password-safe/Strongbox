@@ -40,6 +40,7 @@ class OneDriveDriveItem: NSObject {
     let lastModifiedDateTime: Date?
     let driveType: String?
     let siteId: String?
+    let sharedWithMe: Bool
 
     init(parentItemId: String?,
          driveId: String?,
@@ -47,7 +48,8 @@ class OneDriveDriveItem: NSObject {
          itemId: String?,
          lastModifiedDateTime: Date?,
          driveType: String?,
-         siteId: String?)
+         siteId: String?,
+         sharedWithMe: Bool)
     {
         self.parentItemId = parentItemId
         self.driveId = driveId
@@ -56,6 +58,7 @@ class OneDriveDriveItem: NSObject {
         self.lastModifiedDateTime = lastModifiedDateTime
         self.driveType = driveType
         self.siteId = siteId
+        self.sharedWithMe = sharedWithMe
     }
 }
 
@@ -201,13 +204,16 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
     }
 
     func getJsonFileIdentifier(msalResult: MSALResult, driveItem: OneDriveDriveItem) -> String? {
-        guard let driveId = driveItem.driveId, let parentItemId = driveItem.parentItemId else {
+        guard let driveId = driveItem.driveId else {
             swlog("🔴 Missing required driveId or parentItemId in getJsonFileIdentifier")
             return nil
         }
 
-        var dp = ["driveId": driveId,
-                  "parentFolderId": parentItemId]
+        var dp: [String: Any] = ["driveId": driveId]
+
+        if let parentItemId = driveItem.parentItemId {
+            dp["parentFolderId"] = parentItemId
+        }
 
         if let accountIdentifier = msalResult.account.identifier {
             dp["accountIdentifier"] = accountIdentifier
@@ -225,6 +231,14 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             dp["siteId"] = siteId
         }
 
+        if let itemId = driveItem.itemId {
+            dp["itemId"] = itemId
+        }
+
+        if driveItem.sharedWithMe {
+            dp["sharedWithMe"] = driveItem.sharedWithMe
+        }
+
         guard let data = try? JSONSerialization.data(withJSONObject: dp, options: []),
               let json = String(data: data, encoding: .utf8)
         else {
@@ -237,13 +251,13 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
     
 
-    class func convertOdataDriveItemToBrowserItem(msalResult: MSALResult, item: AnyObject) -> StorageBrowserItem? {
+    class func convertOdataDriveItemToBrowserItem(msalResult: MSALResult, item: AnyObject, sharedWithMe: Bool) -> StorageBrowserItem? {
         guard let item = item as? [String: AnyObject],
               let name = item["name"] as? String,
               let lastModifiedDateTimeString = item["lastModifiedDateTime"] as? String,
               let lastModifiedDateTime = NSDate.microsoftGraphDate(from: lastModifiedDateTimeString)
         else {
-            swlog("🔴 Could not get required fields...")
+            swlog("🔴 Could not get required fields...") 
             return nil
         }
 
@@ -252,15 +266,14 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
         let itemId: String
         let driveType: String?
         let siteId: String?
-        let parentId: String
+        let parentId: String?
 
         if let remoteItem = item["remoteItem"] as? [String: AnyObject] {
             guard let pr = remoteItem["parentReference"] as? [String: AnyObject],
-                  let prId = pr["id"] as? String,
                   let dId = pr["driveId"] as? String,
                   let id = remoteItem["id"] as? String
             else {
-                swlog("🔴 Could not get required fields...")
+                swlog("🔴 Could not get required fields...") 
                 return nil
             }
 
@@ -269,14 +282,13 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             isFolder = remoteItem["folder"] != nil
             driveId = dId
             itemId = id
-            parentId = prId
+            parentId = pr["id"] as? String 
         } else {
             guard let parentReference = item["parentReference"] as? [String: AnyObject],
-                  let prId = parentReference["id"] as? String,
                   let id = item["id"] as? String,
                   let dId = parentReference["driveId"] as? String
             else {
-                swlog("🔴 Could not get required fields...")
+                swlog("🔴 Could not get required fields...") 
                 return nil
             }
 
@@ -285,10 +297,10 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             isFolder = item["folder"] != nil
             driveId = dId
             itemId = id
-            parentId = prId
+            parentId = parentReference["id"] as? String 
         }
 
-        let theDriveItem = OneDriveDriveItem(parentItemId: parentId, driveId: driveId, name: name, itemId: itemId, lastModifiedDateTime: lastModifiedDateTime as Date, driveType: driveType, siteId: siteId)
+        let theDriveItem = OneDriveDriveItem(parentItemId: parentId, driveId: driveId, name: name, itemId: itemId, lastModifiedDateTime: lastModifiedDateTime as Date, driveType: driveType, siteId: siteId, sharedWithMe: sharedWithMe)
 
         let navContext = OneDriveNavigationContext(mode: .regularDriveNavigation, msalResult: msalResult, driveItem: theDriveItem)
 
@@ -572,13 +584,15 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
         guard let data = json.data(using: .utf8),
               let obj = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: AnyObject],
-              let driveId = obj["driveId"] as? String,
-              let parentFolderId = obj["parentFolderId"] as? String
+              let driveId = obj["driveId"] as? String
         else {
             swlog("🔴 Could not decode the fileIdentifier")
             completion(nil, false, Utils.createNSError("🔴 Could not decode the fileIdentifier", errorCode: 123_456))
             return
         }
+
+        let parentFolderId = obj["parentFolderId"] as? String 
+        let itemId = obj["itemId"] as? String 
 
         #if os(iOS)
             let filename = metadata.fileName
@@ -590,26 +604,38 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
         Task {
             do {
-                let maybeFound = try await getFileByFilename(accountIdentifier: accountIdentifier, driveId: driveId, parentFolderId: parentFolderId, fileName: filename, viewController: viewController)
+                if parentFolderId == nil, let itemId {
+                    let maybeFound = try await getFileById(accountIdentifier: accountIdentifier, driveId: driveId, itemId: itemId, viewController: viewController)
 
-                if let found = maybeFound {
-                    let navContext = found.providerData as? OneDriveNavigationContext
-
-                    completion(navContext, false, nil)
-                } else {
-                    
-                    
-                    
-                    
-
-                    let listing = try await listFolder(accountIdentifier: accountIdentifier, viewController: viewController, driveId: driveId, folderId: parentFolderId)
-
-                    if let found = listing.first(where: { $0.name.compare(filename) == .orderedSame }) {
+                    if let found = maybeFound {
                         let navContext = found.providerData as? OneDriveNavigationContext
 
                         completion(navContext, false, nil)
                     } else {
                         completion(nil, false, Utils.createNSError("Could not locate the database file. Has it been renamed or moved?", errorCode: 45))
+                    }
+                } else {
+                    let maybeFound = try await getFileByFilename(accountIdentifier: accountIdentifier, driveId: driveId, parentFolderId: parentFolderId, fileName: filename, viewController: viewController)
+
+                    if let found = maybeFound {
+                        let navContext = found.providerData as? OneDriveNavigationContext
+
+                        completion(navContext, false, nil)
+                    } else {
+                        
+                        
+                        
+                        
+
+                        let listing = try await listFolder(accountIdentifier: accountIdentifier, viewController: viewController, driveId: driveId, folderId: parentFolderId)
+
+                        if let found = listing.first(where: { $0.name.compare(filename) == .orderedSame }) {
+                            let navContext = found.providerData as? OneDriveNavigationContext
+
+                            completion(navContext, false, nil)
+                        } else {
+                            completion(nil, false, Utils.createNSError("Could not locate the database file. Has it been renamed or moved?", errorCode: 45))
+                        }
                     }
                 }
             } catch OneDriveStorageProviderError.userCancelledAuthentication {
@@ -635,7 +661,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
         return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
-    func getFileByFilenameUrl(driveId: String, parentFolderId: String, fileName: String) -> URL? {
+    func getFileByFilenameUrl(driveId: String, parentFolderId: String?, fileName: String) -> URL? {
         let escapedFilename = fileName.replacingOccurrences(of: "'", with: "''")
 
         let ret: URL?
@@ -654,7 +680,12 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
         var components = URLComponents(string: OneDriveStorageProvider.GraphBaseURL)
 
-        let path = String(format: "/v1.0/drives/%@/items/%@/children", driveId, parentFolderId)
+        let path: String
+        if let parentFolderId {
+            path = String(format: "/v1.0/drives/%@/items/%@/children", driveId, parentFolderId)
+        } else {
+            path = String(format: "/v1.0/drives/%@/items/root/children", driveId)
+        }
         let queryVal = String(format: "name eq '%@'", escapedFilename)
         let queryItems: [URLQueryItem] = [.init(name: "$filter", value: queryVal)]
 
@@ -721,6 +752,25 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
         return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
     }
 
+    func getFileByIdUrl(driveId: String, itemId: String) -> URL? {
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        let request = String(format: "/drives/%@/items/%@", driveId, itemId)
+
+        return URL(string: "\(OneDriveStorageProvider.GraphBaseURL)\(request)")
+    }
+
     func getFileUploadRequestUrl(driveItem: OneDriveDriveItem) -> URL? {
         
         
@@ -761,7 +811,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
         
 
         guard let driveId = parentDriveItem.driveId else {
-            swlog("🔴 Could not get driveId or parentItemId")
+            swlog("🔴 Could not get driveId")
             return nil
         }
 
@@ -788,7 +838,26 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
     
 
-    func getFileByFilename(accountIdentifier: String?, driveId: String, parentFolderId: String, fileName: String, viewController: VIEW_CONTROLLER_PTR?) async throws -> StorageBrowserItem? {
+    func getFileById(accountIdentifier: String?, driveId: String, itemId: String, viewController: VIEW_CONTROLLER_PTR?) async throws -> StorageBrowserItem? {
+        guard let url = getFileByIdUrl(driveId: driveId, itemId: itemId) else {
+            swlog("🔴 getFileById - Could not get request URL")
+            throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
+        }
+
+        let (urlRequest, msalResult) = try await getAuthenticatedUrlRequest(accountIdentifier: accountIdentifier, viewController: viewController, url: url)
+
+        let (jsonData, response) = try await nextGenURLSession.data(for: urlRequest)
+
+        try validateResponse(data: jsonData, response: response)
+
+        guard let json = try? JSONSerialization.jsonObject(with: jsonData, options: []) as AnyObject else {
+            swlog("🔴 error listing - could not read response...")
+            throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
+        }
+        return OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: json, sharedWithMe: false)
+    }
+
+    func getFileByFilename(accountIdentifier: String?, driveId: String, parentFolderId: String?, fileName: String, viewController: VIEW_CONTROLLER_PTR?) async throws -> StorageBrowserItem? {
         guard let url = getFileByFilenameUrl(driveId: driveId, parentFolderId: parentFolderId, fileName: fileName) else {
             swlog("🔴 getFileByFilename - Could not get request URL")
             throw OneDriveStorageProviderError.couldNotGetDriveItemUrl
@@ -811,7 +880,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             return nil
         }
 
-        return OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: match)
+        return OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: match, sharedWithMe: false)
     }
 
     
@@ -835,7 +904,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
-        return items.compactMap { OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
+        return items.compactMap { OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0, sharedWithMe: true) }
     }
 
     func getPrimaryDrive(viewController: VIEW_CONTROLLER_PTR?) async throws -> (StorageBrowserItem, MSALResult) {
@@ -864,7 +933,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
         let name = json["name"] as? String ?? "OneDrive"
 
-        let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: name, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil)
+        let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: name, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil, sharedWithMe: false)
 
         let navContext = OneDriveNavigationContext(mode: .driveRoot, msalResult: msalResult, driveItem: driveItem)
 
@@ -903,7 +972,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
             let name = item["name"] as? String ?? "OneDrive"
 
-            let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: name, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil)
+            let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: name, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil, sharedWithMe: false)
 
             let navContext = OneDriveNavigationContext(mode: .driveRoot, msalResult: msalResultAllDrives, driveItem: driveItem)
 
@@ -1017,7 +1086,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
             let displayName = moreThanOne ? String(format: "%@/%@", siteName, name ?? NSLocalizedString("generic_unknown", comment: "Unknown")) : siteName
 
-            let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: displayName, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil)
+            let driveItem = OneDriveDriveItem(parentItemId: nil, driveId: id, name: displayName, itemId: nil, lastModifiedDateTime: nil, driveType: driveType, siteId: nil, sharedWithMe: false)
 
             let navContext = OneDriveNavigationContext(mode: .driveRoot, msalResult: msalResult, driveItem: driveItem)
 
@@ -1053,7 +1122,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
-        let browserItems = items.compactMap { OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0) }
+        let browserItems = items.compactMap { OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: $0, sharedWithMe: false) }
 
         
 
@@ -1164,7 +1233,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
         try validateResponse(data: data, response: response)
 
         guard let dictionary = try? JSONSerialization.jsonObject(with: data, options: []) as AnyObject,
-              let item = OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: dictionary),
+              let item = OneDriveStorageProvider.convertOdataDriveItemToBrowserItem(msalResult: msalResult, item: dictionary, sharedWithMe: false),
               let navContext = item.providerData as? OneDriveNavigationContext,
               let driveItem = navContext.driveItem
         else {

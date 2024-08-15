@@ -334,7 +334,7 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
         return NSLocalizedString(@"app_privacy_shield_mode_pixellate", @"Pixellate");
     }
     else if ( mode == kAppPrivacyShieldModeNone ) {
-        return NSLocalizedString(@"generic_none", @"None");
+        return NSLocalizedString(@"privacy_shield_none", @"None"); 
     }
     else {
         return NSLocalizedString(@"app_privacy_shield_mode_blue_screen", @"Blue Screen");

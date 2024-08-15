@@ -207,8 +207,6 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property NSInteger monitorForExternalChangesInterval;
 @property BOOL autoReloadAfterExternalChanges;
 
-@property BOOL autoPromptForConvenienceUnlockOnActivate;
-
 @property BOOL launchAtStartup;
 
 @property BOOL alwaysOpenOffline;

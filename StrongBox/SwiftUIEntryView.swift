@@ -16,8 +16,9 @@ struct SwiftUIEntryView: View {
     var favourite: Bool = false
     var flagged: Bool = true
     var totp: OTPToken? = nil
+    var showIcon: Bool = true
 
-    init(title: String, username: String, path: String, icon: IMAGE_TYPE_PTR, favourite: Bool = false, totp: OTPToken? = nil, flagged: Bool = false) {
+    init(title: String, username: String, path: String, icon: IMAGE_TYPE_PTR, favourite: Bool = false, totp: OTPToken? = nil, flagged: Bool = false, showIcon: Bool) {
         self.title = title
         self.username = username
         self.path = path
@@ -25,10 +26,11 @@ struct SwiftUIEntryView: View {
         self.favourite = favourite
         self.totp = totp
         self.flagged = flagged
+        self.showIcon = showIcon
     }
 
-    init(entry: any SwiftEntryModelInterface) {
-        self.init(title: entry.title, username: entry.username, path: entry.searchFoundInPath, icon: entry.image, favourite: entry.isFavourite, totp: entry.totp, flagged: entry.isFlaggedByAudit)
+    init(entry: any SwiftEntryModelInterface, showIcon: Bool) {
+        self.init(title: entry.title, username: entry.username, path: entry.searchFoundInPath, icon: entry.image, favourite: entry.isFavourite, totp: entry.totp, flagged: entry.isFlaggedByAudit, showIcon: showIcon)
     }
 
     var body: some View {
@@ -49,7 +51,9 @@ struct SwiftUIEntryView: View {
                     .cornerRadius(3.0)
             #endif
 
-            img
+            if showIcon {
+                img
+            }
 
 
 
@@ -116,8 +120,8 @@ struct SwiftUIEntryView: View {
     let totp = OTPToken(url: URL(string: "otpauth:
 
     return List {
-        SwiftUIEntryView(title: "Test Title", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, favourite: true, totp: totp, flagged: true)
+        SwiftUIEntryView(title: "Test Title", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, favourite: true, totp: totp, flagged: true, showIcon: true)
 
-        SwiftUIEntryView(title: "Test Title which is quite long and might need to wrap onto a new line or two or to infinity and beyond.", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon)
+        SwiftUIEntryView(title: "Test Title which is quite long and might need to wrap onto a new line or two or to infinity and beyond.", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, showIcon: true)
     }
 }

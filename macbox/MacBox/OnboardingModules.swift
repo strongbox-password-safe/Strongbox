@@ -77,4 +77,52 @@ class OnboardingModules {
                                            completion()
                                        })
     }
+
+    
+
+    class func getHardwareKeyCaching(viewModel: ViewModel) -> OnboardingModule {
+        let image = NSImage(imageLiteralResourceName: "yubikey")
+
+        let model = viewModel.commonModel!
+
+        return GenericOnboardingModule(
+            image: image,
+            title: NSLocalizedString("feature_hardware_key_caching", comment: "Hardware Key Caching"),
+            body: NSLocalizedString("hardware_key_caching_onboarding_msg", comment: "Using a hardware key is a great security choice but it can be a little inconvenient.\n\nWould you like to enable our caching feature?\n\nWith this enabled Strongbox will do things like remember the last challenge response for a period of time. This means you don't need to use your key so often.\n\nFull configuration is available in settings. For more details see online."),
+            button1Title: NSLocalizedString("backup_settings_prompt_option_yes_looks_good", comment: "Yes, Sounds Great!"),
+            button2Title: NSLocalizedString("generic_no_thanks", comment: "No Thanks"),
+            hideDismiss: true,
+            shouldDisplay: {
+                !model.metadata.hasOnboardedHardwareKeyCaching &&
+                    model.originalFormat == .keePass4 &&
+                    model.ckfs.yubiKeyCR != nil &&
+                    Settings.sharedInstance().hardwareKeyCachingBeta &&
+                    !model.metadata.hardwareKeyCRCaching
+            },
+            onButton1: { _, completion in
+                model.metadata.hardwareKeyCRCaching = true
+                model.metadata.challengeRefreshIntervalSecs = 1800 
+                model.metadata.cacheChallengeDurationSecs = 8 * 3600 
+                model.metadata.doNotRefreshChallengeInAF = true
+
+                if let lastCr = model.ckfs.lastChallengeResponse {
+                    model.metadata.addCachedChallengeResponse(lastCr)
+                    model.metadata.lastChallengeRefreshAt = Date.now
+                }
+                model.metadata.hasOnboardedHardwareKeyCaching = true
+
+                completion()
+            },
+            onButton2: { _, completion in
+                model.metadata.hardwareKeyCRCaching = false
+                model.metadata.hasOnboardedHardwareKeyCaching = true
+
+                completion()
+            }
+        )
+    }
+
+    class func firstLaunchWelcome(viewModel: ViewModel) -> OnboardingModule {
+        DatabaseWelcomeOnboardingModule(viewModel: viewModel)
+    }
 }

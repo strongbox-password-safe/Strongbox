@@ -181,6 +181,8 @@ extern NSString* const kCustomFieldsColumn;
 
 @property SystemMenuClickAction systemMenuClickAction;
 
+@property BOOL hardwareKeyCachingBeta;
+
 @end
 
 

@@ -21,7 +21,7 @@ typedef struct _BlockHeader {
 
 typedef void (^SerializeCompletionBlock)(BOOL userCancelled, NSString*_Nullable hash, NSError*_Nullable error);
 
-typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, SerializationData*_Nullable serializationData, NSError*_Nullable innerStreamError, NSError*_Nullable error);
+typedef void (^Kdbx31DeserializeCompletionBlock)(BOOL userCancelled, SerializationData*_Nullable serializationData, NSError*_Nullable innerStreamError, NSError*_Nullable error);
 
 @interface KdbxSerialization : NSObject
 
@@ -31,7 +31,7 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, SerializationData
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
       xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
 sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
-         completion:(DeserializeCompletionBlock)completion;
+         completion:(Kdbx31DeserializeCompletionBlock)completion;
 
 - (instancetype)init:(SerializationData*)serializationData;
 

@@ -18,6 +18,7 @@
 #import "NSArray+Extensions.h"
 #import "XmlSerializer.h"
 #import "InnerRandomStreamFactory.h"
+#import "NSData+Extensions.h"
 
 static const uint32_t kKdbx4MajorVersionNumber = 4;
 static const uint32_t kKdbx4MaximumAcceptableMinorVersionNumber = 1; 
@@ -112,7 +113,10 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     completion(NO, ret, innerStreamError, nil);
 }
 
-+ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database 
+outputStream:(NSOutputStream *)outputStream
+      params:(id)params
+  completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password &&
        !database.ckfs.keyFileDigest &&
        !database.ckfs.yubiKeyCR) {
@@ -153,30 +157,7 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     rootXmlDocument.keePassFile.meta.headerHash = nil; 
         
     id<InnerRandomStream> innerStream = [InnerRandomStreamFactory getStream:database.meta.innerRandomStreamId key:nil];
-
-    
-    
-    
-    
-    
-    BOOL rotateHardwareKeyChallenge = YES; 
-    
-    if ( rotateHardwareKeyChallenge ) {
-        id<KeyDerivationCipher> kdf = getKeyDerivationCipher(database.meta.kdfParameters, &error);
-        
-        if(!kdf) {
-            slog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", database.meta.kdfParameters);
-            completion(NO, nil, error);
-            return;
-        }
-
-
-        
-        [kdf rotateHardwareKeyChallenge];
-        
-        database.meta.kdfParameters = kdf.kdfParameters;
-    }
-    
+            
     
 
     NSDictionary* unknownHeaders = tag ? tag.unknownHeaders : @{ };

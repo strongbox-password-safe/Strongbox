@@ -39,10 +39,13 @@ typedef void (^Deserialize4CompletionBlock)(BOOL userCancelled, Kdbx4Serializati
 typedef void (^Serialize4CompletionBlock)(BOOL userCancelled, NSError*_Nullable error);
 
 id<KeyDerivationCipher> getKeyDerivationCipher(KdfParameters *kdfParameters, NSError** error);
-
+    
 @interface Kdbx4Serialization : NSObject
 
 + (nullable CryptoParameters*)getCryptoParams:(NSInputStream*)stream; 
+
++ (NSData*)getYubiKeyChallenge:(NSInputStream *)stream;
++ (NSData *)getYubiKeyChallenge:(KdfParameters *)kdfParameters error:(NSError * _Nullable __autoreleasing *)error;
 
 + (void)deserialize:(NSInputStream*)stream
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors

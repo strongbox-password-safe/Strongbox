@@ -14,8 +14,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface YubiKeyConfiguration : NSObject
 
-@property NSString* deviceSerial;
-@property NSInteger slot;
++ (instancetype)virtualKeyWithSerial:(NSString*)serial;
++ (instancetype)realKeyWithSerial:(NSString*)serial slot:(NSInteger)slot;
+
+@property BOOL isVirtual;
+@property NSString* deviceSerial; 
+@property NSInteger slot; 
 
 @end
 

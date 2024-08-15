@@ -36,7 +36,7 @@ struct HomeSearchView: View {
             Button(action: {
                 model.navigateTo(destination: .entryDetail(uuid: wrapper.result.uuid))
             }, label: {
-                SwiftUIEntryView(entry: wrapper.result)
+                SwiftUIEntryView(entry: wrapper.result, showIcon: model.showIcons)
                     .contextMenu {
                         EntryViewContextMenu(model: model, item: wrapper.result)
                     }

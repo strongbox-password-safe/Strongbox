@@ -121,7 +121,7 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
         BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
         NSString* subtitle = [self getBrowseItemSubtitle:node subtitleOverride:subtitleOverride];
 
-        [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken];
+        [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken hideIcon:self.viewModel.metadata.hideIconInBrowse];
         
         return cell;
     }
@@ -162,7 +162,7 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
              flagTintColors:flagTintColors
                     expired:node.expired
                    otpToken:node.fields.otpToken
-                   hideIcon:NO
+                   hideIcon:self.viewModel.metadata.hideIconInBrowse
                       audit:briefAudit];
             
             cell.accessoryType = accessoryType;

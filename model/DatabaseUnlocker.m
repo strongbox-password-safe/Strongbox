@@ -10,6 +10,7 @@
 #import "Serializator.h"
 #import "Utils.h"
 #import "Kdbx4Serialization.h"
+#import "KdbxSerialization.h"
 #import "AutoFillManager.h"
 #import "KeePassCiphers.h"
 #import "WorkingCopyManager.h"
@@ -17,6 +18,7 @@
 #import "Argon2KdfCipher.h"
 #import "CrossPlatform.h"
 #import "EncryptionSettingsViewModel.h"
+#import "NSData+Extensions.h"
 
 #if TARGET_OS_IPHONE
 
@@ -205,11 +207,7 @@
             [self autoDetermineEmptyOrNullAmbiguousPassword:url key:key keyFromConvenience:keyFromConvenience completion:completion];
         }
         else {
-            [Serializator fromUrl:url
-                              ckf:key
-                       completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
-                [self onGotDatabaseModelFromData:userCancelled model:model key:key decryptTime:decryptTime error:error];
-            }];
+            [self unlockUrlWrapper:url ckfs:key incorrectCredsCompletion:nil];
         }
     });
 }
@@ -363,51 +361,135 @@
     CompositeKeyFactors *firstCheck = self.database.emptyOrNilPwPreferNilCheckFirst ? nilPw : emptyPw;
     CompositeKeyFactors *secondCheck = self.database.emptyOrNilPwPreferNilCheckFirst ? emptyPw : nilPw;
     
-    [Serializator fromUrl:url
-                      ckf:firstCheck
-               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
-        if(model == nil && error && error.code == StrongboxErrorCodes.incorrectCredentials) {
-            slog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
-            
-            self.database.emptyOrNilPwPreferNilCheckFirst = !self.database.emptyOrNilPwPreferNilCheckFirst;
-                        
+    __weak DatabaseUnlocker* weakSelf = self;
+    
+    slog(@"🐞INFO: nil/empty password check trying [%@] initially...", firstCheck.password == nil ? @"nil" : @"empty");
+    [self unlockUrlWrapper:url ckfs:firstCheck incorrectCredsCompletion:^{
+        slog(@"🐞INFO: Password check didn't work first time! will try alternative password...");
+        
+        weakSelf.database.emptyOrNilPwPreferNilCheckFirst = !weakSelf.database.emptyOrNilPwPreferNilCheckFirst;
+                    
 #if TARGET_OS_IPHONE
-            BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil && self.database.yubiKeyConfig.mode != kVirtual;
+        BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil && weakSelf.database.nextGenPrimaryYubiKeyConfig.mode != kVirtual;
 #else
-            BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil; 
+        BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil && !weakSelf.database.yubiKeyConfiguration.isVirtual;
 #endif
+        
+        if ( physicalYubiKey ) { 
             
-            if ( physicalYubiKey ) { 
-                
-                
-                [self dismissSpinner]; 
-                
-                [self.alertingUi info:self.viewController
+            
+            [weakSelf dismissSpinner]; 
+            
+            [weakSelf.alertingUi info:weakSelf.viewController
                                 title:NSLocalizedString(@"yubikey_fast_unlock_title", @"Determining Fast Unlock for YubiKey")
                               message:NSLocalizedString(@"yubikey_fast_unlock_message", @"Strongbox is determining the fastest way to unlock this database. You will be asked to scan your YubiKey once again.")
                            completion:^{
-                    [Serializator fromUrl:url
-                                      ckf:secondCheck
-                               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
-                        [self onGotDatabaseModelFromData:userCancelled model:model key:secondCheck decryptTime:decryptTime error:error];
-                    }];
-                }];
+                [self unlockUrlWrapper:url ckfs:secondCheck incorrectCredsCompletion:nil]; 
+            }];
+        }
+        else {
+            [weakSelf unlockUrlWrapper:url ckfs:secondCheck incorrectCredsCompletion:nil];
+        }
+    }];
+}
+
+- (CompositeKeyFactors *)getCkfsCachedHardwareKeyWrapper:(NSData *)challenge ckfs:(CompositeKeyFactors *)ckfs {
+    __weak DatabaseUnlocker* weakSelf = self;
+    
+    CompositeKeyFactors* cachedCrCkfsWrapper = [CompositeKeyFactors password:ckfs.password
+                                                               keyFileDigest:ckfs.keyFileDigest
+                                                                   yubiKeyCR:^(NSData * _Nonnull thisChallenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+        NSData* response = [weakSelf.database getCachedChallengeResponse:thisChallenge]; 
+        if ( response ) {
+            slog(@"🟢 Database Unlocker - Got cached response [%@] for challenge [%@], attempting to use...", response.base64String, challenge.base64String);
+            completion(NO, response, nil);
+        }
+        else {
+            completion(NO, nil, [Utils createNSError:@"🔴 Unexpected Challenge or No cached response available." errorCode:-1]);
+        }
+    }];
+    
+    return cachedCrCkfsWrapper;
+}
+
+- (void)unlockUrlWrapper:(NSURL*)url ckfs:(CompositeKeyFactors*)ckfs incorrectCredsCompletion:(void(^_Nullable)(void))incorrectCredsOverride {
+    NSData* challenge = nil;
+
+    if ( self.applicationPreferences.hardwareKeyCachingBeta && ckfs.yubiKeyCR != nil && self.database.hardwareKeyCRCaching ) {
+        challenge = [DatabaseUnlocker getYubiKeyChallenge:url];
+    }
+    
+    
+    if ( challenge ) {
+        NSData* cached = [self.database getCachedChallengeResponse:challenge];
+        if ( cached ) {
+            CompositeKeyFactors * cachedCrCkfsWrapper = [self getCkfsCachedHardwareKeyWrapper:challenge ckfs:ckfs];
+            
+            [Serializator fromUrl:url
+                              ckf:cachedCrCkfsWrapper
+                       completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
+                if(model == nil && error && error.code == StrongboxErrorCodes.incorrectCredentials) {
+                    [self.database removeCachedChallenge:challenge]; 
+                    [self unlockUrlWrapper:url ckfs:ckfs incorrectCredsCompletion:nil]; 
+                }
+                else {
+                    model.ckfs = ckfs; 
+                    [self onGotDatabaseModelFromData:userCancelled model:model key:ckfs decryptTime:decryptTime error:error];
+                }
+            }];
+            
+            return;
+        }
+        else {
+            slog(@"🐞 Hardware Key cache miss for challenge: [%@]", challenge.base64String);
+        }
+    }
+
+    [Serializator fromUrl:url
+                      ckf:ckfs
+               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
+        if(model == nil && error && error.code == StrongboxErrorCodes.incorrectCredentials) {
+            if ( incorrectCredsOverride ) {
+                incorrectCredsOverride();
             }
             else {
-                [Serializator fromUrl:url
-                                  ckf:secondCheck
-                           completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSTimeInterval decryptTime, NSError * _Nullable error) {
-                    [self onGotDatabaseModelFromData:userCancelled model:model key:secondCheck decryptTime:decryptTime error:error];
-                }];
+                
+                [self onGotDatabaseModelFromData:userCancelled model:model key:ckfs decryptTime:decryptTime error:error];
             }
         }
         else {
-            [self onGotDatabaseModelFromData:userCancelled model:model key:firstCheck decryptTime:decryptTime error:error];
+            BOOL successfulUnlock = model != nil && error == nil;
+            if ( successfulUnlock && challenge && self.database.hardwareKeyCRCaching && self.applicationPreferences.hardwareKeyCachingBeta ) {
+                slog(@"🟢 Successful actual hardware key unlock, caching response.");
+                MMcGPair<NSData *,NSData *> *cr = ckfs.lastChallengeResponse;
+                
+                if ( cr ) {
+                    NSData* existing = [self.database getCachedChallengeResponse:cr.a]; 
+                    if ( !existing ) {
+                        [self.database addCachedChallengeResponse:cr];
+                    }
+                }
+            }
+            
+            
+            [self onGotDatabaseModelFromData:userCancelled model:model key:ckfs decryptTime:decryptTime error:error];
         }
     }];
 }
 
 
+
++ (NSData*)getYubiKeyChallenge:(NSURL*)url {
+    DatabaseFormat format = [Serializator getDatabaseFormat:url];
+    
+    if ( format == kKeePass4 ) {
+        NSInputStream* inputStream = [NSInputStream inputStreamWithURL:url];
+        return [Kdbx4Serialization getYubiKeyChallenge:inputStream];
+    }
+    else {
+        return nil;
+    }
+}
 
 + (BOOL)isAutoFillLikelyToCrash:(NSURL*)url {
     DatabaseFormat format = [Serializator getDatabaseFormat:url];

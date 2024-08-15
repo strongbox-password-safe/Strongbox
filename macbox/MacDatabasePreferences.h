@@ -20,6 +20,7 @@
 #import "SearchScope.h"
 #import "SideBarChildCountFormat.h"
 #import "SBLog.h"
+#import "MMcGPair.h"
 
 @class HeaderNodeState;
 
@@ -191,6 +192,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL isSharedInCloudKit; 
 @property BOOL isOwnedByMeCloudKit;
+
+@property BOOL hardwareKeyCRCaching;
+@property BOOL doNotRefreshChallengeInAF;
+@property BOOL hasOnboardedHardwareKeyCaching;
+@property (nullable) NSDate* lastChallengeRefreshAt;
+@property NSInteger challengeRefreshIntervalSecs;
+@property NSInteger cacheChallengeDurationSecs;
+
+- (void)addCachedChallengeResponse:(MMcGPair<NSData*, NSData*>*)challengeResponse;
+- (void)removeCachedChallenge:(NSData*)challenge;
+- (void)clearCachedChallengeResponses;
+- (NSData*)getCachedChallengeResponse:(NSData*)challenge;
 
 @end
 

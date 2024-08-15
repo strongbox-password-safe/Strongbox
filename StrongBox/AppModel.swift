@@ -48,12 +48,14 @@ class AppModel: NSObject {
 
     @objc
     func isEditing(_ id: String) -> Bool {
-        editingSet.contains(id as NSString)
+        let ret = editingSet.contains(id as NSString)
+        swlog("🐞 AppModel::isEditing: %@ => %hhd", id, ret)
+        return ret
     }
 
     @objc
     func markAsEditing(id: String, editing: Bool = true) {
-        swlog("AppModel::markAsEditing: %@ => %hhd", id, editing)
+        swlog("🐞 AppModel::markAsEditing: %@ => %hhd", id, editing)
 
         if editing {
             editingSet.add(id as NSString)

@@ -227,7 +227,7 @@
     @autoreleasepool {
         NSData *ptData = [pt dataUsingEncoding:NSUTF8StringEncoding];
 
-        NSData* ciphertext = [self.innerRandomStream xor:ptData];
+        NSData* ciphertext = [self.innerRandomStream doTheXor:ptData];
         
         return [ciphertext base64EncodedStringWithOptions:kNilOptions];
     }

@@ -13,11 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OnboardingWelcomeViewController : NSViewController
 
-@property (nonatomic, copy) void (^onNext)(BOOL enableTouchID, BOOL enableAutoFill);
+@property (nonatomic, copy) void (^onNext)(BOOL userCancelled, BOOL enableTouchID, BOOL enableAutoFill);
 
-- (void)setInitialState:(BOOL)showTouchID
-           showAutoFill:(BOOL)showAutoFill
-         enableAutoFill:(BOOL)enableAutoFill;
+@property BOOL showTouchID;
+@property BOOL showAutoFill;
+@property BOOL enableAutoFill;
 
 @end
 

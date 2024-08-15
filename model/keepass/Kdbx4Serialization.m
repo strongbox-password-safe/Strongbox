@@ -55,7 +55,7 @@ static const BOOL kLogVerbose = NO;
         return nil;
     }
     
-
+    
     
     return kdf.transformSeed;
 }
@@ -103,8 +103,10 @@ static const BOOL kLogVerbose = NO;
                      completion:^(BOOL userCancelled, Keys * _Nullable keys, NSError * _Nullable error) {
         if(userCancelled || error || keys == nil) {
             if(!keys && !userCancelled) {
-                slog(@"Could not get Keys.");
-                error = [Utils createNSError:@"Could not determine appropriate keys." errorCode:-1];
+                slog(@"Could not get Keys. Error = [%@]", error);
+                if ( !error ) {
+                    error = [Utils createNSError:@"Could not determine appropriate keys." errorCode:-1];
+                }
             }
             completion(userCancelled, error);
         }
@@ -131,7 +133,7 @@ static const BOOL kLogVerbose = NO;
              masterSeed:(NSData*)masterSeed
            outputStream:(NSOutputStream *)outputStream
              completion:(Serialize4CompletionBlock)completion {
-
+    
     
     NSData* encryptionIv = [cipher generateIv];
     
@@ -157,7 +159,7 @@ static const BOOL kLogVerbose = NO;
     
     NSData* headerEntriesData = getHeadersData(headers);
     [headerData appendData:headerEntriesData];
-
+    
     
     
     NSInteger wrote = [outputStream write:headerData.bytes maxLength:headerData.length];
@@ -166,36 +168,36 @@ static const BOOL kLogVerbose = NO;
         completion(NO, [Utils createNSError:@"Could not serialize headers. KDBX4." errorCode:-1]);
         return;
     }
-
     
-
+    
+    
     wrote = [outputStream write:headerData.sha256.bytes maxLength:headerData.sha256.length];
     if ( wrote <= 0 ) {
         slog(@"Could not serialize Headers Hash (SHA256). KDBX4");
         completion(NO, [Utils createNSError:@"Could not serialize Headers Hash (SHA256). KDBX4." errorCode:-1]);
         return;
     }
-
     
-
+    
+    
     NSData* blockKey = getHmacKeyForBlock(keys.hmacKey, 0xFFFFFFFFFFFFFFFF); 
     NSMutableData *hmac = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
     CCHmac(kCCHmacAlgSHA256, blockKey.bytes, blockKey.length, headerData.bytes, (CC_LONG)headerData.length, hmac.mutableBytes);
-
+    
     wrote = [outputStream write:hmac.bytes maxLength:hmac.length];
     if ( wrote <= 0 ) {
         slog(@"Could not serialize HEADER HMAC. KDBX4");
         completion(NO, [Utils createNSError:@"Could not serialize HEADER HMAC. KDBX4." errorCode:-1]);
         return;
     }
-
+    
     
     
     
     HmacBlockOutputStream* hmacBlockifyStream = [[HmacBlockOutputStream alloc] initWithStream:outputStream hmacKey:keys.hmacKey];
     NSOutputStream* encryptStream = [cipher getEncryptionOutputStreamForStream:hmacBlockifyStream key:keys.masterKey iv:encryptionIv];
     NSOutputStream* compression = serializationData.compressionFlags == kGzipCompressionFlag ? [[GZIPCompressOutputStream alloc] initToOutputStream:encryptStream] : encryptStream;
-
+    
     [hmacBlockifyStream open];
     [encryptStream open];
     [compression open];
@@ -213,7 +215,7 @@ static const BOOL kLogVerbose = NO;
     
     
     id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStream:innerStream v4Format:YES prettyPrint:NO outputStream:thePipeline];
-
+    
     [xmlSerializer beginDocument];
     BOOL writeXmlOk = [rootXmlDocument writeXml:xmlSerializer];
     [xmlSerializer endDocument];
@@ -224,7 +226,7 @@ static const BOOL kLogVerbose = NO;
         completion(NO, thePipeline.streamError ? thePipeline.streamError : errXmlSerialize);
         return;
     }
-
+    
     if( xmlSerializer.streamError != nil ) {
         slog(@"Could not serialize Xml to Document.: [%@]", xmlSerializer.streamError );
         completion(NO, xmlSerializer.streamError);
@@ -234,7 +236,7 @@ static const BOOL kLogVerbose = NO;
     [compression close];
     [encryptStream close];
     [hmacBlockifyStream close];
-
+    
     if ( thePipeline.streamError ) {
         slog(@"Error closing streams [%@]", thePipeline.streamError );
     }
@@ -263,7 +265,17 @@ static BOOL readFileHeader(NSInputStream* stream, KeepassFileHeader *pFileHeader
     return [[CryptoParameters alloc] initFromHeaders:headerEntries];
 }
 
-
++ (NSData*)getYubiKeyChallenge:(NSInputStream *)stream {
+    CryptoParameters *cryptoParams = [Kdbx4Serialization getCryptoParams:stream];
+    if (!cryptoParams) {
+        return nil;
+    }
+    
+    NSError* error;
+    NSData* yubiKeyChallenge = [Kdbx4Serialization getYubiKeyChallenge:cryptoParams.kdfParameters error:&error];
+    
+    return error == nil ? yubiKeyChallenge : nil;
+}
 
 + (void)deserialize:(NSInputStream *)stream
 compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors

@@ -105,7 +105,7 @@ static const BOOL kLogVerbose = NO;
     [self open:mutableData ckf:ckf completion:completion];
 }
 
-+ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream params:(id _Nullable)params completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password.length && !database.ckfs.keyFileDigest) {
         
         NSError* error = [Utils createNSError:@"Master Password or Key File not set." errorCode:-3];
@@ -162,10 +162,6 @@ static const BOOL kLogVerbose = NO;
     else {
         completion(NO, nil, nil);
     }
-}
-
-+ (NSData *_Nullable)getYubiKeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
-    return nil;
 }
 
 + (void)addKeePassDefaultRootGroup:(Node*)rootGroup {

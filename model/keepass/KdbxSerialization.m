@@ -200,7 +200,7 @@ static BOOL readFileHeader(NSInputStream* stream, KeepassFileHeader *pFileHeader
 compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
       xmlDumpStream:(NSOutputStream*)xmlDumpStream
 sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
-         completion:(DeserializeCompletionBlock)completion {
+         completion:(Kdbx31DeserializeCompletionBlock)completion {
     NSMutableData* headerDataForIntegrityCheck = [NSMutableData data];
     
     
@@ -280,7 +280,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
                 masterKey:(NSData*)masterKey
             xmlDumpStream:(NSOutputStream*)xmlDumpStream
    sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
-               completion:(DeserializeCompletionBlock)completion {
+               completion:(Kdbx31DeserializeCompletionBlock)completion {
     NSMutableData* headerHash = [[NSMutableData alloc] initWithLength:CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(headerDataForIntegrityCheck.bytes, (CC_LONG)headerDataForIntegrityCheck.length, headerHash.mutableBytes);
     
@@ -491,8 +491,10 @@ NSDictionary<NSNumber *,NSObject *>* getHeaderEntries3(NSInputStream* stream, NS
             slog(@"Couldn't read Header Entry Header");
             return nil;
         }
-        [headerDataForIntegrityCheck appendBytes:&headerEntry length:bytesRead];
-                
+        if ( headerDataForIntegrityCheck ) {
+            [headerDataForIntegrityCheck appendBytes:&headerEntry length:bytesRead];
+        }
+        
         uint16_t length = littleEndian2BytesToUInt16(headerEntry.lengthBytes);
         NSMutableData* headerData = [NSMutableData dataWithLength:length];
         bytesRead = [stream read:headerData.mutableBytes maxLength:length];
@@ -501,8 +503,10 @@ NSDictionary<NSNumber *,NSObject *>* getHeaderEntries3(NSInputStream* stream, NS
             slog(@"Couldn't read Header: [%ld]", (long)bytesRead);
             return nil;
         }
-        [headerDataForIntegrityCheck appendBytes:headerData.bytes length:bytesRead];
-
+        if ( headerDataForIntegrityCheck ) {
+            [headerDataForIntegrityCheck appendBytes:headerData.bytes length:bytesRead];
+        }
+        
         if(kLogVerbose) {
             slog(@"Found Header Entry of Type %d and length %d", headerEntry.id, length);
         }

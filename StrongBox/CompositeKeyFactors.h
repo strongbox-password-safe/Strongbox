@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "MMcGPair.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -32,6 +33,8 @@ typedef void (^YubiKeyCRHandlerBlock)(NSData* challenge, YubiKeyCRResponseBlock 
 @property (readonly, nullable, nonatomic) NSString* password;
 @property (readonly, nullable, nonatomic) NSData* keyFileDigest;
 @property (readonly, nullable, copy) YubiKeyCRHandlerBlock yubiKeyCR;
+
+@property (readonly, nullable) MMcGPair<NSData*, NSData*>* lastChallengeResponse;
 
 @property (readonly) BOOL isAmbiguousEmptyOrNullPassword;
 

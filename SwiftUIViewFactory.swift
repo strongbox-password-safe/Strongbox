@@ -124,5 +124,19 @@ class SwiftUIViewFactory: NSObject {
         static func getAuditIssuesView(model: DatabaseHomeViewModel) -> UIViewController {
             UIHostingController(rootView: AuditNavigationView(model: model))
         }
+
+        @objc
+        static func getHardwareKeySettingsView(metadata: METADATA_PTR, onSettingsChanged: ((Bool, Int, Int, Bool) -> Void)?, completion: (() -> Void)? = nil) -> UIViewController {
+            UIHostingController(
+                rootView: HardwareKeySettingsView(
+                    keyCachingEnabled: metadata.hardwareKeyCRCaching,
+                    autoFillRefreshSuppressed: metadata.doNotRefreshChallengeInAF,
+                    cacheChallengeDurationSecs: metadata.cacheChallengeDurationSecs,
+                    challengeRefreshIntervalSecs: metadata.challengeRefreshIntervalSecs,
+                    onSettingsChanged: onSettingsChanged,
+                    completion: completion
+                ))
+        }
+
     #endif
 }

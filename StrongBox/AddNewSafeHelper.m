@@ -149,7 +149,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                       completion:^(DatabasePreferences *metadata, NSError *error) {
                     [metadata setKeyFile:keyFileBookmark keyFileFileName:keyFileFileName];
                     metadata.likelyFormat = format;
-                    metadata.contextAwareYubiKeyConfig = yubiKeyConfig;
+                    metadata.nextGenPrimaryYubiKeyConfig = yubiKeyConfig;
 
                     dispatch_async(dispatch_get_main_queue(), ^(void) {
                         [SVProgressHUD dismiss];

@@ -22,8 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonUnlock;
 @property (weak, nonatomic) IBOutlet UILabel *labelUnlockAttemptsRemaining;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewLogo;
-@property BOOL manualUnlockInProgress;
-
+@property BOOL firstAppearance;
 @end
 
 @implementation AppLockViewController
@@ -36,29 +35,26 @@
     [self updateFailedUnlockAttemptsUI];
     
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(appBecameActive)
-                                               name:UIApplicationDidBecomeActiveNotification
+                                           selector:@selector(appWillEnterForeground)
+                                               name:UIApplicationWillEnterForegroundNotification
                                              object:nil];
-}
-
-- (void)appBecameActive {
-    slog(@"AppLockViewController::appBecameActive");
-
-    [self attemptBeginUnlockSequence:0];
+    
+    self.firstAppearance = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     
-    slog(@"AppLockViewController::viewDidAppear");
-
-    [self attemptBeginUnlockSequence:0];
+    if ( self.firstAppearance ) {
+        self.firstAppearance = NO;
+        [self attemptBeginUnlockSequence:0];
+    }
 }
 
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-    
-    self.manualUnlockInProgress = NO;
+- (void)appWillEnterForeground { 
+    slog(@"AppLockViewController::appWillEnterForeground");
+
+    [self attemptBeginUnlockSequence:0];
 }
 
 - (void)attemptBeginUnlockSequence:(int)attemptCount {
@@ -67,7 +63,7 @@
     if ( Utils.isAppInForeground ) {
         [self beginUnlockSequence]; 
     }
-    else if ( attemptCount < 4 && !self.manualUnlockInProgress) {
+    else if ( attemptCount < 3 ) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self attemptBeginUnlockSequence:attemptCount + 1];
         });
@@ -82,10 +78,6 @@
 }
 
 - (IBAction)onUnlock:(id)sender {
-    
-    
-    self.manualUnlockInProgress = YES;
-    
     [self beginUnlockSequence];
 }
 

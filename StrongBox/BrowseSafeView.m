@@ -714,6 +714,14 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     NSMutableArray<UIMenuElement*>* ma3 = [NSMutableArray array];
     
+    if ( AppPreferences.sharedInstance.hardwareKeyCachingBeta && self.viewModel.database.originalFormat == kKeePass4 && self.viewModel.database.ckfs.yubiKeyCR != nil ) {
+        [ma3 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_hardware_key", @"Hardware Key")
+                                            image:[UIImage imageNamed:@"yubikey"]
+                                          handler:^(__kindof UIAction * _Nonnull action) {
+            [weakSelf showHardwareKeySettings:nil];
+        }]];
+    }
+    
     [ma3 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_advanced_noun", @"Advanced")
                                   systemImage:@"gear"
                                       handler:^(__kindof UIAction * _Nonnull action) {
@@ -734,6 +742,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                 children:@[menu1, menu2, menu3]];
     
     self.preferencesBarButton.menu = menu;
+}
+
+- (IBAction)showHardwareKeySettings:(id)sender  {
+    [self.browseActionsHelper showHardwareKeySettings];
 }
 
 - (void)showAutoFillSettings {
@@ -1875,6 +1887,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
               message:NSLocalizedString(@"item_details_vc_are_you_sure_discard_changes", @"Are you sure you want to discard all your changes?")
                action:^(BOOL response) {
             if(response) {
+                [AppModel.shared markAsEditingWithId:self.viewModel.databaseUuid editing:NO];
                 [self continueDidSelectRowAtIndexPath:indexPath];
             }
             else {

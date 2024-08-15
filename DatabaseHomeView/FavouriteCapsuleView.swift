@@ -22,13 +22,15 @@ struct FavouriteCapsuleView: View {
             model.actions.navigateTo(destination: .entryDetail(uuid: entry.uuid), homeModel: model)
         }, label: {
             HStack {
-                Image(uiImage: entry.image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 32, height: 32)
-                    .cornerRadius(3.0)
-                    .shadow(radius: 3)
-                    .foregroundStyle(.blue)
+                if model.showIcons {
+                    Image(uiImage: entry.image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 32, height: 32)
+                        .cornerRadius(3.0)
+                        .shadow(radius: 3)
+                        .foregroundStyle(.blue)
+                }
 
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {

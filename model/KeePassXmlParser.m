@@ -191,7 +191,7 @@
 - (NSData*)decryptProtectedToData:(NSString*)ct {
     NSData *ctData = [[NSData alloc] initWithBase64EncodedString:ct options:NSDataBase64DecodingIgnoreUnknownCharacters];
     
-    NSData* plaintext = [self.innerRandomStream xor:ctData];
+    NSData* plaintext = [self.innerRandomStream doTheXor:ctData];
 
     return plaintext;
 }

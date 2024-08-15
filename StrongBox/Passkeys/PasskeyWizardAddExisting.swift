@@ -30,7 +30,7 @@ import SwiftUI
                             showingConfirmation = true
                         }) {
                             let entry = SwiftEntryModel(node: node, model: model)
-                            SwiftUIEntryView(entry: entry)
+                            SwiftUIEntryView(entry: entry, showIcon: !model.metadata.hideIconInBrowse)
                         }
                     }
                 } header: {
@@ -111,7 +111,7 @@ import SwiftUI
                     List(selection: $selectedItem) {
                         ForEach(searchResults, id: \.self) { node in
                             let entry = SwiftEntryModel(node: node, model: model)
-                            SwiftUIEntryView(entry: entry)
+                            SwiftUIEntryView(entry: entry, showIcon: true)
                                 .onDoubleClick {
                                     guard selectedItem != nil else { return }
                                     showingConfirmation = true

@@ -205,7 +205,7 @@ class SelectStorageSwiftHelper: NSObject {
         if case let .copyToStorage(sourceDatabase) = mode {
             newDatabase.likelyFormat = sourceDatabase.likelyFormat
             newDatabase.readOnly = sourceDatabase.readOnly
-            newDatabase.contextAwareYubiKeyConfig = sourceDatabase.contextAwareYubiKeyConfig
+            newDatabase.nextGenPrimaryYubiKeyConfig = sourceDatabase.nextGenPrimaryYubiKeyConfig
             newDatabase.setKeyFile(sourceDatabase.keyFileBookmark, keyFileFileName: sourceDatabase.keyFileFileName)
         }
 

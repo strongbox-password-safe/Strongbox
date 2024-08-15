@@ -22,7 +22,6 @@ extern NSString* const kGenericRefreshAllDatabaseViewsNotification;
 @property (readonly) BOOL isEditsInProgress;
 @property (readonly) ViewModel* viewModel;
 @property (readonly, nullable) MacDatabasePreferences* databaseMetadata;
-@property BOOL wasJustLocked; 
 
 - (void)initiateLockSequence;
  

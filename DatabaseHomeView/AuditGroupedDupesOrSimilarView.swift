@@ -49,7 +49,7 @@ struct AuditGroupedDupesOrSimilarView: View {
                                 model.navigateTo(destination: .entryDetail(uuid: entry.uuid))
                             } label: {
                                 NavigationLink(destination: EmptyView()) {
-                                    SwiftUIEntryView(entry: entry)
+                                    SwiftUIEntryView(entry: entry, showIcon: model.showIcons)
                                         .contextMenu {
                                             EntryViewContextMenu(model: model, item: entry)
                                         }

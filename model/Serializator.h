@@ -66,6 +66,12 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_N
 
 + (void)getAsData:(DatabaseModel*)database format:(DatabaseFormat)format outputStream:(NSOutputStream*)outputStream completion:(SaveCompletionBlock)completion;
 
++ (void)getAsData:(DatabaseModel *)database
+           format:(DatabaseFormat)format
+     outputStream:(NSOutputStream*)outputStream
+           params:(id _Nullable)params
+       completion:(SaveCompletionBlock)completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

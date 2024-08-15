@@ -191,6 +191,7 @@ class AuditConfigurationViewController: NSViewController {
         buttonExcludedItems.isEnabled = config.auditInBackground
 
         ignoreShortNumericOnly.state = config.excludeShortNumericPINCodes ? .on : .off
+        ignoreShortNumericOnly.isEnabled = config.auditInBackground
 
         bindAuditStatusWithProgress()
     }

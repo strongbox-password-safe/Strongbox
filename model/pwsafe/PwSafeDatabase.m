@@ -96,7 +96,10 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     [self open:mutableData ckf:ckf completion:completion];
 }
 
-+ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database
+outputStream:(NSOutputStream *)outputStream
+      params:(id _Nullable)params
+  completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password) {
         NSError* error = [Utils createNSError:@"Master Password not set." errorCode:-3];
         completion(NO, nil, error);
@@ -164,10 +167,6 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     else {
         completion(NO, nil, nil);
     }
-}
-
-+ (NSData *_Nullable)getYubiKeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
-    return nil;
 }
 
 

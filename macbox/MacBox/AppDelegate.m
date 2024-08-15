@@ -124,9 +124,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    
-    
-    
+
+
+
     
     [self determineIfLaunchedAsLoginItem];
     

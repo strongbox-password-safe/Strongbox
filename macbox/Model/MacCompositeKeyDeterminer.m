@@ -26,6 +26,8 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
+#import "VirtualYubiKeys.h"
+
 @interface MacCompositeKeyDeterminer ()
 
 @property (nonnull) METADATA_PTR database;
@@ -377,7 +379,9 @@
         BOOL rememberKeyFile = !Settings.sharedInstance.doNotRememberKeyFile;
         
         BOOL keyFileChanged = ( !rememberKeyFile && self.contextAwareKeyFileBookmark != nil ) || ((!(self.contextAwareKeyFileBookmark == nil && keyFileBookmark == nil)) && (![self.contextAwareKeyFileBookmark isEqual:keyFileBookmark]));
-        BOOL yubikeyChanged = (!(self.database.yubiKeyConfiguration == nil && yubiKeyConfiguration == nil)) && (![self.database.yubiKeyConfiguration isEqual:yubiKeyConfiguration]);
+        
+        YubiKeyConfiguration* configured = self.database.yubiKeyConfiguration;
+        BOOL yubikeyChanged = (!(configured == nil && yubiKeyConfiguration == nil)) && (![configured isEqual:yubiKeyConfiguration]);
         
         if( keyFileChanged || yubikeyChanged ) {
             NSString* temp = rememberKeyFile ? keyFileBookmark : nil;
@@ -455,11 +459,40 @@
                         yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                           onDemandUiProvider:(MacCompositeKeyDeterminerOnDemandUIProviderBlock)onDemandUiProvider
                                        error:(NSError **)error {
-    NSInteger slot = yubiKeyConfiguration.slot;
+
     
     return [CompositeKeyFactors password:password
                            keyFileDigest:keyFileDigest
                                yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+        [MacCompositeKeyDeterminer challengeResponse:yubiKeyConfiguration challenge:challenge onDemandUiProvider:onDemandUiProvider completion:completion];
+    }];
+}
+
++ (void)challengeResponse:(YubiKeyConfiguration*)yubiKeyConfiguration
+                challenge:(NSData*)challenge
+       onDemandUiProvider:(MacCompositeKeyDeterminerOnDemandUIProviderBlock)onDemandUiProvider
+               completion:(YubiKeyCRResponseBlock)completion {
+    if ( !Settings.sharedInstance.isPro ) {
+        NSString* loc = NSLocalizedString(@"open_sequence_yubikey_only_available_in_pro", @"YubiKey Unlock is only available in the Pro edition of Strongbox");
+        NSError* error = [Utils createNSError:loc errorCode:-1];
+        completion(NO, nil, error);
+    }
+    
+    if ( yubiKeyConfiguration.isVirtual ) {
+        VirtualYubiKey* virtual = [VirtualYubiKeys.sharedInstance getById:yubiKeyConfiguration.deviceSerial];
+        if ( virtual ) {
+            slog(@"🐞 Performing Challenge Response using Virtual Hardware Key...");
+            NSData* response = [virtual doChallengeResponse:challenge];
+            completion(NO, response, nil);
+        }
+        else {
+            NSError* error = [Utils createNSError:@"Could not find Virtual Hardware Key!" errorCode:-1];
+            completion(NO, nil, error);
+        }
+    }
+    else {
+        NSInteger slot = yubiKeyConfiguration.slot;
+        
         [MacHardwareKeyManager.sharedInstance compositeKeyFactorCr:challenge
                                                               slot:slot
                                                         completion:completion
@@ -467,7 +500,7 @@
             NSViewController* vc = onDemandUiProvider();
             return vc.view.window;
         }];
-    }];
+    }
 }
 
 - (DatabaseFormat)getKeyFileDatabaseFormat {

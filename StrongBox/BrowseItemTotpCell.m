@@ -36,10 +36,13 @@
     [self stopObservingOtpUpdateTimer];
 }
 
-- (void)setItem:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon expired:(BOOL)expired otpToken:(OTPToken*)otpToken {
+- (void)setItem:(NSString*)title subtitle:(NSString*)subtitle icon:(UIImage*)icon expired:(BOOL)expired otpToken:(OTPToken*)otpToken hideIcon:(BOOL)hideIcon {
     self.labelTitle.text = title;
     self.labelUsername.text = subtitle;
-    self.icon.image = icon;
+    
+    self.icon.image = hideIcon ? nil :icon;
+    self.icon.hidden = hideIcon;
+    
     self.otpToken = otpToken;
     
     self.contentView.alpha = expired ? 0.35 : 1.0f;

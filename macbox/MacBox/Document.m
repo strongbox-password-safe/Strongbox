@@ -397,8 +397,6 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     
     [self.undoManager removeAllActions];
     
-    self.wasJustLocked = YES;
-    
     [DatabasesCollection.shared forceLockWithUuid:self.databaseMetadata.uuid];
     
     _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];

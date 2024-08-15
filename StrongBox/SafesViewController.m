@@ -138,6 +138,8 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     
     [self checkForBrokenVirtualHardwareKeys];
     
+    [self migrateAnyInconsistentAFHardwareKeys]; 
+    
     
     
     
@@ -164,6 +166,21 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     });
 }
 
+- (void)migrateAnyInconsistentAFHardwareKeys {
+    if ( AppPreferences.sharedInstance.hasMigratedInconsistentHardwareKeysForCachingFeature) {
+        return;
+    }
+    
+    AppPreferences.sharedInstance.hasMigratedInconsistentHardwareKeysForCachingFeature = YES;
+
+    for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
+        if ( database.nextGenPrimaryYubiKeyConfig != nil && database.mainAppAndAutoFillYubiKeyConfigsIncoherent ) {
+            YubiKeyHardwareConfiguration *conf = database.nextGenPrimaryYubiKeyConfig;
+            database.nextGenPrimaryYubiKeyConfig = conf; 
+        }
+    }
+}
+
 - (void)checkForBrokenVirtualHardwareKeys {
     NSMutableSet<NSString*>* broken = NSMutableSet.set;
     
@@ -175,17 +192,11 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     }
     
     for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
-        YubiKeyHardwareConfiguration* yubiConfig = database.yubiKeyConfig;
+        YubiKeyHardwareConfiguration* yubiConfig = database.nextGenPrimaryYubiKeyConfig;
         
         if ( yubiConfig && yubiConfig.mode == kVirtual && [broken containsObject:yubiConfig.virtualKeyIdentifier] ) {
             slog(@"🔴 Found database using broken Virtual Hardware Key [%@] - fixing", database.nickName);
-            database.yubiKeyConfig = nil;
-        }
-        
-        yubiConfig = database.autoFillYubiKeyConfig;
-        if ( yubiConfig && yubiConfig.mode == kVirtual && [broken containsObject:yubiConfig.virtualKeyIdentifier] ) {
-            slog(@"🔴 Found database using broken Virtual Hardware Key for AutoFill [%@] - fixing", database.nickName);
-            database.autoFillYubiKeyConfig = nil;
+            database.nextGenPrimaryYubiKeyConfig = nil;
         }
     }
     

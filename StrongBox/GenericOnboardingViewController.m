@@ -7,7 +7,7 @@
 //
 
 #import "GenericOnboardingViewController.h"
-
+#import "FontManager.h"
 
 @interface GenericOnboardingViewController ()
 

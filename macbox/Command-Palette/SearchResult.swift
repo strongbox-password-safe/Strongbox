@@ -440,18 +440,29 @@ struct SearchResult: Identifiable {
     }
 
     @MainActor
+    func onLaunchDatabaseMainWindow() async throws -> SearchResultActionConsequence {
+        guard case let .database(database: database) = type else {
+            throw SearchResultActionError.invalidActionForType
+        }
+
+        DatabasesCollection.shared.showDatabaseDocumentWindow(uuid: database.uuid)
+
+        return .closeWindow
+    }
+
+    @MainActor
     func onUnlockDatabase() async throws -> SearchResultActionConsequence {
         guard case let .database(database: database) = type else {
             throw SearchResultActionError.invalidActionForType
         }
 
-        guard !DatabasesCollection.shared.isUnlocked(uuid: database.uuid) else {
-            return .nop
-        }
-
-        return await withCheckedContinuation { continuation in 
-            DatabasesCollection.shared.initiateDatabaseUnlock(uuid: database.uuid, syncAfterUnlock: true) { _ in
-                continuation.resume(returning: .refreshResults)
+        if DatabasesCollection.shared.isUnlocked(uuid: database.uuid) {
+            return try await onLaunchDatabaseMainWindow()
+        } else {
+            return await withCheckedContinuation { continuation in
+                DatabasesCollection.shared.initiateDatabaseUnlock(uuid: database.uuid, syncAfterUnlock: true) { _ in
+                    continuation.resume(returning: .refreshResults)
+                }
             }
         }
     }

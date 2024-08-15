@@ -35,6 +35,9 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
+#import "VirtualYubiKeys.h"
+#import "NSData+Extensions.h"
+#import "HardwareKeyMenuHelper.h"
 
 @interface LockScreenViewController () < NSTextFieldDelegate >
 
@@ -46,7 +49,7 @@
 @property (weak) IBOutlet NSTextField *textFieldBioUnavailableWarn;
 
 @property (weak) IBOutlet ClickableTextField *textFieldVersion;
-@property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
+
 @property (weak) IBOutlet MMcGSecureTextField *textFieldMasterPassword;
 @property (weak) IBOutlet NSButton *checkboxShowAdvanced;
 @property (weak) IBOutlet NSPopUpButton *yubiKeyPopup;
@@ -56,17 +59,9 @@
 @property (weak) IBOutlet NSPopUpButton *keyFilePopup;
 
 @property (weak) IBOutlet NSStackView *stackViewUnlock;
-@property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
 
-@property BOOL currentYubiKeySlot1IsBlocking;
-@property BOOL currentYubiKeySlot2IsBlocking;
-@property NSString* currentYubiKeySerial;
 @property NSString* selectedKeyFileBookmark;
-@property YubiKeyConfiguration *selectedYubiKeyConfiguration;
 
-@property NSDate* biometricPromptLastDismissedAt; 
-@property (weak) IBOutlet NSButton *checkboxAutoPromptOnActivate;
-@property (weak) IBOutlet NSStackView *stackViewUnlockButtons;
 @property (weak) IBOutlet NSStackView *yubiKeyHeaderStack;
 
 @property (weak) IBOutlet NSView *quickTrialStartContainer;
@@ -81,7 +76,7 @@
 @property LAContext* embeddedTouchIdContext;
 @property (weak) IBOutlet NSStackView *masterPasswordAndEmbeddedTouchIDStack;
 @property (weak) IBOutlet NSImageView *dummyEmbeddedTouchIDImageView;
-@property (readonly) BOOL useEmbeddedTouchID;
+
 @property (weak) IBOutlet NSTextField *textFieldSubtitleOrPrompt;
 
 @property (readonly) BOOL bioOrWatchUnlockIsPossible;
@@ -91,6 +86,7 @@
 @property (weak) IBOutlet NSBox *boxVertLineDivider;
 
 @property (weak) IBOutlet NSTextField *textFieldDatabaseNickName;
+@property HardwareKeyMenuHelper* hardwareKeyMenuHelper;
 
 @end
 
@@ -131,27 +127,11 @@
     };
 
     [self customizeLockStackViewSpacing];
-    
-    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch");
-    self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
-    self.buttonUnlockWithTouchId.hidden = YES;
-    
-    [self bindRevealMasterPasswordTextField];
-    
+            
     self.textFieldMasterPassword.delegate = self;
     
     
-    
-    NSImageSymbolConfiguration* imageConfig = [NSImageSymbolConfiguration configurationWithTextStyle:NSFontTextStyleHeadline scale:NSImageSymbolScaleLarge];
-    
-    [self.buttonUnlockWithPassword setImage:[NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil]];
-    self.buttonUnlockWithPassword.symbolConfiguration = imageConfig;
-    
-    [self.buttonUnlockWithTouchId setImage:[NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:nil]];
-    self.buttonUnlockWithTouchId.symbolConfiguration = imageConfig;
-    
-    
-    
+        
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(bindProOrFreeTrialWrapper)
                                                name:kProStatusChangedNotification
@@ -172,20 +152,12 @@
     [self bindProOrFreeTrial];
     
     [self embedTouchIDIfAvailable];
-    
-
 }
 
 - (void)customizeLockStackViewSpacing {
     [self.stackViewUnlock setCustomSpacing:8 afterView:self.textFieldMasterPassword];
     [self.stackViewUnlock setCustomSpacing:6 afterView:self.labelUnlockKeyFileHeader];
     [self.stackViewUnlock setCustomSpacing:6 afterView:self.yubiKeyHeaderStack];
-    
-    [self.stackViewUnlockButtons setCustomSpacing:12 afterView:self.buttonUnlockWithTouchId];
-}
-
-- (IBAction)onRefreshYubiKey:(id)sender {
-    [self bindUI];
 }
 
 - (void)onDocumentLoaded {
@@ -198,8 +170,6 @@
 - (void)viewWillAppear {
     [super viewWillAppear];
     
-
-
     [self load];
 }
 
@@ -207,20 +177,13 @@
     [super viewDidAppear];
     
     [self setInitialFocus];
-    
-
 }
 
 
 
 - (void)setInitialFocus {
     if(self.viewModel == nil || self.viewModel.locked) {
-        if([self bioOrWatchUnlockIsPossible] && !self.useEmbeddedTouchID ) {
-            [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
-        }
-        else {
-            [self.textFieldMasterPassword becomeFirstResponder];
-        }
+        [self.textFieldMasterPassword becomeFirstResponder];
     }
 }
 
@@ -231,9 +194,9 @@
     
     self.hasLoaded = YES;
     _document = self.view.window.windowController.document;
-
+    
     slog(@"🐞 LockScreenViewController::load - Initial Load - doc=[%@] - vm=[%@]", self.document, self.viewModel);
-
+    
     
     
     [self startObservingModelChanges];
@@ -241,8 +204,11 @@
     [self.view.window.windowController synchronizeWindowTitleWithDocumentName]; 
     
     self.selectedKeyFileBookmark = self.viewModel ? self.databaseMetadata.keyFileBookmark : nil;
-    self.selectedYubiKeyConfiguration = self.viewModel ? self.databaseMetadata.yubiKeyConfiguration : nil;
-
+    
+    self.hardwareKeyMenuHelper = [[HardwareKeyMenuHelper alloc] initWithViewController:self 
+                                                                          yubiKeyPopup:self.yubiKeyPopup
+                                                                  currentConfiguration:self.databaseMetadata.yubiKeyConfiguration
+                                                                            verifyMode:NO];
     
     if ( !self.databaseMetadata.hasSetInitialWindowPosition ) {
         slog(@"First Launch of Database! Making reasonable size and centering...");
@@ -253,19 +219,6 @@
     }
     
     [self bindUI];
-
-    [self setInitialFocus];
-    
-    
-    
-    if ( !self.document.wasJustLocked ) { 
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self autoPromptForTouchIdIfDesired];
-        });
-    }
-    else {
-        self.document.wasJustLocked = NO;
-    }
 }
 
 - (void)stopObservingModelChanges {
@@ -323,16 +276,6 @@
     [self bindShowAdvancedOnUnlockScreen];
     
     [self bindUnlockButtons];
-}
-
-- (void)bindRevealMasterPasswordTextField { 
-
-
-
-
-
-
-
 }
 
 - (void)bindProOrFreeTrialWrapper {
@@ -511,221 +454,11 @@
 
 
 - (void)bindYubiKeyOnLockScreen {
-    self.currentYubiKeySerial = nil;
-    self.currentYubiKeySlot1IsBlocking = NO;
-    self.currentYubiKeySlot2IsBlocking = NO;
-
-    
-
-    [self.yubiKeyPopup.menu removeAllItems];
-
-    NSString* loc = NSLocalizedString(@"generic_refreshing_ellipsis", @"Refreshing...");
-    [self.yubiKeyPopup.menu addItemWithTitle:loc
-                              action:nil
-                       keyEquivalent:@""];
-    self.yubiKeyPopup.enabled = NO;
-
-    [MacHardwareKeyManager.sharedInstance getAvailableKey:^(HardwareKeyData * _Nonnull yk) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self onGotAvailableYubiKey:yk];
-        });
-    }];
+    [self.hardwareKeyMenuHelper scanForConnectedAndRefresh];
 }
 
-- (void)addNoneProHardwareKeyMenuItem {
-    [self.yubiKeyPopup.menu removeAllItems];
-    NSString* loc = NSLocalizedString(@"mac_lock_screen_yubikey_popup_menu_yubico_pro_only", @"Hardware Key (Pro Only)");
-    [self.yubiKeyPopup.menu addItemWithTitle:loc action:nil keyEquivalent:@""];
-    [self.yubiKeyPopup selectItemAtIndex:0];
-}
-
-- (NSMenuItem*)addNoneOrNoneAvailableHardwareKeyMenuItem:(NSUInteger)availableSlots {
-    NSString* loc;
-    if ( availableSlots > 0 ) {
-        loc = [NSString stringWithFormat:NSLocalizedString(@"mac_hardware_key_dropdown_n_available_fmt", @"None (%@ Available)"), @(availableSlots)];
-    }
-    else {
-        loc = NSLocalizedString(@"mac_hardware_key_dropdown_none_no_keys_detected", @"None (No Keys Detected)");
-    }
-
-    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectNoYubiKey) keyEquivalent:@""];
-}
-
-- (NSMenuItem*)addConfiguredButCRUnavailableHardwareKey {
-    NSString* loc = NSLocalizedString(@"mac_hardware_key_key_configured_but_cr_unavailable", @"🔴 Configured Key [CR Unavailable]");
-    
-    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectConfigured) keyEquivalent:@""];
-}
-
-- (NSMenuItem*)addConfiguredButUnavailableHardwareKey {
-    NSString* loc = NSLocalizedString(@"mac_hardware_key_key_configured_but_disconnected", @"⚠️ Disconnected Key (Configured)");
-    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectConfigured) keyEquivalent:@""];
-}
-
-- (NSMenuItem*)addConfiguredAndReadyToGo:(YubiKeyConfiguration*)config {
-    NSString* loc = [NSString stringWithFormat:NSLocalizedString(@"mac_hardware_key_configured_and_connected_slot_n_fmt", @"Connected Key Slot %@ (Configured)"), @(config.slot)];
-    NSMenuItem* item = [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectConfigured) keyEquivalent:@""];
-    
-    item.identifier = @(config.slot).stringValue;
-    
-    return item;
-}
-
-- (NSMenuItem*)addConnectedAndReadyToGoAtSlot:(NSUInteger)slot {
-    NSString* loc = [NSString stringWithFormat:NSLocalizedString(@"mac_hardware_key_connected_slot_n_fmt", @"Connected Key Slot %@"), @(slot)];
-    NSMenuItem* item = [self.yubiKeyPopup.menu addItemWithTitle:loc action:slot == 1 ? @selector(onSelectYubiKeySlot1) : @selector(onSelectYubiKeySlot2) keyEquivalent:@""];
-    
-    item.identifier = @(slot).stringValue;
-    
-    return item;
-}
-
-- (NSMenuItem*)addConnectedAndReadyToGo:(YubiKeyConfiguration*)config {
-    return [self addConnectedAndReadyToGoAtSlot:config.slot];
-}
-
-- (NSMenuItem*)addSelectedButUnavailableHardwareKey {
-    NSString* loc = NSLocalizedString(@"mac_hardware_key_selected_but_has_been_disconnected", @"⚠️ Selected Key (Disconnected)");
-    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:nil keyEquivalent:@""];
-}
-
-- (NSMenuItem*)addConfigured:(YubiKeyConfiguration*)configuration
-      connectedSerial:(NSString*)connectedSerial
-       slot1CrEnabled:(BOOL)slot1CrEnabled
-       slot2CrEnabled:(BOOL)slot2CrEnabled {
-    BOOL deviceMatches = [configuration.deviceSerial isEqualToString:connectedSerial];
-    BOOL slotGood = configuration.slot == 1 ? slot1CrEnabled : slot2CrEnabled;
-
-    if ( deviceMatches ) {
-        if ( slotGood ) {
-            return [self addConfiguredAndReadyToGo:configuration];
-        }
-        else {
-            return [self addConfiguredButCRUnavailableHardwareKey];
-        }
-    }
-    else {
-        return [self addConfiguredButUnavailableHardwareKey];
-    }
-}
-
-- (NSMenuItem*)addSelected:(YubiKeyConfiguration*)configuration
-    connectedSerial:(NSString*)connectedSerial
-     slot1CrEnabled:(BOOL)slot1CrEnabled
-     slot2CrEnabled:(BOOL)slot2CrEnabled {
-    BOOL deviceMatches = [configuration.deviceSerial isEqualToString:connectedSerial];
-    BOOL slotGood = configuration.slot == 1 ? slot1CrEnabled : slot2CrEnabled;
-
-    if ( deviceMatches && slotGood ) {
-        return [self addConnectedAndReadyToGo:configuration];
-    }
-    else {
-        return [self addSelectedButUnavailableHardwareKey];
-    }
-}
-
-- (void)onGotAvailableYubiKey:(HardwareKeyData*)yk {
-    if ( !Settings.sharedInstance.isPro ) {
-        [self addNoneProHardwareKeyMenuItem];
-        self.yubiKeyPopup.enabled = NO;
-        return;
-    }
-
-    [self.yubiKeyPopup.menu removeAllItems];
-    
-    
-
-    self.currentYubiKeySerial = yk.serial;
-    self.currentYubiKeySlot1IsBlocking = yk.slot1CrStatus == kHardwareKeySlotCrStatusSupportedBlocking;
-    self.currentYubiKeySlot2IsBlocking = yk.slot2CrStatus == kHardwareKeySlotCrStatusSupportedBlocking;
-    BOOL slot1CrEnabled = [self yubiKeyCrIsSupported:yk.slot1CrStatus];
-    BOOL slot2CrEnabled = [self yubiKeyCrIsSupported:yk.slot2CrStatus];
-
-    NSUInteger availableSlots = (slot1CrEnabled ? 1 : 0) + (slot2CrEnabled ? 1 : 0);
-
-    
-
-    NSMenuItem* none = [self addNoneOrNoneAvailableHardwareKeyMenuItem:availableSlots];
-
-    
-    
-    YubiKeyConfiguration* configured = self.databaseMetadata.yubiKeyConfiguration;
-    YubiKeyConfiguration* selected = self.selectedYubiKeyConfiguration;
-    
-
-    
-    NSMenuItem* configuredMenuItem = nil;
-    if ( configured ) {
-        configuredMenuItem = [self addConfigured:configured connectedSerial:yk.serial slot1CrEnabled:slot1CrEnabled slot2CrEnabled:slot2CrEnabled];
-    }
-    
-    NSMenuItem* selectedMenuItem = nil;
-    if ( selected ) {
-        if ( ![selected isEqual:configured] ) {
-            selectedMenuItem = [self addSelected:selected connectedSerial:yk.serial slot1CrEnabled:slot1CrEnabled slot2CrEnabled:slot2CrEnabled];
-        }
-        else {
-            selectedMenuItem = configuredMenuItem;
-        }
-    }
-
-    BOOL configuredIsConnected = ([selected.deviceSerial isEqualToString:yk.serial]);
-    BOOL selectedIsConnected = ([selected.deviceSerial isEqualToString:yk.serial]);
-    
-    BOOL slot1Added = (configured != nil && configuredIsConnected && configured.slot == 1) || (selected != nil && selectedIsConnected && selected.slot == 1);
-    BOOL slot2Added = (configured != nil && configuredIsConnected && configured.slot == 2) || (selected != nil && selectedIsConnected && selected.slot == 2);
-        
-    if ( slot1CrEnabled && !slot1Added ) {
-        [self addConnectedAndReadyToGoAtSlot:1];
-    }
-    if ( slot2CrEnabled && !slot2Added ) {
-        [self addConnectedAndReadyToGoAtSlot:2];
-    }
-    
-    
-    
-    if ( self.yubiKeyPopup.menu.numberOfItems == 3 ) { 
-        NSMenuItem* a = self.yubiKeyPopup.menu.itemArray[1];
-        NSMenuItem* b = self.yubiKeyPopup.menu.itemArray[2];
-        
-        if ( [a.identifier isEqualToString:@"2"] && [b.identifier isEqualToString:@"1"] ) { 
-            [self.yubiKeyPopup.menu removeItemAtIndex:2];
-            [self.yubiKeyPopup.menu insertItem:b atIndex:1];
-        }
-    }
-
-    if ( selectedMenuItem ) {
-        [self.yubiKeyPopup selectItem:selectedMenuItem];
-    }
-    else {
-        [self.yubiKeyPopup selectItem:none];
-    }
-    
-    self.yubiKeyPopup.enabled = availableSlots > 0 || configured;
-}
-
-- (BOOL)yubiKeyCrIsSupported:(HardwareKeySlotCrStatus)status {
-    return status == kHardwareKeySlotCrStatusSupportedBlocking || status == kHardwareKeySlotCrStatusSupportedNonBlocking;
-}
-
-- (void)onSelectConfigured {
-    self.selectedYubiKeyConfiguration = self.databaseMetadata.yubiKeyConfiguration;
-}
-
-- (void)onSelectNoYubiKey {
-    self.selectedYubiKeyConfiguration = nil;
-}
-
-- (void)onSelectYubiKeySlot1 {
-    self.selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
-    self.selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
-    self.selectedYubiKeyConfiguration.slot = 1;
-}
-
-- (void)onSelectYubiKeySlot2 {
-    self.selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
-    self.selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
-    self.selectedYubiKeyConfiguration.slot = 2;
+- (IBAction)onRefreshYubiKey:(id)sender {
+    [self bindUI];
 }
 
 
@@ -938,7 +671,7 @@
     
     NSString* password = self.textFieldMasterPassword.stringValue;
     NSString* keyFileBookmark = self.selectedKeyFileBookmark;
-    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+    YubiKeyConfiguration* yubiKeyConfiguration = self.hardwareKeyMenuHelper.selectedConfiguration;
 
     [determiner getCkfsWithExplicitPassword:password
                             keyFileBookmark:keyFileBookmark
@@ -1310,40 +1043,11 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
         if( self.viewModel && self.viewModel.locked ) {
             [self bindUI];
         }
-
-        
-        
-        if ( !self.useEmbeddedTouchID ) {
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self autoPromptForTouchIdIfDesired];
-            });
-        }
-    }
-}
-
-- (void)autoPromptForTouchIdIfDesired {
-
-    
-    if(self.viewModel && self.viewModel.locked && !self.useEmbeddedTouchID ) { 
-        BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
-
-        if( weAreKeyWindow && self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate && self.bioOrWatchUnlockIsPossible ) {
-            NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.biometricPromptLastDismissedAt];
-            if(self.biometricPromptLastDismissedAt != nil && secondsBetween < 1.5) {
-                slog(@"Too many auto biometric requests too soon - ignoring...");
-                return;
-            }
-
-            [self onUnlockWithConvenience:nil];
-        }
     }
 }
 
 - (void)enableMasterCredentialsEntry:(BOOL)enable {
     [self.textFieldMasterPassword setEnabled:enable];
-
-
-
     [self.keyFilePopup setEnabled:enable];
 }
 
@@ -1413,19 +1117,6 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
         }
     }
 
-    if( control == self.textFieldMasterPassword ) {
-        if (commandSelector == @selector(insertTab:)) {
-            if ( self.bioOrWatchUnlockIsPossible && !self.useEmbeddedTouchID ) {
-                [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
-            }
-            else if ( [self manualCredentialsAreValid] ) {
-                [self.view.window makeFirstResponder:self.buttonUnlockWithPassword];
-            }
-
-            return YES;
-        }
-    }
-
     return NO;
 }
 
@@ -1441,12 +1132,6 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     }
 }
 
-- (IBAction)onToggleAutoPromptOnActivate:(id)sender {
-    self.viewModel.autoPromptForConvenienceUnlockOnActivate = !self.viewModel.autoPromptForConvenienceUnlockOnActivate;
-    
-    [self bindUnlockButtons];
-}
-
 - (void)showIncorrectPasswordToast {
     CGFloat yOffset = self.checkboxShowAdvanced.state == NSControlStateValueOn ? -125.0f : -75.0f; 
     [self showToastNotification:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message", @"The credentials were incorrect for this database.") error:YES yOffset:yOffset];
@@ -1455,22 +1140,12 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 
 
-- (BOOL)useEmbeddedTouchID {
-    return YES;
-}
-
 - (BOOL)bioOrWatchUnlockIsPossible {
     return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.databaseMetadata];
 }
 
 - (void)embedTouchIDIfAvailable {
     self.dummyEmbeddedTouchIDImageView.hidden = YES; 
-
-    if ( !self.useEmbeddedTouchID ) {
-        return;
-    }
-    
-    
     
     self.embeddedTouchIdContext = [[LAContext alloc] init];
     self.embeddedLaAuthenticationView = [[LAAuthenticationView alloc] initWithContext:self.embeddedTouchIdContext controlSize:NSControlSizeRegular];
@@ -1483,42 +1158,11 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
         [self.embeddedLaAuthenticationView.widthAnchor constraintEqualToConstant:30],
         [self.embeddedLaAuthenticationView.heightAnchor constraintEqualToConstant:30],
     ]];
-
+    
     [self.masterPasswordAndEmbeddedTouchIDStack addArrangedSubview:self.embeddedLaAuthenticationView];
-    
-    
-    
-
-    
-
-
-
-
-
-    
-    
-
-
-
-    
-
-
-
-    
-
-
-
-
-
-    
-
 }
 
 - (void)requestEmbeddedBioUnlock {
-    if ( !self.useEmbeddedTouchID ) {
-        return;
-    }
-    
     NSUInteger policy = [BiometricIdHelper.sharedInstance getPolicyForDatabase:self.databaseMetadata];
     
     NSError *authError;
@@ -1543,43 +1187,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     }];
 }
 
-- (IBAction)onUnlockWithConvenience:(id)sender {
-    if ( !self.bioOrWatchUnlockIsPossible ) {
-        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
-        [self bindUI];
-        return;
-    }
-    
-    NSString* uuid = self.databaseMetadata.uuid;
-    
-    MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
-                                                             isNativeAutoFillAppExtensionOpen:NO
-                                                                      isAutoFillQuickTypeOpen:NO
-                                                                           onDemandUiProvider:^NSViewController * {
-        return [LockScreenViewController getAppropriateOnDemandViewController:uuid];
-    }];
-    
-    NSString* keyFileBookmark = self.selectedKeyFileBookmark;
-    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
-    
-    [determiner getCkfsWithBiometrics:keyFileBookmark
-                 yubiKeyConfiguration:yubiKeyConfiguration
-                           completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
-        self.biometricPromptLastDismissedAt = NSDate.date;
-        
-        [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
-    }];
-}
-
 - (void)onTouchIDOrWatchUnlockEmbeddedSuccess {
-    
-    
-    if ( !self.bioOrWatchUnlockIsPossible ) {
-        slog(@"🔴 WARNWARN - convenienceUnlockIsPossible but attempt initiated pressed?");
-        [self bindUI];
-        return;
-    }
-    
     NSString* uuid = self.databaseMetadata.uuid;
     MacCompositeKeyDeterminer *determiner = [MacCompositeKeyDeterminer determinerWithDatabase:self.databaseMetadata
                                                              isNativeAutoFillAppExtensionOpen:NO
@@ -1589,14 +1197,11 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     }];
     
     NSString* keyFileBookmark = self.selectedKeyFileBookmark;
-    YubiKeyConfiguration* yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+    YubiKeyConfiguration* yubiKeyConfiguration = self.hardwareKeyMenuHelper.selectedConfiguration;
     
     [determiner getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark
                                yubiKeyConfiguration:yubiKeyConfiguration
                                          completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
-        
-        
-        
         [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
     }];
 }
@@ -1627,62 +1232,22 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 - (void)bindBiometricButtonOnLockScreen {
     self.embeddedLaAuthenticationView.hidden = YES;
-
-    self.buttonUnlockWithTouchId.hidden = YES;
-    self.checkboxAutoPromptOnActivate.hidden = YES;
     
-
-
-
-
-
-
-
-
-
-
-
-    
-    BOOL isPossible = self.bioOrWatchUnlockIsPossible;
-    
-    
-    
-    
-
-        if ( isPossible ) {
-            self.embeddedLaAuthenticationView.hidden = NO;
-
-            NSString* bioPrompt = [self getBiometricTooltip];
-
-            self.embeddedLaAuthenticationView.toolTip = bioPrompt;
-
-            [self requestEmbeddedBioUnlock];
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
+    if ( self.bioOrWatchUnlockIsPossible ) {
+        self.embeddedLaAuthenticationView.hidden = NO;
+        
+        NSString* bioPrompt = [self getBiometricTooltip];
+        
+        self.embeddedLaAuthenticationView.toolTip = bioPrompt;
+        
+        [self requestEmbeddedBioUnlock];
+    }
 }
 
 - (void)bindManualUnlockButtonFast { 
     BOOL enabled = [self manualCredentialsAreValid];
-
-    
-    
-    self.buttonUnlockWithPassword.hidden = YES; 
-
-    
-    self.imageButtonUnlock.hidden = !enabled; 
-
+        
+    self.imageButtonUnlock.hidden = !enabled;
     
     self.boxVertLineDivider.hidden = self.imageButtonUnlock.hidden || self.embeddedLaAuthenticationView.hidden;
 }

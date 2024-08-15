@@ -9,6 +9,11 @@
 import Foundation
 
 class SwiftDummyDatabaseModel: SwiftDatabaseModelInterface {
+    var showIcons = true
+
+    var format: DatabaseFormat = .keePass4
+    var ckfs: CompositeKeyFactors = .init(password: "a")
+
     #if os(iOS)
         var visibleHomeSections: Set<HomeViewSection> = Set([.favourites, .navigation, .otherViews, .quickTags])
 

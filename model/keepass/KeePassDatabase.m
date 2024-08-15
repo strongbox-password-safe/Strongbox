@@ -116,7 +116,10 @@ static void onDeserialized(SerializationData *serializationData, NSError * _Null
     completion(NO, ret, innerStreamError, nil);
 }
 
-+ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database 
+outputStream:(NSOutputStream *)outputStream
+      params:(id _Nullable)params 
+  completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password &&
        !database.ckfs.keyFileDigest &&
        !database.ckfs.yubiKeyCR) {

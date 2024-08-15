@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifndef IS_APP_EXTENSION
 - (void)showAuditDrillDown:(NSUUID*)uuid;
+- (void)showHardwareKeySettings;
 #endif
 
 - (void)deleteSingleItem:(NSUUID * _Nonnull)uuid

@@ -30,7 +30,10 @@ xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
 sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
   completion:(OpenCompletionBlock)completion;
 
-+ (void)save:(DatabaseModel*)database outputStream:(NSOutputStream*)outputStream completion:(SaveCompletionBlock)completion;
++ (void)save:(DatabaseModel*)database 
+outputStream:(NSOutputStream*)outputStream
+      params:(id _Nullable)params
+  completion:(SaveCompletionBlock)completion;
 
 @property (nonatomic, class, readonly) DatabaseFormat format;
 @property (nonatomic, class, readonly) NSString* fileExtension;

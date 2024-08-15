@@ -177,7 +177,8 @@ static NSString* const kWarnAboutLocalDeviceDatabases = @"warnAboutLocalDeviceDa
 static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
-static NSString* const kDisableHomeTab = @"disableHomeTab";
+static NSString* const kDisableHomeTab = @"disableHomeTab"; 
+static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta"; 
 
 @implementation AppPreferences
 
@@ -219,6 +220,14 @@ static NSString* const kDisableHomeTab = @"disableHomeTab";
 }
 
 
+
+- (BOOL)hardwareKeyCachingBeta {
+    return [self getBool:kHardwareKeyCachingBeta];
+}
+
+- (void)setHardwareKeyCachingBeta:(BOOL)hardwareKeyCachingBeta {
+    [self setBool:kHardwareKeyCachingBeta value:hardwareKeyCachingBeta];
+}
 
 - (BOOL)disableHomeTab {
     return [self getBool:kDisableHomeTab];

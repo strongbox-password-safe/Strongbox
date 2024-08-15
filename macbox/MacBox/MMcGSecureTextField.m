@@ -73,7 +73,7 @@
     self.buttonRevealConceal.keyEquivalentModifierMask = NSEventModifierFlagCommand;
     self.buttonRevealConceal.keyEquivalent = @"r";
     self.buttonRevealConceal.title = @"";
-    self.buttonRevealConceal.toolTip = @"Reveal or Conceal (⌘R to Toggle)"; 
+    self.buttonRevealConceal.toolTip = NSLocalizedString(@"secure_text_field_conceal_reveal_tooltip", @"Reveal or Conceal (⌘R to Toggle)");
     [self bindRevealConcealButtonImage];
     
     self.buttonRevealConceal.translatesAutoresizingMaskIntoConstraints = NO;

@@ -170,7 +170,7 @@ static const BOOL kLogVerbose = NO;
 }
 
 - (void)rotateHardwareKeyChallenge {
-
+    slog(@"✅ Rotating Argon2 Yubi Challenge");
     
     _salt = getRandomData(kDefaultSaltLength);
 }

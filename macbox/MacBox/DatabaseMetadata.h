@@ -63,7 +63,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nullable) NSDate* lastSyncRemoteModDate; 
 @property (nullable) NSDate* lastSyncAttempt;
 @property BOOL launchAtStartup;
-@property BOOL autoPromptForConvenienceUnlockOnActivate;
 
 @property (nonatomic, strong, nullable) NSString* autoFillConvenienceAutoUnlockPassword;
 @property NSInteger autoFillConvenienceAutoUnlockTimeout; 
@@ -204,6 +203,14 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property BOOL isSharedInCloudKit; 
 @property BOOL isOwnedByMeCloudKit; 
+
+@property (nullable) NSDictionary<NSData*, NSData*> *cachedYubiKeyChallengeResponses;
+@property BOOL hardwareKeyCRCaching;
+@property BOOL doNotRefreshChallengeInAF;
+@property BOOL hasOnboardedHardwareKeyCaching;
+@property (nullable) NSDate* lastChallengeRefreshAt;
+@property NSInteger challengeRefreshIntervalSecs;
+@property NSInteger cacheChallengeDurationSecs;
 
 @end
 

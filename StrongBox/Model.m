@@ -37,6 +37,9 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
+#import "KeyDerivationCipher.h"
+#import "Kdbx4Serialization.h"
+
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotification = @"kAuditProgressNotificationKey";
 NSString* const kAuditCompletedNotification = @"kAuditCompletedNotificationKey";
@@ -394,6 +397,11 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
     }
     
     AsyncUpdateJob* job = [[AsyncUpdateJob alloc] init];
+    
+    if ( self.originalFormat == kKeePass4 ) {
+        [self rotateHardwareKeyChallengeIfDue]; 
+    }
+        
     job.snapshot = [self.database clone];
     job.jobType = jobType;
     job.completion = completion;
@@ -448,11 +456,54 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
     NSOutputStream* outputStream = [NSOutputStream outputStreamToFileAtPath:streamingFile append:NO];
     [outputStream open];
     
+    DatabaseModel* snapshot = job.snapshot;
+    CompositeKeyFactors* originalCkfs = snapshot.ckfs;
+    
+    __weak Model* weakSelf = self;
+    BOOL useHardwareKeyCaching = self.applicationPreferences.hardwareKeyCachingBeta && snapshot.originalFormat == kKeePass4 && snapshot.ckfs.yubiKeyCR != nil && self.metadata.hardwareKeyCRCaching;
+    
+    if ( useHardwareKeyCaching ) {
+        CompositeKeyFactors* cachedCrCkfsWrapper = [CompositeKeyFactors password:originalCkfs.password
+                                                                   keyFileDigest:originalCkfs.keyFileDigest
+                                                                       yubiKeyCR:^(NSData * _Nonnull thisChallenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+            NSData* response = [weakSelf.metadata getCachedChallengeResponse:thisChallenge];
+            
+            if ( response ) {
+                slog(@"🟢 Got cached response [%@] for challenge [%@], attempting to use...", response.base64String, thisChallenge.base64String);
+                completion(NO, response, nil);
+            }
+            else {
+                slog(@"🟢 beginAsyncUpdate - Cached MISS for for challenge [%@], using physical fallback...", thisChallenge.base64String);
+                originalCkfs.yubiKeyCR(thisChallenge, completion);
+            }
+        }];
+        
+        snapshot.ckfs = cachedCrCkfsWrapper;
+    }
+    
     [Serializator getAsData:job.snapshot
                      format:job.snapshot.originalFormat
                outputStream:outputStream
+                     params:nil
                  completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
         [outputStream close];
+
+        BOOL successful = !userCancelled && error == nil;
+        
+        if ( successful && useHardwareKeyCaching  ) { 
+            slog(@"🐞 Successful Save - Trying to cache CR");
+            
+            MMcGPair<NSData *,NSData *> *cr = snapshot.ckfs.lastChallengeResponse;
+            if ( cr ) {
+                NSData* existing = [weakSelf.metadata getCachedChallengeResponse:cr.a]; 
+                if ( !existing ) {
+                    slog(@"🐞 Caching serialization CR");
+                    [weakSelf.metadata addCachedChallengeResponse:cr];
+                }
+            }
+            
+            snapshot.ckfs = originalCkfs; 
+        }
         
         [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled streamingFile:streamingFile updateMutex:mutex job:job error:error]; 
     }];
@@ -2161,6 +2212,43 @@ double getFieldWeight ( DatabaseSearchMatchField field ) {
     }
     else {
         return NO;
+    }
+}
+
+
+
+- (void)rotateHardwareKeyChallengeIfDue {
+    NSDate* lastRefresh = self.metadata.lastChallengeRefreshAt;
+    NSInteger interval = self.metadata.challengeRefreshIntervalSecs;
+        
+    BOOL rotateHardwareKeyChallenge = YES;
+    if ( lastRefresh != nil && interval > 0 ) {
+        rotateHardwareKeyChallenge = [lastRefresh isMoreThanXSecondsAgo:interval];
+        slog(@"🐞 Saving: rotateHardwareKeyChallenge = %hhd. r=%@, i=%d", rotateHardwareKeyChallenge, lastRefresh.friendlyDateTimeStringBothPrecise, interval);
+    }
+    
+#ifdef IS_APP_EXTENSION
+    BOOL suppressForAF = self.metadata.doNotRefreshChallengeInAF;
+    rotateHardwareKeyChallenge = !suppressForAF;
+#endif
+
+    if ( rotateHardwareKeyChallenge ) {
+        slog(@"✅ Rotating KDBX4 Hardware Key Challenge");
+        
+        NSError* error;
+        id<KeyDerivationCipher> kdf = getKeyDerivationCipher(self.database.meta.kdfParameters, &error);
+        if(!kdf) {
+            return; 
+        }
+
+        
+        
+        [kdf rotateHardwareKeyChallenge];
+        self.database.meta.kdfParameters = kdf.kdfParameters;
+        self.metadata.lastChallengeRefreshAt = NSDate.date;
+    }
+    else {
+        slog(@"✅ Not Rotating KDBX4 Hardware Key Challenge as directed.");
     }
 }
 

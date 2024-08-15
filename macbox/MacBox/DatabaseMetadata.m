@@ -11,9 +11,13 @@
 #import "BookmarksHelper.h"
 #import "StrongboxMacFilesManager.h"
 #import "Settings.h"
+#import "NSDate+Extensions.h"
 
 const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
 static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
+
+const NSInteger kDefaultCacheChallengeDurationSecs = 8 * 60 * 60; 
+const NSInteger kDefaultChallengeRefreshIntervalSecs = 0; 
 
 @interface DatabaseMetadata ()
 
@@ -55,7 +59,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.headerNodes = HeaderNodeState.defaults;
         self.autoFillCopyTotp = YES;
         self.searchScope = kSearchScopeAll;
-        self.autoPromptForConvenienceUnlockOnActivate = NO;
+
         self.customSortOrderForFields = YES; 
         
         
@@ -69,6 +73,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         
         self.includeAssociatedDomains = YES;
         self.quickTypeEnabled = YES;
+        self.cacheChallengeDurationSecs = kDefaultCacheChallengeDurationSecs;
+        self.challengeRefreshIntervalSecs = kDefaultChallengeRefreshIntervalSecs;
+        self.doNotRefreshChallengeInAF = YES;
     }
     
     return self;
@@ -95,14 +102,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     return (self.storageProvider == kLocalDevice || self.storageProvider == kWiFiSync) ? 5 : 30;
 }
 
-
-- (void)clearSecureItems {
-    [self setConveniencePassword:nil];
-    self.keyFileBookmark = nil;
-    self.autoFillKeyFileBookmark = nil;
-    self.autoFillConvenienceAutoUnlockPassword = nil;
-    self.sideBarSelectedTag = nil;
-}
 
 - (NSString*)getConveniencePasswordIdentifier {
 #ifdef IS_APP_EXTENSION 
@@ -245,7 +244,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.launchAtStartup forKey:@"launchAtStartup"];
     
     [encoder encodeBool:self.isWatchUnlockEnabled forKey:@"isWatchUnlockEnabled"];
-    [encoder encodeBool:self.autoPromptForConvenienceUnlockOnActivate forKey:@"autoPromptForConvenienceUnlockOnActivate"];
+
     
     [encoder encodeObject:self.autoFillLastUnlockedAt forKey:@"autoFillLastUnlockedAt"];
     [encoder encodeInteger:self.autoFillConvenienceAutoUnlockTimeout forKey:@"autoFillConvenienceAutoUnlockTimeout"];
@@ -341,6 +340,15 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     
     [encoder encodeBool:self.isSharedInCloudKit forKey:@"isSharedInCloudKit"];
     [encoder encodeBool:self.isOwnedByMeCloudKit forKey:@"isOwnedByMeCloudKit"];
+
+    [encoder encodeBool:self.hardwareKeyCRCaching forKey:@"hardwareKeyCRCaching"];
+    
+    [encoder encodeObject:self.lastChallengeRefreshAt forKey:@"lastChallengeRefreshAt"];
+    [encoder encodeInteger:self.challengeRefreshIntervalSecs forKey:@"challengeRefreshIntervalSecs"];
+    [encoder encodeInteger:self.cacheChallengeDurationSecs forKey:@"cacheChallengeDurationSecs"];
+    
+    [encoder encodeBool:self.doNotRefreshChallengeInAF forKey:@"doNotRefreshChallengeInAF"];
+    [encoder encodeBool:self.hasOnboardedHardwareKeyCaching forKey:@"hasOnboardedHardwareKeyCaching"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -419,9 +427,9 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.isWatchUnlockEnabled = self.isTouchIdEnabled; 
         }
         
-        if( [decoder containsValueForKey:@"autoPromptForConvenienceUnlockOnActivate"] ) {
-            self.autoPromptForConvenienceUnlockOnActivate = [decoder decodeBoolForKey:@"autoPromptForConvenienceUnlockOnActivate"];
-        }
+
+
+
         
         if( [decoder containsValueForKey:@"autoFillLastUnlockedAt"] ) {
             self.autoFillLastUnlockedAt = [decoder decodeObjectForKey:@"autoFillLastUnlockedAt"];
@@ -769,6 +777,40 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         if ( [decoder containsValueForKey:@"isOwnedByMeCloudKit"] ) {
             self.isOwnedByMeCloudKit = [decoder decodeBoolForKey:@"isOwnedByMeCloudKit"];
         }
+        
+        
+
+        if ( [decoder containsValueForKey:@"hardwareKeyCRCaching"] ) {
+            self.hardwareKeyCRCaching = [decoder decodeBoolForKey:@"hardwareKeyCRCaching"];
+        }
+        if ( [decoder containsValueForKey:@"lastChallengeRefreshAt"] ) {
+            self.lastChallengeRefreshAt = [decoder decodeObjectForKey:@"lastChallengeRefreshAt"];
+        }
+
+        if ( [decoder containsValueForKey:@"challengeRefreshIntervalSecs"] ) {
+            self.challengeRefreshIntervalSecs = [decoder decodeIntForKey:@"challengeRefreshIntervalSecs"];
+        }
+        else {
+            self.challengeRefreshIntervalSecs = kDefaultChallengeRefreshIntervalSecs;
+        }
+
+        if ( [decoder containsValueForKey:@"cacheChallengeDurationSecs"] ) {
+            self.cacheChallengeDurationSecs = [decoder decodeIntForKey:@"cacheChallengeDurationSecs"];
+        }
+        else {
+            self.cacheChallengeDurationSecs = kDefaultCacheChallengeDurationSecs;
+        }
+        
+        if ( [decoder containsValueForKey:@"doNotRefreshChallengeInAF"] ) {
+            self.doNotRefreshChallengeInAF = [decoder decodeBoolForKey:@"doNotRefreshChallengeInAF"];
+        }
+        else {
+            self.doNotRefreshChallengeInAF = YES;
+        }
+        
+        if ( [decoder containsValueForKey:@"hasOnboardedHardwareKeyCaching"] ) {
+            self.hasOnboardedHardwareKeyCaching = [decoder decodeBoolForKey:@"hasOnboardedHardwareKeyCaching"];
+        }
     }
     
     return self;
@@ -945,6 +987,48 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     NSString* foo = searchText ? searchText : @"";
     NSString* key = [NSString stringWithFormat:@"search-text-%@", self.uuid];
     [SecretStore.sharedInstance setSecureString:foo forIdentifier:key];
+}
+
+
+
+- (NSDictionary<NSData *,NSData *> *)cachedYubiKeyChallengeResponses {
+    NSString *key = [NSString stringWithFormat:@"%@-cached-crs", self.uuid];
+    
+    NSDictionary<NSData *,NSData *> *ret = [SecretStore.sharedInstance getSecureObject:key];
+    
+    return ret ? ret : @{};
+}
+
+- (void)setCachedYubiKeyChallengeResponses:(NSDictionary<NSData *,NSData *> *)cachedYubiKeyChallengeResponses {
+    NSString *key = [NSString stringWithFormat:@"%@-cached-crs", self.uuid];
+    
+    if ( cachedYubiKeyChallengeResponses ) {
+        if ( self.cacheChallengeDurationSecs > 0 ) {
+            NSDate* expiry = [NSDate.now dateByAddingTimeInterval:self.cacheChallengeDurationSecs];
+            slog(@"setting challenge cache with expiry = [%@]", expiry.friendlyDateTimeStringBothPrecise);
+            [SecretStore.sharedInstance setSecureObject:cachedYubiKeyChallengeResponses forIdentifier:key expiresAt:expiry];
+        }
+        else if ( self.cacheChallengeDurationSecs == 0 ) { 
+            [SecretStore.sharedInstance setSecureObject:cachedYubiKeyChallengeResponses forIdentifier:key];
+        }
+        else {
+            [SecretStore.sharedInstance setSecureEphemeralObject:cachedYubiKeyChallengeResponses forIdentifer:key];
+        }
+    }
+    else {
+        [SecretStore.sharedInstance deleteSecureItem:key];
+    }
+}
+
+
+
+- (void)clearSecureItems {
+    [self setConveniencePassword:nil];
+    self.keyFileBookmark = nil;
+    self.autoFillKeyFileBookmark = nil;
+    self.autoFillConvenienceAutoUnlockPassword = nil;
+    self.sideBarSelectedTag = nil;
+    self.cachedYubiKeyChallengeResponses = nil;
 }
 
 @end

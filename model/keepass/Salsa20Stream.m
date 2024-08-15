@@ -66,7 +66,7 @@ static const uint8_t iv[] = {0xE8, 0x30, 0x09, 0x4B, 0x97, 0x20, 0x5D, 0x2A};
     return self;
 }
 
--(NSData*)xor:(NSData *)ct {
+-(NSData*)doTheXor:(NSData *)ct {
     uint32_t currentBlock = (uint32_t)self.bytesProcessed / kBlockSize;
     int offset = self.bytesProcessed % kBlockSize;
 

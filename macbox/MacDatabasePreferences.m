@@ -10,12 +10,14 @@
 #import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "NSDate+Extensions.h"
+#import "NSData+Extensions.h"
 #import <objc/message.h>
 
 @interface MacDatabasePreferences ()
 
 @property (readonly) DatabaseMetadata* metadata;
 @property (readonly) DatabaseMetadata* templateDummy;
+@property NSDictionary<NSData*, NSData*> *cachedYubiKeyChallengeResponses;
 
 @end
 
@@ -368,19 +370,6 @@
 - (void)setLaunchAtStartup:(BOOL)launchAtStartup {
     [self update:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.launchAtStartup = launchAtStartup;
-    }];
-
-}
-
-
-
-- (BOOL)autoPromptForConvenienceUnlockOnActivate {
-    return self.metadata.autoPromptForConvenienceUnlockOnActivate;
-}
-
-- (void)setAutoPromptForConvenienceUnlockOnActivate:(BOOL)autoPromptForConvenienceUnlockOnActivate {
-    [self update:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.autoPromptForConvenienceUnlockOnActivate = autoPromptForConvenienceUnlockOnActivate;
     }];
 
 }
@@ -1491,6 +1480,97 @@
     return YES;
 }
 
+- (BOOL)hardwareKeyCRCaching {
+    BOOL ret = self.metadata.hardwareKeyCRCaching;
+    return ret;
+}
 
+- (void)setHardwareKeyCRCaching:(BOOL)hardwareKeyCRCaching {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.hardwareKeyCRCaching = hardwareKeyCRCaching;
+    }];
+    [self clearCachedChallengeResponses];
+}
+
+- (BOOL)doNotRefreshChallengeInAF {
+    return self.metadata.doNotRefreshChallengeInAF;
+}
+
+- (void)setDoNotRefreshChallengeInAF:(BOOL)doNotRefreshChallengeInAF {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.doNotRefreshChallengeInAF = doNotRefreshChallengeInAF;
+    }];
+}
+
+- (BOOL)hasOnboardedHardwareKeyCaching {
+    return self.metadata.hasOnboardedHardwareKeyCaching;
+}
+
+- (void)setHasOnboardedHardwareKeyCaching:(BOOL)hasOnboardedHardwareKeyCaching {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.hasOnboardedHardwareKeyCaching = hasOnboardedHardwareKeyCaching;
+    }];
+}
+
+- (NSDate *)lastChallengeRefreshAt {
+    return self.metadata.lastChallengeRefreshAt;
+}
+
+- (void)setLastChallengeRefreshAt:(NSDate *)lastChallengeRefreshAt {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.lastChallengeRefreshAt = lastChallengeRefreshAt;
+    }];
+}
+
+- (NSInteger)challengeRefreshIntervalSecs {
+    return self.metadata.challengeRefreshIntervalSecs;
+}
+
+- (void)setChallengeRefreshIntervalSecs:(NSInteger)challengeRefreshIntervalSecs {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.challengeRefreshIntervalSecs = challengeRefreshIntervalSecs;
+    }];
+}
+
+- (NSInteger)cacheChallengeDurationSecs {
+    return self.metadata.cacheChallengeDurationSecs;
+}
+
+- (void)setCacheChallengeDurationSecs:(NSInteger)cacheChallengeDurationSecs {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.cacheChallengeDurationSecs = cacheChallengeDurationSecs;
+    }];
+    [self clearCachedChallengeResponses];
+}
+
+- (NSDictionary<NSData *,NSData *> *)cachedYubiKeyChallengeResponses {
+    return self.metadata.cachedYubiKeyChallengeResponses;
+}
+
+- (void)setCachedYubiKeyChallengeResponses:(NSDictionary<NSData *,NSData *> *)cachedYubiKeyChallengeResponses {
+    self.metadata.cachedYubiKeyChallengeResponses = cachedYubiKeyChallengeResponses; 
+}
+
+- (void)addCachedChallengeResponse:(MMcGPair<NSData *,NSData *> *)challengeResponse {
+    slog(@"🐞 addCachedChallengeResponse [%@] -> [%@]", challengeResponse.a.base64String, challengeResponse.b.base64String );
+    self.cachedYubiKeyChallengeResponses = @{ challengeResponse.a : challengeResponse.b }; 
+}
+
+- (void)removeCachedChallenge:(NSData *)challenge {
+    slog(@"🐞 removeCachedChallenge [%@]", challenge.base64String );
+    [self clearCachedChallengeResponses];
+}
+
+- (void)clearCachedChallengeResponses {
+    self.cachedYubiKeyChallengeResponses = @{};
+}
+
+- (NSData *)getCachedChallengeResponse:(NSData *)challenge {
+    NSData* ret = self.cachedYubiKeyChallengeResponses[challenge];
+    
+    slog(@"🐞 getCachedChallengeResponse [%@] -> [%@]", challenge.base64String, ret.base64String );
+    
+    return ret;
+}
 
 @end

@@ -99,6 +99,7 @@ protocol DatabaseActionsInterface {
     func presentAuditSettings()
     func presentAutoLockSettings()
     func presentAdvancedSettings()
+    func presentHardwareKeySettings()
     func presentEncryptionSettings()
     func presentSetMasterCredentials()
 
@@ -111,6 +112,10 @@ struct DummyDatabaseActionsInterface: DatabaseActionsInterface {
     var syncStatus: SyncStatus = .init(databaseId: UUID().uuidString)
     var isRunningAsyncUpdate: Bool = false
     var lastAsyncUpdateResult: AsyncJobResult? = nil
+
+    func presentHardwareKeySettings() {
+        swlog("DummyDatabaseActionsInterface::presentHardwareKeySettings() called")
+    }
 
     func onAddEntry() {
         swlog("DummyDatabaseActionsInterface::onAddEntry() called")
@@ -418,6 +423,10 @@ class DatabaseHomeViewModel: ObservableObject {
         actions.presentAdvancedSettings()
     }
 
+    func presentHardwareKeySettings() {
+        actions.presentHardwareKeySettings()
+    }
+
     func presentEncryptionSettings() {
         actions.presentEncryptionSettings()
     }
@@ -458,6 +467,10 @@ class DatabaseHomeViewModel: ObservableObject {
         actions.lastAsyncUpdateResult
     }
 
+    var showIcons: Bool {
+        database.showIcons
+    }
+
     var title: String {
         database.nickName
     }
@@ -488,5 +501,9 @@ class DatabaseHomeViewModel: ObservableObject {
 
     func emptyRecycleBin() async {
         await actions.emptyRecycleBin()
+    }
+
+    var shouldShowYubiKeySettingsOption: Bool {
+        AppPreferences.sharedInstance().hardwareKeyCachingBeta && database.format == .keePass4 && database.ckfs.yubiKeyCR != nil
     }
 }

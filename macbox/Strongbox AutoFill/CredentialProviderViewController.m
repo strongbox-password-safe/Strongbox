@@ -647,7 +647,7 @@
     [unlocker unlockLocalWithKey:ckf
               keyFromConvenience:isConvenienceUnlock
                       completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
-
+        slog(@"unlockLocalWithKey => [%lu](%@) - error = [%@]", result, result == kUnlockDatabaseResultSuccess ? @"Success" : @"Not Successful", error);
         
         if ( result == kUnlockDatabaseResultSuccess ) {
             [self onSucccesfullyUnlocked:model];

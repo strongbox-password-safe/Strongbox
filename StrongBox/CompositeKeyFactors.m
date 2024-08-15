@@ -7,6 +7,14 @@
 //
 
 #import "CompositeKeyFactors.h"
+#import "sblog.h"
+#import "NSData+Extensions.h"
+
+@interface CompositeKeyFactors ()
+
+@property (nullable) MMcGPair<NSData*, NSData*>* lastCRResponse;
+
+@end
 
 @implementation CompositeKeyFactors
 
@@ -37,11 +45,30 @@
 - (instancetype)initWithPassword:(NSString *)password keyFileDigest:(NSData *)keyFileDigest yubiKeyCR:(YubiKeyCRHandlerBlock)yubiKeyCR {
     self = [super init];
     if (self) {
+        __weak CompositeKeyFactors* weakSelf = self;
+        
         _password = password;
         _keyFileDigest = keyFileDigest;
-        _yubiKeyCR = yubiKeyCR;
+        
+        if ( yubiKeyCR ) {
+            _yubiKeyCR = ^( NSData* challenge, YubiKeyCRResponseBlock responseFn ) {
+                yubiKeyCR(challenge, ^(BOOL userCancelled, NSData*_Nullable response, NSError*_Nullable error) {
+                    
+                    weakSelf.lastCRResponse = [MMcGPair pairOfA:challenge andB:response]; 
+                    responseFn(userCancelled, response, error);
+                });
+            };
+        }
+        else {
+            _yubiKeyCR = nil;
+        }
     }
+    
     return self;
+}
+
+- (MMcGPair<NSData *,NSData *> *)lastChallengeResponse {
+    return self.lastCRResponse;
 }
 
 - (BOOL)isAmbiguousEmptyOrNullPassword {

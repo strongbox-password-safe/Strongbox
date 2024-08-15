@@ -69,7 +69,7 @@ static const uint32_t kKeySize = 32;
     return self;
 }
 
--(NSData *)xor:(NSData *)ct {
+-(NSData *)doTheXor:(NSData *)ct {
     uint32_t currentBlock = (uint32_t)self.bytesProcessed / kBlockSize;
     int offset = self.bytesProcessed % kBlockSize;
 

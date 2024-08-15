@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 -(id)init NS_UNAVAILABLE;
 -(id)initWithKey:(const NSData*)key NS_DESIGNATED_INITIALIZER;
--(NSData *)xor:(NSData *)ct;
+-(NSData *)doTheXor:(NSData *)ct;
 
 @property (nonatomic, readonly) NSData* key;
 
