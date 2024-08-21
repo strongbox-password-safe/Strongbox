@@ -39,6 +39,7 @@ typedef void (^AsyncUpdateCompletion)(AsyncJobResult *result);
 
 extern NSString* const kAuditNodesChangedNotificationKey;
 extern NSString* const kAuditProgressNotification;
+extern NSString* const kBeginImport2FAOtpAuthUrlNotification;
 extern NSString* const kAuditCompletedNotification;
 extern NSString* const kAuditNewSwitchedOffNotificationKey;
 
@@ -173,6 +174,7 @@ extern NSString* const kAsyncUpdateStartingNotification;
 - (BOOL)isFavourite:(NSUUID*)itemId;
 - (BOOL)toggleFavourite:(NSUUID*)itemId;
 - (BOOL)addFavourite:(NSUUID*)itemId;
+- (BOOL)addFavourites:(NSArray<NSUUID *>*)items;
 - (BOOL)removeFavourite:(NSUUID*)itemId;
 
 - (BOOL)launchUrl:(Node*)item;
@@ -318,6 +320,12 @@ extern NSString* const kAsyncUpdateStartingNotification;
 @property (readonly, nullable) NSNumber* auditIssueCount;
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditHibpErrorCount;
+
+- (Node*)duplicateWithOptions:(NSUUID*)itemId
+                        title:(NSString*)title
+            preserveTimestamp:(BOOL)preserveTimestamp
+            referencePassword:(BOOL)referencePassword
+            referenceUsername:(BOOL)referenceUsername;
 
 @end
 

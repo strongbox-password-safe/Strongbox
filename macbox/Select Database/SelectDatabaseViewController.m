@@ -19,6 +19,7 @@
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
 @property (nonatomic, strong) NSArray<MacDatabasePreferences*>* databases;
 @property (weak) IBOutlet NSButton *buttonSelect;
+@property (weak) IBOutlet NSTextField *textFieldTitle;
 
 @property BOOL viewWillAppearFirstTimeDone;
 @property BOOL firstAppearanceDone;
@@ -37,7 +38,6 @@
         self.viewWillAppearFirstTimeDone = YES;
         
         self.tableView.headerView = nil;
-        
         self.tableView.delegate = self;
         self.tableView.dataSource = self;
         
@@ -47,6 +47,10 @@
         self.tableView.emptyString = NSLocalizedString(@"mac_no_autofill_enabled_databases_initial_message", @"No AutoFill Enabled Databases");
         
         self.tableView.doubleAction = @selector(onDoubleClick:);
+        
+        if ( self.customTitle != nil ) {
+            self.textFieldTitle.stringValue = self.customTitle;
+        }
         
         [self refresh];
     }
@@ -82,12 +86,14 @@
     
     [self.tableView reloadData];
     
-    NSUInteger idx = [self.databases indexOfFirstMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
-        return obj.autoFillEnabled;
-    }];
-    
-    if ( idx != NSNotFound ) {
-        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
+    if ( self.autoFillMode ) {
+        NSUInteger idx = [self.databases indexOfFirstMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+            return obj.autoFillEnabled;
+        }];
+        
+        if ( idx != NSNotFound ) {
+            [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:idx] byExtendingSelection:NO];
+        }
     }
     
     [self bindSelectedButton];
@@ -128,8 +134,7 @@
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
     
     BOOL wormholeDetectedUnlocked = [self.unlockedDatabases containsObject:database.uuid];
-    
-    BOOL disabled = self.disabledDatabases && [self.disabledDatabases containsObject:database.uuid];
+    BOOL disabled = [self isDisabled:database];
     
     [result setWithDatabase:database
    nickNameEditClickEnabled:NO
@@ -152,6 +157,11 @@
 }
 
 - (BOOL)isDisabled:(MacDatabasePreferences*)database {
+    BOOL isReadOnly = database.readOnly;
+    if (self.disableReadOnlyDatabases && isReadOnly) {
+        return YES;
+    }
+    
     BOOL disabled = ( ( self.disabledDatabases && [self.disabledDatabases containsObject:database.uuid] ) || ( self.autoFillMode && !database.autoFillEnabled ) );
     
     return disabled;

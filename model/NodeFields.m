@@ -167,8 +167,13 @@ NSString* const kOtpAuthScheme = @"otpauth";
     NSArray<NSDictionary*>* autoTypeAssoc = dict[@"autoTypeAssoc"];
     NSNumber* ie = ((NSNumber*)dict[@"isExpanded"]);
     NSNumber* qc = ((NSNumber*)dict[@"qualityCheck"]);
-    
     NSString* ppg = dict[@"previousParentGroup"];
+    
+    NSNumber* created = dict[@"created"];
+    NSNumber* modified = dict[@"modified"];
+    NSNumber* accessed = dict[@"accessed"];
+    NSNumber* locationChanged = dict[@"locationChanged"];
+    NSNumber* usageCount = dict[@"usageCount"];
     
     NodeFields* ret = [[NodeFields alloc] initWithUsername:username
                                                        url:url
@@ -242,6 +247,15 @@ NSString* const kOtpAuthScheme = @"otpauth";
     
     ret.isExpanded = ie != nil ? ie.boolValue : NO;
     ret.qualityCheck = qc != nil ? qc.boolValue : YES;
+    
+    
+    
+    NSDate* cDate = created != nil ? [NSDate dateWithTimeIntervalSince1970:created.unsignedIntegerValue] : nil;
+    NSDate* aDate = accessed != nil ? [NSDate dateWithTimeIntervalSince1970:accessed.unsignedIntegerValue] : nil;
+    NSDate* mDate = modified != nil ? [NSDate dateWithTimeIntervalSince1970:modified.unsignedIntegerValue] : nil;
+    NSDate* lcDate = locationChanged != nil ? [NSDate dateWithTimeIntervalSince1970:locationChanged.unsignedIntegerValue] : nil;
+    
+    [ret setTouchPropertiesWithCreated:cDate accessed:aDate modified:mDate locationChanged:lcDate usageCount:usageCount];
     
     return ret;
 }
@@ -341,6 +355,24 @@ NSString* const kOtpAuthScheme = @"otpauth";
     
     ret[@"tags"] = self.tags.allObjects;
     
+    
+
+    if ( self.created ) {
+        ret[@"created"] = @((NSUInteger)[self.created timeIntervalSince1970]);
+    }
+    if ( self.modified ) {
+        ret[@"modified"] = @((NSUInteger)[self.modified timeIntervalSince1970]);
+    }
+    if ( self.accessed ) {
+        ret[@"accessed"] = @((NSUInteger)[self.accessed timeIntervalSince1970]);
+    }
+    if ( self.locationChanged ) {
+        ret[@"locationChanged"] = @((NSUInteger)[self.locationChanged timeIntervalSince1970]);
+    }
+    if ( self.usageCount ) {
+        ret[@"usageCount"] = self.usageCount;
+    }
+
     return ret;
 }
 

@@ -142,7 +142,15 @@ static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kSystemMenuClickAction = @"systemMenuClickAction";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
-static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta"; 
+static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta2"; 
+
+static NSString* const kLastKnownGoodDatabaseState = @"lastKnownGoodDatabaseState";
+static NSString* const kAutoFillLastKnownGoodDatabaseState = @"autoFillLastKnownGoodDatabaseState";
+
+static NSString* const kDuplicateItemPreserveTimestamp = @"duplicateItemPreserveTimestamp";
+static NSString* const kDuplicateItemReferencePassword = @"duplicateItemReferencePassword";
+static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenceUsername";
+static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
 
 
 
@@ -288,8 +296,62 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+- (BOOL)duplicateItemEditAfterwards {
+    return [self getBool:kDuplicateItemEditAfterwards];
+}
+
+- (void)setDuplicateItemEditAfterwards:(BOOL)duplicateItemEditAfterwards {
+    [self setBool:kDuplicateItemEditAfterwards value:duplicateItemEditAfterwards];
+}
+
+- (BOOL)duplicateItemPreserveTimestamp {
+    return [self getBool:kDuplicateItemPreserveTimestamp];
+}
+
+- (void)setDuplicateItemPreserveTimestamp:(BOOL)duplicateItemPreserveTimestamp {
+    [self setBool:kDuplicateItemPreserveTimestamp value:duplicateItemPreserveTimestamp];
+}
+
+- (BOOL)duplicateItemReferencePassword {
+    return [self getBool:kDuplicateItemReferencePassword];
+}
+
+- (void)setDuplicateItemReferencePassword:(BOOL)duplicateItemReferencePassword {
+    [self setBool:kDuplicateItemReferencePassword value:duplicateItemReferencePassword];
+}
+
+- (BOOL)duplicateItemReferenceUsername {
+    return [self getBool:kDuplicateItemReferenceUsername];
+}
+
+- (void)setDuplicateItemReferenceUsername:(BOOL)duplicateItemReferenceUsername {
+    [self setBool:kDuplicateItemReferenceUsername value:duplicateItemReferenceUsername];
+}
+
+
+
+- (NSData *)lastKnownGoodBiometricsDatabaseState {
+    return [self.sharedAppGroupDefaults objectForKey:kLastKnownGoodDatabaseState];
+}
+
+- (void)setLastKnownGoodBiometricsDatabaseState:(NSData *)lastKnownGoodBiometricsDatabaseState {
+    [self.sharedAppGroupDefaults setObject:lastKnownGoodBiometricsDatabaseState forKey:kLastKnownGoodDatabaseState];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (NSData *)autoFillLastKnownGoodBiometricsDatabaseState {
+    return [self.sharedAppGroupDefaults objectForKey:kAutoFillLastKnownGoodDatabaseState];
+}
+
+- (void)setAutoFillLastKnownGoodBiometricsDatabaseState:(NSData *)autoFillLastKnownGoodBiometricsDatabaseState {
+    [self.sharedAppGroupDefaults setObject:autoFillLastKnownGoodBiometricsDatabaseState forKey:kAutoFillLastKnownGoodDatabaseState];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+
+
 - (BOOL)hardwareKeyCachingBeta {
-    return [self getBool:kHardwareKeyCachingBeta];
+    return [self getBool:kHardwareKeyCachingBeta fallback:YES];
 }
 
 - (void)setHardwareKeyCachingBeta:(BOOL)hardwareKeyCachingBeta {

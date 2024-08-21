@@ -349,6 +349,7 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
     
     [encoder encodeBool:self.doNotRefreshChallengeInAF forKey:@"doNotRefreshChallengeInAF"];
     [encoder encodeBool:self.hasOnboardedHardwareKeyCaching forKey:@"hasOnboardedHardwareKeyCaching"];
+    [encoder encodeBool:self.markDirtyOnExpandCollapseGroups forKey:@"markDirtyOnExpandCollapseGroups"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -810,6 +811,10 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
         
         if ( [decoder containsValueForKey:@"hasOnboardedHardwareKeyCaching"] ) {
             self.hasOnboardedHardwareKeyCaching = [decoder decodeBoolForKey:@"hasOnboardedHardwareKeyCaching"];
+        }        
+        
+        if ( [decoder containsValueForKey:@"markDirtyOnExpandCollapseGroups"] ) {
+            self.markDirtyOnExpandCollapseGroups = [decoder decodeBoolForKey:@"markDirtyOnExpandCollapseGroups"];
         }
     }
     

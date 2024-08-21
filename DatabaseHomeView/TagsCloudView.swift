@@ -14,7 +14,7 @@ struct TagsCloudView: View {
     var model: DatabaseHomeViewModel
 
     var wrappedTags: [Tag] {
-        model.database.popularTags.map { Tag($0) }
+        model.database.popularTags.sorted().map { Tag($0) }
     }
 
     var body: some View {

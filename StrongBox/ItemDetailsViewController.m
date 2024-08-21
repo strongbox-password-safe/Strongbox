@@ -227,7 +227,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     self.navigationController.navigationBarHidden = NO;
     self.navigationController.navigationBar.prefersLargeTitles = NO;
     
-    self.hideMetadataSection = !AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
+    self.hideMetadataSection = !AppPreferences.sharedInstance.showMetadataOnDetailsScreen || self.explicitHideMetadata;
     
 #ifndef IS_APP_EXTENSION
     self.isAutoFillContext = NO;
@@ -237,9 +237,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     [self customizeLeftBarButtons];
     [self customizeRightBarButtons];
-    
-    
-    
+
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"generic_verb_close", @"Close")
                                                                      style:UIBarButtonItemStylePlain
                                                                     target:self
@@ -600,6 +598,9 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
             [self onCancelConfirmed];
         }
     }
+    else if ( self.isStandaloneDetailsModal ) {
+        [self.presentingViewController dismissViewControllerAnimated:self completion:nil];
+    }
 }
 
 - (void)onModelEdited {
@@ -625,8 +626,14 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     else {
         self.navigationItem.leftItemsSupplementBackButton = YES;
         self.editButtonItem.enabled = !self.isEffectivelyReadOnly;
+        [self.cancelOrDiscardBarButton setTitle:NSLocalizedString(@"generic_verb_close", @"Close")];
         
-        self.navigationItem.leftBarButtonItems = self.splitViewController ? @[self.splitViewController.displayModeButtonItem, self.preferencesBarButton] : @[self.preferencesBarButton];
+        if ( self.isStandaloneDetailsModal ) {
+            self.navigationItem.leftBarButtonItems = @[self.cancelOrDiscardBarButton];
+        }
+        else {
+            self.navigationItem.leftBarButtonItems = self.splitViewController ? @[self.splitViewController.displayModeButtonItem, self.preferencesBarButton] : @[self.preferencesBarButton];
+        }
         
         [self bindTitle];
     }
@@ -960,7 +967,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     else if(indexPath.section == kMetadataSectionIdx && (self.editing || self.hideMetadataSection)) {
         return CGFLOAT_MIN;
     }
-    else if(indexPath.section == kOtherSectionIdx && (!self.hasHistory || self.editing)) {
+    else if(indexPath.section == kOtherSectionIdx && (!self.hasHistory || self.explicitHideHistory || self.editing)) {
         return CGFLOAT_MIN;
     }
 #else
@@ -992,7 +999,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     else if(section == kMetadataSectionIdx && (self.editing || self.hideMetadataSection)) {
         return CGFLOAT_MIN;
     }
-    else if(section == kOtherSectionIdx && (self.editing || !self.hasHistory)) {
+    else if(section == kOtherSectionIdx && (self.editing || !self.hasHistory || self.explicitHideHistory)) {
         return CGFLOAT_MIN;
     }
 #else
@@ -2328,12 +2335,17 @@ suggestionProvider:^NSString*(NSString *text) {
     BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
     
     NSError* error;
-    NSString* html = [StrongboxCMarkGFMHelper convertMarkdownWithMarkdown:markdown darkMode:dark error:&error];
+    NSString* html = [StrongboxCMarkGFMHelper convertMarkdownWithMarkdown:markdown
+                                                                 darkMode:dark
+                                                          disableMarkdown:!AppPreferences.sharedInstance.markdownNotes
+                                                                    error:&error];
     
     if ( error != nil || html.length == 0 ) {
         slog(@"🔴 Could not convert notes markdown to HTML, returning standard notes cell");
         return [self getStandardNonMarkdownNotesCell:markdown indexPath:indexPath];
     }
+    
+
     
     __weak ItemDetailsViewController* weakSelf = self;
     
@@ -2349,7 +2361,8 @@ suggestionProvider:^NSString*(NSString *text) {
 - (UITableViewCell*)getNotesCell:(NSIndexPath*)indexPath {
     NSString* notes = [self maybeDereference:self.model.notes];
     
-    if ( self.editing || notes.length == 0 || self.databaseModel.metadata.easyReadFontForAll || !AppPreferences.sharedInstance.markdownNotes ) {
+    
+    if ( self.editing || self.databaseModel.metadata.easyReadFontForAll ) {
         return [self getStandardNonMarkdownNotesCell:notes indexPath:indexPath];
     }
     else {

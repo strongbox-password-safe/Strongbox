@@ -547,6 +547,11 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
 }
 
 + (void)dismissViewControllerCorrectly:(NSViewController*)vc {
+    if ( !vc ) {
+        slog(@"🔴 nil viewController passed to dismissViewControllerCorrectly");
+        return;
+    }
+    
     if ( vc.presentingViewController ) {
         [vc.presentingViewController dismissViewController:vc];
     }

@@ -32,6 +32,10 @@ extern NSString *const CellHeightsChangedNotification;
 @property NSNumber*_Nullable historicalIndex;
 
 @property BOOL forcedReadOnly;
+@property BOOL isStandaloneDetailsModal;
+@property BOOL explicitHideMetadata;
+@property BOOL explicitHideHistory;
+
 @property Model* databaseModel;
 
 #ifdef IS_APP_EXTENSION

@@ -126,7 +126,7 @@ BOOL checkForScreenRecordingPermissionsOnMac(void);
 
 NSColor* NSColorFromRGB(NSUInteger rgbValue);
 
-+ (void)dismissViewControllerCorrectly:(NSViewController*)vc;
++ (void)dismissViewControllerCorrectly:(NSViewController*_Nullable)vc;
 
 #endif
 

@@ -57,9 +57,9 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
 @implementation ViewModel
 
 - (void)dealloc {
-
+    
     slog(@"😎 ViewModel DEALLOC...");
-
+    
 }
 
 - (instancetype)initLocked:(Document*)document
@@ -651,7 +651,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
                                                             userInfo:nil];
         });
     }
-
+    
 }
 
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes {
@@ -666,10 +666,10 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         slog(@"🔴 setItemNotes - Model is RO!");
         return;
     }
-
+    
     NSString* old = item.fields.notes;
     NSDate* oldModified = item.fields.modified;
-
+    
     if(self.document.undoManager.isUndoing) {
         if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
     }
@@ -677,15 +677,15 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         Node* cloneForHistory = [item cloneForHistory];
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
-
+    
     item.fields.notes = notes;
     [self touchAndModify:item modDate:modified];
-
+    
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemNotes:item notes:old modified:oldModified];
-
+    
     NSString* loc = NSLocalizedString(@"mac_undo_action_notes_change", @"Notes Change");
     [self.document.undoManager setActionName:loc];
-
+    
     [self rebuildMapsAndCaches];
 }
 
@@ -728,7 +728,10 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     item.fields.isExpanded = expanded;
     [self touchAndModify:item modDate:NSDate.date];
-
+    
+    if ( self.databaseMetadata.markDirtyOnExpandCollapseGroups ) {  
+        [self.document updateChangeCount:NSChangeDone];
+    }
 }
 
 - (BOOL)applyModelEditsAndMoves:(EntryViewModel *)editModel toNode:(NSUUID*)nodeId {
@@ -829,7 +832,7 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         [self rebuildMapsAndCaches];
         
         [self notifyOnMain:kModelUpdateNotificationItemEdited];
-                
+        
         return YES;
     }
     
@@ -1065,6 +1068,55 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         NSString* loc = fav ? NSLocalizedString(@"browse_vc_action_pin", @"Favourite") : NSLocalizedString(@"browse_vc_action_unpin", @"Un-Favourite");
         [self.document.undoManager setActionName:loc];
     }
+    
+    [self notifyOnMain:kModelUpdateNotificationTagsChanged];
+}
+
+- (void)addFavourites:(NSArray<NSUUID*>*)items {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    if ( self.isEffectivelyReadOnly ) {
+        slog(@"🔴 toggleFavourite - Model is RO!");
+        return;
+    }
+
+    [self.document.undoManager beginUndoGrouping];
+    
+    for (NSUUID* itemId in items) {
+        if ( [self isFavourite:itemId] ) {
+            continue;
+        }
+
+        Node* item = [self getItemById:itemId];
+        NSDate* oldModified = item.fields.modified;
+        
+        if(self.document.undoManager.isUndoing) {
+            if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+        }
+        else {
+            Node* cloneForHistory = [item cloneForHistory];
+            [item.fields.keePassHistory addObject:cloneForHistory];
+        }
+        
+        [self.innerModel addFavourite:itemId];
+        
+        [self touchAndModify:item modDate:nil];
+        
+        [[self.document.undoManager prepareWithInvocationTarget:self] toggleFavourite:itemId modified:oldModified];
+
+        if(!self.document.undoManager.isUndoing) {
+            [self.document.undoManager setActionName:NSLocalizedString(@"browse_vc_action_pin", @"Favourite") ];
+        }
+    }
+    
+    if(!self.document.undoManager.isUndoing) {
+        NSString* loc = NSLocalizedString(@"browse_vc_action_pin", @"Favourite");
+        [self.document.undoManager setActionName:loc];
+    }
+    [self.document.undoManager endUndoGrouping];
+    
+    [self rebuildMapsAndCaches];
     
     [self notifyOnMain:kModelUpdateNotificationTagsChanged];
 }
@@ -1453,6 +1505,36 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     
     [self notifyOnMain:kModelUpdateNotificationItemsDeleted];
 }
+
+
+
+- (Node*)duplicateWithOptions:(NSUUID*)itemId
+                        title:(NSString*)title
+            preserveTimestamp:(BOOL)preserveTimestamp
+            referencePassword:(BOOL)referencePassword
+            referenceUsername:(BOOL)referenceUsername {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    if ( self.isEffectivelyReadOnly ) {
+        slog(@"🔴 duplicateWithOptions - Model is RO!");
+        return nil;
+    }
+
+    Node* dupe = [self.commonModel duplicateWithOptions:itemId 
+                                                  title:title
+                                      preserveTimestamp:preserveTimestamp
+                                      referencePassword:referencePassword
+                                      referenceUsername:referencePassword];
+        
+    if ( !dupe || ![self addChildren:@[dupe] parent:dupe.parent] ) {
+        return nil;
+    }
+    
+    return dupe;
+}
+
+
 
 - (BOOL)canRecycle:(Node *)item {
     return [self.database canRecycle:item.uuid];

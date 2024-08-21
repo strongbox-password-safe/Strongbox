@@ -684,13 +684,13 @@ static NSString* getFreeTrialSuffix(void) {
         else if ( theAction == @selector(onCompareAndMerge:)) { 
             return YES;
         }
-        else if ( theAction == @selector(onExportAsKeePass2:)) {
-            return !isKeePass2;
-        }
-        else if ( theAction == @selector(onExportDatabaseAsCsv:)) {
+
+
+
+        else if ( theAction == @selector(onExportDatabase:)) {
             return YES;
         }
-        else if ( theAction == @selector(onExportDatabase:) ) {
+        else if ( theAction == @selector(onSaveDatabaseAs:) ) {
             return YES;
         }
         else if(theAction == @selector(onPrintDatabase:)) {
@@ -1681,26 +1681,72 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (IBAction)onDuplicateItem:(id)sender {
-    slog(@"onDuplicateItem");
-    
     Node* item = nil;
-    
     if( self.viewModel && !self.viewModel.locked ) {
         item = [self getSingleSelectedItem];
     }
+    if ( !item ) {
+        return;
+    }
     
-    if ( item ) {
-        Node* destinationItem = item.parent ? item.parent : self.viewModel.rootGroup;
+    NSString* newTitle = [item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")];
+    
+    BOOL showReferencingOptions = self.viewModel.database.originalFormat != kPasswordSafe;
+
+    Settings* settings = Settings.sharedInstance;
+    __weak WindowController* weakSelf = self;
+    NSViewController* vc = [SwiftUIViewFactory getDuplicateItemOptionsViewWithShowReferencingOptions:showReferencingOptions
+                                                                                               title:newTitle
+                                                                                   referencePassword:settings.duplicateItemReferencePassword
+                                                                                   referenceUsername:settings.duplicateItemReferenceUsername
+                                                                                  preserveTimestamps:settings.duplicateItemPreserveTimestamp
+                                                                                      editAfterwards:settings.duplicateItemEditAfterwards
+                                                                                          completion:^(BOOL cancelled, NSString * _Nonnull title, BOOL referencePassword, BOOL referenceUsername, BOOL preserveTimestamp, BOOL editAfterwards) {
+        [Utils dismissViewControllerCorrectly:weakSelf.contentViewController.presentedViewControllers.lastObject];
         
+        settings.duplicateItemReferencePassword = referencePassword;
+        settings.duplicateItemReferenceUsername = referenceUsername;
+        settings.duplicateItemPreserveTimestamp = preserveTimestamp;
+        settings.duplicateItemEditAfterwards = editAfterwards;
         
-        
-        Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")] preserveTimestamps:NO];
-        
-        [item touch:NO touchParents:YES];
-        if ( [self.viewModel addChildren:@[dupe] parent:destinationItem] ) {
-            NSString* loc = NSLocalizedString(@"mac_item_duplicated", @"Item Duplicated");
-            [self showPopupChangeToastNotification:loc];
+        if ( cancelled ) {
+            return;
         }
+        
+        [weakSelf duplicateItemWithOptions:item.uuid
+                                     title:title
+                         referencePassword:referencePassword
+                         referenceUsername:referenceUsername
+                         preserveTimestamp:preserveTimestamp
+                            editAfterwards:editAfterwards];
+    }];
+    
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (void)duplicateItemWithOptions:(NSUUID*)itemId
+                           title:(NSString * _Nonnull)title
+               referencePassword:(BOOL)referencePassword
+               referenceUsername:(BOOL)referenceUsername
+               preserveTimestamp:(BOOL)preserveTimestamp
+                  editAfterwards:(BOOL)editAfterwards {
+    Node* dupe = [self.viewModel duplicateWithOptions:itemId
+                                                title:title
+                                    preserveTimestamp:preserveTimestamp
+                                    referencePassword:referencePassword
+                                    referenceUsername:referenceUsername];
+    
+    if ( dupe ) {
+        NSString* loc = NSLocalizedString(@"mac_item_duplicated", @"Item Duplicated");
+        [self showPopupChangeToastNotification:loc];
+        
+        if ( editAfterwards ) {
+            NextGenSplitViewController* vc = (NextGenSplitViewController*)self.contentViewController;
+            [vc editEntryWithUuid:dupe.uuid];
+        }
+    }
+    else {
+        [MacAlerts info:NSLocalizedString(@"generic_error", @"Error") window:self.window];
     }
 }
 
@@ -2324,22 +2370,6 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 - (id)supplementalTargetForAction:(SEL)action sender:(id)sender {
 
     
@@ -2373,28 +2403,40 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 
-- (IBAction)onExportSelectedItems:(id)sender {
-    NSArray<Node*>* items = [self getSelectedItems];
-    
-    if ( items.count > 0 ) {
-        [self exportSelectedItems:items];
-    }
-}
-
-- (void)exportSelectedItems:(NSArray<Node*>*)items {
-    [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"export_items_dialog_title", @"Export Items")
+- (IBAction)onExportDatabase:(id)sender {
+    [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"generic_export_database", @"Export Database")
                     informativeText:NSLocalizedString(@"export_what_format_question", @"What format would you like to export to?")
                   option1AndDefault:@"CSV"
                             option2:@"KeePass"
                              window:self.window
                          completion:^(int response) {
         if ( response == 0 ) {
-            [self exportItemsAsCsv:items suggestedFilenameSuffix:@""];
+            [self onExportDatabaseAsCSV:nil];
         }
         else if ( response == 1 ) {
-            [self exportItemsAsKeePass2:items suggestedFilenameSuffix:@""];
+            [self onExportDatabaseAsKeePass2];
         }
     }];
+}
+
+- (IBAction)onExportSelectedItems:(id)sender {
+    NSArray<Node*>* items = [self getSelectedItems];
+    
+    if ( items.count > 0 ) {
+        [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"export_items_dialog_title", @"Export Items")
+                        informativeText:NSLocalizedString(@"export_what_format_question", @"What format would you like to export to?")
+                      option1AndDefault:@"CSV"
+                                option2:@"KeePass"
+                                 window:self.window
+                             completion:^(int response) {
+            if ( response == 0 ) {
+                [self exportItemsAsCsv:items suggestedFilenameSuffix:@""];
+            }
+            else if ( response == 1 ) {
+                [self exportItemsAsKeePass2:items suggestedFilenameSuffix:@""];
+            }
+        }];
+    }
 }
 
 - (IBAction)onExportGroupFromSideBar:(id)sender {
@@ -2413,8 +2455,8 @@ static NSString* getFreeTrialSuffix(void) {
     }];
 }
 
-- (IBAction)onExportAsKeePass2:(id)sender {
-    if ( self.viewModel == nil || self.viewModel.locked || self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4 ) {
+- (void)onExportDatabaseAsKeePass2 {
+    if ( self.viewModel == nil || self.viewModel.locked ) {
         return;
     }
     
@@ -2426,7 +2468,11 @@ static NSString* getFreeTrialSuffix(void) {
     [self exportGroupAsKeePass2:root suggestedFilenameSuffix:@""];
 }
 
-- (IBAction)onExportGroupAsCsv:(id)sender {
+- (void)onExportDatabaseAsCSV:(id)sender {
+    [self exportGroupAsCsv:self.viewModel.database.effectiveRootGroup suggestedFilenameSuffix:@""];
+}
+
+- (void)onExportGroupAsCsv:(id)sender {
     Node* item = [self getSideBarSelectedItem];
     
     if ( item && item.isGroup ) {
@@ -2434,7 +2480,7 @@ static NSString* getFreeTrialSuffix(void) {
     }
 }
 
-- (IBAction)onExportGroupAsKeePass2:(id)sender {
+- (void)onExportGroupAsKeePass2:(id)sender {
     Node* item = [self getSideBarSelectedItem];
     
     if ( item && item.isGroup ) {
@@ -2443,25 +2489,6 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)exportGroupAsKeePass2:(Node*)root suggestedFilenameSuffix:(NSString*)suggestedFilenameSuffix {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     [self exportItemsAsKeePass2:@[root] suggestedFilenameSuffix:suggestedFilenameSuffix];
 }
 
@@ -2525,56 +2552,6 @@ static NSString* getFreeTrialSuffix(void) {
     }
 }
 
-- (IBAction)onExportDatabase:(id)sender {
-    MacDatabasePreferences* database = self.viewModel.databaseMetadata;
-    
-    NSSavePanel* panel = [NSSavePanel savePanel];
-    panel.nameFieldStringValue = database.exportFileName;
-    
-    if ( [panel runModal] != NSModalResponseOK ) {
-        return;
-    }
-    
-    NSURL* dest = panel.URL;
-    
-    [self export:dest];
-}
-
-- (void)export:(NSURL*)dest {
-    NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseMetadata.uuid];
-    slog(@"Export [%@] => [%@]", src, dest);
-    
-    if ( !src ) {
-        [MacAlerts info:NSLocalizedString(@"open_sequence_couldnt_open_local_message", "Could not open Strongbox's local copy of this database. A online sync is required.")
-                 window:self.window];
-    }
-    else {
-        NSError* errr;
-        BOOL copy;
-        
-        if ( [NSFileManager.defaultManager fileExistsAtPath:dest.path] ) {
-            NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:src.path error:nil];
-            NSData* data = [NSData dataWithContentsOfFile:src.path];
-            copy = [NSFileManager.defaultManager createFileAtPath:dest.path contents:data attributes:attr];
-        }
-        else {
-            copy = [NSFileManager.defaultManager copyItemAtURL:src toURL:dest error:&errr];
-        }
-        
-        if ( !copy ) {
-            [MacAlerts error:errr window:self.window];
-        }
-        else {
-            [MacAlerts info:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
-                     window:self.window];
-        }
-    }
-}
-
-- (IBAction)onExportDatabaseAsCsv:(id)sender {
-    [self exportGroupAsCsv:self.viewModel.database.effectiveRootGroup suggestedFilenameSuffix:@""];
-}
-
 - (void)exportGroupAsCsv:(Node*)group suggestedFilenameSuffix:(NSString*)suggestedFilenameSuffix {
     NSArray<Node*>* nodes = [group filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
@@ -2632,6 +2609,54 @@ static NSString* getFreeTrialSuffix(void) {
         NSError* error;
         if (! [data writeToFile:url.path options:kNilOptions error:&error] ) {
             [MacAlerts error:error window:self.window];
+        }
+    }
+}
+
+
+
+- (IBAction)onSaveDatabaseAs:(id)sender {
+    MacDatabasePreferences* database = self.viewModel.databaseMetadata;
+    
+    NSSavePanel* panel = [NSSavePanel savePanel];
+    panel.nameFieldStringValue = database.exportFileName;
+    
+    if ( [panel runModal] != NSModalResponseOK ) {
+        return;
+    }
+    
+    NSURL* dest = panel.URL;
+    
+    [self saveDatabaseAs:dest];
+}
+
+- (void)saveDatabaseAs:(NSURL*)dest {
+    NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.viewModel.databaseMetadata.uuid];
+    slog(@"Export [%@] => [%@]", src, dest);
+    
+    if ( !src ) {
+        [MacAlerts info:NSLocalizedString(@"open_sequence_couldnt_open_local_message", "Could not open Strongbox's local copy of this database. A online sync is required.")
+                 window:self.window];
+    }
+    else {
+        NSError* errr;
+        BOOL copy;
+        
+        if ( [NSFileManager.defaultManager fileExistsAtPath:dest.path] ) {
+            NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:src.path error:nil];
+            NSData* data = [NSData dataWithContentsOfFile:src.path];
+            copy = [NSFileManager.defaultManager createFileAtPath:dest.path contents:data attributes:attr];
+        }
+        else {
+            copy = [NSFileManager.defaultManager copyItemAtURL:src toURL:dest error:&errr];
+        }
+        
+        if ( !copy ) {
+            [MacAlerts error:errr window:self.window];
+        }
+        else {
+            [MacAlerts info:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
+                     window:self.window];
         }
     }
 }

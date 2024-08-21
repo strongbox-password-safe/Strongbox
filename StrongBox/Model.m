@@ -42,6 +42,7 @@
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotification = @"kAuditProgressNotificationKey";
+NSString* const kBeginImport2FAOtpAuthUrlNotification = @"kBeginImport2FAOtpAuthUrlNotification";
 NSString* const kAuditCompletedNotification = @"kAuditCompletedNotificationKey";
 NSString* const kAuditNewSwitchedOffNotificationKey = @"kAuditNewSwitchedOffNotificationKey";
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
@@ -1207,16 +1208,19 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }
 }
 
-- (BOOL)addFavourite:(NSUUID*)itemId {
+- (BOOL)addFavourites:(NSArray<NSUUID *>*)items {
     if ( self.formatSupportsTags ) {
-        BOOL added = [self addTag:itemId tag:kCanonicalFavouriteTag];
-        return added;
+        return [self addTagToItems:items tag:kCanonicalFavouriteTag];
     }
     else {
-        [self legacyAddFavourite:itemId];
+        [self legacyAddFavourites:items];
         [self notifyEdited];
         return NO;
     }
+}
+
+- (BOOL)addFavourite:(NSUUID*)itemId {
+    return [self addFavourites:@[itemId]];
 }
 
 - (BOOL)removeFavourite:(NSUUID*)itemId {
@@ -1236,18 +1240,16 @@ userInteractionRequired:(BOOL)userInteractionRequired
     return needsSave;
 }
 
-- (void)legacyAddFavourite:(NSUUID*)itemId {
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
-    if ( sid ) {
-        NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
-        
-        [favs addObject:sid];
-        
-        [self resetLegacyFavourites:favs];
-    }
-    else {
-        slog(@"🔴 legacyAddFavourite - Could not get sid");
-    }
+- (void)legacyAddFavourites:(NSArray<NSUUID *>*)items {
+    NSArray<NSString*> *sids = [items map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [self.database getCrossSerializationFriendlyIdId:obj];
+    }];
+    
+    NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
+    
+    [favs addObjectsFromArray:sids];
+    
+    [self resetLegacyFavourites:favs];
 }
 
 - (void)legacyRemoveFavourite:(NSUUID*)itemId {
@@ -2250,6 +2252,37 @@ double getFieldWeight ( DatabaseSearchMatchField field ) {
     else {
         slog(@"✅ Not Rotating KDBX4 Hardware Key Challenge as directed.");
     }
+}
+
+
+
+- (Node*)duplicateWithOptions:(NSUUID*)itemId
+                        title:(NSString*)title
+            preserveTimestamp:(BOOL)preserveTimestamp
+            referencePassword:(BOOL)referencePassword
+            referenceUsername:(BOOL)referenceUsername {
+    Node* item = [self getItemById:itemId];
+    if (!item) {
+        return nil;
+    }
+    
+    Node* dupe = [item duplicate:title preserveTimestamps:preserveTimestamp];
+    
+    if ( self.database.originalFormat != kPasswordSafe ) {
+        if ( referencePassword ) {
+            NSString *fieldReference = [NSString stringWithFormat:@"{REF:P@I:%@}", keePassStringIdFromUuid(item.uuid)];
+            dupe.fields.password = fieldReference;
+        }
+        
+        if ( referenceUsername ) {
+            NSString *fieldReference = [NSString stringWithFormat:@"{REF:U@I:%@}", keePassStringIdFromUuid(item.uuid)];
+            dupe.fields.username = fieldReference;
+        }
+    }
+    
+    [item touch:NO touchParents:YES];
+
+    return dupe;
 }
 
 @end

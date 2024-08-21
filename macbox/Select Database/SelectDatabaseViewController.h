@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL autoFillMode;
 @property (nullable) NSSet<NSString*>* disabledDatabases;
 @property NSSet<NSString*> *unlockedDatabases;
+@property BOOL disableReadOnlyDatabases;
+@property NSString* customTitle;
 
 @end
 

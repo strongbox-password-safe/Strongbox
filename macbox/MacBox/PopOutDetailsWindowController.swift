@@ -12,6 +12,7 @@ class PopOutDetailsWindowController: NSWindowController {
     var database: ViewModel!
     var uuid: UUID!
 
+    @objc
     var floatOnTop: Bool = false {
         didSet {
             bindFloatOnTop()

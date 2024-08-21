@@ -1643,7 +1643,7 @@ extension DetailViewController: NSTableViewDelegate {
     func getNotesCell(_ field: DetailsViewField) -> NSTableCellView? {
         if field.value.count > 0,
            Settings.sharedInstance().markdownNotes,
-           let currentHtml = try? StrongboxCMarkGFMHelper.convertMarkdown(markdown: field.value, darkMode: DarkMode.isOn), currentHtml.count > 0
+           let currentHtml = try? StrongboxCMarkGFMHelper.convertMarkdown(markdown: field.value, darkMode: DarkMode.isOn, disableMarkdown: false), currentHtml.count > 0
         {
             let cell = tableView.makeView(withIdentifier: MarkdownCocoaTableCellView.NibIdentifier, owner: self) as! MarkdownCocoaTableCellView
 

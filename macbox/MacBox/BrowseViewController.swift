@@ -1024,12 +1024,6 @@ extension BrowseViewController: NSOutlineViewDelegate {
 
             guard let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)) else { return [] }
 
-            if case .regularHierarchy = navigationContext {
-                
-            } else {
-                return []
-            }
-
             if index == NSOutlineViewDropOnItemIndex { 
                 return []
             } else {
@@ -1041,11 +1035,13 @@ extension BrowseViewController: NSOutlineViewDelegate {
                     case .allEntries:
                         return [.copy]
                     default:
-                        return []
+                        break
                     }
                 default:
-                    return [] 
+                    break
                 }
+
+                return []
             }
         }
     }

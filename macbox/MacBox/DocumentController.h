@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)originalOpenDocument:(id _Nullable)sender;
 - (void)originalOpenDocumentWithFileSelection;
 
-- (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^_Nullable)(NSError* error))completion;
+- (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^_Nullable)(Document*_Nullable document, NSError* _Nullable error))completion;
 
 - (Document*_Nullable)documentForDatabase:(NSString*)uuid;
 

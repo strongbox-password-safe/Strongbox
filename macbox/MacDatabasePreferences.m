@@ -1573,4 +1573,14 @@
     return ret;
 }
 
+- (BOOL)markDirtyOnExpandCollapseGroups {
+    return self.metadata.markDirtyOnExpandCollapseGroups;
+}
+
+- (void)setMarkDirtyOnExpandCollapseGroups:(BOOL)markDirtyOnExpandCollapseGroups {
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.markDirtyOnExpandCollapseGroups = markDirtyOnExpandCollapseGroups;
+    }];
+}
+
 @end

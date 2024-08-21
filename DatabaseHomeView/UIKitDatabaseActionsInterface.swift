@@ -45,7 +45,7 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
 
     @MainActor
     func close() {
-        splitViewController.onClose()
+        splitViewController.closeAndCleanup()
     }
 
     @MainActor
@@ -310,5 +310,15 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
 
     var lastAsyncUpdateResult: AsyncJobResult? {
         viewModel.lastAsyncUpdateResult
+    }
+
+    @MainActor
+    var hasDoneDatabaseOnLaunchTasks: Bool {
+        get {
+            splitViewController.hasDoneDatabaseOnLaunchTasks
+        }
+        set {
+            splitViewController.hasDoneDatabaseOnLaunchTasks = newValue
+        }
     }
 }

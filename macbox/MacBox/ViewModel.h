@@ -102,6 +102,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (BOOL)isFavourite:(NSUUID*)itemId;
 - (void)toggleFavourite:(NSUUID*)itemId;
+- (void)addFavourites:(NSArray<NSUUID*>*)items;
 @property (readonly) NSArray<Node*>* favourites;
 
 
@@ -322,7 +323,11 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (void)rebuildMapsAndCaches;
 
-
+- (Node*)duplicateWithOptions:(NSUUID*)itemId
+                        title:(NSString*)title
+            preserveTimestamp:(BOOL)preserveTimestamp
+            referencePassword:(BOOL)referencePassword
+            referenceUsername:(BOOL)referenceUsername;
 
 @end
 

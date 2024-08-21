@@ -19,9 +19,13 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
 
     @IBOutlet var titleWidthConstraint: NSLayoutConstraint!
 
+    override func awakeFromNib() {
+        super.awakeFromNib()
 
-
-
+        icon.wantsLayer = true
+        icon.layer?.cornerRadius = 3.0
+        icon.clipsToBounds = true
+    }
 
     static let NibIdentifier: NSUserInterfaceItemIdentifier = .init("TitleAndIconCell")
 

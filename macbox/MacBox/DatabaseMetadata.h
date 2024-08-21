@@ -208,9 +208,12 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL hardwareKeyCRCaching;
 @property BOOL doNotRefreshChallengeInAF;
 @property BOOL hasOnboardedHardwareKeyCaching;
+
 @property (nullable) NSDate* lastChallengeRefreshAt;
 @property NSInteger challengeRefreshIntervalSecs;
 @property NSInteger cacheChallengeDurationSecs;
+
+@property BOOL markDirtyOnExpandCollapseGroups;
 
 @end
 

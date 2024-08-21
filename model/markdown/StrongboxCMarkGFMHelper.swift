@@ -81,20 +81,35 @@ public class StrongboxCMarkGFMHelper: NSObject {
     }
 
     @objc
-    public static func convertMarkdown(markdown: String, darkMode: Bool) throws -> String {
-        let markdownHtmlFragment = try convertToHtmlFragment(markdown: markdown)
+    public static func convertMarkdown(markdown: String, darkMode: Bool, disableMarkdown: Bool) throws -> String {
+        if disableMarkdown {
+            let lines = markdown.lines.map { line in
+                String(format: "<p>\(line.htmlStringEscaped)</p>")
+            }
 
-        guard let url = Bundle.main.url(forResource: "markdown-index", withExtension: "html") else {
-            swlog("🔴 Could not load markdown-index.html")
-            throw CmarkGFMError.generic(description: "Could not load markdown-index.html")
+            let markdownHtmlFragment = lines.joined()
+
+
+
+            guard let url = Bundle.main.url(forResource: "non-markdown-index", withExtension: "html") else {
+                swlog("🔴 Could not load non-markdown-index.html")
+                throw CmarkGFMError.generic(description: "Could not load markdown-index.html")
+            }
+            let templateHtml = try String(contentsOf: url)
+
+            return String(format: templateHtml, markdownHtmlFragment)
+        } else {
+            let markdownHtmlFragment = try convertToHtmlFragment(markdown: markdown)
+
+            guard let url = Bundle.main.url(forResource: "markdown-index", withExtension: "html") else {
+                swlog("🔴 Could not load markdown-index.html")
+                throw CmarkGFMError.generic(description: "Could not load markdown-index.html")
+            }
+            let templateHtml = try String(contentsOf: url)
+
+            let codeHighlightingStylesheet = darkMode ? "stackoverflow-dark.min.css" : "stackoverflow-light.min.css"
+
+            return String(format: templateHtml, codeHighlightingStylesheet, markdownHtmlFragment)
         }
-
-        let templateHtml = try String(contentsOf: url)
-
-        let codeHighlightingStylesheet = darkMode ? "stackoverflow-dark.min.css" : "stackoverflow-light.min.css"
-
-        let result = String(format: templateHtml, codeHighlightingStylesheet, markdownHtmlFragment)
-
-        return result
     }
 }

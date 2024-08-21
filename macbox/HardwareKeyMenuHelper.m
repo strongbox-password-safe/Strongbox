@@ -12,6 +12,7 @@
 #import "Settings.h"
 #import "VirtualYubiKeys.h"
 #import "NSData+Extensions.h"
+#import "NSArray+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -149,6 +150,14 @@
     [self.yubiKeyPopup.menu addItem:item];
 }
 
+- (void)addNoAvailableVirtualHardwareKeysMenuItem {
+    NSMenuItem* item = [[NSMenuItem alloc] initWithTitle:NSLocalizedString( @"generic_none_available", @"None Available")
+                                                  action:nil
+                                           keyEquivalent:@""];
+    item.enabled = NO;
+    [self.yubiKeyPopup.menu addItem:item];
+}
+
 - (void)addHardwareKeyMenuOptions:(HardwareKeyData*)yk {
     YubiKeyConfiguration* configured = self.verifyMode ? nil : self.currentlySetDatabaseConfiguration;
     
@@ -241,8 +250,13 @@
     
     NSArray<VirtualYubiKey*>* virtuals = VirtualYubiKeys.sharedInstance.snapshot;
     
-    for ( VirtualYubiKey* virtual in virtuals ) {
-        [self addVirtualHardwareKeyMenuItem:virtual];
+    if ( virtuals.count ) {
+        for ( VirtualYubiKey* virtual in virtuals ) {
+            [self addVirtualHardwareKeyMenuItem:virtual];
+        }
+    }
+    else {
+        [self addNoAvailableVirtualHardwareKeysMenuItem];
     }
     
     [self.yubiKeyPopup.menu addItem:NSMenuItem.separatorItem];
@@ -339,18 +353,7 @@
     YubiKeyConfiguration* config = item.representedObject;
     
     if ( ( NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption ) == NSEventModifierFlagOption ) {
-        VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:config.deviceSerial];
-        
-        NSString* loc = NSLocalizedString(@"ays_delete_virtual_hardware_key_fmt", @"Are you sure you would like to delete the virtual hardware key '%@'?");
-        
-        [MacAlerts areYouSure:[NSString stringWithFormat:loc, key.name]
-                       window:self.alertWindowOverride ? self.alertWindowOverride : self.viewController.view.window
-                   completion:^(BOOL response) {
-            if ( response ) {
-                [VirtualYubiKeys.sharedInstance deleteKey:key.identifier];
-                [self refreshHardwareKeyDropdownMenu];
-            }
-        }];
+        [self onDeleteVirtual:config];
     }
     else {
         [self onSelectYubiKeyConfiguration:sender];
@@ -361,6 +364,30 @@
     NSMenuItem* menuItem = sender;
     YubiKeyConfiguration* configuration = menuItem.representedObject;
     self.selectedConfiguration = configuration;
+}
+
+- (void)onDeleteVirtual:(YubiKeyConfiguration*)config {
+    VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:config.deviceSerial];
+    
+    NSString* loc = NSLocalizedString(@"ays_delete_virtual_hardware_key_fmt", @"Are you sure you would like to delete the virtual hardware key '%@'?");
+    
+    [MacAlerts areYouSure:[NSString stringWithFormat:loc, key.name]
+                   window:self.alertWindowOverride ? self.alertWindowOverride : self.viewController.view.window
+               completion:^(BOOL response) {
+        if ( response ) {
+            [VirtualYubiKeys.sharedInstance deleteKey:key.identifier];
+            
+            NSArray<MacDatabasePreferences*> *dbsUsingIt = [MacDatabasePreferences.allDatabases filter:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+                return [obj.yubiKeyConfiguration isEqual:config];
+            }];
+            
+            for ( MacDatabasePreferences *db in dbsUsingIt ) {
+                db.yubiKeyConfiguration = nil;
+            }
+            
+            [self refreshHardwareKeyDropdownMenu];
+        }
+    }];
 }
 
 @end

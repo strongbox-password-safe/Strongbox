@@ -245,7 +245,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                                                    error:&error];
     
         if( url == nil ) {
-            slog(@"WARN: Could not resolve bookmark for database... will try the saved fileUrl...");
+            slog(@"⚠️ WARN: Could not resolve bookmark for database... will try the saved fileUrl... Error = [%@], updatedBookmark = [%@]", error, updatedBookmark);
         }
         else {
             

@@ -43,7 +43,7 @@
 #import "MMcGPair.h"
 #import "ConvenienceUnlockPreferences.h"
 #import "KeyFileManagement.h"
-#import "SecondDatabaseListTableViewController.h"
+#import "SelectDatabaseViewController.h"
 #import "DatabaseUnlocker.h"
 #import "IOSCompositeKeyDeterminer.h"
 #import "DuressActionHelper.h"
@@ -237,11 +237,14 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     
     
-    if( !self.parentSplitViewController.hasAlreadyDoneStartWithSearch && self.isDisplayingRoot ) {
+    
+    
+    if( self.isDisplayingRoot && !self.parentSplitViewController.hasDoneDatabaseOnLaunchTasks ) {
         if ( self.viewModel.metadata.immediateSearchOnBrowse ) {
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                self.searchController.active = YES;
-            });
+            [self startWithSearch];
+        }
+        else if ( self.viewModel.metadata.showLastViewedEntryOnUnlock ) {
+            [self displayLastViewedEntryIfAppropriate];
         }
     }
     else {
@@ -250,9 +253,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         });
     }
     
-    self.parentSplitViewController.hasAlreadyDoneStartWithSearch = YES;
-    
-    
+    self.parentSplitViewController.hasDoneDatabaseOnLaunchTasks = YES; 
     
     if ( self.splitViewController.isCollapsed ) {
         
@@ -261,18 +262,22 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)displayLastViewedEntryIfAppropriate {
-    if ( self.isDisplayingRoot && self.viewModel.metadata.showLastViewedEntryOnUnlock && self.viewModel.metadata.lastViewedEntry ) {
-        if ( self.viewModel.metadata.immediateSearchOnBrowse && self.splitViewController.isCollapsed ) {
-            slog(@"Not showing last viewed entry because Start with Search and Split View collapsed");
-        }
-        else {
-            Node* item = [self.viewModel getItemById:self.viewModel.metadata.lastViewedEntry];
-            
-            if ( item ) {
-                [self showEntry:item animated:NO];
-            }
+    if ( self.splitViewController.isCollapsed || !self.viewModel.metadata.lastViewedEntry ) {
+        slog(@"Not showing last viewed entry because Split View collapsed");
+    }
+    else {
+        Node* item = [self.viewModel getItemById:self.viewModel.metadata.lastViewedEntry];
+        
+        if ( item ) {
+            [self showEntry:item animated:NO];
         }
     }
+}
+
+- (void)startWithSearch {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        self.searchController.active = YES;
+    });
 }
 
 - (void)viewDidLoad {
@@ -296,9 +301,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self refresh];
     
     [self listenToNotifications];
-    
-    [self displayLastViewedEntryIfAppropriate];
-    
+        
     [self performOnboardingDatabaseChangeRequests];
 }
 
@@ -1124,7 +1127,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [self setEditing:NO];
     }
     else {
-        [self.parentSplitViewController onClose];
+        [self.parentSplitViewController closeAndCleanupWithCompletion:nil];
     }
 }
 
@@ -1601,6 +1604,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         return;
     }
     
+    __weak BrowseSafeView* weakSelf = self;
     DuplicateOptionsViewController* vc = [DuplicateOptionsViewController instantiate];
     NSString* newTitle = [item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")];
     
@@ -1608,28 +1612,22 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     vc.showFieldReferencingOptions = self.viewModel.database.originalFormat != kPasswordSafe;
     vc.completion = ^(BOOL go, BOOL referencePassword, BOOL referenceUsername, BOOL preserveTimestamp, NSString * _Nonnull title, BOOL editAfter) {
         if ( go ) {
-            Node* dupe = [item duplicate:title preserveTimestamps:preserveTimestamp];
+            Node* dupe = [self.viewModel duplicateWithOptions:item.uuid
+                                                        title:title
+                                            preserveTimestamp:preserveTimestamp
+                                            referencePassword:referencePassword
+                                            referenceUsername:referenceUsername];
             
-            if ( self.viewModel.database.originalFormat != kPasswordSafe ) {
-                if ( referencePassword ) {
-                    NSString *fieldReference = [NSString stringWithFormat:@"{REF:P@I:%@}", keePassStringIdFromUuid(item.uuid)];
-                    dupe.fields.password = fieldReference;
+            if ( dupe ) {
+                BOOL done = [self.viewModel addChildren:@[dupe] destination:item.parent];
+               
+                if ( done ) {
+                    [weakSelf updateAndSave];
+                    
+                    if ( editAfter ) {
+                        [weakSelf editEntry:dupe];
+                    }
                 }
-                
-                if ( referenceUsername ) {
-                    NSString *fieldReference = [NSString stringWithFormat:@"{REF:U@I:%@}", keePassStringIdFromUuid(item.uuid)];
-                    dupe.fields.username = fieldReference;
-                }
-            }
-            
-            [item touch:NO touchParents:YES];
-            
-            BOOL done = [self.viewModel addChildren:@[dupe] destination:item.parent];
-            
-            [self updateAndSave];
-            
-            if ( done && editAfter ) {
-                [self editEntry:dupe];
             }
         }
         
@@ -2036,15 +2034,17 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         __weak BrowseSafeView* weakSelf = self;
         
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
-        SecondDatabaseListTableViewController* vc = (SecondDatabaseListTableViewController*)nav.topViewController;
-        vc.firstDatabase = self.viewModel;
+        SelectDatabaseViewController* vc = (SelectDatabaseViewController*)nav.topViewController;
+        vc.disableDatabaseUuid = self.viewModel.metadata.uuid;
         vc.disableReadOnlyDatabases = YES;
         vc.customTitle = NSLocalizedString(@"export_items_select_destination_database_title", @"Destination Database");
         
         NSArray<Node*>* itemsToExport = sender;
         vc.onSelectedDatabase = ^(DatabasePreferences * _Nonnull secondDatabase, UIViewController *__weak  _Nonnull vcToDismiss) {
             [vcToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                [weakSelf onExportItemsToDatabase:secondDatabase itemsToExport:itemsToExport];
+                if ( secondDatabase ) {
+                    [weakSelf onExportItemsToDatabase:secondDatabase itemsToExport:itemsToExport];
+                }
             }];
         };
     }

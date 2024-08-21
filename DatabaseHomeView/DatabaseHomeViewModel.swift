@@ -61,6 +61,7 @@ enum HomeViewSection: Int, CaseIterable, Identifiable {
 }
 
 protocol DatabaseActionsInterface {
+    var hasDoneDatabaseOnLaunchTasks: Bool { get set }
     var syncStatus: SyncStatus { get }
     var isRunningAsyncUpdate: Bool { get }
     var lastAsyncUpdateResult: AsyncJobResult? { get }
@@ -109,6 +110,8 @@ protocol DatabaseActionsInterface {
 }
 
 struct DummyDatabaseActionsInterface: DatabaseActionsInterface {
+    var hasDoneDatabaseOnLaunchTasks: Bool = false
+
     var syncStatus: SyncStatus = .init(databaseId: UUID().uuidString)
     var isRunningAsyncUpdate: Bool = false
     var lastAsyncUpdateResult: AsyncJobResult? = nil
@@ -384,6 +387,15 @@ class DatabaseHomeViewModel: ObservableObject {
         }
         set {
             database.startWithSearch = newValue
+        }
+    }
+
+    var hasDoneDatabaseOnLaunchTasks: Bool {
+        get {
+            actions.hasDoneDatabaseOnLaunchTasks
+        }
+        set {
+            actions.hasDoneDatabaseOnLaunchTasks = newValue
         }
     }
 

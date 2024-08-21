@@ -15,6 +15,7 @@ class AdvancedDatabasePreferences: NSViewController {
     @IBOutlet var checkboxShowAutoCompleteSuggestions: NSButton!
     @IBOutlet var checkboxSortCustomFields: NSButton!
     @IBOutlet var checkboxAlwaysAutoMerge: NSButton!
+    @IBOutlet var checkboxMarkDirtyOnExpandCollapseGroups: NSButton!
 
     @objc
     var model: ViewModel!
@@ -37,6 +38,7 @@ class AdvancedDatabasePreferences: NSViewController {
         checkboxConcealEmptyProtected.state = model.concealEmptyProtectedFields ? .on : .off
         checkboxSortCustomFields.state = !model.customSortOrderForFields ? .on : .off
         checkboxAlwaysAutoMerge.state = model.conflictResolutionStrategy == .autoMerge ? .on : .off
+        checkboxMarkDirtyOnExpandCollapseGroups.state = model.databaseMetadata.markDirtyOnExpandCollapseGroups ? .on : .off
     }
 
     @IBAction func onClose(_: Any) {
@@ -50,6 +52,8 @@ class AdvancedDatabasePreferences: NSViewController {
         model.outlineViewTitleIsReadonly = checkboxTitleIsEditable.state == .off
         model.customSortOrderForFields = checkboxSortCustomFields.state == .off
         model.conflictResolutionStrategy = checkboxAlwaysAutoMerge.state == .on ? .autoMerge : .ask
+
+        model.databaseMetadata.markDirtyOnExpandCollapseGroups = checkboxMarkDirtyOnExpandCollapseGroups.state == .on
 
         bindUI()
 

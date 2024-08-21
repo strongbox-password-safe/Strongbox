@@ -1,22 +1,27 @@
 //
-//  SecondDatabaseListTableViewController.m
+//  SelectDatabaseViewController.m
 //  Strongbox
 //
 //  Created by Mark on 14/12/2020.
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "SecondDatabaseListTableViewController.h"
+#import "SelectDatabaseViewController.h"
 #import "DatabasePreferences.h"
 #import "DatabaseCell.h"
 
-@interface SecondDatabaseListTableViewController ()
+@interface SelectDatabaseViewController ()
 
 @property NSArray<DatabasePreferences*> *list;
 
 @end
 
-@implementation SecondDatabaseListTableViewController
+@implementation SelectDatabaseViewController
+
++ (UINavigationController*)fromStoryboard {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"SelectSecondDatabase" bundle:nil];
+    return [sb instantiateInitialViewController];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -40,10 +45,10 @@
     
     DatabasePreferences* database = self.list[indexPath.row];
     
-    BOOL isFirstDatabase = [database.uuid isEqualToString:self.firstDatabase.metadata.uuid];
+    BOOL isDisabledDatabase = self.disableDatabaseUuid ? [database.uuid isEqualToString:self.disableDatabaseUuid] : NO;
     BOOL isReadOnly = database.readOnly;
     
-    [cell populateCell:database disabled:isFirstDatabase || (self.disableReadOnlyDatabases && isReadOnly)];
+    [cell populateCell:database disabled:isDisabledDatabase || (self.disableReadOnlyDatabases && isReadOnly)];
     
     return cell;
 }
@@ -57,7 +62,7 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    self.onSelectedDatabase(nil, self); 
 }
 
 @end

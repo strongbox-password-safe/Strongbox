@@ -118,7 +118,8 @@ struct DatabaseHomeView: View {
 
             if isFirstAppearance {
                 isFirstAppearance = false
-                isSearchPresented = model.startWithSearch
+                isSearchPresented = model.startWithSearch && !model.hasDoneDatabaseOnLaunchTasks
+                model.hasDoneDatabaseOnLaunchTasks = true
             } else {
                 model.objectWillChange.send() 
             }

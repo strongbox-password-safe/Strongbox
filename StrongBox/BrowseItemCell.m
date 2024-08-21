@@ -36,6 +36,13 @@
     [self stopObservingOtpUpdateTimer];
 }
 
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+    self.iconImageView.layer.cornerRadius = 3.0;
+    self.iconImageView.clipsToBounds = YES;
+}
+
 -(void)prepareForReuse {
     [super prepareForReuse];
 
@@ -43,7 +50,7 @@
     
     self.iconImageView.hidden = YES;
     self.iconImageView.image = nil;
-        
+    
     [self setFlags:@[] flagTintColors:nil];
     
     [self stopObservingOtpUpdateTimer];

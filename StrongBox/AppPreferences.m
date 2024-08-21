@@ -178,7 +178,8 @@ static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
 static NSString* const kDisableHomeTab = @"disableHomeTab"; 
-static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta"; 
+static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta2"; 
+static NSString* const kHasMigratedInconsistentHardwareKeysForCachingFeature = @"hasMigratedInconsistentHardwareKeysForCachingFeature"; 
 
 @implementation AppPreferences
 
@@ -221,8 +222,16 @@ static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta";
 
 
 
+- (BOOL)hasMigratedInconsistentHardwareKeysForCachingFeature {
+    return [self getBool:kHasMigratedInconsistentHardwareKeysForCachingFeature];
+}
+
+- (void)setHasMigratedInconsistentHardwareKeysForCachingFeature:(BOOL)hasMigratedInconsistentHardwareKeysForCachingFeature {
+    [self setBool:kHasMigratedInconsistentHardwareKeysForCachingFeature value:hasMigratedInconsistentHardwareKeysForCachingFeature];
+}
+
 - (BOOL)hardwareKeyCachingBeta {
-    return [self getBool:kHardwareKeyCachingBeta];
+    return [self getBool:kHardwareKeyCachingBeta fallback:YES];
 }
 
 - (void)setHardwareKeyCachingBeta:(BOOL)hardwareKeyCachingBeta {

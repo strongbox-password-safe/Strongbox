@@ -34,6 +34,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL dummyMode;
 @property (readonly) BOOL biometricsInProgress;
 
+- (BOOL)isBiometricDatabaseStateRecorded:(BOOL)autoFill;
+- (void)recordBiometricDatabaseState:(BOOL)autoFill;
+- (BOOL)isBiometricDatabaseStateHasChanged:(BOOL)autoFill;
+- (void)clearBiometricRecordedDatabaseState;
+
 @end
 
 NS_ASSUME_NONNULL_END

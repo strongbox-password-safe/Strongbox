@@ -205,6 +205,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearCachedChallengeResponses;
 - (NSData*)getCachedChallengeResponse:(NSData*)challenge;
 
+@property BOOL markDirtyOnExpandCollapseGroups;
+
 @end
 
 NS_ASSUME_NONNULL_END

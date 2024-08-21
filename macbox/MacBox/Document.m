@@ -33,6 +33,7 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 
 @property WindowController* windowController;
 @property BOOL isPromptingAboutUnderlyingFileChange;
+@property (nullable, readonly) NextGenSplitViewController* splitViewController;
 
 @end
 
@@ -279,10 +280,26 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 
 
-- (BOOL)isEditsInProgress {
+- (NextGenSplitViewController*)splitViewController {
     if ( [self.windowController.contentViewController isKindOfClass:NextGenSplitViewController.class] ) { 
         NextGenSplitViewController* vc = (NextGenSplitViewController*)self.windowController.contentViewController;
-        return vc.editsInProgress;
+        return vc;
+    }
+    else {
+        return nil;
+    }
+}
+
+- (BOOL)isEditsInProgress {
+    if ( self.splitViewController ) { 
+        return self.splitViewController.editsInProgress;
+    }
+    
+    return NO;
+}
+- (BOOL)isDisplayingEditSheet {
+    if ( self.splitViewController ) { 
+        return self.splitViewController.isDisplayingEditSheet;
     }
     
     return NO;
@@ -525,6 +542,12 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
             [hud hide:YES];
         });
     });
+}
+
+
+
+- (void)import2FAToken:(OTPToken *)token {
+    [self.splitViewController import2FATokenWithToken:token];
 }
 
 @end

@@ -1,5 +1,5 @@
 //
-//  PasskeyWizardCreateNew.swift
+//  WizardCreateNewView.swift
 //  TestSwiftUINav
 //
 //  Created by Strongbox on 15/09/2023.
@@ -7,10 +7,38 @@
 
 import SwiftUI
 
+private struct HeadingView: View {
+    var mode: AddOrCreateWizardDisplayMode
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: mode.icon)
+                .font(.system(size: 40, weight: .bold))
+                .foregroundStyle(.tint)
+
+            VStack(spacing: 2) {
+                Text(mode.title)
+                    .font(.largeTitle)
+                    .bold()
+
+                Text(mode.createSubtitle)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 350)
+                    .font(.subheadline)
+            }
+        }
+    }
+}
+
 #if os(iOS)
-    @available(iOS 17.0, *)
-    struct PasskeyWizardCreateNew: View {
-        @Environment(\.dismiss) private var dismiss
+    struct WizardCreateNewView: View {
+        enum FocusedField {
+            case title
+        }
+
+        @FocusState private var focusedField: FocusedField?
+
+        var mode: AddOrCreateWizardDisplayMode
 
         @State var title: String
         @State var groups: [String]
@@ -20,36 +48,25 @@ import SwiftUI
 
         var body: some View {
             Form {
-                VStack(spacing: 8) {
-                    Image(systemName: "person.badge.key.fill")
-                        .font(.system(size: 48))
-                        .foregroundStyle(.tint)
-
-                    VStack(spacing: 4) {
-                        Text("passkey_new_entry_title")
-                            .font(.title)
-
-                        Text("passkey_new_entry_text")
-                            .multilineTextAlignment(.center)
-                            .font(.subheadline)
-                    }
-                }
-                .padding()
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(EmptyView())
+                HeadingView(mode: mode)
+                    .padding()
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(EmptyView())
 
                 Section {
                     HStack {
-                        Image(systemName: "person.badge.key.fill").foregroundColor(.secondary)
-                        TextField("generic_fieldname_title", text: $title).foregroundColor(.primary)
-                        Spacer()
+                        Image(systemName: mode.icon)
+                            .foregroundColor(.secondary)
+
+                        TextField("generic_fieldname_title", text: $title)
+                            .focused($focusedField, equals: .title)
                     }
                 } header: {
                     Text("generic_fieldname_title")
                 }
 
                 Section {
-                    Picker("", selection: $selectedGroupIdx) {
+                    let picker = Picker("", selection: $selectedGroupIdx) {
                         ForEach(groups.indices, id: \.self) { idx in
                             HStack {
                                 Image(systemName: idx == 0 ? "house.fill" : "folder.fill")
@@ -59,55 +76,42 @@ import SwiftUI
                         }
                     }
                     .padding(.horizontal, -8)
-                    .pickerStyle(.navigationLink)
+
+                    if #available(iOS 16.0, *) {
+                        picker.pickerStyle(.navigationLink)
+                    } else {
+                        picker
+                    }
                 } header: {
                     Text("generic_field_name_group")
                 }
-
-                Section {
-                    VStack(spacing: 16) {
-                        Button {
-                            dismiss()
-                            completion?(false, true, title, selectedGroupIdx, nil)
-                        } label: {
-                            HStack {
-                                Image(systemName: "person.badge.key.fill")
-                                Text("passkey_save_passkey")
-                            }
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(.blue)
-                            .cornerRadius(5)
-                        }
-                        .buttonStyle(BorderlessButtonStyle()) 
-                        
-                        
-
-                        Button {
-                            dismiss()
-                            completion?(true, true, nil, nil, nil)
-                        } label: {
-                            Text("generic_cancel")
-                        }
-                        .buttonStyle(BorderlessButtonStyle())
-                    }
-                    .padding()
-                }
-                .listRowInsets(EdgeInsets())
-                .listRowBackground(EmptyView())
             }
+            .onAppear {
+                focusedField = .title
+            }
+            .toolbar(content: {
+                ToolbarItem(placement: .confirmationAction) {
+                    HStack {
+                        Button(action: {
+                            completion?(false, true, title, selectedGroupIdx, nil)
+                        }) {
+                            Text("mac_save_action")
+                        }
+                    }
+                }
+            })
         }
     }
 
 #else
 
-    struct PasskeyWizardCreateNew: View {
+    struct WizardCreateNewView: View {
         @Environment(\.dismiss) private var dismiss
 
-        @State var title: String = "Relying Party"
-        @State var groups: [String] = ["Database", "group2", "group3", "group4"]
+        var mode: AddOrCreateWizardDisplayMode
+
+        @State var title: String
+        @State var groups: [String]
         @State var selectedGroupIdx: Int = 0
 
         enum FocusedField {
@@ -120,29 +124,12 @@ import SwiftUI
 
         var body: some View {
             VStack(spacing: 20) {
+                HeadingView(mode: mode)
 
-
-                VStack(spacing: 4) {
-                    Image("StrongBox-256x256")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundStyle(.tint)
-
-                    VStack(spacing: 4) {
-                        Text("passkey_new_entry_title")
-                            .font(.title)
-
-                        Text("passkey_new_entry_text")
-                            .fixedSize(horizontal: false, vertical: true)
-                            .multilineTextAlignment(.center)
-                            .font(.subheadline)
-                    }
-                }
-
-                VStack(spacing: 16) {
+                VStack(spacing: 8) {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 4) {
-                            Image(systemName: "person.badge.key.fill")
+                            Image(systemName: mode.icon)
                                 .foregroundColor(.secondary)
 
                             Text("generic_fieldname_title")
@@ -154,6 +141,7 @@ import SwiftUI
                             .controlSize(.large)
                             .textFieldStyle(.roundedBorder)
                             .focused($focusedField, equals: .title)
+                            .frame(maxWidth: 350)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
@@ -163,20 +151,23 @@ import SwiftUI
                             ForEach(groups.indices, id: \.self) { idx in
                                 HStack {
                                     Image(systemName: idx == 0 ? "house.fill" : "folder.fill")
-                                    Text(groups[idx]).foregroundColor(.primary)
+                                    Text(groups[idx])
+
                                 }
                             }
                         }
+                        .frame(maxWidth: 350)
                         .controlSize(.large)
                         .padding(.leading, -8)
-                        .pickerStyle(.automatic)
+
                     }
                 }
 
-                HStack(spacing: 12) {
+                HStack(spacing: 8) {
                     Button {
-
-
+                        swlog("🟢 CANCEL")
+                        
+                        dismiss()
                         completion?(true, false, nil, nil, nil)
                     } label: {
                         Text("generic_cancel")
@@ -185,28 +176,46 @@ import SwiftUI
                     .keyboardShortcut(.cancelAction)
 
                     Button {
-
-
+                        dismiss()
+                        swlog("🟢 NOT CANCEL")
+                        
                         completion?(false, true, title, selectedGroupIdx, nil)
                     } label: {
-                        HStack {
-                            Image(systemName: "person.badge.key.fill")
-                            Text("passkey_save_passkey")
+                        HStack(spacing: 4) {
+                            Image(systemName: mode.icon)
+                            Text("mac_save_action")
                                 .foregroundColor(.white)
                                 .font(.headline)
                         }
                         .padding(.horizontal)
                     }
+                    .buttonStyle(.borderedProminent)
                     .controlSize(.large)
-                    .cornerRadius(5)
                     .keyboardShortcut(.defaultAction)
                 }
+                .padding(.bottom)
             }
-            .padding(20)
-            .frame(maxWidth: 400)
+            .fixedSize()
+            .scenePadding()
             .onAppear {
                 focusedField = .title
             }
         }
     }
 #endif
+
+#Preview {
+    #if os(iOS)
+        NavigationView {
+            WizardCreateNewView(mode: .totp,
+                                title: "Test Title",
+                                groups: ["foo", "bar"],
+                                selectedGroupIdx: 0)
+        }
+    #else
+        WizardCreateNewView(mode: .passkey,
+                            title: "Test Title",
+                            groups: ["foo", "bar"],
+                            selectedGroupIdx: 0)
+    #endif
+}

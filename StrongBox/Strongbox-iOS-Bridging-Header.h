@@ -82,3 +82,6 @@
 #import "EncryptionPreferencesViewController.h"
 #import "CASGTableViewController.h"
 #import "SyncManager.h"
+#import "SelectDatabaseViewController.h"
+#import "IOSCompositeKeyDeterminer.h"
+#import "DatabaseUnlocker.h"

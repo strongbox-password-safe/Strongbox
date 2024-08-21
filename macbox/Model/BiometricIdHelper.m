@@ -15,6 +15,9 @@
 
 @property LAContext *inProgressLaContext;
 
+@property NSData* lastKnownGoodDatabaseState;
+@property NSData* autoFillLastKnownGoodDatabaseState;
+
 @end
 
 @implementation BiometricIdHelper
@@ -27,6 +30,15 @@
         sharedInstance = [[BiometricIdHelper alloc] init];
     });
     return sharedInstance;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.lastKnownGoodDatabaseState = Settings.sharedInstance.lastKnownGoodBiometricsDatabaseState;
+        self.autoFillLastKnownGoodDatabaseState = Settings.sharedInstance.autoFillLastKnownGoodBiometricsDatabaseState;
+    }
+    return self;
 }
 
 - (NSString *)biometricIdName {
@@ -140,6 +152,108 @@
     if(self.biometricsInProgress) {
         [self.inProgressLaContext invalidate];
     }
+}
+
+
+
++ (void)logBiometricError:(NSError*)error {
+    if (error.code == LAErrorAuthenticationFailed) {
+        slog(@"BIOMETRIC: Auth Failed %@", error);
+    }
+    else if (error.code == LAErrorUserFallback) {
+        slog(@"BIOMETRIC: User Choose Fallback %@", error);
+    }
+    else if (error.code == LAErrorUserCancel) {
+        slog(@"BIOMETRIC: User Cancelled %@", error);
+    }
+    else if (error.code == LAErrorBiometryNotAvailable) {
+        slog(@"BIOMETRIC: LAErrorBiometryNotAvailable %@", error);
+    }
+    else if (error.code == LAErrorSystemCancel) {
+        slog(@"BIOMETRIC: LAErrorSystemCancel %@", error);
+    }
+    else if (error.code == LAErrorBiometryNotEnrolled) {
+        slog(@"BIOMETRIC: LAErrorBiometryNotEnrolled %@", error);
+    }
+    else if (error.code == LAErrorBiometryLockout) {
+        slog(@"BIOMETRIC: LAErrorBiometryLockout %@", error);
+    }
+    else {
+        slog(@"BIOMETRIC: Unknown Error: [%@]", error);
+    }
+}
+
+- (NSData*)getLastKnownGoodDatabaseState:(BOOL)autoFill {
+    return autoFill ? self.autoFillLastKnownGoodDatabaseState : self.lastKnownGoodDatabaseState;
+}
+
+- (void)clearBiometricRecordedDatabaseState {
+    Settings.sharedInstance.lastKnownGoodBiometricsDatabaseState = nil;
+    Settings.sharedInstance.autoFillLastKnownGoodBiometricsDatabaseState = nil;
+    
+    self.lastKnownGoodDatabaseState = nil;
+    self.autoFillLastKnownGoodDatabaseState = nil;
+}
+
+
+- (BOOL)isBiometricDatabaseStateHasChanged:(BOOL)autoFill {
+    if([self getLastKnownGoodDatabaseState:autoFill] == nil) {
+        return NO;
+    }
+    
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    if (localAuthContext == nil) {
+        return NO;
+    }
+    
+    NSError *error;
+    [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
+    
+    if (error) {
+        slog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
+        [BiometricIdHelper logBiometricError:error];
+        return NO;
+    }
+    
+    slog(@"Biometrics State: [%@] vs Last Good: [%@]",
+         [localAuthContext.evaluatedPolicyDomainState base64EncodedStringWithOptions:kNilOptions],
+         [self.lastKnownGoodDatabaseState base64EncodedStringWithOptions:kNilOptions]);
+    
+    return ![localAuthContext.evaluatedPolicyDomainState isEqualToData:[self getLastKnownGoodDatabaseState:autoFill]];
+}
+
+
+- (BOOL)isBiometricDatabaseStateRecorded:(BOOL)autoFill {
+    return [self getLastKnownGoodDatabaseState:autoFill] != nil;
+}
+
+- (void)recordBiometricDatabaseState:(BOOL)autoFill {
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    if (localAuthContext == nil) {
+        return;
+    }
+    
+    NSError *error;
+    [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error];
+    
+    if (error) {
+        slog(@"isBiometricIdChangedSinceEnrolment: NO -> ");
+        [BiometricIdHelper logBiometricError:error];
+        return;
+    }
+    
+    
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
+        if(autoFill) {
+            self.autoFillLastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
+            Settings.sharedInstance.autoFillLastKnownGoodBiometricsDatabaseState = self.autoFillLastKnownGoodDatabaseState;
+        }
+        else {
+            self.lastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
+            Settings.sharedInstance.lastKnownGoodBiometricsDatabaseState = self.lastKnownGoodDatabaseState;
+        }
+    });
 }
 
 @end

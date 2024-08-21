@@ -7,7 +7,7 @@
 //
 
 #import "MergeSelectSecondDatabaseViewController.h"
-#import "SecondDatabaseListTableViewController.h"
+#import "SelectDatabaseViewController.h"
 #import "Alerts.h"
 #import "SelectComparisonTypeViewController.h"
 #import "IOSCompositeKeyDeterminer.h"
@@ -34,13 +34,15 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToShowMergeSecondDatabasesList"]) {
         UINavigationController *nav = segue.destinationViewController;
-        SecondDatabaseListTableViewController* vc = (SecondDatabaseListTableViewController*)nav.topViewController;
-        vc.firstDatabase = self.firstDatabase;
+        SelectDatabaseViewController* vc = (SelectDatabaseViewController*)nav.topViewController;
+        vc.disableDatabaseUuid = self.firstDatabase.metadata.uuid;
         
         __weak MergeSelectSecondDatabaseViewController* weakSelf = self;
         vc.onSelectedDatabase = ^(DatabasePreferences * _Nonnull secondDatabase, UIViewController *__weak  _Nonnull vcToDismiss) {
             [vcToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                [weakSelf onSecondDatabaseSelected:secondDatabase];
+                if ( secondDatabase ) {
+                    [weakSelf onSecondDatabaseSelected:secondDatabase];
+                }
             }];
         };
     }

@@ -1141,7 +1141,7 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 
 - (BOOL)bioOrWatchUnlockIsPossible {
-    return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.databaseMetadata];
+    return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.databaseMetadata isAutoFillOpen:NO];
 }
 
 - (void)embedTouchIDIfAvailable {

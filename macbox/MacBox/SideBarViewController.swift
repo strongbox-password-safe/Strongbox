@@ -1148,12 +1148,21 @@ extension SideBarViewController: NSOutlineViewDelegate {
         return false
     }
 
-    func isValidNonHeaderDragDestination(_ context: NavigationContext) -> Bool {
+    func isValidNonHeaderDragDestination(_ destinationItem: SideBarViewNode, isExternalSource: Bool) -> Bool {
+        if let hdr = destinationItem.headerNode, hdr == kHeaderNodeFavourites {
+            return !isExternalSource
+        }
+
+        let context = destinationItem.context
         switch context {
-        case .regularHierarchy(_), .tags:
+        case .regularHierarchy:
             return true
+        case .tags:
+            return !isExternalSource
+        case .special(.allEntries):
+            return isExternalSource
         default:
-            return false 
+            return false
         }
     }
 
@@ -1164,17 +1173,18 @@ extension SideBarViewController: NSOutlineViewDelegate {
         if let _ = info.draggingPasteboard.string(forType: NSPasteboard.PasteboardType(kDragAndDropSideBarHeaderMoveInternalUti)) {
             guard source == outlineView, destinationItem.headerNode != nil, index == NSOutlineViewDropOnItemIndex else { return [] }
 
-
+            swlog("Header re-ordering validate: [%@]", destinationItem.title)
 
             return [.move]
         }
 
-        guard isValidNonHeaderDragDestination(destinationItem.context) else {
-            return []
-        }
-
         let sourceIsBrowseView = source == browseView.outlineView
         let sourceIsThisDatabase = source == outlineView || sourceIsBrowseView
+
+        guard isValidNonHeaderDragDestination(destinationItem, isExternalSource: !sourceIsThisDatabase) else {
+            swlog("🐞 Invalid Drag Destination: [%@]", destinationItem.context)
+            return []
+        }
 
         if sourceIsThisDatabase {
             if case let .regularHierarchy(destinationGroupId) = destinationItem.context {
@@ -1214,13 +1224,19 @@ extension SideBarViewController: NSOutlineViewDelegate {
             } else if case .tags = destinationItem.context, index == NSOutlineViewDropOnItemIndex, sourceIsBrowseView {
 
                 return [.copy]
+            } else if let hdr = destinationItem.headerNode, hdr == kHeaderNodeFavourites, index != NSOutlineViewDropOnItemIndex, sourceIsThisDatabase {
+                swlog("Drop from browse onto Favourites: [%@]")
+                return [.copy]
             }
         } else {
-            guard case .regularHierarchy = destinationItem.context,
-                  let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)),
-                  index == NSOutlineViewDropOnItemIndex else { return [] }
-
             swlog("SideBar validateDrop: External Source - %d", index)
+
+            guard let _ = info.draggingPasteboard.data(forType: NSPasteboard.PasteboardType(kDragAndDropExternalUti)),
+                  index == NSOutlineViewDropOnItemIndex
+            else {
+                return []
+            }
+
             return [.copy]
         }
 
@@ -1257,12 +1273,12 @@ extension SideBarViewController: NSOutlineViewDelegate {
             return true
         }
 
-        guard isValidNonHeaderDragDestination(destinationItem.context) else {
-            return false
-        }
-
         let sourceIsBrowseView = source == browseView.outlineView
         let sourceIsThisDatabase = source == outlineView || sourceIsBrowseView
+
+        guard isValidNonHeaderDragDestination(destinationItem, isExternalSource: !sourceIsThisDatabase) else {
+            return false
+        }
 
         if case let .regularHierarchy(destinationGroupId) = destinationItem.context {
             guard let destination = database.getItemBy(destinationGroupId) else {
@@ -1310,6 +1326,22 @@ extension SideBarViewController: NSOutlineViewDelegate {
 
 
             database.addTag(toItems: sourceItems, tag: tag)
+            return true
+        } else if case .special(.allEntries) = destinationItem.context, index == NSOutlineViewDropOnItemIndex, !sourceIsThisDatabase {
+            let destinationItemId = database.rootGroup.uuid
+            guard let destinationItem = database.getItemBy(destinationItemId) else {
+                return false
+            }
+
+            return windowController.pasteItems(from: info.draggingPasteboard, destinationItem: destinationItem, internal: false, clear: true) != 0
+        } else if let hdr = destinationItem.headerNode, hdr == kHeaderNodeFavourites, index != NSOutlineViewDropOnItemIndex, sourceIsThisDatabase {
+            guard let serializationIds = info.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType(kDragAndDropInternalUti)) as? [String] else { return false }
+            let sourceItems = serializationIds.compactMap { database.getItemFromSerializationId($0) }
+
+            
+
+            database.addFavourites(sourceItems.map(\.uuid))
+
             return true
         }
 

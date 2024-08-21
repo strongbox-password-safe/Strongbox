@@ -395,7 +395,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotification object:nil];
     
     
-    
+
     [NSAppleEventManager.sharedAppleEventManager setEventHandler:self
                                                      andSelector:@selector(handleGetURLEvent:withReplyEvent:)
                                                    forEventClass:kInternetEventClass
@@ -412,25 +412,6 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)cleanupWorkingDirectories {
     [StrongboxFilesManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
     [StrongboxFilesManager.sharedInstance deleteAllTmpWorkingFiles];
-}
-
-- (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
-    NSString *URLString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
-    NSURL *url = [NSURL URLWithString:URLString];
-    
-    
-    
-    if ( [url.absoluteString hasPrefix:@"com.googleusercontent.apps"] ) {
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-        [GoogleDriveManager.sharedInstance handleUrl:url];
-#endif
-    }
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    else if ([url.absoluteString hasPrefix:@"db"]) {
-        [DropboxV2StorageProvider.sharedInstance handleAuthRedirectUrl:url];
-        [NSRunningApplication.currentApplication activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
-    }
-#endif
 }
 
 - (BOOL)isWindowOfInterest:(NSNotification*)notification {
@@ -899,7 +880,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if ( databaseUuid ) {
         MacDatabasePreferences* metadata = [MacDatabasePreferences fromUuid:databaseUuid];
         if ( metadata ) {
-            [dc openDatabase:metadata completion:^(NSError * _Nonnull error) {
+            [dc openDatabase:metadata completion:^(Document * document, NSError * error) {
                 [self showAndActivateStrongboxStage2:completion];
             }];
         }
@@ -954,6 +935,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     slog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
 
+
+    
     [self cancelAutoLockTimer];
     
     [self performedScheduledEntitlementsCheck];
@@ -1002,6 +985,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self maybeWarnAboutCloudKitUnavailability];
 #endif
+    
+    [self checkIfBiometricsDatabaseChanged];
     
     self.suppressQuickLaunchForNextAppActivation = NO; 
 }
@@ -1932,6 +1917,190 @@ static NSInteger clipboardChangeCount;
     [self showAndActivateStrongbox:nil suppressEmptyLaunchBehaviour:YES suppressWindowUnminimization:YES completion:^{
         [weakSelf onShowPasswordGenerator:nil];
     }];
+}
+
+
+
+- (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
+    NSString *URLString = [[event paramDescriptorForKeyword:keyDirectObject] stringValue];
+    NSURL *url = [NSURL URLWithString:URLString];
+    
+    slog(@"🐞 handleGetURLEvent: [%@]", URLString);
+    
+    if ( [url.absoluteString.lowercaseString hasPrefix:@"otpauth"]) {
+        [self beginImport2FACodeOtpAuthUrl:url];
+    }
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    else if ( [url.absoluteString hasPrefix:@"com.googleusercontent.apps"] ) {
+        [GoogleDriveManager.sharedInstance handleUrl:url];
+
+    }
+    else if ([url.absoluteString hasPrefix:@"db"]) {
+        [DropboxV2StorageProvider.sharedInstance handleAuthRedirectUrl:url];
+        [NSRunningApplication.currentApplication activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)];
+    }
+#endif
+}
+
+- (void)beginImport2FACodeOtpAuthUrl:(NSURL*)url {
+    [DBManagerPanel.sharedInstance show];
+    NSViewController* viewController = DBManagerPanel.sharedInstance.contentViewController;
+    
+    OTPToken* token = [OTPToken tokenWithURL:url];
+    
+    if ( !token ) {
+        slog(@"🔴 Could not parse OTPAuth url [%@]", url);
+        [MacAlerts info:@"This is not a valid OTPAuth URL" window:viewController.view.window];
+        return;
+    }
+    
+    [self beginImport2FACodeWithToken:token viewController:viewController];
+}
+
+- (void)beginImport2FACodeWithToken:(OTPToken*)token viewController:(NSViewController*)viewController {
+    NSArray<MacDatabasePreferences*>* writeableDbs = [MacDatabasePreferences.allDatabases filter:^BOOL(MacDatabasePreferences * _Nonnull obj) {
+        return !obj.readOnly;
+    }];
+    
+    if ( writeableDbs.count == 0 ) {
+        slog(@"🔴 No writeable databases available!");
+        [MacAlerts info:@"No Writeable Databases Found" window:viewController.view.window];
+        return;
+    }
+    
+    if ( MacDatabasePreferences.allDatabases.count > 1 ) {
+        [self selectDatabaseFor2FAImport:token viewController:viewController];
+    } else {
+        [self beginImport2FAIntoDatabase:MacDatabasePreferences.allDatabases.firstObject token:token viewController:viewController];
+    }
+}
+
+- (void)selectDatabaseFor2FAImport:(OTPToken*)token viewController:(NSViewController*)viewController {
+    SelectDatabaseViewController* selectDbVc = [SelectDatabaseViewController fromStoryboard];
+    
+    selectDbVc.unlockedDatabases = [[DatabasesCollection.shared getUnlockedDatabases] map:^id _Nonnull(Model * _Nonnull obj, NSUInteger idx) {
+        return obj.databaseUuid;
+    }].set;
+    
+    selectDbVc.disableReadOnlyDatabases = YES;
+    selectDbVc.customTitle = NSLocalizedString(@"select_database_to_save_2fa_code_title", @"Select Database for 2FA Code");
+    
+    __weak AppDelegate* weakSelf = self;
+    selectDbVc.onDone = ^(BOOL userCancelled, MacDatabasePreferences * _Nonnull database) {
+        if (!userCancelled) {
+            [weakSelf beginImport2FAIntoDatabase:database token:token viewController:viewController];
+        }
+    };
+
+    [viewController presentViewControllerAsSheet:selectDbVc];
+}
+
+- (void)beginImport2FAIntoDatabase:(MacDatabasePreferences*)database token:(OTPToken*)token viewController:(NSViewController*)viewController {
+    Model* model = [DatabasesCollection.shared getUnlockedWithUuid:database.uuid];
+    
+    if ( model ) {
+        [self import2FAIntoUnlockedDatabase:model token:token viewController:viewController];
+    }
+    else {
+        __weak AppDelegate* weakSelf = self;
+        [DatabasesCollection.shared initiateDatabaseUnlockWithUuid:database.uuid
+                                                   syncAfterUnlock:YES
+                                                           message:nil
+                                                        completion:^(BOOL success) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( success ) {
+                    [weakSelf beginImport2FAIntoDatabase:database token:token viewController:viewController]; 
+                }
+                else {
+                    [MacAlerts yesNo:NSLocalizedString(@"unlock_was_unsuccessful", @"Unlock Unsuccessful")
+                     informativeText:NSLocalizedString(@"generic_would_you_like_to_try_again", @"Would you like to try again?")
+                              window:viewController.view.window
+                          completion:^(BOOL yesNo) {
+                        if ( yesNo ) {
+                            [weakSelf beginImport2FACodeWithToken:token viewController:viewController];
+                        }
+                    }];
+                }
+            });
+        }];
+    }
+}
+
+- (void)import2FAIntoUnlockedDatabase:(Model*)model token:(OTPToken*)token viewController:(NSViewController*)viewController {
+    Document* doc = [DatabasesCollection.shared documentForDatabaseWithUuid:model.databaseUuid];
+    if ( doc ) {
+        [self import2FAWithDocument:doc token:token viewController:viewController];
+    }
+    else {
+        __weak AppDelegate* weakSelf = self;
+        [DatabasesCollection.shared showDatabaseDocumentWindowWithUuid:model.databaseUuid
+                                                            completion:^(Document * _Nullable document, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if ( error ) {
+                    [MacAlerts error:error window:viewController.view.window];
+                }
+                else {
+                    [weakSelf import2FAWithDocument:document token:token viewController:viewController];
+                }
+            });
+        }];
+    }
+}
+
+- (void)import2FAWithDocument:(Document*)document token:(OTPToken*)token viewController:(NSViewController*)viewController {
+    if ( document.isDisplayingEditSheet ) {
+        [MacAlerts info:NSLocalizedString(@"generic_edit_in_progress", @"Edit In Progress")
+        informativeText:NSLocalizedString(@"generic_edit_in_progress_2fa_code", @"There is an edit in progress, please complete this before adding a 2FA Code.")
+                 window:viewController.view.window
+             completion:nil];
+    }
+    else {
+        [document import2FAToken:token];
+    }
+}
+
+
+
+- (void)checkIfBiometricsDatabaseChanged {
+    BOOL bioDbHasChanged = [BiometricIdHelper.sharedInstance isBiometricDatabaseStateHasChanged:NO];
+    if ( bioDbHasChanged ) {
+        [self clearBioDbAndMessageUser];
+    }
+}
+
+- (void)clearBioDbAndMessageUser {
+    [DatabasesCollection.shared tryToLockAll];
+    
+    [self clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState];
+    
+    [DBManagerPanel.sharedInstance show];
+    NSViewController* viewController = DBManagerPanel.sharedInstance.contentViewController;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MacAlerts info:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_title", @"Biometrics Database Changed")
+        informativeText:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_message", @"It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons.")
+                 window:viewController.view.window
+             completion:nil];
+    });
+}
+
+- (void)clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState {
+    NSArray<MacDatabasePreferences*>* databases = MacDatabasePreferences.allDatabases;
+    
+    
+    
+    
+    
+    for (MacDatabasePreferences* database in databases) {
+        if( database.isConvenienceUnlockEnabled ) {
+            slog(@"Clearing Biometrics for Database: [%@]", database.nickName);
+            
+            database.conveniencePasswordHasBeenStored = NO; 
+            database.convenienceMasterPassword = nil;
+        }
+    }
+    
+    [BiometricIdHelper.sharedInstance clearBiometricRecordedDatabaseState];
 }
 
 @end

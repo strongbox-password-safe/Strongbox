@@ -29,6 +29,13 @@
     [self stopObservingOtpUpdateTimer];
 }
 
+- (void)awakeFromNib {
+    [super awakeFromNib];
+    
+    self.icon.layer.cornerRadius = 3.0;
+    self.icon.clipsToBounds = YES;
+}
+
 -(void)prepareForReuse {
     [super prepareForReuse];
 

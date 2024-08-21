@@ -379,12 +379,6 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
     }
 
     @objc func onSync(_: Any?) {
-
-
-
-
-
-
         guard let doc = view.window?.windowController?.document as? Document else {
             swlog("🔴 NextGenSplitViewController::load Document not set!")
             return
@@ -438,6 +432,20 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             vc.initialNodeId = selectedItem
         }
 
+        vc.database = database
+
+        presentAsSheet(vc)
+    }
+
+    @objc
+    func editEntry(uuid: UUID) {
+        if database.locked || database.isEffectivelyReadOnly {
+            swlog("🔴 Cannot edit locked or read-only database")
+            return
+        }
+
+        let vc = CreateEditViewController.instantiateFromStoryboard()
+        vc.initialNodeId = uuid
         vc.database = database
 
         presentAsSheet(vc)
@@ -654,20 +662,24 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
 
     var popouts: [UUID: PopOutDetailsWindowController] = [:] 
 
-    @objc func onPopOutDetailsAndPin(_: Any?) {
-        popOutDetails(pin: true)
+    @objc public func onPopOutDetailsAndPin(_: Any?) {
+        popOutSelectedItemDetails(pin: true)
     }
 
-    @objc func onPopOutDetails(_: Any?) {
-        popOutDetails()
+    @objc public func onPopOutDetails(_: Any?) {
+        popOutSelectedItemDetails()
     }
 
-    func popOutDetails(pin: Bool = false) {
+    func popOutSelectedItemDetails(pin: Bool = false) {
         guard database.nextGenSelectedItems.count == 1, let uuid = database.nextGenSelectedItems.first else {
             swlog("✅ onPopOutDetails - Selection invalid")
             return
         }
 
+        popOutItemDetails(uuid: uuid, pin: pin)
+    }
+
+    func popOutItemDetails(uuid: UUID, pin: Bool = false) {
         if let existing = popouts[uuid] {
             existing.floatOnTop = pin
             existing.showWindow(nil)
@@ -681,6 +693,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             popout.floatOnTop = pin
 
             popout.showWindow(nil)
+            popout.window?.center()
         }
     }
 
@@ -703,6 +716,18 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         popouts.removeAll()
     }
 
+    @objc var isDisplayingEditSheet: Bool {
+        if let presentedViewControllers {
+            for presentedViewController in presentedViewControllers {
+                if let _ = presentedViewController as? CreateEditViewController {
+                    return true
+                }
+            }
+        }
+
+        return false
+    }
+
     @objc var editsInProgress: Bool {
         if let presentedViewControllers {
             for presentedViewController in presentedViewControllers {
@@ -721,6 +746,79 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         }
 
         return false
+    }
+
+    
+
+    @objc func import2FAToken(token: OTPToken) {
+        guard let model = database.commonModel else {
+            return
+        }
+
+        let vc = SwiftUIViewFactory.getCreateOrAdd2FACodeView(token: token, model: model) { [weak self] cancel, createNew, title, group, selectedEntry in
+            guard let self else { return }
+
+            Utils.dismissViewControllerCorrectly(presentedViewControllers?.last)
+
+            guard !cancel else { return }
+
+            if createNew {
+                guard let title, let group else {
+                    swlog("🔴 Could not get proper params to create new TOTP!")
+
+                    MacAlerts.info(NSLocalizedString("generic_error", comment: "Error"),
+                                   informativeText: "Could not get proper params to create new TOTP",
+                                   window: view.window, completion: nil)
+                    return
+                }
+
+                onCreateNewWith2FACode(model: model, group: group, title: title, token: token)
+            } else {
+                guard let selectedEntry, let entry = model.getItemBy(selectedEntry) else {
+                    swlog("🔴 Could not get proper params to add new TOTP!")
+                    MacAlerts.info(NSLocalizedString("generic_error", comment: "Error"),
+                                   informativeText: "Could not get proper params to create new TOTP",
+                                   window: view.window, completion: nil)
+
+                    return
+                }
+
+                onAdd2FACodeToExistingEntry(model: model, entry: entry, token: token)
+            }
+        }
+
+        presentAsSheet(vc)
+    }
+
+    func onCreateNewWith2FACode(model: Model, group: Node, title: String, token: OTPToken) {
+        let node = Node(asRecord: title, parent: group)
+
+        if !database.addChildren([node], parent: group) {
+            swlog("🔴 Could not add!")
+            MacAlerts.info(NSLocalizedString("generic_error", comment: "Error"),
+                           informativeText: "Could not add",
+                           window: view.window, completion: nil)
+            return
+        }
+
+        onAdd2FACodeToExistingEntry(model: model, entry: node, token: token)
+    }
+
+    func onAdd2FACodeToExistingEntry(model: Model, entry: Node, token: OTPToken) {
+        let editModel = EntryViewModel.fromNode(entry, model: model)
+        editModel.totp = token
+        database.applyEditsAndMoves(editModel, toNode: entry.uuid)
+
+        showToastNotification(message: NSLocalizedString("2fa_code_imported", comment: "2FA Code Imported"))
+
+        setModelNavigationContextWithViewNode(database, .special(.totpItems))
+        database.nextGenSelectedItems = [entry.uuid]
+
+        if Settings.sharedInstance().autoSave {
+            DispatchQueue.main.async { [weak self] in 
+                self?.onSync(nil) 
+            }
+        }
     }
 }
 
@@ -1123,23 +1221,9 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
         } else if action == #selector(onCreateGroup) {
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onPopOutDetails(_:)) {
-            guard !database.locked, database.nextGenSelectedItems.count == 1,
-                  let uuid = database.nextGenSelectedItems.first
-            else {
-                swlog("✅ onPopOutDetails - Selection invalid")
-                return false
-            }
-
-            return true
+            return singleSelectedNode != nil && !singleSelectedNode!.isGroup
         } else if action == #selector(onPopOutDetailsAndPin(_:)) {
-            guard !database.locked, database.nextGenSelectedItems.count == 1,
-                  let uuid = database.nextGenSelectedItems.first
-            else {
-                swlog("✅ onPopOutDetailsAndPin - Selection invalid")
-                return false
-            }
-
-            return true
+            return singleSelectedNode != nil && !singleSelectedNode!.isGroup
         } else if action == #selector(onLockDatabase) {
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onCreateRecord) {
@@ -1153,7 +1237,7 @@ extension NextGenSplitViewController: NSMenuItemValidation, NSToolbarItemValidat
 
             return !database.locked && !database.isEffectivelyReadOnly
         } else if action == #selector(onEditSelectedEntry) {
-            return !database.locked && singleSelectedNode != nil && !singleSelectedNode!.isGroup && !database.isEffectivelyReadOnly
+            return singleSelectedNode != nil && !singleSelectedNode!.isGroup && !database.isEffectivelyReadOnly
         } else if action == #selector(onDeleteOrRecycleItem) {
             return !database.locked && atLeastOneSelected && !database.isEffectivelyReadOnly
         } else if action == #selector(onSync) {

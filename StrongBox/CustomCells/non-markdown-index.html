@@ -8,33 +8,30 @@
             :root {
                 color-scheme: light dark;
             }
-
+            
             body {
                 margin: 0px;
                 padding: 0px;
-                font: -apple-system-body;
+                font: -apple-system-body; /* H/T https://useyourloaf.com/blog/using-dynamic-type-with-web-views/ */
             }
             
-            .markdown-body {
+            .non-markdown-body {
                 box-sizing: border-box;
                 min-width: 200px;
                 max-width: 980px;
                 margin: 0 auto;
-                /* padding: 16px; */
-                /* border-radius: 5px; /*
-                /* --color-canvas-default: #0d1117 !important; */
-                /*        --color-canvas-default: #000000;*/
                 --color-canvas-default: transparent !important; /* Override the default style sheet below */
+                display: inline-block;
+            }
+            
+            p {
+                margin-top: 0;
+                margin-bottom: 10px; /* Required for correct sizing */
             }
         </style>
-
-        <link rel="stylesheet" href="github-markdown.css">
-        <link rel="stylesheet" href="%@"> <!-- Highlight.js stylesheet -->
-        <script src="highlight.min.js"></script>
-        <script>hljs.highlightAll();</script>
     </head>
     <body>
-        <article class="markdown-body">
+        <article class="non-markdown-body">
             %@
         </article>
     </body>

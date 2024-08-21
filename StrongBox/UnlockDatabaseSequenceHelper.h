@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)beginUnlockSequence:(BOOL)isAutoFillQuickTypeOpen
         biometricPreCleared:(BOOL)biometricPreCleared
        explicitManualUnlock:(BOOL)noConvenienceUnlock
+          explicitEagerSync:(BOOL)explicitEagerSync
                  completion:(UnlockDatabaseCompletionBlock)completion;
 
 @end

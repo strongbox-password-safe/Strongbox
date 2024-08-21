@@ -183,6 +183,14 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL hardwareKeyCachingBeta;
 
+@property (nullable) NSData* lastKnownGoodBiometricsDatabaseState;
+@property (nullable) NSData* autoFillLastKnownGoodBiometricsDatabaseState;
+
+@property BOOL duplicateItemReferencePassword;
+@property BOOL duplicateItemReferenceUsername;
+@property BOOL duplicateItemPreserveTimestamp;
+@property BOOL duplicateItemEditAfterwards;
+
 @end
 
 

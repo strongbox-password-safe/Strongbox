@@ -63,9 +63,9 @@ class SwiftUIAutoFillHelper: NSObject {
             return
         #else
 
-            let sortedGroups = getSortedGroups(model)
-            var sortedPaths = sortedGroups.map { getGroupPathDisplayString($0, model.database) }
-            let rootPath = getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
+            let sortedGroups = AddOrCreateHelper.getSortedGroups(model)
+            var sortedPaths = sortedGroups.map { AddOrCreateHelper.getGroupPathDisplayString($0, model.database) }
+            let rootPath = AddOrCreateHelper.getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
             sortedPaths.insert(rootPath, at: 0)
 
             let template = NewEntryDefaultsHelper.getDefaultNewEntryNode(model.database, parentGroup: model.database.effectiveRootGroup)
@@ -201,48 +201,42 @@ class SwiftUIAutoFillHelper: NSObject {
         }
     }
 
-    func getGroupPathDisplayString(_ node: Node, _ database: DatabaseModel, _ rootGroupNameInsteadOfSlash: Bool = false) -> String {
-        database.getPathDisplayString(node, includeRootGroup: true, rootGroupNameInsteadOfSlash: rootGroupNameInsteadOfSlash, includeFolderEmoji: false, joinedBy: "/")
-    }
-
-    func getSortedGroups(_ model: Model) -> [Node] {
-        model.database.allActiveGroups.sorted { n1, n2 in
-            let p1 = getGroupPathDisplayString(n1, model.database)
-            let p2 = getGroupPathDisplayString(n2, model.database)
-            return finderStringCompare(p1, p2) == .orderedAscending
-        }
-    }
-
     @available(macOS 14.0, *)
     func savePasskeyToDatabase(_ passkey: Passkey,
                                _ model: Model,
                                _ parentViewController: VIEW_CONTROLLER_PTR,
                                _ completion: @escaping ((_ cancelled: Bool, _ error: Error?) -> Void)) throws
     {
-        let sortedGroups = getSortedGroups(model)
-        var sortedPaths = sortedGroups.map { getGroupPathDisplayString($0, model.database) }
-        let rootPath = getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
+        let sortedGroups = AddOrCreateHelper.getSortedGroups(model)
+        var sortedPaths = sortedGroups.map { AddOrCreateHelper.getGroupPathDisplayString($0, model.database) }
+        let rootPath = AddOrCreateHelper.getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
         sortedPaths.insert(rootPath, at: 0)
 
         let entries = NSMutableArray(array: model.allSearchableNoneExpiredEntries)
         let sorted = model.filterAndSort(forBrowse: entries, includeGroups: false)
 
-        let wizard = PasskeyWizard(title: passkey.relyingPartyId,
-                                   groups: sortedPaths,
-                                   entries: sorted,
-                                   selectedGroupIdx: 0,
-                                   model: model)
-        { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
-            self?.handlePasskeyWizardResponse(passkey, model, sortedGroups, cancel, createNew, title, selectedGroupIdx, selectedEntry, completion)
-        }
-
         #if os(iOS)
+            let wizard = AddOrCreateWizard(mode: .passkey,
+                                           title: passkey.relyingPartyId,
+                                           groups: sortedPaths,
+                                           entries: sorted,
+                                           selectedGroupIdx: 0,
+                                           model: model)
+            { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
+                self?.handlePasskeyWizardResponse(passkey, model, sortedGroups, cancel, createNew, title, selectedGroupIdx, selectedEntry, completion)
+            }
             parentViewController.present(UIHostingController(rootView: wizard), animated: true)
         #else
+            let wizard = WizardAddToOrCreateNewView(mode: .passkey, entries: sorted, model: model, title: passkey.relyingPartyId, groups: sortedPaths) { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
+                Utils.dismissViewControllerCorrectly(parentViewController.presentedViewControllers?.last)
+
+                self?.handlePasskeyWizardResponse(passkey, model, sortedGroups, cancel, createNew, title, selectedGroupIdx, selectedEntry, completion)
+            }
+
             let hostingController = NSHostingController(rootView: wizard)
 
-            hostingController.preferredContentSize = NSSize(width: 400, height: 400)
-            hostingController.sizingOptions = .preferredContentSize
+
+
 
             parentViewController.presentAsSheet(hostingController)
         #endif

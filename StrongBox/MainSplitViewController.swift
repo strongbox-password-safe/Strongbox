@@ -7,6 +7,19 @@
 //
 
 import Foundation
+import SwiftUI
+
+@objc
+class PresentUnlockedDatabaseParams: NSObject {
+    var suppressInitialLazySync: Bool
+    var onLoadAdd2FAOtpAuthUrl: URL?
+
+    @objc
+    init(suppressInitialLazySync: Bool, onLoadAdd2FAOtpAuthUrl: URL? = nil) {
+        self.suppressInitialLazySync = suppressInitialLazySync
+        self.onLoadAdd2FAOtpAuthUrl = onLoadAdd2FAOtpAuthUrl
+    }
+}
 
 class MainSplitViewController: UISplitViewController, UISplitViewControllerDelegate {
     deinit {
@@ -17,8 +30,16 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
     var cancelOtpTimer: Bool = false
     var nextGenSyncInProgress: Bool = false
+    @objc var hasDoneDatabaseOnLaunchTasks = false
+
     @objc var model: Model!
-    @objc var hasAlreadyDoneStartWithSearch = false
+    @objc var presentationParams: PresentUnlockedDatabaseParams!
+
+    @objc
+    class func fromStoryboard() -> Self {
+        let storyboard = UIStoryboard(name: "MasterDetail", bundle: nil)
+        return storyboard.instantiateInitialViewController() as! Self
+    }
 
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -51,7 +72,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
         startOtpRefresh()
 
-        if model.metadata.storageProvider != .kLocalDevice, model.metadata.lazySyncMode {
+        if !presentationParams.suppressInitialLazySync, model.metadata.storageProvider != .kLocalDevice, model.metadata.lazySyncMode {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
 
                 self?.beginOnLoadLazySync()
@@ -60,6 +81,20 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
             self?.model.restartBackgroundAudit()
+        }
+    }
+
+    var firstAppearance = true
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+
+        if firstAppearance {
+            firstAppearance = false
+            
+
+            if let otpAuthUrl = presentationParams.onLoadAdd2FAOtpAuthUrl {
+                begin2FAImport(otpAuthUrl: otpAuthUrl)
+            }
         }
     }
 
@@ -80,6 +115,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         swlog("MainSplitViewController: listenToNotifications")
 
         NotificationCenter.default.addObserver(self, selector: #selector(onAutoFillChangedConfig(object:)), name: .autoFillChangedConfig, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(onBeginImport2FAOtpAuthUrlNotification(object:)), name: .beginImport2FAOtpAuthUrl, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(onWiFiSyncUpdatedWorkingCopy(object:)),
                                                name: Notification.Name("wiFiSyncServiceNameDidChange"), 
@@ -92,6 +128,17 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
     func unListenToNotifications() {
         NotificationCenter.default.removeObserver(self)
+    }
+
+    @objc func onBeginImport2FAOtpAuthUrlNotification(object: Any?) {
+        swlog("🟢 MainSplitViewController::onBeginImport2FAOtpAuthUrlNotification - [%@]", object)
+
+        guard let notification = object as? Notification, let otpAuthUrl = notification.object as? URL else {
+            swlog("🔴 Couldn't get URL in notification")
+            return
+        }
+
+        begin2FAImport(otpAuthUrl: otpAuthUrl)
     }
 
     @objc func onAutoFillChangedConfig(object _: Any?) {
@@ -218,16 +265,16 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         }
     }
 
-    @objc public func onClose() {
+    @objc public func closeAndCleanup(completion: (() -> Void)? = nil) {
         swlog("MainSplitViewController: onClose")
 
         killOtpTimer()
 
-        NotificationCenter.default.post(name: .masterDetailViewClose, object: model.metadata.uuid)
-
-        presentingViewController?.dismiss(animated: true)
+        NotificationCenter.default.post(name: .masterDetailViewClose, object: model.metadata.uuid) 
 
         model.closeAndCleanup()
+
+        presentingViewController?.dismiss(animated: true, completion: completion)
     }
 
     func killOtpTimer() {
@@ -522,7 +569,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
                 swlog("🔴 Could not Unlock updated database after reload. Key changed?! - Force Locking.")
 
-                self?.onClose()
+                self?.closeAndCleanup()
             }
 
             completion?(success)
@@ -539,5 +586,118 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         if let completion {
             completion(.success, localWasChanged, nil)
         }
+    }
+
+    
+
+    func begin2FAImport(otpAuthUrl: URL) {
+        guard let token = OTPToken(url: otpAuthUrl) else {
+            Alerts.info(self,
+                        title: NSLocalizedString("generic_error", comment: "Error"),
+                        message: NSLocalizedString("invalid_otpauth_url", comment: "Invalid OTPAuth URL"))
+            return
+        }
+
+        let sortedGroups = AddOrCreateHelper.getSortedGroups(model)
+        var sortedPaths = sortedGroups.map { AddOrCreateHelper.getGroupPathDisplayString($0, model.database) }
+        let rootPath = AddOrCreateHelper.getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
+        sortedPaths.insert(rootPath, at: 0)
+
+        let entries = NSMutableArray(array: model.allSearchableNoneExpiredEntries)
+        let sorted = model.filterAndSort(forBrowse: entries, includeGroups: false)
+
+        let title = (token.name ?? token.issuer) ?? NSLocalizedString("generic_unknown", comment: "Unknown")
+
+        let wizard = AddOrCreateWizard(
+            mode: .totp,
+            title: title,
+            groups: sortedPaths,
+            entries: sorted,
+            selectedGroupIdx: 0,
+            model: model
+        ) { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
+            guard let self else { return }
+
+            visibleViewController.dismiss(animated: true) { [weak self] in
+                guard let self else { return }
+                guard !cancel else { return }
+
+                var success: Bool
+                if createNew {
+                    guard let title, let selectedGroupIdx, let group = selectedGroupIdx == 0 ? model.database.effectiveRootGroup : sortedGroups[safe: selectedGroupIdx - 1] else {
+                        swlog("🔴 Could not get proper params to create new TOTP!")
+                        Alerts.info(visibleViewController, title: NSLocalizedString("generic_error", comment: "Error"), message: "Could not get proper params to create new TOTP")
+                        return
+                    }
+
+                    success = onCreateNew(model: model, group: group, title: title, token: token)
+                } else {
+                    guard let selectedEntry, let entry = model.getItemBy(selectedEntry) else {
+                        swlog("🔴 Could not get proper params to add new TOTP!")
+                        Alerts.info(visibleViewController, title: NSLocalizedString("generic_error", comment: "Error"), message: "Could not get proper params to add new TOTP")
+                        return
+                    }
+
+                    success = onAddToExistingEntry(model: model, entry: entry, token: token)
+                }
+
+                if !success {
+                    Alerts.info(visibleViewController,
+                                title: NSLocalizedString("generic_error", comment: "Error"),
+                                message: NSLocalizedString("error_adding_2fa_code", comment: "Error Adding 2FA Code"))
+                }
+            }
+        }
+
+        let vc = UIHostingController(rootView: wizard)
+        vc.modalPresentationStyle = .formSheet
+
+        visibleViewController.present(vc, animated: true)
+    }
+
+    func onCreateNew(model: Model, group: Node, title: String, token: OTPToken) -> Bool {
+        let node = Node(asRecord: title, parent: group)
+
+        if !model.addChildren([node], destination: group) {
+            swlog("🔴 Could not add!")
+            return false
+        }
+
+        return onAddToExistingEntry(model: model, entry: node, token: token)
+    }
+
+    func onAddToExistingEntry(model: Model, entry: Node, token: OTPToken) -> Bool {
+        let appendUrlToNotes = model.originalFormat == .passwordSafe || model.originalFormat == .keePass1
+        entry.fields.setTotp(token,
+                             appendUrlToNotes: appendUrlToNotes,
+                             addLegacyFields: AppPreferences.sharedInstance().addLegacySupplementaryTotpCustomFields,
+                             addOtpAuthUrl: AppPreferences.sharedInstance().addOtpAuthUrl)
+
+        Task {
+            if await updateAndQueueSync() {
+                StrongboxToastMessages.showSlimInfoStatusBar(body: NSLocalizedString("2fa_code_saved", comment: "2FA Code Saved"),
+                                                             delay: 1.0)
+                presentItemDetailsModal(uuid: entry.uuid)
+            }
+        }
+
+        return true
+    }
+
+    @MainActor
+    func presentItemDetailsModal(uuid: UUID) {
+        let vc = ItemDetailsViewController.fromStoryboard(model, nodeUuid: uuid)
+        vc.isStandaloneDetailsModal = true
+        vc.explicitHideMetadata = true
+        vc.explicitHideHistory = true
+
+        let nav = UINavigationController(rootViewController: vc)
+        nav.modalPresentationStyle = .formSheet
+
+        visibleViewController.present(nav, animated: true)
+    }
+
+    var visibleViewController: UIViewController {
+        presentedViewController ?? self
     }
 }

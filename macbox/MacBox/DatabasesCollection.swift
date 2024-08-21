@@ -235,13 +235,13 @@ class DatabasesCollection: NSObject {
     }
 
     @objc
-    public func showDatabaseDocumentWindow(uuid: String) {
+    public func showDatabaseDocumentWindow(uuid: String, completion: ((_ document: Document?, _ error: Error?) -> Void)? = nil) {
         guard let dc = DocumentController.shared as? DocumentController, let database = MacDatabasePreferences.getById(uuid) else {
             swlog("🔴 Couldn't get shared document controller")
             return
         }
 
-        dc.openDatabase(database)
+        dc.openDatabase(database, completion: completion)
     }
 
     static func getDbManagerPanelVc() -> NSViewController {
@@ -295,6 +295,7 @@ class DatabasesCollection: NSObject {
         return go
     }
 
+    @objc
     public func initiateDatabaseUnlock(uuid: String, syncAfterUnlock: Bool, message: String? = nil, completion: ((_: Bool) -> Void)? = nil) {
         if isUnlocked(uuid: uuid) {
             swlog("⚠️ This database was already unlocked! NOP")

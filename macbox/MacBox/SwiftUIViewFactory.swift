@@ -149,5 +149,37 @@ class SwiftUIViewFactory: NSObject {
                     onSettingsChanged: onSettingsChanged
                 ))
         }
+
+        @objc
+        static func getCreateOrAdd2FACodeView(token: OTPToken, model: Model, completion: @escaping ((_ cancel: Bool, _ createNew: Bool, _ title: String?, _ group: Node?, _ selectedEntry: UUID?) -> Void)) -> NSViewController {
+            let sortedGroups = AddOrCreateHelper.getSortedGroups(model)
+            var sortedPaths = sortedGroups.map { AddOrCreateHelper.getGroupPathDisplayString($0, model.database) }
+            let rootPath = AddOrCreateHelper.getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
+            sortedPaths.insert(rootPath, at: 0)
+            let title = (token.name ?? token.issuer) ?? NSLocalizedString("generic_unknown", comment: "Unknown")
+
+            let entries = NSMutableArray(array: model.allSearchableNoneExpiredEntries)
+            let sorted = model.filterAndSort(forBrowse: entries, includeGroups: false)
+
+            let view = WizardAddToOrCreateNewView(mode: .totp, entries: sorted, model: model, title: title, groups: sortedPaths) { cancel, createNew, title, selectedGroupIdx, selectedEntry in
+                swlog("Completion \(cancel)")
+
+                var group: Node? = nil
+                if !cancel, let selectedGroupIdx {
+                    group = selectedGroupIdx == 0 ? model.database.effectiveRootGroup : sortedGroups[safe: selectedGroupIdx - 1]
+                }
+
+                completion(cancel, createNew, title, group, selectedEntry)
+            }
+
+            return NSHostingController(rootView: view)
+        }
+
+        @objc
+        static func getDuplicateItemOptionsView(showReferencingOptions: Bool, title: String, referencePassword: Bool, referenceUsername: Bool, preserveTimestamps: Bool, editAfterwards: Bool, completion: ((Bool, String, Bool, Bool, Bool, Bool) -> Void)?) -> NSViewController {
+            NSHostingController(
+                rootView: DuplicateItemOptionsView(showReferencingOptions: showReferencingOptions, title: title, referencePassword: referencePassword, referenceUsername: referenceUsername, preserveTimestamps: preserveTimestamps, editAfterwards: editAfterwards, completion: completion))
+        }
+
     #endif
 }

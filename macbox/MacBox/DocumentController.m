@@ -104,13 +104,13 @@ static BOOL didRestoreAWindowAtStartup;
 }
 
 
-- (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^)(NSError* error))completion {
+- (void)openDatabase:(MacDatabasePreferences*)database completion:(void (^)(Document* document, NSError* error))completion {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [self openDatabaseWorker:database completion:completion]; 
     });
 }
 
-- (void)openDatabaseWorker:(MacDatabasePreferences*)database completion:(void (^)(NSError* error))completion {
+- (void)openDatabaseWorker:(MacDatabasePreferences*)database completion:(void (^)(Document*_Nullable document, NSError*_Nullable error))completion {
     NSURL* url = database.fileUrl;
     
     slog(@"Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
@@ -125,13 +125,13 @@ static BOOL didRestoreAWindowAtStartup;
                 }
                 
                 if ( completion ) {
-                    completion(error);
+                    completion((Document*)document, error);
                 }
             }];
         }
         else {
             if ( completion ) {
-                completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
+                completion(nil, [Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
             }
         }
     });
@@ -296,7 +296,7 @@ static BOOL didRestoreAWindowAtStartup;
     slog(@"Found %ld startup databases. Launching...", startupDatabases.count);
     
     for ( MacDatabasePreferences* db in startupDatabases ) {
-        [self openDatabase:db completion:^(NSError *error) { }];
+        [self openDatabase:db completion:^(Document * _Nullable document, NSError * _Nullable error) { }];
     }
 }
 

@@ -248,7 +248,6 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 #endif
     else {
         SafesViewController *safesViewController = [self getInitialViewController];
-
         NSNumber* num = [options objectForKey:UIApplicationOpenURLOptionsOpenInPlaceKey];
 
         [safesViewController enqueueImport:url canOpenInPlace:num ? num.boolValue : NO];

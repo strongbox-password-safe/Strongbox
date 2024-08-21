@@ -362,6 +362,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
                                                 systemImage:@"externaldrive.badge.plus"
                                                     handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onAddExistingSafe];
+
     }];
     
     UIMenuElement* wifiTransfer = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_wifi_transfer", @"Wi-Fi Transfer")
@@ -466,23 +467,34 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 }
 
 - (void)doAppOnboarding:(BOOL)userJustCompletedBiometricAuthentication quickLaunchWhenDone:(BOOL)quickLaunchWhenDone {
-    if ( ![self isVisibleViewController] ) {
-        slog(@"We're not the visible view controller - not doing Onboarding");
-        return;
+    if ( self.enqueuedImportUrl ) {
+        if ([self.enqueuedImportUrl.absoluteString.lowercaseString hasPrefix:@"otpauth"]) {
+            NSURL* copy = self.enqueuedImportUrl;
+            self.enqueuedImportUrl = nil;
+            [self handleOtpAuthUrl:copy];
+        }
+        else {
+            if ( ![self isVisibleViewController] ) {
+                slog(@"We're not the visible view controller - not doing Onboarding");
+                return;
+            }
+
+            [self processEnqueuedImport];
+        }
     }
-    
-    __weak SafesViewController* weakSelf = self;
-    [OnboardingManager.sharedInstance startAppOnboarding:self completion:^{
-
-
-        
-        if ( weakSelf.enqueuedImportUrl ) {
-            [weakSelf processEnqueuedImport];
+    else {
+        if ( ![self isVisibleViewController] ) {
+            slog(@"We're not the visible view controller - not doing Onboarding");
+            return;
         }
-        else if ( quickLaunchWhenDone ) {
-            [weakSelf openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
-        }
-    }];
+
+        __weak SafesViewController* weakSelf = self;
+        [OnboardingManager.sharedInstance startAppOnboarding:self completion:^{
+            if ( quickLaunchWhenDone ) {
+                [weakSelf openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
+            }
+        }];
+    }
 }
 
 
@@ -731,7 +743,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         if ([visibleSoFar isKindOfClass:UINavigationController.class]) {
             UINavigationController* nav = (UINavigationController*)visibleSoFar;
             
-            
+             slog(@"VISIBLE: [%@] is Nav Controller, moving to Visisble: [%@]", visibleSoFar, nav.visibleViewController);
 
             if (nav.visibleViewController) {
                 visibleSoFar = nav.visibleViewController;
@@ -741,7 +753,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
             }
         }
         else {
-            
+             slog(@"VISIBLE: [%@] is regular VC checking is it's presenting anything: [%@]", visibleSoFar, visibleSoFar.presentedViewController);
 
             if (visibleSoFar.presentedViewController) {
                 visibleSoFar = visibleSoFar.presentedViewController;
@@ -752,7 +764,7 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         }
     } while (--attempts); 
 
-
+    slog(@"VISIBLE: [%@]", visibleSoFar);
     
     return visibleSoFar;
 }
@@ -1101,7 +1113,8 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
        explicitOffline:explicitOffline
   explicitManualUnlock:explicitManualUnlock
    biometricPreCleared:NO
-        explicitOnline:explicitOnline];
+        explicitOnline:explicitOnline
+     explicitEagerSync:NO];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -1111,14 +1124,49 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
        explicitOffline:NO
   explicitManualUnlock:NO
    biometricPreCleared:NO
-        explicitOnline:NO];
+        explicitOnline:NO
+     explicitEagerSync:NO];
 }
 
 - (void)openDatabase:(DatabasePreferences*)safe
      explicitOffline:(BOOL)explicitOffline
 explicitManualUnlock:(BOOL)explicitManualUnlock
  biometricPreCleared:(BOOL)biometricPreCleared
-      explicitOnline:(BOOL)explicitOnline {
+      explicitOnline:(BOOL)explicitOnline
+   explicitEagerSync:(BOOL)explicitEagerSync {
+    PresentUnlockedDatabaseParams* presentationParams = [[PresentUnlockedDatabaseParams alloc] initWithSuppressInitialLazySync:NO onLoadAdd2FAOtpAuthUrl:nil];
+
+    [self openDatabase:safe 
+       explicitOffline:explicitOffline
+  explicitManualUnlock:explicitManualUnlock
+   biometricPreCleared:biometricPreCleared
+        explicitOnline:explicitOnline
+     explicitEagerSync:explicitEagerSync
+    suppressOnboarding:NO
+    presentationParams:presentationParams];
+}
+
+- (void)openDatabaseFor2FAAdd:(DatabasePreferences*)safe optAuthUrl:(NSURL*)optAuthUrl {
+    PresentUnlockedDatabaseParams* presentationParams = [[PresentUnlockedDatabaseParams alloc] initWithSuppressInitialLazySync:YES onLoadAdd2FAOtpAuthUrl:optAuthUrl];
+
+    [self openDatabase:safe 
+       explicitOffline:false
+  explicitManualUnlock:false 
+   biometricPreCleared:false
+        explicitOnline:false
+     explicitEagerSync:YES
+    suppressOnboarding:YES
+    presentationParams:presentationParams];
+}
+
+- (void)openDatabase:(DatabasePreferences*)safe
+     explicitOffline:(BOOL)explicitOffline
+explicitManualUnlock:(BOOL)explicitManualUnlock
+ biometricPreCleared:(BOOL)biometricPreCleared
+      explicitOnline:(BOOL)explicitOnline
+   explicitEagerSync:(BOOL)explicitEagerSync 
+  suppressOnboarding:(BOOL)suppressOnboarding
+  presentationParams:(PresentUnlockedDatabaseParams*)presentationParams {
     slog(@"======================== OPEN DATABASE: %@ [EON: %hhd, EOFF: %hhd, MAN: %hhd, BPC: %hhd] ============================",
           safe.nickName, explicitOnline, explicitOffline, explicitManualUnlock, biometricPreCleared);
         
@@ -1143,11 +1191,12 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         [helper beginUnlockSequence:NO
                 biometricPreCleared:biometricPreCleared
                explicitManualUnlock:explicitManualUnlock
+                  explicitEagerSync:explicitEagerSync
                          completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
             self.openingDatabaseInProgress = NO;
             
             if (result == kUnlockDatabaseResultSuccess) {
-                [self onboardOrShowUnlockedDatabase:model];
+                [self showUnlockedDatabase:model suppressOnboarding:suppressOnboarding presentationParams:presentationParams];
             }
             else if (result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
                 [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
@@ -1170,16 +1219,26 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }
 }
 
-- (void)onboardOrShowUnlockedDatabase:(Model*)model {
-    [OnboardingManager.sharedInstance startDatabaseOnboarding:self model:model completion:^{
-        [self showUnlockedDatabase:model];
-    }];
+- (void)showUnlockedDatabase:(Model*)model suppressOnboarding:(BOOL)suppressOnboarding presentationParams:(PresentUnlockedDatabaseParams*)presentationParams {
+    if ( !suppressOnboarding ) {
+        [OnboardingManager.sharedInstance startDatabaseOnboarding:self model:model completion:^{
+            [self presentUnlockedDatabase:model presentationParams:presentationParams];
+        }];
+    }
+    else {
+        [self presentUnlockedDatabase:model presentationParams:presentationParams];
+    }
 }
 
-- (void)showUnlockedDatabase:(Model*)model {
+- (void)presentUnlockedDatabase:(Model*)model presentationParams:(PresentUnlockedDatabaseParams*)presentationParams {
     [AppModel.shared unlockDatabase:model];
     
-    [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
+    MainSplitViewController *svc = MainSplitViewController.fromStoryboard;
+    svc.model = model;
+    svc.presentationParams = presentationParams;
+    
+    svc.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:svc animated:YES completion:nil];
 }
 
 
@@ -1779,12 +1838,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ( [segue.identifier isEqualToString:@"segueToMasterDetail"] ) {
-        MainSplitViewController *svc = segue.destinationViewController;
-        svc.model = (Model*)sender;
-    }
-    else if ( [segue.identifier isEqualToString:@"segueToStorageType"] )
-    {
+    if ( [segue.identifier isEqualToString:@"segueToStorageType"] ) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         SelectStorageProviderController *vc = (SelectStorageProviderController*)nav.topViewController;
         
@@ -2538,7 +2592,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
        explicitOffline:NO
   explicitManualUnlock:NO
    biometricPreCleared:userJustCompletedBiometricAuthentication
-        explicitOnline:NO];
+        explicitOnline:NO
+     explicitEagerSync:NO];
 }
 
 
@@ -3390,6 +3445,73 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     else {
         [self.selectStorageSwiftHelper beginCreateOnStorageInteractionWithNickName:name databaseModel:importModel];
     }
+}
+
+
+
+- (void)handleOtpAuthUrl:(NSURL*)url {
+    UIViewController* vc = [self getVisibleViewController];
+
+    if ( AppModel.shared.editInProgress ) {
+        [Alerts info:vc 
+               title:NSLocalizedString(@"generic_edit_in_progress", @"Edit In Progress")
+             message:NSLocalizedString(@"generic_edit_in_progress_2fa_code", @"There is an edit in progress, please complete this before adding a 2FA Code.")
+          completion:nil];
+        return;
+    }
+    
+    [TwoFactorOtpAuthUrlUIHelper beginOtpAuthURLImportWithUrl:url
+                                               viewController:vc
+                                            completionHandler:^(DatabasePreferences * _Nullable database, NSError * _Nullable error) {
+        if ( error ) {
+            slog(@"🔴 Error adding TOTP: [%@]", error);
+            [Alerts info:self title:NSLocalizedString(@"generic_error", @"Error") message:error.debugDescription];
+        }
+        else if ( database != nil ) {
+            if ( AppModel.shared.unlockedDatabase ) {
+                if ( AppModel.shared.unlockedDatabase.metadata.uuid == database.uuid ) {
+                    [NSNotificationCenter.defaultCenter postNotificationName:kBeginImport2FAOtpAuthUrlNotification object:url];
+                }
+                else {
+                    [Alerts yesNo:vc 
+                            title:NSLocalizedString(@"close_current_db_question", @"Close Current Database?")
+                          message:NSLocalizedString(@"close_current_db_question_for_2fa", @"You currently have a different database unlocked. Can Strongbox close that database to continue adding your 2FA Code?")
+                           action:^(BOOL response) {
+                        if ( response ) {
+                            [self closeUnlockedDatabase:^{
+                                [self openDatabaseFor2FAAdd:database optAuthUrl:url];
+                            }];
+                        }
+                    }];
+                }
+            }
+            else {
+                [self openDatabaseFor2FAAdd:database optAuthUrl:url];
+            }
+        }
+    }];
+}
+
+- (void)closeUnlockedDatabase:(void(^)(void))completion {
+    Model* model = AppModel.shared.unlockedDatabase;
+    if ( !model ) {
+        slog(@"🔴 No database unlocked to close!!");
+        return;
+    }
+    
+    UIViewController* presented = self.presentedViewController;
+    if ( presented == nil || ![presented isKindOfClass:MainSplitViewController.class] ) {
+        
+        slog(@"🔴 Unexpected, couldn't find the main splitviewcontroller!");
+        return;
+    }
+    MainSplitViewController* splitView = (MainSplitViewController*)presented;
+    if ( splitView.model != model ) {
+        slog(@"🔴 Mismatching models!");
+        return;
+    }
+    
+    [splitView closeAndCleanupWithCompletion:completion];
 }
 
 @end

@@ -20,12 +20,15 @@ extern NSString* const kGenericRefreshAllDatabaseViewsNotification;
 @interface Document : NSDocument
 
 @property (readonly) BOOL isEditsInProgress;
+@property (readonly) BOOL isDisplayingEditSheet;
+
 @property (readonly) ViewModel* viewModel;
 @property (readonly, nullable) MacDatabasePreferences* databaseMetadata;
 
 - (void)initiateLockSequence;
- 
 - (void)onDatabaseChangedByExternalOther;
+
+- (void)import2FAToken:(OTPToken*)token;
 
 @end
 

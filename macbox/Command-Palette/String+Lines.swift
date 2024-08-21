@@ -10,4 +10,10 @@ extension String {
     var lines: [String] {
         components(separatedBy: CharacterSet.newlines)
     }
+
+    var htmlStringEscaped: String {
+        replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+    }
 }

@@ -310,6 +310,11 @@
 - (void)getCkfsAfterSuccessfulBiometricAuth:(NSString *)keyFileBookmark
                        yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                                  completion:(CompositeKeyDeterminedBlock)completion {
+    if(![BiometricIdHelper.sharedInstance isBiometricDatabaseStateRecorded:self.isNativeAutoFillAppExtensionOpen]) {
+        
+        [BiometricIdHelper.sharedInstance recordBiometricDatabaseState:self.isNativeAutoFillAppExtensionOpen];
+    }
+
     [self getCkfsWithPassword:self.database.conveniencePassword
               keyFileBookmark:keyFileBookmark
          yubiKeyConfiguration:yubiKeyConfiguration
@@ -517,10 +522,10 @@
 }
 
 - (BOOL)bioOrWatchUnlockIsPossible {
-    return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.database];
+    return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.database isAutoFillOpen:self.isNativeAutoFillAppExtensionOpen];
 }
 
-+ (BOOL)bioOrWatchUnlockIsPossible:(MacDatabasePreferences*)database {
++ (BOOL)bioOrWatchUnlockIsPossible:(MacDatabasePreferences*)database isAutoFillOpen:(BOOL)isAutoFillOpen {
     if ( !database ) {
         return NO;
     }
@@ -532,10 +537,15 @@
     BOOL methodEnabled = touchEnabled || watchEnabled;
     BOOL passwordAvailable = database.conveniencePasswordHasBeenStored;
     BOOL featureAvailable = Settings.sharedInstance.isPro;
+    BOOL bioDbHasChanged = [BiometricIdHelper.sharedInstance isBiometricDatabaseStateHasChanged:isAutoFillOpen];
+    
+    if ( bioDbHasChanged ){
+        slog(@"👾 Biometrics Database has changed! Cannot do Biometric Unlock."); 
+    }
     
     [database triggerPasswordExpiry];
     BOOL expired = database.conveniencePasswordHasExpired;
-    BOOL possible = methodEnabled && featureAvailable && passwordAvailable && !expired;
+    BOOL possible = methodEnabled && featureAvailable && passwordAvailable && !expired && !bioDbHasChanged;
     
 
     

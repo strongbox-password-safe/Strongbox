@@ -514,7 +514,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     
     [self showProgressModal:NSLocalizedString(@"generic_loading", "Loading...")];
     
-    [dc openDatabase:database completion:^(NSError *error) {
+    [dc openDatabase:database completion:^(Document * _Nullable document, NSError * _Nullable error) {
         [self hideProgressModal];
         
         if(error) {
@@ -713,7 +713,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     if ( singleSelectedDatabase ) {
         if (theAction == @selector(onViewSyncLog:) ||
             theAction == @selector(onViewBackups:) ||
-            theAction == @selector(onExportDatabase:) ||
+            theAction == @selector(onSaveDatabaseAs:) ||
             theAction == @selector(onCopyTo:) ||
             theAction == @selector(onSync:) ||
             theAction == @selector(onRename:)) {
@@ -872,7 +872,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
     [NSMenu popUpContextMenu:self.tableView.menu withEvent:NSApp.currentEvent forView:self.tableView];
 }
 
-- (IBAction)onExportDatabase:(id)sender {
+- (IBAction)onSaveDatabaseAs:(id)sender {
     if(self.tableView.selectedRow == -1) {
         return;
     }
@@ -897,7 +897,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 [self syncBeforeExport:database dest:dest showSpinner:YES];
             }
             else {
-                [self export:database dest:dest];
+                [self saveDatabaseAs:database dest:dest];
             }
         }];
     }
@@ -923,14 +923,14 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
                 [MacAlerts error:error window:self.view.window];
             }
             else {
-                [self export:database dest:dest];
+                [self saveDatabaseAs:database dest:dest];
             }
         });
     }];
 }
 
-- (void)export:(MacDatabasePreferences *)database
-          dest:(NSURL*)dest {
+- (void)saveDatabaseAs:(MacDatabasePreferences *)database
+                  dest:(NSURL*)dest {
     NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
     slog(@"Export [%@] => [%@]", src, dest);
     

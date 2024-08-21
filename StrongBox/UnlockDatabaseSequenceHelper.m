@@ -115,12 +115,13 @@
 }
 
 - (void)beginUnlockSequence:(UnlockDatabaseCompletionBlock)completion {
-    return [self beginUnlockSequence:NO biometricPreCleared:NO explicitManualUnlock:NO completion:completion];
+    return [self beginUnlockSequence:NO biometricPreCleared:NO explicitManualUnlock:NO explicitEagerSync:NO completion:completion];
 }
 
 - (void)beginUnlockSequence:(BOOL)isAutoFillQuickTypeOpen
         biometricPreCleared:(BOOL)biometricPreCleared
        explicitManualUnlock:(BOOL)explicitManualUnlock
+          explicitEagerSync:(BOOL)explicitEagerSync
                  completion:(UnlockDatabaseCompletionBlock)completion {
     self.completion = completion;
     
@@ -134,7 +135,7 @@
     [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
             self.unlockedWithConvenienceFactors = fromConvenience;
-            [self beginUnlockWithCredentials:factors];
+            [self beginUnlockWithCredentials:factors explicitEagerSync:explicitEagerSync];
         }
         else if (result == kGetCompositeKeyResultDuressIndicated ) {
             [DuressActionHelper performDuressAction:self.viewController database:self.database isAutoFillOpen:self.isAutoFillOpen completion:self.completion];
@@ -157,7 +158,7 @@
     return NO;
 }
 
-- (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors {
+- (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors explicitEagerSync:(BOOL)explicitEagerSync {
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
   
     if ( self.explicitOnline && self.explicitOffline ) {
@@ -186,7 +187,7 @@
         
         syncStateGood = syncStateGood | self.database.persistLazyEvenLastSyncErrors; 
         
-        if ( syncStateGood && localCopyUrl && self.database.storageProvider != kLocalDevice && self.database.lazySyncMode && !self.explicitOnline ) { 
+        if ( !explicitEagerSync && syncStateGood && localCopyUrl && self.database.storageProvider != kLocalDevice && self.database.lazySyncMode && !self.explicitOnline ) { 
             
             
             

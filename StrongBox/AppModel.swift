@@ -47,6 +47,11 @@ class AppModel: NSObject {
     }
 
     @objc
+    var editInProgress: Bool {
+        editingSet.anyObject != nil
+    }
+
+    @objc
     func isEditing(_ id: String) -> Bool {
         let ret = editingSet.contains(id as NSString)
         swlog("🐞 AppModel::isEditing: %@ => %hhd", id, ret)
