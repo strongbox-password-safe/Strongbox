@@ -55,6 +55,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNoneCommercialUse;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAppAppearance;
 @property (weak, nonatomic) IBOutlet UILabel *labelAppAppearance;
+@property (weak, nonatomic) IBOutlet UILabel *labelPrivacyShieldMode;
 
 
 @end
@@ -90,6 +91,7 @@
 - (void)bindUI {
     AppPreferences* prefs = AppPreferences.sharedInstance;
     self.labelAppAppearance.text = stringForAppAppearanceMode(prefs.appAppearance);
+    self.labelPrivacyShieldMode.text = stringForPrivacyShieldMode(prefs.appPrivacyShieldMode);
 }
 
 - (void)onProStatusChanged:(id)param {
@@ -163,7 +165,14 @@
         NSArray<NSNumber*>* options = @[@(kAppPrivacyShieldModeNone),
                                         @(kAppPrivacyShieldModeBlur),
                                         @(kAppPrivacyShieldModePixellate),
-                                        @(kAppPrivacyShieldModeBlueScreen)];
+                                        @(kAppPrivacyShieldModeBlueScreen),
+                                        @(kAppPrivacyShieldModeBlackScreen),
+                                        @(kAppPrivacyShieldModeDarkLogo),
+                                        @(kAppPrivacyShieldModeRed),
+                                        @(kAppPrivacyShieldModeGreen),
+                                        @(kAppPrivacyShieldModeLightLogo),
+                                        @(kAppPrivacyShieldModeWhite),
+        ];
         
         NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
             return stringForPrivacyShieldMode(obj.integerValue);
@@ -175,6 +184,7 @@
                    completion:^(BOOL success, NSInteger selectedIndex) {
             if ( success ) {
                 AppPreferences.sharedInstance.appPrivacyShieldMode = selectedIndex;
+                [self bindUI];
             }
         }];
     }
@@ -336,8 +346,29 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
     else if ( mode == kAppPrivacyShieldModeNone ) {
         return NSLocalizedString(@"privacy_shield_none", @"None"); 
     }
-    else {
+    else if ( mode == kAppPrivacyShieldModeBlueScreen ) {
         return NSLocalizedString(@"app_privacy_shield_mode_blue_screen", @"Blue Screen");
+    }
+    else if ( mode == kAppPrivacyShieldModeBlackScreen ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_black_screen", @"Black Screen");
+    }
+    else if ( mode == kAppPrivacyShieldModeDarkLogo ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_dark_logo", @"Dark Logo");
+    }
+    else if ( mode == kAppPrivacyShieldModeRed ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_red_screen", @"Red Screen");
+    }
+    else if ( mode == kAppPrivacyShieldModeGreen ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_green_screen", @"Green Screen");
+    }
+    else if ( mode == kAppPrivacyShieldModeLightLogo ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_blue_light_logo", @"Light Logo");
+    }
+    else if ( mode == kAppPrivacyShieldModeWhite ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_white_screen", @"White Screen");
+    }
+    else {
+        return @"🔴 Error unknown privacy shield mode";
     }
 }
 

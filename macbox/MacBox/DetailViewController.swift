@@ -242,8 +242,6 @@ class DetailViewController: NSViewController {
         var ret: [DetailsViewField] = []
 
         if database.isFlagged(byAudit: node.uuid) {
-
-
             for issue in database.getQuickAuditAllIssuesSummary(forNode: node.uuid) {
                 ret.append(DetailsViewField(name: issue,
                                             value: issue,

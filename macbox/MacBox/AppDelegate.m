@@ -124,9 +124,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-
-
-
+    
+    
+    
     
     [self determineIfLaunchedAsLoginItem];
     
@@ -320,9 +320,9 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [self installGlobalHotKeys];
     
     [self removeUnwantedMenuItems];
-
+    
     [self setupSystemTrayPopover];
-
+    
     [self showHideSystemStatusBarIcon];
     
     [self clearAsyncUpdateIdsAndEphemeralOfflineFlags]; 
@@ -395,7 +395,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged:) name:kProStatusChangedNotification object:nil];
     
     
-
+    
     [NSAppleEventManager.sharedAppleEventManager setEventHandler:self
                                                      andSelector:@selector(handleGetURLEvent:withReplyEvent:)
                                                    forEventClass:kInternetEventClass
@@ -423,10 +423,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)onWindowWillClose:(NSNotification*)notification {
-
+    
     
     if ( ![self isWindowOfInterest:notification] ) { 
-
+                                                     
         return;
     }
     
@@ -434,7 +434,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)onWindowDidMiniaturize:(NSNotification*)notification {
-
+    
     
     if ( ![self isWindowOfInterest:notification] ) { 
                                                      
@@ -610,10 +610,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
             statusImage.size = NSMakeSize(18.0, 18.0);
             self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
             self.statusItem.button.image = statusImage;
-
+            
             self.statusItem.highlightMode = YES;
             self.statusItem.button.enabled = YES;
-                        
+            
             self.systemTrayNewMenu = [[NSMenu alloc] init];
             self.systemTrayNewMenu.title = @"Strongbox";
             self.systemTrayNewMenu.delegate = self;
@@ -651,11 +651,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)refreshSystemTrayNewMenu {
     [self.systemTrayNewMenu removeAllItems];
-
+    
     MASShortcut* globalShowShortcut = [MASShortcutBinder.sharedBinder valueForKey:kPreferenceGlobalShowShortcutNotification];
     MASShortcut* showQuickSearchShortcut = [MASShortcutBinder.sharedBinder valueForKey:kPreferenceLaunchQuickSearchShortcut];
     MASShortcut* showPasswordGeneratorShortcut = [MASShortcutBinder.sharedBinder valueForKey:kPreferencePasswordGeneratorShortcut];
-
+    
     NSMenuItem* mu = [[NSMenuItem alloc] init];
     
     mu.title = NSLocalizedString(@"system_tray_menu_item_show", @"Show Strongbox");
@@ -679,11 +679,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
     
     [self.systemTrayNewMenu addItem:mu2];
-
+    
     
     
     [self.systemTrayNewMenu addItemWithTitle:NSLocalizedString(@"system_tray_menu_item_show_databases_manager", @"Show Databases Manager") action:@selector(onTrayShowViewDatabases:) keyEquivalent:@"d"];
-
+    
     
     
     if ( showPasswordGeneratorShortcut ) {
@@ -714,7 +714,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"quick_search", @"Quick Search") action:kSystemMenuClickActionQuickSearch]];
     [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"system_tray_menu_item_show", @"Show Strongbox") action:kSystemMenuClickActionShowStrongbox]];
     [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"popout_password_generator", @"Password Generator") action:kSystemMenuClickActionPasswordGenerator]];
-    [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"show_this_menu", @"Show this Menu") action:kSystemMenuClickActionShowMenu]]; 
+    [sub addItem:[self createClickActionMenuItem:NSLocalizedString(@"show_this_menu", @"Show this Menu") action:kSystemMenuClickActionShowMenu]];
     
     clickAction.submenu = sub;
     
@@ -724,7 +724,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     NSImage * locked = [NSImage imageWithSystemSymbolName:@"lock" accessibilityDescription:nil];
     NSImage * locked2 = [locked imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
-
+    
     NSImageSymbolConfiguration* config = [[NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.systemGreenColor]] configurationByApplyingConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
     
     NSImage * unlocked = [NSImage imageWithSystemSymbolName:@"lock.open" accessibilityDescription:nil];
@@ -733,7 +733,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     int i = 0;
     for ( MacDatabasePreferences* database in MacDatabasePreferences.allDatabases ) {
         NSMenuItem* mu = [[NSMenuItem alloc] init];
-    
+        
         mu.title = database.nickName;
         mu.action = @selector(onSystemTrayShowDatabase:);
         mu.representedObject = database.uuid;
@@ -747,7 +747,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self.systemTrayNewMenu addItemWithTitle:NSLocalizedString(@"system_tray_menu_item_lock_all", @"Lock All") action:@selector(onSystemTrayLockAll:) keyEquivalent:@"l"];
     [self.systemTrayNewMenu addItemWithTitle:NSLocalizedString(@"generic_settings", @"Settings") action:@selector(onTrayShowAppSettings:) keyEquivalent:@","];
-    [self.systemTrayNewMenu addItemWithTitle:NSLocalizedString(@"system_tray_menu_item_quit", @"Quit Strongbox") action:@selector(onStrongboxQuit:) keyEquivalent:@"q"];
+    [self.systemTrayNewMenu addItemWithTitle:NSLocalizedString(@"system_tray_menu_item_quit", @"Quit Strongbox") action:@selector(onStrongboxQuitFromTray:) keyEquivalent:@"q"];
 }
 
 - (void)onSystemTrayLockAll:(id)sender {
@@ -760,7 +760,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     self.systemTrayPopover.animates = YES;
     
     PasswordGenerationPreferences* vc =  [PasswordGenerationPreferences fromStoryboard];
-        
+    
     self.systemTrayPopover.contentViewController = vc;
     self.systemTrayPopover.delegate = self;
 }
@@ -909,12 +909,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)showAndActivateStrongboxStage2:(void (^_Nullable)(void))completion {
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     [NSApp arrangeInFront:nil];
-
+    
     
     [[NSRunningApplication currentApplication] activateWithOptions:(NSApplicationActivateAllWindows | NSApplicationActivateIgnoringOtherApps)]; 
-
     
-
+    
+    
     if ( completion ) {
         completion();
     }
@@ -934,8 +934,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
     slog(@"✅ applicationDidBecomeActive - START - [%@]", notification);
-
-
+    
+    
     
     [self cancelAutoLockTimer];
     
@@ -944,13 +944,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if ( !self.firstActivationDone ) {
         self.firstActivationDone = YES;
         
-
-
+        
+        
         DocumentController* dc = NSDocumentController.sharedDocumentController;
-
+        
         [dc onAppStartup];
     }
-        
+    
     if ( [self isHiddenToTray] ) {
         slog(@"✅ applicationDidBecomeActive - isHiddenToTray - showing dock icon and and activating");
         
@@ -965,19 +965,19 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }
     
     
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
 #ifndef NO_NETWORKING
@@ -993,7 +993,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)hasVisibleWindows {
     slog(@"✅ AppDelegate::applicationShouldHandleReopen: hasVisibleWindows = [%@]", localizedYesOrNoFromBool(hasVisibleWindows));
-
+    
     
     
     
@@ -1012,7 +1012,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
-
+    
     
     [self startAutoLockTimer];
 }
@@ -1032,7 +1032,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
         [self cancelAutoLockTimer];
         
         slog(@"🐞 DEBUG - [startAutoLockForAppInBackgroundTimer] Creating Background Auto-Lock work block... [timeout = %ld secs]", timeout);
-
+        
         self.autoLockWorkBlock = dispatch_block_create(0, ^{
             slog(@"🐞 DEBUG - App in Background timeout exceeded -> Sending Notification...");
             
@@ -1069,7 +1069,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     else if (theAction == @selector(signOutOfGoogleDrive:)) {
         return YES; 
     }
-
+    
     return YES;
 }
 
@@ -1099,14 +1099,14 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     MASShortcut* showQuickSearchShortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_J modifierFlags:NSEventModifierFlagCommand | NSEventModifierFlagShift];
     NSData *globalQuickSearchShortcutData = [NSKeyedArchiver archivedDataWithRootObject:showQuickSearchShortcut];
-
-
-
+    
+    
+    
     
     [NSUserDefaults.standardUserDefaults registerDefaults:@{
         kPreferenceGlobalShowShortcutNotification : globalLaunchShortcutData,
         kPreferenceLaunchQuickSearchShortcut : globalQuickSearchShortcutData,
-
+        
     }];
     
     [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferenceGlobalShowShortcutNotification toAction:^{
@@ -1116,7 +1116,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferenceLaunchQuickSearchShortcut toAction:^{
         [self showQuickSearchPalette:nil];
     }];
-
+    
     [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferencePasswordGeneratorShortcut toAction:^{
         [self onTrayShowPasswordGenerator:nil];
     }];
@@ -1136,7 +1136,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
                                                               forKeyPath:observableKeyPath
                                                                  options:kNilOptions
                                                                  context:kPreferenceLaunchQuickSearchShortcut];
-
+    
     observableKeyPath = [@"values." stringByAppendingString:kPreferencePasswordGeneratorShortcut];
     
     [[NSUserDefaultsController sharedUserDefaultsController] addObserver:self
@@ -1189,7 +1189,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     NSMenu* fileMenu = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagFile].submenu;
     NSInteger openDocumentMenuItemIndex = [fileMenu indexOfItemWithTarget:nil andAction:@selector(originalOpenDocument:)];
-
+    
     if (openDocumentMenuItemIndex>=0 &&
         [[fileMenu itemAtIndex:openDocumentMenuItemIndex+1] hasSubmenu])
     {
@@ -1201,7 +1201,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     
     
-
+    
 }
 
 - (void)removeMenuItem:(NSInteger)topLevelTag action:(SEL)action {
@@ -1212,11 +1212,11 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     }];
     
     if( topLevelMenuItem &&  index != NSNotFound) {
-
+        
         [topLevelMenuItem removeItemAtIndex:index];
     }
     else {
-
+        
     }
 }
 
@@ -1250,7 +1250,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)showUpgradeModal:(BOOL)naggy {
     if ( MacCustomizationManager.isUnifiedFreemiumBundle ) {
         UnifiedUpgrade* uu = [UnifiedUpgrade fromStoryboard];
-
+        
         uu.naggy = naggy;
         
         [uu presentInNewWindow];
@@ -1270,13 +1270,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)onSettingsChanged:(NSNotification*)notification {
     slog(@"AppDelegate::Settings Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
-
+    
     [self initializeClipboardWatchingTask];
     [self showHideSystemStatusBarIcon];
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)notification {
-
+    
     [self initializeClipboardWatchingTask];
 }
 
@@ -1289,30 +1289,30 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
-
+    
     [self killClipboardWatchingTask];
 }
 
 - (void)startClipboardWatchingTask {
-
+    
     self.currentClipboardVersion = -1;
     
     self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f
-                                     target:self
-                                   selector:@selector(checkClipboardForChangesAndNotify)
-                                   userInfo:nil
-                                    repeats:YES];
-
+                                                                   target:self
+                                                                 selector:@selector(checkClipboardForChangesAndNotify)
+                                                                 userInfo:nil
+                                                                  repeats:YES];
     
-
-
-
-
-
+    
+    
+    
+    
+    
+    
 }
 
 - (void)killClipboardWatchingTask {
-
+    
     
     self.currentClipboardVersion = -1;
     
@@ -1343,7 +1343,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 static NSInteger clipboardChangeCount;
 
 - (void)onStrongboxDidChangeClipboard {
-
+    
     
     if ( Settings.sharedInstance.clearClipboardEnabled ) {
         clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
@@ -1367,7 +1367,7 @@ static NSInteger clipboardChangeCount;
         [NSPasteboard.generalPasteboard clearContents];
     }
     else {
-
+        
     }
     
     [self clearAppCustomClipboard];
@@ -1394,11 +1394,11 @@ static NSInteger clipboardChangeCount;
 
 - (IBAction)onImportFromCsvFile:(id)sender {
     [DBManagerPanel.sharedInstance show]; 
-
+    
     NSString* loc = NSLocalizedString(@"mac_csv_file_must_contain_header_and_fields", @"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.");
-
+    
     NSString* message = [NSString stringWithFormat:loc, kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderTotp, kCSVHeaderNotes];
-   
+    
     loc = NSLocalizedString(@"mac_csv_format_info_title", @"CSV Format");
     
     [MacAlerts info:loc
@@ -1429,7 +1429,7 @@ static NSInteger clipboardChangeCount;
 
 - (IBAction)onImport1Password1Pif:(id)sender {
     [DBManagerPanel.sharedInstance show]; 
-
+    
     NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
     NSString* msg = NSLocalizedString(@"1password_import_warning_msg", @"The import process isn't perfect and some features of 1Password such as named sections are not available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
     
@@ -1445,10 +1445,10 @@ static NSInteger clipboardChangeCount;
 
 - (IBAction)onImport1Password1Pux:(id)sender {
     [DBManagerPanel.sharedInstance show]; 
-
+    
     NSString* title = NSLocalizedString(@"1password_import_warning_title", @"1Password Import Warning");
     NSString* msg = NSLocalizedString(@"1password_import_warning_msg", @"The import process isn't perfect and some features of 1Password such as named sections are not available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
-
+    
     [MacAlerts info:title
     informativeText:msg
              window:DBManagerPanel.sharedInstance.window
@@ -1491,7 +1491,7 @@ static NSInteger clipboardChangeCount;
     [panel setCanChooseFiles:YES];
     [panel setFloatingPanel:NO];
     panel.allowedFileTypes = importer.allowedFileTypes;
-
+    
     NSInteger result = [panel runModal];
     if(result == NSModalResponseOK) {
         NSURL* url = panel.URLs.firstObject;
@@ -1540,7 +1540,7 @@ static NSInteger clipboardChangeCount;
     NSViewController* vc = [SwiftUIViewFactory makeImportResultViewControllerWithMessages:messages
                                                                            dismissHandler:^(BOOL cancel) {
         [presenter dismissViewController:presenter.presentedViewControllers.firstObject];
-
+        
         if ( !cancel ) {
             [self createNewImportedDatabase:database];
         }
@@ -1557,7 +1557,7 @@ static NSInteger clipboardChangeCount;
     BOOL asyncUpdatesInProgress = [MacDatabasePreferences.allDatabases anyMatch:^BOOL(MacDatabasePreferences * _Nonnull obj) {
         return obj.asyncUpdateId != nil;
     }];
-
+    
     return asyncUpdatesInProgress || MacSyncManager.sharedInstance.syncInProgress;
 }
 
@@ -1568,10 +1568,16 @@ static NSInteger clipboardChangeCount;
         NSWindowController* wc = (NSWindowController*)doc.windowControllers.firstObject;
         return wc.window;
     }].mutableCopy;
-
+    
     for ( NSWindow* window in mainWindows ) {
         [window close];
     }
+}
+
+- (IBAction)onStrongboxQuitFromTray:(id)sender {
+    slog(@"✅ onStrongboxQuitFromTray...");
+
+    [NSApplication.sharedApplication terminate:nil];
 }
 
 - (IBAction)onStrongboxQuit:(id)sender {

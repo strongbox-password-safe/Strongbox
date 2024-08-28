@@ -130,6 +130,8 @@
     advancedPreferences.model = self.viewModel;
 
     if ( Settings.sharedInstance.hardwareKeyCachingBeta && self.viewModel.database.originalFormat == kKeePass4 && self.viewModel.database.ckfs.yubiKeyCR != nil ) {
+        __weak DatabaseSettingsTabViewController* weakSelf = self;
+        
         METADATA_PTR metadata = self.viewModel.databaseMetadata;
         Model* model = self.viewModel.commonModel;
         
@@ -150,6 +152,8 @@
                 [metadata clearCachedChallengeResponses];
                 metadata.lastChallengeRefreshAt = nil;
             }
+        } completion:^{
+            [weakSelf cancel:nil];
         }];
         
         NSTabViewItem* hksTab = [NSTabViewItem tabViewItemWithViewController:hardwareKeySettings];

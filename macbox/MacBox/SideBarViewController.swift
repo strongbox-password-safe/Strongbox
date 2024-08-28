@@ -419,7 +419,7 @@ class SideBarViewController: NSViewController, DocumentViewController {
         }
 
         let auditHeader = SideBarViewNode(context: .none,
-                                          title: NSLocalizedString("quick_view_title_audit_issues_title", comment: "Audit Issues"),
+                                          title: NSLocalizedString("browse_vc_action_audit", comment: "Audit"),
                                           image: Icon.auditShieldFill.image(),
                                           parent: nil,
                                           children: [],

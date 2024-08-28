@@ -795,6 +795,8 @@
         return !model.metadata.hasOnboardedHardwareKeyCaching &&
         model.originalFormat == kKeePass4 &&
         model.ckfs.yubiKeyCR != nil &&
+        model.metadata.nextGenPrimaryYubiKeyConfig &&
+        model.metadata.nextGenPrimaryYubiKeyConfig.mode != kVirtual &&
         AppPreferences.sharedInstance.hardwareKeyCachingBeta &&
         !model.metadata.hardwareKeyCRCaching;
     };

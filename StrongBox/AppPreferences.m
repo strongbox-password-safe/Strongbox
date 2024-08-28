@@ -585,7 +585,7 @@ static NSString* const kHasMigratedInconsistentHardwareKeysForCachingFeature = @
 }
 
 - (BOOL)exportItemsPreserveTimestamps {
-    return [self getBool:kExportItemsPreserveTimestamps];
+    return [self getBool:kExportItemsPreserveTimestamps fallback:YES];
 }
 
 - (void)setExportItemsPreserveTimestamps:(BOOL)exportItemsPreserveTimestamps {

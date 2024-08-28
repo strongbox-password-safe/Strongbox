@@ -45,7 +45,7 @@
 @interface AppDelegate ()
 
 @property AppLockViewController* lockScreenVc;
-@property UIImageView* privacyScreen;
+@property UIView* privacyScreen;
 @property NSInteger privacyScreenPresentationIdentifier; 
 
 @property (nonatomic, strong) NSDate *appLockEnteredBackgroundAtTime;
@@ -342,48 +342,96 @@ void uncaughtExceptionHandler(NSException *exception) {
 
 - (void)showPrivacyShieldView {
     slog(@"showPrivacyShieldView - [%@]", self.privacyScreen);
-
+    
     if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeNone ) {
         return;
     }
+    
+    if ( self.privacyScreen ) {
+        slog(@"Privacy Screen Already in Place... NOP");
+        self.privacyScreenPresentationIdentifier++;
+        return;
+    }
+    
+    if ( self.lockScreenVc != nil ) {
+        slog(@"Lock Screen is up, privacy screen inappropriate, likely initial launch and switch back...");
+        return;
+    }
 
+    self.privacyScreen = [self createPrivacyScreenView];
+    self.privacyScreenPresentationIdentifier++;
+    
+    [self.window addSubview:self.privacyScreen];
+}
+
+- (UIView*)createPrivacyScreenView {
+    UIImageView* tmp = [[UIImageView alloc] init];
+    tmp.frame = self.window.frame;
     UIImage* cover = nil;
+    
     if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlur ) {
         UIImage* screenshot = [self screenShot];
         cover = [self blur:screenshot];
+        tmp.contentMode = UIViewContentModeScaleToFill;
     }
     else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModePixellate ) {
         UIImage* screenshot = [self screenShot];
         cover = [self pixellate:screenshot];
+        tmp.contentMode = UIViewContentModeScaleToFill;
     }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlueScreen ) {
+        tmp.backgroundColor = UIColor.systemBlueColor;
+    }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlackScreen ) {
+        tmp.backgroundColor = UIColor.blackColor;
+    }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeDarkLogo ) {
+        cover = [self createPrivacyShieldLogo];
 
-    UIImageView* tmp = [[UIImageView alloc] init];
-    tmp.frame = self.window.frame;
-    tmp.contentMode = UIViewContentModeScaleToFill;
-    tmp.backgroundColor = UIColor.systemBlueColor;
-    
-    if ( !self.privacyScreen ) {
-        if ( self.lockScreenVc != nil ) {
-            slog(@"Lock Screen is up, privacy screen inappropriate, likely initial launch and switch back...");
-            return;
-        }
-        else {
-            slog(@"No Lock Screen up [%@]", cover);
-        }
+        tmp.backgroundColor = [UIColor colorWithWhite:0.075 alpha:1.0];
+        tmp.contentMode = UIViewContentModeCenter;
+        tmp.tintColor = [UIColor colorWithWhite:0.15 alpha:1.0];
+    }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeRed ) {
+        tmp.backgroundColor = UIColor.systemRedColor;
+    }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeGreen ) {
+        tmp.backgroundColor = UIColor.systemGreenColor;
+    }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeLightLogo ) {
+        cover = [self createPrivacyShieldLogo];
         
-        self.privacyScreen = tmp;
-        self.privacyScreenPresentationIdentifier++;
-
-        [self.window addSubview:self.privacyScreen];
-
-        if ( cover ) {
-            self.privacyScreen.image = cover;
-        }
+        tmp.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+        tmp.contentMode = UIViewContentModeCenter;
+        tmp.tintColor = UIColor.systemGrayColor;
+    }
+    else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeWhite ) {
+        tmp.backgroundColor = UIColor.whiteColor;
     }
     else {
-        slog(@"Privacy Screen Already in Place... NOP");
-        self.privacyScreenPresentationIdentifier++;
+        slog(@"🔴 Unknown privacy shield mode!");
     }
+    
+    if ( cover ) {
+        tmp.image = cover;
+    }
+
+    return tmp;
+}
+
+- (UIImage*)createPrivacyShieldLogo {
+    UIImage* cover = [UIImage imageNamed:@"AppIcon-2019-Glyph-Shadow"];
+    
+    CGFloat divisor = cover.size.width / 128;
+    
+    CGSize newSize = CGSizeMake(cover.size.width / divisor, cover.size.height / divisor);
+    UIGraphicsImageRenderer *renderer = [[UIGraphicsImageRenderer alloc] initWithSize:newSize];
+    UIImage *image = [renderer imageWithActions:^(UIGraphicsImageRendererContext*_Nonnull myContext) {
+        [cover drawInRect:(CGRect) {.origin = CGPointZero, .size = newSize}];
+    }];
+    cover = [image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    
+    return cover;
 }
 
 - (void)hidePrivacyShield:(NSInteger)identifier {

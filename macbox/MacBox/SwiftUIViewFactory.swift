@@ -139,14 +139,15 @@ class SwiftUIViewFactory: NSObject {
         }
 
         @objc
-        static func getHardwareKeySettingsView(metadata: METADATA_PTR, onSettingsChanged: ((Bool, Int, Int, Bool) -> Void)?) -> NSViewController {
+        static func getHardwareKeySettingsView(metadata: METADATA_PTR, onSettingsChanged: ((Bool, Int, Int, Bool) -> Void)?, completion: @escaping (() -> Void)) -> NSViewController {
             NSHostingController(
                 rootView: HardwareKeySettingsView(
                     keyCachingEnabled: metadata.hardwareKeyCRCaching,
                     autoFillRefreshSuppressed: metadata.doNotRefreshChallengeInAF,
                     cacheChallengeDurationSecs: metadata.cacheChallengeDurationSecs,
                     challengeRefreshIntervalSecs: metadata.challengeRefreshIntervalSecs,
-                    onSettingsChanged: onSettingsChanged
+                    onSettingsChanged: onSettingsChanged,
+                    completion: completion
                 ))
         }
 
@@ -162,7 +163,6 @@ class SwiftUIViewFactory: NSObject {
             let sorted = model.filterAndSort(forBrowse: entries, includeGroups: false)
 
             let view = WizardAddToOrCreateNewView(mode: .totp, entries: sorted, model: model, title: title, groups: sortedPaths) { cancel, createNew, title, selectedGroupIdx, selectedEntry in
-                swlog("Completion \(cancel)")
 
                 var group: Node? = nil
                 if !cancel, let selectedGroupIdx {

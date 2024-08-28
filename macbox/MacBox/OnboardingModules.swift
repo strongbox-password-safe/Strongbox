@@ -96,6 +96,8 @@ class OnboardingModules {
                 !model.metadata.hasOnboardedHardwareKeyCaching &&
                     model.originalFormat == .keePass4 &&
                     model.ckfs.yubiKeyCR != nil &&
+                    model.metadata.yubiKeyConfiguration != nil &&
+                    !(model.metadata.yubiKeyConfiguration?.isVirtual ?? true) &&
                     Settings.sharedInstance().hardwareKeyCachingBeta &&
                     !model.metadata.hardwareKeyCRCaching
             },

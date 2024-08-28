@@ -305,7 +305,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)duplicateItemPreserveTimestamp {
-    return [self getBool:kDuplicateItemPreserveTimestamp];
+    return [self getBool:kDuplicateItemPreserveTimestamp fallback:YES];
 }
 
 - (void)setDuplicateItemPreserveTimestamp:(BOOL)duplicateItemPreserveTimestamp {

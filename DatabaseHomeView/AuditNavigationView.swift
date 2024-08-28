@@ -72,7 +72,7 @@ struct AuditNavigationView: View {
             swlog("🐞 AuditNavigationView received databaseReloaded")
             model.objectWillChange.send() 
         }
-        .navigationTitle("quick_view_title_audit_issues_title")
+        .navigationTitle("browse_vc_action_audit")
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 HStack {
@@ -94,7 +94,7 @@ struct AuditNavigationView: View {
                         .foregroundColor(noIssues ? .blue : .orange)
                         .font(.subheadline)
 
-                    Text("quick_view_title_audit_issues_title")
+                    Text("browse_vc_action_audit")
                         .lineLimit(1)
                         .font(.headline)
                 }

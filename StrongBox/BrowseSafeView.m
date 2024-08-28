@@ -1775,16 +1775,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         title = NSLocalizedString(@"quick_view_title_expired_and_expiring", @"Expired & Expiring");
         image = [UIImage systemImageNamed:@"calendar" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleDefault]];
     }
-
-
-
-
     else {
         slog(@"🔴 Could not refreshNavBarTitle - unknown view type");
     }
-    
-    
-    
     
     UIView* view = [MMcGSwiftUtils navTitleWithImageAndTextWithTitleText:title
                                                                    image:image

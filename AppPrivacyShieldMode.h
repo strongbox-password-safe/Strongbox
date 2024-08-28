@@ -14,6 +14,12 @@ typedef NS_ENUM (NSInteger, AppPrivacyShieldMode) {
     kAppPrivacyShieldModeBlur,
     kAppPrivacyShieldModePixellate,
     kAppPrivacyShieldModeBlueScreen,
+    kAppPrivacyShieldModeBlackScreen,
+    kAppPrivacyShieldModeDarkLogo,
+    kAppPrivacyShieldModeRed,
+    kAppPrivacyShieldModeGreen,
+    kAppPrivacyShieldModeLightLogo,
+    kAppPrivacyShieldModeWhite,
 };
 
 #endif /* AppPrivacyShieldMode_h */

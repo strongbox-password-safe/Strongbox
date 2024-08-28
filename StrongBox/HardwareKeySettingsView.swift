@@ -89,61 +89,68 @@ struct HardwareKeySettingsView: View {
     }
 
     var body: some View {
-        Form {
-            Section {
-                Toggle("setting_response_caching_title", isOn: $keyCachingEnabled.onChange { _ in notifySettingChanged() })
-                    .toggleStyle(.switch)
+        VStack(spacing: 20) {
+            Form {
+                Section {
+                    Toggle("setting_response_caching_title", isOn: $keyCachingEnabled.onChange { _ in notifySettingChanged() })
+                        .toggleStyle(.switch)
 
-                Picker("setting_cache_response_for_period_of_time", selection: $cacheChallengeDurationSecs.onChange { _ in notifySettingChanged() }) {
-                    ForEach(challengeDurationIntervals, id: \.self) {
-                        Text(titleForCacheDuration(interval: $0))
+                    Picker("setting_cache_response_for_period_of_time", selection: $cacheChallengeDurationSecs.onChange { _ in notifySettingChanged() }) {
+                        ForEach(challengeDurationIntervals, id: \.self) {
+                            Text(titleForCacheDuration(interval: $0))
+                        }
                     }
+                    .disabled(!keyCachingEnabled)
+                } header: {
+                    Text("challenge_response_caching_header")
+                    #if os(macOS)
+                        .font(.headline)
+                    #endif
+                } footer: {
+                    Text("challenge_response_caching_footer")
+                    #if os(macOS)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    #endif
                 }
-                .disabled(!keyCachingEnabled)
-            } header: {
-                Text("challenge_response_caching_header")
+
                 #if os(macOS)
-                    .font(.headline)
+                    Spacer()
+                    Divider()
+                    Spacer()
                 #endif
-            } footer: {
-                Text("challenge_response_caching_footer")
-                #if os(macOS)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                #endif
+
+                Section {
+                    Picker("refresh_challenge_interval", selection: $challengeRefreshIntervalSecs.onChange { _ in notifySettingChanged() }) {
+                        ForEach(challengeRefreshIntervals, id: \.self) {
+                            Text(titleForChallengeRefreshInterval(interval: $0))
+                        }
+                    }
+
+                    Toggle("autofill_refresh_challenge_suppressed", isOn: $autoFillRefreshSuppressed.onChange { _ in notifySettingChanged() })
+                        .toggleStyle(.switch)
+                } header: {
+                    Text("challenge_refreshing_header")
+                    #if os(macOS)
+                        .font(.headline)
+                    #endif
+                } footer: {
+                    Text("challenge_refreshing_footer")
+                    #if os(macOS)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    #endif
+                }
             }
 
             #if os(macOS)
-                Spacer()
-                Divider()
-                Spacer()
-            #endif
-
-            Section {
-                Picker("refresh_challenge_interval", selection: $challengeRefreshIntervalSecs.onChange { _ in notifySettingChanged() }) {
-                    ForEach(challengeRefreshIntervals, id: \.self) {
-                        Text(titleForChallengeRefreshInterval(interval: $0))
-                    }
+                Button {
+                    completion?()
+                } label: {
+                    Text("generic_verb_close")
                 }
-
-                Toggle("autofill_refresh_challenge_suppressed", isOn: $autoFillRefreshSuppressed.onChange { _ in notifySettingChanged() })
-                    .toggleStyle(.switch)
-            } header: {
-                Text("challenge_refreshing_header")
-                #if os(macOS)
-                    .font(.headline)
-                #endif
-            } footer: {
-                Text("challenge_refreshing_footer")
-                #if os(macOS)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                #endif
-            }
-
-
-
-
+                .keyboardShortcut(.defaultAction)
+            #endif
         }
         .controlSize(.large)
         #if os(iOS)
@@ -160,14 +167,18 @@ struct HardwareKeySettingsView: View {
             }
         #endif
         #if os(macOS)
-        .frame(minWidth: 200, minHeight: 200)
+
         .scenePadding()
         #endif
     }
 }
 
 #Preview {
-    NavigationView {
+    #if os(macOS)
         HardwareKeySettingsView()
-    }
+    #else
+        NavigationView {
+            HardwareKeySettingsView()
+        }
+    #endif
 }

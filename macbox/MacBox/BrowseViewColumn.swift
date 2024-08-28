@@ -127,7 +127,7 @@ enum BrowseViewColumn: String, CaseIterable {
         case .uuid:
             return NSLocalizedString("generic_fieldname_id", comment: "ID")
         case .auditIssues:
-            return NSLocalizedString("quick_view_title_audit_issues_title", comment: "Audit Issues")
+            return NSLocalizedString("browse_vc_action_audit", comment: "Audit")
         case .customIconSize:
             return NSLocalizedString("generic_fieldname_custom_icon_size", comment: "Custom Icon Size")
         case .size:

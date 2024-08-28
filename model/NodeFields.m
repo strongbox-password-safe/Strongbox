@@ -890,8 +890,14 @@ NSString* const kOtpAuthScheme = @"otpauth";
     
     
     NSURL *url = [NodeFields findOtpUrlInString:notes];
+    ret = [NodeFields getOtpTokenFromUrl:url];
+    if ( ret ) {
+        return ret;
+    }
     
-    return [NodeFields getOtpTokenFromUrl:url];
+    
+    
+    return [NodeFields getKeeOtpLastResortFallback:fields];
 }
 
 + (OTPToken*)getOriginalWindowsKeePassOTPToken:(MutableOrderedDictionary<NSString*, StringValue*>*)fields {
@@ -1078,11 +1084,31 @@ NSString* const kOtpAuthScheme = @"otpauth";
         }
     }
     
+    return nil;
+}
+
++ (OTPToken*)getKeeOtpLastResortFallback:(MutableOrderedDictionary<NSString*, StringValue*>*)fields {
     
     
     
     
     
+    
+    StringValue* keeOtpSecretEntry = fields[kKeeOtpPluginKey];
+    if(!keeOtpSecretEntry) {
+        return nil;
+    }
+        
+    
+    
+    NSString* keeOtpSecret = keeOtpSecretEntry.value;
+    if(!keeOtpSecret) {
+        return nil;
+    }
+    
+    if ( [keeOtpSecret isEqualToString:@"30;6"] ) { 
+        return nil;
+    }
     
     OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer
                                        secret:[NSData secretWithString:keeOtpSecret]];

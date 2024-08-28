@@ -253,7 +253,7 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
         case .expiredAndExpiring:
             return NSLocalizedString("quick_view_title_expired_and_expiring", comment: "Expired & Expiring")
         case .auditIssues:
-            return NSLocalizedString("quick_view_title_audit_issues_title", comment: "Audit Issues")
+            return NSLocalizedString("browse_vc_action_audit", comment: "Audit")
         @unknown default:
             return "🔴 UNKNOWN"
         }

@@ -25,7 +25,7 @@ struct OtherViewsView: View {
             if auditModel.isEnabled {
                 let issueCount = model.database.auditIssueEntryCount
                 NavigationCapsule(model: model,
-                                  title: issueCount == 0 ? "browse_vc_action_audit" : "quick_view_title_audit_issues_title",
+                                  title: "browse_vc_action_audit",
                                   image: "checkmark.shield.fill",
                                   count: issueCount == 0 ? "" : String(issueCount),
                                   imageBackgroundColor: issueCount == 0 ? .green : .orange,

@@ -692,8 +692,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         else {
             Keys *ret = [[Keys alloc] init];
 
-            ret.compositeKey = compositeKey;
-            ret.transformKey = [kdf deriveKey:ret.compositeKey];
+            
+            
+            ret.compositeKey = compositeKey; 
+            ret.transformKey = [kdf deriveKey:ret.compositeKey]; 
             ret.masterKey = getMasterKey(masterSeed, ret.transformKey);
 
             
