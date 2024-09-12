@@ -46,6 +46,9 @@ typedef enum : NSUInteger {
     AutoFillOperationModeRegisterPasskey,
     AutoFillOperationModeGetPasskeyAssertionManualOrQuickTypeWithUI,
     AutoFillOperationModeGetPasskeyAssertionQuickTypeNoUI,
+    AutoFillOperationModeTextToInsert,
+    AutoFillOperationMode2FACodeFillQuickType,
+    AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI,
 } AutoFillOperationMode;
 
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
@@ -134,10 +137,28 @@ typedef enum : NSUInteger {
 }
 
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    slog(@"prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
+    slog(@"🐞 prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
     [self commonInit];
     
     self.mode = AutoFillOperationModeGetPasswordManualSelect;
+    self.serviceIdentifiers = serviceIdentifiers;
+}
+
+
+
+- (void)prepareInterfaceForUserChoosingTextToInsert {
+    slog(@"🐞 prepareInterfaceForUserChoosingTextToInsert");
+    [self commonInit];
+    
+    self.mode = AutoFillOperationModeTextToInsert;
+    self.serviceIdentifiers = @[];
+}
+
+- (void)prepareOneTimeCodeCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+    slog(@"🐞 prepareOneTimeCodeCredentialListForServiceIdentifiers: [%@]", serviceIdentifiers);
+    [self commonInit];
+    
+    self.mode = AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI;
     self.serviceIdentifiers = serviceIdentifiers;
 }
 
@@ -156,37 +177,55 @@ typedef enum : NSUInteger {
 - (void)provideCredentialWithoutUserInteractionForRequest:(id<ASCredentialRequest>)credentialRequest {
     slog(@"🟢 provideCredentialWithoutUserInteractionForRequest [%@]", credentialRequest);
     [self commonInit];
+
+    id<ASCredentialIdentity> credentialIdentity = credentialRequest.credentialIdentity;
+    QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
+    DatabasePreferences* database = [self getDatabaseFromQuickTypeIdentifier:identifier];
+    if ( !database ) {
+        [self exitWithUserInteractionRequired];
+    }
     
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
         self.mode = AutoFillOperationModeGetPasskeyAssertionQuickTypeNoUI;
         self.withoutUserInteraction = YES;
         self.passkeyCredentialRequest = credentialRequest;
-        
-        id<ASCredentialIdentity> credentialIdentity = credentialRequest.credentialIdentity;
-        QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
-        DatabasePreferences* database = [self getDatabaseFromQuickTypeIdentifier:identifier];
-        
-        if ( database ) {
-            slog(@"provideCredentialWithoutUserInteractionForRequest - Passkey - Got DB");
-            
-            IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self
-                                                                                                      database:database
-                                                                                                isAutoFillOpen:YES
-                                                                    transparentAutoFillBackgroundForBiometrics:YES
-                                                                                           biometricPreCleared:NO
-                                                                                           noConvenienceUnlock:NO];
-            if ( keyDeterminer.isAutoFillConvenienceAutoLockPossible ) {
-                slog(@"provideCredentialWithoutUserInteractionForRequest - Passkey - Within Timeout - Filling without UI");
-                [self unlockDatabase:database identifier:identifier transparentBio:YES];
-                return;
+                
+        if ( ![self unlockIfPossibleWithoutUserInteraction:database identifier:identifier] ) {
+            [self exitWithUserInteractionRequired];
+        }
+    }
+    else if (@available(iOS 18.0, *)) {
+        if ( credentialRequest.type == ASCredentialRequestTypeOneTimeCode ) {
+            self.mode = AutoFillOperationMode2FACodeFillQuickType;
+            self.withoutUserInteraction = YES;
+            self.credentialIdentity = credentialIdentity;
+
+            if ( ![self unlockIfPossibleWithoutUserInteraction:database identifier:identifier] ) {
+                [self exitWithUserInteractionRequired];
             }
         }
-        
-        [self exitWithUserInteractionRequired];
     }
     else {
         [self provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
     }
+}
+
+- (BOOL)unlockIfPossibleWithoutUserInteraction:(DatabasePreferences*)database identifier:(QuickTypeRecordIdentifier*)identifier {
+    slog(@"provideCredentialWithoutUserInteractionForRequest - Passkey or 2FA Code AutoFill without UI - Got DB");
+    
+    IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self
+                                                                                              database:database
+                                                                                        isAutoFillOpen:YES
+                                                            transparentAutoFillBackgroundForBiometrics:YES
+                                                                                   biometricPreCleared:NO
+                                                                                   noConvenienceUnlock:NO];
+    if ( keyDeterminer.isAutoFillConvenienceAutoLockPossible ) {
+        slog(@"provideCredentialWithoutUserInteractionForRequest - Passkey - Within Timeout - Filling without UI");
+        [self unlockDatabase:database identifier:identifier transparentBio:YES];
+        return YES;
+    }
+    
+    return NO;
 }
 
 - (void)prepareInterfaceToProvideCredentialForRequest:(id<ASCredentialRequest>)credentialRequest {
@@ -202,10 +241,18 @@ typedef enum : NSUInteger {
         
         
     }
+    else if (@available(iOS 18.0, *)) {
+        if ( credentialRequest.type == ASCredentialRequestTypeOneTimeCode ) {
+            self.mode = AutoFillOperationMode2FACodeFillQuickType;
+            self.credentialIdentity = credentialRequest.credentialIdentity;
+        }
+    }
     else {
         [self prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
     }
 }
+
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -292,11 +339,27 @@ typedef enum : NSUInteger {
         slog(@"🟢 startup UI: QuickType password...");
         [self unlockWithQuickTypeIdentifier];
     }
+    else if ( self.mode == AutoFillOperationMode2FACodeFillQuickType ) {
+        slog(@"🟢 startup UI: QuickType 2FA Code non-interactive...");
+        [self unlockWithQuickTypeIdentifier];
+    }
+    else if ( self.mode == AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI ) {
+        if ( self.credentialIdentity ) {
+            slog(@"🟢 startup UI: QuickType 2FA Code interactive...");
+            [self unlockWithQuickTypeIdentifier];
+        }
+        else {
+            slog(@"🟢 startup UI: 2FA Code with manual select...");
+            [self launchSingleOrRequestDatabaseSelection];
+        }
+    }
     else { 
         slog(@"🟢 startup UI: fallback but should be manual password select...");
         [self launchSingleOrRequestDatabaseSelection];
     }
 }
+
+
 
 - (void)launchSingleOrRequestDatabaseSelection {
     DatabasePreferences* database = [self getSingleEnabledDatabase]; 
@@ -337,6 +400,8 @@ typedef enum : NSUInteger {
         [self exitWithUserCancelled:nil];
     }
 }
+
+
 
 - (void)unlockWithQuickTypeIdentifier {
     QuickTypeRecordIdentifier* identifier;
@@ -472,11 +537,27 @@ typedef enum : NSUInteger {
         slog(@"🟢 Database successfully unlocked! Getting quicktype password");
         [self findAndReturnQuickTypeCredential:identifier model:model];
     }
+    else if ( self.mode == AutoFillOperationMode2FACodeFillQuickType ) { 
+        slog(@"🟢 Database successfully unlocked! Getting quicktype 2FA Code");
+        [self findAndReturnQuickTypeCredential:identifier model:model];
+    }
+    else if ( self.mode == AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI ) { 
+        if ( identifier ) {
+            slog(@"🟢 Database successfully unlocked! Finding and returning 2FA with quicktype id.");
+            [self findAndReturnQuickTypeCredential:identifier model:model];
+        }
+        else {
+            slog(@"🟢 Database successfully unlocked! Requesting 2FA Code be manually selected for return");
+            [self promptUserToSelectCredential:model selectPasskey:YES];
+        }
+    }
     else { 
         slog(@"🟢 Database successfully unlocked! Requesting manual selection of password.");
         [self promptUserToSelectCredential:model selectPasskey:NO];
     }
 }
+
+
 
 - (void)findAndReturnQuickTypeCredential:(QuickTypeRecordIdentifier *)identifier model:(Model *)model {
     NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:identifier.nodeId];
@@ -486,6 +567,9 @@ typedef enum : NSUInteger {
     if ( node ) {
         if ( self.mode == AutoFillOperationModeGetPasskeyAssertionQuickTypeNoUI || self.mode == AutoFillOperationModeGetPasskeyAssertionManualOrQuickTypeWithUI ) {
             [self completePasskeyAssertionWithNode:model node:node];
+        }
+        else if ( self.mode == AutoFillOperationMode2FACodeFillQuickType || self.mode == AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI ) {
+            [self exitWith2FACode:model item:node];
         }
         else {
             [self exitWithCredential:model item:node quickTypeIdentifier:identifier];
@@ -508,9 +592,11 @@ typedef enum : NSUInteger {
     
     vc.model = model;
     vc.serviceIdentifiers = self.serviceIdentifiers;
+    vc.disableCreateNew = self.mode == AutoFillOperationModeTextToInsert || self.mode == AutoFillOperationMode2FACodeFillQuickType || self.mode == AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI;
+    vc.twoFactorOnly = self.mode == AutoFillOperationMode2FACodeFillQuickType || self.mode == AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI;
+    vc.alsoRequestFieldSelection = self.mode == AutoFillOperationModeTextToInsert;
+    
     vc.completion = ^(BOOL userCancelled, Node * _Nullable node, NSString * _Nullable username, NSString * _Nullable password) {
-        slog(@"🟢 User Done!");
-        
         if ( userCancelled ) {
             [self exitWithUserCancelled:model.metadata];
         }
@@ -518,6 +604,18 @@ typedef enum : NSUInteger {
             if ( self.mode == AutoFillOperationModeGetPasskeyAssertionManualOrQuickTypeWithUI ) {
                 slog(@"🟢 User Selected a Node and we are in passkey assertion mode...");
                 [self completePasskeyAssertionWithNode:model node:node];
+            }
+            else if ( self.mode == AutoFillOperationModeTextToInsert ) {
+                slog(@"🟢 User Selected a Node and we are in Text insertion mode...");
+                [self exitWithTextToInsert:model text:password];
+            }
+            else if ( self.mode == AutoFillOperationMode2FACodeFillManualOrQuickTypeWithUI ) {
+                slog(@"🟢 User Selected a Node and we are in 2FA Code mode...");
+                [self exitWith2FACode:model item:node];
+            }
+            else if ( self.mode == AutoFillOperationMode2FACodeFillQuickType ) {
+                slog(@"🔴 promptUserToSelect and we're in none interactive mode?!");
+                [self exitWithUserCancelled:nil];
             }
             else {
                 slog(@"🟢 User Selected a Node and we are in password mode... %lu", (unsigned long)self.mode);
@@ -732,8 +830,31 @@ typedef enum : NSUInteger {
     }
 }
 
+- (void)exitWithTextToInsert:(Model*)model text:(NSString*)text {
+    slog(@"exitWithTextToInsert: Success");
+    
+    [self commonExit:model.metadata];
+    
+    if (@available(iOS 18.0, *)) {
+        [self.extensionContext completeRequestWithTextToInsert:text completionHandler:nil]; 
+    }
+}
+
+- (void)exitWith2FACode:(Model*)model item:(Node*)item {
+    NSString* totp = item.fields.otpToken ? item.fields.otpToken.password : @"";
+    
+    slog(@"exitWith2FACode: Success");
+    
+    [self commonExit:model.metadata];
+    
+    if (@available(iOS 18.0, *)) {
+        ASOneTimeCodeCredential* code = [ASOneTimeCodeCredential credentialWithCode:totp];
+        [self.extensionContext completeOneTimeCodeRequestWithSelectedCredential:code completionHandler:nil];
+    }
+}
+    
 - (void)exitWithCredential:(DatabasePreferences*)database user:(NSString*)user password:(NSString*)password {
-    slog(@"EXIT: Success");
+    slog(@"exitWithCredential: Success");
  
     [self commonExit:database];
     

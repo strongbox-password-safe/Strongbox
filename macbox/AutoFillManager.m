@@ -97,8 +97,10 @@
         NSArray<Node*>* sortedNodes = [self getFilteredSortedNodes:database];
         
         for ( Node* node in sortedNodes ) {
+            NSSet<NSString*>* uniqueUrls = [AutoFillCommon getUniqueUrlsForNode:database node:node];
+            
             if ( database.metadata.quickTypeEnabled ) {
-                NSArray<ASPasswordCredentialIdentity*>* nodeIdenitities = [self getPasswordCredentialIdentities:node database:database];
+                NSArray<ASPasswordCredentialIdentity*>* nodeIdenitities = [self getPasswordCredentialIdentities:node database:database uniqueUrls:uniqueUrls];
                 
                 [identities addObjectsFromArray:nodeIdenitities];
             }
@@ -110,6 +112,13 @@
                     if ( pkid ) {
                         [identities addObject:pkid];
                     }
+                }
+            }
+
+            if (@available(iOS 18.0, macOS 15.0, *)) {
+                if ( node.fields.otpToken ) {
+                    NSArray<ASOneTimeCodeCredentialIdentity*>* otcids = [self getOneTimeCodeCredentialIdentities:database node:node uniqueUrls:uniqueUrls];
+                    [identities addObjectsFromArray:otcids];
                 }
             }
         }
@@ -154,9 +163,8 @@
 }
 
 - (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentities:(Node*)node
-                                                                  database:(Model*)database {
-    NSSet<NSString*>* uniqueUrls = [AutoFillCommon getUniqueUrlsForNode:database node:node];
-    
+                                                                  database:(Model*)database
+                                                                uniqueUrls:(NSSet<NSString*>*)uniqueUrls {
     NSMutableArray<ASPasswordCredentialIdentity*> *passwordIdentities = [NSMutableArray array];
     
     BOOL usedEmailAsUser = NO;
@@ -288,6 +296,40 @@
     return pkid;
 }
 
+- (NSArray<ASOneTimeCodeCredentialIdentity*>*)getOneTimeCodeCredentialIdentities:(Model*)database
+                                                                            node:(Node*)node
+                                                                      uniqueUrls:(NSSet<NSString*>*)uniqueUrls API_AVAILABLE(ios(18.0), macos (15.0)) {
+    OTPToken* token = node.fields.otpToken;
+    if ( token == nil ) {
+        return nil;
+    }
+    
+    NSString* quickTypeText = [self getQuickTypeUserText:database node:node usedEmailAsUser:nil fieldKey:nil];
+    
+    if ( quickTypeText == nil ) {
+        return nil;
+    }
+
+    QuickTypeRecordIdentifier* rid = [QuickTypeRecordIdentifier identifierWithDatabaseId:database.metadata.uuid
+                                                                                  nodeId:node.uuid.UUIDString
+                                                                                fieldKey:nil];
+    
+    NSMutableArray<ASOneTimeCodeCredentialIdentity*> *identities = [NSMutableArray array];
+    
+    for ( NSString* url in uniqueUrls ) {
+        ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url
+                                                                                                        type:ASCredentialServiceIdentifierTypeURL];
+        
+        ASOneTimeCodeCredentialIdentity *otcid = [[ASOneTimeCodeCredentialIdentity alloc] initWithServiceIdentifier:serviceId
+                                                                                                              label:quickTypeText
+                                                                                                   recordIdentifier:[rid toJson]];
+        if ( otcid ) {
+            [identities addObject:otcid];
+        }
+    }
+        
+    return identities;
+}
 
 - (NSString*)getQuickTypeUserText:(Model*)database
                              node:(Node*)node
@@ -454,21 +496,31 @@
     }
     else {
         ASPasswordCredentialIdentity* aspcid = [self getIdentity:node url:node.fields.url database:database fieldKey:nil fieldValue:nil];
-        
         if ( aspcid ) {
             [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:@[aspcid]
                                                                  completion:^(BOOL success, NSError * _Nullable error) {
                 slog(@"refreshQuickTypeAfterAutoFillAddition Done: %hhd - %@", success, error);
             }];
         }
+        
+        if (@available(iOS 18.0, macOS 15.0, *)) {
+            if ( node.fields.otpToken ) {
+                NSArray<ASOneTimeCodeCredentialIdentity*>* otcs = [self getOneTimeCodeCredentialIdentities:database node:node uniqueUrls:@[node.fields.url].set];
+                
+                [ASCredentialIdentityStore.sharedStore saveCredentialIdentityEntries:otcs
+                                                                          completion:^(BOOL success, NSError * _Nullable error) {
+                    slog(@"refreshQuickTypeAfterAutoFillAddition 2FA Code Done: %hhd - %@", success, error);
+                }];
+            }
+        }
     }
 }
 
 - (void)removeItemsFromQuickType:(const NSArray<Node *> *)items database:(Model *)database {
     for ( Node* node in items ) {
+        NSSet<NSString*>* uniqueUrls = [AutoFillCommon getUniqueUrlsForNode:database node:node];
 
-        
-        NSArray<ASPasswordCredentialIdentity*>* identities = [self getPasswordCredentialIdentities:node database:database];
+        NSArray<ASPasswordCredentialIdentity*>* identities = [self getPasswordCredentialIdentities:node database:database uniqueUrls:uniqueUrls];
         
         [ASCredentialIdentityStore.sharedStore removeCredentialIdentities:identities
                                                                completion:^(BOOL success, NSError * _Nullable error) {
@@ -480,6 +532,17 @@
                 ASPasskeyCredentialIdentity *pkid = [self getPasskeyAutoFillCredentialIdentity:database node:node];
                 
                 [ASCredentialIdentityStore.sharedStore removeCredentialIdentityEntries:@[pkid]
+                                                                            completion:^(BOOL success, NSError * _Nullable error) {
+                    slog(@"🟢 removeCredentialIdentityEntries done with %hhd - %@", success, error);
+                }];
+            }
+        }
+        
+        if (@available(iOS 18.0, macOS 15.0, *)) {
+            if ( node.fields.otpToken ) {
+                NSArray<ASOneTimeCodeCredentialIdentity*>* otcs = [self getOneTimeCodeCredentialIdentities:database node:node uniqueUrls:uniqueUrls];
+                
+                [ASCredentialIdentityStore.sharedStore removeCredentialIdentityEntries:otcs
                                                                             completion:^(BOOL success, NSError * _Nullable error) {
                     slog(@"🟢 removeCredentialIdentityEntries done with %hhd - %@", success, error);
                 }];

@@ -51,9 +51,7 @@
 
 @property BOOL withoutUserInteraction;
 @property BOOL hasDoneCommonInit;
-
 @property BOOL quickTypeMode;
-
 @property id passkeyCredentialRequest;
 
 @property BOOL requireWormhole; 

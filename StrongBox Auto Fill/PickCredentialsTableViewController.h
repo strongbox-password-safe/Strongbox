@@ -22,6 +22,10 @@ typedef void (^PickCredentialsCompletion)(BOOL userCancelled, Node* _Nullable no
 @property NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers;
 @property (nonatomic, copy) PickCredentialsCompletion completion;
 
+@property BOOL disableCreateNew;
+@property BOOL twoFactorOnly;
+@property BOOL alsoRequestFieldSelection;
+
 @end
 
 NS_ASSUME_NONNULL_END

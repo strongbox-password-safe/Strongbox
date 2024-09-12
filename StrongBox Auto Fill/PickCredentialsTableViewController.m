@@ -29,6 +29,8 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
+#import "SelectItemTableViewController.h"
+
 static NSString* const kGroupTitleMatches = @"title";
 static NSString* const kGroupUrlMatches = @"url";
 static NSString* const kGroupAllFieldsMatches = @"all-matches";
@@ -104,7 +106,7 @@ static NSString* const kGroupAllItems = @"all-items";
     NSArray<Node*> *pinnedItems = [self loadPinnedItems];
     
     self.groupedResults = @{ kGroupAllItems : allItems,
-                                   kGroupPinned : pinnedItems };
+                             kGroupPinned : pinnedItems };
 }
 
 - (void)setupTableview {
@@ -125,7 +127,7 @@ static NSString* const kGroupAllItems = @"all-items";
     }
 }
 
-- (IBAction)updateOtpCodes:(id)sender {
+- (void)updateOtpCodes:(id)sender {
     [self.tableView reloadData];
 }
 
@@ -159,7 +161,7 @@ static NSString* const kGroupAllItems = @"all-items";
 
             
             
-            if ( AppPreferences.sharedInstance.autoProceedOnSingleMatch ) {
+            if ( AppPreferences.sharedInstance.autoProceedOnSingleMatch && !self.twoFactorOnly ) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [self proceedWithSingleMatch];
                 });
@@ -301,11 +303,13 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)loadAllItems {
-    return [self.model filterAndSortForBrowse:self.model.allSearchableNoneExpiredEntries.mutableCopy includeGroups:NO];
+    NSArray<Node*>* entries = self.twoFactorOnly ? self.model.totpEntries : self.model.allSearchableNoneExpiredEntries;
+    
+    return [self.model filterAndSortForBrowse:entries.mutableCopy includeGroups:NO];
 }
 
 - (NSArray<Node*>*)loadPinnedItems {
-    if( !self.model.favourites.count || !AppPreferences.sharedInstance.autoFillShowFavourites ) {
+    if( !self.model.favourites.count || !AppPreferences.sharedInstance.autoFillShowFavourites || self.twoFactorOnly ) {
         return @[];
     }
     
@@ -364,7 +368,16 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
-    return [self.model search:searchText scope:scope includeGroups:NO];
+    NSArray<Node*>* ret = [self.model search:searchText scope:scope includeGroups:NO];
+    
+    if ( self.twoFactorOnly ) {
+        return [ret filter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.otpToken != nil;
+        }];
+    }
+    else {
+        return ret;
+    }
 }
 
 
@@ -521,7 +534,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         return NSLocalizedString(@"generic_actions", @"Actions");
     }
     else if ( [group isEqualToString:kGroupAllItems] ) {
-        return NSLocalizedString(@"quick_view_title_all_entries_title", @"All Entries");
+        return self.twoFactorOnly ? NSLocalizedString(@"quick_view_title_totp_entries_title", @"2FA Codes") : NSLocalizedString(@"quick_view_title_all_entries_title", @"All Entries");
     }
     else if ( [group isEqualToString:kGroupNoMatchingItems] ) {
         return NSLocalizedString(@"quick_view_title_no_matches_title", @"Results");
@@ -534,7 +547,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     NSString* group = self.groups[section];
 
     if ( [group isEqualToString:kGroupServiceId] ) {
-        return NSLocalizedString(@"autofill_search_service_id_section_footer", @"");
+        return self.serviceIdentifiers.count > 0 ? NSLocalizedString(@"autofill_search_service_id_section_footer", @"") : nil;
     }
     
     return nil;
@@ -542,27 +555,29 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     NSString* group = self.groups[section];
+    
+    if ( [group isEqualToString:kGroupActions] ) {
+        return (self.twoFactorOnly || self.alsoRequestFieldSelection) ? 0.1f : UITableViewAutomaticDimension;
+    }
 
-
-
-
-
-
-
-        if ( [group isEqualToString:kGroupNoMatchingItems] ) {
-            return self.showNoMatchesSection ? UITableViewAutomaticDimension : 0.1f;
+    if ( [group isEqualToString:kGroupServiceId] ) {
+        return self.serviceIdentifiers.count > 0 ? UITableViewAutomaticDimension : 0.1f;
+    }
+    
+    if ( [group isEqualToString:kGroupNoMatchingItems] ) {
+        return self.showNoMatchesSection ? UITableViewAutomaticDimension : 0.1f;
+    }
+    
+    if ( [group isEqualToString:kGroupAllItems] ) {
+        return self.showAllItemsSection ? UITableViewAutomaticDimension : 0.1f;
+    }
+    
+    if ( ![group isEqualToString:kGroupServiceId] && ![group isEqualToString:kGroupActions] ) {
+        NSArray<Node*> *items = self.groupedResults[group];
+        if ( items.count == 0) {
+            return 0.1f;
         }
-        
-        if ( [group isEqualToString:kGroupAllItems] ) {
-            return self.showAllItemsSection ? UITableViewAutomaticDimension : 0.1f;
-        }
-        
-        if ( ![group isEqualToString:kGroupServiceId] && ![group isEqualToString:kGroupActions] ) {
-            NSArray<Node*> *items = self.groupedResults[group];
-            if ( items.count == 0) {
-                return 0.1f;
-            }
-        }
+    }
 
     
     return UITableViewAutomaticDimension;
@@ -573,12 +588,23 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
     if ( [group isEqualToString:kGroupActions] ) {
         if ( indexPath.row == 0 ) {
-            if ( self.model.isReadOnly ) {
+            if ( self.model.isReadOnly || self.twoFactorOnly || self.alsoRequestFieldSelection ) {
+                return 0.0f;
+            }
+        }
+        else {
+            if ( self.twoFactorOnly || self.alsoRequestFieldSelection ) {
                 return 0.0f;
             }
         }
     }
-    
+
+    if ( [group isEqualToString:kGroupServiceId] ) {
+        if ( self.serviceIdentifiers.count == 0 ) {
+            return 0.0f;
+        }
+    }
+
 
 
 
@@ -594,7 +620,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 
         if ( [group isEqualToString:kGroupServiceId] ) {
-            return UITableViewAutomaticDimension;
+            return self.serviceIdentifiers.count > 0 ? UITableViewAutomaticDimension : 0.1f;
         }
 
         return 0.1f;
@@ -610,6 +636,14 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
     if ( [group isEqualToString:kGroupAllItems] ) {
         return self.showAllItemsSection ? [super tableView:tableView viewForHeaderInSection:section] : [self sectionFiller];
+    }
+
+    if ( [group isEqualToString:kGroupServiceId] ) {
+        return self.serviceIdentifiers.count > 0 ? [super tableView:tableView viewForHeaderInSection:section] : [self sectionFiller];
+    }
+
+    if ( [group isEqualToString:kGroupActions] ) {
+        return (self.twoFactorOnly || self.alsoRequestFieldSelection) ? [self sectionFiller] : [super tableView:tableView viewForHeaderInSection:section];
     }
     
     if ( ![group isEqualToString:kGroupServiceId]  && ![group isEqualToString:kGroupActions] ) {
@@ -662,16 +696,23 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 - (void)proceedWithTopMatch {
     Node* item = [self getTopMatch];
-    [self proceedWithItem:item];
+    
+    if ( item ) {
+        [self proceedWithItem:item];
+    }
 }
 
 - (void)proceedWithItem:(Node*)item {
-    if ( item ) {
+    if ( self.alsoRequestFieldSelection ) {
+        [self promptForFieldSelection:item];
+    }
+    else {
         [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
             self.completion(NO, item, nil, nil);
         }];
     }
 }
+
 
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
@@ -791,7 +832,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (BOOL)canCreateNewCredential {
-    return !self.model.isReadOnly;
+    return !self.model.isReadOnly && !self.disableCreateNew;
 }
 
 
@@ -1035,6 +1076,103 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 - (UIAction*)getContextualMenuGenericCopy:(NSString*)locKey item:(Node*)item handler:(UIActionHandler)handler  {
     return [ContextMenuHelper getItem:NSLocalizedString(locKey, nil) systemImage:@"doc.on.doc" handler:handler];
+}
+
+
+
+- (void)promptForFieldSelection:(Node*)item  {
+    NSMutableArray<NSString*>* fields = NSMutableArray.array;
+    NSMutableArray<NSString*>* values = NSMutableArray.array;
+    
+    if ( item.fields.username.length ) {
+        [fields addObject:NSLocalizedString(@"generic_fieldname_username", @"Username")];
+        [values addObject:[self dereference:item.fields.username node:item]];
+    }
+    
+    if ( item.fields.password.length ) {
+        [fields addObject:NSLocalizedString(@"generic_fieldname_password", @"Password")];
+        [values addObject:[self dereference:item.fields.password node:item]];
+    }
+    
+    if ( item.fields.otpToken ) {
+        [fields addObject:NSLocalizedString(@"generic_fieldname_totp", @"2FA Code")];
+        [values addObject:item.fields.otpToken.password];
+    }
+    
+    if ( item.fields.email.length ) {
+        [fields addObject:NSLocalizedString(@"generic_fieldname_email", @"Email")];
+        [values addObject:[self dereference:item.fields.email node:item]];
+    }
+    
+    if ( item.fields.url.length ) {
+        [fields addObject:NSLocalizedString(@"generic_fieldname_url", @"URL")];
+        [values addObject:[self dereference:item.fields.url node:item]];
+    }
+    
+    if (item.fields.notes.length) {
+        [fields addObject:NSLocalizedString(@"generic_fieldname_notes", @"Notes")];
+        [values addObject:[self dereference:item.fields.notes node:item]];
+    }
+    
+    
+    
+    NSArray<NSString*> *allKeys = item.fields.customFieldsNoEmail.allKeys;
+    NSArray* sortedKeys = self.model.metadata.customSortOrderForFields ? allKeys : [allKeys sortedArrayUsingComparator:finderStringComparator];
+    
+    for(NSString* key in sortedKeys) {
+        if (![NodeFields isTotpCustomFieldKey:key] &&
+            ![NodeFields isPasskeyCustomFieldKey:key] ) {
+            StringValue* sv = item.fields.customFields[key];
+            NSString* value = [self dereference:sv.value node:item];
+            
+            [fields addObject:key];
+            [values addObject:value];
+        }
+    }
+    
+    
+    
+    __weak PickCredentialsTableViewController* weakSelf = self;
+    [self promptForChoice:NSLocalizedString(@"select_field_to_insert_text", @"Select Field to Insert Text")
+                  options:fields
+     currentlySelectIndex:NSNotFound
+               completion:^(BOOL success, NSInteger selectedIndex) {
+        if ( !success ) {
+            return;
+        }
+        
+        NSString* text = values[selectedIndex];
+        
+        [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:^{
+            weakSelf.completion(NO, item, nil, text);
+        }];
+    }];
+}
+
+- (void)promptForChoice:(NSString*)title
+                options:(NSArray<NSString*>*)items
+   currentlySelectIndex:(NSInteger)currentlySelectIndex
+             completion:(void(^)(BOOL success, NSInteger selectedIndex))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+    vc.groupItems = @[items];
+    
+    if ( currentlySelectIndex != NSNotFound ) {
+        vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
+    }
+    else {
+        vc.selectedIndexPaths = nil;
+    }
+    
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSIndexSet* set = selectedIndices.firstObject;
+        [self.navigationController popViewControllerAnimated:YES];
+        completion(YES, set.firstIndex);
+    };
+    
+    vc.title = title;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 @end

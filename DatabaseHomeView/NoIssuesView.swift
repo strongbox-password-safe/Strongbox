@@ -20,7 +20,7 @@ struct NoIssuesView: View {
                     .foregroundColor(.green)
             }.frame(width: 200, height: 200)
 
-            Text("Audit Complete")
+            Text("audit_complete")
                 .font(.title)
             Text("audit_status_no_issues_found")
                 .font(.callout)

@@ -27,7 +27,7 @@ struct SettingsNavBarButton: View {
 
             Divider()
 
-            Menu("Show Sections", systemImage: "slider.horizontal.3") {
+            Menu("configure_home_show_sections", systemImage: "slider.horizontal.3") {
                 ForEach(HomeViewSection.allCases) { section in
                     Toggle(isOn: Binding(
                         get: {
