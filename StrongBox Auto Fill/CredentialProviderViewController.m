@@ -204,6 +204,9 @@ typedef enum : NSUInteger {
                 [self exitWithUserInteractionRequired];
             }
         }
+        else {
+            [self provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
+        }
     }
     else {
         [self provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
@@ -245,6 +248,9 @@ typedef enum : NSUInteger {
         if ( credentialRequest.type == ASCredentialRequestTypeOneTimeCode ) {
             self.mode = AutoFillOperationMode2FACodeFillQuickType;
             self.credentialIdentity = credentialRequest.credentialIdentity;
+        }
+        else {
+            [self prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
         }
     }
     else {
