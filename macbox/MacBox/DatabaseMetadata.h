@@ -41,9 +41,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nonatomic) StorageProvider storageProvider;
 
 @property (nonatomic, strong, nullable) NSString* conveniencePassword;
-@property (nonatomic, strong, nullable) NSString* keyFileBookmark;
-@property (nonatomic, strong, nullable) NSString* autoFillKeyFileBookmark;
-
 @property (nonatomic, strong, nullable) YubiKeyConfiguration* yubiKeyConfiguration;
 
 
@@ -214,6 +211,10 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property NSInteger cacheChallengeDurationSecs;
 
 @property BOOL markDirtyOnExpandCollapseGroups;
+
+@property (nonatomic, strong, nullable) NSString* keyFileBookmark;
+@property (nonatomic, strong, nullable) NSString* autoFillKeyFileBookmark;
+@property (nullable) NSString* fallbackLastKnownKeyFileUrl;
 
 @end
 

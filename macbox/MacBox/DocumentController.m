@@ -15,7 +15,6 @@
 #import "MacAlerts.h"
 #import "Utils.h"
 #import "NSArray+Extensions.h"
-#import "BookmarksHelper.h"
 #import "Serializator.h"
 #import "MacUrlSchemes.h"
 #import "SafeStorageProviderFactory.h"

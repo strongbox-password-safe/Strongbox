@@ -113,6 +113,7 @@
              manualFallbackHeadline:manualHeadline
           manualFallbackSubHeadline:manualSubhead
                     keyFileBookmark:self.contextAwareKeyFileBookmark
+                 keyFileFallbackUrl:self.database.keyFileFallbackUrl
                yubiKeyConfiguration:self.database.yubiKeyConfiguration
                       allowFallback:YES
                          completion:completion];
@@ -138,12 +139,14 @@
 }
 
 - (void)getCkfsWithBiometrics:(NSString *)keyFileBookmark
+           keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
          yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                    completion:(CompositeKeyDeterminedBlock)completion {
     [self getCkfsWithBiometrics:nil
          manualFallbackHeadline:nil
       manualFallbackSubHeadline:nil
                 keyFileBookmark:keyFileBookmark
+             keyFileFallbackUrl:keyFileFallbackUrl
            yubiKeyConfiguration:yubiKeyConfiguration
                   allowFallback:NO
                      completion:completion];
@@ -153,6 +156,7 @@
        manualFallbackHeadline:(NSString*_Nullable)manualFallbackHeadline
     manualFallbackSubHeadline:(NSString*_Nullable)manualFallbackSubHeadline
               keyFileBookmark:(NSString *)keyFileBookmark
+           keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
          yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                 allowFallback:(BOOL)allowFallback
                    completion:(CompositeKeyDeterminedBlock)completion {
@@ -163,6 +167,7 @@
               manualFallbackHeadline:manualFallbackHeadline
            manualFallbackSubHeadline:manualFallbackSubHeadline
                      keyFileBookmark:keyFileBookmark
+                  keyFileFallbackUrl:keyFileFallbackUrl
                 yubiKeyConfiguration:yubiKeyConfiguration
                        allowFallback:allowFallback
                           completion:completion];
@@ -186,13 +191,14 @@
                               subheadline:(NSString *)subheadline
                                completion:(CompositeKeyDeterminedBlock)completion {
     ManualCredentialsEntry* mce = [[ManualCredentialsEntry alloc] initWithNibName:@"ManualCredentialsEntry" bundle:nil];
+    
     mce.databaseUuid = self.database.uuid;
     mce.isNativeAutoFillAppExtensionOpen = self.isNativeAutoFillAppExtensionOpen;
     mce.headline = headline;
     mce.subheadline = subheadline;
     mce.verifyCkfsMode = self.verifyCkfsMode;
     
-    mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
+    mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, NSURL* keyFileUrl, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
         if (userCancelled) {
             completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
         }
@@ -201,6 +207,7 @@
                       keyFileBookmark:keyFileBookmark
                  yubiKeyConfiguration:yubiKeyConfiguration
                       fromConvenience:NO
+                   keyFileFallbackUrl:keyFileUrl
                            completion:completion];
         }
     };
@@ -239,6 +246,7 @@
         manualFallbackHeadline:(NSString*_Nullable)manualFallbackHeadline
      manualFallbackSubHeadline:(NSString*_Nullable)manualFallbackSubHeadline
                keyFileBookmark:(NSString *)keyFileBookmark
+            keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
           yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                  allowFallback:(BOOL)allowFallback
                     completion:(CompositeKeyDeterminedBlock)completion {
@@ -286,7 +294,10 @@
             }
             
             if(success) {
-                [self getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark yubiKeyConfiguration:yubiKeyConfiguration completion:completion];
+                [self getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark
+                                     yubiKeyConfiguration:yubiKeyConfiguration
+                                       keyFileFallbackUrl:keyFileFallbackUrl
+                                               completion:completion];
             }
             else {
                 if( allowFallback && error && error.code == LAErrorUserFallback ) {
@@ -309,6 +320,7 @@
 
 - (void)getCkfsAfterSuccessfulBiometricAuth:(NSString *)keyFileBookmark
                        yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
+                         keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
                                  completion:(CompositeKeyDeterminedBlock)completion {
     if(![BiometricIdHelper.sharedInstance isBiometricDatabaseStateRecorded:self.isNativeAutoFillAppExtensionOpen]) {
         
@@ -319,17 +331,20 @@
               keyFileBookmark:keyFileBookmark
          yubiKeyConfiguration:yubiKeyConfiguration
               fromConvenience:YES
+           keyFileFallbackUrl:keyFileFallbackUrl
                    completion:completion];
 }
 
 - (void)getCkfsWithExplicitPassword:(NSString *)password
                     keyFileBookmark:(NSString *)keyFileBookmark
                yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
+                 keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
                          completion:(CompositeKeyDeterminedBlock)completion {
     [self getCkfsWithPassword:password
               keyFileBookmark:keyFileBookmark
          yubiKeyConfiguration:yubiKeyConfiguration
               fromConvenience:NO
+           keyFileFallbackUrl:keyFileFallbackUrl
                    completion:completion];
 }
 
@@ -337,12 +352,15 @@
             keyFileBookmark:(NSString *)keyFileBookmark
        yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
             fromConvenience:(BOOL)fromConvenience
+         keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
                  completion:(CompositeKeyDeterminedBlock)completion {
     NSError* error;
+    
     CompositeKeyFactors* ckf = [self getCkfsWithSelectedUiFactors:password
                                                   keyFileBookmark:keyFileBookmark
                                              yubiKeyConfiguration:yubiKeyConfiguration
                                                   fromConvenience:NO
+                                               keyFileFallbackUrl:keyFileFallbackUrl
                                                             error:&error];
     
     if( !ckf || error) {
@@ -359,16 +377,26 @@
                                      keyFileBookmark:(NSString *)keyFileBookmark
                                 yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
                                      fromConvenience:(BOOL)fromConvenience
+                                  keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
                                                error:(NSError**)outError {
     DatabaseFormat formatKeyFileHint = keyFileBookmark ? [self getKeyFileDatabaseFormat] : kKeePass4;
+
+    NSURL* resolvedKeyFileUrl = nil;
+    NSString* keyFileUpdatedBookmark = nil;
 
     CompositeKeyFactors* ret = [MacCompositeKeyDeterminer getCkfsWithConfigs:password
                                                              keyFileBookmark:keyFileBookmark
                                                         yubiKeyConfiguration:yubiKeyConfiguration
                                                           onDemandUiProvider:self.onDemandUiProvider
                                                            formatKeyFileHint:formatKeyFileHint
+                                                          keyFileFallbackUrl:keyFileFallbackUrl
+                                                          resolvedKeyFileUrl:&resolvedKeyFileUrl
+                                                      keyFileUpdatedBookmark:&keyFileUpdatedBookmark
                                                                        error:outError];
     
+    if ( keyFileUpdatedBookmark ) {
+        keyFileBookmark = keyFileUpdatedBookmark;
+    }
     
     if ( ret == nil && fromConvenience ) {
         slog(@"Could not get CKFs with Convenience Unlock. Clearing Secure Convenience Items");
@@ -400,6 +428,10 @@
             
             self.database.yubiKeyConfiguration = yubiKeyConfiguration;
         }
+        
+        if ( resolvedKeyFileUrl && rememberKeyFile ) {
+            self.database.fallbackLastKnownKeyFileUrl = resolvedKeyFileUrl.absoluteString;
+        }
     }
     
     return ret;
@@ -418,7 +450,12 @@
                                     yubiKeyConfiguration:yubiKeyConfiguration
                                       onDemandUiProvider:^NSViewController * _Nonnull{
         return hardwareKeyInteractionViewController;
-    } formatKeyFileHint:formatKeyFileHint error:outError];
+    }
+                                       formatKeyFileHint:formatKeyFileHint
+                                      keyFileFallbackUrl:nil
+                                      resolvedKeyFileUrl:nil
+                                  keyFileUpdatedBookmark:nil
+                                                   error:outError];
 }
 
 + (CompositeKeyFactors*)getCkfsWithConfigs:(NSString*)password
@@ -426,15 +463,21 @@
                       yubiKeyConfiguration:(YubiKeyConfiguration*)yubiKeyConfiguration
                         onDemandUiProvider:(MacCompositeKeyDeterminerOnDemandUIProviderBlock)onDemandUiProvider
                          formatKeyFileHint:(DatabaseFormat)formatKeyFileHint
+                        keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
+                        resolvedKeyFileUrl:(NSURL*_Nullable*_Nullable)resolvedKeyFileUrl
+                    keyFileUpdatedBookmark:(NSString*_Nullable*_Nullable)keyFileUpdatedBookmark
                                      error:(NSError**)outError {
     NSData* keyFileDigest = nil;
 
     if( keyFileBookmark ) {
         NSError *keyFileParseError;
         keyFileDigest = [KeyFileManagement getDigestFromBookmark:keyFileBookmark
-                                             keyFileFileName:nil
-                                                      format:formatKeyFileHint
-                                                       error:&keyFileParseError];
+                                                     fallbackUrl:keyFileFallbackUrl
+                                                 keyFileFileName:nil
+                                                          format:formatKeyFileHint
+                                              resolvedKeyFileUrl:resolvedKeyFileUrl
+                                                 updatedBookmark:keyFileUpdatedBookmark
+                                                           error:&keyFileParseError];
                 
         if( keyFileDigest == nil ) {
             slog(@"WARNWARN: Could not read Key File [%@]", keyFileParseError);

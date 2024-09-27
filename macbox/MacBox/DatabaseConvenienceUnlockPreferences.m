@@ -7,7 +7,6 @@
 //
 
 #import "DatabaseConvenienceUnlockPreferences.h"
-#import "BookmarksHelper.h"
 #import "Utils.h"
 #import "SecretStore.h"
 #import "MacAlerts.h"

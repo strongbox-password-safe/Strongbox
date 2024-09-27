@@ -355,9 +355,12 @@
     if( keyFileInvolved ) {
         NSError* error;
         NSData* keyFileDigest = [KeyFileManagement getDigestFromSources:keyFileBookmark
+                                                            fallbackUrl:nil
                                                         keyFileFileName:keyFileFileName
                                                      onceOffKeyFileData:oneTimeKeyFileData
                                                                  format:self.model.database.originalFormat
+                                                     resolvedKeyFileUrl:nil 
+                                                        updatedBookmark:nil 
                                                                   error:&error];
         
         if ( keyFileDigest == nil ) {

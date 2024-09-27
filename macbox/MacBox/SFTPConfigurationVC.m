@@ -8,7 +8,6 @@
 
 #import "SFTPConfigurationVC.h"
 #import "MacAlerts.h"
-#import "BookmarksHelper.h"
 #import "SFTPStorageProvider.h"
 #import "Utils.h"
 

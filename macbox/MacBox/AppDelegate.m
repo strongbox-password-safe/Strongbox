@@ -54,7 +54,6 @@
     #import "SFTPConnectionsManager.h"
 #endif
 
-#import "MacFileBasedBookmarkStorageProvider.h"
 #import <UserNotifications/UserNotifications.h>
 #import "SBLog.h"
 

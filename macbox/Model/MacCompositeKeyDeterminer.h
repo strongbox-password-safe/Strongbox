@@ -44,16 +44,19 @@ typedef NSViewController* _Nonnull (^MacCompositeKeyDeterminerOnDemandUIProvider
              completion:(CompositeKeyDeterminedBlock)completion;
 
 - (void)getCkfsWithBiometrics:(NSString*_Nullable)keyFileBookmark
+           keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
          yubiKeyConfiguration:(YubiKeyConfiguration*_Nullable)yubiKeyConfiguration
                    completion:(CompositeKeyDeterminedBlock)completion;
 
 - (void)getCkfsAfterSuccessfulBiometricAuth:(NSString *)keyFileBookmark
                        yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
+                         keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
                                  completion:(CompositeKeyDeterminedBlock)completion;
 
-- (void)getCkfsWithExplicitPassword:(NSString*_Nullable)password
-                    keyFileBookmark:(NSString*_Nullable)keyFileBookmark
-               yubiKeyConfiguration:(YubiKeyConfiguration*_Nullable)yubiKeyConfiguration
+- (void)getCkfsWithExplicitPassword:(NSString *)password
+                    keyFileBookmark:(NSString *)keyFileBookmark
+               yubiKeyConfiguration:(YubiKeyConfiguration *)yubiKeyConfiguration
+                 keyFileFallbackUrl:(NSURL*_Nullable)keyFileFallbackUrl
                          completion:(CompositeKeyDeterminedBlock)completion;
 
 @property (readonly) BOOL bioOrWatchUnlockIsPossible;

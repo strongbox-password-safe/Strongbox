@@ -29,6 +29,9 @@ typedef NS_ENUM(NSUInteger, GetCompositeKeyResult) {
     kGetCompositeKeyResultSuccess,
 };
 
-typedef void(^CompositeKeyDeterminedBlock)(GetCompositeKeyResult result, CompositeKeyFactors*_Nullable factors, BOOL fromConvenience, NSError*_Nullable error);
+typedef void(^CompositeKeyDeterminedBlock)(GetCompositeKeyResult result,
+                                           CompositeKeyFactors*_Nullable factors,
+                                           BOOL fromConvenience,
+                                           NSError*_Nullable error);
 
 NS_ASSUME_NONNULL_END

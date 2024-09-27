@@ -8,7 +8,6 @@
 
 #import "DatabaseMetadata.h"
 #import "SecretStore.h"
-#import "BookmarksHelper.h"
 #import "StrongboxMacFilesManager.h"
 #import "Settings.h"
 #import "NSDate+Extensions.h"
@@ -994,6 +993,21 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
     [SecretStore.sharedInstance setSecureString:foo forIdentifier:key];
 }
 
+- (NSString *)fallbackLastKnownKeyFileUrl {
+    NSString* key = [NSString stringWithFormat:@"fallbackLastKnownKeyFileUrl-%@", self.uuid];
+    NSString* ret = [SecretStore.sharedInstance getSecureString:key];
+    
+    slog(@"fallbackLastKnownKeyFileUrl GET: [%@]", ret);
+    
+    return ret;
+}
+
+- (void)setFallbackLastKnownKeyFileUrl:(NSString *)fallbackLastKnownKeyFileUrl {
+    NSString* key = [NSString stringWithFormat:@"fallbackLastKnownKeyFileUrl-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureString:fallbackLastKnownKeyFileUrl forIdentifier:key];
+    slog(@"fallbackLastKnownKeyFileUrl SET: [%@]", fallbackLastKnownKeyFileUrl);
+}
+
 
 
 - (NSDictionary<NSData *,NSData *> *)cachedYubiKeyChallengeResponses {
@@ -1030,6 +1044,7 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
 - (void)clearSecureItems {
     [self setConveniencePassword:nil];
     self.keyFileBookmark = nil;
+    self.fallbackLastKnownKeyFileUrl = nil;
     self.autoFillKeyFileBookmark = nil;
     self.autoFillConvenienceAutoUnlockPassword = nil;
     self.sideBarSelectedTag = nil;

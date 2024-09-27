@@ -14,7 +14,7 @@
 #import "MacAlerts.h"
 #import "Settings.h"
 #import "DatabaseModel.h"
-#import "BookmarksHelper.h"
+
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
 #import "BiometricIdHelper.h"
@@ -603,6 +603,7 @@
     [det getCkfsWithExplicitPassword:password
                      keyFileBookmark:self.database.autoFillKeyFileBookmark
                 yubiKeyConfiguration:self.database.yubiKeyConfiguration
+                  keyFileFallbackUrl:self.database.keyFileFallbackUrl
                           completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
     }];

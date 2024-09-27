@@ -17,6 +17,7 @@
 #import "DatabasesManagerVC.h"
 #import "Constants.h"
 #import "HardwareKeyMenuHelper.h"
+#import "KeyFileManagement.h"
 
 @interface ManualCredentialsEntry () <NSTextFieldDelegate>
 
@@ -39,6 +40,7 @@
 @property (weak) IBOutlet NSButton *acceptEmptyPassword;
 
 @property NSString* selectedKeyFileBookmark;
+@property NSURL* selectedKeyFileUrl;
 
 @property BOOL concealed;
 @property BOOL hasSetInitialFocus;
@@ -83,6 +85,7 @@
     
     if ( !self.verifyCkfsMode ) {
         self.selectedKeyFileBookmark = [self contextAwareKeyFileBookmark];
+        self.selectedKeyFileUrl = self.database.keyFileFallbackUrl;
     }
     
     if ( self.headline ) {
@@ -245,7 +248,7 @@
         [self.view.window close];
     }
     
-    self.onDone(YES, nil, nil, nil);
+    self.onDone(YES, nil, nil, nil, nil);
 }
 
 - (IBAction)onUnlock:(id)sender {
@@ -256,7 +259,7 @@
         [self.view.window close];
     }
 
-    self.onDone(NO, self.textFieldPassword.stringValue, self.selectedKeyFileBookmark, self.hardwareKeyMenuHelper.selectedConfiguration);
+    self.onDone(NO, self.textFieldPassword.stringValue, self.selectedKeyFileBookmark, self.selectedKeyFileUrl, self.hardwareKeyMenuHelper.selectedConfiguration);
 }
 
 
@@ -277,44 +280,65 @@
 
     
 
-    NSURL* configuredUrl;
+    NSURL* configuredUrl = nil;
     NSString* configuredBookmarkForKeyFile = [self contextAwareKeyFileBookmark];
     
-    if(self.database && configuredBookmarkForKeyFile) {
+    if ( self.database && configuredBookmarkForKeyFile ) {
+        NSURL* resolvedKeyFileUrl = nil;
         NSString* updatedBookmark = nil;
         NSError* error;
-        configuredUrl = [BookmarksHelper getUrlFromBookmark:configuredBookmarkForKeyFile
-                                                   readOnly:YES
-                                            updatedBookmark:&updatedBookmark
-                                                      error:&error];
-
-        if(!configuredUrl) {
-            slog(@"getUrlFromBookmark: [%@]", error);
+        
+        NSData* tmp = [KeyFileManagement getDigestFromBookmark:configuredBookmarkForKeyFile
+                                                   fallbackUrl:self.database.keyFileFallbackUrl
+                                               keyFileFileName:nil
+                                                        format:self.database.likelyFormat
+                                            resolvedKeyFileUrl:&resolvedKeyFileUrl
+                                               updatedBookmark:&updatedBookmark
+                                                         error:&error];
+        
+        if ( !tmp ) {
+            slog(@"⚠️ Couldn't read configured key file! [%@]", error);
         }
         else {
-           
-        }
-
-        if(updatedBookmark) {
-            self.contextAwareKeyFileBookmark = updatedBookmark;
+            if ( updatedBookmark ) {
+                self.contextAwareKeyFileBookmark = updatedBookmark;
+            }
+            if ( resolvedKeyFileUrl ) {
+                configuredUrl = resolvedKeyFileUrl;
+                self.database.fallbackLastKnownKeyFileUrl = configuredUrl.absoluteString;
+            }
         }
     }
-
+    
     
 
     NSString* bookmark = self.selectedKeyFileBookmark;
-    NSURL* currentlySelectedUrl;
-    if(bookmark) {
+    NSURL* currentlySelectedUrl = nil;
+    
+    if ( bookmark ) {
         NSString* updatedBookmark = nil;
         NSError* error;
-        currentlySelectedUrl = [BookmarksHelper getUrlFromBookmark:bookmark readOnly:YES updatedBookmark:&updatedBookmark error:&error];
+        NSURL* resolvedKeyFileUrl = nil;
 
-        if(currentlySelectedUrl == nil) {
-            self.selectedKeyFileBookmark = nil;
+        NSData* tmp = [KeyFileManagement getDigestFromBookmark:bookmark
+                                                   fallbackUrl:self.selectedKeyFileUrl
+                                               keyFileFileName:nil
+                                                        format:self.database.likelyFormat
+                                            resolvedKeyFileUrl:&resolvedKeyFileUrl
+                                               updatedBookmark:&updatedBookmark
+                                                         error:&error];
+        
+        if ( !tmp ) {
+            slog(@"⚠️ Couldn't read selected key file! [%@]", error);
         }
-
-        if(updatedBookmark) {
-            self.selectedKeyFileBookmark = updatedBookmark;
+        else {
+            if ( updatedBookmark ) {
+                self.selectedKeyFileBookmark = updatedBookmark;
+            }
+            if ( resolvedKeyFileUrl ) {
+                self.selectedKeyFileUrl = resolvedKeyFileUrl;
+                currentlySelectedUrl = resolvedKeyFileUrl;
+            }
         }
     }
 
@@ -371,6 +395,7 @@
             }
 
             self.selectedKeyFileBookmark = bookmark;
+            self.selectedKeyFileUrl = openPanel.URL;
         }
 
         [self refreshKeyFileDropdown];
@@ -379,11 +404,14 @@
 
 - (void)onSelectNoneKeyFile {
     self.selectedKeyFileBookmark = nil;
+    self.selectedKeyFileUrl = nil;
     [self refreshKeyFileDropdown];
 }
 
 - (void)onSelectPreconfiguredKeyFile {
     self.selectedKeyFileBookmark = self.contextAwareKeyFileBookmark;
+    self.selectedKeyFileUrl = self.database.keyFileFallbackUrl;
+    
     [self refreshKeyFileDropdown];
 }
 

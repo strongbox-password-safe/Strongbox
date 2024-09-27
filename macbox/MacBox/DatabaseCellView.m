@@ -7,7 +7,6 @@
 //
 
 #import "DatabaseCellView.h"
-#import "BookmarksHelper.h"
 #import "Utils.h"
 #import "NSDate+Extensions.h"
 #import "MacUrlSchemes.h"

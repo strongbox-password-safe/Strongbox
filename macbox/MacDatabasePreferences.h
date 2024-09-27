@@ -78,8 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSString *autoFillStorageInfo; 
 @property (nonatomic) StorageProvider storageProvider;
 @property (nonatomic, strong, nullable) NSString* conveniencePassword;
-@property (nonatomic, strong, nullable) NSString* keyFileBookmark;
-@property (nonatomic, strong, nullable) NSString* autoFillKeyFileBookmark;
+
 @property (nonatomic) BOOL autoFillEnabled;
 
 @property (nonatomic) BOOL quickTypeEnabled;
@@ -206,6 +205,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSData*)getCachedChallengeResponse:(NSData*)challenge;
 
 @property BOOL markDirtyOnExpandCollapseGroups;
+
+@property (nullable) NSString* fallbackLastKnownKeyFileUrl;
+@property (nonatomic, strong, nullable) NSString* keyFileBookmark;
+@property (nonatomic, strong, nullable) NSString* autoFillKeyFileBookmark;
+
+@property (readonly, nullable) NSURL* keyFileFallbackUrl;
 
 @end
 

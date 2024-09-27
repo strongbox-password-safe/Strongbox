@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* headline;
 @property (nullable) NSString* subheadline;
 
-@property (nonatomic, copy) void (^onDone)(BOOL userCancelled, NSString*_Nullable password, NSString*_Nullable keyFileBookmark, YubiKeyConfiguration*_Nullable yubiKeyConfiguration);
+@property (nonatomic, copy) void (^onDone)(BOOL userCancelled, NSString*_Nullable password, NSString*_Nullable keyFileBookmark, NSURL* _Nullable keyFileUrl, YubiKeyConfiguration*_Nullable yubiKeyConfiguration);
 
 @end
 

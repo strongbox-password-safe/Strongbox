@@ -561,11 +561,14 @@ static const int kMaxFailedPinAttempts = 3;
         }
 
         keyFileDigest = [KeyFileManagement getDigestFromSources:keyFileBookmark
-                                            keyFileFileName:keyFileFileName
-                                         onceOffKeyFileData:oneTimeKeyFileData
-                                                     format:format
-                                                      error:&error];
-                
+                                                    fallbackUrl:nil
+                                                keyFileFileName:keyFileFileName
+                                             onceOffKeyFileData:oneTimeKeyFileData
+                                                         format:format
+                                             resolvedKeyFileUrl:nil 
+                                                updatedBookmark:nil 
+                                                          error:&error];
+                        
         if( keyFileDigest == nil ) {
             slog(@"WARNWARN: Could not read Key File [%@]", error);
             

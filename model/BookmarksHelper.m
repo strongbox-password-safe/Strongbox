@@ -116,11 +116,20 @@
     
     NSURL* bookmarkFileURL;
     @try {
+        NSError* fooError;
         bookmarkFileURL = [NSURL URLByResolvingBookmarkData:bookmark
                                                     options:options
                                               relativeToURL:nil
                                         bookmarkDataIsStale:&bookmarkDataIsStale
-                                                      error:error];
+                                                      error:&fooError];
+        
+        if ( fooError ) {
+            slog(@"🔴 URLByResolvingBookmarkData ERROR: [%@]", fooError);
+            
+            if ( error ) {
+                *error = fooError;
+            }
+        }
     } @catch (NSException *exception) {
         slog(@"🔴 Exception getUrlFromBookmarkData [%@]", exception);
         if ( error ) {

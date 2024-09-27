@@ -578,7 +578,7 @@
     
     if(self.useAKeyFile && self.selectedKeyFileBookmark) {
         NSError* error;
-        NSData* data = [BookmarksHelper dataWithContentsOfBookmark:self.selectedKeyFileBookmark error:&error];
+        NSData* data = [BookmarksHelper dataWithContentsOfBookmark:self.selectedKeyFileBookmark error:&error]; 
         
         if(!data) {
             slog(@"Could not read key file. Error: %@", error);

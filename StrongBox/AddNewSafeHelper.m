@@ -171,10 +171,13 @@ static DatabaseModel* getNewDatabase(NSString* password,
     NSData* keyFileDigest = nil;
     if ( keyFileBookmark || keyFileFileName || onceOffKeyFileData ) {
         keyFileDigest = [KeyFileManagement getDigestFromSources:keyFileBookmark
-                                            keyFileFileName:keyFileFileName
-                                         onceOffKeyFileData:onceOffKeyFileData
-                                                     format:format
-                                                      error:error];
+                                                    fallbackUrl:nil
+                                                keyFileFileName:keyFileFileName
+                                             onceOffKeyFileData:onceOffKeyFileData
+                                                         format:format
+                                             resolvedKeyFileUrl:nil 
+                                                updatedBookmark:nil 
+                                                          error:error];
     
         if ( *error ) {
             return nil;

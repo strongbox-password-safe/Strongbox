@@ -2,12 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>com.apple.developer.aps-environment</key>
-    <string>Production</string>
-	<key>com.apple.developer.icloud-container-environment</key>
+	<key>com.apple.developer.aps-environment</key>
 	<string>Production</string>
 	<key>com.apple.developer.authentication-services.autofill-credential-provider</key>
 	<true/>
+	<key>com.apple.developer.icloud-container-environment</key>
+	<string>Production</string>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
 		<string>iCloud.com.strongbox</string>
@@ -59,8 +59,8 @@
 		<string>/Library/Application Support/Sidekick/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Orion/NativeMessagingHosts/</string>
 		<string>/Library/Application Support/Thorium/NativeMessagingHosts/</string>
-        <string>/Library/Application Support/BraveSoftware/Brave-Browser/NativeMessagingHosts/</string>
-        <string>/Library/Application Support/TorBrowser-Data/Browser/Mozilla/NativeMessagingHosts/</string>
+		<string>/Library/Application Support/BraveSoftware/Brave-Browser/NativeMessagingHosts/</string>
+		<string>/Library/Application Support/TorBrowser-Data/Browser/Mozilla/NativeMessagingHosts/</string>
 	</array>
 	<key>keychain-access-groups</key>
 	<array>

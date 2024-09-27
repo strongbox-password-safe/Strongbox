@@ -38,6 +38,7 @@
 #import "VirtualYubiKeys.h"
 #import "NSData+Extensions.h"
 #import "HardwareKeyMenuHelper.h"
+#import "KeyFileManagement.h"
 
 @interface LockScreenViewController () < NSTextFieldDelegate >
 
@@ -61,6 +62,7 @@
 @property (weak) IBOutlet NSStackView *stackViewUnlock;
 
 @property NSString* selectedKeyFileBookmark;
+@property NSURL* selectedKeyFileUrl;
 
 @property (weak) IBOutlet NSStackView *yubiKeyHeaderStack;
 
@@ -204,8 +206,9 @@
     [self.view.window.windowController synchronizeWindowTitleWithDocumentName]; 
     
     self.selectedKeyFileBookmark = self.viewModel ? self.databaseMetadata.keyFileBookmark : nil;
+    self.selectedKeyFileUrl = self.viewModel ? self.databaseMetadata.keyFileFallbackUrl : nil;
     
-    self.hardwareKeyMenuHelper = [[HardwareKeyMenuHelper alloc] initWithViewController:self 
+    self.hardwareKeyMenuHelper = [[HardwareKeyMenuHelper alloc] initWithViewController:self
                                                                           yubiKeyPopup:self.yubiKeyPopup
                                                                   currentConfiguration:self.databaseMetadata.yubiKeyConfiguration
                                                                             verifyMode:NO];
@@ -484,39 +487,62 @@
     
 
     MacDatabasePreferences *database = self.databaseMetadata;
-    NSURL* configuredUrl;
+    NSURL* configuredUrl = nil;
     if ( database && database.keyFileBookmark ) {
+        NSURL* resolvedKeyFileUrl = nil;
         NSString* updatedBookmark = nil;
         NSError* error;
-        configuredUrl = [BookmarksHelper getUrlFromBookmark:database.keyFileBookmark
-                                                   readOnly:YES updatedBookmark:&updatedBookmark
-                                                      error:&error];
-            
-        if(!configuredUrl) {
-            slog(@"getUrlFromBookmark Error / Nil: [%@]", error);
+        
+        NSData* tmp = [KeyFileManagement getDigestFromBookmark:database.keyFileBookmark
+                                                   fallbackUrl:database.keyFileFallbackUrl
+                                               keyFileFileName:nil
+                                                        format:self.databaseMetadata.likelyFormat
+                                            resolvedKeyFileUrl:&resolvedKeyFileUrl
+                                               updatedBookmark:&updatedBookmark
+                                                         error:&error];
+
+        if ( !tmp ) {
+            slog(@"⚠️ Couldn't read configured key file! [%@]", error);
         }
         else {
-           
-            if(updatedBookmark) {
+            if ( updatedBookmark ) {
                 database.keyFileBookmark = updatedBookmark;
+            }
+            if ( resolvedKeyFileUrl ) {
+                configuredUrl = resolvedKeyFileUrl;
+                database.fallbackLastKnownKeyFileUrl = configuredUrl.absoluteString;
             }
         }
     }
 
     
     
-    NSURL* currentlySelectedUrl;
+    NSURL* currentlySelectedUrl = nil;
     if ( self.selectedKeyFileBookmark ) {
+        NSURL* resolvedKeyFileUrl = nil;
         NSString* updatedBookmark = nil;
         NSError* error;
-        currentlySelectedUrl = [BookmarksHelper getUrlFromBookmark:self.selectedKeyFileBookmark readOnly:YES updatedBookmark:&updatedBookmark error:&error];
         
-        if ( currentlySelectedUrl == nil ) {
+        NSData* tmp = [KeyFileManagement getDigestFromBookmark:self.selectedKeyFileBookmark
+                                                   fallbackUrl:self.selectedKeyFileUrl
+                                               keyFileFileName:nil
+                                                        format:self.databaseMetadata.likelyFormat
+                                            resolvedKeyFileUrl:&resolvedKeyFileUrl
+                                               updatedBookmark:&updatedBookmark
+                                                         error:&error];
+        
+        if ( !tmp ) {
             self.selectedKeyFileBookmark = nil;
+            self.selectedKeyFileUrl = nil;
         }
-        
-        if ( updatedBookmark ) {
-            self.selectedKeyFileBookmark = updatedBookmark;
+        else {
+            if ( updatedBookmark ) {
+                self.selectedKeyFileBookmark = updatedBookmark;
+            }
+            if ( resolvedKeyFileUrl ) {
+                self.selectedKeyFileUrl = resolvedKeyFileUrl;
+                currentlySelectedUrl = resolvedKeyFileUrl;
+            }
         }
     }
 
@@ -572,6 +598,7 @@
             }
 
             self.selectedKeyFileBookmark = bookmark;
+            self.selectedKeyFileUrl = openPanel.URL;
         }
 
         [self refreshKeyFileDropdown];
@@ -580,11 +607,14 @@
 
 - (void)onSelectNoneKeyFile {
     self.selectedKeyFileBookmark = nil;
+    self.selectedKeyFileUrl = nil;
     [self refreshKeyFileDropdown];
 }
 
 - (void)onSelectPreconfiguredKeyFile {
     self.selectedKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
+    self.selectedKeyFileUrl = self.databaseMetadata.keyFileFallbackUrl;
+    
     [self refreshKeyFileDropdown];
 }
 
@@ -671,12 +701,14 @@
     
     NSString* password = self.textFieldMasterPassword.stringValue;
     NSString* keyFileBookmark = self.selectedKeyFileBookmark;
+    NSURL* keyFileFallbackUrl = self.selectedKeyFileUrl;
     YubiKeyConfiguration* yubiKeyConfiguration = self.hardwareKeyMenuHelper.selectedConfiguration;
 
     [determiner getCkfsWithExplicitPassword:password
                             keyFileBookmark:keyFileBookmark
                        yubiKeyConfiguration:yubiKeyConfiguration
-                                 completion:^(GetCompositeKeyResult result, CompositeKeyFactors* factors, BOOL fromConvenience, NSError* error) {
+                         keyFileFallbackUrl:keyFileFallbackUrl
+                                 completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
     }];
 }
@@ -1197,10 +1229,13 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     }];
     
     NSString* keyFileBookmark = self.selectedKeyFileBookmark;
+    NSURL* keyFileFallbackUrl = self.selectedKeyFileUrl;
+    
     YubiKeyConfiguration* yubiKeyConfiguration = self.hardwareKeyMenuHelper.selectedConfiguration;
     
     [determiner getCkfsAfterSuccessfulBiometricAuth:keyFileBookmark
                                yubiKeyConfiguration:yubiKeyConfiguration
+                                 keyFileFallbackUrl:keyFileFallbackUrl
                                          completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         [self handleGetCkfsResult:result factors:factors fromConvenience:fromConvenience error:error];
     }];

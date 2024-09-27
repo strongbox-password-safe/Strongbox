@@ -270,6 +270,24 @@
     self.metadata.autoFillKeyFileBookmark = autoFillKeyFileBookmark;
 }
 
+- (NSString *)fallbackLastKnownKeyFileUrl {
+    return self.metadata.fallbackLastKnownKeyFileUrl;
+}
+
+- (void)setFallbackLastKnownKeyFileUrl:(NSString *)fallbackLastKnownKeyFileUrl {
+    self.metadata.fallbackLastKnownKeyFileUrl = fallbackLastKnownKeyFileUrl;
+}
+
+- (NSURL *)keyFileFallbackUrl {
+    NSString* foo = self.fallbackLastKnownKeyFileUrl;
+    if ( foo ) {
+        return [NSURL URLWithString:foo];
+    }
+    else {
+        return nil;
+    }
+}
+
 
 
 - (BOOL)autoFillEnabled {

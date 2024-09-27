@@ -281,20 +281,30 @@ BOOL isAll64CharactersAreHex(NSData* data) {
 
 + (NSData *)getNonePerformantKeyFileDigest:(NSData *)data checkForXml:(BOOL)checkForXml {
     return [self getDigestFromSources:nil
+                          fallbackUrl:nil
                       keyFileFileName:nil
                    onceOffKeyFileData:data
-                               format:checkForXml ? kKeePass4 : kKeePass1 error:nil];
+                               format:checkForXml ? kKeePass4 : kKeePass1
+                   resolvedKeyFileUrl:nil
+                      updatedBookmark:nil
+                                error:nil];
 }
 
 + (NSData *)getDigestFromBookmark:(NSString *)keyFileBookmark
-                  keyFileFileName:(NSString*)keyFileFileName
+                      fallbackUrl:(NSURL *)fallbackUrl
+                  keyFileFileName:(NSString *)keyFileFileName
                            format:(DatabaseFormat)format
-                            error:(NSError **)error {
+               resolvedKeyFileUrl:(NSURL * _Nullable __autoreleasing *)resolvedKeyFileUrl
+                  updatedBookmark:(NSString*_Nullable*_Nullable)updatedBookmark
+                            error:(NSError *__autoreleasing  _Nullable *)error {
     return [KeyFileManagement getDigestFromSources:keyFileBookmark
-                               keyFileFileName:nil
-                            onceOffKeyFileData:nil
-                                        format:format
-                                         error:error];
+                                       fallbackUrl:fallbackUrl
+                                   keyFileFileName:nil
+                                onceOffKeyFileData:nil
+                                            format:format
+                                resolvedKeyFileUrl:resolvedKeyFileUrl
+                                   updatedBookmark:updatedBookmark
+                                             error:error];
 }
 
 static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseFormat format, NSURL *keyFileUrl) {
@@ -325,22 +335,36 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
     return ret;
 }
 
-+ (NSData * _Nullable)getByBookmark:(NSError **)error
-                             format:(DatabaseFormat)format
-                    keyFileBookmark:(NSString *)keyFileBookmark {
++ (NSData * _Nullable)getByBookmark:(DatabaseFormat)format
+                    keyFileBookmark:(NSString *)keyFileBookmark
+                        fallbackUrl:(NSURL *)fallbackUrl
+                 resolvedKeyFileUrl:(NSURL**)resolvedKeyFileUrl
+                    updatedBookmark:(NSString*_Nullable*_Nullable)updatedBookmark
+                              error:(NSError **)error {
     NSString* updated;
     NSURL* keyFileUrl = [BookmarksHelper getUrlFromBookmark:keyFileBookmark
                                                    readOnly:YES
                                             updatedBookmark:&updated
                                                       error:error];
-    
+
+    if ( updatedBookmark && updated ) {
+        *updatedBookmark = updated;
+    }
+    if ( resolvedKeyFileUrl ) {
+        *resolvedKeyFileUrl = keyFileUrl;
+    }
+
     if ( keyFileUrl ) {
         return getByUrl(error, format, keyFileUrl);
     }
+    else if ( fallbackUrl ) {
+        slog(@"⚠️ Using Fallback URL in Key File bookmark resolution!");
+        return getByUrl(error, format, fallbackUrl);
+    }
     else {
-        if ( error ) {
-            *error = [Utils createNSError:@"Could not read Key File Bookmark" errorCode:-123456];
-        }
+
+
+
         
         slog(@"WARNWARN: Could not read Key File Bookmark.");
         return nil;
@@ -348,9 +372,12 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
 }
 
 + (NSData *)getDigestFromSources:(NSString *)keyFileBookmark
-                 keyFileFileName:(NSString*)keyFileFileName
+                     fallbackUrl:(NSURL *)fallbackUrl
+                 keyFileFileName:(NSString *)keyFileFileName
               onceOffKeyFileData:(NSData *)onceOffKeyFileData
                           format:(DatabaseFormat)format
+              resolvedKeyFileUrl:(NSURL * _Nullable __autoreleasing *)resolvedKeyFileUrl
+                 updatedBookmark:(NSString*_Nullable*_Nullable)updatedBookmark
                            error:(NSError *__autoreleasing  _Nullable *)error {
     if ( !keyFileBookmark && !onceOffKeyFileData && !keyFileFileName ) {
         slog(@"WARNWARN: No Sources is nil");
@@ -363,7 +390,12 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
     }
         
     if ( keyFileBookmark ) {
-        NSData* bookmarkData = [KeyFileManagement getByBookmark:error format:format keyFileBookmark:keyFileBookmark];
+        NSData* bookmarkData = [KeyFileManagement getByBookmark:format
+                                                keyFileBookmark:keyFileBookmark
+                                                    fallbackUrl:fallbackUrl
+                                             resolvedKeyFileUrl:resolvedKeyFileUrl
+                                                updatedBookmark:updatedBookmark
+                                                          error:error];
         
         if ( bookmarkData ) {
             return bookmarkData;
