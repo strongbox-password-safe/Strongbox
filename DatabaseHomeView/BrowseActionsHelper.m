@@ -359,8 +359,8 @@
                                                         keyFileFileName:keyFileFileName
                                                      onceOffKeyFileData:oneTimeKeyFileData
                                                                  format:self.model.database.originalFormat
-                                                     resolvedKeyFileUrl:nil 
-                                                        updatedBookmark:nil 
+                                                     resolvedKeyFileUrl:nil
+                                                        updatedBookmark:nil
                                                                   error:&error];
         
         if ( keyFileDigest == nil ) {

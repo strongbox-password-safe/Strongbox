@@ -175,8 +175,8 @@ static DatabaseModel* getNewDatabase(NSString* password,
                                                 keyFileFileName:keyFileFileName
                                              onceOffKeyFileData:onceOffKeyFileData
                                                          format:format
-                                             resolvedKeyFileUrl:nil 
-                                                updatedBookmark:nil 
+                                             resolvedKeyFileUrl:nil
+                                                updatedBookmark:nil
                                                           error:error];
     
         if ( *error ) {

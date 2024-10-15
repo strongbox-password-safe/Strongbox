@@ -565,8 +565,8 @@ static const int kMaxFailedPinAttempts = 3;
                                                 keyFileFileName:keyFileFileName
                                              onceOffKeyFileData:oneTimeKeyFileData
                                                          format:format
-                                             resolvedKeyFileUrl:nil 
-                                                updatedBookmark:nil 
+                                             resolvedKeyFileUrl:nil
+                                                updatedBookmark:nil
                                                           error:&error];
                         
         if( keyFileDigest == nil ) {

@@ -128,15 +128,25 @@ class BrowseTabViewController: UITabBarController {
 
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(onLongPress(_:)))
         tabBar.addGestureRecognizer(longPressRecognizer)
+    }
 
-        refreshVisibleTabs(true)
+    var firstAppearance = true
 
-        NotificationCenter.default.addObserver(forName: .ConfigureTabs.tabsChanged, object: nil, queue: nil) { [weak self] _ in
-            self?.onTabsChanged(true)
-        }
+    override func viewWillAppear(_: Bool) {
+        if firstAppearance {
+            firstAppearance = false
 
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: kTabsMayHaveChangedDueToModelEdit), object: nil, queue: nil) { [weak self] _ in
-            self?.onTabsChanged(false)
+            
+
+            refreshVisibleTabs(true)
+
+            NotificationCenter.default.addObserver(forName: .ConfigureTabs.tabsChanged, object: nil, queue: nil) { [weak self] _ in
+                self?.onTabsChanged(true)
+            }
+
+            NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: kTabsMayHaveChangedDueToModelEdit), object: nil, queue: nil) { [weak self] _ in
+                self?.onTabsChanged(false)
+            }
         }
     }
 
