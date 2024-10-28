@@ -415,7 +415,7 @@
 - (void)unlockUrlWrapper:(NSURL*)url ckfs:(CompositeKeyFactors*)ckfs incorrectCredsCompletion:(void(^_Nullable)(void))incorrectCredsOverride {
     NSData* challenge = nil;
 
-    if ( self.applicationPreferences.hardwareKeyCachingBeta && ckfs.yubiKeyCR != nil && self.database.hardwareKeyCRCaching ) {
+    if ( ckfs.yubiKeyCR != nil && self.database.hardwareKeyCRCaching ) {
         challenge = [DatabaseUnlocker getYubiKeyChallenge:url];
     }
     
@@ -459,7 +459,7 @@
         }
         else {
             BOOL successfulUnlock = model != nil && error == nil;
-            if ( successfulUnlock && challenge && self.database.hardwareKeyCRCaching && self.applicationPreferences.hardwareKeyCachingBeta ) {
+            if ( successfulUnlock && challenge && self.database.hardwareKeyCRCaching ) {
                 slog(@"🟢 Successful actual hardware key unlock, caching response.");
                 MMcGPair<NSData *,NSData *> *cr = ckfs.lastChallengeResponse;
                 

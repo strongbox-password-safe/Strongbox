@@ -129,7 +129,7 @@
     AdvancedDatabasePreferences* advancedPreferences = (AdvancedDatabasePreferences*)advanced.viewController;
     advancedPreferences.model = self.viewModel;
 
-    if ( Settings.sharedInstance.hardwareKeyCachingBeta && self.viewModel.database.originalFormat == kKeePass4 && self.viewModel.database.ckfs.yubiKeyCR != nil ) {
+    if ( self.viewModel.database.originalFormat == kKeePass4 && self.viewModel.database.ckfs.yubiKeyCR != nil ) {
         __weak DatabaseSettingsTabViewController* weakSelf = self;
         
         METADATA_PTR metadata = self.viewModel.databaseMetadata;

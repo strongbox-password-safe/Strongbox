@@ -110,9 +110,6 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStrongboxSyncStatus;
 
-@property (weak, nonatomic) IBOutlet UISwitch *switchDisableHomeTab;
-@property (weak, nonatomic) IBOutlet UISwitch *switchHardwareKeyCaching;
-
 @end
 
 @implementation AdvancedPreferencesTableViewController
@@ -319,31 +316,31 @@
     [self bindPreferences];
 }
 
-- (IBAction)onHardwareKeyCaching:(id)sender {
-    if ( self.switchHardwareKeyCaching.on ) {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"experimental_feature_warning_title", @"Experimental Feature Warning")
-              message:NSLocalizedString(@"experimental_feature_warning_message_yes_no", @"Caution is required using this feature. While we have performed extensive testing, this is still an early release feature which could corrupt your database. You should only use this if you are an advanced and technical user with a regular backup system in place.\n\nThank you for helping to test Strongbox. Feedback welcome.")
-               action:^(BOOL response) {
-            if ( response ) {
-                for ( DatabasePreferences* database in DatabasePreferences.allDatabases) {
-                    [database clearCachedChallengeResponses];
-                }
 
-                [self onPreferencesChanged:sender];
-            }
-            else {
-                [self bindPreferences];
-            }
-        }];
-    }
-    else {
-        for ( DatabasePreferences* database in DatabasePreferences.allDatabases) {
-            [database clearCachedChallengeResponses];
-        }
-        [self onPreferencesChanged:sender];
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (IBAction)onPreferencesChanged:(id)sender {
     slog(@"Advanced Preference Changed: [%@]", sender);
@@ -399,10 +396,6 @@
         [[UIApplication sharedApplication] setShortcutItems:@[]]; 
     }
     
-    AppPreferences.sharedInstance.disableHomeTab = self.switchDisableHomeTab.on;
-
-    AppPreferences.sharedInstance.hardwareKeyCachingBeta = self.switchHardwareKeyCaching.on;
-
     [self bindPreferences];
 }
 
@@ -442,11 +435,7 @@
     
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
     self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
-    
-    self.switchDisableHomeTab.on = AppPreferences.sharedInstance.disableHomeTab;
-    
-    self.switchHardwareKeyCaching.on = AppPreferences.sharedInstance.hardwareKeyCachingBeta;
-    
+        
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{

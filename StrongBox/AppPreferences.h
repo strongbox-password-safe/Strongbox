@@ -213,11 +213,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL disableCopyTo;
 @property BOOL disableMakeVisibleInFiles;
 
-@property BOOL disableHomeTab;
-
-@property BOOL hardwareKeyCachingBeta;
-@property BOOL hasMigratedInconsistentHardwareKeysForCachingFeature;
-
 @end
 
 NS_ASSUME_NONNULL_END

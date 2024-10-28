@@ -34,14 +34,18 @@ class SshAgentSettings: NSViewController {
 
         var hours: Int = -1
         if idx == 0 {
-            hours = 4
+            hours = 4 * 60
         } else if idx == 1 {
-            hours = 12
+            hours = 12 * 60
         } else if idx == 2 {
-            hours = 24
+            hours = 24 * 60
+        } else if idx == 3 {
+            hours = -1 
+        } else {
+            hours = -2 
         }
 
-        Settings.sharedInstance().sshAgentApprovalDefaultExpiryMinutes = hours == -1 ? -1 : hours * 60
+        Settings.sharedInstance().sshAgentApprovalDefaultExpiryMinutes = hours
 
         bindUi()
     }
@@ -56,8 +60,8 @@ class SshAgentSettings: NSViewController {
         comboExpiry.menu?.addItem(withTitle: String(format: fmt, "4"), action: nil, keyEquivalent: "")
         comboExpiry.menu?.addItem(withTitle: String(format: fmt, "12"), action: nil, keyEquivalent: "")
         comboExpiry.menu?.addItem(withTitle: String(format: fmt, "24"), action: nil, keyEquivalent: "")
-
         comboExpiry.menu?.addItem(withTitle: NSLocalizedString("ssh_agent_remember_approval_until_strongbox_quits", comment: "until Strongbox quits"), action: nil, keyEquivalent: "")
+        comboExpiry.menu?.addItem(withTitle: NSLocalizedString("generic_do_not_remember", comment: "Do Not Remember"), action: nil, keyEquivalent: "")
 
         guard let scrollView = textView.enclosingScrollView, let textContainer = textView.textContainer else {
             return
@@ -150,6 +154,8 @@ class SshAgentSettings: NSViewController {
 
         if mins == -1 {
             comboExpiry.selectItem(at: 3)
+        } else if mins == -2 {
+            comboExpiry.selectItem(at: 4)
         } else {
             var idx = 0
             let hours = mins / 60

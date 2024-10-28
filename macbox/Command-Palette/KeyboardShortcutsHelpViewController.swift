@@ -24,7 +24,7 @@ class KeyboardShortcutsHelpViewController: NSViewController {
         textFieldQuickSearch.stringValue = quickSearchShortcut
         textFieldQuickSearch.isHidden = quickSearchShortcut.isEmpty
 
-        textFieldShowStrongbox.stringValue = showStrongboxShortcut.isEmpty ? "⌘S" : showStrongboxShortcut
+        textFieldShowStrongbox.stringValue = showStrongboxShortcut.isEmpty ? "⌘ S" : showStrongboxShortcut
 
         buttonToggleKeyboardHints.contentTintColor = .clear
         buttonClose.contentTintColor = .clear

@@ -120,9 +120,16 @@
 - (void)customizeUi {
     self.textFieldDatabaseNickName.font = FontManager.shared.boldLargeTitleFont;
     
-    NSString* fmt2 = Settings.sharedInstance.isPro ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    NSString* fmt = @"";
+    if ( StrongboxProductBundle.isZeroEdition ) {
+        fmt = NSLocalizedString(@"subtitle_app_version_info_zero_fmt", @"Strongbox Zero %@");
+    }
+    else {
+        fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    }
     
-    NSString* about = [NSString stringWithFormat:fmt2, [Utils getAppVersion]];
+    NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+    
     self.textFieldVersion.stringValue = about;
     self.textFieldVersion.onClick = ^{
         [AboutViewController show];

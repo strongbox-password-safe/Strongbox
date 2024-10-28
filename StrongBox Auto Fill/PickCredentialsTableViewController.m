@@ -154,7 +154,9 @@ static NSString* const kGroupAllItems = @"all-items";
     if (!self.doneFirstAppearanceTasks) {
         self.doneFirstAppearanceTasks = YES;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+        
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.20  * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
             [self smartInitializeSearch];
 
             [self.searchController.searchBar becomeFirstResponder];

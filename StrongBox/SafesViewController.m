@@ -138,8 +138,6 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     
     [self checkForBrokenVirtualHardwareKeys];
     
-    [self migrateAnyInconsistentAFHardwareKeys]; 
-    
     
     
     
@@ -164,21 +162,6 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 
         }
     });
-}
-
-- (void)migrateAnyInconsistentAFHardwareKeys {
-    if ( AppPreferences.sharedInstance.hasMigratedInconsistentHardwareKeysForCachingFeature) {
-        return;
-    }
-    
-    AppPreferences.sharedInstance.hasMigratedInconsistentHardwareKeysForCachingFeature = YES;
-
-    for ( DatabasePreferences* database in DatabasePreferences.allDatabases ) {
-        if ( database.nextGenPrimaryYubiKeyConfig != nil && database.mainAppAndAutoFillYubiKeyConfigsIncoherent ) {
-            YubiKeyHardwareConfiguration *conf = database.nextGenPrimaryYubiKeyConfig;
-            database.nextGenPrimaryYubiKeyConfig = conf; 
-        }
-    }
 }
 
 - (void)checkForBrokenVirtualHardwareKeys {

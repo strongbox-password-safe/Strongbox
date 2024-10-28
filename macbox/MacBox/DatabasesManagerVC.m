@@ -169,7 +169,13 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 }
 
 - (void)bindVersionSubtitle {
-    NSString* fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    NSString* fmt = @"";
+    if ( StrongboxProductBundle.isZeroEdition ) {
+        fmt = NSLocalizedString(@"subtitle_app_version_info_zero_fmt", @"Strongbox Zero %@");
+    }
+    else {
+        fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    }
     
     NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
     self.textFieldVersion.stringValue = about;
@@ -695,6 +701,46 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             [menu insertItem:item atIndex:5];
         }
     }
+#else
+    
+    
+    
+    NSMenuItem* item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
+        return obj.action == @selector(onOpenInOfflineMode:);
+    }];
+    
+    if ( item ) {
+        [menu removeItem:item];
+    }
+    
+    if (! ( singleSelectedDatabase && singleSelectedDatabase.alwaysOpenOffline )) { 
+        item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
+            return obj.action == @selector(onToggleAlwaysOpenOffline:);
+        }];
+        
+        if ( item ) {
+            [menu removeItem:item];
+        }
+    }
+    
+    
+    
+    item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
+        return obj.action == @selector(onSync:);
+    }];
+    
+    if ( item ) {
+        [menu removeItem:item];
+    }
+    
+    item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
+        return obj.action == @selector(onViewSyncLog:);
+    }];
+    
+    if ( item ) {
+        [menu removeItem:item];
+    }
+
 #endif
 }
 
@@ -715,9 +761,19 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             theAction == @selector(onViewBackups:) ||
             theAction == @selector(onSaveDatabaseAs:) ||
             theAction == @selector(onCopyTo:) ||
-            theAction == @selector(onSync:) ||
             theAction == @selector(onRename:)) {
+#ifndef NO_NETWORKING
             return YES;
+#else
+            return singleSelectedDatabase.isLocalDeviceDatabase;
+#endif
+        }
+        else if ( theAction == @selector(onSync:) ) {
+#ifndef NO_NETWORKING
+            return !singleSelectedDatabase.isLocalDeviceDatabase || singleSelectedDatabase.outstandingUpdateId != nil;
+#else
+            return singleSelectedDatabase.outstandingUpdateId != nil;
+#endif
         }
         else if (theAction == @selector(onChangeFilename:)) {
             if( singleSelectedDatabase.storageProvider == kCloudKit ) {
@@ -763,12 +819,16 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             
             NSMenuItem* item = (NSMenuItem*)anItem;
             [item setState:isReadOnly ? NSControlStateValueOn : NSControlStateValueOff];
+            
+#ifndef NO_NETWORKING
             return YES;
+#else
+            return singleSelectedDatabase.isLocalDeviceDatabase;
+#endif
+
         }
         else if ( theAction == @selector(onLock:)) {
-            BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
-            
-            return isUnlocked;
+            return [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
         }
         else if ( theAction == @selector(onLockOrUnlock:)) {
             BOOL isUnlocked = [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
@@ -777,13 +837,21 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             
             [item setTitle:isUnlocked ? NSLocalizedString(@"generic_verb_lock_action", @"Lock") : NSLocalizedString(@"casg_unlock_action", @"unlock")];
             
+#ifndef NO_NETWORKING
             return YES;
+#else
+            return singleSelectedDatabase.isLocalDeviceDatabase;
+#endif
         }
         else if (theAction == @selector(onToggleLaunchAtStartup:)) {
             NSMenuItem* item = (NSMenuItem*)anItem;
             [item setState:singleSelectedDatabase.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff];
             
+#ifndef NO_NETWORKING
             return YES;
+#else
+            return singleSelectedDatabase.isLocalDeviceDatabase;
+#endif
         }
     }
     

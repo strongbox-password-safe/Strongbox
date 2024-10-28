@@ -177,9 +177,6 @@ static NSString* const kWarnAboutLocalDeviceDatabases = @"warnAboutLocalDeviceDa
 static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
-static NSString* const kDisableHomeTab = @"disableHomeTab"; 
-static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta2"; 
-static NSString* const kHasMigratedInconsistentHardwareKeysForCachingFeature = @"hasMigratedInconsistentHardwareKeysForCachingFeature"; 
 
 @implementation AppPreferences
 
@@ -221,30 +218,6 @@ static NSString* const kHasMigratedInconsistentHardwareKeysForCachingFeature = @
 }
 
 
-
-- (BOOL)hasMigratedInconsistentHardwareKeysForCachingFeature {
-    return [self getBool:kHasMigratedInconsistentHardwareKeysForCachingFeature];
-}
-
-- (void)setHasMigratedInconsistentHardwareKeysForCachingFeature:(BOOL)hasMigratedInconsistentHardwareKeysForCachingFeature {
-    [self setBool:kHasMigratedInconsistentHardwareKeysForCachingFeature value:hasMigratedInconsistentHardwareKeysForCachingFeature];
-}
-
-- (BOOL)hardwareKeyCachingBeta {
-    return [self getBool:kHardwareKeyCachingBeta fallback:YES];
-}
-
-- (void)setHardwareKeyCachingBeta:(BOOL)hardwareKeyCachingBeta {
-    [self setBool:kHardwareKeyCachingBeta value:hardwareKeyCachingBeta];
-}
-
-- (BOOL)disableHomeTab {
-    return [self getBool:kDisableHomeTab];
-}
-
-- (void)setDisableHomeTab:(BOOL)disableHomeTab {
-    [self setBool:kDisableHomeTab value:disableHomeTab];
-}
 
 - (NSDate *)lastCloudKitRefresh {
     NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;

@@ -181,8 +181,6 @@ extern NSString* const kCustomFieldsColumn;
 
 @property SystemMenuClickAction systemMenuClickAction;
 
-@property BOOL hardwareKeyCachingBeta;
-
 @property (nullable) NSData* lastKnownGoodBiometricsDatabaseState;
 @property (nullable) NSData* autoFillLastKnownGoodBiometricsDatabaseState;
 

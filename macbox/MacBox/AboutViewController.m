@@ -15,6 +15,7 @@
 #import "ProUpgradeIAPManager.h"
 #import "ClickableTextField.h"
 #import "AppDelegate.h"
+#import "Strongbox-Swift.h"
 
 @interface AboutViewController () <NSWindowDelegate>
 
@@ -24,6 +25,7 @@
 @property (weak) IBOutlet NSTextField *labelLicense;
 @property (weak) IBOutlet NSImageView *imageViewLicense;
 @property (weak) IBOutlet ClickableTextField *labelChangeLicense;
+@property (weak) IBOutlet NSImageView *imageViewLogo;
 
 @end
 
@@ -96,10 +98,26 @@ static AboutViewController* sharedInstance;
 }
 
 - (void)bindVersionAndProStatus {
-    NSString* fmt = NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
-    NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
-    self.view.window.title = about;
-    self.labelAbout.stringValue = [Utils getAppVersion];
+
+
+    
+    NSString* fmt;
+    if ( StrongboxProductBundle.isZeroEdition ) {
+        fmt = NSLocalizedString(@"prefs_vc_app_version_info_zero_fmt", @"About Strongbox Zero %@");
+    }
+    else {
+        fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+    }
+    
+    self.view.window.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+    
+    if ( StrongboxProductBundle.isZeroEdition ) {
+        self.labelAbout.stringValue = [NSString stringWithFormat:@"Strongbox Zero %@", [Utils getAppVersion]];
+        self.imageViewLogo.image = [NSImage imageNamed:@"AppIcon-Zero-BigSur"];
+    }
+    else {
+        self.labelAbout.stringValue = [Utils getAppVersion];
+    }
     
     
     

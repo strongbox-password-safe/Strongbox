@@ -461,7 +461,7 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
     CompositeKeyFactors* originalCkfs = snapshot.ckfs;
     
     __weak Model* weakSelf = self;
-    BOOL useHardwareKeyCaching = self.applicationPreferences.hardwareKeyCachingBeta && snapshot.originalFormat == kKeePass4 && snapshot.ckfs.yubiKeyCR != nil && self.metadata.hardwareKeyCRCaching;
+    BOOL useHardwareKeyCaching = snapshot.originalFormat == kKeePass4 && snapshot.ckfs.yubiKeyCR != nil && self.metadata.hardwareKeyCRCaching;
     
     if ( useHardwareKeyCaching ) {
         CompositeKeyFactors* cachedCrCkfsWrapper = [CompositeKeyFactors password:originalCkfs.password
@@ -1904,7 +1904,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     NSString* path = [self.database getPathDisplayString:item.parent includeRootGroup:YES rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
     
-    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_fieldname_location", @"Location")
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_field_name_group", @"Group")
                                                   value:path
                                                copyable:NO]];
     

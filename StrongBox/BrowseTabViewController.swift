@@ -92,8 +92,6 @@ class BrowseTabViewController: UITabBarController {
     var configuredVisibleTabs: [BrowseViewType] {
         
 
-        
-
         if !model.metadata.hasInitializedHomeTab {
             model.metadata.hasInitializedHomeTab = true
 
@@ -177,10 +175,6 @@ class BrowseTabViewController: UITabBarController {
             }
 
             if tab == .totpList, model.database.totpEntries.isEmpty {
-                continue
-            }
-
-            if tab == .home, AppPreferences.sharedInstance().disableHomeTab {
                 continue
             }
 

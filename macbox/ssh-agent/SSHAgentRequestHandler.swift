@@ -12,6 +12,7 @@ import LocalAuthentication
 enum SSHAgentApprovalExpiryType: Codable {
     case timed(time: Date)
     case quit
+    case immediateDoNotRememberApproval
 }
 
 struct SSHAgentApproval: Codable {
@@ -56,10 +57,13 @@ class SSHAgentRequestHandler: NSObject {
     var approvals: [SSHAgentApproval] {
         get {
             let ret = rawApprovals.filter { approval in
-                if case let .timed(time: date) = approval.expiry {
-                    return (date as NSDate).isInFuture
-                } else {
+                switch approval.expiry {
+                case .quit:
                     return true
+                case let .timed(time: time):
+                    return (time as NSDate).isInFuture
+                case .immediateDoNotRememberApproval:
+                    return false
                 }
             }
 
@@ -88,6 +92,8 @@ class SSHAgentRequestHandler: NSObject {
         let expiry: SSHAgentApprovalExpiryType
         if expiryConfig == -1 {
             expiry = .quit
+        } else if expiryConfig == -2 {
+            expiry = .immediateDoNotRememberApproval
         } else {
             let date = Date().addSec(n: expiryConfig * 60)
             expiry = .timed(time: date)

@@ -357,15 +357,18 @@ class DatabasesCollection: NSObject {
 
             if let ckfs, result == .success {
                 
-                var unlockCompletionCalled = false
+
+                
+
+
                 self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience) { result, _, _ in
                     swlog("🐞 Unlock Completion Called...")
 
-                    guard !unlockCompletionCalled else {
-                        swlog("🔴 Unlock Completion Called Multiple Times!")
-                        return
-                    }
-                    unlockCompletionCalled = true
+
+
+
+
+
 
                     DispatchQueue.global().async {
                         if result == .success, syncAfterUnlock {

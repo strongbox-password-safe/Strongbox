@@ -9,6 +9,7 @@
 #import "ClipboardManager.h"
 #import <Cocoa/Cocoa.h>
 #import "Settings.h"
+#import "AppDelegate.h"
 
 @implementation ClipboardManager
 
@@ -29,6 +30,8 @@
 }
 
 - (void)copyConcealedString:(NSString *)string {
+
+    
     [NSPasteboard.generalPasteboard clearContents]; 
     
     if (!Settings.sharedInstance.clipboardHandoff) {
@@ -40,6 +43,17 @@
     }
     
     [NSPasteboard.generalPasteboard setString:(string ? string : @"") forType:NSPasteboardTypeString];
+
+    [self scheduleClipboardClearingTask];
+}
+
+- (void)scheduleClipboardClearingTask {
+    if ( Settings.sharedInstance.clearClipboardEnabled ) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            AppDelegate* delegate = NSApplication.sharedApplication.delegate;
+            [delegate onStrongboxDidChangeClipboard];
+        });
+    }
 }
 
 @end

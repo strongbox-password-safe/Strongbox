@@ -797,7 +797,6 @@
         model.ckfs.yubiKeyCR != nil &&
         model.metadata.nextGenPrimaryYubiKeyConfig &&
         model.metadata.nextGenPrimaryYubiKeyConfig.mode != kVirtual &&
-        AppPreferences.sharedInstance.hardwareKeyCachingBeta &&
         !model.metadata.hardwareKeyCRCaching;
     };
     

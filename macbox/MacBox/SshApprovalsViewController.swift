@@ -38,9 +38,12 @@ class SshApprovalsViewController: NSViewController, NSTableViewDataSource, NSTab
         if tableColumn?.identifier.rawValue == "Process" {
             cell.title.stringValue = String(format: "%@", approval.processName)
         } else {
-            if case let .timed(time: timestamp) = approval.expiry {
-                cell.title.stringValue = (timestamp as NSDate).friendlyDateTimeStringPrecise
-            } else {
+            switch approval.expiry {
+            case .immediateDoNotRememberApproval:
+                cell.title.stringValue = NSLocalizedString("browse_vc_section_title_expired", comment: "Expired") 
+            case let .timed(time: time):
+                cell.title.stringValue = (time as NSDate).friendlyDateTimeStringPrecise
+            case .quit:
                 cell.title.stringValue = NSLocalizedString("ssh_agent_remember_approval_until_strongbox_quits", comment: "until Strongbox quits")
             }
         }

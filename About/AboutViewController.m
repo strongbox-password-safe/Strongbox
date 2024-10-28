@@ -14,6 +14,7 @@
 #import "Utils.h"
 #import "ProUpgradeIAPManager.h"
 #import "CustomizationManager.h"
+#import "Strongbox-Swift.h"
 
 @interface AboutViewController ()
 
@@ -28,13 +29,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    if([[AppPreferences sharedInstance] isPro]) {
-        NSString* about = [NSString stringWithFormat:
-                       NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@"), [Utils getAppVersion]];
-
-        self.navigationItem.title = about;
+    NSString* fmt;
+    if ( StrongboxProductBundle.isZeroEdition ) {
+        fmt = NSLocalizedString(@"prefs_vc_app_version_info_zero_fmt", @"About Strongbox Zero %@");
     }
-
+    else {
+        fmt = AppPreferences.sharedInstance.isPro ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+    }
+    
+    self.navigationItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+    
     self.upgradeOptions.hidden = CustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro; 
     
     self.debugTextView.layer.cornerRadius = 2.0f;

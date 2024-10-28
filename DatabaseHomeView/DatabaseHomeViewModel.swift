@@ -516,6 +516,6 @@ class DatabaseHomeViewModel: ObservableObject {
     }
 
     var shouldShowYubiKeySettingsOption: Bool {
-        AppPreferences.sharedInstance().hardwareKeyCachingBeta && database.format == .keePass4 && database.ckfs.yubiKeyCR != nil
+        database.format == .keePass4 && database.ckfs.yubiKeyCR != nil
     }
 }

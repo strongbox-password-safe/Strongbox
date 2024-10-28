@@ -333,7 +333,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
             stackViewHints.addArrangedSubview(fun1)
         }
 
-        let rootView1 = KeyboardShortcutView(shortcut: "⌘/", title: NSLocalizedString("keyboard_shortcuts", comment: "Keyboard Shortcuts"))
+        let rootView1 = KeyboardShortcutView(shortcut: "⌘ /", title: NSLocalizedString("keyboard_shortcuts", comment: "Keyboard Shortcuts"))
         let fun1 = NSHostingView(rootView: rootView1)
         stackViewHints.addArrangedSubview(fun1)
 
@@ -363,7 +363,7 @@ class QuickSearchPaletteViewController: NSViewController, NSSearchFieldDelegate 
             }
         }
 
-        let showStrongbox = KeyboardShortcutView(shortcut: model.showStrongboxShortcut ?? "⌘S", title: NSLocalizedString("system_tray_menu_item_show", comment: "Show Strongbox"))
+        let showStrongbox = KeyboardShortcutView(shortcut: model.showStrongboxShortcut ?? "⌘ S", title: NSLocalizedString("system_tray_menu_item_show", comment: "Show Strongbox"))
         let showStrongboxView = NSHostingView(rootView: showStrongbox)
         stackViewHints.addArrangedSubview(showStrongboxView)
     }

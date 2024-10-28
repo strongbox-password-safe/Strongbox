@@ -98,7 +98,6 @@ class OnboardingModules {
                     model.ckfs.yubiKeyCR != nil &&
                     model.metadata.yubiKeyConfiguration != nil &&
                     !(model.metadata.yubiKeyConfiguration?.isVirtual ?? true) &&
-                    Settings.sharedInstance().hardwareKeyCachingBeta &&
                     !model.metadata.hardwareKeyCRCaching
             },
             onButton1: { _, completion in

@@ -734,19 +734,7 @@ import Foundation
 
     func copyString(_ string: String) {
         ClipboardManager.sharedInstance().copyConcealedString(string)
-        scheduleClipboardClearingTask()
     }
-
-    func scheduleClipboardClearingTask() {
-        if Settings.sharedInstance().clearClipboardEnabled {
-            DispatchQueue.main.async {
-                let delegate = NSApplication.shared.delegate as! AppDelegate
-                delegate.onStrongboxDidChangeClipboard()
-            }
-        }
-    }
-
-    
 
     func createEntry(request: CreateEntryRequest) -> CreateEntryResponse {
         guard let prefs = MacDatabasePreferences.getById(request.databaseId), prefs.autoFillEnabled,

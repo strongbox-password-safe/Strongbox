@@ -131,7 +131,11 @@ class QuickSearchViewModel {
 
     class func getShortcutTextFromMasShortcut(_ shortcut: MASShortcut?) -> String? {
         if let shortcut, let keyCodeString = shortcut.keyCodeString {
-            return "\(shortcut.modifierFlagsString)\(keyCodeString)"
+            let foo = Array(shortcut.modifierFlagsString).map { String($0) }
+
+            let bar = (foo as NSArray).componentsJoined(by: " ")
+
+            return "\(bar) \(keyCodeString)"
         } else {
             return nil
         }

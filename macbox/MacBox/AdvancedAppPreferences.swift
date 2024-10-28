@@ -31,8 +31,6 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var labelStrongboxSyncStatus: NSTextField!
     @IBOutlet var imageViewStrongboxSyncStatus: NSImageView!
 
-    @IBOutlet var hardwareKeyCaching: NSButton!
-
     
 
     override func viewDidLoad() {
@@ -82,7 +80,7 @@ class AdvancedAppPreferences: NSViewController {
         hideKeyFile.isHidden = settings.doNotRememberKeyFile
         enableThirdParty.isEnabled = settings.isPro
 
-
+        
 
         
 
@@ -105,8 +103,6 @@ class AdvancedAppPreferences: NSViewController {
                 }
             }
         #endif
-
-        hardwareKeyCaching.state = settings.hardwareKeyCachingBeta ? .on : .off
     }
 
     #if !NO_NETWORKING
@@ -139,32 +135,32 @@ class AdvancedAppPreferences: NSViewController {
         }
     #endif
 
-    @IBAction func onHardwareKeyCaching(_ sender: Any) {
-        if hardwareKeyCaching.state == .on {
-            MacAlerts.yesNo(NSLocalizedString("experimental_feature_warning_title", comment: "Experimental Feature Warning"),
-                            informativeText: NSLocalizedString("experimental_feature_warning_message_yes_no", comment: "Caution is required using this feature. While we have performed extensive testing, this is still an early release feature which could corrupt your database. You should only use this if you are an advanced and technical user with a regular backup system in place.\n\nThank you for helping to test Strongbox. Feedback welcome."),
-                            window: view.window)
-            { [weak self] response in
-                guard let self else { return }
 
-                if response {
-                    for database in MacDatabasePreferences.allDatabases {
-                        database.clearCachedChallengeResponses()
-                    }
 
-                    onChanged(sender)
-                } else {
-                    bindUI()
-                }
-            }
-        } else {
-            for database in MacDatabasePreferences.allDatabases {
-                database.clearCachedChallengeResponses()
-            }
 
-            onChanged(sender)
-        }
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     @IBAction func onChanged(_: Any) {
         let settings = Settings.sharedInstance()
@@ -185,8 +181,6 @@ class AdvancedAppPreferences: NSViewController {
         settings.concealClipboardFromMonitors = concealedClipboard.state == .on
         settings.atomicSftpWrite = atomicSftpWrites.state == .on
 
-
-        settings.hardwareKeyCachingBeta = hardwareKeyCaching.state == .on
 
         notifyChanged()
     }

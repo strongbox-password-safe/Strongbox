@@ -142,7 +142,6 @@ static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kSystemMenuClickAction = @"systemMenuClickAction";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
-static NSString* const kHardwareKeyCachingBeta = @"hardwareKeyCachingBeta2"; 
 
 static NSString* const kLastKnownGoodDatabaseState = @"lastKnownGoodDatabaseState";
 static NSString* const kAutoFillLastKnownGoodDatabaseState = @"autoFillLastKnownGoodDatabaseState";
@@ -346,16 +345,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (void)setAutoFillLastKnownGoodBiometricsDatabaseState:(NSData *)autoFillLastKnownGoodBiometricsDatabaseState {
     [self.sharedAppGroupDefaults setObject:autoFillLastKnownGoodBiometricsDatabaseState forKey:kAutoFillLastKnownGoodDatabaseState];
     [self.sharedAppGroupDefaults synchronize];
-}
-
-
-
-- (BOOL)hardwareKeyCachingBeta {
-    return [self getBool:kHardwareKeyCachingBeta fallback:YES];
-}
-
-- (void)setHardwareKeyCachingBeta:(BOOL)hardwareKeyCachingBeta {
-    [self setBool:kHardwareKeyCachingBeta value:hardwareKeyCachingBeta];
 }
 
 

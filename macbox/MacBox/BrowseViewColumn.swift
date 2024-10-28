@@ -119,7 +119,7 @@ enum BrowseViewColumn: String, CaseIterable {
         case .tags:
             return NSLocalizedString("generic_fieldname_tags", comment: "Tags")
         case .path:
-            return NSLocalizedString("generic_fieldname_location", comment: "Location")
+            return NSLocalizedString("generic_field_name_group", comment: "Group")
         case .historicalItemCount:
             return NSLocalizedString("generic_fieldname_historical_item_count", comment: "Historical Item Count")
         case .customIcon:

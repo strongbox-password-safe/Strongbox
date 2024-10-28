@@ -1288,11 +1288,13 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
+
     
     [self killClipboardWatchingTask];
 }
 
 - (void)startClipboardWatchingTask {
+
     
     self.currentClipboardVersion = -1;
     
@@ -1301,17 +1303,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
                                                                  selector:@selector(checkClipboardForChangesAndNotify)
                                                                  userInfo:nil
                                                                   repeats:YES];
-    
-    
-    
-    
-    
-    
-    
 }
 
 - (void)killClipboardWatchingTask {
-    
+
     
     self.currentClipboardVersion = -1;
     
@@ -1322,7 +1317,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)checkClipboardForChangesAndNotify {
-    
+
     
     if(self.currentClipboardVersion == -1) { 
         self.currentClipboardVersion = NSPasteboard.generalPasteboard.changeCount;
@@ -1340,13 +1335,12 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 static NSInteger clipboardChangeCount;
-
 - (void)onStrongboxDidChangeClipboard {
-    
+
     
     if ( Settings.sharedInstance.clearClipboardEnabled ) {
         clipboardChangeCount = NSPasteboard.generalPasteboard.changeCount;
-        
+
         [self scheduleClipboardClearTask];
     }
 }
@@ -1362,11 +1356,11 @@ static NSInteger clipboardChangeCount;
 
 - (void)clearClipboardWhereAppropriate {
     if ( clipboardChangeCount == NSPasteboard.generalPasteboard.changeCount ) {
-        slog(@"General Clipboard change count matches after time delay... Clearing Clipboard");
+
         [NSPasteboard.generalPasteboard clearContents];
     }
     else {
-        
+
     }
     
     [self clearAppCustomClipboard];
@@ -1378,7 +1372,7 @@ static NSInteger clipboardChangeCount;
     @synchronized (self) {
         if([appCustomPasteboard canReadItemWithDataConformingToTypes:@[kDragAndDropExternalUti]]) {
             [appCustomPasteboard clearContents];
-            slog(@"Clearing Custom App Clipboard!");
+
         }
     }
 }
@@ -1761,7 +1755,15 @@ static NSInteger clipboardChangeCount;
 
         if( index != NSNotFound) {
             NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
-            NSString* fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+            
+            NSString* fmt;
+            if ( StrongboxProductBundle.isZeroEdition ) {
+                fmt = NSLocalizedString(@"prefs_vc_app_version_info_zero_fmt", @"About Strongbox Zero %@");
+            }
+            else {
+                fmt = Settings.sharedInstance.isPro ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+            }
+            
             menuItem.title = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
         }
         

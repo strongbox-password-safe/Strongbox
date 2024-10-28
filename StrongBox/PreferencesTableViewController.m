@@ -253,7 +253,10 @@
 - (void)bindVersionAndProStatus {
     NSString *aboutString;
     
-    if( AppPreferences.sharedInstance.isPro ) {
+    if ( StrongboxProductBundle.isZeroEdition ) {
+        aboutString = [NSString stringWithFormat:NSLocalizedString(@"about_strongbox_zero_version_fmt", @"Zero Version %@"), [Utils getAppVersion]];
+    }
+    else if( AppPreferences.sharedInstance.isPro ) {
         aboutString = [NSString stringWithFormat:NSLocalizedString(@"about_strongbox_pro_version_fmt", @"Pro Version %@"), [Utils getAppVersion]];
     }
     else {
@@ -262,7 +265,6 @@
         
     self.labelVersion.text = aboutString;
         
-    
     self.labelProStatus.textColor = UIColor.labelColor;
     self.cellProStatus.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleDefault;

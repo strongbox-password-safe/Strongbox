@@ -717,7 +717,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     NSMutableArray<UIMenuElement*>* ma3 = [NSMutableArray array];
     
-    if ( AppPreferences.sharedInstance.hardwareKeyCachingBeta && self.viewModel.database.originalFormat == kKeePass4 && self.viewModel.database.ckfs.yubiKeyCR != nil ) {
+    if ( self.viewModel.database.originalFormat == kKeePass4 && self.viewModel.database.ckfs.yubiKeyCR != nil ) {
         [ma3 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_hardware_key", @"Hardware Key")
                                             image:[UIImage imageNamed:@"yubikey"]
                                           handler:^(__kindof UIAction * _Nonnull action) {
