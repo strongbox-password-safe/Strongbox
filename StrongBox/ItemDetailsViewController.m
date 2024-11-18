@@ -2210,7 +2210,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         UIImage *launchUrlImage = url ? [UIImage imageNamed:@"link"] : nil;
         
         NSArray<NSString*>* associatedDomains = @[];
-        if ( url && self.databaseModel.metadata.includeAssociatedDomains ) {
+        if ( url && self.databaseModel.metadata.includeAssociatedDomains && AppPreferences.sharedInstance.associatedWebsites ) {
             NSSet<NSString*> *ads = [BrowserAutoFillManager getAssociatedDomainsWithUrl:value];
             associatedDomains = [ads.allObjects sortedArrayUsingComparator:finderStringComparator];
         }

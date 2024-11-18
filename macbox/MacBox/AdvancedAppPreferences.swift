@@ -31,6 +31,8 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var labelStrongboxSyncStatus: NSTextField!
     @IBOutlet var imageViewStrongboxSyncStatus: NSImageView!
 
+    @IBOutlet var associatedWebsites: NSButton!
+
     
 
     override func viewDidLoad() {
@@ -103,6 +105,8 @@ class AdvancedAppPreferences: NSViewController {
                 }
             }
         #endif
+
+        associatedWebsites.state = settings.associatedWebsites ? .on : .off
     }
 
     #if !NO_NETWORKING
@@ -180,6 +184,7 @@ class AdvancedAppPreferences: NSViewController {
         settings.runBrowserAutoFillProxyServer = enableThirdParty.state == .on
         settings.concealClipboardFromMonitors = concealedClipboard.state == .on
         settings.atomicSftpWrite = atomicSftpWrites.state == .on
+        settings.associatedWebsites = associatedWebsites.state == .on
 
 
         notifyChanged()

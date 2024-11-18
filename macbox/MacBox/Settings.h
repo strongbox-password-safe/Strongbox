@@ -189,7 +189,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL duplicateItemPreserveTimestamp;
 @property BOOL duplicateItemEditAfterwards;
 
-@end
+@property BOOL associatedWebsites;
 
+@end
 
 NS_ASSUME_NONNULL_END

@@ -72,6 +72,7 @@ typedef enum : NSUInteger {
 @property AppAppearance appAppearance; 
 
 @property BOOL useOneDriveUSGovCloudInstance;
+@property BOOL associatedWebsites;
 
 @end
 

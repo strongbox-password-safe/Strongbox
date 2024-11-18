@@ -606,7 +606,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     if (Settings.sharedInstance.showSystemTrayIcon) {
         if (!self.statusItem) {
             NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
-            statusImage.size = NSMakeSize(18.0, 18.0);
+            statusImage.size = NSMakeSize(16.0, 16.0);
             self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
             self.statusItem.button.image = statusImage;
             

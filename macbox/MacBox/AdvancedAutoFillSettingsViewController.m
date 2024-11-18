@@ -64,7 +64,9 @@
     
     self.popupDisplayFormat.enabled = quickTypeOn;
     
-    self.includeAssociated.state = meta.includeAssociatedDomains ? NSControlStateValueOn : NSControlStateValueOff;
+    self.includeAssociated.state = meta.includeAssociatedDomains && Settings.sharedInstance.associatedWebsites ? NSControlStateValueOn : NSControlStateValueOff;
+    self.includeAssociated.enabled = Settings.sharedInstance.associatedWebsites;
+    
     self.addConcealedFields.state = meta.autoFillConcealedFieldsAsCreds ? NSControlStateValueOn : NSControlStateValueOff;
     self.addUnconcealedFields.state = meta.autoFillUnConcealedFieldsAsCreds ? NSControlStateValueOn : NSControlStateValueOff;
 

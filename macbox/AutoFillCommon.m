@@ -8,6 +8,7 @@
 
 #import "AutoFillCommon.h"
 #import "NSString+Extensions.h"
+#import "CrossPlatform.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -17,7 +18,17 @@
 
 static NSString* const kMailToScheme = @"mailto";
 
+@interface AutoFillCommon ()
+
+@property (class, readonly) id<ApplicationPreferences> appSettings;
+
+@end
+
 @implementation AutoFillCommon
+
++ (id<ApplicationPreferences>)appSettings {
+    return CrossPlatformDependencies.defaults.applicationPreferences;
+}
 
 + (NSSet<NSString*>*)getUniqueUrlsForNode:(Model*)model
                                      node:(Node*)node {
@@ -77,7 +88,7 @@ static NSString* const kMailToScheme = @"mailto";
          
     
     
-    if ( model.metadata.includeAssociatedDomains ) {
+    if ( model.metadata.includeAssociatedDomains && AutoFillCommon.appSettings.associatedWebsites ) {
         NSMutableArray<NSString*>* additional = NSMutableArray.array;
         
         for ( NSString* url in uniqueUrls ) {

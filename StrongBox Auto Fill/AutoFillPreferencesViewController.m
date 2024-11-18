@@ -167,14 +167,14 @@
     [self cell:self.cellAddServiceIds setHidden:!on];
     [self cell:self.cellLongTapPreview setHidden:!on];
     
-    [self cell:self.quickTypeIncludeAssociated setHidden:!on];
+    [self cell:self.quickTypeIncludeAssociated setHidden:!on || !AppPreferences.sharedInstance.associatedWebsites];
     [self cell:self.quickTypeScanCustom setHidden:!on];
     [self cell:self.quickTypeScanCustom setHidden:!on];
     [self cell:self.quickTypeScanNotes setHidden:!on];
     [self cell:self.quickTypeSuggestConcealable setHidden:!on];
     [self cell:self.quickTypeSuggestUnconcealable setHidden:!on];
     [self cell:self.cellAddServiceIds setHidden:!on];
-
+    
     
     
     self.switchQuickTypeAutoFill.on = self.viewModel.metadata.autoFillEnabled && self.viewModel.metadata.quickTypeEnabled;

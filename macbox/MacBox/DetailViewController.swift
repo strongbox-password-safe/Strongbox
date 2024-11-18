@@ -436,7 +436,7 @@ class DetailViewController: NSViewController {
         let actualUrl = dereference(model.url, node: node)
         var associatedWebsites = ""
 
-        if database.databaseMetadata.includeAssociatedDomains {
+        if database.databaseMetadata.includeAssociatedDomains, Settings.sharedInstance().associatedWebsites {
             let set = BrowserAutoFillManager.getAssociatedDomains(url: actualUrl)
 
             let sorted = set.sorted()

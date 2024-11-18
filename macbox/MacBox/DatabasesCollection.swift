@@ -339,14 +339,15 @@ class DatabasesCollection: NSObject {
         let appDelegate = NSApplication.shared.delegate as! AppDelegate
         appDelegate.cancelAutoLockTimer()
 
-        var ckfsCompletionCalled = false
+
+        
         
         determiner.getCkfs(message) { [weak self] result, ckfs, fromConvenience, error in
-            guard !ckfsCompletionCalled else {
-                swlog("🔴 CKFs Completion Called Multiple Times!")
-                return
-            }
-            ckfsCompletionCalled = true
+
+
+
+
+
 
             if !NSApplication.shared.isActive {
                 

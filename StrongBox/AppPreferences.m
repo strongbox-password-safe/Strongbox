@@ -177,6 +177,7 @@ static NSString* const kWarnAboutLocalDeviceDatabases = @"warnAboutLocalDeviceDa
 static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
+static NSString* const kAssociatedWebsites = @"associatedWebsites";
 
 @implementation AppPreferences
 
@@ -218,6 +219,14 @@ static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
 }
 
 
+
+- (BOOL)associatedWebsites {
+    return [self getBool:kAssociatedWebsites fallback:YES];
+}
+
+- (void)setAssociatedWebsites:(BOOL)showAssociatedWebsites {
+    [self setBool:kAssociatedWebsites value:showAssociatedWebsites];
+}
 
 - (NSDate *)lastCloudKitRefresh {
     NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;

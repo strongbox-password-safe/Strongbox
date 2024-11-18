@@ -1496,8 +1496,14 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 - (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    BOOL associatedDomains = self.metadata.includeAssociatedDomains && self.applicationPreferences.associatedWebsites;
+    
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains] != kStringSearchMatchTypeNoMatch;
+        return [self.database isUrlMatches:searchText
+                                      node:node
+                               dereference:dereference
+                               checkPinYin:checkPinYin
+                  includeAssociatedDomains:associatedDomains] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
@@ -1508,8 +1514,10 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 - (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    BOOL associatedDomains = self.metadata.includeAssociatedDomains && self.applicationPreferences.associatedWebsites;
+
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:self.metadata.includeAssociatedDomains] != kStringSearchMatchTypeNoMatch;
+        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin includeAssociatedDomains:associatedDomains] != kStringSearchMatchTypeNoMatch;
     }];
 }
 
@@ -1940,8 +1948,8 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     BOOL dereference = self.metadata.searchDereferencedFields;
     BOOL checkPinYin = self.applicationPreferences.checkPinYin;
-    BOOL includeAssociatedDomains = self.metadata.includeAssociatedDomains;
-    
+    BOOL includeAssociatedDomains = self.metadata.includeAssociatedDomains && self.applicationPreferences.associatedWebsites;
+
     NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
     
     NSMutableDictionary<NSUUID*, NSNumber*> *results = NSMutableDictionary.dictionary;

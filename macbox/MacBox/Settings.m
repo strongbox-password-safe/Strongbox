@@ -150,6 +150,7 @@ static NSString* const kDuplicateItemPreserveTimestamp = @"duplicateItemPreserve
 static NSString* const kDuplicateItemReferencePassword = @"duplicateItemReferencePassword";
 static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenceUsername";
 static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
+static NSString* const kAssociatedWebsites = @"associatedWebsites";
 
 
 
@@ -294,6 +295,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 #endif
 
 
+
+- (BOOL)associatedWebsites {
+    return [self getBool:kAssociatedWebsites fallback:YES];
+}
+
+- (void)setAssociatedWebsites:(BOOL)showAssociatedWebsites {
+    [self setBool:kAssociatedWebsites value:showAssociatedWebsites];
+}
 
 - (BOOL)duplicateItemEditAfterwards {
     return [self getBool:kDuplicateItemEditAfterwards];

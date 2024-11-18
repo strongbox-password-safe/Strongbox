@@ -109,6 +109,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStrongboxSyncStatus;
+@property (weak, nonatomic) IBOutlet UISwitch *showAssociatedWebsites;
 
 @end
 
@@ -396,6 +397,8 @@
         [[UIApplication sharedApplication] setShortcutItems:@[]]; 
     }
     
+    AppPreferences.sharedInstance.associatedWebsites = self.showAssociatedWebsites.on;
+    
     [self bindPreferences];
 }
 
@@ -436,6 +439,8 @@
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
     self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
         
+    self.showAssociatedWebsites.on = AppPreferences.sharedInstance.associatedWebsites;
+
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
