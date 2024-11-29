@@ -166,7 +166,7 @@ static NSString* const kSymlinkDirectory = @".strongbox";
 - (NSString*)getSocketPath {
     static const int MAX_PATH = 103;
     
-    NSURL* url = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:@"group.strongbox.mac.mcguill"];
+    NSURL* url = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:kDefaultAppGroupName];
     
     
     NSString* path = [url.path stringByAppendingPathComponent:kSocketFileName];

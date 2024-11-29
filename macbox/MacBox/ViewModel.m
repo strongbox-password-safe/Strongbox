@@ -613,6 +613,9 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     NSDate* oldModified = item.fields.modified;
     
     Node* cloneForHistory = [item cloneForHistory];
+    
+    NSString* ogText = [AutoFillManager.sharedInstance getQuickTypeUserText:self.commonModel node:item usedEmailAsUser:nil fieldKey:nil]; 
+
     if( [item setTitle:title keePassGroupTitleRules:self.format != kPasswordSafe] ) {
         [self touchAndModify:item modDate:modified];
         
@@ -630,6 +633,8 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
         
         [self rebuildMapsAndCaches];
         
+        [AutoFillManager.sharedInstance refreshQuickTypeSuggestionForEntry:item database:self.commonModel previousSuggestionText:ogText];
+
         [self notifyOnMain:kModelUpdateNotificationTitleChanged];
         
         return YES;

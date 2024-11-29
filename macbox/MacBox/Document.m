@@ -52,7 +52,15 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
         
         if ( ret == nil ) {
             slog(@"🔴 WARNWARN: NIL MacDatabasePreferences - None Found in Document::databaseMetadata for URL: [%@]", self.fileURL);
-            ret = [MacDatabasePreferences addOrGet:self.fileURL]; 
+    
+            StorageProvider provider = storageProviderFromUrl(self.fileURL);
+            
+            if ( provider == kLocalDevice ) {
+                ret = [MacDatabasePreferences addOrGet:self.fileURL]; 
+            }
+            else {
+                return nil;
+            }
         }
         else {
             
@@ -160,6 +168,13 @@ NSString* const kGenericRefreshAllDatabaseViewsNotification = @"genericRefreshAl
 
 
     if ( !self.viewModel ) { 
+        MacDatabasePreferences* db = self.databaseMetadata;
+        if ( !db ) {
+            if ( outError ) {
+                *outError = [Utils createNSError:@"Could not get Database Metadata - Cannot read/open this database!" errorCode:-1];
+            }
+            return NO;
+        }
         _viewModel = [[ViewModel alloc] initLocked:self databaseUuid:self.databaseMetadata.uuid];
     }
     

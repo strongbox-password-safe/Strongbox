@@ -2210,7 +2210,13 @@ double getFieldWeight ( DatabaseSearchMatchField field ) {
     
     if ( node ) {
         if ( ![title isEqualToString:node.title] ) {
+            NSString* ogText = [AutoFillManager.sharedInstance getQuickTypeUserText:self node:node usedEmailAsUser:nil fieldKey:nil]; 
+            
             BOOL ret = [self.database setItemTitle:node title:title];
+
+            if ( ret ) {
+                [AutoFillManager.sharedInstance refreshQuickTypeSuggestionForEntry:node database:self previousSuggestionText:ogText];
+            }
             
             [self notifyEdited];
             

@@ -100,6 +100,8 @@
 
 - (void)getCkfs:(NSString*_Nullable)message
      completion:(CompositeKeyDeterminedBlock)completion {
+    
+    
     return [self getCkfs:message manualHeadline:nil manualSubhead:nil completion:completion];
 }
 
@@ -198,7 +200,15 @@
     mce.subheadline = subheadline;
     mce.verifyCkfsMode = self.verifyCkfsMode;
     
+    __block BOOL completionCalled = NO;
+    
     mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, NSURL* keyFileUrl, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
+        if ( completionCalled ) {
+            slog(@"⚠️ Completion already called! Problem in ManualCredentialsEntry"); 
+            return;
+        }
+        completionCalled = YES;
+        
         if (userCancelled) {
             completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
         }

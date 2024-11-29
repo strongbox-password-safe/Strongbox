@@ -22,9 +22,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clearAutoFillQuickTypeDatabase;
 
-- (void)refreshQuickTypeAfterAutoFillAddition:(Node*)node database:(Model*)database;
+- (void)refreshQuickTypeSuggestionForEntry:(Node*)node database:(Model*)database previousSuggestionText:(NSString* _Nullable)previousSuggestionText;
 
 - (void)removeItemsFromQuickType:(const NSArray<Node*>*)items database:(Model*)database;
+
+- (NSString*)getQuickTypeUserText:(Model*)database
+                             node:(Node*)node
+                  usedEmailAsUser:(BOOL*_Nullable)usedEmailAsUser
+                         fieldKey:(NSString*_Nullable)fieldKey;
 
 @end
 

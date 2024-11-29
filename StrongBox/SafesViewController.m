@@ -2706,10 +2706,39 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     NSError* error;
     
     if (![Serializator isValidDatabaseWithPrefix:data error:&error]) { 
-        [Alerts error:self
-                title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
-                error:error];
-        return;
+        
+        
+        if ( [DatabaseUnzipper isZipFileWithData:data] ) {
+            [Alerts yesNo:self
+                    title:NSLocalizedString(@"import_file_zip_detected_ask_unzip_title", @"Unzip First?")
+                  message:NSLocalizedString(@"import_file_zip_detected_ask_unzip_msg", @"This appears to be a Zip file rather than a database.\n\nShould Strongbox try to unzip first and then import a database if it can find one?")
+                   action:^(BOOL response) {
+                if ( response ) {
+                    NSError* error;
+                    NSArray<NSObject*>* unzippedDataAndUrl = [DatabaseUnzipper unzipSingleDatabaseWithData:data error:&error];
+                    
+                    if ( !unzippedDataAndUrl ) {
+                        [Alerts error:self
+                                title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
+                                error:error];
+                    }
+                    else {
+                        NSData* data = (NSData*)unzippedDataAndUrl[0];
+                        NSURL* url = (NSURL*)unzippedDataAndUrl[1];
+                        
+                        [self importDatabase:data url:url canOpenInPlace:NO forceOpenInPlace:NO modDate:modDate]; 
+                    }
+                }
+            }];
+            
+            return;
+        }
+        else {
+            [Alerts error:self
+                    title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
+                    error:error];
+            return;
+        }
     }
     
     if ( canOpenInPlace ) {

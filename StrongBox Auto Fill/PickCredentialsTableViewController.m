@@ -429,9 +429,9 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if ( [group isEqualToString:kGroupServiceId] ) {
         UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:@"PickCredentialGenericCell" forIndexPath:indexPath];
       
-
         cell.textLabel.text = @"";
-        cell.detailTextLabel.text = self.serviceIdentifiers.firstObject ? self.serviceIdentifiers.firstObject.identifier : NSLocalizedString(@"generic_none", @"None");
+        cell.detailTextLabel.text = self.serviceIdentifiers.firstObject ? self.serviceIdentifiers.firstObject.identifier : NSLocalizedString(@"generic_none_available", @"None Available");
+        cell.detailTextLabel.textColor = self.serviceIdentifiers.firstObject ? nil : UIColor.systemOrangeColor;
         
         cell.imageView.image = nil;
         
@@ -489,6 +489,10 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     if ( [group isEqualToString:kGroupServiceId] ) {
         if ( self.serviceIdentifiers.firstObject ) {
             [ClipboardManager.sharedInstance copyStringWithNoExpiration:self.serviceIdentifiers.firstObject.identifier];
+            
+            [Alerts info:self
+                   title:NSLocalizedString(@"generic_copied", @"Copied")
+                 message:NSLocalizedString(@"generic_copied", @"Copied")];
         }
     }
     else if ( [group isEqualToString:kGroupActions] ) {
@@ -531,7 +535,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         return NSLocalizedString(@"browse_vc_section_title_pinned", @"Pinned");
     }
     else if ( [group isEqualToString:kGroupServiceId] ) {
-        return NSLocalizedString(@"autofill_search_title_service_id_section_header", @"Service ID");
+        return NSLocalizedString(@"autofill_search_title_service_id_section_header", @"Caller ID");
     }
     else if ( [group isEqualToString:kGroupActions] ) {
         return NSLocalizedString(@"generic_actions", @"Actions");
@@ -602,11 +606,11 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         }
     }
 
-    if ( [group isEqualToString:kGroupServiceId] ) {
-        if ( self.serviceIdentifiers.count == 0 ) {
-            return 0.0f;
-        }
-    }
+
+
+
+
+
 
 
 

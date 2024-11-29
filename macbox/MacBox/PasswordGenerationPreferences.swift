@@ -295,7 +295,7 @@ class PasswordGenerationPreferences: NSViewController {
     @IBAction func onEditBasicCharacterCount(_: Any) {
         let config = Settings.sharedInstance().passwordGenerationConfig
 
-        guard let ret = MacAlerts().input(NSLocalizedString("password_gen_vc_prompt_excluded_characters", comment: "Excluded Characters"),
+        guard let ret = MacAlerts().input(NSLocalizedString("alert_enter_password_basic_length", comment: "Enter Length"),
                                           defaultValue: String(config.basicLength),
                                           allowEmpty: false)
         else {

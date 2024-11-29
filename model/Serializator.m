@@ -37,6 +37,9 @@
     return nil;
 }
 
++ (BOOL)isValidDatabaseSwiftCompat:(NSURL *)url {
+    return [Serializator isValidDatabase:url error:nil];
+}
 + (BOOL)isValidDatabase:(NSURL *)url error:(NSError *__autoreleasing  _Nullable *)error {
     NSData* prefix = [Serializator getValidationPrefixFromUrl:url];
     

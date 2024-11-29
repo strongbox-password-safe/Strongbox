@@ -9,11 +9,11 @@
 #import "StrongboxMacFilesManager.h"
 #include <pwd.h>
 #import "SBLog.h"
+#import "MacConstants.h"
 
 static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 
-static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 static NSString* const kiCloudIdentifier = @"group.strongbox.mac.mcguill";
 static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
 

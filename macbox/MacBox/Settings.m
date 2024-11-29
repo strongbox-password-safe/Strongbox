@@ -154,10 +154,6 @@ static NSString* const kAssociatedWebsites = @"associatedWebsites";
 
 
 
-static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
-
-
-
 @interface Settings ()
 
 @property BOOL wiFiSyncPasscodeSSKeyHasBeenInitialized;

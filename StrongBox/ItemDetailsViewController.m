@@ -1680,8 +1680,9 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     return parentGroup ? parentGroup : self.databaseModel.database.effectiveRootGroup;
 }
 
-- (void)applyModelChangesToDatabaseNode:(void (^)(Node* item))completion {
+- (void)applyModelChangesToDatabaseNode:(void (^)(Node* item, NSString* originalQuickTypeText))completion {
     Node* ret;
+    NSString* originalQuickTypeText;
     
     if ( self.createNewItem ) {
         ret = [self createNewEntryNode];
@@ -1690,7 +1691,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         BOOL added = [self.databaseModel addChildren:@[ret] destination:parentGroup];
         
         if ( !added ) {
-            completion(nil);
+            completion(nil, nil);
             return;
         }
     }
@@ -1698,13 +1699,14 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         ret = [self.databaseModel.database getItemById:self.itemId];
         Node* originalNodeForHistory = [ret cloneForHistory];
         [self addHistoricalNode:ret originalNodeForHistory:originalNodeForHistory];
+        originalQuickTypeText = [AutoFillManager.sharedInstance getQuickTypeUserText:self.databaseModel node:ret usedEmailAsUser:nil fieldKey:nil];
     }
     
     if ( ![self.model applyToNode:ret
                             model:self.databaseModel
           legacySupplementaryTotp:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
                     addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl] ) {
-        completion(nil);
+        completion(nil, nil);
         return;
     }
     
@@ -1713,7 +1715,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     
     
     [self processIconBeforeSave:ret completion:^{
-        completion(ret);
+        completion(ret, originalQuickTypeText);
     }];
 }
 
@@ -2671,7 +2673,7 @@ suggestionProvider:^NSString*(NSString *text) {
     [item touch:YES touchParents:NO];
     [item.fields.keePassHistory removeObject:historicalNode];
     
-    [self refreshPublishAndSyncAfterModelEdit];
+    [self refreshPublishAndSyncAfterModelEdit:nil];
 }
 
 - (void)onRestoreFromHistoryNode:(Node*)historicalNode {
@@ -2685,7 +2687,7 @@ suggestionProvider:^NSString*(NSString *text) {
     
     [item restoreFromHistoricalNode:historicalNode];
     
-    [self refreshPublishAndSyncAfterModelEdit];
+    [self refreshPublishAndSyncAfterModelEdit:nil];
 }
 
 - (void)onPasswordHistoryChanged:(PasswordHistory*)changed {
@@ -2696,7 +2698,7 @@ suggestionProvider:^NSString*(NSString *text) {
     
     [self.databaseModel.database rebuildFastMaps];
     
-    [self refreshPublishAndSyncAfterModelEdit];
+    [self refreshPublishAndSyncAfterModelEdit:nil];
 }
 
 
@@ -2712,7 +2714,7 @@ suggestionProvider:^NSString*(NSString *text) {
 
     self.urlJustChanged = [self.model.url compare:self.preEditModelClone.url] != NSOrderedSame;
     
-    [self applyModelChangesToDatabaseNode:^(Node *item) { 
+    [self applyModelChangesToDatabaseNode:^(Node *item, NSString *originalQuickTypeText) { 
         [self enableUi];
         
         if ( !item ) {
@@ -2733,7 +2735,7 @@ suggestionProvider:^NSString*(NSString *text) {
             } completion:^(BOOL finished) {
                 [self bindNavBar];
                 
-                [self refreshPublishAndSyncAfterModelEdit];
+                [self refreshPublishAndSyncAfterModelEdit:originalQuickTypeText];
             }];
         }
     }];
@@ -2774,7 +2776,7 @@ suggestionProvider:^NSString*(NSString *text) {
     [self updateSyncBarButtonItemState];
 }
 
-- (void)refreshPublishAndSyncAfterModelEdit {
+- (void)refreshPublishAndSyncAfterModelEdit:(NSString*)previousSuggestionText {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         [self refreshAll];
         
@@ -2783,7 +2785,17 @@ suggestionProvider:^NSString*(NSString *text) {
         [self showToast:NSLocalizedString(@"generic_database_saved", @"Database Saved")];
         
         [self updateAndSync];
+
+        [self refreshAutoFillSuggestion:previousSuggestionText];
     });
+}
+
+- (void)refreshAutoFillSuggestion:(NSString*)previousSuggestionText {
+    if ( self.databaseModel.metadata.autoFillEnabled ) {
+        Node* node = [self.databaseModel getItemById:self.itemId];
+
+        [AutoFillManager.sharedInstance refreshQuickTypeSuggestionForEntry:node database:self.databaseModel previousSuggestionText:previousSuggestionText];
+    }
 }
 
 - (void)updateAndSync {
@@ -2791,7 +2803,7 @@ suggestionProvider:^NSString*(NSString *text) {
     [self disableUi];
     
     AppPreferences.sharedInstance.autoFillWroteCleanly = NO;
-    
+
     [self.databaseModel asyncUpdate:^(AsyncJobResult * _Nonnull result) {
         AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
         
@@ -2807,7 +2819,6 @@ suggestionProvider:^NSString*(NSString *text) {
                 [Alerts error:self.navigationController.visibleViewController error:result.error];
             }
         });
-
     }];
 #else
     [self.parentSplitViewController updateAndQueueSyncWithCompletion:nil];

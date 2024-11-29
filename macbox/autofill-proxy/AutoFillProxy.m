@@ -21,15 +21,18 @@
 #import "NSData+Extensions.h"
 #import "SBLog.h"
 
+#import "MacConstants.h"
+
 static const int MAX_PATH = 103;
 
 NSString* _Nullable getSocketPath(BOOL hardcodeSandboxTestingPath) {
-    NSURL* url = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:@"group.strongbox.mac.mcguill"];
+    NSURL* url = [NSFileManager.defaultManager containerURLForSecurityApplicationGroupIdentifier:kDefaultAppGroupName];
 
 
 #ifdef DEBUG
     if ( hardcodeSandboxTestingPath ) {
-        NSString* foo = [@"~/Library/Group Containers/group.strongbox.mac.mcguill/F" stringByExpandingTildeInPath];
+        NSString *path = [NSString stringWithFormat:@"~/Library/Group Containers/%@/F", kDefaultAppGroupName];
+        NSString* foo = [path stringByExpandingTildeInPath];
         slog(@"⚠️ WARN: Hardcoded Sandbox Path used for Socket. Make sure this is only used in Test mode! [%@] => %ld chars", foo, foo.length);
         return foo;
     }

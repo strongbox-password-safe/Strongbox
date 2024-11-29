@@ -37,6 +37,9 @@
 @property (weak) IBOutlet NSButton *buttonCreateNew;
 
 @property (nullable) NSTimer* otpTimer;
+@property (weak) IBOutlet NSTextField *serviceIde;
+@property (weak) IBOutlet NSStackView *stackView;
+@property (weak) IBOutlet NSTextField *serviceIdHeader;
 
 @end
 
@@ -56,6 +59,10 @@
     if ( !self.doneFirstAppearanceTasks ) {
         self.doneFirstAppearanceTasks = YES;
         self.view.window.frameAutosaveName = @"SelectCredential-AutoSave";
+        
+        [self.stackView setCustomSpacing:4 afterView:self.serviceIdHeader];
+
+        self.serviceIde.stringValue = self.serviceIdentifiers.firstObject ? self.serviceIdentifiers.firstObject.identifier : NSLocalizedString(@"generic_none_available", @"None Available");
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self smartInitializeSearch];

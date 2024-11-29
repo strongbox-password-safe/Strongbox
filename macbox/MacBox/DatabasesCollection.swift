@@ -389,10 +389,15 @@ class DatabasesCollection: NSObject {
                     let unlocked = self?.isUnlocked(uuid: uuid) ?? false
 
                     if unlocked {
-                        swlog("⚠️ MCE Cancelled - but database locked")
-                    }
+                        swlog("⚠️ getCkfs Unsuccessful/cancelled? - but database unlocked")
 
-                    completion?(unlocked) 
+                        
+                        
+
+                        completion?(unlocked) 
+                    } else {
+                        completion?(unlocked) 
+                    }
                 }
             }
         }

@@ -62,6 +62,61 @@ class OneDriveDriveItem: NSObject {
     }
 }
 
+enum OneDriveStorageProviderError: Error {
+    case invalidUploadUrl(detail: String)
+    case unexpectedResponse(detail: String)
+    case unexpectedResponseCode(code: Int, detail: String)
+    case couldNotGetDriveItemUrl
+    case couldNotReadNextUrlForListing
+    case couldNotBuildEscapedFilename
+    case couldNotConvertOdataDriveItem
+    case couldNotGetModDateAfterUpload
+    case couldNotReadDriveOrParentItemId
+    case couldNotDeserializeExpectedJson
+    case couldNotAuthenticate(innerError: (any Error)?)
+    case couldNotFindApplication
+    case interactiveSessionRequired
+    case userCancelledAuthentication
+    case couldNotGetDriveFields
+}
+
+extension OneDriveStorageProviderError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case let .unexpectedResponseCode(status, message):
+            return "unexpectedResponseCode: \(status) and message: \(message)"
+        case let .invalidUploadUrl(detail: detail):
+            return "invalidUploadUrl: \(detail)"
+        case let .unexpectedResponse(detail: detail):
+            return "unexpectedResponse: \(detail)"
+        case .couldNotGetDriveItemUrl:
+            return "couldNotGetDriveItemUrl"
+        case .couldNotReadNextUrlForListing:
+            return "couldNotReadNextUrlForListing"
+        case .couldNotBuildEscapedFilename:
+            return "couldNotBuildEscapedFilename"
+        case .couldNotConvertOdataDriveItem:
+            return "couldNotConvertOdataDriveItem"
+        case .couldNotGetModDateAfterUpload:
+            return "couldNotGetModDateAfterUpload"
+        case .couldNotReadDriveOrParentItemId:
+            return "couldNotReadDriveOrParentItemId"
+        case .couldNotDeserializeExpectedJson:
+            return "couldNotDeserializeExpectedJson"
+        case let .couldNotAuthenticate(innerError: innerError):
+            return "unexpectedResponse: \(String(describing: innerError))"
+        case .couldNotFindApplication:
+            return "couldNotFindApplication"
+        case .interactiveSessionRequired:
+            return "interactiveSessionRequired"
+        case .userCancelledAuthentication:
+            return "userCancelledAuthentication"
+        case .couldNotGetDriveFields:
+            return "couldNotGetDriveFields"
+        }
+    }
+}
+
 class OneDriveStorageProvider: NSObject, SafeStorageProvider {
     @objc
     static let sharedInstance = OneDriveStorageProvider()
@@ -82,24 +137,6 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
         return queue
     }()
-
-    enum OneDriveStorageProviderError: Error {
-        case invalidUploadUrl(detail: String)
-        case unexpectedResponse(detail: String)
-        case unexpectedResponseCode(code: Int, detail: String)
-        case couldNotGetDriveItemUrl
-        case couldNotReadNextUrlForListing
-        case couldNotBuildEscapedFilename
-        case couldNotConvertOdataDriveItem
-        case couldNotGetModDateAfterUpload
-        case couldNotReadDriveOrParentItemId
-        case couldNotDeserializeExpectedJson
-        case couldNotAuthenticate(innerError: (any Error)?)
-        case couldNotFindApplication
-        case interactiveSessionRequired
-        case userCancelledAuthentication
-        case couldNotGetDriveFields
-    }
 
     enum OneDriveAPIHTTPParams {
         static let authorization = "Authorization"

@@ -16,6 +16,7 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_N
 
 @interface Serializator : NSObject
 
++ (BOOL)isValidDatabaseSwiftCompat:(NSURL*)url;
 + (BOOL)isValidDatabase:(NSURL*)url error:(NSError**)error;
 + (BOOL)isValidDatabaseWithPrefix:(nullable NSData *)prefix error:(NSError**)error; 
 

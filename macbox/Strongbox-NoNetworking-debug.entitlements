@@ -9,6 +9,7 @@
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.strongbox.mac.mcguill</string>
+		<string>4326J8XDF2.group.strongbox.mac.mcguill</string>
 	</array>
 	<key>com.apple.security.device.usb</key>
 	<true/>

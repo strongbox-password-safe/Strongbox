@@ -38,7 +38,7 @@ class OnePassword1PuxImporter: NSObject, Importer {
     }
 
     func convertEx(url: URL) throws -> ImportResult {
-        let unzippedDir = try unzip1Pux(url: url)
+        let unzippedDir = try Zip.unzipUrlToUniqueDirectory(url: url)
 
         let database = DatabaseModel(format: .keePass4,
                                      compositeKeyFactors: .password("a"),
@@ -54,18 +54,18 @@ class OnePassword1PuxImporter: NSObject, Importer {
         return ImportResult(database: database, messages: messages)
     }
 
-    func unzip1Pux(url: URL) throws -> URL {
-        let temp = URL(fileURLWithPath: NSTemporaryDirectory())
-        let uniqDir = temp.appendingPathComponent(UUID().uuidString)
 
-        StrongboxFilesManager.sharedInstance().createIfNecessary(uniqDir)
 
-        Zip.addCustomFileExtension(url.pathExtension) 
 
-        try Zip.unzipFile(url, destination: uniqDir, overwrite: true, password: nil)
 
-        return uniqDir
-    }
+
+
+
+
+
+
+
+
 
     func processUnzippedDirectory(database: DatabaseModel, unzippedDir: URL) throws -> [ImportMessage] {
         let jsonFile = unzippedDir.appendingPathComponent("export.data")

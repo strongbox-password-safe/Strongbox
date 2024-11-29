@@ -413,6 +413,10 @@
 - (void)bindTitlesAndBioAvailability {
     MacDatabasePreferences* database = self.databaseMetadata;
     
+    if ( !database ) {
+        return;
+    }
+    
     self.textFieldDatabaseNickName.stringValue = database.nickName;
     self.textFieldBioUnavailableWarn.stringValue = @"";
     self.textFieldBioUnavailableWarn.hidden = YES;

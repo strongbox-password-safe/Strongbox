@@ -330,7 +330,7 @@ class SwiftUIAutoFillHelper: NSObject {
             } else {
                 
 
-                AutoFillManager.sharedInstance().refreshQuickType(afterAutoFillAddition: node, database: model)
+                AutoFillManager.sharedInstance().refreshQuickTypeSuggestion(forEntry: node, database: model, previousSuggestionText: nil)
 
                 completion(false, nil)
             }

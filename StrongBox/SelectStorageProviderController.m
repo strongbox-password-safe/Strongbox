@@ -692,7 +692,7 @@ static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUp
     else {
         if(self.existing) {
             [Alerts info:self
-                   title:@"Error Selecting Storage Provider"
+                   title:NSLocalizedString(@"safes_vc_error_selecting_storage_location", @"Error title - error selecting storage location")
                  message:@"Please contact support@strongboxsafe.com if you receive this message. It looks like there is a problem with this Storage provider"
               completion:^{
                 self.onDone(SelectedStorageParameters.userCancelled); 

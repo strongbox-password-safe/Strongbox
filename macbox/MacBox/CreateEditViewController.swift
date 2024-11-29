@@ -909,6 +909,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
     func postValidationSave(dismissAfterSave: Bool) {
         let nodeId: UUID
+        var originalQuickTypeText: String? = nil 
 
         if initialNodeId == nil {
             guard let node = getExistingOrNewEntry(newEntryParentGroupId: model.parentGroupUuid) else {
@@ -949,6 +950,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
             nodeId = node.uuid
         } else {
+            if let original = database.getItemBy(initialNodeId!), let md = database.commonModel {
+                originalQuickTypeText = AutoFillManager.sharedInstance().getQuickTypeUserText(md, node: original, usedEmailAsUser: nil, fieldKey: nil)
+            }
+
             if !database.applyEditsAndMoves(model, toNode: initialNodeId!) {
                 swlog("🔴 Could not apply model changes")
                 messageProblemSaving()
@@ -960,10 +965,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         
 
-        setIconAndSave(nodeId, dismissAfterSave: dismissAfterSave)
+        setIconAndSave(nodeId, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: originalQuickTypeText)
     }
 
-    func setIconAndSave(_ nodeId: UUID, dismissAfterSave: Bool) {
+    func setIconAndSave(_ nodeId: UUID, dismissAfterSave: Bool, previousQuickTypeSuggestionText: String?) {
         guard let node = database.getItemBy(nodeId) else {
             swlog("🔴 Could not load node for setIconAndExit")
             messageProblemSaving()
@@ -973,7 +978,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         if iconExplicitlyChanged {
             iconExplicitlyChanged = false
             database.setItemIcon(node, icon: model.icon)
-            onSaveDone(node, dismissAfterSave: dismissAfterSave)
+            onSaveDone(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
         } else {
             let urlChanged = model.url.compare(preEditModelClone.url) != .orderedSame
 
@@ -995,28 +1000,28 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                             self.database.promptedForAutoFetchFavIcon = true
                                             self.database.downloadFavIconOnChange = yesNo
 
-                                            self.maybeDownloadFavIconAndExit(node, dismissAfterSave: dismissAfterSave)
+                                            self.maybeDownloadFavIconAndExit(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
                                         })
                     } else {
-                        maybeDownloadFavIconAndExit(node, dismissAfterSave: dismissAfterSave)
+                        maybeDownloadFavIconAndExit(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
                     }
                 } else {
-                    onSaveDone(node, dismissAfterSave: dismissAfterSave)
+                    onSaveDone(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
                 }
             } else {
-                onSaveDone(node, dismissAfterSave: dismissAfterSave)
+                onSaveDone(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
             }
         }
     }
 
-    func maybeDownloadFavIconAndExit(_ node: Node, dismissAfterSave: Bool) {
+    func maybeDownloadFavIconAndExit(_ node: Node, dismissAfterSave: Bool, previousQuickTypeSuggestionText: String?) {
         #if NO_FAVICON_LIBRARY 
-            onSaveDone(node, dismissAfterSave: dismissAfterSave)
+            onSaveDone(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
         #else
             if database.downloadFavIconOnChange {
                 let url = node.fields.url.urlExtendedParse
                 if url == nil {
-                    onSaveDone(node, dismissAfterSave: dismissAfterSave)
+                    onSaveDone(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
                     return
                 }
 
@@ -1033,27 +1038,32 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                                 self.database.setItemIcon(node, icon: maybeImage)
                             }
 
-                            self.onSaveDone(node, dismissAfterSave: dismissAfterSave)
+                            self.onSaveDone(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
                         }
                     }
                 }
             } else {
-                onSaveDone(node, dismissAfterSave: dismissAfterSave)
+                onSaveDone(node, dismissAfterSave: dismissAfterSave, previousQuickTypeSuggestionText: previousQuickTypeSuggestionText)
             }
         #endif
     }
 
     var savedNewItemSoShouldSelectOnDismiss: Bool = false
-    func onSaveDone(_ node: Node, dismissAfterSave: Bool) {
+    func onSaveDone(_ node: Node, dismissAfterSave: Bool, previousQuickTypeSuggestionText: String?) {
         
 
         
 
         if Settings.sharedInstance().autoSave { 
             guard let doc = database.document else { return } 
+            guard let md = database.commonModel else { return }
 
             DispatchQueue.main.async { 
                 doc.save(nil)
+
+                if md.metadata.autoFillEnabled {
+                    AutoFillManager.sharedInstance().refreshQuickTypeSuggestion(forEntry: node, database: md, previousSuggestionText: previousQuickTypeSuggestionText) 
+                }
             }
         }
 

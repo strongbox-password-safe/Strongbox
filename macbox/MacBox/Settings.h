@@ -11,6 +11,7 @@
 #import "AutoFillNewRecordSettings.h"
 #import "FavIconDownloadOptions.h"
 #import "ApplicationPreferences.h"
+#import "MacConstants.h"
 
 typedef enum : NSUInteger {
     kSystemMenuClickActionQuickSearch,

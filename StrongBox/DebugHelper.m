@@ -311,6 +311,8 @@ int OPParentIDForProcessID(int pid)
     [debugLines addObject:[NSString stringWithFormat:@"AMS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription]];
     [debugLines addObject:[NSString stringWithFormat:@"AYS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription]];
     [debugLines addObject:[NSString stringWithFormat:@"FTA: %hhd", ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable]];
+    [debugLines addObject:[NSString stringWithFormat:@"EMP: %hhd", [DebugHelper hasEmbeddedMobileProvision]]];
+    [debugLines addObject:[NSString stringWithFormat:@"HMC: %hhd", [DebugHelper hasManagedConfig]]];
         
     
 
@@ -563,4 +565,14 @@ int OPParentIDForProcessID(int pid)
     return ret;
 }
 
++ (BOOL)hasEmbeddedMobileProvision {
+    BOOL hasEmbeddedMobileProvision = !![[NSBundle mainBundle] pathForResource:@"embedded" ofType:@"mobileprovision"];
+    return hasEmbeddedMobileProvision;
+}
+
++ (BOOL)hasManagedConfig {
+    return [NSUserDefaults.standardUserDefaults objectForKey:@"com.apple.configuration.managed"] != nil;
+}
+
+    
 @end
