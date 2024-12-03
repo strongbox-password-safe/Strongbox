@@ -16,6 +16,7 @@
 #import "DatabaseCell.h"
 #import "SVProgressHUD.h"
 #import "NSArray+Extensions.h"
+#import "Strongbox-Swift.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -362,9 +363,17 @@
                                                                    initialDateModified:initialDateModified]);
         }
         else {
-            [Alerts error:self
-                    title:NSLocalizedString(@"sbtvc_invalid_database_file", @"Invalid Database File")
-                    error:err];
+            if ( [DatabaseUnzipper isZipFileWithData:data] ) {
+                [Alerts info:self
+                       title:NSLocalizedString(@"sbtvc_invalid_database_file", @"Invalid Database File")
+                     message:NSLocalizedString(@"import_file_zip_file_you_must_unzip_first", @"This appears to be a Zip file, which may contain your database.\n\nYou will need to unzip it first before you can add it to Strongbox.")
+                  completion:nil];
+            }
+            else {
+                [Alerts error:self
+                        title:NSLocalizedString(@"sbtvc_invalid_database_file", @"Invalid Database File")
+                        error:err];
+            }
         }
     }
     else {

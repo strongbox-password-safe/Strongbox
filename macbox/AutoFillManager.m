@@ -503,11 +503,12 @@
         identities = [identities arrayByAddingObjectsFromArray:favIdentities];
     }
     
-    if (@available(macOS 14.0, *)) {
+    if (@available(iOS 17.0, macOS 14.0, *)) {
         [ASCredentialIdentityStore.sharedStore removeCredentialIdentityEntries:identities completion:^(BOOL success, NSError * _Nullable error) {
             slog(@"🟢 removeCredentialIdentityEntries done with %hhd - %@", success, error);
         }];
-    } else {
+    }
+    else {
         [ASCredentialIdentityStore.sharedStore removeCredentialIdentities:identities
                                                                completion:^(BOOL success, NSError * _Nullable error) {
             slog(@"🟢 removeCredentialIdentities done with %hhd - %@", success, error);

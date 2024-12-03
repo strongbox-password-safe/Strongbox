@@ -308,7 +308,14 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 - (NSArray<Node*>*)loadAllItems {
     NSArray<Node*>* entries = self.twoFactorOnly ? self.model.totpEntries : self.model.allSearchableNoneExpiredEntries;
     
-    return [self.model filterAndSortForBrowse:entries.mutableCopy includeGroups:NO];
+    return [self.model filterAndSortForBrowse:entries.mutableCopy
+                        includeKeePass1Backup:NO
+                            includeRecycleBin:NO
+                               includeExpired:NO
+                                includeGroups:NO
+                              browseSortField:kBrowseSortFieldTitle
+                                   descending:NO
+                            foldersSeparately:YES];
 }
 
 - (NSArray<Node*>*)loadPinnedItems {

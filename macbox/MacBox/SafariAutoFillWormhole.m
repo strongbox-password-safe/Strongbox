@@ -355,7 +355,7 @@
     NSDictionary* securePayload = @{
         @"user" : user,
         @"password" : password,
-
+        @"totp" : totp,
     };
     
     NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 

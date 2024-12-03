@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSArray<ASCredentialServiceIdentifier *>* serviceIdentifiers;
 @property Model* model;
+@property BOOL twoFaOnlyMode;
 @property (nonatomic, copy) void (^onDone)(BOOL userCancelled, BOOL createNew, NSString*_Nullable username, NSString*_Nullable password, NSString*_Nullable totp);
 
 @end

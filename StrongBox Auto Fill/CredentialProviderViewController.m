@@ -532,7 +532,7 @@ typedef enum : NSUInteger {
         }
         else {
             slog(@"🟢 Database successfully unlocked! Requesting passkey be manually selected for return");
-            [self promptUserToSelectCredential:model selectPasskey:YES];
+            [self promptUserToSelectCredential:model]; 
         }
     }
     else if ( self.mode == AutoFillOperationModeGetPasskeyAssertionQuickTypeNoUI ) { 
@@ -554,12 +554,12 @@ typedef enum : NSUInteger {
         }
         else {
             slog(@"🟢 Database successfully unlocked! Requesting 2FA Code be manually selected for return");
-            [self promptUserToSelectCredential:model selectPasskey:YES];
+            [self promptUserToSelectCredential:model];
         }
     }
     else { 
         slog(@"🟢 Database successfully unlocked! Requesting manual selection of password.");
-        [self promptUserToSelectCredential:model selectPasskey:NO];
+        [self promptUserToSelectCredential:model];
     }
 }
 
@@ -593,7 +593,7 @@ typedef enum : NSUInteger {
     }
 }
 
-- (void)promptUserToSelectCredential:(Model *)model selectPasskey:(BOOL)selectPasskey { 
+- (void)promptUserToSelectCredential:(Model *)model { 
     PickCredentialsTableViewController* vc = [PickCredentialsTableViewController fromStoryboard];
     
     vc.model = model;

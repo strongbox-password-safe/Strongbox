@@ -52,6 +52,7 @@
 @property BOOL withoutUserInteraction;
 @property BOOL hasDoneCommonInit;
 @property BOOL quickTypeMode;
+@property BOOL twoFaOnlyMode;
 @property id passkeyCredentialRequest;
 
 @property BOOL requireWormhole; 
@@ -100,7 +101,7 @@
         MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:identifier.databaseId];
 
         if ( database && database.autoFillEnabled && database.autoFillEnabled && database.quickTypeEnabled ) {
-            [self doWormholePasswordFill:identifier];
+            [self doWormholePasswordOr2FACodeFill:identifier];
             return;
         }
     }
@@ -141,7 +142,30 @@
         
         [self exitWithUserInteractionRequired];
     }
-    else {
+    else if (@available(macOS 15.0, *)) {
+        if ( credentialRequest.type == ASCredentialRequestTypeOneTimeCode ) {
+            self.twoFaOnlyMode = YES;
+
+            id<ASCredentialIdentity> credentialIdentity = credentialRequest.credentialIdentity;
+                        
+            QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
+            slog(@"🐞 Checking wormhole to see if Main App can provide credentials immediately for [%@]...", identifier);
+            
+            if ( identifier ) {
+                MacDatabasePreferences* database = [MacDatabasePreferences fromUuid:identifier.databaseId];
+                
+                if ( database && database.autoFillEnabled && database.autoFillEnabled ) {
+                    [self doWormholePasswordOr2FACodeFill:identifier];
+                    return;
+                }
+            }
+        
+            [self exitWithUserInteractionRequired];
+        }
+        else {
+            [self provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
+        }
+    } else {
         [self provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
     }
 }
@@ -180,7 +204,7 @@
     }
 }
 
-- (void)doWormholePasswordFill:(QuickTypeRecordIdentifier*)identifier {
+- (void)doWormholePasswordOr2FACodeFill:(QuickTypeRecordIdentifier*)identifier {
     [AutoFillWormholeHelper.sharedInstance postWormholeMessage:kAutoFillWormholeQuickTypeRequestId
                                                     responseId:kAutoFillWormholeQuickTypeResponseId
                                                        message:@{ @"id" : [identifier toJson] }
@@ -195,14 +219,21 @@
             
             NSString* username = payload[@"user"];
             NSString* password = payload[@"password"];
-
+            NSString* totp = payload[@"totp"]; 
             
-            if ( username && password ) {
-                [self exitWithCredential:metadata username:username password:password totp:nil];
+            if ( self.twoFaOnlyMode ) {
+                [self exitWithCredential:metadata username:nil password:nil totp:totp];
             }
             else {
-                slog(@"🔴 Successful wormhole quicktype request but nothing in secret store? => UI");
-                [self exitWithUserInteractionRequired];
+                if ( username && password ) {
+                    
+                    
+                    [self exitWithCredential:metadata username:username password:password totp:nil];
+                }
+                else {
+                    slog(@"🔴 Successful wormhole quicktype request but nothing in secret store? => UI");
+                    [self exitWithUserInteractionRequired];
+                }
             }
         }
         else {
@@ -250,6 +281,21 @@
         QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
         [self initializeQuickTypeWithUI:identifier];
     }
+    else if (@available(macOS 15.0, *)) {
+        if ( credentialRequest.type == ASCredentialRequestTypeOneTimeCode ) {
+            slog(@"🟢 prepareInterfaceToProvideCredentialForRequest for 2FA Code called with [%@]", credentialRequest);
+            
+            self.twoFaOnlyMode = YES;
+            
+            id<ASCredentialIdentity> credentialIdentity = credentialRequest.credentialIdentity;
+
+            QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
+            [self initializeQuickTypeWithUI:identifier];
+        }
+        else {
+            [self prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
+        }
+    }
     else {
         [self prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity*)credentialRequest.credentialIdentity];
     }
@@ -275,9 +321,7 @@
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if( safe ) {
-                [self unlockDatabase:safe 
-                 quickTypeIdentifier:identifier
-                  serviceIdentifiers:nil];
+                [self unlockDatabase:safe quickTypeIdentifier:identifier serviceIdentifiers:nil];
             }
             else {
                 [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -314,6 +358,18 @@
     
     self.quickTypeMode = NO;
     
+    self.serviceIdentifiers = serviceIdentifiers;
+}
+
+
+
+- (void)prepareOneTimeCodeCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+    slog(@"🐞 prepareOneTimeCodeCredentialListForServiceIdentifiers: [%@]", serviceIdentifiers);
+    
+    [self commonInit];
+    
+    self.twoFaOnlyMode = YES;
+    self.quickTypeMode = NO;
     self.serviceIdentifiers = serviceIdentifiers;
 }
 
@@ -703,40 +759,14 @@
                 [self createAndSaveNewPasskey:model];
             }
         }
+        else if ( self.twoFaOnlyMode ) {
+            [self presentCredentialSelector:model twoFaOnlyMode:YES];
+        }
         else { 
             [self presentCredentialSelector:model];
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)autoFillWithQuickType:(Model*)model {
     NSUUID* uuid = [[NSUUID alloc] initWithUUIDString:self.quickTypeIdentifier.nodeId];
@@ -789,14 +819,21 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (void)presentCredentialSelector:(Model*)model {
+    [self presentCredentialSelector:model twoFaOnlyMode:NO];
+}
+
+- (void)presentCredentialSelector:(Model*)model twoFaOnlyMode:(BOOL)twoFaOnlyMode {
 
     
     SelectCredential* vc = [[SelectCredential alloc] initWithNibName:@"SelectCredential" bundle:nil];
     vc.model = model;
+    vc.twoFaOnlyMode = twoFaOnlyMode;
     vc.serviceIdentifiers = self.serviceIdentifiers;
+    
     vc.onDone = ^(BOOL userCancelled, BOOL createNew, NSString * _Nullable username, NSString * _Nullable password, NSString * _Nullable totp) {
         if (userCancelled) {
             [self exitWithUserCancelled:self.database];
+            return;
         }
         else if ( createNew ) {
             NSError* error;
@@ -1050,6 +1087,11 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 - (void)copyTotpIfPossible:(MacDatabasePreferences*)unlockedDatabase 
                       totp:(NSString*)totp
                 completion:(void (^) (void))completion {
+    if ( self.twoFaOnlyMode ) {
+        completion(); 
+        return;
+    }
+    
     BOOL pro = Settings.sharedInstance.isPro;
     
     if (!pro) {
@@ -1081,30 +1123,6 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         
         [ClipboardManager.sharedInstance copyConcealedString:totp];
         slog(@"🟢 Copied TOTP to Clipboard...");
-        
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
     
     completion();
@@ -1114,7 +1132,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 
 - (void)exitWithUserCancelled:(MacDatabasePreferences*)unlockedDatabase {
-
+    slog(@"🟢 EXIT: User Cancelled");
     
     if ( unlockedDatabase ) {
         [self markLastUnlockedAtTime:unlockedDatabase];
@@ -1181,12 +1199,31 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     __weak CredentialProviderViewController* weakSelf = self;
     
     [self copyTotpIfPossible:unlockedDatabase totp:totp completion:^{
-        ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
-        
-        slog(@"🟢 EXIT: completeRequestWithSelectedCredential - Success");
-       
-        [self notifyMainAppAutoFillExited];
-        [weakSelf.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+        if ( self.twoFaOnlyMode ) {
+            slog(@"exitWith2FACode: Success [%@]", totp);
+            
+            if (@available(macOS 15.0, *)) {
+                ASOneTimeCodeCredential* code = [ASOneTimeCodeCredential credentialWithCode:totp];
+                
+                [self notifyMainAppAutoFillExited];
+                
+                [weakSelf.extensionContext completeOneTimeCodeRequestWithSelectedCredential:code completionHandler:nil];
+                
+                slog(@"🟢 EXIT: completeOneTimeCodeRequestWithSelectedCredential - Success");
+            } else {
+                slog(@"🔴 EXIT: completeOneTimeCodeRequestWithSelectedCredential - Failed - old OS.");
+                [weakSelf exitWithUserCancelled:unlockedDatabase];
+            }
+        }
+        else {
+            ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
+            
+            slog(@"🟢 EXIT: completeRequestWithSelectedCredential - Success [%@] [%@]", username, password);
+            
+            [self notifyMainAppAutoFillExited];
+            
+            [weakSelf.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+        }
     }];
 }
 

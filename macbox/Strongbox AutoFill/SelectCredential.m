@@ -13,6 +13,7 @@
 #import "NSString+Extensions.h"
 #import "CustomBackgroundTableView.h"
 #import "OTPToken+Generation.h"
+#import "NSArray+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -64,7 +65,7 @@
 
         self.serviceIde.stringValue = self.serviceIdentifiers.firstObject ? self.serviceIdentifiers.firstObject.identifier : NSLocalizedString(@"generic_none_available", @"None Available");
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self smartInitializeSearch];
             
             [self.view.window makeFirstResponder:self.searchField];
@@ -110,7 +111,7 @@
     self.cautionImpreciseWarning.hidden = YES;
     
     if (@available(macOS 13.0, *)) {
-        self.buttonCreateNew.hidden = self.model.isReadOnly;
+        self.buttonCreateNew.hidden = self.model.isReadOnly || self.twoFaOnlyMode;
     }
     else {
         self.buttonCreateNew.hidden = YES;
@@ -186,7 +187,9 @@
 }
 
 - (void)loadItems {
-    self.items = [self.model filterAndSortForBrowse:self.model.allSearchableNoneExpiredEntries.mutableCopy
+    NSArray<Node*>* entries = self.twoFaOnlyMode ? self.model.totpEntries : self.model.allSearchableNoneExpiredEntries;
+    
+    self.items = [self.model filterAndSortForBrowse:entries.mutableCopy
                               includeKeePass1Backup:NO
                                   includeRecycleBin:NO
                                      includeExpired:NO
@@ -309,7 +312,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
-    return [self.model search:searchText
+    NSArray<Node*>* ret = [self.model search:searchText
                         scope:scope
                   dereference:YES
         includeKeePass1Backup:NO
@@ -319,6 +322,15 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
               browseSortField:kBrowseSortFieldTitle
                    descending:NO
             foldersSeparately:YES];
+    
+    if ( self.twoFaOnlyMode ) {
+        return [ret filter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.otpToken != nil;
+        }];
+    }
+    else {
+        return ret;
+    }
 }
 
 
@@ -330,14 +342,20 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         Node* node = [self getDataSource][index];
         
         NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
-        NSString* user = [self.model dereference:node.fields.username node:node];
-        if ( user.length == 0 ) {
-            user = [self.model.database dereference:node.fields.email node:node]; 
-        }
         
-        NSString* password = [self.model dereference:node.fields.password node:node];
-
-        [self dismissAndComplete:NO createNew:NO username:user password:password totp:totp];
+        if ( !self.twoFaOnlyMode ) {
+            NSString* user = [self.model dereference:node.fields.username node:node];
+            if ( user.length == 0 ) {
+                user = [self.model.database dereference:node.fields.email node:node]; 
+            }
+            
+            NSString* password = [self.model dereference:node.fields.password node:node];
+            
+            [self dismissAndComplete:NO createNew:NO username:user password:password totp:totp];
+        }
+        else {
+            [self dismissAndComplete:NO createNew:NO username:nil password:nil totp:totp];
+        }
     }
 }
 
