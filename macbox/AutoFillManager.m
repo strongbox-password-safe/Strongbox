@@ -382,7 +382,7 @@
 }
 
 - (NSUInteger)getDatabasesUsingQuickTypeCount {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSUInteger databasesUsingQuickType = [CommonDatabasePreferences filteredDatabases:^BOOL(DatabasePreferences * _Nonnull obj) {
         return obj.autoFillEnabled && obj.quickTypeEnabled;
     }].count;

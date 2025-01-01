@@ -118,6 +118,7 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property BOOL showQuickViewExpired;
 
 @property (nullable) NSArray<NSString*>* legacyFavouritesStore;
+@property (nullable) NSArray<NSString*>* legacyWatchEntries;
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;
  
@@ -256,9 +257,12 @@ extern const NSInteger kDefaultConvenienceExpiryPeriodHours;
 @property BOOL hardwareKeyCRCaching;
 @property BOOL doNotRefreshChallengeInAF;
 @property BOOL hasOnboardedHardwareKeyCaching;
+
 @property (nullable) NSDate* lastChallengeRefreshAt;
 @property NSInteger challengeRefreshIntervalSecs;
 @property NSInteger cacheChallengeDurationSecs;
+
+@property BOOL appleWatchEnabled;
 
 @end
 

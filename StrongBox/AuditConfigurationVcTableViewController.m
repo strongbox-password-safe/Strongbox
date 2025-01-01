@@ -355,7 +355,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
         NSString* locNo = NSLocalizedString(@"audit_hibp_warning_no", @"No, I don't want to use this feature");
         NSString* locYes = NSLocalizedString(@"audit_hibp_warning_yes", @"Yes, I understand and agree");
         
-        [Alerts twoOptionsWithCancel:self title:loc1 message:loc2 defaultButtonText:locNo secondButtonText:locYes action:^(int response) {
+        [Alerts twoOptionsWithCancel:self title:loc1 message:loc2 defaultButtonText:locNo secondButtonText:locYes completion:^(int response) {
             if (response == 1) { 
                 DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
                 

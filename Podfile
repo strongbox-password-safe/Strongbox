@@ -6,58 +6,24 @@ abstract_target 'common-mac' do
   project 'macbox/MacBox.xcodeproj'
   platform :osx, '12.0'
   
-  pod 'SwiftCBOR'
-  
   target 'Mac-Freemium' do
-    pod 'GoogleAPIClientForREST/Drive'
-    pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
   end
   
   target 'Mac-Pro' do
-    pod 'GoogleAPIClientForREST/Drive'
-    pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
   end
   
   target 'Mac-Unified-Freemium' do
-    pod 'GoogleAPIClientForREST/Drive'
-    pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
   end
   
   target 'Mac-Unified-Pro' do
-    pod 'GoogleAPIClientForREST/Drive'
-    pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
-  end
-  
-  target 'Mac-Graphene' do
-    
   end
   
   target 'Mac-Business' do
-    pod 'GoogleAPIClientForREST/Drive'
-    pod 'GoogleSignIn'
     pod 'ObjectiveDropboxOfficial'
-  end
-  
-  target 'Mac-Freemium-AutoFill' do
-  end
-  
-  target 'Mac-Unified-Freemium-AutoFill' do
-  end
-  
-  target 'Mac-Unified-Pro-AutoFill' do
-  end
-  
-  target 'Mac-Pro-AutoFill' do
-  end
-  
-  target 'Mac-Graphene-AutoFill' do
-  end
-  
-  target 'Mac-Business-AutoFill' do
   end
 end
 
@@ -65,55 +31,16 @@ abstract_target 'common-ios' do
     project 'Strongbox.xcodeproj'
     platform :ios, '15.0'
     
-    pod 'SwiftCBOR'
-    
     target 'Strongbox-iOS' do
-        pod 'ISMessages'
         pod 'ObjectiveDropboxOfficial'
-        pod 'GoogleAPIClientForREST/Drive'
-        pod 'GoogleSignIn'
     end
 
     target 'Strongbox-iOS-Pro' do
-        pod 'ISMessages'
         pod 'ObjectiveDropboxOfficial'
-        pod 'GoogleAPIClientForREST/Drive'
-        pod 'GoogleSignIn'
     end
 
     target 'Strongbox-iOS-Business' do
-      pod 'ISMessages'
       pod 'ObjectiveDropboxOfficial'
-      pod 'GoogleAPIClientForREST/Drive'
-      pod 'GoogleSignIn'
-    end
-
-    target 'Strongbox-iOS-SCOTUS' do
-        pod 'ISMessages'
-    end    
-
-    target 'Strongbox-iOS-Graphene' do
-        pod 'ISMessages'
-    end  
-
-    target 'Strongbox-Auto-Fill' do
-
-    end
-
-    target 'Strongbox-Auto-Fill-Pro' do
-
-    end
-
-    target 'Strongbox-Auto-Fill-Business' do
-      
-    end
-    
-    target 'Strongbox-Auto-Fill-SCOTUS' do 
-
-    end
-
-    target 'Strongbox-Auto-Fill-Graphene' do 
-    
     end
 end
 

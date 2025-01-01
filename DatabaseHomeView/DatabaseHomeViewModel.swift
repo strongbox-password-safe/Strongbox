@@ -22,6 +22,7 @@ enum DatabaseNavigationDestination {
     case tags(tag: String?)
     case entryDetail(uuid: UUID)
     case recycleBin
+    case watchEntries
 }
 
 @objc
@@ -68,11 +69,13 @@ protocol DatabaseActionsInterface {
 
     var tabBarControllerIsHidden: Bool { get }
     var biometricsIsFaceId: Bool { get }
+    var watchIsPairedAndInstalled: Bool { get }
 
     func close()
     func navigateTo(destination: DatabaseNavigationDestination, homeModel: DatabaseHomeViewModel)
 
     func onPulldownToRefresh() async
+    func interactiveSyncAppleWatch(_ withInteractiveGuide: Bool, allowUserToOptOut: Bool)
     func updateAndQueueSync() async -> Bool
 
     func copyPassword(entry: any SwiftEntryModelInterface)
@@ -115,6 +118,10 @@ struct DummyDatabaseActionsInterface: DatabaseActionsInterface {
     var syncStatus: SyncStatus = .init(databaseId: UUID().uuidString)
     var isRunningAsyncUpdate: Bool = false
     var lastAsyncUpdateResult: AsyncJobResult? = nil
+
+    func interactiveSyncAppleWatch(_: Bool, allowUserToOptOut _: Bool) {
+        swlog("DummyDatabaseActionsInterface::interactiveSyncAppleWatch() called")
+    }
 
     func presentHardwareKeySettings() {
         swlog("DummyDatabaseActionsInterface::presentHardwareKeySettings() called")
@@ -171,6 +178,8 @@ struct DummyDatabaseActionsInterface: DatabaseActionsInterface {
     var tabBarControllerIsHidden: Bool = true
 
     var biometricsIsFaceId: Bool = true
+
+    var watchIsPairedAndInstalled: Bool = true
 
     func emptyRecycleBin() async {
         swlog("DummyDatabaseActionsInterface::emptyRecycleBin() called")
@@ -281,6 +290,21 @@ class DatabaseHomeViewModel: ObservableObject {
                 await actions.updateAndQueueSync()
             }
         }
+    }
+
+    func toggleAppleWatch(entry: any SwiftEntryModelInterface) {
+        let needsSave = entry.toggleAppleWatch()
+        if needsSave {
+            Task {
+                await actions.updateAndQueueSync()
+            }
+        }
+
+        actions.interactiveSyncAppleWatch(false, allowUserToOptOut: false)
+    }
+
+    func syncAppleWatchNow() {
+        actions.interactiveSyncAppleWatch(true, allowUserToOptOut: false)
     }
 
     func copyPassword(entry: any SwiftEntryModelInterface) {
@@ -483,6 +507,10 @@ class DatabaseHomeViewModel: ObservableObject {
         database.showIcons
     }
 
+    var twoFactorShowSeparator: Bool {
+        database.twoFactorShowSeparator
+    }
+
     var title: String {
         database.nickName
     }
@@ -517,5 +545,15 @@ class DatabaseHomeViewModel: ObservableObject {
 
     var shouldShowYubiKeySettingsOption: Bool {
         database.format == .keePass4 && database.ckfs.yubiKeyCR != nil
+    }
+
+    
+
+    var appleWatchEnabled: Bool {
+        database.appleWatchEnabled
+    }
+
+    var watchIsPairedAndInstalled: Bool {
+        actions.watchIsPairedAndInstalled
     }
 }

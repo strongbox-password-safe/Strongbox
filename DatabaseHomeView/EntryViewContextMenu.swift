@@ -125,6 +125,7 @@ struct DeleteOrRecycleItemButton: View {
 struct EntryViewContextMenu: View {
     var model: DatabaseHomeViewModel
     var item: any SwiftItemModelInterface
+
     var database: SwiftDatabaseModelInterface { model.database }
 
     var body: some View {
@@ -137,6 +138,10 @@ struct EntryViewContextMenu: View {
 
             if !database.isReadOnly, !item.isGroup, let entry = item as? any SwiftEntryModelInterface {
                 ToggleFavouriteButton(model: model, entry: entry)
+
+                if model.appleWatchEnabled, model.watchIsPairedAndInstalled {
+                    ToggleAppleWatchButton(model: model, entry: entry)
+                }
             }
 
             if !item.isGroup, let entry = item as? any SwiftEntryModelInterface {
@@ -222,21 +227,21 @@ struct EntryViewContextMenu: View {
 
             Divider()
 
-            if !item.isGroup, let entry = item as? any SwiftEntryModelInterface, !self.model.database.isReadOnly {
-                
 
-                
-                
-            } else {
-                
+            
 
-                
+            
+            
 
-                
-                
-                
-                
-            }
+            
+
+            
+
+            
+            
+            
+            
+
 
             
 

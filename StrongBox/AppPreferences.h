@@ -194,8 +194,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL wiFiSyncHasRequestedNetworkPermissions;
 
-@property BOOL zipExports;
-
 @property BOOL runAsWiFiSyncSourceDevice;
 @property (nullable) NSString* wiFiSyncServiceName;
 @property (nullable) NSString* wiFiSyncPasscode;
@@ -214,6 +212,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL disableMakeVisibleInFiles;
 
 @property BOOL associatedWebsites;
+@property BOOL twoFactorEasyReadSeparator;
+
+@property BOOL appleWatchIntegration;
+@property NSInteger lastDisplayedWhatsNewMessage;
+
+@property BOOL showInteractiveAppleWatchSyncGuide;
+
+@property NSInteger zipExportBehaviour; 
 
 @end
 

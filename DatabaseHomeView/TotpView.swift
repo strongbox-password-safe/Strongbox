@@ -11,9 +11,10 @@ import SwiftUI
 
 struct TotpView: View {
     var totp: OTPToken
+    var easyReadSeparator: Bool
 
     @State private var totpString: String? = nil
-    @State private var totpColor: Color = .blue
+    @State private var totpColor: Color = .primary
     @State private var animationOpacity = 1.0
 
     #if DEBUG
@@ -21,20 +22,32 @@ struct TotpView: View {
     #endif
 
     var body: some View {
-        Text(totpString ?? "")
-            .foregroundStyle(totpColor)
-            .opacity(animationOpacity)
-            .onAppear(perform: {
-                updateTotp()
-            })
-            .onReceive(NotificationCenter.default.publisher(for: .centralUpdateOtpUi, object: nil)) { _ in
-                updateTotp()
+        if #available(iOS 16.0, *) {
+            HStack {
+                TwoFactorCodeView(totp: totp,
+                                  updateMode: .automatic,
+                                  easyReadSeparator: easyReadSeparator,
+                                  isPro: true,
+                                  limitNonPro: false,
+                                  font: Font(FontManager.sharedInstance().easyReadBoldFont),
+                                  separatorSize: 4, colorize: true)
             }
-        #if DEBUG
-            .onReceive(previewDummyTestTimer) { _ in
-                updateTotp()
-            }
-        #endif
+        } else {
+            Text(totpString ?? "")
+                .foregroundStyle(totpColor)
+                .opacity(animationOpacity)
+                .onAppear(perform: {
+                    updateTotp()
+                })
+                .onReceive(NotificationCenter.default.publisher(for: .centralUpdateOtpUi, object: nil)) { _ in
+                    updateTotp()
+                }
+            #if DEBUG
+                .onReceive(previewDummyTestTimer) { _ in
+                    updateTotp()
+                }
+            #endif
+        }
     }
 
     func updateTotp() {
@@ -64,7 +77,7 @@ struct TotpView: View {
 
 #if DEBUG
     #Preview {
-        var timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common)
+        let timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common)
             .autoconnect()
             .eraseToAnyPublisher()
 

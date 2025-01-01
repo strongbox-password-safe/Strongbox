@@ -12,7 +12,7 @@
 #import <MessageUI/MessageUI.h>
 #import "CHCSVParser.h"
 #import "Csv.h"
-#import "ISMessages.h"
+
 #import "ClipboardManager.h"
 #import "Utils.h"
 #import "NSDate+Extensions.h"
@@ -20,6 +20,12 @@
 #import "WorkingCopyManager.h"
 #import "AppPreferences.h"
 #import "ExportHelper.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @interface Delegate : NSObject <CHCSVParserDelegate, UIActivityItemSource>
 
@@ -108,13 +114,21 @@
 
 - (void)onShare {
     DatabasePreferences* database = self.viewModel.metadata;
-    NSError* error;
-    NSURL* url = [ExportHelper getExportFile:database error:&error];
-    if ( !url || error ) {
-        [Alerts error:self error:error];
-        return;
-    }
+    [ExportHelper getExportFile:self database:database completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        if ( url == nil && error == nil ) {
+            return; 
+        }
 
+        if ( !url || error ) {
+            [Alerts error:self error:error];
+        }
+        else {
+            [self onGotExportFile:url];
+        }
+    }];
+}
+
+- (void)onGotExportFile:(NSURL*)url {
     NSArray *activityItems = @[url]; 
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
@@ -150,26 +164,10 @@
 
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:newStr];
     
-    [ISMessages showCardAlertWithTitle:NSLocalizedString(@"export_vc_message_csv_copied", @"Database CSV Copied to Clipboard")
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [StrongboxToastMessages showSlimWithTitle:NSLocalizedString(@"export_vc_message_csv_copied", @"Database CSV Copied to Clipboard")];
 
     [self informSuccessAndDismiss];
 }
-
-
-
-
-
-
-
-
-
 
 
 

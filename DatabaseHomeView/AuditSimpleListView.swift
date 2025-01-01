@@ -21,10 +21,10 @@ struct AuditSimpleListView: View {
                     model.navigateTo(destination: .entryDetail(uuid: entry.uuid))
                 } label: {
                     NavigationLink(destination: EmptyView()) {
-                        SwiftUIEntryView(entry: entry, showIcon: model.showIcons)
+                        SwiftUIEntryView(entry: entry, showIcon: model.showIcons, easyReadSeparator: model.twoFactorShowSeparator)
                             .contextMenu {
                                 EntryViewContextMenu(model: model, item: entry)
-                            }
+                            }.id(UUID()) 
                     }
                     .foregroundColor(Color(uiColor: .label))
                 }

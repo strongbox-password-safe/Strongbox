@@ -39,6 +39,13 @@ class SwiftDummyEntryModel: SwiftEntryModelInterface {
         return false
     }
 
+    var appleWatch = false
+    func toggleAppleWatch() -> Bool {
+        appleWatch.toggle()
+        return false
+    }
+
+    var isWatchEntry: Bool { appleWatch }
     var isFavourite: Bool { favourite }
 
     var isGroup: Bool { false }

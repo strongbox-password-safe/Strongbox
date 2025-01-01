@@ -40,6 +40,7 @@ protocol SwiftDatabaseModelInterface {
     var passkeyEntryCount: Int { get }
     var sshKeyEntryCount: Int { get }
     var attachmentsEntryCount: Int { get }
+    var watchEntryCount: Int { get }
     var expiredEntryCount: Int { get }
     var expiringEntryCount: Int { get }
 
@@ -64,6 +65,8 @@ protocol SwiftDatabaseModelInterface {
     var disableExport: Bool { get }
     var disablePrinting: Bool { get }
     var showIcons: Bool { get }
+    var twoFactorShowSeparator: Bool { get }
+    var appleWatchEnabled: Bool { get }
 
     #if os(iOS)
         func isHomeViewSectionVisible(section: HomeViewSection) -> Bool

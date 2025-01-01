@@ -307,7 +307,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
                              message:NSLocalizedString(@"favicon_retry_all_or_failed_message", @"Would you like to retry all items, or just the failed ones?")
                    defaultButtonText:NSLocalizedString(@"favicon_retry_all_action", @"Retry All")
                     secondButtonText:NSLocalizedString(@"favicon_retry_failed_action", @"Retry Failed")
-                              action:^(int response) {
+                          completion:^(int response) {
             if(response == 0) {
                 [self retryAll];
             }

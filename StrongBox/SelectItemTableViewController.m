@@ -10,7 +10,9 @@
 #import "NSArray+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
-#import <ISMessages/ISMessages.h>
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
 @interface SelectItemTableViewController ()
@@ -84,14 +86,8 @@
                 [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
                 
 #ifndef IS_APP_EXTENSION
-                [ISMessages showCardAlertWithTitle:NSLocalizedString(@"select_item_vc_title_select_one", @"Select One")
-                                           message:NSLocalizedString(@"select_item_vc_message_select_one", @"You must select at least one item")
-                                          duration:0.5f
-                                       hideOnSwipe:YES
-                                         hideOnTap:YES
-                                         alertType:ISAlertTypeWarning
-                                     alertPosition:ISAlertPositionTop
-                                           didHide:nil];
+                [StrongboxToastMessages showWarningWithTitle:NSLocalizedString(@"select_item_vc_title_select_one", @"Select One")
+                                                        body:NSLocalizedString(@"select_item_vc_message_select_one", @"You must select at least one item")];
 #endif
                 return;
             }

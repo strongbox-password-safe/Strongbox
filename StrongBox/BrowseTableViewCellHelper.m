@@ -14,6 +14,12 @@
 #import "Utils.h"
 #import "Constants.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
@@ -36,7 +42,12 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
         [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
         [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemTotpCell bundle:nil] forCellReuseIdentifier:kBrowseItemTotpCell];
         [self.tableView registerNib:[UINib nibWithNibName:kBrowseQuickViewItemCell bundle:nil] forCellReuseIdentifier:kBrowseQuickViewItemCell];
+        
+        if (@available(iOS 16.0, *)) {
+            [self.tableView registerClass:TwoFactorCodeTableViewCell.class forCellReuseIdentifier:TwoFactorCodeTableViewCell.CellIdentifier];
+        }
     }
+    
     return self;
 }
 
@@ -118,12 +129,31 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
 
 
     if(showLargeTotpCell) {
-        BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
         NSString* subtitle = [self getBrowseItemSubtitle:node subtitleOverride:subtitleOverride];
 
-        [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken hideIcon:self.viewModel.metadata.hideIconInBrowse];
-        
-        return cell;
+        if (@available(iOS 16.0, *)) {
+            TwoFactorCodeTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:TwoFactorCodeTableViewCell.CellIdentifier forIndexPath:indexPath];
+            
+            [cell setContentWithTotp:node.fields.otpToken
+                   easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
+                          updateMode:TwoFactorUpdateModeAutomatic
+                               title:title
+                            subtitle:subtitle
+                                icon:self.viewModel.metadata.hideIconInBrowse ? nil : icon
+                            onQrCode:nil];
+            
+            cell.contentView.alpha = node.expired ? 0.35 : 1.0f;
+            cell.accessoryType = UITableViewCellAccessoryNone;
+            
+            return cell;
+        }
+        else {
+            BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
+            
+            [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken hideIcon:self.viewModel.metadata.hideIconInBrowse];
+            
+            return cell;
+        }
     }
     else {
         BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];

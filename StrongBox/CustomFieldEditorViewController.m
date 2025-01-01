@@ -213,7 +213,7 @@ const static NSSet<NSString*> *keePassReservedNames;
                              message:NSLocalizedString(@"field_tidy_message_tidy_up_field", @"There are some blank characters (e.g. spaces, tabs) at the start or end of this field.\n\nShould Strongbox tidy up these extraneous characters?")
                    defaultButtonText:NSLocalizedString(@"field_tidy_choice_tidy_up_field", @"Tidy Up")
                     secondButtonText:NSLocalizedString(@"field_tidy_choice_dont_tidy", @"Don't Tidy")
-                              action:^(int response) {
+                          completion:^(int response) {
             if ( response == 0 ) {
                 [weakSelf postValidationSetAndDismiss:trim(value)];
             }

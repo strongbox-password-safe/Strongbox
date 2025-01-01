@@ -27,6 +27,7 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
         .attachments,
         .expiredAndExpiring,
         .auditIssues,
+        .watchEntries,
     ]
 
     var visibleTabs: [BrowseViewType] = []
@@ -254,6 +255,8 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
             return NSLocalizedString("quick_view_title_expired_and_expiring", comment: "Expired & Expiring")
         case .auditIssues:
             return NSLocalizedString("browse_vc_action_audit", comment: "Audit")
+        case .watchEntries:
+            return NSLocalizedString("sidebar_watch_entries", comment: "Watch Entries")
         @unknown default:
             return "🔴 UNKNOWN"
         }
@@ -283,6 +286,8 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
             return UIColor.systemCyan
         case .auditIssues:
             return UIColor.systemOrange
+        case .watchEntries:
+            return UIColor.systemBlue
         @unknown default:
             return nil
         }
@@ -318,6 +323,8 @@ class ConfigureTabsViewController: UITableViewController, UIAdaptivePresentation
             imageName = "calendar"
         case .auditIssues:
             imageName = "checkmark.shield.fill"
+        case .watchEntries:
+            imageName = "applewatch"
         @unknown default:
             imageName = "questionmark.circle.fill"
         }

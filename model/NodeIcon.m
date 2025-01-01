@@ -24,7 +24,7 @@
 }
 
 + (instancetype)withCustomImage:(IMAGE_TYPE_PTR)image {
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IOS && !TARGET_OS_WATCH
     CGImageRef cgRef = [image CGImageForProposedRect:NULL context:nil hints:nil];
 
     if (cgRef) { 
@@ -166,7 +166,7 @@
         
         
         
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
         IMAGE_TYPE_PTR img = [UIImage imageWithData:self.custom];
 #else
         IMAGE_TYPE_PTR img = [[NSImage alloc] initWithData:self.custom];

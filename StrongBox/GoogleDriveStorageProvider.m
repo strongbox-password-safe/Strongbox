@@ -10,7 +10,7 @@
 #import "Constants.h"
 #import "Utils.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "SVProgressHUD.h"
 
@@ -58,7 +58,7 @@
 
 - (void)dismissProgressSpinner {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD dismiss];
 #else
         [macOSSpinnerUI.sharedInstance dismiss];
@@ -68,7 +68,7 @@
 
 - (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD showWithStatus:message];
 #else
         [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
@@ -109,7 +109,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 
 
 - (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString* fileIdentifier = safeMetaData.fileIdentifier;
     NSString* fileName = safeMetaData.fileName;
 #else
@@ -121,7 +121,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 }
 
 - (void)pullDatabase:(METADATA_PTR)safeMetaData interactiveVC:(VIEW_CONTROLLER_PTR)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString* fileIdentifier = safeMetaData.fileIdentifier;
     NSString* fileName = safeMetaData.fileName;
 #else
@@ -149,7 +149,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         [self showProgressSpinner:@"" viewController:viewController];
     }
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString* fileIdentifier = safeMetaData.fileIdentifier;
     NSString* fileName = safeMetaData.fileName;
 #else
@@ -285,7 +285,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                                               withUrl:file.iconLink
                                            completion:^(NSData *data, NSError *error) {
            if (error == nil && data) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
                IMAGE_TYPE_PTR image = [UIImage imageWithData:data];
 #else
                IMAGE_TYPE_PTR image = [[NSImage alloc] initWithData:data];
@@ -340,7 +340,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 
     NSString* json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     return [DatabasePreferences templateDummyWithNickName:nickName
                                   storageProvider:self.storageId
                                          fileName:file.name

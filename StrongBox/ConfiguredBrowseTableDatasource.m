@@ -312,6 +312,9 @@ const NSUInteger kSectionIdxLast = 3;
             case kBrowseViewTypeExpiredAndExpiring:
                 ret = [self loadExpirySetItems];
                 break;
+            case kBrowseViewTypeWatchEntries:
+                ret = self.viewModel.appleWatchEntries;
+                break;
             default:
                 break;
         }

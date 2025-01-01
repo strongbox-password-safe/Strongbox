@@ -47,3 +47,4 @@
 #import "AdvancedDatabaseSettings.h"
 #import "EncryptionPreferencesViewController.h"
 #import "CASGTableViewController.h"
+#import "ColoredStringHelper.h"

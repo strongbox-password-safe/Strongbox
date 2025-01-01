@@ -14,11 +14,13 @@ struct AddOrCreateWizard: View {
     var entries: [Node]
     var selectedGroupIdx: Int
     var model: Model
+    var easyReadSeparator: Bool
+
     var completion: ((_ cancel: Bool, _ createNew: Bool, _ title: String?, _ selectedGroupIdx: Int?, _ selectedEntry: UUID?) -> Void)?
 
     var body: some View {
         NavigationView {
-            WizardChooseCreateOrAddView(mode: mode, title: title, groups: groups, entries: entries, model: model, completion: completion)
+            WizardChooseCreateOrAddView(mode: mode, title: title, groups: groups, entries: entries, model: model, easyReadSeparator: easyReadSeparator, completion: completion)
                 .navigationBarTitleDisplayMode(.inline)
         }
         .navigationViewStyle(StackNavigationViewStyle())
@@ -33,5 +35,5 @@ struct AddOrCreateWizard: View {
 
     let node1 = Node(parent: nil, title: "Foo Entry", isGroup: false, uuid: nil, fields: nil, childRecordsAllowed: false)
 
-    return AddOrCreateWizard(mode: .totp, title: "", groups: ["Foo", "Bar"], entries: [node1], selectedGroupIdx: 0, model: model, completion: nil)
+    return AddOrCreateWizard(mode: .totp, title: "", groups: ["Foo", "Bar"], entries: [node1], selectedGroupIdx: 0, model: model, easyReadSeparator: true, completion: nil)
 }

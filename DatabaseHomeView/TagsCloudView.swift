@@ -22,7 +22,7 @@ struct TagsCloudView: View {
             Button(action: {
                 model.navigateTo(destination: .tags(tag: tag.name))
             }, label: {
-                TagView(title: tag.name)
+                TagView(title: tag.name, font: .body)
             })
             .buttonStyle(PlainButtonStyle())
         }

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
 
 #import <UIKit/UIKit.h>
 
@@ -19,6 +19,8 @@
 #endif
 
 NS_ASSUME_NONNULL_BEGIN
+
+extern NSString* const kCentralUpdateOtpUiNotification;
 
 extern NSString* const kDatabasesCollectionLockStateChangedNotification;
 
@@ -76,6 +78,7 @@ extern const size_t kMaxAttachmentTableviewIconImageSize;
 
 extern NSString* const kCanonicalEmailFieldName;
 extern NSString* const kCanonicalFavouriteTag;
+extern NSString* const kCanonicalAppleWatchTag;
 
 extern NSString* const kStrongboxPasteboardName;
 extern NSString* const kDragAndDropInternalUti;
@@ -86,7 +89,7 @@ extern NSString* const kKeeAgentSettingsAttachmentName;
 
 extern NSString* const kIsExcludedFromAutoFillCustomDataKey;
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
 
 @property (class, readonly) UIColor* recycleBinTintColor;
 

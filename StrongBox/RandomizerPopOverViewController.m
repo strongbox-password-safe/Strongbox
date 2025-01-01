@@ -118,7 +118,11 @@
     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
     [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
 
-    [StrongboxToastMessages showToastWithTitle:NSLocalizedString(@"generic_copied", @"Copied") body:@"" category:ToastMessageCategoryInfo icon:ToastIconInfo];
+    [StrongboxToastMessages showToastWithTitle:NSLocalizedString(@"generic_copied", @"Copied")
+                                          body:@""
+                                      duration:1.5
+                                      category:ToastMessageCategoryInfo
+                                          icon:ToastIconInfo];
 }
 
 

@@ -485,6 +485,14 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     }];
 }
 
+- (NSArray<CustomFieldViewModel *> *)customFieldsFilteredAndExcludeAlternativeUrls {
+    return [self.customFieldsUnfiltered filter:^BOOL(CustomFieldViewModel * _Nonnull obj) {
+        return ![NodeFields isAlternativeURLCustomFieldKey:obj.key] &&
+               ![NodeFields isTotpCustomFieldKey:obj.key] &&
+               ![NodeFields isPasskeyCustomFieldKey:obj.key]; 
+    }];
+}
+
 - (NSUInteger)translateFilteredIndex:(NSUInteger)atIndex {
     NSUInteger fallbackIdx = self.mutableCustomFields.count;
     NSArray* filtered = self.customFieldsFiltered;

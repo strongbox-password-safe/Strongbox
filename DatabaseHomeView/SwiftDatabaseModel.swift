@@ -17,6 +17,18 @@ struct SwiftDatabaseModel: SwiftDatabaseModelInterface {
         #endif
     }
 
+    var twoFactorShowSeparator: Bool {
+        appPreferences.twoFactorEasyReadSeparator
+    }
+
+    var appleWatchEnabled: Bool {
+        #if os(iOS)
+            AppPreferences.sharedInstance().appleWatchIntegration && model.metadata.appleWatchEnabled
+        #else
+            false
+        #endif
+    }
+
     var format: DatabaseFormat {
         model.originalFormat
     }
@@ -238,6 +250,10 @@ struct SwiftDatabaseModel: SwiftDatabaseModelInterface {
 
     var attachmentsEntryCount: Int {
         model.database.attachmentEntries.count
+    }
+
+    var watchEntryCount: Int {
+        model.appleWatchEntries.count
     }
 
     var expiredEntryCount: Int {

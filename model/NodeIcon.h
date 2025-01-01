@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Utils.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
     #import <UIKit/UIKit.h>
     typedef UIImage* IMAGE_TYPE_PTR;
-#else
+#elif TARGET_OS_OSX
     #import <Cocoa/Cocoa.h>
     typedef NSImage* IMAGE_TYPE_PTR;
 #endif

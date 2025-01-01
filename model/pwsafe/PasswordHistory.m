@@ -32,7 +32,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _enabled = NO;
+        _enabled = YES; 
         _maximumSize = 3;
         _entries = [[NSMutableArray alloc] init];
 

@@ -101,9 +101,13 @@ struct TagsView: View {
     var viewModel: TagsViewModel
     var useEasyReadFont: Bool
 
+    var font: Font {
+        useEasyReadFont ? Font(FontManager.sharedInstance().easyReadFont) : .body
+    }
+
     var body: some View {
         FlowLayout(viewModel.tags) { tag in
-            TagView(title: tag.name, useEasyReadFont: useEasyReadFont)
+            TagView(title: tag.name, font: font)
         }
         .clipped()
     }

@@ -6,7 +6,10 @@
 //
 
 import Foundation
-import libcmark_gfm
+
+// import libcmark_gfm
+import cmark_gfm
+import cmark_gfm_extensions
 
 enum CmarkGFMError: Error {
     case generic(description: String)

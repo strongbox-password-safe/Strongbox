@@ -220,6 +220,10 @@
                completion:^(BOOL success, NSInteger selectedIdx) {
         if (success) {
            self.databaseMetaData.keePassIconSet = (KeePassIconSet)options[selectedIdx].integerValue;
+            
+            if ( self.databaseMetaData.appleWatchEnabled ) {
+                [WatchAppManager.shared expressUpdateEntriesWithModel:self.model];
+            }
         }
 
         [self bindPreferences];

@@ -30,6 +30,9 @@ class SwiftTOTPGenerator: NSObject {
         case .steam:
             swlog("🔴 WARNWARN - Using Swift Generator with Steam algo!")
             hmac = Data(HMAC<Insecure.SHA1>.authenticationCode(for: counterMessage, using: SymmetricKey(data: secret)))
+        case .yandex:
+            swlog("🔴 WARNWARN - Using Swift Generator with Yandex algo!")
+            hmac = Data(HMAC<Insecure.SHA1>.authenticationCode(for: counterMessage, using: SymmetricKey(data: secret)))
         @unknown default:
             swlog("🔴 WARNWARN - Using Swift Generator with unknown algo")
             hmac = Data(HMAC<Insecure.SHA1>.authenticationCode(for: counterMessage, using: SymmetricKey(data: secret)))

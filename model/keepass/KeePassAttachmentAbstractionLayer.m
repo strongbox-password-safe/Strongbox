@@ -11,7 +11,7 @@
 #import "NSString+Extensions.h"
 #import <CommonCrypto/CommonCrypto.h>
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import "StrongboxiOSFilesManager.h"
 #else
 #import "StrongboxMacFilesManager.h"
@@ -29,7 +29,7 @@ static NSString* kEmptyDataDigest;
 
 static const BOOL kEncrypt = YES; 
 
-#if defined(TARGET_OS_IPHONE) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
+#if defined(TARGET_OS_IOS) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
 static const BOOL kMemoryPerfMeasuresEnabled = YES;
 #else
 static const BOOL kMemoryPerfMeasuresEnabled = NO;
@@ -126,7 +126,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
         self.encryptionKey = getRandomData(kCCKeySizeAES256);
         self.encryptionIV = getRandomData(kCCBlockSizeAES128);
         
-#if defined(TARGET_OS_IPHONE) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
+#if defined(TARGET_OS_IOS) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
         if ( kMemoryPerfMeasuresEnabled ) {
             self.encryptedSessionFilePath = [self getUniqueFileName];
         }
@@ -273,7 +273,7 @@ static const BOOL kMemoryPerfMeasuresEnabled = NO;
     return [NSData dataWithContentsOfStream:[self getPlainTextInputStream]];
 }
 
-#if defined(TARGET_OS_IPHONE) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
+#if defined(TARGET_OS_IOS) && defined(IS_APP_EXTENSION) && defined(MEMORY_PERF_MEASURES)
 - (NSString*)getUniqueFileName {
     NSString* ret;
     

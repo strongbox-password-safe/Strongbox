@@ -12,7 +12,7 @@
 #import "NSDate+Extensions.h"
 #import <GoogleSignIn/GoogleSignIn.h>
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "SVProgressHUD.h"
 #import "AppPreferences.h"
@@ -70,7 +70,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
 - (void)dismissProgressSpinner {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD dismiss];
 #else
         [macOSSpinnerUI.sharedInstance dismiss];
@@ -80,7 +80,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
 - (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD showWithStatus:message];
 #else
         [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
@@ -132,13 +132,13 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
             }];
         }
         else {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
             AppPreferences.sharedInstance.suppressAppBackgroundTriggers = YES;
 #endif
             
                 
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
                 [GIDSignIn.sharedInstance signInWithPresentingViewController:viewController
 #else
                 [GIDSignIn.sharedInstance signInWithPresentingWindow:viewController.view.window
@@ -168,7 +168,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         self.driveService.authorizer = user.fetcherAuthorizer;
     }
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO;
 #endif
     

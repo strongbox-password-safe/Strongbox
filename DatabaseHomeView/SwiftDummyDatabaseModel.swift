@@ -10,6 +10,8 @@ import Foundation
 
 class SwiftDummyDatabaseModel: SwiftDatabaseModelInterface {
     var showIcons = true
+    var twoFactorShowSeparator = true
+    var appleWatchEnabled: Bool = true
 
     var format: DatabaseFormat = .keePass4
     var ckfs: CompositeKeyFactors = .init(password: "a")
@@ -49,6 +51,7 @@ class SwiftDummyDatabaseModel: SwiftDatabaseModelInterface {
     var passkeyEntryCount: Int = 2
     var sshKeyEntryCount: Int = 3
     var attachmentsEntryCount = 34
+    var watchEntryCount: Int = 4
     var expiredEntryCount = 2
     var expiringEntryCount = 3
     var entryCount: Int { entries.count }

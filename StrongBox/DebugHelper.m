@@ -16,7 +16,7 @@
 #import "ProUpgradeIAPManager.h"
 #import "Strongbox-Swift.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "DatabasePreferences.h"
 #import "AppPreferences.h"
@@ -55,7 +55,7 @@
     }];
 }
 
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IOS
 
 static NSString *ModelIdentifier(void)
 {
@@ -107,7 +107,7 @@ int OPParentIDForProcessID(int pid)
     BOOL isAProBundle;
     BOOL isPro;
     
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IOS
     isAProBundle =  MacCustomizationManager.isAProBundle;
     isPro =Settings.sharedInstance.isPro;
 #else
@@ -145,7 +145,7 @@ int OPParentIDForProcessID(int pid)
 + (void)getDebugLines:(void (^)(NSArray<NSString*>* lines))completion {
     NSMutableArray<NSString*>* debugLines = [NSMutableArray array];
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
@@ -184,7 +184,7 @@ int OPParentIDForProcessID(int pid)
     
     NSString* proStatus = [DebugHelper getProStatusDisplayString];
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
     [debugLines addObject:@"-------------------- App Summary -----------------------"];
     
@@ -266,6 +266,35 @@ int OPParentIDForProcessID(int pid)
     [debugLines addObject:[NSString stringWithFormat:@"LEC: %@", Settings.sharedInstance.lastEntitlementCheckAttempt.friendlyDateTimeStringBothPrecise]];
 #endif
     
+    [debugLines addObject:[NSString stringWithFormat:@"LLIAPP: %hhd", ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro]];
+    [debugLines addObject:[NSString stringWithFormat:@"AMS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription]];
+    [debugLines addObject:[NSString stringWithFormat:@"AYS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription]];
+    [debugLines addObject:[NSString stringWithFormat:@"FTA: %hhd", ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable]];
+    [debugLines addObject:[NSString stringWithFormat:@"EMP: %hhd", [DebugHelper hasEmbeddedMobileProvision]]];
+    [debugLines addObject:[NSString stringWithFormat:@"HMC: %hhd", [DebugHelper hasManagedConfig]]];
+    
+    
+    
+    
+    
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Device"];
+    [debugLines addObject:@"--------------------"];
+    
+    const NXArchInfo *info = NXGetLocalArchInfo();
+    NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
+    
+#if TARGET_OS_IOS
+    NSString* model = UIDevice.modelName;
+#else
+    NSString* model = ModelIdentifier();
+#endif
+    
+    [debugLines addObject:[NSString stringWithFormat:@"Model: %@", model]];
+    [debugLines addObject:[NSString stringWithFormat:@"CPU: %@", typeOfCpu]];
+    [debugLines addObject:[NSString stringWithFormat:@"System Name: %@", systemName]];
+    [debugLines addObject:[NSString stringWithFormat:@"System Version: %@", systemVersion]];
+
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getInstrumentsWithCompletionHandler:^(Instrumentation * _Nonnull instrumentation) {
         [debugLines addObject:@"--------------------"];
@@ -307,38 +336,7 @@ int OPParentIDForProcessID(int pid)
 }
 
 + (void)continueAddingDebugInfo:(NSMutableArray<NSString*>*)debugLines completion:(void (^)(NSArray<NSString*>* lines))completion {
-    [debugLines addObject:[NSString stringWithFormat:@"LLIAPP: %hhd", ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro]];
-    [debugLines addObject:[NSString stringWithFormat:@"AMS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveMonthlySubscription]];
-    [debugLines addObject:[NSString stringWithFormat:@"AYS: %hhd", ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription]];
-    [debugLines addObject:[NSString stringWithFormat:@"FTA: %hhd", ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable]];
-    [debugLines addObject:[NSString stringWithFormat:@"EMP: %hhd", [DebugHelper hasEmbeddedMobileProvision]]];
-    [debugLines addObject:[NSString stringWithFormat:@"HMC: %hhd", [DebugHelper hasManagedConfig]]];
-        
-    
-
-    [debugLines addObject:@"--------------------"];
-    [debugLines addObject:@"Device"];
-    [debugLines addObject:@"--------------------"];
-
-    const NXArchInfo *info = NXGetLocalArchInfo();
-    NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
-
-#if TARGET_OS_IPHONE
-    NSString* model = UIDevice.modelName;
-    NSString* systemName = [[UIDevice currentDevice] systemName];
-    NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
-#else
-    NSString* model = ModelIdentifier();
-    NSString* systemName = @"MacOS";
-    NSString* systemVersion = [DebugHelper systemVersion];
-#endif
-
-    [debugLines addObject:[NSString stringWithFormat:@"Model: %@", model]];
-    [debugLines addObject:[NSString stringWithFormat:@"CPU: %@", typeOfCpu]];
-    [debugLines addObject:[NSString stringWithFormat:@"System Name: %@", systemName]];
-    [debugLines addObject:[NSString stringWithFormat:@"System Version: %@", systemVersion]];
-
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     
@@ -354,6 +352,19 @@ int OPParentIDForProcessID(int pid)
     }
 #endif
     
+    WatchStatus* status = WatchAppManager.shared.status;
+
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Apple Watch Status"];
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:[NSString stringWithFormat:@"isSupportedOnThisDevice: %hhd", status.isSupportedOnThisDevice]];
+    [debugLines addObject:[NSString stringWithFormat:@"isPaired: %hhd", status.isPaired]];
+    [debugLines addObject:[NSString stringWithFormat:@"isInstalled: %hhd", status.isInstalled]];
+    [debugLines addObject:[NSString stringWithFormat:@"isReachable: %hhd", status.isReachable]];
+    [debugLines addObject:[NSString stringWithFormat:@"activationState: %ld", (long)status.activationState]];
+    [debugLines addObject:[NSString stringWithFormat:@"lastError: %@", status.lastError]];
+    [debugLines addObject:[NSString stringWithFormat:@"lastSuccessfulComms: %@", status.lastSuccessfulComms.friendlyDateTimeStringBothPrecise]];
+    [debugLines addObject:@"--------------------"];
 #endif
     
     
@@ -361,7 +372,7 @@ int OPParentIDForProcessID(int pid)
     [debugLines addObject:@"--------------------"];
     [debugLines addObject:@"Settings"];
     [debugLines addObject:@"--------------------"];
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSUserDefaults *defs = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     NSDictionary* prefs = [defs persistentDomainForName:AppPreferences.sharedInstance.appGroupName];
 #else
@@ -382,7 +393,7 @@ int OPParentIDForProcessID(int pid)
         }
     }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
     long epoch = (long)AppPreferences.sharedInstance.installDate.timeIntervalSince1970;
     [debugLines addObject:[NSString stringWithFormat:@"Ep: %ld", epoch]];
@@ -406,7 +417,7 @@ int OPParentIDForProcessID(int pid)
     [debugLines addObject:@"Sync"];
     [debugLines addObject:@"--------------------"];
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
         SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
 #else
@@ -465,7 +476,7 @@ int OPParentIDForProcessID(int pid)
         
         
         
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.appSupportDirectory]];
         [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.documentsDirectory]];
         
@@ -479,7 +490,7 @@ int OPParentIDForProcessID(int pid)
         [debugLines addObject:@"--------------------"];
         
         
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         for(DatabasePreferences *safe in DatabasePreferences.allDatabases) {
             NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
             [debugLines addObject:@"================================================================="];

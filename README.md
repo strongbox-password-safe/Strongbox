@@ -19,7 +19,7 @@ Big thank you to all the localization contributors
 - Dutch - Wishes to remain anonymous
 - French - Charles-Ivan Chesneau
 - German - @Slummi
-- Greek - John Spiropoulos
+- Greek - John Spiropoulos 
 - Italian - Marco Ermini
 - Japanese - Anonymous
 - Norwegian - Ole Aldric
@@ -110,7 +110,6 @@ We use many different libraries in the app here are just a few, many thanks to a
 - Google-API-Client
 - SVProgressHUD
 - Reachability
-- ISMessages
 - libsodium
 - DAVKit
 - NMSSH
@@ -132,3 +131,4 @@ We use many different libraries in the app here are just a few, many thanks to a
 - libcmark_gfm - https://github.com/KristopherGBaker/libcmark_gfm
 - highlight.js - https://github.com/highlightjs/highlight.js 
 - github-markdown-css - https://github.com/sindresorhus/github-markdown-css
+- swift-markdown-ui - https://github.com/gonzalezreal/swift-markdown-ui

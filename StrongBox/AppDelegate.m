@@ -111,7 +111,15 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         self.window.overrideUserInterfaceStyle = appearance == kAppAppearanceLight ? UIUserInterfaceStyleLight : UIUserInterfaceStyleDark;
     }
     
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self doDeferredAppLaunchTasks]; 
+    });
+
     return YES;
+}
+
+- (void)doDeferredAppLaunchTasks {
+
 }
 
 - (void)application:(UIApplication *)application userDidAcceptCloudKitShareWithMetadata:(CKShareMetadata *)cloudKitShareMetadata {
@@ -717,6 +725,8 @@ void uncaughtExceptionHandler(NSException *exception) {
     }
 #endif
     
+    [self initializeWatchAppSync];
+    
     self.appLockEnteredBackgroundAtTime = nil;
 }
 
@@ -741,6 +751,25 @@ void uncaughtExceptionHandler(NSException *exception) {
 #ifndef NO_NETWORKING
     [self stopWiFiSyncServer];
 #endif
+}
+
+- (void)initializeWatchAppSync {
+    slog(@"🐞 initializeWatchAppSync");
+    
+    if ( AppPreferences.sharedInstance.appleWatchIntegration ) {
+        [WatchAppManager.shared activateWithCompletionHandler:^(BOOL success, NSError * _Nullable error ) {
+            if ( success ) {
+                slog(@"syncDatabasesAndSettings...");
+                
+                [WatchAppManager.shared syncDatabasesAndSettingsWithCompletionHandler:^(BOOL success, NSError * _Nullable error) {
+                    slog(@"syncDatabasesAndSettings Done.");
+                }];
+            }
+            else if ( error ) {
+                slog(@"🔴 Error activating Watch Session: [%@]", error);
+            }
+        }];
+    }
 }
 
 @end

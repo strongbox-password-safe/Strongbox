@@ -16,7 +16,7 @@
 #import "Constants.h"
 #import "Node+Passkey.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import "KissXML.h" 
 #endif
 

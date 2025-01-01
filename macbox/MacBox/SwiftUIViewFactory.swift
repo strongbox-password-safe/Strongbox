@@ -162,7 +162,9 @@ class SwiftUIViewFactory: NSObject {
             let entries = NSMutableArray(array: model.allSearchableNoneExpiredEntries)
             let sorted = model.filterAndSort(forBrowse: entries, includeGroups: false)
 
-            let view = WizardAddToOrCreateNewView(mode: .totp, entries: sorted, model: model, title: title, groups: sortedPaths) { cancel, createNew, title, selectedGroupIdx, selectedEntry in
+            let easyReadSeparatorFor2FACode = Settings.sharedInstance().twoFactorEasyReadSeparator
+
+            let view = WizardAddToOrCreateNewView(mode: .totp, entries: sorted, model: model, easyReadSeparatorFor2FACode: easyReadSeparatorFor2FACode, title: title, groups: sortedPaths) { cancel, createNew, title, selectedGroupIdx, selectedEntry in
 
                 var group: Node? = nil
                 if !cancel, let selectedGroupIdx {

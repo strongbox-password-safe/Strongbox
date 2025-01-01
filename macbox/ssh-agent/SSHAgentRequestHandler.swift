@@ -13,6 +13,7 @@ enum SSHAgentApprovalExpiryType: Codable {
     case timed(time: Date)
     case quit
     case immediateDoNotRememberApproval
+
 }
 
 struct SSHAgentApproval: Codable {

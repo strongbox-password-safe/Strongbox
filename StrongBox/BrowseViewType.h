@@ -22,6 +22,7 @@ typedef NS_ENUM (NSUInteger, BrowseViewType) {
     kBrowseViewTypeAttachments,
     kBrowseViewTypeExpiredAndExpiring,
     kBrowseViewTypeAuditIssues,
+    kBrowseViewTypeWatchEntries,
 };
 
 #endif /* BrowseViewType_h */

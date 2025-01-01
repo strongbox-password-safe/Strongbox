@@ -170,6 +170,16 @@ struct SwiftEntryModel: SwiftEntryModelInterface {
         model.toggleFavourite(uuid)
     }
 
+    func toggleAppleWatch() -> Bool {
+        #if os(iOS)
+            model.toggleAppleWatch(uuid)
+        #else
+            false
+        #endif
+    }
+
+    var isWatchEntry: Bool { model.isAppleWatchEntry(uuid) }
+
     var isFavourite: Bool { model.isFavourite(uuid) }
 
     var isFlaggedByAudit: Bool { model.isFlagged(byAudit: uuid) }

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     #import <UIKit/UIKit.h>
     typedef UIViewController* VIEW_CONTROLLER_PTR;
 //    typedef UIImage* IMAGE_TYPE_PTR;
@@ -86,14 +86,14 @@
                   message:(NSString *)message
         defaultButtonText:(NSString *)defaultButtonText
          secondButtonText:(NSString *)secondButtonText
-                   action:(void (^) (int response))action;
+                     completion:(void (^) (int response))completion;
 
 + (void)   twoOptions:(VIEW_CONTROLLER_PTR)viewController
                 title:(NSString *)title
               message:(NSString *)message
     defaultButtonText:(NSString *)defaultButtonText
      secondButtonText:(NSString *)secondButtonText
-               action:(void (^)(BOOL response))action;
+           completion:(void (^)(BOOL response))completion;
 
 + (void) threeOptions:(VIEW_CONTROLLER_PTR)viewController
                 title:(NSString *)title
@@ -161,7 +161,7 @@
                       message:(NSString *)message
                    completion:(void (^) (NSString *password, BOOL response))completion;
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 + (void)actionSheet:(VIEW_CONTROLLER_PTR)viewController
           barButton:(UIBarButtonItem *)barButton

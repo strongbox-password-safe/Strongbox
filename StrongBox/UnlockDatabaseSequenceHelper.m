@@ -46,7 +46,7 @@
 
 #endif
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "DatabasePreferences.h"
 
@@ -247,7 +247,7 @@
                              message:message
                    defaultButtonText:NSLocalizedString(@"open_sequence_yes_use_local_copy_option", @"Yes, Open Offline")
                     secondButtonText:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_no_try_connect_option", @"No, Try to connect anyway")
-                              action:^(int response) {
+                          completion:^(int response) {
             if (response == 0) { 
                 [self unlockLocalCopy:factors forceReadOnly:!isPro offline:YES];
             }
@@ -387,7 +387,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
                          message:message
                defaultButtonText:relocateDatabase
                 secondButtonText:openOfflineText
-                          action:^(int response) {
+                      completion:^(int response) {
         if (response == 0) {
             [self onRelocateFilesBasedDatabase:factors];
         }

@@ -24,7 +24,7 @@ class WiFiSyncServerConnectionConfig: NSObject, Codable {
         }
         set {
             if let newPasscode = newValue {
-                SecretStore.sharedInstance().setSecureString(newValue, forIdentifier: keychainIdentifier)
+                SecretStore.sharedInstance().setSecureString(newPasscode, forIdentifier: keychainIdentifier)
             } else {
                 SecretStore.sharedInstance().deleteSecureItem(keychainIdentifier)
             }

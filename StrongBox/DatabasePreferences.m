@@ -627,6 +627,14 @@
     self.metadata.legacyFavouritesStore = legacyFavouritesStore;
 }
 
+- (NSArray<NSString *> *)legacyWatchEntries {
+    return self.metadata.legacyWatchEntries;
+}
+
+- (void)setLegacyWatchEntries:(NSArray<NSString *> *)legacyWatchEntries {
+    self.metadata.legacyWatchEntries = legacyWatchEntries;
+}
+
 - (NSArray<NSString *> *)autoFillExcludedItems {
     return self.metadata.autoFillExcludedItems;
 }
@@ -1457,6 +1465,16 @@
 - (void)setIsOwnedByMeCloudKit:(BOOL)isOwnedByMeCloudKit {
     [self update:^(SafeMetaData * _Nonnull metadata) {
         metadata.isOwnedByMeCloudKit = isOwnedByMeCloudKit;
+    }];
+}
+
+- (BOOL)appleWatchEnabled {
+    return self.metadata.appleWatchEnabled;
+}
+
+- (void)setAppleWatchEnabled:(BOOL)appleWatchEnabled {
+    [self update:^(SafeMetaData * _Nonnull metadata) {
+        metadata.appleWatchEnabled = appleWatchEnabled;
     }];
 }
 

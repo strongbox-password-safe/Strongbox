@@ -215,19 +215,21 @@ class SwiftUIAutoFillHelper: NSObject {
         let entries = NSMutableArray(array: model.allSearchableNoneExpiredEntries)
         let sorted = model.filterAndSort(forBrowse: entries, includeGroups: false)
 
+        let prefs = CrossPlatformDependencies.defaults().applicationPreferences
         #if os(iOS)
             let wizard = AddOrCreateWizard(mode: .passkey,
                                            title: passkey.relyingPartyId,
                                            groups: sortedPaths,
                                            entries: sorted,
                                            selectedGroupIdx: 0,
-                                           model: model)
+                                           model: model,
+                                           easyReadSeparator: prefs.twoFactorEasyReadSeparator)
             { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
                 self?.handlePasskeyWizardResponse(passkey, model, sortedGroups, cancel, createNew, title, selectedGroupIdx, selectedEntry, completion)
             }
             parentViewController.present(UIHostingController(rootView: wizard), animated: true)
         #else
-            let wizard = WizardAddToOrCreateNewView(mode: .passkey, entries: sorted, model: model, title: passkey.relyingPartyId, groups: sortedPaths) { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
+            let wizard = WizardAddToOrCreateNewView(mode: .passkey, entries: sorted, model: model, easyReadSeparatorFor2FACode: prefs.twoFactorEasyReadSeparator, title: passkey.relyingPartyId, groups: sortedPaths) { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
                 Utils.dismissViewControllerCorrectly(parentViewController.presentedViewControllers?.last)
 
                 self?.handlePasskeyWizardResponse(passkey, model, sortedGroups, cancel, createNew, title, selectedGroupIdx, selectedEntry, completion)

@@ -1,5 +1,5 @@
 //
-//  PlusNavBarButton.swift
+//  MoreNavBarButton.swift
 //  Strongbox
 //
 //  Created by Strongbox on 01/08/2024.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct PlusNavBarButton: View {
+struct MoreNavBarButton: View {
     @ObservedObject
     var model: DatabaseHomeViewModel
 
@@ -35,6 +35,19 @@ struct PlusNavBarButton: View {
                 }
             })
             .disabled(model.database.isReadOnly)
+
+            Divider()
+
+            if model.watchIsPairedAndInstalled, model.appleWatchEnabled {
+                Button(action: {
+                    model.syncAppleWatchNow()
+                }, label: {
+                    HStack {
+                        Text("generic_action_sync_apple_watch_now")
+                        Image(systemName: "applewatch")
+                    }
+                })
+            }
 
             Divider()
 
@@ -70,7 +83,7 @@ struct PlusNavBarButton: View {
         Text("Test")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    PlusNavBarButton(model: DatabaseHomeViewModel())
+                    MoreNavBarButton(model: DatabaseHomeViewModel())
                 }
             }
             .navigationTitle("Testing")

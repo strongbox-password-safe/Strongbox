@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ExportHelper : NSObject
 
-+ (NSURL*)getExportFile:(DatabasePreferences*)database error:(NSError**)error;
++ (void)getExportFile:(UIViewController*)viewController database:(DatabasePreferences*)database completion:(void(^)(NSURL*_Nullable url, NSError *_Nullable error))completion;
 + (void)cleanupExportFiles:(NSURL *)url;
     
 @end

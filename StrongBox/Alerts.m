@@ -10,7 +10,7 @@
 #import "utils.h"
 #import "AppPreferences.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import <MobileCoreServices/MobileCoreServices.h>
 #endif
 
@@ -202,7 +202,7 @@
               message:(NSString *)message
     defaultButtonText:(NSString *)defaultButtonText
      secondButtonText:(NSString *)secondButtonText
-               action:(void (^) (BOOL response))action {
+           completion:(void (^) (BOOL response))completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
                                                                                  message:message
@@ -211,11 +211,11 @@
 
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
                                                                 style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction *a) { action(YES); }];
+                                                              handler:^(UIAlertAction *a) { completion(YES); }];
 
         UIAlertAction *noAction = [UIAlertAction actionWithTitle:secondButtonText
                                                            style:UIAlertActionStyleCancel
-                                                         handler:^(UIAlertAction *a) { action(NO); }];
+                                                         handler:^(UIAlertAction *a) { completion(NO); }];
 
         [alertController addAction:defaultAction];
         [alertController addAction:noAction];
@@ -373,7 +373,7 @@
                     message:(NSString *)message
             defaultButtonText:(NSString *)defaultButtonText
                secondButtonText:(NSString *)secondButtonText
-                         action:(void (^) (int response))action {
+                   completion:(void (^) (int response))completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
                                                                                  message:message
@@ -384,15 +384,15 @@
         
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
                                                                 style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction *a) { action(0); }];
+                                                              handler:^(UIAlertAction *a) { completion(0); }];
         
         UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
                                                                style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction *a) { action(1); }];
+                                                             handler:^(UIAlertAction *a) { completion(1); }];
         
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                style:UIAlertActionStyleCancel
-                                                             handler:^(UIAlertAction *a) { action(3); }];
+                                                             handler:^(UIAlertAction *a) { completion(3); }];
         
         [alertController addAction:defaultAction];
         [alertController addAction:secondAction];

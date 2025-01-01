@@ -13,7 +13,7 @@
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "real-secrets.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "SVProgressHUD.h"
 #import "AppPreferences.h"
@@ -66,7 +66,7 @@
 }
 
 - (void)initialize:(BOOL)useIsolatedDropbox {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     if ( useIsolatedDropbox ) {
         [DBClientsManager setupWithAppKey:DROPBOX_APP_ISOLATED_KEY];
     }
@@ -85,7 +85,7 @@
 
 - (void)dismissProgressSpinner {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD dismiss];
 #else
         [macOSSpinnerUI.sharedInstance dismiss];
@@ -95,7 +95,7 @@
 
 - (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD showWithStatus:message];
 #else
         [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
@@ -460,7 +460,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 - (METADATA_PTR)getDatabaseMetadata:(NSString*)filename
                          parentPath:(NSString*)parentPath
                            nickName:(NSString*)nickName {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
             METADATA_PTR metadata = [DatabasePreferences templateDummyWithNickName:nickName
                                                                    storageProvider:self.storageId
                                                                           fileName:filename
@@ -489,7 +489,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 }
 
 -(NSString*)getPathFromDatabaseMetadata:(METADATA_PTR )safeMetaData {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
 #else
     NSString *path = [NSString pathWithComponents:@[safeMetaData.storageInfo, safeMetaData.fileUrl.lastPathComponent]];
@@ -532,7 +532,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                                                                               scopes:minimalScopes
                                                                 includeGrantedScopes:NO];
             
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
             [DBClientsManager authorizeFromControllerV2:UIApplication.sharedApplication
                                              controller:viewController
                                   loadingStatusDelegate:nil

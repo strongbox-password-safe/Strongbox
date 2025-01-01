@@ -23,9 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage handler:(UIActionHandler)handler ;
 
-+ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage colour:(UIColor*)colour handler:(UIActionHandler)handler;
++ (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage color:(UIColor*)color handler:(UIActionHandler)handler;
 
-+ (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage colour:(UIColor *)colour large:(BOOL)large handler:(UIActionHandler)handler;
++ (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage color:(UIColor *)color large:(BOOL)large handler:(UIActionHandler)handler;
 
 + (UIAction*)getItem:(NSString*)title systemImage:(NSString*_Nullable)systemImage enabled:(BOOL)enabled handler:(UIActionHandler)handler ;
 
@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIAction*)getItem:(NSString*)title
          systemImage:(NSString*)systemImage
-              colour:(UIColor*_Nullable)colour
+              color:(UIColor*_Nullable)color
                large:(BOOL)large
          destructive:(BOOL)destructive
              enabled:(BOOL)enabled

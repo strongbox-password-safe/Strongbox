@@ -8,29 +8,10 @@
 
 import SwiftUI
 
-struct LargeTextViewCharacter: View {
-    let character: String
-    let index: Int
-    let color: Color
-    let font: Font
-
-    var body: some View {
-        VStack(spacing: 4) {
-
-
-            Text(character)
-                .font(font)
-
-                .foregroundColor(color)
-
-
-            Text(String(index + 1))
-                .foregroundColor(.secondary)
-                .font(.caption)
-        }
-    }
-}
-
 #Preview {
-    LargeTextViewCharacter(character: "_", index: 1, color: .blue, font: .custom("Menlo", size: 32))
+    List {
+        LargeTextViewCharacter(character: "A", index: 0, color: .blue, font: Font.system(size: 32).monospaced())
+
+        LargeTextViewCharacter(character: "j", index: 1, color: .blue, font: Font.system(size: 32).monospaced())
+    }
 }

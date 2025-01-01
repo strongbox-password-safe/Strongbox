@@ -119,6 +119,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.cacheChallengeDurationSecs = kDefaultCacheChallengeDurationSecs;
         self.challengeRefreshIntervalSecs = kDefaultChallengeRefreshIntervalSecs;
         self.doNotRefreshChallengeInAF = YES;
+        self.appleWatchEnabled = YES;
     }
     
     return self;
@@ -631,6 +632,13 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.hasOnboardedHardwareKeyCaching = ((NSNumber*)jsonDictionary[@"hasOnboardedHardwareKeyCaching"]).boolValue;
     }
 
+    if ( jsonDictionary[@"appleWatchEnabled"] != nil ) {
+        ret.appleWatchEnabled = ((NSNumber*)jsonDictionary[@"appleWatchEnabled"]).boolValue;
+    }
+    else {
+        ret.appleWatchEnabled = YES;
+    }
+
     return ret;
 }
 
@@ -728,6 +736,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"cacheChallengeDurationSecs" : @(self.cacheChallengeDurationSecs),
         @"doNotRefreshChallengeInAF" : @(self.doNotRefreshChallengeInAF),
         @"hasOnboardedHardwareKeyCaching" : @(self.hasOnboardedHardwareKeyCaching),
+        @"appleWatchEnabled" : @(self.appleWatchEnabled),
     }];
     
     if (self.nickName != nil) {
@@ -906,6 +915,25 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     
     if(legacyFavouritesStore) {
         [SecretStore.sharedInstance setSecureObject:legacyFavouritesStore forIdentifier:key];
+    }
+    else {
+        [SecretStore.sharedInstance deleteSecureItem:key];
+    }
+}
+
+- (NSArray<NSString *> *)legacyWatchEntries {
+    NSString *key = [NSString stringWithFormat:@"%@-watch-entries", self.uuid];
+    
+    NSArray<NSString *>* ret = [SecretStore.sharedInstance getSecureObject:key];
+    
+    return ret ? ret : @[];
+}
+
+- (void)setLegacyWatchEntries:(NSArray<NSString *> *)legacyWatchEntries {
+    NSString *key = [NSString stringWithFormat:@"%@-watch-entries", self.uuid];
+    
+    if (legacyWatchEntries) {
+        [SecretStore.sharedInstance setSecureObject:legacyWatchEntries forIdentifier:key];
     }
     else {
         [SecretStore.sharedInstance deleteSecureItem:key];

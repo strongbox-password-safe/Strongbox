@@ -16,6 +16,7 @@ struct FavouriteCapsuleView: View {
     var model: DatabaseHomeViewModel
 
     var entry: any SwiftEntryModelInterface
+    var easyReadSeparator: Bool
 
     var body: some View {
         Button(action: {
@@ -40,8 +41,7 @@ struct FavouriteCapsuleView: View {
                         Spacer()
 
                         if let totp = entry.totp {
-                            TotpView(totp: totp)
-                                .font(.custom("Menlo", size: 12.0, relativeTo: .caption2))
+                            TotpView(totp: totp, easyReadSeparator: easyReadSeparator)
                         }
                     }
 
@@ -64,19 +64,17 @@ struct FavouriteCapsuleView: View {
 
 #Preview {
     let foo = UIImage(systemName: "lock.fill")!
-    let tinted = foo.withTintColor(.blue, renderingMode: .alwaysTemplate)
 
     let nodeIcon = NodeIcon.withPreset(0)
-    let aleph = NodeIconHelper.getNodeIcon(nodeIcon, predefinedIconSet: .sfSymbols)
 
-    let bar = UIImage(named: "AppIcon-2019-1024")!
+
 
     let url = "otpauth:
 
     return VStack {
-        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test with a long title", imageSystemName: "lock.fill", totpUrl: url))
-        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test1"))
-        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test2"))
-        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test3"))
+        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test with a long title", imageSystemName: "lock.fill", totpUrl: url), easyReadSeparator: true)
+        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test1"), easyReadSeparator: true)
+        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test2"), easyReadSeparator: true)
+        FavouriteCapsuleView(model: DatabaseHomeViewModel(), entry: SwiftDummyEntryModel(title: "Test3"), easyReadSeparator: true)
     }
 }

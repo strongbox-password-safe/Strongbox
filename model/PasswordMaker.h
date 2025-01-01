@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "PasswordGenerationConfig.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import <UIKit/UIKit.h>
 #endif
 
@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)isCommonPassword:(NSString*)password;
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 - (void)promptWithUsernameSuggestions:(UIViewController*)viewController config:(PasswordGenerationConfig*)config action:(void (^)(NSString *response))action;
 - (void)promptWithSuggestions:(UIViewController*)viewController config:(PasswordGenerationConfig*)config action:(void (^)(NSString *response))action;

@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SBLog.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
 #import <UIKit/UIKit.h>
 
 #define ColorFromRGB(rgbValue) \
@@ -18,7 +18,8 @@ green:((float)((rgbValue & 0x00FF00) >>  8))/255.0 \
 blue:((float)((rgbValue & 0x0000FF) >>  0))/255.0 \
 alpha:1.0]
 
-#else
+#elif TARGET_OS_OSX
+
 #import <Cocoa/Cocoa.h>
 
 #define ColorFromRGB(rgbValue) \
@@ -32,10 +33,10 @@ alpha:1.0]
 
 #endif
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
 #import <UIKit/UIKit.h>
 typedef UIImage* IMAGE_TYPE_PTR;
-#else
+#elif TARGET_OS_OSX
 #import <Cocoa/Cocoa.h>
 typedef NSImage* IMAGE_TYPE_PTR;
 #endif
@@ -50,9 +51,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString *)getAppBuildNumber;
 + (NSString *)getAppBundleId;
 + (NSString *)insertTimestampInFilename:(NSString *)title;
-+ (nullable NSString *)hostname;
+
 + (NSString *)getUsername;
 + (NSURL*)userHomeDirectoryEvenInSandbox;
+
+#if TARGET_OS_IOS || TARGET_OS_OSX
++ (nullable NSString *)hostname;
+#endif
 
 
 
@@ -98,7 +103,7 @@ NSData* hmacSha1(NSData *data, NSData* key);
 NSData*_Nullable getRandomData(uint32_t length);
 uint32_t getRandomUint32(void);
 
-#if TARGET_OS_IPHONE && !IS_APP_EXTENSION
+#if TARGET_OS_IOS && !IS_APP_EXTENSION
 
 @property (class, readonly) BOOL isAppInForeground;
 
@@ -108,13 +113,18 @@ uint32_t getRandomUint32(void);
 
 + (NSString *)likelyFileExtensionForData:(NSData *)data;
 
-#if TARGET_OS_IPHONE
-
-UIImage* scaleImage(UIImage* image, CGSize newSize);
+#if TARGET_OS_IOS
 + (UIImage *)makeRoundedImage:(UIImage*)image radius:(float)radius;
 + (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize;
+#endif
 
-#else
+#if TARGET_OS_IOS || TARGET_OS_WATCH
+
+UIImage* scaleImage(UIImage* image, CGSize newSize);
+
+
+
+#elif TARGET_OS_OSX
 
 + (NSImage *)imageTintedWithColor:(NSImage*)img tint:(NSColor *)tint;
 
@@ -130,7 +140,8 @@ NSColor* NSColorFromRGB(NSUInteger rgbValue);
 
 #endif
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS 
+
 + (nullable NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error;
 
 @property (readonly, class) BOOL isiPadPro;

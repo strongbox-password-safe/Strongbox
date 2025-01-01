@@ -27,7 +27,6 @@
 #import "SearchResultsBrowseTableDatasource.h"
 #import "BrowseTableViewCellHelper.h"
 
-#import <ISMessages/ISMessages.h>
 #import "BiometricsManager.h"
 #import "AuditDrillDownController.h"
 #import "NSString+Extensions.h"
@@ -611,11 +610,20 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                           handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onExportDatabase:nil]; }]];
     }
     
+    BOOL featureEnabled = AppPreferences.sharedInstance.appleWatchIntegration && self.viewModel.metadata.appleWatchEnabled;
+    if ( featureEnabled && WatchAppManager.shared.watchIsPairedAndInstalled ) {
+        [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_action_sync_apple_watch_now", @"Sync Apple Watch Now")
+                                      systemImage:@"applewatch"
+                                          handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onSyncAppleWatchNow]; }]];
+    }
+    
     if ( !AppPreferences.sharedInstance.disablePrinting ) {
         [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_print_database", @"Print Database")
                                       systemImage:@"printer"
                                           handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onPrint]; }]];
     }
+    
+    
     
     UIMenu* menu2 = [UIMenu menuWithTitle:@""
                                     image:nil
@@ -882,35 +890,17 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     if (lastKnownAuditIssueCount == nil) { 
         if (issueCount == 0) {
-            [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
-                                       message:NSLocalizedString(@"browse_vc_audit_complete_message", @"No issues found")
-                                      duration:1.5f
-                                   hideOnSwipe:YES
-                                     hideOnTap:YES
-                                     alertType:ISAlertTypeSuccess
-                                 alertPosition:ISAlertPositionTop
-                                       didHide:nil];
+            [StrongboxToastMessages showInfoWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
+                                                 body:NSLocalizedString(@"browse_vc_audit_complete_message", @"No issues found")];
         }
         else {
-            [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
-                                       message:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_issues_found_fmt", @"%ld issues found"), issueCount]
-                                      duration:1.5f
-                                   hideOnSwipe:YES
-                                     hideOnTap:YES
-                                     alertType:ISAlertTypeWarning
-                                 alertPosition:ISAlertPositionTop
-                                       didHide:nil];
+            [StrongboxToastMessages showWarningWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
+                                                        body:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_issues_found_fmt", @"%ld issues found"), issueCount]];
         }
     }
     else if (issueCount > lastKnownAuditIssueCount.unsignedIntegerValue) {
-        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
-                                   message:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_new_issues_found_fmt",@"%ld New Issues Found!"), issueCount - lastKnownAuditIssueCount.unsignedIntegerValue]
-                                  duration:2.5f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeError
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
+        [StrongboxToastMessages showErrorWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
+                                                  body:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_new_issues_found_fmt",@"%ld New Issues Found!"), issueCount - lastKnownAuditIssueCount.unsignedIntegerValue]];
     }
 }
 
@@ -1775,6 +1765,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         title = NSLocalizedString(@"quick_view_title_expired_and_expiring", @"Expired & Expiring");
         image = [UIImage systemImageNamed:@"calendar" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleDefault]];
     }
+    else if ( self.viewType == kBrowseViewTypeWatchEntries ) {
+        title = NSLocalizedString(@"sidebar_watch_entries", @"Watch Entries");
+        image = [UIImage systemImageNamed:@"applewatch" withConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleDefault]];
+    }
     else {
         slog(@"🔴 Could not refreshNavBarTitle - unknown view type");
     }
@@ -2392,14 +2386,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)copyTitle:(Node*)item {
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.title node:item]];
     
-    [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_title_copied_fmt", @"'%@' Title Copied"), [self dereference:item.title node:item]]
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [StrongboxToastMessages showSlimWithTitle:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_title_copied_fmt", @"'%@' Title Copied")]];
 }
 
 - (void)copyUrl:(Node*)item {
@@ -2575,6 +2562,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         if (!item.isGroup) {
             [ma addObject:[self getContextualMenuToggleFavouriteAction:indexPath item:item]];
+            
+            BOOL featureEnabled = AppPreferences.sharedInstance.appleWatchIntegration && self.viewModel.metadata.appleWatchEnabled;
+            if ( featureEnabled && WatchAppManager.shared.watchIsPairedAndInstalled ) {
+                [ma addObject:[self getContextualMenuToggleAppleWatchAction:indexPath item:item]];
+            }
         }
     }
     
@@ -2822,6 +2814,20 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }];
 }
 
+- (UIAction*)getContextualMenuToggleAppleWatchAction:(NSIndexPath*)indexPath item:(Node*)item {
+    BOOL isOn = [self.viewModel isAppleWatchEntry:item.uuid];
+    NSString* title = isOn ? NSLocalizedString(@"action_remove_entry_from_apple_watch", @"Remove from Apple Watch") : NSLocalizedString(@"action_add_entry_to_apple_watch", @"Add to Apple Watch");
+    
+    __weak BrowseSafeView* weakSelf = self;
+    
+    return [ContextMenuHelper getItem:title
+                          systemImage:isOn ? @"applewatch.slash" : @"applewatch"
+            
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf toggleAppleWatch:item];
+    }];
+}
+
 - (UIAction*)getContextualMenuExcludeFromAutoFillAction:(NSIndexPath*)indexPath item:(Node*)item {
     BOOL excluded = [self.viewModel isExcludedFromAutoFill:item.uuid];
     NSString* title = NSLocalizedString(@"suggest_in_autofill_yesno_flag", @"Suggest in AutoFill");
@@ -2845,7 +2851,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     return [ContextMenuHelper getItem:title
                           systemImage:@"checkmark.shield"
-                               colour:UIColor.systemOrangeColor
+                               color:UIColor.systemOrangeColor
                                 large:NO
                           destructive:NO
                               enabled:YES
@@ -2860,7 +2866,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     return [ContextMenuHelper getItem:text
                           systemImage:@"info.circle"
-                               colour:UIColor.secondaryLabelColor
+                               color:UIColor.secondaryLabelColor
                                 large:NO
                           destructive:NO
                               enabled:NO
@@ -3642,6 +3648,26 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)onPrint {
     [self.browseActionsHelper printDatabase];
+}
+
+- (void)onSyncAppleWatchNow {
+    [self.parentSplitViewController syncAppleWatchNowWithInteractiveGuide:YES
+                                                                   allowUserToOptOut:NO];
+}
+
+- (void)toggleAppleWatch:(Node*)item {
+    if ( !item || item.isGroup || self.viewModel.isReadOnly ) {
+        return; 
+    }
+    
+    BOOL needsSave = [self.viewModel toggleAppleWatch:item.uuid];
+    
+    if ( needsSave ) { 
+        [self updateAndSave];
+    }
+
+    [self.parentSplitViewController syncAppleWatchNowWithInteractiveGuide:NO
+                                                                   allowUserToOptOut:NO];
 }
 
 

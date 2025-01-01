@@ -16,7 +16,7 @@
 #import "DatabaseSyncOperationalData.h"
 #import "NSDate+Extensions.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import "StrongboxiOSFilesManager.h"
 #else
 #import "StrongboxMacFilesManager.h"
@@ -33,7 +33,7 @@
 #import "CompositeKeyDeterminer.h"
 #import "CommonDatabasePreferences.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "ConflictResolutionWizard.h"
 #import "DatabaseDiffAndMergeViewController.h"
@@ -106,7 +106,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManage
         
         NSMutableDictionary* md = NSMutableDictionary.dictionary;
         
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         NSArray<NSNumber*> *supported = @[@(kGoogleDrive),
                                           @(kDropbox),
                                           @(kLocalDevice),
@@ -468,7 +468,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManage
 
     ConflictResolutionStrategy strategy = database.conflictResolutionStrategy;
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     
     
     if ( database.storageProvider == kLocalDevice && database.conflictResolutionStrategy == kConflictResolutionStrategyAsk ) {
@@ -542,7 +542,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManage
                       remoteModified:(NSDate*)remoteModified
                           parameters:(SyncParameters*)parameters
                           completion:(SyncAndMergeCompletionBlock)completion {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"ConflictResolutionWizard" bundle:nil];
     UINavigationController* nav = [storyboard instantiateInitialViewController];
     ConflictResolutionWizard* wiz = (ConflictResolutionWizard*)nav.topViewController;
@@ -555,7 +555,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManage
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
     wiz.remoteStorage = [SafeStorageProviderFactory getStorageDisplayName:database];
     wiz.completion = ^(ConflictResolutionWizardResult result) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [parameters.interactiveVC dismissViewControllerAnimated:YES completion:^{
 #endif
             [self doConflictResolutionWizardChoice:databaseUuid
@@ -567,12 +567,12 @@ NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManage
                                     remoteModified:remoteModified
                                         parameters:parameters
                                         completion:completion];
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         }];
 #endif
     };
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     [parameters.interactiveVC presentViewController:nav animated:YES completion:nil];
 #else
     [parameters.interactiveVC presentViewControllerAsSheet:wiz];
@@ -746,7 +746,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManage
 - (void)requestCredentials:(VIEW_CONTROLLER_PTR)vc
                   database:(METADATA_PTR)database
                 completion:(void (^)(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, NSError * _Nullable error))completion {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     IOSCompositeKeyDeterminer *determiner = [IOSCompositeKeyDeterminer determinerWithViewController:vc
                                                                                            database:database
                                                                                      isAutoFillOpen:NO
@@ -1032,7 +1032,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChangedNotification = @"syncManage
     }
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 - (void)compare:(NSString*)databaseUuid
            mine:(DatabaseModel*)mine

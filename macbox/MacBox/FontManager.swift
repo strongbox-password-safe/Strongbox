@@ -7,12 +7,15 @@
 //
 
 import Cocoa
+import SwiftUI
 
 class FontManager: NSObject {
     @objc
     static let shared = FontManager()
-
-    static let EasyReadFontName: String = "Menlo"
+    @objc
+    static func sharedInstance() -> FontManager {
+        shared
+    }
 
     static let BodyPointSize: CGFloat = NSFont.preferredFont(forTextStyle: .body).pointSize
 
@@ -23,10 +26,13 @@ class FontManager: NSObject {
     static let LargeTitlePointSize: CGFloat = NSFont.preferredFont(forTextStyle: .largeTitle).pointSize
 
     @objc
-    let easyReadFont: NSFont = .init(name: EasyReadFontName, size: BodyPointSize) ?? NSFont.systemFont(ofSize: BodyPointSize)
+    let easyReadFont: NSFont = .monospacedSystemFont(ofSize: BodyPointSize, weight: .regular)
 
     @objc
-    let largeTextEasyReadFont: NSFont = .init(name: EasyReadFontName, size: LargeTitlePointSize) ?? NSFont.systemFont(ofSize: LargeTitlePointSize)
+    let easyReadBoldFont: NSFont = .monospacedSystemFont(ofSize: BodyPointSize, weight: .bold)
+
+    @objc
+    let largeTextEasyReadFont: NSFont = .monospacedSystemFont(ofSize: LargeTitlePointSize, weight: .regular)
 
     @objc
     let bodyFont: NSFont = .preferredFont(forTextStyle: .body)

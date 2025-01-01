@@ -9,7 +9,7 @@
 #ifndef AlertingUI_h
 #define AlertingUI_h
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import <UIKit/UIKit.h>
 

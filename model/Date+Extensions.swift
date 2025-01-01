@@ -7,6 +7,7 @@
 //
 
 // iso8601withFractionalSeconds always at 'Zulu' i.e. GMT+00:00 and always fixed string length of 24
+import Foundation
 
 public extension ISO8601DateFormatter {
     static let Iso8601withFractionalSecondsCharacterCount = 24
@@ -23,6 +24,7 @@ public extension Formatter {
 
 public extension Date {
     var iso8601withFractionalSeconds: String { Formatter.iso8601withFractionalSeconds.string(from: self) }
+    var friendlyDateTimeString: String { (self as NSDate).friendlyDateTimeString }
 }
 
 public extension String {

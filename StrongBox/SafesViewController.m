@@ -1617,13 +1617,21 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 - (void)onExport:(NSIndexPath*)indexPath {
     DatabasePreferences *database = [self.collection objectAtIndex:indexPath.row];
     
-    NSError* error;
-    NSURL* url = [ExportHelper getExportFile:database error:&error];
-    if ( !url || error ) {
-        [Alerts error:self error:error];
-        return;
-    }
+    [ExportHelper getExportFile:self database:database completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        if ( url == nil && error == nil ) {
+            return; 
+        }
 
+        if ( !url || error ) {
+            [Alerts error:self error:error];
+        }
+        else {
+            [self onGotExportFile:indexPath url:url];
+        }
+    }];
+}
+
+- (void)onGotExportFile:(NSIndexPath*)indexPath url:(NSURL*)url {
     NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
@@ -2172,7 +2180,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                      message:NSLocalizedString(@"icloud_create_issue_message", @"Strongbox could not create a new iCloud Database for you, most likely because the Strongbox iCloud folder has been deleted.\n\nYou can find out how to fix this issue below.")
                            defaultButtonText:NSLocalizedString(@"icloud_create_issue_fix", @"How do I fix this?")
                             secondButtonText:NSLocalizedString(@"icloud_create_issue_local_instead", @"Create local database instead")
-                                      action:^(int response) {
+                                  completion:^(int response) {
                     if ( response == 0 ) {
                         NSURL* url = [NSURL URLWithString:@"https:
                         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
@@ -2777,7 +2785,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                  message:NSLocalizedString(@"safesvc_update_existing_question", @"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?")
                        defaultButtonText:NSLocalizedString(@"safesvc_update_existing_option_update", @"Update Existing Database")
                         secondButtonText:NSLocalizedString(@"safesvc_update_existing_option_create", @"Create a New Database")
-                                  action:^(int response) {
+                              completion:^(int response) {
                                       if(response == 0) {
                                           NSString *suggestedFilename = url.lastPathComponent;
                                           

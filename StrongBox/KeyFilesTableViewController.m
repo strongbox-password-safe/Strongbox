@@ -532,7 +532,7 @@
                          message:NSLocalizedString(@"key_files_vc_remove_after_import_message", @"Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing?")
                defaultButtonText:NSLocalizedString(@"key_files_vc_remove_after_import_option_yes", @"Yes, Remove Local Copy")
                 secondButtonText:NSLocalizedString(@"key_files_vc_remove_after_import_option_no", @"No, Keep Local Copy")
-                          action:^(int response) {
+                      completion:^(int response) {
         
         NSError* error;
         if(response == 1) {

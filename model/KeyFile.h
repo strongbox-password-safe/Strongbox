@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import <UIKit/UIKit.h>
 
@@ -35,7 +35,7 @@ extern NSString* const kHashAttributeName;
 
 #ifndef IS_APP_EXTENSION
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 - (void)printRecoverySheet:(UIViewController*)viewController;
 #else
 - (void)printRecoverySheet;

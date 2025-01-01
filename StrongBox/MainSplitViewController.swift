@@ -118,7 +118,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         NotificationCenter.default.addObserver(self, selector: #selector(onBeginImport2FAOtpAuthUrlNotification(object:)), name: .beginImport2FAOtpAuthUrl, object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(onWiFiSyncUpdatedWorkingCopy(object:)),
-                                               name: Notification.Name("wiFiSyncServiceNameDidChange"), 
+                                               name: Notification.Name("wiFiSyncSourceWorkingCopyDidChange"), 
                                                object: nil)
 
         NotificationCenter.default.addObserver(self, selector: #selector(onCloudKitUpdateAvailableNotification(object:)),
@@ -435,7 +435,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     func doSyncAfterPulldownRefresh(ignoreOfflineMode: Bool, completion: @escaping () -> Void) {
         sync(ignoreOfflineModeAndTrySync: ignoreOfflineMode) { _, localWasChanged, _ in
             if localWasChanged {
-                StrongboxToastMessages.showSlimInfoStatusBar(body: NSLocalizedString("browse_vc_pulldown_refresh_updated_title", comment: "Database Updated"), delay: 1.5)
+                StrongboxToastMessages.showSlim(title: NSLocalizedString("browse_vc_pulldown_refresh_updated_title", comment: "Database Updated"), delay: 1.5)
             }
 
             completion()
@@ -614,7 +614,8 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
             groups: sortedPaths,
             entries: sorted,
             selectedGroupIdx: 0,
-            model: model
+            model: model,
+            easyReadSeparator: AppPreferences.sharedInstance().twoFactorEasyReadSeparator
         ) { [weak self] cancel, createNew, title, selectedGroupIdx, selectedEntry in
             guard let self else { return }
 
@@ -675,8 +676,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
         Task {
             if await updateAndQueueSync() {
-                StrongboxToastMessages.showSlimInfoStatusBar(body: NSLocalizedString("2fa_code_saved", comment: "2FA Code Saved"),
-                                                             delay: 1.0)
+                StrongboxToastMessages.showSlim(title: NSLocalizedString("2fa_code_saved", comment: "2FA Code Saved"))
                 presentItemDetailsModal(uuid: entry.uuid)
             }
         }
@@ -699,5 +699,56 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
     var visibleViewController: UIViewController {
         presentedViewController ?? self
+    }
+
+    @objc
+    func syncAppleWatchNow(interactiveGuide: Bool = false, allowUserToOptOut: Bool = false) {
+        Task {
+            if interactiveGuide {
+                if !allowUserToOptOut || AppPreferences.sharedInstance().showInteractiveAppleWatchSyncGuide {
+                    if allowUserToOptOut {
+                        let foo = await Alerts.twoOptions(self,
+                                                          title: NSLocalizedString("apple_watch_sync_title", comment: "Sync Apple Watch"),
+                                                          message: NSLocalizedString("apple_watch_sync_guidance", comment: "Make sure your watch is paired and the Strongbox app is open on screen) then tap OK."),
+                                                          defaultButtonText: NSLocalizedString("alerts_ok", comment: "OK"),
+                                                          secondButtonText: NSLocalizedString("generic_dont_show_this_again", comment: "Don't Show This Again"))
+
+                        if !foo {
+                            AppPreferences.sharedInstance().showInteractiveAppleWatchSyncGuide = false
+                        }
+                    } else {
+                        await Alerts.info(self, title: NSLocalizedString("apple_watch_sync_title", comment: "Sync Apple Watch"),
+                                          message: NSLocalizedString("apple_watch_sync_guidance", comment: "Make sure your watch is paired and the Strongbox app is open on screen) then tap OK."))
+                    }
+                }
+
+                CrossPlatformDependencies.defaults().spinnerUi.show(NSLocalizedString("apple_watch_sync_progress", comment: "Syncing with Apple Watch..."), viewController: self)
+            }
+
+            do {
+                let success = try await WatchAppManager.shared.updateEntries(model: self.model)
+
+                if interactiveGuide {
+                    CrossPlatformDependencies.defaults().spinnerUi.dismiss()
+
+                    if success {
+                        StrongboxToastMessages.showSlim(title: NSLocalizedString("apple_watch_sync_success", comment: "Apple Watch Synced OK"),
+                                                        delay: 1.5,
+                                                        icon: .watch)
+                    } else {
+                        StrongboxToastMessages.showToast(title: NSLocalizedString("apple_watch_sync_could_not", comment: "Could Not Sync Apple Watch"),
+                                                         body: NSLocalizedString("apple_watch_sync_not_reachable", comment: "Watch App is not reachable"),
+                                                         duration: 2.0,
+                                                         category: .warning,
+                                                         icon: .watch)
+                    }
+                }
+            } catch {
+                StrongboxToastMessages.showToast(title: NSLocalizedString("apple_watch_sync_error", comment: "Apple Watch Sync Error"),
+                                                 body: error.localizedDescription,
+                                                 category: .error,
+                                                 icon: .watch)
+            }
+        }
     }
 }

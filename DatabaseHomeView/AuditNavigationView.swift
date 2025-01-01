@@ -112,7 +112,7 @@ struct AuditNavigationView: View {
 }
 
 #Preview {
-    var db = SwiftDummyDatabaseModel()
+    let db = SwiftDummyDatabaseModel()
 
     let duplicated = [
         "a2": [

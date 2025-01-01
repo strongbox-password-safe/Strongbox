@@ -19,7 +19,7 @@
 #import "ConcurrentMutableStack.h"
 #import "MMcGPair.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import "StrongboxiOSFilesManager.h"
 #else
 #import "StrongboxMacFilesManager.h"
@@ -45,7 +45,7 @@ NSString* const kAuditProgressNotification = @"kAuditProgressNotificationKey";
 NSString* const kBeginImport2FAOtpAuthUrlNotification = @"kBeginImport2FAOtpAuthUrlNotification";
 NSString* const kAuditCompletedNotification = @"kAuditCompletedNotificationKey";
 NSString* const kAuditNewSwitchedOffNotificationKey = @"kAuditNewSwitchedOffNotificationKey";
-NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
+
 NSString *const kModelEditedNotification = @"kNotificationModelEdited";
 NSString* const kMasterDetailViewCloseNotification = @"kMasterDetailViewClose";
 NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
@@ -62,6 +62,13 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
 @interface Model ()
 
 @property NSSet<NSString*> *cachedLegacyFavourites;
+@property (readonly) NSArray<Node*>* legacyFavourites;
+
+#if TARGET_OS_IOS
+@property NSSet<NSString*> *cachedLegacyWatchEntries;
+@property (readonly) NSArray<Node*>* legacyWatchEntries;
+#endif
+
 @property DatabaseAuditor* auditor;
 @property BOOL isNativeAutoFillAppExtensionOpen;
 @property BOOL forcedReadOnly;
@@ -74,7 +81,7 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
 
 @property (readonly) id<ApplicationPreferences> applicationPreferences;
 @property (readonly) id<SyncManagement> syncManagement;
-@property (readonly) NSArray<Node*>* legacyFavourites;
+
 
 @property (readonly) NSDictionary<NSString*, NSSet<NSUUID*>*> *domainNodeMap; 
 
@@ -114,7 +121,7 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
     }
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 - (instancetype)initAsDuressDummy:(BOOL)isNativeAutoFillAppExtensionOpen
                  templateMetaData:(METADATA_PTR)templateMetaData {
@@ -192,6 +199,10 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
         
         _cachedLegacyFavourites = [NSSet setWithArray:self.metadata.legacyFavouritesStore];
         
+#if TARGET_OS_IOS
+        _cachedLegacyWatchEntries = [NSSet setWithArray:self.metadata.legacyWatchEntries];
+#endif
+        
         if ( self.applicationPreferences.databasesAreAlwaysReadOnly ) {
             self.forcedReadOnly = YES;
         }
@@ -250,6 +261,8 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
     [self refreshAutoFillSuggestions];
     
     [self restartBackgroundAudit];
+    
+    [self refreshWatchAppEntries];
     
     
     
@@ -620,7 +633,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSString* ret;
     
     do {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         ret = [StrongboxFilesManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
 #else
         
@@ -1141,7 +1154,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 - (void)launchLaunchableUrl:(NSURL*)launchableUrl {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #ifndef IS_APP_EXTENSION
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [UIApplication.sharedApplication openURL:launchableUrl options:@{} completionHandler:^(BOOL success) {
@@ -1281,6 +1294,136 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }];
     self.cachedLegacyFavourites = [NSSet setWithArray:trimmed];
     self.metadata.legacyFavouritesStore = trimmed;
+}
+
+
+
+
+#if TARGET_OS_IOS
+- (NSArray<Node *> *)legacyWatchEntries {
+    return [self getNodesFromSerializationIds:self.cachedLegacyWatchEntries];
+}
+#endif
+
+- (NSSet<NSUUID *> *)watchEntriesIdSet {
+    if ( !self.formatSupportsTags ) {
+#if TARGET_OS_IOS
+        NSArray<Node*>* filtered = [self.legacyWatchEntries filter:^BOOL(Node * _Nonnull obj) {
+            return !obj.isGroup;
+        }];
+        
+        NSSet<NSUUID*>* legacySet = [filtered map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+            return obj.uuid;
+        }].set;
+        
+        return legacySet;
+#else
+        return NSSet.set;
+#endif
+    }
+    else {
+        return [self getItemIdsForTag:kCanonicalAppleWatchTag].set;
+    }
+}
+
+- (BOOL)isAppleWatchEntry:(NSUUID *)itemId {
+    return [self.watchEntriesIdSet containsObject:itemId];
+}
+
+- (NSArray<Node *> *)appleWatchEntries {
+    return [self getItemsById:self.watchEntriesIdSet.allObjects];
+}
+
+#if TARGET_OS_IOS
+- (BOOL)toggleAppleWatch:(NSUUID *)itemId {
+    if ( ![self isAppleWatchEntry:itemId] ) {
+        return [self addToAppleWatch:@[itemId]];
+    }
+    else {
+        return [self removeFromAppleWatch:itemId];
+    }
+}
+
+- (BOOL)addToAppleWatch:(NSArray<NSUUID *>*)items {
+    if ( self.formatSupportsTags ) {
+        return [self addTagToItems:items tag:kCanonicalAppleWatchTag];
+    }
+    else {
+        [self legacyAddToAppleWatch:items];
+        [self notifyEdited];
+        return NO;
+    }
+}
+
+- (BOOL)removeFromAppleWatch:(NSUUID*)itemId {
+    BOOL needsSave = NO;
+    if ( self.formatSupportsTags ) {
+        BOOL removed = [self removeTag:itemId tag:kCanonicalAppleWatchTag];
+        needsSave = removed;
+        
+        [self legacyRemoveFromAppleWatch:itemId];
+        [self notifyEdited];
+    }
+    else {
+        [self legacyRemoveFromAppleWatch:itemId];
+        [self notifyEdited];
+    }
+    
+    return needsSave;
+}
+
+- (void)legacyAddToAppleWatch:(NSArray<NSUUID *>*)items {
+    NSArray<NSString*> *sids = [items map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+        return [self.database getCrossSerializationFriendlyIdId:obj];
+    }];
+    
+    NSMutableSet<NSString*>* foo = self.cachedLegacyWatchEntries.mutableCopy;
+    
+    [foo addObjectsFromArray:sids];
+    
+    [self resetLegacyWatchEntries:foo];
+}
+
+- (void)legacyRemoveFromAppleWatch:(NSUUID*)itemId {
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
+    if ( sid ) {
+        NSMutableSet<NSString*>* foo = self.cachedLegacyWatchEntries.mutableCopy;
+        
+        [foo removeObject:sid];
+        
+        [self resetLegacyWatchEntries:foo];
+    }
+    else {
+        slog(@"🔴 legacyRemoveFromAppleWatch - Could not get sid");
+    }
+}
+
+- (void)resetLegacyWatchEntries:(NSSet<NSString*>*)entries {
+    
+    
+    __weak Model* weakSelf = self;
+    NSArray<Node*>* watchNodes = [self.database.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:node.uuid];
+        return [entries containsObject:sid];
+    }];
+    
+    NSArray<NSString*>* trimmed = [watchNodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:obj.uuid];
+        return sid;
+    }];
+    self.cachedLegacyWatchEntries = [NSSet setWithArray:trimmed];
+    self.metadata.legacyWatchEntries = trimmed;
+}
+#endif
+
+- (void)refreshWatchAppEntries {
+#if TARGET_OS_IOS
+#ifndef IS_APP_EXTENSION
+    slog(@"refreshWatchAppEntries...");
+    
+    [WatchAppManager.shared expressUpdateEntriesWithModel:self];
+#endif
+#endif
 }
 
 
@@ -1722,7 +1865,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 
 
-#if !TARGET_OS_IPHONE 
+#if !TARGET_OS_IOS 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
 #ifndef IS_APP_EXTENSION 
     if ( self.metadata.autoFillEnabled ) {
@@ -1758,7 +1901,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     _domainNodeMap = @{};
     
-#if !TARGET_OS_IPHONE 
+#if !TARGET_OS_IOS 
     if ( self.metadata.autoFillEnabled ) {
         _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self];
     }
@@ -1768,7 +1911,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 }
 
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 - (BrowseSortConfiguration*)getDefaultSortConfiguration {
     BrowseSortConfiguration* ret = [[BrowseSortConfiguration alloc] init];

@@ -10,9 +10,9 @@
 #import "ClipboardManager.h"
 
 #ifndef IS_APP_EXTENSION
-
-#import "ISMessages/ISMessages.h"
-
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
 @interface PreviousPasswordsTableViewController ()
@@ -62,14 +62,7 @@
         NSString* message = NSLocalizedString(@"item_details_password_copied", @"Password Copied");
     
 #ifndef IS_APP_EXTENSION
-        [ISMessages showCardAlertWithTitle:message
-                                   message:nil
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeSuccess
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
+        [StrongboxToastMessages showSlimWithTitle:message];
 #endif
     }
     

@@ -22,10 +22,6 @@
 #import "ExportHelper.h"
 
 #ifndef IS_APP_EXTENSION
-#import <ISMessages/ISMessages.h>
-#endif
-
-#ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
@@ -436,14 +432,7 @@
 
 - (void)showToast:(NSString*)message {
 #ifndef IS_APP_EXTENSION
-    [ISMessages showCardAlertWithTitle:message
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [StrongboxToastMessages showSlimWithTitle:message];
 #endif
 }
 
@@ -474,13 +463,22 @@
 
 - (void)exportDatabase {
     DatabasePreferences* database = self.model.metadata;
-    NSError* error;
-    NSURL* url = [ExportHelper getExportFile:database error:&error];
-    if ( !url || error ) {
-        [Alerts error:self.viewController error:error];
-        return;
-    }
     
+    [ExportHelper getExportFile:self.viewController database:database completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        if ( url == nil && error == nil ) {
+            return; 
+        }
+        
+        if ( !url || error ) {
+            [Alerts error:self.viewController error:error];
+        }
+        else {
+            [self onGotExportFile:url];
+        }
+    }];
+}
+    
+- (void)onGotExportFile:(NSURL*)url {
     NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
         

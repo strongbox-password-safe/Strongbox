@@ -139,7 +139,7 @@ const static NSArray<NSString*> *kEmailDomains;
     return self;
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     
 - (void)promptWithUsernameSuggestions:(UIViewController *)viewController
                                config:(PasswordGenerationConfig *)config

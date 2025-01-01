@@ -8,7 +8,7 @@
 
 #import "SafeStorageProviderFactory.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     #import "LocalDeviceStorageProvider.h"
 
     #ifndef IS_APP_EXTENSION
@@ -49,7 +49,7 @@
 #ifndef IS_APP_EXTENSION
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     if (providerId == kLocalDevice) {
         return [LocalDeviceStorageProvider sharedInstance];
     }
@@ -122,7 +122,7 @@
             _displayName = @"iCloud";
         }
     }
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     else if (provider == kLocalDevice) {
         if (database) {
             _displayName = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
@@ -184,7 +184,7 @@
         }
     }
     else if(provider == kWebDAV) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         _displayName = NSLocalizedString(@"storage_provider_name_webdav", @"WebDAV");
 #else
         _displayName = @"DAV";
@@ -207,7 +207,7 @@
     if (provider == kiCloud) {
         return @"cloud";
     }
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     else if (provider == kLocalDevice) {
         return @"iphone_x";
     }
@@ -239,7 +239,7 @@
     }
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 + (IMAGE_TYPE_PTR)getImageForProvider:(StorageProvider)provider {
     return [self getImageForProvider:provider database:nil];
 }
@@ -340,7 +340,7 @@
 }
 #endif
 
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IOS
 
 + (NSString *)getStorageSubtitleForDatabaseWindow:(METADATA_PTR)metadata {
     NSString* path = @"";

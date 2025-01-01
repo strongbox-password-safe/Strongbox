@@ -8,25 +8,63 @@
 
 import Foundation
 
+private struct AppleSharedCredentials: Codable {
+    var shared: [String]?
+    var from: [String]?
+    var to: [String]?
+    var fromDomainsAreObsoleted: Bool?
+}
+
 class ApplePasswordManagerQuirks {
     private var equivalents: [String: [String]] = [:]
 
     static let shared = ApplePasswordManagerQuirks()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private init() {
         let decoder = JSONDecoder()
 
-        guard let url = Bundle.main.url(forResource: "websites-with-shared-credential-backends", withExtension: "json"),
+        guard let url = Bundle.main.url(forResource: "shared-credentials", withExtension: "json"),
               let data = try? Data(contentsOf: url),
-              let equivs = try? decoder.decode([[String]].self, from: data)
+              let sharedCredentialsGroups = try? decoder.decode([AppleSharedCredentials].self, from: data)
         else {
-            swlog("🔴 Could not load file 'websites-with-shared-credential-backends.json' from Bundle!")
+            swlog("🔴 Could not load file 'shared-credentials.json' from Bundle!")
             return
         }
 
-        for eqGroup in equivs {
-            for eq in eqGroup {
-                equivalents[eq] = eqGroup
+        for sharedCredentialGroup in sharedCredentialsGroups {
+            if let sharedDomains = sharedCredentialGroup.shared {
+                for domain in sharedDomains {
+                    equivalents[domain] = sharedDomains
+                }
+            } else if let from = sharedCredentialGroup.from, let to = sharedCredentialGroup.to {
+                
+
+                for f in from {
+                    equivalents[f] = to
+                }
+                for t in to {
+                    equivalents[t] = from
+                }
+            } else {
+                swlog("🔴 Couldn't process \(sharedCredentialGroup)")
             }
         }
     }

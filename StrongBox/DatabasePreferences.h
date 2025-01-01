@@ -182,6 +182,7 @@ initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
 
 @property NSArray<NSNumber*>* detailsViewCollapsedSections;
 @property (nullable) NSArray<NSString*>* legacyFavouritesStore;
+@property (nullable) NSArray<NSString*>* legacyWatchEntries;
 
 @property (nullable) NSArray<NSString*>* auditExcludedItems;
 @property (nullable) NSArray<NSString*>* autoFillExcludedItems;
@@ -233,6 +234,7 @@ initialCacheModDate:(NSDate * _Nullable )initialCacheModDate
 
 
 
+@property BOOL appleWatchEnabled;
 
 @end
 

@@ -17,8 +17,9 @@ struct SwiftUIEntryView: View {
     var flagged: Bool = true
     var totp: OTPToken? = nil
     var showIcon: Bool = true
+    var easyReadSeparator: Bool
 
-    init(title: String, username: String, path: String, icon: IMAGE_TYPE_PTR, favourite: Bool = false, totp: OTPToken? = nil, flagged: Bool = false, showIcon: Bool) {
+    init(title: String, username: String, path: String, icon: IMAGE_TYPE_PTR, favourite: Bool = false, totp: OTPToken? = nil, flagged: Bool = false, showIcon: Bool, easyReadSeparator: Bool) {
         self.title = title
         self.username = username
         self.path = path
@@ -27,10 +28,11 @@ struct SwiftUIEntryView: View {
         self.totp = totp
         self.flagged = flagged
         self.showIcon = showIcon
+        self.easyReadSeparator = easyReadSeparator
     }
 
-    init(entry: any SwiftEntryModelInterface, showIcon: Bool) {
-        self.init(title: entry.title, username: entry.username, path: entry.searchFoundInPath, icon: entry.image, favourite: entry.isFavourite, totp: entry.totp, flagged: entry.isFlaggedByAudit, showIcon: showIcon)
+    init(entry: any SwiftEntryModelInterface, showIcon: Bool, easyReadSeparator: Bool) {
+        self.init(title: entry.title, username: entry.username, path: entry.searchFoundInPath, icon: entry.image, favourite: entry.isFavourite, totp: entry.totp, flagged: entry.isFlaggedByAudit, showIcon: showIcon, easyReadSeparator: easyReadSeparator)
     }
 
     var body: some View {
@@ -55,20 +57,6 @@ struct SwiftUIEntryView: View {
                 img
             }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
                     Text(title)
@@ -92,8 +80,7 @@ struct SwiftUIEntryView: View {
                     Spacer()
 
                     if let totp {
-                        TotpView(totp: totp)
-                            .font(.custom("Menlo", size: 14.0, relativeTo: .caption2))
+                        TotpView(totp: totp, easyReadSeparator: easyReadSeparator)
                     }
                 }
 
@@ -120,8 +107,8 @@ struct SwiftUIEntryView: View {
     let totp = OTPToken(url: URL(string: "otpauth:
 
     return List {
-        SwiftUIEntryView(title: "Test Title", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, favourite: true, totp: totp, flagged: true, showIcon: true)
+        SwiftUIEntryView(title: "Test Title", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, favourite: true, totp: totp, flagged: true, showIcon: true, easyReadSeparator: true)
 
-        SwiftUIEntryView(title: "Test Title which is quite long and might need to wrap onto a new line or two or to infinity and beyond.", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, showIcon: true)
+        SwiftUIEntryView(title: "Test Title which is quite long and might need to wrap onto a new line or two or to infinity and beyond.", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, showIcon: true, easyReadSeparator: true)
     }
 }

@@ -12,9 +12,10 @@ struct WizardAddExistingView: View {
     @State private var selectedEntry: Node? = nil
 
     var mode: AddOrCreateWizardDisplayMode
-
     let entries: [Node]
     var model: Model
+    var easyReadSeparator: Bool
+
     var completion: ((_ cancel: Bool, _ createNew: Bool, _ title: String?, _ selectedGroupIdx: Int?, _ selectedEntry: UUID?) -> Void)?
 
     var body: some View {
@@ -26,7 +27,7 @@ struct WizardAddExistingView: View {
                         showingConfirmation = true
                     }) {
                         let entry = SwiftEntryModel(node: node, model: model)
-                        SwiftUIEntryView(entry: entry, showIcon: !model.metadata.hideIconInBrowse)
+                        SwiftUIEntryView(entry: entry, showIcon: !model.metadata.hideIconInBrowse, easyReadSeparator: easyReadSeparator)
                     }
                 }
             } header: {
@@ -82,6 +83,6 @@ struct WizardAddExistingView: View {
     let node1 = Node(parent: nil, title: "Foo Entry", isGroup: false, uuid: nil, fields: nil, childRecordsAllowed: false)
 
     return NavigationView {
-        WizardAddExistingView(mode: .totp, entries: [node1], model: model)
+        WizardAddExistingView(mode: .totp, entries: [node1], model: model, easyReadSeparator: true)
     }
 }

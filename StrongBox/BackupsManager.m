@@ -8,7 +8,7 @@
 
 #import "BackupsManager.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import "StrongboxiOSFilesManager.h"
 #else
 #import "StrongboxMacFilesManager.h"
@@ -17,7 +17,7 @@
 #import "Utils.h"
 #import "NSDate+Extensions.h"
 
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IOS
 #import "Settings.h"
 #endif
 
@@ -35,7 +35,7 @@
 }
 
 - (BOOL)writeBackup:(NSURL *)snapshot metadata:(METADATA_PTR)metadata {
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IOS
     if ( !Settings.sharedInstance.makeLocalRollingBackups ) {
         return YES;
     }
@@ -108,7 +108,7 @@
 }
 
 - (NSArray<BackupItem*> *)getAllEmergencyRecoveryFilesAsBackups {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSArray<BackupItem*>* appSupport = [self getAllAvailableFilesAsBackupsAtDir:StrongboxFilesManager.sharedInstance.appSupportDirectory];
     NSArray<BackupItem*>* documents = [self getAllAvailableFilesAsBackupsAtDir:StrongboxFilesManager.sharedInstance.documentsDirectory];
 #endif
@@ -119,7 +119,7 @@
     NSMutableArray<BackupItem*>* ret = [NSMutableArray arrayWithArray:sharedAppGroup];
     [ret addObjectsFromArray:syncManager];
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     [ret addObjectsFromArray:appSupport];
     [ret addObjectsFromArray:documents];
 #endif

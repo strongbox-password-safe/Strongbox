@@ -32,7 +32,7 @@
 + (NSData *)getBookmarkDataFromUrl:(NSURL *)url readOnly:(BOOL)readOnly error:(NSError *_Nonnull*)error {
     NSURLBookmarkCreationOptions options = kNilOptions;
     
-    #if !TARGET_OS_IPHONE
+    #if !TARGET_OS_IOS
         options |= readOnly ? NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess : kNilOptions; 
         options |= NSURLBookmarkCreationWithSecurityScope;
     #else
@@ -108,7 +108,7 @@
 
 + (NSURL *)getUrlFromBookmarkData:(NSData *)bookmark readOnly:(BOOL)readOnly updatedBookmark:(NSData * _Nonnull __autoreleasing *)updatedBookmark error:(NSError * _Nonnull __autoreleasing *)error {
     NSURLBookmarkResolutionOptions options = NSURLBookmarkResolutionWithoutUI; 
-    #if !TARGET_OS_IPHONE
+    #if !TARGET_OS_IOS
         options |= NSURLBookmarkResolutionWithSecurityScope;
     #endif
 

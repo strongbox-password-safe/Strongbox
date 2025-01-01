@@ -66,6 +66,7 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 @property (readonly) BOOL sortCustomFields;
 @property (readonly) NSSet<NSString*> *existingCustomFieldsKeySet;
 @property (readonly) NSArray<CustomFieldViewModel*> *customFieldsFiltered;
+@property (readonly) NSArray<CustomFieldViewModel*> *customFieldsFilteredAndExcludeAlternativeUrls;
 
 - (void)removeCustomFieldAtIndex:(NSUInteger)index;
 - (void)addCustomField:(CustomFieldViewModel*)field;

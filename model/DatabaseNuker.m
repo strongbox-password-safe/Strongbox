@@ -11,7 +11,7 @@
 #import "BackupsManager.h"
 #import "WorkingCopyManager.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "LocalDeviceStorageProvider.h"
 #import "AppleICloudProvider.h"
@@ -29,6 +29,20 @@
 #endif
 
 @implementation DatabaseNuker
+
++ (void)clearAppleWatchEntriesFor:(NSString*)databaseUuid {
+#if TARGET_OS_IOS
+#ifndef IS_APP_EXTENSION
+    slog(@"clearAppleWatchEntriesFor...");
+    
+    [WatchAppManager.shared clearAllEntriesForDatabaseWithDatabaseUuid:databaseUuid completionHandler:^(BOOL success, NSError * _Nullable error) {
+        
+    }];
+    
+#endif
+#endif
+}
+
 
 + (void)nuke:(METADATA_PTR)database deleteUnderlyingIfSupported:(BOOL)deleteUnderlyingIfSupported completion:(void (^)(NSError * _Nullable))completion {
     slog(@"☢️ Nuking Database: [%@]... ⚛ - Delete Underlying = [%hhd]", database, deleteUnderlyingIfSupported);
@@ -56,7 +70,7 @@
         [DatabaseNuker completeDatabaseNuke:database partialError:nil completion:completion];
 #endif
     }
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     else if (database.storageProvider == kLocalDevice) {
         [[LocalDeviceStorageProvider sharedInstance] delete:database
                                                  completion:^(NSError *error) {
@@ -104,7 +118,7 @@
     
     [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database.uuid];
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     [database clearKeychainItems];
 
     
@@ -118,6 +132,8 @@
     }
     
     [database removeFromDatabasesList];
+    
+    [DatabaseNuker clearAppleWatchEntriesFor:database.uuid];
 #else
     [database clearSecureItems];
     

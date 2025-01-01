@@ -831,7 +831,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             NSString* storageName = [SafeStorageProviderFactory getStorageDisplayName:self.model.metadata];
             NSString* message = [NSString stringWithFormat:locMessage, storageName];
             
-            [Alerts twoOptions:self title:title message:message defaultButtonText:gotIt secondButtonText:gotItDontTellMeAgain action:^(BOOL response) {
+            [Alerts twoOptions:self title:title message:message defaultButtonText:gotIt secondButtonText:gotItDontTellMeAgain completion:^(BOOL response) {
                 if (response == NO) {
                     AppPreferences.sharedInstance.dontNotifyToSwitchToMainAppForSync = YES;
                 }

@@ -15,11 +15,9 @@
 
 @implementation ExportHelper
 
-+ (NSURL*)getExportFile:(DatabasePreferences*)database error:(NSError**)error {
-    if (!database) {
-        return nil;
-    }
-    
++ (void)getExportFile:(UIViewController *)viewController
+             database:(DatabasePreferences *)database
+           completion:(void (^)(NSURL * _Nullable, NSError * _Nullable))completion {
     NSString* filename = AppPreferences.sharedInstance.appendDateToExportFileName ? database.exportFilename : database.fileName;
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
@@ -27,42 +25,54 @@
     
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
     if (!localCopyUrl) {
-        if ( error ) {
-            *error = [Utils createNSError:@"Could not get local copy" errorCode:-2145];
-        }
-        return nil;
+        completion(nil, [Utils createNSError:@"Could not get local copy" errorCode:-2145]);
+        return;
     }
     
     NSError* err;
     NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
     if (err) {
-        if ( error ) {
-            *error = err;
-        }
-        return nil;
+        completion(nil, err);
+        return;
     }
     
     [data writeToFile:f options:kNilOptions error:&err];
     if (err) {
-        if ( error ) {
-            *error = err;
-        }
-        return nil;
+        completion(nil, err);
+        return;
     }
     
     NSURL* fileUrl = [NSURL fileURLWithPath:f];
     
     
     
+    if ( AppPreferences.sharedInstance.zipExportBehaviour == 0 ) { 
+        [Alerts yesNo:viewController
+                title:NSLocalizedString(@"zip_export_question", @"Zip Export?")
+              message:NSLocalizedString(@"zip_export_file_prompt_message", @"Strongbox can zip this export file if you prefer.\n\nWould you like to zip the export file?")
+               action:^(BOOL response) {
+            if ( response ) { 
+                [ExportHelper onContinueExport:fileUrl zip:YES completion:completion];
+            }
+            else { 
+                [ExportHelper onContinueExport:fileUrl zip:NO completion:completion];
+            }
+        }];
+    }
+    else {
+        BOOL zip = (AppPreferences.sharedInstance.zipExportBehaviour == 1);
+        [ExportHelper onContinueExport:fileUrl zip:zip completion:completion];
+    }
+}
+
++ (void)onContinueExport:(NSURL*)fileUrl zip:(BOOL)zip completion:(void (^)(NSURL * _Nullable, NSError * _Nullable))completion {
     NSURL* url;
-    if ( AppPreferences.sharedInstance.zipExports ) {
+    if ( zip ) {
         NSError* zipError;
         NSURL* zippedUrl = [Zipper zipFile:fileUrl error:&zipError];
         if ( zippedUrl == nil ) {
-            if ( error ) {
-                *error = zipError;
-            }
-            return nil;
+            completion(nil, zipError);
+            return;
         }
         
         url = zippedUrl;
@@ -71,7 +81,7 @@
         url = fileUrl;
     }
     
-    return url;
+    completion(url, nil);
 }
 
 + (void)cleanupExportFiles:(NSURL *)url {

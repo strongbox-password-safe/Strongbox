@@ -14,10 +14,16 @@
 
 #include <pwd.h>
 
+#if !TARGET_OS_WATCH
+
 #import <CoreImage/CoreImage.h>
 
-#if TARGET_OS_IPHONE
+#endif
+
+#if TARGET_OS_IOS
+
 #import <MobileCoreServices/MobileCoreServices.h>
+
 #endif
 
 @implementation Utils
@@ -102,8 +108,9 @@ BOOL isValidUrl(NSString* urlString) {
 }
 
 
+#if TARGET_OS_IOS || TARGET_OS_OSX
 + (NSString *)hostname {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     char baseHostName[256];
     int success = gethostname(baseHostName, 255);
     if (success != 0) {
@@ -111,10 +118,11 @@ BOOL isValidUrl(NSString* urlString) {
     }
     baseHostName[255] = '\0';
     return [NSString stringWithFormat:@"%s", baseHostName];
-#else
+#elif TARGET_OS_OSX
     return [[NSHost currentHost] localizedName];
 #endif
 }
+#endif
 
 
 
@@ -198,7 +206,7 @@ BOOL isValidUrl(NSString* urlString) {
     return nil;
 }
 
-#if TARGET_OS_IPHONE && !IS_APP_EXTENSION
+#if TARGET_OS_IOS && !IS_APP_EXTENSION && !TARGET_OS_WATCH
 + (void)openStrongboxSettingsAndPermissionsScreen {
     NSString* settings = [NSString stringWithFormat:@"%@&path=LOCATION/%@", UIApplicationOpenSettingsURLString, NSBundle.mainBundle.bundleIdentifier];
     NSURL* url = [NSURL URLWithString:settings];
@@ -262,7 +270,8 @@ NSComparator finderStringComparator = ^(id obj1, id obj2)
     return finderStringCompare(string1, string2);
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
+
 + (BOOL)isiPadPro {
     
 
@@ -442,7 +451,7 @@ NSData* getRandomData(uint32_t length) {
     return start;
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
 
 UIImage* scaleImage(UIImage* image, CGSize newSize) {
     float heightToWidthRatio = image.size.height / image.size.width;
@@ -467,6 +476,9 @@ UIImage* scaleImage(UIImage* image, CGSize newSize) {
     }
 }
 
+#endif
+
+#if TARGET_OS_IOS
 + (UIImage *)makeRoundedImage:(UIImage*)image radius:(float)radius {
     CALayer *imageLayer = [CALayer layer];
     imageLayer.frame = CGRectMake(0, 0, image.size.width, image.size.height);
@@ -483,7 +495,7 @@ UIImage* scaleImage(UIImage* image, CGSize newSize) {
     return roundedImage;
 }
 
-#else
+#elif TARGET_OS_OSX
 
 NSColor* NSColorFromRGB(NSUInteger rgbValue) {
     return [NSColor colorWithCalibratedRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 green:((float)((rgbValue & 0xFF00) >> 8))/255.0 blue:((float)(rgbValue & 0xFF))/255.0 alpha:1.0];
@@ -565,7 +577,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
 
 #endif
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 + (NSData*)getImageDataFromPickedImage:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info error:(NSError**)error {
     NSString* mediaType = [info objectForKey:UIImagePickerControllerMediaType];
     BOOL isImage = UTTypeConformsTo((__bridge CFStringRef)mediaType, kUTTypeImage) != 0;
@@ -586,6 +598,22 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
     
     return data;
 }
+#elif TARGET_OS_OSX
+
++ (NSImage*)getQrCode:(NSString*)string pointSize:(NSUInteger)pointSize {
+    CIImage* qrCode = [self getQrCodeCIImage:string pointSize:pointSize];
+    
+    NSCIImageRep *rep = [NSCIImageRep imageRepWithCIImage:qrCode];
+    NSImage *nsImage = [[NSImage alloc] initWithSize:rep.size];
+    
+    [nsImage addRepresentation:rep];
+    
+    return nsImage;
+}
+
+#endif
+
+#if TARGET_OS_IOS
 
 + (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize {
     CIImage* qrCode = [self getQrCodeCIImage:string pointSize:pointSize];
@@ -595,26 +623,14 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
                          orientation:UIImageOrientationUp];
 }
 
-#else
-
-+ (NSImage*)getQrCode:(NSString*)string pointSize:(NSUInteger)pointSize {
-    CIImage* qrCode = [self getQrCodeCIImage:string pointSize:pointSize];
-
-    NSCIImageRep *rep = [NSCIImageRep imageRepWithCIImage:qrCode];
-    NSImage *nsImage = [[NSImage alloc] initWithSize:rep.size];
-
-    [nsImage addRepresentation:rep];
-
-    return nsImage;
-}
-
 #endif
 
+#if TARGET_OS_IOS || TARGET_OS_OSX
 + (CIImage *)getQrCodeCIImage:(NSString *)qrString pointSize:(NSUInteger)pointSize {
     CIImage *input = [self createQRForString:qrString];
 
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSUInteger kImageViewSize = pointSize * UIScreen.mainScreen.scale;
 #else
     NSUInteger kImageViewSize = pointSize * 2;
@@ -641,6 +657,8 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
     return qrFilter.outputImage;
 }
 
+#endif
+
 NSString* localizedYesOrNoFromBool(BOOL george) {
     return george ?
     NSLocalizedString(@"alerts_yes", @"Yes") :
@@ -653,7 +671,7 @@ NSString* localizedOnOrOffFromBool(BOOL george) {
     NSLocalizedString(@"generic_state_off", @"Off");
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #ifndef IS_APP_EXTENSION
 + (BOOL)isAppInForeground {
@@ -663,7 +681,7 @@ NSString* localizedOnOrOffFromBool(BOOL george) {
 }
 #endif
 
-#else
+#elif TARGET_OS_OSX
 BOOL checkForScreenRecordingPermissionsOnMac(void) {
     
     BOOL canRecordScreen = NO;

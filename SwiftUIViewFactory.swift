@@ -29,6 +29,12 @@ class SwiftUIViewFactory: NSObject {
         return hostingController
     }
 
+    #if !IS_APP_EXTENSION
+        @objc static func makeWhatsNewViewController(_ messages: [WhatsNewMessage], dismissHandler: @escaping (() -> Void)) -> UIViewController {
+            UIHostingController(rootView: WhatsNewView(messages: messages, dismiss: dismissHandler))
+        }
+    #endif
+
     @objc static func makeWiFiSyncPasscodeViewController(_ server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig?, _ pinCode: String?) -> Void)) -> UIViewController {
         let hostingController = UIHostingController(rootView: PasscodeEntryView(server: server, onDone: onDone))
 
@@ -79,10 +85,8 @@ class SwiftUIViewFactory: NSObject {
         return hostingController
     }
 
-    @objc static func getLargeTextDisplayView(text: String, font: UIFont, colorMapper: @escaping ((_ character: String) -> UIColor), onTapped: @escaping (() -> Void)) -> UIViewController {
-        let view = LargeTextDisplayView(text: text, font: Font(font), colorMapper: { char in
-            Color(colorMapper(char))
-        }) {
+    @objc static func getLargeTextDisplayView(text: String, font: UIFont, colorize: Bool, colorBlind: Bool, onTapped: @escaping (() -> Void)) -> UIViewController {
+        let view = LargeTextDisplayView(text: text, font: Font(font), colorize: colorize, colorBlind: colorBlind) {
             onTapped()
         }
 
@@ -136,6 +140,15 @@ class SwiftUIViewFactory: NSObject {
                     onSettingsChanged: onSettingsChanged,
                     completion: completion
                 ))
+        }
+
+        @objc
+        static func getTheGarageViewController() -> UIViewController {
+            let viewModel = TheGarageViewModel(watchStatus: WatchAppManager.shared.status, preferences: AppPreferences.sharedInstance())
+            let view = TheGarageView(model: viewModel)
+                .defaultAppStorage(UserDefaults.StrongboxAppGroupUserDefaults)
+
+            return UIHostingController(rootView: view)
         }
 
     #endif

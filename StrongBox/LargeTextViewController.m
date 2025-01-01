@@ -15,12 +15,6 @@
 #import "ColoredStringHelper.h"
 
 #ifndef IS_APP_EXTENSION
-
-#import "ISMessages/ISMessages.h"
-
-#endif
-
-#ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
@@ -73,14 +67,13 @@
 }
 
 - (void)loadSwiftUIView {
-    BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
-    BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
+    BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette; 
     
     self.swiftUILargeTextView = [SwiftUIViewFactory getLargeTextDisplayViewWithText:self.string
-                                                                          font:FontManager.sharedInstance.easyReadFontForTotp
-                                                                   colorMapper:^UIColor * _Nonnull(NSString * _Nonnull character) {
-        return self.colorize ? [ColoredStringHelper getColorForCharacter:character darkMode:dark colorBlind:colorBlind] : UIColor.labelColor;
-    } onTapped:^{
+                                                                               font:FontManager.sharedInstance.easyReadFontForTotp
+                                                                           colorize:self.colorize
+                                                                         colorBlind:colorBlind
+                                                                           onTapped:^{
         [self labelTapped];
     }];
 
@@ -130,14 +123,7 @@
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
     
 #ifndef IS_APP_EXTENSION
-    [ISMessages showCardAlertWithTitle:NSLocalizedString(@"generic_copied", @"Copied")
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [StrongboxToastMessages showSlimWithTitle:NSLocalizedString(@"generic_copied", @"Copied")];
 #endif
 }
 

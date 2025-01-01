@@ -7,12 +7,12 @@
 //
 
 #import "FontManager.h"
-//#import "Settings.h"
-
-static NSString* const kEasyReadFontName = @"Menlo";
-static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
 
 @implementation FontManager
+
++ (FontManager*)shared {
+    return FontManager.sharedInstance;
+}
 
 + (instancetype)sharedInstance {
     static FontManager *sharedInstance = nil;
@@ -29,7 +29,11 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
     self = [super init];
     if (self) {
         [self buildFonts];
+        
+#if !TARGET_OS_WATCH
         [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onFontSizeChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
+#endif
+        
     }
     return self;
 }
@@ -50,24 +54,15 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
     UIFontDescriptor* desc2 = [self.headlineFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     _headlineItalicFont = [UIFont fontWithDescriptor:desc2 size:0];
     
-    _easyReadFontForTotp = [UIFont fontWithName:kEasyReadFontName size:30.0];
+#if !TARGET_OS_WATCH
+    UIFont* customEasyReadFont = [UIFont monospacedSystemFontOfSize:UIFont.labelFontSize weight:UIFontWeightRegular];
+    UIFont* customEasyReadBoldFont = [UIFont monospacedSystemFontOfSize:UIFont.labelFontSize weight:UIFontWeightBold];
 
-    UIFont* customFont = [UIFont fontWithName:kEasyReadFontName size:UIFont.labelFontSize];
-    UIFont* customBoldFont = [UIFont fontWithName:kEasyReadBoldFontName size:UIFont.labelFontSize];
-    
-
-    
-    
-    
-
-
-
-
-    _easyReadFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customFont];
-    _easyReadBoldFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customBoldFont];
-    _easyReadFontForLargeTextView = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleLargeTitle] scaledFontForFont:customFont];
-    
-
+    _easyReadFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customEasyReadFont];
+    _easyReadBoldFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customEasyReadBoldFont];
+    _easyReadFontForLargeTextView = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleLargeTitle] scaledFontForFont:customEasyReadFont];
+    _easyReadFontForTotp = [UIFont monospacedSystemFontOfSize:30 weight:UIFontWeightBold];
+#endif
 }
 
 - (void)onFontSizeChanged:(NSNotificationCenter*)center {

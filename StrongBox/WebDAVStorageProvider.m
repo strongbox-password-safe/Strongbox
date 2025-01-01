@@ -16,7 +16,7 @@
 #import "NSDate+Extensions.h"
 #import "WebDAVConnections.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "SVProgressHUD.h"
 
@@ -79,7 +79,7 @@
 
 - (void)dismissProgressSpinner {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD dismiss];
 #else
         [macOSSpinnerUI.sharedInstance dismiss];
@@ -89,7 +89,7 @@
 
 - (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD showWithStatus:message];
 #else
         [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
@@ -559,7 +559,7 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
 
 - (WebDAVProviderData*)getProviderDataFromMetaData:(METADATA_PTR)metaData {
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString* json = metaData.fileIdentifier;
 #else
     NSString* json = metaData.storageInfo;
@@ -588,7 +588,7 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     DatabasePreferences *ret = [DatabasePreferences templateDummyWithNickName:nickName
                                                               storageProvider:self.storageId
                                                                      fileName:[[foo.href lastPathComponent] stringByRemovingPercentEncoding]

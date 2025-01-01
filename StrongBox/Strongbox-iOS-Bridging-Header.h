@@ -85,3 +85,4 @@
 #import "SelectDatabaseViewController.h"
 #import "IOSCompositeKeyDeterminer.h"
 #import "DatabaseUnlocker.h"
+#import "ColoredStringHelper.h"

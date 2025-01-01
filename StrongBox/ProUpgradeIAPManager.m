@@ -16,7 +16,7 @@
 #import "CrossPlatform.h"
 #import "NSDate+Extensions.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import "CustomizationManager.h"
 #elif TARGET_OS_MAC
 #import "MacCustomizationManager.h"
@@ -212,7 +212,7 @@ static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly
         self.preferences.numberOfEntitlementCheckFails = 0;
     }
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     if ( CustomizationManager.isAProBundle ) {
 #elif TARGET_OS_MAC
     if ( MacCustomizationManager.isAProBundle ) {

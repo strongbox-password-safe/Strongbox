@@ -11,8 +11,9 @@
 #import "Utils.h"
 #import "ConcurrentMutableDictionary.h"
 
-#if TARGET_OS_IPHONE
-#else
+#if TARGET_OS_IOS || TARGET_OS_WATCH
+
+#elif TARGET_OS_OSX
 #import "Settings.h"
 #endif
 
@@ -26,23 +27,26 @@ static IMAGE_TYPE_PTR kSmallLockImage;
 static NSArray<IMAGE_TYPE_PTR> *kKeePassIconSet;
 static NSArray<IMAGE_TYPE_PTR> *kKeePassiOS13SFIconSet;
 static NSArray<IMAGE_TYPE_PTR> *kKeePassXCIconSet;
+static NSArray<NSString*> *kSfSymbolNames;
 
 @implementation NodeIconHelper
 
 + (void)initialize {
     if(self == [NodeIconHelper class]) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
         kPwSafeFolderImage = [UIImage imageNamed:@"folder"];
         kPwSafeRecordImage = [UIImage imageNamed:@"document"];
-#else
+#elif TARGET_OS_OSX
         kFolderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
         kSmallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
         kSmallLockImage = [NSImage imageNamed:@"lock-48"];
 #endif
+        
+        kSfSymbolNames = loadSfSymbolNames();
     }
 }
 
-static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
+static NSArray<NSString*>* loadSfSymbolNames(void) {
     NSArray<NSString*>* names = @[@"lock.fill",
                                   @"globe",
                                   @"exclamationmark.triangle",
@@ -119,8 +123,12 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
         mut[58] = @"person.badge.key.fill";
     }
     
-    return [mut map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-#if TARGET_OS_IPHONE
+    return mut.copy;
+}
+
+static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
+    return [kSfSymbolNames map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+#if TARGET_OS_IOS || TARGET_OS_WATCH
         IMAGE_TYPE_PTR img;
         if (@available(iOS 16.0, *)) {
             img = [[UIImage systemImageNamed:obj] imageWithConfiguration:[UIImageSymbolConfiguration configurationPreferringMonochrome]];
@@ -129,7 +137,7 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet(void) {
         }
         
         return img ? [img imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate] : [[UIImage systemImageNamed:@"lock.fill"] imageWithTintColor:UIColor.blueColor renderingMode:UIImageRenderingModeAlwaysTemplate];
-#else
+#elif TARGET_OS_OSX
         IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
         
         return img ? img : kSmallLockImage;
@@ -210,9 +218,9 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassXCIconSet(void) {
                                   @"KPXC_C68_Smartphone"];
     
     return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
         return [UIImage imageNamed:obj];
-#else
+#elif TARGET_OS_OSX
         return [NSImage imageNamed:obj];
 #endif
     }];
@@ -290,9 +298,9 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
                                   @"C68_Smartphone"];
     
     return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
         return [UIImage imageNamed:obj];
-#else
+#elif TARGET_OS_OSX
         return [NSImage imageNamed:obj];
 #endif
     }];
@@ -300,6 +308,10 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
 
 + (IMAGE_TYPE_PTR)defaultIcon {
     return [NodeIconHelper getNodeIcon:NodeIcon.defaultNodeIcon];
+}
+
++ (NSString *)getSfSymbolName:(NodeIcon *)icon {
+    return icon.preset >= 0 && icon.preset < kSfSymbolNames.count ? kSfSymbolNames[icon.preset] : kSfSymbolNames[0];
 }
 
 + (IMAGE_TYPE_PTR)getIconForNode:(Node*)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format {
@@ -328,7 +340,7 @@ static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet(void) {
 
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format isGroup:(BOOL)isGroup large:(BOOL)large {
     if(format == kPasswordSafe) {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
         return isGroup ? kPwSafeFolderImage : kPwSafeRecordImage;
 #else
         if ( !large ) {

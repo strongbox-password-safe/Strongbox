@@ -48,6 +48,10 @@ struct OtherViewsView: View {
                 NavigationCapsule(model: model, title: "item_details_section_header_attachments", image: "doc.richtext.fill", count: String(model.database.attachmentsEntryCount), imageBackgroundColor: .mint, destination: .attachments)
             }
 
+            if model.database.watchEntryCount > 0 {
+                NavigationCapsule(model: model, title: "sidebar_watch_entries", image: "applewatch", count: String(model.database.watchEntryCount), imageBackgroundColor: Color.brown, destination: .watchEntries)
+            }
+
             if model.expireCount > 0 {
                 NavigationCapsule(model: model, title: "quick_view_title_expired_and_expiring", image: "calendar", count: String(model.expireCount), imageBackgroundColor: .cyan, destination: .expiredAndExpiring)
             }

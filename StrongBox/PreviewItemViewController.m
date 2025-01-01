@@ -13,6 +13,12 @@
 #import "MutableOrderedDictionary.h"
 #import "Utils.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 @interface PreviewItemViewController ()
 
 @property UILabel *totpLabel;
@@ -21,6 +27,7 @@
 
 @property Model* model;
 @property Node* item;
+@property UIFont* twoFactorEasyReadSeparatorFont;
 
 @end
 
@@ -35,7 +42,8 @@
     if (self) {
         self.item = item;
         self.model = model;
-        
+        self.twoFactorEasyReadSeparatorFont = [UIFont monospacedSystemFontOfSize:30 weight:UIFontWeightRegular];
+
         UIImage* icon = [NodeIconHelper getIconForNode:item predefinedIconSet:model.metadata.keePassIconSet format:model.database.originalFormat];
 
         UIImageView *imageView = [[UIImageView alloc] init];
@@ -182,8 +190,36 @@
 
 - (void)updateTotpLabel {
     uint64_t remainingSeconds = self.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.otpToken.period);
-    self.totpLabel.text = [NSString stringWithFormat:@"%@", self.otpToken.password];
-    self.totpLabel.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.systemBlueColor;
+    
+    NSArray<NSString*>* codes = self.otpToken.codeSeparated;
+    if ( codes && codes.count == 2 && AppPreferences.sharedInstance.twoFactorEasyReadSeparator ) {
+        NSMutableAttributedString* mut = [[NSMutableAttributedString alloc] init];
+        [mut beginEditing];
+        
+        UIColor *color = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.labelColor;
+        
+        [mut appendAttributedString:[[NSAttributedString alloc] initWithString:codes[0] attributes:@{
+            NSForegroundColorAttributeName : color,
+        }]];
+        
+        [mut appendAttributedString:[[NSAttributedString alloc] initWithString:@"•" attributes:@{
+            NSForegroundColorAttributeName : UIColor.tertiaryLabelColor,
+            NSFontAttributeName: self.twoFactorEasyReadSeparatorFont,
+        }]];
+        
+        [mut appendAttributedString:[[NSAttributedString alloc] initWithString:codes[1] attributes:@{
+            NSForegroundColorAttributeName : color,
+        }]];
+        
+        [mut endEditing];
+        
+        self.totpLabel.attributedText = mut.copy;
+    }
+    else {
+        self.totpLabel.text = [NSString stringWithFormat:@"%@", self.otpToken.password];
+        self.totpLabel.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.labelColor;
+    }
+    
     self.totpLabel.alpha = 1;
     
     if(remainingSeconds < 16) {

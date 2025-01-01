@@ -110,6 +110,26 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStrongboxSyncStatus;
 @property (weak, nonatomic) IBOutlet UISwitch *showAssociatedWebsites;
+@property (weak, nonatomic) IBOutlet UISwitch *split2FACodes;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellTheGarage;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAssociatedWebsites;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSplit2FACodes;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cell2FAAddOtpAuthURL;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cell2FAAddLegacyFields;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPinYinSearch;
+
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellColorBling;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowThirdPartyKeyboards;
+@property (weak, nonatomic) IBOutlet UITableViewCell *showMetadataOnDetailsScreen;
+@property (weak, nonatomic) IBOutlet UITableViewCell *showDatabasesOnAppShortcutMenu;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellMarkdownNotes;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPinCodeHaptics;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryParentIcon;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellStripUnusedIcons;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellStripHistoricalCustomIcons;
 
 @end
 
@@ -117,7 +137,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     self.navigationController.toolbar.hidden = YES;
     self.navigationController.toolbarHidden = YES;
     
@@ -131,7 +151,7 @@
     
     
     
-    if ( AppPreferences.sharedInstance.disableExport ) { 
+    if ( AppPreferences.sharedInstance.disableExport ) {
         [self cell:self.cellZipExports setHidden:YES];
         [self cell:self.cellHideExport setHidden:YES];
         [self cell:self.cellExportDate setHidden:YES];
@@ -146,7 +166,7 @@
         
         [self cell:self.cellForcePull setHidden:YES];
         [self cell:self.cellSyncForcePush setHidden:YES];
-
+        
         [self cell:self.cellWiFiSyncSwitch setHidden:YES];
         [self cell:self.cellWiFiSyncPasscode setHidden:YES];
         [self cell:self.cellWiFiSyncServiceName setHidden:YES];
@@ -159,7 +179,7 @@
     }
     
     [self cell:self.cellNewEntryDefaults setHidden:YES];
-
+    
     if ( CustomizationManager.isAProBundle ) {
         [self cell:self.cellRedeemOfferCode setHidden:YES];
     }
@@ -170,7 +190,7 @@
     [self bindCloudSessions];
     [self bindPasswordStrength];
     [self bindWiFiSyncSource];
-        
+    
 #ifndef NO_NETWORKING 
     __weak AdvancedPreferencesTableViewController* weakSelf = self;
     [NSNotificationCenter.defaultCenter addObserverForName:NSNotification.wiFiSyncServiceNameDidChange
@@ -180,6 +200,30 @@
         [weakSelf bindWiFiSyncSource];
     }];
 #endif
+    
+    [self cell:self.cellDetectIfOffline setHidden:YES];
+    [self cell:self.cellAssociatedWebsites setHidden:YES];
+    [self cell:self.cellAtomicSftpWrites setHidden:YES];
+    [self cell:self.cellSplit2FACodes setHidden:YES];
+    [self cell:self.cell2FAAddLegacyFields setHidden:YES];
+    [self cell:self.cell2FAAddOtpAuthURL setHidden:YES];
+    [self cell:self.cellPinYinSearch setHidden:YES];
+    [self cell:self.cellColorBling setHidden:YES];
+    [self cell:self.cellAllowThirdPartyKeyboards setHidden:YES];
+    [self cell:self.showMetadataOnDetailsScreen setHidden:YES];
+    [self cell:self.showDatabasesOnAppShortcutMenu setHidden:YES];
+    [self cell:self.cellMarkdownNotes setHidden:YES];
+    [self cell:self.cellPinCodeHaptics setHidden:YES];
+    [self cell:self.cellNewEntryParentIcon setHidden:YES];
+    [self cell:self.cellStripUnusedIcons setHidden:YES];
+    [self cell:self.cellStripHistoricalCustomIcons setHidden:YES];
+    
+    [self cell:self.cellDropboxAppFolder setHidden:YES];
+    [self cell:self.cellInstantPin setHidden:YES];
+    
+    [self cell:self.cellZipExports setHidden:YES];
+    [self cell:self.cellHideExport setHidden:YES];
+    [self cell:self.cellExportDate setHidden:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -301,6 +345,10 @@
             }
         }];
     }
+    else if ( cell == self.cellTheGarage ) {
+        UIViewController* vc = [SwiftUIViewFactory getTheGarageViewController];
+        [self.navigationController pushViewController:vc animated:YES];
+    }
 }
 
 - (IBAction)onDone:(id)sender {
@@ -388,7 +436,10 @@
         
     AppPreferences.sharedInstance.appendDateToExportFileName = self.switchAppendDateExportFilenames.on;
     AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
-    AppPreferences.sharedInstance.zipExports = self.switchZipExports.on;
+    
+
+
+
 
     AppPreferences.sharedInstance.atomicSftpWrite = self.atomicSftpWrites.on;
     AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu = self.switchShowDatabasesOnAppShortcutsMenu.on;
@@ -398,6 +449,7 @@
     }
     
     AppPreferences.sharedInstance.associatedWebsites = self.showAssociatedWebsites.on;
+    AppPreferences.sharedInstance.twoFactorEasyReadSeparator = self.split2FACodes.on;
     
     [self bindPreferences];
 }
@@ -433,13 +485,17 @@
     self.stripHistoricalCustomIconsOnSave.on = AppPreferences.sharedInstance.stripUnusedHistoricalIcons;
     
     self.switchHideExportOnDatabaseMenu.on = AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu;
-    self.switchZipExports.on = AppPreferences.sharedInstance.zipExports;
+    
+
+    
     self.switchAppendDateExportFilenames.on = AppPreferences.sharedInstance.appendDateToExportFileName;
     
     self.atomicSftpWrites.on = AppPreferences.sharedInstance.atomicSftpWrite;
     self.switchShowDatabasesOnAppShortcutsMenu.on = AppPreferences.sharedInstance.showDatabasesOnAppShortcutMenu;
         
     self.showAssociatedWebsites.on = AppPreferences.sharedInstance.associatedWebsites;
+
+    self.split2FACodes.on = AppPreferences.sharedInstance.twoFactorEasyReadSeparator;
 
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {

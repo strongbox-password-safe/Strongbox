@@ -16,7 +16,7 @@
 #import "SFTPConnections.h"
 #import "CrossPlatform.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "SVProgressHUD.h"
 #import "Alerts.h"
@@ -68,7 +68,7 @@
     viewController:(VIEW_CONTROLLER_PTR)viewController
         completion:(void (^)(BOOL yesNo))completion {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [Alerts yesNo:viewController title:title message:message action:completion];
 #else
         [MacAlerts yesNo:message window:viewController.view.window completion:completion];
@@ -79,7 +79,7 @@
 
 - (void)dismissProgressSpinner {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD dismiss];
 #else
         [macOSSpinnerUI.sharedInstance dismiss];
@@ -89,7 +89,7 @@
 
 - (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
     dispatch_async(dispatch_get_main_queue(), ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         [SVProgressHUD showWithStatus:message];
 #else
         [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
@@ -336,7 +336,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 
 
 - (SFTPProviderData*)getProviderDataFromMetaData:(METADATA_PTR )metaData {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     NSString* json = metaData.fileIdentifier;
 #else
     NSString* json = metaData.storageInfo;
@@ -371,7 +371,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     DatabasePreferences *ret = [DatabasePreferences templateDummyWithNickName:nickName
                                                               storageProvider:self.storageId
                                                                      fileName:[foo.filePath lastPathComponent]

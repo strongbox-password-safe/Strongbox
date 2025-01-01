@@ -13,7 +13,7 @@
 #import "BookmarksHelper.h"
 #import "Utils.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "StrongboxiOSFilesManager.h"
 #import "KissXML.h" 
@@ -402,7 +402,7 @@ static NSData * _Nullable getByUrl(NSError *__autoreleasing *error, DatabaseForm
         }
     }
     
-#if TARGET_OS_IPHONE 
+#if TARGET_OS_IOS 
     if ( keyFileFileName ) {
         NSURL* localGroupFile = [StrongboxFilesManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:keyFileFileName];
         return getByUrl(error, format, localGroupFile);

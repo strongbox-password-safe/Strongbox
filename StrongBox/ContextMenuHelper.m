@@ -26,12 +26,12 @@
     return [ContextMenuHelper getItem:title systemImage:systemImage enabled:YES handler:handler];
 }
 
-+ (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage colour:(UIColor *)colour handler:(UIActionHandler)handler {
-    return [self getItem:title systemImage:systemImage colour:colour large:NO handler:handler];
++ (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage color:(UIColor *)color handler:(UIActionHandler)handler {
+    return [self getItem:title systemImage:systemImage color:color large:NO handler:handler];
 }
 
-+ (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage colour:(UIColor *)colour large:(BOOL)large handler:(UIActionHandler)handler {
-    return [self getItem:title systemImage:systemImage colour:colour large:large destructive:NO enabled:YES checked:NO handler:handler];
++ (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage color:(UIColor *)color large:(BOOL)large handler:(UIActionHandler)handler {
+    return [self getItem:title systemImage:systemImage color:color large:large destructive:NO enabled:YES checked:NO handler:handler];
 }
 
 
@@ -40,16 +40,16 @@
 }
 
 + (UIAction *)getItem:(NSString *)title systemImage:(NSString *)systemImage enabled:(BOOL)enabled checked:(BOOL)checked handler:(UIActionHandler)handler {
-    return [ContextMenuHelper getItem:title systemImage:systemImage colour:nil destructive:NO enabled:enabled checked:checked handler:handler];
+    return [ContextMenuHelper getItem:title systemImage:systemImage color:nil destructive:NO enabled:enabled checked:checked handler:handler];
 }
 
 + (UIAction*)getDestructiveItem:(NSString*)title systemImage:(NSString*)systemImage handler:(UIActionHandler)handler  {
-    return [ContextMenuHelper getItem:title systemImage:systemImage colour:nil destructive:YES enabled:YES checked:NO handler:handler];
+    return [ContextMenuHelper getItem:title systemImage:systemImage color:nil destructive:YES enabled:YES checked:NO handler:handler];
 }
 
 + (UIAction*)getItem:(NSString*)title
          systemImage:(NSString*)systemImage
-              colour:(UIColor*_Nullable)colour
+              color:(UIColor*_Nullable)color
          destructive:(BOOL)destructive
              enabled:(BOOL)enabled
              checked:(BOOL)checked
@@ -57,7 +57,7 @@
 {
     return [self getItem:title
              systemImage:systemImage
-                  colour:colour
+                  color:color
                    large:NO
              destructive:destructive
                  enabled:enabled
@@ -67,7 +67,7 @@
 
 + (UIAction*)getItem:(NSString*)title
          systemImage:(NSString*)systemImage
-              colour:(UIColor*_Nullable)colour
+              color:(UIColor*_Nullable)color
                large:(BOOL)large
          destructive:(BOOL)destructive
              enabled:(BOOL)enabled
@@ -77,8 +77,8 @@
     if ( systemImage ) {
         image = [UIImage systemImageNamed:systemImage];
         
-        if ( colour ) {
-            UIImageSymbolConfiguration* colourConfig = [UIImageSymbolConfiguration configurationWithHierarchicalColor:colour];
+        if ( color ) {
+            UIImageSymbolConfiguration* colourConfig = [UIImageSymbolConfiguration configurationWithHierarchicalColor:color];
             
             if ( large ) {
                 colourConfig = [colourConfig configurationByApplyingConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]];

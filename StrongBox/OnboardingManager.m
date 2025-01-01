@@ -81,6 +81,7 @@
     id<OnboardingModule> downgraded = [self getHasBeenDowngradedModule];
     id<OnboardingModule> upgradeToPro = [self getUpgradeToProModule];
     id<OnboardingModule> saleNowOn = [self getSaleNowOnModule];
+    id<OnboardingModule> whatsNew = [self getWhatsNewModule];
     id<OnboardingModule> finalAllSetWelcomeToStrongbox = [self getFirstRunFinalWelcomeToStrongboxModule];
     
     NSArray<id<OnboardingModule>> *onboardingItems = @[businessActivation,
@@ -93,6 +94,7 @@
                                                        downgraded,
                                                        upgradeToPro,
                                                        saleNowOn,
+                                                       whatsNew,
                                                        finalAllSetWelcomeToStrongbox];
 
 
@@ -271,6 +273,11 @@
 - (id<OnboardingModule>)getSaleNowOnModule {
     SaleNowOnOnboardingModule *module = [[SaleNowOnOnboardingModule alloc] initWithModel:nil];
     return module;    
+}
+
+- (id<OnboardingModule>)getWhatsNewModule {
+    WhatsNewOnboardingModule *module = [[WhatsNewOnboardingModule alloc] initWithModel:nil];
+    return module;
 }
 
 - (id<OnboardingModule>)getAutoFillOnboardingModule {
@@ -980,13 +987,25 @@
 - (void)onShare:(GenericOnboardingViewController*)viewController
        database:(DatabasePreferences*)database
          onDone:(OnboardingModuleDoneBlock)onDone {
-    NSError* error;
-    NSURL* url = [ExportHelper getExportFile:database error:&error];
-    if ( !url || error ) {
-        [Alerts error:viewController error:error];
-        return;
-    }
+    
+    [ExportHelper getExportFile:viewController database:database completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        if ( url == nil && error == nil ) {
+            onDone(NO, NO);
+            return; 
+        }
 
+        if ( !url || error ) {
+            [Alerts error:viewController error:error completion:^{
+                onDone(NO, NO);
+            }];
+        }
+        else {
+            [self onGotExportFile:viewController url:url onDone:onDone];
+        }
+    }];
+}
+
+- (void)onGotExportFile:(GenericOnboardingViewController*)viewController url:(NSURL*)url onDone:(OnboardingModuleDoneBlock)onDone {
     NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     

@@ -323,6 +323,6 @@ struct TagsList: View {
     let currentItemTags = ["Alpha - Α α", "Gamma - Γ γ", "Iota - Ι ι", "Phi - Φ φ", "Omega - Ω ω", "Tau - Τ τ"]
 
     return TagsEditorView(currentItemTags: Set(currentItemTags), allTags: Set(allTags)) { cancelled, selectedTags in
-        print("completion called with \(cancelled) - \(selectedTags)")
+        swlog("completion called with \(cancelled) - \(selectedTags)")
     }
 }

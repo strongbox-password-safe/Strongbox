@@ -9,7 +9,8 @@
 #import "BrowseItemTotpCell.h"
 #import "OTPToken+Generation.h"
 //#import "Settings.h"
-#import "Model.h"
+//#import "Model.h"
+#import "Constants.h"
 
 @interface BrowseItemTotpCell ()
 

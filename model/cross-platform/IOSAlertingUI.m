@@ -27,7 +27,7 @@
 }
 
 - (void)twoOptionsWithCancel:(nonnull PARENT_UI_ELEMENT_PTR)parentUiElement title:(nonnull NSString *)title message:(nonnull NSString *)message defaultButtonText:(nonnull NSString *)defaultButtonText secondButtonText:(nonnull NSString *)secondButtonText action:(nonnull void (^)(int))action {
-    [Alerts twoOptionsWithCancel:parentUiElement title:title message:message defaultButtonText:defaultButtonText secondButtonText:secondButtonText action:action];
+    [Alerts twoOptionsWithCancel:parentUiElement title:title message:message defaultButtonText:defaultButtonText secondButtonText:secondButtonText completion:action];
 }
 
 - (void)warn:(nonnull PARENT_UI_ELEMENT_PTR)parentUiElement title:(nonnull NSString *)title message:(nonnull NSString *)message {

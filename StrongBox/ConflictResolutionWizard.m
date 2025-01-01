@@ -67,7 +67,7 @@
                          message:NSLocalizedString(@"conflict_resolution_force_overwrite_message", @"You can overwrite changes in either your local copy or in the remote copy.")
                defaultButtonText:NSLocalizedString(@"conflict_resolution_force_overwrite_take_remote", @"Take Remote Copy, Overwrite Local")
                 secondButtonText:NSLocalizedString(@"conflict_resolution_force_overwrite_keep_lacal", @"Keep Local Copy, Overwrite Remote")
-                          action:^(int response) {
+                      completion:^(int response) {
         if (response == 0) {
             self.completion(kConflictWizardResultForcePullRemote);
         }

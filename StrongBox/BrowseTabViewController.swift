@@ -45,6 +45,8 @@ class BrowseTabViewController: UITabBarController {
             return NSLocalizedString("quick_view_title_expired_and_expiring", comment: "Expired & Expiring")
         case .auditIssues:
             return NSLocalizedString("browse_vc_action_audit", comment: "Audit")
+        case .watchEntries:
+            return NSLocalizedString("browse_tab_watch", comment: "Watch")
         @unknown default:
             return "🔴 UNKNOWN"
         }
@@ -80,6 +82,8 @@ class BrowseTabViewController: UITabBarController {
             imageName = "calendar"
         case .auditIssues:
             imageName = "checkmark.shield.fill"
+        case .watchEntries:
+            imageName = "applewatch"
         @unknown default:
             imageName = "questionmark.circle.fill"
         }

@@ -189,7 +189,7 @@ static const int kMaxFailedPinAttempts = 3;
                                  message:NSLocalizedString(@"composite_key_determiner_convenience_expired_message", @"It's time now to re-enter your Master Password manually. You can change this master password expiry interval in Database Settings.")
                        defaultButtonText:NSLocalizedString(@"alerts_ok", @"OK")
                         secondButtonText:NSLocalizedString(@"generic_ok_dont_remind_me_again", @"OK, Don't Remind Me Again")
-                                  action:^(int response) {
+                              completion:^(int response) {
                 if ( response == 0 ) { 
                     [self promptForManualCredentials];
                 }

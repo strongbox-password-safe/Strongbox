@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Utils.h"
 #import "Node.h"
 #import "NodeIcon.h"
 #import "KeePassIconSet.h"
@@ -25,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*_Nullable)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet;
+
++ (NSString*)getSfSymbolName:(NodeIcon*_Nullable)icon;
+
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*_Nullable)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format;
 + (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*_Nullable)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format isGroup:(BOOL)isGroup;
 

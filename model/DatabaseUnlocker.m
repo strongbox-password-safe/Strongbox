@@ -20,7 +20,7 @@
 #import "EncryptionSettingsViewModel.h"
 #import "NSData+Extensions.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "AppPreferences.h"
 
@@ -282,6 +282,10 @@
     
     [self updateQuickTypeAutoFill:viewModel];
 
+#if TARGET_OS_IOS
+    [viewModel refreshWatchAppEntries];
+#endif
+    
     self.completion(kUnlockDatabaseResultSuccess, viewModel, nil);
 }
 
@@ -369,7 +373,7 @@
         
         weakSelf.database.emptyOrNilPwPreferNilCheckFirst = !weakSelf.database.emptyOrNilPwPreferNilCheckFirst;
                     
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil && weakSelf.database.nextGenPrimaryYubiKeyConfig.mode != kVirtual;
 #else
         BOOL physicalYubiKey = secondCheck.yubiKeyCR != nil && !weakSelf.database.yubiKeyConfiguration.isVirtual;
@@ -534,7 +538,7 @@
 }
 
 - (void)doHapticFeedback:(BOOL)success {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
     [gen notificationOccurred:success ? UINotificationFeedbackTypeSuccess : UINotificationFeedbackTypeError];
 #endif
@@ -544,7 +548,7 @@
                            key:(CompositeKeyFactors*)key
             keyFromConvenience:(BOOL)keyFromConvenience
                     completion:(UnlockDatabaseCompletionBlock)completion {
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     if ( self.isNativeAutoFillAppExtensionOpen && !AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseUnlocker isAutoFillLikelyToCrash:url] ) {
         AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
 

@@ -14,7 +14,7 @@
 #import "StorageProvider.h"
 #import "CrossPlatform.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
     #import <UIKit/UIKit.h>
     typedef UIViewController* VIEW_CONTROLLER_PTR;
     typedef UIImage* IMAGE_TYPE_PTR;

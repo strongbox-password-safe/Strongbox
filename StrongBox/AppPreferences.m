@@ -12,6 +12,12 @@
 #import "SecretStore.h"
 #import "PasswordMaker.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 static NSString* cachedAppGroupName;
 
@@ -156,7 +162,8 @@ static NSString* const kStripUnusedHistoricalIcons = @"stripUnusedHistoricalIcon
 static NSString* const kDatabasesSerializationError = @"databasesSerializationError";
 static NSString* const kWiFiSyncHasBeenGrantedPermission = @"wiFiSyncHasBeenGrantedPermission";
 static NSString* const kDisableWiFiSync = @"disableWiFiSync";
-static NSString* const kZipExports = @"zipExports";
+
+static NSString* const kZipExportBehaviour = @"zipExportBehaviour";
 
 static NSString* const kWiFiSyncOn = @"wiFiSyncOn";
 static NSString* const kWiFiSyncServiceName = @"wiFiSyncServiceName";
@@ -178,6 +185,10 @@ static NSString* const kDisableCopyTo = @"disableCopyTo";
 static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles";
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
 static NSString* const kAssociatedWebsites = @"associatedWebsites";
+static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparator";
+static NSString* const kAppleWatchIntegration = @"appleWatchIntegration";
+static NSString* const kLastDisplayedWhatsNewMessage = @"lastDisplayedWhatsNewMessage";
+static NSString* const kShowInteractiveAppleWatchSyncGuide = @"showInteractiveAppleWatchSyncGuide";
 
 @implementation AppPreferences
 
@@ -219,6 +230,46 @@ static NSString* const kAssociatedWebsites = @"associatedWebsites";
 }
 
 
+
+- (BOOL)showInteractiveAppleWatchSyncGuide {
+    return [self getBool:kShowInteractiveAppleWatchSyncGuide fallback:YES];
+}
+
+- (void)setShowInteractiveAppleWatchSyncGuide:(BOOL)showInteractiveAppleWatchSyncGuide {
+    [self setBool:kShowInteractiveAppleWatchSyncGuide value:showInteractiveAppleWatchSyncGuide];
+}
+
+- (NSInteger)lastDisplayedWhatsNewMessage {
+    return [self getInteger:kLastDisplayedWhatsNewMessage fallback:-1];
+}
+
+- (void)setLastDisplayedWhatsNewMessage:(NSInteger)lastDisplayedWhatsNewMessage {
+    [self setInteger:kLastDisplayedWhatsNewMessage value:lastDisplayedWhatsNewMessage];
+}
+
+
+
+- (BOOL)appleWatchIntegration {
+    return [self getBool:kAppleWatchIntegration fallback:YES];
+}
+
+- (void)setAppleWatchIntegration:(BOOL)appleWatchIntegration {
+    [self setBool:kAppleWatchIntegration value:appleWatchIntegration];
+    
+#ifndef IS_APP_EXTENSION
+    if ( appleWatchIntegration ) {
+        [WatchAppManager.shared quickActivate];
+    }
+#endif
+}
+
+- (BOOL)twoFactorEasyReadSeparator {
+    return [self getBool:kTwoFactorEasyReadSeparator fallback:YES];
+}
+
+- (void)setTwoFactorEasyReadSeparator:(BOOL)twoFactorEasyReadSeparator {
+    [self setBool:kTwoFactorEasyReadSeparator value:twoFactorEasyReadSeparator];
+}
 
 - (BOOL)associatedWebsites {
     return [self getBool:kAssociatedWebsites fallback:YES];
@@ -408,12 +459,12 @@ static NSString* const kAssociatedWebsites = @"associatedWebsites";
     [self setString:kWiFiSyncServiceName value:wiFiSyncServiceName];
 }
 
-- (BOOL)zipExports {
-    return [self getBool:kZipExports fallback:YES];
+- (NSInteger)zipExportBehaviour {
+    return [self getInteger:kZipExportBehaviour];
 }
 
-- (void)setZipExports:(BOOL)zipExports {
-    [self setBool:kZipExports value:zipExports];
+- (void)setZipExportBehaviour:(NSInteger)zipExportBehaviour {
+    [self setInteger:kZipExportBehaviour value:zipExportBehaviour];
 }
 
 - (BOOL)wiFiSyncHasRequestedNetworkPermissions {

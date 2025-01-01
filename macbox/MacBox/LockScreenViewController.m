@@ -149,8 +149,8 @@
     
     
     self.quickTrialStartContainer.wantsLayer = YES;
-    NSColor *colour = ColorFromRGB(0x2C2C2E);
-    self.quickTrialStartContainer.layer.backgroundColor = colour.CGColor;
+    NSColor *color = ColorFromRGB(0x2C2C2E);
+    self.quickTrialStartContainer.layer.backgroundColor = color.CGColor;
     self.quickTrialStartContainer.layer.cornerRadius = 10;
     
     __weak LockScreenViewController* weakSelf = self;

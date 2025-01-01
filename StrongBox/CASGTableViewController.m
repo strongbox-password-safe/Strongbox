@@ -235,7 +235,7 @@
                          message:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
                defaultButtonText:NSLocalizedString(@"casg_question_option_empty", @"Empty Password")
                 secondButtonText:NSLocalizedString(@"casg_question_option_none", @"No Password")
-                          action:^(int response) {
+                      completion:^(int response) {
                               if(response == 0) {
                                   self.selectedPassword = @"";
                                   [self checkKeyFileForCommonMistake];
@@ -261,7 +261,7 @@
             NSString* option1 = NSLocalizedString(@"casg_key_file_correct_yes_key_file_correct", @"Yes, the key file is correct");
             NSString* option2 = NSLocalizedString(@"casg_key_file_correct_no_no_key_file", @"No, I don't use a key file");
                                 
-            [Alerts twoOptionsWithCancel:self title:title message:message defaultButtonText:option1 secondButtonText:option2 action:^(int response) {
+            [Alerts twoOptionsWithCancel:self title:title message:message defaultButtonText:option1 secondButtonText:option2 completion:^(int response) {
                 slog(@"%d", response);
                 
                 if (response == 0) {

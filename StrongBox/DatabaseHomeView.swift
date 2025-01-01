@@ -109,7 +109,7 @@ struct DatabaseHomeView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
                     SyncNavBarButton(model: model)
-                    PlusNavBarButton(model: model)
+                    MoreNavBarButton(model: model)
                 }
             }
         }

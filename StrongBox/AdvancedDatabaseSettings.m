@@ -23,6 +23,7 @@
 #import "StatisticsPropertiesViewController.h"
 #import "ScheduledExportConfigurationViewController.h"
 #import "AutoFillNewRecordSettingsController.h"
+#import "Strongbox-Swift.h"
 
 @interface AdvancedDatabaseSettings ()
 
@@ -33,6 +34,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellScheduledExport;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryDefaults;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoFetchFavIcon;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAppleWatchSync;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAppleWatchSync;
 
 @end
 
@@ -167,14 +170,25 @@
     [self performSegueWithIdentifier:@"segueToExportOptions" sender:nil];
 }
 
-- (IBAction)onToggleAutoFetchFavIcon:(id)sender {
-    self.viewModel.metadata.tryDownloadFavIconForNewRecord = !self.viewModel.metadata.tryDownloadFavIconForNewRecord;
-
+- (IBAction)onSettingChanged:(id)sender {
+    self.viewModel.metadata.tryDownloadFavIconForNewRecord = self.switchAutoFetchFavIcon.on;
+    self.viewModel.metadata.appleWatchEnabled = self.switchAppleWatchSync.on;
+    
+    if ( self.viewModel.metadata.appleWatchEnabled ) {
+        [WatchAppManager.shared expressUpdateEntriesWithModel:self.viewModel];
+    }
+    else {
+        [WatchAppManager.shared syncDatabasesAndSettingsWithCompletionHandler:^(BOOL success, NSError * _Nullable error) {
+            slog(@"syncDatabasesAndSettings Done.");
+        }];
+    }
+    
     [self bindUI];
 }
 
 - (void)bindUI {
     self.switchAutoFetchFavIcon.on = self.viewModel.metadata.tryDownloadFavIconForNewRecord;
+    self.switchAppleWatchSync.on = self.viewModel.metadata.appleWatchEnabled;
 }
 
 - (void)onConfigureDefaults {

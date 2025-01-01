@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSURL*_Nullable)getExpressUrlFromBookmark:(NSString *)bookmark;
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 + (NSURL*_Nullable)getUrlFromBookmarkData:(NSData*)bookmark updatedBookmark:(NSData*_Nonnull*_Nonnull)updatedBookmark error:(NSError*_Nonnull*_Nonnull)error;
 
 + (NSURL*_Nullable)getExpressReadOnlyUrlFromBookmark:(NSString *)bookmark;

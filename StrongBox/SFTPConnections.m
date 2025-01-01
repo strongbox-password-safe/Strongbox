@@ -10,7 +10,7 @@
 #import "NSArray+Extensions.h"
 #import "SBLog.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 #import "StrongboxiOSFilesManager.h"
 #else
 #import "StrongboxMacFilesManager.h"

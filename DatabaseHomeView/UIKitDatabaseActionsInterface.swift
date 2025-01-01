@@ -93,7 +93,15 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
         case .auditIssues:
             let auditNavView = UIHostingController(rootView: AuditNavigationView(model: homeModel, showCloseButton: false))
             navController.pushViewController(auditNavView, animated: true)
+        case .watchEntries:
+            let browse = BrowseSafeView.fromStoryboard(.watchEntries, model: viewModel)
+            navController.pushViewController(browse, animated: true)
         }
+    }
+
+    @MainActor
+    func interactiveSyncAppleWatch(_ withInteractiveGuide: Bool = false, allowUserToOptOut: Bool = false) {
+        splitViewController.syncAppleWatchNow(interactiveGuide: withInteractiveGuide, allowUserToOptOut: false)
     }
 
     func onPulldownToRefresh() async {
@@ -172,6 +180,10 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
 
     var biometricsIsFaceId: Bool {
         BiometricsManager.sharedInstance().isFaceId()
+    }
+
+    var watchIsPairedAndInstalled: Bool {
+        WatchAppManager.shared.watchIsPairedAndInstalled
     }
 
     @MainActor

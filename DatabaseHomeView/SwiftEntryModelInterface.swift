@@ -30,7 +30,9 @@ protocol SwiftEntryModelInterface: SwiftItemModelInterface {
     var totp: OTPToken? { get }
     var searchFoundInPath: String { get }
     func toggleFavourite() -> Bool
+    func toggleAppleWatch() -> Bool
     var isFavourite: Bool { get }
+    var isWatchEntry: Bool { get }
     var isFlaggedByAudit: Bool { get }
     var launchableUrl: URL? { get }
 

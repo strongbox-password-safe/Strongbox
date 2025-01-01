@@ -12,6 +12,8 @@
 
 @implementation Constants
 
+NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
+
 NSString* const kDatabasesCollectionLockStateChangedNotification = @"DatabasesCollectionLockStateChangedNotification";
 
 NSString *const kPreferenceGlobalShowShortcutNotification = @"GlobalShowStrongboxHotKey-New";
@@ -35,6 +37,7 @@ const size_t kMaxAttachmentTableviewIconImageSize = 4 * 1024 * 1024;
 
 NSString* const kCanonicalEmailFieldName = @"Email";
 NSString* const kCanonicalFavouriteTag = @"Favorite";
+NSString* const kCanonicalAppleWatchTag = @"Apple Watch";
 
 NSString* const kTitleStringKey = @"Title";
 NSString* const kUserNameStringKey = @"UserName";
@@ -76,7 +79,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     if(self == [Constants class]) {
         kUserInteractionRequiredError = [Utils createNSError:kStorageProviderUserInteractionRequiredErrorMessage errorCode:kStorageProviderUserInteractionRequiredErrorCode];
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
         kRecycleBinTintColor = ColorFromRGB(0x7DC583); 
 #else
         kRecycleBinTintColor = ColorFromRGB(0x7DC583); 
@@ -133,7 +136,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     return keys;
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS || TARGET_OS_WATCH
 
 static UIColor* kRecycleBinTintColor;
 

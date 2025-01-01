@@ -14,6 +14,7 @@ private struct ButtonsView: View {
     var groups: [String]
     var entries: [Node]
     var model: Model
+    var easyReadSeparator: Bool
 
     var completion: ((_ cancel: Bool, _ createNew: Bool, _ title: String?, _ selectedGroupIdx: Int?, _ selectedEntry: UUID?) -> Void)?
 
@@ -28,7 +29,7 @@ private struct ButtonsView: View {
             })
 
             NavigationLink(destination: {
-                WizardAddExistingView(mode: mode, entries: entries, model: model, completion: completion)
+                WizardAddExistingView(mode: mode, entries: entries, model: model, easyReadSeparator: easyReadSeparator, completion: completion)
             }, label: {
                 Text("passkey_add_to_existing")
                     .frame(maxWidth: .infinity)
@@ -50,6 +51,7 @@ struct WizardChooseCreateOrAddView: View {
     var groups: [String]
     var entries: [Node]
     var model: Model
+    var easyReadSeparator: Bool
 
     var completion: ((_ cancel: Bool, _ createNew: Bool, _ title: String?, _ selectedGroupIdx: Int?, _ selectedEntry: UUID?) -> Void)?
 
@@ -72,7 +74,7 @@ struct WizardChooseCreateOrAddView: View {
                     .font(.subheadline)
             }
 
-            ButtonsView(mode: mode, title: title, groups: groups, entries: entries, model: model, completion: completion)
+            ButtonsView(mode: mode, title: title, groups: groups, entries: entries, model: model, easyReadSeparator: easyReadSeparator, completion: completion)
 
             Button {
                 dismiss()
@@ -93,5 +95,5 @@ struct WizardChooseCreateOrAddView: View {
 
     let node1 = Node(parent: nil, title: "Foo Entry", isGroup: false, uuid: nil, fields: nil, childRecordsAllowed: false)
 
-    return WizardChooseCreateOrAddView(mode: .passkey, title: "Title", groups: ["Foo", "Bar"], entries: [node1], model: model)
+    return WizardChooseCreateOrAddView(mode: .passkey, title: "Title", groups: ["Foo", "Bar"], entries: [node1], model: model, easyReadSeparator: true)
 }

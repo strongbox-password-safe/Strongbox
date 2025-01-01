@@ -23,6 +23,7 @@ struct WizardAddToOrCreateNewView: View {
 
     let entries: [Node]
     var model: Model
+    var easyReadSeparatorFor2FACode: Bool
 
     @State var title: String
     @State var groups: [String]
@@ -90,7 +91,7 @@ struct WizardAddToOrCreateNewView: View {
                 List(selection: $selectedItem) {
                     ForEach(searchResults, id: \.self) { node in
                         let entry = SwiftEntryModel(node: node, model: model)
-                        SwiftUIEntryView(entry: entry, showIcon: true)
+                        SwiftUIEntryView(entry: entry, showIcon: true, easyReadSeparator: easyReadSeparatorFor2FACode)
                             .onDoubleClick {
                                 guard selectedItem != nil else { return }
                                 showingConfirmation = true
@@ -182,6 +183,7 @@ struct WizardAddToOrCreateNewView: View {
     return WizardAddToOrCreateNewView(mode: .passkey,
                                       entries: [node1],
                                       model: model,
+                                      easyReadSeparatorFor2FACode: true,
                                       title: "Test Title",
                                       groups: ["foo", "bar"])
 }

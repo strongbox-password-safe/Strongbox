@@ -8,7 +8,7 @@
 
 #import "CrossPlatform.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import "AppPreferences.h"
 #import "SyncManager.h"
@@ -31,7 +31,7 @@
     static dispatch_once_t onceToken;
     
     dispatch_once(&onceToken, ^{
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
         sharedInstance = [[CrossPlatformDependencies alloc] initWithApplicationPreferences:AppPreferences.sharedInstance
                                                                             syncManagement:SyncManager.sharedInstance
                                                                                  spinnerUi:iOSSpinnerUI.sharedInstance

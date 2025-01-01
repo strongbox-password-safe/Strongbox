@@ -51,10 +51,11 @@ struct FavoritesView: View {
         ScrollView(.horizontal) {
             LazyHGrid(rows: rows, alignment: .top) {
                 ForEach(model.database.favourites) { favourite in
-                    FavouriteCapsuleView(model: model, entry: favourite)
+                    FavouriteCapsuleView(model: model, entry: favourite, easyReadSeparator: model.twoFactorShowSeparator)
                         .contextMenu {
                             EntryViewContextMenu(model: model, item: favourite)
-                        }
+
+                        }.id(UUID()) 
                 }
             }
         }

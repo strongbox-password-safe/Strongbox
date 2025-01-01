@@ -146,7 +146,7 @@ static const NSUInteger KeyFileRandomDataLength = 32;
     return html;
 }
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 - (void)printRecoverySheet:(UIViewController*)viewController {
     NSString* html = [self getHtml];

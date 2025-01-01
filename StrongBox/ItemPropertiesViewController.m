@@ -19,7 +19,9 @@
 #import "SelectItemTableViewController.h"
 
 #ifndef IS_APP_EXTENSION
-#import "ISMessages/ISMessages.h"
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
 static NSString* const kSwitchTableCellId = @"SwitchTableCell";
@@ -408,16 +410,9 @@ const static NSUInteger kSectionUuidIdx = 6;
     }
     
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
-
+    
 #ifndef IS_APP_EXTENSION
-    [ISMessages showCardAlertWithTitle:message
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [StrongboxToastMessages showSlimWithTitle:message];
 #endif
 }
 

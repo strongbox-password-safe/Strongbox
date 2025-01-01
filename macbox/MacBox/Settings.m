@@ -151,6 +151,7 @@ static NSString* const kDuplicateItemReferencePassword = @"duplicateItemReferenc
 static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenceUsername";
 static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
 static NSString* const kAssociatedWebsites = @"associatedWebsites";
+static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparator";
 
 
 
@@ -291,6 +292,14 @@ static NSString* const kAssociatedWebsites = @"associatedWebsites";
 #endif
 
 
+
+- (BOOL)twoFactorEasyReadSeparator {
+    return [self getBool:kTwoFactorEasyReadSeparator fallback:YES];
+}
+
+- (void)setTwoFactorEasyReadSeparator:(BOOL)twoFactorEasyReadSeparator {
+    [self setBool:kTwoFactorEasyReadSeparator value:twoFactorEasyReadSeparator];
+}
 
 - (BOOL)associatedWebsites {
     return [self getBool:kAssociatedWebsites fallback:YES];

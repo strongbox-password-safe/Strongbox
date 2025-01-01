@@ -11,7 +11,7 @@ import SwiftUI
 
 struct TagView: View {
     var title: String
-    var useEasyReadFont: Bool = false
+    var font: Font
 
     var body: some View {
         HStack(spacing: 2) {
@@ -20,7 +20,7 @@ struct TagView: View {
 
             Text(title)
                 .lineLimit(1)
-                .font(useEasyReadFont ? .custom("Menlo", size: 16) : .body)
+                .font(font)
         }
         .padding(.trailing, 10)
         .padding(.leading, 6)
@@ -33,10 +33,16 @@ struct TagView: View {
 }
 
 #Preview {
-    VStack {
-        TagView(title: "Test")
-        TagView(title: "Test with a long title")
-        TagView(title: "Super Word")
-        TagView(title: "Testing #1")
+    #if os(iOS)
+        let font2 = Font(FontManager.sharedInstance().easyReadFont)
+    #else
+        let font2 = Font(FontManager.shared.easyReadFont)
+    #endif
+
+    return VStack {
+        TagView(title: "Test", font: font2)
+        TagView(title: "Test with a long title", font: font2)
+        TagView(title: "Super Word", font: font2)
+        TagView(title: "Testing #1", font: font2)
     }
 }

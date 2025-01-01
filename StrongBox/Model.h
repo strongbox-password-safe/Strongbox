@@ -14,7 +14,7 @@
 #import "BrowseViewType.h"
 #import "ItemMetadataEntry.h"
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 #import <UIKit/UIKit.h>
 
@@ -44,7 +44,7 @@ extern NSString* const kAuditCompletedNotification;
 extern NSString* const kAuditNewSwitchedOffNotificationKey;
 
 extern NSString* const kAppStoreSaleNotificationKey;
-extern NSString* const kCentralUpdateOtpUiNotification;
+
 extern NSString *const kModelEditedNotification;
 extern NSString* const kMasterDetailViewCloseNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
@@ -88,7 +88,7 @@ extern NSString* const kAsyncUpdateStartingNotification;
                                  isAutoFill:(BOOL)isAutoFill
                                 offlineMode:(BOOL)offlineMode; 
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 - (instancetype)initAsDuressDummy:(BOOL)isNativeAutoFillAppExtensionOpen
                  templateMetaData:(METADATA_PTR)templateMetaData;
@@ -272,12 +272,12 @@ extern NSString* const kAsyncUpdateStartingNotification;
 - (void)refreshCaches; 
 
 #ifndef IS_APP_EXTENSION 
-#if !TARGET_OS_IPHONE 
+#if !TARGET_OS_IOS 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString;
 #endif
 #endif
 
-#if TARGET_OS_IPHONE
+#if TARGET_OS_IOS
 
 - (BrowseSortConfiguration*)getDefaultSortConfiguration;
 - (BrowseSortConfiguration*)getSortConfigurationForViewType:(BrowseViewType)viewType;
@@ -326,6 +326,16 @@ extern NSString* const kAsyncUpdateStartingNotification;
             preserveTimestamp:(BOOL)preserveTimestamp
             referencePassword:(BOOL)referencePassword
             referenceUsername:(BOOL)referenceUsername;
+
+
+
+- (BOOL)isAppleWatchEntry:(NSUUID *)itemId;
+@property (readonly) NSArray<Node *>* appleWatchEntries;
+
+#if TARGET_OS_IOS
+- (void)refreshWatchAppEntries;
+- (BOOL)toggleAppleWatch:(NSUUID *)itemId;
+#endif
 
 @end
 

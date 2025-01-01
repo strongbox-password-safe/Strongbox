@@ -47,7 +47,6 @@
 
 #ifndef IS_APP_EXTENSION
 
-#import "ISMessages/ISMessages.h"
 #import "SetNodeIconUiHelper.h"
 #import "Strongbox-Swift.h"
 #import "NavBarSyncButtonHelper.h"
@@ -542,6 +541,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
     
     if (@available(iOS 16.0, *)) {
         [self.tableView registerClass:TagsNGTableViewCell.class forCellReuseIdentifier:TagsNGTableViewCell.CellIdentifier];
+        [self.tableView registerClass:TwoFactorCodeTableViewCell.class forCellReuseIdentifier:TwoFactorCodeTableViewCell.CellIdentifier];
     }
     
     [self.tableView setSectionHeaderTopPadding:0.0f];
@@ -684,7 +684,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                                  message:NSLocalizedString(@"field_tidy_message_tidy_up_password", @"There are some blank characters (e.g. spaces, tabs) at the start or end of your password.\n\nShould Strongbox tidy up these extraneous characters?")
                        defaultButtonText:NSLocalizedString(@"field_tidy_choice_tidy_up_field", @"Tidy Up")
                         secondButtonText:NSLocalizedString(@"field_tidy_choice_dont_tidy", @"Don't Tidy")
-                                  action:^(int response) {
+                              completion:^(int response) {
                 if ( response == 0 ) {
                     weakSelf.model.password = trim(weakSelf.model.password);
                     [weakSelf postValidationSetEditing:editing animated:animated];
@@ -1177,7 +1177,7 @@ static NSString* const kMarkdownUIKitTableCellViewId = @"MarkdownUIKitTableCellV
                          message:NSLocalizedString(@"details_add_new_ssh_key_what_kind_prompt", @"What kind of SSH key would you like to add?\n\nWe recommend using the modern ED25519 key type.")
                defaultButtonText:NSLocalizedString(@"details_add_new_ssh_key_ed25519", @"New ED25519 Key")
                 secondButtonText:NSLocalizedString(@"details_add_new_ssh_key_rsa", @"New RSA Key")
-                          action:^(int response) {
+                      completion:^(int response) {
         if ( response == 0 ) {
             
             [self addNewSshKey:YES];
@@ -1569,14 +1569,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
 - (void)showToast:(NSString*)message {
 #ifndef IS_APP_EXTENSION
-    [ISMessages showCardAlertWithTitle:message
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    [StrongboxToastMessages showSlimWithTitle:message];
 #endif
 }
 
@@ -2105,16 +2098,41 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         return cell;
     }
     else {
-        TotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kTotpCell forIndexPath:indexPath];
-        
-        [cell setItem:self.model.totp];
-        
         __weak ItemDetailsViewController* weakSelf = self;
-        cell.onShowQrCode = ^{
-            [weakSelf showQrCodeForTotp];
-        };
         
-        return cell;
+        if (@available(iOS 16.0, *)) {
+            TwoFactorCodeTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:TwoFactorCodeTableViewCell.CellIdentifier];
+
+            if ( self.isEditing ) {
+                [cell setContentWithTotp:totp
+                       easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
+                              updateMode:TwoFactorUpdateModeAutomatic
+                                onQrCode:nil];
+            }
+            else {
+                [cell setContentWithTotp:totp
+                       easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
+                              updateMode:TwoFactorUpdateModeAutomatic
+                                onQrCode:^{
+                    [weakSelf showQrCodeForTotp];
+                }];
+            }
+            
+            cell.editingAccessoryType = UITableViewCellAccessoryNone;
+            cell.accessoryType = UITableViewCellAccessoryNone;
+            
+            return cell;
+        } else {
+            TotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kTotpCell forIndexPath:indexPath];
+            
+            [cell setItem:self.model.totp];
+            
+            cell.onShowQrCode = ^{
+                [weakSelf showQrCodeForTotp];
+            };
+            
+            return cell;
+        }
     }
 }
 

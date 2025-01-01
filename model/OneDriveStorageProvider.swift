@@ -217,7 +217,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             }
 
             var components = URLComponents()
-            components.scheme = kStrongboxGoogleDriveUrlScheme
+            components.scheme = kStrongboxOneDriveUrlScheme
             components.path = String(format: "/host/%@", filename) 
 
             guard let url = components.url else {

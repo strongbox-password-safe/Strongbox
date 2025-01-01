@@ -191,6 +191,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL duplicateItemEditAfterwards;
 
 @property BOOL associatedWebsites;
+@property BOOL twoFactorEasyReadSeparator;
 
 @end
 

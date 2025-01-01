@@ -8,6 +8,25 @@
 
 import SwiftUI
 
+struct ToggleAppleWatchButton: View {
+    var model: DatabaseHomeViewModel
+    var entry: any SwiftEntryModelInterface
+
+    var body: some View {
+        Button(action: {
+            model.toggleAppleWatch(entry: entry)
+        }) {
+            let isWatchEntry = entry.isWatchEntry
+            let title: LocalizedStringKey = isWatchEntry ? "action_remove_entry_from_apple_watch" : "action_add_entry_to_apple_watch"
+
+            HStack {
+                Text(title)
+                Image(systemName: isWatchEntry ? "applewatch.slash" : "applewatch")
+            }
+        }
+    }
+}
+
 struct ToggleFavouriteButton: View {
     var model: DatabaseHomeViewModel
     var entry: any SwiftEntryModelInterface

@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString*)getStorageDisplayNameForProvider:(StorageProvider)provider;
 
 
-#if !TARGET_OS_IPHONE
+#if !TARGET_OS_IOS
 + (NSString*)getStorageSubtitleForDatabasesManager:(METADATA_PTR)database;
 + (NSString*)getStorageSubtitleForDatabaseWindow:(METADATA_PTR)database;
 #endif
