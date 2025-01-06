@@ -339,16 +339,7 @@ class DatabasesCollection: NSObject {
         let appDelegate = NSApplication.shared.delegate as! AppDelegate
         appDelegate.cancelAutoLockTimer()
 
-
-        
-        
         determiner.getCkfs(message) { [weak self] result, ckfs, fromConvenience, error in
-
-
-
-
-
-
             if !NSApplication.shared.isActive {
                 
                 
@@ -357,19 +348,8 @@ class DatabasesCollection: NSObject {
             }
 
             if let ckfs, result == .success {
-                
-
-                
-
-
                 self?.unlockModelFromLocalWorkingCopy(database: prefs, ckfs: ckfs, fromConvenience: fromConvenience) { result, _, _ in
                     swlog("🐞 Unlock Completion Called...")
-
-
-
-
-
-
 
                     DispatchQueue.global().async {
                         if result == .success, syncAfterUnlock {
@@ -388,16 +368,7 @@ class DatabasesCollection: NSObject {
                 DispatchQueue.global().async {
                     let unlocked = self?.isUnlocked(uuid: uuid) ?? false
 
-                    if unlocked {
-                        swlog("⚠️ getCkfs Unsuccessful/cancelled? - but database unlocked")
-
-                        
-                        
-
-                        completion?(unlocked) 
-                    } else {
-                        completion?(unlocked) 
-                    }
+                    completion?(unlocked)
                 }
             }
         }

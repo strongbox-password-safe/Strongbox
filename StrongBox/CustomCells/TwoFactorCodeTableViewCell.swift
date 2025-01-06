@@ -16,17 +16,17 @@ class TwoFactorCodeTableViewCell: UITableViewCell {
     static let CellIdentifier = "TwoFactorCodeTableViewCell"
 
     @objc
-    func setContent(totp: OTPToken, easyReadSeparator: Bool, updateMode: TwoFactorUpdateMode, onQrCode: (() -> Void)?) {
-        setContent(totp: totp, easyReadSeparator: easyReadSeparator, updateMode: updateMode, title: nil, subtitle: nil, icon: nil, onQrCode: onQrCode)
+    func setContent(totp: OTPToken, easyReadSeparator: Bool, hideCountdownDigits: Bool, updateMode: TwoFactorUpdateMode, onQrCode: (() -> Void)?) {
+        setContent(totp: totp, easyReadSeparator: easyReadSeparator, hideCountdownDigits: hideCountdownDigits, updateMode: updateMode, title: nil, subtitle: nil, icon: nil, onQrCode: onQrCode)
     }
 
     @objc
-    func setContent(totp: OTPToken?, easyReadSeparator: Bool, updateMode: TwoFactorUpdateMode, title: String?, subtitle: String?, icon: UIImage?, onQrCode: (() -> Void)?) {
+    func setContent(totp: OTPToken?, easyReadSeparator: Bool, hideCountdownDigits: Bool, updateMode: TwoFactorUpdateMode, title: String?, subtitle: String?, icon: UIImage?, onQrCode: (() -> Void)?) {
         if let totp {
             let font = Font(FontManager.sharedInstance().easyReadFontForTotp)
 
             let content = {
-                TwoFactorView(totp: totp, updateMode: updateMode, easyReadSeparator: easyReadSeparator, font: font, title: title, subtitle: subtitle, image: icon, onQrCode: onQrCode)
+                TwoFactorView(totp: totp, updateMode: updateMode, easyReadSeparator: easyReadSeparator, font: font, hideCountdownDigits: hideCountdownDigits, title: title, subtitle: subtitle, image: icon, onQrCode: onQrCode)
             }
 
             contentConfiguration = UIHostingConfiguration(content: content)

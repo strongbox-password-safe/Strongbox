@@ -355,7 +355,11 @@ static NSString* const kAccountPrefix = @"strongbox-credential-store-encrypted-b
 
 
 + (CFStringRef)accessibility {
+#if TARGET_OS_WATCH
+    return kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly;
+#else
     return kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
+#endif
 }
 
 + (CFStringRef)keyType {

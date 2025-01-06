@@ -35,8 +35,19 @@ public class WhatsNewOnboardingModule: NSObject, OnboardingModule {
 
         """
 
+    static let markdownBody_1_60_31 =
+        """
+        #### Apple Watch App
+        -  New Dedicated 2FA tab and other technical improvements
+
+        #### 2FA Code Improvements 
+        -  Option to hide the digits of the countdown for 2FA Code (Advanced Settings) 
+
+        """
+
     static let Messages: [WhatsNewMessage] = [
         WhatsNewMessage(sequenceNumber: 8, version: "1.60.30", markdownBody: markdownBody_1_60_30),
+        WhatsNewMessage(sequenceNumber: 9, version: "1.60.31", markdownBody: markdownBody_1_60_31),
     ]
 
     var lastDisplayedWhatsNewMessage: Int {

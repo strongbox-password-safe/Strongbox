@@ -402,11 +402,11 @@ int OPParentIDForProcessID(int pid)
     
     
 
-    [debugLines addObject:@"--------------------"];
-    [debugLines addObject:@"Last Crash"];
-    [debugLines addObject:@"--------------------"];
-
     if ([NSFileManager.defaultManager fileExistsAtPath:StrongboxFilesManager.sharedInstance.archivedCrashFile.path]) {
+        [debugLines addObject:@"--------------------"];
+        [debugLines addObject:@"Last Crash"];
+        [debugLines addObject:@"--------------------"];
+        
         NSData* crashFileData = [NSData dataWithContentsOfURL:StrongboxFilesManager.sharedInstance.archivedCrashFile];
         NSString* jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
         [debugLines addObject:[NSString stringWithFormat:@"JSON Crash:%@", jsonCrash]];
@@ -477,17 +477,18 @@ int OPParentIDForProcessID(int pid)
         
         
 #if TARGET_OS_IOS
-        [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.appSupportDirectory]];
+
         [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.documentsDirectory]];
         
         
 #endif
         
-        [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:StrongboxFilesManager.sharedInstance.sharedAppGroupDirectory]];
+
         
         
         
         [debugLines addObject:@"--------------------"];
+        
         
         
 #if TARGET_OS_IOS

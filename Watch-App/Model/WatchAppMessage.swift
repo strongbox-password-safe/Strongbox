@@ -12,4 +12,5 @@ enum WatchAppMessage {
     static let appendEntries = "appendEntries"
     static let resetEntries = "resetEntries"
     static let databases = "databases"
+    static let databaseId = "databaseUuid"
 }

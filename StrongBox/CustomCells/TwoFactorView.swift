@@ -14,6 +14,7 @@ struct TwoFactorView: View {
     var updateMode: TwoFactorUpdateMode
     var easyReadSeparator: Bool
     var font: Font
+    var hideCountdownDigits: Bool
 
     var title: String? = nil
     var subtitle: String? = nil
@@ -68,7 +69,7 @@ struct TwoFactorView: View {
                 Spacer()
 
                 HStack {
-                    TwoFactorCodeCircularProgressView(totp: totp, radius: 55, updateMode: updateMode)
+                    TwoFactorCodeCircularProgressView(totp: totp, radius: 55, updateMode: updateMode, hideCountdownDigits: hideCountdownDigits)
 
                     if let onQrCode {
                         Button {
@@ -111,14 +112,14 @@ struct TwoFactorView: View {
 
     return NavigationView {
         List {
-            TwoFactorView(totp: token, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), title: "HSBC", subtitle: "markymark", image: bar) {}
+            TwoFactorView(totp: token, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true, title: "HSBC", subtitle: "markymark", image: bar) {}
 
-            TwoFactorView(totp: tokenSteam, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp))
-            TwoFactorView(totp: token8Digits120Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp))
-            TwoFactorView(totp: token8Digit, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp))
-            TwoFactorView(totp: token8Digits60Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp))
-            TwoFactorView(totp: tokenSha25645Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp))
-            TwoFactorView(totp: tokenSha51215Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp))
+            TwoFactorView(totp: tokenSteam, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true)
+            TwoFactorView(totp: token8Digits120Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true)
+            TwoFactorView(totp: token8Digit, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true)
+            TwoFactorView(totp: token8Digits60Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true)
+            TwoFactorView(totp: tokenSha25645Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true)
+            TwoFactorView(totp: tokenSha51215Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true)
         }
         .navigationTitle("Sample Item")
         .navigationBarTitleDisplayMode(.inline)

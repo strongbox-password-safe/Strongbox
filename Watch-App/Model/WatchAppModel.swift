@@ -24,7 +24,7 @@ class WatchAppModel: ObservableObject {
         }
     }
 
-    private(set) var settings: WatchSettingsModel = .init(pro: false, markdownNotes: true, twoFactorEasyReadSeparator: true, colorBlind: true) {
+    private(set) var settings: WatchSettingsModel = .init() {
         didSet {
             saveSettings()
         }
@@ -57,6 +57,10 @@ class WatchAppModel: ObservableObject {
     init() {
         
 
+        refreshSettings()
+    }
+
+    func refreshSettings() {
         loadAllSettings()
     }
 
@@ -70,7 +74,7 @@ class WatchAppModel: ObservableObject {
                 entryList = getOrderedEntryList()
             }
         } catch {
-            swlog("Could not load settings... \(error)")
+            swlog("Could not load all settings... \(error)")
         }
     }
 
@@ -120,12 +124,14 @@ class WatchAppModel: ObservableObject {
             throw WatchAppError.couldNotReadSettings
         }
 
+
+
         do {
             return try JSONDecoder().decode(WatchSettingsModel.self, from: json)
         } catch {
             swlog("🔴 Couldn't decode settings from JSON")
             resetAllSettings() 
-            return .init(pro: false, markdownNotes: true, twoFactorEasyReadSeparator: true, colorBlind: true)
+            return .init()
         }
     }
 
@@ -196,7 +202,7 @@ class WatchAppModel: ObservableObject {
         }
     }
 
-    func refreshAndPublish() {
+    private func refreshAndPublish() {
         Task { @MainActor in
             entryList = getOrderedEntryList() 
             lastSynced = Date.now

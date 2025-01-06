@@ -213,6 +213,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL associatedWebsites;
 @property BOOL twoFactorEasyReadSeparator;
+@property BOOL twoFactorHideCountdownDigits;
 
 @property BOOL appleWatchIntegration;
 @property NSInteger lastDisplayedWhatsNewMessage;

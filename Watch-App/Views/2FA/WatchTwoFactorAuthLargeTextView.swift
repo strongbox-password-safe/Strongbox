@@ -12,6 +12,7 @@ struct WatchTwoFactorAuthLargeTextView: View {
     var totp: OTPToken
     var easyReadSeparator: Bool
     var isPro: Bool
+    var hideCountdownDigits: Bool
 
     var body: some View {
         VStack {
@@ -19,7 +20,7 @@ struct WatchTwoFactorAuthLargeTextView: View {
 
             Spacer()
 
-            TwoFactorCodeCircularProgressView(totp: totp, radius: 80, updateMode: .automatic)
+            TwoFactorCodeCircularProgressView(totp: totp, radius: 80, updateMode: .automatic, hideCountdownDigits: hideCountdownDigits)
                 .padding()
         }
     }
@@ -29,5 +30,5 @@ struct WatchTwoFactorAuthLargeTextView: View {
     let otpAuthUrl = "otpauth:
     let token = OTPToken(url: URL(string: otpAuthUrl))!
 
-    WatchTwoFactorAuthLargeTextView(totp: token, easyReadSeparator: true, isPro: true)
+    WatchTwoFactorAuthLargeTextView(totp: token, easyReadSeparator: true, isPro: true, hideCountdownDigits: true)
 }

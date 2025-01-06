@@ -2106,12 +2106,14 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
             if ( self.isEditing ) {
                 [cell setContentWithTotp:totp
                        easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
+                     hideCountdownDigits:AppPreferences.sharedInstance.twoFactorHideCountdownDigits
                               updateMode:TwoFactorUpdateModeAutomatic
                                 onQrCode:nil];
             }
             else {
                 [cell setContentWithTotp:totp
                        easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
+                     hideCountdownDigits:AppPreferences.sharedInstance.twoFactorHideCountdownDigits
                               updateMode:TwoFactorUpdateModeAutomatic
                                 onQrCode:^{
                     [weakSelf showQrCodeForTotp];

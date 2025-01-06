@@ -38,9 +38,11 @@ struct WatchEntryDetailView: View {
 
             if let otpAuthUrl = entry.twoFaOtpAuthUrl, let token = OTPToken(url: URL(string: otpAuthUrl)) {
                 NavigationLink {
-                    WatchTwoFactorAuthLargeTextView(totp: token, easyReadSeparator: model.settings.twoFactorEasyReadSeparator, isPro: model.settings.pro)
+                    WatchTwoFactorAuthLargeTextView(totp: token, easyReadSeparator: model.settings.twoFactorEasyReadSeparator, isPro: model.settings.pro, hideCountdownDigits: model.settings.twoFactorHideCountdownDigits)
                 } label: {
-                    WatchTwoFactorAuthListItemView(totp: token, easyReadSeparator: model.settings.twoFactorEasyReadSeparator)
+                    WatchTwoFactorAuthListItemView(totp: token,
+                                                   easyReadSeparator: model.settings.twoFactorEasyReadSeparator,
+                                                   hideCountdownDigits: model.settings.twoFactorHideCountdownDigits)
                 }
             }
 

@@ -13,6 +13,9 @@ struct WatchApp: App {
     let syncer: WatchClientSyncer!
     let model: WatchAppModel!
 
+
+
+
     init() {
         model = WatchAppModel()
 
@@ -37,6 +40,22 @@ struct WatchApp: App {
         WindowGroup {
             WatchHomeScreen()
                 .environmentObject(model)
+                .onLoad {
+                    model.refreshSettings() 
+                }
+
+
+
+
+
+
+
+
+
+
+
+
+
         }
     }
 }

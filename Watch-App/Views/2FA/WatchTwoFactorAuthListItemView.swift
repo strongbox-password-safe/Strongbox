@@ -9,12 +9,76 @@
 import Combine
 import SwiftUI
 
-struct WatchTwoFactorAuthListItemView: View {
+struct WatchTwoFactorAuthDigitsView: View {
     var totp: OTPToken
     var easyReadSeparator: Bool
 
     @State private var totpString: String? = nil
     @State private var totpStringPair: [String]? = nil
+
+    @EnvironmentObject
+    var model: WatchAppModel
+
+    var body: some View {
+        Group {
+            if easyReadSeparator, let totpStringPair, totpStringPair.count == 2 {
+                let view = HStack(spacing: 2) {
+                    Text(totpStringPair[0])
+                        .lineLimit(1)
+
+                    Circle()
+                        .foregroundStyle(.tertiary)
+                        .frame(width: 4)
+
+                    Text(totpStringPair[1])
+                        .lineLimit(1)
+                }
+
+                if model.settings.pro {
+                    view
+                } else {
+                    ZStack(alignment: .leading) {
+                        ProBadge()
+
+                        view.blur(radius: 6)
+                    }
+                }
+            } else {
+                let view = Text(totpString ?? "")
+                    .lineLimit(1)
+
+                if model.settings.pro {
+                    view
+                } else {
+                    ZStack(alignment: .leading) {
+                        ProBadge()
+
+                        view.blur(radius: 6)
+                    }
+                }
+            }
+        }
+        .font(.system(size: 26).monospaced().bold())
+        .minimumScaleFactor(0.5)
+        .contentTransition(.numericText(countsDown: true))
+        .animation(.default, value: totpString)
+        .onAppear { updateTotp() }
+        .twoFactorUpdater { updateTotp() }
+    }
+
+    func updateTotp() {
+        totpString = totp.codeDisplayString
+
+        if let codeSeparated = totp.codeSeparated {
+            totpStringPair = codeSeparated
+        }
+    }
+}
+
+struct WatchTwoFactorAuthListItemView: View {
+    var totp: OTPToken
+    var easyReadSeparator: Bool
+    var hideCountdownDigits: Bool
 
     @EnvironmentObject
     var model: WatchAppModel
@@ -26,63 +90,14 @@ struct WatchTwoFactorAuthListItemView: View {
                     .font(.caption2)
                     .foregroundStyle(.secondary)
 
-                if easyReadSeparator, let totpStringPair, totpStringPair.count == 2 {
-                    let view = HStack(spacing: 2) {
-                        Text(totpStringPair[0])
-                            .lineLimit(1)
-
-                        Circle()
-                            .foregroundStyle(.tertiary)
-                            .frame(width: 4)
-
-                        Text(totpStringPair[1])
-                            .lineLimit(1)
-                    }
-
-                    if model.settings.pro {
-                        view
-                    } else {
-                        ZStack(alignment: .leading) {
-                            ProBadge()
-
-                            view.blur(radius: 6)
-                        }
-                    }
-                } else {
-                    let view = Text(totpString ?? "")
-                        .lineLimit(1)
-
-                    if model.settings.pro {
-                        view
-                    } else {
-                        ZStack(alignment: .leading) {
-                            ProBadge()
-
-                            view.blur(radius: 6)
-                        }
-                    }
-                }
+                WatchTwoFactorAuthDigitsView(totp: totp, easyReadSeparator: easyReadSeparator)
             }
-            .font(.system(size: 26).monospaced().bold())
-            .minimumScaleFactor(0.5)
-            .contentTransition(.numericText(countsDown: true))
-            .animation(.default, value: totpString)
 
             Spacer()
 
-            TwoFactorCodeCircularProgressView(totp: totp, radius: 35, updateMode: .automatic)
+            TwoFactorCodeCircularProgressView(totp: totp, radius: 35, updateMode: .automatic, hideCountdownDigits: hideCountdownDigits)
                 .padding(2)
                 .frame(width: 32)
-        }
-        .onAppear { updateTotp() }
-        .twoFactorUpdater { updateTotp() }
-    }
-
-    func updateTotp() {
-        totpString = totp.codeDisplayString
-
-        if let codeSeparated = totp.codeSeparated {
-            totpStringPair = codeSeparated
         }
     }
 }
@@ -112,13 +127,13 @@ struct WatchTwoFactorAuthListItemView: View {
         let tokenSteam = OTPToken(url: URL(string: otpAuthUrlSteam))!
 
         List {
-            WatchTwoFactorAuthListItemView(totp: token, easyReadSeparator: true)
-            WatchTwoFactorAuthListItemView(totp: tokenSteam, easyReadSeparator: true)
-            WatchTwoFactorAuthListItemView(totp: token8Digits120Seconds, easyReadSeparator: true)
-            WatchTwoFactorAuthListItemView(totp: token8Digit, easyReadSeparator: true)
-            WatchTwoFactorAuthListItemView(totp: token8Digits60Seconds, easyReadSeparator: true)
-            WatchTwoFactorAuthListItemView(totp: tokenSha25645Seconds, easyReadSeparator: true)
-            WatchTwoFactorAuthListItemView(totp: tokenSha51215Seconds, easyReadSeparator: true)
+            WatchTwoFactorAuthListItemView(totp: token, easyReadSeparator: true, hideCountdownDigits: true)
+            WatchTwoFactorAuthListItemView(totp: tokenSteam, easyReadSeparator: true, hideCountdownDigits: true)
+            WatchTwoFactorAuthListItemView(totp: token8Digits120Seconds, easyReadSeparator: true, hideCountdownDigits: true)
+            WatchTwoFactorAuthListItemView(totp: token8Digit, easyReadSeparator: true, hideCountdownDigits: true)
+            WatchTwoFactorAuthListItemView(totp: token8Digits60Seconds, easyReadSeparator: true, hideCountdownDigits: true)
+            WatchTwoFactorAuthListItemView(totp: tokenSha25645Seconds, easyReadSeparator: true, hideCountdownDigits: true)
+            WatchTwoFactorAuthListItemView(totp: tokenSha51215Seconds, easyReadSeparator: true, hideCountdownDigits: true)
         }
         .environmentObject(WatchAppModel())
     }

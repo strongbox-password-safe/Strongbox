@@ -163,7 +163,7 @@ static NSString* const kColumnLog = @"log";
             return result;
         }
         else {
-            NSString* log = entry.error ? entry.error.description : (entry.message ? entry.message : @"");
+            NSString* log = entry.error ? entry.error.localizedDescription : (entry.message ? entry.message : @"");
         
             NSTableCellView *result = [tableView makeViewWithIdentifier:@"SyncLogLogCellId" owner:self];
 

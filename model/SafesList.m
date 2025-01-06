@@ -142,7 +142,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     }];
     
     if (!json || coorderror || readError) {
-        if ( readError.code != NSFileReadNoSuchFileError ) {
+        if ( readError.code != NSFileReadNoSuchFileError) {
             slog(@"🔴 Error reading file for databases: [%@] - [%@]", coorderror, readError);
             AppPreferences.sharedInstance.databasesSerializationError = [NSString stringWithFormat:@"Read Error: [%@]", *error];
             
@@ -153,8 +153,9 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
             return NO;
         }
         else {
-            *error = readError ? readError : coorderror;
-            AppPreferences.sharedInstance.databasesSerializationError = [NSString stringWithFormat:@"Read Error: [%@]", *error];
+
+
+            
             return NO;
         }
     }

@@ -74,6 +74,7 @@ typedef enum : NSUInteger {
 @property BOOL useOneDriveUSGovCloudInstance;
 @property BOOL associatedWebsites;
 @property BOOL twoFactorEasyReadSeparator; 
+@property BOOL twoFactorHideCountdownDigits; 
 
 @end
 

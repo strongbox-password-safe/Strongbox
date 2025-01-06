@@ -152,6 +152,7 @@ static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenc
 static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
 static NSString* const kAssociatedWebsites = @"associatedWebsites";
 static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparator";
+static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownDigits";
 
 
 
@@ -292,6 +293,14 @@ static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparato
 #endif
 
 
+
+- (BOOL)twoFactorHideCountdownDigits {
+    return [self getBool:kTwoFactorHideCountdownDigits fallback:NO];
+}
+
+- (void)setTwoFactorHideCountdownDigits:(BOOL)twoFactorHideCountdownDigits {
+    [self setBool:kTwoFactorHideCountdownDigits value:twoFactorHideCountdownDigits];
+}
 
 - (BOOL)twoFactorEasyReadSeparator {
     return [self getBool:kTwoFactorEasyReadSeparator fallback:YES];

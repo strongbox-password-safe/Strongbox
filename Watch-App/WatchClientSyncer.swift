@@ -80,6 +80,7 @@ class WatchClientSyncer: NSObject, WCSessionDelegate {
 
     func onGotMessageSerialized(message: [String: Any]) async throws {
         let decoder = JSONDecoder()
+        decoder.allowsJSON5 = true
 
         if let resetMessage = message[WatchAppMessage.resetEntries] as? Data {
             let message = try decoder.decode(ResetMessage.self, from: resetMessage)

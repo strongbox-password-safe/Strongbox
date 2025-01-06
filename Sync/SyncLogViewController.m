@@ -89,7 +89,7 @@ static NSString* const kSyncLogCellCellId = @"SyncLogCell";
     NSArray *entries = self.syncs[indexPath.section];
     SyncStatusLogEntry *entry = entries[indexPath.row];
     
-    NSString* log = entry.error ? entry.error.description : (entry.message ? entry.message : @"");
+    NSString* log = entry.error ? entry.error.localizedDescription : (entry.message ? entry.message : @"");
     NSString* timestamp = entry.timestamp.friendlyTimeStringPrecise;
 
     [cell setState:entry.state log:log timestamp:timestamp];

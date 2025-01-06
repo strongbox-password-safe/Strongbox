@@ -8,6 +8,39 @@
 
 import SwiftUI
 
+struct WatchListItemIconView: View {
+    @EnvironmentObject
+    var model: WatchAppModel
+    var entry: WatchEntry
+    var database: WatchDatabaseModel
+    var size: CGFloat = 24.0
+
+    var body: some View {
+        let iconSet = KeePassIconSet(rawValue: database.iconSet)!
+
+        if case .preset = entry.icon {
+            if iconSet == .sfSymbols {
+                let icon = entry.icon.sfSymbolName
+
+                Image(systemName: icon)
+                    .imageScale(.large)
+                    .foregroundStyle(.blue)
+                    .frame(width: size)
+            } else {
+                Image(uiImage: entry.icon.getUIImage(iconSet: iconSet))
+                    .resizable()
+                    .frame(width: size, height: size)
+                    .cornerRadius(3)
+            }
+        } else {
+            Image(uiImage: entry.icon.getUIImage(iconSet: iconSet))
+                .resizable()
+                .frame(width: size, height: size)
+                .cornerRadius(3)
+        }
+    }
+}
+
 struct WatchListItemView: View {
     var entry: WatchEntry
     var database: WatchDatabaseModel
@@ -17,28 +50,7 @@ struct WatchListItemView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            let iconSet = KeePassIconSet(rawValue: database.iconSet)!
-
-            if case .preset = entry.icon {
-                if iconSet == .sfSymbols {
-                    let icon = entry.icon.sfSymbolName
-
-                    Image(systemName: icon)
-                        .imageScale(.large)
-                        .foregroundStyle(.blue)
-                        .frame(width: 24)
-                } else {
-                    Image(uiImage: entry.icon.getUIImage(iconSet: iconSet))
-                        .resizable()
-                        .frame(width: 24, height: 24)
-                        .cornerRadius(3)
-                }
-            } else {
-                Image(uiImage: entry.icon.getUIImage(iconSet: iconSet))
-                    .resizable()
-                    .frame(width: 24, height: 24)
-                    .cornerRadius(3)
-            }
+            WatchListItemIconView(entry: entry, database: database)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(entry.title)

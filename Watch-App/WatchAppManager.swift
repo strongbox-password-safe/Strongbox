@@ -17,6 +17,7 @@ class WatchStatus: NSObject {
     @objc var lastError: Error?
     @objc var lastSuccessfulComms: Date?
     @objc var activationState: WCSessionActivationState
+    @objc var outstandingUpdateCount: Int
 
     init(isPaired: Bool,
          isSupportedOnThisDevice: Bool,
@@ -24,7 +25,8 @@ class WatchStatus: NSObject {
          isReachable: Bool,
          lastError: Error? = nil,
          lastSuccessfulComms: Date? = nil,
-         activationState: WCSessionActivationState)
+         activationState: WCSessionActivationState,
+         outstandingUpdateCount: Int)
     {
         self.isPaired = isPaired
         self.isSupportedOnThisDevice = isSupportedOnThisDevice
@@ -33,13 +35,14 @@ class WatchStatus: NSObject {
         self.lastError = lastError
         self.lastSuccessfulComms = lastSuccessfulComms
         self.activationState = activationState
+        self.outstandingUpdateCount = outstandingUpdateCount
     }
 }
 
 @objc
 class WatchAppManager: NSObject, WCSessionDelegate {
     static let MaxBatchSize = 62 * 1024 
-    static let MaxEntriesPerDatabase = 32 
+    static let MaxEntriesPerDatabase = 100 
 
     enum WatchAppManagerError: Error {
         case couldNotEncodeEntry
@@ -57,7 +60,8 @@ class WatchAppManager: NSObject, WCSessionDelegate {
                     isReachable: wcSession.isReachable,
                     lastError: lastError,
                     lastSuccessfulComms: lastSuccessfulComms,
-                    activationState: wcSession.activationState)
+                    activationState: wcSession.activationState,
+                    outstandingUpdateCount: outstandingUpdateCount)
     }
 
     var wcSession: WCSession! = nil
@@ -116,12 +120,44 @@ class WatchAppManager: NSObject, WCSessionDelegate {
                 return false
             }
 
-            swlog("🟢 Watch Session activated. isPaired = \(wcSession.isPaired) && isWatchAppInstalled = \(wcSession.isWatchAppInstalled)")
+            swlog("🟢 Watch Session activated. isPaired = \(wcSession.isPaired) && isWatchAppInstalled = \(wcSession.isWatchAppInstalled). Clearing outstanding updates...")
+
+            cancelOutstandingUpdates(databaseId: nil)
 
             return wcSession.isPaired && wcSession.isWatchAppInstalled
         } catch {
             lastError = error
             throw error
+        }
+    }
+
+    private var outstandingUpdateCount: Int {
+        guard wcSession.activationState == .activated else {
+            swlog("🔴 Cannot get outstandingUpdateCount, session is not activated.")
+            return 0
+        }
+
+        return wcSession.outstandingFileTransfers.count
+    }
+
+    private func cancelOutstandingUpdates(databaseId: String?) {
+        guard wcSession.activationState == .activated else {
+            swlog("🔴 Cannot cancelOutstandingUpdates, session is not activated.")
+            return
+        }
+
+        let outstanding = wcSession.outstandingUserInfoTransfers
+
+        for foo in outstanding {
+            if let databaseId {
+                if let thisDbId = foo.userInfo[WatchAppMessage.databaseId] as? String, thisDbId == databaseId {
+                    swlog("🐞 Cancelling DB Specific Outstanding Update...")
+                    foo.cancel()
+                }
+            } else {
+                swlog("🐞 Cancelling Outstanding Update...")
+                foo.cancel()
+            }
         }
     }
 
@@ -224,6 +260,8 @@ class WatchAppManager: NSObject, WCSessionDelegate {
         let limited = Array(mapped.prefix(Self.MaxEntriesPerDatabase)) 
 
         do {
+            cancelOutstandingUpdates(databaseId: model.databaseUuid) 
+
             try await sendRemoveAllEntriesForDatabase(model.databaseUuid, isStartOfBatchUpdate: true)
 
             try await sendEntrySetToWatch(model.databaseUuid, entries: limited)
@@ -259,6 +297,10 @@ class WatchAppManager: NSObject, WCSessionDelegate {
         swlog("⌚︎ sessionDidDeactivate")
     }
 
+    func session(_: WCSession, didFinish _: WCSessionUserInfoTransfer, error: (any Error)?) {
+        swlog("🐞 WC: didFinishUserInfoTransfer: \(String(describing: error))")
+    }
+
     
 
     private func sendEntrySetToWatch(_ databaseUuid: String, entries: [WatchEntry]) async throws {
@@ -288,7 +330,8 @@ class WatchAppManager: NSObject, WCSessionDelegate {
         let watchDatabasesEncoded = try jsonEncoder.encode(watchDatabases)
         let watchSettingsEncoded = try jsonEncoder.encode(watchSettings)
 
-        let message = [
+        let message: [String: Any] = [
+            WatchAppMessage.databaseId: databaseUuid,
             WatchAppMessage.settings: watchSettingsEncoded,
             WatchAppMessage.databases: watchDatabasesEncoded,
             WatchAppMessage.appendEntries: encoded,
@@ -462,9 +505,14 @@ class WatchAppManager: NSObject, WCSessionDelegate {
     }
 
     private func getSettings() -> WatchSettingsModel {
-        WatchSettingsModel(pro: AppPreferences.sharedInstance().isPro,
-                           markdownNotes: AppPreferences.sharedInstance().markdownNotes,
-                           twoFactorEasyReadSeparator: AppPreferences.sharedInstance().twoFactorEasyReadSeparator,
-                           colorBlind: AppPreferences.sharedInstance().colorizeUseColorBlindPalette)
+        var ret = WatchSettingsModel()
+
+        ret.pro = AppPreferences.sharedInstance().isPro
+        ret.markdownNotes = AppPreferences.sharedInstance().markdownNotes
+        ret.twoFactorEasyReadSeparator = AppPreferences.sharedInstance().twoFactorEasyReadSeparator
+        ret.colorBlind = AppPreferences.sharedInstance().colorizeUseColorBlindPalette
+        ret.twoFactorHideCountdownDigits = AppPreferences.sharedInstance().twoFactorHideCountdownDigits
+
+        return ret
     }
 }

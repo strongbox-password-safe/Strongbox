@@ -48,6 +48,8 @@ struct TheGarageView: View {
                         Text(String(format: "isInstalled: %hhd", model.watchStatus.isInstalled))
                         Text(String(format: "isReachable: %hhd", model.watchStatus.isReachable))
                         Text(String(format: "activationState: \(model.watchStatus.activationState)"))
+                        Text(String(format: "outstandingUpdateCount: \(model.watchStatus.outstandingUpdateCount)"))
+
                         if let lastError = model.watchStatus.lastError {
                             Text(String(format: "lastError: \(lastError)"))
                         }
@@ -64,6 +66,7 @@ struct TheGarageView: View {
 
             Section {
                 Toggle("setting_split_2fa_codes", isOn: $model.preferences.twoFactorEasyReadSeparator)
+                Toggle("setting_2fa_hide_countdown_digits", isOn: $model.preferences.twoFactorHideCountdownDigits)
                 Toggle("setting_2fa_code_add_otpauth", isOn: $model.preferences.addOtpAuthUrl)
                 Toggle("setting_2fa_code_add_legacy_fields", isOn: $model.preferences.addLegacySupplementaryTotpCustomFields)
             }
@@ -131,7 +134,7 @@ struct TheGarageView: View {
     struct PreviewView: View {
         @State
         var viewModel = TheGarageViewModel(watchStatus:
-            WatchStatus(isPaired: true, isSupportedOnThisDevice: true, isInstalled: true, isReachable: true, lastError: nil, lastSuccessfulComms: nil, activationState: .activated),
+            WatchStatus(isPaired: true, isSupportedOnThisDevice: true, isInstalled: true, isReachable: true, lastError: nil, lastSuccessfulComms: nil, activationState: .activated, outstandingUpdateCount: 0),
             preferences: AppPreferences.sharedInstance())
 
         var body: some View {

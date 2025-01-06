@@ -192,6 +192,7 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL associatedWebsites;
 @property BOOL twoFactorEasyReadSeparator;
+@property BOOL twoFactorHideCountdownDigits;
 
 @end
 

@@ -27,16 +27,38 @@ class CloudKitManagerInstrumentation: NSObject {
     }
 }
 
-class CloudKitManager {
-    enum CloudKitManagerError: Error {
-        case invalidParameters
-        case invalidRemoteShare
-        case couldNotFindRecord
-        case corruptRecord
-        case saveError(detail: String)
-        case generic(detail: String)
-    }
+enum CloudKitManagerError: Error {
+    case invalidParameters
+    case invalidRemoteShare
+    case couldNotFindRecord
+    case corruptRecord
+    case saveError(detail: String)
+    case generic(detail: String)
+    case notEnoughStorageSpace
+}
 
+extension CloudKitManagerError: LocalizedError {
+    public var errorDescription: String? {
+        switch self {
+        case .invalidParameters:
+            return "invalidParameters"
+        case .invalidRemoteShare:
+            return "invalidRemoteShare"
+        case .couldNotFindRecord:
+            return "couldNotFindRecord"
+        case .corruptRecord:
+            return "corruptRecord"
+        case let .saveError(detail: detail):
+            return "saveError: \(detail)"
+        case let .generic(detail: detail):
+            return "generic: \(detail)"
+        case .notEnoughStorageSpace:
+            return NSLocalizedString("error_apple_account_storage_full", comment: "Your Apple account storage is full. Cannot save database.")
+        }
+    }
+}
+
+class CloudKitManager {
     private static let ContainerIdentifier = "iCloud.com.strongbox"
     private static let DatabaseRecordType = "Database"
     public static let RecordZoneName = "Databases"
@@ -501,7 +523,14 @@ class CloudKitManager {
                 }
 
                 logError(error)
-                throw error
+
+                if let ckErr = error as? CKError, ckErr.code == .quotaExceeded {
+                    throw CloudKitManagerError.notEnoughStorageSpace
+                } else if (error as NSError).code == NSCloudSharingQuotaExceededError {
+                    throw CloudKitManagerError.notEnoughStorageSpace
+                } else {
+                    throw error
+                }
             }
         }
     }
