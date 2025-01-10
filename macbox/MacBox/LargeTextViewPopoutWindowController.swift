@@ -33,8 +33,12 @@ class LargeTextViewPopoutWindowController: NSWindowController {
         contentViewController as! LargeTextViewAndQrCode
     }
 
-    func setContent(fieldName: String, string: String, largeText: Bool = true, subtext: String = "", qrCodeString: String? = nil) {
+    func setContent(entryTitle: String?, fieldName: String, string: String, largeText: Bool = true, subtext: String = "", qrCodeString: String? = nil) {
         theViewController.setContent(string: string, largeText: largeText, subtext: subtext, qrCodeString: qrCodeString)
+
+        if let entryTitle {
+            window?.title = entryTitle
+        }
 
         window?.subtitle = fieldName
     }

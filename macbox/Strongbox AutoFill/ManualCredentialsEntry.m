@@ -14,7 +14,7 @@
 #import "BookmarksHelper.h"
 #import "MacAlerts.h"
 #import "StrongboxMacFilesManager.h"
-#import "DatabasesManagerVC.h"
+
 #import "Constants.h"
 #import "HardwareKeyMenuHelper.h"
 #import "KeyFileManagement.h"

@@ -41,8 +41,8 @@ class WatchStatus: NSObject {
 
 @objc
 class WatchAppManager: NSObject, WCSessionDelegate {
-    static let MaxBatchSize = 62 * 1024 
-    static let MaxEntriesPerDatabase = 100 
+    static let MaxBatchSize = 60 * 1024 
+    static let MaxEntriesPerDatabase = 150 
 
     enum WatchAppManagerError: Error {
         case couldNotEncodeEntry

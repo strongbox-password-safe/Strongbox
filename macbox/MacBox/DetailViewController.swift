@@ -1141,24 +1141,36 @@ class DetailViewController: NSViewController {
         }
     }
 
-    var wc: LargeTextViewPopoutWindowController? = nil
+    var largeTextViewWindowController: LargeTextViewPopoutWindowController? = nil
     func showLargeTextView(_ field: DetailsViewField) {
-        if let wc {
-            wc.close()
+        if let largeTextViewWindowController {
+            largeTextViewWindowController.close()
         }
-        wc = LargeTextViewPopoutWindowController.instantiateFromStoryboard()
+        largeTextViewWindowController = LargeTextViewPopoutWindowController.instantiateFromStoryboard()
 
-        guard let wc else { return }
+        guard let largeTextViewWindowController else { return }
+
+        var title: String? = nil
+        if let node = getNode() {
+            title = dereference(node.title, node: node)
+        }
 
         if field.fieldType == .totp {
             guard let token = field.object as? OTPToken, let url = token.url(true), let b32 = token.secretBase32 else { return }
 
-            wc.setContent(fieldName: field.name, string: b32, largeText: false, subtext: url.absoluteString, qrCodeString: url.absoluteString)
+            largeTextViewWindowController.setContent(entryTitle: title, fieldName: field.name, string: b32, largeText: false, subtext: url.absoluteString, qrCodeString: url.absoluteString)
         } else {
-            wc.setContent(fieldName: field.name, string: field.value)
+            largeTextViewWindowController.setContent(entryTitle: title, fieldName: field.name, string: field.value)
         }
 
-        wc.showWindow(nil)
+        largeTextViewWindowController.showWindow(nil)
+    }
+
+    func onLockDoneKillAllWindows() {
+        if let largeTextViewWindowController {
+            largeTextViewWindowController.close()
+        }
+        largeTextViewWindowController = nil
     }
 
     func previewAttachment(_ field: DetailsViewField) {

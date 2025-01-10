@@ -186,7 +186,7 @@ static NSString* const kDisableMakeVisibleInFiles = @"disableMakeVisibleInFiles"
 static NSString* const kLastCloudKitRefresh = @"lastCloudKitRefresh";
 static NSString* const kAssociatedWebsites = @"associatedWebsites";
 static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparator";
-static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownDigits";
+static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownDigits2";
 static NSString* const kAppleWatchIntegration = @"appleWatchIntegration";
 static NSString* const kLastDisplayedWhatsNewMessage = @"lastDisplayedWhatsNewMessage";
 static NSString* const kShowInteractiveAppleWatchSyncGuide = @"showInteractiveAppleWatchSyncGuide";
@@ -265,7 +265,7 @@ static NSString* const kShowInteractiveAppleWatchSyncGuide = @"showInteractiveAp
 }
 
 - (BOOL)twoFactorHideCountdownDigits {
-    return [self getBool:kTwoFactorHideCountdownDigits fallback:NO];
+    return [self getBool:kTwoFactorHideCountdownDigits fallback:YES];
 }
 
 - (void)setTwoFactorHideCountdownDigits:(BOOL)twoFactorHideCountdownDigits {

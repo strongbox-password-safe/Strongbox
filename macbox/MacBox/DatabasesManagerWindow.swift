@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class DatabasesManagerWindow: NSWindow {
+class DatabasesManagerWindow: NSPanel {
     override var canBecomeKey: Bool {
         true
     }

@@ -739,7 +739,7 @@
             return NO;
         }
         
-        BOOL showRandomly = arc4random_uniform(100) < 5;
+        BOOL showRandomly = arc4random_uniform(100) < 10; 
         
         return model.metadata.unlockCount < 2 || showRandomly || [model.metadata.databaseCreated isMoreThanXDaysAgo:90]; 
     };

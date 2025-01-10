@@ -63,6 +63,8 @@
         
         [self.stackView setCustomSpacing:4 afterView:self.serviceIdHeader];
 
+        self.serviceIde.maximumNumberOfLines = 4;
+        
         self.serviceIde.stringValue = self.serviceIdentifiers.firstObject ? self.serviceIdentifiers.firstObject.identifier : NSLocalizedString(@"generic_none_available", @"None Available");
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

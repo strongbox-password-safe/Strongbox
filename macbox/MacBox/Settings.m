@@ -295,7 +295,7 @@ static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownD
 
 
 - (BOOL)twoFactorHideCountdownDigits {
-    return [self getBool:kTwoFactorHideCountdownDigits fallback:NO];
+    return [self getBool:kTwoFactorHideCountdownDigits fallback:YES];
 }
 
 - (void)setTwoFactorHideCountdownDigits:(BOOL)twoFactorHideCountdownDigits {

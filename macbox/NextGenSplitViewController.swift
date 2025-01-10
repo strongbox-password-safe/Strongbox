@@ -714,6 +714,10 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         }
 
         popouts.removeAll()
+
+        
+
+        detailView.onLockDoneKillAllWindows()
     }
 
     @objc var isDisplayingEditSheet: Bool {
