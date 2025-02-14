@@ -11,6 +11,7 @@
 #import "MacAlerts.h"
 #import "SafeStorageProviderFactory.h"
 #import "Utils.h"
+#import "Strongbox-Swift.h"
 
 @interface SelectStorageLocationVC () <NSOutlineViewDelegate, NSOutlineViewDataSource>
 
@@ -54,8 +55,10 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
 - (void)setupUi {
     self.outlineView.dataSource = self;
     self.outlineView.delegate = self;
-    
     self.outlineView.doubleAction = @selector(onSelect:);
+    
+    [self.outlineView registerNib:[[NSNib alloc] initWithNibNamed:TitleAndIconCell.NibIdentifier bundle:nil]
+                    forIdentifier:TitleAndIconCell.NibIdentifier];
     
     if ( self.createMode ) {
         self.labelTitle.stringValue = NSLocalizedString(@"choose_storage_loc", @"Choose Storage Location");
@@ -174,35 +177,44 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
 }
 
 - (nullable NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item {
-
-    
-    NSTableCellView* cell = (NSTableCellView*)[self.outlineView makeViewWithIdentifier:@"storageBrowserCellIdentifier" owner:self];
     StorageBrowserItem *sbi = item;
 
-    cell.textField.stringValue = sbi.name;
-    cell.imageView.contentTintColor = nil;
-    
+    TitleAndIconCell* cell = (TitleAndIconCell*)[self.outlineView makeViewWithIdentifier:TitleAndIconCell.NibIdentifier owner:self];
+
+    NSImage* image;
+    NSColor* contentTintColor = nil;
     if ( [sbi.identifier isEqualToString:kLoadingItemIdentifier] ) {
-        cell.imageView.image = [NSImage imageNamed:@"syncronize"];
+        image = [NSImage imageNamed:@"syncronize"];
     }
     else if ([sbi.identifier isEqualToString:kLoadingItemErrorIdentifier]) {
-        cell.imageView.image = [NSImage imageNamed:@"cancel"];
-        cell.imageView.contentTintColor = NSColor.systemRedColor;
+        image = [NSImage imageNamed:@"cancel"];
+        contentTintColor = NSColor.systemRedColor;
     }
     else {
-        cell.imageView.image = sbi.folder ?  [NSImage imageNamed:@"KPXC_C48_Folder"] : [NSImage imageNamed:@"KPXC_C22_ASCII"];
+        image = sbi.folder ?  [NSImage imageNamed:@"KPXC_C48_Folder"] : [NSImage imageNamed:@"KPXC_C22_ASCII"];
     }
+
+    BOOL isFile = !sbi.folder;
+    BOOL enabled = !sbi.disabled && ((!self.createMode) || (!isFile && self.createMode));
+    
+    [cell setContent:sbi.name
+                font:nil
+       textTintColor:nil
+            editable:NO
+           iconImage:image
+          topSpacing:4.0
+       bottomSpacing:4.0
+        leadingSpace:4.0
+ showTrailingFavStar:NO
+       iconTintColor:contentTintColor
+               count:nil
+             tooltip:nil
+  disabledAppearance:!enabled
+       onTitleEdited:nil];
     
     if ( sbi.name.length > 0 && [[sbi.name substringToIndex:1] isEqualToString:@"."] ) {
         cell.alphaValue = 0.7f;
     }
-    
-    BOOL isFile = !sbi.folder;
-    BOOL enabled = !sbi.disabled && ((!self.createMode) || (!isFile && self.createMode));
-    
-    cell.textField.enabled = enabled;
-    cell.textField.textColor = enabled ? nil : NSColor.secondaryLabelColor;
-    cell.imageView.enabled = enabled;
     
     return cell;
 }

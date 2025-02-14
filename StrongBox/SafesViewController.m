@@ -2329,9 +2329,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     });
 }
 
-- (void)showSaleScreen {
-
-    
+- (void)showSaleScreen {    
     BOOL existingSubscriber = ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription;
     Sale* sale = SaleScheduleManager.sharedInstance.currentSale;
     

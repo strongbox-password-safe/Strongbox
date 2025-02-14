@@ -668,7 +668,7 @@ static NSString* getFreeTrialSuffix(void) {
             else if (theAction == @selector(onDuplicateItem:)) {
                 return singleSelectedItem != nil;
             }
-            else if (theAction == @selector(paste:)) {
+            else if (theAction == @selector(paste:)) { 
                 NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
                 NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
                 slog(@"Validate Paste - %d", blah != nil);

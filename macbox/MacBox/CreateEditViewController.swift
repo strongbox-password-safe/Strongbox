@@ -2176,12 +2176,18 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
         }
     }
 
+    var customFieldKeySet: Set<String> {
+        database.customFieldKeySet.filter { key in
+            !NodeFields.isTotpCustomFieldKey(key) && !NodeFields.isPasskeyCustomFieldKey(key)
+        }
+    }
+
     @IBAction func onAddField(_: Any) {
         let vc = EditCustomFieldController.fromStoryboard()
 
         vc.existingKeySet = model.existingCustomFieldsKeySet
 
-        vc.customFieldKeySet = database.customFieldKeySet
+        vc.customFieldKeySet = customFieldKeySet
 
         vc.onSetField = { [weak self] key, value, protected in
             guard let self else { return }
@@ -2204,7 +2210,7 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
 
         vc.existingKeySet = model.existingCustomFieldsKeySet
 
-        vc.customFieldKeySet = database.customFieldKeySet
+        vc.customFieldKeySet = customFieldKeySet
 
         vc.field = CustomField()
         vc.field.key = field.key

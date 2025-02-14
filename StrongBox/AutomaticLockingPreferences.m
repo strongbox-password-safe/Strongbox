@@ -70,7 +70,7 @@
 
 - (void)promptForAutoLockTimeout {
     [self promptForInteger:NSLocalizedString(@"prefs_vc_auto_lock_database_delay", @"Auto Lock Delay")
-                   options:@[@0, @30, @60, @120, @180, @300, @600]
+                   options:@[@0, @30, @60, @120, @180, @300, @600, @900, @1200, @1800, @3600, @7200, @14400, @28800]
          formatAsIntervals:YES
               currentValue:self.viewModel.metadata.autoLockTimeoutSeconds ? self.viewModel.metadata.autoLockTimeoutSeconds.integerValue : 60
                 completion:^(BOOL success, NSInteger selectedValue) {

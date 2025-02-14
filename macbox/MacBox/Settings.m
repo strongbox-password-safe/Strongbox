@@ -153,6 +153,7 @@ static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwa
 static NSString* const kAssociatedWebsites = @"associatedWebsites";
 static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparator";
 static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownDigits";
+static NSString* const kShowOfflineOptionsOnLocalDeviceDatabases = @"showOfflineOptionsOnLocalDeviceDatabases";
 
 
 
@@ -293,6 +294,14 @@ static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownD
 #endif
 
 
+
+- (BOOL)showOfflineOptionsOnLocalDeviceDatabases {
+    return [self getBool:kShowOfflineOptionsOnLocalDeviceDatabases];
+}
+
+- (void)setShowOfflineOptionsOnLocalDeviceDatabases:(BOOL)showOfflineOptionsOnLocalDeviceDatabases {
+    [self setBool:kShowOfflineOptionsOnLocalDeviceDatabases value:showOfflineOptionsOnLocalDeviceDatabases];
+}
 
 - (BOOL)twoFactorHideCountdownDigits {
     return [self getBool:kTwoFactorHideCountdownDigits fallback:YES];
@@ -924,7 +933,7 @@ static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownD
 }
 
 - (BOOL)checkPinYin {
-    return NO;
+    return NO; 
 }
 
 - (void)setCheckPinYin:(BOOL)checkPinYin {

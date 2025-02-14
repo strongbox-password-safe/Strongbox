@@ -191,7 +191,7 @@
     [self bindPasswordStrength];
     [self bindWiFiSyncSource];
     
-#ifndef NO_NETWORKING 
+#ifndef NO_NETWORKING
     __weak AdvancedPreferencesTableViewController* weakSelf = self;
     [NSNotificationCenter.defaultCenter addObserverForName:NSNotification.wiFiSyncServiceNameDidChange
                                                     object:nil
@@ -550,7 +550,7 @@
 }
 
 - (void)restartOrStopWiFiSyncSource {
-#ifndef NO_NETWORKING 
+#ifndef NO_NETWORKING
     NSError* error;
     
     if ( ![WiFiSyncServer.shared startOrStopWiFiSyncServerAccordingToSettingsAndReturnError:&error] ) {

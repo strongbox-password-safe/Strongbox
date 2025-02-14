@@ -11,7 +11,7 @@
 #import "Settings.h"
 #import "MacAlerts.h"
 #import "Utils.h"
-#import "Strongbox.h"
+
 #import "BiometricIdHelper.h"
 #import "SafeStorageProviderFactory.h"
 #import "AboutViewController.h"

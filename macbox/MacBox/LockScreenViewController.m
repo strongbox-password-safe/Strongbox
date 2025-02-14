@@ -160,7 +160,7 @@
     
     [self bindProOrFreeTrial];
     
-    [self embedTouchIDIfAvailable];
+    [self resetEmbeddedTouchID];
 }
 
 - (void)customizeLockStackViewSpacing {
@@ -404,7 +404,6 @@
 }
 
 - (void)bindUnlockButtons {
-
     [self bindBiometricButtonOnLockScreen];
 
     [self bindManualUnlockButtonFast];
@@ -936,16 +935,20 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
         incorrectCredentials:(BOOL)incorrectCredentials {
     [self enableMasterCredentialsEntry:YES];
     
-    [self bindUI];
-    
-    [self setInitialFocus];
-    
-    if ( incorrectCredentials && !fromConvenience
+    if ( incorrectCredentials && !fromConvenience ) {
+        [self bindUI];
         
-        ) {
+        [self setInitialFocus];
+
         [self showIncorrectPasswordToast];
     }
     else if (error) {
+        [self resetEmbeddedTouchID]; 
+
+        [self bindUI];
+        
+        [self setInitialFocus];
+
         if ( self.databaseMetadata.storageProvider == kLocalDevice && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error] ) {
             [self askAboutRelocatingDatabase:ckfs fromConvenience:fromConvenience];
         }
@@ -1187,10 +1190,15 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
     return [MacCompositeKeyDeterminer bioOrWatchUnlockIsPossible:self.databaseMetadata isAutoFillOpen:NO];
 }
 
-- (void)embedTouchIDIfAvailable {
+- (void)resetEmbeddedTouchID {
     self.dummyEmbeddedTouchIDImageView.hidden = YES; 
     
     self.embeddedTouchIdContext = [[LAContext alloc] init];
+    
+    if ( self.embeddedLaAuthenticationView ) {
+        [self.masterPasswordAndEmbeddedTouchIDStack removeArrangedSubview:self.embeddedLaAuthenticationView];
+        [self.embeddedLaAuthenticationView removeFromSuperview];
+    }
     self.embeddedLaAuthenticationView = [[LAAuthenticationView alloc] initWithContext:self.embeddedTouchIdContext controlSize:NSControlSizeRegular];
     
     [self.embeddedLaAuthenticationView removeConstraints:self.embeddedLaAuthenticationView.constraints];

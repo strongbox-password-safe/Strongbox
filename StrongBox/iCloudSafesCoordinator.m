@@ -8,9 +8,9 @@
 
 #import "iCloudSafesCoordinator.h"
 #import "LocalDeviceStorageProvider.h"
-#import "Strongbox.h"
 #import "DatabasePreferences.h"
 #import "AppPreferences.h"
+#import "Constants.h"
 
 @implementation iCloudSafesCoordinator
 

@@ -27,6 +27,7 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
         icon.clipsToBounds = true
     }
 
+    @objc
     static let NibIdentifier: NSUserInterfaceItemIdentifier = .init("TitleAndIconCell")
 
     override func prepareForReuse() {
@@ -36,6 +37,7 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
         trailingFavStar.isHidden = true
     }
 
+    @objc
     func setContent(_ text: String,
                     font: NSFont? = FontManager.shared.bodyFont,
                     textTintColor: NSColor? = nil,
@@ -48,6 +50,7 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
                     iconTintColor: NSColor? = nil,
                     count: String? = nil,
                     tooltip: String? = nil,
+                    disabledAppearance: Bool = false,
                     onTitleEdited: ((_ text: String) -> Void)? = nil)
     {
         trailingFavStar.isHidden = !showTrailingFavStar
@@ -84,6 +87,10 @@ class TitleAndIconCell: NSTableCellView, NSTextFieldDelegate {
         topSpaceConstraint.constant = topSpacing
         bottomSpaceConstraint.constant = bottomSpacing
         leadingSpaceConstraint.constant = leadingSpace
+
+        title.isEnabled = !disabledAppearance
+        title.textColor = !disabledAppearance ? nil : .secondaryLabelColor
+        icon.isEnabled = !disabledAppearance
     }
 
     var onTitleEdited: ((_ text: String) -> Void)? = nil

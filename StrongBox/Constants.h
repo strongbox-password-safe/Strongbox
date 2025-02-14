@@ -88,6 +88,7 @@ extern NSString* const kDragAndDropSideBarHeaderMoveInternalUti;
 extern NSString* const kKeeAgentSettingsAttachmentName;
 
 extern NSString* const kIsExcludedFromAutoFillCustomDataKey;
+extern NSString* const kStrongboxICloudContainerIdentifier;
 
 #if TARGET_OS_IOS || TARGET_OS_WATCH
 

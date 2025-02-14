@@ -194,6 +194,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL twoFactorEasyReadSeparator;
 @property BOOL twoFactorHideCountdownDigits;
 
+@property BOOL showOfflineOptionsOnLocalDeviceDatabases;
+
 @end
 
 NS_ASSUME_NONNULL_END

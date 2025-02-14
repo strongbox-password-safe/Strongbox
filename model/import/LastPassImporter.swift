@@ -28,7 +28,9 @@ class LastPassImporter: NSObject, Importer {
                                      metadata: .withDefaultsFor(.keePass4),
                                      root: Node.rootWithDefaultKeePassEffectiveRootGroup())
 
-        guard let rows = NSArray(contentsOfCSVURL: url, options: [.sanitizesFields, .usesFirstLineAsKeys]) as? [CHCSVOrderedDictionary] else {
+        let rows = NSArray(contentsOfCSVURL: url, options: [.sanitizesFields, .usesFirstLineAsKeys])
+
+        guard let rows else {
             swlog("🔴 Error parsing CSV file...")
             throw CsvGenericImporterError.errorParsing(details: "Could not read any rows from file")
         }
@@ -37,9 +39,26 @@ class LastPassImporter: NSObject, Importer {
             throw CsvGenericImporterError.errorParsing(details: NSLocalizedString("mac_csv_file_contains_zero_rows", comment: "CSV File Contains Zero Rows. Cannot Import."))
         }
 
-        guard let header = rows.first else {
+        guard let headerRow = rows.firstObject else {
             throw CsvGenericImporterError.errorParsing(details: "Could not read header row to validate")
         }
+
+        guard let header = headerRow as? CHCSVOrderedDictionary else {
+            throw CsvGenericImporterError.errorParsing(details: "Could not read header row to validate")
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         guard header[Fields.url.rawValue] as? String != nil,
               header[Fields.username.rawValue] as? String != nil,
@@ -53,7 +72,11 @@ class LastPassImporter: NSObject, Importer {
             throw CsvGenericImporterError.errorParsing(details: "Could not find required fields [url, username, password, totp, extra, name, grouping, fav]. Incorrect format.")
         }
 
-        for row in rows {
+        for rowAny in rows {
+            guard let row = rowAny as? CHCSVOrderedDictionary else {
+                throw CsvGenericImporterError.errorParsing(details: "Could not read row to validate")
+            }
+
             addRow(row: row, database: database)
         }
 

@@ -701,8 +701,11 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
             [menu insertItem:item atIndex:5];
         }
     }
-#else
     
+    
+    
+        
+#else
     
     
     NSMenuItem* item = [menu.itemArray firstOrDefault:^BOOL(NSMenuItem * _Nonnull obj) {
@@ -805,13 +808,22 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 #endif
         else if (theAction == @selector(onOpenInOfflineMode:)) {
             BOOL isOpen = [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
-            
-            return !isOpen;
+            BOOL cacheAvailable = [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:singleSelectedDatabase.uuid modified:nil];
+            BOOL showOfflineOnFilesDbs = Settings.sharedInstance.showOfflineOptionsOnLocalDeviceDatabases;
+            BOOL isFilesBasedDb = singleSelectedDatabase.storageProvider == kLocalDevice;
+                        
+            return !isOpen && cacheAvailable && (!isFilesBasedDb || showOfflineOnFilesDbs);
         }
         else if (theAction == @selector(onToggleAlwaysOpenOffline:)) {
             NSMenuItem* item = (NSMenuItem*)anItem;
             [item setState:singleSelectedDatabase.alwaysOpenOffline ? NSControlStateValueOn : NSControlStateValueOff];
-            return YES;
+            
+            BOOL isOpen = [DatabasesCollection.shared isUnlockedWithUuid:singleSelectedDatabase.uuid];
+            BOOL cacheAvailable = [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:singleSelectedDatabase.uuid modified:nil];
+            BOOL showOfflineOnFilesDbs = Settings.sharedInstance.showOfflineOptionsOnLocalDeviceDatabases;
+            BOOL isFilesBasedDb = singleSelectedDatabase.storageProvider == kLocalDevice;
+            
+            return cacheAvailable && (!isFilesBasedDb || showOfflineOnFilesDbs);
         }
         else if (theAction == @selector(onToggleReadOnly:)) {
             Model* model = [DatabasesCollection.shared getUnlockedWithUuid:singleSelectedDatabase.uuid];

@@ -33,6 +33,7 @@ class AdvancedAppPreferences: NSViewController {
 
     @IBOutlet var associatedWebsites: NSButton!
 
+    @IBOutlet var showOfflineOptionsForFilesDatabases: NSButton!
     
 
     override func viewDidLoad() {
@@ -86,7 +87,7 @@ class AdvancedAppPreferences: NSViewController {
 
         
 
-        stackViewStrongboxSyncStatus.isHidden = Settings.sharedInstance().disableNetworkBasedFeatures
+        stackViewStrongboxSyncStatus.isHidden = true 
 
         #if !NO_NETWORKING
             labelStrongboxSyncStatus.textColor = .secondaryLabelColor
@@ -107,6 +108,7 @@ class AdvancedAppPreferences: NSViewController {
         #endif
 
         associatedWebsites.state = settings.associatedWebsites ? .on : .off
+        showOfflineOptionsForFilesDatabases.state = settings.showOfflineOptionsOnLocalDeviceDatabases ? .on : .off
     }
 
     #if !NO_NETWORKING
@@ -186,6 +188,9 @@ class AdvancedAppPreferences: NSViewController {
         settings.atomicSftpWrite = atomicSftpWrites.state == .on
         settings.associatedWebsites = associatedWebsites.state == .on
 
+        
+
+        settings.showOfflineOptionsOnLocalDeviceDatabases = showOfflineOptionsForFilesDatabases.state == .on
 
         notifyChanged()
     }

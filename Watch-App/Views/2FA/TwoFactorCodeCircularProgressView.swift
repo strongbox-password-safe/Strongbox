@@ -50,7 +50,7 @@ struct TwoFactorCodeCircularProgressView: View {
                     let secs = Text(totpSeconds)
                         .lineLimit(1)
                         .contentTransition(.numericText(countsDown: true))
-                        .font(Font.custom("DSEG7ClassicMini-Bold", size: fontSize)) 
+                        .font(Font.custom("DSEG7ClassicMini-Bold", size: fontSize))
 
                     if totpSeconds.hasPrefix("1") {
                         secs.padding(.leading, -(fontSize / 2.5))

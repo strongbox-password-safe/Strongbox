@@ -1865,7 +1865,6 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 
 
-#if !TARGET_OS_IOS 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
 #ifndef IS_APP_EXTENSION 
     if ( self.metadata.autoFillEnabled ) {
@@ -1895,7 +1894,6 @@ userInteractionRequired:(BOOL)userInteractionRequired
     return @[];
 #endif
 }
-#endif
 
 - (void)rebuildAutoFillDomainNodeMap {
     

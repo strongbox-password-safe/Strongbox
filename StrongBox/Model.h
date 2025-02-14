@@ -272,9 +272,7 @@ extern NSString* const kAsyncUpdateStartingNotification;
 - (void)refreshCaches; 
 
 #ifndef IS_APP_EXTENSION 
-#if !TARGET_OS_IOS 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString;
-#endif
 #endif
 
 #if TARGET_OS_IOS

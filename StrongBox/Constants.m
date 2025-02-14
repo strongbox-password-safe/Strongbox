@@ -72,6 +72,7 @@ NSString* const kPasskeyCustomFieldKeyUsernameIncorrect = @"KPXC_PASSKEY_USERNAM
 NSString* const kPasskeyCustomFieldKeyUsernameCanonical = @"KPEX_PASSKEY_USERNAME";
 
 NSString* const kDocumentRestorationNSCoderKeyForUrl = @"StrongboxNonFileRestorationStateURLAsString";
+NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
 
 const static NSSet<NSString*> *wellKnownKeys;
 

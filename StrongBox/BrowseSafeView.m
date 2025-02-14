@@ -610,12 +610,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                           handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onExportDatabase:nil]; }]];
     }
     
-    BOOL featureEnabled = AppPreferences.sharedInstance.appleWatchIntegration && self.viewModel.metadata.appleWatchEnabled;
-    if ( featureEnabled && WatchAppManager.shared.watchIsPairedAndInstalled ) {
-        [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_action_sync_apple_watch_now", @"Sync Apple Watch Now")
-                                      systemImage:@"applewatch"
-                                          handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onSyncAppleWatchNow]; }]];
-    }
+
+
+
+
+
+
     
     if ( !AppPreferences.sharedInstance.disablePrinting ) {
         [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_print_database", @"Print Database")

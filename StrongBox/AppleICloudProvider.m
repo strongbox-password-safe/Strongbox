@@ -8,7 +8,7 @@
 
 #import "AppleICloudProvider.h"
 #import "StrongboxUIDocument.h"
-#import "Strongbox.h"
+#import "Constants.h"
 #import "Utils.h"
 #import "DatabasePreferences.h"
 #import "iCloudSafesCoordinator.h"
