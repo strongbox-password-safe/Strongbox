@@ -78,7 +78,7 @@ class Sale: NSObject {
         
 
         Sale("2025-03-14", "2025-03-18", title: "☘️ St. Patrick's Day Special ☘️", promoCode: "IRE25"),
-        
+
 
 
 

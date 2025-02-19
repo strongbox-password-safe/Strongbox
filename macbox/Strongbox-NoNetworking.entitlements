@@ -18,9 +18,7 @@
 	<true/>
 	<key>com.apple.security.files.user-selected.read-write</key>
 	<true/>
-	<key>com.apple.security.network.client</key>
-	<true/>
-	<key>com.apple.security.network.server</key>
+	<key>com.apple.security.network.client</key> <!-- Required for Markdown Notes (WebKit view requires it!) -->
 	<true/>
 	<key>com.apple.security.print</key>
 	<true/>
