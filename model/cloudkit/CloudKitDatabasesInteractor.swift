@@ -330,12 +330,14 @@ class CloudKitDatabasesInteractor: NSObject {
     }
 
     func mergeOrUpdateDatabases(_ ckDbs: [CloudKitHostedDatabase]) async throws {
-        removeNoneExistentDatabases(ckDbs)
+        removeDeletedDatabases(ckDbs)
 
         
 
         for db in ckDbs {
-            try await mergeCloudKitDatabaseIn(db)
+            if db.deletedAt == nil {
+                try await mergeCloudKitDatabaseIn(db)
+            }
         }
     }
 
@@ -412,18 +414,17 @@ class CloudKitDatabasesInteractor: NSObject {
         }
     }
 
-    func removeNoneExistentDatabases(_ ckDbs: [CloudKitHostedDatabase]) {
+    private func removeDeletedDatabases(_ ckDbs: [CloudKitHostedDatabase]) {
+        
+        
         
 
-        let allIds = Set(ckDbs.map(\.id))
+        let deletedCkDbs = ckDbs.filter { ckDb in
+            ckDb.deletedAt != nil
+        }
 
-        let toRemove = existingCloudKitDatabases.filter { db in
-            guard let cloudKitDatabaseId = cloudKitIdentifierFromStrongboxDatabase(db) else {
-                swlog("🔴 ERROR: Could not read fileId! \(#function)!!")
-                return true 
-            }
-
-            return !allIds.contains(cloudKitDatabaseId)
+        let toRemove = deletedCkDbs.compactMap { deletedCkDb in
+            findStrongboxDatabaseForCloudKitDatabase(cloudKitIdentifier: deletedCkDb.id)
         }
 
         for removeMe in toRemove {

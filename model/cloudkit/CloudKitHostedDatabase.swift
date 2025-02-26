@@ -15,6 +15,7 @@ extension CloudKitHostedDatabase {
         static let filename = "filename"
         static let dataBlob = "dataBlob"
         static let modDate = "modDate"
+        static let deletedAt = "deletedAt" 
     }
 }
 
@@ -24,6 +25,7 @@ struct CloudKitHostedDatabase: Identifiable {
     let nickname: String
     let filename: String
     let modDate: Date
+    let deletedAt: Date?
     let dataBlob: Data? 
     let associatedCkRecord: CKRecord
     let sharedWithMe: Bool
@@ -55,9 +57,12 @@ struct CloudKitHostedDatabase: Identifiable {
             return nil
         }
 
+        let deletedAt = record.encryptedValues[RecordKeys.deletedAt] as? Date
+
         self.nickname = nickname
         self.filename = filename
         self.modDate = modDate
+        self.deletedAt = deletedAt
 
         if let asset = record[RecordKeys.dataBlob] as? CKAsset {
             

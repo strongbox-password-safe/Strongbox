@@ -112,6 +112,7 @@ class CloudKitManager {
             CloudKitHostedDatabase.RecordKeys.nickname,
             CloudKitHostedDatabase.RecordKeys.filename,
             CloudKitHostedDatabase.RecordKeys.modDate,
+            CloudKitHostedDatabase.RecordKeys.deletedAt,
             CKRecord.SystemFieldKey.share,
         ]
 
@@ -148,11 +149,12 @@ class CloudKitManager {
             CloudKitHostedDatabase.RecordKeys.nickname,
             CloudKitHostedDatabase.RecordKeys.filename,
             CloudKitHostedDatabase.RecordKeys.modDate,
+            CloudKitHostedDatabase.RecordKeys.deletedAt,
             CKRecord.SystemFieldKey.share,
             
         ]
 
-        return try await executeCloudKitOperation(theDatabase: cloudKitDatabase) { database in
+        let all = try await executeCloudKitOperation(theDatabase: cloudKitDatabase) { database in
             var all: [CloudKitHostedDatabase] = []
 
             let (results, initialQueryCursor) = try await database.records(matching: query, inZoneWith: zone.zoneID, desiredKeys: desiredKeys)
@@ -178,6 +180,34 @@ class CloudKitManager {
 
             return all
         }
+
+        
+
+        maintenanceDeleteOldDatabasesMarkedDeletedAt(all)
+
+        return all
+    }
+
+    func maintenanceDeleteOldDatabasesMarkedDeletedAt(_ databases: [CloudKitHostedDatabase]) {
+        let olds = databases.filter { ckDb in
+            if !ckDb.sharedWithMe, let deletedAt = ckDb.deletedAt, (deletedAt as NSDate).isMoreThanXDaysAgo(90) {
+                return true
+            } else {
+                return false
+            }
+        }
+
+        if !olds.isEmpty {
+            Task {
+                for old in olds {
+                    do {
+                        try await deleteActual(id: old.id)
+                    } catch {
+                        swlog("🔴 Cannot cleanup an old database [\(old)] marked deleted more than 90 days ago.")
+                    }
+                }
+            }
+        }
     }
 
     func updateDatabase(_ id: CloudKitDatabaseIdentifier, dataBlob: Data) async throws -> CloudKitHostedDatabase {
@@ -195,6 +225,22 @@ class CloudKitManager {
     }
 
     func delete(id: CloudKitDatabaseIdentifier) async throws {
+        
+        
+        
+        
+        
+        
+
+        let existing = try await getDatabase(id: id, includeDataBlob: false) 
+
+        
+        
+
+        _ = try await saveOrUpdate(existing.associatedCkRecord, sharedWithMe: id.sharedWithMe, modDate: .now, dataBlob: Data(), deletedAt: .now)
+    }
+
+    func deleteActual(id: CloudKitDatabaseIdentifier) async throws {
         guard !id.sharedWithMe else {
             swlog("🔴 Cannot delete a database we don't own")
             throw CloudKitManagerError.invalidParameters
@@ -207,12 +253,15 @@ class CloudKitManager {
         }
     }
 
-    private func saveOrUpdate(_ ckRecord: CKRecord, sharedWithMe: Bool, nickName: String? = nil, fileName: String? = nil, modDate: Date? = nil, dataBlob: Data? = nil) async throws -> CloudKitHostedDatabase {
+    private func saveOrUpdate(_ ckRecord: CKRecord, sharedWithMe: Bool, nickName: String? = nil, fileName: String? = nil, modDate: Date? = nil, dataBlob: Data? = nil, deletedAt: Date? = nil) async throws -> CloudKitHostedDatabase {
         if let nickName {
             ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.nickname] = nickName
         }
         if let fileName {
             ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.filename] = fileName
+        }
+        if let deletedAt {
+            ckRecord.encryptedValues[CloudKitHostedDatabase.RecordKeys.deletedAt] = deletedAt
         }
 
         var tmpAssetUrlToDelete: URL? = nil
