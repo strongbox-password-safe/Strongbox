@@ -33,10 +33,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSUInteger minimumLength;
 
 @property BOOL checkHibp;
+@property BOOL checkHibpBreaches;
 
 @property (nullable) NSNumber* lastKnownAuditIssueCount;
 @property BOOL showAuditPopupNotifications;
 @property BOOL hibpCaveatAccepted;
+@property BOOL hibpCaveatTwoAccepted;
 
 @property NSUInteger hibpCheckForNewBreachesIntervalSeconds;
 @property NSTimeInterval lastDuration;

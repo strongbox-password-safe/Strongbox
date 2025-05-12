@@ -21,7 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
                                  tooShort:(NSSet<NSUUID *> *)tooShort
                                     pwned:(NSSet<NSUUID *> *)pwned
                                lowEntropy:(NSSet<NSUUID *> *)lowEntropy
-                       twoFactorAvailable:(NSSet<NSUUID *> *)twoFactorAvailable NS_DESIGNATED_INITIALIZER;
+                       twoFactorAvailable:(NSSet<NSUUID *> *)twoFactorAvailable
+                          breachedAccounts:(NSSet<NSUUID *> *)breachedAccounts NS_DESIGNATED_INITIALIZER;
 
 @property (readonly) NSSet<NSUUID*>* entriesWithNoPasswords;
 @property (readonly) NSSet<NSUUID*>* entriesWithDuplicatePasswords;
@@ -31,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSSet<NSUUID*>* entriesPwned;
 @property (readonly) NSSet<NSUUID*>* entriesWithLowEntropyPasswords;
 @property (readonly) NSSet<NSUUID*>* entriesWithTwoFactorAvailable;
+@property (readonly) NSSet<NSUUID*>* entriesWithBreachedAccounts;
 @property (readonly) NSSet<NSUUID*>* allEntries;
 
 @property (readonly) NSDictionary<NSString*, NSSet<NSUUID*>*>* duplicatedDictionary;

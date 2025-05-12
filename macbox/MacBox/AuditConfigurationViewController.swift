@@ -25,6 +25,7 @@ class AuditConfigurationViewController: NSViewController {
     @IBOutlet var chckboxCommon: NSButton!
     @IBOutlet var checkboxTwoFactor: NSButton!
     @IBOutlet var checkboxHibp: NSButton!
+    @IBOutlet weak var checkboxHibpBreaches: NSButton!
     @IBOutlet var checkboxDuplicated: NSButton!
     @IBOutlet var checkboxDuplicateCaseInsensitive: NSButton!
 
@@ -134,6 +135,7 @@ class AuditConfigurationViewController: NSViewController {
         chckboxCommon.state = config.checkForCommonPasswords ? .on : .off
         checkboxTwoFactor.state = config.checkForTwoFactorAvailable ? .on : .off
         checkboxHibp.state = config.checkHibp ? .on : .off
+        checkboxHibpBreaches.state = config.checkHibpBreaches ? .on : .off
 
         checkboxDuplicated.state = config.checkForDuplicatedPasswords ? .on : .off
         checkboxDuplicateCaseInsensitive.state = config.caseInsensitiveMatchForDuplicates ? .on : .off
@@ -158,6 +160,7 @@ class AuditConfigurationViewController: NSViewController {
 
         let hibpPossible = config.auditInBackground && Settings.sharedInstance().isPro
         checkboxHibp.isEnabled = hibpPossible
+        checkboxHibpBreaches.isEnabled = hibpPossible
         if !hibpPossible {
 
         }
@@ -285,6 +288,39 @@ class AuditConfigurationViewController: NSViewController {
         }
     }
 
+
+    @IBAction func onHibpBreachesChanged(_: Any) {
+        if checkboxHibpBreaches.state != .on {
+            let config = database.auditConfig
+            config.lastHibpOnlineCheck = nil
+            database.auditConfig = config
+        }
+
+        if checkboxHibpBreaches.state == .on, !database.auditConfig.checkHibpBreaches, !database.auditConfig.hibpCaveatTwoAccepted {
+            let loc1 = NSLocalizedString("audit_hibp_warning_title", comment: "HIBP Disclaimer")
+            let loc2 = NSLocalizedString("audit_hibp_warning_message_breaches", comment: "I understand that my account usernames will be sent over the web (HTTPS) to the 'Have I Been Pwned?' breach checking service, through a dedicated cloud function that validates requests originate from a legitimate build of Strongbox. I also absolve Strongbox, Applause, Mark McGuill and Phoebe Code Limited of all liabilty for using this feature.")
+            let locNo = NSLocalizedString("audit_hibp_warning_no", comment: "No, I don't want to use this feature")
+            let locYes = NSLocalizedString("audit_hibp_warning_yes", comment: "Yes, I understand and agree")
+
+            MacAlerts.twoOptions(withCancel: loc1, informativeText: loc2, option1AndDefault: locNo, option2: locYes, window: view.window) { [weak self] response in
+                guard let self else { return }
+
+                if response == 1 { 
+                    let config = self.database.auditConfig
+
+                    config.hibpCaveatTwoAccepted = true
+                    self.database.auditConfig = config
+
+                    self.onSimpleChanged(nil)
+                } else { 
+                    self.bindUI()
+                }
+            }
+        } else {
+            onSimpleChanged(nil)
+        }
+    }
+
     @IBAction func onSimpleChanged(_: Any?) {
 
 
@@ -298,6 +334,7 @@ class AuditConfigurationViewController: NSViewController {
         config.checkForCommonPasswords = chckboxCommon.state == .on
         config.checkForTwoFactorAvailable = checkboxTwoFactor.state == .on
         config.checkHibp = checkboxHibp.state == .on
+        config.checkHibpBreaches = checkboxHibpBreaches.state == .on
 
         config.checkForDuplicatedPasswords = checkboxDuplicated.state == .on
         config.caseInsensitiveMatchForDuplicates = checkboxDuplicateCaseInsensitive.state == .on

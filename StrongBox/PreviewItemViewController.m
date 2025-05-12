@@ -33,10 +33,6 @@
 
 @implementation PreviewItemViewController
 
-+ (instancetype)forItem:(Node *)item andModel:(Model *)model {
-    return [[PreviewItemViewController alloc] initForItem:item andModel:model];
-}
-
 - (instancetype)initForItem:(Node *)item andModel:(Model *)model  {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {

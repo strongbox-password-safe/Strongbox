@@ -868,9 +868,11 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
     __weak PickCredentialsTableViewController* weakSelf = self;
     
-    return [UIContextMenuConfiguration configurationWithIdentifier:indexPath
-                                                   previewProvider:^UIViewController * _Nullable{ return item.isGroup ? nil : [PreviewItemViewController forItem:item andModel:self.model];   }
-                                                    actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
+    return [
+        UIContextMenuConfiguration configurationWithIdentifier:indexPath
+        previewProvider:^UIViewController * _Nullable{ return item.isGroup ? nil : [[PreviewItemViewControllerNext alloc] initWithItem:item model: self.model];
+        }
+        actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
         return [UIMenu menuWithTitle:@""
                                image:nil
                           identifier:nil

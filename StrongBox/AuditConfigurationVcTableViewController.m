@@ -45,7 +45,8 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchHibp;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowPopups;
-
+@property (weak, nonatomic) IBOutlet UISwitch *switchHibpBreaches;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellCheckHibpBreaches;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCheckHibp;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellOnlineHibpInterval;
 
@@ -55,6 +56,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UILabel *labelLastOnlineCheckHeader;
 @property (weak, nonatomic) IBOutlet UIStackView *stackViewLastOnlineCheck;
 @property (weak, nonatomic) IBOutlet UILabel *labelCheckHaveIBeenPwned;
+@property (weak, nonatomic) IBOutlet UILabel *labelCheckHaveIBeenPwnedBreaches;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelCaseInsensitiveDupes;
 @property (weak, nonatomic) IBOutlet UILabel *labelLengthOfMinimumLength;
@@ -86,6 +88,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     [super viewDidLoad];
     
     [self cell:self.cellCheckHibp setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
+    [self cell:self.cellCheckHibpBreaches setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
     [self cell:self.cellOnlineHibpInterval setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
     
     [self reloadDataAnimated:NO];
@@ -144,20 +147,22 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     
     self.switchHibp.on = self.model.metadata.auditConfig.checkHibp;
+    self.switchHibpBreaches.on = self.model.metadata.auditConfig.checkHibpBreaches;
 
     [self bindLastOnlineCheckUi];
-    self.cellOnlineHibpInterval.userInteractionEnabled = self.switchHibp.on;
+    self.cellOnlineHibpInterval.userInteractionEnabled = self.switchHibp.on || self.switchHibpBreaches.on;
 
     
     
     BOOL pro = AppPreferences.sharedInstance.isPro;
     self.switchHibp.enabled = pro;
+    self.switchHibpBreaches.enabled = pro;
 
-    self.labelCheckHaveIBeenPwned.textColor = pro ? nil : secondary;
     self.labelLastOnlineCheckHeader.textColor = pro && self.switchHibp.on ? nil : secondary;
     self.labelOnlineCheckInterval.textColor = pro && self.switchHibp.on ? nil : secondary;
 
     self.labelCheckHaveIBeenPwned.textColor = pro ? nil : secondary;
+    self.labelCheckHaveIBeenPwnedBreaches.textColor = pro ? nil : secondary;
 
     
 
@@ -305,6 +310,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     config.minimumLength = self.sliderMinLength.value;
     config.levenshteinSimilarityThreshold = ((CGFloat)self.sliderSimilar.value / 100.0f);
     config.checkHibp = self.switchHibp.on;
+    config.checkHibpBreaches = self.switchHibpBreaches.on;
     config.showAuditPopupNotifications = self.switchShowPopups.on;
 
     config.checkForLowEntropy = self.switchLowEntropy.on;
@@ -351,7 +357,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     if (self.switchHibp.on && self.model.metadata.auditConfig.checkHibp == NO && !self.model.metadata.auditConfig.hibpCaveatAccepted) {
         NSString* loc1 = NSLocalizedString(@"audit_hibp_warning_title", @"HIBP Disclaimer");
-        NSString* loc2 = NSLocalizedString(@"audit_hibp_warning_message", @"I understand that my passwords will be sent over the web (HTTPS) to the 'Have I Been Pwned?' password checking service (using k-anonymity) and that I fully consent to this functionality. I also absolve Strongbox, Mark McGuill and Phoebe Code Limited of all liabilty for using this feature.");
+        NSString* loc2 = NSLocalizedString(@"audit_hibp_warning_message", @"I understand that my passwords will be sent over the web (HTTPS) to the 'Have I Been Pwned?' password checking service (using k-anonymity) and that I fully consent to this functionality. I also absolve Strongbox, Applause, Mark McGuill and Phoebe Code Limited of all liabilty for using this feature.");
         NSString* locNo = NSLocalizedString(@"audit_hibp_warning_no", @"No, I don't want to use this feature");
         NSString* locYes = NSLocalizedString(@"audit_hibp_warning_yes", @"Yes, I understand and agree");
         
@@ -373,6 +379,40 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
         [self onPreferenceChanged:nil];
     }
 }
+
+- (IBAction)onHIbpBreachesChanged:(id)sender {
+    if (!self.switchHibpBreaches.on) {
+        DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
+        config.lastHibpOnlineCheck = nil;
+        self.model.metadata.auditConfig = config;
+    }
+
+    if (self.switchHibpBreaches.on && self.model.metadata.auditConfig.checkHibpBreaches == NO && !self.model.metadata.auditConfig.hibpCaveatTwoAccepted) {
+        NSString* loc1 = NSLocalizedString(@"audit_hibp_warning_title", @"HIBP Disclaimer");
+        NSString* loc2 = NSLocalizedString(@"audit_hibp_warning_message_breaches", @"I understand that my account usernames will be sent over the web (HTTPS) to the 'Have I Been Pwned?' breach checking service, through a dedicated cloud function that validates requests originate from a legitimate build of Strongbox. I also absolve Strongbox, Applause, Mark McGuill and Phoebe Code Limited of all liabilty for using this feature.");
+        NSString* locNo = NSLocalizedString(@"audit_hibp_warning_no", @"No, I don't want to use this feature");
+        NSString* locYes = NSLocalizedString(@"audit_hibp_warning_yes", @"Yes, I understand and agree");
+
+        [Alerts twoOptionsWithCancel:self title:loc1 message:loc2 defaultButtonText:locNo secondButtonText:locYes completion:^(int response) {
+            if (response == 1) { 
+                DatabaseAuditorConfiguration* config = self.model.metadata.auditConfig;
+
+                config.hibpCaveatTwoAccepted = YES;
+                self.model.metadata.auditConfig = config;
+
+                [self onPreferenceChanged:nil];
+            }
+            else { 
+                [self bindUi];
+            }
+        }];
+    }
+    else {
+        [self onPreferenceChanged:nil];
+    }
+}
+
+
 
 - (IBAction)onDone:(id)sender {
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];

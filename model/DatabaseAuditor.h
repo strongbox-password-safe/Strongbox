@@ -31,6 +31,7 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
     kAuditFlagPwned,
     kAuditFlagLowEntropy,
     kAuditFlagTwoFactorAvailable,
+    kAuditFlagBreachedAccount,
 };
 
 typedef void (^AuditCompletionBlock)(BOOL userStopped, NSTimeInterval duration);
@@ -77,8 +78,11 @@ typedef BOOL (^IsExcludedBlock)(Node* item);
 - (NSSet<NSUUID*>*)getDuplicatedPasswordNodeSet:(NSUUID*)nodeId;
 
 @property (readonly) NSUInteger haveIBeenPwnedErrorCount;
+@property (nonatomic, strong) NSString *deviceCheckToken;
 
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;
+- (void)oneTimeAccountBreachCheck:(NSString*)email completion:(void(^)(BOOL breached, NSArray<NSString*>* _Nullable breachedSites, NSError* _Nullable error))completion;
+- (void)fetchAndStoreDeviceCheckToken;
 
 @end
 

@@ -130,22 +130,22 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
                                                               fileName:templateMetaData.fileName
                                                         fileIdentifier:templateMetaData.fileIdentifier];
     self.isDuressDummyDatabase = YES;
-    
+
     NSData* data = [self getDuressDummyData];
     if (!data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
-        
+
         DatabaseModel* model = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:cpf];
-        
+
         [SampleItemsGenerator addSampleGroupAndRecordToRoot:model passwordConfig:self.applicationPreferences.passwordGenerationConfig];
-        
+
         data = [Serializator expressToData:model format:model.originalFormat];
-        
+
         [self setDuressDummyData:data];
     }
-    
+
     DatabaseModel* model = [Serializator expressFromData:data password:@"1234"];
-    
+
     return [self initWithDatabase:model
                          metaData:meta
                    forcedReadOnly:NO
@@ -190,34 +190,34 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
         if ( !passwordDatabase ) {
             return nil;
         }
-        
+
         _domainNodeMap = @{};
         _metadata = metaData;
         self.theDatabase = passwordDatabase;
         self.asyncUpdateEncryptionQueue = dispatch_queue_create("Model-AsyncUpdateEncryptionQueue", DISPATCH_QUEUE_SERIAL);
         self.asyncUpdatesStack = ConcurrentMutableStack.mutableStack;
-        
+
         _cachedLegacyFavourites = [NSSet setWithArray:self.metadata.legacyFavouritesStore];
-        
+
 #if TARGET_OS_IOS
         _cachedLegacyWatchEntries = [NSSet setWithArray:self.metadata.legacyWatchEntries];
 #endif
-        
+
         if ( self.applicationPreferences.databasesAreAlwaysReadOnly ) {
             self.forcedReadOnly = YES;
         }
         else {
             self.forcedReadOnly = forcedReadOnly;
         }
-        
+
         self.isNativeAutoFillAppExtensionOpen = isAutoFill;
         self.isDuressDummyMode = isDuressDummyMode;
         self.offlineMode = offlineMode;
-        
+
         [self rebuildAutoFillDomainNodeMap];
-        
+
         [self createNewAuditor];
-        
+
         return self;
     }
     else {
@@ -257,15 +257,15 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
 
 - (void)refreshCaches {
     [self.database rebuildFastMaps];
-    
+
     [self refreshAutoFillSuggestions];
-    
+
     [self restartBackgroundAudit];
-    
+
     [self refreshWatchAppEntries];
+
     
-    
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kTabsMayHaveChangedDueToModelEdit object:nil];
     });
@@ -303,36 +303,36 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
             if (completion) {
                 completion(YES);
             }
-            
+
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotification object:nil];
             });
         });
         return;
     }
-    
+
     slog(@"reloadDatabaseFromLocalWorkingCopy....");
-    
+
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata
                                                          forceReadOnly:self.forcedReadOnly
                                       isNativeAutoFillAppExtensionOpen:self.isNativeAutoFillAppExtensionOpen
                                                            offlineMode:self.offlineMode
                                                     onDemandUiProvider:onDemandViewController];
-    
+
     unlocker.noProgressSpinner = noProgressSpinner;
-    
+
     [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         if ( result == kUnlockDatabaseResultSuccess) {
             slog(@"reloadDatabaseFromLocalWorkingCopy... Success ");
-            
+
             self.theDatabase = model.database;
-            
+
             if (completion) {
                 completion(YES);
             }
-            
+
             [self refreshCaches];
-            
+
             dispatch_async(dispatch_get_main_queue(), ^{
                 [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotification object:self.databaseUuid];
             });
@@ -343,8 +343,8 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
             
             
             
-            
-            
+
+
             if (completion) {
                 completion(NO); 
             }
@@ -364,11 +364,11 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
 
 - (void)replaceEntireUnderlyingDatabaseWith:(DatabaseModel*)newDatabase {
     self.theDatabase = newDatabase;
-    
+
     [self restartBackgroundAudit];
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotification object:nil]; 
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotification object:nil];
     });
 }
 
@@ -404,36 +404,36 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
 - (BOOL)asyncJob:(AsyncJobType)jobType
       completion:(AsyncUpdateCompletion _Nullable)completion {
     
-    
+
     if ( self.isReadOnly && jobType != kAsyncJobTypeSyncOnly ) {
         slog(@"🔴 WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
         return NO;
     }
-    
+
     AsyncUpdateJob* job = [[AsyncUpdateJob alloc] init];
-    
+
     if ( self.originalFormat == kKeePass4 ) {
         [self rotateHardwareKeyChallengeIfDue]; 
     }
-        
+
     job.snapshot = [self.database clone];
     job.jobType = jobType;
     job.completion = completion;
-    
+
     [self.asyncUpdatesStack push:job];
-    
+
     dispatch_async(self.asyncUpdateEncryptionQueue, ^{
         [self dequeueOutstandingAsyncUpdateAndProcess];
     });
+
     
-    
-    
+
     return YES;
 }
 
 - (void)dequeueOutstandingAsyncUpdateAndProcess {
     AsyncUpdateJob* job = [self.asyncUpdatesStack popAndClear]; 
-    
+
     if ( job ) {
         [self beginJobWithDatabaseClone:NSUUID.UUID job:job];
     }
@@ -444,24 +444,24 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
 
 - (void)beginJobWithDatabaseClone:(NSUUID*)updateId job:(AsyncUpdateJob*)job {
     
-    
+
     _isRunningAsyncUpdate = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateStartingNotification object:self.databaseUuid];
     });
-    
+
     dispatch_group_t mutex = dispatch_group_create();
     dispatch_group_enter(mutex);
-    
+
     if ( job.jobType == kAsyncJobTypeBoth || job.jobType == kAsyncJobTypeSerializeOnly ) {
         [self beginAsyncUpdate:NSUUID.UUID updateMutex:mutex job:job];
     }
     else if ( job.jobType == kAsyncJobTypeSyncOnly ) {
         [self beginAsyncSync:NSUUID.UUID updateMutex:mutex job:job];
     }
-    
+
     dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
-    
+
     slog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
 }
 
@@ -469,19 +469,19 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
     NSString* streamingFile = [self getUniqueStreamingFilename];
     NSOutputStream* outputStream = [NSOutputStream outputStreamToFileAtPath:streamingFile append:NO];
     [outputStream open];
-    
+
     DatabaseModel* snapshot = job.snapshot;
     CompositeKeyFactors* originalCkfs = snapshot.ckfs;
-    
+
     __weak Model* weakSelf = self;
     BOOL useHardwareKeyCaching = snapshot.originalFormat == kKeePass4 && snapshot.ckfs.yubiKeyCR != nil && self.metadata.hardwareKeyCRCaching;
-    
+
     if ( useHardwareKeyCaching ) {
         CompositeKeyFactors* cachedCrCkfsWrapper = [CompositeKeyFactors password:originalCkfs.password
                                                                    keyFileDigest:originalCkfs.keyFileDigest
                                                                        yubiKeyCR:^(NSData * _Nonnull thisChallenge, YubiKeyCRResponseBlock  _Nonnull completion) {
             NSData* response = [weakSelf.metadata getCachedChallengeResponse:thisChallenge];
-            
+
             if ( response ) {
                 slog(@"🟢 Got cached response [%@] for challenge [%@], attempting to use...", response.base64String, thisChallenge.base64String);
                 completion(NO, response, nil);
@@ -491,10 +491,10 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
                 originalCkfs.yubiKeyCR(thisChallenge, completion);
             }
         }];
-        
+
         snapshot.ckfs = cachedCrCkfsWrapper;
     }
-    
+
     [Serializator getAsData:job.snapshot
                      format:job.snapshot.originalFormat
                outputStream:outputStream
@@ -503,10 +503,10 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
         [outputStream close];
 
         BOOL successful = !userCancelled && error == nil;
-        
+
         if ( successful && useHardwareKeyCaching  ) { 
             slog(@"🐞 Successful Save - Trying to cache CR");
-            
+
             MMcGPair<NSData *,NSData *> *cr = snapshot.ckfs.lastChallengeResponse;
             if ( cr ) {
                 NSData* existing = [weakSelf.metadata getCachedChallengeResponse:cr.a]; 
@@ -515,10 +515,10 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
                     [weakSelf.metadata addCachedChallengeResponse:cr];
                 }
             }
-            
+
             snapshot.ckfs = originalCkfs; 
         }
-        
+
         [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled streamingFile:streamingFile updateMutex:mutex job:job error:error]; 
     }];
 }
@@ -530,44 +530,44 @@ NSString* const kAsyncUpdateStartingNotification = @"kAsyncUpdateStarting";
                                job:(AsyncUpdateJob*)job
                              error:(NSError * _Nullable)error {
     
-    
+
     [self refreshCaches];
-    
+
     if (userCancelled || error) {
         
         [self onAsyncJobDone:updateId job:job success:NO userCancelled:userCancelled userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:error];
         return;
     }
-    
+
     if (self.isDuressDummyMode) {
         NSData* data = [NSData dataWithContentsOfFile:streamingFile];
         [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
-        
+
         [self setDuressDummyData:data];
         [self onAsyncJobDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:nil];
         return;
     }
-    
+
     NSError* localUpdateError;
     BOOL success = [self.syncManagement updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&localUpdateError];
-    
+
     [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
-    
+
     if (!success) { 
         [self onAsyncJobDone:updateId job:job success:NO userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:localUpdateError];
         return;
     }
+
     
-    
-    
+
     if ( self.offlineMode || job.jobType == kAsyncJobTypeSerializeOnly ) {
         slog(@"ℹ️ Offline or Update ONLY mode - AsyncUpdateAndSync DONE");
-        
+
         [self onAsyncJobDone:updateId job:job success:YES userCancelled:NO userInteractionRequired:NO localWasChanged:NO updateMutex:updateMutex error:nil];
-        
+
         return;
     }
-    
+
     [self beginAsyncSync:updateId updateMutex:updateMutex job:job];
 }
 
@@ -605,53 +605,53 @@ userInteractionRequired:(BOOL)userInteractionRequired
            updateMutex:(dispatch_group_t)updateMutex
                  error:(NSError*)error {
     slog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localWasChanged=%hhd, error=%@", updateId, success, userInteractionRequired, localWasChanged, error);
-    
+
     AsyncJobResult* result = [[AsyncJobResult alloc] init];
-    
+
     result.databaseUuid = self.databaseUuid;
     result.success = success;
     result.error = error;
     result.userCancelled = userCancelled;
     result.localWasChanged = localWasChanged;
     result.userInteractionRequired = userInteractionRequired;
-    
+
     self.lastAsyncUpdateResult = result;
     _isRunningAsyncUpdate = NO;
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{ 
         [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDoneNotification object:result];
-        
+
         if ( job.completion ) {
             job.completion(result);
         }
     });
-    
+
     dispatch_group_leave(updateMutex);
 }
 
 - (NSString*)getUniqueStreamingFilename {
     NSString* ret;
-    
+
     do {
 #if TARGET_OS_IOS
         ret = [StrongboxFilesManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
 #else
         
-        
+
         NSURL* localWorkingCacheUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCacheUrlForDatabase:self.databaseUuid];
         NSError* error;
         NSURL* url = [NSFileManager.defaultManager URLForDirectory:NSItemReplacementDirectory inDomain:NSUserDomainMask appropriateForURL:localWorkingCacheUrl create:YES error:&error];
-        
+
         if ( !url ) {
             slog(@"getUniqueStreamingFilename: ERROR = [%@]", error);
             return [StrongboxFilesManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
         }
-        
+
         ret = [url URLByAppendingPathComponent:NSUUID.UUID.UUIDString].path;
         
 #endif
     } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
-    
+
     return ret;
 }
 
@@ -706,10 +706,10 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)restartAudit {
     [self stopAndClearAuditor];
-    
+
 #ifndef IS_APP_EXTENSION
     __weak Model* weakSelf = self;
-    
+
     [self.auditor start:self.database
                  config:self.metadata.auditConfig
            nodesChanged:^{
@@ -726,9 +726,9 @@ userInteractionRequired:(BOOL)userInteractionRequired
         });
     } completion:^(BOOL userStopped, NSTimeInterval duration) {
         
-        
+
         self.metadata.auditConfig.lastDuration = duration;
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( weakSelf ) {
                 [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotification object:@{ @"userStopped" : @(userStopped), @"model" : weakSelf }];
@@ -754,7 +754,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if (self.auditor) {
         return [self.auditor getQuickAuditVeryBriefSummaryForNode:item];
     }
-    
+
     return @"";
 }
 
@@ -762,7 +762,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if (self.auditor) {
         return [self.auditor getQuickAuditAllIssuesVeryBriefSummaryForNode:item];
     }
-    
+
     return @[];
 }
 
@@ -770,7 +770,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if (self.auditor) {
         return [self.auditor getQuickAuditAllIssuesSummaryForNode:item];
     }
-    
+
     return @[];
 }
 
@@ -778,7 +778,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if (self.auditor) {
         return [self.auditor getQuickAuditSummaryForNode:item];
     }
-    
+
     return @"";
 }
 
@@ -786,7 +786,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if (self.auditor) {
         return [self.auditor getQuickAuditFlagsForNode:item];
     }
-    
+
     return NSSet.set;
 }
 
@@ -795,7 +795,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         NSSet<NSNumber*>* auditFlags = [self.auditor getQuickAuditFlagsForNode:item];
         return auditFlags.count > 0;
     }
-    
+
     return NO;
 }
 
@@ -803,35 +803,35 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if (self.auditor) {
         return [self.auditor getAuditReport];
     }
-    
+
     return nil;
 }
 
 - (NSSet<Node *> *)getSimilarPasswordNodeSet:(NSUUID *)node {
     if (self.auditor) {
         NSSet<NSUUID*>* sims = [self.auditor getSimilarPasswordNodeSet:node];
-        
+
         return [[sims.allObjects filter:^BOOL(NSUUID * _Nonnull obj) {
             return [self.database getItemById:obj] != nil;
         }] map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
             return [self.database getItemById:obj];
         }].set;
     }
-    
+
     return NSSet.set;
 }
 
 - (NSSet<Node *> *)getDuplicatedPasswordNodeSet:(NSUUID *)node {
     if (self.auditor) {
         NSSet<NSUUID*>* dupes = [self.auditor getDuplicatedPasswordNodeSet:node];
-        
+
         return [[dupes.allObjects filter:^BOOL(NSUUID * _Nonnull obj) {
             return [self.database getItemById:obj] != nil;
         }] map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
             return [self.database getItemById:obj];
         }].set;
     }
-    
+
     return NSSet.set;
 }
 
@@ -854,7 +854,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }
     else {
         NSSet<NSString*> *legacyExcluded = [NSSet setWithArray:self.metadata.auditExcludedItems];
-        
+
         return [self.database.allActiveEntries filter:^BOOL(Node * _Nonnull obj) {
             NSString* sid = [self.database getCrossSerializationFriendlyIdId:obj.uuid];
             return [legacyExcluded containsObject:sid];
@@ -865,7 +865,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 - (void)toggleAuditExclusion:(NSUUID *)uuid {
     BOOL isExcluded = [self isExcludedFromAudit:uuid];
     Node* node = [self getItemById:uuid];
-    
+
     if ( node ) {
         [self excludeFromAudit:node exclude:!isExcluded];
     }
@@ -881,9 +881,9 @@ userInteractionRequired:(BOOL)userInteractionRequired
     else {
         NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
         NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-        
+
         NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
-        
+
         if (exclude) {
             if ( self.originalFormat != kKeePass4 ) { 
                 [mutable addObject:sid];
@@ -892,10 +892,10 @@ userInteractionRequired:(BOOL)userInteractionRequired
         else {
             [mutable removeObject:sid];
         }
-        
+
         self.metadata.auditExcludedItems = mutable.allObjects;
     }
-    
+
     [self notifyEdited];
 }
 
@@ -921,9 +921,9 @@ userInteractionRequired:(BOOL)userInteractionRequired
     }
     else {
         NSSet<NSString*> *set = self.metadata.autoFillExcludedItems.set;
-        
+
         NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
-        
+
         return [set containsObject:sid];
     }
 }
@@ -935,7 +935,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BOOL)setItemsExcludedFromAutoFill:(NSArray<NSUUID *> *)uuids exclude:(BOOL)exclude {
     NSArray<Node*>* nodes = [self getItemsById:uuids];
-    
+
     if ( self.isKeePass2Format ) {
         for ( Node* node in nodes ) {
             node.fields.isAutoFillExcluded = exclude;
@@ -944,10 +944,10 @@ userInteractionRequired:(BOOL)userInteractionRequired
     else {
         NSArray<NSString*> *excluded = self.metadata.autoFillExcludedItems;
         NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
-        
+
         for ( Node* node in nodes ) {
             NSString* sid = [self.database getCrossSerializationFriendlyIdId:node.uuid];
-            
+
             if ( exclude ) {
                 [mutable addObject:sid];
             }
@@ -955,18 +955,18 @@ userInteractionRequired:(BOOL)userInteractionRequired
                 [mutable removeObject:sid];
             }
         }
-        
+
         self.metadata.autoFillExcludedItems = mutable.allObjects;
     }
-    
+
     if ( self.metadata.autoFillEnabled && exclude ) {
         [self removeItemsFromAutoFillQuickType:nodes];
     }
-    
+
     [self refreshAutoFillSuggestions];
-    
+
     [self notifyEdited];
-    
+
     return self.isKeePass2Format;
 }
 
@@ -994,9 +994,9 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title {
     BOOL keePassGroupTitleRules = self.database.originalFormat != kPasswordSafe;
-    
+
     Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup keePassGroupTitleRules:keePassGroupTitleRules uuid:nil];
-    
+
     return [self addItem:parentGroup item:newGroup];
 }
 
@@ -1004,15 +1004,15 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if ( [self addChildren:@[item] destination:parent] ) {
         return item;
     }
-    
+
     return nil;
 }
 
 - (BOOL)addChildren:(NSArray<Node *> *)items destination:(Node *)destination {
     BOOL ret = [self.database addChildren:items destination:destination];
-    
+
     [self notifyEdited];
-    
+
     return ret;
 }
 
@@ -1022,17 +1022,17 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (NSInteger)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node *)parentGroup {
     BOOL ret = [self.database reorderChildFrom:from to:to parentGroup:parentGroup];
-    
+
     [self notifyEdited];
-    
+
     return ret;
 }
 
 - (NSInteger)reorderItem:(NSUUID *)nodeId idx:(NSInteger)idx {
     BOOL ret = [self.database reorderItem:nodeId idx:idx];
-    
+
     [self notifyEdited];
-    
+
     return ret;
 }
 
@@ -1044,23 +1044,23 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node *)destination undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
     BOOL ret = [self.database moveItems:items destination:destination undoData:undoData];
-    
+
     if ( self.metadata.autoFillEnabled ) {
         [self removeItemsFromAutoFillQuickType:items];
-        
+
         [self refreshAutoFillSuggestions];
     }
-    
+
     if ( ret ) {
         [self notifyEdited];
     }
-    
+
     return ret;
 }
 
 - (void)undoMove:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
     [self.database undoMove:undoData];
-    
+
     [self notifyEdited];
 }
 
@@ -1080,17 +1080,17 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
     [self.database deleteItems:items undoData:undoData];
-    
+
     if ( self.metadata.autoFillEnabled ) {
         [self removeItemsFromAutoFillQuickType:items];
     }
-    
+
     [self notifyEdited];
 }
 
 - (void)unDelete:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
     [self.database unDelete:undoData];
-    
+
     [self notifyEdited];
 }
 
@@ -1100,21 +1100,21 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
     BOOL ret = [self.database recycleItems:items undoData:undoData];
-    
+
     if ( ret ) {
         if ( self.metadata.autoFillEnabled ) {
             [self removeItemsFromAutoFillQuickType:items];
         }
     }
-    
+
     [self notifyEdited];
-    
+
     return ret;
 }
 
 - (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
     [self.database undoRecycle:undoData];
-    
+
     [self notifyEdited];
 }
 
@@ -1124,31 +1124,31 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)emptyRecycleBin {
     [self.database emptyRecycleBin];
-    
+
     [self notifyEdited];
 }
 
 - (BOOL)launchUrl:(Node *)item {
     NSURL* launchableUrl = [self.database launchableUrlForItem:item];
-    
+
     if ( !launchableUrl ) {
         slog(@"Could not get launchable URL for item.");
         return NO;
     }
-    
+
     [self launchLaunchableUrl:launchableUrl];
-    
+
     return YES;
 }
 
 - (BOOL)launchUrlString:(NSString*)urlString {
     NSURL* launchableUrl = [self.database launchableUrlForUrlString:urlString];
-    
+
     if ( !launchableUrl ) {
         slog(@"Could not get launchable URL for string.");
         return NO;
     }
-    
+
     [self launchLaunchableUrl:launchableUrl];
     return YES;
 }
@@ -1169,7 +1169,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         slog(@"Could not get launchable URL for item.");
         return;
     }
-    
+
     [[NSWorkspace sharedWorkspace] openURL:launchableUrl
                              configuration:NSWorkspaceOpenConfiguration.configuration
                          completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
@@ -1191,16 +1191,16 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSArray<Node*>* filtered = [self.legacyFavourites filter:^BOOL(Node * _Nonnull obj) {
         return !obj.isGroup;
     }];
-    
+
     NSSet<NSUUID*>* legacySet = [filtered map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;
     }].set;
-    
+
     NSMutableSet<NSUUID*>* unionTagged = legacySet.mutableCopy;
     if ( self.formatSupportsTags ) {
         [unionTagged addObjectsFromArray:[self getItemIdsForTag:kCanonicalFavouriteTag]];
     }
-    
+
     return unionTagged;
 }
 
@@ -1241,7 +1241,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if ( self.formatSupportsTags ) {
         BOOL removed = [self removeTag:itemId tag:kCanonicalFavouriteTag];
         needsSave = removed;
-        
+
         [self legacyRemoveFavourite:itemId];
         [self notifyEdited];
     }
@@ -1249,7 +1249,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         [self legacyRemoveFavourite:itemId];
         [self notifyEdited];
     }
-    
+
     return needsSave;
 }
 
@@ -1257,11 +1257,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSArray<NSString*> *sids = [items map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [self.database getCrossSerializationFriendlyIdId:obj];
     }];
-    
+
     NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
-    
+
     [favs addObjectsFromArray:sids];
-    
+
     [self resetLegacyFavourites:favs];
 }
 
@@ -1269,9 +1269,9 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
     if ( sid ) {
         NSMutableSet<NSString*>* favs = self.cachedLegacyFavourites.mutableCopy;
-        
+
         [favs removeObject:sid];
-        
+
         [self resetLegacyFavourites:favs];
     }
     else {
@@ -1281,13 +1281,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)resetLegacyFavourites:(NSSet<NSString*>*)favs {
     
-    
+
     __weak Model* weakSelf = self;
     NSArray<Node*>* pinned = [self.database.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:node.uuid];
         return [favs containsObject:sid];
     }];
-    
+
     NSArray<NSString*>* trimmed = [pinned map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:obj.uuid];
         return sid;
@@ -1311,11 +1311,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
         NSArray<Node*>* filtered = [self.legacyWatchEntries filter:^BOOL(Node * _Nonnull obj) {
             return !obj.isGroup;
         }];
-        
+
         NSSet<NSUUID*>* legacySet = [filtered map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
             return obj.uuid;
         }].set;
-        
+
         return legacySet;
 #else
         return NSSet.set;
@@ -1360,7 +1360,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if ( self.formatSupportsTags ) {
         BOOL removed = [self removeTag:itemId tag:kCanonicalAppleWatchTag];
         needsSave = removed;
-        
+
         [self legacyRemoveFromAppleWatch:itemId];
         [self notifyEdited];
     }
@@ -1368,7 +1368,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
         [self legacyRemoveFromAppleWatch:itemId];
         [self notifyEdited];
     }
-    
+
     return needsSave;
 }
 
@@ -1376,11 +1376,11 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSArray<NSString*> *sids = [items map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
         return [self.database getCrossSerializationFriendlyIdId:obj];
     }];
-    
+
     NSMutableSet<NSString*>* foo = self.cachedLegacyWatchEntries.mutableCopy;
-    
+
     [foo addObjectsFromArray:sids];
-    
+
     [self resetLegacyWatchEntries:foo];
 }
 
@@ -1388,9 +1388,9 @@ userInteractionRequired:(BOOL)userInteractionRequired
     NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
     if ( sid ) {
         NSMutableSet<NSString*>* foo = self.cachedLegacyWatchEntries.mutableCopy;
-        
+
         [foo removeObject:sid];
-        
+
         [self resetLegacyWatchEntries:foo];
     }
     else {
@@ -1400,13 +1400,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)resetLegacyWatchEntries:(NSSet<NSString*>*)entries {
     
-    
+
     __weak Model* weakSelf = self;
     NSArray<Node*>* watchNodes = [self.database.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:node.uuid];
         return [entries containsObject:sid];
     }];
-    
+
     NSArray<NSString*>* trimmed = [watchNodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:obj.uuid];
         return sid;
@@ -1420,7 +1420,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 #if TARGET_OS_IOS
 #ifndef IS_APP_EXTENSION
     slog(@"refreshWatchAppEntries...");
-    
+
     [WatchAppManager.shared expressUpdateEntriesWithModel:self];
 #endif
 #endif
@@ -1435,15 +1435,15 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (NSArray<Node*>*)getNodesFromSerializationIds:(NSSet<NSString*>*)set {
     NSMutableArray<Node*>* ret = @[].mutableCopy;
-    
+
     for (NSString *sid in set) {
         Node* node = [self.database getItemByCrossSerializationFriendlyId:sid];
-        
+
         if (node) {
             [ret addObject:node];
         }
     }
-    
+
     return [ret sortedArrayUsingComparator:finderStyleNodeComparator];
 }
 
@@ -1529,25 +1529,25 @@ userInteractionRequired:(BOOL)userInteractionRequired
 #ifdef DEBUG
     NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
 #endif
-    
+
     NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRootIncludingRecycled : self.database.allSearchableIncludingRecycled;
-    
+
     NSMutableArray* results = [nodes mutableCopy]; 
-    
+
     NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
-    
+
     for (NSString* word in terms) {
         [self filterForWord:results
                  searchText:word
                       scope:scope
                 dereference:dereference];
     }
-    
+
 #ifdef DEBUG
     NSTimeInterval searchTime = NSDate.timeIntervalSinceReferenceDate - startTime;
     NSTimeInterval startBrowseFilterTime = NSDate.timeIntervalSinceReferenceDate;
 #endif
-    
+
     NSArray<Node*>* ret = [self filterAndSortForBrowse:results
                                  includeKeePass1Backup:includeKeePass1Backup
                                      includeRecycleBin:includeRecycleBin
@@ -1556,13 +1556,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
                                        browseSortField:browseSortField
                                             descending:descending
                                      foldersSeparately:foldersSeparately];
-    
-    
+
+
 #ifdef DEBUG
     NSString* searchTerm = searchText;
     slog(@"✅ SEARCH for [%@] done in [%f] seconds then Filter/Sort for return took [%f] seconds", searchTerm, searchTime, NSDate.timeIntervalSinceReferenceDate - startBrowseFilterTime);
 #endif
-    
+
     return ret;
 }
 
@@ -1592,7 +1592,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
        includeRecycleBin:includeRecycleBin
           includeExpired:includeExpired
            includeGroups:includeGroups];
-    
+
     return [self sortItemsForBrowse:nodes browseSortField:browseSortField descending:descending foldersSeparately:foldersSeparately];
 }
 
@@ -1640,7 +1640,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     BOOL associatedDomains = self.metadata.includeAssociatedDomains && self.applicationPreferences.associatedWebsites;
-    
+
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
         return [self.database isUrlMatches:searchText
                                       node:node
@@ -1672,37 +1672,37 @@ userInteractionRequired:(BOOL)userInteractionRequired
     DatabaseFormat format = self.database.originalFormat;
     Node* backupGroup = (!includeKeePass1Backup && format == kKeePass1) ? self.database.keePass1BackupNode : nil;
     Node* recycleBin = (!includeRecycleBin && (format == kKeePass || format == kKeePass4 )) ? self.database.recycleBinNode : nil;
-    
+
     if ( !backupGroup && !recycleBin && includeExpired && includeGroups ) {
         
         return;
     }
-    
+
     [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
         if ( backupGroup ) {
             if (obj == backupGroup || [backupGroup contains:obj]) {
                 return NO;
             }
         }
-        
+
         if ( recycleBin ) {
             if (obj == recycleBin || [recycleBin contains:obj]) {
                 return NO;
             }
         }
-        
+
         if ( !includeExpired ) {
             if ( obj.expired ) {
                 return NO;
             }
         }
-        
+
         if ( !includeGroups ) {
             if ( obj.isGroup ) {
                 return NO;
             }
         }
-        
+
         return YES;
     }];
 }
@@ -1712,26 +1712,26 @@ userInteractionRequired:(BOOL)userInteractionRequired
                            descending:(BOOL)descending
                     foldersSeparately:(BOOL)foldersSeparately {
     BrowseSortField field = browseSortField;
-    
+
     if( field == kBrowseSortFieldNone && self.database.originalFormat == kPasswordSafe ) {
         field = kBrowseSortFieldTitle;
     }
-    
+
     if ( field != kBrowseSortFieldNone ) {
         NSArray<Node*> *ret = [items sortedArrayWithOptions:NSSortStable
                                             usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
             return [self compareNodesForSort:(Node*)obj1 node2:(Node*)obj2 field:field descending:descending foldersSeparately:foldersSeparately];
         }];
+
         
-        
-        
+
         if ( self.database.recycleBinEnabled && self.database.recycleBinNode ) {
             NSUInteger idx = [ret indexOfObject:self.database.recycleBinNode];
-            
+
             if ( idx != NSNotFound ) {
                 NSMutableArray* mut = ret.mutableCopy;
                 [mut removeObjectAtIndex:idx];
-                
+
                 if ( foldersSeparately ) {
                     NSUInteger folderCount = [mut filter:^BOOL(Node * _Nonnull obj) {
                         return obj.isGroup;
@@ -1741,25 +1741,25 @@ userInteractionRequired:(BOOL)userInteractionRequired
                 else {
                     [mut addObject:self.database.recycleBinNode];
                 }
-                
+
                 return mut;
             }
         }
-        
+
         return ret;
     }
     else { 
         if ( foldersSeparately ) { 
-            
+
             return [items sortedArrayWithOptions:NSSortStable
                                  usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
                 Node* node1 = (Node*)obj1;
                 Node* node2 = (Node*)obj2;
-                
+
                 if ( node1.isGroup == node2.isGroup ) {
                     return NSOrderedSame;
                 }
-                
+
                 return node1.isGroup ? NSOrderedAscending : NSOrderedDescending;
             }];
         }
@@ -1771,7 +1771,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (NSComparisonResult)compareGroupsForSort:(BrowseSortField)field n1:(Node *)n1 n2:(Node *)n2 {
     NSComparisonResult result = NSOrderedSame;
-    
+
     if ( field == kBrowseSortFieldCreated ) {
         result = [n1.fields.created compare:n2.fields.created];
     }
@@ -1781,19 +1781,19 @@ userInteractionRequired:(BOOL)userInteractionRequired
     else {
         return finderStringCompare(n1.title, n2.title);
     }
+
     
-    
-    
+
     if( result == NSOrderedSame ) {
         result = finderStringCompare(n1.title, n2.title);
     }
-    
+
     return result;
 }
 
 - (NSComparisonResult)compareEntryOrGroupsForSort:(BrowseSortField)field n1:(Node *)n1 n2:(Node *)n2 {
     NSComparisonResult result = NSOrderedSame;
-    
+
     if (field == kBrowseSortFieldTitle) {
         return finderStringCompare([self dereference:n1.title node:n1], [self dereference:n2.title node:n2]);
     }
@@ -1818,13 +1818,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
     else if(field == kBrowseSortFieldModified) {
         result = [n1.fields.modified compare:n2.fields.modified];
     }
+
     
-    
-    
+
     if( result == NSOrderedSame ) {
         result = finderStringCompare([self dereference:n1.title node:n1], [self dereference:n2.title node:n2]);
     }
-    
+
     return result;
 }
 
@@ -1841,12 +1841,12 @@ userInteractionRequired:(BOOL)userInteractionRequired
             return NSOrderedDescending;
         }
     }
-    
+
     Node* n1 = descending ? node2 : node1;
     Node* n2 = descending ? node1 : node2;
+
     
-    
-    
+
     if ( n1.isGroup && n2.isGroup ) {
         return [self compareGroupsForSort:field n1:n1 n2:n2];
     }
@@ -1870,13 +1870,13 @@ userInteractionRequired:(BOOL)userInteractionRequired
     if ( self.metadata.autoFillEnabled ) {
         NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString
                                                                     domainNodeMap:self.domainNodeMap];
-        
+
         NSArray<Node*> *ret2 = [self getItemsById:matches.allObjects];
-        
+
         NSArray<Node*> *filtered = [ret2 filter:^BOOL(Node * _Nonnull obj) {
             return [self dereference:obj.fields.password node:obj].length > 0;
         }];
-        
+
         return [filtered sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
             return [BrowserAutoFillManager compareMatchesWithNode1:obj1
                                                              node2:obj2
@@ -1898,7 +1898,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
 - (void)rebuildAutoFillDomainNodeMap {
     
     _domainNodeMap = @{};
-    
+
 #if !TARGET_OS_IOS 
     if ( self.metadata.autoFillEnabled ) {
         _domainNodeMap = [BrowserAutoFillManager loadDomainNodeMap:self];
@@ -1913,41 +1913,41 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BrowseSortConfiguration*)getDefaultSortConfiguration {
     BrowseSortConfiguration* ret = [[BrowseSortConfiguration alloc] init];
+
     
-    
-    
+
     ret.field = kBrowseSortFieldTitle;
     ret.descending = NO;
     ret.foldersOnTop = YES;
     ret.showAlphaIndex = NO;
-    
+
     return ret;
 }
 
 - (BrowseSortConfiguration*)getSortConfigurationForViewType:(BrowseViewType)viewType {
     BrowseSortConfiguration* config = self.metadata.sortConfigurations[@(viewType).stringValue];
-    
+
     if ( config == nil ) {
         config = [BrowseSortConfiguration defaults];
         config.showAlphaIndex = viewType == kBrowseViewTypeList || viewType == kBrowseViewTypeTotpList;
+
         
-        
-        
+
         if ( viewType == kBrowseViewTypeList ) {
             config.field = kBrowseSortFieldModified;
             config.descending = true;
         }
     }
-    
+
     return config;
 }
 
 - (void)setSortConfigurationForViewType:(BrowseViewType)viewType
                           configuration:(BrowseSortConfiguration *)configuration {
     NSMutableDictionary* mut = self.metadata.sortConfigurations.mutableCopy;
-    
+
     mut[@(viewType).stringValue] = configuration;
-    
+
     self.metadata.sortConfigurations = mut;
 }
 
@@ -1978,21 +1978,21 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (BOOL)addTag:(NSUUID*)itemId tag:(NSString*)tag {
     BOOL ret = [self.database addTag:itemId tag:tag];
-    
+
     if ( ret ) {
         [self notifyEdited];
     }
-    
+
     return ret;
 }
 
 - (BOOL)removeTag:(NSUUID*)itemId tag:(NSString*)tag {
     BOOL ret = [self.database removeTag:itemId tag:tag];
-    
+
     if ( ret ) {
         [self notifyEdited];
     }
-    
+
     return ret;
 }
 
@@ -2024,20 +2024,21 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 - (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item {
     NSMutableArray<ItemMetadataEntry*>* metadata = [NSMutableArray array];
-    
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
-    
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
                                                   value:item.fields.created ? item.fields.created.friendlyDateTimeStringPrecise : @""
                                                copyable:NO]];
+
     
     
     
-    
-    
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
                                                   value:item.fields.modified ? item.fields.modified.friendlyDateTimeStringPrecise : @""
                                                copyable:NO]];
+
     
     
     
@@ -2049,40 +2050,43 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     
     
-    
-    
+
     NSString* path = [self.database getPathDisplayString:item.parent includeRootGroup:YES rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
-    
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_field_name_group", @"Group")
                                                   value:path
                                                copyable:NO]];
+
     
-    
-    
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"group_properties_searchable", @"Searchable")
                                                   value:localizedYesOrNoFromBool(item.isSearchable)
                                                copyable:NO]];
+
     
-    
-    
+
     BOOL autofillable = item.isSearchable && ![self isExcludedFromAutoFill:item.uuid] && !item.expired;
-    
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"generic_autofill_suggestable", @"Suggestable in AutoFill")
                                                   value:localizedYesOrNoFromBool(autofillable)
                                                copyable:NO]];
+
     
-    
-    
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"browse_vc_section_title_expired", @"Expired")
                                                   value:localizedYesOrNoFromBool(item.expired)
                                                copyable:NO]];
-    
+
     return metadata;
 }
 
 
 
 - (NSArray<Node*>*)searchAutoBestMatch:(NSString *)searchText scope:(SearchScope)scope {
+    return [self searchAutoBestMatch:searchText scope:scope allowExpired:false];
+}
+
+- (NSArray<Node*>*)searchAutoBestMatch:(NSString *)searchText scope:(SearchScope)scope allowExpired:(BOOL)allowExpired {
 #ifdef DEBUG
     NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
 #endif
@@ -2163,7 +2167,7 @@ userInteractionRequired:(BOOL)userInteractionRequired
     
     
     NSMutableArray<Node*>* mutable = sorted.mutableCopy;
-    [self filterExcluded:mutable includeKeePass1Backup:NO includeRecycleBin:NO includeExpired:NO includeGroups:NO];
+    [self filterExcluded:mutable includeKeePass1Backup:NO includeRecycleBin:NO includeExpired:allowExpired includeGroups:NO];
     
 #ifdef DEBUG
 

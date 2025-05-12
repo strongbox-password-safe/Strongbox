@@ -332,8 +332,16 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     if ( !MacCustomizationManager.isAProBundle ) {
         [ProUpgradeIAPManager.sharedInstance initialize]; 
+    } else {
+        #if defined(SUBSCRIPTIONS)
+        
+        [RCStrongboxBridge setOnFetchComplete:^{
+            [[TipJarLogic sharedInstance] refresh];
+        }];
+        [RCStrongboxBridge initializeRevenueCat];
+        #endif
     }
-    
+
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [DropboxV2StorageProvider.sharedInstance initialize:Settings.sharedInstance.useIsolatedDropbox];
 #endif

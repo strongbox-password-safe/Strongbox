@@ -267,8 +267,8 @@ class DatabaseHomeViewModel: ObservableObject {
     var entryCount: Int { database.entryCount }
     var groupCount: Int { database.groupCount }
 
-    func search(searchText: String, searchScope: SearchScope) -> [any SwiftEntryModelInterface] {
-        database.search(searchText: searchText, searchScope: searchScope)
+    func search(searchText: String, searchScope: SearchScope, allowExpired: Bool) -> [any SwiftEntryModelInterface] {
+        database.search(searchText: searchText, searchScope: searchScope, allowExpired: allowExpired)
     }
 
     func close() {

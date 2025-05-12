@@ -19,6 +19,7 @@
 @property NSSet<NSUUID*>* pwned;
 @property NSSet<NSUUID*>* lowEntropy;
 @property NSSet<NSUUID*>* twoFactorAvailable;
+@property NSSet<NSUUID*>* breachedAccounts;
 
 @end
 
@@ -32,7 +33,8 @@
                                   tooShort:NSSet.set
                                      pwned:NSSet.set
                                 lowEntropy:NSSet.set
-                        twoFactorAvailable:NSSet.set];
+                        twoFactorAvailable:NSSet.set
+                           breachedAccounts:NSSet.set];
 }
 
 - (instancetype)initWithNoPasswordEntries:(NSSet<NSUUID *> *)noPasswords
@@ -42,7 +44,8 @@
                                  tooShort:(NSSet<NSUUID *> *)tooShort
                                     pwned:(NSSet<NSUUID *> *)pwned
                                lowEntropy:(NSSet<NSUUID *> *)lowEntropy
-                       twoFactorAvailable:(NSSet<NSUUID *> *)twoFactorAvailable {
+                       twoFactorAvailable:(NSSet<NSUUID *> *)twoFactorAvailable
+                          breachedAccounts:(NSSet<NSUUID *> *)breachedAccounts {
     self = [super init];
     
     if (self) {
@@ -54,6 +57,7 @@
         self.pwned = pwned.copy;
         self.lowEntropy = lowEntropy.copy;
         self.twoFactorAvailable = twoFactorAvailable;
+        self.breachedAccounts = breachedAccounts;
     }
     
     return self;
@@ -107,6 +111,10 @@
     return self.twoFactorAvailable;
 }
 
+- (NSSet<NSUUID *> *)entriesWithBreachedAccounts {
+    return self.breachedAccounts;
+}
+
 - (NSSet<NSUUID *> *)allEntries {
     NSMutableSet* all = [NSMutableSet setWithSet:self.noPasswords];
     
@@ -117,13 +125,14 @@
     [all unionSet:self.pwned];
     [all unionSet:self.lowEntropy];
     [all unionSet:self.twoFactorAvailable];
+    [all unionSet:self.breachedAccounts];
     
     return all;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"No Passswords = [%@], Duplicates = [%@], Common = [%@], Similar = [%@], tooShort = [%@], pwned = [%@], lowEntropy = [%@], 2faAvail = [%@]",
-            self.noPasswords, self.duplicatedPasswords, self.commonPasswords, self.similarPasswords, self.tooShort, self.pwned, self.lowEntropy, self.twoFactorAvailable];
+    return [NSString stringWithFormat:@"No Passswords = [%@], Duplicates = [%@], Common = [%@], Similar = [%@], tooShort = [%@], pwned = [%@], lowEntropy = [%@], 2faAvail = [%@], breachedAccounts = [%@]",
+            self.noPasswords, self.duplicatedPasswords, self.commonPasswords, self.similarPasswords, self.tooShort, self.pwned, self.lowEntropy, self.twoFactorAvailable, self.breachedAccounts];
 }
 
 @end

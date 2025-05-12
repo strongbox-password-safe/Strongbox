@@ -15,6 +15,7 @@ struct TwoFactorView: View {
     var easyReadSeparator: Bool
     var font: Font
     var hideCountdownDigits: Bool
+    var radius: CGFloat = 55
 
     var title: String? = nil
     var subtitle: String? = nil
@@ -69,7 +70,12 @@ struct TwoFactorView: View {
                 Spacer()
 
                 HStack {
-                    TwoFactorCodeCircularProgressView(totp: totp, radius: 55, updateMode: updateMode, hideCountdownDigits: hideCountdownDigits)
+                    TwoFactorCodeCircularProgressView(
+                        totp: totp,
+                        radius: radius,
+                        updateMode: updateMode,
+                        hideCountdownDigits: hideCountdownDigits
+                    )
 
                     if let onQrCode {
                         Button {

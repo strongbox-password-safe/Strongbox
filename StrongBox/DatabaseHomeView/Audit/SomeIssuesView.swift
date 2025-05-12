@@ -82,6 +82,18 @@ struct SomeIssuesView: View {
                 }
             }
 
+            let pwnedEmails = auditModel.breached.count
+            if pwnedEmails > 0 {
+                Section {
+                    AuditNavigationLink(title: "audit_quick_summary_very_brief_password_is_breached", count: .init(String(pwnedEmails))) {
+                        AuditSimpleListView(model: model, title: "audit_quick_summary_very_brief_password_is_breached", list: auditModel.breached)
+                    }
+                } footer: {
+                    Text("audit_view_section_footer_breach_hibp")
+                }
+            }
+
+
             let lowEntropy = auditModel.lowEntropy.count
             if lowEntropy > 0 {
                 Section {
@@ -126,7 +138,7 @@ struct SomeIssuesView: View {
                    SwiftDummyEntryModel(title: "Gamma2"),
                    SwiftDummyEntryModel(title: "Delta")]
 
-    db.auditModel = AuditViewModel(duplicated: duplicated, noPasswords: samples, common: samples, similar: similar, tooShort: samples, pwned: samples, lowEntropy: samples, twoFactorAvailable: samples, similarEntryCount: 3, duplicateEntryCount: 3)
+    db.auditModel = AuditViewModel(duplicated: duplicated, noPasswords: samples, common: samples, similar: similar, tooShort: samples, pwned: samples, breached: samples, lowEntropy: samples, twoFactorAvailable: samples, similarEntryCount: 3, duplicateEntryCount: 3)
 
     return NavigationView {
         SomeIssuesView(model: DatabaseHomeViewModel(database: db))

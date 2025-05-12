@@ -56,6 +56,7 @@ protocol SwiftDatabaseModelInterface {
 
     func canRecycle(item: any SwiftItemModelInterface) -> Bool
     func search(searchText: String, searchScope: SearchScope) -> [any SwiftEntryModelInterface]
+    func search(searchText: String, searchScope: SearchScope, allowExpired: Bool) -> [any SwiftEntryModelInterface]
 
     var auditIssueEntryCount: Int { get }
     var auditModel: AuditViewModel { get }

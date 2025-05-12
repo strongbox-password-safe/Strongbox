@@ -96,10 +96,18 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
-    if ( !CustomizationManager.isAProBundle ) {
+    if (!CustomizationManager.isAProBundle) {
         [ProUpgradeIAPManager.sharedInstance initialize]; 
+    } else {
+        #if defined(SUBSCRIPTIONS)
+        
+        [RCStrongboxBridge setOnFetchComplete:^{
+            [[TipJarLogic sharedInstance] refresh];
+        }];
+        [RCStrongboxBridge initializeRevenueCat];
+        #endif
     }
-    
+
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
         
 #ifndef NO_NETWORKING

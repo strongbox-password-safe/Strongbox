@@ -10,6 +10,10 @@
     import UIKit
 #endif
 
+#if canImport(StrongboxPurchases)
+import StrongboxPurchases
+#endif
+
 extension Notification.Name {
     enum Tips {
         static let loaded = Notification.Name("TipsLoadedNotification")
@@ -40,6 +44,7 @@ class TipJarLogic: NSObject {
         }
     }
 
+    @objc
     public func refresh() {
         loadTips()
     }
@@ -57,7 +62,7 @@ class TipJarLogic: NSObject {
         NotificationCenter.default.post(name: .Tips.loaded, object: nil)
     }
 
-    private func getProductId(_ tip: Tip) -> String {
+    func getProductId(_ tip: Tip) -> String {
         #if !os(macOS)
             if CustomizationManager.isAProBundle { 
                 return String(format: "pro.%@", tip.rawValue)
@@ -85,52 +90,37 @@ class TipJarLogic: NSObject {
             return
         }
 
-        let productIds = Tip.allCases.map { tip in
-            getProductId(tip)
-        }
-
-        RMStore.default().requestProducts(Set(productIds)) { [weak self] products, invalidProducts in
-            guard let self else { return }
-
-            if invalidProducts != nil, !invalidProducts!.isEmpty {
-                swlog("Got Invalid Tips = [%@]", invalidProducts ?? "nil")
-            }
-
-            guard let ps = products else {
-                swlog("🔴 WARNWARN: Nil Tip Products Returned from App Store")
-                self.errorLoading = true
-                return
-            }
-
-            self.appStoreProducts = ps.reduce(into: [Tip: SKProduct]()) { partialResult, product in
-                let p: SKProduct = product as! SKProduct
-
-                var pid: String = p.productIdentifier
-                if pid.starts(with: "pro.") {
-                    let index = pid.index(pid.startIndex, offsetBy: 4)
-                    pid = String(pid[index...])
-                }
-
-                let tip = Tip(rawValue: pid)
-
-                if tip != nil {
-                    partialResult[tip!] = p
-                }
-            }
-
-            self.isLoaded = true
-        } failure: { [weak self] error in
-            guard let self else { return }
-
-            let err = error as NSError?
-            if err != nil {
-                swlog("🔴 WARNWARN: Error getting Tips Products: [%@]", err!)
-            }
-
-            
-
+        #if canImport(StrongboxPurchases)
+        let products = RCStrongbox.tipProducts
+        if products.isEmpty {
+            print("💰 TipJar Error")
             self.errorLoading = true
+            return
         }
+
+        print("💰 TipJar Products \(products)")
+
+
+        self.appStoreProducts = products.reduce(into: [Tip: SKProduct]()) { partialResult, product in
+            let p: SKProduct = product.sk1Product!
+
+            var pid: String = p.productIdentifier
+            if pid.starts(with: "pro.") {
+                let index = pid.index(pid.startIndex, offsetBy: 4)
+                pid = String(pid[index...])
+            }
+
+            let tip = Tip(rawValue: pid)
+
+            if tip != nil {
+                partialResult[tip!] = p
+            }
+        }
+
+        print("💰 TipJar Dict \(appStoreProducts)")
+        self.errorLoading = false
+        self.isLoaded = true
+        #endif
     }
 
     func getTipPrice(_ tip: Tip) -> String {
@@ -158,23 +148,36 @@ class TipJarLogic: NSObject {
             completion(error)
             return
         }
-
-        RMStore.default().addPayment(getProductId(tip)) { transaction in
-            swlog("Product purchased: [%@]", transaction!)
-            completion(nil)
-        } failure: { transaction, error in
-            swlog("Something went wrong: [%@] error = [%@]", transaction ?? "nil", error?.localizedDescription ?? "nil")
+        #if canImport(StrongboxPurchases)
+        let identifier = getProductId(tip)
+        guard let product = RCStrongbox.tipProducts.first(where: { $0.productIdentifier == identifier })?.sk1Product else {
+            let errorMessage = "Unable to purchase" 
+            let error = Utils.createNSError(errorMessage, errorCode: -1)
             completion(error)
+            return
         }
+
+        RCStrongbox.purchaseProduct(product) { error in
+            if let error {
+                swlog("Something went wrong: error = [%@]", error.localizedDescription)
+                completion(error)
+            } else {
+                completion(nil)
+            }
+        }
+        #endif
     }
 
     func restorePrevious(completion: @escaping (_ error: Error?) -> Void) {
-        RMStore.default().restoreTransactions { _ in
-            swlog("Transactions Restoreed!")
-            completion(nil)
-        } failure: { error in
-            swlog("Something went wrong: error = [%@]", error?.localizedDescription ?? "nil")
-            completion(error)
+        #if canImport(StrongboxPurchases)
+        RCStrongbox.restorePurchases { error in
+            if let error {
+                swlog("Something went wrong: error = [%@]", error.localizedDescription)
+                completion(error)
+            } else {
+                completion(nil)
+            }
         }
+        #endif
     }
 }

@@ -105,7 +105,11 @@ struct SwiftDatabaseModel: SwiftDatabaseModelInterface {
     }
 
     func search(searchText: String, searchScope: SearchScope) -> [any SwiftEntryModelInterface] {
-        let results = model.searchAutoBestMatch(searchText, scope: searchScope)
+        self.search(searchText: searchText, searchScope: searchScope, allowExpired: false)
+    }
+
+    func search(searchText: String, searchScope: SearchScope, allowExpired: Bool) -> [any SwiftEntryModelInterface] {
+        let results = model.searchAutoBestMatch(searchText, scope: searchScope, allowExpired: allowExpired)
 
         return results.map { SwiftEntryModel(node: $0, model: model) }
     }
@@ -210,6 +214,13 @@ struct SwiftDatabaseModel: SwiftDatabaseModelInterface {
 
                 
 
+                let breached = model.getItemsById(Array(report.entriesWithBreachedAccounts))
+                    .map { SwiftEntryModel(node: $0, model: model) }
+                    .sorted()
+
+
+                
+
                 let lowEntropy = model.getItemsById(Array(report.entriesWithLowEntropyPasswords))
                     .map { SwiftEntryModel(node: $0, model: model) }
                     .sorted()
@@ -226,6 +237,7 @@ struct SwiftDatabaseModel: SwiftDatabaseModelInterface {
                                       similar: groupedSimilar,
                                       tooShort: tooShort,
                                       pwned: pwned,
+                                      breached: breached,
                                       lowEntropy: lowEntropy,
                                       twoFactorAvailable: twoFactorAvailable,
                                       similarEntryCount: report.entriesWithSimilarPasswords.count,

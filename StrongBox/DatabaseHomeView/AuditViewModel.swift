@@ -18,6 +18,7 @@ struct AuditViewModel {
     var similar: [String: [any SwiftEntryModelInterface]]
     var tooShort: [any SwiftEntryModelInterface]
     var pwned: [any SwiftEntryModelInterface]
+    var breached: [any SwiftEntryModelInterface]
     var lowEntropy: [any SwiftEntryModelInterface]
     var twoFactorAvailable: [any SwiftEntryModelInterface]
 
@@ -25,7 +26,7 @@ struct AuditViewModel {
     var duplicateEntryCount: Int
 
     var totalIssueCount: Int {
-        similarEntryCount + duplicateEntryCount + common.count + noPasswords.count + tooShort.count + pwned.count + lowEntropy.count + twoFactorAvailable.count
+        similarEntryCount + duplicateEntryCount + common.count + noPasswords.count + tooShort.count + pwned.count + breached.count + lowEntropy.count + twoFactorAvailable.count
     }
 
     init(isEnabled: Bool = true,
@@ -36,6 +37,7 @@ struct AuditViewModel {
          similar: [String: [any SwiftEntryModelInterface]] = [:],
          tooShort: [any SwiftEntryModelInterface] = [],
          pwned: [any SwiftEntryModelInterface] = [],
+         breached: [any SwiftEntryModelInterface] = [],
          lowEntropy: [any SwiftEntryModelInterface] = [],
          twoFactorAvailable: [any SwiftEntryModelInterface] = [],
          similarEntryCount: Int = 0,
@@ -49,6 +51,7 @@ struct AuditViewModel {
         self.similar = similar
         self.tooShort = tooShort
         self.pwned = pwned
+        self.breached = breached
         self.lowEntropy = lowEntropy
         self.twoFactorAvailable = twoFactorAvailable
         self.similarEntryCount = similarEntryCount

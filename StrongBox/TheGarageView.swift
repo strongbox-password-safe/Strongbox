@@ -14,9 +14,22 @@ extension UserDefaults {
     }
 }
 
-struct TheGarageViewModel {
+class TheGarageViewModel: ObservableObject {
     var watchStatus: WatchStatus
     var preferences: AppPreferences
+
+    @Published var zipExportBehaviour: Int {
+        didSet {
+            
+            preferences.zipExportBehaviour = zipExportBehaviour
+        }
+    }
+
+    init(watchStatus: WatchStatus, preferences: AppPreferences) {
+        self.watchStatus = watchStatus
+        self.preferences = preferences
+        self.zipExportBehaviour = preferences.zipExportBehaviour
+    }
 }
 
 enum SettingsKeys: String {
@@ -24,8 +37,7 @@ enum SettingsKeys: String {
 }
 
 struct TheGarageView: View {
-    @State
-    var model: TheGarageViewModel
+    @ObservedObject var model: TheGarageViewModel
 
     
 
@@ -75,16 +87,18 @@ struct TheGarageView: View {
             }
 
             Section {
-                Picker(selection: $model.preferences.zipExportBehaviour, label: Text("zip_exports_setting_title")) {
-                    ForEach(0 ..< Self.ZipExportBehaviours.count, id: \.self) {
-                        Text(Self.ZipExportBehaviours[$0]).tag($0)
+                Picker(selection: $model.zipExportBehaviour, label: Text("zip_exports_setting_title")) {
+                    ForEach(0 ..< Self.ZipExportBehaviours.count, id: \.self) { index in
+                        Text(Self.ZipExportBehaviours[index])
+                            .tag(index)
+                            .frame(minWidth: 120, alignment: .trailing)
                     }
                 }
+                .animation(.smooth, value: model.zipExportBehaviour)
 
                 Toggle("hide_export_on_database_menu", isOn: $model.preferences.hideExportFromDatabaseContextMenu)
                 Toggle("append_date_to_export_filenames", isOn: $model.preferences.appendDateToExportFileName)
-            }
-            header: {
+            } header: {
                 Text("generic_export")
             }
 

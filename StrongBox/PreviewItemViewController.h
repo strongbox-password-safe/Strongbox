@@ -15,8 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-+ (instancetype)forItem:(Node *)item andModel:(Model *)model;
-
 - (instancetype)initForItem:(Node*)item andModel:(Model*)model;
 
 @end

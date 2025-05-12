@@ -14,6 +14,11 @@ struct HomeSearchView: View {
         var result: any SwiftEntryModelInterface
     }
 
+    @AppStorage(
+        "search_allow_expired",
+        store: AppPreferences.sharedInstance().sharedAppGroupDefaults
+    ) var allowExpired: Bool = false
+
     @ObservedObject
     var model: DatabaseHomeViewModel
 
@@ -23,7 +28,7 @@ struct HomeSearchView: View {
     var searchScope: SearchScope
 
     private var searchResults: [SearchResultWrapperFFS] {
-        let matches = model.search(searchText: searchText, searchScope: searchScope)
+        let matches = model.search(searchText: searchText, searchScope: searchScope, allowExpired: allowExpired)
 
         return matches.map { SearchResultWrapperFFS(result: $0) }
     }
@@ -32,7 +37,38 @@ struct HomeSearchView: View {
     var selection: Set<UUID> = .init()
 
     var body: some View {
-        let list = List(searchResults, selection: $selection) { wrapper in
+        Group {
+            if #available(iOS 17.0, *) {
+                if searchResults.isEmpty, !searchText.isEmpty {
+                    ContentUnavailableView.search(text: searchText)
+                } else {
+                    list
+                }
+            } else {
+                list
+            }
+        }
+        .overlay(alignment: .bottom) {
+            HStack {
+                Spacer()
+
+                Toggle(isOn: $allowExpired, label: {
+                    Text("search_show_expired")
+                })
+                .font(.subheadline.weight(.regular))
+            }
+            .padding(.horizontal)
+            .padding(.vertical, 8)
+            .background(Material.bar)
+            .overlay(alignment: .top) {
+                Divider()
+            }
+        }
+        .animation(.snappy, value: searchResults.count)
+    }
+
+    var list: some View {
+        List(searchResults, selection: $selection) { wrapper in
             Button(action: {
                 model.navigateTo(destination: .entryDetail(uuid: wrapper.result.uuid))
             }, label: {
@@ -42,27 +78,18 @@ struct HomeSearchView: View {
                     }.id(UUID()) 
             })
         }
-
-        if #available(iOS 17.0, *) {
-            if searchResults.isEmpty, !searchText.isEmpty {
-                ContentUnavailableView.search(text: searchText)
-            } else {
-                list
-            }
-        } else {
-            list
-        }
+        .transition(.opacity.animation(.snappy))
     }
 }
 
-@available(iOS 16.0, *)
+@available(iOS 17.0, *)
 #Preview {
-    let model = DatabaseHomeViewModel()
-
-    @State
+    @Previewable @State
     var searchText: String = ""
-    @State
+    @Previewable @State
     var searchScope: SearchScope = .all
+
+    let model = DatabaseHomeViewModel()
 
     return NavigationStack {
         HomeSearchView(model: model, searchText: $searchText, searchScope: $searchScope)

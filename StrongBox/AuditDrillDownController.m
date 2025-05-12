@@ -390,6 +390,9 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     else if (flag.intValue == kAuditFlagPwned) {
         return NSLocalizedString(@"audit_summary_flag_pwned", @"Password is Pwned (HIBP)");
     }
+    else if(flag.intValue == kAuditFlagBreachedAccount) {
+        return NSLocalizedString(@"audit_summary_flag_breached", @"Account was included in a breach (HIBP)");
+    }
     else if (flag.intValue == kAuditFlagTooShort) {
         return NSLocalizedString(@"audit_summary_flag_password_is_too_short", @"Password is too short.");
     }

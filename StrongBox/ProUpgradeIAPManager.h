@@ -34,6 +34,9 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 - (void)restorePrevious:(RestoreCompletionBlock)completion;
 - (void)refreshReceiptAndCheckForProEntitlements:(void(^)(void))completion;
 
+- (void)didUpdateSubscription:(BOOL)pro;
+- (void)subscriptionStatusChanged:(NSNotification *)notification;
+
 @property (readonly, nullable) SKProduct* monthlyProduct;
 @property (readonly, nullable) SKProduct* yearlyProduct;
 

@@ -87,10 +87,14 @@ class SwiftDummyDatabaseModel: SwiftDatabaseModelInterface {
 
     var auditModel: AuditViewModel = .init()
 
-    func search(searchText: String, searchScope _: SearchScope) -> [any SwiftEntryModelInterface] {
+    func search(searchText: String, searchScope _: SearchScope, allowExpired: Bool) -> [any SwiftEntryModelInterface] {
         Self.TestEntries.filter { entry in
             entry.title.localizedCaseInsensitiveContains(searchText)
         }
+    }
+
+    func search(searchText: String, searchScope scope: SearchScope) -> [any SwiftEntryModelInterface] {
+        self.search(searchText: searchText, searchScope: scope, allowExpired: true)
     }
 
     func canRecycle(item _: any SwiftItemModelInterface) -> Bool {

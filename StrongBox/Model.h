@@ -219,6 +219,9 @@ extern NSString* const kAsyncUpdateStartingNotification;
 
 - (NSArray<Node*>*)searchAutoBestMatch:(NSString *)searchText scope:(SearchScope)scope;
 
+
+- (NSArray<Node*>*)searchAutoBestMatch:(NSString *)searchText scope:(SearchScope)scope allowExpired:(BOOL)allowExpired;
+
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope
             includeGroups:(BOOL)includeGroups;
