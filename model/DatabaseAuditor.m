@@ -826,7 +826,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     self.hibpCompletedCount = 0;
 
     
-    BOOL checkForNewBreaches = self.config.checkHibp;
+    BOOL checkForNewBreaches = self.config.checkHibpBreaches;
 
     NSDate *lastChecked = self.config.lastHibpOnlineCheck;
     if (checkForNewBreaches && lastChecked && self.config.hibpCheckForNewBreachesIntervalSeconds > 0) {

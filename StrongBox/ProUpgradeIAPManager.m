@@ -472,11 +472,12 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #pragma mark - Subscription Updates Handler
 
 - (void)didUpdateSubscription:(BOOL)pro {
-    slog(@"🔄 SubscriptionUpdate - didUpdateSubscription: isPro = %@", pro ? @"YES" : @"NO");
+    BOOL isPro = pro || CustomizationManager.isAProBundle;
+    slog(@"🔄 SubscriptionUpdate - didUpdateSubscription: isPro = %@ isProBundle = %@", pro ? @"YES" : @"NO", CustomizationManager.isAProBundle ? @"YES" : @"NO");
+
     
-    
-    [self.preferences setPro:pro];
-    
+    [self.preferences setPro:isPro];
+
     if (pro) {
         self.preferences.numberOfEntitlementCheckFails = 0;
         self.preferences.appHasBeenDowngradedToFreeEdition = NO;
@@ -491,22 +492,11 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #pragma mark - Subscription Status Notification Handler
 
 - (void)subscriptionStatusChanged:(NSNotification *)notification {
-    BOOL isPro = [notification.userInfo[@"isPro"] boolValue];
-    
+    BOOL isPro = [notification.userInfo[@"isPro"] boolValue] || CustomizationManager.isAProBundle;
+
     slog(@"🔄 Subscription status changed notification received: isPro = %@", isPro ? @"YES" : @"NO");
-    
-    
-    [self.preferences setPro:isPro];
-    
-    if (isPro) {
-        self.preferences.numberOfEntitlementCheckFails = 0;
-        self.preferences.appHasBeenDowngradedToFreeEdition = NO;
-    }
-    
-    
-    if (self.productsAvailableNotify) {
-        self.productsAvailableNotify();
-    }
+
+    [self didUpdateSubscription:isPro];
 }
 
 @end

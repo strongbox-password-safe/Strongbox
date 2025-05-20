@@ -2,8 +2,10 @@ import Foundation
 import StoreKit
 import RevenueCat
 
-// Wrapper around RevenueCat to share code for purchases across bundles
 @objc public class RCStrongbox: NSObject {
+
+    
+    
     public enum ProductType: String {
         case monthly = "monthly"
         case yearly = "yearly"
@@ -23,8 +25,8 @@ import RevenueCat
         }
     }
     private static var currentOffering: Offering? = nil
-    private static let syncInfoKey = "sync_info_key"
-    private static let restoreKey = "restore_info_key"
+    private static let syncInfoKey = "sync_info_key_"
+    private static let restoreKey = "restore_info_key_"
     private static let defaultOfferingIdentifier = "default"
     
     
@@ -202,7 +204,16 @@ import RevenueCat
            proEntitlement.productIdentifier.contains(ProductType.lifetime.rawValue) {
             return true
         }
+
         
+        if let proEntitlement = entitlements.active[Entitlement.pro.rawValue], [
+            "com.markmcguill.strongbox.ios.iap.freetrial",
+            "com.markmcguill.strongbox.pro"
+        ]
+        .contains(proEntitlement.productIdentifier) {
+            return true
+        }
+
         return false
     }
     
