@@ -31,6 +31,7 @@ extern NSString *const kSettingsChangedNotification;
 extern NSString *const kTotpUpdateNotification;
 extern NSString* const kProStatusChangedNotification;
 extern NSString* const kAutoFillChangedConfigNotification;
+extern NSString* const kRevenueCatFetchCompleteNotification;
 
 extern NSString* const kKeePassXcTotpSeedKey;
 extern NSString* const kKeePassXcTotpSettingsKey;

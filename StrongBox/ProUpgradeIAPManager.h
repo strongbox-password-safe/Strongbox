@@ -39,6 +39,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 @property (readonly, nullable) SKProduct* monthlyProduct;
 @property (readonly, nullable) SKProduct* yearlyProduct;
+@property (readonly, nullable) SKProduct* lifetimeProduct;
 
 @property (readonly) BOOL isFreeTrialAvailable;
 

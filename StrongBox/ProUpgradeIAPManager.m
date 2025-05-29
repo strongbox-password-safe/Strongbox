@@ -15,6 +15,7 @@
 #import "Model.h"
 #import "CrossPlatform.h"
 #import "NSDate+Extensions.h"
+#import "Constants.h"
 
 #if TARGET_OS_IOS
 #import "CustomizationManager.h"
@@ -63,7 +64,7 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 - (void)productsDidLoad:(NSNotification *)notification {
     slog(@"✅ Products loaded notification received");
     self.readyState = kReady;
-    
+
     if (self.productsAvailableNotify) {
         self.productsAvailableNotify();
     }
@@ -98,14 +99,20 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
                                              selector:@selector(productsDidLoad:)
                                                  name:@"ProductsLoadedNotification"
                                                object:nil];
-    
+
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(subscriptionStatusChanged:)
                                                  name:@"SubscriptionStatusChangedNotification"
                                                object:nil];
-    
+
     slog(@"🐱 Initialising RevenueCat");
+    
+    
+    [RCStrongboxBridge setOnFetchComplete:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kRevenueCatFetchCompleteNotification object:nil];
+    }];
+    
     [RCStrongboxBridge initializeRevenueCat];
 
     
@@ -259,7 +266,7 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
     [RCStrongboxBridge checkReceiptForTrialAndProEntitlements:userInitiated completion:completion];
 #else
     self.preferences.lastEntitlementCheckAttempt = [NSDate date];
-    
+
     if (self.isVerifiedReceipt) {
         slog(@"Receipt Valid... checking for Valid Pro IAP purchases...");
         [self checkVerifiedReceiptIsEntitledToPro:userInitiated];
@@ -267,7 +274,7 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
         self.preferences.numberOfEntitlementCheckFails++;
         slog(@"Number of Entitlement Check Fails Now = %lu", (unsigned long)self.preferences.numberOfEntitlementCheckFails);
     }
-    
+
     if (completion) {
         completion();
     }
@@ -435,6 +442,14 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #endif
 }
 
+- (SKProduct *)lifetimeProduct {
+#if defined(SUBSCRIPTIONS)
+    return [RCStrongboxBridge lifeTimeProduct];
+#else
+    return self.availableProducts[kMonthly];
+#endif
+}
+
 - (SKProduct *)monthlyProduct {
 #if defined(SUBSCRIPTIONS)
     return [RCStrongboxBridge monthlyProduct];
@@ -472,8 +487,13 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #pragma mark - Subscription Updates Handler
 
 - (void)didUpdateSubscription:(BOOL)pro {
+    #if TARGET_OS_MAC && !TARGET_OS_IOS
+    BOOL isPro = pro || MacCustomizationManager.isAProBundle;
+    slog(@"🔄 SubscriptionUpdate - didUpdateSubscription: isPro = %@ isProBundle = %@", pro ? @"YES" : @"NO", MacCustomizationManager.isAProBundle ? @"YES" : @"NO");
+    #else
     BOOL isPro = pro || CustomizationManager.isAProBundle;
     slog(@"🔄 SubscriptionUpdate - didUpdateSubscription: isPro = %@ isProBundle = %@", pro ? @"YES" : @"NO", CustomizationManager.isAProBundle ? @"YES" : @"NO");
+    #endif
 
     
     [self.preferences setPro:isPro];
@@ -482,7 +502,7 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
         self.preferences.numberOfEntitlementCheckFails = 0;
         self.preferences.appHasBeenDowngradedToFreeEdition = NO;
     }
-    
+
     
     if (self.productsAvailableNotify) {
         self.productsAvailableNotify();
@@ -492,7 +512,11 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #pragma mark - Subscription Status Notification Handler
 
 - (void)subscriptionStatusChanged:(NSNotification *)notification {
+    #if TARGET_OS_MAC && !TARGET_OS_IOS
+    BOOL isPro = [notification.userInfo[@"isPro"] boolValue] || MacCustomizationManager.isAProBundle;
+    #else
     BOOL isPro = [notification.userInfo[@"isPro"] boolValue] || CustomizationManager.isAProBundle;
+    #endif
 
     slog(@"🔄 Subscription status changed notification received: isPro = %@", isPro ? @"YES" : @"NO");
 

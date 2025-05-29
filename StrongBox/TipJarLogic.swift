@@ -120,6 +120,53 @@ class TipJarLogic: NSObject {
         print("💰 TipJar Dict \(appStoreProducts)")
         self.errorLoading = false
         self.isLoaded = true
+        #else
+        let productIds = Tip.allCases.map { tip in
+                   getProductId(tip)
+               }
+
+               RMStore.default().requestProducts(Set(productIds)) { [weak self] products, invalidProducts in
+                   guard let self else { return }
+
+                   if invalidProducts != nil, !invalidProducts!.isEmpty {
+                       swlog("Got Invalid Tips = [%@]", invalidProducts ?? "nil")
+                   }
+
+                   guard let ps = products else {
+                       swlog("🔴 WARNWARN: Nil Tip Products Returned from App Store")
+                       self.errorLoading = true
+                       return
+                   }
+
+                   self.appStoreProducts = ps.reduce(into: [Tip: SKProduct]()) { partialResult, product in
+                       let p: SKProduct = product as! SKProduct
+
+                       var pid: String = p.productIdentifier
+                       if pid.starts(with: "pro.") {
+                           let index = pid.index(pid.startIndex, offsetBy: 4)
+                           pid = String(pid[index...])
+                       }
+
+                       let tip = Tip(rawValue: pid)
+
+                       if tip != nil {
+                           partialResult[tip!] = p
+                       }
+                   }
+
+                   self.isLoaded = true
+               } failure: { [weak self] error in
+                   guard let self else { return }
+
+                   let err = error as NSError?
+                   if err != nil {
+                       swlog("🔴 WARNWARN: Error getting Tips Products: [%@]", err!)
+                   }
+
+                   
+
+                   self.errorLoading = true
+               }
         #endif
     }
 
@@ -165,6 +212,21 @@ class TipJarLogic: NSObject {
                 completion(nil)
             }
         }
+        #else
+        if !SKPaymentQueue.canMakePayments() {
+                   let errorMessage = NSLocalizedString("upgrade_mgr_purchases_are_disabled", comment: "Purchases are disabled on your device.")
+                   let error = Utils.createNSError(errorMessage, errorCode: -1)
+                   completion(error)
+                   return
+               }
+
+               RMStore.default().addPayment(getProductId(tip)) { transaction in
+                   swlog("Product purchased: [%@]", transaction!)
+                   completion(nil)
+               } failure: { transaction, error in
+                   swlog("Something went wrong: [%@] error = [%@]", transaction ?? "nil", error?.localizedDescription ?? "nil")
+                   completion(error)
+               }
         #endif
     }
 
@@ -178,6 +240,14 @@ class TipJarLogic: NSObject {
                 completion(nil)
             }
         }
+        #else
+        RMStore.default().restoreTransactions { _ in
+                   swlog("Transactions Restoreed!")
+                   completion(nil)
+               } failure: { error in
+                   swlog("Something went wrong: error = [%@]", error?.localizedDescription ?? "nil")
+                   completion(error)
+               }
         #endif
     }
 }

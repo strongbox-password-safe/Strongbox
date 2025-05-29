@@ -23,18 +23,30 @@ struct TwoFactorView: View {
 
     var onQrCode: (() -> Void)? = nil
 
+    @ViewBuilder
+    var imageView: some View {
+        if let image {
+            #if os(macOS)
+            Image(nsImage: image)
+                .resizable()
+            #else
+            Image(uiImage: image)
+                .resizable()
+            #endif
+        } else {
+            EmptyView()
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             HStack {
-                if let image {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 40, height: 40)
-                        .cornerRadius(3.0)
-                        .shadow(radius: 3)
-                        .foregroundStyle(.blue)
-                }
+                imageView
+                    .scaledToFit()
+                    .frame(width: 40, height: 40)
+                    .cornerRadius(3.0)
+                    .shadow(radius: 3)
+                    .foregroundStyle(.blue)
 
                 VStack(alignment: .leading, spacing: 0) {
                     HStack(spacing: 4) {
@@ -83,10 +95,14 @@ struct TwoFactorView: View {
                         } label: {
                             Image(systemName: "qrcode").font(.title)
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
         }
+        #if os(macOS)
+        .padding(.vertical)
+        #endif
     }
 }
 
@@ -114,7 +130,12 @@ struct TwoFactorView: View {
     let otpAuthUrlSteam = "otpauth:
     let tokenSteam = OTPToken(url: URL(string: otpAuthUrlSteam))!
 
+
+    #if os(macOS)
+    let bar = NSImage(named: "AppIcon-2019-1024")!
+    #else
     let bar = UIImage(named: "AppIcon-2019-1024")!
+    #endif
 
     return NavigationView {
         List {
@@ -128,6 +149,8 @@ struct TwoFactorView: View {
             TwoFactorView(totp: tokenSha51215Seconds, updateMode: .automatic, easyReadSeparator: true, font: Font(FontManager.sharedInstance().easyReadFontForTotp), hideCountdownDigits: true)
         }
         .navigationTitle("Sample Item")
+        #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
+        #endif
     }
 }

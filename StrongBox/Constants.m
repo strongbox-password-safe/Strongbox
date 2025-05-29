@@ -24,6 +24,7 @@ NSString *const kSettingsChangedNotification = @"settingsChangedNotification";
 NSString *const kTotpUpdateNotification = @"TotpUpdateNotification";
 NSString* const kProStatusChangedNotification = @"proStatusChangedNotification";
 NSString* const kAutoFillChangedConfigNotification = @"autoFillChangedConfigNotification";
+NSString* const kRevenueCatFetchCompleteNotification = @"revenueCatFetchCompleteNotification";
 
 const NSInteger kStorageProviderSFTPorWebDAVSecretMissingErrorCode = 172924134;
 

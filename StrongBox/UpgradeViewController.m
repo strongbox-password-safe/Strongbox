@@ -354,16 +354,7 @@
 
 
 - (IBAction)onLifer:(id)sender {
-    SKStoreProductViewController *vc = [[SKStoreProductViewController alloc] init];
-    
-    [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(1481853033) }
-                  completionBlock:^(BOOL result, NSError * _Nullable error) {
-        if ( !result ) {
-            slog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
-        }
-    }];
-    
-    [self presentViewController:vc animated:YES completion:nil];
+    [self purchase:ProUpgradeIAPManager.sharedInstance.lifetimeProduct];
 }
 
 - (IBAction)onRestorePurchase:(id)sender {

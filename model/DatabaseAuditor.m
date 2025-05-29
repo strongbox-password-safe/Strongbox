@@ -1284,9 +1284,15 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 }
 
 - (void)fetchAndStoreDeviceCheckToken {
+    #if TARGET_OS_OSX
+    if([Settings.sharedInstance disableNetworkBasedFeatures]) {
+        return;
+    }
+    #else
     if ([[AppPreferences sharedInstance] disableNetworkBasedFeatures]) {
         return;
     }
+    #endif
 
     DCDevice *device = [DCDevice currentDevice];
     if (![device isSupported]) {

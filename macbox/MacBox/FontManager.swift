@@ -87,4 +87,13 @@ class FontManager: NSObject {
         let ret = NSFontManager.shared.convert(bodyFont, toHaveTrait: .boldFontMask)
         return ret
     }()
+
+    
+    @objc
+    let easyReadFontForTotp: NSFont = {
+        let bodyFont = NSFont.monospacedSystemFont(
+            ofSize: 24, weight: .medium
+        )
+        return bodyFont
+    }()
 }

@@ -1821,10 +1821,10 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.setContent(field,
-                            popupMenuUpdater: { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) },
-                            onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field) } : nil)
-            { [weak self] field in
+            cell.setContent(
+                field,
+                popupMenuUpdater: { [weak self] menu, originalField in self?.onPopupMenuNeedsUpdate(menu, originalField) },
+                onCopyButton: Settings.sharedInstance().showCopyFieldButton ? { [weak self] field in self?.onCopyField(field: field) } : nil) { [weak self] field in
                 if let field {
                     self?.showLargeTextView(field)
                 }

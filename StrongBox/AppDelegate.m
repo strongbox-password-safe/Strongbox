@@ -28,6 +28,7 @@
 #import "AppLockViewController.h"
 #import "CustomizationManager.h"
 #import "MemoryOnlyURLProtocol.h"
+#import "Constants.h"
 #import "Strongbox-Swift.h"
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
@@ -103,6 +104,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         
         [RCStrongboxBridge setOnFetchComplete:^{
             [[TipJarLogic sharedInstance] refresh];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kRevenueCatFetchCompleteNotification object:nil];
         }];
         [RCStrongboxBridge initializeRevenueCat];
         #endif

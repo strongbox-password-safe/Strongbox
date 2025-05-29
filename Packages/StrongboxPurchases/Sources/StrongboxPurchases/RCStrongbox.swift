@@ -12,6 +12,11 @@ import RevenueCat
         case lifetime = "lifetime"
     }
 
+    private enum SBProductIdentifier: String {
+        case lifetime = "com.markmcguill.strongbox.pro"
+        case trial = "com.markmcguill.strongbox.ios.iap.freetrial"
+    }
+
     enum Entitlement: String, CaseIterable {
         case pro = "pro"
     }
@@ -25,10 +30,10 @@ import RevenueCat
         }
     }
     private static var currentOffering: Offering? = nil
-    private static let syncInfoKey = "sync_info_key_"
-    private static let restoreKey = "restore_info_key_"
+    private static let syncInfoKey = "sync_info_key__"
+    private static let restoreKey = "restore_info_key__"
     private static let defaultOfferingIdentifier = "default"
-    
+
     
     public static var onSubscriptionUpdated: ((Bool) -> Void)?
     
@@ -44,18 +49,24 @@ import RevenueCat
     ) {
         Purchases.configure(
             withAPIKey: key,
-            appUserID: UserIdentifier.id, 
+            appUserID: nil,
             purchasesAreCompletedBy: .revenueCat,
             storeKitVersion: .storeKit1
         )
 
-        print("🐱 Identifier \(UserIdentifier.id)")
         print("🐱 RevenueCat \(Purchases.shared.appUserID)")
 
+        
+        self.latestPurchaserInfo = Purchases.shared.cachedCustomerInfo
+        print("🐱 Info at launch \(Purchases.shared.cachedCustomerInfo)")
         self.tipIdentifiers = tipIdentifiers
 
         Task {
-            self.latestPurchaserInfo = try? await Purchases.shared.logIn(UserIdentifier.id).customerInfo
+            if !Purchases.shared.appUserID.contains("$RCAnonymousID") {
+                latestPurchaserInfo = try? await Purchases.shared.logOut()
+            }
+            self.latestPurchaserInfo = try? await Purchases.shared.customerInfo()
+            print("🐱 Info fetched \(self.latestPurchaserInfo)")
             self.syncPurchasesIfNeeded()
             self.fetchOfferings()
         }
@@ -167,7 +178,7 @@ import RevenueCat
         guard let entitlements = latestPurchaserInfo?.entitlements else { return false }
         let entitlementsKeys = Entitlement.allCases.map(\.rawValue)
         let isActive = entitlements.active.keys.contains { entitlementsKeys.contains($0) }
-        return isActive
+        return isActive || hasPurchasedLifeTime()
     }
     
     
@@ -207,10 +218,15 @@ import RevenueCat
 
         
         if let proEntitlement = entitlements.active[Entitlement.pro.rawValue], [
-            "com.markmcguill.strongbox.ios.iap.freetrial",
-            "com.markmcguill.strongbox.pro"
+            SBProductIdentifier.trial.rawValue,
+            SBProductIdentifier.lifetime.rawValue
         ]
         .contains(proEntitlement.productIdentifier) {
+            return true
+        }
+
+        
+        if latestPurchaserInfo?.allPurchasedProductIdentifiers.contains("com.markmcguill.strongbox.pro") ?? false {
             return true
         }
 
@@ -258,6 +274,7 @@ import RevenueCat
                     latestPurchaserInfo = latestInfo
                     defaults.set(true, forKey: restoreKey)
                     defaults.synchronize()
+                    _ = try? await Purchases.shared.syncPurchases()
                 } catch { }
             } else {
                 print("🐱 Skipping Restoring Purchases")

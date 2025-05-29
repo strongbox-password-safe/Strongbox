@@ -78,6 +78,7 @@
 @property LAContext* embeddedTouchIdContext;
 @property (weak) IBOutlet NSStackView *masterPasswordAndEmbeddedTouchIDStack;
 @property (weak) IBOutlet NSImageView *dummyEmbeddedTouchIDImageView;
+@property (weak) IBOutlet NSButton *retryBioButton;
 
 @property (weak) IBOutlet NSTextField *textFieldSubtitleOrPrompt;
 
@@ -159,7 +160,7 @@
     };
     
     [self bindProOrFreeTrial];
-    
+
     [self resetEmbeddedTouchID];
 }
 
@@ -649,6 +650,10 @@
 
 - (IBAction)onShowPasswordGenerator:(id)sender {
     [PasswordGenerator.sharedInstance show];
+}
+
+- (IBAction)onRetryBio:(id)sender {
+    [self requestEmbeddedBioUnlock];
 }
 
 
@@ -1286,10 +1291,11 @@ alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
 
 - (void)bindBiometricButtonOnLockScreen {
     self.embeddedLaAuthenticationView.hidden = YES;
-    
+    self.retryBioButton.hidden = YES;
+
     if ( self.bioOrWatchUnlockIsPossible ) {
         self.embeddedLaAuthenticationView.hidden = NO;
-        
+        self.retryBioButton.hidden = NO;
         NSString* bioPrompt = [self getBiometricTooltip];
         
         self.embeddedLaAuthenticationView.toolTip = bioPrompt;

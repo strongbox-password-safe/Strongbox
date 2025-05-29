@@ -93,6 +93,7 @@
 
 static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUpdated";
 static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdated";
+static BOOL revenueCatFetchCompleted = NO;
 
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate>
 
@@ -107,6 +108,9 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
 @property BOOL enqueuedImportCanOpenInPlace;
 
 @property BOOL ignoreNextAppActiveNotification;
+@property BOOL pendingOnboardingAfterRevenueCatFetch;
+@property BOOL pendingOnboardingUserJustCompletedBiometricAuthentication;
+@property BOOL pendingOnboardingQuickLaunchWhenDone;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonDice;
 @property BOOL openingDatabaseInProgress;
@@ -137,7 +141,11 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     [self customizeUI];
     
     [self checkForBrokenVirtualHardwareKeys];
-    
+
+    #if !defined(SUBSCRIPTIONS)
+    revenueCatFetchCompleted = YES; 
+    #endif
+
     
     
     
@@ -472,6 +480,16 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
         }
 
         __weak SafesViewController* weakSelf = self;
+        
+        
+        if (!revenueCatFetchCompleted) {
+            slog(@"RevenueCat fetch not yet complete - waiting for completion before starting onboarding");
+            self.pendingOnboardingAfterRevenueCatFetch = YES;
+            self.pendingOnboardingUserJustCompletedBiometricAuthentication = userJustCompletedBiometricAuthentication;
+            self.pendingOnboardingQuickLaunchWhenDone = quickLaunchWhenDone;
+            return;
+        }
+        
         [OnboardingManager.sharedInstance startAppOnboarding:self completion:^{
             if ( quickLaunchWhenDone ) {
                 [weakSelf openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
@@ -815,6 +833,11 @@ static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdate
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(refresh)
                                                name:kDebugLoggerLinesUpdatedNotification
+                                             object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onRevenueCatFetchComplete:)
+                                               name:kRevenueCatFetchCompleteNotification
                                              object:nil];
 }
 
@@ -2326,6 +2349,24 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         [self bindToolbar];
         
         [CustomAppIconObjCHelper downgradeProIconIfInUse];
+    });
+}
+
+- (void)onRevenueCatFetchComplete:(id)param {
+    slog(@"RevenueCat fetch complete!");
+    revenueCatFetchCompleted = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.pendingOnboardingAfterRevenueCatFetch) {
+            slog(@"Processing pending onboarding after RevenueCat fetch completion");
+            BOOL userJustCompletedBiometricAuthentication = self.pendingOnboardingUserJustCompletedBiometricAuthentication;
+            BOOL quickLaunchWhenDone = self.pendingOnboardingQuickLaunchWhenDone;
+            
+            self.pendingOnboardingAfterRevenueCatFetch = NO;
+            self.pendingOnboardingUserJustCompletedBiometricAuthentication = NO;
+            self.pendingOnboardingQuickLaunchWhenDone = NO;
+            
+            [self doAppOnboarding:userJustCompletedBiometricAuthentication quickLaunchWhenDone:quickLaunchWhenDone];
+        }
     });
 }
 
