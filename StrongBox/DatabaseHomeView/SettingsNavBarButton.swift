@@ -12,6 +12,11 @@ struct SettingsNavBarButton: View {
     @ObservedObject
     var model: DatabaseHomeViewModel
 
+    @AppStorage(
+        "rememberSearchScope",
+        store: AppPreferences.sharedInstance().sharedAppGroupDefaults
+    ) private var rememberSearchScope = true
+
     var biometricsIdName: String {
         model.biometricsIsFaceId ? NSLocalizedString("settings_face_id_name", comment: "Face ID") : NSLocalizedString("settings_touch_id_name", comment: "Touch ID")
     }
@@ -22,6 +27,13 @@ struct SettingsNavBarButton: View {
                 HStack {
                     Text("browse_context_menu_start_with_search")
                     Image(systemName: "magnifyingglass")
+                }
+            })
+
+            Toggle(isOn: $rememberSearchScope, label: {
+                HStack {
+                    Text("settings_remember_search_scope")
+                    Image(systemName: "line.3.horizontal.decrease")
                 }
             })
 

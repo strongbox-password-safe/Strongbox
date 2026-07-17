@@ -50,7 +50,7 @@
             if ( str.length ) {
                 NSString* host = [str containsString:@":"] ? [NSString stringWithFormat:@"[%@]", str] : str;
                 self.helpfulInfo.hidden = NO;
-                self.serverUrl.text = [NSString stringWithFormat:@"http:
+                self.serverUrl.text = [NSString stringWithFormat:@"http://%@/?Alt", host];
             }
             else {
                 self.helpfulInfo.hidden = YES;

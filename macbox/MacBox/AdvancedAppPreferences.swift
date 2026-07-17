@@ -10,6 +10,11 @@ import CloudKit
 import Cocoa
 
 class AdvancedAppPreferences: NSViewController {
+    private var scrollViewHeightCap: NSLayoutConstraint?
+    private var scrollViewDocumentConstraints: [NSLayoutConstraint] = []
+
+    @IBOutlet weak var scrollViewBottomConstraint: NSLayoutConstraint!
+    @IBOutlet weak var scrollView: NSScrollView!
     @IBOutlet var newEntryUsesParentGroupIcon: NSButton!
     @IBOutlet var makeBackups: NSButton!
     @IBOutlet var autoSave: NSButton!
@@ -22,7 +27,6 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var stripUnusedIcons: NSButton!
     @IBOutlet var stripHistoricalIcons: NSButton!
 
-    @IBOutlet var enableThirdParty: NSButton!
     @IBOutlet var quitClosesAllWindowsNotTerminate: NSButton!
     @IBOutlet var concealedClipboard: NSButton!
     @IBOutlet var atomicSftpWrites: NSButton!
@@ -34,12 +38,15 @@ class AdvancedAppPreferences: NSViewController {
     @IBOutlet var associatedWebsites: NSButton!
     @IBOutlet var disableCustomViews: NSButton!
     @IBOutlet var clearQuickSearchOnOpen: NSButton!
+    @IBOutlet var deleteDatabaseAfterXFailedUnlockAttempts: NSButton!
     
     @IBOutlet var showOfflineOptionsForFilesDatabases: NSButton!
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        setupScrollViewLayout()
 
         useIsolatedDropbox.isHidden = !StrongboxProductBundle.supports3rdPartyStorageProviders
         atomicSftpWrites.isHidden = !StrongboxProductBundle.supportsSftpWebDAV
@@ -54,6 +61,36 @@ class AdvancedAppPreferences: NSViewController {
         NotificationCenter.default.addObserver(forName: .proStatusChanged, object: nil, queue: nil) { [weak self] _ in
             self?.bindUI()
         }
+    }
+
+    private func setupScrollViewLayout() {
+        guard let scrollView else { return }
+        guard let documentView = scrollView.documentView else { return }
+        let clipView = scrollView.contentView
+
+        documentView.translatesAutoresizingMaskIntoConstraints = false
+
+        if scrollViewDocumentConstraints.isEmpty {
+            scrollViewDocumentConstraints = [
+                documentView.leadingAnchor.constraint(equalTo: clipView.leadingAnchor),
+                documentView.trailingAnchor.constraint(equalTo: clipView.trailingAnchor),
+                documentView.topAnchor.constraint(equalTo: clipView.topAnchor),
+                documentView.widthAnchor.constraint(equalTo: clipView.widthAnchor)
+            ]
+
+            NSLayoutConstraint.activate(scrollViewDocumentConstraints)
+        }
+
+        scrollViewBottomConstraint?.priority = .defaultLow
+
+        if scrollViewHeightCap == nil {
+            let cap = scrollView.heightAnchor.constraint(lessThanOrEqualToConstant: 500)
+            cap.priority = .required
+            cap.isActive = true
+            scrollViewHeightCap = cap
+        }
+
+        scrollView.setContentHuggingPriority(.defaultLow + 1, for: .vertical)
     }
 
     func bindUI() {
@@ -72,7 +109,6 @@ class AdvancedAppPreferences: NSViewController {
         stripUnusedIcons.state = Settings.sharedInstance().stripUnusedIconsOnSave ? .on : .off
         stripHistoricalIcons.state = Settings.sharedInstance().stripUnusedHistoricalIcons ? .on : .off
 
-        enableThirdParty.state = settings.isPro && settings.runBrowserAutoFillProxyServer ? .on : .off
         quitClosesAllWindowsNotTerminate.state = settings.quitTerminatesProcessEvenInSystemTrayMode ? .off : .on
         concealedClipboard.state = settings.concealClipboardFromMonitors ? .on : .off
         atomicSftpWrites.state = settings.atomicSftpWrite ? .on : .off
@@ -85,7 +121,6 @@ class AdvancedAppPreferences: NSViewController {
 
         useColorBindPalette.isHidden = !settings.colorizePasswords
         hideKeyFile.isHidden = settings.doNotRememberKeyFile
-        enableThirdParty.isEnabled = settings.isPro
         
 
         
@@ -112,6 +147,8 @@ class AdvancedAppPreferences: NSViewController {
 
         associatedWebsites.state = settings.associatedWebsites ? .on : .off
         showOfflineOptionsForFilesDatabases.state = settings.showOfflineOptionsOnLocalDeviceDatabases ? .on : .off
+        deleteDatabaseAfterXFailedUnlockAttempts.state = .off
+        deleteDatabaseAfterXFailedUnlockAttempts.isHidden = true
     }
 
     #if !NO_NETWORKING
@@ -171,7 +208,7 @@ class AdvancedAppPreferences: NSViewController {
 
 
 
-    @IBAction func onChanged(_: Any) {
+    @IBAction func onChanged(_ sender: Any) {
         let settings = Settings.sharedInstance()
 
         settings.useParentGroupIconOnCreate = newEntryUsesParentGroupIcon.state == .on
@@ -186,7 +223,6 @@ class AdvancedAppPreferences: NSViewController {
         settings.stripUnusedIconsOnSave = stripUnusedIcons.state == .on
         settings.stripUnusedHistoricalIcons = stripHistoricalIcons.state == .on
         settings.quitTerminatesProcessEvenInSystemTrayMode = quitClosesAllWindowsNotTerminate.state == .off
-        settings.runBrowserAutoFillProxyServer = enableThirdParty.state == .on
         settings.concealClipboardFromMonitors = concealedClipboard.state == .on
         settings.atomicSftpWrite = atomicSftpWrites.state == .on
         settings.associatedWebsites = associatedWebsites.state == .on
@@ -325,19 +361,5 @@ class AdvancedAppPreferences: NSViewController {
                            window: view.window,
                            completion: nil)
         #endif
-    }
-
-    @IBAction func onEnableThirdParty(_ sender: Any) {
-        onChanged(sender)
-
-        let settings = Settings.sharedInstance()
-
-        if settings.runBrowserAutoFillProxyServer {
-            NativeMessagingManifestInstallHelper.installNativeMessagingHostsFiles()
-            AutoFillProxyServer.sharedInstance().start()
-        } else {
-            AutoFillProxyServer.sharedInstance().stop()
-            NativeMessagingManifestInstallHelper.removeNativeMessagingHostsFiles()
-        }
     }
 }

@@ -69,6 +69,21 @@ public class PasswordHistoryHelper {
         return ret
     }
 
+    class func getPasswordHistorySubmenu(item: Node) -> NSMenu? {
+        guard let menu = getPasswordHistoryMenu(item: item) else {
+            return nil
+        }
+
+        let submenu = NSMenu(title: NSLocalizedString("item_details_password_history", comment: "Password History"))
+        submenu.autoenablesItems = false
+
+        for item in menu.items.dropFirst() {
+            submenu.items.append(item.copy() as! NSMenuItem)
+        }
+
+        return submenu
+    }
+
     @objc class func copyHistoricalPassword(sender: Any?) {
         guard let menuItem = sender as? NSMenuItem else {
             

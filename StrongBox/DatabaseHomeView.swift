@@ -14,7 +14,7 @@ struct DatabaseHomeView: View {
 
     @State var isFirstAppearance = true
     @State var searchText = ""
-    @State var searchScope: SearchScope = .all
+    @State var searchScope: SearchScope = AppPreferences.sharedInstance().initialSearchScope
     @State var isSearchPresented = false
 
     let scopes: [SearchScope] = [.title, .username, .password, .url, .tags, .all]
@@ -38,10 +38,9 @@ struct DatabaseHomeView: View {
         }
     }
 
-    init(model: DatabaseHomeViewModel, searchText: String = "", searchScope: SearchScope = .all, isSearchPresented: Bool = false) {
+    init(model: DatabaseHomeViewModel, searchText: String = "", isSearchPresented: Bool = false) {
         self.model = model
         self.searchText = searchText
-        self.searchScope = searchScope
         self.isSearchPresented = isSearchPresented
     }
 
@@ -152,6 +151,14 @@ struct DatabaseHomeView: View {
                         Text(getScopeDisplayName(scope: scope))
                     }
                 }
+                .onChange(of: searchScope) { newScope in
+                    AppPreferences.sharedInstance().persistSearchScope(ifEnabled: newScope)
+                }
+                .onChange(of: isSearchPresented) { presented in
+                    if presented { 
+                        searchScope = AppPreferences.sharedInstance().initialSearchScope
+                    }
+                }
 
         } else {
             return view
@@ -166,6 +173,6 @@ struct DatabaseHomeView: View {
     let model = DatabaseHomeViewModel(database: SwiftDummyDatabaseModel.testModel)
 
     return NavigationView {
-        DatabaseHomeView(model: model, searchScope: .all)
+        DatabaseHomeView(model: model)
     }
 }

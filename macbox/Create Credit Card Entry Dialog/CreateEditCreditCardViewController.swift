@@ -438,7 +438,8 @@ final class CreateEditCreditCardViewController: NSViewController, NSWindowDelega
         }
         
         syncFormToViewModel()
-        
+
+        viewModel?.syncCustomFieldsFromModel()
         if let viewModel = viewModel {
             customFields = viewModel.customFields
         }
@@ -668,7 +669,9 @@ final class CreateEditCreditCardViewController: NSViewController, NSWindowDelega
         let formattedValue: String
         
         if textField == cardNumberTextField {
-            formattedValue = currentValue.formattedAsCreditCardNumber()
+            let digits = currentValue.filter { $0.isASCII && $0.isWholeNumber }
+            let isAmex = viewModel?.cardType == "American Express" || digits.hasPrefix("34") || digits.hasPrefix("37")
+            formattedValue = currentValue.formattedAsCreditCardNumber(usingAmexFormat: isAmex)
         } else if textField == creditLimitTextField {
             formattedValue = currentValue.formattedAsMoney()
         } else if textField == cashWithdrawalLimitTextField {

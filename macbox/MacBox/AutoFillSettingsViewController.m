@@ -28,6 +28,7 @@
 @property (weak) IBOutlet NSStackView *stackViewProOnlyMessage;
 @property (weak) IBOutlet NSTextField *labelConvenienceAutoUnlock;
 @property (weak) IBOutlet NSButton *advancedSettings;
+@property (weak) IBOutlet NSButton *browserExtensionToggle;
 
 @end
 
@@ -92,6 +93,9 @@
     
     
     self.advancedSettings.enabled = meta.autoFillEnabled && pro;
+    BOOL browserExtensionEnabled = Settings.sharedInstance.runBrowserAutoFillProxyServer;
+    self.browserExtensionToggle.state = browserExtensionEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.browserExtensionToggle.enabled = meta.autoFillEnabled && pro;
     
     
     
@@ -154,6 +158,20 @@
     });
 }
 
+- (IBAction)onBrowserExtensionToggled:(id)sender {
+    BOOL enable = self.browserExtensionToggle.state == NSControlStateValueOn;
+    Settings.sharedInstance.runBrowserAutoFillProxyServer = enable;
+    
+    if ( enable ) {
+        [NativeMessagingManifestInstallHelper installNativeMessagingHostsFiles];
+        [AutoFillProxyServer.sharedInstance start];
+    }
+    else {
+        [AutoFillProxyServer.sharedInstance stop];
+        [NativeMessagingManifestInstallHelper removeNativeMessagingHostsFiles];
+    }
+}
+
 - (IBAction)onClose:(id)sender {
     [self.view.window cancelOperation:nil];
 }
@@ -185,7 +203,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 }
 
 - (IBAction)onChromeExtension:(id)sender {
-    NSURL* url = [NSURL URLWithString:@"https:
+    NSURL* url = [NSURL URLWithString:@"https://chrome.google.com/webstore/detail/strongbox-autofill/mnilpkfepdibngheginihjpknnopchbn"];
 
     [[NSWorkspace sharedWorkspace] openURL:url
                              configuration:NSWorkspaceOpenConfiguration.configuration
@@ -197,7 +215,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 }
 
 - (IBAction)onFirefoxExtension:(id)sender {
-    NSURL* url = [NSURL URLWithString:@"https:
+    NSURL* url = [NSURL URLWithString:@"https://addons.mozilla.org/en-GB/firefox/addon/strongbox-autofill/"];
     
     [[NSWorkspace sharedWorkspace] openURL:url
                              configuration:NSWorkspaceOpenConfiguration.configuration

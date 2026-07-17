@@ -9,6 +9,9 @@
 import Foundation
 
 public enum CustomAppIcon: CaseIterable {
+    case liquidGlass
+    case liquidGlassPro
+    case liquidGlassZero
     case spaceInvader
     case blueInvader
     case nuclear
@@ -45,15 +48,57 @@ public enum CustomAppIcon: CaseIterable {
 
     var isPro: Bool {
         switch self {
-        case .original, .regular, .code, .binary, .bluey, .iridescent, .water, .lightBlue, .white, .calendar1:
+        case .liquidGlass, .original, .regular, .code, .binary, .bluey, .iridescent, .water, .lightBlue, .white, .calendar1:
             return false
         default:
             return true
         }
     }
 
+    
+    
+    static let selectableIcons: [CustomAppIcon] = [
+        .liquidGlass,
+        .liquidGlassPro,
+        .liquidGlassZero,
+        .proBadge,
+        .regular,
+        .zero,
+        .black,
+        .bluey,
+        .iridescent,
+        .lightBlue,
+        .midnightFire,
+        .red,
+        .water,
+        .original,
+        .white,
+    ]
+
+    
+    static var primaryAppIconName: String? {
+        (Bundle.main.object(forInfoDictionaryKey: "CFBundleIcons") as? [String: Any])
+            .flatMap { $0["CFBundlePrimaryIcon"] as? [String: Any] }
+            .flatMap { $0["CFBundleIconName"] as? String }
+    }
+
+    
+    
+    var alternateIconName: String? {
+        plistKey == Self.primaryAppIconName ? nil : plistKey
+    }
+
+    var previewImageName: String {
+        switch self {
+        case .liquidGlass, .liquidGlassPro, .liquidGlassZero:
+            return plistKey + "-preview"
+        default:
+            return plistKey
+        }
+    }
+
     var image: UIImage {
-        UIImage(named: plistKey)!
+        UIImage(named: previewImageName)!
     }
 
     var category: CustomAppIconCategory {
@@ -62,13 +107,19 @@ public enum CustomAppIcon: CaseIterable {
             return .fun
         case .weather, .modernCalculator, .lightBlueCalculator, .oldSchoolCalculator, .calendar1, .calendar2, .todoChecklist, .notepad:
             return .boringApp
-        case .proBadge, .regular, .zero, .black, .bluey, .iridescent, .lightBlue, .midnightFire, .red, .water, .original, .white:
+        case .liquidGlass, .liquidGlassPro, .liquidGlassZero, .proBadge, .regular, .zero, .black, .bluey, .iridescent, .lightBlue, .midnightFire, .red, .water, .original, .white:
             return .strongbox
         }
     }
 
     var plistKey: String {
         switch self {
+        case .liquidGlass:
+            return "strongboxicon"
+        case .liquidGlassPro:
+            return "strongboxiconpro"
+        case .liquidGlassZero:
+            return "strongboxzeroicon"
         case .jollyRoger:
             return "jolly-roger"
         case .multiColourJollyRoger:

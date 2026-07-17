@@ -13,11 +13,13 @@ class CredentialsForUrlRequest: Codable {
     static let AbsoluteMaxResults = 24
 
     var url: String
+    var subdomainMatching: Bool? = nil
     var skip: Int? = 0
     var take: Int? = DefaultMaxResults
 
-    init(url: String, skip: Int? = nil, take: Int? = nil) {
+    init(url: String, subdomainMatching: Bool? = nil, skip: Int? = nil, take: Int? = nil) {
         self.url = url
+        self.subdomainMatching = subdomainMatching
         self.skip = skip
         self.take = take
     }

@@ -129,3 +129,4 @@
 
 #import "DatabaseCellView.h"
 #import "OnboardingWelcomeViewController.h"
+#import "DatabaseAuditor+Swift.h"

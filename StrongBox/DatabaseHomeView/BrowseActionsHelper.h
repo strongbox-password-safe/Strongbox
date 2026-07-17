@@ -46,6 +46,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)printDatabase;
 - (void)exportDatabase;
 
+- (BOOL)canExportItems;
+- (void)moveItems:(NSArray<NSUUID*>*)uuids completion:(void (^)(BOOL actionPerformed))completion;
+- (void)exportItems:(NSArray<NSUUID*>*)uuids completion:(void (^)(BOOL actionPerformed))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

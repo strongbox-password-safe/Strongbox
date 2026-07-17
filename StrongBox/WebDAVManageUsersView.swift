@@ -79,6 +79,9 @@ struct WebDAVManageUsersView: View {
             ToolbarItemGroup(placement: .automatic) {
                 Button {
                     viewModel.commitChanges()
+                    #if os(iOS)
+                    dismiss()
+                    #endif
                 } label: {
                     Image(systemName: "checkmark")
                 }
@@ -154,8 +157,6 @@ struct UserCredential: Identifiable {
 
 @objc class WebDAVManageUsersViewModel: NSObject, ObservableObject {
     
-
-    
     @Published private(set) var users: [UserCredential]
     @Published private(set) var defaultUserIdentifier: String
     @Published private(set) var error: Error?
@@ -189,6 +190,7 @@ struct UserCredential: Identifiable {
     
     func markAsDefault(user: UserCredential) {
         defaultUserIdentifier = user.id
+        updateChanges()
     }
     
     func testAndSave(username: String, password: String) {

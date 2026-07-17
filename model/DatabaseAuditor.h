@@ -78,6 +78,7 @@ typedef BOOL (^IsExcludedBlock)(Node* item);
 - (NSSet<NSUUID*>*)getDuplicatedPasswordNodeSet:(NSUUID*)nodeId;
 
 @property (readonly) NSUInteger haveIBeenPwnedErrorCount;
+@property (readonly) NSArray<NSString*>* haveIBeenPwnedErrorReasons;
 @property (nonatomic, strong) NSString *deviceCheckToken;
 
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;

@@ -51,11 +51,11 @@
 
 
 static NSString *const EMPTY_STRING = @"";
-static NSString *const XML_NAMESPACE_URI = @"http:
+static NSString *const XML_NAMESPACE_URI = @"http://www.w3.org/XML/1998/namespace";
 static NSString *const XML_NAMESPACE_URI_PREFIX = @"xml";
-static NSString *const XMLNS_NAMESPACE_URI = @"http:
+static NSString *const XMLNS_NAMESPACE_URI = @"http://www.w3.org/2000/xmlns/";
 static NSString *const XMLNS_NAMESPACE_URI_PREFIX = @"xmlns";
-static NSString *const XSI_NAMESPACE_URI = @"http:
+static NSString *const XSI_NAMESPACE_URI = @"http://www.w3.org/2001/XMLSchema/";
 static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 
 @implementation XMLWriter

@@ -103,7 +103,7 @@ class TotpTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMenu
             hostingView?.rootView = AnyView(
                 TwoFactorView(
                     totp: totp,
-                    updateMode: .automatic,
+                    updateMode: .centralTimerNotification,
                     easyReadSeparator: true,
                     font: font,
                     hideCountdownDigits: true,

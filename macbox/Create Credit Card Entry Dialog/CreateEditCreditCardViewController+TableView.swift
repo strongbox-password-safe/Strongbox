@@ -52,10 +52,11 @@ extension CreateEditCreditCardViewController {
             if let model = self.model {
                 let field = CustomFieldViewModel.customField(withKey: trimmedKey, value: value, protected: protected)
                 model.addCustomField(field)
-                self.onModelEdited()
             } else {
                 self.customFields.append((key: trimmedKey, value: value, protected: protected))
+                self.viewModel?.addCustomField(key: trimmedKey, value: value, protected: protected)
             }
+            self.onModelEdited()
             self.refreshCustomFields()
         }
 
@@ -119,6 +120,8 @@ extension CreateEditCreditCardViewController {
                     return
                 }
                 self.customFields[idx] = (key: trimmedKey, value: value, protected: protected)
+                self.viewModel?.updateCustomField(at: idx, key: trimmedKey, value: value, protected: protected)
+                self.onModelEdited()
                 self.refreshCustomFields()
             }
         }
@@ -140,7 +143,10 @@ extension CreateEditCreditCardViewController {
             if let model = model {
                 var offsetIndex = 0
                 for row in selectedRows {
-                    if let originalModelIndex = self.originalModelIndex(for: row - offsetIndex) {
+                    let filteredRow = row - offsetIndex
+                    if let originalModelIndex = self.originalModelIndex(for: filteredRow) {
+                        let field = self.filteredCustomFields[filteredRow]
+                        self.viewModel?.removeCustomField(withKey: field.key)
                         model.removeCustomField(at: UInt(originalModelIndex))
                     }
                     offsetIndex += 1
@@ -149,9 +155,11 @@ extension CreateEditCreditCardViewController {
             } else {
                 for row in selectedRows.reversed() {
                     if row < customFields.count {
+                        viewModel?.removeCustomField(at: row)
                         customFields.remove(at: row)
                     }
                 }
+                onModelEdited()
             }
             refreshCustomFields()
         }

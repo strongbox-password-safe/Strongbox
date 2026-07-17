@@ -20,7 +20,7 @@ enum DatabaseNavigationDestination {
     case attachments
     case expiredAndExpiring
     case tags(tag: String?)
-    case entryDetail(uuid: UUID)
+    case entryDetail(uuid: UUID, search: Bool = false)
     case recycleBin
     case watchEntries
 }
@@ -93,6 +93,11 @@ protocol DatabaseActionsInterface {
     func showAuditDrillDown(entry: any SwiftEntryModelInterface)
 
     func deleteItem(item: any SwiftItemModelInterface) async -> Bool
+    func deleteItems(items: [any SwiftItemModelInterface]) async -> Bool
+    var canExportItems: Bool { get }
+    func moveItems(items: [any SwiftItemModelInterface]) async -> Bool
+    func exportItems(items: [any SwiftItemModelInterface]) async -> Bool
+    func merge(entryA: any SwiftEntryModelInterface, entryB: any SwiftEntryModelInterface) async -> Bool
     func emptyRecycleBin() async
 
     func presentConfigureTabsView()
@@ -108,6 +113,7 @@ protocol DatabaseActionsInterface {
     func presentSetMasterCredentials()
 
     func onAddEntry()
+    func onAddCreditCard()
     func exportDatabase()
     func printDatabase()
 }
@@ -131,6 +137,10 @@ struct DummyDatabaseActionsInterface: DatabaseActionsInterface {
         swlog("DummyDatabaseActionsInterface::onAddEntry() called")
     }
 
+    func onAddCreditCard() {
+        swlog("DummyDatabaseActionsInterface::onAddCreditCard() called")
+    }
+    
     func exportDatabase() {
         swlog("DummyDatabaseActionsInterface::exportDatabase() called")
     }
@@ -187,6 +197,30 @@ struct DummyDatabaseActionsInterface: DatabaseActionsInterface {
 
     func deleteItem(item _: any SwiftItemModelInterface) async -> Bool {
         swlog("DummyDatabaseActionsInterface::deleteItem() called")
+        return true
+    }
+
+    func deleteItems(items _: [any SwiftItemModelInterface]) async -> Bool {
+        swlog("DummyDatabaseActionsInterface::deleteItems() called")
+        return true
+    }
+
+    var canExportItems: Bool {
+        true
+    }
+
+    func moveItems(items _: [any SwiftItemModelInterface]) async -> Bool {
+        swlog("DummyDatabaseActionsInterface::moveItems() called")
+        return true
+    }
+
+    func exportItems(items _: [any SwiftItemModelInterface]) async -> Bool {
+        swlog("DummyDatabaseActionsInterface::exportItems() called")
+        return true
+    }
+
+    func merge(entryA _: any SwiftEntryModelInterface, entryB _: any SwiftEntryModelInterface) async -> Bool {
+        swlog("DummyDatabaseActionsInterface::merge() called")
         return true
     }
 
@@ -359,6 +393,26 @@ class DatabaseHomeViewModel: ObservableObject {
         await actions.deleteItem(item: item)
     }
 
+    func deleteItems(items: [any SwiftItemModelInterface]) async -> Bool {
+        await actions.deleteItems(items: items)
+    }
+
+    var canExportItems: Bool {
+        actions.canExportItems
+    }
+
+    func moveItems(items: [any SwiftItemModelInterface]) async -> Bool {
+        await actions.moveItems(items: items)
+    }
+
+    func exportItems(items: [any SwiftItemModelInterface]) async -> Bool {
+        await actions.exportItems(items: items)
+    }
+
+    func merge(entryA: any SwiftEntryModelInterface, entryB: any SwiftEntryModelInterface) async -> Bool {
+        await actions.merge(entryA: entryA, entryB: entryB)
+    }
+
     var expireCount: Int {
         database.expiredEntryCount + database.expiringEntryCount
     }
@@ -481,6 +535,10 @@ class DatabaseHomeViewModel: ObservableObject {
 
     func onAddEntry() {
         actions.onAddEntry()
+    }
+
+    func onAddCreditCard() {
+        actions.onAddCreditCard()
     }
 
     func exportDatabase() {

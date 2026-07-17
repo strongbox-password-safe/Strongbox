@@ -58,24 +58,24 @@
 
     self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
-    
+
     self.keyLabel.font = FontManager.sharedInstance.caption1Font;
-    
+
     self.valueText.onEdited = ^(NSString * _Nonnull text) {
         [self onValueEdited];
     };
     self.valueText.font = self.configuredValueFont;
 
-    
+
     self.auditStack.hidden = YES;
-    [self.linesStack setCustomSpacing:10.0f afterView:self.valueLabel];   
-    
+    [self.linesStack setCustomSpacing:10.0f afterView:self.valueLabel];
+
     self.keyLabel.adjustsFontForContentSizeCategory = YES;
     self.valueText.adjustsFontForContentSizeCategory = YES;
     self.valueLabel.adjustsFontForContentSizeCategory = YES;
 
     self.selectAllOnEdit = NO;
-    
+
 
 
 
@@ -89,13 +89,13 @@
     self.rightButtonSplashLabel.text = @" "; 
 
     
-    
+
     self.buttonHistory.showsMenuAsPrimaryAction = YES;
     self.buttonHistory.hidden = YES;
     self.contentView.userInteractionEnabled = YES;
+
     
-    
-    
+
     self.labelAudit.userInteractionEnabled = YES;
     UITapGestureRecognizer *tapGesture =
           [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -103,7 +103,7 @@
     [self.labelAudit addGestureRecognizer:tapGesture];
 
     UIImage* auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
-    
+
     self.imageAuditError.image = auditImage;
     self.imageAuditError.userInteractionEnabled = YES;
     UITapGestureRecognizer *imageAuditErrorGesture =
@@ -116,41 +116,43 @@
     [super prepareForReuse];
 
     self.selectAllOnEdit = NO;
-    
+
     self.keyLabel.text = @"";
     self.valueText.text = @"";
     self.valueText.tag = 0;
     self.valueText.enabled = NO;
     self.valueText.placeholder = @"";
     self.valueText.font = self.configuredValueFont;
-    
+
     self.valueLabel.text = @"";
-    
+
     self.valueLabel.hidden = YES;
     self.valueText.hidden = NO;
-    
+
     self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
 
     self.onEdited = nil;
     self.showUiValidationOnEmpty = NO;
     self.suggestionProvider = nil;
-    
+
     self.accessoryType = UITableViewCellAccessoryNone;
     self.editingAccessoryType = UITableViewCellAccessoryNone;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
-    
+
     self.buttonRightButton.hidden = YES;
-    
+
     self.rightButtonImage = nil;
     self.onRightButton = nil;
 
     self.auditStack.hidden = YES;
     self.stackStrength.hidden = YES;
-    
+
     [self.buttonRightButton setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
                                                 forImageInState:UIControlStateNormal];
-    
+
     self.historyMenu = nil;
+
+    [self configureTextInputForSemantic:GenericKeyValueTextSemanticDefault];
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
@@ -211,7 +213,7 @@ showLargeTextView:NO];
     [self setConcealableKey:key value:value concealed:concealed colorize:colorize audit:audit showStrength:showStrength showLargeTextView:NO];
 }
 
-- (void)setConcealableKey:(NSString *)key 
+- (void)setConcealableKey:(NSString *)key
                     value:(NSString *)value
                 concealed:(BOOL)concealed
                  colorize:(BOOL)colorize
@@ -219,9 +221,9 @@ showLargeTextView:NO];
              showStrength:(BOOL)showStrength
         showLargeTextView:(BOOL)showLargeTextView {
     
-        
+
     UIImage *image = [UIImage systemImageNamed:concealed ? @"eye" : @"eye.slash"];
-  
+
     [self setKey:key
            value:value
          editing:NO
@@ -233,8 +235,8 @@ rightButtonImage:image
        concealed:concealed
    colorizeValue:colorize
            audit:audit
-    showStrength:showStrength 
-associatedWebsites:@[] 
+    showStrength:showStrength
+associatedWebsites:@[]
 showLargeTextView:showLargeTextView];
 }
 
@@ -278,40 +280,40 @@ rightButtonImage:(UIImage*)rightButtonImage
  colorizeValue:(BOOL)colorizeValue
          audit:(NSString*_Nullable)audit
   showStrength:(BOOL)showStrength
-associatedWebsites:(NSArray<NSString*>*)associatedWebsites 
+associatedWebsites:(NSArray<NSString*>*)associatedWebsites
 showLargeTextView:(BOOL)showLargeTextView {
     [self bindKey:key];
-        
+
     self.selectAllOnEdit = selectAllOnEdit;
-    
+
     self.horizontalLine.hidden = !editing;
     self.selectionStyle = editing ? UITableViewCellSelectionStyleNone : UITableViewCellSelectionStyleDefault;
     self.useEasyReadFont = useEasyReadFont;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
-    
+
     self.rightButtonImage = rightButtonImage;
-    
+
     self.concealed = concealed;
     self.colorizeValue = colorizeValue;
-    
+
     self.value = value;
     [self bindValue:formatAsUrl suggestionProvider:suggestionProvider editing:editing key:key];
-    
+
     self.valueLabel.hidden = self.editing;
     self.valueText.hidden = !self.editing;
-    
+
     [self bindAudit:audit];
     [self bindRightButton];
     [self bindStrength:showStrength];
-    
+
     self.buttonLargeTextView.hidden = !showLargeTextView;
-    
+
     [self bindAssociatedWebsites:associatedWebsites];
 }
 
 - (void)bindAssociatedWebsites:(NSArray<NSString*>*)associatedWebsites {
     self.stackAssociatedWebsites.hidden = associatedWebsites.count == 0;
-    
+
     NSString* sites = [associatedWebsites componentsJoinedByString:@", "];
     self.labelAssociatedWebsites.text = sites;
 }
@@ -352,7 +354,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 
 - (void)bindValueText {
     if(self.concealed) {
-        
+
         self.valueText.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
         self.valueLabel.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
 
@@ -365,17 +367,17 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     else {
         self.valueText.accessibilityLabel = nil;
         self.valueLabel.accessibilityLabel = nil;
-        
+
         if (self.colorizeValue) {
             BOOL dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
             BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
-            
+
             self.valueText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.value
                                                                                      colorize:self.colorizeValue
                                                                                      darkMode:dark
                                                                                    colorBlind:colorBlind
                                                                                          font:self.configuredValueFont];
-            
+
             self.valueLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:self.value
                                                                                       colorize:self.colorizeValue
                                                                                       darkMode:dark
@@ -399,11 +401,11 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 
 - (BOOL)becomeFirstResponder {
     BOOL ret = [self.valueText becomeFirstResponder];
-    
+
     if(self.selectAllOnEdit) {
         [self.valueText selectAll:nil];
     }
-    
+
     return ret;
 }
 
@@ -411,7 +413,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     if(self.onEdited) {
         self.onEdited(self.valueText.text);
     }
-    
+
     if(self.showUiValidationOnEmpty) {
         if(self.valueText.text.length == 0) {
             self.horizontalLine.backgroundColor = UIColor.systemRedColor;
@@ -433,22 +435,22 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 
 - (void)setIsConcealed:(BOOL)isConcealed {
     self.concealed = isConcealed;
-    
+
     UIImage *image = [UIImage systemImageNamed:self.concealed ? @"eye" : @"eye.slash"];
     self.rightButtonImage = image;
 
     [self bindRightButton];
     [self bindValueText];
-    
+
     [[NSNotificationCenter defaultCenter] postNotificationName:CellHeightsChangedNotification object:self];
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
-   
+
     self.valueLabel.hidden = self.editing;
     self.valueText.hidden = !self.editing;
-    
+
     [self bindRightButton];
 }
 
@@ -479,6 +481,46 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     [self onValueEdited];
 }
 
+- (void)configureTextInputForSemantic:(GenericKeyValueTextSemantic)semantic {
+    self.valueText.keyboardType = UIKeyboardTypeDefault;
+    self.valueText.textContentType = nil;
+    self.valueText.autocorrectionType = UITextAutocorrectionTypeNo;
+    self.valueText.spellCheckingType = UITextSpellCheckingTypeNo;
+    self.valueText.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+
+    if (@available(iOS 11.0, *)) {
+        self.valueText.smartQuotesType = UITextSmartQuotesTypeNo;
+        self.valueText.smartDashesType = UITextSmartDashesTypeNo;
+    }
+
+    if (@available(iOS 11.0, *)) {
+        self.valueText.smartInsertDeleteType = UITextSmartInsertDeleteTypeNo;
+    }
+
+    switch (semantic) {
+        case GenericKeyValueTextSemanticUsername:
+            self.valueText.textContentType = UITextContentTypeUsername;
+            self.valueText.autocapitalizationType = UITextAutocapitalizationTypeNone;
+            break;
+
+        case GenericKeyValueTextSemanticEmailAddress:
+            self.valueText.keyboardType = UIKeyboardTypeEmailAddress;
+            self.valueText.textContentType = UITextContentTypeEmailAddress;
+            self.valueText.autocapitalizationType = UITextAutocapitalizationTypeNone;
+            break;
+
+        case GenericKeyValueTextSemanticURL:
+            self.valueText.keyboardType = UIKeyboardTypeURL;
+            self.valueText.textContentType = UITextContentTypeURL;
+            self.valueText.autocapitalizationType = UITextAutocapitalizationTypeNone;
+            break;
+
+        case GenericKeyValueTextSemanticDefault:
+        default:
+            break;
+    }
+}
+
 - (void)onAuditLabelTap {
     if (self.onAuditTap) {
         self.onAuditTap();
@@ -492,7 +534,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
                               emptyPwHideSummary:NO
                                            label:self.labelStrength
                                         progress:self.progressStrength];
-        
+
         self.stackStrength.hidden = NO;
     }
     else {

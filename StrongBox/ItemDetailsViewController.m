@@ -22,6 +22,7 @@
 #import "IconTableCell.h"
 #import "TotpCell.h"
 #import "Alerts.h"
+#import "CrossPlatform.h"
 #import "NSDictionary+Extensions.h"
 #import "OTPToken+Serialization.h"
 #import "KeePassHistoryController.h"
@@ -553,6 +554,7 @@ static NSString* const kPasskeyRowCollapsedUserDefaultsKey = @"ItemDetailsPasske
     
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.tableView.prefetchingEnabled = NO; 
     self.tableView.tableFooterView = [UIView new];
     
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
@@ -1477,25 +1479,63 @@ static NSString* const kPasskeyRowCollapsedUserDefaultsKey = @"ItemDetailsPasske
 }
 
 - (void)setTotpWithString:(NSString*)string steam:(BOOL)steam {
+    [self setTotpWithString:string steam:steam completion:nil];
+}
+
+- (void)applyImportedTotp:(OTPToken*)token {
+    self.model.totp = token;
+
+    [self updateTotpRow];
+
+    [self onModelEdited];
+
+    slog(@"✅ Saving as just added a TOTP");
+
+    self.justAutoCommittedTotp = YES;
+
+    [self applyChangesAndSave];
+}
+
+- (void)setTotpWithString:(NSString*)string steam:(BOOL)steam completion:(void (^ _Nullable)(BOOL success))completion {
     OTPToken* token = [NodeFields getOtpTokenFromString:string forceSteam:steam];
     
     if(token) {
-        self.model.totp = token;
+        [self applyImportedTotp:token];
+        if(completion) {
+            completion(YES);
+        }
+    }
+    else if(!steam && [IDMeOtpAuthImporter canImportActivationString:string]) {
+        [CrossPlatformDependencies.defaults.spinnerUi show:NSLocalizedString(@"idme_totp_import_spinner_message", @"Importing ID.me 2FA...")
+                                             viewController:self];
         
-        [self updateTotpRow];
-        
-        [self onModelEdited];
-        
-        slog(@"✅ Saving as just added a TOTP");
-        
-        self.justAutoCommittedTotp = YES;
-        
-        [self applyChangesAndSave];
+        __weak ItemDetailsViewController* weakSelf = self;
+        [IDMeOtpAuthImporter importTokenFromActivationString:string completion:^(OTPToken * _Nullable importedToken, NSError * _Nullable error) {
+            [CrossPlatformDependencies.defaults.spinnerUi dismiss];
+
+            if(importedToken) {
+                [weakSelf applyImportedTotp:importedToken];
+                if(completion) {
+                    completion(YES);
+                }
+            }
+            else {
+                [Alerts warn:weakSelf
+                       title:NSLocalizedString(@"item_details_setup_totp_failed_title", @"Failed to Set TOTP")
+                     message:error.localizedDescription ?: NSLocalizedString(@"item_details_setup_totp_failed_message", @"Could not set TOTP because it could not be initialized.")];
+                if(completion) {
+                    completion(NO);
+                }
+            }
+        }];
     }
     else {
         [Alerts warn:self
                title:NSLocalizedString(@"item_details_setup_totp_failed_title", @"Failed to Set TOTP")
              message:NSLocalizedString(@"item_details_setup_totp_failed_message", @"Could not set TOTP because it could not be initialized.")];
+        if(completion) {
+            completion(NO);
+        }
     }
 }
 
@@ -1998,6 +2038,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         }] sortedArrayUsingComparator:finderStringComparator];
         return matches.firstObject;
     }];
+    [cell configureTextInputForSemantic:GenericKeyValueTextSemanticUsername];
     
     cell.onEdited = ^(NSString * _Nonnull text) {
         weakSelf.model.username = trim(text);
@@ -2008,8 +2049,9 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
             [PasswordMaker.sharedInstance promptWithUsernameSuggestions:weakSelf
-                                                                 config:AppPreferences.sharedInstance.passwordGenerationConfig
-                                                                 action:^(NSString * _Nonnull response) {
+                                                                hostname:weakSelf.model.url
+                                                                  config:AppPreferences.sharedInstance.passwordGenerationConfig
+                                                                  action:^(NSString * _Nonnull response) {
                 [weakCell pokeValue:response];
             }];
         };
@@ -2024,13 +2066,13 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
 - (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
     if (@available(iOS 16.0, *)) {
 
-            TagsNGTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:TagsNGTableViewCell.CellIdentifier];
+        TagsNGTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:TagsNGTableViewCell.CellIdentifier];
         [cell setContentWithTags:self.model.tags useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll isEditing:self.isEditing];
             
-            cell.selectionStyle = self.isEditing ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
-            cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.selectionStyle = self.isEditing ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
+        cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.accessoryType = UITableViewCellAccessoryNone;
-            return cell;
+        return cell;
 
 
 
@@ -2134,14 +2176,14 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
                 [cell setContentWithTotp:totp
                        easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
                      hideCountdownDigits:AppPreferences.sharedInstance.twoFactorHideCountdownDigits
-                              updateMode:TwoFactorUpdateModeAutomatic
+                              updateMode:TwoFactorUpdateModeCentralTimerNotification
                                 onQrCode:nil];
             }
             else {
                 [cell setContentWithTotp:totp
                        easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
                      hideCountdownDigits:AppPreferences.sharedInstance.twoFactorHideCountdownDigits
-                              updateMode:TwoFactorUpdateModeAutomatic
+                              updateMode:TwoFactorUpdateModeCentralTimerNotification
                                 onQrCode:^{
                     [weakSelf showQrCodeForTotp];
                 }];
@@ -2257,6 +2299,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
             }] sortedArrayUsingComparator:finderStringComparator];
             return matches.firstObject;
         }];
+        [cell configureTextInputForSemantic:GenericKeyValueTextSemanticURL];
         
         cell.onEdited = ^(NSString * _Nonnull text) {
             weakSelf.model.url = trim(text);
@@ -2311,6 +2354,7 @@ suggestionProvider:^NSString*(NSString *text) {
         }] sortedArrayUsingComparator:finderStringComparator];
         return matches.firstObject;
     }];
+    [cell configureTextInputForSemantic:GenericKeyValueTextSemanticEmailAddress];
     
     cell.onEdited = ^(NSString * _Nonnull text) {
         weakSelf.model.email = trim(text);
@@ -2978,9 +3022,11 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (void)onTagsEdited:(NSSet<NSString*>*)tags {
-    if ( [self.model resetTags:tags] ) { 
+    NSSet<NSString*>* safeTags = tags ?: NSSet.set;
+
+    if ( [self.model resetTags:safeTags] ) { 
         [self onModelEdited];
-        
+
         [self.tableView reloadData];
     }
 }

@@ -33,6 +33,7 @@
 #import "Serializator.h"
 #import "DatabaseFormatIncompatibilityHelper.h"
 #import "DatabaseMerger.h"
+#import "Node+KeeAgentSSH.h"
 
 #ifndef NO_NETWORKING
 
@@ -59,6 +60,8 @@
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController; 
 @property (readonly, nullable) ViewModel* viewModel;
 @property (readonly) BOOL databaseIsLocked;
+
+- (void)setHidden:(BOOL)hidden forMenuItemsWithAction:(SEL)action inMenu:(NSMenu*)menu;
 
 @end
 
@@ -195,9 +198,9 @@ static NSString* getFreeTrialSuffix(void) {
     
     
     [vc.view setFrame:self.contentViewController.view.frame];
-        
+    
     self.contentViewController = vc;
-        
+    
     if ( [self.contentViewController respondsToSelector:@selector(onDocumentLoaded)]) {
         [self.contentViewController performSelector:@selector(onDocumentLoaded)];
     }
@@ -205,6 +208,11 @@ static NSString* getFreeTrialSuffix(void) {
     if ( !self.databaseIsLocked ) {
         self.window.titlebarAppearsTransparent = NO;
         [self maybeOnboardDatabase];
+        
+        if ( self.window && self.window.isVisible ) {
+            [self.window makeKeyAndOrderFront:nil];
+            [NSApp activateIgnoringOtherApps:YES];
+        }
     }
     else {
         self.window.titlebarAppearsTransparent = YES;
@@ -299,7 +307,7 @@ static NSString* getFreeTrialSuffix(void) {
         
         return ret;
     }];
-
+    
     if ( searchableOnly ) {
         return [entries filter:^BOOL(Node * _Nonnull obj) {
             return obj.isSearchable;
@@ -313,7 +321,7 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (void)menuNeedsUpdate:(NSMenu *)menu {
-
+    
     
     
     
@@ -328,6 +336,33 @@ static NSString* getFreeTrialSuffix(void) {
         }
         else if ([item.identifier isEqualToString:@"copy-field-submenu-identifier"]) {
             [self populateCopyFieldSubMenu:item.submenu];
+        }
+    }
+
+    NSArray<Node*>* selectedItems = [self getSelectedItems];
+    BOOL selectedItemsContainGroup = [selectedItems anyMatch:^BOOL(Node * _Nonnull obj) {
+        return obj.isGroup;
+    }];
+    BOOL selectedItemsAllHaveKeeAgentKey = selectedItems.count > 0 && [selectedItems allMatch:^BOOL(Node * _Nonnull obj) {
+        return obj.keeAgentSshKeyViewModel != nil;
+    }];
+
+    BOOL showKeeAgentToggle = self.viewModel &&
+        !self.viewModel.locked &&
+        !selectedItemsContainGroup &&
+        selectedItemsAllHaveKeeAgentKey;
+
+    [self setHidden:!showKeeAgentToggle forMenuItemsWithAction:@selector(onToggleKeeAgentSshKeyEnabled:) inMenu:menu];
+}
+
+- (void)setHidden:(BOOL)hidden forMenuItemsWithAction:(SEL)action inMenu:(NSMenu*)menu {
+    for (NSMenuItem *item in menu.itemArray) {
+        if ( item.action == action ) {
+            item.hidden = hidden;
+        }
+
+        if ( item.submenu ) {
+            [self setHidden:hidden forMenuItemsWithAction:action inMenu:item.submenu];
         }
     }
 }
@@ -451,6 +486,9 @@ static NSString* getFreeTrialSuffix(void) {
         BOOL itemsContainGroup = [items anyMatch:^BOOL(Node * _Nonnull obj) {
             return obj.isGroup; 
         }];
+        BOOL itemsAllHaveKeeAgentKey = items.count > 0 && [items allMatch:^BOOL(Node * _Nonnull obj) {
+            return obj.keeAgentSshKeyViewModel != nil;
+        }];
         
         if ( !self.viewModel.isEffectivelyReadOnly ) { 
             if ( theAction == @selector(onSideBarCreateGroup:)) {
@@ -517,6 +555,20 @@ static NSString* getFreeTrialSuffix(void) {
                 else {
                     return NO;
                 }
+            }
+            else if ( theAction == @selector(onToggleKeeAgentSshKeyEnabled:)) {
+                menuItem.title = NSLocalizedString(@"ssh_agent_key_enabled_for_agent", @"Enabled for SSH Agent");
+                menuItem.state = NSControlStateValueOff;
+
+                if ( items.count > 0 && !itemsContainGroup && itemsAllHaveKeeAgentKey ) {
+                    KeeAgentSshKeyViewModel* sshKey = items.firstObject.keeAgentSshKeyViewModel;
+                    if ( sshKey ) {
+                        menuItem.state = sshKey.enabled ? NSControlStateValueOn : NSControlStateValueOff;
+                        return YES;
+                    }
+                }
+
+                return NO;
             }
             else if ( theAction == @selector(onNewGroupWithItems:)) {
                 if ( items.count && !itemsContainGroup ) {
@@ -684,9 +736,9 @@ static NSString* getFreeTrialSuffix(void) {
         else if ( theAction == @selector(onCompareAndMerge:)) { 
             return YES;
         }
-
-
-
+        
+        
+        
         else if ( theAction == @selector(onExportDatabase:)) {
             return YES;
         }
@@ -798,7 +850,15 @@ static NSString* getFreeTrialSuffix(void) {
         else if (theAction == @selector(copy:)) {
             return items.count > 0;
         }
-        
+        else if (theAction == @selector(onMerge:)) {
+            if (items.count != 2) {
+                return false;
+            }
+            BOOL itemsContainGroupOrCreditCard = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+                return obj.isGroup || obj.isCreditCard;
+            }];
+            return !itemsContainGroupOrCreditCard;
+        }
     }
     
     
@@ -843,10 +903,10 @@ static NSString* getFreeTrialSuffix(void) {
     }
     else if (theAction == @selector(onConvenienceUnlockProperties:)) {
         BOOL pinEnabled = self.viewModel.databaseMetadata.conveniencePin != nil;
-
+        
         if (pinEnabled) {
             menuItem.title = NSLocalizedString(@"pin_code_settings_menu", @"Pin Code Settings...");
-          
+            
         } else {
             menuItem.title = NSLocalizedString(@"nextgen_toolbar_settings_convenience_unlock_ellipsis", @"Touch ID & Watch Unlock Settings...");
         }
@@ -1110,6 +1170,19 @@ static NSString* getFreeTrialSuffix(void) {
     }
 }
 
+- (IBAction)onToggleKeeAgentSshKeyEnabled:(id)sender {
+    slog(@"onToggleKeeAgentSshKeyEnabled: [%@]", sender);
+
+    NSArray<Node*>* items = [self getSelectedItems];
+
+    if ( items && items.count ) {
+        KeeAgentSshKeyViewModel* sshKey = items.firstObject.keeAgentSshKeyViewModel;
+        if ( sshKey ) {
+            [self.viewModel batchSetKeeAgentSshKeyEnabled:items enabled:!sshKey.enabled];
+        }
+    }
+}
+
 - (IBAction)onPrintGroupFromSideBar:(id)sender {
     Node* item = [self getSideBarSelectedItem];
     
@@ -1200,14 +1273,14 @@ static NSString* getFreeTrialSuffix(void) {
 
 
 - (void)unsubscribeFromNotifications {
-
+    
     
     [NSNotificationCenter.defaultCenter removeObserver:self];
     [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
 }
 
 - (void)listenToEventsOfInterest {
-
+    
     
     [self unsubscribeFromNotifications]; 
     
@@ -1256,7 +1329,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)onGenericDatabasePreferencesChanged {
-
+    
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self synchronizeWindowTitleWithDocumentName]; 
@@ -1306,7 +1379,7 @@ static NSString* getFreeTrialSuffix(void) {
     [self onDownloadFavIconsForEntries:entries];
 }
 
-- (void)onDownloadFavIconsForEntries:(NSArray<Node*>*)entries { 
+- (void)onDownloadFavIconsForEntries:(NSArray<Node*>*)entries {
 #ifndef NO_FAVICON_LIBRARY
     if(self.viewModel.format == kPasswordSafe || entries.count == 0) {
         return;
@@ -1494,7 +1567,7 @@ static NSString* getFreeTrialSuffix(void) {
                                       isNativeAutoFillAppExtensionOpen:NO
                                                            offlineMode:NO];
     
-
+    
     
     [unlocker unlockLocalWithKey:factors
               keyFromConvenience:NO
@@ -1515,38 +1588,38 @@ static NSString* getFreeTrialSuffix(void) {
         }
     }];
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 }
 
 - (void)promptToChangeMasterCredentials:(void (^)(BOOL okCancel))completion {
-    self.changeMasterPassword = [CreateDatabaseOrSetCredentialsWizard newSetCredentialsWizard:self.viewModel.format 
+    self.changeMasterPassword = [CreateDatabaseOrSetCredentialsWizard newSetCredentialsWizard:self.viewModel.format
                                                                               keyFileBookmark:self.databaseMetadata.keyFileBookmark
                                                                                 yubiKeyConfig:self.databaseMetadata.yubiKeyConfiguration];
     
@@ -1704,7 +1777,7 @@ static NSString* getFreeTrialSuffix(void) {
     NSString* newTitle = [item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")];
     
     BOOL showReferencingOptions = self.viewModel.database.originalFormat != kPasswordSafe;
-
+    
     Settings* settings = Settings.sharedInstance;
     __weak WindowController* weakSelf = self;
     NSViewController* vc = [SwiftUIViewFactory getDuplicateItemOptionsViewWithShowReferencingOptions:showReferencingOptions
@@ -1796,7 +1869,7 @@ static NSString* getFreeTrialSuffix(void) {
 }
 
 - (void)postValidationPartialDeleteRecycleWithConfirm:(const NSArray<Node*>*)toBeDeleted
-                                         toBeRecycled:(const NSArray<Node*>*)toBeRecycled 
+                                         toBeRecycled:(const NSArray<Node*>*)toBeRecycled
                                            completion:( void (^ _Nullable)(BOOL success) )completion {
     [MacAlerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
      informativeText:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
@@ -1961,7 +2034,7 @@ static NSString* getFreeTrialSuffix(void) {
     return nil;
 }
 
-- (id)paste:(id)sender { 
+- (id)paste:(id)sender {
     NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
     NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
     if ( blah == nil ) {
@@ -2299,6 +2372,16 @@ static NSString* getFreeTrialSuffix(void) {
     [self.viewModel launchUrl:item];
 }
 
+- (IBAction)onMerge:(id)sender {
+    NSArray<Node *>* itemsToMerge = [self getSelectedItems];
+    if (itemsToMerge.count != 2) {
+        return;
+    }
+    Node* lhs = itemsToMerge[0];
+    Node* rhs = itemsToMerge[1];
+    [self showMergeSelectionForNodeA:lhs nodeB:rhs];
+}
+
 - (void)copyUsernameAndPassword:(Node*)item {
     NSMutableArray<NSString*>* fields = NSMutableArray.array;
     
@@ -2319,6 +2402,69 @@ static NSString* getFreeTrialSuffix(void) {
     
     NSString* loc = NSLocalizedString(@"generic_copied", @"Copied");
     [self showPopupChangeToastNotification:loc];
+}
+
+- (void)showMergeSelectionForNodeA:(Node *)nodeA nodeB:(Node *)nodeB {
+    NSString *titleAtoB = [NSString stringWithFormat:NSLocalizedString(@"merge_alert_action_button_title", "Merge two entries alert button title."), nodeA.title, nodeB.title];
+    NSString *titleBtoA = [NSString stringWithFormat:NSLocalizedString(@"merge_alert_action_button_title", "Merge two entries alert button title."), nodeB.title, nodeA.title];
+    
+    NSString *message = [NSString stringWithFormat:NSLocalizedString(@"merge_alert_message", "Merge two entries alert message."), nodeA.title, nodeB.title, nodeA.title, nodeB.title, nodeA.title, nodeB.title];
+    
+    NSAlert *alert = [[NSAlert alloc] init];
+    alert.alertStyle = NSAlertStyleCritical;
+    alert.messageText = NSLocalizedString(@"generic_action_merge", @"Merge");
+    alert.informativeText = message;
+    
+    [alert addButtonWithTitle:titleAtoB];
+    [alert addButtonWithTitle:titleBtoA];
+    [alert addButtonWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")];
+    
+    alert.buttons[0].keyEquivalent = @"\r";
+    alert.buttons[2].keyEquivalent = [NSString stringWithFormat:@"%C", (unichar)0x1B];
+
+    void (^handleResponse)(NSModalResponse) = ^(NSModalResponse returnCode) {
+        if (returnCode == NSAlertFirstButtonReturn) {
+            
+            [self.viewModel.commonModel mergeNode:nodeA
+                                         intoNode:nodeB
+                         mergeLocationChangedDate:YES
+                                   includeHistory:YES
+                                   allowOverwrite:YES];
+            [self notifyOnMain:kGenericRefreshAllDatabaseViewsNotification object:self.viewModel.databaseUuid];
+            [self.viewModel.commonModel asyncSync];
+        } else if (returnCode == NSAlertSecondButtonReturn) {
+            
+            [self.viewModel.commonModel mergeNode:nodeB
+                                         intoNode:nodeA
+                         mergeLocationChangedDate:YES
+                                   includeHistory:YES
+                                   allowOverwrite:YES];
+            [self notifyOnMain:kGenericRefreshAllDatabaseViewsNotification object:self.viewModel.databaseUuid];
+            [self.viewModel.commonModel asyncSync];
+        }
+    };
+
+    if (self.window) {
+        [alert beginSheetModalForWindow:self.window completionHandler:handleResponse];
+    } else {
+        NSModalResponse rc = [alert runModal];
+        handleResponse(rc);
+    }
+}
+
+- (void)notifyOnMain:(NSString*)notificationName object:(nullable id)object {
+    if (NSThread.isMainThread) {
+        [NSNotificationCenter.defaultCenter postNotificationName:notificationName
+                                                          object:object
+                                                        userInfo:nil];
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:notificationName
+                                                              object:object
+                                                            userInfo:nil];
+        });
+    }
 }
 
 - (void)showPopupChangeToastNotification:(NSString*)message {

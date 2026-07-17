@@ -357,13 +357,13 @@
     }
     else if (cell == self.cellInfoDiceware) {
 #ifndef IS_APP_EXTENSION
-        NSURL* url = [NSURL URLWithString:@"http:
+        NSURL* url = [NSURL URLWithString:@"http://world.std.com/~reinhold/diceware.html"];
         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
 #endif
     }
     else if (cell == self.cellInfoXkcd) {
 #ifndef IS_APP_EXTENSION
-        NSURL* url = [NSURL URLWithString:@"https:
+        NSURL* url = [NSURL URLWithString:@"https://xkcd.com/936/"];
         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
 #endif
     }

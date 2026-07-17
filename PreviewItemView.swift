@@ -33,7 +33,7 @@ struct PreviewItemView: View {
                         if #available(iOS 16.0, *) {
                             TwoFactorView(
                                 totp: otpToken,
-                                updateMode: .automatic,
+                                updateMode: .centralTimerNotification,
                                 easyReadSeparator: AppPreferences.sharedInstance().twoFactorEasyReadSeparator,
                                 font: .title3,
                                 hideCountdownDigits: true,

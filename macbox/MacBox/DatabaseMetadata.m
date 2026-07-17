@@ -30,6 +30,43 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
 
 @implementation DatabaseMetadata
 
++ (NSArray<NSNumber *> *)defaultDetailsViewCollapsedSections {
+    static NSArray<NSNumber *> *defaults;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        defaults = @[@0, @0, @0, @1, @1, @0];
+        NSCAssert(defaults.count == DetailsViewCollapsedSectionCount, @"DetailsViewCollapsedSection defaults out of sync");
+    });
+
+    return defaults;
+}
+
++ (NSArray<NSNumber *> *)normalizedDetailsViewCollapsedSections:(id)detailsViewCollapsedSections {
+    NSArray<NSNumber *> *defaults = [self defaultDetailsViewCollapsedSections];
+
+    if (![detailsViewCollapsedSections isKindOfClass:NSArray.class]) {
+        return defaults;
+    }
+
+    NSArray *decoded = (NSArray *)detailsViewCollapsedSections;
+    for (id item in decoded) {
+        if (![item isKindOfClass:NSNumber.class]) {
+            return defaults;
+        }
+    }
+
+    if (decoded.count >= defaults.count) {
+        return [decoded copy];
+    }
+
+    NSMutableArray<NSNumber *> *normalized = [decoded mutableCopy];
+    for (NSUInteger idx = normalized.count; idx < defaults.count; idx++) {
+        [normalized addObject:defaults[idx]];
+    }
+
+    return [normalized copy];
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -56,6 +93,7 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
         self.browseSelectedItems = @[];
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
         self.headerNodes = HeaderNodeState.defaults;
+        self.detailsViewCollapsedSections = [DatabaseMetadata defaultDetailsViewCollapsedSections];
         self.autoFillCopyTotp = YES;
         self.searchScope = kSearchScopeAll;
 
@@ -315,6 +353,7 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
     [encoder encodeObject:self.sideBarSelectedFavouriteId forKey:@"sideBarSelectedFavouriteId"];
     
     [encoder encodeObject:self.headerNodes forKey:@"headerNodes2"];
+    [encoder encodeObject:self.detailsViewCollapsedSections forKey:@"detailsViewCollapsedSections"];
     
     [encoder encodeBool:self.customSortOrderForFields forKey:@"customSortOrderForFields"];
     [encoder encodeBool:self.autoFillCopyTotp forKey:@"autoFillCopyTotp"];
@@ -688,6 +727,13 @@ const NSInteger kDefaultChallengeRefreshIntervalSecs = 0;
         }
         else {
             self.headerNodes = HeaderNodeState.defaults;
+        }
+
+        if ( [decoder containsValueForKey:@"detailsViewCollapsedSections"] ) {
+            self.detailsViewCollapsedSections = [DatabaseMetadata normalizedDetailsViewCollapsedSections:[decoder decodeObjectForKey:@"detailsViewCollapsedSections"]];
+        }
+        else {
+            self.detailsViewCollapsedSections = [DatabaseMetadata defaultDetailsViewCollapsedSections];
         }
         
         if ( [decoder containsValueForKey:@"customSortOrderForFields"] ) {

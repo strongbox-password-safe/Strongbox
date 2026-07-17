@@ -26,7 +26,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern const NSInteger kDefaultPasswordExpiryHours;
 
+typedef NS_ENUM(NSInteger, DetailsViewCollapsedSection) {
+    DetailsViewCollapsedSectionSimpleFields = 0,
+    DetailsViewCollapsedSectionNotes = 1,
+    DetailsViewCollapsedSectionAttachments = 2,
+    DetailsViewCollapsedSectionMetadata = 3,
+    DetailsViewCollapsedSectionOther = 4,
+    DetailsViewCollapsedSectionSshKey = 5,
+    DetailsViewCollapsedSectionCount = 6,
+};
+
 @interface DatabaseMetadata : NSObject
+
++ (NSArray<NSNumber *> *)defaultDetailsViewCollapsedSections;
++ (NSArray<NSNumber *> *)normalizedDetailsViewCollapsedSections:(nullable id)detailsViewCollapsedSections;
 
 - (instancetype)initWithNickName:(NSString *)nickName
                  storageProvider:(StorageProvider)storageProvider
@@ -185,6 +198,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL searchIncludeGroups;
 
 @property NSArray<HeaderNodeState*>* headerNodes;
+@property NSArray<NSNumber*>* detailsViewCollapsedSections;
 
 @property BOOL customSortOrderForFields;
 

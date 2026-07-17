@@ -27,14 +27,24 @@ class HeaderTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMe
                     showCopyButton: Bool = false,
                     onCopyClicked: (() -> Void)? = nil,
                     popupMenuImage: NSImage? = nil,
-                    popupMenuText: String? = nil)
+                    popupMenuText: String? = nil,
+                    showDisclosure: Bool = false,
+                    disclosureExpanded: Bool = true,
+                    onDisclosureClicked: ((Bool) -> Void)? = nil)
     {
         self.field = field
         self.popupMenuUpdater = popupMenuUpdater
         copyButton.isHidden = !showCopyButton
         onCopyClickedCallback = onCopyClicked
+        self.onDisclosureClicked = onDisclosureClicked
 
         labelHeader.stringValue = field.name
+
+        buttonDisclosure.isHidden = !showDisclosure
+        buttonDisclosure.state = disclosureExpanded ? .on : .off
+        updateDisclosureAccessibility(sectionName: field.name,
+                                      isExpanded: disclosureExpanded,
+                                      showDisclosure: showDisclosure)
 
         popupButton.menu?.delegate = self
         popupButton.isHidden = popupMenuUpdater == nil
@@ -57,6 +67,25 @@ class HeaderTableCellView: NSTableCellView, DetailTableCellViewPopupButton, NSMe
     var onDisclosureClicked: ((_: Bool) -> Void)?
     @IBAction func onDisclosure(_: Any) {
         onDisclosureClicked?(buttonDisclosure.state == .on)
+    }
+
+    private func updateDisclosureAccessibility(sectionName: String, isExpanded: Bool, showDisclosure: Bool) {
+        guard showDisclosure else {
+            buttonDisclosure.toolTip = nil
+            buttonDisclosure.setAccessibilityLabel(nil)
+            return
+        }
+
+        let formatKey = isExpanded ? "item_details_section_disclosure_collapse_fmt" : "item_details_section_disclosure_expand_fmt"
+        let fallbackValue = isExpanded ? "Collapse %@ section" : "Expand %@ section"
+        let format = NSLocalizedString(formatKey,
+                                       tableName: nil,
+                                       bundle: .main,
+                                       value: fallbackValue,
+                                       comment: "Tooltip and accessibility label for the detail section disclosure button")
+        let label = String(format: format, sectionName)
+        buttonDisclosure.toolTip = label
+        buttonDisclosure.setAccessibilityLabel(label)
     }
 
     @IBAction func onCopyClicked(_: Any) {

@@ -19,6 +19,7 @@
 #import "NextNavigationConstants.h"
 #import "SearchScope.h"
 #import "SideBarChildCountFormat.h"
+#import "DatabaseMetadata.h"
 #import "SBLog.h"
 #import "MMcGPair.h"
 
@@ -165,6 +166,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property SearchScope searchScope;
 
 @property NSArray<HeaderNodeState*>* headerNodes;
+@property NSArray<NSNumber*>* detailsViewCollapsedSections;
+- (BOOL)isDetailsViewCollapsedForSection:(DetailsViewCollapsedSection)section;
+- (void)setDetailsViewCollapsed:(BOOL)collapsed forSection:(DetailsViewCollapsedSection)section;
 @property BOOL customSortOrderForFields;
 @property BOOL autoFillCopyTotp;
 

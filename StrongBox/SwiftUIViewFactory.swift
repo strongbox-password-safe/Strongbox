@@ -29,12 +29,6 @@ import SwiftUI
         return hostingController
     }
 
-    #if !IS_APP_EXTENSION
-        @objc static func makeWhatsNewViewController(_ messages: [WhatsNewMessage], dismissHandler: @escaping (() -> Void)) -> UIViewController {
-            UIHostingController(rootView: WhatsNewView(messages: messages, dismiss: dismissHandler))
-        }
-    #endif
-
     @objc static func makeWiFiSyncPasscodeViewController(_ server: WiFiSyncServerConfig, onDone: @escaping ((_ server: WiFiSyncServerConfig?, _ pinCode: String?) -> Void)) -> UIViewController {
         let hostingController = UIHostingController(rootView: PasscodeEntryView(server: server, onDone: onDone))
 
@@ -105,7 +99,7 @@ import SwiftUI
 
         return hostingController
     }
-
+    
     @objc static func getCreditCardEditorViewWithModel(_ model: Model,
                                                        itemId: NSUUID?,
                                                        parentGroupId: UUID?,

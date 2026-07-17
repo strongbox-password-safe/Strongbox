@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 #if TARGET_OS_IOS
 
 - (void)promptWithUsernameSuggestions:(UIViewController*)viewController config:(PasswordGenerationConfig*)config action:(void (^)(NSString *response))action;
+- (void)promptWithUsernameSuggestions:(UIViewController*)viewController hostname:(NSString*_Nullable)hostname config:(PasswordGenerationConfig*)config action:(void (^)(NSString *response))action;
 - (void)promptWithSuggestions:(UIViewController*)viewController config:(PasswordGenerationConfig*)config action:(void (^)(NSString *response))action;
 
 #endif

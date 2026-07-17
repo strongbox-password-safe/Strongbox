@@ -958,8 +958,4 @@ typedef enum : NSUInteger {
     return identifier ? [DatabasePreferences fromUuid:identifier.databaseId] : nil;
 }
 
-
-
-
-
 @end

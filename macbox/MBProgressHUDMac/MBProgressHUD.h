@@ -42,7 +42,7 @@
  NSProgressIndicator* indicator = [[[NSProgressIndicator alloc] initWithFrame:NSMakeRect(20, 20, 30, 30)] autorelease];
  [indicator setStyle:NSProgressIndicatorSpinningStyle];
  
- https:
+ https://developer.apple.com/library/mac/documentation/cocoa/conceptual/ProgIndic/Concepts/AboutProgIndic.html
  
  */
 

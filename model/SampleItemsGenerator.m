@@ -42,7 +42,7 @@
     [database addChildren:@[sampleFolder] destination:parent];
 
     NodeFields *fields = [[NodeFields alloc] initWithUsername:NSLocalizedString(@"model_sample_entry_username", @"username")
-                                                          url:@"https:
+                                                          url:@"https://strongboxsafe.com"
                                                      password:password
                                                         notes:@""
                                                         email:@""];

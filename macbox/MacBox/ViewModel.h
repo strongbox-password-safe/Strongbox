@@ -80,6 +80,8 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 
 - (BOOL)setItemTitle:(Node* )item title:(NSString* )title;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
+- (void)setKeeAgentSshKeyEnabled:(Node*)item enabled:(BOOL)enabled;
+- (void)batchSetKeeAgentSshKeyEnabled:(NSArray<Node*>*)items enabled:(BOOL)enabled;
 
 - (void)setGroupExpandedState:(Node*)item expanded:(BOOL)expanded;
 - (void)setSearchableState:(Node *)item searchable:(NSNumber*_Nullable)searchable;
@@ -277,6 +279,7 @@ extern NSString* const kModelUpdateNotificationItemEdited;
 @property DatabaseAuditorConfiguration* auditConfig;
 @property (readonly) AuditState auditState;
 @property (readonly) NSUInteger auditHibpErrorCount;
+@property (readonly) NSArray<NSString*>* auditHibpErrorReasons;
 @property (readonly) NSUInteger auditIssueNodeCount;
 
 - (BOOL)isExcludedFromAudit:(NSUUID*)item;

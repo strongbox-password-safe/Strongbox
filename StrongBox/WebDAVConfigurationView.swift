@@ -1,6 +1,14 @@
 import SwiftUI
 import Combine
 
+#if os(iOS)
+import UIKit
+typealias PlatformTextContentType = UITextContentType
+#elseif os(macOS)
+import AppKit
+typealias PlatformTextContentType = NSTextContentType
+#endif
+
 struct WebDAVConfigurationView: View {
     
     enum FocusField {
@@ -10,6 +18,7 @@ struct WebDAVConfigurationView: View {
         case password
     }
     
+    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel: WebDAVConfigurationViewModel
     @FocusState private var focusedField: FocusField?
     
@@ -39,13 +48,16 @@ struct WebDAVConfigurationView: View {
                 ConfigurationField(title: "web_dav_connection_name_label",
                                    placeholder: "e.g. My Home Nextcloud",
                                    isSecure: false,
-                                   text: $viewModel.connectionName)
+                                   contentType: contentTypeForConnectionNameField,
+                                   text: $viewModel.connectionName
+                )
                 .focused($focusedField, equals: .connectionName)
                 
                 ConfigurationField(title: "web_dav_server_url_placeholder",
-                                   placeholder: "https:
+                                   placeholder: "https://my.server.com/folder",
                                    note: "web_dav_server_url_note",
                                    isSecure: false,
+                                   contentType: contentTypeForConnectionURLField,
                                    text: $viewModel.rootURL)
                 .focused($focusedField, equals: .url)
                 
@@ -64,6 +76,7 @@ struct WebDAVConfigurationView: View {
                     ConfigurationField(title: "generic_fieldname_username",
                                        placeholder: "admin",
                                        isSecure: false,
+                                       contentType: .username,
                                        text: $viewModel.username)
                     .focused($focusedField, equals: .username)
                     
@@ -71,6 +84,7 @@ struct WebDAVConfigurationView: View {
                                        placeholder: "password",
                                        note: "web_dav_connection_password_note",
                                        isSecure: true,
+                                       contentType: .password,
                                        text: $viewModel.password)
                     .focused($focusedField, equals: .password)
                     
@@ -168,6 +182,22 @@ struct WebDAVConfigurationView: View {
             Text(message)
         }
     }
+    
+    private var contentTypeForConnectionNameField: PlatformTextContentType? {
+        if #available(macOS 14.0, iOS 13.0, *) {
+            return .name
+        } else {
+            return nil
+        }
+    }
+    
+    private var contentTypeForConnectionURLField: PlatformTextContentType? {
+        if #available(macOS 14.0, iOS 13.0, *) {
+            return .URL
+        } else {
+            return nil
+        }
+    }
 }
 
 @objc class WebDAVConfigurationViewModel: NSObject, ObservableObject {
@@ -242,7 +272,7 @@ struct WebDAVConfigurationView: View {
             let message = String(localized: "webdav_vc_validation_url_are_you_sure", comment: "Are you sure the URL is correct? It should be a URL to a parent folder. Not the database file.")
             
             #if os(iOS)
-            Alerts.yesNo(parentController, title: title, message: message) { [weak self] confirmed in
+            Alerts.yesNo(parentController.presentedViewController ?? parentController, title: title, message: message) { [weak self] confirmed in
                 guard let self, confirmed else { return }
                 self.checkConnection()
             }
@@ -278,7 +308,7 @@ struct WebDAVConfigurationView: View {
     
     func sessionConfiguration() -> WebDAVSessionConfiguration {
         let name = connectionName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let host = rootURL.trimmingCharacters(in: .whitespacesAndNewlines).urlExtendedParse ?? URL(string: "https:
+        let host = rootURL.trimmingCharacters(in: .whitespacesAndNewlines).urlExtendedParse ?? URL(string: "https://")!
         
         let configuration = WebDAVSessionConfiguration()
         
@@ -364,14 +394,9 @@ struct WebDAVConfigurationView: View {
         guard let parentController else { return }
         guard let (name, url) = validateConnection() else { return }
         
-        let configuration = WebDAVSessionConfiguration()
+        let configuration = sessionConfiguration()
         
-        if let initialConfiguration {
-            configuration.identifier = initialConfiguration.identifier
-            let defaultCreds = initialConfiguration.selectedCredential()
-            configuration.username = defaultCreds?.username ?? ""
-            configuration.password = defaultCreds?.password ?? ""
-        } else {
+        if configuration.credentials.isEmpty {
             configuration.username = username
             configuration.password = password
         }
@@ -449,7 +474,8 @@ fileprivate struct ConfigurationField: View {
     var placeholder: LocalizedStringKey
     var note: LocalizedStringKey? = nil
     var isSecure: Bool
-    
+    var contentType: PlatformTextContentType?
+
     @Binding var text: String
     
     var body: some View {
@@ -469,6 +495,7 @@ fileprivate struct ConfigurationField: View {
                         SecureField("", text: $text)
                             .font(.callout)
                             .multilineTextAlignment(.leading)
+                            .textContentType(contentType)
                             #if os(macOS)
                             .textFieldStyle(.roundedBorder)
                             #endif
@@ -476,6 +503,10 @@ fileprivate struct ConfigurationField: View {
                         TextField("", text: $text)
                             .font(.callout)
                             .multilineTextAlignment(.leading)
+                            .textContentType(contentType)
+                            #if os(iOS)
+                            .textInputAutocapitalization((contentType == .username || contentType == .URL) ? .never : .words)
+                            #endif
                             #if os(macOS)
                             .textFieldStyle(.roundedBorder)
                             #endif

@@ -12,12 +12,12 @@ class CreditCardEditorViewModel: ObservableObject {
     @Published var errorMessage = ""
     
     
-    private var model: Model?
+    private(set) var model: Model?
     private var itemUuid: UUID?
     private var parentGroupUuid: UUID?
     private var onCancel: (() -> Void)?
     private var saveCompletion: ((_ saved: Bool) -> Void)?
-
+    
     
     private static let reservedCustomFieldKeys: Set<String> = [
         "CreditCardName",
@@ -108,10 +108,12 @@ class CreditCardEditorViewModel: ObservableObject {
         creditCardData.interestRate = item.fields.customFields["InterestRate"]?.value ?? ""
         creditCardData.issueNumber = item.fields.customFields["IssueNumber"]?.value ?? ""
         creditCardData.notes = item.fields.notes
+        creditCardData.tags = Set(item.fields.tags.allObjects as! [String])
         
         
         creditCardData.customFields.removeAll()
         creditCardData.customFieldsConceablable.removeAll()
+        creditCardData.customFieldsConcealed.removeAll()
         let allKeys = item.fields.customFields.allKeys().compactMap { String($0) }
         for stringKey in allKeys {
             if !["CreditCardName",
@@ -131,6 +133,7 @@ class CreditCardEditorViewModel: ObservableObject {
                 let isConceablable = stringValue?.protected ?? false
                 creditCardData.customFields.append(["key": stringKey, "value": value])
                 creditCardData.customFieldsConceablable.append(isConceablable)
+                creditCardData.customFieldsConcealed.append(isConceablable)
             }
         }
         
@@ -261,6 +264,8 @@ class CreditCardEditorViewModel: ObservableObject {
         item.fields.setCustomField("InterestRate", value: StringValue(string: creditCardData.interestRate, protected: false))
         item.fields.setCustomField("IssueNumber", value: StringValue(string: creditCardData.issueNumber, protected: false))
         
+        item.fields.tags = NSMutableSet(set: creditCardData.tags)
+        
         let desiredCustomFieldKeys = Set(
             creditCardData.customFields.compactMap { customField -> String? in
                 guard let key = customField["key"], !key.isEmpty else { return nil }
@@ -308,6 +313,11 @@ class CreditCardEditorViewModel: ObservableObject {
         if itemUuid == nil {
             itemUuid = item.uuid
         }
+    }
+    
+    func onTagsEdited(tags: Set<String>) {
+        self.creditCardData.tags = tags
+        markAsChanged()
     }
     
     private func showError(_ message: String) {
@@ -385,7 +395,7 @@ class CreditCardEditorViewModel: ObservableObject {
         objectWillChange.send()
         
         creditCardData.customFields.append(["key": key, "value": value])
-        creditCardData.customFieldsConcealed.append(false) 
+        creditCardData.customFieldsConcealed.append(isConceablable) 
         creditCardData.customFieldsConceablable.append(isConceablable) 
         
         print("DEBUG: After add - custom fields count: \(creditCardData.customFields.count)")
@@ -407,6 +417,9 @@ class CreditCardEditorViewModel: ObservableObject {
         
         creditCardData.customFields[index] = ["key": key, "value": value]
         
+        let previousIsConceablable = index < creditCardData.customFieldsConceablable.count ? creditCardData.customFieldsConceablable[index] : false
+        let hadConcealedEntry = index < creditCardData.customFieldsConcealed.count
+        
         if index < creditCardData.customFieldsConceablable.count {
             creditCardData.customFieldsConceablable[index] = isConceablable
         } else {
@@ -420,6 +433,10 @@ class CreditCardEditorViewModel: ObservableObject {
             while creditCardData.customFieldsConcealed.count <= index {
                 creditCardData.customFieldsConcealed.append(false)
             }
+        }
+        
+        if !hadConcealedEntry || previousIsConceablable != isConceablable {
+            creditCardData.customFieldsConcealed[index] = isConceablable
         }
         
         markAsChanged()
@@ -482,13 +499,6 @@ class CreditCardEditorViewModel: ObservableObject {
         
         let metadataArray = model.getMetadataFromItem(item)
         creditCardData.metadataEntries = metadataArray
-    }
-    
-    
-    func updateCardType(cardNumber: String) {
-        guard cardNumber.count < 6 else { return }
-        let cardType = CardDetection.detectCardType(cardNumber).type
-        creditCardData.cardType = cardType
     }
 }
 

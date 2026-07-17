@@ -45,6 +45,7 @@ struct SwiftGroupModel: SwiftGroupModelInterface {
 
     var node: Node? { model.getItemBy(uuid) }
     var isGroup: Bool { true }
+    var isCreditCard: Bool { false }
 
     var searchFoundInPath: String {
         guard let node else {
@@ -147,6 +148,7 @@ struct SwiftEntryModel: SwiftEntryModelInterface {
 
     var node: Node? { model.getItemBy(uuid) }
     var isGroup: Bool { false }
+    var isCreditCard: Bool { node?.isCreditCard() ?? false }
 
     var searchFoundInPath: String {
         guard let node else {

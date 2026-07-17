@@ -93,6 +93,32 @@ class FreeTrialOrUpgradeOnboardingViewController: NSViewController {
                 let fmt = String(format: NSLocalizedString("upgrade_vc_price_per_year_fmt", comment: "%@ / year"), priceText)
                 labelPricing.stringValue = fmt
             } else {
+                let trialDuration = ProUpgradeIAPManager.sharedInstance().freeTrialDurationText()
+
+                if let trialDuration, !trialDuration.isEmpty {
+                    let messageFmt = NSLocalizedString(
+                        "fwY-jx-AUt.title",
+                        tableName: "FreeTrialOrUpgradeOnboarding",
+                        value: "Strongbox includes %@ of Strongbox Pro for you to try, for free",
+                        comment: ""
+                    )
+                    labelSubtitle.stringValue = String(format: messageFmt, trialDuration)
+
+                    let redeemFmt = NSLocalizedString(
+                        "iiH-ir-M2u.title",
+                        tableName: "FreeTrialOrUpgradeOnboarding",
+                        value: "Redeem Your %@ Free Trial",
+                        comment: ""
+                    )
+                    buttonSubscribeToYearly.title = String(format: redeemFmt, trialDuration)
+                } else {
+                    labelSubtitle.stringValue = NSLocalizedString(
+                        "generic_free_trial_available_message",
+                        comment: "Strongbox includes a free trial of Pro for you to try"
+                    )
+                    buttonSubscribeToYearly.title = NSLocalizedString("generic_start_free_trial", comment: "Start Free Trial")
+                }
+
                 let fmt = String(format: NSLocalizedString("price_per_year_after_free_trial_fmt", comment: "Then %@ every year"), priceText)
                 labelPricing.stringValue = fmt
             }

@@ -15,6 +15,7 @@
 #import "WorkingCopyManager.h"
 #import "ProUpgradeIAPManager.h"
 #import "Strongbox-Swift.h"
+#import "Model.h"
 
 #if TARGET_OS_IOS
 
@@ -106,17 +107,22 @@ int OPParentIDForProcessID(int pid)
 + (NSString*)getProStatusDisplayString {
     BOOL isAProBundle;
     BOOL isPro;
-    
+    BOOL isSetapp;
+
 #if !TARGET_OS_IOS
     isAProBundle =  MacCustomizationManager.isAProBundle;
-    isPro =Settings.sharedInstance.isPro;
+    isPro = Settings.sharedInstance.isPro;
+    isSetapp = MacCustomizationManager.isSetapp;
 #else
     isAProBundle =  CustomizationManager.isAProBundle;
     isPro = AppPreferences.sharedInstance.isPro;
+    isSetapp = ProUpgradeIAPManager.sharedInstance.hasSetapp;
 #endif
     
     NSString* proStatus;
-    if ( isAProBundle ) {
+    if ( isSetapp ) {
+        proStatus = @"Setapp";
+    } else if ( isAProBundle ) {
         proStatus = @"Lifetime Pro (App SKU is Pro)";
     }
     else {
@@ -530,6 +536,54 @@ int OPParentIDForProcessID(int pid)
 #endif
         
         [debugLines addObject:@"--------------------"];
+        
+#if TARGET_OS_IOS
+        Model* unlockedModel = AppModel.shared.unlockedDatabase;
+
+        if (unlockedModel) {
+            [debugLines addObject:@"HIBP Errors"];
+            [debugLines addObject:@"--------------------"];
+
+            NSArray<NSString*>* hibpReasons = unlockedModel.auditHibpErrorReasons;
+            [debugLines addObject:[NSString stringWithFormat:@"Recorded HIBP errors: %lu", (unsigned long)hibpReasons.count]];
+
+            if (hibpReasons.count == 0) {
+                [debugLines addObject:@"<No recorded HIBP error reasons>"];
+            }
+            else {
+                for (NSString* reason in hibpReasons) {
+                    [debugLines addObject:[NSString stringWithFormat:@"- %@", reason]];
+                }
+            }
+
+            [debugLines addObject:@"--------------------"];
+        }
+#else
+        NSArray<Model*>* unlockedModels = [DatabasesCollection.shared getUnlockedDatabases];
+
+        if (unlockedModels.count > 0) {
+            [debugLines addObject:@"HIBP Errors"];
+            [debugLines addObject:@"--------------------"];
+
+            for (Model* model in unlockedModels) {
+                NSArray<NSString*>* hibpReasons = model.auditHibpErrorReasons;
+
+                [debugLines addObject:[NSString stringWithFormat:@"Database: %@", model.metadata.nickName]];
+                [debugLines addObject:[NSString stringWithFormat:@"Recorded HIBP errors: %lu", (unsigned long)hibpReasons.count]];
+
+                if (hibpReasons.count == 0) {
+                    [debugLines addObject:@"<No recorded HIBP error reasons>"];
+                }
+                else {
+                    for (NSString* reason in hibpReasons) {
+                        [debugLines addObject:[NSString stringWithFormat:@"- %@", reason]];
+                    }
+                }
+
+                [debugLines addObject:@"--------------------"];
+            }
+        }
+#endif
         
         completion (debugLines);
     }

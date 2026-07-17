@@ -274,7 +274,7 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     NSURLComponents* components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
     
     if ( !components.scheme.length ) { 
-        urlString = [NSString stringWithFormat:@"https:
+        urlString = [NSString stringWithFormat:@"https://%@", urlString];
         url = urlString.urlExtendedParse;
     }
     
@@ -1625,6 +1625,66 @@ static NSString* const kPrintingStylesheet = @"<head><style type=\"text/css\"> \
     }
     
     return compiled ? compiled : @""; 
+}
+
+- (BOOL)mergeNode:(Node *)source
+         intoNode:(Node *)destination
+mergeLocationChangedDate:(BOOL)mergeLocationChangedDate
+   includeHistory:(BOOL)includeHistory
+    allowOverwrite:(BOOL)allowOverwrite {
+    if (source == nil || destination == nil) {
+        return NO;
+    }
+
+    BOOL merged = [destination mergePropertiesInFromNode:source
+                               mergeLocationChangedDate:mergeLocationChangedDate
+                                         includeHistory:includeHistory
+                                keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
+
+    if (!merged && allowOverwrite) {
+        merged = [self overwriteNode:destination withNode:source];
+    }
+
+    if (merged) {
+        [self rebuildFastMaps];
+    }
+
+    return merged;
+}
+
+- (BOOL)overwriteNode:(Node *)existing withNode:(Node *)replacement {
+    if (existing == nil || replacement == nil) {
+        return NO;
+    }
+
+    if (existing.parent == nil) {
+        return NO;
+    }
+
+    Node *parent = existing.parent;
+    NSInteger index = [parent.children indexOfObject:existing];
+    if (index == NSNotFound) {
+        return NO;
+    }
+
+    Node *replacementClone = [replacement cloneOrDuplicate:YES
+                                                   cloneUuid:YES
+                                              cloneRecursive:YES
+                                                    newTitle:nil
+                                                  parentNode:parent];
+
+    if (replacementClone == nil) {
+        return NO;
+    }
+
+    [parent removeChild:existing];
+
+    if (![parent insertChild:replacementClone keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules atPosition:index]) {
+        [parent insertChild:existing keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules atPosition:index];
+        return NO;
+    }
+
+    return YES;
 }
 
 - (BOOL)preOrderTraverse:(BOOL (^)(Node * _Nonnull))function {

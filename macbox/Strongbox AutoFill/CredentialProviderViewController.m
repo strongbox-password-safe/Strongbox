@@ -35,6 +35,8 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #import "AutoFillWormholeHelper.h"
 
+static const CGFloat kQuickTypeAutoExitTimeout = 30.0f;
+
 @interface CredentialProviderViewController ()
 
 @property SelectDatabaseViewController* selectDbVc;
@@ -57,6 +59,8 @@
 
 @property BOOL requireWormhole; 
 @property (weak) IBOutlet NSProgressIndicator *spinner;
+@property BOOL quickTypeRequestResolved;
+@property BOOL quickTypeAutoExitCancelled;
 
 @property NSSet<NSString*>* wormholeUnlockedSet;
 
@@ -64,9 +68,23 @@
 
 @implementation CredentialProviderViewController
 
+- (void)cancelQuickTypeAutoExitIfNeeded:(NSString*)reason {
+    if ( self.quickTypeMode && !self.withoutUserInteraction && !self.quickTypeAutoExitCancelled ) {
+        self.quickTypeAutoExitCancelled = YES;
+        slog(@"🟢 quickType auto-exit cancelled - %@", reason);
+    }
+}
+
 - (void)commonInit {
     if ( !self.hasDoneCommonInit ) {
         slog(@"🟢 AutoFill::commonInit");
+#if DEBUG
+        NSDictionary* info = NSBundle.mainBundle.infoDictionary;
+        slog(@"🧪 DEBUG AutoFill Extension [%@] v%@ (%@)",
+             NSBundle.mainBundle.bundleIdentifier,
+             info[@"CFBundleShortVersionString"],
+             info[@"CFBundleVersion"]);
+#endif
         self.hasDoneCommonInit = YES;
         
         [DatabasesManager.sharedInstance forceReload];
@@ -272,6 +290,8 @@
     }
 
     self.quickTypeMode = YES;
+    self.quickTypeRequestResolved = NO;
+    self.quickTypeAutoExitCancelled = NO;
 
     if ( credentialRequest.type == ASCredentialRequestTypePasskeyAssertion ) {
         self.passkeyCredentialRequest = credentialRequest;
@@ -307,6 +327,8 @@
     slog(@"AutoFill: prepareInterfaceToProvideCredentialForIdentity [%@]", credentialIdentity);
     
     self.quickTypeMode = YES;
+    self.quickTypeRequestResolved = NO;
+    self.quickTypeAutoExitCancelled = NO;
     
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
     
@@ -314,7 +336,8 @@
 }
 
 - (void)initializeQuickTypeWithUI:(QuickTypeRecordIdentifier*)identifier {
-    
+
+    [self cancelQuickTypeAutoExitIfNeeded:@"initializeQuickTypeWithUI"];
     
     if ( identifier ) {
         MacDatabasePreferences* safe = [MacDatabasePreferences fromUuid:identifier.databaseId];
@@ -325,25 +348,13 @@
             }
             else {
                 [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-                
-
-
-
-
-                    [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
-
+                [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
             }
         });
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-        
-
-
-
-
-            [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
-
+        [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
     }
 }
 
@@ -398,17 +409,25 @@
 - (void)delayedStartup {
     slog(@"🟢 delayedStartup - sheet parent = [%@], presentingViewController = [%@], window = [%@]", self.view.window.sheetParent, self.presentingViewController, self.view.window);
     
-    if ( !self.quickTypeMode ) {
-        [self startupWithUI];
-    }
-    else {
+    if (self.quickTypeMode) {
         slog(@"🟢 delayedStartup - quickType mode - NOP");
         
+        if ( !self.withoutUserInteraction ) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kQuickTypeAutoExitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if ( self.quickTypeMode && !self.quickTypeRequestResolved && !self.quickTypeAutoExitCancelled ) {
+                    slog(@"🟢 delayedStartup - quickType mode timed out (%.1fs). Auto-exiting without popup.", kQuickTypeAutoExitTimeout);
+                    [self exitWithUserInteractionRequired];
+                }
+            });
+        }
         
         
         
         
         
+        
+    } else {
+        [self startupWithUI];
     }
 }
 
@@ -464,6 +483,8 @@
 }
 
 - (void)requestDatabaseSelection {
+    [self cancelQuickTypeAutoExitIfNeeded:@"requestDatabaseSelection"];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         slog(@"✅ requestDatabaseSelectionWithUnlockedSet - [%@]", self.selectDbVc);
         
@@ -473,6 +494,8 @@
         
         __weak CredentialProviderViewController* weakSelf = self;
         self.selectDbVc.onDone = ^(BOOL userCancelled, MacDatabasePreferences * _Nonnull database) {
+            [weakSelf cancelQuickTypeAutoExitIfNeeded:@"database selection completed"];
+            
             if (userCancelled) {
                 [weakSelf exitWithUserCancelled:nil];
             }
@@ -499,6 +522,7 @@
    quickTypeIdentifier:(QuickTypeRecordIdentifier*_Nullable)quickTypeIdentifier
     serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
 
+    [self cancelQuickTypeAutoExitIfNeeded:@"unlockDatabase"];
     
     StorageProvider provider = database.storageProvider;
     BOOL sftpOrDav = provider == kSFTP || provider == kWebDAV;
@@ -724,6 +748,8 @@
 }
 
 - (void)onSucccesfullyUnlocked:(Model*)model {
+    [self cancelQuickTypeAutoExitIfNeeded:@"onSucccesfullyUnlocked"];
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         
 
@@ -824,6 +850,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 - (void)presentCredentialSelector:(Model*)model twoFaOnlyMode:(BOOL)twoFaOnlyMode {
 
+    [self cancelQuickTypeAutoExitIfNeeded:@"presentCredentialSelector"];
     
     SelectCredential* vc = [[SelectCredential alloc] initWithNibName:@"SelectCredential" bundle:nil];
     vc.model = model;
@@ -831,6 +858,8 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     vc.serviceIdentifiers = self.serviceIdentifiers;
     
     vc.onDone = ^(BOOL userCancelled, BOOL createNew, NSString * _Nullable username, NSString * _Nullable password, NSString * _Nullable totp) {
+        [self cancelQuickTypeAutoExitIfNeeded:@"credential selector completed"];
+        
         if (userCancelled) {
             [self exitWithUserCancelled:self.database];
             return;
@@ -845,7 +874,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                 if(serviceId) {
 
                         NSString* bar = [BrowserAutoFillManager extractPSLDomainFromUrlWithUrl:serviceId.identifier];
-                        suggestedUrl = [NSString stringWithFormat:@"https:
+                        suggestedUrl = [NSString stringWithFormat:@"https://%@", bar];
                         
                         NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
                         suggestedTitle = foo.length ? [foo capitalizedString] : foo;
@@ -1275,6 +1304,8 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 }
 
 - (void)notifyMainAppAutoFillExited {
+    self.quickTypeRequestResolved = YES;
+    
     
 
     [DatabasesManager.sharedInstance forceSerialize];

@@ -57,6 +57,18 @@ If you're having trouble, please checkout the following sources:
 
 Another important step is to restart your device, it's surprising how often this can fix issues. If you are having iCloud trouble, then signing in and out of iCloud/iCloud Drive can help.
 
+## FAQ
+
+### macOS local file sync stops working unexpectedly
+
+macOS 15 (Sequoia) periodically re-prompts apps for Local Network permission. If you accidentally tap **Don't Allow** on that prompt, Strongbox can no longer see peers on your LAN and local file-based sync will silently fail. To restore access:
+
+1. Open **System Settings**.
+2. Go to **Privacy & Security > Local Network**.
+3. Enable Local Network access for **Strongbox**.
+
+After re-enabling, local sync between your macOS device and iOS/iPadOS devices should resume working. macOS may ask for reconfirmation every so often, so keep an eye out for the prompt.
+
 ---
 
 # Licensing & Building

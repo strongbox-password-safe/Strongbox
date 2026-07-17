@@ -379,7 +379,7 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
             }
         }
     }
-
+    
     @objc func onCreateRecord(_: Any?) {
         createOrEdit()
     }
@@ -658,8 +658,9 @@ class NextGenSplitViewController: NSSplitViewController, NSSearchFieldDelegate {
         let rawText = searchField.stringValue
         let trimmedText = rawText.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        if rawText != trimmedText {
-            searchField.stringValue = trimmedText
+        
+        if trimmedText.isEmpty && !rawText.isEmpty {
+            searchField.stringValue = ""
         }
 
         if database.nextGenSearchText != trimmedText {

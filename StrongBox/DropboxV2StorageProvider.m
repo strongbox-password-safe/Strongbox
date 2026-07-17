@@ -360,7 +360,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                      items:(NSMutableArray<StorageBrowserItem *> *)items
                 completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion {
     DBXDropboxClient *client = DBXDropboxClientsManager.authorizedClient;
-    [[client.files listFolderWithPath:cursor] responseWithCompletionHandler:^(DBXFilesListFolderResult * _Nullable response, DBXFilesListFolderError * _Nullable routeError, DBXCallError * _Nullable networkError) {
+    [[client.files listFolderContinueWithCursor:cursor] responseWithCompletionHandler:^(DBXFilesListFolderResult * _Nullable response, DBXFilesListFolderContinueError * _Nullable routeError, DBXCallError * _Nullable networkError) {
         if (response) {
             NSArray<DBXFilesMetadata *> *entries = response.entries;
             NSString *cursor = response.cursor;

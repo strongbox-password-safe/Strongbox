@@ -51,11 +51,18 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
     @MainActor
     func navigateTo(destination: DatabaseNavigationDestination, homeModel: DatabaseHomeViewModel) {
         switch destination {
-        case let .entryDetail(uuid):
+        case let .entryDetail(uuid, search):
             let vc = ItemDetailsViewController.fromStoryboard(viewModel, nodeUuid: uuid)
-            DispatchQueue.main.asyncAfter(deadline: .now()+0.1, execute: {
-                self.splitViewController.showDetailViewController(vc, sender: nil)
-            })
+
+            let isSplitViewExpanded = !self.splitViewController.isCollapsed
+
+            if search && !isSplitViewExpanded {
+                navController.pushViewController(vc, animated: true)
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now()+0.1, execute: {
+                    self.splitViewController.showDetailViewController(vc, sender: nil)
+                })
+            }
         case .allEntries:
             let browse = BrowseSafeView.fromStoryboard(.list, model: viewModel)
             navController.pushViewController(browse, animated: true)
@@ -164,6 +171,146 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
 
     func deleteItem(item: any SwiftItemModelInterface) async -> Bool {
         await browseActionsHelper.deleteSingleItem(item.uuid)
+    }
+
+    var canExportItems: Bool {
+        browseActionsHelper.canExportItems()
+    }
+
+    @MainActor
+    func moveItems(items: [any SwiftItemModelInterface]) async -> Bool {
+        let uuids = items.map(\.uuid)
+
+        return await withCheckedContinuation { continuation in
+            browseActionsHelper.moveItems(uuids) { actionPerformed in
+                continuation.resume(returning: actionPerformed)
+            }
+        }
+    }
+
+    @MainActor
+    func exportItems(items: [any SwiftItemModelInterface]) async -> Bool {
+        let uuids = items.map(\.uuid)
+
+        return await withCheckedContinuation { continuation in
+            browseActionsHelper.exportItems(uuids) { actionPerformed in
+                continuation.resume(returning: actionPerformed)
+            }
+        }
+    }
+
+    @MainActor
+    func deleteItems(items: [any SwiftItemModelInterface]) async -> Bool {
+        let nodes = items.compactMap { viewModel.getItemBy($0.uuid) }
+        guard !nodes.isEmpty else { return false }
+
+        let grouped = Dictionary(grouping: nodes) { node in
+            viewModel.canRecycle(node.uuid)
+        }
+
+        let toBeRecycled = grouped[true] ?? []
+        let toBeDeleted = grouped[false] ?? []
+
+        let title: String
+        let message: String
+        if toBeDeleted.isEmpty {
+            title = NSLocalizedString("browse_vc_are_you_sure", comment: "Are you sure?")
+            message = NSLocalizedString("browse_vc_are_you_sure_recycle", comment: "Are you sure you want to send these item(s) to the Recycle Bin?")
+        } else if toBeRecycled.isEmpty {
+            title = NSLocalizedString("browse_vc_are_you_sure", comment: "Are you sure?")
+            message = NSLocalizedString("browse_vc_are_you_sure_delete", comment: "Are you sure you want to permanently delete these item(s)?")
+        } else {
+            title = NSLocalizedString("browse_vc_partial_recycle_alert_title", comment: "Partial Recycle")
+            message = NSLocalizedString("browse_vc_partial_recycle_alert_message", comment: "Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
+        }
+
+        return await withCheckedContinuation { continuation in
+            Alerts.yesNo(navController, title: title, message: message) { [weak self] response in
+                guard let self, response else {
+                    continuation.resume(returning: false)
+                    return
+                }
+
+                if !toBeDeleted.isEmpty {
+                    self.viewModel.deleteItems(toBeDeleted)
+                }
+
+                if !toBeRecycled.isEmpty, !self.viewModel.recycleItems(toBeRecycled) {
+                    Alerts.warn(self.navController,
+                                title: NSLocalizedString("browse_vc_error_deleting", comment: "Error Deleting"),
+                                message: NSLocalizedString("browse_vc_error_deleting_message", comment: "There was a problem deleting at least one of these items."))
+                    continuation.resume(returning: false)
+                    return
+                }
+
+                Task { @MainActor in
+                    let saved = await self.saveAndNotifyAfterChanges(clearSelectedDetailItem: true)
+                    continuation.resume(returning: saved)
+                }
+            }
+        }
+    }
+
+    @MainActor
+    func merge(entryA: any SwiftEntryModelInterface, entryB: any SwiftEntryModelInterface) async -> Bool {
+        guard let nodeA = viewModel.getItemBy(entryA.uuid),
+              let nodeB = viewModel.getItemBy(entryB.uuid),
+              !nodeA.isGroup, !nodeB.isGroup, !nodeA.isCreditCard(), !nodeB.isCreditCard()
+        else {
+            return false
+        }
+
+        let titleAtoB = String(format: NSLocalizedString("merge_alert_action_button_title", comment: "Merge two entries alert button title."), nodeA.title, nodeB.title)
+        let titleBtoA = String(format: NSLocalizedString("merge_alert_action_button_title", comment: "Merge two entries alert button title."), nodeB.title, nodeA.title)
+        let message = String(format: NSLocalizedString("merge_alert_message", comment: "Merge two entries alert message."), nodeA.title, nodeB.title, nodeA.title, nodeB.title, nodeA.title, nodeB.title)
+
+        return await withCheckedContinuation { continuation in
+            let sheet = UIAlertController(title: NSLocalizedString("generic_action_merge", comment: "Merge"),
+                                          message: message,
+                                          preferredStyle: .actionSheet)
+
+            sheet.addAction(UIAlertAction(title: titleAtoB, style: .default) { [weak self] _ in
+                guard let self else {
+                    continuation.resume(returning: false)
+                    return
+                }
+
+                self.viewModel.merge(nodeA,
+                                     into: nodeB,
+                                     mergeLocationChangedDate: true,
+                                     includeHistory: true,
+                                     allowOverwrite: true)
+
+                Task { @MainActor in
+                    let saved = await self.saveAndNotifyAfterChanges(clearSelectedDetailItem: true)
+                    continuation.resume(returning: saved)
+                }
+            })
+
+            sheet.addAction(UIAlertAction(title: titleBtoA, style: .default) { [weak self] _ in
+                guard let self else {
+                    continuation.resume(returning: false)
+                    return
+                }
+
+                self.viewModel.merge(nodeB,
+                                     into: nodeA,
+                                     mergeLocationChangedDate: true,
+                                     includeHistory: true,
+                                     allowOverwrite: true)
+
+                Task { @MainActor in
+                    let saved = await self.saveAndNotifyAfterChanges(clearSelectedDetailItem: true)
+                    continuation.resume(returning: saved)
+                }
+            })
+
+            sheet.addAction(UIAlertAction(title: NSLocalizedString("generic_cancel", comment: "Cancel"), style: .cancel) { _ in
+                continuation.resume(returning: false)
+            })
+
+            navController.present(sheet, animated: true)
+        }
     }
 
     func emptyRecycleBin() async {
@@ -284,10 +431,29 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
         
         DispatchQueue.main.asyncAfter(deadline: .now()+0.1, execute: {
             let vc = ItemDetailsViewController.fromStoryboard(self.viewModel, nodeUuid: nil)
-            self.splitViewController.showDetailViewController(vc, sender: nil)
+            self.showDetailController(viewController: vc)
         })
     }
 
+    @MainActor
+    func onAddCreditCard() {
+        
+        
+        DispatchQueue.main.asyncAfter(deadline: .now()+0.1, execute: {
+            let vc = SwiftUIViewFactory.getCreditCardEditorViewWithModel(self.viewModel,
+                                                                         itemId: nil,
+                                                                         parentGroupId: nil,
+                                                                         createNewItem: true,
+                                                                         editImmediately: true,
+                                                                         forcedReadOnly: self.viewModel.isReadOnly) { [weak self] saved in
+                if saved {
+                    Task { await self?.saveAndNotifyAfterChanges() }
+                }
+            }
+            self.showDetailController(viewController: vc)
+        })
+    }
+    
     @MainActor
     func exportDatabase() {
         browseActionsHelper.exportDatabase()
@@ -337,6 +503,15 @@ class UIKitDatabaseActionsInterface: DatabaseActionsInterface {
         }
         set {
             splitViewController.hasDoneDatabaseOnLaunchTasks = newValue
+        }
+    }
+    
+    @MainActor
+    private func showDetailController(viewController: UIViewController) {
+        if splitViewController.isCollapsed {
+            self.navController.pushViewController(viewController, animated: true)
+        } else {
+            self.splitViewController.showDetailViewController(viewController, sender: self)
         }
     }
 }

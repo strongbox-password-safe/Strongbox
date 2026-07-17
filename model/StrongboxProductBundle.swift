@@ -8,6 +8,20 @@
 
 import Foundation
 
+struct SettingsProUpsellDecision {
+    let isUnifiedFreemiumBundle: Bool
+    let hasProEntitlement: Bool
+    let hasDismissed: Bool
+
+    var isEligibleAudience: Bool {
+        isUnifiedFreemiumBundle && !hasProEntitlement
+    }
+
+    var shouldShow: Bool {
+        isEligibleAudience && !hasDismissed
+    }
+}
+
 @objc
 public class StrongboxProductBundle: NSObject {
     enum BundleIdentifiers: String {
@@ -18,6 +32,7 @@ public class StrongboxProductBundle: NSObject {
         case scotus = "com.markmcguill.strongbox.scotus"
         case macOSStandaloneFreemium = "com.markmcguill.strongbox.mac"
         case macOSStandalonePro = "com.markmcguill.strongbox.mac.pro"
+        case setapp = "com.markmcguill.strongbox-setapp"
 
         var isPro: Bool {
             switch self {
@@ -34,6 +49,8 @@ public class StrongboxProductBundle: NSObject {
             case .macOSStandaloneFreemium:
                 return false
             case .macOSStandalonePro:
+                return true
+            case .setapp:
                 return true
             }
         }
@@ -54,6 +71,8 @@ public class StrongboxProductBundle: NSObject {
                 return false
             case .macOSStandalonePro:
                 return false
+            case .setapp:
+                return false
             }
         }
 
@@ -72,6 +91,8 @@ public class StrongboxProductBundle: NSObject {
             case .macOSStandaloneFreemium:
                 return true
             case .macOSStandalonePro:
+                return true
+            case .setapp:
                 return true
             }
         }
@@ -92,6 +113,8 @@ public class StrongboxProductBundle: NSObject {
                 return true
             case .macOSStandalonePro:
                 return true
+            case .setapp:
+                return true
             }
         }
 
@@ -110,6 +133,8 @@ public class StrongboxProductBundle: NSObject {
             case .macOSStandaloneFreemium:
                 return true
             case .macOSStandalonePro:
+                return true
+            case .setapp:
                 return true
             }
         }
@@ -130,6 +155,17 @@ public class StrongboxProductBundle: NSObject {
                 return true
             case .macOSStandalonePro:
                 return true
+            case .setapp:
+                return true
+            }
+        }
+
+        var isSetapp: Bool {
+            switch self {
+            case .setapp:
+                return true
+            default:
+                return false
             }
         }
 
@@ -149,6 +185,8 @@ public class StrongboxProductBundle: NSObject {
                 return "Non-Universal (macOS only, Freemium)"
             case .macOSStandalonePro:
                 return "Non-Universal (macOS only, Outright Pro)"
+            case .setapp:
+                return "Setapp"
             }
         }
     }
@@ -158,7 +196,7 @@ public class StrongboxProductBundle: NSObject {
 
         if let bundle = BundleIdentifiers(rawValue: bundleId) {
 
-            return bundle == .unifiedPro || bundle == .business
+            return bundle == .unifiedPro || bundle == .business || bundle == .setapp
         } else {
             swlog("🔴 Unknown Bundle in StrongboxProductBundle.isUnifiedProBundle()")
             return false
@@ -221,6 +259,18 @@ public class StrongboxProductBundle: NSObject {
             return bundle.isPro
         } else {
             swlog("🔴 Unknown Bundle in StrongboxProductBundle.isAProBundle()")
+            return false
+        }
+    }
+
+    @objc class var isSetapp: Bool {
+        let bundleId = Utils.getAppBundleId()
+
+        if let bundle = BundleIdentifiers(rawValue: bundleId) {
+
+            return bundle.isSetapp
+        } else {
+            swlog("🔴 Unknown Bundle in StrongboxProductBundle.isSetapp()")
             return false
         }
     }

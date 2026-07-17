@@ -340,7 +340,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     else if([subOperation isEqualToString:kUrlSubOperationRemoveScheme]) {
         if(components && components.rangeOfScheme.location != NSNotFound) {
             NSString* foo = [dereferencedUrl stringByReplacingCharactersInRange:components.rangeOfScheme withString:@""];
-            if([foo hasPrefix:@":
+            if([foo hasPrefix:@"://"]) {
                 return [foo stringByReplacingCharactersInRange:NSMakeRange(0, 3) withString:@""];
             }
             return foo;

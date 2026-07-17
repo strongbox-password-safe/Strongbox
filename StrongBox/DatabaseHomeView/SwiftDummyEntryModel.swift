@@ -49,6 +49,7 @@ class SwiftDummyEntryModel: SwiftEntryModelInterface {
     var isFavourite: Bool { favourite }
 
     var isGroup: Bool { false }
+    var isCreditCard: Bool = false
 
     var searchFoundInPath: String { "in Database/Finance/Another Folder" }
 

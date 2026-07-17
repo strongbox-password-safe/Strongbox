@@ -43,6 +43,32 @@ legacySupplementaryTotp:(BOOL)legacySupplementaryTotp
 
 - (instancetype)init NS_UNAVAILABLE;
 
+- (instancetype)initWithTitle:(NSString *)title
+                     username:(NSString *)username
+                     password:(NSString *)password
+                          url:(NSString *)url
+                        notes:(NSString *)notes
+                        email:(NSString *)email;
+
+- (instancetype)initWithTitle:(NSString *)title
+                     username:(NSString *)username
+                     password:(NSString *)password
+                          url:(NSString *)url
+                        notes:(NSString *)notes
+                        email:(NSString *)email
+                      expires:(nullable NSDate*)expires
+                         tags:(NSSet<NSString*>*)tags
+                         totp:(nullable OTPToken *)totp
+                         icon:(nullable NodeIcon*)icon
+                    favourite:(BOOL)favourite
+                 customFields:(NSArray<CustomFieldViewModel *> *)customFields
+                  attachments:(NSDictionary<NSString *,KeePassAttachmentAbstractionLayer *> *)attachments
+              parentGroupUuid:(nullable NSUUID*)parentGroupUuid
+               keeAgentSshKey:(nullable KeeAgentSshKeyViewModel*)keeAgentSshKey
+             sortCustomFields:(BOOL)sortCustomFields
+      reservedAttachmentNames:(NSSet<NSString*>*)reservedAttachmentNames
+                      passkey:(nullable Passkey*)passkey;
+
 - (instancetype)clone;
 - (BOOL)isDifferentFrom:(EntryViewModel*)other;
 

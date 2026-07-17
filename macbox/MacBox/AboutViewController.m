@@ -102,7 +102,9 @@ static AboutViewController* sharedInstance;
 
     
     NSString* fmt;
-    if ( StrongboxProductBundle.isZeroEdition ) {
+    if ( StrongboxProductBundle.isSetapp) {
+        fmt = NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+    } else if ( StrongboxProductBundle.isZeroEdition ) {
         fmt = NSLocalizedString(@"prefs_vc_app_version_info_zero_fmt", @"About Strongbox Zero %@");
     }
     else {
@@ -123,8 +125,10 @@ static AboutViewController* sharedInstance;
     
     self.labelLicense.textColor = NSColor.labelColor;
     BOOL linkToUpgradeScreen = NO;
-    
-    if ( MacCustomizationManager.isAProBundle ) {
+
+    if ( MacCustomizationManager.isSetapp ) {
+        self.labelLicense.stringValue = NSLocalizedString(@"pro_status_setapp", @"Setapp");
+    } else if ( MacCustomizationManager.isAProBundle ) {
         self.labelLicense.stringValue = NSLocalizedString(@"pro_status_lifetime_pro", @"Lifetime Pro");
     }
     else {

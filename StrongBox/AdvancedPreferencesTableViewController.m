@@ -26,6 +26,8 @@
 #import "CustomizationManager.h"
 #import <StoreKit/StoreKit.h>
 #import "Strongbox-Swift.h"
+#import "AppDelegate.h"
+#import "SecretStore.h"
 
 @interface AdvancedPreferencesTableViewController ()
 
@@ -114,6 +116,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *disableCustomViews;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellTheGarage;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSimpleLogin;
+@property (weak, nonatomic) IBOutlet UILabel *labelSimpleLoginStatus;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAssociatedWebsites;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSplit2FACodes;
@@ -131,6 +135,10 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNewEntryParentIcon;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStripUnusedIcons;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStripHistoricalCustomIcons;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSentryCrashReporting;
+@property (weak, nonatomic) IBOutlet UISwitch *switchSentryCrashReporting;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDeleteDatabaseAfterXFailedUnlockAttempts;
+@property (weak, nonatomic) IBOutlet UISwitch *switchDeleteDatabaseAfterXFailedUnlockAttempts;
 
 @end
 
@@ -218,13 +226,23 @@
     [self cell:self.cellNewEntryParentIcon setHidden:YES];
     [self cell:self.cellStripUnusedIcons setHidden:YES];
     [self cell:self.cellStripHistoricalCustomIcons setHidden:YES];
+    [self cell:self.cellDeleteDatabaseAfterXFailedUnlockAttempts setHidden:YES];
+#ifdef NO_NETWORKING
+    [self cell:self.cellSentryCrashReporting setHidden:YES];
+#endif
     
     [self cell:self.cellDropboxAppFolder setHidden:YES];
     [self cell:self.cellInstantPin setHidden:YES];
-    
+
     [self cell:self.cellZipExports setHidden:YES];
     [self cell:self.cellHideExport setHidden:YES];
     [self cell:self.cellExportDate setHidden:YES];
+
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        [self cell:self.cellSimpleLogin setHidden:YES];
+    }
+
+    [self bindSimpleLoginStatus];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -348,6 +366,9 @@
             }
         }];
     }
+    else if ( cell == self.cellSimpleLogin ) {
+        [self showSimpleLoginSettings];
+    }
     else if ( cell == self.cellTheGarage ) {
         UIViewController* vc = [SwiftUIViewFactory getTheGarageViewController];
         [self.navigationController pushViewController:vc animated:YES];
@@ -459,6 +480,15 @@
     [self bindPreferences];
 }
 
+- (IBAction)onSentryCrashReportingChanged:(id)sender {
+    AppPreferences.sharedInstance.sentryCrashReportingEnabled = self.switchSentryCrashReporting.on;
+#ifndef NO_NETWORKING
+    AppDelegate *appDelegate = (AppDelegate *)UIApplication.sharedApplication.delegate;
+    [appDelegate updateSentryState];
+#endif
+    [self bindPreferences];
+}
+
 - (void)bindPreferences {
     self.switchSyncForcePull.on = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
     self.switchSyncForcePush.on = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
@@ -501,8 +531,10 @@
     self.showAssociatedWebsites.on = AppPreferences.sharedInstance.associatedWebsites;
 
     self.split2FACodes.on = AppPreferences.sharedInstance.twoFactorEasyReadSeparator;
+    self.switchDeleteDatabaseAfterXFailedUnlockAttempts.on = NO;
 
     self.disableCustomViews.on = AppPreferences.sharedInstance.disableCustomViews;
+    self.switchSentryCrashReporting.on = AppPreferences.sharedInstance.sentryCrashReportingEnabled;
 
 #ifndef NO_NETWORKING
     [CloudKitDatabasesInteractor.shared getCloudKitAccountStatusWithCompletionHandler:^(CKAccountStatus status, NSError * _Nullable error) {
@@ -601,6 +633,97 @@
     [self cell:self.cellWiFiSyncServiceName setHidden:!isOn];
 
     [self reloadDataAnimated:YES];
+}
+
+- (void)bindSimpleLoginStatus {
+    if ( SimpleLoginClient.shared.isConfigured ) {
+        self.labelSimpleLoginStatus.text = NSLocalizedString(@"simplelogin_status_configured", @"API key saved");
+        self.labelSimpleLoginStatus.textColor = UIColor.systemGreenColor;
+    }
+    else {
+        self.labelSimpleLoginStatus.text = NSLocalizedString(@"simplelogin_status_not_configured", @"Not configured");
+        self.labelSimpleLoginStatus.textColor = UIColor.secondaryLabelColor;
+    }
+}
+
+- (void)showSimpleLoginSettings {
+    BOOL alreadyConfigured = SimpleLoginClient.shared.isConfigured;
+
+    NSString* title = NSLocalizedString(@"simplelogin_settings_header", @"SimpleLogin");
+    NSString* message = NSLocalizedString(@"simplelogin_settings_message", @"Enter your SimpleLogin API key from the SimpleLogin dashboard.");
+
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title
+                                                                  message:message
+                                                           preferredStyle:UIAlertControllerStyleAlert];
+
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.placeholder = NSLocalizedString(@"simplelogin_api_key_placeholder", @"Paste your SimpleLogin API key");
+        textField.secureTextEntry = YES;
+        if ( alreadyConfigured ) {
+            textField.text = [SimpleLoginClient.shared getApiKey];
+        }
+    }];
+
+    __weak AdvancedPreferencesTableViewController* weakSelf = self;
+
+    UIAlertAction *saveAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"simplelogin_verify_button", @"Save & Verify")
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * _Nonnull action) {
+        NSString* key = [alert.textFields.firstObject.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+
+        if ( key.length == 0 ) {
+            [Alerts info:weakSelf
+                   title:NSLocalizedString(@"simplelogin_error_title", @"SimpleLogin Error")
+                 message:NSLocalizedString(@"simplelogin_error_empty_key", @"Please enter an API key")];
+            return;
+        }
+
+        [SimpleLoginClient.shared setApiKey:key];
+
+        [SimpleLoginClient.shared getUserInfoWithCompletion:^(SimpleLoginUserInfo * _Nullable info, NSError * _Nullable error) {
+            if ( info ) {
+                NSString* status = info.isPremium
+                    ? [NSString stringWithFormat:NSLocalizedString(@"simplelogin_status_connected_premium_fmt", @"Connected — %@ (Premium)"), info.email]
+                    : [NSString stringWithFormat:NSLocalizedString(@"simplelogin_status_connected_fmt", @"Connected — %@"), info.email];
+
+                [Alerts info:weakSelf
+                       title:NSLocalizedString(@"simplelogin_settings_header", @"SimpleLogin")
+                     message:status];
+            }
+            else {
+                SimpleLoginError slError = error ? (SimpleLoginError)error.code : SimpleLoginErrorUnexpectedResponse;
+                NSString* errorMessage = [SimpleLoginClient localizedErrorMessage:slError];
+
+                [SimpleLoginClient.shared setApiKey:nil];
+
+                [Alerts info:weakSelf
+                       title:NSLocalizedString(@"simplelogin_error_title", @"SimpleLogin Error")
+                     message:errorMessage];
+            }
+
+            [weakSelf bindSimpleLoginStatus];
+        }];
+    }];
+
+    UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:nil];
+
+    [alert addAction:saveAction];
+
+    if ( alreadyConfigured ) {
+        UIAlertAction *removeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"simplelogin_remove_key", @"Remove Key")
+                                                               style:UIAlertActionStyleDestructive
+                                                             handler:^(UIAlertAction * _Nonnull action) {
+            [SimpleLoginClient.shared setApiKey:nil];
+            [weakSelf bindSimpleLoginStatus];
+        }];
+        [alert addAction:removeAction];
+    }
+
+    [alert addAction:cancelAction];
+
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)promptForInteger:(NSString*)title

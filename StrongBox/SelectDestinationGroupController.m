@@ -14,10 +14,10 @@
 
 @interface SelectDestinationGroupController ()
 
-@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonSelectThisDestination;
+@property (strong, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonSelectThisDestination;
 @property NSArray<Node*> *items;
 @property BrowseTableViewCellHelper* cellHelper;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddGroup;
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonAddGroup;
 
 @end
 
@@ -35,19 +35,39 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    if ( self.buttonSelectThisDestination == nil ) {
+        UIBarButtonItem* cancel = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                                                target:self
+                                                                                action:@selector(onCancel:)];
+        UIBarButtonItem* flexibleSpace1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                        target:nil
+                                                                                        action:nil];
+        self.buttonSelectThisDestination = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"moveentry_vc_move_here", @"Move Here")
+                                                                            style:UIBarButtonItemStyleDone
+                                                                           target:self
+                                                                           action:@selector(onSelectThisGroupAsDestination:)];
+        UIBarButtonItem* flexibleSpace2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                        target:nil
+                                                                                        action:nil];
+        self.buttonAddGroup = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize
+                                                                            target:self
+                                                                            action:@selector(onAddGroup:)];
+        self.toolbarItems = @[cancel, flexibleSpace1, self.buttonSelectThisDestination, flexibleSpace2, self.buttonAddGroup];
+    }
+
     self.navigationItem.title = NSLocalizedString(@"select_destination_group", @"Select Destination Group");
     self.navigationItem.prompt = [self.viewModel.database getPathDisplayString:self.currentGroup includeRootGroup:YES rootGroupNameInsteadOfSlash:YES includeFolderEmoji:YES joinedBy:@" "];
-    
+
     self.tableView.tableFooterView = [UIView new];
-    
+
     self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.viewModel tableView:self.tableView];
-    
+
     if ( self.hideAddGroupButton ) {
         [self.buttonAddGroup setEnabled:NO];
         [self.buttonAddGroup setTintColor:[UIColor clearColor]];
     }
-    
+
     if ( self.customSelectDestinationButtonTitle.length ) {
         [self.buttonSelectThisDestination setTitle:self.customSelectDestinationButtonTitle];
     }
@@ -59,14 +79,14 @@
 
 - (void)refresh {
     BrowseSortConfiguration* sortConfig = [self.viewModel getDefaultSortConfiguration];
-    
+
     self.items = [self.viewModel sortItemsForBrowse:self.currentGroup.childGroups
                                     browseSortField:sortConfig.field
                                          descending:sortConfig.descending
                                   foldersSeparately:sortConfig.foldersOnTop];
-        
+
     self.buttonSelectThisDestination.enabled = [self isValidDestination:self.currentGroup validIfContainsAValidDestination:NO];
-    
+
     [self.tableView reloadData];
 }
 
@@ -148,7 +168,19 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     Node* vm = self.items[indexPath.row];
 
-    [self performSegueWithIdentifier:@"segueRecurse" sender:vm];
+    if ( self.storyboard ) {
+        [self performSegueWithIdentifier:@"segueRecurse" sender:vm];
+    }
+    else {
+        SelectDestinationGroupController* vc = [[SelectDestinationGroupController alloc] initWithStyle:UITableViewStylePlain];
+        vc.currentGroup = vm;
+        vc.viewModel = self.viewModel;
+        vc.validateDestination = self.validateDestination;
+        vc.onSelectedDestination = self.onSelectedDestination;
+        vc.hideAddGroupButton = self.hideAddGroupButton;
+        vc.customSelectDestinationButtonTitle = self.customSelectDestinationButtonTitle;
+        [self.navigationController pushViewController:vc animated:YES];
+    }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

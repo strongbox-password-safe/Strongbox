@@ -137,7 +137,7 @@ static NSString* const kBrowseQuickViewItemCell = @"BrowseQuickViewItemCell";
             [cell setContentWithTotp:node.fields.otpToken
                    easyReadSeparator:AppPreferences.sharedInstance.twoFactorEasyReadSeparator
                    hideCountdownDigits:AppPreferences.sharedInstance.twoFactorHideCountdownDigits
-                          updateMode:TwoFactorUpdateModeAutomatic
+                          updateMode:TwoFactorUpdateModeCentralTimerNotification
                                title:title
                             subtitle:subtitle
                                 icon:self.viewModel.metadata.hideIconInBrowse ? nil : icon

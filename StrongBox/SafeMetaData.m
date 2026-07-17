@@ -1087,8 +1087,8 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 - (BOOL)mainAppAndAutoFillYubiKeyConfigsIncoherent {
     BOOL mainAppUsesYubiKey = self.yubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
-    BOOL autoFillUsesYubiKey = self.autoFillYubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
-
+    BOOL autoFillUsesYubiKey = self.autoFillYubiKeyConfig != nil && self.autoFillYubiKeyConfig.mode != kNoYubiKey;
+    
     return !(!mainAppUsesYubiKey && !autoFillUsesYubiKey) && !(mainAppUsesYubiKey && autoFillUsesYubiKey);
 }
 
@@ -1115,8 +1115,17 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 }
 
 - (void)setNextGenPrimaryYubiKeyConfig:(YubiKeyHardwareConfiguration *)nextGenPrimaryYubiKeyConfig {
+#ifndef IS_APP_EXTENSION
     self.yubiKeyConfig = nextGenPrimaryYubiKeyConfig;
+
+    BOOL autoFillConfigIsUnsetOrMatched = self.autoFillYubiKeyConfig == nil || [self.autoFillYubiKeyConfig isEqual:self.yubiKeyConfig];
+
+    if (autoFillConfigIsUnsetOrMatched) {
+        self.autoFillYubiKeyConfig = nextGenPrimaryYubiKeyConfig;
+    }
+#else
     self.autoFillYubiKeyConfig = nextGenPrimaryYubiKeyConfig;
+#endif
 }
 
 

@@ -13,6 +13,7 @@ struct TwoFactorCodeView: View {
     @State private var totpString: String
     @State private var totpStringPair: [String]
     @State private var totpColor: Color
+    @State private var lastCounter: UInt64
 
     var totp: OTPToken
     var updateMode: TwoFactorUpdateMode
@@ -48,6 +49,7 @@ struct TwoFactorCodeView: View {
         totpString = displayValues.totpString
         totpStringPair = displayValues.totpStringPair
         totpColor = displayValues.totpColor
+        _lastCounter = State(initialValue: totp.counter)
     }
 
     var body: some View {
@@ -109,19 +111,44 @@ struct TwoFactorCodeView: View {
     }
 
     func updateTotp() {
-        let displayValues = OTPToken.getTotpDisplayValues(from: totp, colorize: colorize)
+        let currentCounter = totp.counter
 
-        totpString = displayValues.totpString
-        totpStringPair = displayValues.totpStringPair
-        totpColor = displayValues.totpColor
+        if currentCounter != lastCounter {
+            let displayValues = OTPToken.getTotpDisplayValues(from: totp, colorize: colorize)
+
+            totpString = displayValues.totpString
+            totpStringPair = displayValues.totpStringPair
+            lastCounter = currentCounter
+        } else if easyReadSeparator, totpStringPair.isEmpty {
+            totpStringPair = splitTotp(totpString)
+        }
+
+        if colorize, let color = totp.color {
+            #if os(iOS) || os(watchOS)
+                totpColor = Color(uiColor: color)
+            #else
+                totpColor = Color(nsColor: color)
+            #endif
+        } else {
+            totpColor = .primary
+        }
+    }
+
+    private func splitTotp(_ code: String) -> [String] {
+        guard code.count > 5, code.count % 2 == 0 else {
+            return []
+        }
+
+        let midIndex = code.index(code.startIndex, offsetBy: code.count / 2)
+        return [String(code[..<midIndex]), String(code[midIndex...])]
     }
 }
 
 @available(iOS 16.0, *)
 #Preview {
-    let otpAuthUrl = "otpauth:
+    let otpAuthUrl = "otpauth://totp/Timely:Kimberely%20Schimke?secret=2Y&algorithm=SHA1&digits=6&period=30&issuer=Timely"
 
     let token = OTPToken(url: URL(string: otpAuthUrl))!
 
-    return TwoFactorCodeView(totp: token, updateMode: .automatic, easyReadSeparator: true, isPro: true, limitNonPro: true, colorize: true)
+    return TwoFactorCodeView(totp: token, updateMode: .centralTimerNotification, easyReadSeparator: true, isPro: true, limitNonPro: true, colorize: true)
 }

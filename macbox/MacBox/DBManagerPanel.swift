@@ -9,8 +9,8 @@
 import Cocoa
 
 class DBManagerPanel: NSWindowController {
-    @objc
-    static let sharedInstance: DBManagerPanel = .instantiateFromStoryboard()
+    
+    @objc static let sharedInstance: DBManagerPanel = .instantiateFromStoryboard()
 
     private class func instantiateFromStoryboard() -> DBManagerPanel {
         let storyboard = NSStoryboard(name: "DatabasesManager", bundle: nil)
@@ -18,31 +18,24 @@ class DBManagerPanel: NSWindowController {
         return wc
     }
 
-    @objc
-    public func show() {
-        
-
+    @objc public func show() {
         showWindow(nil)
+        window?.makeKeyAndOrderFront(nil)
     }
 
-    @objc
-    public func showAndBeginAddDatabaseSequence(createMode: Bool, newModel: DatabaseModel? = nil) {
-        
-
+    @objc public func showAndBeginAddDatabaseSequence(createMode: Bool, newModel: DatabaseModel? = nil) {
         showWindow(nil)
-
+        window?.makeKeyAndOrderFront(nil)
+        
         guard let vc = contentViewController as? DatabasesManagerVC else {
             swlog("🔴 Could not get contentviewcontroller?! for DBManager")
             return
         }
-
+        
         vc.beginAddDatabaseSequence(createMode, newModel: newModel, existingDatabaseToCopy: nil)
     }
 
-    @objc
-    public func hide() {
-        
-
+    @objc public func hide() {
         window?.orderOut(nil)
     }
 }

@@ -29,7 +29,7 @@ import RevenueCat
             updateStatus()
         }
     }
-    private static var currentOffering: Offering? = nil
+    public static var currentOffering: Offering? = nil
     private static let syncInfoKey = "sync_info_key__"
     private static let restoreKey = "restore_info_key__"
     private static let defaultOfferingIdentifier = "default"
@@ -45,7 +45,8 @@ import RevenueCat
     
     @objc public static func initializeRevenueCat(
         key: String,
-        tipIdentifiers: [String] = []
+        tipIdentifiers: [String] = [],
+        collectAdServicesAttribution: Bool = false
     ) {
         Purchases.configure(
             withAPIKey: key,
@@ -53,6 +54,12 @@ import RevenueCat
             purchasesAreCompletedBy: .revenueCat,
             storeKitVersion: .storeKit1
         )
+
+        #if os(iOS)
+        if collectAdServicesAttribution, #available(iOS 14.3, *) {
+            Purchases.shared.attribution.enableAdServicesAttributionTokenCollection()
+        }
+        #endif
 
         print("🐱 RevenueCat \(Purchases.shared.appUserID)")
 
@@ -63,7 +70,11 @@ import RevenueCat
 
         Task {
             if !Purchases.shared.appUserID.contains("$RCAnonymousID") {
-                latestPurchaserInfo = try? await Purchases.shared.logOut()
+                
+                
+                
+                _ = try? await Purchases.shared.logOut()
+                UserDefaults.standard.set(false, forKey: restoreKey)
             }
             self.latestPurchaserInfo = try? await Purchases.shared.customerInfo()
             print("🐱 Info fetched \(self.latestPurchaserInfo)")
@@ -129,6 +140,12 @@ import RevenueCat
         }
     }
     
+    @objc public static func setProperties(
+        props: [String: String]
+    ) {
+        Purchases.shared.attribution.setAttributes(props)
+    }
+    
     @objc public static func availableProducts() -> [String: SKProduct] {
         guard let offering = currentOffering else { return [:] }
         
@@ -142,8 +159,11 @@ import RevenueCat
         return products
     }
     
-    private static func getPackage(for productType: ProductType) -> Package? {
+    public static func getPackage(for productType: ProductType) -> Package? {
         guard let offering = currentOffering else { return nil }
+    
+        
+        
         
         
         if let package = offering.package(identifier: productType.rawValue) {
@@ -182,6 +202,11 @@ import RevenueCat
     }
     
     
+    @objc public static func hasAnnualTrialEligibility() async -> Bool {
+        guard let yearlyProduct = currentOffering?.annual else { return false }
+        let status = await Purchases.shared.checkTrialOrIntroDiscountEligibility(product: yearlyProduct.storeProduct)
+        return status == .eligible
+    }
     
     @objc public static func hasActiveYearlySubscription() -> Bool {
         guard let entitlements = latestPurchaserInfo?.entitlements else { return false }
@@ -244,21 +269,88 @@ import RevenueCat
         
         let yearlyPackage = getPackage(for: .yearly)
         let monthlyPackage = getPackage(for: .monthly)
-        
+
         
         if let yearlyProduct = yearlyPackage?.storeProduct.sk1Product,
            let intro = yearlyProduct.introductoryPrice,
            intro.price.compare(NSDecimalNumber.zero) == .orderedSame {
             return true
         }
-        
+
         if let monthlyProduct = monthlyPackage?.storeProduct.sk1Product,
            let intro = monthlyProduct.introductoryPrice,
            intro.price.compare(NSDecimalNumber.zero) == .orderedSame {
             return true
         }
-        
+
         return false
+    }
+
+    
+    
+    @objc public static func freeTrialDurationText() -> String? {
+        guard let yearlyPackage = getPackage(for: .yearly),
+              let yearlyProduct = yearlyPackage.storeProduct.sk1Product,
+              let intro = yearlyProduct.introductoryPrice,
+              intro.paymentMode == .freeTrial || intro.price.compare(NSDecimalNumber.zero) == .orderedSame else {
+            return nil
+        }
+        let period = intro.subscriptionPeriod
+
+        return localizedDuration(from: period)
+    }
+
+    private static func localizedDuration(from period: SKProductSubscriptionPeriod) -> String? {
+        guard period.numberOfUnits > 0 else { return nil }
+
+        
+        if period.numberOfUnits == 1 {
+            return singularUnitName(for: period.unit)
+        }
+
+        
+        let components = DateComponents(
+            year: period.unit == .year ? period.numberOfUnits : nil,
+            month: period.unit == .month ? period.numberOfUnits : nil,
+            day: period.unit == .day ? period.numberOfUnits : nil,
+            weekOfMonth: period.unit == .week ? period.numberOfUnits : nil
+        )
+
+        let allowedUnit: NSCalendar.Unit
+        switch period.unit {
+        case .day:
+            allowedUnit = .day
+        case .week:
+            allowedUnit = .weekOfMonth
+        case .month:
+            allowedUnit = .month
+        case .year:
+            allowedUnit = .year
+        @unknown default:
+            return nil
+        }
+
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = allowedUnit
+        formatter.unitsStyle = .full
+        formatter.maximumUnitCount = 1
+
+        return formatter.string(from: components)
+    }
+
+    private static func singularUnitName(for unit: SKProduct.PeriodUnit) -> String {
+        switch unit {
+        case .day:
+            return NSLocalizedString("duration_singular_day", comment: "day")
+        case .week:
+            return NSLocalizedString("duration_singular_week", comment: "week")
+        case .month:
+            return NSLocalizedString("duration_singular_month", comment: "month")
+        case .year:
+            return NSLocalizedString("duration_singular_year", comment: "year")
+        @unknown default:
+            return ""
+        }
     }
 
     
@@ -271,9 +363,12 @@ import RevenueCat
                 print("🐱 Restoring Purchases")
                 do {
                     let latestInfo = try await Purchases.shared.restorePurchases()
-                    latestPurchaserInfo = latestInfo
+                    
+                    
+                    
                     defaults.set(true, forKey: restoreKey)
                     defaults.synchronize()
+                    latestPurchaserInfo = latestInfo
                     _ = try? await Purchases.shared.syncPurchases()
                 } catch { }
             } else {
@@ -294,31 +389,60 @@ import RevenueCat
         }
     }
 
+    enum SubscriptionStatusPush: Equatable {
+        case push(pro: Bool)
+        case suppress
+    }
+
+    
+    
+    
+    static func statusPushDecision(isActive: Bool, hasCompletedRestore: Bool) -> SubscriptionStatusPush {
+        if !isActive, !hasCompletedRestore {
+            return .suppress
+        }
+
+        return .push(pro: isActive)
+    }
+
     static func updateStatus() {
-        let entitlementsKeys = Entitlement.allCases.map(\.rawValue)
-        let isEntitled = latestPurchaserInfo?.entitlements.active.keys.contains(where: { entitlementsKeys.contains($0) })
-        onSubscriptionUpdated?(isEntitled ?? false)
+        
+        
+        let decision = statusPushDecision(isActive: isActive(),
+                                          hasCompletedRestore: UserDefaults.standard.bool(forKey: restoreKey))
+
+        switch decision {
+        case .suppress:
+            return
+        case let .push(pro):
+            onSubscriptionUpdated?(pro)
+        }
     }
 
     
 
     @objc public static func restorePurchases(withCompletion completion: @escaping (NSError?) -> Void) {
         Purchases.shared.restorePurchases { purchaserInfo, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    completion(error as NSError)
-                } else {
-                    if let info = purchaserInfo {
-                        latestPurchaserInfo = info
+            Purchases.shared.syncPurchases { syncInfo, error in
+                DispatchQueue.main.async {
+                    if let error = error {
+                        completion(error as NSError)
+                    } else {
+                        if let info = syncInfo {
+                            
+                            
+                            
+                            UserDefaults.standard.set(true, forKey: restoreKey)
+                            latestPurchaserInfo = info
+                        }
+                        completion(nil)
                     }
-                    completion(nil)
                 }
             }
         }
     }
 
     
-
     @objc public static func purchaseProduct(_ product: SKProduct, completion: @escaping (NSError?) -> Void) {
         Purchases.shared.purchase(
             product: StoreProduct(sk1Product: product)

@@ -90,6 +90,7 @@ struct BitwardenIdentity: Decodable {
 
 struct BitwardenLogin: Decodable {
     var uris: [BitwardenUri?]?
+    var fido2Credentials: [BitwardenFido2Credential?]?
     var username: String?
     var password: String?
     var totp: String?
@@ -97,4 +98,20 @@ struct BitwardenLogin: Decodable {
 
 struct BitwardenUri: Decodable {
     var uri: String?
+}
+
+struct BitwardenFido2Credential: Decodable {
+    var credentialId: String?
+    var keyType: String?
+    var keyAlgorithm: String?
+    var keyCurve: String?
+    var keyValue: String?
+    var rpId: String?
+    var counter: String?
+    var discoverable: String?
+    var creationDate: Date?
+    var userHandle: String?
+    var userName: String?
+    var rpName: String?
+    var userDisplayName: String?
 }

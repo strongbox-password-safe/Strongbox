@@ -16,11 +16,13 @@
 @implementation MacCustomizationManager
 
 + (void)applyCustomizations {
-    if ( [self isAProBundle] ) {
-
+    if ( [self isAProBundle] || [self isSetapp] ) {
+        slog(@"Pro Bundle... customizing...");
         [Settings.sharedInstance setPro:YES];
+    } else {
+        slog(@"Not Pro Bundle");
     }
-    
+
     if ( StrongboxProductBundle.isZeroEdition ) {
         slog(@"Graphene Edition... customizing...");
         
@@ -45,6 +47,10 @@
 
 + (BOOL)isAProBundle {
     return StrongboxProductBundle.isAProBundle;
+}
+
++ (BOOL)isSetapp {
+    return StrongboxProductBundle.isSetapp;
 }
 
 + (BOOL)isUnifiedFreemiumBundle {

@@ -15,6 +15,7 @@ struct CreditCardData {
     var issueNumber: String = ""
     var customFields: [[String: String]] = []
     var notes: String = ""
+    var tags: Set<String> = []
     
     
     var numberConcealed: Bool = false
@@ -52,6 +53,7 @@ extension CreditCardData {
         copy.issueNumber = self.issueNumber
         copy.customFields = self.customFields
         copy.notes = self.notes
+        copy.tags = self.tags
         copy.numberConcealed = self.numberConcealed
         copy.verificationNumberConcealed = self.verificationNumberConcealed
         copy.pinConcealed = self.pinConcealed
@@ -62,20 +64,21 @@ extension CreditCardData {
     }
     
     func isEqual(to other: CreditCardData) -> Bool {
-        return self.name == other.name &&
-               self.cardholderName == other.cardholderName &&
-               self.cardType == other.cardType &&
-               self.number == other.number &&
-               self.verificationNumber == other.verificationNumber &&
-               self.expiryDate == other.expiryDate &&
-               self.validFrom == other.validFrom &&
-               self.pin == other.pin &&
-               self.creditLimit == other.creditLimit &&
-               self.cashWithdrawalLimit == other.cashWithdrawalLimit &&
-               self.interestRate == other.interestRate &&
-               self.issueNumber == other.issueNumber &&
-               self.customFields.elementsEqual(other.customFields, by: { $0 == $1 }) &&
-               self.notes == other.notes
+        self.name == other.name &&
+        self.cardholderName == other.cardholderName &&
+        self.cardType == other.cardType &&
+        self.number == other.number &&
+        self.verificationNumber == other.verificationNumber &&
+        self.expiryDate == other.expiryDate &&
+        self.validFrom == other.validFrom &&
+        self.pin == other.pin &&
+        self.creditLimit == other.creditLimit &&
+        self.cashWithdrawalLimit == other.cashWithdrawalLimit &&
+        self.interestRate == other.interestRate &&
+        self.issueNumber == other.issueNumber &&
+        self.customFields.elementsEqual(other.customFields, by: { $0 == $1 }) &&
+        self.notes == other.notes &&
+        self.tags.elementsEqual(other.tags, by: { $0 == $1 })
     }
 }
 

@@ -286,7 +286,7 @@ class SwiftUIAutoFillHelper: NSObject {
         }
 
         if entry.fields.url.count == 0 {
-            entry.fields.url = String(format: "https:
+            entry.fields.url = String(format: "https://%@", passkey.relyingPartyId)
         }
 
         entry.touch(true)
@@ -304,7 +304,7 @@ class SwiftUIAutoFillHelper: NSObject {
         node.passkey = passkey
         node.icon = NodeIcon.withPreset(58) 
 
-        node.fields.url = String(format: "https:
+        node.fields.url = String(format: "https://%@", passkey.relyingPartyId)
         node.fields.username = passkey.username
 
         if !model.addChildren([node], destination: group) {

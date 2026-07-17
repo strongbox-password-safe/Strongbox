@@ -226,6 +226,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)addTagToItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
 - (BOOL)removeTagFromItems:(NSArray<NSUUID *> *)ids tag:(NSString *)tag;
 
+- (BOOL)mergeNode:(Node *)source
+         intoNode:(Node *)destination
+mergeLocationChangedDate:(BOOL)mergeLocationChangedDate
+   includeHistory:(BOOL)includeHistory
+    allowOverwrite:(BOOL)allowOverwrite;
+
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 
 @end

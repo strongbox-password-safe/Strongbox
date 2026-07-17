@@ -168,14 +168,16 @@
 }
 
 - (void)updateConvenienceUnlockTab:(NSTabViewItem*)convenienceUnlockItem {
-    BOOL pinEnabled = self.viewModel.databaseMetadata.conveniencePin != nil;
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL showBiometricTab = watchAvailable || touchAvailable;
     
-    if (pinEnabled) {
-        convenienceUnlockItem.label = NSLocalizedString(@"pin_code_tab_title", @"Pin Code");
-        convenienceUnlockItem.image = [NSImage imageNamed:@"keypad"];
-    } else {
+    if (showBiometricTab) {
         convenienceUnlockItem.label = NSLocalizedString(@"touchid_tab_title", @"Touch ID");
         convenienceUnlockItem.image = [NSImage imageWithSystemSymbolName:@"touchid" accessibilityDescription:@"Touch ID"];
+    } else {
+        convenienceUnlockItem.label = NSLocalizedString(@"pin_code_tab_title", @"Pin Code");
+        convenienceUnlockItem.image = [NSImage imageNamed:@"keypad"];
     }
 }
 

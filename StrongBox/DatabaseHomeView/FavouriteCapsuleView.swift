@@ -20,7 +20,7 @@ struct FavouriteCapsuleView: View {
 
     var body: some View {
         Button(action: {
-            model.actions.navigateTo(destination: .entryDetail(uuid: entry.uuid), homeModel: model)
+            model.navigateTo(destination: .entryDetail(uuid: entry.uuid, search: true))
         }, label: {
             HStack {
                 if model.showIcons {

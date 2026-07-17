@@ -10,6 +10,16 @@
 #import "NSArray+Extensions.h"
 #import "Utils.h"
 
+#if TARGET_OS_IOS
+#import "AppPreferences.h"
+#endif
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 static NSString* const kAllSymbols = @"+-=_@#$%^&;:,.<>/~\\[](){}?!|*'\"";
 static NSString* const kAllUppercase = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static NSString* const kAllLowercase = @"abcdefghijklmnopqrstuvwxyz";
@@ -42,6 +52,12 @@ static NSString* const kEmojis = @"😀😃😄😁😆😅";
 @property NSArray<NSString*> *surnamesCache;
 
 @property NSSet<NSString*>* commonPasswordsSetCache;
+
+#if TARGET_OS_IOS
+- (void)generateSimpleLoginAlias:(UIViewController *)viewController
+                        hostname:(NSString * _Nullable)hostname
+                          action:(void (^)(NSString * _Nonnull))action;
+#endif
 
 @end
 
@@ -144,17 +160,25 @@ const static NSArray<NSString*> *kEmailDomains;
 - (void)promptWithUsernameSuggestions:(UIViewController *)viewController
                                config:(PasswordGenerationConfig *)config
                                action:(void (^)(NSString * _Nonnull))action {
-    [self promptWithSuggestions:viewController usernamesOnly:YES config:config action:action];
+    [self promptWithUsernameSuggestions:viewController hostname:nil config:config action:action];
+}
+
+- (void)promptWithUsernameSuggestions:(UIViewController *)viewController
+                             hostname:(NSString * _Nullable)hostname
+                               config:(PasswordGenerationConfig *)config
+                               action:(void (^)(NSString * _Nonnull))action {
+    [self promptWithSuggestions:viewController usernamesOnly:YES hostname:hostname config:config action:action];
 }
 
 - (void)promptWithSuggestions:(UIViewController *)viewController
                        config:(PasswordGenerationConfig *)config
                        action:(void (^)(NSString * _Nonnull))action {
-    [self promptWithSuggestions:viewController usernamesOnly:NO config:config action:action];
+    [self promptWithSuggestions:viewController usernamesOnly:NO hostname:nil config:config action:action];
 }
 
 - (void)promptWithSuggestions:(UIViewController *)viewController
                 usernamesOnly:(BOOL)usernamesOnly
+                     hostname:(NSString * _Nullable)hostname
                        config:(PasswordGenerationConfig *)config
                        action:(void (^)(NSString * _Nonnull))action {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -211,24 +235,72 @@ const static NSArray<NSString*> *kEmailDomains;
         UIAlertAction *regenAction = [UIAlertAction actionWithTitle:loc
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) {
-            [self promptWithSuggestions:viewController usernamesOnly:usernamesOnly config:config action:action];
+            [self promptWithSuggestions:viewController usernamesOnly:usernamesOnly hostname:hostname config:config action:action];
         }];
         [regenAction setValue:UIColor.systemGreenColor forKey:@"titleTextColor"];
 
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { }];
-            
+
         [alertController addAction:firstSuggestion];
         [alertController addAction:secondAction];
         [alertController addAction:thirdAction];
         [alertController addAction:fourthAction];
         [alertController addAction:fifthAction];
+
+        if ( SimpleLoginClient.shared.isConfigured && !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+            NSString* slTitle = NSLocalizedString(@"simplelogin_generate_alias", @"Generate Email Alias...");
+            UIAlertAction *simpleLoginAction = [UIAlertAction actionWithTitle:slTitle
+                                                                       style:UIAlertActionStyleDefault
+                                                                     handler:^(UIAlertAction *a) {
+                [self generateSimpleLoginAlias:viewController hostname:hostname action:action];
+            }];
+            [simpleLoginAction setValue:UIColor.systemBlueColor forKey:@"titleTextColor"];
+            [alertController addAction:simpleLoginAction];
+        }
+
         [alertController addAction:regenAction];
 
         [alertController addAction:cancelAction];
-            
+
         [viewController presentViewController:alertController animated:YES completion:nil];
+    });
+}
+
+- (void)generateSimpleLoginAlias:(UIViewController *)viewController
+                        hostname:(NSString * _Nullable)hostname
+                          action:(void (^)(NSString * _Nonnull))action {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *spinner = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"simplelogin_generating_alias", @"Generating Alias...")
+                                                                        message:nil
+                                                                 preferredStyle:UIAlertControllerStyleAlert];
+
+        [viewController presentViewController:spinner animated:YES completion:^{
+            NSString* extractedHostname = [SimpleLoginClient extractHostnameFrom:hostname];
+
+            [SimpleLoginClient.shared createRandomAliasWithHostname:extractedHostname
+                                                               note:nil
+                                                         completion:^(SimpleLoginAlias * _Nullable alias, NSError * _Nullable error) {
+                [spinner dismissViewControllerAnimated:YES completion:^{
+                    if ( alias ) {
+                        action(alias.email);
+                    }
+                    else {
+                        SimpleLoginError slError = error ? (SimpleLoginError)error.code : SimpleLoginErrorUnexpectedResponse;
+                        NSString* message = [SimpleLoginClient localizedErrorMessage:slError];
+
+                        UIAlertController *errorAlert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"simplelogin_error_title", @"SimpleLogin Error")
+                                                                                           message:message
+                                                                                    preferredStyle:UIAlertControllerStyleAlert];
+                        [errorAlert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"generic_ok", @"OK")
+                                                                      style:UIAlertActionStyleDefault
+                                                                    handler:nil]];
+                        [viewController presentViewController:errorAlert animated:YES completion:nil];
+                    }
+                }];
+            }];
+        }];
     });
 }
 

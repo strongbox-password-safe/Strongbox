@@ -14,9 +14,9 @@ class WhatIsMarkdownViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        moreInfoLink.href = "https:
+        moreInfoLink.href = "https://www.markdownguide.org/getting-started"
         moreInfoLink.onClicked = {
-            NSWorkspace.shared.open(URL(string: "https:
+            NSWorkspace.shared.open(URL(string: "https://www.markdownguide.org/getting-started")!)
         }
     }
 }

@@ -243,11 +243,23 @@
 }
 
 - (void)showUpgradeScreenIfAppropriate {
-    if ( CustomizationManager.isAProBundle || ( AppPreferences.sharedInstance.isPro && ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro )) {
+    if (CustomizationManager.isAProBundle || AppPreferences.sharedInstance.isPro) {
         return;
     }
     
-    [self performSegueWithIdentifier:@"segueToUpgradeScreen" sender:nil];
+    if (
+        ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro ||
+        ProUpgradeIAPManager.sharedInstance.hasSetapp
+    ) {
+        return;
+    }
+    
+    
+    #if SUBSCRIPTIONS
+    [[SuperwallService shared] presentWithCampaign:SuperwallCampaignSettings completion:^(BOOL subscribed) {
+        
+    }];
+    #endif
 }
 
 - (void)bindVersionAndProStatus {
@@ -280,6 +292,9 @@
                 self.labelProStatus.text = NSLocalizedString(@"pro_status_lifetime_pro_iap", @"Lifetime Pro (In-App Purchase)");
                 self.cellProStatus.accessoryType = UITableViewCellAccessoryNone;
                 self.cellProStatus.selectionStyle = UITableViewCellSelectionStyleNone;
+            }
+            else if ( ProUpgradeIAPManager.sharedInstance.hasSetapp) {
+                self.labelProStatus.text = NSLocalizedString(@"pro_status_setapp", @"Setapp");
             }
             else if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription ){
                 self.labelProStatus.text = NSLocalizedString(@"pro_status_yearly_pro", @"Pro (Yearly subscription)");
@@ -331,7 +346,7 @@
 
 
 
-        NSURL* url = [NSURL URLWithString:@"https:
+        NSURL* url = [NSURL URLWithString:@"https://strongboxsafe.com/support/"];
         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
 
 }

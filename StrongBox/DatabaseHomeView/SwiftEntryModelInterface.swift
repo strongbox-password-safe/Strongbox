@@ -16,6 +16,7 @@ protocol SwiftItemModelInterface: Comparable, Identifiable where ID == UUID {
     var title: String { get }
     var image: IMAGE_TYPE_PTR { get }
     var isGroup: Bool { get }
+    var isCreditCard: Bool { get }
 }
 
 protocol SwiftGroupModelInterface: SwiftItemModelInterface {}

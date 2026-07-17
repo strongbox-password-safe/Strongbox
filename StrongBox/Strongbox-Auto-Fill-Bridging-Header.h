@@ -48,3 +48,5 @@
 #import "EncryptionPreferencesViewController.h"
 #import "CASGTableViewController.h"
 #import "ColoredStringHelper.h"
+#import "PasswordMaker.h"
+#import "SecretStore.h"

@@ -10,6 +10,7 @@ import Foundation
 @objc
 public class BrowserAutoFillManager: NSObject {
     private static let domainParser: DomainParser! = getParser()
+    private static let wwwPrefix = "www."
 
     class func getParser() -> DomainParser? {
         do {
@@ -50,6 +51,129 @@ public class BrowserAutoFillManager: NSObject {
         }
     }
 
+    private class func extractRawHost(url: String) -> String? {
+        if let urlProcessed = url.urlExtendedParseAddingDefaultScheme,
+           let components = URLComponents(url: urlProcessed, resolvingAgainstBaseURL: false),
+           let host = components.host
+        {
+            return host.lowercased()
+        }
+
+        let trimmed = url.trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased()
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
+    private class func normalizeHost(_ host: String) -> String {
+        host.trimmingCharacters(in: CharacterSet(charactersIn: ".")).lowercased()
+    }
+
+    private class func extractMatchingHost(url: String) -> String? {
+        guard let host = extractRawHost(url: url) else {
+            return nil
+        }
+
+        let normalized = normalizeHost(host)
+        return normalized.isEmpty ? nil : normalized
+    }
+
+    private class func getHostComponents(_ host: String) -> [String] {
+        host.split(separator: ".").map(String.init)
+    }
+
+    private class func isHostSuffixMatch(candidateHost: String, targetHost: String) -> Bool {
+        if candidateHost == targetHost {
+            return true
+        }
+
+        return targetHost.hasSuffix(".\(candidateHost)")
+    }
+
+    private class func getHostMatchRank(candidateHost: String, targetHost: String) -> Int {
+        guard isHostSuffixMatch(candidateHost: candidateHost, targetHost: targetHost) else {
+            return 0
+        }
+
+        let labelCount = getHostComponents(candidateHost).count
+        return candidateHost == targetHost ? 10_000 + labelCount : labelCount
+    }
+
+    private class func getRegistrableDomain(host: String) -> String? {
+        if let parsedHost = domainParser.parse(host: host),
+           let domain = parsedHost.domain
+        {
+            return normalizeHost(domain.lowercased())
+        }
+
+        
+        
+        let components = getHostComponents(host)
+        guard components.count >= 2 else {
+            return nil
+        }
+
+        return components.suffix(2).joined(separator: ".")
+    }
+
+    private class func getImmediateWwwEquivalent(host: String) -> String? {
+        guard let registrableDomain = getRegistrableDomain(host: host) else {
+            return nil
+        }
+
+        if host == registrableDomain {
+            return "\(wwwPrefix)\(registrableDomain)"
+        }
+
+        if host == "\(wwwPrefix)\(registrableDomain)" {
+            return registrableDomain
+        }
+
+        return nil
+    }
+
+    private class func getAllowedHosts(url: String, subdomainMatching: Bool) -> [String] {
+        guard let exactHost = extractMatchingHost(url: url) else {
+            return []
+        }
+
+        var allowedHosts = [String]()
+        var seenHosts = Set<String>()
+
+        func appendAllowedHost(_ host: String) {
+            guard seenHosts.insert(host).inserted else {
+                return
+            }
+
+            allowedHosts.append(host)
+
+            if let equivalentHost = getImmediateWwwEquivalent(host: host),
+               seenHosts.insert(equivalentHost).inserted
+            {
+                allowedHosts.append(equivalentHost)
+            }
+        }
+
+        guard subdomainMatching, let registrableDomain = getRegistrableDomain(host: exactHost) else {
+            appendAllowedHost(exactHost)
+            return allowedHosts
+        }
+
+        let exactComponents = getHostComponents(exactHost)
+        let registrableComponents = getHostComponents(registrableDomain)
+
+        guard exactComponents.count > registrableComponents.count else {
+            appendAllowedHost(exactHost)
+            return allowedHosts
+        }
+
+        appendAllowedHost(exactHost)
+
+        for index in 1...(exactComponents.count - registrableComponents.count) {
+            appendAllowedHost(exactComponents[index...].joined(separator: "."))
+        }
+
+        return allowedHosts
+    }
+
     @objc class func getAssociatedDomains(url: String) -> Set<String> {
         let domain = extractPSLDomainFromUrl(url: url)
 
@@ -70,12 +194,19 @@ public class BrowserAutoFillManager: NSObject {
         return equivs
     }
 
-    @objc class func getMatchingNodes(url: String, domainNodeMap: [String: Set<UUID>]) -> Set<UUID> {
+    @objc(getMatchingNodesWithUrl:domainNodeMap:)
+    class func getMatchingNodes(url: String, domainNodeMap: [String: Set<UUID>]) -> Set<UUID> {
+        getMatchingNodes(url: url, domainNodeMap: domainNodeMap, subdomainMatching: true)
+    }
+
+    @objc(getMatchingNodesWithUrl:domainNodeMap:subdomainMatching:)
+    class func getMatchingNodes(url: String, domainNodeMap: [String: Set<UUID>], subdomainMatching: Bool) -> Set<UUID> {
 
 
-        let domain = extractPSLDomainFromUrl(url: url)
-
-        let ret: Set<UUID> = domainNodeMap[domain] ?? Set()
+        let allowedHosts = getAllowedHosts(url: url, subdomainMatching: subdomainMatching)
+        let ret = allowedHosts.reduce(into: Set<UUID>()) { partialResult, host in
+            partialResult.formUnion(domainNodeMap[host] ?? Set())
+        }
 
 
 
@@ -96,16 +227,16 @@ public class BrowserAutoFillManager: NSObject {
         for node in all {
             let uniqueUrls = AutoFillCommon.getUniqueUrls(forNode: model, node: node)
 
-            let domains = Set(uniqueUrls.map { extractPSLDomainFromUrl(url: $0) })
+            let hosts = Set(uniqueUrls.compactMap { extractMatchingHost(url: $0) })
 
-            for domain in domains {
-                mutableRet[domain, default: Set<UUID>()].insert(node.uuid)
+            for host in hosts {
+                mutableRet[host, default: Set<UUID>()].insert(node.uuid)
             }
         }
 
         let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
 
-        swlog("🐞 ⏱ loadDomainNodeMap: Loaded \(mutableRet.count) domains from \(all.count) entries in \(timeElapsed) s.")
+        swlog("🐞 ⏱ loadDomainNodeMap: Loaded \(mutableRet.count) hosts from \(all.count) entries in \(timeElapsed) s.")
 
         return mutableRet
     }
@@ -151,9 +282,9 @@ public class BrowserAutoFillManager: NSObject {
 
             
 
-            let targetDomain = extractFullDomainFromUrl(url: url)
-            let fullDomain1 = extractFullDomainFromUrl(url: node1.fields.url)
-            let fullDomain2 = extractFullDomainFromUrl(url: node2.fields.url)
+            let targetDomain = extractMatchingHost(url: url) ?? extractFullDomainFromUrl(url: url)
+            let fullDomain1 = extractMatchingHost(url: node1.fields.url) ?? extractFullDomainFromUrl(url: node1.fields.url)
+            let fullDomain2 = extractMatchingHost(url: node2.fields.url) ?? extractFullDomainFromUrl(url: node2.fields.url)
 
             if fullDomain1 != fullDomain2 { 
                 if fullDomain1 == targetDomain {
@@ -164,6 +295,13 @@ public class BrowserAutoFillManager: NSObject {
                 if fullDomain2 == targetDomain {
                     
                     return .orderedDescending
+                }
+
+                let hostMatchRank1 = getHostMatchRank(candidateHost: fullDomain1, targetHost: targetDomain)
+                let hostMatchRank2 = getHostMatchRank(candidateHost: fullDomain2, targetHost: targetDomain)
+
+                if hostMatchRank1 != hostMatchRank2 {
+                    return hostMatchRank1 > hostMatchRank2 ? .orderedAscending : .orderedDescending
                 }
 
                 

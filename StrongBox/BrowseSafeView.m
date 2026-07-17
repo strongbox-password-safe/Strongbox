@@ -73,6 +73,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonMove; 
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonDelete; 
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *exportItemsBarButton;  
+@property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonMerge;  
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
 
 @property UIBarButtonItem* moreiOS14Button;
@@ -207,7 +208,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     
     if(self.isMovingFromParentViewController) { 
-                                                
+        
         [self onClosed];
     }
 }
@@ -232,6 +233,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         NSLocalizedString(@"browse_vc_search_scope_tags", @"Tags"),
         NSLocalizedString(@"browse_vc_search_scope_all", @"All")
     ];
+
+    self.searchController.searchBar.selectedScopeButtonIndex = AppPreferences.sharedInstance.initialSearchScope;
 }
 
 - (void)didPresentSearchController:(UISearchController *)searchController {
@@ -268,7 +271,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         });
     }
     
-    self.parentSplitViewController.hasDoneDatabaseOnLaunchTasks = YES; 
+    self.parentSplitViewController.hasDoneDatabaseOnLaunchTasks = YES;
     
     if ( self.splitViewController.isCollapsed ) {
         
@@ -316,7 +319,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self refresh];
     
     [self listenToNotifications];
-        
+    
     [self performOnboardingDatabaseChangeRequests];
 }
 
@@ -358,8 +361,22 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)customizeUi {
-    self.extendedLayoutIncludesOpaqueBars = YES;
-    self.edgesForExtendedLayout = UIRectEdgeTop | UIRectEdgeBottom;
+    if (@available(iOS 26, *)) {
+        self.extendedLayoutIncludesOpaqueBars = YES;
+        self.edgesForExtendedLayout = UIRectEdgeTop | UIRectEdgeBottom;
+    } else {
+        self.extendedLayoutIncludesOpaqueBars = NO;
+        self.edgesForExtendedLayout = UIRectEdgeTop;
+        
+        UIToolbar *tb = self.navigationController.toolbar;
+        UIToolbarAppearance *appearance = [[UIToolbarAppearance alloc] init];
+
+        
+        [appearance configureWithOpaqueBackground];
+
+        tb.standardAppearance = appearance;
+        tb.compactAppearance = appearance;
+    }
     self.definesPresentationContext = YES;
     
     [self setupTableview];
@@ -487,9 +504,25 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     BOOL ro = self.viewModel.isReadOnly;
     BOOL moveAndDeleteEnabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
     BOOL exportEnabled = self.isItemsCanBeExported && self.tableView.indexPathsForSelectedRows.count > 0;
+    BOOL mergeEnabled = NO;
+
+    NSArray<NSIndexPath*> *selectedRows = self.tableView.indexPathsForSelectedRows;
+    if (selectedRows && selectedRows.count == 2) {
+        NSArray<Node *> *itemsToMerge = [self getSelectedItems:selectedRows];
+        if (itemsToMerge.count == 2) {
+            Node* lhItem = itemsToMerge[0];
+            Node* rhItem = itemsToMerge[1];
+            BOOL isFirstMergable = !lhItem.isGroup && !lhItem.isCreditCard;
+            BOOL isSecondMergable = !rhItem.isGroup && !rhItem.isCreditCard;
+            mergeEnabled = isFirstMergable && isSecondMergable;
+        }
+    }
     
-    self.navigationController.toolbar.hidden = !(exportEnabled || moveAndDeleteEnabled); 
-    self.navigationController.toolbarHidden = !(exportEnabled || moveAndDeleteEnabled); 
+    BOOL shouldHide = !(exportEnabled || moveAndDeleteEnabled);
+
+    self.navigationController.toolbar.hidden = shouldHide;
+    self.navigationController.toolbarHidden = shouldHide;
+
     [self.tabBarController.tabBar setHidden: (exportEnabled || moveAndDeleteEnabled)];
 
     [self updateNavigationPrompt];
@@ -497,22 +530,46 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.buttonMove.enabled = moveAndDeleteEnabled;
     self.buttonDelete.enabled = moveAndDeleteEnabled;
     self.exportItemsBarButton.enabled = exportEnabled;
+    self.buttonMerge.enabled = mergeEnabled;
 
     [self updateRightNavBarButtons];
 }
 
 - (void)customizeBottomToolbar {
-    UIBarButtonItem* flexibleSpace1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem* flexibleSpace2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem* flexibleSpace3 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem* flexibleSpace4 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    
-    NSArray *toolbarButtons = @[flexibleSpace1, self.buttonMove, flexibleSpace2, self.exportItemsBarButton, flexibleSpace3, self.buttonDelete, flexibleSpace4];
+    UIBarButtonItem* flexibleSpace1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                    target:nil
+                                                                                    action:nil];
+    UIBarButtonItem* flexibleSpace2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                    target:nil
+                                                                                    action:nil];
+    UIBarButtonItem* flexibleSpace3 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                    target:nil
+                                                                                    action:nil];
+    UIBarButtonItem* flexibleSpace4 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                    target:nil
+                                                                                    action:nil];
+    UIBarButtonItem* flexibleSpace5 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                                                    target:nil
+                                                                                    action:nil];
 
+    [self.exportItemsBarButton setTitle:NSLocalizedString(@"generic_export_ellipsis", @"Export")];
+    [self.buttonMove setTitle:NSLocalizedString(@"generic_move_ellipsis", @"Move...")];
     [self.buttonDelete setTintColor:UIColor.systemRedColor];
+    [self.buttonMerge setTitle:NSLocalizedString(@"generic_action_merge", @"Merge")];
+
+    NSArray *toolbarButtons = @[
+        flexibleSpace1,
+        self.buttonMove,
+        flexibleSpace2,
+        self.exportItemsBarButton,
+        flexibleSpace3,
+        self.buttonMerge,
+        flexibleSpace4,
+        self.buttonDelete,
+        flexibleSpace5
+    ];
 
     [self setToolbarItems:toolbarButtons animated:NO];
-
 }
 
 - (void)onSyncButtonClicked:(id)sender {
@@ -552,7 +609,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [weakSelf onAddEntry];
     }]];
     
-    [ma0 addObject:[ContextMenuHelper getItem:@"New Credit Card Entry"
+    [ma0 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_new_credit_card_entry", @"New Credit Card Entry")
                                   systemImage:@"creditcard"
                                       enabled:!ro
                                       handler:^(__kindof UIAction * _Nonnull action) {
@@ -633,12 +690,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                           handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onExportDatabase:nil]; }]];
     }
     
-
-
-
-
-
-
+    
+    
+    
+    
+    
+    
     
     if ( !AppPreferences.sharedInstance.disablePrinting ) {
         [ma2 addObject:[ContextMenuHelper getItem:NSLocalizedString(@"generic_print_database", @"Print Database")
@@ -918,12 +975,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         }
         else {
             [StrongboxToastMessages showWarningWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
-                                                        body:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_issues_found_fmt", @"%ld issues found"), issueCount]];
+                                                    body:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_issues_found_fmt", @"%ld issues found"), issueCount]];
         }
     }
     else if (issueCount > lastKnownAuditIssueCount.unsignedIntegerValue) {
         [StrongboxToastMessages showErrorWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
-                                                  body:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_new_issues_found_fmt",@"%ld New Issues Found!"), issueCount - lastKnownAuditIssueCount.unsignedIntegerValue]];
+                                              body:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_new_issues_found_fmt",@"%ld New Issues Found!"), issueCount - lastKnownAuditIssueCount.unsignedIntegerValue]];
     }
 }
 
@@ -1038,8 +1095,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.searchController.searchResultsUpdater = self;
     self.searchController.obscuresBackgroundDuringPresentation = NO;
     self.searchController.searchBar.delegate = self;
-    
-    self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
 }
 
 - (void)addSearchBarToNav {
@@ -1619,7 +1674,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             
             if ( dupe ) {
                 BOOL done = [self.viewModel addChildren:@[dupe] destination:item.parent];
-               
+                
                 if ( done ) {
                     [weakSelf updateAndSave];
                     
@@ -1665,6 +1720,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
+    [AppPreferences.sharedInstance persistSearchScopeIfEnabled:(SearchScope)selectedScope];
     [self updateSearchResultsForSearchController:self.searchController];
 }
 
@@ -1949,7 +2005,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     __weak BrowseSafeView* weakSelf = self;
     
-    if ([segue.identifier isEqualToString:@"segueMasterDetailToDetail"] || [segue.identifier isEqualToString:@"segueMasterDetailToDetail-NonAnimated"]) {
+    if (
+        [segue.identifier isEqualToString:@"segueMasterDetailToDetail"] ||
+        [segue.identifier isEqualToString:@"segueMasterDetailToDetail-NonAnimated"] ||
+        [segue.identifier isEqualToString:@"segueMasterDetailToDetail-Push"] ||
+        [segue.identifier isEqualToString:@"segueMasterDetailToDetail-NonAnimated-Push"]
+        ) {
         
         ItemDetailsViewController *vc = (ItemDetailsViewController*)segue.destinationViewController;
         
@@ -2167,7 +2228,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         return;
     }
     
-    NSString* segueName = animated ? @"segueMasterDetailToDetail" : @"segueMasterDetailToDetail-NonAnimated";
+    NSString *segueName;
+    if (UIDevice.currentDevice.userInterfaceIdiom == UIUserInterfaceIdiomPad && !self.splitViewController.isCollapsed) {
+        segueName = animated ? @"segueMasterDetailToDetail" : @"segueMasterDetailToDetail-NonAnimated";
+    } else {
+        segueName = animated ? @"segueMasterDetailToDetail-Push" : @"segueMasterDetailToDetail-NonAnimated-Push";
+    }
     
     if ( item ) {
         self.viewModel.metadata.lastViewedEntry = item.uuid;
@@ -2217,6 +2283,70 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (BOOL)validateMoveDestination:(NSArray*)itemsToMove destinationGroup:(Node*)destinationGroup {
     return [self.viewModel.database validateMoveItems:itemsToMove destination:destinationGroup];
+}
+
+- (IBAction)onMerge:(id)sender {
+    if (self.isEditing) {
+        NSArray<NSIndexPath*> *selectedRows = self.tableView.indexPathsForSelectedRows;
+        
+        if (selectedRows && selectedRows.count == 2) {
+            NSArray<Node *> *itemsToMerge = [self getSelectedItems:selectedRows];
+            if (itemsToMerge.count == 2) {
+                Node* lhs = itemsToMerge[0];
+                Node* rhs = itemsToMerge[1];
+                [self showMergeSelectionForNodeA:lhs nodeB:rhs completion:^{
+                    [self refresh];
+                }];
+            }
+        }
+    }
+    [self setEditing:NO animated:YES];
+}
+
+- (void)showMergeSelectionForNodeA:(Node *)nodeA nodeB:(Node *)nodeB completion:(void(^)(void))completion {
+    NSString *titleAtoB = [NSString stringWithFormat:NSLocalizedString(@"merge_alert_action_button_title", "Merge two entries alert button title."), nodeA.title, nodeB.title];
+    NSString *titleBtoA = [NSString stringWithFormat:NSLocalizedString(@"merge_alert_action_button_title", "Merge two entries alert button title."), nodeB.title, nodeA.title];
+    
+    NSString *message = [NSString stringWithFormat:NSLocalizedString(@"merge_alert_message", "Merge two entries alert message."), nodeA.title, nodeB.title, nodeA.title, nodeB.title, nodeA.title, nodeB.title];
+    
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"generic_action_merge", @"Merge")
+                                                                   message:message
+                                                            preferredStyle:UIAlertControllerStyleActionSheet];
+
+    [sheet addAction:[UIAlertAction actionWithTitle:titleAtoB
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(__unused UIAlertAction *a) {
+        [self.viewModel mergeNode:nodeA
+                         intoNode:nodeB
+         mergeLocationChangedDate:YES
+                   includeHistory:YES
+                   allowOverwrite:YES];
+        
+        if (completion)
+            completion();
+    }]];
+
+    [sheet addAction:[UIAlertAction actionWithTitle:titleBtoA
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(__unused UIAlertAction *a) {
+        [self.viewModel mergeNode:nodeB
+                         intoNode:nodeA
+         mergeLocationChangedDate:YES
+                   includeHistory:YES
+                   allowOverwrite:YES];
+        
+        if (completion)
+            completion();
+    }]];
+    
+    [sheet addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                              style:UIAlertActionStyleCancel
+                                            handler:^(__unused UIAlertAction *a) {
+        if (completion)
+            completion();
+    }]];
+    
+    [self presentViewController:sheet animated:YES completion:nil];
 }
 
 
@@ -2517,7 +2647,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
     
     return [UIContextMenuConfiguration configurationWithIdentifier:indexPath
-                                                   previewProvider:^UIViewController * _Nullable{ return item.isGroup ? nil : [[PreviewItemViewControllerNext alloc] initWithItem:item model: self.viewModel];   }
+                                                   previewProvider:nil
                                                     actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
         return [UIMenu menuWithTitle:@""
                                image:nil
@@ -2589,6 +2719,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (UIMenu*)getFirstContextMenuSection:(NSIndexPath*)indexPath item:(Node*)item  {
     NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
+    
+    [ma addObject:[self getContextualMenuOpenAction:indexPath item:item]];
     
     if (!self.viewModel.isReadOnly) {
         BOOL isRecycleBin = item.isGroup && self.viewModel.isKeePass2Format && [self.viewModel.database.recycleBinNode.uuid isEqual:item.uuid];
@@ -3086,6 +3218,17 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         [weakSelf.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
         
+        [weakSelf updateNavAndToolbarButtonsState];
+    }];
+}
+
+- (UIAction*)getContextualMenuOpenAction:(NSIndexPath*)indexPath item:(Node*)item  {
+    __weak BrowseSafeView* weakSelf = self;
+    
+    return [ContextMenuHelper getItem:NSLocalizedString(@"generic_view", @"View")
+                          systemImage:@"arrow.up.right"
+                              handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf openDetails:item];
         [weakSelf updateNavAndToolbarButtonsState];
     }];
 }

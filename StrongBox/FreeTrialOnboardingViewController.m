@@ -20,6 +20,7 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonTryPro;
 @property (weak, nonatomic) IBOutlet UILabel *labelBiometricUnlockFeature;
+@property (weak, nonatomic) IBOutlet UILabel *labelTrialMessage;
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOK1;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewOK2;
@@ -64,6 +65,25 @@
     NSString* loc = NSLocalizedString(@"generic_biometric_unlock_fmt", @"%@ Unlock");
     NSString* fmt = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
     self.labelBiometricUnlockFeature.text = fmt;
+
+    NSString* trialDuration = ProUpgradeIAPManager.sharedInstance.freeTrialDurationText;
+    if ( trialDuration.length > 0 ) {
+        NSString* messageFmt = NSLocalizedStringFromTable(@"9ft-2d-Rrj.text",
+                                                          @"FreemiumOnboarding",
+                                                          @"Strongbox includes %@ of Pro for you to try, for free");
+        self.labelTrialMessage.text = [NSString stringWithFormat:messageFmt, trialDuration];
+
+        NSString* buttonFmt = NSLocalizedStringFromTable(@"dwl-l4-HZT.normalTitle",
+                                                         @"FreemiumOnboarding",
+                                                         @"Redeem Your %@ Free Trial");
+        [self.buttonTryPro setTitle:[NSString stringWithFormat:buttonFmt, trialDuration]
+                           forState:UIControlStateNormal];
+    } else {
+        self.labelTrialMessage.text = NSLocalizedString(@"generic_free_trial_available_message",
+                                                        @"Strongbox includes a free trial of Pro for you to try");
+        [self.buttonTryPro setTitle:NSLocalizedString(@"generic_start_free_trial", @"Start Free Trial")
+                           forState:UIControlStateNormal];
+    }
     
     NSString* priceText = [self getPriceTextFromProduct:self.yearly];
     

@@ -58,6 +58,7 @@ static NSString* const kSecretStoreBreachedAccountsCacheKey = @"SecretStoreBreac
 @property NSUInteger hibpTotalCount;
 @property CGFloat hibpProgress;
 @property CGFloat similarProgress;
+@property NSMutableArray<NSString*>* hibpErrorReasons;
 
 @property NSArray<Node*>* auditableNonEmptyPasswordNodes;
 
@@ -115,7 +116,8 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         self.hibpQueue.maxConcurrentOperationCount = 4;
         self.mutablePwnedNodes = ConcurrentMutableSet.mutableSet;
         self.mutableBreachedAccountNodes = ConcurrentMutableSet.mutableSet;
-
+        self.hibpErrorReasons = NSMutableArray.array;
+        
         
         self.matchedBreachedDomainsByNode = [NSMutableDictionary dictionary];
 
@@ -162,6 +164,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     self.nodesChanged = nodesChanged;
     self.progress = progress;
     self.config = config;
+    self.stopRequested = NO;
 
     self.database = database;
 
@@ -181,25 +184,14 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 
     self.progress(0.0);
 
-    NSTimeInterval start = NSDate.timeIntervalSinceReferenceDate;
-
     [self performAudits];
-
-    NSTimeInterval auditDuration = NSDate.timeIntervalSinceReferenceDate - start;
-
-    self.progress(1.0);
-
-    if (self.state == kAuditStateRunning) { 
-        self.state = kAuditStateDone;
-    }
-
-    self.completion(self.state == kAuditStateStoppedIncomplete, auditDuration);
 }
 
 - (void)stop {
     slog(@"AUDIT: Stopping Audit...");
     self.stopRequested = YES;
     [self.hibpQueue cancelAllOperations];
+    [self cancelSwiftAuditTask];
 }
 
 - (DatabaseAuditReport *)getAuditReport {
@@ -479,6 +471,22 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     return self.hibpErrorCount;
 }
 
+- (NSArray<NSString *> *)haveIBeenPwnedErrorReasons {
+    @synchronized (self) {
+        return self.hibpErrorReasons.copy;
+    }
+}
+
+- (void)recordHibpErrorReason:(NSString *)reason {
+    if (reason.length == 0) {
+        return;
+    }
+
+    @synchronized (self) {
+        [self.hibpErrorReasons addObject:reason];
+    }
+}
+
 - (NSSet<NSUUID *> *)getSimilarPasswordNodeSet:(NSUUID *)node {
     if ([self.similarPasswordsNodeSet containsObject:node]) {
         NSArray<NSSet<NSUUID*>*>* containedInOthers = [self.similar.allValues filter:^BOOL(NSSet<NSUUID *> * _Nonnull obj) {
@@ -533,38 +541,49 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 
 
 - (void)performAudits {
-    self.noPasswords = [self checkForNoPasswords];
+    NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
+    __weak typeof(self) weakSelf = self;
 
-    self.duplicatedPasswords = [self checkForDuplicatedPasswords];
-    self.duplicatedPasswordsNodeSet = [NSSet setWithArray:[self.duplicatedPasswords.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
-        return obj.allObjects;
-    }]];
-
-    self.commonPasswords = [self checkForCommonPasswords];
-
-    self.lowEntropy = [self checkForLowEntropy];
-
-    self.tooShort = [self checkForTooShort];
-
-    if (self.tooShort.anyObject || self.noPasswords.anyObject || self.duplicatedPasswordsNodeSet.anyObject || self.commonPasswords.anyObject) {
-        self.nodesChanged();
+    @synchronized (self) {
+        self.hibpErrorReasons = NSMutableArray.array;
     }
-
-    if (self.isPro) {
-        [self checkHibp];
-    }
-
-    if (self.isPro) {
-        self.similar = [self checkForSimilarPasswords];
-        self.similarPasswordsNodeSet = [NSSet setWithArray:[self.similar.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
-            return obj.allObjects;
-        }]];
-        if (self.similarPasswordsNodeSet.anyObject) {
-            self.nodesChanged();
+    self.hibpErrorCount = 0;
+    
+    [self startSwiftAuditTaskWithAuditableNodes:self.auditableNonEmptyPasswordNodes
+                                    nodesChanged:^{
+        __strong typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
         }
+        strongSelf.nodesChanged();
     }
+                              progressCallback:^(double progress) {
+        __strong typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        strongSelf.progress(progress);
+    }
+                                    completion:^(BOOL cancelled) {
+        __strong typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
 
-    self.twoFactorAvailable = [self checkForTwoFactorAvailable];
+        NSTimeInterval duration = NSDate.timeIntervalSinceReferenceDate - startTime;
+
+        if (cancelled || strongSelf.stopRequested) {
+            strongSelf.state = kAuditStateStoppedIncomplete;
+        }
+        else if (strongSelf.state == kAuditStateRunning) {
+            strongSelf.state = kAuditStateDone;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            strongSelf.progress(1.0);
+            strongSelf.completion(strongSelf.state == kAuditStateStoppedIncomplete, duration);
+        });
+    }];
 }
 
 - (NSSet<NSUUID*>*)checkForTwoFactorAvailable {
@@ -782,7 +801,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 
 - (NSString *)normalizeDomain:(NSString *)domain {
     NSString *lowercased = [domain lowercaseString];
-    if ([lowercased hasPrefix:@"http:
+    if ([lowercased hasPrefix:@"http://"] || [lowercased hasPrefix:@"https://"]) {
         NSURL *url = [NSURL URLWithString:lowercased];
         if (url.host) {
             lowercased = url.host;
@@ -1006,6 +1025,9 @@ const static NSSet<NSString*>* kTwoFactorDomains;
                               data:(NSData*)data
                           response:(NSURLResponse*)response
                              error:(NSError*)error {
+    
+    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+    
     self.hibpCompletedCount++;
 
     if (self.hibpCompletedCount % 10 == 0) {
@@ -1015,11 +1037,10 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 
     if (error) {
         self.hibpErrorCount++;
+        [self recordHibpErrorReason:[NSString stringWithFormat:@"Password unexpected status: %ld - %@", (long)httpResponse.statusCode, error.localizedDescription]];
         slog(@"ERROR: [%@]", error);
         return;
     }
-
-    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
 
     if (httpResponse.statusCode == kHttpStatusOk) {
         BOOL found = [self processHibpResponse:data targetHash:sha1HexPassword];
@@ -1041,6 +1062,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
     else {
         slog(@"HTTP [%ld] - [%@]", (long)httpResponse.statusCode , error);
         self.hibpErrorCount++;
+        [self recordHibpErrorReason:[NSString stringWithFormat:@"Password unexpected status: %ld - %@", (long)httpResponse.statusCode, error.localizedDescription]];
     }
 }
 
@@ -1077,6 +1099,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
 
     if (error) {
         self.hibpErrorCount++;
+        [self recordHibpErrorReason:[NSString stringWithFormat:@"Account check for [%@] failed: %@", email, error.localizedDescription]];
         slog(@"❌ HIBP Account Check - ERROR: [%@]", error);
         return;
     }
@@ -1100,6 +1123,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
         if (jsonError) {
             slog(@"❌ HIBP Account Check - Failed to parse JSON: %@", jsonError);
             self.hibpErrorCount++;
+            [self recordHibpErrorReason:[NSString stringWithFormat:@"Account check for [%@] JSON parse error: %@", email, jsonError.localizedDescription]];
             return;
         }
 
@@ -1147,6 +1171,7 @@ const static NSSet<NSString*>* kTwoFactorDomains;
             slog(@"❌ HIBP Account Check - Error response body: [%@]", rawResponse);
         }
         self.hibpErrorCount++;
+        [self recordHibpErrorReason:[NSString stringWithFormat:@"Account check for [%@] unexpected status: %ld", email, (long)httpResponse.statusCode]];
     }
 }
 

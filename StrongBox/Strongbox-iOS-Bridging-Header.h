@@ -80,6 +80,7 @@
 #import "AutomaticLockingPreferences.h"
 #import "AdvancedDatabaseSettings.h"
 #import "EncryptionPreferencesViewController.h"
+#import "MMcG_MF_Base32Additions.h"
 #import "CASGTableViewController.h"
 #import "SyncManager.h"
 #import "SelectDatabaseViewController.h"
@@ -91,3 +92,7 @@
 #import "WebDAVStorageProvider.h"
 #import "WebDAVSessionConfigurationCredential.h"
 
+#import "DatabaseAuditor.h"
+#import "DatabaseAuditor+Swift.h"
+#import "PasswordMaker.h"
+#import "PasswordStrengthTester.h"

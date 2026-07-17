@@ -12,9 +12,12 @@
 #import "MacAlerts.h"
 #import "NSArray+Extensions.h"
 #import "BiometricIdHelper.h"
+#import "DatabaseUnlocker.h"
+#import "MacCompositeKeyDeterminer.h"
 #import "Settings.h"
 #import "NSDate+Extensions.h"
 #import "DatabaseMetadata.h"
+#import "WorkingCopyManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -106,31 +109,32 @@
 }
 
 - (void)bindUi {
-    BOOL pinEnabled = [self isPinEnabled];
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
     BOOL methodAvailable = watchAvailable || touchAvailable;
     BOOL featureAvailable = Settings.sharedInstance.isPro;
+    BOOL showPinMode = [self shouldShowPinMode];
     
     MacDatabasePreferences* meta = self.model.databaseMetadata;
-    BOOL biometricEnabled = (meta.isTouchIdEnabled && touchAvailable) || (meta.isWatchUnlockEnabled && watchAvailable);
     BOOL convenienceEnabled = meta.isConvenienceUnlockEnabled;
     BOOL conveniencePossible = methodAvailable && featureAvailable;
+    BOOL showConvenienceUi = conveniencePossible || showPinMode;
+    BOOL expiryEnabled = featureAvailable && convenienceEnabled;
 
-    self.pinStackView.hidden = !pinEnabled;
-    self.biometricStackView.hidden = !conveniencePossible;
+    self.pinStackView.hidden = !showPinMode;
+    self.biometricStackView.hidden = !showConvenienceUi;
     self.checkboxUseTouchId.enabled = touchAvailable && featureAvailable;
     self.checkboxUseTouchId.state = meta.isTouchIdEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     self.checkBoxEnableWatch.enabled = watchAvailable && featureAvailable;
     self.checkBoxEnableWatch.state = meta.isWatchUnlockEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    self.sliderExpiry.enabled = conveniencePossible && convenienceEnabled;
+    self.sliderExpiry.enabled = expiryEnabled;
     self.sliderExpiry.integerValue = [self getSliderValueFromHours:meta.touchIdPasswordExpiryPeriodHours];
     self.labelExpiryPeriod.stringValue = [self getExpiryPeriodString:meta.touchIdPasswordExpiryPeriodHours];
-    self.labelExpiryPeriod.textColor = (conveniencePossible && convenienceEnabled) ? nil : NSColor.disabledControlTextColor;
-    self.labelRequireReentry.textColor = (conveniencePossible && convenienceEnabled) ? nil : NSColor.disabledControlTextColor;
-    self.passwordStorageSummary.textColor = conveniencePossible ? nil : NSColor.disabledControlTextColor;
+    self.labelExpiryPeriod.textColor = expiryEnabled ? nil : NSColor.disabledControlTextColor;
+    self.labelRequireReentry.textColor = expiryEnabled ? nil : NSColor.disabledControlTextColor;
+    self.passwordStorageSummary.textColor = showConvenienceUi ? nil : NSColor.disabledControlTextColor;
     self.passwordStorageSummary.stringValue = [self getSecureStorageSummary];
-    if (pinEnabled) {
+    if (showPinMode) {
         [self bindPinMode];
     }
 }
@@ -258,10 +262,11 @@
 
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL methodAvailable = watchAvailable || touchAvailable;
     MacDatabasePreferences* meta = self.model.databaseMetadata;
     BOOL biometricEnabled = (meta.isTouchIdEnabled && touchAvailable) || (meta.isWatchUnlockEnabled && watchAvailable);
     
-    if (!biometricEnabled) {
+    if (!biometricEnabled && (pinEnabled || !methodAvailable)) {
         self.passwordStorageSummary.stringValue = [self getPinSecureStorageSummary];
     }
 }
@@ -397,6 +402,111 @@
     [self.view.window cancelOperation:nil];
 }
 
+#pragma mark - Credential Verification
+
+- (void)requestVerifyMasterCredentialsForPinChange:(void (^)(BOOL verified))completion {
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.model.databaseUuid];
+    if ( url == nil ) {
+        NSError* error = [Utils createNSError:@"Could not get working cache to verify credentials. Cannot continue."
+                                    errorCode:-12345];
+        [MacAlerts error:error window:self.view.window];
+        completion(NO);
+        return;
+    }
+    
+    MacCompositeKeyDeterminer* ckd =
+        [MacCompositeKeyDeterminer determinerWithViewController:self
+                                                       database:self.model.databaseMetadata
+                               isNativeAutoFillAppExtensionOpen:NO];
+    
+    ckd.verifyCkfsMode = YES;
+    
+    NSString* biometricMessage = NSLocalizedString(@"verify_creds_before_changing_bio_message_suffix",
+                                                    @"verify credentials before you can change them");
+    NSString* manualHeadline = NSLocalizedString(@"verify_creds_headline", @"Verify Master Credentials");
+    NSString* manualSubhead = NSLocalizedString(@"verify_creds_subhead",
+                                                @"For security reasons your master credentials must be verified before you can change them.");
+    
+    __weak typeof(self) weakSelf = self;
+    [ckd getCkfs:biometricMessage
+   manualHeadline:manualHeadline
+    manualSubhead:manualSubhead
+       completion:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            __strong typeof(self) strongSelf = weakSelf;
+            if (!strongSelf) {
+                return;
+            }
+            
+            if ( result == kGetCompositeKeyResultError ) {
+                if ( error ) {
+                    [MacAlerts error:error window:strongSelf.view.window];
+                }
+                completion(NO);
+                return;
+            }
+            
+            if ( result == kGetCompositeKeyResultSuccess ) {
+                if ( !factors ) {
+                    completion(NO);
+                    return;
+                }
+                
+                [strongSelf verifyCkfsAreCorrect:factors completion:^(BOOL verified, NSError * _Nullable verifyError) {
+                    if ( verifyError ) {
+                        [MacAlerts error:verifyError window:strongSelf.view.window];
+                        completion(NO);
+                        return;
+                    }
+                    
+                    if ( !verified ) {
+                        NSString* title = NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title",
+                                                            @"Incorrect Credentials");
+                        NSString* message = NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message",
+                                                              @"The credentials were incorrect for this database.");
+                        [MacAlerts info:title informativeText:message window:strongSelf.view.window completion:nil];
+                        completion(NO);
+                        return;
+                    }
+                    
+                    completion(YES);
+                }];
+                return;
+            }
+            
+            completion(NO);
+        });
+    }];
+}
+
+- (void)verifyCkfsAreCorrect:(CompositeKeyFactors*)factors
+                  completion:(void (^)(BOOL verified, NSError* _Nullable error))completion {
+    DatabaseUnlocker *unlocker = [DatabaseUnlocker unlockerForDatabase:self.model.databaseMetadata
+                                                        viewController:self
+                                                         forceReadOnly:NO
+                                      isNativeAutoFillAppExtensionOpen:NO
+                                                           offlineMode:NO];
+    
+    [unlocker unlockLocalWithKey:factors
+              keyFromConvenience:NO
+                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( result == kUnlockDatabaseResultSuccess ) {
+                completion(YES, nil);
+            }
+            else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
+                completion(NO, nil);
+            }
+            else if ( result == kUnlockDatabaseResultError ) {
+                completion(NO, error);
+            }
+            else {
+                completion(NO, nil);
+            }
+        });
+    }];
+}
+
 #pragma mark - PIN Functionality
 
 - (void)createPinUIElements {
@@ -449,7 +559,7 @@
 
 - (BOOL)shouldShowPinMode {
     BOOL featureAvailable = Settings.sharedInstance.isPro;
-    return featureAvailable;
+    return featureAvailable || [self isPinEnabled];
 }
 
 - (BOOL)isPinEnabled {
@@ -460,7 +570,21 @@
     BOOL enablePin = self.checkboxEnablePin.state == NSControlStateValueOn;
     
     if (enablePin) {
-        [SimplePinModal showFrom:self delegate:self];
+        __weak typeof(self) weakSelf = self;
+        [self requestVerifyMasterCredentialsForPinChange:^(BOOL verified) {
+            __strong typeof(self) strongSelf = weakSelf;
+            if (!strongSelf) {
+                return;
+            }
+            
+            if ( verified ) {
+                [SimplePinModal showFrom:strongSelf delegate:strongSelf];
+            }
+            else {
+                strongSelf.checkboxEnablePin.state = NSControlStateValueOff;
+                [strongSelf bindUi];
+            }
+        }];
     } else {
         self.model.databaseMetadata.conveniencePin = nil;
         [self bindUi];
@@ -469,7 +593,17 @@
 }
 
 - (void)onChangePin:(id)sender {
-    [SimplePinModal showFrom:self delegate:self];
+    __weak typeof(self) weakSelf = self;
+    [self requestVerifyMasterCredentialsForPinChange:^(BOOL verified) {
+        __strong typeof(self) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        
+        if ( verified ) {
+            [SimplePinModal showFrom:strongSelf delegate:strongSelf];
+        }
+    }];
 }
 
 #pragma mark - SimplePinModalDelegate

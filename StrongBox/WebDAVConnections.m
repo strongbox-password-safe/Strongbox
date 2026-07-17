@@ -19,6 +19,13 @@
 
 static NSString* const kConfigFilename = @"webdav-connections.json";
 
+@interface WebDAVConnections ()
+
+- (NSURL*)configFileURL;
+- (BOOL)ensureConfigFileExistsAtURL:(NSURL*)fileUrl;
+
+@end
+
 @implementation WebDAVConnections
 
 + (instancetype)sharedInstance {
@@ -34,7 +41,16 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
 - (NSMutableArray<WebDAVSessionConfiguration*>*)deserialize {
     NSMutableArray<WebDAVSessionConfiguration*> *ret = NSMutableArray.array;
     
-    NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kConfigFilename];
+    NSURL* fileUrl = [self configFileURL];
+    if (!fileUrl) {
+        slog(@"Missing preferences directory for WebDAV connections.");
+        return ret;
+    }
+    
+    if (![self ensureConfigFileExistsAtURL:fileUrl]) {
+        slog(@"Unable to create WebDAV connections config at [%@]", fileUrl);
+        return ret;
+    }
     
     NSError* error;
     __block NSError* readError;
@@ -45,7 +61,7 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
                                         options:kNilOptions
                                           error:&error
                                      byAccessor:^(NSURL * _Nonnull newURL) {
-        json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
+        json = [NSData dataWithContentsOfURL:newURL options:kNilOptions error:&readError];
     }];
     
     if (!json || error || readError) {
@@ -86,7 +102,11 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
         return;
     }
 
-    NSURL* fileUrl = [StrongboxFilesManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kConfigFilename];
+    NSURL* fileUrl = [self configFileURL];
+    if (!fileUrl) {
+        slog(@"Missing preferences directory for WebDAV connections. Cannot persist.");
+        return;
+    }
 
     NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
     __block NSError *writeError = nil;
@@ -147,6 +167,39 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
     NSMutableArray<WebDAVSessionConfiguration*>* list = [self deserialize];
 
     return list.copy;
+}
+
+- (NSURL*)configFileURL {
+    NSURL* preferencesDirectory = StrongboxFilesManager.sharedInstance.preferencesDirectory;
+    if (!preferencesDirectory) {
+        return nil;
+    }
+    
+    return [preferencesDirectory URLByAppendingPathComponent:kConfigFilename];
+}
+
+- (BOOL)ensureConfigFileExistsAtURL:(NSURL*)fileUrl {
+    if (!fileUrl) {
+        return NO;
+    }
+    
+    if ([NSFileManager.defaultManager fileExistsAtPath:fileUrl.path]) {
+        return YES;
+    }
+    
+    NSError* error = nil;
+    NSData* emptyJson = [NSJSONSerialization dataWithJSONObject:@[] options:NSJSONWritingPrettyPrinted error:&error];
+    if (error || !emptyJson) {
+        slog(@"Error creating empty WebDAV connections json: [%@]", error);
+        return NO;
+    }
+    
+    BOOL success = [emptyJson writeToURL:fileUrl options:NSDataWritingAtomic error:&error];
+    if (!success || error) {
+        slog(@"Error writing empty WebDAV connections file: [%@]", error);
+    }
+    
+    return success && !error;
 }
 
 @end

@@ -122,8 +122,8 @@ public class KeeAgentSettings: NSObject {
         writer.writeStartDocument(withEncodingAndVersion: "UTF-16", version: nil)
 
         writer.writeStartElement(XmlElementNames.EntrySettings)
-        writer.writeAttribute("xmlns:xsd", value: "http:
-        writer.writeAttribute("xmlns:xsi", value: "http:
+        writer.writeAttribute("xmlns:xsd", value: "http://www.w3.org/2001/XMLSchema")
+        writer.writeAttribute("xmlns:xsi", value: "http://www.w3.org/2001/XMLSchema-instance")
 
         writer.writeStartElement(XmlElementNames.AllowUseOfSshKey)
         writer.writeCharacters(enabled ? "true" : "false")

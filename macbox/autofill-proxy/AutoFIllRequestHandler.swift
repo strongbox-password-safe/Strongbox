@@ -1,11 +1,3 @@
-//
-//  AutoFillRequestHandler.swift
-//  MacBox
-//
-//  Created by Strongbox on 26/08/2022.
-//  Copyright © 2022 Mark McGuill. All rights reserved.
-//
-
 import Foundation
 
 @objc class AutoFillRequestHandler: NSObject {
@@ -388,8 +380,10 @@ import Foundation
         }
 
         let skip = gcfuRequest.skip ?? 0
+        
+        let allowParentDomainFallbacks = gcfuRequest.subdomainMatching ?? !Settings.sharedInstance().browserAutoFillStrictSubdomainMatching
 
-        let credentials = getCredentialsForUrl(unlockedDatabases: unlockedDatabases, url: gcfuRequest.url, skip: skip, take: take)
+        let credentials = getCredentialsForUrl(unlockedDatabases: unlockedDatabases, url: gcfuRequest.url, allowParentDomainFallbacks: allowParentDomainFallbacks, skip: skip, take: take)
 
         let response = CredentialsForUrlResponse(results: credentials, unlockedDatabaseCount: unlockedDatabases.count)
 
@@ -398,14 +392,14 @@ import Foundation
         return AutoFillEncryptedResponse.successWithResult(resultJson: json, clientPublicKey: request.clientPublicKey, keyPair: keyPair)
     }
 
-    func getCredentialsForUrl(unlockedDatabases: [MacDatabasePreferences], url: String, skip: Int, take: Int) -> [AutoFillCredential] {
+    func getCredentialsForUrl(unlockedDatabases: [MacDatabasePreferences], url: String, allowParentDomainFallbacks: Bool, skip: Int, take: Int) -> [AutoFillCredential] {
         var collected: [(Model, Node)] = []
         for database in unlockedDatabases {
             guard let model = DatabasesCollection.shared.getUnlocked(uuid: database.uuid) else {
                 continue
             }
 
-            let nodes = model.getAutoFillMatchingNodes(forUrl: url)
+            let nodes = model.getAutoFillMatchingNodes(forUrl: url, subdomainMatching: allowParentDomainFallbacks)
 
             
 
@@ -683,7 +677,7 @@ import Foundation
 
             
 
-            let smallFallbackVisible = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX
+            let smallFallbackVisible = "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII"
 
             ret = smallFallbackVisible
         }

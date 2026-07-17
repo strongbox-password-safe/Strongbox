@@ -88,6 +88,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL showPasswordGenInTray;
 
 @property BOOL hasPromptedForThirdPartyAutoFill;
+@property BOOL hasDismissedSettingsProUpsells;
 
 
 
@@ -143,6 +144,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL stripUnusedHistoricalIcons;
 
 @property BOOL runBrowserAutoFillProxyServer;
+@property BOOL browserAutoFillStrictSubdomainMatching;
 
 @property BOOL quitTerminatesProcessEvenInSystemTrayMode;
 @property BOOL lockDatabaseOnWindowClose; 
@@ -199,6 +201,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL showOfflineOptionsOnLocalDeviceDatabases;
 
 @property BOOL showHiddenDatabases;
+@property BOOL deleteDatabaseAfterXFailedUnlockAttempts;
 
 @end
 

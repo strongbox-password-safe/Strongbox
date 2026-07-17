@@ -53,7 +53,7 @@ struct Watch2FACodeOnlyView: View {
 
                     Spacer()
 
-                    TwoFactorCodeCircularProgressView(totp: token, radius: 28, updateMode: .automatic, hideCountdownDigits: model.settings.twoFactorHideCountdownDigits)
+                    TwoFactorCodeCircularProgressView(totp: token, radius: 28, updateMode: .centralTimerNotification, hideCountdownDigits: model.settings.twoFactorHideCountdownDigits)
                         .padding(2)
                         .frame(width: 28)
                 }

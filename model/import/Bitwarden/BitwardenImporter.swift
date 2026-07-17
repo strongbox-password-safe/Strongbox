@@ -14,6 +14,16 @@ class BitwardenImporter: NSObject, Importer {
     var groups: [String: String] = [:]
     var tags: [String: String] = [:]
 
+    private struct ImportedPasskey {
+        let passkey: Passkey
+        let titleSuffix: String
+    }
+
+    private enum PasskeyConversion {
+        case imported(ImportedPasskey)
+        case warning(ImportMessage)
+    }
+
     func convert(url: URL) throws -> DatabaseModel {
         let result = try convertEx(url: url)
 
@@ -126,7 +136,9 @@ class BitwardenImporter: NSObject, Importer {
             }
         }
 
-        if let login = item.login {
+        let login = item.login
+
+        if let login {
             processItemLogin(node, login)
         }
 
@@ -150,6 +162,12 @@ class BitwardenImporter: NSObject, Importer {
 
         if let passwordHistories = item.passwordHistory {
             processPasswordHistories(node, passwordHistories)
+        }
+
+        if let login {
+            let importedPasskeys = processItemPasskeys(node, login)
+            messages.append(contentsOf: importedPasskeys.messages)
+            addPasskeys(importedPasskeys.passkeys, to: node, parentGroup: parentGroup)
         }
 
         return messages
@@ -285,5 +303,140 @@ class BitwardenImporter: NSObject, Importer {
                 }
             }
         }
+    }
+
+    private func processItemPasskeys(_ node: Node, _ login: BitwardenLogin) -> (passkeys: [ImportedPasskey], messages: [ImportMessage]) {
+        var passkeys: [ImportedPasskey] = []
+        var messages: [ImportMessage] = []
+
+        guard let credentials = login.fido2Credentials else {
+            return (passkeys, messages)
+        }
+
+        for credential in credentials {
+            guard let credential else {
+                continue
+            }
+
+            switch convertPasskey(credential, fallbackUsername: login.username ?? node.fields.username) {
+            case .imported(let importedPasskey):
+                passkeys.append(importedPasskey)
+            case .warning(let message):
+                messages.append(message)
+            }
+        }
+
+        return (passkeys, messages)
+    }
+
+    private func addPasskeys(_ passkeys: [ImportedPasskey], to node: Node, parentGroup: Node) {
+        guard let firstPasskey = passkeys.first else {
+            return
+        }
+
+        node.passkey = firstPasskey.passkey
+
+        for importedPasskey in passkeys.dropFirst() {
+            let duplicate = node.duplicate(passkeyDuplicateTitle(baseTitle: node.title, suffix: importedPasskey.titleSuffix), preserveTimestamps: true)
+            duplicate.passkey = importedPasskey.passkey
+            parentGroup.addChild(duplicate, keePassGroupTitleRules: true)
+        }
+    }
+
+    private func convertPasskey(_ credential: BitwardenFido2Credential, fallbackUsername: String) -> PasskeyConversion {
+        if !matchesIfPresent(credential.keyType, "public-key") {
+            return .warning(ImportMessage("Skipping unsupported Bitwarden passkey key type", .warning))
+        }
+
+        if !matchesIfPresent(credential.keyAlgorithm, "ECDSA") {
+            return .warning(ImportMessage("Skipping unsupported Bitwarden passkey key algorithm", .warning))
+        }
+
+        if !matchesIfPresent(credential.keyCurve, "P-256") {
+            return .warning(ImportMessage("Skipping unsupported Bitwarden passkey key curve", .warning))
+        }
+
+        guard let relyingPartyId = credential.rpId, !relyingPartyId.isEmpty else {
+            return .warning(ImportMessage("Skipping Bitwarden passkey without relying party ID", .warning))
+        }
+
+        guard let credentialId = credential.credentialId, !credentialId.isEmpty else {
+            return .warning(ImportMessage("Skipping Bitwarden passkey without credential ID", .warning))
+        }
+
+        guard let credentialIdData = decodeBitwardenCredentialId(credentialId) else {
+            return .warning(ImportMessage("Skipping Bitwarden passkey with invalid credential ID", .warning))
+        }
+
+        guard let userHandleB64 = credential.userHandle, !userHandleB64.isEmpty,
+              let userHandleData = Base64UrlEncoding.base64UrlEncodingToData(userHandleB64) else {
+            return .warning(ImportMessage("Skipping Bitwarden passkey with invalid user handle", .warning))
+        }
+
+        guard let keyValue = credential.keyValue,
+              let privateKeyData = Base64UrlEncoding.base64UrlEncodingToData(keyValue) else {
+            return .warning(ImportMessage("Skipping Bitwarden passkey with invalid private key", .warning))
+        }
+
+        let privateKeyPem = pemWrappedPrivateKey(privateKeyData)
+        let username = firstNonEmpty(credential.userName, fallbackUsername, credential.userDisplayName) ?? ""
+
+        guard let passkey = Passkey(relyingPartyId: relyingPartyId,
+                                    username: username,
+                                    userHandleData: userHandleData,
+                                    credentialIdData: credentialIdData,
+                                    privateKeyPem: privateKeyPem) else {
+            return .warning(ImportMessage("Skipping Bitwarden passkey with unsupported private key", .warning))
+        }
+
+        let suffix = firstNonEmpty(credential.rpName, relyingPartyId, username) ?? relyingPartyId
+        return .imported(ImportedPasskey(passkey: passkey, titleSuffix: suffix))
+    }
+
+    private func matchesIfPresent(_ value: String?, _ expected: String) -> Bool {
+        guard let value, !value.isEmpty else {
+            return true
+        }
+
+        return value.caseInsensitiveCompare(expected) == .orderedSame
+    }
+
+    private func firstNonEmpty(_ values: String?...) -> String? {
+        values.first { value in
+            guard let value else {
+                return false
+            }
+
+            return !value.isEmpty
+        } ?? nil
+    }
+
+    private func pemWrappedPrivateKey(_ data: Data) -> String {
+        let base64 = data.base64EncodedString()
+        let lines = stride(from: 0, to: base64.count, by: 64).map { offset -> String in
+            let start = base64.index(base64.startIndex, offsetBy: offset)
+            let end = base64.index(start, offsetBy: min(64, base64.distance(from: start, to: base64.endIndex)))
+            return String(base64[start..<end])
+        }
+
+        return "-----BEGIN PRIVATE KEY-----\n\(lines.joined(separator: "\n"))\n-----END PRIVATE KEY-----\n"
+    }
+
+    private func decodeBitwardenCredentialId(_ credentialId: String) -> Data? {
+        if credentialId.hasPrefix("b64.") {
+            return Base64UrlEncoding.base64UrlEncodingToData(String(credentialId.dropFirst(4)))
+        }
+
+        guard let uuid = UUID(uuidString: credentialId) else {
+            return nil
+        }
+
+        var uuidBytes = uuid.uuid
+        return withUnsafeBytes(of: &uuidBytes) { Data($0) }
+    }
+
+    private func passkeyDuplicateTitle(baseTitle: String, suffix: String) -> String {
+        let cleanSuffix = suffix.isEmpty ? NSLocalizedString("generic_noun_passkey", comment: "Passkey") : suffix
+        return String(format: "%@ (%@)", baseTitle, cleanSuffix)
     }
 }

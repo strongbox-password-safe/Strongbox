@@ -216,7 +216,7 @@ class UnifiedRecord: Decodable {
         case "concealed":
             if !stringValue.isEmpty {
                 let isAlternativeTotpStyle = name.starts(with: "TOTP_")
-                let isTotpUrl = stringValue.starts(with: "otpauth:
+                let isTotpUrl = stringValue.starts(with: "otpauth://")
 
                 if isTotpUrl {
                     let url = URL(string: stringValue)
@@ -264,33 +264,33 @@ class UnifiedRecord: Decodable {
                 addEntryField(entry, title, stringExpiry, sectionLabel: sectionLabel)
             }
         case "date":
-
-
-
-
-
-
-
-
-
-
+//            if ( !stringValue.isEmpty ) {
+//                let d : Int64? = value.value as? Int64
+//                if ( d != nil ) {
+//                    addDateStringField(d!, title, entry)
+//                }
+//                else {
+//                    swlog("🔴 Unknown Date format value: [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
+//                }
+//            }
+//            else if ( value.value as? Int64 != nil ) {
             let epoch: Int64? = value.value as? Int64
 
             if epoch != nil {
-
-
-
-
+//                if ( title == "expires" ) {
+//                    entry.fields.expires = Date(timeIntervalSince1970: Double(epoch!))
+//                }
+//                else {
                 addDateStringField(epoch!, title, entry, sectionLabel: sectionLabel)
-
+//                }
             } else {
                 swlog("🔴 Unknown Date format value: [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
             }
 
-
+//            }
         case "string", "phone", "menu", "cctype", "gender", "email":
             if !stringValue.isEmpty {
-
+//                swlog("Adding regular String Field [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
                 addEntryField(entry, title, stringValue, sectionLabel: sectionLabel)
             }
         case "address":
@@ -300,7 +300,7 @@ class UnifiedRecord: Decodable {
                 if !line.key.isEmpty {
                     let stringValue = String(describing: line.value)
                     if !stringValue.isEmpty {
-
+//                        swlog("Adding Address Field [\(line.key)] = [\(stringValue)]")
                         addEntryField(entry, line.key, stringValue)
                     }
                 }
@@ -311,10 +311,10 @@ class UnifiedRecord: Decodable {
                 BaseImporter.addUrl(entry, stringValue, label)
             }
         case "file":
-            
+            // Ignore Files
             break
         default:
-
+//            swlog("🔴 Adding Unknown Type field [\(title)] = [\(stringValue)] with type [\(String(describing: datatype))]")
             addEntryField(entry, title, stringValue, sectionLabel: sectionLabel)
         }
     }

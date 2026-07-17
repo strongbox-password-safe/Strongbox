@@ -54,6 +54,11 @@
     #import "SFTPConnectionsManager.h"
 #endif
 
+#ifdef SETAPP
+    #import <Setapp/Setapp.h>
+    #import <Setapp/Setapp-Swift.h>
+#endif
+
 #import <UserNotifications/UserNotifications.h>
 #import "SBLog.h"
 
@@ -75,6 +80,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 
 @property BOOL firstActivationDone;
 @property BOOL wasLaunchedAsLoginItem;
+@property BOOL didShowMissingLocalNetworkAccessPermissionAlert;
 
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 @property (readonly) BOOL quitsToSystemTrayInsteadOfTerminates;
@@ -86,6 +92,8 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
 @property NSDate* systemTrayPopoverClosedAt;
 
 @property NSString *_Nullable pendingAutofillUUID;
+
+@property LocalNetworkPermissionChecker *checker;
 
 @end
 
@@ -148,6 +156,10 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self doDeferredAppLaunchTasks]; 
     });
+    
+    [self showSetappIfNeeded];
+    
+    [self validateLocalNetworkAccess];
 }
 
 - (void)doDeferredAppLaunchTasks {
@@ -332,18 +344,18 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self bindFreeOrProStatus];
     
-    if ( !MacCustomizationManager.isAProBundle ) {
+    if ( !MacCustomizationManager.isAProBundle && !MacCustomizationManager.isSetapp ) {
         [ProUpgradeIAPManager.sharedInstance initialize]; 
     } else {
-        #if defined(SUBSCRIPTIONS)
+#if defined(SUBSCRIPTIONS)
         
         [RCStrongboxBridge setOnFetchComplete:^{
             [[TipJarLogic sharedInstance] refresh];
         }];
         [RCStrongboxBridge initializeRevenueCat];
-        #endif
+#endif
     }
-
+    
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [DropboxV2StorageProvider.sharedInstance initialize:Settings.sharedInstance.useIsolatedDropbox];
 #endif
@@ -435,7 +447,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     
     if ( ![self isWindowOfInterest:notification] ) { 
-                                                     
+        
         return;
     }
     
@@ -446,7 +458,7 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     
     
     if ( ![self isWindowOfInterest:notification] ) { 
-                                                     
+        
         return;
     }
     
@@ -1087,6 +1099,47 @@ const NSInteger kTopLevelMenuItemTagView = 1113;
     return YES;
 }
 
+- (void)validateLocalNetworkAccess {
+    if (self.didShowMissingLocalNetworkAccessPermissionAlert) {
+        return;
+    }
+    self.didShowMissingLocalNetworkAccessPermissionAlert = true;
+    
+    if (self.checker == nil) {
+        self.checker = [[LocalNetworkPermissionChecker alloc] init];
+    }
+    
+    [self.checker requestAuthorizationWithCompletion:^(BOOL granted) {
+        if (granted) {
+            slog(@"Local Network access granted.");
+        } else {
+            BOOL isWiFiSyncOn = Settings.sharedInstance.runAsWiFiSyncSourceDevice;
+            if (isWiFiSyncOn) {
+                [MacAlerts info:NSLocalizedString(@"generic_warning", @"Warning")
+                informativeText:NSLocalizedString(@"local_network_access_not_granted", @"Missing Local Network Access permission message.")
+                         window:DBManagerPanel.sharedInstance.window
+                     completion:^{
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [self openLocalNetworkPrivacyPane];
+                    });
+                }];
+            }
+        }
+    }];
+}
+
+- (void)openLocalNetworkPrivacyPane {
+    
+    NSURL *url = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_LocalNetwork"];
+    if ([[NSWorkspace sharedWorkspace] openURL:url]) {
+        return;
+    }
+
+    
+    NSURL *privacyRoot = [NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy"];
+    [[NSWorkspace sharedWorkspace] openURL:privacyRoot];
+}
+
 - (IBAction)signOutOfGoogleDrive:(id)sender {
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [GoogleDriveManager.sharedInstance signout];
@@ -1411,13 +1464,13 @@ static NSInteger clipboardChangeCount;
     
     [MacAlerts info:loc
     informativeText:message
-             window:NSApplication.sharedApplication.mainWindow
+             window:DBManagerPanel.sharedInstance.window
          completion:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             [self requestImportFile:[[CSVImporter alloc] init]];
         });
     }];
-}
+  }
 
 - (IBAction)onImportFromiCloudCsvFile:(id)sender {
     [self requestImportFile:[[iCloudImporter alloc] init] showGenericWarning:YES];
@@ -1433,6 +1486,22 @@ static NSInteger clipboardChangeCount;
 
 - (IBAction)onImportFromBitwardenJson:(id)sender {
     [self requestImportFile:[[BitwardenImporter alloc] init] showGenericWarning:YES];
+}
+
+- (IBAction)onImportFromProtonPassJson:(id)sender {
+    [self requestImportFile:[[ProtonPassImporter alloc] init] showGenericWarning:YES];
+}
+
+- (IBAction)onImportFromMinimalistJson:(id)sender {
+    [self requestImportFile:[[MinimalistImporter alloc] init] showGenericWarning:YES];
+}
+
+- (IBAction)onImportFrommSecureCsv:(id)sender {
+    [self requestImportFile:[[MSecureImporter alloc] init] showGenericWarning:YES];
+}
+
+- (IBAction)onImportFromSecrets4Xml:(id)sender {
+    [self requestImportFile:[[Secrets4Importer alloc] init] showGenericWarning:YES];
 }
 
 - (IBAction)onImport1Password1Pif:(id)sender {
@@ -1683,7 +1752,7 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)onContactSupport:(id)sender {
-    NSURL* launchableUrl = [NSURL URLWithString:@"https:
+    NSURL* launchableUrl = [NSURL URLWithString:@"https://strongboxsafe.com/support/"];
     
     [[NSWorkspace sharedWorkspace] openURL:launchableUrl
                              configuration:NSWorkspaceOpenConfiguration.configuration
@@ -1725,6 +1794,7 @@ static NSInteger clipboardChangeCount;
 
 - (void)publishTotpUpdateNotification {
     [NSNotificationCenter.defaultCenter postNotificationName:kTotpUpdateNotification object:nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:kCentralUpdateOtpUiNotification object:nil];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
@@ -1754,7 +1824,7 @@ static NSInteger clipboardChangeCount;
 }
 
 - (void)bindFreeOrProStatus {
-    if ( MacCustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro ) { 
+    if ( MacCustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.isLegacyLifetimeIAPPro || MacCustomizationManager.isSetapp) {
         [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onUpgradeToFullVersion:)];
     }
     
@@ -1772,7 +1842,9 @@ static NSInteger clipboardChangeCount;
             NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
             
             NSString* fmt;
-            if ( StrongboxProductBundle.isZeroEdition ) {
+            if ( StrongboxProductBundle.isSetapp ) {
+                fmt = NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+            } else if ( StrongboxProductBundle.isZeroEdition ) {
                 fmt = NSLocalizedString(@"prefs_vc_app_version_info_zero_fmt", @"About Strongbox Zero %@");
             }
             else {

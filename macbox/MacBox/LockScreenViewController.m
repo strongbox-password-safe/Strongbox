@@ -318,6 +318,16 @@
     
     self.labelPricing.stringValue = fmt;
     self.labelPricing.hidden = NO;
+
+    NSString* trialDuration = ProUpgradeIAPManager.sharedInstance.freeTrialDurationText;
+    if ( trialDuration.length > 0 ) {
+        NSString* titleFmt = NSLocalizedStringFromTable(@"3ys-DD-kzc.title",
+                                                        @"Main",
+                                                        @"Redeem your %@ Free Trial");
+        [self.buttonFreeTrialOrUpgrade setTitle:[NSString stringWithFormat:titleFmt, trialDuration]];
+    } else {
+        [self.buttonFreeTrialOrUpgrade setTitle:NSLocalizedString(@"generic_start_free_trial", @"Start Free Trial")];
+    }
     
     [self.buttonFreeTrialOrUpgrade setAction:@selector(onQuickStartFreeTrialOrYearly)];
 }

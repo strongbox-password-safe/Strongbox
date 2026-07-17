@@ -30,8 +30,7 @@ public class SaleNowOnOnboardingModule: NSObject, OnboardingModule {
         }
 
         let vcc = SwiftUIViewFactory.makeSaleOfferViewController(sale: sale,
-                                                                 existingSubscriber: existingSubscriber)
-        {
+                                                                 existingSubscriber: existingSubscriber) {
             SaleScheduleManager.sharedInstance().userHasBeenPromptedAboutCurrentSale = true
             SKPaymentQueue.default().presentCodeRedemptionSheet()
             onDone(false, true)

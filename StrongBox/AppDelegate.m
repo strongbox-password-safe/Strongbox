@@ -31,6 +31,10 @@
 #import "Constants.h"
 #import "Strongbox-Swift.h"
 
+#ifndef NO_NETWORKING
+@import Sentry;
+#endif
+
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 
 #import "DropboxV2StorageProvider.h"
@@ -72,6 +76,9 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
     [self installTopLevelExceptionHandlers];
     
+    [self updateSentryState];
+
+    
     
     
     [self initializeDropbox];
@@ -98,7 +105,11 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
     if (!CustomizationManager.isAProBundle) {
+        [self initializeSetappIfNeeded];
         [ProUpgradeIAPManager.sharedInstance initialize]; 
+        #if defined(SUBSCRIPTIONS)
+        [SuperwallService configure];
+        #endif
     } else {
         #if defined(SUBSCRIPTIONS)
         
@@ -125,7 +136,63 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         [self doDeferredAppLaunchTasks]; 
     });
 
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+        NSDictionary *userActivityDictionary = [launchOptions objectForKey:UIApplicationLaunchOptionsUserActivityDictionaryKey];
+        if (userActivityDictionary) {
+            NSUserActivity *userActivity = [userActivityDictionary objectForKey: @"UIApplicationLaunchOptionsUserActivityKey"];
+            if (userActivity) {
+                [self processUserActivityWithUserActivity:userActivity];
+            }
+        }
+    });
+    
     return YES;
+}
+
+- (void)updateSentryState {
+#ifndef NO_NETWORKING
+    if (!AppPreferences.sharedInstance.sentryCrashReportingEnabled) {
+        if ([SentrySDK isEnabled]) {
+            [SentrySDK close];
+        }
+        return;
+    }
+
+    if ([SentrySDK isEnabled]) {
+        return;
+    }
+
+    [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
+        if([CustomizationManager isAProBundle]) {
+            options.dsn = @"https://7c6877020f52764e32e0b67598acf093@o416041.ingest.us.sentry.io/4510459509604353";
+        } else {
+            options.dsn = @"https://98cc53f9bdd23d5412b6150fc35cee8f@o416041.ingest.us.sentry.io/4510420896317440";
+        }
+        
+        options.enableSwizzling = NO;
+        options.enableNetworkBreadcrumbs = NO;
+        options.enableAutoBreadcrumbTracking = NO;
+        options.enableUserInteractionTracing = NO;
+        options.enableAutoSessionTracking = NO;
+        options.enableWatchdogTerminationTracking = NO;
+        options.enableAppHangTracking = NO;
+        options.enableAutoPerformanceTracing = NO;
+        options.enableUIViewControllerTracing = NO;
+        options.enableNetworkTracking = NO;
+        options.enableFileIOTracing = NO;
+        options.enableCoreDataTracing = NO;
+        options.enableCaptureFailedRequests = NO;
+        options.tracesSampleRate = @0;
+        options.attachScreenshot = NO;
+        options.attachViewHierarchy = NO;
+        options.sendClientReports = NO;
+        #ifdef DEBUG
+        options.debug = YES; 
+        options.diagnosticLevel = kSentryLevelDebug;
+        #endif
+    }];
+#endif
 }
 
 - (void)doDeferredAppLaunchTasks {
@@ -210,6 +277,13 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
 
 
 
+- (BOOL)application:(UIApplication *)application
+ continueUserActivity:(NSUserActivity *)userActivity
+   restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
+    [self processUserActivityWithUserActivity:userActivity];
+    return YES;
+}
+
 - (void)cleanupWorkingDirectories:(NSDictionary *)launchOptions {
     if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
         
@@ -247,8 +321,10 @@ fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHand
             openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
     slog(@"openURL: [%@] => [%@] - Source App: [%@]", options, url, options[UIApplicationOpenURLOptionsSourceApplicationKey]);
-    
-    if ([url.scheme isEqualToString:@"strongbox"]) {
+
+    if ([self processSetappURLWithUrl:url options:options]) {
+        return YES;
+    } else if ([url.scheme isEqualToString:@"strongbox"]) {
 
 
         return YES;
@@ -783,4 +859,3 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 @end
-

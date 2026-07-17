@@ -27,7 +27,7 @@ struct ChromeNativeMessagingManifest: Encodable {
 
     
 
-    let allowed_origins: [String] = ["chrome-extension:
+    let allowed_origins: [String] = ["chrome-extension://mnilpkfepdibngheginihjpknnopchbn/"]
 
     
 }
@@ -102,14 +102,22 @@ class NativeMessagingManifestInstallHelper: NSObject {
     }
 
     class func installFirefoxLikeManifestAt(_ browserHomePath: String) {
+        #if SETAPP
+        let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/afproxy-setapp").path
+        #else
         let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/afproxy").path
+        #endif
         let manifest = FirefoxNativeMessagingManifest(path: path)
 
         writeNativeManifest(manifest, browserHomePath: browserHomePath)
     }
 
     class func installForChromiumBasedBrowser(_ browserHomePath: String) {
+        #if SETAPP
+        let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/afproxy-setapp").path
+        #else
         let path = Bundle.main.bundleURL.appendingPathComponent("Contents/MacOS/afproxy").path
+        #endif
         let manifest = ChromeNativeMessagingManifest(path: path)
 
         writeNativeManifest(manifest, browserHomePath: browserHomePath)

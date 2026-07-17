@@ -25,17 +25,28 @@ extension String {
     
     
     
-    func formattedAsCreditCardNumber() -> String {
+    func formattedAsCreditCardNumber(usingAmexFormat: Bool = false) -> String {
         let digits = self.filter { $0.isASCII && $0.isWholeNumber }
-        let truncated = String(digits.prefix(16))
+        
+        let maxLength = usingAmexFormat ? 15 : 16
+        let truncated = String(digits.prefix(maxLength))
         
         guard !truncated.isEmpty else { return "" }
-        
-        let groups = stride(from: 0, to: truncated.count, by: 4).map {
-            let start = truncated.index(truncated.startIndex, offsetBy: $0)
-            let end = truncated.index(start, offsetBy: min(4, truncated.count - $0))
-            return String(truncated[start..<end])
+
+        let groupSizes = usingAmexFormat ? [4, 6, 5] : [4, 4, 4, 4]
+        var groups: [String] = []
+
+        var currentIndex = truncated.startIndex
+        for size in groupSizes {
+            guard currentIndex < truncated.endIndex else { break }
+
+            let remainingCharacters = truncated.distance(from: currentIndex, to: truncated.endIndex)
+            let endIndex = truncated.index(currentIndex, offsetBy: min(size, remainingCharacters))
+            groups.append(String(truncated[currentIndex..<endIndex]))
+
+            currentIndex = endIndex
         }
+
         return groups.joined(separator: "-")
     }
     
@@ -88,4 +99,11 @@ extension String {
         
         return formatter.string(from: NSNumber(value: number)) ?? digits
     }
-} 
+}
+
+extension String {
+    var onlyNumbers: String {
+        let numbersOnlyString = self.filter { $0.isNumber }
+        return numbersOnlyString
+    }
+}

@@ -121,7 +121,7 @@ class LastPassImporter: NSObject, Importer {
 
         var isSecureNote = false
         if let url = row[Fields.url.rawValue] as? String {
-            if url != "http:
+            if url != "http://sn" {
                 node.fields.url = url
             } else {
                 isSecureNote = true

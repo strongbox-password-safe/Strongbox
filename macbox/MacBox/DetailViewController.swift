@@ -177,7 +177,9 @@ class DetailViewController: NSViewController {
 
         ret.append(getTitleField(model, selectedNode))
 
-        if isCreditCardEntry(selectedNode) {
+        let isCreditCard = isCreditCardEntry(selectedNode)
+
+        if isCreditCard {
             ret.append(contentsOf: getCreditCardFields(model, selectedNode))
         } else {
             ret.append(contentsOf: getUsernameFields(model, selectedNode))
@@ -187,7 +189,11 @@ class DetailViewController: NSViewController {
         ret.append(contentsOf: getAuditIssueFields(model, selectedNode))
         ret.append(contentsOf: getTotpFields(model))
         ret.append(contentsOf: getEmailFields(model, selectedNode))
-        ret.append(contentsOf: getExpiresFields(model))
+
+        
+        if !isCreditCard || creditCardExpiryDisplayString(selectedNode) == nil {
+            ret.append(contentsOf: getExpiresFields(model))
+        }
         ret.append(contentsOf: loadUrlFields(model, selectedNode))
         ret.append(contentsOf: loadTagsFields(model))
         ret.append(contentsOf: loadPasskeyFields(model))
@@ -200,9 +206,121 @@ class DetailViewController: NSViewController {
         return ret
     }
 
+    private func isMetadataSectionCollapsed() -> Bool {
+        database.databaseMetadata.isDetailsViewCollapsed(for: .metadata)
+    }
+
+    private func isSshSectionCollapsed() -> Bool {
+        database.databaseMetadata.isDetailsViewCollapsed(for: .sshKey)
+    }
+
+    private func setMetadataSectionCollapsed(_ collapsed: Bool) {
+        database.databaseMetadata.setDetailsViewCollapsed(collapsed, for: .metadata)
+    }
+
+    private func setSshSectionCollapsed(_ collapsed: Bool) {
+        database.databaseMetadata.setDetailsViewCollapsed(collapsed, for: .sshKey)
+    }
+
+    private func metadataValueFields() -> [DetailsViewField] {
+        guard let databaseModel = database.commonModel,
+              let node = getNode()
+        else {
+            return []
+        }
+
+        return databaseModel.getMetadataFromItem(node).map { meta in
+            DetailsViewField(name: meta.key, value: meta.value, fieldType: .metadata)
+        }
+    }
+
+    private func isMetadataHeaderField(_ field: DetailsViewField) -> Bool {
+        field.fieldType == .header && (field.object as? DetailsViewField.FieldType) == .metadata
+    }
+
+    private func isSshHeaderField(_ field: DetailsViewField) -> Bool {
+        field.fieldType == .headerWithTextButton && field.object is KeeAgentSshKeyViewModel
+    }
+
+    private func isSectionHeaderField(_ field: DetailsViewField) -> Bool {
+        field.fieldType == .header || field.fieldType == .headerWithTextButton
+    }
+
+    private func updateSectionCollapsed(_ collapsed: Bool,
+                                        headerMatcher: (DetailsViewField) -> Bool,
+                                        setCollapsed: (Bool) -> Void,
+                                        replacementBodyFields: [DetailsViewField])
+    {
+        let previousFields = fields
+        setCollapsed(collapsed)
+
+        guard let headerIndex = previousFields.firstIndex(where: headerMatcher) else {
+            refresh()
+            return
+        }
+
+        let bodyStartIndex = headerIndex + 1
+        let existingBodyCount: Int
+
+        if bodyStartIndex < previousFields.count {
+            existingBodyCount = previousFields[bodyStartIndex...].prefix { !isSectionHeaderField($0) }.count
+        } else {
+            existingBodyCount = 0
+        }
+
+        let trailingFields = Array(previousFields.dropFirst(bodyStartIndex + existingBodyCount))
+
+        var updatedFields = Array(previousFields.prefix(bodyStartIndex))
+        updatedFields.append(contentsOf: replacementBodyFields)
+        updatedFields.append(contentsOf: trailingFields)
+        cached = updatedFields
+
+        let headerRow = IndexSet(integer: headerIndex)
+        let columns = IndexSet(integer: 0)
+        let removedRows = IndexSet(integersIn: bodyStartIndex..<(bodyStartIndex + existingBodyCount))
+        let insertedRows = IndexSet(integersIn: bodyStartIndex..<(bodyStartIndex + replacementBodyFields.count))
+
+        NSAnimationContext.runAnimationGroup { context in
+            context.duration = 0
+            tableView.beginUpdates()
+            if !removedRows.isEmpty {
+                tableView.removeRows(at: removedRows, withAnimation: [])
+            }
+            if !insertedRows.isEmpty {
+                tableView.insertRows(at: insertedRows, withAnimation: [])
+            }
+            tableView.reloadData(forRowIndexes: headerRow, columnIndexes: columns)
+            tableView.endUpdates()
+        }
+    }
+
+    private func updateMetadataSectionCollapsed(_ collapsed: Bool) {
+        updateSectionCollapsed(collapsed,
+                               headerMatcher: isMetadataHeaderField,
+                               setCollapsed: setMetadataSectionCollapsed,
+                               replacementBodyFields: collapsed ? [] : metadataValueFields())
+    }
+
+    private func updateSshSectionCollapsed(_ collapsed: Bool, _ model: EntryViewModel) {
+        updateSectionCollapsed(collapsed,
+                               headerMatcher: isSshHeaderField,
+                               setCollapsed: setSshSectionCollapsed,
+                               replacementBodyFields: collapsed ? [] : sshSectionFields(model))
+    }
+
     func isCreditCardEntry(_ node: Node) -> Bool {
         guard !Settings.sharedInstance().disableCustomViews else { return false }
         return node.isCreditCard()
+    }
+
+    
+    
+    private func creditCardExpiryDisplayString(_ node: Node) -> String? {
+        let customFields = node.fields.customFields
+        guard let expiryField = customFields["ExpiryDate" as NSString] ?? customFields["Expiry Date" as NSString] else { return nil }
+
+        let resolved = dereference(expiryField.value, node: node).trimmingCharacters(in: .whitespacesAndNewlines)
+        return resolved.isEmpty ? nil : resolved
     }
 
     func getCreditCardFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
@@ -264,10 +382,9 @@ class DetailViewController: NSViewController {
         }
 
         
-        if let expiryField = customField("ExpiryDate", aliases: ["Expiry Date"]),
-           !expiryField.value.isEmpty {
+        if let expiryValue = creditCardExpiryDisplayString(node) {
             ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_expiry_date", comment: "Expiry Date"),
-                                        value: dereference(expiryField.value, node: node),
+                                        value: expiryValue,
                                         fieldType: .creditCardType))
         }
 
@@ -360,7 +477,6 @@ class DetailViewController: NSViewController {
                                        showStrength: true)
 
             ret.showHistory = true
-            ret.showLargeTextView = true
 
             return [ret]
         } else {
@@ -402,51 +518,61 @@ class DetailViewController: NSViewController {
         guard let sshKey = model.keeAgentSshKey else {
             return []
         }
-        let key = sshKey.openSshKey
 
         var ret: [DetailsViewField] = []
 
-
         ret.append(DetailsViewField(name: NSLocalizedString("ssh_agent_ssh_key", comment: "SSH Key"),
                                     value: NSLocalizedString("generic_export_ellipsis", comment: "Export..."),
-                                    fieldType: .header,
-                                    object: model.keeAgentSshKey))
-
-        let fingerprintImage: NSImage? = nil
-
-        ret.append(DetailsViewField(name: "",
-                                    value: model.password,
-                                    fieldType: .keeAgentKeySummary,
-                                    object: sshKey))
-
-        ret.append(DetailsViewField(name: NSLocalizedString("generic_public_key", comment: "Public Key"),
-                                    value: key.publicKey,
-                                    fieldType: .keeAgentKey,
-                                    concealed: false,
-                                    concealable: false,
+                                    fieldType: .headerWithTextButton,
                                     object: sshKey,
-                                    showShare: true,
-                                    singleLineMode: true,
-                                    params: ["filename": sshKey.filename, "password": model.password]))
+                                    params: ["password": model.password]))
 
-        ret.append(DetailsViewField(name: NSLocalizedString("generic_private_key", comment: "Private Key"),
-                                    value: key.privateKey,
-                                    fieldType: .keeAgentKey,
-                                    concealed: true,
-                                    concealable: true,
-                                    object: sshKey,
-                                    showShare: true,
-                                    params: ["filename": sshKey.filename, "password": model.password]))
-
-        ret.append(DetailsViewField(name: NSLocalizedString("ssh_agent_key_fingerprint", comment: "Fingerprint"),
-                                    value: key.fingerprint,
-                                    fieldType: .customField,
-                                    concealed: false,
-                                    concealable: false,
-                                    singleLineMode: true,
-                                    leftImage: fingerprintImage))
+        if !isSshSectionCollapsed() {
+            ret.append(contentsOf: sshSectionFields(model))
+        }
 
         return ret
+    }
+
+    private func sshSectionFields(_ model: EntryViewModel) -> [DetailsViewField] {
+        guard let sshKey = model.keeAgentSshKey else {
+            return []
+        }
+
+        let key = sshKey.openSshKey
+        let fingerprintImage: NSImage? = nil
+
+        return [
+            DetailsViewField(name: "",
+                             value: model.password,
+                             fieldType: .keeAgentKeySummary,
+                             object: sshKey),
+            DetailsViewField(name: NSLocalizedString("generic_public_key", comment: "Public Key"),
+                             value: key.publicKey,
+                             fieldType: .keeAgentKey,
+                             concealed: false,
+                             concealable: false,
+                             object: sshKey,
+                             showShare: true,
+                             singleLineMode: true,
+                             params: ["filename": sshKey.filename, "password": model.password]),
+            DetailsViewField(name: NSLocalizedString("generic_private_key", comment: "Private Key"),
+                             value: key.privateKey,
+                             fieldType: .keeAgentKey,
+                             concealed: true,
+                             concealable: true,
+                             object: sshKey,
+                             showShare: true,
+                             params: ["filename": sshKey.filename, "password": model.password]),
+            DetailsViewField(name: NSLocalizedString("ssh_agent_key_fingerprint", comment: "Fingerprint"),
+                             value: key.fingerprint,
+                             fieldType: .customField,
+                             concealed: false,
+                             concealable: false,
+                             object: sshKey,
+                             singleLineMode: true,
+                             leftImage: fingerprintImage)
+        ]
     }
 
     func loadPasskeyFields(_ model: EntryViewModel) -> [DetailsViewField] {
@@ -618,9 +744,13 @@ class DetailViewController: NSViewController {
         return ret
     }
 
-    fileprivate func loadCustomFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
-        var ret: [DetailsViewField] = []
-
+    
+    
+    
+    
+    
+    
+    fileprivate func realCustomFields(_ model: EntryViewModel, _ node: Node) -> [CustomFieldViewModel] {
         var filtered = model.customFieldsFiltered.filter { field in
             
             !NodeFields.isTotpCustomFieldKey(field.key) && !NodeFields.isAlternativeURLCustomFieldKey(field.key)
@@ -657,6 +787,14 @@ class DetailViewController: NSViewController {
                 !creditCardFieldKeys.contains(field.key)
             }
         }
+
+        return filtered
+    }
+
+    fileprivate func loadCustomFields(_ model: EntryViewModel, _ node: Node) -> [DetailsViewField] {
+        var ret: [DetailsViewField] = []
+
+        let filtered = realCustomFields(model, node)
 
         if !filtered.isEmpty {
             ret.append(DetailsViewField(name: NSLocalizedString("generic_fieldname_custom_fields", comment: "Custom Fields"),
@@ -722,21 +860,21 @@ class DetailViewController: NSViewController {
     }
 
     fileprivate func loadMetadataFields(_: EntryViewModel) -> [DetailsViewField] {
-        var ret: [DetailsViewField] = []
+        let metadataFields = metadataValueFields()
 
-        if let databaseModel = database.commonModel, let node = getNode() {
-            let metadata = databaseModel.getMetadataFromItem(node)
+        guard !metadataFields.isEmpty else {
+            return []
+        }
 
-            if !metadata.isEmpty {
-                ret.append(DetailsViewField(name: NSLocalizedString("item_details_section_header_metadata", comment: "Metadata"),
-                                            value: "",
-                                            fieldType: .header,
-                                            object: DetailsViewField.FieldType.metadata))
+        var ret: [DetailsViewField] = [
+            DetailsViewField(name: NSLocalizedString("item_details_section_header_metadata", comment: "Metadata"),
+                             value: "",
+                             fieldType: .header,
+                             object: DetailsViewField.FieldType.metadata)
+        ]
 
-                for meta in metadata {
-                    ret.append(DetailsViewField(name: meta.key, value: meta.value, fieldType: .metadata))
-                }
-            }
+        if !isMetadataSectionCollapsed() {
+            ret.append(contentsOf: metadataFields)
         }
 
         return ret
@@ -1061,6 +1199,20 @@ class DetailViewController: NSViewController {
                     menu.addItem(menuItem2)
                 }
             }
+
+            if field.showHistory,
+               let historySubmenu = getPasswordHistorySubmenu()
+            {
+                let historyMenuItem = NSMenuItem(title: NSLocalizedString("item_details_section_header_history", comment: "History"), action: nil, keyEquivalent: "")
+                historyMenuItem.submenu = historySubmenu
+
+                if let image = NSImage(systemSymbolName: "clock.arrow.circlepath", accessibilityDescription: "") {
+                    historyMenuItem.image = image
+                }
+
+                menu.addItem(historyMenuItem)
+            }
+
             menu.addItem(getShowLargeTextViewMenuItem(field))
         }
 
@@ -1202,10 +1354,35 @@ class DetailViewController: NSViewController {
 
     
 
+    
+    
+    
+    
+    func copyCustomField(displayIndex: Int) -> Bool {
+        guard let node = getNode(), let dbModel = database.commonModel else {
+            return false
+        }
+
+        let model = EntryViewModel.fromNode(node, model: dbModel)
+        let customFields = realCustomFields(model, node)
+
+        guard customFields.indices.contains(displayIndex) else {
+            return false
+        }
+
+        let field = customFields[displayIndex]
+        copyFieldToClipboard(field.key, dereference(field.value, node: node))
+
+        return true
+    }
+
     func copyFieldToClipboard(_ field: DetailsViewField) {
         if field.fieldType == .totp {
             guard let token = field.object as? OTPToken else { return }
             copyFieldToClipboard(field.name, token.password)
+        } else if field.fieldType == .creditCardNumber {
+            let numbersOnlyString = field.value.onlyNumbers
+            copyFieldToClipboard(field.name, numbersOnlyString)
         } else {
             copyFieldToClipboard(field.name, field.value)
         }
@@ -1775,6 +1952,16 @@ extension DetailViewController: DocumentViewController {
 
         return PasswordHistoryHelper.getPasswordHistoryMenu(item: item)
     }
+
+    func getPasswordHistorySubmenu() -> NSMenu? {
+        guard database.format == .keePass4 || database.format == .keePass,
+              let item = getNode()
+        else {
+            return nil
+        }
+
+        return PasswordHistoryHelper.getPasswordHistorySubmenu(item: item)
+    }
 }
 
 extension DetailViewController: NSMenuDelegate {
@@ -1939,11 +2126,7 @@ extension DetailViewController: NSTableViewDelegate {
                             containingWindow: view.window,
                             singleLineMode: field.singleLineMode)
 
-            if field.showHistory {
-                cell.history = getPasswordHistoryMenu()
-            } else {
-                cell.history = nil
-            }
+            cell.history = nil
 
             return cell
         case .title:
@@ -1974,9 +2157,25 @@ extension DetailViewController: NSTableViewDelegate {
                 return nil
             }
 
-            cell.setContent(field) { [weak self] in
+            let isSshHeader = isSshHeaderField(field)
+
+            cell.setContent(field,
+                            onButtonClicked: { [weak self] in
                 self?.onExportSshKey(field)
-            }
+            },
+                            showDisclosure: isSshHeader,
+                            disclosureExpanded: isSshHeader ? !isSshSectionCollapsed() : true,
+                            onDisclosureClicked: isSshHeader ? { [weak self] disclosed in
+                                guard let self,
+                                      let node = self.getNode(),
+                                      let dbModel = self.database.commonModel
+                                else {
+                                    return
+                                }
+
+                                let model = EntryViewModel.fromNode(node, model: dbModel)
+                                self.updateSshSectionCollapsed(!disclosed, model)
+                            } : nil)
 
             return cell
         case .header:
@@ -1995,7 +2194,13 @@ extension DetailViewController: NSTableViewDelegate {
                             showCopyButton: subtype == .some(.notes),
                             onCopyClicked: subtype == .some(.notes) ? { [weak self] in self?.onCopyEntiresNotes() } : nil,
                             popupMenuImage: subtype == .some(.customField) ? sortImage : nil,
-                            popupMenuText: subtype == .some(.customField) ? sortTitle : "")
+                            popupMenuText: subtype == .some(.customField) ? sortTitle : "",
+                            showDisclosure: subtype == .some(.metadata),
+                            disclosureExpanded: subtype == .some(.metadata) ? !isMetadataSectionCollapsed() : true,
+                            onDisclosureClicked: subtype == .some(.metadata) ? { [weak self] disclosed in
+                                guard let self else { return }
+                                self.updateMetadataSectionCollapsed(!disclosed)
+                            } : nil)
 
             return cell
         case .metadata:

@@ -92,7 +92,7 @@
     NSString* password = [PasswordMaker.sharedInstance generateWithDefaultConfig];
     NSString* email = [PasswordMaker.sharedInstance generateEmail];
 
-    NSString* url = [NSString stringWithFormat:@"https:
+    NSString* url = [NSString stringWithFormat:@"https://www.website-%d.com/path", index];
     NSString* notes = [NSString stringWithFormat:@"notes could be quite long too-%d", index];
 
     NodeFields *fields = [[NodeFields alloc] initWithUsername:username

@@ -184,7 +184,7 @@ static NSString* const kMailToScheme = @"mailto";
                 NSURLComponents* components = [NSURLComponents componentsWithURL:parsed resolvingAgainstBaseURL:NO];
                 
                 if ( !components.scheme.length ) { 
-                    NSString* urlString = [NSString stringWithFormat:@"https:
+                    NSString* urlString = [NSString stringWithFormat:@"https://%@", expUrl];
                     [uniqueUrls addObject:urlString];
                 }
                 else {

@@ -729,7 +729,7 @@ NSString* const kOtpAuthScheme = @"otpauth";
     
     
     if ( self.usingLegacyKeeOtpStyle ) {
-        NSURLComponents *components = [NSURLComponents componentsWithString:@"http:
+        NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
         NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret mmcg_base32String]];
         
         if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {

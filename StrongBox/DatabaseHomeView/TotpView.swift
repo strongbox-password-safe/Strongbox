@@ -25,7 +25,7 @@ struct TotpView: View {
         if #available(iOS 16.0, *) {
             HStack {
                 TwoFactorCodeView(totp: totp,
-                                  updateMode: .automatic,
+                                  updateMode: .centralTimerNotification,
                                   easyReadSeparator: easyReadSeparator,
                                   isPro: true,
                                   limitNonPro: false,
@@ -39,7 +39,7 @@ struct TotpView: View {
                 .onAppear(perform: {
                     updateTotp()
                 })
-                .onReceive(NotificationCenter.default.publisher(for: .centralUpdateOtpUi, object: nil)) { _ in
+                .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name.centralUpdateOtpUi , object: nil)) { _ in
                     updateTotp()
                 }
             #if DEBUG
@@ -81,6 +81,6 @@ struct TotpView: View {
             .autoconnect()
             .eraseToAnyPublisher()
 
-        return TotpView(totp: OTPToken(url: URL(string: "otpauth:
+        return TotpView(totp: OTPToken(url: URL(string: "otpauth://totp/Timely:Kimberely%20Schimke?secret=2Y&algorithm=SHA1&digits=6&period=30&issuer=Timely")), easyReadSeparator: true, previewDummyTestTimer: timer)
     }
 #endif

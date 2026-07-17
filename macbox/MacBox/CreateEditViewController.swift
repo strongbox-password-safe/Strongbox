@@ -57,6 +57,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     @IBOutlet var labelStrength: NSTextField!
     @IBOutlet var buttonGeneratePassword: NSButton!
     @IBOutlet var buttonPasswordPreferences: NSButton!
+    @IBOutlet var buttonUsernameSuggestions: NSButton!
+    @IBOutlet var buttonEmailSuggestions: NSButton!
     @IBOutlet var popupButtonAlternativeSuggestions: NSPopUpButton!
     @IBOutlet var popupButtonUsernameSuggestions: NSPopUpButton!
     @IBOutlet var popupButtonEmailSuggestions: NSPopUpButton!
@@ -460,6 +462,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func setupUsername() {
+        configureSuggestionsButton(buttonUsernameSuggestions)
+
         textFieldUsername.completions = Array(database.usernameSet)
         textFieldUsername.completionEnabled = database.showAutoCompleteSuggestions
         textFieldUsername.onTextDidChange = { [weak self] in
@@ -494,6 +498,8 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func setupEmail() {
+        configureSuggestionsButton(buttonEmailSuggestions)
+
         textFieldEmail.completions = Array(database.emailSet)
         textFieldEmail.completionEnabled = database.showAutoCompleteSuggestions
         textFieldEmail.onTextDidChange = { [weak self] in
@@ -506,6 +512,29 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             guard let self else { return }
             self.handlePasteImageIntoField()
         }
+    }
+
+    private func configureSuggestionsButton(_ button: NSButton) {
+        button.image = NSImage(systemSymbolName: "chevron.down", accessibilityDescription: nil)
+        button.symbolConfiguration = .init(scale: .large)
+        button.contentTintColor = .secondaryLabelColor
+    }
+
+    private func showSuggestionsMenu(_ popupButton: NSPopUpButton, from triggerButton: NSButton) {
+        guard let menu = popupButton.menu else {
+            return
+        }
+
+        menu.update()
+        menu.popUp(positioning: nil, at: NSPoint(x: 0, y: triggerButton.bounds.height + 4), in: triggerButton)
+    }
+
+    @IBAction func onShowUsernameSuggestionsMenu(_ sender: NSButton) {
+        showSuggestionsMenu(popupButtonUsernameSuggestions, from: sender)
+    }
+
+    @IBAction func onShowEmailSuggestionsMenu(_ sender: NSButton) {
+        showSuggestionsMenu(popupButtonEmailSuggestions, from: sender)
     }
 
     func setupPassword() {
@@ -1340,6 +1369,16 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
                 let item = NSMenuItem(title: NSLocalizedString("menu_item_header_most_used_suggestions", comment: "Most Used"), action: nil, keyEquivalent: "")
                 item.isEnabled = false
                 menu.addItem(item)
+            } else if suggestion == "_SIMPLELOGIN_" {
+                menu.addItem(NSMenuItem.separator())
+                let header = NSMenuItem(title: "SimpleLogin", action: nil, keyEquivalent: "")
+                header.isEnabled = false
+                menu.addItem(header)
+
+                let generateItem = NSMenuItem(title: NSLocalizedString("simplelogin_generate_alias", comment: "Generate Email Alias..."),
+                                              action: #selector(onGenerateSimpleLoginAlias(_:)),
+                                              keyEquivalent: "")
+                menu.addItem(generateItem)
             } else {
                 let font = easyReadFont ? FontManager.shared.easyReadFont : FontManager.shared.bodyFont
 
@@ -1397,6 +1436,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             altSuggestions.append(PasswordMaker.sharedInstance().generateUsername().lowercased())
             altSuggestions.append(PasswordMaker.sharedInstance().generateEmail())
             altSuggestions.append(PasswordMaker.sharedInstance().generateRandomWord())
+
+            if SimpleLoginClient.shared.isConfigured && !Settings.sharedInstance().disableNetworkBasedFeatures {
+                altSuggestions.append("_SIMPLELOGIN_")
+            }
         } else if menu == popupButtonEmailSuggestions.menu {
             if database.mostPopularEmails.count > 0 {
                 altSuggestions.append("_POPULAR_")
@@ -1415,6 +1458,10 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             altSuggestions.append(PasswordMaker.sharedInstance().generateEmail())
             altSuggestions.append(PasswordMaker.sharedInstance().generateEmail())
             altSuggestions.append(PasswordMaker.sharedInstance().generateEmail())
+
+            if SimpleLoginClient.shared.isConfigured && !Settings.sharedInstance().disableNetworkBasedFeatures {
+                altSuggestions.append("_SIMPLELOGIN_")
+            }
         } else if menu == popupButtonTagsSuggestions.menu {
             var popular = database.mostPopularTags
             popular.removeAll { tag in
@@ -1463,6 +1510,40 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
             model.addTag(trim(menuItem.title))
             bindTags()
             onModelEdited()
+        }
+    }
+
+    @objc
+    func onGenerateSimpleLoginAlias(_ sender: Any) {
+        guard let menuItem = sender as? NSMenuItem else { return }
+
+        let hostname = SimpleLoginClient.extractHostname(from: model.url)
+
+        Task { @MainActor in
+            do {
+                let alias = try await SimpleLoginClient.shared.createRandomAlias(hostname: hostname)
+
+                if menuItem.menu == popupButtonEmailSuggestions.menu {
+                    onGenerateEmail(alias.email)
+                } else {
+                    onGenerateUsername(alias.email)
+                }
+            } catch {
+                let slError = error as? SimpleLoginError ?? .unexpectedResponse
+                let message = SimpleLoginClient.localizedErrorMessage(slError)
+
+                let alert = NSAlert()
+                alert.messageText = NSLocalizedString("simplelogin_error_title", comment: "SimpleLogin Error")
+                alert.informativeText = message
+                alert.alertStyle = .warning
+                alert.addButton(withTitle: NSLocalizedString("generic_ok", comment: "OK"))
+
+                if let window = view.window {
+                    await alert.beginSheetModal(for: window)
+                } else {
+                    alert.runModal()
+                }
+            }
         }
     }
 
@@ -1711,25 +1792,47 @@ class CreateEditViewController: NSViewController, NSWindowDelegate, NSToolbarDel
     }
 
     func setTotpFromQrCodeScanner(_ totpString: String) {
-        setTotpWithString(string: totpString, steam: false)
-
-        if Settings.sharedInstance().autoCommitScannedTotp {
-            save(dismissAfterSave: false)
+        setTotpWithString(string: totpString, steam: false) { [weak self] success in
+            guard success, Settings.sharedInstance().autoCommitScannedTotp else { return }
+            self?.save(dismissAfterSave: false)
         }
     }
 
-    func setTotpWithString(string: String, steam: Bool) {
+    func setTotpWithString(string: String, steam: Bool, completion: ((Bool) -> Void)? = nil) {
         if let token = NodeFields.getOtpToken(from: string, forceSteam: steam) {
             model.totp = token
 
             bindTOTP()
 
             onModelEdited()
+            completion?(true)
+        } else if !steam, IDMeOtpAuthImporter.canImport(activationString: string) {
+            CrossPlatformDependencies.defaults().spinnerUi.show(NSLocalizedString("idme_totp_import_spinner_message", comment: "Importing ID.me 2FA..."),
+                                                                viewController: self)
+
+            IDMeOtpAuthImporter.importToken(fromActivationString: string) { [weak self] token, error in
+                CrossPlatformDependencies.defaults().spinnerUi.dismiss()
+                guard let self else { return }
+
+                if let token {
+                    self.model.totp = token
+                    self.bindTOTP()
+                    self.onModelEdited()
+                    completion?(true)
+                } else {
+                    MacAlerts.info(NSLocalizedString("item_details_setup_totp_failed_title", comment: "Failed to Set TOTP"),
+                                   informativeText: error?.localizedDescription ?? NSLocalizedString("item_details_setup_totp_failed_message", comment: "Could not set TOTP because it could not be initialized."),
+                                   window: self.view.window,
+                                   completion: nil)
+                    completion?(false)
+                }
+            }
         } else {
             MacAlerts.info(NSLocalizedString("item_details_setup_totp_failed_title", comment: "Failed to Set TOTP"),
                            informativeText: NSLocalizedString("item_details_setup_totp_failed_message", comment: "Could not set TOTP because it could not be initialized."),
                            window: view.window,
                            completion: nil)
+            completion?(false)
         }
     }
 

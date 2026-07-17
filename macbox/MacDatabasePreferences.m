@@ -1383,6 +1383,33 @@
     }];
 }
 
+- (NSArray<NSNumber *> *)detailsViewCollapsedSections {
+    return [DatabaseMetadata normalizedDetailsViewCollapsedSections:self.metadata.detailsViewCollapsedSections];
+}
+
+- (void)setDetailsViewCollapsedSections:(NSArray<NSNumber *> *)detailsViewCollapsedSections {
+    NSArray<NSNumber *> *normalized = [DatabaseMetadata normalizedDetailsViewCollapsedSections:detailsViewCollapsedSections];
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.detailsViewCollapsedSections = normalized;
+    }];
+}
+
+- (BOOL)isDetailsViewCollapsedForSection:(DetailsViewCollapsedSection)section {
+    NSParameterAssert(section >= 0 && section < DetailsViewCollapsedSectionCount);
+
+    return self.detailsViewCollapsedSections[section].boolValue;
+}
+
+- (void)setDetailsViewCollapsed:(BOOL)collapsed forSection:(DetailsViewCollapsedSection)section {
+    NSParameterAssert(section >= 0 && section < DetailsViewCollapsedSectionCount);
+
+    [self update:^(DatabaseMetadata * _Nonnull metadata) {
+        NSMutableArray<NSNumber *> *sections = [[DatabaseMetadata normalizedDetailsViewCollapsedSections:metadata.detailsViewCollapsedSections] mutableCopy];
+        sections[section] = @(collapsed);
+        metadata.detailsViewCollapsedSections = [sections copy];
+    }];
+}
+
 - (BOOL)customSortOrderForFields {
     return self.metadata.customSortOrderForFields;
 }

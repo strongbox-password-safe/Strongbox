@@ -7,9 +7,7 @@ class EmptyDetailsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        if UIDevice.current.userInterfaceIdiom != .pad {
-            toggleButton.isHidden = true
-        }
+        toggleButton.isHidden = true
     }
 
     

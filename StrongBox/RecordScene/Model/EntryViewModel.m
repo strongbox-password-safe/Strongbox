@@ -70,7 +70,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     EntryViewModel* ret = [[EntryViewModel alloc] initWithTitle:@"Acme Inc."
                                                        username:@"mark.mc"
                                                        password:@"very very secret that is waaaaaay too long to fit on one line"
-                                                            url:@"https:
+                                                            url:@"https://www.strongboxsafe.com"
                                                           notes:notes
                                                           email:@"markmc@gmail.com"
                                                         expires:nil
@@ -345,26 +345,47 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
 
 
 - (BOOL)resetTags:(NSSet<NSString*>*)tags {
-    NSArray<NSString*>* splitByDelimiter = [tags.allObjects flatMap:^NSArray * _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-        return [Utils getTagsFromTagString:obj];
-    }];
+    NSSet* safeTags = tags ?: NSSet.set;
+    NSMutableArray<NSString*>* splitByDelimiter = NSMutableArray.array;
+
+    for (id obj in safeTags) {
+        if (![obj isKindOfClass:NSString.class]) {
+            slog(@"⚠️ Ignoring non-string tag while resetting tags: %@", obj);
+            continue;
+        }
+
+        NSArray<NSString*>* tagsFromString = [Utils getTagsFromTagString:(NSString*)obj];
+        if ( tagsFromString ) {
+            [splitByDelimiter addObjectsFromArray:tagsFromString];
+        }
+    }
 
     if ( [self.mutableTags isEqualToSet:splitByDelimiter.set] ) {
         return NO;
     }
-    
+
     [self.mutableTags removeAllObjects];
     [self.mutableTags addObjectsFromArray:splitByDelimiter];
-    
+
     return YES;
 }
 
 - (void)addTag:(NSString*)tag {
+    if ( tag.length == 0 ) {
+        return;
+    }
+
     NSArray<NSString*>* tags = [Utils getTagsFromTagString:tag]; 
-    [self.mutableTags addObjectsFromArray:tags];
+    if ( tags ) {
+        [self.mutableTags addObjectsFromArray:tags];
+    }
 }
 
 - (void)removeTag:(NSString*)tag {
+    if ( tag.length == 0 ) {
+        return;
+    }
+
     [self.mutableTags removeObject:tag];
 }
 

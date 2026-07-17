@@ -50,9 +50,16 @@ class WatchAppModel: ObservableObject {
     @Published @MainActor
     private(set) var lastSynced: Date?
 
+    private var otpRefreshTimer: Timer?
+
     init() {
         
         refreshSettings()
+        startOtpRefresh()
+    }
+
+    deinit {
+        otpRefreshTimer?.invalidate()
     }
 
     func refreshSettings() {
@@ -88,6 +95,20 @@ class WatchAppModel: ObservableObject {
             }
         } catch {
             swlog("Could not load all settings... \(error)")
+        }
+    }
+
+    private func startOtpRefresh() {
+        let notificationName = NSNotification.Name.centralUpdateOtpUi
+        NotificationCenter.default.post(name: notificationName, object: nil)
+
+        otpRefreshTimer?.invalidate()
+        otpRefreshTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            NotificationCenter.default.post(name: notificationName, object: nil)
+        }
+
+        if let otpRefreshTimer {
+            RunLoop.main.add(otpRefreshTimer, forMode: .common)
         }
     }
 

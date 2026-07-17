@@ -19,6 +19,7 @@
 #import "Serializator.h"
 #import "Utils.h"
 #import "Document.h"
+#import "Node+KeeAgentSSH.h"
 
 #import "Strongbox-Swift.h"
 
@@ -441,6 +442,16 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     }
 }
 
+- (NSArray<NSString *> *)auditHibpErrorReasons {
+    if ( !self.locked ) {
+        return self.innerModel.auditHibpErrorReasons;
+    }
+    else {
+        slog(@"🔴 auditState - Model Locked.");
+        return @[];
+    }
+}
+
 - (NSUInteger)auditIssueNodeCount {
     if ( !self.locked ) {
         return self.innerModel.auditIssueNodeCount;
@@ -692,6 +703,58 @@ NSString* const kModelUpdateNotificationNextGenSearchContextChanged = @"kModelUp
     [self.document.undoManager setActionName:loc];
     
     [self rebuildMapsAndCaches];
+}
+
+- (void)setKeeAgentSshKeyEnabled:(Node*)item enabled:(BOOL)enabled {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    if ( self.isEffectivelyReadOnly ) {
+        slog(@"🔴 setKeeAgentSshKeyEnabled - Model is RO!");
+        return;
+    }
+
+    if ( item.keeAgentSshKeyViewModel == nil ) {
+        slog(@"🔴 setKeeAgentSshKeyEnabled - Item has no KeeAgent SSH key!");
+        return;
+    }
+
+    if ( item.keeAgentSshKeyViewModel.enabled == enabled ) {
+        slog(@"✅ NOP - setKeeAgentSshKeyEnabled");
+        return;
+    }
+
+    Node* editedNode = [item clone];
+    [editedNode setKeeAgentSshKeyEnabled:enabled];
+    [editedNode touch:YES touchParents:NO];
+
+    if ( ![self editNodeFieldsUsingSourceNode:editedNode destination:item.uuid] ) {
+        slog(@"🔴 setKeeAgentSshKeyEnabled - Could not apply edited KeeAgent SSH state!");
+    }
+}
+
+- (void)batchSetKeeAgentSshKeyEnabled:(NSArray<Node*>*)items enabled:(BOOL)enabled {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    if ( self.isEffectivelyReadOnly ) {
+        slog(@"🔴 batchSetKeeAgentSshKeyEnabled - Model is RO!");
+        return;
+    }
+
+    [self.document.undoManager beginUndoGrouping];
+
+    for (Node* item in items) {
+        [self setKeeAgentSshKeyEnabled:item enabled:enabled];
+    }
+
+    NSString* loc = enabled ?
+        NSLocalizedString(@"ssh_agent_key_enabled_for_agent", @"Enabled for SSH Agent") :
+        NSLocalizedString(@"ssh_agent_disabled_for_agent", @"Disabled for SSH Agent");
+
+    [self.document.undoManager setActionName:loc];
+    [self.document.undoManager endUndoGrouping];
 }
 
 - (void)touchAndModify:(Node*)item modDate:(NSDate*_Nullable)modDate {

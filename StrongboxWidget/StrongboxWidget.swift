@@ -25,7 +25,7 @@ struct SimpleEntry: TimelineEntry {
 }
 
 struct StrongboxWidgetEntryView : View {
-    private static let deeplinkURL: URL = URL(string: "strongbox-widget-deeplink:
+    private static let deeplinkURL: URL = URL(string: "strongbox-widget-deeplink://2fa")!
     @Environment(\.widgetFamily) var family
     var entry: Provider.Entry
     

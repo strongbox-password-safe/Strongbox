@@ -438,11 +438,13 @@
     if ( node.passkey ) {
         if (@available(iOS 17.0, macOS 14.0, *)) {
             ASPasskeyCredentialIdentity *pkid = [self getPasskeyAutoFillCredentialIdentity:database node:node];
-            
-            [ASCredentialIdentityStore.sharedStore saveCredentialIdentityEntries:@[pkid]
-                                                                      completion:^(BOOL success, NSError * _Nullable error) {
-                slog(@"refreshQuickTypeAfterAutoFillAddition Passkey Done: %hhd - %@", success, error);
-            }];
+
+            if ( pkid ) { 
+                [ASCredentialIdentityStore.sharedStore saveCredentialIdentityEntries:@[pkid]
+                                                                          completion:^(BOOL success, NSError * _Nullable error) {
+                    slog(@"refreshQuickTypeAfterAutoFillAddition Passkey Done: %hhd - %@", success, error);
+                }];
+            }
         }
     }
     else {
@@ -518,11 +520,13 @@
     if (@available(iOS 17.0, macOS 14.0, *)) {
         if ( node.passkey ) {
             ASPasskeyCredentialIdentity *pkid = [self getPasskeyAutoFillCredentialIdentity:database node:node];
-            
-            [ASCredentialIdentityStore.sharedStore removeCredentialIdentityEntries:@[pkid]
-                                                                        completion:^(BOOL success, NSError * _Nullable error) {
-                slog(@"🟢 removeCredentialIdentityEntries done with %hhd - %@", success, error);
-            }];
+
+            if ( pkid ) { 
+                [ASCredentialIdentityStore.sharedStore removeCredentialIdentityEntries:@[pkid]
+                                                                            completion:^(BOOL success, NSError * _Nullable error) {
+                    slog(@"🟢 removeCredentialIdentityEntries done with %hhd - %@", success, error);
+                }];
+            }
         }
     }
     

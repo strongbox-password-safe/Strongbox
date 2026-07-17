@@ -207,6 +207,20 @@ class UnifiedUpgrade: NSViewController {
         labelFreeTrialPromoText.isHidden = !ProUpgradeIAPManager.sharedInstance().isFreeTrialAvailable
         labelMonthlyDummyFreeTrialText.isHidden = !ProUpgradeIAPManager.sharedInstance().isFreeTrialAvailable
 
+        if ProUpgradeIAPManager.sharedInstance().isFreeTrialAvailable {
+            if let trialDuration = ProUpgradeIAPManager.sharedInstance().freeTrialDurationText(), !trialDuration.isEmpty {
+                let promoFmt = NSLocalizedString(
+                    "Dgu-cX-01s.title",
+                    tableName: "UnifiedUpgrade",
+                    value: "Your first %@ are free then",
+                    comment: ""
+                )
+                labelFreeTrialPromoText.stringValue = String(format: promoFmt, trialDuration)
+            } else {
+                labelFreeTrialPromoText.isHidden = true
+            }
+        }
+
         if let product = ProUpgradeIAPManager.sharedInstance().yearlyProduct, state == .ready {
             if let monthlyProduct = ProUpgradeIAPManager.sharedInstance().monthlyProduct {
                 let percentSavings = calculatePercentageSavings(getEffectivePrice(product), getEffectivePrice(monthlyProduct), 12)
@@ -255,15 +269,15 @@ class UnifiedUpgrade: NSViewController {
     }
 
     func onTerms() {
-        NSWorkspace.shared.open(URL(string: "https:
+        NSWorkspace.shared.open(URL(string: "https://strongboxsafe.com/terms/")!)
     }
 
     func onPrivacy() {
-        NSWorkspace.shared.open(URL(string: "https:
+        NSWorkspace.shared.open(URL(string: "https://strongboxsafe.com/privacy/")!)
     }
 
     func onLifetime() {
-        NSWorkspace.shared.open(URL(string: "itms-apps:
+        NSWorkspace.shared.open(URL(string: "itms-apps://apps.apple.com/app/strongbox-pro/id1481853033")!)
     }
 
     func onRestorePurchases() {

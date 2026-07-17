@@ -742,6 +742,10 @@ userInteractionRequired:(BOOL)userInteractionRequired
     return self.auditor ? self.auditor.haveIBeenPwnedErrorCount : 0;
 }
 
+- (NSArray<NSString *> *)auditHibpErrorReasons {
+    return self.auditor ? self.auditor.haveIBeenPwnedErrorReasons : @[];
+}
+
 - (NSNumber*)auditIssueCount {
     return self.auditor ? @(self.auditor.auditIssueCount) : nil;
 }
@@ -1869,10 +1873,16 @@ userInteractionRequired:(BOOL)userInteractionRequired
 
 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString {
+    return [self getAutoFillMatchingNodesForUrl:urlString subdomainMatching:YES];
+}
+
+- (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString
+                                  subdomainMatching:(BOOL)subdomainMatching {
 #ifndef IS_APP_EXTENSION 
     if ( self.metadata.autoFillEnabled ) {
         NSSet<NSUUID*>* matches = [BrowserAutoFillManager getMatchingNodesWithUrl:urlString
-                                                                    domainNodeMap:self.domainNodeMap];
+                                                                    domainNodeMap:self.domainNodeMap
+                                                               subdomainMatching:subdomainMatching];
 
         NSArray<Node*> *ret2 = [self getItemsById:matches.allObjects];
 
@@ -2445,6 +2455,24 @@ double getFieldWeight ( DatabaseSearchMatchField field ) {
     [item touch:NO touchParents:YES];
 
     return dupe;
+}
+
+- (BOOL)mergeNode:(Node *)source
+         intoNode:(Node *)destination
+mergeLocationChangedDate:(BOOL)mergeLocationChangedDate
+   includeHistory:(BOOL)includeHistory
+   allowOverwrite:(BOOL)allowOverwrite {
+    BOOL success = [self.database mergeNode:source
+                                   intoNode:destination
+                   mergeLocationChangedDate:mergeLocationChangedDate
+                             includeHistory:includeHistory
+                             allowOverwrite:allowOverwrite];
+    if (success) {
+        NSArray *nodesToDelete = [NSArray arrayWithObjects:source, nil];
+        [self deleteItems:nodesToDelete];
+    }
+    
+    return success;
 }
 
 @end

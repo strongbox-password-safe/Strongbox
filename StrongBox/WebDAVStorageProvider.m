@@ -33,6 +33,17 @@
 @property DAVSession* maintainedSessionForListings;
 @property WebDAVSessionConfiguration* maintainedConfigurationForListings;
 
+- (void)enqueueListingRequestWithSession:(DAVSession *)session
+                                    path:(NSString *)path
+                            fallbackPath:(NSString *)fallbackPath
+                              completion:(void (^)(BOOL success, NSArray<DAVResponseItem*> *result, NSError *error))completion;
+
+- (void)enqueueListingRequestWithSession:(DAVSession *)session
+                                    path:(NSString *)path
+                            fallbackPath:(NSString *)fallbackPath
+                         attemptFallback:(BOOL)attemptFallback
+                              completion:(void (^)(BOOL success, NSArray<DAVResponseItem*> *result, NSError *error))completion;
+
 @end
 
 @implementation WebDAVStorageProvider
@@ -315,16 +326,13 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         
         
         NSString* path = pd.href.stringByDeletingLastPathComponent; 
+        NSString* fallbackPath = [path isEqualToString:pd.href] ? nil : pd.href;
         
-        DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
-        listingRequest.delegate = self;
-        
-        listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+        [self enqueueListingRequestWithSession:session path:path fallbackPath:fallbackPath completion:^(BOOL success, NSArray<DAVResponseItem *> *listingResponse, NSError *error) {
             if(!success) {
                 completion(YES, nil, error);
             }
             else {
-                NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
                 NSString* targetFileName = pd.href.lastPathComponent;       
                 NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
                             
@@ -342,9 +350,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                 NSDate* modDate = responseItem.modificationDate;
                 completion(YES, modDate, nil);
             }
-        };
-        
-        [session enqueueRequest:listingRequest];
+        }];
     }];
 }
 
@@ -381,10 +387,9 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
         
         
         NSString* path = pd.href.stringByDeletingLastPathComponent; 
+        NSString* fallbackPath = [path isEqualToString:pd.href] ? nil : pd.href;
         
-        DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
-        listingRequest.delegate = self;
-        listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+        void (^listingCompletion)(BOOL, NSArray<DAVResponseItem *> *, NSError *) = ^(BOOL success, NSArray<DAVResponseItem *> *listingResponse, NSError *error) {
             if(!success) {
                 if (viewController) {
                     [self dismissProgressSpinner];
@@ -393,7 +398,6 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                 completionHandler(kReadResultError, nil, nil, error);
             }
             else {
-                NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
                 NSString* targetFileName = pd.href.lastPathComponent;       
                 NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
                             
@@ -442,12 +446,12 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                 [session enqueueRequest:request];
             }
         };
-  
+
         if (viewController) {
             [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...") viewController:viewController];
         }
         
-        [session enqueueRequest:listingRequest];
+        [self enqueueListingRequestWithSession:session path:path fallbackPath:fallbackPath completion:listingCompletion];
     }];
 }
 
@@ -500,9 +504,9 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
     NSString* path = providerData.href.stringByDeletingLastPathComponent; 
-    DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
-    listingRequest.delegate = self;
-    listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+    NSString* fallbackPath = [path isEqualToString:providerData.href] ? nil : providerData.href;
+    
+    [self enqueueListingRequestWithSession:session path:path fallbackPath:fallbackPath completion:^(BOOL success, NSArray<DAVResponseItem *> *listingResponse, NSError *error) {
         if(!success) {
             if (viewController) {
                 [self dismissProgressSpinner];
@@ -511,7 +515,6 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
             completion(kUpdateResultError, nil, error);
         }
         else {
-            NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
             NSString* targetFileName = providerData.href.lastPathComponent;       
             NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
                         
@@ -539,12 +542,42 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 
             completion(kUpdateResultSuccess, modDate, nil);
         }
+    }];
+}
+
+
+
+
+
+- (void)enqueueListingRequestWithSession:(DAVSession *)session
+                                    path:(NSString *)path
+                            fallbackPath:(NSString *)fallbackPath
+                              completion:(void (^)(BOOL success, NSArray<DAVResponseItem*> *result, NSError *error))completion {
+    [self enqueueListingRequestWithSession:session path:path fallbackPath:fallbackPath attemptFallback:YES completion:completion];
+}
+
+- (void)enqueueListingRequestWithSession:(DAVSession *)session
+                                    path:(NSString *)path
+                            fallbackPath:(NSString *)fallbackPath
+                         attemptFallback:(BOOL)attemptFallback
+                              completion:(void (^)(BOOL success, NSArray<DAVResponseItem*> *result, NSError *error))completion {
+    if (!session || !path || !completion) {
+        return;
+    }
+    
+    DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
+    listingRequest.delegate = self;
+    listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+        if (success || !fallbackPath || !attemptFallback) {
+            completion(success, success ? (NSArray<DAVResponseItem*>*)result : nil, error);
+            return;
+        }
+        
+        [self enqueueListingRequestWithSession:session path:fallbackPath fallbackPath:nil attemptFallback:NO completion:completion];
     };
     
     [session enqueueRequest:listingRequest];
 }
-
-
 
 static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfiguration* sessionConfiguration) {
     WebDAVProviderData* ret = [[WebDAVProviderData alloc] init];

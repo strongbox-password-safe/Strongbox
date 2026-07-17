@@ -43,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)onDatabaseEncryptionSettings:(id)sender;
 - (IBAction)onChangeMasterPassword:(id)sender;
 - (IBAction)onEmptyRecycleBin:(id)sender;
+- (IBAction)onToggleKeeAgentSshKeyEnabled:(id)sender;
 - (IBAction)onToggleFavouriteItemInSideBar:(id)sender;
 - (IBAction)onSideBarCreateGroup:(id)sender;
 - (IBAction)onSideBarDuplicateItem:(id)sender;
@@ -51,6 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (IBAction)onDeleteSideBarItem:(id)sender;
 - (IBAction)onSetSideBarItemIcon:(id)sender;
 - (IBAction)onRenameSideBarItem:(id)sender;
+- (IBAction)onMerge:(id)sender;
 
 - (Node*_Nullable)getSingleSelectedItem; 
 

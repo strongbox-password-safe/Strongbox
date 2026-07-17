@@ -56,6 +56,7 @@
 #import <notify.h>
 #import "AppDelegate.h"
 #import "SaleScheduleManager.h"
+#import "CustomizationManager.h"
 
 #import "StrongboxErrorCodes.h"
 #import "RandomizerPopOverViewController.h"
@@ -93,8 +94,13 @@
 
 static NSString* kWifiBrowserResultsUpdatedNotification = @"wifiBrowserResultsUpdated";
 static NSString* kDebugLoggerLinesUpdatedNotification = @"debugLoggerLinesUpdated";
+static NSString* kApplePasswordsImportCompletedNotification = @"applePasswordsImportCompleted";
+static NSString* kApplePasswordsImportFailedNotification = @"applePasswordsImportFailed";
 static BOOL revenueCatFetchCompleted = NO;
-
+static CGFloat const kSaleBannerAdditionalPadding = 24.0f;
+static CGFloat const kSaleBannerFallbackHeight = 72.0f;
+static CGFloat const kNudgeBannerAdditionalPadding = 24.0f;
+static CGFloat const kNudgeBannerFallbackHeight = 72.0f;
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate, UIDocumentPickerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
@@ -119,6 +125,18 @@ static BOOL revenueCatFetchCompleted = NO;
 
 @property (nullable) NSString* overrideQuickLaunchWithAppShortcutQuickLaunchUuid;
 
+@property (nonatomic, strong) SaleBannerView *saleBannerView;
+@property (nonatomic) BOOL saleBannerVisible;
+@property (nonatomic) CGFloat saleBannerAppliedInset;
+@property (nonatomic, strong) Sale *saleBannerSale;
+
+@property (nonatomic, strong) NudgeView *nudgeView;
+@property (nonatomic) BOOL nudgeViewVisible;
+@property (nonatomic) CGFloat nudgeViewAppliedInset;
+
+@property (nonatomic, strong) NSMutableSet<NSIndexPath*> *pendingRowReloads;
+@property (nonatomic, strong, nullable) dispatch_block_t coalescedReloadBlock;
+
 @property NSArray<DebugLine*> *debugLines;
 
 @property (nonatomic, strong) NSDate *unlockedDatabaseWentIntoBackgroundAt;
@@ -135,21 +153,23 @@ static BOOL revenueCatFetchCompleted = NO;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     
     
     
     self.navigationController.view.backgroundColor = UIColor.systemBackgroundColor;
     self.tableView.hidden = YES;
-
+    
+    [self setupSaleBannerView];
+    
     [self customizeUI];
     
     [self checkForBrokenVirtualHardwareKeys];
-
-    #if !defined(SUBSCRIPTIONS)
+    
+#if !defined(SUBSCRIPTIONS)
     revenueCatFetchCompleted = YES; 
-    #endif
-
+#endif
+    
     
     
     
@@ -162,16 +182,16 @@ static BOOL revenueCatFetchCompleted = NO;
         [self internalRefresh];
         
         self.tableView.hidden = NO;
-
+        
         [self listenToNotifications];
         
         if ( ![self isAppLocked] ) {
-
+            
             
             [self doAppActivationTasks:NO];
         }
         else {
-
+            
         }
     });
 }
@@ -204,7 +224,7 @@ static BOOL revenueCatFetchCompleted = NO;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-
+    
     
     [self setupTips];
     
@@ -218,6 +238,16 @@ static BOOL revenueCatFetchCompleted = NO;
     [self bindToolbar];
     
     [CustomAppIconObjCHelper downgradeProIconIfInUse];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self setupSaleBannerView];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self hideSaleBannerAnimated:NO];
 }
 
 - (void)setupTips {
@@ -252,7 +282,7 @@ static BOOL revenueCatFetchCompleted = NO;
     [self bindToolbar];
     
     [CustomAppIconObjCHelper downgradeProIconIfInUse];
-
+    
 #ifndef NO_NETWORKING
     [self maybeWarnAboutCloudKitUnavailability];
 #endif
@@ -324,7 +354,7 @@ static BOOL revenueCatFetchCompleted = NO;
     [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_settings", @"Settings")];
     [self.buttonCustomizeView setAccessibilityLabel:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")];
     [self.buttonAddSafe setAccessibilityLabel:NSLocalizedString(@"casg_add_action", @"Add")];
-
+    
     self.barButtonDice.image = [UIImage systemImageNamed:@"dice"];
     
     self.collection = [NSArray array];
@@ -358,7 +388,7 @@ static BOOL revenueCatFetchCompleted = NO;
                                                 systemImage:@"externaldrive.badge.plus"
                                                     handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onAddExistingSafe];
-
+        
     }];
     
     UIMenuElement* wifiTransfer = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_wifi_transfer", @"Wi-Fi Transfer")
@@ -366,7 +396,7 @@ static BOOL revenueCatFetchCompleted = NO;
                                                      handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf performSegueWithIdentifier:@"segueToLocalNetworkServer" sender:nil];
     }];
-
+    
     UIMenuElement* import1P = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_1password_1pif", @"1Password (1Pif)")
                                                  handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImport1Password];
@@ -378,11 +408,11 @@ static BOOL revenueCatFetchCompleted = NO;
     }];
     
     UIMenuElement* importEnpass = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_enpass_json", @"Enpass (JSON)")
-                                                 handler:^(__kindof UIAction * _Nonnull action) {
+                                                     handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImportEnpass];
     }];
     UIMenuElement* importBitwarden = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_bitwarden_json", @"Bitwarden (JSON)")
-                                                 handler:^(__kindof UIAction * _Nonnull action) {
+                                                        handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImportBitwarden];
     }];
     
@@ -398,6 +428,26 @@ static BOOL revenueCatFetchCompleted = NO;
     UIMenuElement* importCsv = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_csv", @"CSV...")
                                                   handler:^(__kindof UIAction * _Nonnull action) {
         [weakSelf onImportGenericCsv];
+    }];
+    
+    UIMenuElement* importProtonPass = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_proton_pass_json", @"Proton Pass (JSON)")
+                                                         handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportProtonPass];
+    }];
+    
+    UIMenuElement* importMinimalist = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_minimalist_json", @"Minimalist (JSON)")
+                                                         handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportMinimalist];
+    }];
+    
+    UIMenuElement* importMSecure = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_msecure_csv", @"mSecure (CSV)")
+                                                      handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportMSecure];
+    }];
+
+    UIMenuElement* importSecrets4 = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_import_secrets4_xml", @"Secrets 4 (XML)")
+                                                       handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onImportSecrets4];
     }];
     
     UIMenu* menu1 = [UIMenu menuWithTitle:@""
@@ -416,13 +466,13 @@ static BOOL revenueCatFetchCompleted = NO;
                                      image:[UIImage systemImageNamed:@"square.and.arrow.down"]
                                 identifier:nil
                                    options:UIMenuOptionsDisplayInline
-                                  children:@[import1P1Pux, import1P, importBitwarden, importEnpass, importLastPass, importiCloud, importCsv]];
+                                  children:@[import1P1Pux, import1P, importBitwarden, importEnpass, importLastPass, importiCloud, importCsv, importProtonPass, importMinimalist, importMSecure, importSecrets4]];
     
     UIMenu* advanced = [UIMenu menuWithTitle:NSLocalizedString(@"generic_advanced_noun", @"Advanced")
-                                     image:[UIImage systemImageNamed:@"gearshape.2.fill"]
-                                identifier:nil
-                                   options:UIMenuOptionsDisplayInline
-                                  children:@[wifiTransfer]];
+                                       image:[UIImage systemImageNamed:@"gearshape.2.fill"]
+                                  identifier:nil
+                                     options:UIMenuOptionsDisplayInline
+                                    children:@[wifiTransfer]];
     
     BOOL showTransferOverLan = !AppPreferences.sharedInstance.disableNetworkBasedFeatures;
     
@@ -444,19 +494,19 @@ static BOOL revenueCatFetchCompleted = NO;
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
     [self refreshICloudFolderDatabases];
-     
+    
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     
     
     
     [self startWiFiSyncObservation];
-
+    
     [self doAppOnboarding:userJustCompletedBiometricAuthentication quickLaunchWhenDone:YES];
 }
 
 - (void)refreshICloudFolderDatabases {
     if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest ) {
-
+        
         
         [[iCloudSafesCoordinator sharedInstance] startQuery];
     }
@@ -474,7 +524,7 @@ static BOOL revenueCatFetchCompleted = NO;
                 slog(@"We're not the visible view controller - not doing Onboarding");
                 return;
             }
-
+            
             [self processEnqueuedImport];
         }
     }
@@ -483,7 +533,7 @@ static BOOL revenueCatFetchCompleted = NO;
             slog(@"We're not the visible view controller - not doing Onboarding");
             return;
         }
-
+        
         __weak SafesViewController* weakSelf = self;
         
         
@@ -496,9 +546,17 @@ static BOOL revenueCatFetchCompleted = NO;
         }
         
         [OnboardingManager.sharedInstance startAppOnboarding:self completion:^{
-            if ( quickLaunchWhenDone ) {
-                [weakSelf openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
+            SafesViewController* strongSelf = weakSelf;
+            if ( strongSelf == nil ) {
+                return;
             }
+            [WhatsNewPresenter presentIfNeededFrom:strongSelf
+                                       launchCount:AppPreferences.sharedInstance.launchCount
+                                        completion:^{
+                if ( quickLaunchWhenDone ) {
+                    [weakSelf openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
+                }
+            }];
         }];
     }
 }
@@ -521,7 +579,7 @@ static BOOL revenueCatFetchCompleted = NO;
         self.ignoreNextAppActiveNotification = YES;
         return;
     }
-
+    
     self.unlockedDatabaseWentIntoBackgroundAt = [[NSDate alloc] init];
 }
 
@@ -572,7 +630,7 @@ static BOOL revenueCatFetchCompleted = NO;
     }
     
     if ( !AppPreferences.sharedInstance.wiFiSyncHasRequestedNetworkPermissions ) {
-
+        
         return;
     }
     
@@ -604,7 +662,7 @@ static BOOL revenueCatFetchCompleted = NO;
 
 - (void)onAppLockScreenWillBeDismissed:(void (^)(void))completion {
     slog(@"SafesViewController::onAppLockWillBeDismissed");
-
+    
     if ( [self shouldLockUnlockedDatabase] ) {
         [self lockUnlockedDatabase:completion];
     }
@@ -617,7 +675,7 @@ static BOOL revenueCatFetchCompleted = NO;
 
 - (void)onAppLockScreenWasDismissed:(BOOL)userJustCompletedBiometricAuthentication {
     slog(@"SafesViewController::onAppLockWasDismissed [%hhd]", userJustCompletedBiometricAuthentication);
-
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
     });
@@ -655,19 +713,19 @@ static BOOL revenueCatFetchCompleted = NO;
 
 - (void)protectedDataWillBecomeUnavailable {
     
-
+    
     [self onDeviceLocked];
 }
 
 - (void)onMainSplitViewControllerClosed:(id)param {
     NSNotification* notification = param;
     NSString* databaseId = notification.object;
-
+    
     slog(@"onMainSplitViewControllerClosed [%@]", databaseId);
-
+    
     if ( AppModel.shared.unlockedDatabase ) {
         slog(@"onMainSplitViewControllerClosed - Matching unlock db - clearing unlocked state.");
-
+        
         if ( [AppModel.shared isUnlocked:databaseId] ) {
             [AppModel.shared closeDatabase];
             self.unlockedDatabaseWentIntoBackgroundAt = nil;
@@ -684,7 +742,7 @@ static BOOL revenueCatFetchCompleted = NO;
 - (void)onDeviceLocked {
     slog(@"onDeviceLocked - Device Lock detected - locking open database if so configured...");
     Model* model = AppModel.shared.unlockedDatabase;
-
+    
     if ( model && model.metadata.autoLockOnDeviceLock ) {
         DatabasePreferences *prefs = model.metadata;
         
@@ -709,7 +767,7 @@ static BOOL revenueCatFetchCompleted = NO;
 - (void)lockUnlockedDatabase:(void (^ __nullable)(void))completion {
     if ( AppModel.shared.unlockedDatabase ) {
         slog(@"Locking Unlocked Database...");
-                
+        
         if ( ![self isAppLocked] ) {
             slog(@"lockUnlockedDatabase: App is not locked... we can lock");
             
@@ -717,13 +775,13 @@ static BOOL revenueCatFetchCompleted = NO;
             
             
             [AppModel.shared markAsEditingWithId:AppModel.shared.unlockedDatabase.databaseUuid editing:NO];
-
+            
             
             
             UINavigationController* nav = self.navigationController;
             [nav popToRootViewControllerAnimated:NO];
             [self dismissViewControllerAnimated:NO completion:completion];
-
+            
             [AppModel.shared closeDatabase]; 
             self.unlockedDatabaseWentIntoBackgroundAt = nil;
         }
@@ -736,7 +794,7 @@ static BOOL revenueCatFetchCompleted = NO;
     }
     else {
         slog(@"lockUnlockedDatabase: No unlocked database to lock");
-
+        
         if ( completion ) {
             completion();
         }
@@ -750,8 +808,8 @@ static BOOL revenueCatFetchCompleted = NO;
         if ([visibleSoFar isKindOfClass:UINavigationController.class]) {
             UINavigationController* nav = (UINavigationController*)visibleSoFar;
             
-             slog(@"VISIBLE: [%@] is Nav Controller, moving to Visisble: [%@]", visibleSoFar, nav.visibleViewController);
-
+            slog(@"VISIBLE: [%@] is Nav Controller, moving to Visisble: [%@]", visibleSoFar, nav.visibleViewController);
+            
             if (nav.visibleViewController) {
                 visibleSoFar = nav.visibleViewController;
             }
@@ -760,8 +818,8 @@ static BOOL revenueCatFetchCompleted = NO;
             }
         }
         else {
-             slog(@"VISIBLE: [%@] is regular VC checking is it's presenting anything: [%@]", visibleSoFar, visibleSoFar.presentedViewController);
-
+            slog(@"VISIBLE: [%@] is regular VC checking is it's presenting anything: [%@]", visibleSoFar, visibleSoFar.presentedViewController);
+            
             if (visibleSoFar.presentedViewController) {
                 visibleSoFar = visibleSoFar.presentedViewController;
             }
@@ -770,7 +828,7 @@ static BOOL revenueCatFetchCompleted = NO;
             }
         }
     } while (--attempts); 
-
+    
     slog(@"VISIBLE: [%@]", visibleSoFar);
     
     return visibleSoFar;
@@ -779,8 +837,8 @@ static BOOL revenueCatFetchCompleted = NO;
 - (BOOL)isVisibleViewController {
     UIViewController* visible =[self getVisibleViewController];
     BOOL ret = visible == self;
-
-
+    
+    
     
     return ret;
 }
@@ -805,7 +863,7 @@ static BOOL revenueCatFetchCompleted = NO;
                                            selector:@selector(appResignActive)
                                                name:UIApplicationWillResignActiveNotification
                                              object:nil];
-
+    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onAppDidEnterBackground)
                                                name:UIApplicationDidEnterBackgroundNotification
@@ -815,7 +873,7 @@ static BOOL revenueCatFetchCompleted = NO;
                                            selector:@selector(appBecameActive)
                                                name:UIApplicationDidBecomeActiveNotification
                                              object:nil];
-
+    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseUpdated:)
                                                name:kSyncManagerDatabaseSyncStatusChangedNotification
@@ -845,12 +903,41 @@ static BOOL revenueCatFetchCompleted = NO;
                                            selector:@selector(onRevenueCatFetchComplete:)
                                                name:kRevenueCatFetchCompleteNotification
                                              object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onApplePasswordsImport:)
+                                               name:kApplePasswordsImportCompletedNotification
+                                             object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onApplePasswordsImportFailed:)
+                                               name:kApplePasswordsImportFailedNotification
+                                             object:nil];
+}
+
+- (void)onApplePasswordsImport:(NSNotification *)notification {
+    ImportResult* result = notification.object;
+    if ( !result ) {
+        return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self addImportedDatabase:result.database messages:result.messages error:nil];
+    });
+}
+
+- (void)onApplePasswordsImportFailed:(NSNotification *)notification {
+    NSError* error = notification.object;
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self importFailedNotification:error];
+    });
 }
 
 - (void)onDatabaseUpdated:(id)param {
     NSNotification* notification = param;
     NSString* databaseId = notification.object;
-        
+
     NSArray<DatabasePreferences*>* newColl = [self sortedDatabases];
     
     if (newColl.count != self.collection.count) { 
@@ -858,28 +945,67 @@ static BOOL revenueCatFetchCompleted = NO;
     }
     else {
         self.collection = newColl; 
-
+        
         NSUInteger index = [self.collection indexOfObjectPassingTest:^BOOL(DatabasePreferences * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             return [obj.uuid isEqualToString:databaseId];
         }];
-
+        
         if (index == NSNotFound) {
             slog(@"WARNWARN: Database Update for DB [%@] but DB not found in Collection!", databaseId);
         }
         else {
-
-
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]]
-                                      withRowAnimation:UITableViewRowAnimationAutomatic];
-            });
+            
+            [self enqueueRowReloadAtIndex:index];
         }
     }
 }
 
+- (void)enqueueRowReloadAtIndex:(NSUInteger)index {
+    NSIndexPath* indexPath = [NSIndexPath indexPathForRow:index inSection:0];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.pendingRowReloads == nil) {
+            self.pendingRowReloads = [NSMutableSet set];
+        }
+        
+        [self.pendingRowReloads addObject:indexPath];
+        
+        if (self.coalescedReloadBlock) {
+            dispatch_block_cancel(self.coalescedReloadBlock);
+            self.coalescedReloadBlock = nil;
+        }
+        
+        __weak typeof(self) weakSelf = self;
+        dispatch_block_t block = dispatch_block_create(0, ^{
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            if (!strongSelf) {
+                return;
+            }
+            
+            if (strongSelf.pendingRowReloads.count == 0) {
+                strongSelf.coalescedReloadBlock = nil;
+                return;
+            }
+            
+            NSArray<NSIndexPath*>* indexPaths = strongSelf.pendingRowReloads.allObjects;
+            [strongSelf.pendingRowReloads removeAllObjects];
+            strongSelf.coalescedReloadBlock = nil;
+            
+            [strongSelf.tableView reloadRowsAtIndexPaths:indexPaths
+                                        withRowAnimation:UITableViewRowAnimationAutomatic];
+        });
+        
+        self.coalescedReloadBlock = block;
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)),
+                       dispatch_get_main_queue(),
+                       block);
+    });
+}
+
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
-
+    
     if(editing) {
         [self removeEditButtonInLeftBar];
         [self insertEditButtonInLeftBar];
@@ -899,9 +1025,9 @@ static BOOL revenueCatFetchCompleted = NO;
 
 - (void)insertEditButtonInLeftBar {
     NSMutableArray* leftBarButtonItems = self.navigationItem.leftBarButtonItems ?  self.navigationItem.leftBarButtonItems.mutableCopy : @[].mutableCopy;
-
+    
     [leftBarButtonItems insertObject:self.editButtonItem atIndex:0];
-
+    
     self.navigationItem.leftBarButtonItems = leftBarButtonItems;
 }
 
@@ -937,23 +1063,23 @@ static BOOL revenueCatFetchCompleted = NO;
 
 - (NSAttributedString*)getEmptyDatasetDescription {
     NSString *text = NSLocalizedString(@"safes_vc_empty_databases_list_tableview_subtitle", @"Subtitle displayed in tableview when there are no databases setup");
-
+    
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;
     paragraph.alignment = NSTextAlignmentCenter;
-
+    
     NSDictionary *attributes = @{NSFontAttributeName: FontManager.sharedInstance.subheadlineFont,
                                  NSForegroundColorAttributeName: UIColor.secondaryLabelColor,
                                  NSParagraphStyleAttributeName: paragraph};
-
+    
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
 - (NSAttributedString*)getEmptyDatasetButtonTitle {
     NSDictionary *attributes = @{
-                                    NSFontAttributeName : FontManager.sharedInstance.headlineFont,
-                                    NSForegroundColorAttributeName : UIColor.whiteColor,
-                                    };
+        NSFontAttributeName : FontManager.sharedInstance.headlineFont,
+        NSForegroundColorAttributeName : UIColor.whiteColor,
+    };
     
     return [[NSAttributedString alloc] initWithString:NSLocalizedString(@"generic_get_started", @"Get Started") attributes:attributes];
 }
@@ -1006,7 +1132,7 @@ static BOOL revenueCatFetchCompleted = NO;
 - (void)showFirstDatabaseGetStartedWizard {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"Welcome" bundle:nil];
     UINavigationController* nav = [storyboard instantiateInitialViewController];
-
+    
     WelcomeAddDatabaseViewController *vc = (WelcomeAddDatabaseViewController*)nav.topViewController;
     
     __weak id weakSelf = self;
@@ -1063,7 +1189,7 @@ static BOOL revenueCatFetchCompleted = NO;
         else if ( line.category == DebugLineCategoryDebug ) {
             cell.imageView.tintColor = UIColor.systemBlueColor;
         }
-
+        
         return cell;
     }
 }
@@ -1147,8 +1273,8 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
       explicitOnline:(BOOL)explicitOnline
    explicitEagerSync:(BOOL)explicitEagerSync {
     PresentUnlockedDatabaseParams* presentationParams = [[PresentUnlockedDatabaseParams alloc] initWithSuppressInitialLazySync:NO onLoadAdd2FAOtpAuthUrl:nil];
-
-    [self openDatabase:safe 
+    
+    [self openDatabase:safe
        explicitOffline:explicitOffline
   explicitManualUnlock:explicitManualUnlock
    biometricPreCleared:biometricPreCleared
@@ -1160,10 +1286,10 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 
 - (void)openDatabaseFor2FAAdd:(DatabasePreferences*)safe optAuthUrl:(NSURL*)optAuthUrl {
     PresentUnlockedDatabaseParams* presentationParams = [[PresentUnlockedDatabaseParams alloc] initWithSuppressInitialLazySync:YES onLoadAdd2FAOtpAuthUrl:optAuthUrl];
-
-    [self openDatabase:safe 
+    
+    [self openDatabase:safe
        explicitOffline:false
-  explicitManualUnlock:false 
+  explicitManualUnlock:false
    biometricPreCleared:false
         explicitOnline:false
      explicitEagerSync:YES
@@ -1176,12 +1302,12 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 explicitManualUnlock:(BOOL)explicitManualUnlock
  biometricPreCleared:(BOOL)biometricPreCleared
       explicitOnline:(BOOL)explicitOnline
-   explicitEagerSync:(BOOL)explicitEagerSync 
+   explicitEagerSync:(BOOL)explicitEagerSync
   suppressOnboarding:(BOOL)suppressOnboarding
   presentationParams:(PresentUnlockedDatabaseParams*)presentationParams {
     slog(@"======================== OPEN DATABASE: %@ [EON: %hhd, EOFF: %hhd, MAN: %hhd, BPC: %hhd] ============================",
-          safe.nickName, explicitOnline, explicitOffline, explicitManualUnlock, biometricPreCleared);
-        
+         safe.nickName, explicitOnline, explicitOffline, explicitManualUnlock, biometricPreCleared);
+    
     biometricPreCleared = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics && biometricPreCleared;
     
     if(safe.hasUnresolvedConflicts) { 
@@ -1199,7 +1325,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                                                                        isAutoFillOpen:NO
                                                                                       explicitOffline:explicitOffline
                                                                                        explicitOnline:explicitOnline];
-
+        
         [helper beginUnlockSequence:NO
                 biometricPreCleared:biometricPreCleared
                explicitManualUnlock:explicitManualUnlock
@@ -1215,7 +1341,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
             }
             else if (result == kUnlockDatabaseResultIncorrectCredentials) {
                 
-                slog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+                slog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials [explicitManualUnlock=%hhd]", explicitManualUnlock);
             }
             else if (result == kUnlockDatabaseResultError) {
                 [Alerts error:self
@@ -2220,7 +2346,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                   buttonText:NSLocalizedString(@"icloud_create_issue_fix", @"How do I fix this?")
                                       action:^(BOOL response) {
                     if ( response ) {
-                        NSURL* url = [NSURL URLWithString:@"https:
+                        NSURL* url = [NSURL URLWithString:@"https://strongbox.reamaze.com/kb/troubleshooting-and-errors/i-deleted-my-icloud-strongbox-folder-and-now-i-cant-create-a-new-icloud-database"];
                         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
                     }
                 }];
@@ -2257,7 +2383,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                             secondButtonText:NSLocalizedString(@"icloud_create_issue_local_instead", @"Create local database instead")
                                   completion:^(int response) {
                     if ( response == 0 ) {
-                        NSURL* url = [NSURL URLWithString:@"https:
+                        NSURL* url = [NSURL URLWithString:@"https://strongbox.reamaze.com/kb/troubleshooting-and-errors/i-deleted-my-icloud-strongbox-folder-and-now-i-cant-create-a-new-icloud-database"];
                         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
                     }
                     else if ( response == 1) {
@@ -2408,28 +2534,40 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     slog(@"RevenueCat fetch complete!");
     revenueCatFetchCompleted = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
+        
+        [self bindToolbar];
+
         if (self.pendingOnboardingAfterRevenueCatFetch) {
             slog(@"Processing pending onboarding after RevenueCat fetch completion");
             BOOL userJustCompletedBiometricAuthentication = self.pendingOnboardingUserJustCompletedBiometricAuthentication;
             BOOL quickLaunchWhenDone = self.pendingOnboardingQuickLaunchWhenDone;
-            
+
             self.pendingOnboardingAfterRevenueCatFetch = NO;
             self.pendingOnboardingUserJustCompletedBiometricAuthentication = NO;
             self.pendingOnboardingQuickLaunchWhenDone = NO;
-            
+
             [self doAppOnboarding:userJustCompletedBiometricAuthentication quickLaunchWhenDone:quickLaunchWhenDone];
         }
     });
 }
 
-- (void)showSaleScreen {    
+- (void)presentSaleOfferWithSale:(Sale*)sale hideBanner:(BOOL)hideBanner {
+    if ( !sale ) {
+        slog(@"🔴 Can't present sale screen - missing sale model");
+        return;
+    }
+
+    SaleScheduleManager.sharedInstance.userHasBeenPromptedAboutCurrentSale = YES;
+
     BOOL existingSubscriber = ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription;
-    Sale* sale = SaleScheduleManager.sharedInstance.currentSale;
-    
-    if ( sale ) {
-        __weak SafesViewController* weakSelf = self;
-        UIViewController* vc = [SwiftUIViewFactory makeSaleOfferViewControllerWithSale:sale
-                                                                    existingSubscriber:existingSubscriber
+
+    if ( hideBanner ) {
+        [self hideSaleBannerAnimated:YES];
+    }
+
+    __weak SafesViewController* weakSelf = self;
+    UIViewController* vc = [SwiftUIViewFactory makeSaleOfferViewControllerWithSale:sale
+                                                                existingSubscriber:existingSubscriber
          redeemHandler:^{
             [weakSelf dismissViewControllerAnimated:YES completion:^{
                 SKPaymentQueue* queue = SKPaymentQueue.defaultQueue;
@@ -2442,13 +2580,9 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
         } dismissHandler:^{
             [weakSelf dismissViewControllerAnimated:YES completion:nil];
         }];
-        vc.modalPresentationStyle = UIModalPresentationFormSheet;
-        
-        [self presentViewController:vc animated:YES completion:nil];
-    }
-    else {
-        slog(@"🔴 Can't show sale screen - no sale on!");
-    }
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 - (void)showLifetimePurchaseScreen {
@@ -2465,8 +2599,17 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (void)showUpgradeScreen {
+#if SUBSCRIPTIONS
+    [[SuperwallService shared] presentPaywallFrom:self campaign:SuperwallCampaignNudge completion:^(BOOL subscribed) {
+        
+        if (subscribed) {
+            [self internalRefresh];
+        }
+    }];
+#else
     UpgradeViewController* vc = [UpgradeViewController fromStoryboard];
     [self presentViewController:vc animated:YES completion:nil];
+#endif
 }
 
 - (void)showToolbar:(NSString*)title
@@ -2524,64 +2667,360 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
 }
 
 - (BOOL)shouldShowSaleNotification {
-    if ( SaleScheduleManager.sharedInstance.saleNowOn && !CustomizationManager.isAProBundle ) {
-        
-        if ( !AppPreferences.sharedInstance.isPro ) {
-            return YES;
-        }
-        
-        if ( ProUpgradeIAPManager.sharedInstance.hasActiveYearlySubscription && 
-            SaleScheduleManager.sharedInstance.currentSale.showToExistingSubscribers ) {
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-            return YES;
-        }
+    if ( !SaleScheduleManager.sharedInstance.saleNowOn ) {
+        return NO;
     }
-    
-    return NO;
+
+    if ( CustomizationManager.isAProBundle ) {
+        return NO;
+    }
+
+    if ( AppPreferences.sharedInstance.isPro ) {
+        return NO;
+    }
+
+    return !SaleScheduleManager.sharedInstance.saleBannerDismissedForCurrentSale;
 }
 
 - (void)bindToolbar {
-    if ( [self shouldShowSaleNotification] ) {
-        [self showToolbar:NSLocalizedString(@"safesvc_sale_now_on", @"Strongbox Sale Now On")
-                    image:@"gift"
-            textTintColor:UIColor.systemBlueColor
-                tintColor:UIColor.greenColor
-        showDismissButton:NO
-                   action:@selector(showSaleScreen)];
+    
+    [self hideToolbar];
+
+    BOOL showingSaleBanner = [self updateSaleBannerIfNeeded];
+
+    if ( showingSaleBanner ) {
+        
+        [self hideNudgeViewAnimated:YES];
+        return;
     }
-    else if ( [self shouldShowUpgradeNotification] ) {
-        BOOL freeTrialAvailable = ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable;
-        
-        NSString *upgradeButtonTitle = freeTrialAvailable ?
-        NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Try Pro free for 3 months") :
-        NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Please Upgrade...");
-        
-        [self showToolbar:upgradeButtonTitle
-                    image:@"star.circle.fill"
-            textTintColor:AppPreferences.sharedInstance.daysInstalled > 60 ? UIColor.systemOrangeColor : UIColor.linkColor
-                tintColor:AppPreferences.sharedInstance.daysInstalled > 60 ? UIColor.systemOrangeColor : UIColor.systemYellowColor
-        showDismissButton:NO
-                   action:@selector(showUpgradeScreen)];
+
+    
+    [self updateNudgeViewIfNeeded];
+}
+
+- (UIView*)saleBannerHostView {
+    return self.navigationController.view;
+}
+
+- (void)setupSaleBannerView {
+    if ( self.saleBannerView ) {
+        return;
+    }
+
+    UIView* hostView = [self saleBannerHostView];
+    if ( !hostView ) {
+        return;
+    }
+
+    SaleBannerView* banner = [[SaleBannerView alloc] initWithFrame:CGRectZero];
+    banner.translatesAutoresizingMaskIntoConstraints = NO;
+    banner.hidden = YES;
+    banner.alpha = 0.0f;
+    [banner addTarget:self action:@selector(onSaleBannerTapped) forControlEvents:UIControlEventTouchUpInside];
+
+    [hostView addSubview:banner];
+    [hostView bringSubviewToFront:banner];
+
+    UILayoutGuide* guide = hostView.safeAreaLayoutGuide;
+    [NSLayoutConstraint activateConstraints:@[
+        [banner.leadingAnchor constraintEqualToAnchor:guide.leadingAnchor constant:16.0],
+        [banner.trailingAnchor constraintEqualToAnchor:guide.trailingAnchor constant:-16.0],
+        [banner.bottomAnchor constraintEqualToAnchor:guide.bottomAnchor constant:-12.0],
+        [banner.heightAnchor constraintGreaterThanOrEqualToConstant:56.0]
+    ]];
+
+    self.saleBannerView = banner;
+}
+
+- (BOOL)updateSaleBannerIfNeeded {
+    if ( !self.saleBannerView ) {
+        [self setupSaleBannerView];
+    }
+
+    if ( !self.saleBannerView ) {
+        return NO;
+    }
+
+    BOOL shouldShow = [self shouldShowSaleNotification];
+    Sale* sale = SaleScheduleManager.sharedInstance.currentSale;
+
+    if ( shouldShow && sale ) {
+        NSString* subtitle = sale.title.length ? sale.title : nil;
+        if ( !subtitle && sale.promoCode.length ) {
+            subtitle = sale.promoCode;
+        }
+        if ( !subtitle ) {
+            subtitle = NSLocalizedString(@"sale_view_regular_cta", @"Show sale offer");
+        }
+
+        self.saleBannerView.titleText = NSLocalizedString(@"safesvc_sale_now_on", @"Strongbox Sale Now On");
+        self.saleBannerView.subtitleText = subtitle;
+        self.saleBannerSale = sale;
+
+        [self showSaleBannerAnimated:YES];
+        return YES;
+    }
+
+    [self hideSaleBannerAnimated:YES];
+    return NO;
+}
+
+- (void)onSaleBannerTapped {
+    Sale* sale = self.saleBannerSale ?: SaleScheduleManager.sharedInstance.currentSale;
+
+    if ( !sale ) {
+        [self updateSaleBannerIfNeeded];
+        sale = self.saleBannerSale ?: SaleScheduleManager.sharedInstance.currentSale;
+    }
+
+    if ( !sale ) {
+        slog(@"🔴 Sale banner tapped but no sale data available");
+        [self hideSaleBannerAnimated:YES];
+        return;
+    }
+
+    SaleScheduleManager.sharedInstance.saleBannerDismissedForCurrentSale = YES;
+
+    [self presentSaleOfferWithSale:sale hideBanner:YES];
+}
+
+- (void)showSaleBannerAnimated:(BOOL)animated {
+    if ( self.saleBannerVisible || !self.saleBannerView ) {
+        return;
+    }
+
+    [self.saleBannerView.superview layoutIfNeeded];
+    CGFloat bannerHeight = CGRectGetHeight(self.saleBannerView.bounds);
+    if ( bannerHeight < 1.0f ) {
+        bannerHeight = kSaleBannerFallbackHeight;
+    }
+    CGFloat insetAmount = bannerHeight + kSaleBannerAdditionalPadding;
+
+    UIEdgeInsets inset = self.tableView.contentInset;
+    inset.bottom += insetAmount;
+    self.tableView.contentInset = inset;
+
+    UIEdgeInsets indicatorInset = self.tableView.scrollIndicatorInsets;
+    indicatorInset.bottom += insetAmount;
+    self.tableView.scrollIndicatorInsets = indicatorInset;
+
+    self.saleBannerAppliedInset = insetAmount;
+
+    self.saleBannerView.hidden = NO;
+    [self.saleBannerView.superview bringSubviewToFront:self.saleBannerView];
+
+    if ( animated ) {
+        self.saleBannerView.alpha = 0.0f;
+        [UIView animateWithDuration:0.25 animations:^{
+            self.saleBannerView.alpha = 1.0f;
+        } completion:nil];
     }
     else {
-        [self hideToolbar];
+        self.saleBannerView.alpha = 1.0f;
     }
+
+    self.saleBannerVisible = YES;
+}
+
+- (void)hideSaleBannerAnimated:(BOOL)animated {
+    if ( !self.saleBannerView ) {
+        return;
+    }
+
+    if ( self.saleBannerVisible && self.saleBannerAppliedInset > 0.0f ) {
+        UIEdgeInsets inset = self.tableView.contentInset;
+        inset.bottom = MAX(0.0f, inset.bottom - self.saleBannerAppliedInset);
+        self.tableView.contentInset = inset;
+
+        UIEdgeInsets indicatorInset = self.tableView.scrollIndicatorInsets;
+        indicatorInset.bottom = MAX(0.0f, indicatorInset.bottom - self.saleBannerAppliedInset);
+        self.tableView.scrollIndicatorInsets = indicatorInset;
+    }
+
+    if ( self.saleBannerView.isHidden && !self.saleBannerVisible ) {
+        return;
+    }
+
+    void (^animations)(void) = ^{
+        self.saleBannerView.alpha = 0.0f;
+    };
+
+    void (^completion)(BOOL) = ^(BOOL finished) {
+        self.saleBannerView.hidden = YES;
+    };
+
+    if ( animated && self.saleBannerVisible ) {
+        [UIView animateWithDuration:0.2 animations:animations completion:completion];
+    }
+    else {
+        animations();
+        completion(YES);
+    }
+
+    self.saleBannerVisible = NO;
+    self.saleBannerAppliedInset = 0.0f;
+    self.saleBannerSale = nil;
+}
+
+#pragma mark - NudgeView
+
+- (void)setupNudgeView {
+    if ( self.nudgeView ) {
+        return;
+    }
+
+    UIView* hostView = [self saleBannerHostView];
+    if ( !hostView ) {
+        return;
+    }
+
+    NudgeView* nudge = [[NudgeView alloc] initWithFrame:CGRectZero];
+    nudge.translatesAutoresizingMaskIntoConstraints = NO;
+    nudge.hidden = YES;
+    nudge.alpha = 0.0f;
+    [nudge addTarget:self action:@selector(onNudgeViewTapped) forControlEvents:UIControlEventTouchUpInside];
+
+    [hostView addSubview:nudge];
+    [hostView bringSubviewToFront:nudge];
+
+    UILayoutGuide* guide = hostView.safeAreaLayoutGuide;
+    [NSLayoutConstraint activateConstraints:@[
+        [nudge.leadingAnchor constraintEqualToAnchor:guide.leadingAnchor constant:16.0],
+        [nudge.trailingAnchor constraintEqualToAnchor:guide.trailingAnchor constant:-16.0],
+        [nudge.bottomAnchor constraintEqualToAnchor:guide.bottomAnchor constant:-12.0],
+        [nudge.heightAnchor constraintGreaterThanOrEqualToConstant:56.0]
+    ]];
+
+    self.nudgeView = nudge;
+}
+
+- (BOOL)updateNudgeViewIfNeeded {
+    
+    if ( !revenueCatFetchCompleted ) {
+        return NO;
+    }
+
+    if ( !self.nudgeView ) {
+        [self setupNudgeView];
+    }
+
+    if ( !self.nudgeView ) {
+        return NO;
+    }
+
+    BOOL shouldShow = [self shouldShowUpgradeNotification];
+
+    if ( shouldShow ) {
+        BOOL freeTrialAvailable = ProUpgradeIAPManager.sharedInstance.isFreeTrialAvailable;
+        BOOL isUrgent = AppPreferences.sharedInstance.daysInstalled > 60;
+
+        NSString *title;
+        NSString *subtitle = nil;
+
+        if ( freeTrialAvailable ) {
+            NSString* trialDuration = ProUpgradeIAPManager.sharedInstance.freeTrialDurationText;
+            if ( trialDuration.length > 0 ) {
+                title = NSLocalizedString(@"nudge_view_try_pro_title", @"Try Strongbox Pro");
+                subtitle = [NSString stringWithFormat:NSLocalizedString(@"nudge_view_free_trial_subtitle_fmt", @"Free for %@"), trialDuration];
+            } else {
+                title = NSLocalizedString(@"generic_start_free_trial", @"Start Free Trial");
+            }
+        } else {
+            title = NSLocalizedString(@"nudge_view_upgrade_title", @"Upgrade to Pro");
+            subtitle = NSLocalizedString(@"nudge_view_upgrade_subtitle", @"Unlock all features");
+        }
+
+        self.nudgeView.titleText = title;
+        self.nudgeView.subtitleText = subtitle;
+        self.nudgeView.useUrgentStyle = isUrgent;
+
+        [self showNudgeViewAnimated:YES];
+        return YES;
+    }
+
+    [self hideNudgeViewAnimated:YES];
+    return NO;
+}
+
+- (void)onNudgeViewTapped {
+    [self showUpgradeScreen];
+}
+
+- (void)showNudgeViewAnimated:(BOOL)animated {
+    if ( self.nudgeViewVisible || !self.nudgeView ) {
+        return;
+    }
+
+    [self.nudgeView.superview layoutIfNeeded];
+    CGFloat bannerHeight = CGRectGetHeight(self.nudgeView.bounds);
+    if ( bannerHeight < 1.0f ) {
+        bannerHeight = kNudgeBannerFallbackHeight;
+    }
+    CGFloat insetAmount = bannerHeight + kNudgeBannerAdditionalPadding;
+
+    UIEdgeInsets inset = self.tableView.contentInset;
+    inset.bottom += insetAmount;
+    self.tableView.contentInset = inset;
+
+    UIEdgeInsets indicatorInset = self.tableView.scrollIndicatorInsets;
+    indicatorInset.bottom += insetAmount;
+    self.tableView.scrollIndicatorInsets = indicatorInset;
+
+    self.nudgeViewAppliedInset = insetAmount;
+
+    self.nudgeView.hidden = NO;
+    [self.nudgeView.superview bringSubviewToFront:self.nudgeView];
+
+    if ( animated ) {
+        self.nudgeView.alpha = 0.0f;
+        [UIView animateWithDuration:0.25 animations:^{
+            self.nudgeView.alpha = 1.0f;
+        } completion:nil];
+    }
+    else {
+        self.nudgeView.alpha = 1.0f;
+    }
+
+    self.nudgeViewVisible = YES;
+}
+
+- (void)hideNudgeViewAnimated:(BOOL)animated {
+    if ( !self.nudgeView ) {
+        return;
+    }
+
+    if ( self.nudgeViewVisible && self.nudgeViewAppliedInset > 0.0f ) {
+        UIEdgeInsets inset = self.tableView.contentInset;
+        inset.bottom = MAX(0.0f, inset.bottom - self.nudgeViewAppliedInset);
+        self.tableView.contentInset = inset;
+
+        UIEdgeInsets indicatorInset = self.tableView.scrollIndicatorInsets;
+        indicatorInset.bottom = MAX(0.0f, indicatorInset.bottom - self.nudgeViewAppliedInset);
+        self.tableView.scrollIndicatorInsets = indicatorInset;
+    }
+
+    if ( self.nudgeView.isHidden && !self.nudgeViewVisible ) {
+        return;
+    }
+
+    void (^animations)(void) = ^{
+        self.nudgeView.alpha = 0.0f;
+    };
+
+    void (^completion)(BOOL) = ^(BOOL finished) {
+        self.nudgeView.hidden = YES;
+    };
+
+    if ( animated && self.nudgeViewVisible ) {
+        [UIView animateWithDuration:0.2 animations:animations completion:completion];
+    }
+    else {
+        animations();
+        completion(YES);
+    }
+
+    self.nudgeViewVisible = NO;
+    self.nudgeViewAppliedInset = 0.0f;
 }
 
 - (IBAction)onPreferences:(id)sender {
@@ -2741,7 +3180,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
           forceOpenInPlace:(BOOL)forceOpenInPlace
                    modDate:(NSDate*)modDate {
     if(!success || !data) {
-        if ([url.absoluteString isEqualToString:@"auth:
+        if ([url.absoluteString isEqualToString:@"auth://"]) {
             
             slog(@"IGNORE - sent by Launcher app for some reason - just ignore...");
         }
@@ -3240,6 +3679,42 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     }];
 }
 
+- (void)onImportProtonPass {
+    [Alerts info:self
+           title:NSLocalizedString(@"safes_vc_import_proton_pass", @"Import Proton Pass")
+         message:NSLocalizedString(@"safes_vc_import_json_message", @"Strongbox can import JSON files. Tap OK to select your exported JSON file.")
+      completion:^{
+        [self continueImportFileSelection:@"ProtonPass"];
+    } ];
+}
+
+- (void)onImportMinimalist {
+    [Alerts info:self
+           title:NSLocalizedString(@"safes_vc_import_minimalist", @"Import Minimalist")
+         message:NSLocalizedString(@"safes_vc_import_json_message", @"Strongbox can import JSON files. Tap OK to select your exported JSON file.")
+      completion:^{
+        [self continueImportFileSelection:@"Minimalist"];
+    } ];
+}
+
+- (void)onImportMSecure {
+    [Alerts info:self
+           title:NSLocalizedString(@"safes_vc_import_msecure", @"Import from mSecure")
+         message:NSLocalizedString(@"mac_choose_csv_file_import", @"Choose CSV file to import.")
+      completion:^{
+        [self continueImportFileSelection:@"mSecure"];
+    } ];
+}
+
+- (void)onImportSecrets4 {
+    [Alerts info:self
+           title:NSLocalizedString(@"safes_vc_import_secrets4", @"Import Secrets 4")
+         message:NSLocalizedString(@"safes_vc_import_xml_message", @"Strongbox can import XML files. Tap OK to select your exported XML file.")
+      completion:^{
+        [self continueImportFileSelection:@"Secrets4"];
+    } ];
+}
+
 - (void)continueImportFileSelection:(NSString*)importFormat {
     UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[UTTypeItem]];
     vc.delegate = self;
@@ -3291,6 +3766,18 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
     else if ( [self.importFormat isEqualToString:@"Bitwarden"] ) {
         [self importBitwarden:url];
     }
+    else if ( [self.importFormat isEqualToString:@"ProtonPass"] ) {
+        [self importProtonPass:url];
+    }
+    else if ( [self.importFormat isEqualToString:@"Minimalist"] ) {
+        [self importMinimalist:url];
+    }
+    else if ( [self.importFormat isEqualToString:@"mSecure"] ) {
+        [self importMSecure:url];
+    }
+    else if ( [self.importFormat isEqualToString:@"Secrets4"] ) {
+        [self importSecrets4:url];
+    }
 }
 
 - (void)import1Password1Pux:(NSURL*)url {
@@ -3318,6 +3805,66 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
       completion:^{
         NSError* error;
         id<Importer> importer = [[BitwardenImporter alloc] init];
+        ImportResult* result = [importer convertExWithUrl:url error:&error];
+        [self addImportedDatabase:result.database messages:result.messages error:error];
+    }];
+}
+
+- (void)importProtonPass:(NSURL*)url {
+    NSString* title = NSLocalizedString(@"proton_pass_import_warning_title", @"Proton Pass Import Warning");
+    NSString* msg = NSLocalizedString(@"proton_pass_import_warning_msg", @"The import process isn't perfect and some features of Proton Pass such as named sections are not available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+    
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        id<Importer> importer = [[ProtonPassImporter alloc] init];
+        ImportResult* result = [importer convertExWithUrl:url error:&error];
+        [self addImportedDatabase:result.database messages:result.messages error:error];
+    }];
+}
+
+- (void)importMinimalist:(NSURL*)url {
+    NSString* title = NSLocalizedString(@"generic_import_warning_title", @"Import Warning");
+    NSString* msg = NSLocalizedString(@"generic_import_warning_msg", @"The import process may not be perfect and some features may not be available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        id<Importer> importer = [[MinimalistImporter alloc] init];
+        ImportResult* result = [importer convertExWithUrl:url error:&error];
+        [self addImportedDatabase:result.database messages:result.messages error:error];
+    }];
+}
+
+- (void)importMSecure:(NSURL*)url {
+    NSString* title = NSLocalizedString(@"generic_import_warning_title", @"Import Warning");
+    NSString* msg = NSLocalizedString(@"generic_import_warning_msg", @"The import process may not be perfect and some features may not be available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+    
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        id<Importer> importer = [[MSecureImporter alloc] init];
+        DatabaseModel* database = [importer convertWithUrl:url error:&error];
+        [self addImportedDatabase:database error:error];
+    }];
+}
+
+- (void)importSecrets4:(NSURL*)url {
+    NSString* title = NSLocalizedString(@"generic_import_warning_title", @"Import Warning");
+    NSString* msg = NSLocalizedString(@"generic_import_warning_msg", @"The import process may not be perfect and some features may not be available in Strongbox.\n\nIt is important to check that your entries as acceptable after you have imported.");
+    
+    [Alerts info:self
+           title:title
+         message:msg
+      completion:^{
+        NSError* error;
+        id<Importer> importer = [[Secrets4Importer alloc] init];
         ImportResult* result = [importer convertExWithUrl:url error:&error];
         [self addImportedDatabase:result.database messages:result.messages error:error];
     }];
@@ -3537,7 +4084,7 @@ explicitManualUnlock:(BOOL)explicitManualUnlock
                                   buttonText:NSLocalizedString(@"icloud_create_issue_fix", @"How do I fix this?")
                                       action:^(BOOL response) {
                     if ( response ) {
-                        NSURL* url = [NSURL URLWithString:@"https:
+                        NSURL* url = [NSURL URLWithString:@"https://strongbox.reamaze.com/kb/troubleshooting-and-errors/i-deleted-my-icloud-strongbox-folder-and-now-i-cant-create-a-new-icloud-database"];
                         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
                     }
                 }];

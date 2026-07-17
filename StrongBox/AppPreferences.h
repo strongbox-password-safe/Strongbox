@@ -13,6 +13,7 @@
 #import "AppPrivacyShieldMode.h"
 #import "AppLockMode.h"
 #import "ApplicationPreferences.h"
+#import "SearchScope.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,6 +30,11 @@ typedef NS_ENUM(NSUInteger, DatabaseSortOption) {
 
 @property (nullable, readonly) NSUserDefaults* sharedAppGroupDefaults;
 @property (readonly) NSString* appGroupName;
+
+@property (nonatomic) SearchScope searchScope; 
+@property (nonatomic) BOOL rememberSearchScope; 
+@property (nonatomic, readonly) SearchScope initialSearchScope;
+- (void)persistSearchScopeIfEnabled:(SearchScope)scope NS_SWIFT_NAME(persistSearchScope(ifEnabled:));
 @property BOOL suppressAppBackgroundTriggers; 
 
 @property BOOL colorizeUseColorBlindPalette;
@@ -50,6 +56,7 @@ typedef NS_ENUM(NSUInteger, DatabaseSortOption) {
 
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL monitorInternetConnectivity;
+@property BOOL sentryCrashReportingEnabled;
 
 @property FavIconDownloadOptions *favIconDownloadOptions;
 @property BOOL showDatabasesSeparator;
@@ -111,6 +118,7 @@ typedef NS_ENUM(NSUInteger, DatabaseSortOption) {
 @property NSString* appLockPin;
 @property NSInteger appLockDelay;
 @property BOOL appLockAppliesToPreferences;
+@property BOOL deleteDatabaseAfterXFailedUnlockAttempts;
 @property NSInteger deleteDataAfterFailedUnlockCount;
 @property NSUInteger failedUnlockAttempts;
 
@@ -127,6 +135,7 @@ typedef NS_ENUM(NSUInteger, DatabaseSortOption) {
 
 @property PasswordStrengthConfig* passwordStrengthConfig;
 @property NSInteger promptedForSale;
+@property NSInteger saleBannerDismissedForSale;
 
 @property BOOL addLegacySupplementaryTotpCustomFields;
 @property BOOL addOtpAuthUrl;
@@ -224,7 +233,6 @@ typedef NS_ENUM(NSUInteger, DatabaseSortOption) {
 @property BOOL twoFactorHideCountdownDigits;
 
 @property BOOL appleWatchIntegration;
-@property NSInteger lastDisplayedWhatsNewMessage;
 
 @property BOOL showInteractiveAppleWatchSyncGuide;
 

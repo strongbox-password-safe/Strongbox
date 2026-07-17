@@ -30,7 +30,7 @@
     }
     
     const NSUInteger percentageChanceOfShowing = 15;
-    NSInteger random = arc4random_uniform(1000);
+    NSInteger random = arc4random_uniform(100);
 
     return (random < percentageChanceOfShowing);
 }

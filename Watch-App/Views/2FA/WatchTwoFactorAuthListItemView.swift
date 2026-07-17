@@ -95,7 +95,7 @@ struct WatchTwoFactorAuthListItemView: View {
 
             Spacer()
 
-            TwoFactorCodeCircularProgressView(totp: totp, radius: 35, updateMode: .automatic, hideCountdownDigits: hideCountdownDigits)
+            TwoFactorCodeCircularProgressView(totp: totp, radius: 35, updateMode: .centralTimerNotification, hideCountdownDigits: hideCountdownDigits)
                 .padding(2)
                 .frame(width: 32)
         }
@@ -104,26 +104,26 @@ struct WatchTwoFactorAuthListItemView: View {
 
 #if DEBUG
     #Preview {
-        let otpAuthUrl = "otpauth:
+        let otpAuthUrl = "otpauth://totp/Timely:Kimberely%20Schimke?secret=2Y&algorithm=SHA1&digits=6&period=30&issuer=Timely"
 
         let token = OTPToken(url: URL(string: otpAuthUrl))!
 
-        let otpAuthUrl8Digit = "otpauth:
+        let otpAuthUrl8Digit = "otpauth://totp/Strongbox?secret=123456&issuer=Phoebe%20Code%20Limited&algorithm=SHA1&digits=8&period=30"
         let token8Digit = OTPToken(url: URL(string: otpAuthUrl8Digit))!
 
-        let otpAuthUrl8Digits60Seconds = "otpauth:
+        let otpAuthUrl8Digits60Seconds = "otpauth://totp/Strongbox?secret=123456&issuer=Phoebe%20Code%20Limited&algorithm=SHA1&digits=8&period=60"
         let token8Digits60Seconds = OTPToken(url: URL(string: otpAuthUrl8Digits60Seconds))!
 
-        let otpAuthUrl8Digits120Seconds = "otpauth:
+        let otpAuthUrl8Digits120Seconds = "otpauth://totp/Strongbox?secret=123456&issuer=Phoebe%20Code%20Limited&algorithm=SHA1&digits=8&period=120"
         let token8Digits120Seconds = OTPToken(url: URL(string: otpAuthUrl8Digits120Seconds))!
 
-        let otpAuthUrlSha25645Seconds = "otpauth:
+        let otpAuthUrlSha25645Seconds = "otpauth://totp/Strongbox?secret=123456&issuer=Phoebe%20Code%20Limited&algorithm=SHA256&digits=6&period=45"
         let tokenSha25645Seconds = OTPToken(url: URL(string: otpAuthUrlSha25645Seconds))!
 
-        let otpAuthUrlSha51215Seconds = "otpauth:
+        let otpAuthUrlSha51215Seconds = "otpauth://totp/Strongbox?secret=123456&issuer=Phoebe%20Code%20Limited&algorithm=SHA512&digits=6&period=15"
         let tokenSha51215Seconds = OTPToken(url: URL(string: otpAuthUrlSha51215Seconds))!
 
-        let otpAuthUrlSteam = "otpauth:
+        let otpAuthUrlSteam = "otpauth://totp/Steam:mark@gmail.com?secret=63BEDWCQZKTQWPESARIERL5DTTQFCJTK&issuer=Steam&encoder=steam"
         let tokenSteam = OTPToken(url: URL(string: otpAuthUrlSteam))!
 
         List {

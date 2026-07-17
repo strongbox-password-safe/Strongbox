@@ -183,7 +183,7 @@
     
 
     if ( url && url.scheme.length == 0 ) {
-        NSString* foo = [@"https:
+        NSString* foo = [@"https://" stringByAppendingString:url.absoluteString];
         url = foo.urlExtendedParse;
 
     }

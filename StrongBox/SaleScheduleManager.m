@@ -115,4 +115,39 @@
     AppPreferences.sharedInstance.promptedForSale = idx;
 }
 
+- (BOOL)saleBannerDismissedForCurrentSale {
+    NSDate* now = NSDate.date;
+
+    NSInteger idx = [self.newerSchedule indexOfFirstMatch:^BOOL(Sale* _Nonnull obj) {
+        return [now isLaterThan:obj.start] && [now isEarlierThan:obj.end];
+    }];
+
+    if ( idx == NSNotFound ) {
+        return YES;
+    }
+
+    NSInteger stored = AppPreferences.sharedInstance.saleBannerDismissedForSale;
+    return stored >= idx;
+}
+
+- (void)setSaleBannerDismissedForCurrentSale:(BOOL)saleBannerDismissedForCurrentSale {
+    if ( !saleBannerDismissedForCurrentSale ) {
+        AppPreferences.sharedInstance.saleBannerDismissedForSale = -1;
+        return;
+    }
+
+    NSDate* now = NSDate.date;
+
+    NSInteger idx = [self.newerSchedule indexOfFirstMatch:^BOOL(Sale* _Nonnull obj) {
+        return [now isLaterThan:obj.start] && [now isEarlierThan:obj.end];
+    }];
+
+    if ( idx == NSNotFound ) {
+        slog(@"WARNWARN: No current sale to set as banner dismissed");
+        return;
+    }
+
+    AppPreferences.sharedInstance.saleBannerDismissedForSale = idx;
+}
+
 @end

@@ -104,7 +104,7 @@ struct SwiftUIEntryView: View {
 }
 
 #Preview {
-    let totp = OTPToken(url: URL(string: "otpauth:
+    let totp = OTPToken(url: URL(string: "otpauth://totp/Timely:Kimberely%20Schimke?secret=2Y&algorithm=SHA1&digits=6&period=30&issuer=Timely"))
 
     return List {
         SwiftUIEntryView(title: "Test Title", username: "Username", path: "/Factories/Acme Inc.", icon: NodeIconHelper.defaultIcon, favourite: true, totp: totp, flagged: true, showIcon: true, easyReadSeparator: true)

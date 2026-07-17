@@ -52,6 +52,12 @@ class NextGenWindow: NSWindow {
     func onCmdPlusNumberPressed(number: Int) {
         
 
+        
+        
+        if copySelectedEntryCustomField(displayIndex: number - 1) {
+            return
+        }
+
         if let group = tabGroup,
            let tabbedWindows,
            number <= tabbedWindows.count
@@ -60,5 +66,13 @@ class NextGenWindow: NSWindow {
 
             group.selectedWindow = tabbedWindows[number - 1]
         }
+    }
+
+    func copySelectedEntryCustomField(displayIndex: Int) -> Bool {
+        guard let split = windowController?.contentViewController as? NextGenSplitViewController else {
+            return false
+        }
+
+        return split.detailView.copyCustomField(displayIndex: displayIndex)
     }
 }

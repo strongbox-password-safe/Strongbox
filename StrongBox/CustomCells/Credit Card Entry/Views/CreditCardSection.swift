@@ -34,9 +34,13 @@ struct CreditCardSection: View {
                 .keyboardType(.numberPad)
                 .focused(focusedField, equals: .number)
                 .onChange(of: viewModel.creditCardData.number) { newValue in
-                    viewModel.creditCardData.number = newValue.formattedAsCreditCardNumber()
-                    viewModel.updateCardType(cardNumber: newValue)
+                    let detectedType = CardDetection.detectCardType(newValue).type
+                    viewModel.creditCardData.cardType = detectedType
+                    
+                    let useAmexFormat = detectedType == .americanExpress
+                    viewModel.creditCardData.number = newValue.formattedAsCreditCardNumber(usingAmexFormat: useAmexFormat)
                     viewModel.markAsChanged()
+                    
                 }
         } trailingContent: {
             Button {
@@ -49,7 +53,8 @@ struct CreditCardSection: View {
             .frame(width: 25, height: 25, alignment: .center)
         }
         .tappable(isTappable: !isEditing) {
-            onCopy(viewModel.creditCardData.number, "Card Number Copied")
+            let numbersOnlyString = viewModel.creditCardData.number.onlyNumbers
+            onCopy(numbersOnlyString, "Card Number Copied")
         }
         
         CreditCardFormRow(icon: Image(systemName: "creditcard.fill"), title: "Card Type", interactable: isEditing) {

@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) BOOL saleNowOn;
 @property BOOL userHasBeenPromptedAboutCurrentSale;
+@property BOOL saleBannerDismissedForCurrentSale;
 
 @property (readonly, nullable) Sale* currentSale;
 

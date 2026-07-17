@@ -143,11 +143,14 @@ class TOTPScannerViewController: UIViewController, AVCaptureMetadataOutputObject
         if let metadataObject = metadataObjects.first {
             guard let readableObject = metadataObject as? AVMetadataMachineReadableCodeObject,
                   let stringValue = readableObject.stringValue,
-                  let url = stringValue.urlExtendedParse,
-                  let scheme = url.scheme,
-                  scheme.lowercased() == kOtpAuthScheme
+                  let url = stringValue.urlExtendedParse
             else {
-                swlog("Not a proper OTPAUTH TOTP URL... Ignoring")
+                swlog("Not a proper TOTP URL... Ignoring")
+                return
+            }
+
+            guard OTPToken(url: url) != nil || IDMeOtpAuthImporter.canImport(url) else {
+                swlog("Unsupported TOTP QR payload... Ignoring")
                 return
             }
 

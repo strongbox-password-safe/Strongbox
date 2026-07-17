@@ -794,7 +794,7 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                     suggestedUrl = url.absoluteString;
                 }
                 else {
-                    suggestedUrl = [[url.scheme stringByAppendingString:@":
+                    suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:bar];
                 }
             }
         }
@@ -1142,7 +1142,14 @@ static NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             NSString* value = [self dereference:sv.value node:item];
             
             [fields addObject:key];
-            [values addObject:value];
+            
+            if (item.isCreditCard && [key isEqualToString:@"CardNumber"]) {
+                NSCharacterSet *nonDigitCharacterSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+                NSString *numbersOnlyString = [[value componentsSeparatedByCharactersInSet:nonDigitCharacterSet] componentsJoinedByString:@""];
+                [values addObject:numbersOnlyString];
+            } else {
+                [values addObject:value];
+            }
         }
     }
     

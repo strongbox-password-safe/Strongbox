@@ -31,7 +31,6 @@ struct TagsEditorView: View {
 }
 
 struct TagsList: View {
-    @State private var dummySelection = Set<String>()
     @State var currentItemTags: Set<String>
     @State var allTags: Set<String>
 
@@ -102,17 +101,14 @@ struct TagsList: View {
     }
 
     func removeTag(tag: String) {
-        dummySelection.removeAll()
         currentItemTags.remove(tag)
         dismissSearch()
     }
 
     func addTagToCurrentItemTags(tag: String) {
-        dummySelection.removeAll()
-
         let trimmed = trim(tag)
 
-        guard trimmed.count > 0, tag != kCanonicalFavouriteTag else {
+        guard trimmed.count > 0, trimmed != kCanonicalFavouriteTag else {
             return
         }
 
@@ -161,7 +157,7 @@ struct TagsList: View {
     }
 
     var body: some View {
-        List(selection: $dummySelection) {
+        List {
             if searchText.count > 0, !allTags.contains(trimmedSearchText), !trimmedSearchText.isEmpty {
                 createNewTagButton()
             }

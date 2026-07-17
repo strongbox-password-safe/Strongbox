@@ -12,7 +12,6 @@
 #import "Model.h"
 
 #ifndef IS_APP_EXTENSION
-
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 #import "GoogleDriveManager.h"
 #endif
@@ -20,6 +19,7 @@
 #endif
 
 #ifndef IS_APP_EXTENSION
+#import "MacCustomizationManager.h"
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
@@ -99,6 +99,7 @@ static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
 static NSString* const kUseParentGroupIconOnCreate = @"useParentGroupIconOnCreate";
 static NSString* const kStripUnusedIconsOnSave = @"stripUnusedIconsOnSave";
 static NSString* const kRunBrowserAutoFillProxyServer = @"runBrowserAutoFillProxyServer-Prod-22-Oct-2022";
+static NSString* const kBrowserAutoFillStrictSubdomainMatching = @"browserAutoFillStrictSubdomainMatching-08-Apr-2026";
 static NSString* const kQuitTerminatesProcessEvenInSystemTrayMode = @"quitTerminatesProcessEvenInSystemTrayMode";
 static NSString* const kLockDatabaseOnWindowClose = @"lockDatabaseOnWindowClose";
 static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock";
@@ -108,6 +109,8 @@ static NSString* const kConcealClipboardFromMonitors = @"concealClipboardFromMon
 static NSString* const kAutoCommitScannedTotp = @"autoCommitScannedTotp";
 static NSString* const kHideOnCopy = @"hideOnCopy";
 static NSString* const kHasPromptedForThirdPartyAutoFill = @"hasPromptedForThirdPartyAutoFill";
+
+static NSString* const kHasDismissedSettingsProUpsells = @"hasDismissedSettingsProUpsells-2026-07";
 static NSString* const kRunSshAgent = @"runSshAgent";
 
 static NSString* const kBusinessOrganisationName = @"businessOrganisationName";
@@ -156,13 +159,13 @@ static NSString* const kAssociatedWebsites = @"associatedWebsites";
 static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparator";
 static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownDigits";
 static NSString* const kShowOfflineOptionsOnLocalDeviceDatabases = @"showOfflineOptionsOnLocalDeviceDatabases";
+static NSString* const kDeleteDatabaseAfterXFailedUnlockAttempts = @"deleteDatabaseAfterXFailedUnlockAttempts";
 
 
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
 static NSString* const kAppLockDelay = @"appLockDelay2.0";
 static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferences";
-static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
 
 static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
@@ -713,6 +716,14 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
     [self setBool:kHasPromptedForThirdPartyAutoFill value:hasPromptedForThirdPartyAutoFill];
 }
 
+- (BOOL)hasDismissedSettingsProUpsells {
+    return [self getBool:kHasDismissedSettingsProUpsells fallback:NO];
+}
+
+- (void)setHasDismissedSettingsProUpsells:(BOOL)hasDismissedSettingsProUpsells {
+    [self setBool:kHasDismissedSettingsProUpsells value:hasDismissedSettingsProUpsells];
+}
+
 - (BOOL)hideOnCopy {
     return [self getBool:kHideOnCopy fallback:NO];
 }
@@ -783,6 +794,14 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
 
 - (void)setRunBrowserAutoFillProxyServer:(BOOL)runBrowserAutoFillProxyServer {
     [self setBool:kRunBrowserAutoFillProxyServer value:runBrowserAutoFillProxyServer];
+}
+
+- (BOOL)browserAutoFillStrictSubdomainMatching {
+    return [self getBool:kBrowserAutoFillStrictSubdomainMatching fallback:NO];
+}
+
+- (void)setBrowserAutoFillStrictSubdomainMatching:(BOOL)browserAutoFillStrictSubdomainMatching {
+    [self setBool:kBrowserAutoFillStrictSubdomainMatching value:browserAutoFillStrictSubdomainMatching];
 }
 
 - (BOOL)stripUnusedIconsOnSave {
@@ -1174,8 +1193,19 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
     return [self getBool:kPro];
 }
 
+
 - (void)setPro:(BOOL)value {
+    
+    
+    #ifndef IS_APP_EXTENSION
+    if (MacCustomizationManager.isAProBundle || MacCustomizationManager.isSetapp) {
+        [self setBool:kPro value:YES];
+    } else {
+        [self setBool:kPro value:value];
+    }
+    #else
     [self setBool:kPro value:value];
+    #endif
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotification object:nil];
 }
@@ -1318,6 +1348,15 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
 
 - (void)setShowHiddenDatabases:(BOOL)showHiddenDatabases {
     [self setBool:kShowHiddenDatabases value:showHiddenDatabases];
+}
+
+- (BOOL)deleteDatabaseAfterXFailedUnlockAttempts {
+    return NO;
+}
+
+- (void)setDeleteDatabaseAfterXFailedUnlockAttempts:(BOOL)deleteDatabaseAfterXFailedUnlockAttempts {
+    
+    [self setBool:kDeleteDatabaseAfterXFailedUnlockAttempts value:NO];
 }
 
 @end

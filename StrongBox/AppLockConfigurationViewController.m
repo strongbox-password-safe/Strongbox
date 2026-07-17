@@ -57,11 +57,11 @@
              formatAsIntervals:NO
                   currentValue:AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount
                     completion:^(BOOL success, NSInteger selectedValue) {
-                        if (success) {
-                            AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
-                        }
-                        [self bindAppLock];
-                    }];
+            if (success) {
+                AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
+            }
+            [self bindAppLock];
+        }];
     }
     else if (cell == self.cellAppLockDelay) {
         [self promptForInteger:NSLocalizedString(@"prefs_vc_app_lock_delay", @"App Lock Delay")

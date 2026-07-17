@@ -87,7 +87,7 @@ public class StrongboxCMarkGFMHelper: NSObject {
     public static func convertMarkdown(markdown: String, darkMode: Bool, disableMarkdown: Bool) throws -> String {
         if disableMarkdown {
             let lines = markdown.lines.map { line in
-                String(format: "<p>\(line.htmlStringEscaped)</p>")
+                "<p>\(line.htmlStringEscaped)</p>"
             }
 
             let markdownHtmlFragment = lines.joined()

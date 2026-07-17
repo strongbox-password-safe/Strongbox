@@ -179,7 +179,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
         super.init()
 
-        let config = MSALPublicClientApplicationConfig(clientId: OneDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
+        let config = MSALPublicClientApplicationConfig(clientId: OneDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive://foo/", authority: nil)
 
         do {
             defaultApplication = try MSALPublicClientApplication(configuration: config) 
@@ -688,7 +688,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
     
 
-    static let GraphBaseURL = "https:
+    static let GraphBaseURL = "https://graph.microsoft.com/v1.0"
 
     func getSharedWithMeFilesUrl() -> URL? {
         
@@ -1059,29 +1059,46 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
             throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
         }
 
-        let sites = try items.reduce(into: [String: String]()) { result, key in
-            guard let siteId = key["id"] as? String,
-                  let displayName = key["displayName"] as? String
-            else {
-                swlog("🔴 required fields id, displayName are not present")
-                throw OneDriveStorageProviderError.couldNotDeserializeExpectedJson
+        var sites: [String: String] = [:]
+
+        for site in items {
+            guard let site = site as? [String: AnyObject] else {
+                swlog("🔴 SharePoint site entry was not a dictionary")
+                continue
             }
 
-            result[siteId] = displayName
+            guard let siteId = site["id"] as? String else {
+                swlog("🔴 SharePoint site entry missing id")
+                continue
+            }
+
+            let displayName = site["displayName"] as? String
+            let resolvedDisplayName = ((displayName?.isEmpty == false) ? displayName : nil) ?? NSLocalizedString("generic_unknown", comment: "Unknown")
+
+            sites[siteId] = resolvedDisplayName
         }
 
         var combined: [StorageBrowserItem] = []
 
-        try await withThrowingTaskGroup(of: [StorageBrowserItem]?.self) { taskGroup in
+        await withTaskGroup(of: [StorageBrowserItem]?.self) { taskGroup in
             for site in sites {
                 taskGroup.addTask { [weak self] in
                     let siteId = site.key
                     let siteName = site.value
-                    return try await self?.getAllDrivesForSite(accountIdentifier: msalResult.account.identifier, viewController: viewController, siteId: siteId, siteName: siteName)
+                    guard let self else {
+                        return nil
+                    }
+
+                    do {
+                        return try await self.getAllDrivesForSite(accountIdentifier: msalResult.account.identifier, viewController: viewController, siteId: siteId, siteName: siteName)
+                    } catch {
+                        swlog("🔴 getAllDrivesForSite failed for siteId=%@ error=%@", siteId, String(describing: error))
+                        return nil
+                    }
                 }
             }
 
-            for try await result in taskGroup {
+            for await result in taskGroup {
                 if let result {
                     combined.append(contentsOf: result)
                 }
@@ -1304,7 +1321,7 @@ class OneDriveStorageProvider: NSObject, SafeStorageProvider {
 
             let authority = try? MSALAADAuthority(cloudInstance: .usGovernmentCloudInstance, audienceType: .azureADMultipleOrgsAudience, rawTenant: nil)
 
-            let config = MSALPublicClientApplicationConfig(clientId: OneDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive:
+            let config = MSALPublicClientApplicationConfig(clientId: OneDriveStorageProvider.clientID, redirectUri: "strongbox-twodrive://foo/", authority: authority)
 
             do {
                 application = try MSALPublicClientApplication(configuration: config) 

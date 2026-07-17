@@ -108,11 +108,11 @@ class TipJarViewController: NSViewController {
     }
 
     func onTerms() {
-        NSWorkspace.shared.open(URL(string: "https:
+        NSWorkspace.shared.open(URL(string: "https://strongboxsafe.com/terms/")!)
     }
 
     func onPrivacy() {
-        NSWorkspace.shared.open(URL(string: "https:
+        NSWorkspace.shared.open(URL(string: "https://strongboxsafe.com/privacy/")!)
     }
 
     func enableButtons(_ enable: Bool) {

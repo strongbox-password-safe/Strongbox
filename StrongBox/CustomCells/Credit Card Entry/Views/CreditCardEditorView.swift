@@ -4,6 +4,7 @@ import UIKit
 #endif
 
 struct CreditCardEditorView: View {
+    
     @StateObject private var viewModel: CreditCardEditorViewModel
     @State private var newCustomFieldKey = ""
     @State private var newCustomFieldValue = ""
@@ -11,6 +12,7 @@ struct CreditCardEditorView: View {
     @State private var showingAddCustomField = false
     @State private var editingCustomFieldIndex: Int? = nil
     @State private var editingOriginalCustomFieldKey: String? = nil
+    @State private var showingTagEditor = false
     
     @FocusState private var focusedField: CreditCardFocusField?
     
@@ -65,6 +67,17 @@ struct CreditCardEditorView: View {
                             customFieldRow(index: index)
                         }
                     }
+                }
+                
+                
+                Section("Tags") {
+                    Button {
+                        showingTagEditor = true
+                    } label: {
+                        tagsRow()
+                    }
+                    .disabled(!viewModel.isEditing)
+                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 
@@ -196,6 +209,14 @@ struct CreditCardEditorView: View {
                 focusedField = viewModel.focusFirstField()
             }
         }
+        .sheet(isPresented: $showingTagEditor, content: {
+            TagsEditorView(currentItemTags: viewModel.creditCardData.tags, allTags: viewModel.model?.tagSet ?? Set()) { cancelled, selectedTags in
+                showingTagEditor = false
+                if !cancelled {
+                    viewModel.onTagsEdited(tags: selectedTags ?? Set())
+                }
+            }
+        })
         .sheet(isPresented: $showingAddCustomField, onDismiss: resetCustomFieldFormState) {
             AddCustomFieldView(
                 key: $newCustomFieldKey,
@@ -331,6 +352,28 @@ private extension CreditCardEditorView {
         }
         .tappable(isTappable: !viewModel.isEditing) {
             copyToClipboard(value: fieldValue, message: "'\(fieldKey)' Copied")
+        }
+    }
+    
+    @ViewBuilder
+    func tagsRow() -> some View {
+        if viewModel.creditCardData.tags.isEmpty {
+            HStack {
+                Group {
+                    Image(.customTagFillBadgePlus)
+                        .foregroundStyle(.green, .blue)
+
+                    Text("item_details_tap_to_add_tags")
+                }
+                .padding(.vertical, 4)
+                
+                Spacer()
+            }
+            .frame(maxWidth: .infinity)
+            .contentShape(Rectangle())
+        } else {
+            let vm = TagsViewModel(tags: Array(viewModel.creditCardData.tags))
+            TagsView(viewModel: vm, useEasyReadFont: true)
         }
     }
 }

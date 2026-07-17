@@ -116,7 +116,7 @@ class BrowseTabViewController: UITabBarController {
     fileprivate func customizeUI() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-
+        
         tabBar.standardAppearance = appearance
         tabBar.scrollEdgeAppearance = appearance
     }

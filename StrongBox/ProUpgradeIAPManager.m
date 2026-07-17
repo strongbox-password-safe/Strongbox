@@ -107,7 +107,7 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
                                                object:nil];
 
     slog(@"🐱 Initialising RevenueCat");
-    
+
     
     [RCStrongboxBridge setOnFetchComplete:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kRevenueCatFetchCompleteNotification object:nil];
@@ -122,7 +122,12 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 
     
     [RCStrongboxBridge loadAppStoreProducts];
-
+    
+    
+    [self setIsFreeTrialAvailable:YES];
+    
+    
+   
 #else
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         slog(@"✅ ProUpgradeIAPManager::initialize - Loading Products and Checking Receipt for entitlements");
@@ -221,6 +226,16 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
     [RCStrongboxBridge performScheduledProEntitlementsCheckIfAppropriate];
 #else
     slog(@"🐞 performScheduledProEntitlementsCheckIfAppropriate");
+
+#if TARGET_OS_IOS
+    if ( CustomizationManager.isAProBundle ) {
+#elif TARGET_OS_MAC
+    if ( MacCustomizationManager.isAProBundle || MacCustomizationManager.isSetapp ) {
+#endif
+        slog(@"🐞 Pro edition - the bundle itself is the entitlement, no receipt check required.");
+        return;
+    }
+
     if (self.preferences.lastEntitlementCheckAttempt != nil) {
         NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
         NSDateComponents *components = [gregorian components:NSCalendarUnitDay
@@ -242,14 +257,12 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
         }
     }
     slog(@"🐞 Performing Scheduled Check of Entitlements...");
-    if (self.preferences.numberOfEntitlementCheckFails < 2) {
-        [self checkReceiptForTrialAndProEntitlements];
-    } else {
-        self.preferences.appHasBeenDowngradedToFreeEdition = YES;
-        self.preferences.hasPromptedThatAppHasBeenDowngradedToFreeEdition = NO;
-        self.preferences.numberOfEntitlementCheckFails = 0;
-        [self.preferences setPro:NO];
-    }
+
+    
+    
+    
+    
+    [self checkReceiptForTrialAndProEntitlements];
 #endif
 }
 
@@ -317,7 +330,7 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #if TARGET_OS_IOS
     if (CustomizationManager.isAProBundle) {
 #elif TARGET_OS_MAC
-    if (MacCustomizationManager.isAProBundle) {
+    if (MacCustomizationManager.isAProBundle || MacCustomizationManager.isSetapp) {
 #endif
         slog(@"Upgrading App to Pro as Receipt is Good and this is a Pro edition...");
         [self.preferences setPro:YES];
@@ -424,6 +437,16 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #endif
 }
 
+- (BOOL)hasSetapp {
+#if TARGET_OS_MAC && SETAPP
+    return YES;
+#elif defined(SUBSCRIPTIONS) && TARGET_OS_IOS
+    return [RCStrongboxBridge setappSubscription];
+#else
+    return NO;
+#endif
+}
+
 - (BOOL)hasActiveYearlySubscription {
 #if defined(SUBSCRIPTIONS)
     return [RCStrongboxBridge hasActiveYearlySubscription];
@@ -466,6 +489,77 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #endif
 }
 
+- (nullable NSString *)freeTrialDurationText {
+#if defined(SUBSCRIPTIONS)
+    
+    
+    return [RCStrongboxBridge freeTrialDurationText];
+#else
+    
+    return [self trialDurationTextForProduct:self.yearlyProduct];
+#endif
+}
+
+- (nullable NSString *)trialDurationTextForProduct:(SKProduct*)product {
+    if ( !product ) {
+        return nil;
+    }
+
+    SKProductDiscount* intro = product.introductoryPrice;
+    if ( !intro ) {
+        return nil;
+    }
+
+    if ( intro.paymentMode != SKProductDiscountPaymentModeFreeTrial &&
+         ![intro.price isEqual:NSDecimalNumber.zero] ) {
+        return nil;
+    }
+
+    SKProductSubscriptionPeriod* period = intro.subscriptionPeriod;
+    if ( !period ) {
+        return nil;
+    }
+
+    return [ProUpgradeIAPManager localizedDurationWithUnit:period.unit numberOfUnits:period.numberOfUnits];
+}
+
++ (nullable NSString *)localizedDurationWithUnit:(SKProductPeriodUnit)unit numberOfUnits:(NSInteger)numberOfUnits {
+    if ( numberOfUnits <= 0 ) {
+        return nil;
+    }
+
+    NSDateComponents* components = [[NSDateComponents alloc] init];
+    NSCalendarUnit allowedUnit = 0;
+
+    switch ( unit ) {
+        case SKProductPeriodUnitDay:
+            components.day = numberOfUnits;
+            allowedUnit = NSCalendarUnitDay;
+            break;
+        case SKProductPeriodUnitWeek:
+            components.weekOfMonth = numberOfUnits;
+            allowedUnit = NSCalendarUnitWeekOfMonth;
+            break;
+        case SKProductPeriodUnitMonth:
+            components.month = numberOfUnits;
+            allowedUnit = NSCalendarUnitMonth;
+            break;
+        case SKProductPeriodUnitYear:
+            components.year = numberOfUnits;
+            allowedUnit = NSCalendarUnitYear;
+            break;
+        default:
+            return nil;
+    }
+
+    NSDateComponentsFormatter* formatter = [[NSDateComponentsFormatter alloc] init];
+    formatter.allowedUnits = allowedUnit;
+    formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
+    formatter.maximumUnitCount = 1;
+
+    return [formatter stringFromDateComponents:components];
+}
+
 - (SKProduct *)lifeTimeProduct {
 #if defined(SUBSCRIPTIONS)
     return [RCStrongboxBridge lifeTimeProduct];
@@ -474,13 +568,11 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 #endif
 }
 
-- (BOOL)isFreeTrialAvailable {
+-(void)checkTrialEligibility {
 #if defined(SUBSCRIPTIONS)
-    return [RCStrongboxBridge isFreeTrialAvailable];
-#else
-    SKProduct* product = self.yearlyProduct;
-    SKProductDiscount* introPrice = product ? product.introductoryPrice : nil;
-    return (introPrice != nil) && [introPrice.price isEqual:NSDecimalNumber.zero];
+    [RCStrongboxBridge isFreeTrialAvailableWithCompletionHandler:^(BOOL trialEligible) {
+        [self setIsFreeTrialAvailable:trialEligible];
+    }];
 #endif
 }
 
@@ -488,17 +580,16 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 
 - (void)didUpdateSubscription:(BOOL)pro {
     #if TARGET_OS_MAC && !TARGET_OS_IOS
-    BOOL isPro = pro || MacCustomizationManager.isAProBundle;
+    BOOL isPro = pro || MacCustomizationManager.isAProBundle || MacCustomizationManager.isSetapp;
     slog(@"🔄 SubscriptionUpdate - didUpdateSubscription: isPro = %@ isProBundle = %@", pro ? @"YES" : @"NO", MacCustomizationManager.isAProBundle ? @"YES" : @"NO");
     #else
     BOOL isPro = pro || CustomizationManager.isAProBundle;
     slog(@"🔄 SubscriptionUpdate - didUpdateSubscription: isPro = %@ isProBundle = %@", pro ? @"YES" : @"NO", CustomizationManager.isAProBundle ? @"YES" : @"NO");
     #endif
 
-    
     [self.preferences setPro:isPro];
 
-    if (pro) {
+    if (isPro) {
         self.preferences.numberOfEntitlementCheckFails = 0;
         self.preferences.appHasBeenDowngradedToFreeEdition = NO;
     }
@@ -513,7 +604,7 @@ static NSString* const kYearly    = @"com.strongbox.markmcguill.upgrade.pro.year
 
 - (void)subscriptionStatusChanged:(NSNotification *)notification {
     #if TARGET_OS_MAC && !TARGET_OS_IOS
-    BOOL isPro = [notification.userInfo[@"isPro"] boolValue] || MacCustomizationManager.isAProBundle;
+    BOOL isPro = [notification.userInfo[@"isPro"] boolValue] || MacCustomizationManager.isAProBundle || MacCustomizationManager.isSetapp;
     #else
     BOOL isPro = [notification.userInfo[@"isPro"] boolValue] || CustomizationManager.isAProBundle;
     #endif

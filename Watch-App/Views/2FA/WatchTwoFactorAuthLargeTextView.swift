@@ -16,18 +16,18 @@ struct WatchTwoFactorAuthLargeTextView: View {
 
     var body: some View {
         VStack {
-            TwoFactorCodeView(totp: totp, updateMode: .automatic, easyReadSeparator: easyReadSeparator, isPro: isPro, limitNonPro: true, colorize: false)
+            TwoFactorCodeView(totp: totp, updateMode: .centralTimerNotification, easyReadSeparator: easyReadSeparator, isPro: isPro, limitNonPro: true, colorize: false)
 
             Spacer()
 
-            TwoFactorCodeCircularProgressView(totp: totp, radius: 80, updateMode: .automatic, hideCountdownDigits: hideCountdownDigits)
+            TwoFactorCodeCircularProgressView(totp: totp, radius: 80, updateMode: .centralTimerNotification, hideCountdownDigits: hideCountdownDigits)
                 .padding()
         }
     }
 }
 
 #Preview {
-    let otpAuthUrl = "otpauth:
+    let otpAuthUrl = "otpauth://totp/Timely:Kimberely%20Schimke?secret=2Y&algorithm=SHA1&digits=6&period=30&issuer=Timely"
     let token = OTPToken(url: URL(string: otpAuthUrl))!
 
     WatchTwoFactorAuthLargeTextView(totp: token, easyReadSeparator: true, isPro: true, hideCountdownDigits: true)

@@ -459,10 +459,25 @@ struct SearchResult: Identifiable {
         if DatabasesCollection.shared.isUnlocked(uuid: database.uuid) {
             return try await onLaunchDatabaseMainWindow()
         } else {
-            return await withCheckedContinuation { continuation in
-                DatabasesCollection.shared.initiateDatabaseUnlock(uuid: database.uuid, syncAfterUnlock: true) { _ in
-                    continuation.resume(returning: .refreshResults)
+            let unlocked = await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in
+                let lock = NSLock()
+                var resumed = false
+
+                DatabasesCollection.shared.initiateDatabaseUnlock(uuid: database.uuid, syncAfterUnlock: true) { success in
+                    lock.lock()
+                    defer { lock.unlock() }
+
+                    guard !resumed else { return }
+                    resumed = true
+
+                    continuation.resume(returning: success)
                 }
+            }
+
+            if unlocked {
+                return try await onLaunchDatabaseMainWindow()
+            } else {
+                return .refreshResults
             }
         }
     }

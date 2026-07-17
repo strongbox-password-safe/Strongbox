@@ -55,13 +55,13 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         
         
         static NSString * const kBusinessApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
-        static NSString * const kBusinessRedirectUri = @"https:
+        static NSString * const kBusinessRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
 
         
         
         [ODClient setActiveDirectoryAppId:kBusinessApplicationId
-                               resourceId:@"https:
-                              apiEndpoint:@"https:
+                               resourceId:@"https://graph.microsoft.com/"
+                              apiEndpoint:@"https://graph.microsoft.com/v1.0/me"
                               redirectURL:kBusinessRedirectUri];
         
 

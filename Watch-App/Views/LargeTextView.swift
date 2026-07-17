@@ -5,6 +5,7 @@
 //  Created by Strongbox on 14/12/2024.
 //  Copyright © 2024 Mark McGuill. All rights reserved.
 //
+
 import MarkdownUI
 import SwiftUI
 
@@ -125,7 +126,7 @@ struct LargeTextView: View {
     ##### Heading 5 - AutoLinks
     Autolink literals
 
-    www.example.com, https:
+    www.example.com, https://example.com, and contact@example.com.
 
     ###### Heading 6 - Footnotes
 

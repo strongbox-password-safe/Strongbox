@@ -25,7 +25,7 @@ extension View {
         modifier(SelfTimedTwoFactorUpdateListener(onUpdate: onUpdate))
     }
 
-    func twoFactorUpdater(mode: TwoFactorUpdateMode = .automatic, onUpdate: @escaping (() -> Void)) -> some View {
+    func twoFactorUpdater(mode: TwoFactorUpdateMode = .centralTimerNotification, onUpdate: @escaping (() -> Void)) -> some View {
         modifier(TwoFactorUpdateListener(mode: mode, onUpdate: onUpdate))
     }
 }
@@ -50,8 +50,9 @@ struct CentralTwoFactorUpdateListener: ViewModifier {
     let onUpdate: () -> Void
 
     func body(content: Content) -> some View {
+        let notificationName = NSNotification.Name.centralUpdateOtpUi
         content
-            .onReceive(NotificationCenter.default.publisher(for: .centralUpdateOtpUi, object: nil)) { _ in
+            .onReceive(NotificationCenter.default.publisher(for: notificationName, object: nil)) { _ in
                 onUpdate()
             }
     }

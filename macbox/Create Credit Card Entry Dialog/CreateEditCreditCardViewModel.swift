@@ -87,6 +87,8 @@ final class CreateEditCreditCardViewModel: ObservableObject {
 
     @Published var customFields: [(key: String, value: String, protected: Bool)] = []
 
+    private var customFieldsMarkedForRemoval: Set<String> = []
+
     var database: ViewModel
     var model: EntryViewModel?
     private var initialNodeId: UUID?
@@ -116,6 +118,7 @@ final class CreateEditCreditCardViewModel: ObservableObject {
         } else {
             createNewModel()
         }
+        syncCustomFieldsFromModel()
     }
 
     private func createNewModel() {
@@ -152,6 +155,7 @@ final class CreateEditCreditCardViewModel: ObservableObject {
         expiryDateString = ""
         validFromString = ""
         customFields.removeAll()
+        customFieldsMarkedForRemoval.removeAll()
         iconExplicitlyChanged = true
     }
 
@@ -192,6 +196,8 @@ final class CreateEditCreditCardViewModel: ObservableObject {
         expiryDate = parseDate(from: expiryString)
         expiryDateString = expiryString
 
+        correctLegacyMonthShift(model)
+
         let validFromValue = stringValue(for: CreditCardFieldKey.validFrom, in: node)?.value ?? ""
         validFromDate = parseDate(from: validFromValue)
         validFromString = validFromValue
@@ -200,21 +206,8 @@ final class CreateEditCreditCardViewModel: ObservableObject {
         icon = model.icon ?? node.icon ?? Self.getDefaultCreditCardIcon()
         iconExplicitlyChanged = false
 
-        customFields = additionalCustomFields(from: node)
-    }
-
-    private func additionalCustomFields(from node: Node) -> [(key: String, value: String, protected: Bool)] {
-        let orderedCustomFields = node.fields.customFields
-        let keys = orderedCustomFields.allKeys().compactMap { $0 as? NSString }
-        var results: [(String, String, Bool)] = []
-        for keyObj in keys {
-            let key = String(keyObj)
-            guard !Self.reservedFieldKeys.contains(key) else { continue }
-            guard let stringValue = orderedCustomFields[keyObj] as? StringValue else { continue }
-            let value = stringValue.value ?? ""
-            results.append((key: key, value: value, protected: stringValue.protected))
-        }
-        return results
+        syncCustomFieldsFromModel()
+        customFieldsMarkedForRemoval.removeAll()
     }
 
     func updateModel() {
@@ -236,7 +229,7 @@ final class CreateEditCreditCardViewModel: ObservableObject {
     private func updateCustomFieldsInModel() {
         guard let model = model else { return }
 
-        removeReservedCustomFields(from: model)
+        clearExistingCustomFields(from: model)
 
         setCustomField(CreditCardFieldKey.name, value: title, protected: false)
         setCustomField(CreditCardFieldKey.cardholderName, value: cardholderName, protected: false)
@@ -256,18 +249,18 @@ final class CreateEditCreditCardViewModel: ObservableObject {
             let field = CustomFieldViewModel.customField(withKey: customField.key, value: customField.value, protected: customField.protected)
             model.addCustomField(field)
         }
+
+        customFieldsMarkedForRemoval.removeAll()
     }
 
-    private func removeReservedCustomFields(from model: EntryViewModel) {
-        var indexesToRemove: [UInt] = []
-        for (index, field) in model.customFieldsFiltered.enumerated() {
-            if Self.reservedFieldKeys.contains(field.key) {
-                indexesToRemove.append(UInt(index))
-            }
-        }
+    private func clearExistingCustomFields(from model: EntryViewModel) {
+        let keysToRemove = model.customFieldsFiltered.map { $0.key } + Array(customFieldsMarkedForRemoval)
 
-        for index in indexesToRemove.sorted(by: >) {
-            model.removeCustomField(at: index)
+        let uniqueKeys = Set(keysToRemove)
+        for key in uniqueKeys {
+            while let index = model.customFieldsFiltered.firstIndex(where: { $0.key == key }) {
+                model.removeCustomField(at: UInt(index))
+            }
         }
     }
 
@@ -339,11 +332,16 @@ final class CreateEditCreditCardViewModel: ObservableObject {
             swlog("🔴 Attempted to add reserved credit card field key: \(trimmedKey)")
             return
         }
+        customFieldsMarkedForRemoval.remove(trimmedKey)
         customFields.append((key: trimmedKey, value: value, protected: protected))
     }
-    
+
     func removeCustomField(at index: Int) {
         guard index < customFields.count else { return }
+        let key = customFields[index].key
+        if !key.isEmpty {
+            customFieldsMarkedForRemoval.insert(key)
+        }
         customFields.remove(at: index)
     }
     
@@ -356,6 +354,31 @@ final class CreateEditCreditCardViewModel: ObservableObject {
             return
         }
         customFields[index] = (key: trimmedKey, value: value, protected: protected)
+    }
+
+    func removeCustomField(withKey key: String) {
+        let trimmedKey = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedKey.isEmpty else { return }
+        customFieldsMarkedForRemoval.insert(trimmedKey)
+        if let index = customFields.firstIndex(where: { $0.key == trimmedKey }) {
+            customFields.remove(at: index)
+        }
+    }
+
+    func syncCustomFieldsFromModel() {
+        guard let model else {
+            customFields = []
+            customFieldsMarkedForRemoval.removeAll()
+            return
+        }
+
+        customFields = model.customFieldsFiltered.map { field in
+            (key: field.key, value: field.value, protected: field.protected)
+        }
+
+        customFieldsMarkedForRemoval = Set(customFieldsMarkedForRemoval.filter { key in
+            customFields.contains { $0.key == key } == false
+        })
     }
     
     func setValidFromDate() {
@@ -410,44 +433,18 @@ final class CreateEditCreditCardViewModel: ObservableObject {
     }
 
     private func parseDate(from string: String) -> Date? {
-        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return nil }
+        CreditCardExpiryDateFormatting.parseDate(from: string)
+    }
 
-        let compact = trimmed.replacingOccurrences(of: " ", with: "")
-
-        let mmYYFormatter = DateFormatter()
-        mmYYFormatter.locale = Locale(identifier: "en_US_POSIX")
-        mmYYFormatter.dateFormat = "MM/yy"
-        if let date = mmYYFormatter.date(from: compact) {
-            return date
+    private func correctLegacyMonthShift(_ model: EntryViewModel) {
+        if let corrected = CreditCardExpiryDateFormatting.legacyMonthShiftCorrection(parsedExpiry: expiryDate, entryExpires: model.expires) {
+            expiryDate = corrected
+            expiryDateString = formatExpiryDateString(corrected)
         }
-
-        let mmYYYYFormatter = DateFormatter()
-        mmYYYYFormatter.locale = Locale(identifier: "en_US_POSIX")
-        mmYYYYFormatter.dateFormat = "MM/yyyy"
-        if let date = mmYYYYFormatter.date(from: compact) {
-            return date
-        }
-
-        let mediumFormatter = DateFormatter()
-        mediumFormatter.dateStyle = .medium
-        mediumFormatter.timeStyle = .none
-        return mediumFormatter.date(from: trimmed)
     }
 
     private func formatExpiryDateString(_ date: Date) -> String {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .current
-        let components = calendar.dateComponents([.month, .year], from: date)
-        if let month = components.month, let year = components.year {
-            let twoDigitYear = year % 100
-            return String(format: "%02d / %02d", month, twoDigitYear)
-        }
-
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "MM/yy"
-        return formatter.string(from: date)
+        CreditCardExpiryDateFormatting.format(date)
     }
 
     private func stringValue(for key: String, in node: Node) -> (value: String, protected: Bool)? {
@@ -479,6 +476,20 @@ final class CreateEditCreditCardViewModel: ObservableObject {
         node.fields.notes = notes
 
         ensureDefaultIcon(for: node)
+
+        let desiredCustomFieldKeys = Set(customFields.map { $0.key.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty })
+        let existingKeys: [String] = node.fields.customFields.allKeys().compactMap { key in
+            if let str = key as? String {
+                return str
+            } else if let nsStr = key as? NSString {
+                return String(nsStr)
+            }
+            return nil
+        }
+
+        for key in existingKeys where !Self.reservedFieldKeys.contains(key) && !desiredCustomFieldKeys.contains(key) {
+            node.fields.removeCustomField(key)
+        }
 
         for key in Self.reservedFieldKeys {
             node.fields.removeCustomField(key)

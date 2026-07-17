@@ -301,13 +301,13 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #else   
         /*
          typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {
-            UIViewAutoresizingNone                 = 0,         
-            UIViewAutoresizingFlexibleLeftMargin   = 1 << 0,    
-            UIViewAutoresizingFlexibleWidth        = 1 << 1,    
-            UIViewAutoresizingFlexibleRightMargin  = 1 << 2,    
-            UIViewAutoresizingFlexibleTopMargin    = 1 << 3,    
-            UIViewAutoresizingFlexibleHeight       = 1 << 4,    
-            UIViewAutoresizingFlexibleBottomMargin = 1 << 5     
+            UIViewAutoresizingNone                 = 0,         // 0
+            UIViewAutoresizingFlexibleLeftMargin   = 1 << 0,    // 1
+            UIViewAutoresizingFlexibleWidth        = 1 << 1,    // 2
+            UIViewAutoresizingFlexibleRightMargin  = 1 << 2,    // 4
+            UIViewAutoresizingFlexibleTopMargin    = 1 << 3,    // 8
+            UIViewAutoresizingFlexibleHeight       = 1 << 4,    // 16
+            UIViewAutoresizingFlexibleBottomMargin = 1 << 5     // 32
          };
          enum {
             NSViewNotSizable			=  0,

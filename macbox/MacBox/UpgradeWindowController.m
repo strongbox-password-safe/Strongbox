@@ -139,7 +139,7 @@ static UpgradeWindowController *sharedInstance = nil;
                          completion:^(int response) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( response == 0 ) {
-                [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"itms-apps:
+                [NSWorkspace.sharedWorkspace openURL:[NSURL URLWithString:@"itms-apps://apps.apple.com/app/strongbox-pro/id897283731"]];
                 [self onNoThanks:nil];
             }
             else if ( response == 1 ) {

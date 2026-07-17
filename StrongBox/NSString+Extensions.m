@@ -18,6 +18,27 @@ static NSString* const kLowerCaseTrue = @"true";
 static NSString* const kLowerCaseFalse = @"false";
 static NSString* const kLowerCaseNull = @"null";
 
+static NSCharacterSet* searchApostropheVariantCharacterSet(void) {
+    static NSCharacterSet* set;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        unichar chars[] = { 0x2018, 0x2019, 0x201B, 0x02BC, 0xFF07 };
+        NSString* string = [NSString stringWithCharacters:chars length:sizeof(chars) / sizeof(unichar)];
+        set = [NSCharacterSet characterSetWithCharactersInString:string];
+    });
+    
+    return set;
+}
+
+static NSString* normalizedApostrophesForSearch(NSString* string) {
+    if (string.length == 0) {
+        return string;
+    }
+    
+    return [[string componentsSeparatedByCharactersInSet:searchApostropheVariantCharacterSet()] componentsJoinedByString:@"'"];
+}
+
 @implementation NSString (Extensions)
 
 + (NSRegularExpression *)urlRegex {
@@ -29,7 +50,7 @@ static NSString* const kLowerCaseNull = @"null";
     
         
 
-        _regex = [NSRegularExpression regularExpressionWithPattern:@"^(([^:/?#]+):)?(
+        _regex = [NSRegularExpression regularExpressionWithPattern:@"^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?"
                                                            options:kNilOptions
                                                              error:&error];
 
@@ -285,6 +306,19 @@ static NSString* const kLowerCaseNull = @"null";
         return kStringSearchMatchTypeStartsWith;
     }
     
+    NSString* normalizedSelf = normalizedApostrophesForSearch(self);
+    NSString* normalizedSearchText = normalizedApostrophesForSearch(searchText);
+    if (![normalizedSelf isEqualToString:self] || ![normalizedSearchText isEqualToString:searchText]) {
+        if (normalizedSelf == normalizedSearchText || [normalizedSelf localizedCaseInsensitiveCompare:normalizedSearchText] == NSOrderedSame) {
+            return kStringSearchMatchTypeExact;
+        }
+        
+        NSRange normalizedRange = [normalizedSelf rangeOfString:normalizedSearchText options:NSCaseInsensitiveSearch | NSAnchoredSearch | NSDiacriticInsensitiveSearch];
+        if (normalizedRange.location != NSNotFound) {
+            return kStringSearchMatchTypeStartsWith;
+        }
+    }
+    
     BOOL contains = [self containsSearchString:searchText checkPinYin:checkPinYin];
     
     return contains ? kStringSearchMatchTypeContains : kStringSearchMatchTypeNoMatch;
@@ -299,6 +333,14 @@ static NSString* const kLowerCaseNull = @"null";
 
     if ( simple ) {
         return YES;
+    }
+    
+    NSString* normalizedSelf = normalizedApostrophesForSearch(self);
+    NSString* normalizedSearchText = normalizedApostrophesForSearch(searchText);
+    if (![normalizedSelf isEqualToString:self] || ![normalizedSearchText isEqualToString:searchText]) {
+        if ([normalizedSelf localizedStandardContainsString:normalizedSearchText]) {
+            return YES;
+        }
     }
     
     if ( !checkPinYin ) {

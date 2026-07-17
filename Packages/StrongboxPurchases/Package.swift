@@ -17,7 +17,7 @@ let package = Package(
     ],
     dependencies: [
         
-        .package(url: "https:
+        .package(url: "https://github.com/RevenueCat/purchases-ios.git", from: "5.1.0")
     ],
     targets: [
         
@@ -26,6 +26,10 @@ let package = Package(
             dependencies: [
                 .product(name: "RevenueCat", package: "purchases-ios")
             ]
+        ),
+        .testTarget(
+            name: "StrongboxPurchasesTests",
+            dependencies: ["StrongboxPurchases"]
         )
     ]
 )

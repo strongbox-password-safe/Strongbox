@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, class) BOOL isAProBundle;
 
+@property (readonly, class) BOOL isSetapp;
+
 @property (readonly, class) BOOL isUnifiedFreemiumBundle;
 
 @property (readonly, class) BOOL supportsTipJar;

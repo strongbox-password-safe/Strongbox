@@ -9,16 +9,16 @@
 import Cocoa
 
 class QuickSearchPalettePanel: NSPanel {
-    static let InitialRect = CGRect(x: 0, y: 0, width: 820, height: 40)
+    private static let initialRect = CGRect(x: 0, y: 0, width: 820, height: 40)
 
-    static let StyleMask: StyleMask = [.closable, .titled, .nonactivatingPanel, .fullSizeContentView, .resizable]
+    private static let panelStyleMask: NSWindow.StyleMask = [.closable, .titled, .nonactivatingPanel, .fullSizeContentView, .resizable]
 
     let model: QuickSearchViewModel
 
     init(model: QuickSearchViewModel) {
         self.model = model
 
-        super.init(contentRect: Self.InitialRect, styleMask: Self.StyleMask, backing: .buffered, defer: false)
+        super.init(contentRect: Self.initialRect, styleMask: Self.panelStyleMask, backing: .buffered, defer: false)
 
         minSize = CGSize(width: 400, height: 40)
 

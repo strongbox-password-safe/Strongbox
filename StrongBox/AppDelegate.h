@@ -15,5 +15,6 @@
 @property (nullable) NSDate* appLaunchTime;
 
 - (UIViewController*_Nullable)getVisibleViewController;
+- (void)updateSentryState;
 
 @end

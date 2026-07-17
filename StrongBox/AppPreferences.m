@@ -38,6 +38,7 @@ static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
+static NSString* const kSentryCrashReportingEnabled = @"sentryCrashReportingEnabled";
 
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kShowDatabaseIcon = @"showDatabaseIcon";
@@ -89,6 +90,8 @@ static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFail
 static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
 static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferences";
 
+static NSString* const kDeleteDatabaseAfterXFailedUnlockAttempts = @"deleteDatabaseAfterXFailedUnlockAttempts";
+
 static NSString* const kAppLockMode = @"appLockMode2.0";
 static NSString* const kAppLockPin = @"appLockPin2.0";
 static NSString* const kAppLockDelay = @"appLockDelay2.0";
@@ -109,6 +112,7 @@ static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupp
 static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
 
 static NSString* const kPromptedForSale = @"promptedForSale3";
+static NSString* const kSaleBannerDismissedForSale = @"saleBannerDismissedForSale1";
 static NSString* const kPinYinSearchEnabled = @"pinYinSearchEnabled";
 
 static NSString* const kLastKnownGoodDatabaseState = @"lastKnownGoodDatabaseState";
@@ -191,10 +195,12 @@ static NSString* const kAssociatedWebsites = @"associatedWebsites";
 static NSString* const kTwoFactorEasyReadSeparator = @"twoFactorEasyReadSeparator";
 static NSString* const kTwoFactorHideCountdownDigits = @"twoFactorHideCountdownDigits2";
 static NSString* const kAppleWatchIntegration = @"appleWatchIntegration";
-static NSString* const kLastDisplayedWhatsNewMessage = @"lastDisplayedWhatsNewMessage";
 static NSString* const kShowInteractiveAppleWatchSyncGuide = @"showInteractiveAppleWatchSyncGuide";
 
 static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
+
+static NSString* const kSearchLastUsedScope = @"searchLastUsedScope";
+static NSString* const kRememberSearchScope = @"rememberSearchScope";
 
 @implementation AppPreferences
 
@@ -243,14 +249,6 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
 
 - (void)setShowInteractiveAppleWatchSyncGuide:(BOOL)showInteractiveAppleWatchSyncGuide {
     [self setBool:kShowInteractiveAppleWatchSyncGuide value:showInteractiveAppleWatchSyncGuide];
-}
-
-- (NSInteger)lastDisplayedWhatsNewMessage {
-    return [self getInteger:kLastDisplayedWhatsNewMessage fallback:-1];
-}
-
-- (void)setLastDisplayedWhatsNewMessage:(NSInteger)lastDisplayedWhatsNewMessage {
-    [self setInteger:kLastDisplayedWhatsNewMessage value:lastDisplayedWhatsNewMessage];
 }
 
 
@@ -479,6 +477,39 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
 
 - (void)setZipExportBehaviour:(NSInteger)zipExportBehaviour {
     [self setInteger:kZipExportBehaviour value:zipExportBehaviour];
+}
+
+- (SearchScope)searchScope {
+    NSInteger raw = [self getInteger:kSearchLastUsedScope fallback:kSearchScopeAll];
+
+    if (raw < kSearchScopeTitle || raw > kSearchScopeAll) { 
+        [self setSearchScope:kSearchScopeAll];
+        return kSearchScopeAll;
+    }
+
+    return (SearchScope)raw;
+}
+
+- (void)setSearchScope:(SearchScope)searchScope {
+    [self setInteger:kSearchLastUsedScope value:searchScope];
+}
+
+- (BOOL)rememberSearchScope {
+    return [self getBool:kRememberSearchScope fallback:YES];
+}
+
+- (void)setRememberSearchScope:(BOOL)rememberSearchScope {
+    [self setBool:kRememberSearchScope value:rememberSearchScope];
+}
+
+- (SearchScope)initialSearchScope {
+    return self.rememberSearchScope ? self.searchScope : kSearchScopeAll;
+}
+
+- (void)persistSearchScopeIfEnabled:(SearchScope)scope {
+    if (self.rememberSearchScope) {
+        self.searchScope = scope;
+    }
 }
 
 - (BOOL)wiFiSyncHasRequestedNetworkPermissions {
@@ -873,6 +904,14 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
     [self setInteger:kPromptedForSale value:promptedForSale];
 }
 
+- (NSInteger)saleBannerDismissedForSale {
+    return [self getInteger:kSaleBannerDismissedForSale fallback:-1];
+}
+
+- (void)setSaleBannerDismissedForSale:(NSInteger)saleBannerDismissedForSale {
+    [self setInteger:kSaleBannerDismissedForSale value:saleBannerDismissedForSale];
+}
+
 - (PasswordStrengthConfig *)passwordStrengthConfig {
     NSData *encodedObject = [self.sharedAppGroupDefaults objectForKey:kPasswordStrengthConfig];
 
@@ -1086,6 +1125,7 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
 
 
 
+
 - (void)setPro:(BOOL)value {
     NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
     
@@ -1225,6 +1265,21 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
 
 - (void)setMonitorInternetConnectivity:(BOOL)monitorInternetConnectivity {
     [self setBool:kMonitorInternetConnectivity value:monitorInternetConnectivity];
+}
+
+- (BOOL)sentryCrashReportingEnabled {
+    NSNumber *stored = [self.sharedAppGroupDefaults objectForKey:kSentryCrashReportingEnabled];
+    if (stored == nil) {
+        BOOL defaultValue = (self.launchCount == 0);
+        [self setBool:kSentryCrashReportingEnabled value:defaultValue];
+        return defaultValue;
+    }
+
+    return stored.boolValue;
+}
+
+- (void)setSentryCrashReportingEnabled:(BOOL)sentryCrashReportingEnabled {
+    [self setBool:kSentryCrashReportingEnabled value:sentryCrashReportingEnabled];
 }
 
 - (BOOL)instantPinUnlocking {
@@ -1530,6 +1585,15 @@ static NSString* const kShowHiddenDatabases = @"showHiddenDatabases";
 - (void)setDeleteDataAfterFailedUnlockCount:(NSInteger)deleteDataAfterFailedUnlockCount {
     [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:deleteDataAfterFailedUnlockCount forKey:kDeleteDataAfterFailedUnlockCount];
     [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)deleteDatabaseAfterXFailedUnlockAttempts {
+    return NO;
+}
+
+- (void)setDeleteDatabaseAfterXFailedUnlockAttempts:(BOOL)deleteDatabaseAfterXFailedUnlockAttempts {
+    
+    [self setBool:kDeleteDatabaseAfterXFailedUnlockAttempts value:NO];
 }
 
 - (NSUInteger)failedUnlockAttempts {

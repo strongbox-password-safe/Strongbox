@@ -332,7 +332,15 @@
             self.freeTrialBadge.hidden = NO;
             fmt = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_year_with_free_trial_fmt", @"then %@ every year"), priceText];
             self.yearlyBonusLabel.hidden = YES;
-            self.labelFirstMonthsFree.hidden = NO;
+
+            NSString* trialDuration = ProUpgradeIAPManager.sharedInstance.freeTrialDurationText;
+            if ( trialDuration.length > 0 ) {
+                self.labelFirstMonthsFree.hidden = NO;
+                NSString* freeTrialFmt = NSLocalizedString(@"upgrade_vc_first_period_free_fmt", @"First %@ are free,");
+                self.labelFirstMonthsFree.text = [NSString stringWithFormat:freeTrialFmt, trialDuration];
+            } else {
+                self.labelFirstMonthsFree.hidden = YES;
+            }
         }
         else {
             self.freeTrialBadge.hidden = YES;
@@ -354,7 +362,16 @@
 
 
 - (IBAction)onLifer:(id)sender {
-    [self purchase:ProUpgradeIAPManager.sharedInstance.lifetimeProduct];
+    SKStoreProductViewController *vc = [[SKStoreProductViewController alloc] init];
+    
+    [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(1481853033) }
+                  completionBlock:^(BOOL result, NSError * _Nullable error) {
+        if (result) {
+            [self presentViewController:vc animated:YES completion:nil];
+        } else {
+            slog(@"loadProductWithParameters: result = %hhd, error = %@", result, error);
+        }
+    }];
 }
 
 - (IBAction)onRestorePurchase:(id)sender {
@@ -494,7 +511,7 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
 }
 
 - (IBAction)onFreeProComparisonChart:(id)sender {
-    [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https:
+    [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https://strongboxsafe.com/comparison/"]
                                      options:@{}
                            completionHandler:^(BOOL success) {
         if (!success) {
@@ -526,4 +543,3 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
 }
 
 @end
-

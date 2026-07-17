@@ -41,24 +41,7 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
                                 forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader,
                                 withReuseIdentifier: CustomAppIconSectionHeader.reuseIdentifier)
 
-
-
-        let allowedIcons: [CustomAppIcon] = [
-            .proBadge,
-            .regular,
-            .zero,
-            .black,
-            .bluey,
-            .iridescent,
-            .lightBlue,
-            .midnightFire,
-            .red,
-            .water,
-            .original,
-            .white,
-        ]
-
-        let grouped = Dictionary(grouping: allowedIcons, by: { $0.category })
+        let grouped = Dictionary(grouping: CustomAppIcon.selectableIcons, by: { $0.category })
         icons = CustomAppIconCategory.allCases.compactMap { grouped[$0] }
 
         let layout = UICollectionViewFlowLayout() 
@@ -139,7 +122,7 @@ class CustomAppIconViewController: UICollectionViewController, UICollectionViewD
     }
 
     func setTheIcon(_ icon: CustomAppIcon? = nil) {
-        UIApplication.shared.setAlternateIconName(icon?.plistKey) { [weak self] error in
+        UIApplication.shared.setAlternateIconName(icon?.alternateIconName) { [weak self] error in
             if let error {
                 swlog("🔴 Error setting alternate app icon [%@]", String(describing: error))
                 Alerts.error(self, error: error)

@@ -18,7 +18,7 @@
 @end
 
 static NSString *kApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
-static NSString *kRedirectUri = @"https:
+static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
 
 @implementation OneDriveForBusinessStorageProvider
 

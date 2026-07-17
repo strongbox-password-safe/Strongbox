@@ -276,6 +276,7 @@ extern NSString* const kAsyncUpdateStartingNotification;
 
 #ifndef IS_APP_EXTENSION 
 - (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString;
+- (NSArray<Node *> *)getAutoFillMatchingNodesForUrl:(NSString *)urlString subdomainMatching:(BOOL)subdomainMatching;
 #endif
 
 #if TARGET_OS_IOS
@@ -321,12 +322,19 @@ extern NSString* const kAsyncUpdateStartingNotification;
 @property (readonly, nullable) NSNumber* auditIssueCount;
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditHibpErrorCount;
+@property (readonly) NSArray<NSString*>* auditHibpErrorReasons;
 
 - (Node*)duplicateWithOptions:(NSUUID*)itemId
                         title:(NSString*)title
             preserveTimestamp:(BOOL)preserveTimestamp
             referencePassword:(BOOL)referencePassword
             referenceUsername:(BOOL)referenceUsername;
+
+- (BOOL)mergeNode:(Node *)source
+         intoNode:(Node *)destination
+mergeLocationChangedDate:(BOOL)mergeLocationChangedDate
+   includeHistory:(BOOL)includeHistory
+   allowOverwrite:(BOOL)allowOverwrite;
 
 
 

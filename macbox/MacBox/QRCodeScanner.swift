@@ -140,6 +140,9 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
             progressTotpCode.minValue = 0
             progressTotpCode.maxValue = totp.period
             progressTotpCode.doubleValue = remainingSeconds
+        } else {
+            labelTotpCode.stringValue = ""
+            progressTotpCode.doubleValue = 0
         }
     }
 
@@ -233,7 +236,7 @@ class QRCodeScanner: NSViewController, NSPopoverDelegate {
                 if let url = (string as NSString).urlExtendedParse {
 
 
-                    if let _ = OTPToken(url: url) {
+                    if OTPToken(url: url) != nil || IDMeOtpAuthImporter.canImport(url) {
 
 
 

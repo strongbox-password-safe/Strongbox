@@ -30,19 +30,30 @@ struct TwoFactorCodeCircularProgressView: View {
                 .foregroundStyle(totpColor.opacity(0.4))
 
             if #available(macOS 13.0, iOS 18.0, watchOS 11.0, *) {
-                Circle()
+                let progressCircle = Circle()
                     .trim(from: 0.0, to: min(totpProgress, 1.0))
                     .stroke(totpColor.gradient, style: StrokeStyle(lineWidth: circleStrokeWidth, lineCap: .round, lineJoin: .miter))
                     .rotationEffect(.degrees(270))
-                    .shadow(radius: 2)
+
+                #if os(macOS)
+                    progressCircle
                     .animation(.linear, value: totpProgress)
+                #else
+                    progressCircle
+                        .animation(.linear, value: totpProgress)
+                #endif
             } else {
-                Circle()
+                let progressCircle = Circle()
                     .trim(from: 0.0, to: min(totpProgress, 1.0))
                     .stroke(totpColor, style: StrokeStyle(lineWidth: circleStrokeWidth, lineCap: .round, lineJoin: .miter))
                     .rotationEffect(.degrees(270))
-                    .shadow(radius: 2)
-                    .animation(.linear, value: totpProgress)
+
+                #if os(macOS)
+                    progressCircle
+                #else
+                    progressCircle
+                        .animation(.linear, value: totpProgress)
+                #endif
             }
 
             if !hideCountdownDigits {
@@ -60,7 +71,6 @@ struct TwoFactorCodeCircularProgressView: View {
                 } else {
                     let secs = Text(totpSeconds)
                         .lineLimit(1)
-                        
                         .font(Font.custom("DSEG7ClassicMini-Bold", size: fontSize))
 
                     if totpSeconds.hasPrefix("1") {
@@ -73,7 +83,8 @@ struct TwoFactorCodeCircularProgressView: View {
         }
         .padding(radius / 10)
         .frame(width: radius, height: radius)
-        .animation(.default, value: totpSeconds)
+        
+        
         .onLoad { updateTotp() }
         .twoFactorUpdater(mode: updateMode, onUpdate: updateTotp)
     }
@@ -98,11 +109,11 @@ struct TwoFactorCodeCircularProgressView: View {
 #if DEBUG
     @available(iOS 16.0, *)
     #Preview {
-        let otpAuthUrl = "otpauth:
+        let otpAuthUrl = "otpauth://totp/Timely:Kimberely%20Schimke?secret=2Y&algorithm=SHA1&digits=6&period=30&issuer=Timely"
         let token = OTPToken(url: URL(string: otpAuthUrl))!
 
         return VStack {
-            TwoFactorCodeCircularProgressView(totp: token, radius: 50, updateMode: .automatic, hideCountdownDigits: true)
+            TwoFactorCodeCircularProgressView(totp: token, radius: 50, updateMode: .centralTimerNotification, hideCountdownDigits: true)
         }
     }
 #endif

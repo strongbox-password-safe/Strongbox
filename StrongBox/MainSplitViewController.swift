@@ -61,12 +61,24 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
         
 
         let browseTabController = BrowseTabViewController.fromStoryboard(model: model)
+        let tabContainer = TabContainerViewController(tabController: browseTabController)
         let emptyDetails = UIStoryboard(name: "EmptyDetails", bundle: nil).instantiateInitialViewController()!
-
-        viewControllers = [browseTabController, emptyDetails]
-
+        
+        
+        
+        
+        if #unavailable(iOS 26.0) {
+            let primaryVC = UIDevice.current.userInterfaceIdiom == .pad ? tabContainer : UIViewController()
+            setViewController(primaryVC, for: .primary)
+        } else {
+            setViewController(browseTabController, for: .primary)
+        }
+        
+        setViewController(browseTabController, for: .compact)
+        setViewController(emptyDetails, for: .secondary)
+        
         delegate = self
-        preferredDisplayMode = .oneBesideSecondary 
+        preferredDisplayMode = .oneBesideSecondary
 
         listenToNotifications()
 
@@ -249,6 +261,30 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
 
         return true
     }
+    
+    func splitViewControllerDidExpand(_ svc: UISplitViewController) {
+        swlog("splitViewController::didExpand")
+        
+        guard let primaryVC = self.viewController(for: .primary) as? BrowseTabViewController else { return }
+        
+        if let primaryNav = primaryVC.selectedViewController as? UINavigationController {
+            primaryNav.popToRootViewController(animated: false)
+        } else if primaryVC.presentedViewController != nil {
+            primaryVC.dismiss(animated: false)
+        }
+    }
+    
+    func splitViewController(_: UISplitViewController, topColumnForCollapsingToProposedTopColumn proposedTopColumn: UISplitViewController.Column) -> UISplitViewController.Column {
+        swlog("splitViewController::topColumnForCollapsingToProposedTopColumn proposed [%@]", String(describing: proposedTopColumn))
+        
+        if proposedTopColumn == .compact, UIDevice.current.userInterfaceIdiom == .pad {
+            
+            
+            return .primary
+        }
+        
+        return .compact
+    }
 
     func splitViewController(_: UISplitViewController, separateSecondaryFrom primaryViewController: UIViewController) -> UIViewController? {
         swlog("splitViewController::separateSecondaryFrom: [%@]", String(describing: primaryViewController))
@@ -290,7 +326,7 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     }
 
     func startOtpRefresh() {
-        NotificationCenter.default.post(name: .centralUpdateOtpUi, object: nil)
+        NotificationCenter.default.post(name: NSNotification.Name.centralUpdateOtpUi, object: nil)
 
         if !cancelOtpTimer {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
@@ -599,13 +635,33 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
     
 
     func begin2FAImport(otpAuthUrl: URL) {
-        guard let token = OTPToken(url: otpAuthUrl) else {
+        if let token = OTPToken(url: otpAuthUrl) {
+            begin2FAImport(token: token)
+        } else if IDMeOtpAuthImporter.canImport(otpAuthUrl) {
+            CrossPlatformDependencies.defaults().spinnerUi.show(NSLocalizedString("idme_totp_import_spinner_message", comment: "Importing ID.me 2FA..."),
+                                                                viewController: self)
+
+            IDMeOtpAuthImporter.importToken(fromActivationString: otpAuthUrl.absoluteString) { [weak self] token, error in
+                CrossPlatformDependencies.defaults().spinnerUi.dismiss()
+                guard let self else { return }
+
+                guard let token else {
+                    Alerts.info(self,
+                                title: NSLocalizedString("item_details_setup_totp_failed_title", comment: "Failed to Set TOTP"),
+                                message: error?.localizedDescription ?? NSLocalizedString("item_details_setup_totp_failed_message", comment: "Could not set TOTP because it could not be initialized."))
+                    return
+                }
+
+                self.begin2FAImport(token: token)
+            }
+        } else {
             Alerts.info(self,
                         title: NSLocalizedString("generic_error", comment: "Error"),
                         message: NSLocalizedString("invalid_otpauth_url", comment: "Invalid OTPAuth URL"))
-            return
         }
+    }
 
+    private func begin2FAImport(token: OTPToken) {
         let sortedGroups = AddOrCreateHelper.getSortedGroups(model)
         var sortedPaths = sortedGroups.map { AddOrCreateHelper.getGroupPathDisplayString($0, model.database) }
         let rootPath = AddOrCreateHelper.getGroupPathDisplayString(model.database.effectiveRootGroup, model.database, true)
@@ -758,5 +814,45 @@ class MainSplitViewController: UISplitViewController, UISplitViewControllerDeleg
                                                  icon: .watch)
             }
         }
+    }
+}
+
+final class TabContainerViewController: UIViewController {
+    private let tabVC: BrowseTabViewController
+
+    init(tabController: BrowseTabViewController) {
+        self.tabVC = tabController
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) { fatalError() }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        addChild(tabVC)
+        view.addSubview(tabVC.view)
+        tabVC.view.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            tabVC.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            tabVC.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            tabVC.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tabVC.view.topAnchor.constraint(equalTo: view.topAnchor),
+        ])
+
+        tabVC.didMove(toParent: self)
+        tabVC.view.layoutIfNeeded()
+        
+        
+        
+        
+        self.splitViewController?.displayModeButtonVisibility = .never
+        self.navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
+    
+    override func contentScrollView(for edge: NSDirectionalRectEdge) -> UIScrollView? {
+        tabVC.contentScrollView(for: edge)
     }
 }

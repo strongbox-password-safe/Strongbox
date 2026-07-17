@@ -11,6 +11,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_ENUM(NSInteger, GenericKeyValueTextSemantic) {
+    GenericKeyValueTextSemanticDefault = 0,
+    GenericKeyValueTextSemanticUsername,
+    GenericKeyValueTextSemanticEmailAddress,
+    GenericKeyValueTextSemanticURL,
+};
+
 @interface GenericKeyValueTableViewCell : UITableViewCell
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont;
@@ -42,6 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
                associatedWebsites:(NSArray<NSString*>*)associatedWebsites;
 
 - (void)pokeValue:(NSString *)value;
+
+- (void)configureTextInputForSemantic:(GenericKeyValueTextSemantic)semantic;
 
 @property (nonatomic, copy, nullable) void (^onEdited)(NSString* text);
 @property (nonatomic, copy, nullable) SuggestionProvider suggestionProvider;

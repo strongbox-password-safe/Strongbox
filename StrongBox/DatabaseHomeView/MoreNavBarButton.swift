@@ -24,8 +24,18 @@ struct MoreNavBarButton: View {
             })
             .disabled(model.database.isReadOnly)
 
-            Divider()
+            Button(action: {
+                model.onAddCreditCard()
+            }, label: {
+                HStack {
+                    Text("browse_context_menu_new_credit_card_entry")
+                    Image(systemName: "creditcard")
+                }
+            })
+            .disabled(model.database.isReadOnly)
 
+            Divider()
+            
             Button(action: {
                 model.presentSetMasterCredentials()
             }, label: {

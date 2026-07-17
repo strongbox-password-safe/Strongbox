@@ -108,10 +108,10 @@ class TipJarViewController: UITableViewController {
 
             TipJarLogic.sharedInstance.restorePrevious(completion: onPurchaseCompleted)
         } else if cell == cellPrivacyPolicy {
-            let url = URL(string: "https:
+            let url = URL(string: "https://strongboxsafe.com/privacy-policy")!
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         } else if cell == cellTermsOfUse {
-            let url = URL(string: "https:
+            let url = URL(string: "https://strongboxsafe.com/terms")!
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }

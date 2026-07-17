@@ -173,7 +173,7 @@ struct WizardAddToOrCreateNewView: View {
 }
 
 #Preview {
-    let database = MacDatabasePreferences.templateDummy(withNickName: "nick", storageProvider: .kLocalDevice, fileUrl: URL(string: "file:
+    let database = MacDatabasePreferences.templateDummy(withNickName: "nick", storageProvider: .kLocalDevice, fileUrl: URL(string: "file://path/myfile.txt")!, storageInfo: "{}")
 
     let dbModel = DatabaseModel()
     let model = Model(database: dbModel, metaData: database, forcedReadOnly: false, isAutoFill: false)!
